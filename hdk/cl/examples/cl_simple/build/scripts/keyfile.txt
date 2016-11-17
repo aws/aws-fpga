@@ -1,0 +1,21 @@
+`pragma protect version = 2
+`pragma protect encrypt_agent = "XILINX"
+`pragma protect encrypt_agent_info = "Xilinx Encryption Tool 2015"
+`pragma protect begin_commonblock
+`pragma protect control error_handling="delegated"
+`pragma protect end_commonblock
+`pragma protect begin_toolblock
+`pragma protect rights_digest_method="sha256"
+`pragma protect key_keyowner="Xilinx", key_method="rsa", key_keyname="xilinx_2015_12", key_public_key
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvMWecpwh9W0XzrDNLbLM
+Xhvjvidr+4e+pCwMymwssVLrhCC5MjHRDo4IUnYIHdOZtMSFu0VxyUaQdxEiv8kT
+bSDMg50jSRQvZs0QvTs6OvSyYEKHL+v/dcs9XO4MZZHCaosAon1VK2D+R+vA7g/s
+daCyvFP+uFcfGcFVVwtfTG+OPziFL4B9IfczjTzZFAjKzeFh6FEwdFd5xOWnwp0h
+IXXVrqaTlN9hhw9ktWwQ+WLBghG729blIyqR7w1NnxzESTDSScNXUHmYY2m2Vtf+
+e/szJL1PjANcFwGtBhbQHmYav7NdibGMGp9z9PQggEF/sUlvknA5SFMhvLISnIx9
+0QIDAQAB
+`pragma protect control xilinx_configuration_visible = "false"
+`pragma protect control xilinx_enable_modification = "false"
+`pragma protect control xilinx_enable_probing = "false"
+`pragma protect control decryption=(xilinx_activity==simulation) ? "false" : "true"
+`pragma protect end_toolblock=""
