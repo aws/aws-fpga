@@ -1,9 +1,8 @@
 # Starting your own Custom Logic
 
 The developer has two ways to start a new Custom Logic design:
-*1) Copy one of the example directory from /hdk/cl/example
-or
-*2) Call `sh prepare_new_cl.sh`
+ 1) Copy one of the example directory from /hdk/cl/example, or
+ 2) Call `sh prepare_new_cl.sh`
 
 In both cases, the developer should
 *A) Set the environment variable CL_DIR pointing to directory where the CL is
