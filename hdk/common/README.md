@@ -26,8 +26,8 @@ It also includes a simple model of the
 
 Includes the mandatory timing constrains files required by AWS under `/common/build/constrains`.
 
-The '/common/build/scripts' have auxilary scripts that would be used during the CL build
+The `/common/build/scripts` have auxilary scripts that would be used during the CL build
 
-The '/common/build/checkpoints' have the checkpoint for AWS Shell, that is used during the developer's CL build process since the final AFI is built out of CL + AWS Shell.
+The `/common/build/checkpoints` have the checkpoint for AWS Shell, that is used during the developer's CL build process since the final AFI is built out of CL + AWS Shell.
 
 
