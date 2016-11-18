@@ -24,7 +24,7 @@ file copy -force $CL_DIR/design/cl_int_tst.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/mem_scrb.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_tst_scrb.sv $CL_DIR/build/src_post_encryption
 
-encrypt -k $HDK_COMMON_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
+encrypt -k $HDK_COMMON_DIR/vivado_keyfile.txt -lang verilog \
 $CL_DIR/build/src_post_encryption/cl_simple_defines.vh \
 $CL_DIR/build/src_post_encryption/cl_simple.sv \
 $CL_DIR/build/src_post_encryption/cl_tst.sv  \
