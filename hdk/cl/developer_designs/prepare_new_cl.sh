@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # TODO
 # Check if /build and /design directories exist, abort
 # Check if $HDK_COMMON_DIR exist
