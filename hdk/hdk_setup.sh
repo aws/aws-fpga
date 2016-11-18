@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export HDK_DIR=${HDK_DIR:=`pwd`}
 
 # The next variable should not be modified and should always point to the /common directory that's provided by HDK
