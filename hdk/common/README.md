@@ -21,3 +21,7 @@ It also includes a simple model of the
 ## /lib 
 
 [DOCNOTE - winefred: i dont know what you wanted to have in this /lib, but all the files look the same and have a lot of encryption keys]
+
+## /build
+
+Includes the mandatory timing constrains files required by AWS under `/constrains`
