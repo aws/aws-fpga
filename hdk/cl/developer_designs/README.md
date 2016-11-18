@@ -4,7 +4,7 @@ The developer has two ways to start a new Custom Logic design:
 
  1) Copy one of the example directory from /hdk/cl/example, or
  
- 2) Call `sh prepare_new_cl.sh`
+ 2) Call `./prepare_new_cl.sh`
 
 In both cases, the developer should
 
