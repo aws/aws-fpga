@@ -6,25 +6,30 @@
 ## encrypt.tcl: Encrypt source code files
 ## =============================================================================
 
+# TODO:
+# Add check if CL_DIR and AWS_HDK_COMMON directories exist
+# Add check if /build and /build/src_port_encryption directories exist
+# Add check if the vivado_keyfile exist
+
 ##Convenience to set the root of the RTL directory
 #set RTL_ORIGIN ../../../rtl
 
-#---- User would replae this section with design files ----
+#---- Developr would replace this section with design files ----
 
-## Change file names and paths below to reflect your user area.  DO NOT include AWS RTL files.
-file copy -force $RTL_ORIGIN/cl/cl_simple_defines.vh ../src_post_encryption
-file copy -force $RTL_ORIGIN/cl/cl_simple.sv ../src_post_encryption
-file copy -force $RTL_ORIGIN/cl/cl_tst.sv ../src_post_encryption
-file copy -force $RTL_ORIGIN/cl/cl_int_tst.sv ../src_post_encryption
-file copy -force $RTL_ORIGIN/cl/mem_scrb.sv ../src_post_encryption
-file copy -force $RTL_ORIGIN/cl/cl_tst_scrb.sv ../src_post_encryption
+## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.
+file copy -force $CL_DIR/design/cl_simple_defines.vh $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_simple.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_tst.sv .$CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_int_tst.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/mem_scrb.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_tst_scrb.sv $CL_DIR/build/src_post_encryption
 
-encrypt -k keyfile.txt -lang verilog \
-../src_post_encryption/cl_simple_defines.vh \
-../src_post_encryption/cl_simple.sv \
-../src_post_encryption/cl_tst.sv  \
-../src_post_encryption/mem_scrb.sv  \
-../src_post_encryption/cl_tst_scrb.sv  \
-../src_post_encryption/cl_int_tst.sv  
+encrypt -k $HDK_COMMON_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
+$CL_DIR/build/src_post_encryption/cl_simple_defines.vh \
+$CL_DIR/build/src_post_encryption/cl_simple.sv \
+$CL_DIR/build/src_post_encryption/cl_tst.sv  \
+$CL_DIR/build/src_post_encryption/mem_scrb.sv  \
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv  \
+$CL_DIR/build/src_post_encryption/cl_int_tst.sv  
 
-#---- End of section replaced by User ---
+#---- End of section replaced by Developr ---
