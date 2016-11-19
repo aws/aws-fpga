@@ -1,6 +1,6 @@
 #!/bin/sh
 
-vivado -mode batch -source init_github.tcl
+vivado -mode batch -source $HDK_COMMON_DIR/verif/scripts/init.tcl
 
 cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/arch_defines.v              ./models/ddr4_model/
 cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/arch_package.sv              ./models/ddr4_model/
