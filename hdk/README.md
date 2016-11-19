@@ -6,11 +6,11 @@
 
 AWS FPGA HDK is the official AWS HDK for programming FPGA on AWS EC2 and generating Amazon FPGA Image (AFI)
 
-Check out our [release notes](https://github.com/aws/aws-fpga/hdk/release_notes.md) for information about the latest bug fixes, updates, and features added to the HDK.
+Check out our [release notes](./release_notes.md) for information about the latest bug fixes, updates, and features added to the HDK.
 
 ## Overview
 
-AWS FPGA HDK includes all design files and scripts needed to generate an Amazon FPGA Image (AFI). Developers can download it and use it in their preferred design environment. AWS do offer an AMI with the needed tools to develop, simulate and compile called `FPGA Developer AMI`  on [AWS Marketplace](aws.amazon.com/marketplace) 
+AWS FPGA HDK includes all design files and scripts needed to generate an Amazon FPGA Image (AFI). Developers can download it and use it in their preferred design environment. AWS do offer an AMI with the needed tools to develop, simulate and compile called `FPGA Developer AMI`  on [AWS Marketplace](https://aws.amazon.com/marketplace) 
 
 ## Installion
 
@@ -20,8 +20,8 @@ after installing, go the root directory of the HDK and call â€˜sh hdk_setup.shâ€
 
 ## Content
 
-The /doc directory have a step by step walkthrough how to use the HDK
+The [/doc](./doc) directory have a step by step walkthrough how to use the HDK
 
-The /cl directory is where the Custom Logic is expected to be developed, it includes a set of examples under `hdk/cl/examples`, as well as a placeholder for developer's own Custom Logic under `hdk/cl/developer_design`.  Please refer to 
+The [Custom Logic (cl)](./cl) directory is where the Custom Logic is expected to be developed, it includes a set of [examples directory](./cl/examples), as well as a placeholder for developer's own Custom Logic under [developers_design directory] (./cl/developers_design).  
 
-The /common directory include AWS-provided scripts, timing constrains and compile settings required during the AFI generation process. Developers should not change these files
+The [common directory] (./common) include AWS-provided scripts, timing constrains and compile settings required during the AFI generation process. Developers should not change these files
