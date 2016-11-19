@@ -13,11 +13,11 @@ Please click the "Watch" botton in github upper right corner to stay updated.
 
 The HDK directory includes the development environment, simulation, build and AFI creation scripts, and recommended for developers wanting to start building Amazon FPGA Images (AFI).  The HDK can be installed in any server or EC2 instance. AWS recommend to developers to use the [FPGA Developer AMI on AWS Marketplace place](https//aws.amazon.com/marketplace/AmazonFPGAAmi) and install the HDK there. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI.
 
-Call [`source ./hdk_setup.sh`](.hdk_setup.sh)] to setup the environment variables needed for the rest of the HDK scripts to work.
+Call [`source ./hdk_setup.sh`](./hdk_setup.sh) to setup the environment variables needed for the rest of the HDK scripts to work.
 
 ## FPGA SDK
 
-The SDK directory includes the drivers and runtime environment required by any EC2 Instance running on F1. It has the drivers and tools to interact with a pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI design and build process, they are only required once you load the AFI into an F1 instance.
+The [SDK directory](./sdk) includes the drivers and runtime environment required by any EC2 Instance running on F1. It has the drivers and tools to interact with a pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI design and build process, they are only required once you load the AFI into an F1 instance.
 
 
 
