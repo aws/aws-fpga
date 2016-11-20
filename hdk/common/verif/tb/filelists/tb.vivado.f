@@ -14,9 +14,9 @@
 
 $XILINX_VIVADO/data/verilog/src/glbl.v
 
--f $COMNOM_VERIF/tb/scripts/ddr.vivado.f
+-f ${HDK_COMMON_DIR}/verif/tb/filelists/ddr.vivado.f
 
-$COMNOM_VERIF/models/sh_bfm/sh_bfm.sv
-$COMMON_VERIF/tb/sv/tb.sv
+${HDK_COMMON_DIR}/verif/models/sh_bfm/sh_bfm.sv
+${HDK_COMMON_DIR}verif/tb/sv/tb.sv
 
 

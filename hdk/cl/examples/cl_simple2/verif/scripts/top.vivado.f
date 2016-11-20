@@ -4,7 +4,7 @@
 ## Restricted NDA Material
 ## =============================================================================
 
--f $COMNOM_VERIF/tb/scripts/tb.vivado.f
+-f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
-$CL_ROOT/design/cl/cl_simple.sv
-$CL_ROOT/verif/tests/test_peek_poke.sv
+${CL_ROOT}/design/cl/cl_simple.sv
+${CL_ROOT}/verif/tests/test_peek_poke.sv
