@@ -1,5 +1,11 @@
+   // TODO - put header
+
+// This file includes the entire list of interfaces between AWS shell (sh) and Custom Logic (cl)
+// Most signals are "ACTIVE HIGH", i.e. value of 1'b1 means they are true/asserted and value of 1'b0 means they are false/deasserted
+// signals with _n suffix are "ACTIVE LOW"
+
    //--------------------------------
-   // Globals
+   // Global singlas
    //--------------------------------
    input clk,                                //250MHz clock 
    input rst_n,                              //Reset sync to 250MHz clock
@@ -7,24 +13,26 @@
    input clk_xtra,                           // Free running 125MHz clock
    input rst_xtra_n,
 
-   input sh_cl_flr_assert,
+   input sh_cl_flr_assert,                   // A signal set when the PCIe Application PF gets Function Level Reset (FLR) 
+                                             // from host through PCIe
    output logic cl_sh_flr_done,
          
-   output logic[31:0] cl_sh_status0,
-   output logic[31:0] cl_sh_status1,
-   output logic[31:0] cl_sh_id0,
-   output logic[31:0] cl_sh_id1,
+   output logic[31:0] cl_sh_status0,         // RESERVED FOR FUTURE USE
+   output logic[31:0] cl_sh_status1,         // RESERVED FOR FUTURE USE
+   output logic[31:0] cl_sh_id0,             // RESERVED FOR FUTURE USE
+   output logic[31:0] cl_sh_id1,             // RESERVED FOR FUTURE USE
 
-   input[31:0] sh_cl_ctl0,
-   input[31:0] sh_cl_ctl1,
+   input[31:0] sh_cl_ctl0,                   // RESERVED FOR FUTURE USE
+   input[31:0] sh_cl_ctl1,                   // RESERVED FOR FUTURE USE
 
    input[1:0] sh_cl_pwr_state,               //Power state, 2'b00: Normal, 2'b11: Critical
+                                             // Developer can ignore these signals
 
    //------------------------------------------------------------------------------------------
    // PCL Slave interface (AXI-4)
    //    AXI slave interface per PCIe interface.   This is for PCIe transactions
-   //    mastered from the Host targetting the CL (MMIO access)
-   //
+   //    mastered from the Host targetting the CL (MMIO access), or 
+   //    PCIe transactions mastered from other FPGAs targeting this CL
    //------------------------------------------------------------------------------------------
    input[63:0] sh_cl_pcis_awaddr[NUM_PCIE-1:0],
    input[4:0] sh_cl_pcis_awid[NUM_PCIE-1:0],
@@ -60,8 +68,10 @@
    // PCIe Master interface from CL
    //
    //    AXI-4 master interface per PCIe interface.  This is for PCIe transactions mastered
-   //    from the HL targetting the host (DMA access to host).  Standard AXI-4 interface.
-   //    the user[9:0] signals are the length of the transaction in DW.
+   //    from the CL targetting the host or other FPGAs on the same PCIe Fabric.  
+   //    Its a standard AXI-4 interface except that awuser signals is required to pass
+   //    the length of the transaction in DW (32-bit) as well as the byte-enable bit-mask for the first 
+   //    and last DW. Please refer to AWS Shell Interface specifications
    //-------------------------------------------------------------------------------------------
    output logic[4:0] cl_sh_pcim_awid[NUM_PCIE-1:0],
    output logic[63:0] cl_sh_pcim_awaddr[NUM_PCIE-1:0],
@@ -85,7 +95,7 @@
    output logic[4:0] cl_sh_pcim_arid[NUM_PCIE-1:0],
    output logic[63:0] cl_sh_pcim_araddr[NUM_PCIE-1:0],
    output logic[7:0] cl_sh_pcim_arlen[NUM_PCIE-1:0],
-   output logic[18:0] cl_sh_pcim_aruser[NUM_PCIE-1:0],               //Length in DW of the transaction
+   output logic[18:0] cl_sh_pcim_aruser[NUM_PCIE-1:0],               //Length in DW, refer to AWS Shell specification
    output logic[NUM_PCIE-1:0] cl_sh_pcim_arvalid,
    input[NUM_PCIE-1:0] sh_cl_pcim_arready,
    
@@ -96,18 +106,21 @@
    input[NUM_PCIE-1:0] sh_cl_pcim_rvalid,
    output logic[NUM_PCIE-1:0] cl_sh_pcim_rready,
 
-   input[1:0] cfg_max_payload[NUM_PCIE-1:0],                      //Max payload size - 00:128B, 01:256B, 10:512B
-   input[2:0] cfg_max_read_req[NUM_PCIE-1:0]                      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   input[1:0] cfg_max_payload[NUM_PCIE-1:0],                      //PCIe Max payload size - 00:128B, 01:256B (Default), 10:512B
+   input[2:0] cfg_max_read_req[NUM_PCIE-1:0]                      //PCIe Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
    
    //-----------------------------------------------------------------------------------------------
    // DDR-4 Interface 
    //
-   //    x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in HL)
+   //  There are 3 DDR controllers that get instantiated in CL (DDR Interface A, B and D).  
+   //  The fourth DDR (Interface C) is in shell, due to resource optimization considerations
+   //  These are the signals physical I/O interface definition and connects directly to the 
+   //  DRAM Controllers (DDRC)
    //-----------------------------------------------------------------------------------------------
 `ifndef NO_CL_DDR
   ,
-// ------------------- DDR4 x72 RDIMM 2100 Interface A ----------------------------------
+// ------------------- DDR4 x72 RDIMM Interface A ----------------------------------
    input                CLK_300M_DIMM0_DP,
    input                CLK_300M_DIMM0_DN,
    output               M_A_ACT_N,
@@ -126,7 +139,7 @@
    inout  [17:0]        M_A_DQS_DP,
    inout  [17:0]        M_A_DQS_DN,
 
-// ------------------- DDR4 x72 RDIMM 2100 Interface B ----------------------------------
+// ------------------- DDR4 x72 RDIMM Interface B ----------------------------------
    input                CLK_300M_DIMM1_DP,
    input                CLK_300M_DIMM1_DN,
    output               M_B_ACT_N,
@@ -146,7 +159,7 @@
    inout  [17:0]        M_B_DQS_DN,
 
 
-// ------------------- DDR4 x72 RDIMM 2100 Interface D ----------------------------------
+// ------------------- DDR4 x72 RDIMM Interface D ----------------------------------
    input                CLK_300M_DIMM3_DP,
    input                CLK_300M_DIMM3_DN,
    output               M_D_ACT_N,
@@ -235,6 +248,8 @@
          
 `endif // !`ifndef NO_XDMA
     
+   // Some FPGA designs may have high-speed Serial HMC memory
+   // Please contact AWS if you are interested in using HMC
 
 `ifdef HMC_PRESENT
    ,
@@ -332,7 +347,7 @@
    output logic[7:0] aurora_sh_stat_int
 
    //--------------------------------
-   // Debug bridge
+   // Debug bridge to support chipscope
    //--------------------------------
    `ifdef ENABLE_CS_DEBUG
    ,

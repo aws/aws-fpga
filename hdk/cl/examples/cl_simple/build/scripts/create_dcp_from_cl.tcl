@@ -13,14 +13,13 @@
 #################################################
 
 #Convenience to set the root of the RTL directory
-set RTL_ORIGIN ../../../rtl
 set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
 source encrypt.tcl
 
 #This sets the Device Type
-source ./device_type.tcl
+source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 
 create_project -in_memory -part [DEVICE_TYPE] -force
 
@@ -34,43 +33,40 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
 read_verilog {
-   ../src/cl_simple_defines.vh
+   $CL_DIR/src_post_encryption/cl_simple_defines.vh
 }
 set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
 set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog {
-../src/cl_simple.sv
-../src/cl_tst.sv
-../src/cl_int_tst.sv
-../src/mem_scrb.sv
-../src/cl_tst_scrb.sv
+$CL_DIR/src_post_encryption/cl_simple.sv
+$CL_DIR/src_post_encryption/cl_tst.sv
+$CL_DIR/src_post_encryption/cl_int_tst.sv
+$CL_DIR/src_post_encryption/mem_scrb.sv
+$CL_DIR/src_post_encryption/cl_tst_scrb.sv
 }
 
 #---- End of section replaced by User ----
 
 #Read AWS Design files
 read_verilog [ list \
-$RTL_ORIGIN/lib/flop_fifo.sv \
-$RTL_ORIGIN/lib/flop_fifo_in.sv \
-$RTL_ORIGIN/lib/bram_2rw.sv \
-$RTL_ORIGIN/lib/flop_ccf.sv \
-$RTL_ORIGIN/lib/ccf_ctl.v \
-$RTL_ORIGIN/lib/sync.v \
-$RTL_ORIGIN/lib/axi4_ccf.sv \
-$RTL_ORIGIN/lib/axi4_flop_fifo.sv \
-$RTL_ORIGIN/lib/lib_pipe.sv \
-$RTL_ORIGIN/mgt/mgt_acc_ccf.sv \
-$RTL_ORIGIN/mgt/mgt_acc_axl.sv  \
-$RTL_ORIGIN/mgt/mgt_gen_axl.sv  \
-$RTL_ORIGIN/cl/cl_ports.vh \
-$RTL_ORIGIN/sh/sh_ddr.sv
+$HDK_SHELL_DIR/design/lib/flop_fifo.sv \
+$HDK_SHELL_DIR/design/lib/flop_fifo_in.sv \
+$HDK_SHELL_DIR/design/lib/bram_2rw.sv \
+$HDK_SHELL_DIR/design/lib/flop_ccf.sv \
+$HDK_SHELL_DIR/design/lib/ccf_ctl.v \
+$HDK_SHELL_DIR/design/lib/sync.v \
+$HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
+$HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
+$HDK_SHELL_DIR/design/lib/lib_pipe.sv \
+$HDK_SHELL_DIR/design/cl/cl_ports.vh \
+$HDK_SHELL_DIR/design/sh/sh_ddr.sv
 ]
 
 #Read DDR IP
 read_ip {
-../ip/ddr4_core/ddr4_core.xci
+$HDL_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 }
 
 #Note Developer can add IP 
@@ -82,10 +78,10 @@ read_ip {
 #  ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 #  cl_synt_user.xdc - User constraints.  User can add constraints to this file (or include more constraints as needed)
 read_xdc {
-   ../constraints/cl_synth_aws.xdc
-   ../constraints/cl_clocks_aws.xdc
-   ../constraints/ddr.xdc
-   ../constraints/cl_synth_user.xdc
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc
+   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc
+   $HDK_SHELL_DIR/build/constraints/ddr.xdc
+   $HDK_SHELL_DIR/build/constraints/cl_synth_user.xdc
 }
 
 #Do not propagate local clock constraints for clocks generated in the SH
@@ -99,35 +95,35 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
 opt_design -verbose -directive Explore
-check_timing -file ../reports/cl.synth.check_timing_report.txt
-report_timing_summary -file ../reports/cl.synth.timing_summary.rpt
-write_checkpoint -force ../checkpoints/CL.post_synth_opt.dcp
+check_timing -file $CL_DIR/build/reports/${timestamp}.cl.synth.check_timing_report.txt
+report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.synth.timing_summary.rpt
+write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 close_design
 
 #######################
 # Implementation
 #######################
 #Read in the Shell checkpoint and do the CL implementation
-open_checkpoint ../checkpoints/from_aws/SH_CL_BB_routed.dcp
-read_checkpoint -strict -cell CL ../checkpoints/CL.post_synth_opt.dcp
+open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 
-#Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from SH)
+#Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
 read_xdc {
-../constraints/cl_pnr_aws.xdc
-../constraints/cl_pnr_user.xdc
-../constraints/ddr.xdc
+$CL_DIR/build/constraints/cl_pnr_aws.xdc
+$CL_DIR/build/constraints/cl_pnr_user.xdc
+$CL_DIR/build/constraints/ddr.xdc
 }
 
 opt_design -verbose -directive Explore
-check_timing -file ../reports/SH_CL.check_timing_report.txt
+check_timing -file $CL_DIR/build/reports/${timestamp}.SH_CL.check_timing_report.txt
 
 #place_design -verbose -directive Explore
 place_design -verbose -directive WLDrivenBlockPlacement
-write_checkpoint -force ../checkpoints/SH_CL.post_place.dcp
+write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
 phys_opt_design -verbose -directive Explore
-report_timing_summary -file ../reports/cl.post_place_opt.timing_summary.rpt
-write_checkpoint -force ../checkpoints/SH_CL.post_place_opt.dcp
+report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.post_place_opt.timing_summary.rpt
+write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place_opt.dcp
 
 #route_design  -verbose -directive Explore
 route_design  -verbose -directive MoreGlobalIterations
@@ -136,16 +132,16 @@ phys_opt_design -verbose -directive Explore
 
 lock_design -level routing
 
-report_timing_summary -file ../reports/SH_CL.post_route_opt.timing_summary.rpt
+report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_opt.timing_summary.rpt
 
 #This is what will deliver to AWS
-write_checkpoint -force ../to_aws/SH_CL_routed.dcp
-file copy -force ../to_aws/SH_CL_routed.dcp ../to_aws/${timestamp}.SH_CL_routed.dcp
+write_checkpoint -force $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp
 
 #Verify PR build
-pr_verify -full_check ../to_aws/SH_CL_routed.dcp ../checkpoints/from_aws/SH_CL_BB_routed.dcp -o ../to_aws/${timestamp}.pr_verify.log
+pr_verify -full_check $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz ../to_aws/*
+# created a zipped tar file, that would be used for createFpgaImage EC2 API
+exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/*
 
