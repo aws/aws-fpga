@@ -42,5 +42,5 @@ cp tmp/tmp_pci_ex/pcie4_uscale_plus_0_ex/imports/pci_exp_usrapp_tx.v           .
 cp tmp/tmp_pci_ex/pcie4_uscale_plus_0_ex/imports/xp4_usp_smsw_model_core_top.v ./models/xilinx_task_pcie_x16/dsport
 
 #rm -rf tmp
-cd ./models/
-patch -s -p0 < ./xilinx_task_pcie.patch
+cd $HDK_COMMON_DIR/verif/models/
+patch -s -p0 < $HDK_COMMON_DIR/verif/scripts/xilinx_task_pcie.patch
