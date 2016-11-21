@@ -16,6 +16,10 @@
 set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
+set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
+set CL_DIR $::env(CL_DIR)
+file mkdir ../src_post_encryption
+
 source encrypt.tcl
 
 #This sets the Device Type
