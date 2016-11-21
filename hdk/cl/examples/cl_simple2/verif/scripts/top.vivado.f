@@ -9,7 +9,7 @@
 -sourcelibext .v
 -sourcelibext .sv
 
--sourcelibdir ${CL_ROOT}/design/cl
+-sourcelibdir ${CL_ROOT}/design
 -sourcelibdir ${HDK_DIR}/top/vu9p/design/mgt
 -sourcelibdir ${HDK_DIR}/top/vu9p/design/sh
 -sourcelibdir ${SH_LIB_DIR}
@@ -18,8 +18,8 @@
 
 /proj/awsip_work/winefred/fpga_instance/Chimera/aws-fpga/hdk/top/vu9p/design/sh/sh_ddr.sv
 
-${CL_ROOT}/design/cl/cl_tst_scrb.sv
-${CL_ROOT}/design/cl/cl_tst.sv
-${CL_ROOT}/design/cl/cl_int_tst.sv
-${CL_ROOT}/design/cl/cl_simple.sv
+${CL_ROOT}/design/cl_tst_scrb.sv
+${CL_ROOT}/design/cl_tst.sv
+${CL_ROOT}/design/cl_int_tst.sv
+${CL_ROOT}/design/cl_simple.sv
 ${CL_ROOT}/verif/tests/test_peek_poke.sv
