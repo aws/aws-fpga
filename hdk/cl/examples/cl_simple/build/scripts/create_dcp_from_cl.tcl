@@ -14,12 +14,6 @@
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
 
-#Convenience to set the root of the RTL directory
-set systemtime [clock seconds]
-set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
-
-puts "All reports and intermediate results will be time stamped with $timestamp";
-
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
         set CL_DIR $::env(CL_DIR)
@@ -39,6 +33,12 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
         exit 2
 }
+
+#Convenience to set the root of the RTL directory
+set systemtime [clock seconds]
+set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
+
+puts "All reports and intermediate results will be time stamped with $timestamp";
 
 file mkdir ../src_post_encryption
 
