@@ -13,7 +13,6 @@
 
 set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
 set CL_DIR $::env(CL_DIR)
-file mkdir ../src_post_encryption
 
 
 #---- Developr would replace this section with design files ----
