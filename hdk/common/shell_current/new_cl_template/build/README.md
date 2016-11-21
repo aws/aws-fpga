@@ -22,26 +22,36 @@ Overview: A developer can call '$HDK_SHELL_DIR/build/scripts/create_dcp_from_cl.
 Calling this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
 
 Steps: 
-1) Pre-requisite:
+
+### 1) Pre-requisite: Environment Variables and tools
+
 	1a) The environment variables `HDK_SHELL_DIR` should have been set. This is usually done by called `source hdk_setup.sh` from the hdk root directory
 	1b) the environment variable `CL_DIR` should have been set pointing to the root directory where the CL exists. the CL root directory should have the `/build` and `/design` subdirectories. One way to make sure to have the right directory is to use `source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh`
 	1c) Developer have Xilinx vivado tools installed, with the supported version by the HDK, and with proper license. If the developer is using AWS supplied "FPGA Development AMI" from AWS marketplace, it includes the README.md how to setup up the tools and license  
 
-2) As a pre-cursor to the encryption and build proces,  modify the `$CL_DIR/build/scripts/encrypt.tcl` to include all the CL source files, so the script can encrypt them and copy to `$CL_DIR/build/src_post_encryption` directory
+### 2) Encrypt source files
 
-3) Modify the `$CL_DIR/build/scripts/build_dcp_from_cl` to include all the 
+As a pre-cursor to the encryption and build proces,  modify the `$CL_DIR/build/scripts/encrypt.tcl` to include all the CL source files, so the script can encrypt them and copy to `$CL_DIR/build/src_post_encryption` directory
+
+### 3) Modify the `$CL_DIR/build/scripts/build_dcp_from_cl` 
+
+to include all the 
 	3a) The list of CL encrypted files in `$CL_DIR/build/src_post_encryption`
 	3b) The list of CL specific timing and placement constrains in `$CL_DIR/build/constrains`
 	3c) The specific constrains and design file for IP included in your CL like DDR4
 
-4) Run the build from the '$CL_DIR/build/scripts' folder as follows:
+### 4) Run the build 
+
+from the '$CL_DIR/build/scripts' folder as follows:
           `vivado -mode batch -source create_dcp_from_cl.tcl`
       This runs:
          - Synthesis of CL
          - Implementation of CL with AWS Shell
          - Generates design checkpoint for AWS ingestion and associated logs
   
-5) To aid developers in build verification, AWS also provides a script ('$CL_DIR/build/scripts/emulate_AWS_ingestion_process.tcl') that emulates 
+### 5) Validate the results by emulation AWS ingestion process
+
+To aid developers in build verification, AWS also provides a script ('$CL_DIR/build/scripts/emulate_AWS_ingestion_process.tcl') that emulates 
 the process that AWS uses to generate bitstreams from a developer DCP. The script can be run as follows:
           `vivado -mode batch -source emulate_AWS_ingestion_process.tcl`
 
@@ -55,7 +65,7 @@ the process that AWS uses to generate bitstreams from a developer DCP. The scrip
    A developer may need to iterate multiple times through this process until arriving upon an error-free run.
 
 
-### About Encryption 
+## About Encryption 
    Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source and the implemented design.  
 
 
