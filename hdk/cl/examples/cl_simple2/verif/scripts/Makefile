@@ -3,7 +3,7 @@ export SIMULATOR = vivado
 export SIM_DIR = $(CL_DIR)/verif/sim
 export SCRIPTS_DIR = $(PWD)
 
-include $(HDK_SHELL_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
+include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
 
 all:	compile run
 
