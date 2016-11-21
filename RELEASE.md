@@ -1,6 +1,5 @@
-<span style="display: inline-block;">
 
-#AWS EC2 FPGA Hardware and Software Development Kit r1.0.0
+#AWS EC2 FPGA Development Kit r1.0.0
 
 ##Overview:
 
