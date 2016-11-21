@@ -58,11 +58,11 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-#read_verilog {
-#   $CL_DIR/src_post_encryption/cl_simple_defines.vh
-#}
-#set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
-#set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
+read_verilog [ list \
+   $CL_DIR/build/src_post_encryption/cl_simple_defines.vh
+]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
