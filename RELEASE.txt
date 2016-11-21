@@ -1,20 +1,23 @@
-AWS EC2 FPGA Hardware and Software Development Kit r1.0.0
+<span style="display: inline-block;">
 
-Overview:
+#AWS EC2 FPGA Hardware and Software Development Kit r1.0.0
+
+##Overview:
 
 This is an initial release for AWS EC2 FPGA Hardware and Software Development Kit. This release includes the features below.
 
-License Requirements:
+##License Requirements:
+
 This section will include license requirements.
 
-What's new?
+##What's new?
 
 This section will include any new features added in the future releases.
 
-Bug Fixes:
+##Bug Fixes:
 
 This section will include any bug fixes in the future releases.
 
-Known Issues:
+##Known Issues:
 
 This section will include known issues.
