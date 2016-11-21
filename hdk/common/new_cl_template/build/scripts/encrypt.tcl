@@ -18,6 +18,6 @@
 file copy -force $CL_DIR/design/PUT_YOUR_FILE_NAME_HERE $CL_DIR/build/src_post_encryption
 
 
-encrypt -k $HDK_COMMON_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
 $CL_DIR/build/src_post_encryption/PUT_YOUR_FIRST_FILE_NAME_HERE \
 $CL_DIR/build/src_post_encryption/PUT_YOUR_LAST_FILE_NAME_HERE
