@@ -11,13 +11,35 @@
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
+puts "AWS FPGA Scripts";
+puts "Creating Design Checkpoint from Custom Logic source code";
 
 #Convenience to set the root of the RTL directory
 set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
-set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
-set CL_DIR $::env(CL_DIR)
+puts "All reports and intermediate results will be time stamped with $timestamp";
+
+#checking if CL_DIR env variable exists
+if { [info exists ::env(CL_DIR)] } {
+        set CL_DIR $::env(CL_DIR)
+        puts "Using CL directory $CL_DIR";
+} else {
+        puts "Error: CL_DIR environment variable not defined ! ";
+        puts "Use export CL_DIR=Your_Design_Root_Directory"
+        exit 2
+}
+
+#checking if HDK_SHELL_DIR env variable exists
+if { [info exists ::env(HDK_SHELL_DIR)] } {
+        set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
+        puts "Using CL directory $HDK_SHELL_DIR";
+} else {
+        puts "Error: HDK_SHELL_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
 file mkdir ../src_post_encryption
 
 source encrypt.tcl
@@ -36,20 +58,20 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-read_verilog {
-   $CL_DIR/src_post_encryption/cl_simple_defines.vh
-}
-set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
-set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
+#read_verilog {
+#   $CL_DIR/src_post_encryption/cl_simple_defines.vh
+#}
+#set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
+#set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
-read_verilog {
-$CL_DIR/src_post_encryption/cl_simple.sv
-$CL_DIR/src_post_encryption/cl_tst.sv
-$CL_DIR/src_post_encryption/cl_int_tst.sv
-$CL_DIR/src_post_encryption/mem_scrb.sv
+read_verilog [ list \
+$CL_DIR/src_post_encryption/cl_simple.sv \
+$CL_DIR/src_post_encryption/cl_tst.sv \
+$CL_DIR/src_post_encryption/cl_int_tst.sv \
+$CL_DIR/src_post_encryption/mem_scrb.sv \
 $CL_DIR/src_post_encryption/cl_tst_scrb.sv
-}
+]
 
 #---- End of section replaced by User ----
 
