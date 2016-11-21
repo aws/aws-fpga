@@ -64,16 +64,19 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
 #set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
 
+puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
+
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog [ list \
-$CL_DIR/src_post_encryption/cl_simple.sv \
-$CL_DIR/src_post_encryption/cl_tst.sv \
-$CL_DIR/src_post_encryption/cl_int_tst.sv \
-$CL_DIR/src_post_encryption/mem_scrb.sv \
-$CL_DIR/src_post_encryption/cl_tst_scrb.sv
+$CL_DIR/build/src_post_encryption/cl_simple.sv \
+$CL_DIR/build/src_post_encryption/cl_tst.sv \
+$CL_DIR/build/src_post_encryption/cl_int_tst.sv \
+$CL_DIR/build/src_post_encryption/mem_scrb.sv \
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv
 ]
 
 #---- End of section replaced by User ----
+puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
@@ -86,15 +89,19 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-$HDK_SHELL_DIR/design/cl/cl_ports.vh \
-$HDK_SHELL_DIR/design/sh/sh_ddr.sv
+$HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
+$HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
 
+puts "AWS FPGA: Reading IP blocks";
 #Read DDR IP
-read_ip {
-$HDL_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
-}
+read_ip [ list \
+$HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
+]
 
+#read_ip {
+#/home/centos/aws-fpga/hdk/common/shell_latest/design/ip/ddr4_core/ddr4_core.xci
+#}
 #Note Developer can add IP 
 
 #Read all the constraints
@@ -102,13 +109,12 @@ $HDL_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 #  cl_synth_aws.xdc - AWS provided constraints.  ***DO NOT MODIFY***
 #  cl_clocks_aws.xdc - AWS provided clock constraint.  ***DO NOT MODIFY***
 #  ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
-#  cl_synt_user.xdc - User constraints.  User can add constraints to this file (or include more constraints as needed)
-read_xdc {
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc
-   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc
-   $HDK_SHELL_DIR/build/constraints/ddr.xdc
-   $HDK_SHELL_DIR/build/constraints/cl_synth_user.xdc
-}
+read_xdc [ list \
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
+]
+#   $HDK_SHELL_DIR/build/constraints/ddr.xdc # comment out until we find the file
 
 #Do not propagate local clock constraints for clocks generated in the SH
 set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
