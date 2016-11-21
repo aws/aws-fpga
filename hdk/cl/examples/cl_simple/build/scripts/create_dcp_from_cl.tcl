@@ -99,10 +99,19 @@ read_ip [ list \
 $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 ]
 
-#read_ip {
-#/home/centos/aws-fpga/hdk/common/shell_latest/design/ip/ddr4_core/ddr4_core.xci
-#}
 #Note Developer can add IP 
+
+puts "AWS FPGA: Reading CL specific constrains";
+
+# Developer should add the list of constrains here
+read_xdc [ list \
+   $CL_DIR/build/constrains/cl_synth_user.xdc \
+   $CL_DIR/build/constrains/cl_clocks_user.xdc \
+   $CL_DIR/build/constrains/cl_pnr_user.xdc
+]
+
+puts "AWS FPGA: Reading AWS constrains";
+
 
 #Read all the constraints
 #
@@ -110,12 +119,16 @@ $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 #  cl_clocks_aws.xdc - AWS provided clock constraint.  ***DO NOT MODIFY***
 #  ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
+   $HDK_SHELL_DIR/build/constrains/cl_synth_aws.xdc \
+   $HDK_SHELL_DIR/build/constrains/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constrains/cl_pnr_aws.xdc
 ]
-#   $HDK_SHELL_DIR/build/constraints/ddr.xdc # comment out until we find the file
 
+puts "AWS FPGA: Reading IP constrains";
+
+read_xdc [ list \
+   $HDK_SHELL_DIR/build/constrains/ddr.xdc 
+]
 #Do not propagate local clock constraints for clocks generated in the SH
 set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
 
