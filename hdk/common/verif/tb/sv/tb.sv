@@ -37,7 +37,7 @@ module tb();
    //-------------------------------------
    // PCIe Master interface from CL
    //-------------------------------------
-   logic [5:0]  cl_sh_pcim_awid[NUM_PCIE-1:0];
+   logic [4:0]  cl_sh_pcim_awid[NUM_PCIE-1:0];
    logic [63:0] cl_sh_pcim_awaddr[NUM_PCIE-1:0];
    logic [7:0]  cl_sh_pcim_awlen[NUM_PCIE-1:0];
    logic [18:0] cl_sh_pcim_awuser[NUM_PCIE-1:0];
@@ -50,19 +50,19 @@ module tb();
    logic [NUM_PCIE-1:0] cl_sh_pcim_wvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_wready;
    
-   logic [5:0]          sh_cl_pcim_bid[NUM_PCIE-1:0];
+   logic [4:0]          sh_cl_pcim_bid[NUM_PCIE-1:0];
    logic [1:0]          sh_cl_pcim_bresp[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcim_bready;
    
-   logic [5:0]          cl_sh_pcim_arid[NUM_PCIE-1:0];
+   logic [4:0]          cl_sh_pcim_arid[NUM_PCIE-1:0];
    logic [63:0]         cl_sh_pcim_araddr[NUM_PCIE-1:0];
    logic [7:0]          cl_sh_pcim_arlen[NUM_PCIE-1:0];
    logic [18:0]         cl_sh_pcim_aruser[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] cl_sh_pcim_arvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_arready;
    
-   logic [5:0]          sh_cl_pcim_rid[NUM_PCIE-1:0];
+   logic [4:0]          sh_cl_pcim_rid[NUM_PCIE-1:0];
    logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0];
    logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcim_rlast;
@@ -73,7 +73,7 @@ module tb();
    // PCI Slave interface to CL
    //------------------------------------------------
    logic [63:0] sh_cl_pcis_awaddr[NUM_PCIE-1:0];
-   logic [5:0]  sh_cl_pcis_awid[NUM_PCIE-1:0];
+   logic [4:0]  sh_cl_pcis_awid[NUM_PCIE-1:0];
    logic [7:0]  sh_cl_pcis_awlen[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcis_awuser;
    logic [NUM_PCIE-1:0] sh_cl_pcis_awvalid;
@@ -86,18 +86,18 @@ module tb();
    logic [NUM_PCIE-1:0] cl_sh_pcis_wready;
    
    logic [1:0]          cl_sh_pcis_bresp[NUM_PCIE-1:0];
-   logic [5:0]          cl_sh_pcis_bid[NUM_PCIE-1:0];
+   logic [4:0]          cl_sh_pcis_bid[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] cl_sh_pcis_bvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcis_bready;
    
    logic [63:0]         sh_cl_pcis_araddr[NUM_PCIE-1:0];
-   logic [5:0]          sh_cl_pcis_arid[NUM_PCIE-1:0];
+   logic [4:0]          sh_cl_pcis_arid[NUM_PCIE-1:0];
    logic [7:0]          sh_cl_pcis_arlen[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcis_aruser;
    logic [NUM_PCIE-1:0] sh_cl_pcis_arvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcis_arready;
    
-   logic [5:0]          cl_sh_pcis_rid[NUM_PCIE-1:0];
+   logic [4:0]          cl_sh_pcis_rid[NUM_PCIE-1:0];
    logic [511:0]        cl_sh_pcis_rdata[NUM_PCIE-1:0];
    logic [1:0]          cl_sh_pcis_rresp[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] cl_sh_pcis_rlast;
