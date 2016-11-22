@@ -24,6 +24,7 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 By running the next few steps, you would have downloaded the HDK, compile and build on of the sampled Custom Logics (CL), and register it with AWS
 
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
+    $ cd aws-fpga                                 # move to the root directory of the repository before running the next script
     $ source hdk_setup.sh                         # Set up the environment variables
     $ cd hdk/cl/examples/cl_simple                # Change directory to one of the provided examples
     $ export CL_DIR=$(pwd)                        # define this directory as the root for the CL design
