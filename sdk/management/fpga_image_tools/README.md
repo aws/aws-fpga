@@ -150,16 +150,16 @@ The following FPGA image hardware metrics are provided:
    * In the examples, `agfi-004f34c45ed4e9603` is specified in the `fpga-load-local-image` command in order to load a specific AFI
 into the given fpga-image-slot.   
 * What is a PF?
-   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path '/sys/bus/pci/devices/Domain:Bus:Device.Function'.  The 'Domain:Bus:Device.Function' syntax is the same as returned from 'lspci' program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
+   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
 * What is a DBDF?
    * A DBDF is simply an acronym for Domain:Bus:Device.Function. 
 * What is a BAR?
-   * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path '/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0'.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
+   * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
 * What is the AFIDEVICE and how is it used?
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (see PF).
 * How do the AWS FPGA Image Management Tools work? 
    * Though most customers are not expected to understand the internals of the tools, a short overview is provided here:
-   * Within the F1 instance, the FPGAs expose a management PF (e.g. 0000:00:17.1) that is used for communication between the instance and AWS.
+   * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
    * The AWS FPGA Image Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
