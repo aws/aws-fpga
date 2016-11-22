@@ -11,6 +11,9 @@ AWS provides the following set of tools for Amazon FPGA Image (AFI) managment.
 * **fpga-clear-local-image**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
 
+## Prerequisites
+* Linux based F1 instance.
+
 ## Versions
 * Amazon Linux 2016.09
 
@@ -18,9 +21,6 @@ AWS provides the following set of tools for Amazon FPGA Image (AFI) managment.
 * The tools come pre-installed in `/usr/bin` for Amazon Linux.
 * AWS SDK/HDK is available from the github repository [aws-fpga](https://github.com/aws/aws-fpga).
    * Once the AWS SDK/HDK is downloaded from the github repository, the [sdk_setup](https://github.com/aws/aws-fpga/tree/master/sdk) script can be executed to build and install the tools in `/usr/bin`.
-
-## Prerequisites
-* Linux based F1 instance.
 
 ## Quickstart
 
