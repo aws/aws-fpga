@@ -18,9 +18,10 @@ functional Custom Logic implementation. Each example includes:
     6) Software binary that can be loaded on an F1 instance to test the AFI. 
 
 To summarize:
-** An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on-premise services **
 
-** The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.  **
+**An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on-premise services**
+
+**The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.**
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
