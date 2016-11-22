@@ -1,40 +1,38 @@
 
-#**************************************************************************
-#*************             BittWare Incorporated              *************
-#*************      45 S. Main Street, Concord, NH 03301      *************
-#**************************************************************************
-# LEGAL NOTICE:
-#                 Copyright (c) 2016 BittWare, Inc.
-#   The user is hereby granted a non-exclusive license to use and or
-#     modify this code provided that it runs on BittWare hardware.
-#   Usage of this code on non-BittWare hardware without the express
-#      written permission of BittWare is strictly prohibited.
-#
-# E-mail: support@bittware.com                    Tel: 603-226-0404
-#**************************************************************************
 
-### Created by: Jeff Sanders
-### Date: 21 Mar 2016
-###
-### Constraints for 4x32GB RDIMMs ###
-###
-##############################################
-##########      Memory Clocks       ##########
-##############################################
+set_property PACKAGE_PIN E38 [get_ports CLK_300M_DIMM1_DP]
+set_property PACKAGE_PIN D38 [get_ports CLK_300M_DIMM1_DN]
+set_property PACKAGE_PIN BB36 [get_ports CLK_300M_DIMM3_DP]
+set_property PACKAGE_PIN BC36 [get_ports CLK_300M_DIMM3_DN]
+set_property PACKAGE_PIN K18 [get_ports CLK_300M_DIMM0_DP]
+set_property PACKAGE_PIN J18 [get_ports CLK_300M_DIMM0_DN]
+set_property PACKAGE_PIN BA15 [get_ports CLK_300M_DIMM2_DP]
+set_property PACKAGE_PIN BA14 [get_ports CLK_300M_DIMM2_DN]
+
+#set_property PACKAGE_PIN AN28 [get_ports RST_DIMM_A_N]
+#set_property PACKAGE_PIN AL25 [get_ports RST_DIMM_B_N]
+#set_property PACKAGE_PIN AM25 [get_ports RST_DIMM_D_N]
+#set_property PACKAGE_PIN AU25 [get_ports RST_DIMM_C_N]
+
+#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_A_N]
+#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_B_N]
+#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_D_N]
+
+# These are dummy DDR resets
+set_property PACKAGE_PIN D26 [get_ports RST_DIMM_A_N]
+set_property PACKAGE_PIN M26 [get_ports RST_DIMM_B_N]
+set_property PACKAGE_PIN AB32 [get_ports RST_DIMM_D_N]
+
+set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_A_N]
+set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_B_N]
+set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_D_N]
+
+
 set_property ODT RTT_48 [get_ports CLK_300M_DIMM0_DP]
-
-
-
-
-
 
 
 set_clock_groups -asynchronous -group [get_clocks CLK_300M_DIMM0_DP -include_generated_clocks]
 
-##############################################
-##########   DDR4 Pin Properties    ##########
-##############################################
-### RDIMM 1
 #KIRAN set_property OUTPUT_IMPEDANCE RDRV_NONE_NONE [get_ports RST_DIMM_A_N]
 #KIRAN set_property DRIVE 8 [get_ports RST_DIMM_A_N]
 set_property IOSTANDARD SSTL12_DCI [get_ports {M_A_BG[*]}]
@@ -1318,34 +1316,4 @@ set_property PACKAGE_PIN BE31 [get_ports {M_D_DQ[28]}]
 set_property PACKAGE_PIN BE32 [get_ports {M_D_DQ[29]}]
 set_property PACKAGE_PIN BF32 [get_ports {M_D_DQS_DP[12]}]
 set_property PACKAGE_PIN BF33 [get_ports {M_D_DQS_DN[12]}]
-
-set_property PACKAGE_PIN E38 [get_ports CLK_300M_DIMM1_DP]
-set_property PACKAGE_PIN D38 [get_ports CLK_300M_DIMM1_DN]
-set_property PACKAGE_PIN BB36 [get_ports CLK_300M_DIMM3_DP]
-set_property PACKAGE_PIN BC36 [get_ports CLK_300M_DIMM3_DN]
-set_property PACKAGE_PIN K18 [get_ports CLK_300M_DIMM0_DP]
-set_property PACKAGE_PIN J18 [get_ports CLK_300M_DIMM0_DN]
-set_property PACKAGE_PIN BA15 [get_ports CLK_300M_DIMM2_DP]
-set_property PACKAGE_PIN BA14 [get_ports CLK_300M_DIMM2_DN]
-
-#set_property PACKAGE_PIN AN28 [get_ports RST_DIMM_A_N]
-#set_property PACKAGE_PIN AL25 [get_ports RST_DIMM_B_N]
-#set_property PACKAGE_PIN AM25 [get_ports RST_DIMM_D_N]
-#set_property PACKAGE_PIN AU25 [get_ports RST_DIMM_C_N]
-
-#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_A_N]
-#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_B_N]
-#set_property DRIVE 8 [get_ports cl_hl_RST_DIMM_D_N]
-
-# These are dummy DDR resets
-set_property PACKAGE_PIN D26 [get_ports RST_DIMM_A_N]
-set_property PACKAGE_PIN M26 [get_ports RST_DIMM_B_N]
-set_property PACKAGE_PIN AB32 [get_ports RST_DIMM_D_N]
-
-set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_A_N]
-set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_B_N]
-set_property IOSTANDARD LVCMOS12 [get_ports RST_DIMM_D_N]
-
-
-
 

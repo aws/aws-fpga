@@ -49,8 +49,8 @@ set_false_path -to [get_pins -hier *cdc_to*/D]
 
 
 
-# Following are the constrains for FIFO Generator to eliminate setup/hold violation warnings in simulations
-# This example is using the Set Max Delay constrains for the cross clock domain pointers
+# Following are the constraints for FIFO Generator to eliminate setup/hold violation warnings in simulations
+# This example is using the Set Max Delay constraints for the cross clock domain pointers
 
 # For WR FIFO
 set_false_path -from [get_cells -hierarchical -filter {NAME =~*HWICAP_CTRL_I/IPIC_IF_I/WRFIFO.WRDATA_FIFO_I/USE_2N_DEPTH.V6_S6_AND_LATER.I_ASYNC_FIFO_BRAM/*rstblk*/*rst_reg_reg[*]}]
