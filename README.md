@@ -19,6 +19,17 @@ Call [`source ./hdk_setup.sh`](./hdk_setup.sh) to setup the environment variable
 
 The [SDK directory](./sdk) includes the drivers and runtime environment required by any EC2 Instance running on F1. It has the drivers and tools to interact with a pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI design and build process, they are only required once you load the AFI into an F1 instance.
 
+## Quick start
 
+By running the next few steps, you would have downloaded the HDK, compile and build on of the sampled Custom Logics (CL), and register it with AWS
 
+    $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
+    $ source hdk_setup.sh                         # Set up the environment variables
+    $ cd hdk/cl/examples/cl_simple                # Change directory to one of the provided examples
+    $ export CL_DIR=$(pwd)                        # define this directory as the root for the CL design
+    $ cd build/scripts                            # The build directory for synthesizing, placement, timing etc
+    $ vivado -mode batch -source create_dcp_from_cl.tcl   # make sure you have vivado installed and vivado license manager running
+    $ aws ec2 createFpgaImage TBD TBD TBD         # make sure you have aws account, aws-cli installed, and you ran `aws configure`
+    
+    
 
