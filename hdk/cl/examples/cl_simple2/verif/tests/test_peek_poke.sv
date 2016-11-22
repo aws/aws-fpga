@@ -39,11 +39,15 @@ module test_peek_poke();
       
       tb.sh.poke_burst(64'h4, 4, write_data_b);
       
+<<<<<<< HEAD
       tb.sh.peek_burst(64'h4, 4, read_data_b);
       for (int n= 0; n<$size(read_data_b);n++) begin
          $display("read_data: %x", read_data_b[n]);
       end     
       #500ns;
+=======
+      #5000ns;
+>>>>>>> f0f3c9cf651aab663aa5f5e4f6d18cf6e9ab2f90
       
       tb.sh.power_down();
       $finish;

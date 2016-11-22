@@ -49,8 +49,8 @@
 
 
 
-# Following are the constrains for FIFO Generator to eliminate setup/hold violation warnings in simulations
-# This example is using the Set Max Delay constrains for the cross clock domain pointers
+# Following are the constraints for FIFO Generator to eliminate setup/hold violation warnings in simulations
+# This example is using the Set Max Delay constraints for the cross clock domain pointers
 
 # For WR FIFO
 

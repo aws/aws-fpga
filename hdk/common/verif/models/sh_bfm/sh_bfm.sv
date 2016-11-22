@@ -292,6 +292,10 @@ typedef struct {
    always @(posedge clk_xtra)
      rst_xtra_n <= rst_xtra_n_i;
 
+   always @(posedge clk_out) begin
+      sh_cl_pwr_state <= 2'b00;
+   end
+   
    //
    // sh->cl Address Write Channel
    //

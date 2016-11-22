@@ -27,9 +27,29 @@ if { [info exists ::env(CL_DIR)] } {
 #checking if HDK_SHELL_DIR env variable exists
 if { [info exists ::env(HDK_SHELL_DIR)] } {
         set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
-        puts "Using CL directory $HDK_SHELL_DIR";
+        puts "Using Shell directory $HDK_SHELL_DIR";
 } else {
         puts "Error: HDK_SHELL_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
+#checking if HDK_COMMON_DIR env variable exists
+if { [info exists ::env(HDK_COMMON_DIR)] } {
+        set HDK_COMMON_DIR $::env(HDK_COMMON_DIR)
+        puts "Using Common directory $HDK_COMMON_DIR";
+} else {
+        puts "Error: HDK_COMMON_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
+#checking if HDK_DIR env variable exists
+if { [info exists ::env(HDK_DIR)] } {
+        set HDK_DIR $::env(HDK_DIR)
+        puts "Using HDK directory $HDK_DIR";
+} else {
+        puts "Error: HDK_DIR environment variable not defined ! ";
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
         exit 2
 }
@@ -58,11 +78,11 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-#read_verilog {
-#   $CL_DIR/src_post_encryption/cl_simple_defines.vh
-#}
-#set_property file_type {Verilog Header} [get_files ../src/cl_simple_defines.vh ]
-#set_property is_global_include true [get_files ../src/cl_simple_defines.vh ]
+read_verilog [ list \
+   $CL_DIR/build/src_post_encryption/cl_simple_defines.vh
+]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
@@ -89,6 +109,9 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
+$HDK_DIR/top/vu9p/design/mgt/mgt_acc_ccf.sv \
+$HDK_DIR/top/vu9p/design/mgt/mgt_acc_axl.sv  \
+$HDK_DIR/top/vu9p/design/mgt/mgt_gen_axl.sv  \
 $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
 $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
@@ -101,16 +124,16 @@ $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 
 #Note Developer can add IP 
 
-puts "AWS FPGA: Reading CL specific constrains";
+puts "AWS FPGA: Reading CL specific constraints";
 
-# Developer should add the list of constrains here
+# Developer should add the list of constraints here
 read_xdc [ list \
-   $CL_DIR/build/constrains/cl_synth_user.xdc \
-   $CL_DIR/build/constrains/cl_clocks_user.xdc \
-   $CL_DIR/build/constrains/cl_pnr_user.xdc
+   $CL_DIR/build/constraints/cl_synth_user.xdc \
+   $CL_DIR/build/constraints/cl_clocks_user.xdc \
+   $CL_DIR/build/constraints/cl_pnr_user.xdc
 ]
 
-puts "AWS FPGA: Reading AWS constrains";
+puts "AWS FPGA: Reading AWS constraints";
 
 
 #Read all the constraints
@@ -119,15 +142,15 @@ puts "AWS FPGA: Reading AWS constrains";
 #  cl_clocks_aws.xdc - AWS provided clock constraint.  ***DO NOT MODIFY***
 #  ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constrains/cl_synth_aws.xdc \
-   $HDK_SHELL_DIR/build/constrains/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constrains/cl_pnr_aws.xdc
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
 ]
 
-puts "AWS FPGA: Reading IP constrains";
+puts "AWS FPGA: Reading IP constraints";
 
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constrains/ddr.xdc 
+   $HDK_SHELL_DIR/build/constraints/ddr.xdc 
 ]
 #Do not propagate local clock constraints for clocks generated in the SH
 set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]

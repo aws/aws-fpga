@@ -5,4 +5,4 @@ This checklist include important checks that the developer should check before c
 3. Verity that the /build directory have AWS recommended subdirectories: /constrains, /scripts, /src_port_encryption, /reports, /to_aws
 4. update encrypt.tcl script under $CL_DIR/build/script for your design specific changes.
 5. update create_dcp_from_cl under $CL_DIR/build/script for your design specific changes.
-6. update the timing and placement constrains under $CL_DIR/build/constrains for your design specific changes.
+6. update the timing and placement constraints under $CL_DIR/build/constraints for your design specific changes.

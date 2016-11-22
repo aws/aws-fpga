@@ -1,0 +1,96 @@
+## =============================================================================
+## Copyright 2016 Amazon.com, Inc. or its affiliates.
+## All Rights Reserved Worldwide.
+## Amazon Confidential information
+## Restricted NDA Material
+## =============================================================================
+
+EXE_EXISTS=$(shell [ -e $(COMPILE_DIR)/$(COMPILE_SUBDIR)/simv ] && echo 1 || echo 0 )
+
+ifeq ($(COV), 1)
+COV_OPTIONS ?= "-cm line+cond+tgl+fsm+branch"
+COV_COMP_OPTIONS ?= "-cm_libs yv -cm_hier $(SCRIPTS_DIR)/cov.hier"
+else
+COV_OPTIONS ?= ""
+COV_COMP_OPTIONS ?= ""
+endif
+
+compile:
+	mkdir -p $(COMPILE_DIR)/$(COMPILE_SUBDIR)
+	ln -s -f $(PWD)/xilinx_files.vcs.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/xilinx_files.f
+	ln -s -f $(PWD)/dut_venom.vcs.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_venom.f
+	ln -s -f $(PWD)/dut_$(DESIGN_NAME).vcs.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_venom_cl.f
+	ln -s -f $(PWD)/dut_minotaur_test.vcs.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_minotaur_test.f
+	ln -s -f $(PWD)/uvm_pkg.vcs.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/uvm_pkg.f
+	cd $(COMPILE_DIR)/$(COMPILE_SUBDIR) && ln -s -f $(DESIGN_DIR)/ip_vcs_complib/synopsys_sim.setup
+	cd $(COMPILE_DIR)/$(COMPILE_SUBDIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -ntb_opts uvm-1.2 +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(FILES) +define+VCS $(DEFAULT_DEFINES) $(DEFINES) +lint=TFIPC-L
+	cd $(COMPILE_DIR)/$(COMPILE_SUBDIR) && vcs tb -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts uvm-1.2 -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log
+
+run:
+	mkdir -p $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)
+	touch $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/design.txt
+ifeq ($(REGRESS), 1)
+ifeq ($(COV), 0)
+	@if [ $(EXE_EXISTS) -eq "1" ]; then \
+	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && $(COMPILE_DIR)/$(COMPILE_SUBDIR)/simv -l $(TESTNAME).log +TESTNAME=$(TESTNAME) $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TESTNAME).vpd; \
+	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && sed '/Model:WARNING: Reading unwritten address*/d' < $(TESTNAME).log > $(TESTNAME).$(LOG_EXTENSION); \
+	else \
+	  echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  COMPILE FAILED  -- Did not find simv in $(COMPILE_DIR)/$(COMPILE_SUBDIR)" >> $(RESULTS_FILE); \
+	fi
+else
+	ln -s -f $(PWD)/xilinx_files.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/xilinx_files.f
+	ln -s -f $(PWD)/dut_venom.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom.f
+	ln -s -f $(PWD)/dut_$(DESIGN_NAME).vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom_cl.f
+	ln -s -f $(PWD)/dut_minotaur_test.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_minotaur_test.f
+	ln -s -f $(PWD)/uvm_pkg.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/uvm_pkg.f
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && ln -s -f $(DESIGN_DIR)/ip_vcs_complib/synopsys_sim.setup
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -ntb_opts uvm-1.2 +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l $(TESTNAME).vlogan.log -f $(FILES) +define+VCS $(DEFAULT_DEFINES) $(DEFINES) +lint=TFIPC-L
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vcs tb -R -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts uvm-1.2 -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l $(TESTNAME).log +TESTNAME=$(TESTNAME) $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TESTNAME).vpd $(COV_OPTIONS) $(COV_COMP_OPTIONS)
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && sed '/Model:WARNING: Reading unwritten address*/d' < $(TESTNAME).log > $(TESTNAME).$(LOG_EXTENSION)
+endif
+else
+	ln -s -f $(PWD)/xilinx_files.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/xilinx_files.f
+	ln -s -f $(PWD)/dut_venom.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom.f
+	ln -s -f $(PWD)/dut_$(DESIGN_NAME).vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom_cl.f
+	ln -s -f $(PWD)/dut_minotaur_test.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_minotaur_test.f
+	ln -s -f $(PWD)/uvm_pkg.vcs.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/uvm_pkg.f
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && ln -s -f $(DESIGN_DIR)/ip_vcs_complib/synopsys_sim.setup
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -ntb_opts uvm-1.2 +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l $(TESTNAME).vlogan.log -f $(FILES) +define+VCS $(DEFAULT_DEFINES) $(DEFINES) +lint=TFIPC-L
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vcs tb -R -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts uvm-1.2 -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l $(TESTNAME).log +TESTNAME=$(TESTNAME) $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TESTNAME).vpd $(COV_OPTIONS) $(COV_COMP_OPTIONS)
+	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && sed '/Model:WARNING: Reading unwritten address*/d' < $(TESTNAME).log > $(TESTNAME).$(LOG_EXTENSION)
+endif
+
+check:
+ifeq ($(REGRESS), 1)
+	@if [ $(LOG_EXISTS) -eq "1" ]; then \
+	  if [ $(FAIL_EXISTS) -eq "1" ]; then \
+	    echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Found 'TEST FAIL' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
+	  else \
+	    if [ $(ERROR_EXISTS) -eq "1" ]; then \
+	      echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Found 'ERROR' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
+	    else \
+	      if [ $(PASS_EXISTS) -eq "1" ]; then \
+	        echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  PASSED" >> $(RESULTS_FILE); \
+	      else \
+	        echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Did not find 'TEST PASS' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
+	      fi \
+	    fi \
+	  fi \
+	else \
+	  echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Did not find $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
+	fi
+else
+	@echo "Check not performed -- only applicable for regression runs." > $(RESULTS_FILE)
+endif
+
+cov_report:
+	mkdir -p $(COV_DIR)
+	cd $(COV_DIR) && urg -full64 -dir $(RUN_DIR)/$(RUN_SUBDIR)/*/simv.vdb -elfile $(SCRIPTS_DIR)/venom_code_cov_excl.el
+
+regress_clean:
+	@rm -rf $(COMPILE_DIR)/$(COMPILE_SUBDIR)
+	@rm -rf $(RUN_DIR)/$(RUN_SUBDIR)
+	@rm -rf $(RESULTS_FILE)
+
+regress_sort:
+	@sort -o $(RESULTS_FILE) $(RESULTS_FILE)

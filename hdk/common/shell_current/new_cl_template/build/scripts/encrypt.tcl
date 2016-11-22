@@ -7,17 +7,24 @@
 ## =============================================================================
 
 # TODO:
-# Add check if CL_DIR and AWS_HDK_COMMON directories exist
+# Add check if CL_DIR and HDK_SHELL_DIR directories exist
 # Add check if /build and /build/src_port_encryption directories exist
 # Add check if the vivado_keyfile exist
+
+set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
+set CL_DIR $::env(CL_DIR)
 
 
 #---- Developr would replace this section with design files ----
 
 ## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.
-file copy -force $CL_DIR/design/PUT_YOUR_FILE_NAME_HERE $CL_DIR/build/src_post_encryption
-
+# Use the next command for each file to copy
+# file copy -force $CL_DIR/design/Your_Source_File_Name $CL_DIR/build/src_post_encryption
 
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
-$CL_DIR/build/src_post_encryption/PUT_YOUR_FIRST_FILE_NAME_HERE \
-$CL_DIR/build/src_post_encryption/PUT_YOUR_LAST_FILE_NAME_HERE
+# $CL_DIR/build/src_post_encryption/Your_First_Source_file_name \
+# $CL_DIR/build/src_post_encryption/Your_Second_Source_file_name \
+# ......
+# $CL_DIR/build/src_post_encryption/Your_Last_Source_file_Name  
+
+#---- End of section replaced by Developr ---
