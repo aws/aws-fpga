@@ -1,0 +1,19 @@
+WORKFLOW_OPERATION simulation,dialog;
+
+DEFINE_MEMORY_TYPE lmb_bram_I_MEM_DEVICE [0x00010000] 32;
+DEFINE_MEMORY_TYPE second_lmb_bram_I_MEM_DEVICE [0x00008000] 32;
+
+ADDRESS_MAP microblaze_I MICROBLAZE-LE 100 microblaze_I
+  ADDRESS_SPACE lmb_bram_I_ADDR_SPACE COMBINED [0x00000000:0x00017FFF] dlmb_cntlr
+   ADDRESS_RANGE lmb_bram_I_MEM_DEVICE
+     BUS_BLOCK
+      lmb_bram_I_BUS_BLK [31:0] INPUT = "bd_bf3f_lmb_bram_I_0.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_RANGE;
+   ADDRESS_RANGE second_lmb_bram_I_MEM_DEVICE
+     BUS_BLOCK
+      second_lmb_bram_I_BUS_BLK [31:0] INPUT = "bd_bf3f_second_lmb_bram_I_0.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_RANGE;
+  END_ADDRESS_SPACE;
+END_ADDRESS_MAP;
