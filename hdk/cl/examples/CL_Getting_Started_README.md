@@ -29,27 +29,38 @@ By following the example CLs, a Developer could understand how to interface to t
 
 As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
+**NOTE:** *steps 1 through 3 can be done on any server or EC2 instance, C4/C5 instances are recommended for fastest build time*
+
+
 ### 1. Download and configure the HDK to the source directory on the instance.
 
         $ git clone https://github.com/aws/aws-fpga
         $ cd aws-fpga
         $ source hdk_shell.sh
     
-### 2. Prepare a directory for the new example
+### 2. Prepare a directory for the new CL example
 
-By creating a new directory, setup the environment variables, and prepare the project datastructure:
+There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
+
+Alternatively, by creating a new directory, setup the environment variables, and prepare the project datastructure:
 
         $ mkdir Your_New_CL_Directory
         $ cd Your_New_CL_Directory
         $ export CL_DIR=$(pwd)
-        $ source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh from within the
-directory you want to use for your CL development. A) Set the
-environment variable CL\_DIR pointing to directory where the CL is
-(export CL\_DIR=Directory\_You\_Want\_For\_Your\_New\_CL) and B) Keep
-AWS recommended directory structure for the
-'\$(CL\_DIR)/buildand\$(CL\_DIR)/design\` .
+        $ source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh 
+        
+Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
+The `prepare_new_cl.sh` would set up the directory structure to match what's expected by the HDK simulation and build scripts.
 
-Start the build/create process. Run this script to start Vivado and
+### 3. Build the CL before submitting to AWS
+
+**NOTE** *Before starting this step, please make yourself familiar with the [checklist](../CHECKLIST BEFORE BUILDING_CL.md)*
+
+**NOTE** *This step requires you have Xilinx Vivado Tools installed as well Vivado License:*
+    $ vivado -mode batch        # Run this command to see if vivado is installed
+    $ sudo perl /home/centos/src/project_data/license/license_manager.pl -status  # To check if license server is up. this command is for AWS-provided FPGA Development machine, the license manager can be in different directory in your systems
+    
+Run this script to start Vivado and
 generate a Design Checkpoint
 \$(CL\_DIR)/build/scripts/create\_dcp\_from\_cl.tcl A detailed version
 of the Vivado design flow is included in the /build/scripts directory.
