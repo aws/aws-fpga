@@ -36,7 +36,7 @@ The following scripts requires update before starting the build:
         `/build/scripts/encrypt.tcl`   to update the source file names before encryption
         `/build/scripts/create_dcp_from_cl.tcl`   to update the final build scripts with right source files and IP.
         
-Once your design is ready and you would like to start the build/create process, please refer to the [checklist](../CHECKLIST_FOR_CL_BUILD.md)
+Once your design is ready and you would like to start the build/create process, please refer to the [checklist](../CHECKLIST_BEFORE_BUILDING_CL.md)
 
 Once your verified the checklist, you can run:
 
