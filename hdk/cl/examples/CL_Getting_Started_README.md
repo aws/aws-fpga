@@ -1,9 +1,13 @@
-Building a Custom Logic (CL) implementation in the AWS FPGA instance
-requires an implementation that complies with the CL specification. The
-following CL examples are provided to assist developers in creating a
-functional Custom Logic implementation. All examples are included in the
-hdk/cl/examples directory. Each example includes 1) the design source
-code for the example included in the /design/cl directory, 2)
+# Building a Custom Logic (CL) implementation for AWS FPGA instances
+
+The developer can build custom Logic (CL) as deploy on AWS as long as the CL complies with [AWS Shell Specification](https://github.com/aws/aws-fpga/hdk/doc/AWS_Shell_Interface_Specifications.md), and go through the build scripts. 
+
+The [CL Examples directory](https://github.com/aws/aws-fpga/hdk/cl/examples/) is provided to assist developers in creating a
+functional Custom Logic implementation. Each example includes:
+
+1) The design source code for the example included in the `/design` directory.
+
+2)
 constraints and scripts for compiling the example design in the
 Developer AMI, 3) a design checkpoint that can be submitted for AFI
 generation, 4) an AFI-ID for a pre-generated AFI that matches the
