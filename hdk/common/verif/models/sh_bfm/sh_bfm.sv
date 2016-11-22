@@ -428,19 +428,26 @@ typedef struct {
       #50ns;
    endtask // power_down
 
-   task poke(input logic [63:0] addr, logic [31:0] dat);
+   task poke(input logic [63:0] addr, logic [31:0] dat, logic [5:0] id);
       AXI_Command cmd;
       AXI_Data data;
       logic [1:0] resp;
+      int         byte_idx;
+      int         mem_arr_idx;
       
       cmd.addr = addr;
       cmd.len  = 0;
-      cmd.id   = 2;
+      cmd.id   = id;
 
       sh_cl_wr_cmds.push_back(cmd);
 
-      data.data = dat;
-      data.strb = 'h0f;
+      byte_idx     = addr[5:0];
+      mem_arr_idx  = byte_idx*8;
+      
+      data.data[mem_arr_idx+:32] = dat;
+
+      data.strb[byte_idx+:4] = 'h0f;
+      
       data.id   = 2;
       data.last = 1'b1;
 
@@ -454,22 +461,91 @@ typedef struct {
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output [31:0] data);
+   task peek(input logic [63:0] addr, logic [5:0] id, output [31:0] data);
       AXI_Command cmd;
-
+      int   byte_idx;
+      int   mem_arr_idx;
+      
       cmd.addr = addr;
       cmd.len  = 0;
-      cmd.id   = 1;
+      cmd.id   = id;
 
       sh_cl_rd_cmds.push_back(cmd);
+
+      byte_idx     = addr[5:0];
+      mem_arr_idx  = byte_idx*8;
 
 //      wait(cl_sh_rd_data.size() > 0);   // TBD: This doesn't work for XSIM
       while (cl_sh_rd_data.size() == 0)
         #20ns;
       
-      data = cl_sh_rd_data[0].data;
+      data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
       cl_sh_rd_data.pop_front();
       
    endtask // peek
-   
+
+   task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
+      AXI_Command cmd;
+      AXI_Data data;
+      logic [1:0] resp;
+      
+      int byte_idx;
+      int mem_arr_idx;
+
+ 
+      cmd.addr = start_addr;
+      cmd.len  = len;
+      cmd.id   = 1;
+      
+      sh_cl_wr_cmds.push_back(cmd);
+
+      for (int n= 0; n<len;n++) begin
+         byte_idx     = (start_addr[5:0]+(n*'h4));
+         mem_arr_idx  = byte_idx*8;
+
+         data.data[mem_arr_idx+:32] = dat[n];
+         data.strb[byte_idx+:4] = 'h0f;
+
+         if (n==len-1)
+           data.last = 1;
+         else
+           data.last = 0;
+      end
+
+      #20ns sh_cl_wr_data.push_back(data);
+      
+      while (cl_sh_b_resps.size() == 0)
+        #20ns;
+      
+      resp = cl_sh_b_resps[0].resp;
+      cl_sh_b_resps.pop_front();
+      
+   endtask // poke_burst
+
+   task peek_burst(input logic [63:0] start_addr, logic [7:0] len, output logic [31:0] dat[16]);
+      AXI_Command cmd;
+      AXI_Data data;
+      int byte_idx;
+      int mem_arr_idx;
+      int len;
+
+      len = $size(dat);
+      
+      cmd.addr = start_addr;
+      cmd.len  = len;
+      cmd.id   = 2;
+
+      sh_cl_rd_cmds.push_back(cmd);
+
+      while (cl_sh_rd_data.size() == 0)
+        #20ns;
+      
+      for (int n= 0; n<len; n++) begin
+         byte_idx     = (start_addr[5:0]+(n*'h4));
+         mem_arr_idx  = byte_idx*8;
+         dat[n] = cl_sh_rd_data[0].data[mem_arr_idx+:32];
+      end
+      cl_sh_rd_data.pop_front();
+      
+   endtask // peek_burst
 endmodule // sh_bfm
