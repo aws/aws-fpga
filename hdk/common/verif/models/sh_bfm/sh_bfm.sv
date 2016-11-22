@@ -296,6 +296,13 @@ typedef struct {
       sh_cl_pwr_state <= 2'b00;
    end
    
+   initial begin
+      for (int i=0; i<NUM_PCIE; i++) begin
+         cfg_max_payload[i] <= 2'b01; // 256 bytes
+         cfg_max_read_req[i] <= 3'b001; // 256 bytes
+      end
+   end
+
    //
    // sh->cl Address Write Channel
    //
@@ -475,5 +482,33 @@ typedef struct {
       cl_sh_rd_data.pop_front();
       
    endtask // peek
+   
+   task set_max_payload(input logic [1:0] max_payload, int num_pcie = 0);
+
+      // Valid settings
+      //   2'b00 : 128 bytes
+      //   2'b01 : 256 bytes
+      //   2'b10 : 512 bytes
+      //   2'b11 : 1024 bytes
+
+      @(posedge clk_out)
+      cfg_max_payload[num_pcie] <= max_payload;
+      @(posedge clk_out);
+   endtask // cfg_max_payload
+   
+   task set_max_read_req(input logic [2:0] max_read_req, int num_pcie = 0);
+
+      // Valid settings
+      //   3'b000 : 128 bytes
+      //   3'b001 : 256 bytes
+      //   3'b010 : 512 bytes
+      //   3'b011 : 1024 bytes
+      //   3'b100 : 2048 bytes
+      //   3'b101 : 4096 bytes
+
+      @(posedge clk_out)
+      cfg_max_read_req[num_pcie] <= max_read_req;
+      @(posedge clk_out);
+   endtask // cfg_max_read_req
    
 endmodule // sh_bfm
