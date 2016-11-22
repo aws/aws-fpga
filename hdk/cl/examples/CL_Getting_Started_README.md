@@ -2,7 +2,7 @@
 
 The developer can build custom Logic (CL) as deploy on AWS as long as the CL complies with [AWS Shell Specification](https://github.com/aws/aws-fpga/hdk/doc/AWS_Shell_Interface_Specifications.md), and go through the build scripts. 
 
-The [CL Examples directory](https://github.com/aws/aws-fpga/hdk/cl/examples) is provided to assist developers in creating a
+The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
 functional Custom Logic implementation. Each example includes:
 
 1) The design source code for the example included in the `/design` directory.
@@ -24,14 +24,19 @@ To summarize:
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
-## Follow these steps to create an AFI from the cl example:
+## Follow these steps to create an AFI from one of the CL example:
 
-Have the AWS FGPA AMI installed on an instance. See the README for the
-AWS FPGA AMI in the AWS marketplace for details on launching the FPGA
-AMI for development. &lt;Need link for AWS FPGA AMI&gt;
+As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details on launching the AMI, installing the tools and license.
 
-Download and configure the HDK to the source directory on the instance.
-Prepare a directory for the new example by either creating directories
+### 1. Download and configure the HDK to the source directory on the instance.
+
+    $ git clone https://github.com/aws/aws-fpga
+    $ cd aws-fpga
+    $ source hdk_shell.sh
+    
+### 2. Prepare a directory for the new example
+
+By creating a new directory, setup the environment variables
 manually or call source
 \$(HDK\_DIR)/cl/developer\_designs/prepare\_new\_cl.sh from within the
 directory you want to use for your CL development. A) Set the
