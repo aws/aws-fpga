@@ -27,19 +27,22 @@ By following the example CLs, a Developer could understand how to interface to t
 
 ## Follow these steps to create an AFI from one of the CL example:
 
-As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details on launching the AMI, installing the tools and license.
+As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
 ### 1. Download and configure the HDK to the source directory on the instance.
 
-    $ git clone https://github.com/aws/aws-fpga
-    $ cd aws-fpga
-    $ source hdk_shell.sh
+        $ git clone https://github.com/aws/aws-fpga
+        $ cd aws-fpga
+        $ source hdk_shell.sh
     
 ### 2. Prepare a directory for the new example
 
-By creating a new directory, setup the environment variables
-manually or call source
-\$(HDK\_DIR)/cl/developer\_designs/prepare\_new\_cl.sh from within the
+By creating a new directory, setup the environment variables, and prepare the project datastructure:
+
+        $ mkdir Your_New_CL_Directory
+        $ cd Your_New_CL_Directory
+        $ export CL_DIR=$(pwd)
+        $ source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh from within the
 directory you want to use for your CL development. A) Set the
 environment variable CL\_DIR pointing to directory where the CL is
 (export CL\_DIR=Directory\_You\_Want\_For\_Your\_New\_CL) and B) Keep
