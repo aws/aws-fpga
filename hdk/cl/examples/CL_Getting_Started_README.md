@@ -5,40 +5,44 @@ The developer can build custom Logic (CL) as deploy on AWS as long as the CL com
 The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
 functional Custom Logic implementation. Each example includes:
 
-1) The design source code for the example included in the `/design` directory.
+    1) The design source code for the example included in the `/design` directory.
 
-2) The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instacne/server that have Xilinx tools and license install. Developers are recommended to use "FPGA Development AMI" available free of charge on AWS Marketplace"
+    2) The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instacne/server that have Xilinx tools and license install. Developers are recommended to use "FPGA Development AMI" available free of charge on AWS Marketplace"
 
-3) The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI
+    3) The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI
 
-4) An AFI-ID for a pre-generated AFI that matches the example design
+    4) An AFI-ID for a pre-generated AFI that matches the example design
 
-5) Software source code for any software needed in the FPGA enabled instance to run the example
+    5) Software source code for any software needed in the FPGA enabled instance to run the example
 
-6) Software binary that can be loaded on an F1 instance to test the AFI. 
+    6) Software binary that can be loaded on an F1 instance to test the AFI. 
 
 To summarize:
-** An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on-premise services
 
-** The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6. 
+**An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on-premise services**
+
+**The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.**
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
 ## Follow these steps to create an AFI from one of the CL example:
 
-As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details on launching the AMI, installing the tools and license.
+As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
 ### 1. Download and configure the HDK to the source directory on the instance.
 
-    $ git clone https://github.com/aws/aws-fpga
-    $ cd aws-fpga
-    $ source hdk_shell.sh
+        $ git clone https://github.com/aws/aws-fpga
+        $ cd aws-fpga
+        $ source hdk_shell.sh
     
 ### 2. Prepare a directory for the new example
 
-By creating a new directory, setup the environment variables
-manually or call source
-\$(HDK\_DIR)/cl/developer\_designs/prepare\_new\_cl.sh from within the
+By creating a new directory, setup the environment variables, and prepare the project datastructure:
+
+        $ mkdir Your_New_CL_Directory
+        $ cd Your_New_CL_Directory
+        $ export CL_DIR=$(pwd)
+        $ source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh from within the
 directory you want to use for your CL development. A) Set the
 environment variable CL\_DIR pointing to directory where the CL is
 (export CL\_DIR=Directory\_You\_Want\_For\_Your\_New\_CL) and B) Keep
