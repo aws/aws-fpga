@@ -200,7 +200,7 @@ sh_bfm sh(
    .rst_xtra_n(rst_xtra_n),
    .clk_out(clk_out),
    .rst_out_n(rst_out_n),
-   .sh_cl_pwr_state(),
+   .sh_cl_pwr_state(sh_cl_pwr_state),
 
    //------------------------
    // PCI Express
@@ -620,28 +620,12 @@ sh_bfm sh(
                                        
       );
 
-/*
-   logic [31:0]        read_data;
-   
-   initial begin
-      sh.power_up();
-
-      sh.peek(64'h0, read_data);
-      $display("read_data: %x", read_data);
-      
-      sh.peek(64'h4, read_data);
-      $display("read_data: %x", read_data);
-      
-      sh.peek(64'h8, read_data);
-      $display("read_data: %x", read_data);
-      
-      sh.poke(64'h10, 32'h11223344);
-      
-      #500ns;
-      
-      sh.power_down();
-      $finish;
-   end
-*/
    
 endmodule // tb
+
+`ifdef XILINX_SIMULATOR
+  module short(in1, in1);
+    inout in1;
+  endmodule
+`endif
+

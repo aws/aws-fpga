@@ -103,3 +103,11 @@ ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core.sv
 ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core_ddr4.sv
 ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core_ddr4_mem_intfc.sv
 ${XILINX_IP}/ddr4_core/tb/microblaze_mcs_0.sv
+
+--include ${HDK_COMMON_DIR}/verif/models/ddr4_model
+
+--sourcelibdir ${HDK_COMMON_DIR}/verif/models/ddr4_model
+--sourcelibdir ${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper
+
+# ${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rdimm_wrapper.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_model/ddr4_sdram_model_wrapper.sv
