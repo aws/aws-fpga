@@ -1,23 +1,5 @@
 
-#**************************************************************************
-#*************             BittWare Incorporated              *************
-#*************      45 S. Main Street, Concord, NH 03301      *************
-#**************************************************************************
-# LEGAL NOTICE:
-#                 Copyright (c) 2016 BittWare, Inc.
-#   The user is hereby granted a non-exclusive license to use and or
-#     modify this code provided that it runs on BittWare hardware.
-#   Usage of this code on non-BittWare hardware without the express
-#      written permission of BittWare is strictly prohibited.
-#
-# E-mail: support@bittware.com                    Tel: 603-226-0404
-#**************************************************************************
 
-### Created by: Jeff Sanders
-### Date: 21 Mar 2016
-###
-### Constraints for 4x32GB RDIMMs ###
-###
 ##############################################
 ##########      Memory Clocks       ##########
 ##############################################
