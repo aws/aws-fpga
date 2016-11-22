@@ -22,7 +22,7 @@ after installing, go the root directory of the HDK and call â€˜sh hdk_setup.shâ€
 
 The [documents directory](./docs) have the specification for the AWS Shell to CL interface, and step by step walkthrough how to use the HDK
 
-The [common directory] (./common) include AWS-provided scripts, timing constrains and compile settings required during the AFI generation process. Developers should not change these files
+The [common directory] (./common) include AWS-provided scripts, timing constraints and compile settings required during the AFI generation process. Developers should not change these files
 
 The [Custom Logic (cl)](./cl) directory is where the Custom Logic is expected to be developed, it includes a set of [examples directory](./cl/examples), as well as a placeholder for developer's own Custom Logic under [developer_designs directory] (./cl/developer_designs).  
 

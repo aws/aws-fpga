@@ -37,8 +37,8 @@ As a pre-cursor to the encryption and build proces,  modify the `$CL_DIR/build/s
 
 to include all the 
 	3a) The list of CL encrypted files in `$CL_DIR/build/src_post_encryption`
-	3b) The list of CL specific timing and placement constrains in `$CL_DIR/build/constrains`
-	3c) The specific constrains and design file for IP included in your CL like DDR4
+	3b) The list of CL specific timing and placement constraints in `$CL_DIR/build/constraints`
+	3c) The specific constraints and design file for IP included in your CL like DDR4
 
 ### 4) Run the build 
 
@@ -60,7 +60,7 @@ the process that AWS uses to generate bitstreams from a developer DCP. The scrip
       - '$CL_DIR/build/to_aws/SH_CL_routed.dcp': Encrypted placed-and-routed design checkpoint for AWS ingestion
       - '$CL_DIR/build/reports/*': Various build reports (generally, check_timing/report_timing)
       - '$CL_DIR/build/src_post_encryption/*': Encrypted developer source
-      - '$CL_DIR/build/constrains/*': Implementation constraints
+      - '$CL_DIR/build/constraints/*': Implementation constraints
 
    A developer may need to iterate multiple times through this process until arriving upon an error-free run.
 
