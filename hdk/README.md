@@ -37,7 +37,7 @@ after installing, go the root directory of the HDK and call ‘source hdk_setup.
 
 ### Try out our Hello World Example and others
 
-The [Hello World Readme](./cl/examples/hello_world/README.md) walks the developer how to build an AFI from the provided Hello World example and how to run it on an F1 instance.
+The [Hello World Readme](./cl/examples/cl_hello_world/README.md) walks the developer how to build an AFI from the provided Hello World example and how to run it on an F1 instance.
 
 Other examples are available in the [Examples directory](./cl/examples), each with its own README.md file.
 
