@@ -55,7 +55,7 @@ Follow the [verification environment setup](.TBD) to run these simulations
 
 ### Build and submit the Custom Logic to AWS for generating AFI
 
-You can follow the [build scripts](./common/shell_latest/build/README.md) for step by step instructions how to set up the scripts and run the build process.
+You can follow the [build scripts](./common/shell_current/new_cl_template/build/README.md) for step by step instructions how to set up the scripts and run the build process.
 
 ## FAQ
 
