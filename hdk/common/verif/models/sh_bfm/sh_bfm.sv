@@ -296,13 +296,6 @@ typedef struct {
       sh_cl_pwr_state <= 2'b00;
    end
    
-   initial begin
-      for (int i=0; i<NUM_PCIE; i++) begin
-         cfg_max_payload[i] <= 2'b01; // 256 bytes
-         cfg_max_read_req[i] <= 3'b001; // 256 bytes
-      end
-   end
-
    //
    // sh->cl Address Write Channel
    //
@@ -494,34 +487,6 @@ typedef struct {
       cl_sh_rd_data.pop_front();
       
    endtask // peek
-   
-   task set_max_payload(input logic [1:0] max_payload, int num_pcie = 0);
-
-      // Valid settings
-      //   2'b00 : 128 bytes
-      //   2'b01 : 256 bytes
-      //   2'b10 : 512 bytes
-      //   2'b11 : 1024 bytes
-
-      @(posedge clk_out)
-      cfg_max_payload[num_pcie] <= max_payload;
-      @(posedge clk_out);
-   endtask // cfg_max_payload
-   
-   task set_max_read_req(input logic [2:0] max_read_req, int num_pcie = 0);
-
-      // Valid settings
-      //   3'b000 : 128 bytes
-      //   3'b001 : 256 bytes
-      //   3'b010 : 512 bytes
-      //   3'b011 : 1024 bytes
-      //   3'b100 : 2048 bytes
-      //   3'b101 : 4096 bytes
-
-      @(posedge clk_out)
-      cfg_max_read_req[num_pcie] <= max_read_req;
-      @(posedge clk_out);
-   endtask // cfg_max_read_req
 
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
       AXI_Command cmd;
@@ -551,6 +516,8 @@ typedef struct {
            data.last = 0;
       end
 
+      $display("Write data is %x strb is %x len is %x \n", data.data, data.strb, len);
+      
       #20ns sh_cl_wr_data.push_back(data);
       
       while (cl_sh_b_resps.size() == 0)
@@ -568,8 +535,6 @@ typedef struct {
       int mem_arr_idx;
       int len;
 
-      len = $size(dat);
-      
       cmd.addr = start_addr;
       cmd.len  = len;
       cmd.id   = 2;
