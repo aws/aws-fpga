@@ -43,18 +43,19 @@ Other examples are available in the [Examples directory](./cl/examples), each wi
 
 ### Start your own Custom Logic design
 
-Follow the [instructions](./cl/developer_designs/README.me) to set up a new Custom Logic directory following AWS FPGA HDK convention.
+Follow the [instructions](./cl/developer_designs/README.md) to set up a new Custom Logic directory following AWS FPGA HDK convention.
+
 Note that you have to define the environment variable CL_DIR for the rest of the steps to function properly
 
 ### Simulate your Custom Logic design
 
 You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys', Mentor's, or Cadence).
+
 Follow the [verification environment setup](.TBD) to run these simulations
 
 ### Build and submit the Custom Logic to AWS for generating AFI
 
 You can follow the [build scripts](./common/shell_latest/build/README.md) for step by step instructions how to set up the scripts and run the build process.
-
 
 ## FAQ
 
