@@ -1,4 +1,4 @@
-# Building a Custom Logic (CL) implementation for AWS FPGA instances
+# Overview on process for building a Custom Logic (CL) implementation for AWS FPGA instances
 
 The developer can build custom Logic (CL) as deploy on AWS as long as the CL complies with [AWS Shell Specification](https://github.com/aws/aws-fpga/hdk/doc/AWS_Shell_Interface_Specifications.md), and go through the build scripts. 
 
@@ -25,7 +25,7 @@ To summarize:
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
-## Follow these steps to create an AFI from one of the CL example:
+# Follow these steps to create an AFI from one of the CL example:
 
 As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
@@ -38,19 +38,20 @@ As a pre-requested to building the AFP, the developer should have an instance/se
         $ cd aws-fpga
         $ source hdk_shell.sh
     
-### 2. Prepare a directory for the new CL example
+### 2. Pick one of the examples and move to its directory
 
 There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
 
 Alternatively, by creating a new directory, setup the environment variables, and prepare the project datastructure:
 
-        $ mkdir Your_New_CL_Directory
-        $ cd Your_New_CL_Directory
+        $ cd $HDK_DIR/cl/examples/cl_hello_world    # you can change cl_hello_world to any other example
         $ export CL_DIR=$(pwd)
-        $ source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh 
         
 Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
-The `prepare_new_cl.sh` would set up the directory structure to match what's expected by the HDK simulation and build scripts.
+Each one of the examples following the recommended directory structure to match what's expected by the HDK simulation and build scripts.
+
+If you like to start your own CL, check out the [How to create your own CL Readme](../developer_designs/README.md)
+
 
 ### 3. Build the CL before submitting to AWS
 
