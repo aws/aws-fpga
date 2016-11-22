@@ -1,29 +1,42 @@
-Building a Custom Logic (CL) implementation in the AWS FPGA instance
-requires an implementation that complies with the CL specification. The
-following CL examples are provided to assist developers in creating a
-functional Custom Logic implementation. All examples are included in the
-hdk/cl/examples directory. Each example includes 1) the design source
-code for the example included in the /design/cl directory, 2)
-constraints and scripts for compiling the example design in the
-Developer AMI, 3) a design checkpoint that can be submitted for AFI
-generation, 4) an AFI-ID for a pre-generated AFI that matches the
-example design, 5) software source code for any software needed in the
-instance to run the example, and 6) software images that can be loaded
-on an F1 instance to test the AFI on an F1 instance. An AFI can be
-creating using the files in sections 1, 2, & 3. The AFI can be used in
-an F1 instance by using the files in sections 4, 5 & 6. By following the
-example CLs, a Developer should be understand how to interface to the
-Shell blocks of the FPGA, compile design source code to create an AFI,
-and load an AFI from the F1 instance for use.
+# Building a Custom Logic (CL) implementation for AWS FPGA instances
 
-**Follow these steps to create an AFI from the cl example:**
+The developer can build custom Logic (CL) as deploy on AWS as long as the CL complies with [AWS Shell Specification](https://github.com/aws/aws-fpga/hdk/doc/AWS_Shell_Interface_Specifications.md), and go through the build scripts. 
 
-Have the AWS FGPA AMI installed on an instance. See the README for the
-AWS FPGA AMI in the AWS marketplace for details on launching the FPGA
-AMI for development. &lt;Need link for AWS FPGA AMI&gt;
+The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
+functional Custom Logic implementation. Each example includes:
 
-Download and configure the HDK to the source directory on the instance.
-Prepare a directory for the new example by either creating directories
+1) The design source code for the example included in the `/design` directory.
+
+2) The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instacne/server that have Xilinx tools and license install. Developers are recommended to use "FPGA Development AMI" available free of charge on AWS Marketplace"
+
+3) The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI
+
+4) An AFI-ID for a pre-generated AFI that matches the example design
+
+5) Software source code for any software needed in the FPGA enabled instance to run the example
+
+6) Software binary that can be loaded on an F1 instance to test the AFI. 
+
+To summarize:
+** An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on-premise services
+
+** The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6. 
+
+By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
+
+## Follow these steps to create an AFI from one of the CL example:
+
+As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details on launching the AMI, installing the tools and license.
+
+### 1. Download and configure the HDK to the source directory on the instance.
+
+    $ git clone https://github.com/aws/aws-fpga
+    $ cd aws-fpga
+    $ source hdk_shell.sh
+    
+### 2. Prepare a directory for the new example
+
+By creating a new directory, setup the environment variables
 manually or call source
 \$(HDK\_DIR)/cl/developer\_designs/prepare\_new\_cl.sh from within the
 directory you want to use for your CL development. A) Set the

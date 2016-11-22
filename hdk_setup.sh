@@ -11,5 +11,19 @@ export HDK_SHELL_DIR=$HDK_COMMON_DIR/shell_latest
 # The CL_DIR is where the actual Custom Logic design reside, the developer is expected to override this
 export CL_DIR=$HDK_DIR/cl/developer_designs
 
+echo "Done setting environment variables.";
 # Create DDR and PCIe IP models and patch PCIe
-source $HDK_DIR/common/verif/scripts/init.sh
+if [ ! -f $HDK_COMMON_DIR/verif/models/ddr4_model/arch_defines.v ]
+then
+  echo "DDR4 model files in "$HDK_COMMON_DIR/verif/models/ddr4_model/" do NOT exist. Running model creation step.";
+  # Run init.sh then clean-up
+  source $HDK_DIR/common/verif/scripts/init.sh
+  echo "Done with model creation step. Cleaning up temporary files.";
+  rm -fr tmp
+  rm vivado*jou
+  rm vivado*log
+else
+  echo "DDR4 model files exist in "$HDK_COMMON_DIR/verif/models/ddr4_model/". Skipping model creation step.";
+fi
+echo "Done with setup.";
+

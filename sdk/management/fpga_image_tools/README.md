@@ -49,7 +49,7 @@ Display the current state for the given FPGA logical slot number.  Shows the FPG
 fpga-describe-local-image -S 0 -H
 
 Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-AFI           0        cleared    1
+AFI           0    none    cleared    1
 Type    VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
@@ -91,7 +91,7 @@ Display the current state for the given FPGA logical slot number. Will show the 
 fpga-describe-local-image -S 0 -H
 
 Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-AFI           0        cleared    1
+AFI           0    none    cleared    1
 Type    VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
