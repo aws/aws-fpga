@@ -1,5 +1,9 @@
 ##################################################################
 ## Makefile For Questa compiles and simulations
+## Step to run :
+## 1. make create_libs QUESTA=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all QUESTA=1  -> Runs the test
 ##################################################################
 
 compile:
