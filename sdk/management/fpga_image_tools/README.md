@@ -1,6 +1,6 @@
-# Amazon FPGA Image Management Tools
+# Amazon FPGA Image (AFI) Management Tools
 
-AWS provides the following set of tools for Amazon FPGA Image (AFI) managment.   
+AWS provides the following a set of commands(tools) for Amazon FPGA Image (AFI) managment while running on an FPGA-enabled EC2 instance like EC2 F1. **The tools support Linux Instances only**
 
 * **fpga-describe-local-image-slots**
    * Returns the FPGA image slot numbers and device mappings to use for the fpga-load-local-image, fpga-clear-local-image, and fpga-describe-local-image commands.
@@ -11,27 +11,27 @@ AWS provides the following set of tools for Amazon FPGA Image (AFI) managment.
 * **fpga-clear-local-image**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
 
-## Prerequisites
-* Linux based F1 instance.
-
-## Versions
-* Amazon Linux 2016.09
-
 ## Installs or updates to the Amazon FPGA Image Management Tools
-* The tools come pre-installed in `/usr/bin` for Amazon Linux.
-* AWS SDK/HDK is available from the github repository [aws-fpga](https://github.com/aws/aws-fpga).
-   * Once the AWS SDK/HDK is downloaded from the github repository, the [sdk_setup](https://github.com/aws/aws-fpga/tree/master/sdk) script can be executed to build and install the tools in `/usr/bin`.
+
+The tools come pre-installed in `/usr/bin` for Amazon Linux, version 2016.09 or later.
+
+Alternatively, the tools can be downloaded and installed from AWS SDK/HDK github repository [aws-fpga](https://github.com/aws/aws-fpga)
+
+    $ git clone https://github.com/aws/aws-fpga
+    $ cd aws-fpga
+    $ source sdk_setup.sh
+    
+The sdk_setup.sh script will build the AFI management tool and install them in `/usr/bin`.
 
 ## Quickstart
 
-Display the logical FPGA slot numbers and device mappings for driver attachment (e.g. PCI Domain:Bus:Device:Function).
+Once you have the AFI Management Tools in your F1 instance, you can display the logical FPGA slot numbers and PCIe mappings for driver attachment (e.g. PCI Domain:Bus:Device:Function).
 
 ```
-
 fpga-describe-local-image-slots -H
 
-Type    FpgaImageSlot    VendorId    DeviceId    DBDF
-AFIDEVICE     0    0x1d0f    0x1042    0000:00:17.0
+TypeFpgaImage Slot  VendorId      DeviceId      DBDF
+AFIDEVICE     0     0x1d0f      0x1042    0000:00:17.0
 AFIDEVICE     1    0x1d0f    0x1042    0000:00:18.0
 AFIDEVICE     2    0x1d0f    0x1042    0000:00:19.0
 AFIDEVICE     3    0x1d0f    0x1042    0000:00:1a.0
