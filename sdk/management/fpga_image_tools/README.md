@@ -21,7 +21,7 @@ Alternatively, the tools can be downloaded and installed from AWS SDK/HDK github
     $ cd aws-fpga
     $ source sdk_setup.sh
     
-The sdk_setup.sh script will build the AFI management tool and install them in `/usr/bin`.
+The `sdk_setup.sh` script will build the AFI management tool and install them in `/usr/bin`.
 
 ## Quickstart
 
@@ -30,28 +30,29 @@ Once you have the AFI Management Tools in your F1 instance, you can display the 
 ```
 fpga-describe-local-image-slots -H
 
-TypeFpgaImage Slot  VendorId      DeviceId      DBDF
+TypeFpgaImage Slot  VendorId     DeviceId      DBDF
 AFIDEVICE     0     0x1d0f      0x1042    0000:00:17.0
-AFIDEVICE     1    0x1d0f    0x1042    0000:00:18.0
-AFIDEVICE     2    0x1d0f    0x1042    0000:00:19.0
-AFIDEVICE     3    0x1d0f    0x1042    0000:00:1a.0
-AFIDEVICE     4    0x1d0f    0x1042    0000:00:1b.0
-AFIDEVICE     5    0x1d0f    0x1042    0000:00:1c.0
-AFIDEVICE     6    0x1d0f    0x1042    0000:00:1d.0
-AFIDEVICE     7    0x1d0f    0x1042    0000:00:1e.0
-
-
+AFIDEVICE     1     0x1d0f    0x1042    0000:00:18.0
+AFIDEVICE     2     0x1d0f    0x1042    0000:00:19.0
+AFIDEVICE     3     0x1d0f    0x1042    0000:00:1a.0
+AFIDEVICE     4     0x1d0f    0x1042    0000:00:1b.0
+AFIDEVICE     5     0x1d0f    0x1042    0000:00:1c.0
+AFIDEVICE     6     0x1d0f    0x1042    0000:00:1d.0
+AFIDEVICE     7     0x1d0f    0x1042    0000:00:1e.0
 ```
 
+*The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7.
+  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs
+  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default
+  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#
 Display the current state for the given FPGA logical slot number.  Shows the FPGA in the “cleared” state on instance create.
 
 ```
-
 fpga-describe-local-image -S 0 -H
 
 Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-AFI           0    none    cleared    1
-Type    VendorId    DeviceId    DBDF
+AFI     0                 none            cleared         1
+Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 ```
