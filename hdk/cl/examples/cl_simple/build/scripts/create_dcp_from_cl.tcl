@@ -34,26 +34,6 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
-#checking if HDK_COMMON_DIR env variable exists
-if { [info exists ::env(HDK_COMMON_DIR)] } {
-        set HDK_COMMON_DIR $::env(HDK_COMMON_DIR)
-        puts "Using Common directory $HDK_COMMON_DIR";
-} else {
-        puts "Error: HDK_COMMON_DIR environment variable not defined ! ";
-        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
-        exit 2
-}
-
-#checking if HDK_DIR env variable exists
-if { [info exists ::env(HDK_DIR)] } {
-        set HDK_DIR $::env(HDK_DIR)
-        puts "Using HDK directory $HDK_DIR";
-} else {
-        puts "Error: HDK_DIR environment variable not defined ! ";
-        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
-        exit 2
-}
-
 #Convenience to set the root of the RTL directory
 set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
@@ -109,9 +89,9 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-$HDK_DIR/top/vu9p/design/mgt/mgt_acc_ccf.sv \
-$HDK_DIR/top/vu9p/design/mgt/mgt_acc_axl.sv  \
-$HDK_DIR/top/vu9p/design/mgt/mgt_gen_axl.sv  \
+$HDK_SHELL_DIR/design/mgt/mgt_acc_ccf.sv \
+$HDK_SHELL_DIR/design/mgt/mgt_acc_axl.sv  \
+$HDK_SHELL_DIR/design/mgt/mgt_gen_axl.sv  \
 $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
 $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
@@ -161,8 +141,19 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 # CL Synthesis
 ########################
+puts "AWS FPGA: Start design synthesis";
+
 synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
-opt_design -verbose -directive Explore
+
+set failval [catch {exec grep "FAIL" failfast.csv}]
+if { $failval==0 } {
+	puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
+	exit 1
+}
+
+puts "AWS FPGA: Optimizing design";
+opt_design -directive Explore
+
 check_timing -file $CL_DIR/build/reports/${timestamp}.cl.synth.check_timing_report.txt
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.synth.timing_summary.rpt
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
@@ -172,31 +163,44 @@ close_design
 # Implementation
 #######################
 #Read in the Shell checkpoint and do the CL implementation
+puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
+
 open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
 read_xdc {
-$CL_DIR/build/constraints/cl_pnr_aws.xdc
+$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
 $CL_DIR/build/constraints/cl_pnr_user.xdc
-$CL_DIR/build/constraints/ddr.xdc
+$HDK_SHELL_DIR/build/constraints/ddr.xdc
 }
 
-opt_design -verbose -directive Explore
+puts "AWS FPGA: Optimize design during implementation";
+
+opt_design -directive Explore
 check_timing -file $CL_DIR/build/reports/${timestamp}.SH_CL.check_timing_report.txt
 
+puts "AWS FPGA: Place design stage";
 #place_design -verbose -directive Explore
-place_design -verbose -directive WLDrivenBlockPlacement
+place_design -directive WLDrivenBlockPlacement
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
-phys_opt_design -verbose -directive Explore
+puts "AWS FPGA: Physical optimization stage";
+
+phys_opt_design -directive Explore
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.post_place_opt.timing_summary.rpt
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place_opt.dcp
 
-#route_design  -verbose -directive Explore
-route_design  -verbose -directive MoreGlobalIterations
+puts "AWS FPGA: Route design stage";
 
-phys_opt_design -verbose -directive Explore
+#route_design  -verbose -directive Explore
+route_design  -directive MoreGlobalIterations
+
+puts "AWS FPGA: Post-route Physical optimization stage ";
+
+phys_opt_design  -directive Explore
+
+puts "AWS FPGA: Locking design ";
 
 lock_design -level routing
 
@@ -205,11 +209,13 @@ report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_
 #This is what will deliver to AWS
 write_checkpoint -force $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp
 
+puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+
 #Verify PR build
 pr_verify -full_check $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
 # created a zipped tar file, that would be used for createFpgaImage EC2 API
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/*
+exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/${timestamp}*
 

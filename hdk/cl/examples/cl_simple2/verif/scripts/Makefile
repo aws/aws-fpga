@@ -15,5 +15,4 @@ else
   include Makefile.vivado
 endif
 
-
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
