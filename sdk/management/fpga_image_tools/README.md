@@ -11,6 +11,8 @@ AWS provides the following a set of commands(tools) for Amazon FPGA Image (AFI) 
 * **fpga-clear-local-image**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
 
+**All of the Amazon FPGA Image Management Tools support a `-help` option that may be used to display the full set of options.**
+
 ## Installs or updates to the Amazon FPGA Image Management Tools
 
 The tools come pre-installed in `/usr/bin` for Amazon Linux, version 2016.09 or later.
@@ -27,25 +29,32 @@ The `sdk_setup.sh` script will build the AFI management tool and install them in
 
 Once you have the AFI Management Tools in your F1 instance, you can display the logical FPGA slot numbers and PCIe mappings for driver attachment (e.g. PCI Domain:Bus:Device:Function).
 
+#### Getting inventory of the available FPGA
 ```
 fpga-describe-local-image-slots -H
 
-TypeFpgaImage Slot  VendorId     DeviceId      DBDF
+TypeFpgaImage Slot  VendorId    DeviceId      DBDF
 AFIDEVICE     0     0x1d0f      0x1042    0000:00:17.0
-AFIDEVICE     1     0x1d0f    0x1042    0000:00:18.0
-AFIDEVICE     2     0x1d0f    0x1042    0000:00:19.0
-AFIDEVICE     3     0x1d0f    0x1042    0000:00:1a.0
-AFIDEVICE     4     0x1d0f    0x1042    0000:00:1b.0
-AFIDEVICE     5     0x1d0f    0x1042    0000:00:1c.0
-AFIDEVICE     6     0x1d0f    0x1042    0000:00:1d.0
-AFIDEVICE     7     0x1d0f    0x1042    0000:00:1e.0
+AFIDEVICE     1     0x1d0f      0x1042    0000:00:18.0
+AFIDEVICE     2     0x1d0f      0x1042    0000:00:19.0
+AFIDEVICE     3     0x1d0f      0x1042    0000:00:1a.0
+AFIDEVICE     4     0x1d0f      0x1042    0000:00:1b.0
+AFIDEVICE     5     0x1d0f      0x1042    0000:00:1c.0
+AFIDEVICE     6     0x1d0f      0x1042    0000:00:1d.0
+AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 ```
 
 *The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7.
+  
   *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs
+  
   *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default
+  
   *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#
-Display the current state for the given FPGA logical slot number.  Shows the FPGA in the “cleared” state on instance create.
+
+#### Describing the AFI content loaded on a specific FPGA Slot
+
+The next command displas the current state for the given FPGA logical slot number.  Shows the FPGA in the “cleared” state right after instance create.
 
 ```
 fpga-describe-local-image -S 0 -H
@@ -57,54 +66,57 @@ AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 ```
 
-Load a FPGA image. Uses the FPGA logical slot number and Amazon Global FPGA Image parameters (see FAQ for AGFI).
+#### Loading a specific AFI to a specific slot
+
+To Load the AFI, Use the FPGA logical slot number and Amazon Global FPGA Image parameters (see FAQ for AGFI).
 
 ```
-
 fpga-load-local-image -S 0 -I agfi-004f34c45ed4e9603
 
 ```
+#### Describing the AFI content loaded on a specific FPGA slot after  load
 
-Display the current state for the given FPGA logical slot number.  Shows the FPGA in the “loaded” state after the FPGA image "load" operation.
+Displays the current state for the given FPGA logical slot number.  Shows the FPGA in the “loaded” state after the FPGA image "load" operation.
 
 ```
 
 fpga-describe-local-image -S 0 -H
 
-Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-AFI           0    agfi-004f34c45ed4e9603    loaded    0
-Type    VendorId    DeviceId    DBDF
+Type    FpgaImageSlot    FpgaImageId          StatusName    StatusCode
+AFI     0             agfi-004f34c45ed4e9603    loaded          0
+Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 ```
+#### Clearing the FPGA image on specific slot
 
-Clear the FPGA image, including internal and external memories.
+The next command will clear the FPGA image, including internal and external memories.
 
 ```
 
 fpga-clear-local-image -S 0
 
 ```
+#### Describing the AFI content loaded on a specific FPGA slot after clear
 
-Display the current state for the given FPGA logical slot number. Will show the FPGA in the “cleared” state after the FPGA image "clear" operation.
+Displays the current state for the given FPGA logical slot number. It shows the FPGA in the “cleared” state after the FPGA image "clear" operation.
 
 ```
-
 fpga-describe-local-image -S 0 -H
 
 Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-AFI           0    none    cleared    1
-Type    VendorId    DeviceId    DBDF
+AFI     0               none              cleared         1
+Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 ```
 
-The fpga-describe-local-image **metrics** option may be used to display FPGA image hardware metrics.
-Examples: FPGA PCI and DDR ECC Metrics.
+#### Looking at metrics
 
-Additionally, the fpga-describe-local-image **clear-metrics** option may be used to display and clear FPGA image hardware metrics (clear on read).
+The `fpga-describe-local-image **metrics**` option may be used to display FPGA image hardware metrics, like FPGA PCI and DDR ECC Metrics.
 
-All of the Amazon FPGA Image Management Tools support a **help** option that may be used to display the full set of options.
+Additionally, the `fpga-describe-local-image **clear-metrics**` option may be used to display and clear FPGA image hardware metrics (clear on read).
+
  
 ## fpga-describe-local-image **metrics** option
 The following FPGA image hardware metrics are provided:
