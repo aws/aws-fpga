@@ -451,33 +451,27 @@ typedef struct {
 
 
    //
-   // write Data Channel
-   //
-
-   //
-   // sh->cl Address Write Channel
+   // cl-sh write Data Channel
    //
 
    always @(posedge clk_out) begin
-      if (sh_cl_wr_data.size() != 0) begin
+      AXI_Data wr_data;
+      
+      if (sh_cl_pcim_wready[0] && cl_sh_pcim_wvalid[0]) begin
+         wr_data.data = cl_sh_pcim_wdata[0];
+         wr_data.strb = cl_sh_pcim_wstrb[0];
+         wr_data.last = cl_sh_pcim_wlast[0];
 
-         sh_cl_pcis_wdata[0] <= sh_cl_wr_data[0].data;
-         sh_cl_pcis_wstrb[0] <= sh_cl_wr_data[0].strb;
-         sh_cl_pcis_wlast[0] <= sh_cl_wr_data[0].last;
+         cl_sh_wr_data.push_back(wr_data);
          
-         sh_cl_pcis_wvalid[0] <= !sh_cl_pcis_wvalid[0] ? 1'b1 :
-                                 !cl_sh_pcis_wready[0] ? 1'b1 : 1'b0;
-         
-         if (cl_sh_pcis_wready[0] && sh_cl_pcis_wvalid[0]) begin
-            $display("%t - debug popping wr data fifo - %d", $time(), sh_cl_wr_data.size());
-            sh_cl_wr_data.pop_front();
-         end
-
       end
+      if (cl_sh_wr_data.size() > 64)
+        sh_cl_pcim_wready[0] <= 1'b0;
       else
-         sh_cl_pcis_wvalid <= 1'b0;
+        sh_cl_pcim_wready[0] <= 1'b1;
+        
    end
-
+/*
    //
    // cl->sh B Response Channel
    //
@@ -543,7 +537,8 @@ typedef struct {
       end
 
    end
-
+*/
+   
    //==========================================================
    
    task power_up;
@@ -618,6 +613,8 @@ typedef struct {
       
    endtask // peek
 
+`ifndef NEVER
+   
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
       AXI_Command cmd;
       AXI_Data data;
@@ -682,4 +679,7 @@ typedef struct {
       cl_sh_rd_data.pop_front();
       
    endtask // peek_burst
+
+`endif
+
 endmodule // sh_bfm
