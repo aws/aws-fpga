@@ -55,6 +55,7 @@ AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 
 *  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
 
+** NOTE: ** *While each FPGA have more than one PCIe Physical Function, the AFI management tools will present VendorID and DeviceId of the first PF only*
 
 #### Describing the AFI content loaded on a specific FPGA Slot
 
@@ -115,62 +116,62 @@ AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA image hardware metrics, like FPGA PCI and DDR ECC Metrics.
 
-Additionally, the `fpga-describe-local-image` **`clear-metrics`**` option may be used to display and clear FPGA image hardware metrics (clear on read).
+Additionally, the `fpga-describe-local-image` **`clear-metrics`** option may be used to display and clear FPGA image hardware metrics (clear on read).
 
  
 ## fpga-describe-local-image **metrics** option
 
-The following FPGA image hardware metrics are provided:
+The following FPGA image hardware metrics are provided. PCIe related counters have `ps` or `pm` prefix indicated a PCIe slave access (Instance CPU or other FPGAs accessing this FPGA) or PCIe master access (The FPGA is mastering and outbound transaction toward the instance memory or other FPGAs).
 
-* pci-slave-timeout 
-   * The CustomLogic (CL) did not respond to memory-mapped I/O (MMIO) read access from the instance. In most cases this indicated a design flaw in the AFI
+* ps-timeout-count (32-bit)
+  * The CustomLogic (CL) did not respond to memory-mapped I/O (MMIO) read access from the instance. In most cases this indicated a design flaw in the AFI
 
-* pci-range-error 
-   * The CustomLogic (CL) trying to initiate outbound Read/Write (PCI master) to instance host memory or other FPGAs on the PCIe fabric, but has illegal address
+* ps-timeout-addr (64-bit)
+  * The first address that got `ps-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero
+
+* pm-range-error-count (32-bit)
+   * The CustomLogic (CL) trying to initiate outbound Read/Write (PCI master) to instance memory space or other FPGAs on the PCIe fabric, but has illegal address  
    
-* pci-len-error 
+* pm-range-error-addr (64-bit)
+   * The first address that got `pm-range-error-count` event. 
+
+* pm-len-error-count (32-bit)
    * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specifications.md))
    
-* ps-timeout-addr 
-   * PCI slave timeout address
-* ps-timeout-count 
-   * PCI slave timeout count
-* pm-range-error-addr 
-   * PCI master range error address
-* pm-range-error-count 
-   * PCI master range error count
-* pm-len-error-addr 
-   * PCI master length error address
-* pm-len-error-count 
-   * PCI master length error count
-* pci-write-count 
-* pci-read-count 
-* DDR0
-   * write-count
-   * read-count
-   * ecc-status
-   * ecc-correctable-error-count
-   * ecc-correctable-error-first-failing-data[4]
-   * ecc-correctable-error-first-failing-ecc
-   * ecc-correctable-error-first-failing-address
-   * ecc-uncorrectable-error-first-failing-data[4]
-   * ecc-uncorrectable-error-first-failing-ecc
-   * ecc-uncorrectable-error-first-failing-address
-* Repeated for DDR1,2,3
+* pm-len-error-addr (64-bit)
+   * The first address that got `pm-len-error-count` event.
+
+* pm-write-count (64-bit)
+    * The number of Doublewords/DW (4 Bytes) data written by the AFI toward the instance memory or other FPGAs. DW with partial byte-enable bit-vector is still counted as whole DW in this counter. This counter will not increment in case any of the `pm-???-error-count` events happen.
+    
+* pm-read-count (64-bit)
+    * The number of Doublewords/DW (4 Bytes) data read by the AFI from the instance memory or other FPGAs. DW with partial byte-enable bit-vector is still counted as whole DW in this counter. This counter will not increment in case any of the `pm-???-error-count` events happen.
+    
+* DDR-A
+   * write-count (64-bit), counting the number of bus-beats (512-bit or 64Bytes) on the DRAM controller interface.
+   * read-count, counting the number of bus-beats (512-bit or 64Bytes) on the DRAM controller interface.
+
+* Repeated for DDR B,C,D
 
 ## FAQ
-* What is the Amazon Global FPGA Image Id (AGFI)?
+
+* **Q: What is the Amazon Global FPGA Image Id (AGFI)? **
    * The AGFI is an AWS globally unique identifier that is used to reference a specific Amazon FPGA Image (AFI).
    * In the examples, `agfi-004f34c45ed4e9603` is specified in the `fpga-load-local-image` command in order to load a specific AFI
 into the given fpga-image-slot.   
-* What is a fpga-image-slot?
+
+* **Q: What is a fpga-image-slot? **
    * The fpga-image-slot is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
-* What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?
-   * The VendorId and DeviceId represent the unique identifiers for a PCI device.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG.
-* What is a DBDF?
+
+* ** What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output? **
+   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configureation Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `createFpgaImage` EC2 call.
+
+* **Q: What is a DBDF? **
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
-* What is a PF?
+
+* **Q: What is a PF? **
    * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
+
 * What is a BAR?
    * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
 * What is the AFIDEVICE and how is it used?
