@@ -25,7 +25,7 @@ To summarize:
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
-# Step by step guide how to create an AFI from one of the CL example:
+# Step by step guide how to create an AFI from one of the CL examples
 
 As a pre-requested to building the AFI, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
