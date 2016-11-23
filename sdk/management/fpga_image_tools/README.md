@@ -47,11 +47,11 @@ AFIDEVICE     6     0x1d0f      0x1042    0000:00:1d.0
 AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 ```
 
-*The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7*
+* *The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7*
 
-  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs*
-  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default*
-  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
+*  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs*
+*  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default*
+*  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
 
 #### Describing the AFI content loaded on a specific FPGA Slot
 
@@ -104,7 +104,6 @@ Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
 AFI     0               none              cleared         1
 Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
-
 ```
 
 #### Looking at metrics
