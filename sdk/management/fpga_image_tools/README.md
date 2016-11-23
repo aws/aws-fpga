@@ -1,6 +1,6 @@
-# AWS FPGA Image Management Tools
+# Amazon FPGA Image Management Tools
 
-AWS provides the following set of tools for AWS FPGA Image (AFI) managment.   
+AWS provides the following set of tools for Amazon FPGA Image (AFI) managment.   
 
 * **fpga-describe-local-image-slots**
    * Returns the FPGA image slot numbers and device mappings to use for the fpga-load-local-image, fpga-clear-local-image, and fpga-describe-local-image commands.
@@ -11,15 +11,16 @@ AWS provides the following set of tools for AWS FPGA Image (AFI) managment.
 * **fpga-clear-local-image**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
 
+## Prerequisites
+* Linux based F1 instance.
+
 ## Versions
 * Amazon Linux 2016.09
 
-## Installs
-* Pre-installed in /usr/bin for Amazon Linux.
-* AWS SDK/HDK available from the github repository [aws-fpga](https://github.com/aws/aws-fpga).
-
-## Prerequisites
-* Linux based F1 instance.
+## Installs or updates to the Amazon FPGA Image Management Tools
+* The tools come pre-installed in `/usr/bin` for Amazon Linux.
+* AWS SDK/HDK is available from the github repository [aws-fpga](https://github.com/aws/aws-fpga).
+   * Once the AWS SDK/HDK is downloaded from the github repository, the [sdk_setup](https://github.com/aws/aws-fpga/tree/master/sdk) script can be executed to build and install the tools in `/usr/bin`.
 
 ## Quickstart
 
@@ -102,7 +103,7 @@ Examples: FPGA PCI and DDR ECC Metrics.
 
 Additionally, the fpga-describe-local-image **clear-metrics** option may be used to display and clear FPGA image hardware metrics (clear on read).
 
-All of the FPGA Image Management Tools support a **help** option that may be used to display the full set of options.
+All of the Amazon FPGA Image Management Tools support a **help** option that may be used to display the full set of options.
  
 ## fpga-describe-local-image **metrics** option
 The following FPGA image hardware metrics are provided:
@@ -139,34 +140,33 @@ The following FPGA image hardware metrics are provided:
    * ecc-uncorrectable-error-first-failing-address
 * Repeated for DDR1,2,3
 
-## Installing or updating the AWS FPGA Image Management Tools:
-* AWS will release new versions of the AWS FPGA Image Management Tools from time to time.
-* Amazon Linux will have the tools pre-installed in /usr/bin.
-* The tools may be installed (non-Amazon Linux) or updated from [aws-fpga](https://github.com/aws/aws-fpga). 
-
 ## FAQ
 * What is the Amazon Global FPGA Image Id (AGFI)?
-   * The AGFI is an AWS globally unique identifier that is used to reference a specific AWS FPGA Image (AFI).
+   * The AGFI is an AWS globally unique identifier that is used to reference a specific Amazon FPGA Image (AFI).
    * In the examples, `agfi-004f34c45ed4e9603` is specified in the `fpga-load-local-image` command in order to load a specific AFI
 into the given fpga-image-slot.   
+* What is a fpga-image-slot?
+   * The fpga-image-slot is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
+* What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?
+   * The VendorId and DeviceId represent the unique identifiers for a PCI device.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG.
+* What is a DBDF?
+   * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
 * What is a PF?
    * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
-* What is a DBDF?
-   * A DBDF is simply an acronym for Domain:Bus:Device.Function. 
 * What is a BAR?
-   * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
+   * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
 * What is the AFIDEVICE and how is it used?
-   * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (see PF).
-* How do the AWS FPGA Image Management Tools work? 
+   * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
+* How do the Amazon FPGA Image Management Tools work? 
    * Though most customers are not expected to understand the internals of the tools, a short overview is provided here:
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
-   * The AWS FPGA Image Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
-   * For more information on the FPGA Image Mangement Tool software and FPGA hardware see [aws-fpga](https://github.com/aws/aws-fpga).
-* Can the AWS FPGA Image Management Tools work concurently on multiple FPGA Image slots?
+   * The Amazon FPGA Image Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
+   * For more information on the Amazon FPGA Image Mangement Tool software and FPGA hardware see [aws-fpga](https://github.com/aws/aws-fpga).
+* Can the Amazon FPGA Image Management Tools work concurently on multiple FPGA image slots?
    * The tools can be executed on multiple FPGAs concurrently.  This may be done without synchronization between processes that are using the tools.
-* Can the AWS FPGA Image Management Tools work concurrently from multiple processes on the same FPGA?
+* Can the Amazon FPGA Image Management Tools work concurrently from multiple processes on the same FPGA?
    * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process accross all FPGAs (least level of concurrency).
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
 

@@ -28,7 +28,7 @@ module test_peek_poke();
 
       tb.sh.peek(64'h10, 6'h0, read_data);
       $display("read_data: %x", read_data);
-
+/*
       write_data_b[0] = 32'h44332211;
       write_data_b[1] = 32'h55667788;
       write_data_b[2] = 32'h99AABBCC;
@@ -44,7 +44,10 @@ module test_peek_poke();
          $display("read_data: %x", read_data_b[n]);
       end     
       #500ns;
-      
+*/
+
+      #5000ns;
+
       tb.sh.power_down();
       $finish;
    end

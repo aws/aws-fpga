@@ -439,6 +439,12 @@ typedef struct {
 
    assign ddr_user_rst_n = ~ddr_user_rst;
 
+   //=================================================
+   //
+   // sh->cl PCIeS Interface
+   //
+   //=================================================
+
    //
    // sh->cl Address Write Channel
    //
@@ -557,6 +563,131 @@ typedef struct {
       end
 
    end
+
+   //=================================================
+   //
+   // cl->sh PCIeM Interface
+   //
+   //=================================================
+
+   //
+   // cl->sh Write Address Channel
+   //
+
+   always @(posedge clk_out) begin
+      AXI_Command cmd;
+
+      if (cl_sh_pcim_awvalid[0] && sh_cl_pcim_awready[0]) begin
+         cmd.addr = cl_sh_pcim_awaddr[0];
+         cmd.id   = cl_sh_pcim_awid[0];
+         cmd.len  = cl_sh_pcim_awlen[0];
+
+         cl_sh_wr_cmds.push_back(cmd);         
+      end
+
+      if (cl_sh_wr_cmds.size() < 4)
+        sh_cl_pcim_awready[0] <= 1'b1;
+      else
+        sh_cl_pcim_awready[0] <= 1'b0;
+        
+   end
+
+
+   //
+   // write Data Channel
+   //
+
+   //
+   // sh->cl Address Write Channel
+   //
+
+   always @(posedge clk_out) begin
+      if (sh_cl_wr_data.size() != 0) begin
+
+         sh_cl_pcis_wdata[0] <= sh_cl_wr_data[0].data;
+         sh_cl_pcis_wstrb[0] <= sh_cl_wr_data[0].strb;
+         sh_cl_pcis_wlast[0] <= sh_cl_wr_data[0].last;
+         
+         sh_cl_pcis_wvalid[0] <= !sh_cl_pcis_wvalid[0] ? 1'b1 :
+                                 !cl_sh_pcis_wready[0] ? 1'b1 : 1'b0;
+         
+         if (cl_sh_pcis_wready[0] && sh_cl_pcis_wvalid[0]) begin
+            $display("%t - debug popping wr data fifo - %d", $time(), sh_cl_wr_data.size());
+            sh_cl_wr_data.pop_front();
+         end
+
+      end
+      else
+         sh_cl_pcis_wvalid <= 1'b0;
+   end
+
+   //
+   // cl->sh B Response Channel
+   //
+   always @(posedge clk_out) begin
+      sh_cl_pcis_bready[0] <= 1'b1;
+   end
+
+   always @(posedge clk_out) begin
+      AXI_Command resp;
+
+      if (cl_sh_pcis_bvalid[0] & sh_cl_pcis_bready) begin
+         resp.resp     = cl_sh_pcis_bresp[0];
+         resp.id       = cl_sh_pcis_bid[0];
+
+         cl_sh_b_resps.push_back(resp);
+      end
+
+   end
+
+
+   //
+   // sh->cl Address Read Channel
+   //
+
+   always @(posedge clk_out) begin
+      if (sh_cl_rd_cmds.size() != 0) begin
+
+         sh_cl_pcis_araddr[0]  <= sh_cl_rd_cmds[0].addr;
+         sh_cl_pcis_arid[0]    <= sh_cl_rd_cmds[0].id;
+         sh_cl_pcis_arlen[0]   <= sh_cl_rd_cmds[0].len;
+         
+         sh_cl_pcis_arvalid[0] <= !sh_cl_pcis_arvalid[0] ? 1'b1 :
+                                  !cl_sh_pcis_arready[0] ? 1'b1 : 1'b0;
+         
+         if (cl_sh_pcis_arready[0] && sh_cl_pcis_arvalid[0]) begin
+            $display("%t - debug popping cmd fifo - %d", $time(), sh_cl_rd_cmds.size());
+            sh_cl_rd_cmds.pop_front();
+         end
+
+      end
+      else
+         sh_cl_pcis_arvalid <= 1'b0;
+   end
+
+   //
+   // cl->sh Read Data Channel
+   //
+   always @(posedge clk_out) begin
+      sh_cl_pcis_rready[0] <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
+   end
+
+   always @(posedge clk_out) begin
+      AXI_Data data;
+
+      if (cl_sh_pcis_rvalid[0] & sh_cl_pcis_rready) begin
+         data.data     = cl_sh_pcis_rdata[0];
+         data.id       = cl_sh_pcis_rid[0];
+         data.last     = cl_sh_pcis_rlast[0];
+
+         $display("%t - rddata: %h", $time(), cl_sh_pcis_rdata[0]);
+         
+         cl_sh_rd_data.push_back(data);
+      end
+
+   end
+
+   //==========================================================
 
    // DDR Controller
    axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
@@ -682,7 +813,7 @@ typedef struct {
             .m_axi_wuser(),
             .m_axi_wvalid(sync_cl_sh_ddr_wvalid),
             .m_axi_wready(sync_sh_cl_ddr_wready),
-   
+
             .m_axi_bid(sync_sh_cl_ddr_bid),
             .m_axi_bresp(sync_sh_cl_ddr_bresp),
             .m_axi_buser(),
@@ -799,15 +930,6 @@ typedef struct {
             {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= 3'd0;
           else
             {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= {ddr_is_ready_sync, ddr_is_ready_presync, ddr_is_ready};
-      
-
-
-
-
-
-
-
-
 
    task power_up;
       rst_n_i = 1'b0;
@@ -883,34 +1005,6 @@ typedef struct {
       cl_sh_rd_data.pop_front();
       
    endtask // peek
-   
-   task set_max_payload(input logic [1:0] max_payload, int num_pcie = 0);
-
-      // Valid settings
-      //   2'b00 : 128 bytes
-      //   2'b01 : 256 bytes
-      //   2'b10 : 512 bytes
-      //   2'b11 : 1024 bytes
-
-      @(posedge clk_out)
-      cfg_max_payload[num_pcie] <= max_payload;
-      @(posedge clk_out);
-   endtask // cfg_max_payload
-   
-   task set_max_read_req(input logic [2:0] max_read_req, int num_pcie = 0);
-
-      // Valid settings
-      //   3'b000 : 128 bytes
-      //   3'b001 : 256 bytes
-      //   3'b010 : 512 bytes
-      //   3'b011 : 1024 bytes
-      //   3'b100 : 2048 bytes
-      //   3'b101 : 4096 bytes
-
-      @(posedge clk_out)
-      cfg_max_read_req[num_pcie] <= max_read_req;
-      @(posedge clk_out);
-   endtask // cfg_max_read_req
 
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
       AXI_Command cmd;
@@ -940,6 +1034,8 @@ typedef struct {
            data.last = 0;
       end
 
+      $display("Write data is %x strb is %x len is %x \n", data.data, data.strb, len);
+      
       #20ns sh_cl_wr_data.push_back(data);
       
       while (cl_sh_b_resps.size() == 0)
@@ -957,8 +1053,6 @@ typedef struct {
       int mem_arr_idx;
       int len;
 
-      len = $size(dat);
-      
       cmd.addr = start_addr;
       cmd.len  = len;
       cmd.id   = 2;
