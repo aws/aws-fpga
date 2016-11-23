@@ -13,16 +13,6 @@ module test_peek_poke();
    initial begin
       tb.sh.power_up();
 
-//      tb.sh.peek(64'h0, read_data);
-//      $display("read_data: %x", read_data);
-      
-//      tb.sh.peek(64'h4, read_data);
-//      $display("read_data: %x", read_data);
-      
-//      tb.sh.peek(64'h8, read_data);
-//      $display("read_data: %x", read_data);
-      
-
       tb.sh.poke(64'h1c, 0);                   // write index
       tb.sh.poke(64'h20, pcim_address[31:0]);  // write address low
       tb.sh.poke(64'h24, pcim_address[63:32]); // write address high

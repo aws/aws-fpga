@@ -1057,33 +1057,25 @@ typedef struct {
       #50ns;
    endtask // power_down
 
-   task poke(input logic [63:0] addr, logic [31:0] dat, logic [5:0] id = 2);
-      AXI_Command cmd;
-      AXI_Data data;
+   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+
       logic [1:0] resp;
-      int         byte_idx;
-      int         mem_arr_idx;
       
-      cmd.addr = addr;
-      cmd.len  = 0;
-      cmd.id   = id;
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
 
-      sh_cl_wr_cmds.push_back(cmd);
+      sh_cl_wr_cmds.push_back(axi_cmd);
 
-      byte_idx     = addr[5:0];
-      mem_arr_idx  = byte_idx*8;
+      axi_data.data = data << (addr[5:0] * 8);
+      axi_data.strb = 64'h0f << addr[5:0];
       
-//      data.data[mem_arr_idx+:32] = dat;
-//      data.strb[byte_idx+:4] = 'h0f;
+      axi_data.id   = id;
+      axi_data.last = 1'b1;
 
-      data.data = dat << addr[5:0] * 8;
-      data.strb = 64'h0f << addr[5:0];
-      
-      
-      data.id   = id;
-      data.last = 1'b1;
-
-      #20ns sh_cl_wr_data.push_back(data);
+      #20ns sh_cl_wr_data.push_back(axi_data);
       
       while (cl_sh_b_resps.size() == 0)
         #20ns;
@@ -1093,16 +1085,16 @@ typedef struct {
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output [31:0] data, input logic [5:0] id = 2);
-      AXI_Command cmd;
-      int   byte_idx;
-      int   mem_arr_idx;
+   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0);
+      AXI_Command axi_cmd;
+      int         byte_idx;
+      int         mem_arr_idx;
       
-      cmd.addr = addr;
-      cmd.len  = 0;
-      cmd.id   = id;
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
 
-      sh_cl_rd_cmds.push_back(cmd);
+      sh_cl_rd_cmds.push_back(axi_cmd);
 
       byte_idx     = addr[5:0];
       mem_arr_idx  = byte_idx*8;
@@ -1163,7 +1155,7 @@ typedef struct {
       AXI_Data data;
       int byte_idx;
       int mem_arr_idx;
-      int len;
+//      int len;
 
       cmd.addr = start_addr;
       cmd.len  = len;

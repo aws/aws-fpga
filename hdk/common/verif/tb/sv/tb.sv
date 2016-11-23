@@ -189,13 +189,13 @@ module tb();
 
 sh_bfm sh(
 
-   .cl_sh_status0(),
-   .cl_sh_status1(),
-   .cl_sh_id0(),
-   .cl_sh_id1(),
+   .cl_sh_status0(cl_sh_status0),
+   .cl_sh_status1(cl_sh_status1),
+   .cl_sh_id0(cl_sh_id0),
+   .cl_sh_id1(cl_sh_id1),
 
-   .sh_cl_ctl0(),
-   .sh_cl_ctl1(),
+   .sh_cl_ctl0(sh_cl_ctl0),
+   .sh_cl_ctl1(sh_cl_ctl1),
    .clk_xtra(clk_xtra),
    .rst_xtra_n(rst_xtra_n),
    .clk_out(clk_out),
@@ -205,8 +205,8 @@ sh_bfm sh(
    //------------------------
    // PCI Express
    //------------------------
-   .sh_cl_flr_assert(),
-   .cl_sh_flr_done(),
+   .sh_cl_flr_assert(sh_cl_flr_assert),
+   .cl_sh_flr_done(cl_sh_flr_done),
 
    //-------------------------------   
    // HMC
@@ -261,8 +261,8 @@ sh_bfm sh(
    .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
    .cl_sh_pcim_rready(cl_sh_pcim_rready),
 
-   .cfg_max_payload(),               //Max payload size - 00:128B, 01:256B, 10:512B
-   .cfg_max_read_req(),              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   .cfg_max_payload(cfg_max_payload),               //Max payload size - 00:128B, 01:256B, 10:512B
+   .cfg_max_read_req(cfg_max_read_req),              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
 
 
@@ -482,6 +482,7 @@ sh_bfm sh(
       .sh_cl_pcim_rlast(sh_cl_pcim_rlast),
       .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
       .cl_sh_pcim_rready(cl_sh_pcim_rready),
+
       .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
       .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
       .M_A_ACT_N(M_A_ACT_N),
@@ -536,6 +537,7 @@ sh_bfm sh(
       .M_D_ECC(M_D_ECC),
       .M_D_DQS_DP(M_D_DQS_DP),
       .M_D_DQS_DN(M_D_DQS_DN), 
+
       .sh_ddr_stat_addr(sh_ddr_stat_addr),
       .sh_ddr_stat_wr(sh_ddr_stat_wr),
       .sh_ddr_stat_rd(sh_ddr_stat_rd),
