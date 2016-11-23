@@ -36,5 +36,3 @@ By running the next few steps, you would have downloaded the HDK, compile and bu
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) can walk you through step by step how to build an AFI from one of the provided example, registers with AWS, and run it on an EC2 F1 instance.
 
-    aws-fpga/hdk/cl/examples/Getting_Started_With_CL_Examples.md
-
