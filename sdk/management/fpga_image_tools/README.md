@@ -3,15 +3,18 @@
 AWS provides the following a set of commands(tools) for Amazon FPGA Image (AFI) managment while running on an FPGA-enabled EC2 instance like EC2 F1. **The tools support Linux Instances only**
 
 * **fpga-describe-local-image-slots**
-   * Returns the FPGA image slot numbers and device mappings to use for the fpga-load-local-image, fpga-clear-local-image, and fpga-describe-local-image commands.
+   * Returns the FPGA image slot numbers and device mappings to use for the `fpga-load-local-image`, `fpga-clear-local-image`, and `fpga-describe-local-image` commands.
+   
 * **fpga-describe-local-image**
-   * Returns the status of the FPGA image for a specified FPGA image slot number. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
+   * Returns the status of the FPGA image for a specified FPGA image slot number. The *fpga-image-slot* parameter is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
+   
 * **fpga-load-local-image**
-   * Loads the specified FPGA image to the specified slot number, and returns the status of the command.  The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
+   * Loads the specified FPGA image to the specified slot number, and returns the status of the command.  The *fpga-image-slot* parameter is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image` to return the FPGA image status, and `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
+   
 * **fpga-clear-local-image**
-   * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The fpga-image-slot parameter is a logical index that represents a given FPGA within an instance.  Use fpga-describe-local-image to return the FPGA image status, and fpga-describe-local-image-slots to return the available FPGA image slots for the instance.
+   * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The *fpga-image-slot* parameter is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image` to return the FPGA image status, and `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
-**All of the Amazon FPGA Image Management Tools support a `-help` option that may be used to display the full set of options.**
+**All of the Amazon FPGA Image Management Tools support a *`-help`* option that may be used to display the full set of options.**
 
 ## Installs or updates to the Amazon FPGA Image Management Tools
 
@@ -44,13 +47,11 @@ AFIDEVICE     6     0x1d0f      0x1042    0000:00:1d.0
 AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 ```
 
-*The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7.
-  
-  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs
-  
-  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default
-  
-  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#
+*The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7*
+
+  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs*
+  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default*
+  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
 
 #### Describing the AFI content loaded on a specific FPGA Slot
 
@@ -63,7 +64,6 @@ Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
 AFI     0                 none            cleared         1
 Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
-
 ```
 
 #### Loading a specific AFI to a specific slot
@@ -72,30 +72,26 @@ To Load the AFI, Use the FPGA logical slot number and Amazon Global FPGA Image p
 
 ```
 fpga-load-local-image -S 0 -I agfi-004f34c45ed4e9603
-
 ```
 #### Describing the AFI content loaded on a specific FPGA slot after  load
 
 Displays the current state for the given FPGA logical slot number.  Shows the FPGA in the “loaded” state after the FPGA image "load" operation.
 
 ```
-
 fpga-describe-local-image -S 0 -H
 
 Type    FpgaImageSlot    FpgaImageId          StatusName    StatusCode
 AFI     0             agfi-004f34c45ed4e9603    loaded          0
 Type        VendorId    DeviceId    DBDF
 AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
-
 ```
+
 #### Clearing the FPGA image on specific slot
 
 The next command will clear the FPGA image, including internal and external memories.
 
 ```
-
 fpga-clear-local-image -S 0
-
 ```
 #### Describing the AFI content loaded on a specific FPGA slot after clear
 
@@ -113,9 +109,9 @@ AFIDEVICE     0x1d0f    0x1042    0000:00:17.0
 
 #### Looking at metrics
 
-The `fpga-describe-local-image **metrics**` option may be used to display FPGA image hardware metrics, like FPGA PCI and DDR ECC Metrics.
+The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA image hardware metrics, like FPGA PCI and DDR ECC Metrics.
 
-Additionally, the `fpga-describe-local-image **clear-metrics**` option may be used to display and clear FPGA image hardware metrics (clear on read).
+Additionally, the `fpga-describe-local-image` **`clear-metrics`**` option may be used to display and clear FPGA image hardware metrics (clear on read).
 
  
 ## fpga-describe-local-image **metrics** option
