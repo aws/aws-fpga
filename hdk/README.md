@@ -14,11 +14,11 @@ AWS FPGA HDK includes all design files and scripts needed to generate an Amazon 
 
 ### Content of the release
 
-The [documents directory](./docs) have the specification for the AWS Shell to CL interface, and step by step walkthrough how to use the HDK
+The [documents directory](./docs) have the specification for the AWS Shell to CL interface, and best practices for design a CL for FPGA environment.
 
 The [common directory] (./common) include AWS-provided scripts, timing constraints and compile settings required during the AFI generation process. Developers should not change these files
 
-The [Custom Logic (cl)](./cl) directory is where the Custom Logic is expected to be developed, it includes a set of [examples directory](./cl/examples), as well as a placeholder for developer's own Custom Logic under [developer_designs directory] (./cl/developer_designs).  
+The [Custom Logic (cl)](./cl) directory is where the Custom Logic is expected to be developed, it includes a set of [examples directory](./cl/examples), as well as a placeholder for developer's own Custom Logic under [developer_designs directory](./cl/developer_designs).  
 
 The HDK also include test benches for each provided example, and instructions how to run RTL-level simulations
 
@@ -31,9 +31,10 @@ To get started, the developer need to have a development environment with Xilinx
 ### Install the HDK and setup environment
 
 AWS FPGA HDK and SDK can be cloned to your EC2 instance or server by calling:
-  `git clone https://github.com/aws/aws-fpga`
 
-after installing, go the root directory of the HDK and call ‘source hdk_setup.sh’ to setup the environment
+    $ git clone https://github.com/aws/aws-fpga`
+    $ cd aws-fpga
+    $ source hdk_setup.sh
 
 ### Try out our Hello World Example and others
 
@@ -41,11 +42,11 @@ The [Hello World Readme](./cl/examples/cl_hello_world/README.md) walks the devel
 
 Other examples are available in the [Examples directory](./cl/examples), each with its own README.md file.
 
+The [Getting started with CL examples](./cl/examples/Getting_Started_With_CL_Examples.md) walks you through step by step how to build, register and use an AFI from one of the the other available examples.
+
 ### Start your own Custom Logic design
 
-Follow the [instructions](./cl/developer_designs/README.md) to set up a new Custom Logic directory following AWS FPGA HDK convention.
-
-Note that you have to define the environment variable CL_DIR for the rest of the steps to function properly
+The [Start your own CL design](./cl/developer_designs/README.md) will guide you how to setup your own CL project environment.
 
 ### Simulate your Custom Logic design
 
@@ -56,6 +57,8 @@ Follow the [verification environment setup](.TBD) to run these simulations
 ### Build and submit the Custom Logic to AWS for generating AFI
 
 You can follow the [build scripts](./common/shell_current/new_cl_template/build/README.md) for step by step instructions how to set up the scripts and run the build process.
+
+The [Checklist](.cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
 ## FAQ
 
