@@ -23,7 +23,7 @@ module test_peek_poke();
       
       tb.sh.poke(64'h10, 32'h11223344);
       
-      #5000ns;
+      #30us;
       
       tb.sh.power_down();
       $finish;
