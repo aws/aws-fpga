@@ -85,6 +85,28 @@
    wire [17:0]         M_B_DQS_DN;
    
    //------------------------------------------------------
+   // DIMM 2 Interface from SH
+   //------------------------------------------------------
+   
+   wire                CLK_300M_DIMM2_DP;
+   wire                CLK_300M_DIMM2_DN;
+   wire                M_C_ACT_N;
+   wire [16:0]         M_C_MA;
+   wire [1:0]          M_C_BA;
+   wire [1:0]          M_C_BG;
+   wire [0:0]          M_C_CKE;
+   wire [0:0]          M_C_ODT;
+   wire [0:0]          M_C_CS_N;
+   wire [0:0]          M_C_CLK_DN;
+   wire [0:0]          M_C_CLK_DP;
+   wire                RST_DIMM_C_N;
+   wire                M_C_PAR;
+   wire [63:0]         M_C_DQ;
+   wire [7:0]          M_C_ECC;
+   wire [17:0]         M_C_DQS_DP;
+   wire [17:0]         M_C_DQS_DN;
+   
+   //------------------------------------------------------
    // DIMM 3 Interface from CL
    //------------------------------------------------------
    
@@ -120,6 +142,8 @@
    assign CLK_300M_DIMM0_DN = ~ddr_clk;
    assign CLK_300M_DIMM1_DP =  ddr_clk;
    assign CLK_300M_DIMM1_DN = ~ddr_clk;
+   assign CLK_300M_DIMM2_DP =  ddr_clk;
+   assign CLK_300M_DIMM2_DN = ~ddr_clk;
    assign CLK_300M_DIMM3_DP =  ddr_clk;
    assign CLK_300M_DIMM3_DN = ~ddr_clk;
 
@@ -175,7 +199,7 @@
                                   .ddr4_dm_dbi_n(),
                                   .ddr4_dq(M_A_DQ),
                                   .ddr4_dqs_t(M_A_DQS_DP),
-                                  .ddr4_dqs_c(M_A_DQS_DP),
+                                  .ddr4_dqs_c(M_A_DQS_DN),
                                   .ddr4_alert_n(),
                                   .initDone(),
                                   .scl(),
@@ -230,11 +254,11 @@
                                   .ddr4_cs_n(M_B_CS_N),
                                   .ddr4_ck_t(CLK_300M_DIMM1_DP),
                                   .ddr4_ck_c(CLK_300M_DIMM1_DN),
-                                  .ddr4_reset_n(),
+                                  .ddr4_reset_n(RST_DIMM_B_N),
                                   .ddr4_dm_dbi_n(),
                                   .ddr4_dq(M_B_DQ),
                                   .ddr4_dqs_t(M_B_DQS_DP),
-                                  .ddr4_dqs_c(M_B_DQS_DP),
+                                  .ddr4_dqs_c(M_B_DQS_DN),
                                   .ddr4_alert_n(),
                                   .initDone(),
                                   .scl(),
@@ -245,6 +269,65 @@
                                   .bfunc(),
                                   .vddspd());
 
+
+  ddr4_rdimm_wrapper #(
+             .MC_DQ_WIDTH(DQ_WIDTH),
+             .MC_DQS_BITS(DQS_WIDTH),
+             .MC_DM_WIDTH(DM_WIDTH_RDIMM),
+             .MC_CKE_NUM(CKE_WIDTH_RDIMM),
+             .MC_ODT_WIDTH(ODT_WIDTH_RDIMM),
+             .MC_ABITS(ADDR_WIDTH),
+             .MC_BANK_WIDTH(BANK_WIDTH_RDIMM),
+             .MC_BANK_GROUP(BANK_GROUP_WIDTH_RDIMM),
+             .MC_CS_NUM(CS_WIDTH_RDIMM),
+             .MC_RANKS_NUM(RANK_WIDTH_RDIMM),
+             .NUM_PHYSICAL_PARTS(NUM_PHYSICAL_PARTS),
+             .CALIB_EN("NO"),
+             .tCK(tCK),
+             .tPDM(),
+             .MIN_TOTAL_R2R_DELAY(),
+             .MAX_TOTAL_R2R_DELAY(),
+             .TOTAL_FBT_DELAY(),
+             .MEM_PART_WIDTH(MEM_PART_WIDTH),
+             .MC_CA_MIRROR(CA_MIRROR),
+            // .SDRAM("DDR4"),
+   `ifdef SAMSUNG
+             .DDR_SIM_MODEL("SAMSUNG"),
+
+   `else
+             .DDR_SIM_MODEL("MICRON"),
+   `endif
+             .DM_DBI(DM_DBI),
+             .MC_REG_CTRL(REG_CTRL),
+             .DIMM_MODEL ("RDIMM"),
+             .RDIMM_SLOTS (RDIMM_SLOTS)
+
+                               )
+           u_ddr4_rdimm_C  (
+                                  .ddr4_act_n(M_C_ACT_N),
+                                  .ddr4_addr(M_C_MA),
+                                  .ddr4_ba(M_C_BA),
+                                  .ddr4_bg(M_C_BG),
+                                  .ddr4_par(M_C_PAR),
+                                  .ddr4_cke(M_C_CKE),
+                                  .ddr4_odt(M_C_ODT),
+                                  .ddr4_cs_n(M_C_CS_N),
+                                  .ddr4_ck_t(CLK_300M_DIMM2_DP),
+                                  .ddr4_ck_c(CLK_300M_DIMM2_DN),
+                                  .ddr4_reset_n(RST_DIMM_C_N),
+                                  .ddr4_dm_dbi_n(),
+                                  .ddr4_dq(M_C_DQ),
+                                  .ddr4_dqs_t(M_C_DQS_DP),
+                                  .ddr4_dqs_c(M_C_DQS_DN),
+                                  .ddr4_alert_n(),
+                                  .initDone(),
+                                  .scl(),
+                                  .sa0(),
+                                  .sa1(),
+                                  .sa2(),
+                                  .sda(),
+                                  .bfunc(),
+                                  .vddspd());
 
   ddr4_rdimm_wrapper #(
              .MC_DQ_WIDTH(DQ_WIDTH),
@@ -290,11 +373,11 @@
                                   .ddr4_cs_n(M_D_CS_N),
                                   .ddr4_ck_t(CLK_300M_DIMM3_DP),
                                   .ddr4_ck_c(CLK_300M_DIMM3_DN),
-                                  .ddr4_reset_n(),
+                                  .ddr4_reset_n(RST_DIMM_D_N),
                                   .ddr4_dm_dbi_n(),
                                   .ddr4_dq(M_D_DQ),
                                   .ddr4_dqs_t(M_D_DQS_DP),
-                                  .ddr4_dqs_c(M_D_DQS_DP),
+                                  .ddr4_dqs_c(M_D_DQS_DN),
                                   .ddr4_alert_n(),
                                   .initDone(),
                                   .scl(),
