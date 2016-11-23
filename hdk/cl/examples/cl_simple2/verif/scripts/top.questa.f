@@ -19,7 +19,7 @@
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
-/proj/awsip_work/winefred/fpga_instance/Chimera/aws-fpga/hdk/top/vu9p/design/sh/sh_ddr.sv
+${HDK_DIR}/top/vu9p/design/sh/sh_ddr.sv
 
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
