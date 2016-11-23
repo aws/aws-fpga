@@ -1048,7 +1048,7 @@ typedef struct {
       AXI_Data data;
       int byte_idx;
       int mem_arr_idx;
-      int len;
+//      int len;
 
       cmd.addr = start_addr;
       cmd.len  = len;
