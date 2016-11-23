@@ -25,20 +25,21 @@ To summarize:
 
 By following the example CLs, a Developer could understand how to interface to the AWS Shell of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
-# Follow these steps to create an AFI from one of the CL example:
+# Step by step guide how to create an AFI from one of the CL example:
 
-As a pre-requested to building the AFP, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
+As a pre-requested to building the AFI, the developer should have an instance/server with Xilinx vivado tools and license. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
 **NOTE:** *steps 1 through 3 can be done on any server or EC2 instance, C4/C5 instances are recommended for fastest build time*
 
+**NOTE:** *You can skip steps 0 through 3 if you are not interested in the build process.  Step 4 through 6 will show you how to use one of the predesigned AFI*
 
-### 1. Download and configure the HDK to the source directory on the instance.
+### 0. Download and configure the HDK to the source directory on the instance.
 
         $ git clone https://github.com/aws/aws-fpga
         $ cd aws-fpga
         $ source hdk_shell.sh
     
-### 2. Pick one of the examples and move to its directory
+### 1. Pick one of the examples and move to its directory
 
 There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
 
@@ -52,58 +53,68 @@ Each one of the examples following the recommended directory structure to match 
 
 If you like to start your own CL, check out the [How to create your own CL Readme](../developer_designs/README.md)
 
-
-### 3. Build the CL before submitting to AWS
-
-**NOTE** *Before starting this step, please make yourself familiar with the [checklist](../CHECKLIST BEFORE BUILDING_CL.md)*
+### 2. Build the CL before submitting to AWS
 
 **NOTE** *This step requires you have Xilinx Vivado Tools installed as well Vivado License:*
-    $ vivado -mode batch        # Run this command to see if vivado is installed
-    $ sudo perl /home/centos/src/project_data/license/license_manager.pl -status  # To check if license server is up. this command is for AWS-provided FPGA Development machine, the license manager can be in different directory in your systems
+
+        $ vivado -mode batch        # Run this command to see if vivado is installed
+        $ sudo perl /home/centos/src/project_data/license/license_manager.pl -status  # To check if license server is up. this command is for AWS-provided FPGA Development machine, the license manager can be in different directory in your systems
     
-Run this script to start Vivado and
-generate a Design Checkpoint
-\$(CL\_DIR)/build/scripts/create\_dcp\_from\_cl.tcl A detailed version
-of the Vivado design flow is included in the /build/scripts directory.
-Refer to \$HDK\_DIR/cl/CHECKLIST.txt file to see verification steps that
-should be performed on any new design. Example cl designs meet the
-checklist criteria by default.
+The next script two steps will go through the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA
 
-Submit the dcp file to AWS to generate an AFI. To submit the dcp, create
-an S3 bucket for submitting the design and upload the zipped archive
-into that bucket. Then, add a policy to that bucket allowing our team's
-account (Account ID: 682510182675) read/write permissions. A README
-example of the S3 permissions process is included in the /build/scripts
-directory. Submit an email to AWS (email TBD) providing the following
-information: 1) Name of the logic design, 2) Generic Desription of the
-logic design, 3) PCI IDs (Device, Vendor, Subsystem, SubsystemVendor),
-4)Location of the DCP object (bucket name and key), 4) Location of the
-directory to write logs (bucket name and key), and 5) Version of the
-Shell. After the AFI generation is complete, AWS will write the logs
-back into the bucket locaiton provided by the developer and notify them
-by email, including the AFI IDs used to manage and launch an AFI from
-within an Instance.
+        $ cd $CL_DIR/build/scripts
+        $ vivado -mode batch -source create_dcp_from_cl.tcl 
+        
+### 3. Submit the Design Checkpoint to AWS to register the AFI
 
-**Follow these steps to load and test an AFI from within an F1
-instance:**
+#### If you have access to AWS SDK with support for FPGA API (`aws ec2 createFpgaImage`)
+TBD
 
-Take the FPGA Developer AMI and create a private AMI from the FPGA
-Developer AMI. See the FPGA Developer AMI for details on creating a
-run-time FGPA AMI. The AMI ID is needed to associate the AFI with the
-running instance.
+#### During F1 preview and before AWS EC2 FPGA API are available
 
-Call the AWS CLI associate-fpga-image --fpga-image-id &lt;AFI ID&gt;
-\[--image-id &lt;AMI ID&gt;\] This call will associate the AFI ID with
-the AMI ID. Once complete, the AFI ID can be loaded on to any F1
-instance running that AMI ID.
+To submit the dcp, createan S3 bucket for submitting the design and upload the tar zipped archive into that bucket. Then, add a policy to that bucket allowing our team's account (Account ID: 682510182675) read/write permissions. A [TBD] example of the S3 permissions process is included in the /build/scripts directory. Submit an email to AWS (email TBD) providing the following
+information: 
 
-Purchase and launch an F1 instance with the run-time FPGA AMI. From the
-running instance, call the FPGA Management Tools API command load\_afi
---afi-id &lt;AFI ID&gt; -- slot&lt;0&gt;. This will load the AFI
-specified into the only FPGA in the F1.2XL instance. See the FPGA
-Management Tools README in /sdk for more details on the FPGA Management
-Tools APIs.
+1) Name of the logic design
 
+2) Generic Desription of the logic design
+
+3) PCI IDs (Device, Vendor, Subsystem, SubsystemVendor),
+
+4)Location of the DCP object (bucket name and key),
+
+5) Location of the directory to write logs (bucket name and key)
+
+6) Version of the Shell. 
+
+
+After the AFI generation is complete, AWS will write the logs back into the bucket locaiton provided by the developer and notify them
+by email, including the AFI IDs used to manage and launch an AFI from within an Instance.
+
+# Step by step guide how to load and test a registered AFI from within an F1 instance
+
+To follow the next steps, you have to run an instance on F1. AWS recommend you run an instance with latest Amazon Linux that have the FPGA management tools included, or alternatively the FPGA Developer AMI with both the HDK and SDK.
+
+## 4. Make sure you have AWS CLI configured and AWS FPGA management tools
+
+        $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (typically us-east-1)
+        $ git clone https://github.com/aws/aws-fpga
+        $ cd aws-fpga
+        $ source sdk_setup.sh
+        
+## 5. Associated the AFI with your instance
+
+You can associate more than one AFI with your instance. the Association process just make sure you have the permission to use the specific AFI-Id(s).
+
+        $ aws ec2 associateFpgaImage --fpga-image-id <AFI_ID> --instance-id <instance0id
+        
+## 6. Load the AFI
+
+[TBD - need to define how to load the AFI]
 Load and run the software for the example cl on the running instance
 from the sdk/examples directory that matches the example cl AFI that was
 loaded.
+
+## 7. Call the specific CL example software
+
+[TBD] guide to where the source code is 
