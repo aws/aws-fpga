@@ -58,7 +58,7 @@ Follow the [verification environment setup](.TBD) to run these simulations
 
 You can follow the [build scripts](./common/shell_current/new_cl_template/build/README.md) for step by step instructions how to set up the scripts and run the build process.
 
-The [Checklist](.cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
+The [Checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
 ## FAQ
 
