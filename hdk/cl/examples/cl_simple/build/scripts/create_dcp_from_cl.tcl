@@ -152,7 +152,7 @@ if { $failval==0 } {
 }
 
 puts "AWS FPGA: Optimizing design";
-opt_design -verbose -directive Explore
+opt_design -directive Explore
 
 check_timing -file $CL_DIR/build/reports/${timestamp}.cl.synth.check_timing_report.txt
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.synth.timing_summary.rpt
