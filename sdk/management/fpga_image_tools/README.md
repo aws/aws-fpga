@@ -155,37 +155,41 @@ The following FPGA image hardware metrics are provided. PCIe related counters ha
 
 ## FAQ
 
-* **Q: What is the Amazon Global FPGA Image Id (AGFI)? **
+* **Q: What is the Amazon Global FPGA Image Id (AGFI)?**
    * The AGFI is an AWS globally unique identifier that is used to reference a specific Amazon FPGA Image (AFI).
    * In the examples, `agfi-004f34c45ed4e9603` is specified in the `fpga-load-local-image` command in order to load a specific AFI
 into the given fpga-image-slot.   
 
-* **Q: What is a fpga-image-slot? **
+* **Q: What is a fpga-image-slot?**
    * The fpga-image-slot is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
-* ** What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output? **
+* **Q: What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?**
    * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configureation Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `createFpgaImage` EC2 call.
 
-* **Q: What is a DBDF? **
+* **Q: What is a DBDF?**
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
 
-* **Q: What is a PF? **
+* **Q: What is a PF?**
    * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
 
-* What is a BAR?
-   * A Base Address Register (BAR) specifies the memory region where device registers may be accessed.  Multiple BARs may be supported by a PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
-* What is the AFIDEVICE and how is it used?
+* **Q: What is a BAR?**
+   * A PCI Base Address Register (BAR) specifies the memory region where FPGA memory space may be accessed by external entity (like the instance CPU or other FPGAs).  Multiple BARs may be supported by a given PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
+   
+* **Q: What is the AFIDEVICE and how is it used?**
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
-* How do the Amazon FPGA Image Management Tools work? 
-   * Though most customers are not expected to understand the internals of the tools, a short overview is provided here:
-   * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for communication between the instance and AWS.
+
+* **Q: How do the AFI Management Tools work?**
+   * Though most customers dont have to understand the internals of the tools, a short overview is provided here:
+   * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
    * The Amazon FPGA Image Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
    * For more information on the Amazon FPGA Image Mangement Tool software and FPGA hardware see [aws-fpga](https://github.com/aws/aws-fpga).
-* Can the Amazon FPGA Image Management Tools work concurently on multiple FPGA image slots?
+
+* **Q: Can the AFI Management Tools work concurently on multiple FPGA image slots?**
    * The tools can be executed on multiple FPGAs concurrently.  This may be done without synchronization between processes that are using the tools.
-* Can the Amazon FPGA Image Management Tools work concurrently from multiple processes on the same FPGA?
+   
+* **Q: Can the AFI Management Tools work concurrently from multiple processes on the same FPGA?**
    * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process accross all FPGAs (least level of concurrency).
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
 
