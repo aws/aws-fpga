@@ -34,26 +34,6 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
-#checking if HDK_COMMON_DIR env variable exists
-if { [info exists ::env(HDK_COMMON_DIR)] } {
-        set HDK_COMMON_DIR $::env(HDK_COMMON_DIR)
-        puts "Using Common directory $HDK_COMMON_DIR";
-} else {
-        puts "Error: HDK_COMMON_DIR environment variable not defined ! ";
-        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
-        exit 2
-}
-
-#checking if HDK_DIR env variable exists
-if { [info exists ::env(HDK_DIR)] } {
-        set HDK_DIR $::env(HDK_DIR)
-        puts "Using HDK directory $HDK_DIR";
-} else {
-        puts "Error: HDK_DIR environment variable not defined ! ";
-        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
-        exit 2
-}
-
 #Convenience to set the root of the RTL directory
 set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
@@ -109,9 +89,9 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-$HDK_DIR/top/vu9p/design/mgt/mgt_acc_ccf.sv \
-$HDK_DIR/top/vu9p/design/mgt/mgt_acc_axl.sv  \
-$HDK_DIR/top/vu9p/design/mgt/mgt_gen_axl.sv  \
+$HDK_SHELL_DIR/design/mgt/mgt_acc_ccf.sv \
+$HDK_SHELL_DIR/design/mgt/mgt_acc_axl.sv  \
+$HDK_SHELL_DIR/design/mgt/mgt_gen_axl.sv  \
 $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
 $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
