@@ -50,8 +50,11 @@ AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 * *The list displayed above is for F1.16xl instance that have 8 FPGA on slot 0 through 7*
 
 *  *The VendorId is the PCIe Configuration space Vendor Id, with 0x1d0f representation Amazon registered PCIe vendorId. The developer can choose the VendorId for his/her own AFIs*
+
 *  *The DeviceId is the PCIe Configuration space Device Id, with 0x1042 being the default*
+
 *  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
+
 
 #### Describing the AFI content loaded on a specific FPGA Slot
 
@@ -73,6 +76,7 @@ To Load the AFI, Use the FPGA logical slot number and Amazon Global FPGA Image p
 ```
 fpga-load-local-image -S 0 -I agfi-004f34c45ed4e9603
 ```
+
 #### Describing the AFI content loaded on a specific FPGA slot after  load
 
 Displays the current state for the given FPGA logical slot number.  Shows the FPGA in the “loaded” state after the FPGA image "load" operation.
@@ -93,6 +97,7 @@ The next command will clear the FPGA image, including internal and external memo
 ```
 fpga-clear-local-image -S 0
 ```
+
 #### Describing the AFI content loaded on a specific FPGA slot after clear
 
 Displays the current state for the given FPGA logical slot number. It shows the FPGA in the “cleared” state after the FPGA image "clear" operation.
@@ -114,13 +119,18 @@ Additionally, the `fpga-describe-local-image` **`clear-metrics`**` option may be
 
  
 ## fpga-describe-local-image **metrics** option
+
 The following FPGA image hardware metrics are provided:
+
 * pci-slave-timeout 
-   * AFI did not respond to cycle from host
+   * The CustomLogic (CL) did not respond to memory-mapped I/O (MMIO) read access from the instance. In most cases this indicated a design flaw in the AFI
+
 * pci-range-error 
-   * PCI master cycle from AFI out of range
+   * The CustomLogic (CL) trying to initiate outbound Read/Write (PCI master) to instance host memory or other FPGAs on the PCIe fabric, but has illegal address
+   
 * pci-len-error 
-   * PCI master AXI protocol/length error from AFI
+   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specifications.md))
+   
 * ps-timeout-addr 
    * PCI slave timeout address
 * ps-timeout-count 
