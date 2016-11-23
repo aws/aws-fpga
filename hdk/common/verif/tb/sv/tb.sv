@@ -229,29 +229,29 @@ sh_bfm sh(
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
    //-------------------------------------
-   .cl_sh_pcim_awid(),
-   .cl_sh_pcim_awaddr(),
-   .cl_sh_pcim_awlen(),
-   .cl_sh_pcim_awuser(), // DW length of transfer
-   .cl_sh_pcim_awvalid(),
+   .cl_sh_pcim_awid(cl_sh_pcim_awid),
+   .cl_sh_pcim_awaddr(cl_sh_pcim_awaddr),
+   .cl_sh_pcim_awlen(cl_sh_pcim_awlen),
+   .cl_sh_pcim_awuser(cl_sh_pcim_awuser), // DW length of transfer
+   .cl_sh_pcim_awvalid(cl_sh_pcim_awvalid),
    .sh_cl_pcim_awready(sh_cl_pcim_awready),
 
-   .cl_sh_pcim_wdata(),
-   .cl_sh_pcim_wstrb(),
-   .cl_sh_pcim_wlast(),
-   .cl_sh_pcim_wvalid(),
+   .cl_sh_pcim_wdata(cl_sh_pcim_wdata),
+   .cl_sh_pcim_wstrb(cl_sh_pcim_wstrb),
+   .cl_sh_pcim_wlast(cl_sh_pcim_wlast),
+   .cl_sh_pcim_wvalid(cl_sh_pcim_wvalid),
    .sh_cl_pcim_wready(sh_cl_pcim_wready),
 
    .sh_cl_pcim_bid(sh_cl_pcim_bid),
    .sh_cl_pcim_bresp(sh_cl_pcim_bresp),
    .sh_cl_pcim_bvalid(sh_cl_pcim_bvalid),
-   .cl_sh_pcim_bready(),
+   .cl_sh_pcim_bready(cl_sh_pcim_bready),
 
-   .cl_sh_pcim_arid(),
-   .cl_sh_pcim_araddr(),
-   .cl_sh_pcim_arlen(),
-   .cl_sh_pcim_aruser(), //DW length of transfer
-   .cl_sh_pcim_arvalid(),
+   .cl_sh_pcim_arid(cl_sh_pcim_arid),
+   .cl_sh_pcim_araddr(cl_sh_pcim_araddr),
+   .cl_sh_pcim_arlen(cl_sh_pcim_arlen),
+   .cl_sh_pcim_aruser(cl_sh_pcim_aruser), //DW length of transfer
+   .cl_sh_pcim_arvalid(cl_sh_pcim_arvalid),
    .sh_cl_pcim_arready(sh_cl_pcim_arready),
 
    .sh_cl_pcim_rid(sh_cl_pcim_rid),
@@ -259,7 +259,7 @@ sh_bfm sh(
    .sh_cl_pcim_rresp(sh_cl_pcim_rresp),
    .sh_cl_pcim_rlast(sh_cl_pcim_rlast),
    .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
-   .cl_sh_pcim_rready(),
+   .cl_sh_pcim_rready(cl_sh_pcim_rready),
 
    .cfg_max_payload(),               //Max payload size - 00:128B, 01:256B, 10:512B
    .cfg_max_read_req(),              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B

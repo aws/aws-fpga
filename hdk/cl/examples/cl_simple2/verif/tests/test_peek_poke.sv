@@ -7,46 +7,37 @@
 
 module test_peek_poke();
 
-   logic [31:0]       write_data_b[16];
-   logic [31:0]       read_data_b[16];
+   logic [63:0] pcim_address = 64'h0000_0000_1234_0000;
    
-   logic [31:0]        read_data;
 
    initial begin
       tb.sh.power_up();
 
-      tb.sh.peek(64'h0, 6'h0, read_data);
-      $display("read_data: %x", read_data);
+//      tb.sh.peek(64'h0, read_data);
+//      $display("read_data: %x", read_data);
       
-      tb.sh.peek(64'h4, 6'h0, read_data);
-      $display("read_data: %x", read_data);
+//      tb.sh.peek(64'h4, read_data);
+//      $display("read_data: %x", read_data);
       
-      tb.sh.peek(64'h8, 6'h0, read_data);
-      $display("read_data: %x", read_data);
+//      tb.sh.peek(64'h8, read_data);
+//      $display("read_data: %x", read_data);
       
-      tb.sh.poke(64'h10, 32'h11223344, 6'h0);
 
-      tb.sh.peek(64'h10, 6'h0, read_data);
-      $display("read_data: %x", read_data);
-/*
-      write_data_b[0] = 32'h44332211;
-      write_data_b[1] = 32'h55667788;
-      write_data_b[2] = 32'h99AABBCC;
-      write_data_b[3] = 32'hDDEEFF11;
-      for (int i=4; i<16; i++) begin
-         write_data_b[i] = 'h0;
-      end
-      
-      tb.sh.poke_burst(64'h4, 4, write_data_b);
-      
-      tb.sh.peek_burst(64'h4, 4, read_data_b);
-      for (int n= 0; n<$size(read_data_b);n++) begin
-         $display("read_data: %x", read_data_b[n]);
-      end     
-      #500ns;
-*/
+      tb.sh.poke(64'h1c, 0);                   // write index
+      tb.sh.poke(64'h20, pcim_address[31:0]);  // write address low
+      tb.sh.poke(64'h24, pcim_address[63:32]); // write address high
+      tb.sh.poke(64'h28, 32'h0000_0000);       // write data
+      tb.sh.poke(64'h2c, 32'h0000_0002);       // write 32b
 
-      #5000ns;
+      tb.sh.poke(64'h3c, 0);                   // read index
+      tb.sh.poke(64'h40, pcim_address[31:0]);  // read address low
+      tb.sh.poke(64'h44, pcim_address[63:32]); // read address high
+      tb.sh.poke(64'h48, 32'h0000_0000);       // read data
+      tb.sh.poke(64'h4c, 32'h0000_0002);       // read 32b
+
+      tb.sh.poke(64'h08, 32'h0003);  // start read & write
+
+      #1000ns;
 
       tb.sh.power_down();
       $finish;
