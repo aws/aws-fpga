@@ -29,22 +29,6 @@ module test_peek_poke();
       tb.sh.peek(64'h10, 6'h0, read_data);
       $display("read_data: %x", read_data);
 
-      write_data_b[0] = 32'h44332211;
-      write_data_b[1] = 32'h55667788;
-      write_data_b[2] = 32'h99AABBCC;
-      write_data_b[3] = 32'hDDEEFF11;
-      for (int i=4; i<16; i++) begin
-         write_data_b[i] = 'h0;
-      end
-      
-      tb.sh.poke_burst(64'h4, 4, write_data_b);
-      
-      tb.sh.peek_burst(64'h4, 4, read_data_b);
-
-      for (int n= 0; n<$size(read_data_b);n++) begin
-         $display("read_data: %x", read_data_b[n]);
-      end     
-
       #5000ns;
       
       tb.sh.power_down();
