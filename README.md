@@ -3,11 +3,11 @@
 
 # AWS EC2 FPGA Hardware and Software Development Kit
 
-This release include two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled [EC2 instances like F1](https://aws.amazon.com/ec2/f1)
+This release include two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled [EC2 instances like F1](https://aws.amazon.com/ec2/instance-types/f1/)
 
 call `git clone http://github.com/aws/aws-fpga` to download this HDK+SDK release to your EC2 Instance or local server.
 
-Please click the "Watch" botton in github upper right corner to stay updated.
+Please click the "Watch" button in github upper right corner to stay updated.
 
 ## FPGA HDK
 
@@ -17,7 +17,7 @@ Call [`source ./hdk_setup.sh`](./hdk_setup.sh) to setup the environment variable
 
 ## FPGA SDK
 
-The [SDK directory](./sdk) includes the drivers and runtime environment required by any EC2 Instance running on F1. It has the drivers and tools to interact with a pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI design and build process, they are only required once you load the AFI into an F1 instance.
+The [SDK directory](./sdk) includes the drivers and runtime environment required by any EC2 Instance running on F1. It has the drivers and tools to interact with pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI design and build process, they are only required once you load the AFI into an F1 instance.
 
 # Quick start
 

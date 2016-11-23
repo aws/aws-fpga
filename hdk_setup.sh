@@ -12,6 +12,8 @@ export HDK_SHELL_DIR=$HDK_COMMON_DIR/shell_latest
 export CL_DIR=$HDK_DIR/cl/developer_designs
 
 echo "Done setting environment variables.";
+echo "ATTENTION: Don't forget to change the CL_DIR variable for the directory of your Custom Logic.";
+
 # Create DDR and PCIe IP models and patch PCIe
 if [ ! -f $HDK_COMMON_DIR/verif/models/ddr4_model/arch_defines.v ]
 then
@@ -25,5 +27,5 @@ then
 else
   echo "DDR4 model files exist in "$HDK_COMMON_DIR/verif/models/ddr4_model/". Skipping model creation step.";
 fi
-echo "Done with setup.";
+echo "Done with AWS HDK setup.";
 

@@ -1,4 +1,3 @@
-export SIMULATOR = vivado
 export CL_ROOT = $(PWD)/../..
 export SIM_DIR = $(CL_ROOT)/verif/sim
 export SCRIPTS_DIR = $(PWD)
@@ -7,13 +6,13 @@ export SH_LIB_DIR = $(HDK_COMMON_DIR)/shell_latest/design/lib
 
 all:	compile run
 
+ifeq ($(QUESTA), 1)
+  export SIMULATOR = questa
+  export COMPLIB_DIR = $(CL_ROOT)/verif/questa_complib
+  include Makefile.questa
+else
+  export SIMULATOR = vivado
+  include Makefile.vivado
+endif
+
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
-
-compile:
-	mkdir -p $(SIM_DIR)
-	cd $(SIM_DIR) && xvlog --sv -m64 --relax -f $(SCRIPTS_DIR)/top.vivado.f
-	cd $(SIM_DIR) && xelab -m64 --timescale 1ps/1ps --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -snapshot tb work.tb work.glbl work.test_peek_poke
-
-run:
-	cd $(SIM_DIR) && xsim -R -log test.log -tclbatch $(SCRIPTS_DIR)/waves.tcl -g  tb
-
