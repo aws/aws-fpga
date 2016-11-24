@@ -3,15 +3,14 @@
 ## All Rights Reserved Worldwide.
 ## Amazon Confidential information
 ## Restricted NDA Material
-## create_cl.tcl: Build to generate CL design checkpoint based on
-## 		developer code
 ## =============================================================================
+
 
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
-puts "AWS FPGA Scripts";
+puts "AWS FPGA Scripts:";
 puts "Creating Design Checkpoint from Custom Logic source code";
 
 #checking if CL_DIR env variable exists
@@ -39,6 +38,16 @@ set systemtime [clock seconds]
 set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
 puts "All reports and intermediate results will be time stamped with $timestamp";
+
+#Configuring vivado to suppress basic message to keep vivado.log file
+#shorter and easier to detect errors
+
+set_msg_config -severity INFO -suppress
+set_msg_config -severity STATUS -suppress
+set_msg_config -severity WARNING -suppress
+set_msg_config -id {Chipscope 16-3} -suppress
+
+puts "AWS FPGA: Calling the encrypt.tcl.";
 
 file mkdir ../src_post_encryption
 
