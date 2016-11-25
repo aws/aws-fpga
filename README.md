@@ -33,6 +33,7 @@ By running the next few steps, you would have downloaded the HDK+SDK, compile an
     $ aws ec2 createFpgaImage TBD TBD TBD         # Make sure you have aws account, aws-cli installed, and you ran `aws configure`
 
 You can setup and install the SDK with these few steps.  Note that the first two steps may be skipped if you have already ran them in the above HDK setup.
+
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
     $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
     $ source sdk_setup.sh                         # Set up the envronment variables
