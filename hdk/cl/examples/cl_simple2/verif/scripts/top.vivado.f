@@ -22,4 +22,6 @@ ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv
 ${CL_ROOT}/design/cl_simple.sv
-${CL_ROOT}/verif/tests/test_peek_poke.sv
+
+${TEST_NAME}
+

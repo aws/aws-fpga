@@ -252,6 +252,7 @@ typedef struct {
    logic [7:0]  len;
    logic [5:0]  id;
    logic [1:0]  resp;
+   logic        last;
 } AXI_Command;
    
 typedef struct {
@@ -270,7 +271,7 @@ typedef struct {
    AXI_Command cl_sh_wr_cmds[$];
    AXI_Data    cl_sh_wr_data[$];
    AXI_Command cl_sh_rd_cmds[$];
-   AXI_Data    sh_cl_rd_data[$];
+   AXI_Command sh_cl_rd_data[$];
    AXI_Command cl_sh_b_resps[$];
    
    logic         clk_core;
@@ -475,7 +476,7 @@ typedef struct {
    //
 
    //
-   // sh->cl Address Write Channel
+   // sh->cl data Write Channel
    //
 
    always @(posedge clk_out) begin
@@ -569,7 +570,51 @@ typedef struct {
    // cl->sh PCIeM Interface
    //
    //=================================================
+   logic [31:0] host_memory[*];
+   AXI_Command  host_mem_wr_que[$];
+   logic        first_wr_beat = 1;
+   logic [63:0] wr_addr;
+   
+   always @(posedge clk_out) begin
 
+      if (host_mem_wr_que.size() > 0) begin
+         if (first_wr_beat == 1) begin
+            wr_addr = host_mem_wr_que[0].addr;
+            first_wr_beat = 1'b0;
+         end
+
+         if (cl_sh_wr_data.size() > 0) begin
+            $display("%t - fb: %d %16x %x", $time(), first_wr_beat, cl_sh_wr_data[0].data, cl_sh_wr_data[0].strb);
+            for(int i=0; i<16; i++) begin
+               logic [31:0] word;
+               word = host_memory[wr_addr];
+               
+               for(int j=0; j<4; j++) begin
+                  logic [7:0] c;
+                  int         index;
+                  index = j + (i * 4);
+                  
+                  if (cl_sh_wr_data[0].strb[index]) begin
+                     c = cl_sh_wr_data[0].data >> (index * 8);
+                     word = {c, word[31:8]};
+                  end
+               end // for (int j=0; j<4; j++)
+               host_memory[wr_addr] = word;
+               
+               wr_addr += 4;
+            end
+            if (cl_sh_wr_data[0].last == 1) begin
+               first_wr_beat = 1'b1;
+               host_mem_wr_que.pop_front();
+               $display("reseting ...");
+               
+            end
+            
+            cl_sh_wr_data.pop_front();
+         end // if (cl_sh_wr_data.size() > 0)
+      end // if (host_mem_wr_que.size() > 0)
+   end
+  
    //
    // cl->sh Write Address Channel
    //
@@ -581,8 +626,11 @@ typedef struct {
          cmd.addr = cl_sh_pcim_awaddr[0];
          cmd.id   = cl_sh_pcim_awid[0];
          cmd.len  = cl_sh_pcim_awlen[0];
-
+         cmd.last = 0;
+         
          cl_sh_wr_cmds.push_back(cmd);         
+         sh_cl_b_resps.push_back(cmd);
+         host_mem_wr_que.push_back(cmd);
       end
 
       if (cl_sh_wr_cmds.size() < 4)
@@ -606,6 +654,9 @@ typedef struct {
          wr_data.last = cl_sh_pcim_wlast[0];
 
          cl_sh_wr_data.push_back(wr_data);
+
+         if (wr_data.last == 1)
+           sh_cl_b_resps[0].last = 1;
          
       end
       if (cl_sh_wr_data.size() > 64)
@@ -614,10 +665,32 @@ typedef struct {
         sh_cl_pcim_wready[0] <= 1'b1;
         
    end
-/*
+
    //
    // cl->sh B Response Channel
    //
+
+   always @(posedge clk_out) begin
+      if (sh_cl_b_resps.size() != 0) begin
+         $display("resp.size %0d %0d", sh_cl_b_resps.size(), sh_cl_b_resps[0].last);
+         
+         if (sh_cl_b_resps[0].last != 0) begin
+            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp[0] <= 2'b00;
+            sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
+                                   !cl_sh_pcim_bready ? 1'b1 : 1'b0;
+
+            if (cl_sh_pcim_bready && sh_cl_pcim_bvalid) begin
+               sh_cl_b_resps.pop_front();
+               cl_sh_wr_cmds.pop_front();
+            end
+         end
+      end
+      else
+        sh_cl_pcim_bvalid <= 1'b0;
+      
+   end
+   
    always @(posedge clk_out) begin
       sh_cl_pcis_bready[0] <= 1'b1;
    end
@@ -640,47 +713,86 @@ typedef struct {
    //
 
    always @(posedge clk_out) begin
-      if (sh_cl_rd_cmds.size() != 0) begin
-
-         sh_cl_pcis_araddr[0]  <= sh_cl_rd_cmds[0].addr;
-         sh_cl_pcis_arid[0]    <= sh_cl_rd_cmds[0].id;
-         sh_cl_pcis_arlen[0]   <= sh_cl_rd_cmds[0].len;
+      AXI_Command cmd;
+      
+      if (cl_sh_pcim_arvalid[0] && sh_cl_pcim_arready[0]) begin
+         cmd.addr = cl_sh_pcim_araddr[0];
+         cmd.id   = cl_sh_pcim_arid[0];
+         cmd.len  = cl_sh_pcim_arlen[0];
+         cmd.last = 0;
          
-         sh_cl_pcis_arvalid[0] <= !sh_cl_pcis_arvalid[0] ? 1'b1 :
-                                  !cl_sh_pcis_arready[0] ? 1'b1 : 1'b0;
-         
-         if (cl_sh_pcis_arready[0] && sh_cl_pcis_arvalid[0]) begin
-            $display("%t - debug popping cmd fifo - %d", $time(), sh_cl_rd_cmds.size());
-            sh_cl_rd_cmds.pop_front();
-         end
-
+         cl_sh_rd_cmds.push_back(cmd);
+         sh_cl_rd_data.push_back(cmd);
       end
+
+      if (cl_sh_rd_cmds.size() < 4)
+        sh_cl_pcim_arready[0] <= 1'b1;
       else
-         sh_cl_pcis_arvalid <= 1'b0;
+        sh_cl_pcim_arready[0] <= 1'b0;
    end
 
    //
-   // cl->sh Read Data Channel
+   // sh->cl Read Data Channel
    //
+
+   logic first_rd_beat;
+   logic [63:0] rd_addr;
+   
    always @(posedge clk_out) begin
-      sh_cl_pcis_rready[0] <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
-   end
+      AXI_Command rd_cmd;
+      logic [511:0] beat;
 
-   always @(posedge clk_out) begin
-      AXI_Data data;
+      if (sh_cl_rd_data.size() != 0) begin
+         sh_cl_pcim_rid[0]    <= sh_cl_rd_data[0].id;
+         sh_cl_pcim_rresp[0]  <= 2'b00;
+         sh_cl_pcim_rvalid[0] <= !sh_cl_pcim_rvalid[0] ? 1'b1 :
+                                 !cl_sh_pcim_rready[0] ? 1'b1 :
+                                 !sh_cl_pcim_rlast[0]  ? 1'b1 : 1'b0;
 
-      if (cl_sh_pcis_rvalid[0] & sh_cl_pcis_rready) begin
-         data.data     = cl_sh_pcis_rdata[0];
-         data.id       = cl_sh_pcis_rid[0];
-         data.last     = cl_sh_pcis_rlast[0];
-
-         $display("%t - rddata: %h", $time(), cl_sh_pcis_rdata[0]);
+         sh_cl_pcim_rlast[0] <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
+                                (sh_cl_rd_data[0].len == 1) && sh_cl_pcim_rvalid && cl_sh_pcim_rready ? 1'b1 : 1'b0;
          
-         cl_sh_rd_data.push_back(data);
+         if (first_rd_beat == 1'b1) begin
+            rd_addr = sh_cl_rd_data[0].addr;
+            first_rd_beat = 1'b0;
+         end
+         
+         if (sh_cl_pcim_rvalid[0] & cl_sh_pcim_rready[0])
+           rd_addr+=64;
+
+         for(int i=0; i<16; i++) begin
+            logic [31:0] c;
+
+            $display("reading addr %x", rd_addr);
+            
+            // TODO: add code to make sure entry exists before accessing!!!!
+            c = host_memory[rd_addr + (i*4)];
+            beat = {c, beat[511:32]};
+            
+         end
+         
+         $display("%x", beat);
+         sh_cl_pcim_rdata[0] <= beat;
+
+      end
+      else begin
+         sh_cl_pcim_rvalid[0] <= 1'b0;
+         sh_cl_pcim_rlast[0]  <= 1'b0;         
+         first_rd_beat = 1'b1;
       end
 
+      if (cl_sh_pcim_rready[0] && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
+         if (sh_cl_rd_data[0].len == 0) begin
+            sh_cl_rd_data.pop_front();
+            first_rd_beat = 1'b1;
+         end
+         else
+           sh_cl_rd_data[0].len--;         
+
+      end
+      
    end
-*/
+
    
    //==========================================================
 
@@ -945,30 +1057,25 @@ typedef struct {
       #50ns;
    endtask // power_down
 
-   task poke(input logic [63:0] addr, logic [31:0] dat, logic [5:0] id);
-      AXI_Command cmd;
-      AXI_Data data;
+   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+
       logic [1:0] resp;
-      int         byte_idx;
-      int         mem_arr_idx;
       
-      cmd.addr = addr;
-      cmd.len  = 0;
-      cmd.id   = id;
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
 
-      sh_cl_wr_cmds.push_back(cmd);
+      sh_cl_wr_cmds.push_back(axi_cmd);
 
-      byte_idx     = addr[5:0];
-      mem_arr_idx  = byte_idx*8;
+      axi_data.data = data << (addr[5:0] * 8);
+      axi_data.strb = 64'h0f << addr[5:0];
       
-      data.data[mem_arr_idx+:32] = dat;
+      axi_data.id   = id;
+      axi_data.last = 1'b1;
 
-      data.strb[byte_idx+:4] = 'h0f;
-      
-      data.id   = 2;
-      data.last = 1'b1;
-
-      #20ns sh_cl_wr_data.push_back(data);
+      #20ns sh_cl_wr_data.push_back(axi_data);
       
       while (cl_sh_b_resps.size() == 0)
         #20ns;
@@ -978,16 +1085,16 @@ typedef struct {
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, logic [5:0] id, output [31:0] data);
-      AXI_Command cmd;
-      int   byte_idx;
-      int   mem_arr_idx;
+   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0);
+      AXI_Command axi_cmd;
+      int         byte_idx;
+      int         mem_arr_idx;
       
-      cmd.addr = addr;
-      cmd.len  = 0;
-      cmd.id   = id;
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
 
-      sh_cl_rd_cmds.push_back(cmd);
+      sh_cl_rd_cmds.push_back(axi_cmd);
 
       byte_idx     = addr[5:0];
       mem_arr_idx  = byte_idx*8;
@@ -1001,7 +1108,7 @@ typedef struct {
       
    endtask // peek
 
-`ifndef NEVER
+`ifdef NEVER
    
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
       AXI_Command cmd;
