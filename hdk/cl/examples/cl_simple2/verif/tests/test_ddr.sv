@@ -36,7 +36,7 @@ module test_ddr();
       test_data = 32'h6c93_af50;
 
       // Note all the DDR are ready about the same time, so just need to look at one
-      $display("[%t] : Waiting for DDR controllers to come up", $realtime);
+      $display("[%t] : Waiting for DDR initialization", $realtime);
       wait (tb.CL.all_ddr_is_ready[0]);
 
       //---------------------------
