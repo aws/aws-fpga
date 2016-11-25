@@ -46,7 +46,7 @@ You can setup and install the SDK with these few steps.  Note that the first two
     $ cd sdk                                      # Change directories to the top-level SDK directory       
     $ sdk_install.sh                              # Build and install the SDK
 
-## You want to build a new Custom Logic and register its AFI?
+## You want to build a new Custom Logic and register is as AFI?
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) can walk you through step by step how to build an AFI from one of the provided example, registers with AWS, and run it on an EC2 F1 instance.
 
