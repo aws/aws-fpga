@@ -247,6 +247,8 @@ module sh_bfm #(
   
    );
 
+//`include "sh_dpi_tasks.svh"
+   
 typedef struct {
    logic [63:0] addr;
    logic [7:0]  len;
@@ -366,6 +368,8 @@ typedef struct {
    logic [1:0]   ddr_axl_rresp;
    logic         ddr_axl_interrupt;
 
+   logic         use_c_host_memory = 1'b0;
+   
    initial begin
       clk_core = 1'b0;      
       forever #5ns clk_core = ~clk_core;
@@ -570,6 +574,7 @@ typedef struct {
    // cl->sh PCIeM Interface
    //
    //=================================================
+   logic [63:0] host_memory_addr = 0;
    logic [31:0] host_memory[*];
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
@@ -587,7 +592,16 @@ typedef struct {
             $display("%t - fb: %d %16x %x", $time(), first_wr_beat, cl_sh_wr_data[0].data, cl_sh_wr_data[0].strb);
             for(int i=0; i<16; i++) begin
                logic [31:0] word;
-               word = host_memory[wr_addr];
+
+               if (!use_c_host_memory)
+                 word = host_memory[wr_addr];
+               else begin
+                  for(int k=0; k<4; k++) begin
+                     int t;
+                     tb.host_memory_getc(wr_addr+k, t);
+                     word = {t[7:0], word[31:8]};
+                  end                  
+               end
                
                for(int j=0; j<4; j++) begin
                   logic [7:0] c;
@@ -599,7 +613,20 @@ typedef struct {
                      word = {c, word[31:8]};
                   end
                end // for (int j=0; j<4; j++)
-               host_memory[wr_addr] = word;
+
+               if (!use_c_host_memory)
+                 host_memory[wr_addr] = word;
+               else begin
+                  for(int k=0; k<4; k++) begin
+                     int t;
+                     t = word;                     
+                     tb.host_memory_putc(wr_addr+k, t);
+                     word = word >> 8;
+
+                     $display("sh writing host memory %x %x", wr_addr+k, t);
+                     
+                  end                  
+               end
                
                wr_addr += 4;
             end
@@ -1057,6 +1084,12 @@ typedef struct {
       #50ns;
    endtask // power_down
 
+   task map_host_memory(input logic [63:0] addr);
+      $display("mapping host memory to 0x%16x", addr);
+      host_memory_addr = addr;
+      use_c_host_memory = 1'b1;      
+   endtask // sv_map_host_memory
+   
    task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
       AXI_Command axi_cmd;
       AXI_Data    axi_data;

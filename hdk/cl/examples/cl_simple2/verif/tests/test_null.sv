@@ -7,15 +7,13 @@
 
 module test_null();
 
-`include "sh_dpi_tasks.svh"
-   
    initial begin
       int exit_code;
       
       tb.sh.power_up();
 
       
-      test_main(exit_code);
+      tb.test_main(exit_code);
       
       #50ns;
 
