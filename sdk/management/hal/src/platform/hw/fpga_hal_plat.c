@@ -138,22 +138,7 @@ fpga_plat_attach(struct fpga_slot_spec *spec)
 
 	fpga_plat_set_mem_base_size(v, map->size);
 
-#if 0 /** @todo when the HW support the version reg in BAR4 */
-	/** Perform one read at offset 0 for sanity checking */ 
-	uint32_t val; 
-	int ret = fpga_plat_reg_read(0, &val); 
-	fail_on(ret != 0, unmap_err, "fpga_plat_reg_read failed"); 
-					 
-	log_debug("PCI resource%u offset 0=0x%08x\n",  map->resource_num, val); 
-	fail_on(val == (uint32_t) -1, unmap_err, "Version is all F's"); 
 	return 0;
-
-unmap_err:
-	munmap(v, map->size);
-#else
-	return 0;
-#endif
-
 err:
 	errno = 0;
 	return -1;
