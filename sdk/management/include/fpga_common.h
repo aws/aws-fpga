@@ -50,10 +50,6 @@ struct fpga_pci_resource_map {
 
 /**
  * FPGA slot specification
- *
- * e.g. FPGATalker contains all the business logic of mapping FPGA slots
- * to PCI resources for both the FPGA Worker(s) and the FPGA
- * Mailbox(es) (which can then simply mmap the resource).
  */
 struct fpga_slot_spec {
 	struct fpga_pci_resource_map map;
