@@ -21,17 +21,24 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 
 # Quick start
 
-By running the next few steps, you would have downloaded the HDK, compile and build on of the sampled Custom Logics (CL), and register it with AWS
+By running the next few steps, you would have downloaded the HDK+SDK, compile and build on of the sampled Custom Logics (CL), and register it with AWS
 
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
-    $ cd aws-fpga                                 # move to the root directory of the repository before running the next script
+    $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
     $ source hdk_setup.sh                         # Set up the environment variables
     $ cd hdk/cl/examples/cl_simple                # Change directory to one of the provided examples
-    $ export CL_DIR=$(pwd)                        # define this directory as the root for the CL design
+    $ export CL_DIR=$(pwd)                        # Define this directory as the root for the CL design
     $ cd build/scripts                            # The build directory for synthesizing, placement, timing etc
     $ vivado -mode batch -source create_dcp_from_cl.tcl   # make sure you have vivado installed and vivado license manager running
-    $ aws ec2 createFpgaImage TBD TBD TBD         # make sure you have aws account, aws-cli installed, and you ran `aws configure`
-    
+    $ aws ec2 createFpgaImage TBD TBD TBD         # Make sure you have aws account, aws-cli installed, and you ran `aws configure`
+
+You can setup and install the SDK with these few steps.  Note that the first two steps may be skipped if you have already ran them in the above HDK setup.
+    $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
+    $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
+    $ source sdk_setup.sh                         # Set up the envronment variables
+    $ cd sdk                                      # Change directories to the top-level SDK directory       
+    $ sdk_install.sh                              # Build and install the SDK
+
 ## Building, Registering and Using an AFI 
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) can walk you through step by step how to build an AFI from one of the provided example, registers with AWS, and run it on an EC2 F1 instance.
