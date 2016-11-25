@@ -21,7 +21,9 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 
 # Quick start
 
-By running the next few steps, you would have downloaded the HDK, compile and build on of the sampled Custom Logics (CL), and register it with AWS
+## Building an example AFI
+
+By running the next few steps, you would have downloaded the HDK, compile and build one of the example Custom Logic (CL) included in this the HDK, and register it with AWS.  You can run this step in any EC2 instance, with C4 and M4 being the recommended ones for performance.
 
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
     $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
@@ -32,6 +34,10 @@ By running the next few steps, you would have downloaded the HDK, compile and bu
     $ vivado -mode batch -source create_dcp_from_cl.tcl   # make sure you have vivado installed and vivado license manager running
     $ aws ec2 createFpgaImage TBD TBD TBD         # Make sure you have aws account, aws-cli installed, and you ran `aws configure`
 
+## Using an AFI on EC2 F1
+
+Now that you have built an AFI, or if you want to use one of the exampel pre-built AFIs provided by AWS, you need to run an instance on EC2 F1, and have the SDK installed:
+
 You can setup and install the SDK with these few steps.  Note that the first two steps may be skipped if you have already ran them in the above HDK setup.
 
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
@@ -40,7 +46,7 @@ You can setup and install the SDK with these few steps.  Note that the first two
     $ cd sdk                                      # Change directories to the top-level SDK directory       
     $ sdk_install.sh                              # Build and install the SDK
 
-## Building, Registering and Using an AFI 
+## You want to build a new Custom Logic and register its AFI?
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) can walk you through step by step how to build an AFI from one of the provided example, registers with AWS, and run it on an EC2 F1 instance.
 
