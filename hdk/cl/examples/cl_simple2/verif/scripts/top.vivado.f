@@ -14,6 +14,8 @@
 -sourcelibdir ${HDK_DIR}/top/vu9p/design/sh
 -sourcelibdir ${SH_LIB_DIR}
 
+-include ${CL_ROOT}/verif/sv
+
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
 ${HDK_DIR}/top/vu9p/design/sh/sh_ddr.sv

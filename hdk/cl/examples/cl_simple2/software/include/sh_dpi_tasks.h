@@ -6,6 +6,7 @@
 extern void sv_printf(char *msg);
 extern void cl_peek(long long addr, int *data);
 extern void cl_poke(long long addr, int  data);
+int test_main(int *exit_code);
 
 void log_printf(const char *format, ...)
 {
