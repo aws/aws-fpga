@@ -4,9 +4,10 @@
 
 compile:
 	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && xsc $(C_SRC_DIR)/test.c
 	cd $(SIM_DIR) && xvlog --sv -m64 --relax -f $(SCRIPTS_DIR)/top.vivado.f
-	cd $(SIM_DIR) && xelab -m64 --timescale 1ps/1ps --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -snapshot tb work.tb work.glbl work.test_peek_poke
+	cd $(SIM_DIR) && xelab -m64 --timescale 1ps/1ps --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -sv_lib dpi -snapshot tb work.tb work.glbl work.$(TEST)
 
 run:
-	cd $(SIM_DIR) && xsim -R -log test.log -tclbatch $(SCRIPTS_DIR)/waves.tcl -g  tb
+	cd $(SIM_DIR) && xsim -R -log test.log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
 

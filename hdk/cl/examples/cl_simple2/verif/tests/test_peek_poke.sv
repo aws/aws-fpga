@@ -7,10 +7,27 @@
 
 module test_peek_poke();
 
+   import "DPI-C" context task test_main(output int a);
+   export "DPI-C" task sv_printf;
+   export "DPI-C" task centaur_peek;
+   export "DPI-C" task centaur_poke;
+   
    logic [63:0] pcim_address = 64'h0000_0000_1234_0000;
    
+   task sv_printf(input string msg);
+      $display("%S", msg);
+   endtask // sv_printf
 
+   task centaur_peek(input longint addr, output int data);
+      tb.sh.peek(addr, data);
+   endtask // centaur_peek
+   
+   task centaur_poke(input longint addr, int data);
+      tb.sh.poke(addr, data);
+   endtask // centaur_peek
+   
    initial begin
+      int i;
       tb.sh.power_up();
 
       tb.sh.poke(64'h1c, 0);                   // write index
@@ -29,7 +46,14 @@ module test_peek_poke();
 
       #1000ns;
 
+      test_main(i);
+      $display("i: %x",i);
+      
+      #500ns;
+
       tb.sh.power_down();
+
+      
       $finish;
    end
 
