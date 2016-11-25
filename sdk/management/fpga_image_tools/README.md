@@ -25,8 +25,10 @@ Alternatively, the tools can be downloaded and installed from AWS SDK/HDK github
     $ git clone https://github.com/aws/aws-fpga
     $ cd aws-fpga
     $ source sdk_setup.sh
+	$ cd sdk
+	$ sdk_install.sh
     
-The `sdk_setup.sh` script will build the AFI management tool and install them in `/usr/bin`.
+The `sdk_install.sh` script will build the AFI management tools and install them in `/usr/bin`.
 
 ## Quickstart
 

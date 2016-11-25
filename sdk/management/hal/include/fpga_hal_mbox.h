@@ -1,0 +1,137 @@
+/*
+ * Copyright 2016-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ */
+
+/** @file
+ * FPGA HAL mailbox operations.
+ */
+
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+
+#include <fpga_common.h>
+
+#if defined(USE_VENOM_CL_2_COMPAT)
+#define FPGA_MBOX_MSG_DATA_LEN	256	
+#else
+#define FPGA_MBOX_MSG_DATA_LEN	4096 
+#endif
+
+/**
+ * Mailbox init structure.
+ */
+struct fpga_hal_mbox {
+	uint32_t	slot;		/**< FPGA slot, SW platform only */
+	uint32_t	timeout;	/**< timeout, e.g. N x delay_mec */
+	uint32_t	delay_msec;
+};
+
+/**
+ * Initialize the Mailbox
+ *
+ * @param[in]	mbox	the Mailbox init structure.
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_init(struct fpga_hal_mbox *mbox);
+
+/**
+ * Reset the Mailbox to initial state (e.g. clear RX and TX event).
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_reset(void);
+
+/**
+ * Attach the Mailbox.  Wrapper around fpga_hal_mbox_reset for attach
+ * semantics.
+ *
+ * @param[in]	clear_state		reset mbox to initial state.
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_attach(bool clear_state);
+
+/**
+ * Detach the Mailbox.  Wrapper around fpga_hal_mbox_reset for detach
+ * semantics.
+ *
+ * @param[in]	clear_state		reset mbox to initial state.
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_detach(bool clear_state);
+
+/**
+ * Perform a synchronous read from the Mailbox using the timeout and delay_msec
+ * values from fpga_hal_mbox_init.
+ *
+ * @param[in,out]	msg		the msg buffer to use
+ * @param[in,out]	len		the msg length to set
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_read(void *msg, uint32_t *len);
+
+/**
+ * Perform a synchronous write to the Mailbox using the timeout and delay_msec
+ * values from fpga_hal_mbox_init.
+ *
+ * @param[in]	msg		the msg buffer to use
+ * @param[in]	len		the msg length to write 
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_write(void *msg, uint32_t len);
+
+/**
+ * Perform an asynchronous (non-blocking) read from the Mailbox.
+ *
+ * @param[in,out]	msg		the msg buffer to use
+ * @param[in,out]	len		the msg length to set
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_read_async(void *msg, uint32_t *len);
+
+/**
+ * Perform an asynchronous (non-blocking) write to the Mailbox.
+ *
+ * @param[in]	msg		the msg buffer to use
+ * @param[in]	len		the msg length to write 
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_write_async(void *msg, uint32_t len);
+
+/** 
+ * Test and Clear (TC) asynchronous write acknowledgement. 
+ * e.g. use this to check if an async write was ack'd by the peer.
+ * If the write was ack'd, clear the ack status within the Mailbox, 
+ * and return the ack status. 
+ *
+ * @param[in,out]	ack		the ack flag to set	
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_write_async_tc_ack(bool *ack);
