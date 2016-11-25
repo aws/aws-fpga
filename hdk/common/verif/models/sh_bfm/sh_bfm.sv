@@ -247,8 +247,6 @@ module sh_bfm #(
   
    );
 
-//`include "sh_dpi_tasks.svh"
-   
 typedef struct {
    logic [63:0] addr;
    logic [7:0]  len;
@@ -349,7 +347,6 @@ typedef struct {
    logic         sync_sh_cl_ddr_rvalid;
    logic         sync_cl_sh_ddr_rready;
 
-   // DEBUG: Need to do something with these...
    logic         ddr_axl_awvalid;
    logic         ddr_axl_awready;
    logic [31:0]  ddr_axl_awaddr;
@@ -370,6 +367,19 @@ typedef struct {
 
    logic         use_c_host_memory = 1'b0;
    
+   bit           debug;
+
+   initial begin
+      debug = 1'b0;
+/* TODO: Use the code below once plusarg support is enabled
+      if ($test$plusargs("DEBUG")) begin
+         debug = 1'b1;
+      end else begin
+         debug = 1'b0;
+      end
+*/
+   end
+
    initial begin
       clk_core = 1'b0;      
       forever #5ns clk_core = ~clk_core;
@@ -465,7 +475,9 @@ typedef struct {
                                   !cl_sh_pcis_awready[0] ? 1'b1 : 1'b0;
          
          if (cl_sh_pcis_awready[0] && sh_cl_pcis_awvalid[0]) begin
-            $display("%t - debug popping cmd fifo - %d", $time(), sh_cl_wr_cmds.size());
+            if (debug) begin
+               $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_wr_cmds.size());
+            end
             sh_cl_wr_cmds.pop_front();
          end
 
@@ -494,7 +506,9 @@ typedef struct {
                                  !cl_sh_pcis_wready[0] ? 1'b1 : 1'b0;
          
          if (cl_sh_pcis_wready[0] && sh_cl_pcis_wvalid[0]) begin
-            $display("%t - debug popping wr data fifo - %d", $time(), sh_cl_wr_data.size());
+            if (debug) begin
+               $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
+            end
             sh_cl_wr_data.pop_front();
          end
 
@@ -538,7 +552,9 @@ typedef struct {
                                   !cl_sh_pcis_arready[0] ? 1'b1 : 1'b0;
          
          if (cl_sh_pcis_arready[0] && sh_cl_pcis_arvalid[0]) begin
-            $display("%t - debug popping cmd fifo - %d", $time(), sh_cl_rd_cmds.size());
+            if (debug) begin
+               $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_rd_cmds.size());
+            end
             sh_cl_rd_cmds.pop_front();
          end
 
@@ -562,7 +578,11 @@ typedef struct {
          data.id       = cl_sh_pcis_rid[0];
          data.last     = cl_sh_pcis_rlast[0];
 
-         $display("%t - rddata: %h", $time(), cl_sh_pcis_rdata[0]);
+         if (debug) begin
+            for (int i=0; i<16; i++) begin
+               $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_pcis_rdata[0][(i*32)+:32]);
+            end
+         end
          
          cl_sh_rd_data.push_back(data);
       end
@@ -589,7 +609,9 @@ typedef struct {
          end
 
          if (cl_sh_wr_data.size() > 0) begin
-            $display("%t - fb: %d %16x %x", $time(), first_wr_beat, cl_sh_wr_data[0].data, cl_sh_wr_data[0].strb);
+            if (debug) begin
+               $display("[%t] - DEBUG fb:  %1d  0x%0128x  0x%016x", $realtime, first_wr_beat, cl_sh_wr_data[0].data, cl_sh_wr_data[0].strb);
+            end
             for(int i=0; i<16; i++) begin
                logic [31:0] word;
 
@@ -633,7 +655,9 @@ typedef struct {
             if (cl_sh_wr_data[0].last == 1) begin
                first_wr_beat = 1'b1;
                host_mem_wr_que.pop_front();
-               $display("reseting ...");
+               if (debug) begin
+                  $display("[%t] - DEBUG reseting...", $realtime);
+               end
                
             end
             
@@ -699,8 +723,9 @@ typedef struct {
 
    always @(posedge clk_out) begin
       if (sh_cl_b_resps.size() != 0) begin
-         $display("resp.size %0d %0d", sh_cl_b_resps.size(), sh_cl_b_resps[0].last);
-         
+         if (debug) begin
+            $display("[%t] : DEBUG resp.size  %2d  %1d", $realtime, sh_cl_b_resps.size(), sh_cl_b_resps[0].last);
+         end
          if (sh_cl_b_resps[0].last != 0) begin
             sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
             sh_cl_pcim_bresp[0] <= 2'b00;
@@ -790,15 +815,19 @@ typedef struct {
          for(int i=0; i<16; i++) begin
             logic [31:0] c;
 
-            $display("reading addr %x", rd_addr);
+            if (debug) begin
+               $display("[%t] : DEBUG reading addr 0x%016x", $realtime, rd_addr);
+            end
             
             // TODO: add code to make sure entry exists before accessing!!!!
             c = host_memory[rd_addr + (i*4)];
             beat = {c, beat[511:32]};
             
          end
-         
-         $display("%x", beat);
+
+         if (debug) begin
+            $display("[%t] : DEBUG beat 0x%0128x", $realtime, beat);
+         end
          sh_cl_pcim_rdata[0] <= beat;
 
       end
