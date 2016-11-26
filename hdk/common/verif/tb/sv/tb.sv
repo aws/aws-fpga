@@ -186,7 +186,8 @@ module tb();
    logic [31:0]        aurora_sh_stat_rdata;
    logic [7:0]         aurora_sh_stat_int;
    
-
+`include "sh_dpi_tasks.svh"
+   
 sh_bfm sh(
 
    .cl_sh_status0(cl_sh_status0),
