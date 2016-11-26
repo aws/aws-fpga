@@ -357,14 +357,14 @@ sh_bfm sh(
    .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
    .cl_sh_ddr_awlen(cl_sh_ddr_awlen),
    .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid),
-   .sh_cl_ddr_awready(cl_sh_ddr_awready),
+   .sh_cl_ddr_awready(sh_cl_ddr_awready),
 
    .cl_sh_ddr_wid(cl_sh_ddr_wid),
    .cl_sh_ddr_wdata(cl_sh_ddr_wdata),
    .cl_sh_ddr_wstrb(cl_sh_ddr_wstrb),
    .cl_sh_ddr_wlast(cl_sh_ddr_wlast),
    .cl_sh_ddr_wvalid(cl_sh_ddr_wvalid),
-   .sh_cl_ddr_wready(cl_sh_ddr_wready),
+   .sh_cl_ddr_wready(sh_cl_ddr_wready),
 
    .sh_cl_ddr_bid(sh_cl_ddr_bid),
    .sh_cl_ddr_bresp(sh_cl_ddr_bresp),
