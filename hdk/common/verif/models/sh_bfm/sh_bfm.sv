@@ -282,8 +282,10 @@ typedef struct {
    logic         pre_sync3_rst_n;
    logic         sync_rst_n;
    logic         intf_sync_rst_n;
+   logic         ddr_user_clk;
    logic         ddr_user_rst;
    logic         ddr_user_rst_n;
+   logic         ddr_is_ready;
    logic         ddr_is_ready_presync;
    logic         ddr_is_ready_sync;
 
