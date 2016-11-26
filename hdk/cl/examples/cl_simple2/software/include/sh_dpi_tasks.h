@@ -4,22 +4,22 @@
 #include <stdarg.h>
 
 extern void sv_printf(char *msg);
-extern void sv_map_host_memory(char *memory);
+extern void sv_map_host_memory(uint8_t *memory);
 
-extern void cl_peek(long long addr, int *data);
-extern void cl_poke(long long addr, int  data);
-extern void pause(int x);
+extern void cl_peek(uint64_t addr, uint32_t *data);
+extern void cl_poke(uint64_t addr, uint32_t  data);
+extern void pause(uint32_t x);
 
-int test_main(int *exit_code);
+void test_main(uint32_t *exit_code);
 
-void host_memory_putc(long long addr, int data)
+void host_memory_putc(uint64_t addr, uint8_t data)
 {
-  *(char *)addr = (char)data;
+  *(uint8_t *)addr = data;
 }
 
-void host_memory_getc(long long addr, int *data)
+void host_memory_getc(uint64_t addr, uint8_t *data)
 {
-  *(char *)data = *(char *)addr;
+  *data = *(uint8_t *)addr;
 }
 
 void log_printf(const char *format, ...)
@@ -33,5 +33,8 @@ void log_printf(const char *format, ...)
 
   va_end(args);
 }
+
+#define LOW_32b(a)  ((uint32_t)((uint32_t)(a) & 0xffffffff))
+#define HIGH_32b(a) ((uint32_t)(((uint64_t)(a)) >> 32L))
 
 #endif

@@ -621,9 +621,9 @@ typedef struct {
                  word = host_memory[wr_addr];
                else begin
                   for(int k=0; k<4; k++) begin
-                     int t;
+                     byte t;
                      tb.host_memory_getc(wr_addr+k, t);
-                     word = {t[7:0], word[31:8]};
+                     word = {t, word[31:8]};
                   end                  
                end
                
@@ -642,13 +642,10 @@ typedef struct {
                  host_memory[wr_addr] = word;
                else begin
                   for(int k=0; k<4; k++) begin
-                     int t;
-                     t = word;                     
+                     byte t;
+                     t = word[7:0];                     
                      tb.host_memory_putc(wr_addr+k, t);
                      word = word >> 8;
-
-                     $display("sh writing host memory %x %x", wr_addr+k, t);
-                     
                   end                  
                end
                
