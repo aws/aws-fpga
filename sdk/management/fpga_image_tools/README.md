@@ -14,13 +14,13 @@ AWS provides the following a set of commands(tools) for Amazon FPGA Image (AFI) 
 * **fpga-clear-local-image**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The *fpga-image-slot* parameter is a logical index that represents a given FPGA within an instance.  Use `fpga-describe-local-image` to return the FPGA image status, and `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
-**All of the Amazon FPGA Image Management Tools support a *`-help`* option that may be used to display the full set of options.**
+**All of the AFI Management Tools support a *`-help`* option that may be used to display the full set of options.**
 
-**The Amazon FPGA Image tools require `sudo` or root access**
+**The AFI Management Tools require `sudo` or root access**
 
-The Amazon FPGA Image Tools require sudo (or root) access since AFI loads and clears are modifying the underlying system hardware.  The same `sudo` (or root) access is also required to bind new drivers for a loaded AFI, and to unbind drivers prior to clearing a loaded AFI.
+The tools require sudo (or root) access since AFI loads and clears are modifying the underlying system hardware (also see the FAQ section "Q: How do the AFI Management Tools work?".
 
-## Installs or updates to the Amazon FPGA Image Management Tools
+## Installs or updates to the AFI Management Tools
 
 The tools come pre-installed in `/usr/bin` for Amazon Linux, version 2016.09 or later.
 
@@ -30,7 +30,7 @@ Alternatively, the tools can be downloaded and installed from AWS SDK/HDK github
     $ cd aws-fpga
     $ source sdk_setup.sh
     
-The `sdk_setup.sh` script will build the AFI management tools and install them in `/usr/bin`.
+The `sdk_setup.sh` script will build the AFI Management Tools and install them in `/usr/bin`.
 
 ## Quickstart
 
@@ -59,7 +59,7 @@ AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
 
 *  *The DBDF is the common PCIe bus topology representation representation the Domain:Bus#:Device#:Function#*
 
-** NOTE: ** *While each FPGA has more than one PCIe Physical Function, the AFI management tools will present the VendorId and DeviceId of the first PF only*
+** NOTE: ** *While each FPGA has more than one PCIe Physical Function, the AFI Management Tools will present the VendorId and DeviceId of the first PF only*
 
 #### Describing the AFI content loaded on a specific FPGA slot
 
@@ -187,7 +187,7 @@ into the given fpga-image-slot.
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
-   * The Amazon FPGA Image Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
+   * The AFI Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
    * The Amazon FPGA Image Tools require `sudo` (or root) access since AFI loads and clears are modifying the underlying system hardware.
    * `sudo` (or root) privilege is also required since the tools access the sysfs PCI subsystem and `/dev/kmsg` for `dmesg` logging.
    * For more information on the Amazon FPGA Image Mangement Tool software and FPGA hardware see [aws-fpga](https://github.com/aws/aws-fpga).
