@@ -1,3 +1,7 @@
+set_msg_config -severity INFO -suppress
+set_msg_config -severity STATUS -suppress
+set_msg_config -severity WARNING -suppress
+
 create_project -force tmp_ddr ./tmp -part xcvu9p-flgb2104-2-i-es1
 add_files -norecurse $::env(HDK_DIR)/top/vu9p/design/v3_venom_cl/v3_venom_cl.srcs/sources_1/ip/ddr4_core/ddr4_core.xci
 export_ip_user_files -of_objects  [get_files  $::env(HDK_DIR)/top/vu9p/design/v3_venom_cl/v3_venom_cl.srcs/sources_1/ip/ddr4_core/ddr4_core.xci] -force -quiet
