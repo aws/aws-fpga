@@ -367,8 +367,6 @@ typedef struct {
    logic [1:0]   ddr_axl_rresp;
    logic         ddr_axl_interrupt;
 
-   logic         use_c_host_memory = 1'b0;
-   
    bit           debug;
 
    initial begin
@@ -597,7 +595,6 @@ typedef struct {
    //
    //=================================================
    logic [63:0] host_memory_addr = 0;
-   logic [31:0] host_memory[*];
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
    logic [63:0] wr_addr;
@@ -617,12 +614,12 @@ typedef struct {
             for(int i=0; i<16; i++) begin
                logic [31:0] word;
 
-               if (!use_c_host_memory)
-                 word = host_memory[wr_addr];
+               if (!tb.use_c_host_memory)
+                 word = tb.sv_host_memory[wr_addr];
                else begin
                   for(int k=0; k<4; k++) begin
                      byte t;
-                     tb.host_memory_getc(wr_addr+k, t);
+                     t = tb.host_memory_getc(wr_addr+k);
                      word = {t, word[31:8]};
                   end                  
                end
@@ -638,8 +635,8 @@ typedef struct {
                   end
                end // for (int j=0; j<4; j++)
 
-               if (!use_c_host_memory)
-                 host_memory[wr_addr] = word;
+               if (!tb.use_c_host_memory)
+                 tb.sv_host_memory[wr_addr] = word;
                else begin
                   for(int k=0; k<4; k++) begin
                      byte t;
@@ -818,8 +815,16 @@ typedef struct {
                $display("[%t] : DEBUG reading addr 0x%016x", $realtime, rd_addr);
             end
             
-            // TODO: add code to make sure entry exists before accessing!!!!
-            c = host_memory[rd_addr + (i*4)];
+            if (!tb.use_c_host_memory)
+              // TODO: add code to make sure entry exists before accessing!!!!
+              c = tb.sv_host_memory[rd_addr + (i*4)];
+            else begin
+               for(int k=0; k<4; k++) begin
+                  byte t;
+                  t = tb.host_memory_getc(rd_addr + k);
+                  c = {t, c[31:8]};
+               end
+            end
             beat = {c, beat[511:32]};
             
          end
@@ -1115,7 +1120,7 @@ typedef struct {
    task map_host_memory(input logic [63:0] addr);
       $display("mapping host memory to 0x%16x", addr);
       host_memory_addr = addr;
-      use_c_host_memory = 1'b1;      
+      tb.use_c_host_memory = 1'b1;      
    endtask // sv_map_host_memory
    
    task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);

@@ -186,6 +186,9 @@ module tb();
    logic [31:0]        aurora_sh_stat_rdata;
    logic [7:0]         aurora_sh_stat_int;
    
+   logic [31:0]        sv_host_memory[*];
+   logic               use_c_host_memory = 1'b0;
+   
 `include "sh_dpi_tasks.svh"
    
 sh_bfm sh(
