@@ -42,9 +42,7 @@ You can setup and install the SDK with these few steps.  Note that the first two
 
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
     $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
-    $ source sdk_setup.sh                         # Set up the envronment variables
-    $ cd sdk                                      # Change directories to the top-level SDK directory       
-    $ sdk_install.sh                              # Build and install the SDK
+    $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
 
 ## You want to build a new Custom Logic and register is as AFI?
 
