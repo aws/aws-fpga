@@ -24,7 +24,6 @@ This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with 
          *    128, 256 and 512 byte maximum payload size support.
          *    128, 256, 512, 1024, 2048 and 4096 maximum read request size support.
          *    AXI4 error handling.
-         *    Upto 48 vectors of MSIX interface support.
          *    AxUSER bits implemented on address channels. 
     *    DDR interface for DOM0 stats.         
 
@@ -58,4 +57,5 @@ This initial release will have following limitations.
 
 *    No HMC memory interface support for Customer Logic(CL).
 *    No FPGA to FPGA serial link support.
+*    No MSIX interrupt support in Shell(SH).
 
