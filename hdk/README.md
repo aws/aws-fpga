@@ -72,7 +72,8 @@ Current release of the HDK does not include DMA. Upcoming releases will include 
 AWS FPGA design is provisioned to support chipscope, and developers will have access to chipscope in one of the upcoming HDK and SDK releases.
 
 ### Does HDK support Partial Reconfiguration?
-AWS F1 instances support partial configuration (PR), and the AFI is actually a PR bitstream. Using [AWS EC2 FPGA API](../sdk/management/fpga_image_tools), the users can load/unload AFIs.
+AWS F1 instances support partial configuration (PR), and the AFI is actually a PR bitstream. Using [FPGA Management Tools provided by the SDK](../sdk/management/fpga_image_tools), the users can load/unload AFIs from within the instance.
+**NOTE: The user can only load/unload AFI-id(s) that has been associated a priori to the instance-id or the AMI-id**
 
 
 
