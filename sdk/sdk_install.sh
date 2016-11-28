@@ -10,7 +10,7 @@ RET=$?
 if [ $RET != 0 ]; then
     echo "Error: gcc is not installed."
     echo "    You can install gcc and other useful development tools by using: sudo yum groupinstall \"Development tools\""
-    exit 1
+    exit $RET 
 fi
 
 SDK_MGMT_DIR=$SDK_DIR/management
@@ -20,7 +20,7 @@ $SDK_MGMT_DIR/install_fpga_image_tools.sh
 RET=$?
 if [ $RET != 0 ]; then
     echo "Error: install_fpga_image_tools.sh returned $RET"
-    exit 1
+    exit $RET 
 fi
 
 echo "Done with SDK install."
