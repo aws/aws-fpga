@@ -36,7 +36,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
     *    All PCIe transactions must adhere to the PCIe Exress base spec.
     *    4Kbyte Address boundary for all transactions(PCIe restriction).
     *    Multiple outstanding Read transactions with same ID not supported.
-    *    Only 16 outstanding read transactions supported.
+    *    Only 32 outstanding read transactions supported.
     *    PCIE extended tag not supported.
     *    Address must match DoubleWord(DW) address of the transaction.
     *    WSTRB(write strobe) must reflect appropriate valid bytes for writes.
