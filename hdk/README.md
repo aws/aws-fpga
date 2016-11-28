@@ -6,7 +6,7 @@
 
 AWS FPGA HDK is the official kit for developing an Amazon FPGA Image (AFI) which can be loaded on FPGAs in FPGA-enabled EC2 instances. 
 
-Check out our [release notes](./release_notes.md) for information about the latest bug fixes, updates, and features added to the HDK.
+Check out the [release notes](../RELEASE_NOTES.md) for information about the latest bug fixes, updates, and features added to the HDK.
 
 ## Overview
 
