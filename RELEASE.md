@@ -45,7 +45,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 
 ##**_License Requirements_**:
 
-The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to LICENSE.txt in aws/aws-fpga/sdk and aws/aws-fpga/hdk sections for more information.
+The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to [HDK License](./hdk/LICENSE.txt) and [SDK License](./sdk/LICENSE.txt).
 
 ##**_What's new_**?
 
