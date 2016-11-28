@@ -14,9 +14,9 @@ This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with 
                *    AXI4 protocol support on all interfaces.
     *  	 250 MHz clock and asynchronous reset provided to Customer Logic(CL).
     *    PCIE endpoint presentation to Customer Logic(CL).
-         *    FPGA management physical function
-         *    User physical function
-         *    FLR interface for User physical function
+         *    FPGA management physical function.
+         *    User physical function.
+         *    FLR interface for User physical function.
     *    PCIE interface between Shell(SH) and Customer Logic(CL).
          *    SH to CL inbound AXI4 interface.
          *    CL to SH outbound AXI4 interface.
@@ -31,13 +31,13 @@ This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with 
 
 *    All PCIE AXI4 interfaces between Customer Logic(CL) and Shell(SH) must adhere to following restrictions:
 
-     *     All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express Base specification).
-     *     4Kbyte Address boundary for all transactions(PCIe restriction).
-     *     Multiple outstanding Read transactions with same ID not supported.
-     *     Only 32 outstanding read transactions supported.
-     *     PCIE extended tag not supported.
-     *     Address must reflect the correct DW address of the transfer.
-     *     WSTRB(write strobe) must reflect the appropriate valid bytes for writes. 
+    *    All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express Base specification).
+    *    4Kbyte Address boundary for all transactions(PCIe restriction).
+    *    Multiple outstanding Read transactions with same ID not supported.
+    *    Only 32 outstanding read transactions supported.
+    *    PCIE extended tag not supported.
+    *    Address must reflect the correct DW address of the transfer.
+    *    WSTRB(write strobe) must reflect the appropriate valid bytes for writes. 
 
 ##**_License Requirements_**:
 
