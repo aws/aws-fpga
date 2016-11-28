@@ -41,18 +41,19 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 
 ## Unsupported Features (Planned for future releases)
 
-* DMA Engine not included with the current version of the Shell
+* DMA Engine is not included with the current version of the Shell
 * Interrupts are not supported
 * Build flow limit to RTL/Verilog source files
 * HLS and OpenCL build flow not included in this HDK release
 * ChipScope
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
+* Customizable PCIe DeviceID/VendorID
 
 ## Supported Tools and Environment
 
 * The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms.
-* First install of AWS FPGA HDK requires having gcc installed in the instance server. If that's not available, try `sudo yum update && sudo yum group install "Development Tools"`
+* First install of AWS FPGA SDK requires having gcc installed in the instance server. If that's not available, try `sudo yum update && sudo yum group install "Development Tools"`
 * The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running
 * Vivado License need to support VU9p ES1 FPGA
 * Vivado License need to support encryption
