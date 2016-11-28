@@ -75,7 +75,7 @@ The following command displays the current state for the given FPGA slot number.
 
 To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parameters (see FAQ for AGFI).
 
-    $ sudo fpga-load-local-image -S 0 -I agfi-004f34c45ed4e9603
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
 
 #### Describing the AFI content loaded on a specific FPGA slot after load
 
@@ -84,7 +84,7 @@ Displays the current state for the given FPGA slot number.  The output shows the
     $ sudo fpga-describe-local-image -S 0 -H
     
     Type    FpgaImageSlot    FpgaImageId          StatusName    StatusCode
-    AFI           0       agfi-004f34c45ed4e9603    loaded          0
+    AFI           0       agfi-0123456789abcdefg    loaded          0
     Type        VendorId    DeviceId      DBDF
     AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
 
@@ -149,7 +149,7 @@ The following FPGA image hardware metrics are provided. PCIe related counters ha
 * **Q: What is the Amazon Global FPGA Image ID (AGFI)?**
    * The AGFI is an AWS **globally** unique identifier that is used to reference a specific Amazon FPGA Image (AFI). 
    * It is used to refer to a specific AFI when using the FPGA Management tools from within an EC2 instance.
-   * In the examples, `agfi-004f34c45ed4e9603` is specified in the `fpga-load-local-image` command in order to load a specific AFI
+   * In the examples, `agfi-0123456789abcdefg` is specified in the `fpga-load-local-image` command in order to load a specific AFI
 into the given `fpga-image-slot`.
    * AGFI IDs should not be confused with AFI IDs. The latter are **regional** IDs that are used to refer to a specific AFI when using the AWS EC2 APIs to create or manage and AFI. For example, when copying an AFI across regions, it will preserve the same AGFI ID, but get a new regional AFI ID.
 
