@@ -26,7 +26,9 @@ The HDK also includes test benches for each provided example, and instructions o
 
 ### Have an instance or server with Xilinx Vivado tools and License
 
-To get started, the developer needs to have a development environment with Xilinx tools installed. An easy way to get this by using AWS FPGA Developer AMI and following the instructions inside the README.md of that AMI.
+To get started, the developer needs to have a development environment with Xilinx Vivado tools installed. An easy way to get this by using AWS FPGA Developer AMI and following the instructions inside the README.md of that AMI.
+
+Please refer to the [release notes](../RELEASE_NOTES.md) for the exact version of Vivado tools, and the required license components.
 
 ### Install the HDK and setup environment
 
