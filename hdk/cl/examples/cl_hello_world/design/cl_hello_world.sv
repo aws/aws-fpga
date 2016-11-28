@@ -150,9 +150,6 @@ always_ff @(negedge rst_n or posedge clk)
 //-------------------------------------------------
 // Slave state machine (accesses from PCIe)
 //-------------------------------------------------
-//parameter NUM_TST = (1 + 4 + 4 + 4 + 1 + 2);
-parameter NUM_TST = 1;
-
 typedef enum logic[2:0] {
    SLV_IDLE = 0,
    SLV_WR_ADDR = 1,
