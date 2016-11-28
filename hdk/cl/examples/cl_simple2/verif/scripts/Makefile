@@ -1,3 +1,8 @@
+## =============================================================================
+## Copyright 2016 Amazon.com, Inc. or its affiliates.
+## All Rights Reserved Worldwide.
+## =============================================================================
+
 export TEST ?= test_null
 export C_TEST ?= test_null
 

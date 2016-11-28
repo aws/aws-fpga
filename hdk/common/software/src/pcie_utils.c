@@ -15,7 +15,6 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <dirent.h>
-//#include "mbox.h"
 
 #define MAP_SIZE    (64 * 1024)
 #define MAX_SLOT    8
@@ -250,11 +249,11 @@ pcie_connect(int *argcP, char ***argvP)
             id = pcie_lookup(slot);
             goto try_mmap;
 
-        case 'T': {
-            int t = strtol(opt, NULL, 0);
-            timeout_set(t);
-            break;
-        }
+//      case 'T': {
+//          int t = strtol(opt, NULL, 0);
+//          timeout_set(t);
+//          break;
+//      }
         }
     }
 

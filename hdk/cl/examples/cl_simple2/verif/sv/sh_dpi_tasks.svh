@@ -9,7 +9,7 @@
    export "DPI-C" task sv_map_host_memory;
    export "DPI-C" task cl_peek;
    export "DPI-C" task cl_poke;
-   export "DPI-C" task pause;
+   export "DPI-C" task sv_pause;
 
    task sv_printf(input string msg);
       $display("%S", msg);
@@ -27,7 +27,7 @@
       tb.sh.poke(addr, data);
    endtask // centaur_peek
 
-   task pause(input int x);
+   task sv_pause(input int x);
       repeat (x) #1us;
    endtask
 

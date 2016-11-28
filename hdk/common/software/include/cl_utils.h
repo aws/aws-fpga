@@ -3,9 +3,11 @@
 // All Rights Reserved Worldwide.
 // =============================================================================
 
-#include <stdint.h>
-#include <stdbool.h>
+void sv_printf(char *msg);
+void sv_map_host_memory(uint8_t *memory);
 
-void poke(uint32_t addr, uint32_t value);
-uint32_t peek(uint32_t addr);
-bool pcie_connect(int *argcP, char ***argvP);
+void cl_peek(uint64_t addr, uint32_t *data);
+void cl_poke(uint64_t addr, uint32_t  data);
+void sv_pause(uint32_t x);
+
+void test_main(uint32_t *exit_code);
