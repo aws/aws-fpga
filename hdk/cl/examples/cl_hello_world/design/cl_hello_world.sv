@@ -8,7 +8,7 @@
 module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=4, parameter NUM_GTY = 4) 
 
 (
-   `include "cl_ports.vh"
+   `include "cl_ports.vh" // Fixed port definition
 
 );
   
@@ -58,8 +58,8 @@ always_ff @(negedge rst_n or posedge clk)
    logic [NUM_PCIE-1:0]        sh_cl_pcis_awvalid_q;
    logic [NUM_PCIE-1:0]        cl_sh_pcis_awready_q;
 
-   logic [511:0]                sh_cl_pcis_wdata_q[NUM_PCIE-1:0];
-   logic [63:0]                 sh_cl_pcis_wstrb_q[NUM_PCIE-1:0];
+   logic [511:0]               sh_cl_pcis_wdata_q[NUM_PCIE-1:0];
+   logic [63:0]                sh_cl_pcis_wstrb_q[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0]        sh_cl_pcis_wvalid_q;
    logic [NUM_PCIE-1:0]        cl_sh_pcis_wready_q;
 
@@ -80,7 +80,7 @@ always_ff @(negedge rst_n or posedge clk)
    logic [NUM_PCIE-1:0]        cl_sh_pcis_rvalid_q;
    logic [NUM_PCIE-1:0]        sh_cl_pcis_rready_q;
 
- // AXI-Lite Register Slice for signals between CL and HL
+ // AXI-Lite Register Slice for signals between CL and SH
    axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(5), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) PCI_AXL_REG_SLC (
     .aclk          (clk),
     .aresetn       (sync_rst_n),
@@ -159,30 +159,33 @@ typedef enum logic[2:0] {
 
 slv_state_t slv_state, slv_state_nxt;
 
-logic slv_arb_wr;                //Arbitration winner (write/read)
-logic slv_cyc_wr;                //Cycle is write
-logic[31:0] slv_mx_addr;         //Mux address
-logic slv_mx_rsp_ready;          //Mux the response ready
+logic        slv_arb_wr;          // Arbitration winner (write/read)
+logic        slv_cyc_wr;          // Cycle is write
+logic[31:0]  slv_mx_addr;         // Mux address
+logic        slv_mx_rsp_ready;    // Mux the response ready
+             
+logic        slv_wr_req;          // Write request
+             
+logic        slv_cyc_done;        // Cycle is done
+             
+logic[31:0]  slv_rdata;           // Latch rdata
+             
+logic[31:0]  slv_tst_addr;
+logic[31:0]  slv_tst_wdata;
+logic        slv_tst_wr;
+logic        slv_tst_rd;
+logic        slv_mx_req_valid;
+             
+logic        tst_slv_ack;
+logic[31:0]  tst_slv_rdata ;
+             
+logic        slv_did_req;         // Once cycle request, latch that did the request
 
-logic slv_wr_req;                //Write request
-
-logic slv_cyc_done;              //Cycle is done
-
-logic[31:0] slv_rdata;           //Latch rdata
-
-logic slv_sel;              //Slave select
-
-logic[31:0] slv_tst_addr;
-logic[31:0] slv_tst_wdata;
-logic slv_tst_wr;
-logic slv_tst_rd;
-logic slv_mx_req_valid;
-
-logic tst_slv_ack;
-logic[31:0] tst_slv_rdata ;
-
-logic slv_did_req;            //Once cycle request, latch that did the request
-
+logic [63:0] slv_req_rd_addr;
+logic [63:0] slv_req_wr_addr;
+logic [4:0]  slv_req_rd_id;
+logic [4:0]  slv_req_wr_id;
+   
 //Write request valid when both address is valid
 assign slv_wr_req = sh_cl_pcis_awvalid_q[0];
 
@@ -190,15 +193,9 @@ assign slv_mx_rsp_ready = (slv_cyc_wr)? sh_cl_pcis_bready_q[0]: sh_cl_pcis_rread
 
 assign slv_mx_req_valid = (slv_cyc_wr)?   sh_cl_pcis_wvalid_q[0]:
                                           1'b1;
-
 //Fixed write hi-pri
 assign slv_arb_wr = slv_wr_req;
 
-   logic [63:0] slv_req_rd_addr;
-   logic [63:0] slv_req_wr_addr;
-   logic [4:0]  slv_req_rd_id;
-   logic [4:0]  slv_req_wr_id;
-   
 always_ff @(negedge sync_rst_n or posedge clk)
   if (!sync_rst_n)
     {slv_req_rd_addr, slv_req_wr_addr} <= 128'd0;
@@ -213,9 +210,6 @@ always_ff @(negedge sync_rst_n or posedge clk)
    
 //Mux address
 assign slv_mx_addr = (slv_cyc_wr)? slv_req_wr_addr : slv_req_rd_addr;
-   
-//Slave select (256B per slave)
-assign slv_sel = 1'b1;
    
 //Latch the winner
 always_ff @(negedge sync_rst_n or posedge clk)
@@ -272,7 +266,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
       slv_state <= slv_state_nxt;
 
 
-//Cycle to TST blocks -- Repliacte for timing
+//Cycle to sub-blocks for register access
 always_ff @(negedge sync_rst_n or posedge clk)
    if (!sync_rst_n)
    begin
@@ -284,7 +278,6 @@ always_ff @(negedge sync_rst_n or posedge clk)
       slv_tst_addr  <= slv_mx_addr;
       slv_tst_wdata <= sh_cl_pcis_wdata_q[0] >> (32 * slv_req_wr_addr[5:2]);
    end
-
 
 //Test are 1 clock pulses (because want to support clock crossing)
 always_ff @(negedge sync_rst_n or posedge clk)
@@ -310,8 +303,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
    else
    begin
-      slv_tst_wr <= ((slv_state==SLV_CYC) & slv_mx_req_valid & slv_cyc_wr & !slv_did_req) & slv_sel;
-      slv_tst_rd <= ((slv_state==SLV_CYC) & slv_mx_req_valid & !slv_cyc_wr & !slv_did_req) & slv_sel;
+      slv_tst_wr <= ((slv_state==SLV_CYC) & slv_mx_req_valid & slv_cyc_wr & !slv_did_req);
+      slv_tst_rd <= ((slv_state==SLV_CYC) & slv_mx_req_valid & !slv_cyc_wr & !slv_did_req);
    end
 
 assign slv_cyc_done = tst_slv_ack;
@@ -347,8 +340,7 @@ assign cl_sh_pcis_rid_q[0] = slv_req_rd_id;
 assign cl_sh_pcis_rdata_q[0] = slv_rdata << (32 * slv_req_rd_addr[5:2]);
 assign cl_sh_pcis_rresp_q[0] = 2'b00;
 assign cl_sh_pcis_rvalid_q[0] = (slv_state==SLV_RESP) && !slv_cyc_wr;
-assign cl_sh_pcis_rlast_q[0] = 1'b1;         //Right now is always 1 DW
-
+assign cl_sh_pcis_rlast_q[0] = 1'b1;         //Always 1 DW
 
 always_comb
 begin
@@ -425,7 +417,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
    if (!sync_rst_n) begin                    // Reset
       hello_world_q[31:0] <= 32'h0000_0000;
    end
-   else if (cfg_wr_stretch) begin            // Cfg Write
+   else if (cfg_wr_stretch & (cfg_addr_q == 8'h0)) begin  // Cfg Write to offset 0x00
       hello_world_q[31:0] <= cfg_wdata_q[31:0];
    end
    else begin                                // Hold Value
@@ -437,7 +429,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
 //----------------------------------------- 
 // Although we are not using the DDR controllers in this cl_hello_world
 // design, it must be instantiated in order to prevent build errors related to
-// constraints.
+// DDR pin constraints.
 
 // Only the DDR pins are connected. The AXI and stats interfaces are tied-off.
 
@@ -650,7 +642,6 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    assign aurora_sh_stat_ack   =  1'b0;
    assign aurora_sh_stat_rdata = 32'b0;
    assign aurora_sh_stat_int   =  8'b0;
-
 
 endmodule
 
