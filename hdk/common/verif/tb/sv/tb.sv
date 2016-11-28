@@ -215,20 +215,20 @@ sh_bfm sh(
    //-------------------------------   
    // HMC
    //-------------------------------   
-   .hmc_iic_scl_i(),
-   .hmc_iic_scl_o(),
-   .hmc_iic_scl_t(),
-   .hmc_iic_sda_i(),
-   .hmc_iic_sda_o(),
-   .hmc_iic_sda_t(),
+   .hmc_iic_scl_i(hmc_iic_scl_i),
+   .hmc_iic_scl_o(hmc_iic_scl_o),
+   .hmc_iic_scl_t(hmc_iic_scl_t),
+   .hmc_iic_sda_i(hmc_iic_sda_i),
+   .hmc_iic_sda_o(hmc_iic_sda_o),
+   .hmc_iic_sda_t(hmc_iic_sda_t),
 
-   .sh_hmc_stat_addr(),
-   .sh_hmc_stat_wr(),
-   .sh_hmc_stat_rd(),
-   .sh_hmc_stat_wdata(),
-   .hmc_sh_stat_ack(),
-   .hmc_sh_stat_rdata(),
-   .hmc_sh_stat_int(),  
+   .sh_hmc_stat_addr(sh_hmc_stat_addr),
+   .sh_hmc_stat_wr(sh_hmc_stat_wr),
+   .sh_hmc_stat_rd(sh_hmc_stat_rd),
+   .sh_hmc_stat_wdata(sh_hmc_stat_wdata),
+   .hmc_sh_stat_ack(hmc_sh_stat_ack),
+   .hmc_sh_stat_rdata(hmc_sh_stat_rdata),
+   .hmc_sh_stat_int(hmc_sh_stat_int),  
 
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
@@ -312,14 +312,14 @@ sh_bfm sh(
    .sh_cl_msix_int_ack(),
     
    .cl_sh_aurora_channel_up(),
-   .sh_aurora_stat_addr(),
-   .sh_aurora_stat_wr(),
-   .sh_aurora_stat_rd(),
-   .sh_aurora_stat_wdata(),
+   .sh_aurora_stat_addr(sh_aurora_stat_addr),
+   .sh_aurora_stat_wr(sh_aurora_stat_wr),
+   .sh_aurora_stat_rd(sh_aurora_stat_rd),
+   .sh_aurora_stat_wdata(sh_aurora_stat_wdata),
 
-   .aurora_sh_stat_ack(),
-   .aurora_sh_stat_rdata(),
-   .aurora_sh_stat_int(),
+   .aurora_sh_stat_ack(aurora_sh_stat_ack),
+   .aurora_sh_stat_rdata(aurora_sh_stat_rdata),
+   .aurora_sh_stat_int(aurora_sh_stat_int),
 
    //--------------------------------------------------------------
    // DDR[3] (M_C_) interface 
@@ -347,14 +347,14 @@ sh_bfm sh(
    //----------------------------------------------
    // DDR stats
    //----------------------------------------------
-   .sh_ddr_stat_addr(),
-   .sh_ddr_stat_wr(),
-   .sh_ddr_stat_rd(),
-   .sh_ddr_stat_wdata(),
+   .sh_ddr_stat_addr(sh_ddr_stat_addr),
+   .sh_ddr_stat_wr(sh_ddr_stat_wr),
+   .sh_ddr_stat_rd(sh_ddr_stat_rd),
+   .sh_ddr_stat_wdata(sh_ddr_stat_wdata),
 
-   .ddr_sh_stat_ack(),
-   .ddr_sh_stat_rdata(),
-   .ddr_sh_stat_int(),
+   .ddr_sh_stat_ack(ddr_sh_stat_ack),
+   .ddr_sh_stat_rdata(ddr_sh_stat_rdata),
+   .ddr_sh_stat_int(ddr_sh_stat_int),
 
    .cl_sh_ddr_awid(cl_sh_ddr_awid),
    .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
@@ -617,13 +617,13 @@ sh_bfm sh(
 
    .hmc_sh_stat_int(hmc_sh_stat_int),
 
-   .sh_aurora_stat_addr   (sh_aurora_stat_addr) ,
-   .sh_aurora_stat_wr     (sh_aurora_stat_wr     ) , 
-   .sh_aurora_stat_rd     (sh_aurora_stat_rd     ) , 
-   .sh_aurora_stat_wdata  (sh_aurora_stat_wdata  ) , 
-   .aurora_sh_stat_ack    (aurora_sh_stat_ack    ) ,
-   .aurora_sh_stat_rdata  (aurora_sh_stat_rdata  ),
-   .aurora_sh_stat_int    (aurora_sh_stat_int  )
+   .sh_aurora_stat_addr   (sh_aurora_stat_addr),
+   .sh_aurora_stat_wr     (sh_aurora_stat_wr), 
+   .sh_aurora_stat_rd     (sh_aurora_stat_rd), 
+   .sh_aurora_stat_wdata  (sh_aurora_stat_wdata), 
+   .aurora_sh_stat_ack    (aurora_sh_stat_ack),
+   .aurora_sh_stat_rdata  (aurora_sh_stat_rdata),
+   .aurora_sh_stat_int    (aurora_sh_stat_int)
                                        
       );
 
