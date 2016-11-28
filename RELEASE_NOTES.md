@@ -49,6 +49,9 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
 * Customizable PCIe DeviceID/VendorID
+* Cadence RTL simulations tools
+* Synopsys RTL simulations tools
+* Xilinx SDAccel development environment
 
 ## Supported Tools and Environment
 
@@ -58,6 +61,8 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Vivado License need to support VU9p ES1 FPGA
 * Vivado License need to support encryption
 * This release tested and validated with Vivado 2016.3
+* Vivado XSIM RTL simulator supported by the HDK
+* MentorGraphic's Questa RTL simulator supported by the HDK (but requires a purchase of separate license from MentorGraphics)
 
 ## License Requirements
 
