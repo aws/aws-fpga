@@ -29,15 +29,17 @@ This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with 
 
 ##**_Implementation Restrictions_**:
 
-*    All PCIE AXI4 interfaces between Customer Logic(CL) and Shell(SH) must adhere to following restrictions:
+*    PCIE AXI4 interfaces between Customer Logic(CL) and Shell(SH) have following restrictions:
 
     *    All PCIe transactions must adhere to the PCIe Exress base spec.
     *    4Kbyte Address boundary for all transactions(PCIe restriction).
     *    Multiple outstanding Read transactions with same ID not supported.
     *    Only 16 outstanding read transactions supported.
     *    PCIE extended tag not supported.
-    *    Address must reflect the correct address of the transaction.
-    *    WSTRB(write strobe) must reflect the appropriate valid bytes for writes. 
+    *    Address must match DoubleWord(DW) address of the transaction.
+    *    WSTRB(write strobe) must reflect appropriate valid bytes for writes.
+    *    Only Increment burst type is supported.
+    *    AXI lock, memory type, protection type, Quality of service and Region identifier are not supported.
 
 ##**_License Requirements_**:
 
