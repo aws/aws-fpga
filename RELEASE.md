@@ -3,7 +3,7 @@
 
 ##**_Overview_**:
 
-This is an initial release for AWS EC2 FPGA Development Kit. 
+This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with HDK(hardware development kit) and SDK(software development kit).
 
 *   This initial release AWS EC2 FPGA platform comes with the features below:
 
@@ -21,8 +21,8 @@ This is an initial release for AWS EC2 FPGA Development Kit.
          *    SH to CL inbound AXI4 interface.
          *    CL to SH outbound AXI4 interface.
          *    512 bit bus that supports 32-bit transactions on inbound and outbound transactions.
-         *    128, 256 and 512 byte max payload size support.
-         *    128, 256, 512, 1024, 2048 and 4096 max read request size support.
+         *    128, 256 and 512 byte maximum payload size support.
+         *    128, 256, 512, 1024, 2048 and 4096 maximum read request size support.
          *    AXI4 error handling.
          *    Upto 48 vectors of MSIX interface support.
          *    AxUSER bits implemented on address channels. 
@@ -32,18 +32,16 @@ This is an initial release for AWS EC2 FPGA Development Kit.
 *    All PCIE AXI4 interfaces between Customer Logic(CL) and Shell(SH) must adhere to following restrictions:
 
      *     All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express Base specification).
-     *     Transfers must not cross a 4Kbyte Address boundary (PCIe restriction).
-     *     Transfers must not violate Max Payload Size.
-     *     Read requests must not violate Max Read Request Size.
+     *     4Kbyte Address boundary for all transactions(PCIe restriction).
      *     Multiple outstanding Read transactions with same ID not supported.
-     *     Only 5-bit ARID is supported(32 outstanding read transactions).
+     *     Only 32 outstanding read transactions supported.
      *     PCIE extended tag not supported.
      *     Address must reflect the correct DW address of the transfer.
-     *     WSTRB(write strobe) must be correct and reflect the appropriate valid bytes for writes. 
+     *     WSTRB(write strobe) must reflect the appropriate valid bytes for writes. 
 
 ##**_License Requirements_**:
 
-This section will include license requirements.
+The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to LICENSE.txt in aws/aws-fpga/sdk and aws/aws-fpga/hdk sections for more information.
 
 ##**_What's new_**?
 
@@ -54,6 +52,9 @@ This section will include any new features added in the future releases.
 This section will include any bug fixes in the future releases.
 
 ##**_Known Issues_**:
-This section will include known issues.
 
+This initial release will have following limitations.
+
+*    No HMC memory interface support for Customer Logic(CL).
+*    No FPGA to FPGA serial link support.
 
