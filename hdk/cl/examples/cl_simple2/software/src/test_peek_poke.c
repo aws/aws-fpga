@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 
 #include "sh_dpi_tasks.h"
@@ -45,7 +46,7 @@ void test_main(uint32_t *exit_code) {
 
   cl_poke(CNTL_REG, WR_START_BIT | RD_START_BIT);      // start read & write
 
-  pause(2);                                            // wait 2us
+  sv_pause(2);                                         // wait 2us
 
   // for fun print out the incrementing pattern
   // written by the CL
