@@ -59,20 +59,16 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
 read_verilog [ list \
-   $CL_DIR/build/src_post_encryption/cl_simple_defines.vh
+   $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh
 ]
-set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
-set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog [ list \
-$CL_DIR/build/src_post_encryption/cl_simple.sv \
-$CL_DIR/build/src_post_encryption/cl_tst.sv \
-$CL_DIR/build/src_post_encryption/cl_int_tst.sv \
-$CL_DIR/build/src_post_encryption/mem_scrb.sv \
-$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv
+$CL_DIR/build/src_post_encryption/cl_hello_world.sv 
 ]
 
 #---- End of section replaced by User ----
@@ -143,7 +139,7 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 puts "AWS FPGA: Start design synthesis";
 
-synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
@@ -169,11 +165,11 @@ open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
-read_xdc {
-$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
-$CL_DIR/build/constraints/cl_pnr_user.xdc
+read_xdc [ list\
+$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
+$CL_DIR/build/constraints/cl_pnr_user.xdc \
 $HDK_SHELL_DIR/build/constraints/ddr.xdc
-}
+]
 
 puts "AWS FPGA: Optimize design during implementation";
 
