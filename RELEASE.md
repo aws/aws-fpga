@@ -1,9 +1,11 @@
 
-#**AWS EC2 FPGA Development Kit r1.0.0**
+# AWS EC2 FPGA Hardware and Software Development Kits Release notes
 
-##**_Overview_**:
+# Release 1.0.0
 
-This is an initial release for AWS EC2 FPGA Development Kit. The kit comes with HDK(hardware development kit) and SDK(software development kit). Below is the list of features included in this initial release. More details about these features can be found in the customer logic spec located at the link below (link to be included once the final spec is ready). 
+## Content:
+
+This is first public release for AWS EC2 FPGA Development Kit. The kit comes with HDK(Hardware Development Kit) and SDK(Software Development Kit). Below is the list of features included in this  release. More details about these features can be found in the Custom Logic spec located at the link below (link to be included once the final spec is ready). 
 
 *   AWS EC2 FPGA platform feature list:
 
