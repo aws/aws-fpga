@@ -10,7 +10,9 @@ Check out the [release notes](../RELEASE_NOTES.md) for information about the lat
 
 ## Overview
 
-AWS FPGA HDK includes all the design files and scripts required to generate an Amazon FPGA Image (AFI). Developers can download the HDK and use it in their preferred design environment. AWS offers the `FPGA Developer AMI` on [AWS Marketplace](https://aws.amazon.com/marketplace) with the required tools to develop, simulate and build an AFI.  
+AWS FPGA HDK includes all the design files and scripts required to generate an Amazon FPGA Image (AFI). Developers can download the HDK and use it in their preferred design environment. AWS offers the `FPGA Developer AMI` on [AWS Marketplace](https://aws.amazon.com/marketplace) with the required tools to develop, simulate and build an AFI.
+
+**NOTE: The HDK is developed and tested on _Linux_ environment only**
 
 ### Content of the release
 
