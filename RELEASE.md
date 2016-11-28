@@ -3,7 +3,7 @@
 
 ##**_Overview_**:
 
-This is an initial release for AWS EC2 FPGA Development Kit. The kit has HDK(hardware development kit) and SDK(software development kit). This initial realease comes with the features below.
+This is an initial release for AWS EC2 FPGA Development Kit. The kit has HDK (Hardware Development Kit) and SDK (Software Development Kit). This initial release comes with the features below.
 
 ##**_License Requirements_**:
 

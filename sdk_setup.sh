@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 export SDK_DIR=${SDK_DIR:=$(pwd)/sdk}
 

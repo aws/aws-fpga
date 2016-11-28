@@ -82,7 +82,7 @@ compute instances. Each FPGA is divided into two partitions:
     FPGA external peripherals, PCIe, and Interrupts.
 
 -   Custom Logic (CL) – Custom acceleration logic created by an FPGA
-    Developer
+    Developer.
 
 At the end of the development process, the Shell and CL will become an
 Amazon FPGA Image (AFI)
@@ -100,12 +100,12 @@ to:
 > <http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/FPGA.html> \[TBD -
 > subject to change\]
 
-Architecture and version
+Architecture and Version
 ------------------------
 
 This specification applies to the Xilinx Virtex Ultrascale Plus
 platform, referred to in AWS APIs and the HDK release as
-FpgaImageArchitecture=xvu9p.
+`FpgaImageArchitecture=xvu9p`.
 
 The Shell is tagged with a revision number. Note while AWS tries to keep
 the revision constant, sometimes it is necessary to update the revision
@@ -120,15 +120,15 @@ Convention
 **CL –** Custom Logic: the Logic to be provided by the developer and
 integrated with the Shell.
 
-**DW –** Doubleword: referring to 4-byte (32-bit) data size
+**DW –** Doubleword: referring to 4-byte (32-bit) data size.
 
 **AXI –** ARM Advanced eXtensible Interface.
 
-**AXI Stream –** ARM Advanced eXtensible Stream Interface
+**AXI Stream –** ARM Advanced eXtensible Stream Interface.
 
-**M –** Typically refers to the Master side of an AXI bus
+**M –** Typically refers to the Master side of an AXI bus.
 
-**S –** Typical refers to the Slave side of AXI bus
+**S –** Typical refers to the Slave side of AXI bus.
 
 CL (for xvu9p architecture as in EC F1 instances)
 =================================================
@@ -136,14 +136,14 @@ CL (for xvu9p architecture as in EC F1 instances)
 The F1 FPGA platform includes the following interfaces available to the
 CL:
 
--   One x16 PCIe Gen 3 Interface
+-   One x16 PCIe Gen 3 Interface.
 
--   Four DDR4 RDIMM interfaces (with ECC)
+-   Four DDR4 RDIMM interfaces (with ECC).
 
 -   Optional: Two 2GB half width (8-lane) HMC interfaces @ 12.5Gb/s per
-    lane \[Subject to change\]
+    lane \[Subject to change\].
 
--   Optional: Four inter-FPGA links (only available on F1.16XL)
+-   Optional: Four inter-FPGA links (only available on EC2 instance size F1.16XL).
 
 CL/Shell Interfaces (AXI-4)
 ---------------------------
@@ -153,8 +153,8 @@ AXI-4 interfaces in the Shell have the following restrictions:
 
 -   AxSIZE – All transfers must be the entire width of the bus. While
     byte-enables bitmap are supported, it must adhere to the interface
-    protocol (i.e. PCIe contiguous byte enables on all transfers larger
-    than 64-bits)
+    protocol (i.e., PCIe contiguous byte enables on all transfers larger
+    than 64-bits).
 
 -   AxBURST – Only INCR burst is supported.
 
@@ -162,28 +162,28 @@ AXI-4 interfaces in the Shell have the following restrictions:
 
 -   AxCACHE – Memory type is not supported.
 
--   AxPROT – Protection type is not supported
+-   AxPROT – Protection type is not supported.
 
--   AxQOS – Quality of Service is not supported
+-   AxQOS – Quality of Service is not supported.
 
--   AxREGION – Region identifier is not supported
+-   AxREGION – Region identifier is not supported.
 
 ### Interfaces implemented in CL
 
-Some of the interfaces are implemented in the CL rather than the HL. For
+Due to physical constraints with the XVU9P devices, some of the interfaces are implemented in the CL rather than the HL. For
 those interfaces, the designs are provided by AWS and instantiated in
-the CL. Note this is due to physical constraints.
+the CL.
 
 There are four DDR interfaces labeled A, B, C, and D. Interfaces A, B,
 and D are in the CL and interface C is implemented in the CL. A design
 block (sh\_ddr.sv) instantiates the three DDR interfaces in the CL (A,
 B, D).
 
-The optional HMC interfaces are implemented in the CL. There is a design
-block (hmc\_wrapper.sv) that instantiates the HMC interfaces.
+The optional HMC interfaces are implemented in the CL. A design
+block (hmc\_wrapper.sv) instantiates the HMC interfaces.
 
-The optional inter-FPGA serial links are implemented in the CL. There is
-a design block (aurora\_wrapper.sv) that instantiates the inter-FPGA
+The optional inter-FPGA serial links are implemented in the CL. 
+A design block (aurora\_wrapper.sv) instantiates the inter-FPGA
 links.
 
 For interfaces that are implemented in the CL, the AXI-4 (or AXI-Stream)
@@ -196,12 +196,11 @@ Clocking/Reset
 
 A single 250MHz clock, and associated asynchronous reset is provided to
 the CL. All Shell interfaces are synchronous to the 250MHz clock. The CL
-can derive clocks off of the 250MHz clock (i.e. use an MMCM to create
-clocks of other frequencies/phases). The reset signal combines the board
+can derive clocks off of the 250MHz clock. The reset signal combines the board
 reset and PCIe reset conditions.
 
-A Developer can generate slower clocks using the Xilinx Mixed Mode Clock
-Manager (MMCM) IP. For example, MMCM can divide the supplied 250MHz
+The Xilinx Mixed Mode Clock Manager (MMCM) IP can be used to generate slower clocks off of the 250MHz clock.
+For example, MMCM can divide the supplied 250MHz
 clock down into a 125MHz clock and a 62.5MHz clock. Please refer to the
 Xilinx documentation (ug974) for more information.
 
@@ -221,13 +220,13 @@ interface:
 PCIe Endpoint Presentation to Instance
 --------------------------------------
 
-There are two physical functions (PFs) presented to the user’s operating
+There are two Physical Functions (PFs) presented to the user’s operating
 system:
 
 -   FPGA Management PF –This PF allows for management of the FPGA
     including tracking FPGA state and loading CL images onto the FPGA.
 
--   User PF – Custom PF for Custom logic (CL)
+-   User PF – Custom PF for Custom Logic (CL)
 
 ### Management PF
 
@@ -244,7 +243,7 @@ d)  No BusMaster support
 
 e)  A range of 32-bit addressable registers
 
-The Management PF is persistent throughput the life of the instance, and
+The Management PF is persistent throughout the lifetime of the instance, and
 it will not be reset or cleared (even during the AFI attach/detach
 process).
 
@@ -252,35 +251,35 @@ process).
 
 The User PF exposes the following:
 
-a)  Developer’s specific PCIe VendorID, DeviceID, SystemID and
-    SubsystemID as registered through ***aws ec2 fpgaImageCreate***
+a)  CL’s specific PCIe VendorID, DeviceID, SystemID and
+    SubsystemID as registered through ***`aws ec2 CreateFpgaImage`***
     command parameters.
 
 b)  PCIe BAR0 as a 64-bit prefetchable BAR sized as 64GB (*note the BAR
     size is subject to change, goal is 64GB, but will be no smaller
     than 128MB)*. This BAR may be used to map the entire
     External/Internal memory space to the instance address space if
-    desired, through mmap() type calls.
+    desired, through `mmap()` type calls.
 
-c)  PCIe BAR4 as a 64-bit prefetchable BAR sized as 32MB. This BAR is
+c)  PCIe BAR4 as a 64-bit prefetchable BAR sized as 32MB. This BAR 
     allows for mapping a different software/driver process than is
     mapped through BAR0. For example, this could be used to map to a
     DMA controller.
 
 d)  PCIe BAR2 as a 64-bit prefetchable BAR sized as 4KB for the MSI-X
-    interrupt tables
+    interrupt tables.
 
-e)  FLR capability that will reset the CL
+e)  FLR capability that will reset the CL.
 
-f)  BusMaster capability to allow CL to master transactions towards the
-    instance memory
+f)  BusMaster capability to allow the CL to master transactions towards the
+    instance memory.
 
-g)  Up to 48 MSI-X vectors
+g)  Up to 48 MSI-X vectors.
 
-The Developer can write a drivers for the User PF or can leverage the
+The Developer can write drivers for the User PF or can leverage the
 reference driver provided in the HDK (driver included in Amazon Linux).
 
-#### BAR0 Size implementation note
+#### Note on BAR0 Size Implementation
 
 The CL design determines the mapping of BAR0 to resources in the CL. It
 is possible to use any amount of the BAR0 address space in the CL logic.
@@ -294,13 +293,12 @@ PCIe Interface between Shell and CL
 The PCIe interface between the Shell and CL is accessed over two AXI-4
 interfaces:
 
-### AXI-4 for inbound PCIe transactions (Shell is master, CL is slave) 
+### AXI-4 for Inbound PCIe Transactions (Shell is master, CL is slave) 
 
-This AXI-4 bus is for PCIe transactions mastered by the Instance and
+This AXI-4 bus is for PCIe transactions mastered by the instance and
 targeting User PF BAR0 or BAR4 memory space.
 
-It is a 512-bit wide AXI-4 interface that supports 32-bit transactions
-only.
+It is a 512-bit wide AXI-4 interface that only supports 32-bit transactions.
 
 AxUSER\[0\] on this interface signals whether the address targeted BAR0
 (AxUSER\[0\] == 0), or BAR4 (AxUSER\[0\] == 1).
@@ -308,13 +306,13 @@ AxUSER\[0\] on this interface signals whether the address targeted BAR0
 A read or write request on this AXI-4 bus that is not acknowledged by
 the CL within a certain time window, will be internally terminated by
 the Shell. If the time-out error happens on a read, the Shell will
-return 0xDEADBEEF data back to the instance. This error is reported to
+return `0xDEADBEEF` data back to the instance. This error is reported to
 the Management functions.
 
 Note in future revisions this interface will support larger burst sizes
 (up to the Maximum Payload Size).
 
-### AXI-4 for outbound PCIe transactions (CL is master, Shell is slave) 
+### AXI-4 for Outbound PCIe Transactions (CL is master, Shell is slave) 
 
 This is a 512-bit wide AXI-4 Interface for the CL to master cycles to
 the PCIe bus. This is used, for example, to DMA data to/from instance
@@ -456,7 +454,7 @@ Each DDR-4 interface is accessed over an AXI-4 interface:
 
 -   AXI-4 (CL Master) – 512-bit AXI-4 interface to read/write DDR
 
-There is a single status signal that he DDR is trained and ready for
+There is a single status signal that the DDR is trained and ready for
 access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to
 DDR Row/Col/Bank. The Read and Write channels are serviced with round
 robin priority (equal priority).
@@ -467,7 +465,7 @@ the read data channel to signal ECC errors with the read data.
 
 ### DDR Preservation (Future)
 
-In future Shell versions a DDR preservation feature will be implemented.
+A DDR preservation feature will be implemented in future Shell versions.
 This feature allows the DDR state to be preserved when dynamically
 changing CL logic. The current Shell version will not guarantee
 preservation of DDR contents if the CL logic is re-loaded.
@@ -487,7 +485,7 @@ In some of the instances with multiple FPGA, a bi-directional ring runs
 between the FPGAs. There are 4 inter-FPGA QSFP links. These links are x4
 links (4 bi-directional lanes per link) running at 25Gb/s per lane.
 *Goal is 25Gb/s, based on signal integrity actual rate may be less than
-25Gb/s.* The Shell takes care of abstracting most of the complexities of
+25Gb/s.* The Shell abstracts most of the complexities of
 the serial links from the CL. The Shell implements:
 
 -   Clock compensation
@@ -501,27 +499,27 @@ the serial links from the CL. The Shell implements:
 -   Bit error detection
 
 AXI-Stream interfaces are used to transmit/receive data. The receive
-AXI-Stream interface adds a CRC\_ERROR signal to signal there were bit
+AXI-Stream interface adds a CRC\_ERROR signal to indicate bit
 errors in a packet and that the packet should be discarded. Note the
 Shell only implements bit error detection, it does not implement bit
-error correction (i.e. retry protocol for errored packets). If a
+error correction (i.e., retry protocol for erroneous packets). If a
 reliable transport is desired, that must be implemented in the CL.
 
 The inter-FPGA links are connected in a ring topology. Any “routing”
 between the FPGAs is also implemented in the CL. For example if FPGA\#0
 needs to send data to FPGA\#3, then FPGA\#1 and FPGA\#2 will pass the
 data along the ring, and FPGA\#3 will consume the data. Arbitration for
-the serial links for pass through and locally generated traffic is also
+the serial links for pass-through and locally generated traffic is also
 implemented in the CL.
 
 Miscellaneous signals
 ---------------------
 
-There are some miscellaneous generic signals between Shell and CL.
+There are some miscellaneous generic signals between the Shell and the CL.
 
 ### PCIe IDs
 
-There are some signals that must have the PCIe IDs of the CL:
+Some signals must include the PCIe IDs of the CL:
 
 -   cl\_sh\_id0
 
