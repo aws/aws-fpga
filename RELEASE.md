@@ -7,6 +7,7 @@ This is an initial release for AWS EC2 FPGA Development Kit.
 
 *   This initial release AWS EC2 FPGA platform comes with the features below:
 
+    *    VU9P architecture support.
     *    Interfaces available for Customer Logic(CL):
           *    One x16 PCIe Gen 3 Interface.
           *    Four DDR4 RDIMM interfaces (with ECC).
