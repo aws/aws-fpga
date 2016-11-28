@@ -13,7 +13,7 @@ RET=$?
 
 if [ $RET != 0 ]; then
     echo "Error: AWS SDK install was unsuccessful, sdk_install.sh returned $RET" 
-	exit $RET
+    exit $RET
 fi
 
 echo "Done with AWS SDK setup."
