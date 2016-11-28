@@ -117,4 +117,4 @@ loaded.
 
 ## 7. Call the specific CL example software
 
-[TBD] guide to where the source code is 
+[Validating CL Designs](https://github.com/aws/aws-fpga/wiki/Validating-CL-Designs#quick-start)

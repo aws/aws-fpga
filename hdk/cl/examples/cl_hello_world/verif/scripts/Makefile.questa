@@ -1,141 +1,21 @@
-## =============================================================================
-## Copyright 2016 Amazon.com, Inc. or its affiliates.
-## All Rights Reserved Worldwide.
-## Amazon Confidential information
-## Restricted NDA Material
-## =============================================================================
-
-RESULTS_LOG ?= this_file_does_not_exist.txt
-
-EXE_EXISTS=$(shell [ -e $(COMPILE_DIR)/$(COMPILE_SUBDIR)/work ] && echo 1 || echo 0 )
-
-.IGNORE: run
+##################################################################
+## Makefile For Questa compiles and simulations
+## Step to run :
+## 1. make create_libs QUESTA=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all QUESTA=1  -> Runs the test
+##################################################################
 
 compile:
-	mkdir -p $(COMPILE_DIR)/$(COMPILE_SUBDIR)
-	ln -s -f $(PWD)/xilinx_files.questa.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/xilinx_files.f
-##	ln -s -f $(PWD)/dut_venom.questa.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_venom.f
-	ln -s -f $(PWD)/dut_$(DESIGN_NAME).questa.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_venom_cl.f
-##	ln -s -f $(PWD)/dut_minotaur_test.questa.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/dut_minotaur_test.f
-	ln -s -f $(PWD)/uvm_pkg.questa.f $(COMPILE_DIR)/$(COMPILE_SUBDIR)/uvm_pkg.f
-	vlib $(COMPILE_DIR)/$(COMPILE_SUBDIR)/work
-	cd $(COMPILE_DIR)/$(COMPILE_SUBDIR) && vlog -sv -64 -93 -mfcu -suppress vlog-1902 -timescale=1ps/1ps -l compile.log +libext+.sv +libext+.v -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip  -f $(FILES) +define+QUESTA $(DEFINES) $(DEFAULT_DEFINES)
-
-##-L xil_defaultlib -L xpm -L dist_mem_gen_v8_0_10 -L lib_srl_fifo_v1_0_2 -L axi_lite_ipif_v3_0_3 -L lib_cdc_v1_0_2 -L lib_pkg_v1_0_2 -L axi_hwicap_v3_0_12 -L fifo_generator_v13_1_0 -L fifo_generator_v13_1_1 -L fifo_generator_v13_1_2 -L axi_clock_converter_v2_1_8 -L lib_fifo_v1_0_4 -L interrupt_control_v3_1_3 -L axi_quad_spi_v3_2_7
+	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && vlog -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 
 run:
-	mkdir -p $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)
-ifeq ($(REGRESS), 1)
-	@if [ $(EXE_EXISTS) -eq "1" ]; then \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap work $(COMPILE_DIR)/$(COMPILE_SUBDIR)/work \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap xil_defaultlib $(QUESTA_COMPLIB_DIR)/xil_defaultlib \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap xpm $(QUESTA_COMPLIB_DIR)/xpm \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unimacro_ver $(QUESTA_COMPLIB_DIR)/unimacro_ver \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unimacro $(QUESTA_COMPLIB_DIR)/unimacro \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap secureip $(QUESTA_COMPLIB_DIR)/secureip \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unisims_ver $(QUESTA_COMPLIB_DIR)/unisims_ver \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unisim $(QUESTA_COMPLIB_DIR)/unisim \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unifast_ver  $(QUESTA_COMPLIB_DIR)/unifast_ver \
-  	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unifast  $(QUESTA_COMPLIB_DIR)/unifast \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap simprims_ver $(QUESTA_COMPLIB_DIR)/simprims_ver \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_cdc_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_cdc_v1_0_2 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_pkg_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_pkg_v1_0_2 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_0 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_0 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_1 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_1 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_2 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_2 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_clock_converter_v2_1_8 $(QUESTA_COMPLIB_DIR)/axi_clock_converter_v2_1_8 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_hwicap_v3_0_12 $(QUESTA_COMPLIB_DIR)/axi_hwicap_v3_0_12 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_fifo_v1_0_4 $(QUESTA_COMPLIB_DIR)/lib_fifo_v1_0_4 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap interrupt_control_v3_1_3 $(QUESTA_COMPLIB_DIR)/interrupt_control_v3_1_3 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_srl_fifo_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_srl_fifo_v1_0_2 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_lite_ipif_v3_0_3 $(QUESTA_COMPLIB_DIR)/axi_lite_ipif_v3_0_3 \
-##	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_quad_spi_v3_2_7 $(QUESTA_COMPLIB_DIR)/axi_quad_spi_v3_2_7 \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vsim -lib $(COMPILE_DIR)/$(COMPILE_SUBDIR)/work -voptargs="+acc" -64 +TESTNAME=$(TESTNAME) -suppress 7027 -suppress 12003 -suppress 19 -suppress 2732 -permit_unmatched_virtual_intf -t ps +TESTNAME=$(TESTNAME)  $(PLUSARGS) -sv_seed random -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip  -l $(TESTNAME).log -do "run -all; quit -f" tb glbl \
-	  cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && sed '/Model:WARNING: Reading unwritten address*/d' < $(TESTNAME).log > $(TESTNAME).$(LOG_EXTENSION) \
-	else \
-	  echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  COMPILE FAILED  -- Did not find simv in $(COMPILE_DIR)/$(COMPILE_SUBDIR)" >> $(RESULTS_FILE); \
-	fi
-##-L xil_defaultlib -L xpm -L dist_mem_gen_v8_0_10 -L lib_srl_fifo_v1_0_2 -L axi_lite_ipif_v3_0_3 -L lib_cdc_v1_0_2 -L lib_pkg_v1_0_2 -L axi_hwicap_v3_0_12  -L fifo_generator_v13_1_0 -L fifo_generator_v13_1_1 -L fifo_generator_v13_1_2 -L axi_clock_converter_v2_1_8 -L lib_fifo_v1_0_4 -L interrupt_control_v3_1_3 -L axi_quad_spi_v3_2_7
-else
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 +TESTNAME=$(TESTNAME) -t ps +TESTNAME=$(TESTNAME) -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -do "run -all; quit -f" tb glbl test_peek_poke
 
-	ln -s -f $(PWD)/xilinx_files.questa.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/xilinx_files.f
-##	ln -s -f $(PWD)/dut_venom.questa.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom.f
-	ln -s -f $(PWD)/dut_$(DESIGN_NAME).questa.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_venom_cl.f
-##	ln -s -f $(PWD)/dut_minotaur_test.questa.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/dut_minotaur_test.f
-	ln -s -f $(PWD)/uvm_pkg.questa.f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/uvm_pkg.f
-##	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && ln -s -f $(DESIGN_DIR)/questa_complib/questa_sim.setup
-##	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap xil_defaultlib $(QUESTA_COMPLIB_DIR)/xil_defaultlib
-##	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap xpm $(QUESTA_COMPLIB_DIR)/xpm
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unimacro_ver $(QUESTA_COMPLIB_DIR)/unimacro_ver
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unimacro $(QUESTA_COMPLIB_DIR)/unimacro
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap secureip $(QUESTA_COMPLIB_DIR)/secureip
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unisims_ver $(QUESTA_COMPLIB_DIR)/unisims_ver
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unisim $(QUESTA_COMPLIB_DIR)/unisim
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unifast_ver  $(QUESTA_COMPLIB_DIR)/unifast_ver
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap unifast  $(QUESTA_COMPLIB_DIR)/unifast
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap simprims_ver $(QUESTA_COMPLIB_DIR)/simprims_ver
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_cdc_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_cdc_v1_0_2
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_pkg_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_pkg_v1_0_2
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_0 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_0
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_1 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_1
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap fifo_generator_v13_1_2 $(QUESTA_COMPLIB_DIR)/fifo_generator_v13_1_2
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_clock_converter_v2_1_8 $(QUESTA_COMPLIB_DIR)/axi_clock_converter_v2_1_8
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_hwicap_v3_0_12 $(QUESTA_COMPLIB_DIR)/axi_hwicap_v3_0_12
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_fifo_v1_0_4 $(QUESTA_COMPLIB_DIR)/lib_fifo_v1_0_4
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap interrupt_control_v3_1_3 $(QUESTA_COMPLIB_DIR)/interrupt_control_v3_1_3
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap dist_mem_gen_v8_0_10 $(QUESTA_COMPLIB_DIR)/dist_mem_gen_v8_0_10
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap lib_srl_fifo_v1_0_2 $(QUESTA_COMPLIB_DIR)/lib_srl_fifo_v1_0_2
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_lite_ipif_v3_0_3 $(QUESTA_COMPLIB_DIR)/axi_lite_ipif_v3_0_3
-#	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vmap axi_quad_spi_v3_2_7 $(QUESTA_COMPLIB_DIR)/axi_quad_spi_v3_2_7
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vlog -sv -64 -93 -mfcu -suppress 7027 -suppress vlog-1902 -timescale=1ps/1ps -l compile.log +libext+.sv +libext+.v -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip -f $(FILES) +define+QUESTA $(DEFINES) $(DEFAULT_DEFINES) 
-	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vsim -voptargs="+acc" -64 +TESTNAME=$(TESTNAME)  -suppress 12003 -suppress 19 -suppress 2732 -permit_unmatched_virtual_intf -t ps +TESTNAME=$(TESTNAME)  $(PLUSARGS) -sv_seed random -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip -c -l $(TESTNAME).log -do "add wave -r /tb/*;run -all; quit -f" tb glbl
-##	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vlog -sv -64 -93 -mfcu -suppress 7027 -suppress vlog-1902 -timescale=1ps/1ps -l compile.log +libext+.sv +libext+.v -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip -f $(FILES) +define+QUESTA $(DEFINES) $(DEFAULT_DEFINES) 
-##	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && vsim -voptargs="+acc" -64 +TESTNAME=$(TESTNAME)  -suppress 12003 -suppress 19 -suppress 2732 -permit_unmatched_virtual_intf -t ps +TESTNAME=$(TESTNAME)  $(PLUSARGS) -sv_seed random -L unisims_ver -L unisim -L unifast_ver -L unifast -L unimacro_ver -L unimacro -L secureip -L xil_defaultlib -L xpm  -L lib_cdc_v1_0_2 -L lib_pkg_v1_0_2  -L fifo_generator_v13_1_1 -L axi_clock_converter_v2_1_8 -c -l $(TESTNAME).log -do "add wave -r /tb/*;run -all; quit -f" tb glbl
-##-L xil_defaultlib -L xpm -L dist_mem_gen_v8_0_10 -L lib_srl_fifo_v1_0_2 -L axi_lite_ipif_v3_0_3 -L lib_cdc_v1_0_2 -L lib_pkg_v1_0_2 -L axi_hwicap_v3_0_12 -L fifo_generator_v13_1_1 -L axi_clock_converter_v2_1_8 	cd $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR) && sed '/Model:WARNING: Reading unwritten address*/d' < $(TESTNAME).log > $(TESTNAME).$(LOG_EXTENSION)
-	@echo $(RESULTS_LOG)
-	@if [ -f $(RESULTS_LOG) ] ; then \
-	   if [ ! -f $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/$(TESTNAME).log ]; then \
-	      echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/$(TESTNAME).log - FAIL (missing)" >> $(RESULTS_LOG) ;\
-	   else \
-	      grep "TEST PASSED" $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/$(TESTNAME).log ;\
-	      RESULT=$$? ; \
-	      if [ $$RESULT -eq 0 ] ; then \
-	         echo "HDK - $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/$(TESTNAME).log - PASS" >> $(RESULTS_LOG) ;\
-          else \
-	          echo "HDK - $(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)/$(TESTNAME).log - FAIL" >> $(RESULTS_LOG);\
-	      fi \
-       fi \
-	fi
-endif
+create_libs:
+	cd $(SIM_DIR) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_DIR) && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_DIR) && rm -rf create_libs.tcl 
 
-check:
-ifeq ($(REGRESS), 1)
-	@if [ $(LOG_EXISTS) -eq "1" ]; then \
-	  if [ $(FAIL_EXISTS) -eq "1" ]; then \
-	    echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Found 'TEST FAIL' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
-	  else \
-	    if [ $(ERROR_EXISTS) -eq "1" ]; then \
-	      echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Found 'ERROR' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
-	    else \
-	      if [ $(PASS_EXISTS) -eq "1" ]; then \
-	        echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  PASSED" >> $(RESULTS_FILE); \
-	      else \
-	        echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Did not find 'TEST PASS' message in $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
-	      fi \
-	    fi \
-	  fi \
-	else \
-	  echo "$(RUN_DIR)/$(RUN_SUBDIR)/$(TEST_DIR)  --  FAILED  -- Did not find $(TESTNAME).$(LOG_EXTENSION) file" >> $(RESULTS_FILE); \
-	fi
-else
-	@echo "Check not performed -- only applicable for regression runs." > $(RESULTS_FILE)
-endif
-
-regress_clean:
-	@rm -rf $(COMPILE_DIR)/$(COMPILE_SUBDIR)
-	@rm -rf $(RUN_DIR)/$(RUN_SUBDIR)
-	@rm -rf $(RESULTS_FILE)
-
-create_libs_questa:
-	./create_libs_questa.sh
 
