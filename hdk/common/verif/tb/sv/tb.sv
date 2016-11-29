@@ -37,10 +37,10 @@ module tb();
    //-------------------------------------
    // PCIe Master interface from CL
    //-------------------------------------
-   logic [4:0]  cl_sh_pcim_awid[NUM_PCIE-1:0];
-   logic [63:0] cl_sh_pcim_awaddr[NUM_PCIE-1:0];
-   logic [7:0]  cl_sh_pcim_awlen[NUM_PCIE-1:0];
-   logic [18:0] cl_sh_pcim_awuser[NUM_PCIE-1:0];
+   logic [4:0]          cl_sh_pcim_awid[NUM_PCIE-1:0];
+   logic [63:0]         cl_sh_pcim_awaddr[NUM_PCIE-1:0];
+   logic [7:0]          cl_sh_pcim_awlen[NUM_PCIE-1:0];
+   logic [18:0]         cl_sh_pcim_awuser[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] cl_sh_pcim_awvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_awready;
    
@@ -72,10 +72,9 @@ module tb();
    //------------------------------------------------
    // PCI Slave interface to CL
    //------------------------------------------------
-   logic [63:0] sh_cl_pcis_awaddr[NUM_PCIE-1:0];
-   logic [4:0]  sh_cl_pcis_awid[NUM_PCIE-1:0];
-   logic [7:0]  sh_cl_pcis_awlen[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] sh_cl_pcis_awuser;
+   logic [63:0]         sh_cl_pcis_awaddr[NUM_PCIE-1:0];
+   logic [4:0]          sh_cl_pcis_awid[NUM_PCIE-1:0];
+   logic [7:0]          sh_cl_pcis_awlen[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcis_awvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcis_awready;
 
@@ -93,7 +92,6 @@ module tb();
    logic [63:0]         sh_cl_pcis_araddr[NUM_PCIE-1:0];
    logic [4:0]          sh_cl_pcis_arid[NUM_PCIE-1:0];
    logic [7:0]          sh_cl_pcis_arlen[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] sh_cl_pcis_aruser;
    logic [NUM_PCIE-1:0] sh_cl_pcis_arvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcis_arready;
    
@@ -155,39 +153,39 @@ module tb();
    // HMC Stat Interface from CL
    //------------------------------------------------------
    
-   logic [7:0]         sh_hmc_stat_addr;
-   logic               sh_hmc_stat_wr;
-   logic               sh_hmc_stat_rd;
-   logic [31:0]        sh_hmc_stat_wdata;   
-   logic               hmc_sh_stat_ack;
-   logic [31:0]        hmc_sh_stat_rdata;
-   logic [7:0]         hmc_sh_stat_int;
+   logic [7:0]          sh_hmc_stat_addr;
+   logic                sh_hmc_stat_wr;
+   logic                sh_hmc_stat_rd;
+   logic [31:0]         sh_hmc_stat_wdata;   
+   logic                hmc_sh_stat_ack;
+   logic [31:0]         hmc_sh_stat_rdata;
+   logic [7:0]          hmc_sh_stat_int;
    
    //------------------------------------------------------
    // HMC Stat Interface from CL
    //------------------------------------------------------
    
-   logic               hmc_iic_scl_i;
-   logic               hmc_iic_scl_o;
-   logic               hmc_iic_scl_t;
-   logic               hmc_iic_sda_i;
-   logic               hmc_iic_sda_o;
-   logic               hmc_iic_sda_t;
+   logic                hmc_iic_scl_i;
+   logic                hmc_iic_scl_o;
+   logic                hmc_iic_scl_t;
+   logic                hmc_iic_sda_i;
+   logic                hmc_iic_sda_o;
+   logic                hmc_iic_sda_t;
                               
    //------------------------------------------------------
    // Aurora Stat Interface from CL
    //------------------------------------------------------
    
-   logic [7:0]         sh_aurora_stat_addr;
-   logic               sh_aurora_stat_wr; 
-   logic               sh_aurora_stat_rd; 
-   logic [31:0]        sh_aurora_stat_wdata; 
-   logic               aurora_sh_stat_ack;
-   logic [31:0]        aurora_sh_stat_rdata;
-   logic [7:0]         aurora_sh_stat_int;
+   logic [7:0]          sh_aurora_stat_addr;
+   logic                sh_aurora_stat_wr; 
+   logic                sh_aurora_stat_rd; 
+   logic [31:0]         sh_aurora_stat_wdata; 
+   logic                aurora_sh_stat_ack;
+   logic [31:0]         aurora_sh_stat_rdata;
+   logic [7:0]          aurora_sh_stat_int;
    
-   logic [31:0]        sv_host_memory[*];
-   logic               use_c_host_memory = 1'b0;
+   logic [31:0]         sv_host_memory[*];
+   logic                use_c_host_memory = 1'b0;
    
 `include "sh_dpi_tasks.svh"
    
