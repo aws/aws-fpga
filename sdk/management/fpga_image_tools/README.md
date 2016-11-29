@@ -129,7 +129,7 @@ The following FPGA image hardware metrics are provided. PCIe related counters ha
    * The first address that triggered a `pm-range-error-count` event. 
 
 * `pm-len-error-count` (32-bit)
-   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specifications.md))
+   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
    
 * `pm-len-error-addr` (64-bit)
    * The first address that triggered a `pm-len-error-count` event.
