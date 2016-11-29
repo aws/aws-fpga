@@ -5,7 +5,7 @@
 
 ## Content
 
-This is first public release for AWS EC2 FPGA Development Kit. The kit comes with HDK(Hardware Development Kit) and SDK(Software Development Kit). Below is the list of features included in this  release. More details about these features can be found in the Custom Logic spec located at the link below (link to be included once the final spec is ready). 
+This is first public release for AWS EC2 FPGA Development Kit. The kit comes with HDK(Hardware Development Kit) and SDK(Software Development Kit). Below is the list of features included in this  release. More details about these features can be found in [AWS Shell Interface Specification](https://amazon.awsapps.com/workdocs/index.html#/document/c4056a2cf1b641f9779a6db16d85ca3a2cc8918084bbcf1673de2e671a72dd48)
 
 *   AWS EC2 FPGA platform feature list:
     *    Xilinx UltraScale+ VU9P
@@ -25,7 +25,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
          *    Maximum payload size set by the Shell
          *    Maximum read request size set by the Shell
          *    AXI4 error handling
-         *    Proprietary AxUSER bits implemented on address channels: please refer to AWS Shell Interface Specification
+         *    Proprietary AxUSER bits implemented on address channels: please refer to [AWS Shell Interface Specification](https://amazon.awsapps.com/workdocs/index.html#/document/c4056a2cf1b641f9779a6db16d85ca3a2cc8918084bbcf1673de2e671a72dd48)        
 
 ## Implementation Restrictions
 
@@ -75,7 +75,7 @@ This section will include any new features added in the future releases.
 ## Bug Fixes
 
 This section will include any bug fixes in the future releases.
-Please use [HDK support](https://issues.amazon.com/issues/create?assignedFolder=81d5bc1a-748f-45f5-b32e-dfa12a325550&title=HDK+support&description=Blank+template+for+HDK+bugs&descriptionContentType=text%2Fplain) and [SDK support](http://tiny.amazon.com/o9pqvzqs/issuamazissucrea) to file bugs or support requests for HDK and SDK respectively.
+Please use [HDK support](http://tiny.amazon.com/1hl7kmm4s/issuamazissucrea) and [SDK support](http://tiny.amazon.com/o9pqvzqs/issuamazissucrea) to file bugs or support requests for HDK and SDK respectively.
 
 ## Known Issues
 
