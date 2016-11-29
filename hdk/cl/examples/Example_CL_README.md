@@ -4,19 +4,14 @@ Building a Custom Logic (CL) implementation in the AWS FPGA instance
 requires an implementation that complies with the CL specification. The
 following CL examples are provided to assist developers in creating a
 functional Custom Logic implementation. All examples are included in the
-hdk/cl/examples directory. Each example includes 1) the design source
-code for the example included in the /design/cl directory, 2)
-constraints and scripts for compiling the example design in the
-Developer AMI, 3) a design checkpoint that can be submitted for AFI
-generation, 4) an AFI-ID for a pre-generated AFI that matches the
-example design, 5) software source code for any software needed in the
-instance to run the example, and 6) software images that can be loaded
-on an F1 instance to test the AFI on an F1 instance. An AFI can be
-creating using the files in sections 1, 2, 3, & 4. The AFI can be used
-in an F1 instance by using the files in sections 5 & 6. By following the
-example CLs, a Developer should be understand how to interface to the
-Shell blocks of the FPGA, compile design source code to create an AFI,
-and load an AFI from the F1 instance for use.
+hdk/cl/examples directory. Each example includes:
+1. the design source code for the example included in the /design/cl directory,
+2. constraints and scripts for compiling the example design in the Developer AMI,
+3. a design checkpoint that can be submitted for AFI generation,
+4. an AFI-ID for a pre-generated AFI that matches the example design,
+5. software source code for any software needed in the instance to run the example,
+6. software images that can be loaded on an F1 instance to test the AFI on an F1 instance.
+An AFI can be creating using the files in sections 1, 2, 3, & 4. The AFI can be used in an F1 instance by using the files in sections 5 & 6. By following the example CLs, a Developer should be understand how to interface to the Shell blocks of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
 **cl\_simple Functional Description**
 
