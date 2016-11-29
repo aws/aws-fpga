@@ -6,6 +6,18 @@ There are three components to the cl\_simple FPGA implementation with traffic ge
 
 # Simulation
 
+The paths listed in the simulation notes below are all relative to the ./hdk/cl/examples/cl_simple directory.
+
+To run a simulation, first cd into the ./verif/scripts directory. From there, you can initially run the peek and poke test by using "make TEST=test_peek_poke". That test will run the test_peek_poke.sv code from the ./verif/tests directory. The test code will write the registers inside the cl\_simple design to issue write and read transactions through the PCIe master interface. The results from the test will be placed in the ./verif/sim/test_peek_poke directory. Near the end of the test.log file in that results area you should see a line with "TEST PASSED" or "TEST FAILED" indicating the status.
+
+To clean up an existing simulation area (before re-running a test, for example) you can use the clean target. For the test_peek_poke test, the command line would be "make clean TEST=test_peek_poke". You have to specify the TEST argument in order to identify which set of existing results should be removed.
+
+The other simulation example that is available uses the code in the ./verif/tests/test_ddr.sv file. To run that simulation, you can use "make TEST=test_ddr". The test code will write the registers inside the cl\_simple design to issue write and read transactions through the DDR0 interface. The results from the test will be placed in the ./verif/sim/test_ddr directory.
+
+If you want to write a new test, create a file in the ./verif/tests directory whose name matches the module name used for the test. Then from the ./verif/scripts directory you should be able to run your test with "make TEST=\<module\_name\>".
+
+The default simulator is Vivado.  If you want to run simulations using Questa, you can add "QUESTA=1" to the command line. Before running any Questa simulations, you'll need to generate some compiled library files by running "make create_libs QUESTA=1".
+
 # Synthesis
 
 # Validation
