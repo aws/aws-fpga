@@ -210,15 +210,15 @@ lock_design -level routing
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_opt.timing_summary.rpt
 
 #This is what will deliver to AWS
-write_checkpoint -force $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp
+write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
 puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
 
 #Verify PR build
-pr_verify -full_check $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/to_aws/${timestamp}.pr_verify.log
+pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
 # created a zipped tar file, that would be used for createFpgaImage EC2 API
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/${timestamp}*
+exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/checkpoints/to_aws/${timestamp}*
 

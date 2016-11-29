@@ -14,7 +14,6 @@
 set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
 set CL_DIR $::env(CL_DIR)
 
-
 #---- Developr would replace this section with design files ----
 
 ## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.

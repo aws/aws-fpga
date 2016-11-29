@@ -40,6 +40,13 @@ set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
+set_msg_config -severity INFO -suppress
+set_msg_config -severity STATUS -suppress
+set_msg_config -severity WARNING -suppress
+set_msg_config -id {Chipscope 16-3} -suppress
+
+puts "AWS FPGA: Calling the encrypt.tcl";
+
 file mkdir ../src_post_encryption
 
 source encrypt.tcl
@@ -169,11 +176,11 @@ open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
-read_xdc {
-$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
-$CL_DIR/build/constraints/cl_pnr_user.xdc
+read_xdc [ list \
+$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
+$CL_DIR/build/constraints/cl_pnr_user.xdc \
 $HDK_SHELL_DIR/build/constraints/ddr.xdc
-}
+]
 
 puts "AWS FPGA: Optimize design during implementation";
 
@@ -207,15 +214,15 @@ lock_design -level routing
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_opt.timing_summary.rpt
 
 #This is what will deliver to AWS
-write_checkpoint -force $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp
+write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
 puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
 
 #Verify PR build
-pr_verify -full_check $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/to_aws/${timestamp}.pr_verify.log
+pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
 # created a zipped tar file, that would be used for createFpgaImage EC2 API
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/${timestamp}*
+exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/checkpoints/to_aws/${timestamp}*
 

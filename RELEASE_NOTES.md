@@ -9,12 +9,12 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 
 *   AWS EC2 FPGA platform feature list:
     *    Xilinx UltraScale+ VU9P
-    *    Interfaces available for Customer Logic(CL):
+    *    Interfaces available for Custom Logic(CL):
           *    One x16 PCIe Gen 3 Interface
           *    Four DDR4 RDIMM interfaces (with ECC)
                *    AXI4 protocol support on all interfaces
     *  	250 MHz base clock and asynchronous reset provided to Custom Logic(CL)
-    *    PCIE endpoint presentation to Custom Logic(CL)"
+    *    PCIE endpoint presentation to Custom Logic(CL)
          *    Management PF (physical function)
          *    Application PF
          *    FLR interface for Application PF
@@ -29,7 +29,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 
 ## Implementation Restrictions
 
-*    PCIE AXI4 interfaces between Customer Logic(CL) and Shell(SH) have following restrictions:
+*    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
     *    All PCIe transactions must adhere to the PCIe Exress base spec.
     *    4Kbyte Address boundary for all transactions(PCIe restriction).
     *    Multiple outstanding outbound PCIe Read transactions with same ID not supported.
@@ -75,8 +75,10 @@ This section will include any new features added in the future releases.
 ## Bug Fixes
 
 This section will include any bug fixes in the future releases.
+Please use [HDK support](https://issues.amazon.com/issues/create?assignedFolder=81d5bc1a-748f-45f5-b32e-dfa12a325550&title=HDK+support&description=Blank+template+for+HDK+bugs&descriptionContentType=text%2Fplain) and [SDK support](http://tiny.amazon.com/o9pqvzqs/issuamazissucrea) to file bugs or support requests for HDK and SDK respectively.
 
-##**_Known Issues_**:
+## Known Issues
 
+This section will include any known issues in the future releases.
 
 
