@@ -1,53 +1,98 @@
-Hello\_world is a cl example design that builds on the cl\_simple and
-cl\_test example designs. It is built to show a simple logic function
-implemented with the cl portion of an AWS FPGA while the cl\_test
-functionality runs. Cl\_hello\_world executes a simple byte swap on a 4
-byte value written to the FPGA from the F1 instance software. The design
-illustrates how to write data to the FPGA from an instance, perform a
-logic function within the FPGA, and return data from the FPGA.
-cl\_hello\_world allows software to execute the cl\_test functionality
-at the same time as the byte swap function.
+# Introduction
 
-To start, follow the process illustrated in
-hdl/cl/examples/getting\_started.md to build a custom cl directory with
-the HDK on a C4 instance running the Developer FPGA AMI. In the
-hdk/cl/examples/cl\_hello\_world/design directory are all of the design
-source files for cl\_hello\_world.
+This simple hello_world example would build a Custom Logic that will enable the instance to "peak" and "pook" registers in the memory space of Custom Logic inside the FPGA.
 
-Once the design is ready, start the Vivado build/create process. Refer
-to \$HDK\_DIR/cl/CHECKLIST.txt file to verify all the necessary steps
-are set. Once the checklist is complete, run this script to start Vivado
-and generate a Design Checkpoint
-\$(CL\_DIR)/build/scripts/create\_dcp\_from\_cl.tcl A detailed version
-of the Vivado design flow is included in the /build/scripts directory.
-Note that cl\_hello\_world is built so that it will always meet timing
-constraints in Vivado using the constraints supplied by AWS.
+The walkthrough is split into two parts: 
 
-Once the Design Checkpoint is ready, submit the cl\_test dcp file to AWS
-to generate an AFI. Follow the steps outline in
-hdl/cl/examples/getting\_started.md for details on this process. This
-process will create the AFI ID for use in running cl\_hello\_world on an
-F1 instance. Create a private AMI from the Developer FPGA AMI using the
-process defined in Developer FPGA AMI README. Call the AWS CLI
-associate-fpga-image --fpga-image-id &lt;AFI ID&gt; \[--image-id &lt;AMI
-ID&gt;\] This call will associate the AFI ID with the newly created AMI
-ID.
+  Part 1: How to download the HDK, build the Custom Logic, and register it with AWS to get an AFI-id. 
+  Part 2: Once you have a registered AFI, how to use it on an F1 instance.
 
-To load cl\_hello\_world on an F1 instance, launch an F1 instance from
-the AWS CLI with the private AMI created for association. When the
-instance is ready, call the FPGA Management Tools API command load\_afi
---afi-id &lt;AFI ID&gt; -- slot&lt;0&gt;. This will load the AFI
-specified into the only FPGA in the F1.2XL instance. See the FPGA
-Management Tools README in /sdk for more details on the FPGA Management
-Tools APIs.
+**NOTE:** All the command lines mentioned in this document are targeting Linux environments only.
 
-To run the cl\_hello\_world functionality, run
-cl\_hello\_world\_byte\_swap script in sdk/examples/cl\_hello\_world
-with the 4 byte value to swap. This will write the 4 byte value to the
-FPGA, where it is swapped. It then reads the FPGA back to retrieve the
-new value. The retrieved value is displayed back.
+# Part 1: How to build and register hello_world
 
-For parallel operation with cl\_test functionality, the script
-sdk/examples/cl\_simple cl\_test\_start can be run first. While running,
-run cl\_hello\_world\_byte\_swap to see the byte swap function performed
-while the interface test is performed.
+To begin, the developer need to have a serverr or EC2 instance with Xilinx Vivado tools installed and license server running. For example, by running on AWS FPGA Developer AMI provided on [AWS Marketplace](https://aws.amazon.com/marketplace)
+
+## 0. Download and configure the HDK to the source directory on the instance in case you haven't done so far
+
+    $ git clone https://github.com/aws/aws-fpga
+    $ cd aws-fpga
+    $ source hdk_shell.sh
+
+## 1. Pick the cl_hello_world example and move to its directory
+
+    $ cd $HDK_DIR/cl/examples/cl_hello_world
+    $ export CL_DIR=$(pwd)
+
+Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value. Each one of the examples following the recommended directory structure to match what's expected by the HDK simulation and build scripts.
+
+If you like to start your own CL, check out the How to create your own CL Readme
+
+## 2. Build the CL before submitting to AWS
+
+NOTE This step requires you have Xilinx Vivado Tools installed as well Vivado License:
+
+    $ vivado -mode batch        # Run this command to see if vivado is installed
+    $ sudo perl /home/centos/src/project_data/license/license_manager.pl -status  # To check if license server is up. this command is for AWS-provided FPGA Development machine, the license manager can be in different directory in your systems
+
+The next script two steps will go through the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA
+
+    $ cd $CL_DIR/build/scripts
+    $ vivado -mode batch -source create_dcp_from_cl.tcl 
+
+## 3. Submit the Design Checkpoint to AWS to register the AFI
+
+If you have access to AWS SDK with support for FPGA API (aws ec2 createFpgaImage)
+
+TBD
+
+During F1 preview and before AWS EC2 FPGA API are available
+
+To submit the dcp, createan S3 bucket for submitting the design and upload the tar zipped archive into that bucket. Then, add a policy to that bucket allowing our team's account (Account ID: 682510182675) read/write permissions. A [TBD] example of the S3 permissions process is included in the /build/scripts directory. Submit an email to AWS (email TBD) providing the following information:
+
+1) Name of the logic design
+2) Generic Desription of the logic design
+3) PCI IDs (Device, Vendor, Subsystem, SubsystemVendor),
+4) Location of the DCP object (bucket name and key),
+5) Location of the directory to write logs (bucket name and key)
+6) Version of the Shell.
+
+After the AFI generation is complete, AWS will write the logs back into the bucket location provided by the developer and notify them by email, including the AFI IDs used to manage and launch an AFI from within an Instance.
+
+# Part 2: How to load and test Hello World registered AFI from within an F1 instance
+
+To follow the next steps, you have to run an instance on F1. AWS recommend you run an instance with latest Amazon Linux that have the FPGA management tools included, or alternatively the FPGA Developer AMI with both the HDK and SDK.
+
+## 4. Make sure you have AWS CLI configured and AWS FPGA management tools
+
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (typically us-east-1)
+    $ git clone https://github.com/aws/aws-fpga
+    $ cd aws-fpga
+    $ source sdk_setup.sh
+
+## 5. Associate the AFI with your instance
+
+You can associate more than one AFI with your instance. the Association process just makes sure you have the permission to use the specific AFI-Id(s) but it doesn't load the image to the FPGA
+
+    $ aws ec2 associateFpgaImage --fpga-image-id <AFI_ID> --instance-id <instance0id
+
+## 6. Load the AFI to FPGA slot 3
+
+Run's the fpga-describe-local-image on slot 0 to confirm that the FPGA is cleared, and you should see similar output to the 4 lines below:
+
+$ sudo fpga-describe-local-image -S 0 -H
+
+Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
+AFI           0             none          cleared         1
+Type        VendorId    DeviceId      DBDF
+AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+Then loading the example AFI to FPGA slot 0. (you should have the AFI ID or AGFI ID from step 3 above.
+
+$ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+Now, you can verify the status of the previous load command:
+
+$ sudo fpga-describe-local-image -S 0 -H
+
+7. Call the specific Hello World specific software
+
+[TBD]

@@ -40,15 +40,15 @@ Once you have the AFI Management Tools installed onn your F1 instance, you can d
 
     $ sudo fpga-describe-local-image-slots -H
 
-    Type  FpgaImageSlot VendorId    DeviceId     DBDF
-    AFIDEVICE     0     0x1d0f      0x1042    0000:00:17.0
-    AFIDEVICE     1     0x1d0f      0x1042    0000:00:18.0
-    AFIDEVICE     2     0x1d0f      0x1042    0000:00:19.0
-    AFIDEVICE     3     0x1d0f      0x1042    0000:00:1a.0
-    AFIDEVICE     4     0x1d0f      0x1042    0000:00:1b.0
-    AFIDEVICE     5     0x1d0f      0x1042    0000:00:1c.0
-    AFIDEVICE     6     0x1d0f      0x1042    0000:00:1d.0
-    AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    1       0x1d0f      0x1042      0000:00:18.0
+    AFIDEVICE    2       0x1d0f      0x1042      0000:00:19.0
+    AFIDEVICE    3       0x1d0f      0x1042      0000:00:1a.0
+    AFIDEVICE    4       0x1d0f      0x1042      0000:00:1b.0
+    AFIDEVICE    5       0x1d0f      0x1042      0000:00:1c.0
+    AFIDEVICE    6       0x1d0f      0x1042      0000:00:1d.0
+    AFIDEVICE    7       0x1d0f      0x1042      0000:00:1e.0
 
 * The list displayed above is for F1.16xl instance that have 8 FPGAs on slot 0 through 7.
 
@@ -66,10 +66,10 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-    AFI           0             none          cleared         1
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Loading an AFI to a Specific FPGA Slot
 
@@ -83,10 +83,10 @@ Displays the current state for the given FPGA slot number.  The output shows the
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type    FpgaImageSlot    FpgaImageId          StatusName    StatusCode
-    AFI           0       agfi-0123456789abcdefg    loaded          0
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       agfi-0123456789abcdefg  loaded            0
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Clearing the FPGA Image on Specific Slot
 
@@ -100,10 +100,10 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-    AFI           0              none         cleared         1
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Looking at Metrics
 
@@ -129,7 +129,7 @@ The following FPGA image hardware metrics are provided. PCIe related counters ha
    * The first address that triggered a `pm-range-error-count` event. 
 
 * `pm-len-error-count` (32-bit)
-   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specifications.md))
+   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
    
 * `pm-len-error-addr` (64-bit)
    * The first address that triggered a `pm-len-error-count` event.
