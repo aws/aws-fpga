@@ -16,7 +16,7 @@
 #
 
 if [ -z "$SDK_DIR" ]; then
-    echo "Error: SDK_DIR environment variable is not set.  Please 'source sdk_setup.sh' from the aws-fpga directory first."
+    echo "Error: SDK_DIR environment variable is not set.  Please use 'source sdk_setup.sh' from the aws-fpga directory."
     exit 1
 fi
 
