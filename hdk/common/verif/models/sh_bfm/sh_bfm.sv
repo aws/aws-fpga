@@ -651,7 +651,7 @@ typedef struct {
             if (debug) begin
                $display("[%t] - DEBUG fb:  %1d  0x%0128x  0x%016x", $realtime, first_wr_beat, cl_sh_wr_data[0].data, cl_sh_wr_data[0].strb);
             end
-            for(int i=0; i<16; i++) begin
+            for(int i=wr_addr[5:2]; i<16; i++) begin
                logic [31:0] word;
 
                if (!tb.use_c_host_memory)
@@ -681,6 +681,7 @@ typedef struct {
                   for(int k=0; k<4; k++) begin
                      byte t;
                      t = word[7:0];                     
+
                      tb.host_memory_putc(wr_addr+k, t);
                      word = word >> 8;
                   end                  
@@ -848,7 +849,7 @@ typedef struct {
          if (sh_cl_pcim_rvalid[0] & cl_sh_pcim_rready[0])
            rd_addr+=64;
 
-         for(int i=0; i<16; i++) begin
+         for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
 
             if (debug) begin
