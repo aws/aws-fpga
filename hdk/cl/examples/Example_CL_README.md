@@ -1,64 +1,22 @@
 **Overview**
 
-Building a Custom Logic (CL) implementation in the AWS FPGA instance
-requires an implementation that complies with the CL specification. The
-following CL examples are provided to assist developers in creating a
-functional Custom Logic implementation. All examples are included in the
-hdk/cl/examples directory. Each example includes:
+Building a Custom Logic (CL) implementation in the AWS FPGA instance requires an implementation that complies with the CL specification. The following CL examples are provided to assist developers in creating a functional Custom Logic implementation. All examples are included in the hdk/cl/examples directory. Each example includes:
+
 1. the design source code for the example included in the /design/cl directory,
 2. constraints and scripts for compiling the example design in the Developer AMI,
 3. a design checkpoint that can be submitted for AFI generation,
 4. an AFI-ID for a pre-generated AFI that matches the example design,
 5. software source code for any software needed in the instance to run the example,
 6. software images that can be loaded on an F1 instance to test the AFI on an F1 instance.
+
 An AFI can be creating using the files in sections 1, 2, 3, & 4. The AFI can be used in an F1 instance by using the files in sections 5 & 6. By following the example CLs, a Developer should be understand how to interface to the Shell blocks of the FPGA, compile design source code to create an AFI, and load an AFI from the F1 instance for use.
 
 **cl\_simple Functional Description**
 
-The first CL example is the cl\_simple example. This example contains
-the CL template for generating the CL ports and a CL that exercises the
-data movement interfaces from the CL to the Shell. In the
-hdk/cl/examples/cl\_simple/design directory are all the design source
-files for cl\_simple. cl\_ports.vh is the template for generating a CL.
-It contains the port interfaces for the AXI interfaces from the Shell to
-the CL and including the DDR controller IP blocks. Developers should
-start with this file for building their CL design. Cl\_test.vh is a
-design built to show developers how to create a CL that moves data
-into/out-of DDR and PCIe through the AXI interfaces. Developers should
-include cl\_test.vh as a component within the CL to exercise the
-interfaces. CL\_test performs Write/Read combinations to all 4 DDR
-interfaces and verifies the data. CL\_test also allows software from the
-F1 instance to perform CPU-initiated read/write of FPGA memory in the CL
-region and verifies the data. This software is included in the HDK
-example for CL\_test. CL\_test does not illustrate how to perform DMA
-functionality from the instance to the FPGA. CL\_test also does not
-illustrate how to create logic operations or instantiate other FPGA IP
-blocks within the CL region.
+The first CL example is the cl\_simple example. This example contains the CL template for generating the CL ports and a CL that exercises the data movement interfaces from the CL to the Shell. In the hdk/cl/examples/cl\_simple/design directory are all the design source files for cl\_simple. cl\_ports.vh is the template for generating a CL. It contains the port interfaces for the AXI interfaces from the Shell to the CL and including the DDR controller IP blocks. Developers should start with this file for building their CL design. Cl\_test.vh is a design built to show developers how to create a CL that moves data into/out-of DDR and PCIe through the AXI interfaces. Developers should include cl\_test.vh as a component within the CL to exercise the interfaces. CL\_test performs Write/Read combinations to all 4 DDR interfaces and verifies the data. CL\_test also allows software from the F1 instance to perform CPU-initiated read/write of FPGA memory in the CL region and verifies the data. This software is included in the HDK example for CL\_test. CL\_test does not illustrate how to perform DMA functionality from the instance to the FPGA. CL\_test also does notillustrate how to create logic operations or instantiate other FPGA IP blocks within the CL region.
 
-There are three components to the CL\_simple FPGA implementation with
-traffic generation: Interface to DDR, Interface to PCIe, and traffic
-generation. For the DDR interfaces, CL\_simple instantiates 3 DDR blocks
-for the DDR core supplied in the FPGA HDK. These DDR interfaces all use
-the same DDR block built 3 times to correspond to the 3 DDR interfaces
-contained within the CL region. A developer should not modify the DDR
-blocks built within the CL. Functionality of the DDR interface is only
-guaranteed when the DDR block is built as delivered in the HDK. The
-4^th^ DDR interface is built into the Shell. CL\_test interfaces to the
-4^th^ DDR interface using the AXI interface described in the CL
-specification. For the PCIe interface, CL\_test uses the AXI interface
-described in the CL specification. CL\_test implements an internal
-memory that is written/read from the AXI interface. This interface is
-mapped to a PCIe Base Address Register of the Application PF so that
-instance software can issue reads and writes. No PCIe specific code is
-required in the CL\_test to source/sink data from the instance. For
-traffic generation, CL\_test creates a data pattern that is written and
-read to all 4 DDR banks through the AXI interfaces. The traffic
-generation runs all 4 DDR AXI interfaces in parallel, incrementing the
-address written/read. The values read are checked against the values
-written. An error is indicated if there is a mismatch. The traffic
-generation is initiated by a write from the AXI interface, mapped via
-PCIe BAR. The status of error conditions can be read through the same
-interface.
+There are three components to the CL\_simple FPGA implementation with traffic generation: Interface to DDR, Interface to PCIe, and traffic generation. For the DDR interfaces, CL\_simple instantiates 3 DDR blocks for the DDR core supplied in the FPGA HDK. These DDR interfaces all use the same DDR block built 3 times to correspond to the 3 DDR interfaces contained within the CL region. A developer should not modify the DDR blocks built within the CL. Functionality of the DDR interface is only guaranteed when the DDR block is built as delivered in the HDK. The
+4^th^ DDR interface is built into the Shell. CL\_test interfaces to the 4^th^ DDR interface using the AXI interface described in the CL specification. For the PCIe interface, CL\_test uses the AXI interface described in the CL specification. CL\_test implements an internal memory that is written/read from the AXI interface. This interface is mapped to a PCIe Base Address Register of the Application PF so that instance software can issue reads and writes. No PCIe specific code is required in the CL\_test to source/sink data from the instance. For traffic generation, CL\_test creates a data pattern that is written and read to all 4 DDR banks through the AXI interfaces. The traffic generation runs all 4 DDR AXI interfaces in parallel, incrementing the address written/read. The values read are checked against the values written. An error is indicated if there is a mismatch. The traffic generation is initiated by a write from the AXI interface, mapped via PCIe BAR. The status of error conditions can be read through the same interface.
 
 **Building an AFI from CL\_simple.vh and CL\_test.vh**
 
