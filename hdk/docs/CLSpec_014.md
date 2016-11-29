@@ -1,5 +1,4 @@
-![](media/image1.png){width="3.3291666666666666in"
-height="1.3416666666666666in"}
+
 
 Revision History
 ================
