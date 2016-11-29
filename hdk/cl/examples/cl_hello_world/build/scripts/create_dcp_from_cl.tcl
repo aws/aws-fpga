@@ -40,6 +40,13 @@ set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
 
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
+set_msg_config -severity INFO -suppress
+set_msg_config -severity STATUS -suppress
+set_msg_config -severity WARNING -suppress
+set_msg_config -id {Chipscope 16-3} -suppress
+
+puts "AWS FPGA: Calling the encrypt.tcl";
+
 file mkdir ../src_post_encryption
 
 source encrypt.tcl
