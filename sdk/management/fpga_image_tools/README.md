@@ -157,7 +157,7 @@ into the given `fpga-image-slot`.
    * The fpga-image-slot is an index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
 * **Q: What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?**
-   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configureation Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
+   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configuration Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
 
 * **Q: What is a DBDF?**
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
