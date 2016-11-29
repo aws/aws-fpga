@@ -28,11 +28,11 @@ module sh_bfm #(
    input [31:0]                cl_sh_id0,
    input [31:0]                cl_sh_id1,
 
-   output logic[31:0]          sh_cl_ctl0,
-   output logic[31:0]          sh_cl_ctl1,
+   output logic [31:0]         sh_cl_ctl0,
+   output logic [31:0]         sh_cl_ctl1,
    output logic                clk_xtra,
    output logic                rst_xtra_n,
-   output logic[1:0]           sh_cl_pwr_state,
+   output logic [1:0]          sh_cl_pwr_state,
 
    output logic                clk_out,
    output logic                rst_out_n,
@@ -51,15 +51,15 @@ module sh_bfm #(
    input                      hmc_iic_sda_o,
    input                      hmc_iic_sda_t,
 
-   output[7:0]                 sh_hmc_stat_addr,
-   output                      sh_hmc_stat_wr,
-   output                      sh_hmc_stat_rd,
-   output[31:0]                sh_hmc_stat_wdata,
+   output logic [7:0]         sh_hmc_stat_addr,
+   output logic               sh_hmc_stat_wr,
+   output logic               sh_hmc_stat_rd,
+   output logic [31:0]        sh_hmc_stat_wdata,
 
-   input                       hmc_sh_stat_ack,
-   input [31:0]                hmc_sh_stat_rdata,
+   input                      hmc_sh_stat_ack,
+   input [31:0]               hmc_sh_stat_rdata,
 
-   input[7:0]                  hmc_sh_stat_int
+   input [7:0]                hmc_sh_stat_int
 
     
    ,
@@ -149,14 +149,14 @@ module sh_bfm #(
     
    ,
    input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-   output[7:0]                 sh_aurora_stat_addr,
-   output                      sh_aurora_stat_wr,
-   output                      sh_aurora_stat_rd,
-   output[31:0]                sh_aurora_stat_wdata,
+   output logic [7:0]         sh_aurora_stat_addr,
+   output logic               sh_aurora_stat_wr,
+   output logic               sh_aurora_stat_rd,
+   output logic [31:0]        sh_aurora_stat_wdata,
 
-   input                       aurora_sh_stat_ack,
-   input [31:0]                aurora_sh_stat_rdata,
-   input[7:0]                 aurora_sh_stat_int
+   input                      aurora_sh_stat_ack,
+   input [31:0]               aurora_sh_stat_rdata,
+   input [7:0]                aurora_sh_stat_int
 
    //--------------------------------------------------------------
    // DDR[3] (M_C_) interface 
@@ -193,7 +193,7 @@ module sh_bfm #(
 
    input [2:0]                 ddr_sh_stat_ack,
    input [31:0]                ddr_sh_stat_rdata[2:0],
-   input[7:0]                  ddr_sh_stat_int[2:0],
+   input [7:0]                 ddr_sh_stat_int[2:0],
 
    input [5:0]                 cl_sh_ddr_awid,
    input [63:0]                cl_sh_ddr_awaddr,
@@ -237,9 +237,9 @@ module sh_bfm #(
 
 `ifndef NO_CL_DDR
    ,
-   output              sh_RST_DIMM_A_N,
-   output              sh_RST_DIMM_B_N,
-   output              sh_RST_DIMM_D_N
+   output logic        sh_RST_DIMM_A_N,
+   output logic        sh_RST_DIMM_B_N,
+   output logic        sh_RST_DIMM_D_N
 `endif  
                                
 
@@ -453,6 +453,46 @@ typedef struct {
    end
 
    assign ddr_user_rst_n = ~ddr_user_rst;
+
+   // TODO: Connect up HMC I2C interface once supported
+   initial begin
+      hmc_iic_scl_i <= 1'b0;
+      hmc_iic_sda_i <= 1'b0;
+   end
+
+   // TODO: Connect up HMC stats interface once supported
+   initial begin
+      sh_hmc_stat_addr <= 8'h00;
+      sh_hmc_stat_wr <= 1'b0;
+      sh_hmc_stat_rd <= 1'b0;
+      sh_hmc_stat_wdata <= 32'h0;
+   end
+
+   // TODO: Connect up Aurora stats interface once supported
+   initial begin
+      sh_aurora_stat_addr <= 8'h00;
+      sh_aurora_stat_wr <= 1'b0;
+      sh_aurora_stat_rd <= 1'b0;
+      sh_aurora_stat_wdata <= 32'h0;
+   end
+
+   // TODO: Connect up DDR stats interfaces if needed
+   initial begin
+      sh_ddr_stat_addr[0] <= 8'h00;
+      sh_ddr_stat_wr[0] <= 1'b0;
+      sh_ddr_stat_rd[0] <= 1'b0;
+      sh_ddr_stat_wdata[0] <= 32'h0;
+
+      sh_ddr_stat_addr[1] <= 8'h00;
+      sh_ddr_stat_wr[1] <= 1'b0;
+      sh_ddr_stat_rd[1] <= 1'b0;
+      sh_ddr_stat_wdata[1] <= 32'h0;
+
+      sh_ddr_stat_addr[2] <= 8'h00;
+      sh_ddr_stat_wr[2] <= 1'b0;
+      sh_ddr_stat_rd[2] <= 1'b0;
+      sh_ddr_stat_wdata[2] <= 32'h0;
+   end
 
    //=================================================
    //
