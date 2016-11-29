@@ -28,5 +28,7 @@ See [Simulating CL Designs](https://github.com/aws/aws-fpga/wiki/Simulating-CL-D
 
 # Synthesis
 
+[Building CL Designs](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/Getting_Started_With_CL_Examples.md#overview-on-process-for-building-a-custom-logic-cl-implementation-for-aws-fpga-instances)
+
 # Validation
 
