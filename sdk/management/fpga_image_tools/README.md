@@ -172,7 +172,7 @@ into the given `fpga-image-slot`.
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
 
 * **Q: How do the AFI Management Tools work?**
-   * Though most customers dont have to understand the internals of the tools, a short overview is provided here:
+   * Though most customers do not need to understand the internals of the tools, a short overview is provided here:
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
