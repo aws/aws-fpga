@@ -9,4 +9,4 @@ if { [string length $curr_wave] == 0 } {
 }
 
 run 200 us 
-#quit
+quit
