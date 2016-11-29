@@ -110,10 +110,22 @@ You can associate more than one AFI with your instance. the Association process 
         
 ## 6. Load the AFI
 
-[TBD - need to define how to load the AFI]
-Load and run the software for the example cl on the running instance
-from the sdk/examples directory that matches the example cl AFI that was
-loaded.
+Run's the `fpga-describe-local-image` on slot 0 to confirm that the FPGA is cleared, and you should see similar output to the 4 lines below:
+
+    $ sudo fpga-describe-local-image -S 0 -H
+
+    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
+    AFI           0             none          cleared         1
+    Type        VendorId    DeviceId      DBDF
+    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+
+Then loading the example AFI to FPGA slot 0. (you should have the AFI ID or AGFI ID from step 3 above. 
+
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+
+Now, you can verify the status of the previous load command:
+
+    $ sudo fpga-describe-local-image -S 0 -H
 
 ## 7. Call the specific CL example software
 
