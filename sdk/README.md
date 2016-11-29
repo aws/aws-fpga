@@ -2,7 +2,9 @@
 
 This directory includes the drivers and runtime environment required by any EC2 Instance running on F1. It includes the drivers and tools to interact with pre-built AFIs that are loaded to EC2 F1 FPGAs.
 
-The [SDK management directory](./management) contains the [Amazon FPGA Image (AFI) Management Tools](./management/fpga_image_tools/README.md).
+The [SDK management directory](./management) contains the [Amazon FPGA Image (AFI) Management Tools](./management/fpga_image_tools/README.md), which includes both the source code to the AFI Management Tools as well as detailed [descriptions of the commands](./management/fpga_image_tools/README.md) to use on an F1 instance.
+
+The SDK is **NOT** used to build or register AFI, rather it is only used for managing and deploying pre-built AFIs. For building and registering AFIs, please refer to the [HDK](../hdk/README.me)
 
 **NOTE:** This SDK is designed and testing for Linux environments only.
 
