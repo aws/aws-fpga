@@ -27,7 +27,7 @@ if { [info exists ::env(CL_DIR)] } {
 #checking if HDK_SHELL_DIR env variable exists
 if { [info exists ::env(HDK_SHELL_DIR)] } {
         set HDK_SHELL_DIR $::env(HDK_SHELL_DIR)
-        puts "Using CL directory $HDK_SHELL_DIR";
+        puts "Using Shell directory $HDK_SHELL_DIR";
 } else {
         puts "Error: HDK_SHELL_DIR environment variable not defined ! ";
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
@@ -45,7 +45,7 @@ set_msg_config -severity STATUS -suppress
 set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 
-puts "AWS FPGA: Calling the encrypt.tcl.";
+puts "AWS FPGA: Calling the encrypt.tcl";
 
 file mkdir ../src_post_encryption
 
@@ -65,20 +65,17 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-#read_verilog [ list \
-#   $CL_DIR/build/src_post_encryption/Your_Global_Defines_Files.vh
-#]
-#set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
-#set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
+read_verilog [ list \
+   $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh
+]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
-#read_verilog [ list \
-# $CL_DIR/build/src_post_encryption/Your_First_Source_file \
-# $CL_DIR/build/src_post_encryption/Your_Second_Source_file \
-#..
-#$CL_DIR/build/src_post_encryption/Your_Last_Source_file
+read_verilog [ list \
+$CL_DIR/build/src_post_encryption/cl_hello_world.sv 
 ]
 
 #---- End of section replaced by User ----
@@ -147,10 +144,9 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 # CL Synthesis
 ########################
-
 puts "AWS FPGA: Start design synthesis";
 
-synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
@@ -162,74 +158,67 @@ puts "AWS FPGA: Optimizing design";
 opt_design -directive Explore
 
 check_timing -file $CL_DIR/build/reports/${timestamp}.cl.synth.check_timing_report.txt
-
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.synth.timing_summary.rpt
-
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
-
 close_design
 
 #######################
 # Implementation
 #######################
-
-puts "AWS FPGA: Implementation step: Combining Shell and CL design checkpoints";
-
 #Read in the Shell checkpoint and do the CL implementation
+puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
+
 open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
-read_xdc {
-$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
-$CL_DIR/build/constraints/cl_pnr_user.xdc
+read_xdc [ list\
+$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
+$CL_DIR/build/constraints/cl_pnr_user.xdc \
 $HDK_SHELL_DIR/build/constraints/ddr.xdc
-}
+]
 
 puts "AWS FPGA: Optimize design during implementation";
 
 opt_design -directive Explore
-
 check_timing -file $CL_DIR/build/reports/${timestamp}.SH_CL.check_timing_report.txt
 
 puts "AWS FPGA: Place design stage";
-
 #place_design -verbose -directive Explore
-place_design - -directive WLDrivenBlockPlacement
+place_design -directive WLDrivenBlockPlacement
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
 puts "AWS FPGA: Physical optimization stage";
 
-phys_opt_design  -directive Explore
+phys_opt_design -directive Explore
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.post_place_opt.timing_summary.rpt
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place_opt.dcp
+
+puts "AWS FPGA: Route design stage";
 
 #route_design  -verbose -directive Explore
 route_design  -directive MoreGlobalIterations
 
 puts "AWS FPGA: Post-route Physical optimization stage ";
 
-phys_opt_design -directive Explore
+phys_opt_design  -directive Explore
+
+puts "AWS FPGA: Locking design ";
 
 lock_design -level routing
 
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_opt.timing_summary.rpt
 
 #This is what will deliver to AWS
-write_checkpoint -force $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp
+write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
 puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
 
 #Verify PR build
-pr_verify -full_check $CL_DIR/build/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/to_aws/${timestamp}.pr_verify.log
+pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
 # created a zipped tar file, that would be used for createFpgaImage EC2 API
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/to_aws/${timestamp}.*
-
-puts "AWS FPGA: Create DCP from CL script finished.";
-puts "AWS FPGA: Final delivery file to be used with createFpgaImage API is ${timestamp}.Developer_CL.tar.gz"
-
-
+exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/checkpoints/to_aws/${timestamp}*
 

@@ -1,11 +1,30 @@
 # Introduction
 
-The first CL example is the cl\_simple example. This example contains the CL template for generating the CL ports and a CL that exercises the data movement interfaces from the CL to the Shell. In the hdk/cl/examples/cl\_simple/design directory are all the design source files for cl\_simple. cl\_ports.vh is the template for generating a CL. It contains the port interfaces for the AXI interfaces from the Shell to the CL and including the DDR controller IP blocks. Developers should start with this file for building their CL design. Cl\_test.vh is a design built to show developers how to create a CL that moves data into/out-of DDR and PCIe through the AXI interfaces. Developers should include cl\_test.vh as a component within the CL to exercise the interfaces. CL\_test performs Write/Read combinations to all 4 DDR interfaces and verifies the data. CL\_test also allows software from the F1 instance to perform CPU-initiated read/write of FPGA memory in the CL region and verifies the data. This software is included in the HDK example for CL\_test. CL\_test does not illustrate how to perform DMA functionality from the instance to the FPGA. CL\_test also does notillustrate how to create logic operations or instantiate other FPGA IP blocks within the CL region.
-
-There are three components to the CL\_simple FPGA implementation with traffic generation: Interface to DDR, Interface to PCIe, and traffic generation. For the DDR interfaces, CL\_simple instantiates 3 DDR blocks for the DDR core supplied in the FPGA HDK. These DDR interfaces all use the same DDR block built 3 times to correspond to the 3 DDR interfaces contained within the CL region. A developer should not modify the DDR blocks built within the CL. Functionality of the DDR interface is only guaranteed when the DDR block is built as delivered in the HDK. The
-4^th^ DDR interface is built into the Shell. CL\_test interfaces to the 4^th^ DDR interface using the AXI interface described in the CL specification. For the PCIe interface, CL\_test uses the AXI interface described in the CL specification. CL\_test implements an internal memory that is written/read from the AXI interface. This interface is mapped to a PCIe Base Address Register of the Application PF so that instance software can issue reads and writes. No PCIe specific code is required in the CL\_test to source/sink data from the instance. For traffic generation, CL\_test creates a data pattern that is written and read to all 4 DDR banks through the AXI interfaces. The traffic generation runs all 4 DDR AXI interfaces in parallel, incrementing the address written/read. The values read are checked against the values written. An error is indicated if there is a mismatch. The traffic generation is initiated by a write from the AXI interface, mapped via PCIe BAR. The status of error conditions can be read through the same interface.
+This example exercises the data movement interfaces from the CL to the Shell. The ./design directory contains all the design source files for cl_simple. The cl_ports.vh file is the port list for a CL and should not be modified. Developers should start with this file for building their CL design. The cl_tst instance in the cl_simple module shows developers how data can be moved into and/or out of PCIe by using the associated AXI interface. There are also cl_tst_scrb instances in the cl_simple module that show developers how data can be moved into and/or out of DDR by using the associated AXI interfaces. The cl_tst module performs Write/Read combinations to the PCIe interface and can verify that the read data matches what was written.  The cl_tst_scrb module includes a cl_tst instance that exercises or clears DDR memory. The cl_simple design does not illustrate how to perform DMA functionality from the instance to the FPGA.
 
 # Simulation
+
+The paths listed in the simulation notes below are all relative to the `aws-fpga/hdk/cl/examples/cl_simple` directory. Two tests are supplied with cl_simple: `test_peek_poke` and `test_ddr`.
+
+To run test_peek_poke, type
+
+```
+$ cd verif/scripts
+$ make TEST=test_peek_poke
+  ...
+  [6270000] : Detected   0 errors during this test
+  [6270000] : *** TEST PASSED ***
+```
+  
+The results from the test are placed in the `verif/sim/test_peek_poke` directory.
+
+To clean up an existing simulation area (before re-running a test, for example) you can use the clean target. For `test_peek_poke`, the command line is `make clean TEST=test_peek_poke`. Remember to specify the TEST argument to identify which set of existing test results should be removed.
+
+The other test, `test_ddr`, is available uses the code in the ./verif/tests/test_ddr.sv file.  The test writes the registers inside the cl_simple design to issue write and read transactions through the DDR0 interface.
+
+If you want to write a new test, create a file in `verif/tests` with a filename that matches the module name used for the test. Return to `verif/scripts`, and run your test with `make TEST=<module_name>`.
+
+See [Simulating CL Designs](https://github.com/aws/aws-fpga/wiki/Simulating-CL-Designs-%28RTL-Simulation%29)
 
 # Synthesis
 

@@ -81,14 +81,14 @@ information:
 
 3) PCI IDs (Device, Vendor, Subsystem, SubsystemVendor),
 
-4)Location of the DCP object (bucket name and key),
+4) Location of the DCP object (bucket name and key),
 
 5) Location of the directory to write logs (bucket name and key)
 
 6) Version of the Shell. 
 
 
-After the AFI generation is complete, AWS will write the logs back into the bucket locaiton provided by the developer and notify them
+After the AFI generation is complete, AWS will write the logs back into the bucket location provided by the developer and notify them
 by email, including the AFI IDs used to manage and launch an AFI from within an Instance.
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
@@ -102,7 +102,7 @@ To follow the next steps, you have to run an instance on F1. AWS recommend you r
         $ cd aws-fpga
         $ source sdk_setup.sh
         
-## 5. Associated the AFI with your instance
+## 5. Associate the AFI with your instance
 
 You can associate more than one AFI with your instance. the Association process just make sure you have the permission to use the specific AFI-Id(s).
 
@@ -110,10 +110,22 @@ You can associate more than one AFI with your instance. the Association process 
         
 ## 6. Load the AFI
 
-[TBD - need to define how to load the AFI]
-Load and run the software for the example cl on the running instance
-from the sdk/examples directory that matches the example cl AFI that was
-loaded.
+Run's the `fpga-describe-local-image` on slot 0 to confirm that the FPGA is cleared, and you should see similar output to the 4 lines below:
+
+    $ sudo fpga-describe-local-image -S 0 -H
+
+    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
+    AFI           0             none          cleared         1
+    Type        VendorId    DeviceId      DBDF
+    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+
+Then loading the example AFI to FPGA slot 0. (you should have the AFI ID or AGFI ID from step 3 above. 
+
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+
+Now, you can verify the status of the previous load command:
+
+    $ sudo fpga-describe-local-image -S 0 -H
 
 ## 7. Call the specific CL example software
 
