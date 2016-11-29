@@ -81,14 +81,14 @@ information:
 
 3) PCI IDs (Device, Vendor, Subsystem, SubsystemVendor),
 
-4)Location of the DCP object (bucket name and key),
+4) Location of the DCP object (bucket name and key),
 
 5) Location of the directory to write logs (bucket name and key)
 
 6) Version of the Shell. 
 
 
-After the AFI generation is complete, AWS will write the logs back into the bucket locaiton provided by the developer and notify them
+After the AFI generation is complete, AWS will write the logs back into the bucket location provided by the developer and notify them
 by email, including the AFI IDs used to manage and launch an AFI from within an Instance.
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
@@ -102,7 +102,7 @@ To follow the next steps, you have to run an instance on F1. AWS recommend you r
         $ cd aws-fpga
         $ source sdk_setup.sh
         
-## 5. Associated the AFI with your instance
+## 5. Associate the AFI with your instance
 
 You can associate more than one AFI with your instance. the Association process just make sure you have the permission to use the specific AFI-Id(s).
 
