@@ -33,6 +33,18 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
    localparam HMC_SCRB_BURST_LEN_MINUS1 = 3;
 
 //-------------------------------------------------
+// Signals to Tie-off AXI interfaces to sh_ddr module
+//-------------------------------------------------
+  logic         tie_zero[2:0];
+  logic [  5:0] tie_zero_id[2:0];
+  logic [ 63:0] tie_zero_addr[2:0];
+  logic [  7:0] tie_zero_len[2:0];
+  logic [511:0] tie_zero_data[2:0];
+  logic [ 63:0] tie_zero_strb[2:0];
+  logic [  7:0] tie_zero_stat_addr[2:0];
+  logic [ 31:0] tie_zero_stat_data[2:0];
+
+//-------------------------------------------------
 // Reset Synchronization
 //-------------------------------------------------
 logic pre_sync_rst_n;
@@ -473,24 +485,6 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    .M_B_DQS_DP(M_B_DQS_DP),
    .M_B_DQS_DN(M_B_DQS_DN),
 
-   .CLK_300M_DIMM2_DP(),
-   .CLK_300M_DIMM2_DN(),
-   .M_C_ACT_N(),
-   .M_C_MA(),
-   .M_C_BA(),
-   .M_C_BG(),
-   .M_C_CKE(),
-   .M_C_ODT(),
-   .M_C_CS_N(),
-   .M_C_CLK_DN(),
-   .M_C_CLK_DP(),
-   .RST_DIMM_C_N(),
-   .M_C_PAR(),
-   .M_C_DQ(),
-   .M_C_ECC(),
-   .M_C_DQS_DP(),
-   .M_C_DQS_DN(),
-   
    .CLK_300M_DIMM3_DP(CLK_300M_DIMM3_DP),
    .CLK_300M_DIMM3_DN(CLK_300M_DIMM3_DN),
    .M_D_ACT_N(M_D_ACT_N),
@@ -512,28 +506,28 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    //------------------------------------------------------
    // DDR-4 Interface from CL (AXI-4)
    //------------------------------------------------------
-   .cl_sh_ddr_awid     (),
-   .cl_sh_ddr_awaddr   (),
-   .cl_sh_ddr_awlen    (),
-   .cl_sh_ddr_awvalid  (),
+   .cl_sh_ddr_awid     (tie_zero_id),
+   .cl_sh_ddr_awaddr   (tie_zero_addr),
+   .cl_sh_ddr_awlen    (tie_zero_len),
+   .cl_sh_ddr_awvalid  (tie_zero),
    .sh_cl_ddr_awready  (),
 
-   .cl_sh_ddr_wid      (),
-   .cl_sh_ddr_wdata    (),
-   .cl_sh_ddr_wstrb    (),
-   .cl_sh_ddr_wlast    (),
-   .cl_sh_ddr_wvalid   (),
+   .cl_sh_ddr_wid      (tie_zero_id),
+   .cl_sh_ddr_wdata    (tie_zero_data),
+   .cl_sh_ddr_wstrb    (tie_zero_strb),
+   .cl_sh_ddr_wlast    (3'b0),
+   .cl_sh_ddr_wvalid   (3'b0),
    .sh_cl_ddr_wready   (),
 
    .sh_cl_ddr_bid      (),
    .sh_cl_ddr_bresp    (),
    .sh_cl_ddr_bvalid   (),
-   .cl_sh_ddr_bready   (),
+   .cl_sh_ddr_bready   (3'b0),
 
-   .cl_sh_ddr_arid     (),
-   .cl_sh_ddr_araddr   (),
-   .cl_sh_ddr_arlen    (),
-   .cl_sh_ddr_arvalid  (),
+   .cl_sh_ddr_arid     (tie_zero_id),
+   .cl_sh_ddr_araddr   (tie_zero_addr),
+   .cl_sh_ddr_arlen    (tie_zero_len),
+   .cl_sh_ddr_arvalid  (3'b0),
    .sh_cl_ddr_arready  (),
 
    .sh_cl_ddr_rid      (),
@@ -541,19 +535,19 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    .sh_cl_ddr_rresp    (),
    .sh_cl_ddr_rlast    (),
    .sh_cl_ddr_rvalid   (),
-   .cl_sh_ddr_rready   (),
+   .cl_sh_ddr_rready   (3'b0),
 
    .sh_cl_ddr_is_ready (),
 
-   .sh_ddr_stat_addr   (),
-   .sh_ddr_stat_wr     (), 
-   .sh_ddr_stat_rd     (), 
-   .sh_ddr_stat_wdata  (), 
+   .sh_ddr_stat_addr   (tie_zero_stat_addr),
+   .sh_ddr_stat_wr     (3'b0), 
+   .sh_ddr_stat_rd     (3'b0), 
+   .sh_ddr_stat_wdata  (tie_zero_stat_data),
    .ddr_sh_stat_ack    (),
    .ddr_sh_stat_rdata  (),
    .ddr_sh_stat_int    ()
    );
-   
+
 //-------------------------------------------
 // Tie-Off Global Signals
 //-------------------------------------------
@@ -621,6 +615,31 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    assign cl_sh_ddr_arvalid     =   1'b0;
                                 
    assign cl_sh_ddr_rready      =   1'b0;
+
+  // Tie-off AXI interfaces to sh_ddr module
+  assign tie_zero[2]      = 1'b0;
+  assign tie_zero[1]      = 1'b0;
+  assign tie_zero[0]      = 1'b0;
+                          
+  assign tie_zero_id[2]   = 6'b0;
+  assign tie_zero_id[1]   = 6'b0;
+  assign tie_zero_id[0]   = 6'b0;
+
+  assign tie_zero_addr[2] = 64'b0;
+  assign tie_zero_addr[1] = 64'b0;
+  assign tie_zero_addr[0] = 64'b0;
+
+  assign tie_zero_len[2]  = 8'b0;
+  assign tie_zero_len[1]  = 8'b0;
+  assign tie_zero_len[0]  = 8'b0;
+
+  assign tie_zero_data[2] = 512'b0;
+  assign tie_zero_data[1] = 512'b0;
+  assign tie_zero_data[0] = 512'b0;
+
+  assign tie_zero_strb[2] = 64'b0;
+  assign tie_zero_strb[1] = 64'b0;
+  assign tie_zero_strb[0] = 64'b0;
 
 //------------------------------------
 // Tie-Off HMC Interfaces
