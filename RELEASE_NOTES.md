@@ -75,6 +75,7 @@ This section will include any new features added in the future releases.
 ## Bug Fixes
 
 This section will include any bug fixes in the future releases.
+Please use [HDK support](https://issues.amazon.com/issues/create?assignedFolder=81d5bc1a-748f-45f5-b32e-dfa12a325550&title=HDK+support&description=Blank+template+for+HDK+bugs&descriptionContentType=text%2Fplain) and [SDK support](http://tiny.amazon.com/o9pqvzqs/issuamazissucrea) to file bugs or support requests for HDK and SDK respectively.
 
 ## Known Issues
 
