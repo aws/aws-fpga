@@ -28,11 +28,11 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 By following the next few steps, you would have downloaded the HDK, compiled and built one of the example Custom Logic (CL) designs included in this HDK, and registered it with AWS.  You can run these steps on any EC2 instance, with [C4](https://aws.amazon.com/ec2/instance-types/) and [M4](https://aws.amazon.com/ec2/instance-types/) being the recommended instance types for performance.
 
 #### Prerequisites
-* AWS FPGA HDK and SDK run in Linux environment only
-* If you can not access GitHub repository, please request access permission from your AWS representative
-* The build stage uses Xilinx's Vivado tool set. You should have an installed Vivado and Vivado License Manager (See [Release Notes](./RELEASE.md) for details on the version
-* Calling "aws ec2 createFpgaImage" requires having AWS SDK installed, having an active AWS account, and the server/instance has been configured with your credentials and AWS region via `$ aws configure` command line
-* AWS offers FPGA Developer AMI with all Xilinx's Vivado tools and AWS SDK pre-installed
+* AWS FPGA HDK and SDK run in Linux environment only.
+* If you can not access GitHub repository. Please request access permission from your AWS representative.
+* The build stage uses Xilinx's Vivado tool set. You should have an installed Vivado and Vivado License Manager (See [Release Notes](./RELEASE_NOTES.md) for details on the version).
+* Executing `aws ec2 create-fpga-image` requires having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and AWS region via `aws configure` command line.
+* AWS offers FPGA Developer AMI with all Xilinx's Vivado tools and AWS CLI pre-installed.
 
 ```
 $ git clone https://github.com/aws/aws-fpga   # Step1: Fetch the HDK and SDK code
@@ -42,7 +42,7 @@ $ cd hdk/cl/examples/cl_simple                # Step4: Change directory to one o
 $ export CL_DIR=$(pwd)                        # Step5: Define this directory as the root for the CL design
 $ cd build/scripts                            # Step6: The build directory for synthesizing, placement, timing etc
 $ vivado -mode batch -source create_dcp_from_cl.tcl   # Step7: Should have Xilinx Vivado and Vivado License Manager is running
-$ aws ec2 createFpgaImage TBD TBD TBD         # Step 8: Make sure you have aws account, aws-cli installed, and you ran `aws configure`
+$ aws ec2 create-fpga-image TBD TBD TBD       # Step 8: Make sure you have aws account, aws-cli installed, and you ran `aws configure`
 ```
 
 ## Using an AFI on EC2 F1
