@@ -26,9 +26,7 @@ If you want to write a new test, create a file in `verif/tests` with a filename 
 
 See [Simulating CL Designs](https://github.com/aws/aws-fpga/wiki/Simulating-CL-Designs-%28RTL-Simulation%29)
 
-# Synthesis
+# [Building CL Designs](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/Getting_Started_With_CL_Examples.md#overview-on-process-for-building-a-custom-logic-cl-implementation-for-aws-fpga-instances)
 
-[Building CL Designs](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/Getting_Started_With_CL_Examples.md#overview-on-process-for-building-a-custom-logic-cl-implementation-for-aws-fpga-instances)
-
-# Validation
+# [Validating CL Designs](https://github.com/aws/aws-fpga/wiki/Validating-CL-Designs)
 
