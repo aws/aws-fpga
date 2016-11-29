@@ -22,7 +22,7 @@ To clean up an existing simulation area (before re-running a test, for example) 
 
 The other test, `test_ddr`, is available uses the code in the ./verif/tests/test_ddr.sv file.  The test writes the registers inside the cl_simple design to issue write and read transactions through the DDR0 interface.
 
-If you want to write a new test, create a file in the ./verif/tests directory whose name matches the module name used for the test. Then from the ./verif/scripts directory you should be able to run your test with `make TEST=<module_name>`.
+If you want to write a new test, create a file in `verif/tests` with a filename that matches the module name used for the test. Return to `verif/scripts`, and run your test with `make TEST=<module_name>`.
 
 See [Simulating CL Designs](https://github.com/aws/aws-fpga/wiki/Simulating-CL-Designs-%28RTL-Simulation%29)
 
