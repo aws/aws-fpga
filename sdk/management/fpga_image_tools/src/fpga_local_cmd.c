@@ -93,7 +93,7 @@ cli_show_slot_app_pfs(uint32_t afi_slot)
 	fail_on_quiet(afi_slot >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
 
 	if (f1.show_headers) {
-		printf("Type    VendorId    DeviceId    DBDF\n");         
+		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");         
 	}
 
 	/** Retrieve and display associated application PFs (if any) */
@@ -109,8 +109,8 @@ cli_show_slot_app_pfs(uint32_t afi_slot)
 		 */
 		int ret = cli_get_app_pf_map(afi_slot, i, &app_map);
 		if (ret == 0) {
-			printf(TYPE_FMT "    0x%04x    0x%04x    " PCI_DEV_FMT "\n",
-					"AFIDEVICE", app_map.vendor_id, app_map.device_id, 
+			printf(TYPE_FMT "  %2u       0x%04x      0x%04x      " PCI_DEV_FMT "\n",
+					"AFIDEVICE", afi_slot, app_map.vendor_id, app_map.device_id, 
 					app_map.domain, app_map.bus, app_map.dev, app_map.func);
 			found_app_pf = true;
 		} 
@@ -315,7 +315,7 @@ handle_afi_cmd_error_rsp(const union afi_cmd *cmd,
 			len, tmp_len);
 
 	if (f1.show_headers) {
-		printf("Type    FpgaImageSlot    ErrorName    ErrorCode\n");         
+		printf("Type  FpgaImageSlot    ErrorName    ErrorCode\n");         
 	}
 
 	printf(TYPE_FMT "    %u", "AFI", f1.afi_slot);
@@ -528,17 +528,17 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 			len, tmp_len);
 
 	if (f1.show_headers) {
-		printf("Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode\n");         
+		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode\n");         
 	}
 
 	char *afi_id = (!metrics->ids.afi_id[0]) ? "none" : metrics->ids.afi_id;
-	printf(TYPE_FMT "    %u    %s", "AFI", f1.afi_slot, afi_id);
+	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
 	char *status_name = "internal-error";
 	if ((metrics->status < ACMS_END) && acms_tbl[metrics->status]) {
 		status_name = (void *)acms_tbl[metrics->status]; 
 	}
-	printf("    %s    %u\n", status_name, metrics->status); 
+	printf("  %-8s         %2u\n", status_name, metrics->status); 
 
 	/** Display the application PFs for this slot */
 	int ret = cli_show_slot_app_pfs(f1.afi_slot);
