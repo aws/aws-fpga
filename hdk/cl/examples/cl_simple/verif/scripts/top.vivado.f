@@ -10,7 +10,7 @@
 -sourcelibext .sv
 
 -sourcelibdir ${CL_ROOT}/design
--sourcelibdir ${HDK_DIR}/top/vu9p/design/mgt
+-sourcelibdir ${HDK_DIR}/common/shell_latest/design/mgt
 -sourcelibdir ${HDK_DIR}/top/vu9p/design/sh
 -sourcelibdir ${SH_LIB_DIR}
 
