@@ -22,6 +22,8 @@ endif
 export SCRIPTS_DIR = $(PWD)
 export XILINX_IP = $(HDK_DIR)/top/vu9p/design/v3_venom_cl/v3_venom_cl.srcs/sources_1/ip
 export SH_LIB_DIR = $(HDK_COMMON_DIR)/shell_latest/design/lib
+export SH_INF_DIR = $(HDK_COMMON_DIR)/shell_latest/design/interfaces
+
 export C_INC_DIR  = $(CL_ROOT)/software/include
 export C_SRC_DIR  = $(CL_ROOT)/software/src
 

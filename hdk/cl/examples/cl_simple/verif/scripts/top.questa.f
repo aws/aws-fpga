@@ -11,6 +11,7 @@
 
 +incdir+${CL_ROOT}/design
 +incdir+${SH_LIB_DIR}
++incdir+${SH_INF_DIR}
 
 -y ${CL_ROOT}/design
 -y ${HDK_DIR}/top/vu9p/design/mgt
