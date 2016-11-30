@@ -187,6 +187,15 @@ module tb();
    logic [31:0]         sv_host_memory[*];
    logic                use_c_host_memory = 1'b0;
    
+`ifdef VCS
+initial begin
+   if (!$test$plusargs("NO_WAVES")) begin
+      $vcdpluson;
+      $vcdplusmemon;
+   end
+end
+`endif
+
 `include "sh_dpi_tasks.svh"
    
 sh_bfm sh(

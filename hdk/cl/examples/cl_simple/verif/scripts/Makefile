@@ -34,8 +34,14 @@ ifeq ($(QUESTA), 1)
   export COMPLIB_DIR = $(CL_ROOT)/verif/sim/questa_complib
   include Makefile.questa
 else
+ifeq ($(VCS), 1)
+  export SIMULATOR = vcs
+  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/vcs_complib
+  include Makefile.vcs
+else
   export SIMULATOR = vivado
   include Makefile.vivado
+endif
 endif
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
