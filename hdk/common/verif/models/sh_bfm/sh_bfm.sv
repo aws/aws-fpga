@@ -659,7 +659,7 @@ typedef struct {
                else begin
                   for(int k=0; k<4; k++) begin
                      byte t;
-                     t = tb.host_memory_getc(wr_addr+k);
+                     t = tb.host_memory_getc(wr_addr + k);
                      word = {t, word[31:8]};
                   end                  
                end
@@ -682,7 +682,7 @@ typedef struct {
                      byte t;
                      t = word[7:0];                     
 
-                     tb.host_memory_putc(wr_addr+k, t);
+                     tb.host_memory_putc(wr_addr + k, t);
                      word = word >> 8;
                   end                  
                end
@@ -846,9 +846,6 @@ typedef struct {
             first_rd_beat = 1'b0;
          end
          
-         if (sh_cl_pcim_rvalid[0] & cl_sh_pcim_rready[0])
-           rd_addr+=64;
-
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
 
@@ -858,7 +855,7 @@ typedef struct {
             
             if (!tb.use_c_host_memory)
               // TODO: add code to make sure entry exists before accessing!!!!
-              c = tb.sv_host_memory[rd_addr + (i*4)];
+              c = tb.sv_host_memory[rd_addr];
             else begin
                for(int k=0; k<4; k++) begin
                   byte t;
@@ -867,7 +864,7 @@ typedef struct {
                end
             end
             beat = {c, beat[511:32]};
-            
+            rd_addr +=4;
          end
 
          if (debug) begin
@@ -1159,7 +1156,9 @@ typedef struct {
    endtask // power_down
 
    task map_host_memory(input logic [63:0] addr);
-      $display("mapping host memory to 0x%16x", addr);
+      if (debug) begin
+         $display("[%t] : DEBUG mapping host memory to 0x%16x", $realtime, addr);
+      end
       host_memory_addr = addr;
       tb.use_c_host_memory = 1'b1;      
    endtask // sv_map_host_memory
@@ -1245,7 +1244,9 @@ typedef struct {
            data.last = 0;
       end
 
-      $display("Write data is %x strb is %x len is %x \n", data.data, data.strb, len);
+      if (debug) begin
+         $display("[%t] DEBUG : Write data is %x strb is %x len is %x \n", $realtime, data.data, data.strb, len);
+      end
       
       #20ns sh_cl_wr_data.push_back(data);
       
