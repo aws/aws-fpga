@@ -41,7 +41,7 @@ $ source hdk_setup.sh                         # Step3: Set up the environment va
 $ cd hdk/cl/examples/cl_simple                # Step4: Change directory to one of the provided examples
 $ export CL_DIR=$(pwd)                        # Step5: Define this directory as the root for the CL design
 $ cd build/scripts                            # Step6: The build directory for synthesizing, placement, timing etc
-$ vivado -mode batch -source create_dcp_from_cl.tcl   # Step7: Should have Xilinx Vivado and Vivado License Manager is running
+$ vivado -mode batch -source create_dcp_from_cl.tcl &  # Step7: Should have Xilinx Vivado and Vivado License Manager is running
 $ aws ec2 create-fpga-image TBD TBD TBD       # Step 8: Make sure you have aws account, aws-cli installed, and you ran `aws configure`
 ```
 
