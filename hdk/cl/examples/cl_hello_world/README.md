@@ -38,7 +38,7 @@ NOTE This step requires you have Xilinx Vivado Tools installed as well Vivado Li
 The next script two steps will go through the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA
 
     $ cd $CL_DIR/build/scripts
-    $ vivado -mode batch -source create_dcp_from_cl.tcl 
+    $ vivado -mode batch -source create_dcp_from_cl.tcl &
 
 ## 3. Submit the Design Checkpoint to AWS to register the AFI
 
