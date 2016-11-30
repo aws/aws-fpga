@@ -157,7 +157,7 @@ into the given `fpga-image-slot`.
    * The fpga-image-slot is an index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
 * **Q: What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?**
-   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configureation Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
+   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configuration Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
 
 * **Q: What is a DBDF?**
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
@@ -172,7 +172,7 @@ into the given `fpga-image-slot`.
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
 
 * **Q: How do the AFI Management Tools work?**
-   * Though most customers dont have to understand the internals of the tools, a short overview is provided here:
+   * Though most customers do not need to understand the internals of the tools, a short overview is provided here:
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.

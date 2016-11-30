@@ -15,6 +15,7 @@
 -sourcelibdir ${SH_LIB_DIR}
 
 -include ${CL_ROOT}/verif/sv
+-include ${SH_INF_DIR}
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
