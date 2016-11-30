@@ -147,6 +147,8 @@
    assign CLK_300M_DIMM3_DP =  ddr_clk;
    assign CLK_300M_DIMM3_DN = ~ddr_clk;
 
+`ifndef QUESTA_SIM
+
    //------------------------------------------------------
    // Turn off warnings from DDR models
    //------------------------------------------------------
@@ -227,6 +229,7 @@
       tb.u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
       tb.u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
    end
+`endif
 
   //===========================================================================
   //                         Memory Model instantiation

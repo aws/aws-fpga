@@ -10,12 +10,12 @@ export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
 export C_TEST_NAME = $(CL_ROOT)/software/src/$(C_TEST).sv
 
 export CL_ROOT = $(PWD)/../..
-
+export SIM_ROOT = $(CL_ROOT)/verif/sim
 
 ifeq ($(C_TEST),test_null)
-  export SIM_DIR = $(CL_ROOT)/verif/sim/$(TEST)
+  export SIM_DIR = $(SIM_ROOT)/$(TEST)
 else
-  export SIM_DIR = $(CL_ROOT)/verif/sim/$(C_TEST)
+  export SIM_DIR = $(SIM_ROOT)/$(C_TEST)
 endif
 
 
