@@ -308,23 +308,23 @@ handle_afi_cmd_error_rsp(const union afi_cmd *cmd,
 
 	struct afi_cmd_err_rsp *err_rsp = (void *)rsp->body;
 
-	uint32_t tmp_len = 
+	uint32_t tmp_len =
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
 
 	fail_on_quiet(len != tmp_len, err, "total_rsp_len(%u) != calculated_len(%u)", 
 			len, tmp_len);
 
 	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot    ErrorName    ErrorCode\n");         
+		printf("Type  FpgaImageSlot  ErrorName       ErrorCode\n");
 	}
 
-	printf(TYPE_FMT "    %u", "AFI", f1.afi_slot);
+	printf(TYPE_FMT "  %2u", "AFI", f1.afi_slot);
 
 	char *err_name = "internal-error";
 	if ((err_rsp->error < ACE_END) && ace_tbl[err_rsp->error]) {
 		err_name = (void *)ace_tbl[err_rsp->error];
 	}
-	printf("    %s    %u\n", err_name, err_rsp->error); 
+	printf("       %-13s      %u\n", err_name, err_rsp->error);
 
 	return 0;
 err:
