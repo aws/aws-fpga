@@ -1,6 +1,6 @@
 # Introduction
 
-This simple hello_world example would build a Custom Logic that will enable the instance to "peak" and "pook" registers in the memory space of Custom Logic inside the FPGA.
+This simple hello_world example would build a Custom Logic that will enable the instance to "peek" and "poke" registers in the memory space of Custom Logic inside the FPGA.
 
 The walkthrough is split into two parts: 
 
