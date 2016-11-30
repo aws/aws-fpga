@@ -75,7 +75,7 @@ This section will include any new features added in the future releases.
 ## Bug Fixes
 
 This section will include any bug fixes in the future releases.
-Please use [HDK support]() and [SDK support]() to file bugs or support requests for HDK and SDK respectively.
+Please use [HDK support](https://github.com/aws/aws-fpga/issues/12) and [SDK support](https://github.com/aws/aws-fpga/issues/13) to file bugs or support requests for HDK and SDK respectively.
 
 ## Known Issues
 
