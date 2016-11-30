@@ -31,6 +31,23 @@ module test_ddr();
       base_addr = 64'h0000_0000_0000_0100;
       ddr_common_test(.base_addr(base_addr), .error_count(error_count));
 
+`ifdef VCS
+      // DDR 1
+      $display("[%t] : Programming cl_tst registers for DDR 1", $realtime);
+      base_addr = 64'h0000_0000_0000_0200;
+      ddr_common_test(.base_addr(base_addr), .error_count(error_count));
+
+      // DDR 2
+      $display("[%t] : Programming cl_tst registers for DDR 2", $realtime);
+      base_addr = 64'h0000_0000_0000_0300;
+      ddr_common_test(.base_addr(base_addr), .error_count(error_count));
+
+      // DDR 3
+      $display("[%t] : Programming cl_tst registers for DDR 3", $realtime);
+      base_addr = 64'h0000_0000_0000_0400;
+      ddr_common_test(.base_addr(base_addr), .error_count(error_count));
+`endif
+
       // Power down
       #500ns;
       tb.sh.power_down();
