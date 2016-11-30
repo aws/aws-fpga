@@ -40,15 +40,15 @@ Once you have the AFI Management Tools installed onn your F1 instance, you can d
 
     $ sudo fpga-describe-local-image-slots -H
 
-    Type  FpgaImageSlot VendorId    DeviceId     DBDF
-    AFIDEVICE     0     0x1d0f      0x1042    0000:00:17.0
-    AFIDEVICE     1     0x1d0f      0x1042    0000:00:18.0
-    AFIDEVICE     2     0x1d0f      0x1042    0000:00:19.0
-    AFIDEVICE     3     0x1d0f      0x1042    0000:00:1a.0
-    AFIDEVICE     4     0x1d0f      0x1042    0000:00:1b.0
-    AFIDEVICE     5     0x1d0f      0x1042    0000:00:1c.0
-    AFIDEVICE     6     0x1d0f      0x1042    0000:00:1d.0
-    AFIDEVICE     7     0x1d0f      0x1042    0000:00:1e.0
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    1       0x1d0f      0x1042      0000:00:18.0
+    AFIDEVICE    2       0x1d0f      0x1042      0000:00:19.0
+    AFIDEVICE    3       0x1d0f      0x1042      0000:00:1a.0
+    AFIDEVICE    4       0x1d0f      0x1042      0000:00:1b.0
+    AFIDEVICE    5       0x1d0f      0x1042      0000:00:1c.0
+    AFIDEVICE    6       0x1d0f      0x1042      0000:00:1d.0
+    AFIDEVICE    7       0x1d0f      0x1042      0000:00:1e.0
 
 * The list displayed above is for F1.16xl instance that have 8 FPGAs on slot 0 through 7.
 
@@ -66,10 +66,10 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-    AFI           0             none          cleared         1
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Loading an AFI to a Specific FPGA Slot
 
@@ -83,10 +83,10 @@ Displays the current state for the given FPGA slot number.  The output shows the
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type    FpgaImageSlot    FpgaImageId          StatusName    StatusCode
-    AFI           0       agfi-0123456789abcdefg    loaded          0
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       agfi-0123456789abcdefg  loaded            0
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Clearing the FPGA Image on Specific Slot
 
@@ -100,10 +100,10 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type    FpgaImageSlot    FpgaImageId    StatusName    StatusCode
-    AFI           0              none         cleared         1
-    Type        VendorId    DeviceId      DBDF
-    AFIDEVICE    0x1d0f      0x1042    0000:00:17.0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
+    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
 #### Looking at Metrics
 
@@ -129,7 +129,7 @@ The following FPGA image hardware metrics are provided. PCIe related counters ha
    * The first address that triggered a `pm-range-error-count` event. 
 
 * `pm-len-error-count` (32-bit)
-   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specifications.md))
+   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
    
 * `pm-len-error-addr` (64-bit)
    * The first address that triggered a `pm-len-error-count` event.
@@ -157,7 +157,7 @@ into the given `fpga-image-slot`.
    * The fpga-image-slot is an index that represents a given FPGA within an instance.  Use `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
 
 * **Q: What are the Vendor and Device IDs listed in the `fpga-describe-local-image-slots` and `fpga-describe-local-image` output?**
-   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configureation Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
+   * The VendorId and DeviceId represent the unique identifiers for a PCI device as seen in the PCI Configuration Header Space.  These identifiers are typically used by device drivers to know which devices to attach to.  The identifiers are assigned by PCI-SIG. You can use Amazon's default DeviceId, or use your own during the `CreateFpgaImage` EC2 API.
 
 * **Q: What is a DBDF?**
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
@@ -172,7 +172,7 @@ into the given `fpga-image-slot`.
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
 
 * **Q: How do the AFI Management Tools work?**
-   * Though most customers dont have to understand the internals of the tools, a short overview is provided here:
+   * Though most customers do not need to understand the internals of the tools, a short overview is provided here:
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.

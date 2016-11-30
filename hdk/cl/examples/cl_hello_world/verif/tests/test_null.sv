@@ -22,4 +22,5 @@ module test_null();
       $finish;
    end
 
-endmodule // test_peek_poke
+endmodule // test_null
+
