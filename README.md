@@ -57,6 +57,12 @@ $ cd aws-fpga                                 # Move to the root directory of th
 $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
 ```
 
+**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./sdk/management/fpga_image_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
+
+```
+$ sudo yum groupinstall -y “Development Tools"
+```
+
 ## Need to build a new Custom Logic and register it as AFI?
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 F1 instance.
