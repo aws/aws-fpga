@@ -77,8 +77,7 @@ This section will include any new features added in the future releases.
 
 ## Bug Fixes
 
-This section will include any bug fixes in the future releases.
-Please use [HDK support](https://github.com/aws/aws-fpga/issues/12) and [SDK support](https://github.com/aws/aws-fpga/issues/13) to file bugs or support requests for HDK and SDK respectively.
+This section will include any bug fixes in the future releases. Please use [HDK Bug](https://github.com/aws/aws-fpga/issues/16) and [SDK Bug](https://github.com/aws/aws-fpga/issues/17) to file bugs for HDK and SDK respectively and use [HDK Feature](https://github.com/aws/aws-fpga/issues/18) and [SDK Feature](https://github.com/aws/aws-fpga/issues/19) to file feature requests for HDK and SDK respectively. For any other general purpose requests, please use [F1 FPGA general support](https://github.com/aws/aws-fpga/issues/20).
 
 ## Known Issues
 
