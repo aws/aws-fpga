@@ -60,47 +60,47 @@ parameter DATA_DW = DATA_WIDTH / 32;
 logic wr_inp;
 logic rd_inp;
 logic rd_resp_pend;
-logic[63:0] wr_cyc_count;                       //Total number of cycles
-logic[63:0] wr_loop_count;                      //Total number of times through the RAM
-logic[63:0] rd_cyc_count;                       //Total number of cycles (read requests)
-logic[63:0] rd_loop_count;                      //Total number of times through loop
-logic[63:0] rd_resp_count;                      //Total number of responses
+logic[63:0] wr_cyc_count = 0;                       //Total number of cycles
+logic[63:0] wr_loop_count = 0;                      //Total number of times through the RAM
+logic[63:0] rd_cyc_count = 0;                       //Total number of cycles (read requests)
+logic[63:0] rd_loop_count = 0;                      //Total number of times through loop
+logic[63:0] rd_resp_count = 0;                      //Total number of responses
 
 logic[127:0] wr_cfg_inst_rdata;
 logic[127:0] rd_cfg_inst_rdata;
 
-logic[127:0] wr_cfg_inst_rdata_q;
-logic[127:0] rd_cfg_inst_rdata_q;
+logic[127:0] wr_cfg_inst_rdata_q = 0;
+logic[127:0] rd_cfg_inst_rdata_q = 0;
 
 logic[63:0] rd_cfg_addr_q_ram_data;              //Address
 logic[DATA_WIDTH-1:0] rd_cfg_read_ram_data;     //Read latch data
 logic[DATA_WIDTH-1:0] rd_cfg_exp_ram_data;      //Expect data
 logic rd_cfg_read_ram_ack;
 
-logic[63:0] rd_cfg_addr_q_ram_data_q;              //Address
-logic[DATA_WIDTH-1:0] rd_cfg_read_ram_data_q;    //Read latch data
-logic[DATA_WIDTH-1:0] rd_cfg_exp_ram_data_q;     //Expect data
+logic[63:0] rd_cfg_addr_q_ram_data_q = 0;             //Address
+logic[DATA_WIDTH-1:0] rd_cfg_read_ram_data_q = 0;     //Read latch data
+logic[DATA_WIDTH-1:0] rd_cfg_exp_ram_data_q = 0;      //Expect data
 
 logic[31:0] rd_cfg_error_ram_data;              //Error read latch data
 
-logic[7:0] wr_inst_addr;
+logic[7:0] wr_inst_addr = 0;
 logic[127:0] inst_wr_rdata;
 
-logic[7:0] rd_inst_addr;
+logic[7:0] rd_inst_addr = 0;
 logic[127:0] inst_rd_rdata;
-logic[127:0] inst_rd_rdata_q;
+logic[127:0] inst_rd_rdata_q = 0;
 
-logic[4:0] rd_dat_ram_addr;            //Read return data RAM address
+logic[4:0] rd_dat_ram_addr = 0;            //Read return data RAM address
 logic[4:0] rd_dat_ram_addr_q = 0;
 
-logic[63:0] wr_timer;
-logic[63:0] rd_timer;
+logic[63:0] wr_timer = 0;
+logic[63:0] rd_timer = 0;
 
-logic[31:0] bresp_error_count;               //Bresp error count
-logic[31:0] rresp_error_count;               //Read respone error count
+logic[31:0] bresp_error_count = 0;               //Bresp error count
+logic[31:0] rresp_error_count = 0;               //Read respone error count
 
-logic[31:0] bresp_error_first;               //First errored BRESP user[27:0], 2'b00, bresp[1:0]
-logic[31:0] rresp_error_first;               //First errored RRESP user[27:0], 2'b00, rresp[1:0]
+logic[31:0] bresp_error_first = 0;               //First errored BRESP user[27:0], 2'b00, bresp[1:0]
+logic[31:0] rresp_error_first = 0;               //First errored RRESP user[27:0], 2'b00, rresp[1:0]
 
 logic pre_sync_rst_n;
 logic sync_rst_n;
@@ -243,22 +243,13 @@ always_ff @(negedge rst_n or posedge clk)
 //---------------------------------------------
 // Flop R interface for timing
 //---------------------------------------------
-logic[8:0] rid_q;
-logic[DATA_WIDTH-1:0] rdata_q;
-logic[1:0] rresp_q;
-logic rlast_q;
-logic rvalid_q;
+logic[8:0] rid_q = 0;
+logic[DATA_WIDTH-1:0] rdata_q = 0;
+logic[1:0] rresp_q = 0;
+logic rlast_q = 0;
+logic rvalid_q = 0;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      rid_q <= 0;
-      rdata_q <= 0;
-      rresp_q <= 0;
-      rlast_q <= 0;
-      rvalid_q <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       rid_q <= rid;
       rdata_q <= rdata;
@@ -270,28 +261,28 @@ always_ff @(negedge sync_rst_n or posedge clk)
 //
 //---------------------------------------
 
-logic cfg_rd_cmp_error;
-logic[63:0] cfg_rd_cmp_error_address;
+logic cfg_rd_cmp_error = 0;
+logic[63:0] cfg_rd_cmp_error_address = 0;
 
-logic[15:0] cfg_rd_data_index;
+logic[15:0] cfg_rd_data_index = 0;
 
-logic cfg_cont_mode;
-logic cfg_inc_data_loop_mode;
-logic cfg_prbs_mode;
-logic cfg_rd_compare_en;
-logic cfg_sync_mode;
-logic cfg_iter_mode;
-logic cfg_loop_addr_mode;
-logic cfg_user_mode;
-logic[5:0] cfg_wr_loop_addr_shift;
-logic[5:0] cfg_rd_loop_addr_shift;
+logic cfg_cont_mode = 0;
+logic cfg_inc_data_loop_mode = 0;
+logic cfg_prbs_mode = 0;
+logic cfg_rd_compare_en = 0;
+logic cfg_sync_mode = 0;
+logic cfg_iter_mode = 0;
+logic cfg_loop_addr_mode = 0;
+logic cfg_user_mode = 0;
+logic[5:0] cfg_wr_loop_addr_shift = 0;
+logic[5:0] cfg_rd_loop_addr_shift = 0;
 logic cfg_inc_id_mode;
-logic cfg_const_data_mode;
+logic cfg_const_data_mode = 0;
 
-logic[15:0] cfg_read_start;
-logic[15:0] cfg_max_write;
+logic[15:0] cfg_read_start = 0;
+logic[15:0] cfg_max_write = 0;
 
-logic[8:0] cfg_max_read_req;        //Number of tags allowed (0-based)
+logic[8:0] cfg_max_read_req = 0;        //Number of tags allowed (0-based)
 
 logic cfg_wr_go;
 logic cfg_rd_go;
@@ -303,15 +294,15 @@ logic cfg_clr_error;
 logic cfg_write_reset;
 logic cfg_read_reset;
 
-logic[63:0] cfg_write_address;
-logic[31:0] cfg_write_data;
+logic[63:0] cfg_write_address = 0;
+logic[31:0] cfg_write_data = 0;
 logic[7:0] cfg_write_length;
 logic[7:0] cfg_write_last_length;
 logic[15:0] cfg_write_user;
 logic cfg_write_inst_ram_wr;
 
-logic[63:0] cfg_read_address;
-logic[31:0] cfg_read_data;
+logic[63:0] cfg_read_address = 0;
+logic[31:0] cfg_read_data = 0;
 logic[7:0] cfg_read_length;
 logic[7:0] cfg_read_last_length;
 logic[15:0] cfg_read_user;
@@ -319,33 +310,31 @@ logic cfg_read_inst_ram_wr;
 
 logic[4:0] cfg_rd_cmp_error_data_index;
 
-logic[7:0] cfg_wr_inst_index;
-logic[7:0] cfg_rd_inst_index;
+logic[7:0] cfg_wr_inst_index = 0;
+logic[7:0] cfg_rd_inst_index = 0;
 
 logic[15:0] cfg_wr_num_inst;
 logic[15:0] cfg_rd_num_inst;
 
-logic[63:0] cfg_wr_loop_iter;
-logic[63:0] cfg_rd_loop_iter;
+logic[63:0] cfg_wr_loop_iter = 0;
+logic[63:0] cfg_rd_loop_iter = 0;
 
 logic cfg_wr_stretch;
 logic cfg_rd_stretch;
 
-logic[7:0] cfg_addr_q;        //Only care about lower 8-bits of address, upper bits are decoded somewhere else
-logic[31:0] cfg_wdata_q;
+logic[7:0] cfg_addr_q = 0;        //Only care about lower 8-bits of address, upper bits are decoded somewhere else
+logic[31:0] cfg_wdata_q = 0;
 
 logic cfg_ram_access;
 
 //Commands are single cycle pulse, stretch here
-always_ff @(negedge sync_rst_n or posedge clk)
+always @(negedge sync_rst_n or posedge clk)
    if (!sync_rst_n)
    begin
       cfg_wr_stretch <= 0;
       cfg_rd_stretch <= 0;
-      cfg_addr_q <= 0;
-      cfg_wdata_q <= 0; 
    end
-   else
+   else 
    begin
       cfg_wr_stretch <= cfg_wr || (cfg_wr_stretch && !tst_cfg_ack);
       cfg_rd_stretch <= cfg_rd || (cfg_rd_stretch && !tst_cfg_ack);
@@ -357,41 +346,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
 
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      cfg_cont_mode <= 0;
-      cfg_inc_data_loop_mode <= 0;
-      cfg_prbs_mode <= 0;
-      cfg_rd_compare_en <= 0;
-      cfg_sync_mode <= 0;
-      cfg_iter_mode <= 0;
-      cfg_loop_addr_mode <= 0;
-      cfg_user_mode <= 0;
-      cfg_wr_loop_addr_shift <= 0;
-      cfg_rd_loop_addr_shift <= 0;
-      //cfg_inc_id_mode <= 0;
-      cfg_const_data_mode <= 0;
-
-      cfg_read_start <= 0;
-      cfg_max_write <= 0;
-
-      cfg_rd_num_inst <= 0;
-      cfg_wr_num_inst <= 0;
-
-      cfg_max_read_req <= 15;
-
-      cfg_write_address <= 0;
-      cfg_write_data <= 0;
-      cfg_read_address <= 0;
-      cfg_read_data <= 0;
-      cfg_rd_data_index <= 0;
-
-      cfg_wr_loop_iter <= 0;
-      cfg_rd_loop_iter <= 0;
-   end
-
-   else if (cfg_wr_stretch)
+always @(posedge clk)
+   if (cfg_wr_stretch)
    begin
       if (cfg_addr_q==8'h0)
       begin
@@ -464,13 +420,7 @@ assign cfg_read_inst_ram_wr = (cfg_wr_stretch && (cfg_addr_q==8'h4c));
 assign cfg_clr_error = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'hb0) && cfg_wdata_q[0]);
 
 //Instruction RAM indexes
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      cfg_wr_inst_index <= 0;
-      cfg_rd_inst_index <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       cfg_wr_inst_index <=    (cfg_wr_stretch && (cfg_addr_q==8'h1c))?     cfg_wdata_q:
                               (cfg_write_inst_ram_wr && tst_cfg_ack)?      cfg_wr_inst_index + 1:
@@ -601,11 +551,8 @@ bram_2rw #(.WIDTH(128), .ADDR_WIDTH(8), .DEPTH(256)) READ_INST_RAM (
    );
 
 //For timing flop the inst_rd_data before use it
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      inst_rd_rdata_q <= 0;
-   else
-      inst_rd_rdata_q <= inst_rd_rdata;
+always @(posedge clk)
+   inst_rd_rdata_q <= inst_rd_rdata;
 
 
 
@@ -613,7 +560,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
 // Write state machine      
 //--------------------------------
 
-logic[7:0] wr_running_length;
+logic[7:0] wr_running_length = 0;
 logic wr_dat_end;                   //End of data for this instruction (single transfer)
 logic wr_inst_done;                 //Done with instructions (end and not continuous mode)
 
@@ -622,7 +569,7 @@ logic[(DATA_WIDTH/8)-1:0] wstrb_nxt;
 
 logic wr_stop_pend;
 
-logic[7:0] wr_last_adj;
+logic[7:0] wr_last_adj = 0;
 
 always_comb
 begin
@@ -668,10 +615,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
       wr_state <= wr_state_nxt;
 
 //RAM address
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      wr_inst_addr <= 0;
-   else if (wr_state==WR_IDLE)
+always @( posedge clk)
+   if (wr_state==WR_IDLE)
       wr_inst_addr <= 0;
    else if ((wr_state==WR_ADDR) && (wr_state_nxt!=WR_ADDR))
       wr_inst_addr <= (wr_inst_addr==cfg_wr_num_inst)? 0: wr_inst_addr + 1;
@@ -679,13 +624,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
 
 
 //Loop count
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      wr_cyc_count <= 0;
-      wr_loop_count <= 0;
-   end
-   else if (cfg_wr_go)
+always @(posedge clk)
+   if (cfg_wr_go)
    begin
       wr_cyc_count <= 0;
       wr_loop_count <= 0;
@@ -698,10 +638,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
 
 //Timer
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      wr_timer <= 0;
-   else if (cfg_wr_go)
+always @(posedge clk)
+   if (cfg_wr_go)
       wr_timer <= 0;
    else if (wr_inp)
       wr_timer <= wr_timer + 1;
@@ -767,10 +705,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
 
 //Latch last length
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      wr_last_adj <= 0;
-   else if (wr_state==WR_ADDR)
+always @(posedge clk)
+   if (wr_state==WR_ADDR)
       wr_last_adj = inst_wr_rdata[111:104];
 
 always_ff @(negedge sync_rst_n or posedge clk)
@@ -783,19 +719,14 @@ always_ff @(negedge sync_rst_n or posedge clk)
 //Data
 assign wr_dat_end = (wr_running_length==0);
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      wr_running_length <= 0;
-   else if (wr_state==WR_ADDR)
+always @(posedge clk)
+   if (wr_state==WR_ADDR)
       wr_running_length <= inst_wr_rdata[103:96];
    else if (wvalid && wready)
       wr_running_length <= wr_running_length - 1;
 
-logic[DATA_WIDTH-1:0] first_wdata;         //Pre-compute this for timing
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      first_wdata <= 0;
-   else
+logic[DATA_WIDTH-1:0] first_wdata = 0;         //Pre-compute this for timing
+always @(posedge clk)
    begin
       for (int i=0; i<DATA_DW; i++)
          //FIXME -- Do we want 32-bits here for loopcount, try 8 to help timing         
@@ -908,9 +839,9 @@ logic[8:0] rd_md_ram_wr_addr_pre;
 logic[(DATA_WIDTH+8)-1:0] rd_md_ram_wr_data_pre;
 logic rd_md_ram_wr_pre;
 
-logic[8:0] rd_md_ram_wr_addr;
-logic[(DATA_WIDTH+8)-1:0] rd_md_ram_wr_data;
-logic rd_md_ram_wr;
+logic[8:0] rd_md_ram_wr_addr = 0;
+logic[(DATA_WIDTH+8)-1:0] rd_md_ram_wr_data = 0;
+logic rd_md_ram_wr = 0;
 
 logic[8:0] rd_md_ram_rd_addr;
 logic[(DATA_WIDTH+8)-1:0] rd_md_ram_rd_data_ram;
@@ -1043,21 +974,14 @@ wire rd_wr_holdoff = cfg_sync_mode && wr_inp && rd_cyc_holdoff;
 //Increment the read instruction 
 assign rd_tag_pop = rd_inp && rd_tag_some_avail && !rd_fifo_full && !rd_wr_holdoff;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      rd_inst_addr <= 0;
-   else if (!rd_inp)
+always @(posedge clk)
+   if (!rd_inp)
       rd_inst_addr <= 0;
    else if (rd_tag_pop)
       rd_inst_addr <= (rd_inst_addr==cfg_rd_num_inst)? 0: rd_inst_addr + 1;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      rd_cyc_count <= 0;
-      rd_loop_count <= 0;
-   end
-   else if (cfg_rd_go)
+always @(posedge clk)
+   if (cfg_rd_go)
    begin
       rd_cyc_count <= 0;
       rd_loop_count <= 0;
@@ -1070,20 +994,14 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
 
 //Timer
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      rd_timer  <= 0;
-   else if (cfg_rd_go)
+always @(posedge clk)
+   if (cfg_rd_go)
       rd_timer <= 0;
    else if (rd_inp || rd_resp_pend)
       rd_timer <= rd_timer + 1;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      rd_resp_count <= 0;
-   end
-   else if (cfg_rd_go)
+always @( posedge clk)
+   if (cfg_rd_go)
    begin
       rd_resp_count <= 0;
    end
@@ -1163,14 +1081,7 @@ assign rd_md_ram_wr_addr_pre = rid_q;
 wire[7:0] rd_md_running_length = rd_trk_rd.running_length + 1;
 assign rd_md_ram_wr_data_pre = {rd_md_running_length, rd_data_nxt};
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      rd_md_ram_wr_addr <= 0;
-      rd_md_ram_wr <= 0;
-      rd_md_ram_wr_data <= 0;
-   end   
-   else
+always @(posedge clk)
    begin
       rd_md_ram_wr_addr <= rd_md_ram_wr_addr_pre;
       rd_md_ram_wr <= rd_md_ram_wr_pre;
@@ -1240,16 +1151,10 @@ begin
       rd_data_nxt[32*i+:32] = (cfg_const_data_mode)? rd_data_cmp[32*i+:32]: rd_data_cmp[32*i+:32] + DATA_DW;
 end
 
-logic[DATA_WIDTH-1:0] rd_data_cmp_q;
-logic[DATA_WIDTH-1:0] rd_data_mask_q;
+logic[DATA_WIDTH-1:0] rd_data_cmp_q = 0;
+logic[DATA_WIDTH-1:0] rd_data_mask_q = 0;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      rd_data_cmp_q <= 0;
-      rd_data_mask_q <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       rd_data_cmp_q <= rd_data_cmp;
       rd_data_mask_q <= rd_data_mask;
@@ -1271,14 +1176,8 @@ begin
 end
 
 //Do the read compare 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      cfg_rd_cmp_error <= 0;
-      cfg_rd_cmp_error_address <= 0;
-      cfg_rd_cmp_error_data_index <= 0;
-   end
-   else if (cfg_clr_error)
+always @(posedge clk)
+   if (cfg_clr_error)
    begin
       cfg_rd_cmp_error <= 0;
       cfg_rd_cmp_error_address <= 0;
@@ -1385,10 +1284,8 @@ assign rready = 1;
 
 assign rd_dat_ram_wr = rvalid_q && !cfg_rd_cmp_error;      //Always write the RAM && (rd_trk[rid_q].last_inst || (cfg_rd_compare_en && !cfg_rd_cmp_error));
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      rd_dat_ram_addr <= 0;
-   else if (rd_dat_ram_wr)
+always @(posedge clk)
+   if (rd_dat_ram_wr)
       rd_dat_ram_addr <= rd_dat_ram_addr + 1;
 
 
@@ -1451,16 +1348,7 @@ assign rd_cfg_read_ram_ack = 1;
 assign rd_resp_pend = rd_tag_avail!={NUM_RD_TAG{1'b1}};
 
 //Flop all RAM read data
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      wr_cfg_inst_rdata_q <= 0;
-      rd_cfg_inst_rdata_q <= 0;
-      rd_cfg_addr_q_ram_data_q <= 0;
-      rd_cfg_read_ram_data_q <= 0;
-      rd_cfg_exp_ram_data_q <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       wr_cfg_inst_rdata_q <= wr_cfg_inst_rdata;
       rd_cfg_inst_rdata_q <= rd_cfg_inst_rdata;
@@ -1476,15 +1364,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
 
 //BRESP, RRESP error handling
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      bresp_error_count <= 0;
-      rresp_error_count <= 0;
-      bresp_error_first <= 0;
-      rresp_error_first <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       //FIXME -- Add in HMC stuff later
       bresp_error_count <= (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'hd0))?  0:

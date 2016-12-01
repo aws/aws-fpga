@@ -871,14 +871,6 @@ module fifo_generator_vlog_beh
     wire [C_WR_DATA_COUNT_WIDTH-1:0]  wr_data_count_in;
     wire                              wr_rst_int;
     wire                              rd_rst_int;
-    wire                              wr_rst_busy_o;
-    wire                              wr_rst_busy_ntve;
-    wire                              wr_rst_busy_axis;
-    wire                              wr_rst_busy_wach;
-    wire                              wr_rst_busy_wdch;
-    wire                              wr_rst_busy_wrch;
-    wire                              wr_rst_busy_rach;
-    wire                              wr_rst_busy_rdch;
 
 
 
@@ -926,8 +918,7 @@ module fifo_generator_vlog_beh
     assign prog_empty             = PROG_EMPTY;
     assign sbiterr                = SBITERR;
     assign dbiterr                = DBITERR;
-//    assign wr_rst_busy            = WR_RST_BUSY | wr_rst_busy_o;
-    assign wr_rst_busy            = wr_rst_busy_o;
+    assign wr_rst_busy            = WR_RST_BUSY;
     assign rd_rst_busy            = RD_RST_BUSY;
     assign M_ACLK                 = m_aclk;
     assign S_ACLK                 = s_aclk;
@@ -1245,8 +1236,7 @@ module fifo_generator_vlog_beh
         .PROG_EMPTY               (PROG_EMPTY),
         .SBITERR                  (SBITERR),
         .DBITERR                  (DBITERR),
-        .wr_rst_busy_o            (wr_rst_busy_o),
-        .wr_rst_busy              (wr_rst_busy_i),
+        .wr_rst_busy              (wr_rst_busy),
         .rd_rst_busy              (rd_rst_busy),
         .wr_rst_i_out             (wr_rst_int),
         .rd_rst_i_out             (rd_rst_int)
@@ -1432,20 +1422,17 @@ reg r_inv_pad_0 = 0;
                C_WDCH_TYPE == 1 || C_WRCH_TYPE == 1 || C_RACH_TYPE == 1 || C_RDCH_TYPE == 1)) begin : gaxi_rs_rst
       reg                           rst_d1 = 0        ;
       reg                           rst_d2 = 0        ;
-      reg [3:0]                    axi_rst = 4'h0     ;
       always @ (posedge inverted_reset or posedge S_ACLK) begin
         if (inverted_reset) begin
           rst_d1         <= 1'b1;
           rst_d2         <= 1'b1;
-          axi_rst        <= 4'hf;
         end else begin
           rst_d1         <= #`TCQ 1'b0;
           rst_d2         <= #`TCQ rst_d1;
-          axi_rst        <= #`TCQ {axi_rst[2:0],1'b0};
         end
       end
 
-      assign axi_rs_rst = axi_rst[3];//rst_d2;
+      assign axi_rs_rst = rst_d2;
   end endgenerate // gaxi_rs_rst
 
   generate if (IS_AXI_STREAMING == 1 && C_AXIS_TYPE == 0) begin : axi_streaming
@@ -3472,7 +3459,6 @@ module fifo_generator_v13_1_2_CONV_VER
    output                              PROG_EMPTY,
    output                              SBITERR,
    output                              DBITERR,
-   output                              wr_rst_busy_o,
    output                              wr_rst_busy,
    output                              rd_rst_busy,
    output                              wr_rst_i_out,
@@ -3704,7 +3690,6 @@ module fifo_generator_v13_1_2_CONV_VER
   wire                               srst_comb;
   reg                                rst_full_gen_i = 0;
   reg                                rst_full_ff_i = 0;
-  reg  [2:0]                         sckt_ff0_bsy_o_i = {3{1'b0}};
                                      
   wire                               RD_CLK_P0_IN;
   wire                               RST_P0_IN;
@@ -3769,12 +3754,7 @@ module fifo_generator_v13_1_2_CONV_VER
                            
   assign wr_rst_i_out = wr_rst_i;
   assign rd_rst_i_out = rd_rst_i;
-  assign wr_rst_busy_o = wr_rst_busy | rst_full_gen_i | sckt_ff0_bsy_o_i[2];
-  generate if (C_FULL_FLAGS_RST_VAL == 0 && C_EN_SAFETY_CKT == 1) begin : gsckt_bsy_o
-    wire clk_i = C_COMMON_CLOCK ? CLK : WR_CLK;
-    always @ (posedge clk_i)
-      sckt_ff0_bsy_o_i <= {sckt_ff0_bsy_o_i[1:0],wr_rst_busy}; 
-  end endgenerate 
+   
 // Choose the behavioral model to instantiate based on the C_VERILOG_IMPL
 // parameter (1=Independent Clocks, 0=Common Clock)
 
@@ -4690,13 +4670,12 @@ endgenerate
   wire clk_2_sync_safety = (C_COMMON_CLOCK == 1) ? CLK : RD_CLK;
   localparam RST_SYNC_STAGES = (C_EN_SAFETY_CKT == 0) ? C_SYNCHRONIZER_STAGE :
                                (C_COMMON_CLOCK == 1) ? 3 : C_SYNCHRONIZER_STAGE+2;
-  reg  [RST_SYNC_STAGES-1:0] wrst_reg    = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] rrst_reg    = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] arst_sync_q = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] wrst_q      = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] rrst_q      = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] rrst_wr     = {RST_SYNC_STAGES{1'b0}};
-  reg  [RST_SYNC_STAGES-1:0] wrst_ext    = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] wrst_reg = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] rrst_reg = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] wrst_q   = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] rrst_q   = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] rrst_wr  = {RST_SYNC_STAGES{1'b0}};
+  reg  [RST_SYNC_STAGES-1:0] wrst_ext = {RST_SYNC_STAGES{1'b0}};
   reg  [1:0] wrst_cc  = {2{1'b0}};
   reg  [1:0] rrst_cc  = {2{1'b0}};
 
@@ -4773,9 +4752,9 @@ endgenerate
         wire fifo_rst_active;
         assign wr_rst_comb      = !wr_rst_asreg_d2 && wr_rst_asreg;
         assign rd_rst_comb      = C_EN_SAFETY_CKT ? (!rd_rst_asreg_d2 && rd_rst_asreg) || rd_rst_active : !rd_rst_asreg_d2 && rd_rst_asreg;
-        assign rst_2_sync       = rst_delayed_ic_w_i;
-        assign arst_sync_rst    = arst_sync_q[RST_SYNC_STAGES-1];
-        assign wr_rst_busy      = C_EN_SAFETY_CKT ? |arst_sync_q[RST_SYNC_STAGES-1:1] | fifo_rst_active : 1'b0;
+        assign rst_2_sync       = rst_delayed;
+        assign arst_sync_rst    = wrst_reg[RST_SYNC_STAGES-1];
+        assign wr_rst_busy      = C_EN_SAFETY_CKT ? wrst_reg[1] | arst_sync_rst | fifo_rst_active : 1'b0;
         assign rd_rst_busy      = C_EN_SAFETY_CKT ? safety_ckt_rd_rst : 1'b0;
         assign fifo_rst_done    = fifo_wrst_done & fifo_rrst_done;
         assign fifo_rst_active  = sckt_wrst_i | wrst_ext[RST_SYNC_STAGES-1] | rrst_wr[RST_SYNC_STAGES-1];
@@ -4847,10 +4826,9 @@ endgenerate
         end   
 
         always @(posedge WR_CLK) begin
-          wrst_reg    <= #`TCQ {wrst_reg[RST_SYNC_STAGES-2:0],wr_rst_asreg};
-          wrst_ext    <= #`TCQ {wrst_ext[RST_SYNC_STAGES-2:0],sckt_wrst_i};
-          rrst_wr     <= #`TCQ {rrst_wr[RST_SYNC_STAGES-2:0],safety_ckt_rd_rst};
-          arst_sync_q <= #`TCQ {arst_sync_q[RST_SYNC_STAGES-2:0],rst_delayed_ic_w_i};
+          wrst_reg <= #`TCQ {wrst_reg[RST_SYNC_STAGES-2:0],rst_delayed_ic_w_i};
+          wrst_ext <= #`TCQ {wrst_ext[RST_SYNC_STAGES-2:0],sckt_wrst_i};
+          rrst_wr  <= #`TCQ {rrst_wr[RST_SYNC_STAGES-2:0],safety_ckt_rd_rst};
         end
 
         assign wr_rst_asreg_d1 = wrst_reg[RST_SYNC_STAGES-2];
@@ -4904,11 +4882,10 @@ endgenerate
       // end : g7s_ic_rst
       end else if (C_HAS_RST == 1 && C_COMMON_CLOCK == 1) begin : g7s_cc_rst
         reg  [1:0] rst_delayed_cc   = 2'h0;
-        wire rst_delayed_cc_i;
         assign rst_comb    = !rst_asreg_d2 && rst_asreg;     
-        assign rst_2_sync  = rst_delayed_cc_i;
-        assign wr_rst_busy = C_EN_SAFETY_CKT ? |arst_sync_q[RST_SYNC_STAGES-1:1] | wrst_cc[1] : 1'b0;
-        assign rd_rst_busy = C_EN_SAFETY_CKT ? arst_sync_q[1] | arst_sync_q[RST_SYNC_STAGES-1] | wrst_cc[1] : 1'b0;
+        assign rst_2_sync  = rst_delayed;
+        assign wr_rst_busy = C_EN_SAFETY_CKT ? wrst_reg[1] | wrst_reg[RST_SYNC_STAGES-1] | wrst_cc[1] : 1'b0;
+        assign rd_rst_busy = C_EN_SAFETY_CKT ? wrst_reg[1] | wrst_reg[RST_SYNC_STAGES-1] | wrst_cc[1] : 1'b0;
  
         always @(posedge CLK or posedge rst_delayed) begin
           if (rst_delayed == 1'b1)
@@ -4931,16 +4908,15 @@ endgenerate
         end   
         
         always @(posedge CLK) begin
-          wrst_reg <= #`TCQ {wrst_reg[RST_SYNC_STAGES-2:0],rst_asreg};
-          wrst_cc  <= #`TCQ {wrst_cc[0],arst_sync_q[RST_SYNC_STAGES-1]};
+          wrst_reg <= #`TCQ {wrst_reg[RST_SYNC_STAGES-2:0],rst_delayed_cc_i};
+          wrst_cc  <= #`TCQ {wrst_cc[0],wrst_reg[RST_SYNC_STAGES-1]};
           sckt_wr_rst_i_q     <= #`TCQ wr_rst_busy;
           safety_ckt_wr_rst_i <= #`TCQ wrst_cc[1] | wr_rst_busy | sckt_wr_rst_i_q;
-          arst_sync_q <= #`TCQ {arst_sync_q[RST_SYNC_STAGES-2:0],rst_delayed_cc_i};
         end
         assign rst_asreg_d1 = wrst_reg[RST_SYNC_STAGES-2];
         assign rst_asreg_d2 = C_EN_SAFETY_CKT ? wrst_reg[RST_SYNC_STAGES-1] : wrst_reg[1];
         assign safety_ckt_wr_rst = C_EN_SAFETY_CKT ? safety_ckt_wr_rst_i : 1'b0;
-        assign safety_ckt_rd_rst = C_EN_SAFETY_CKT ? safety_ckt_wr_rst_i : 1'b0;
+        assign safety_ckt_rd_rst = C_EN_SAFETY_CKT ? wrst_cc[1] : 1'b0;
 
         always @(posedge CLK or posedge rst_comb) begin
           if (rst_comb == 1'b1) begin
@@ -4957,7 +4933,7 @@ endgenerate
         always @* rst_full_ff_i  <= rst_reg;
         always @* rst_full_gen_i <= C_FULL_FLAGS_RST_VAL == 1 ? rst_active_i : 0;
         assign safety_ckt_wr_rst = C_EN_SAFETY_CKT ? rst_reg | wr_rst_busy | sckt_wr_rst_i_q : 1'b0;
-        assign safety_ckt_rd_rst = C_EN_SAFETY_CKT ? rst_reg | wr_rst_busy | sckt_wr_rst_i_q : 1'b0;
+        assign safety_ckt_rd_rst = C_EN_SAFETY_CKT ? rst_reg : 1'b0;
 
         always @(posedge CLK) begin
           rst_delayed_d1 <= #`TCQ srst_delayed;
@@ -5022,7 +4998,7 @@ endgenerate
       end
 
       always @* rst_full_ff_i  <= (C_HAS_SRST == 0) ? rst_d2 : 1'b0 ;
-      always @* rst_full_gen_i <= rst_d3;
+      always @* rst_full_gen_i <= rst_d4;
 
     end else if ((C_HAS_RST == 1 || C_HAS_SRST == 1 || C_ENABLE_RST_SYNC == 0) && C_FULL_FLAGS_RST_VAL == 0) begin : gnrst_full
       always @* rst_full_ff_i  <= (C_COMMON_CLOCK == 0) ? wr_rst_i : rst_i;
@@ -5795,8 +5771,6 @@ module fifo_generator_v13_1_2_bhv_ver_as
       dout_reset_val     = hexstr_conv(C_DOUT_RST_VAL);
       ideal_dout         = dout_reset_val;
       err_type           = 0;
-      err_type_d1        = 0;
-      err_type_both      = 0;
       ideal_dout_d1      = dout_reset_val;
       ideal_wr_ack       = 1'b0;
       ideal_valid        = 1'b0;
@@ -5914,42 +5888,49 @@ module fifo_generator_v13_1_2_bhv_ver_as
          reg [1:0] rst_delayed_sft3              =1;
          reg [1:0] rst_delayed_sft4              =1;
 
-        always@(posedge RD_CLK) begin
+       //  if (C_HAS_VALID == 1) begin
+       //       assign valid_out = valid_d2;
+       //  end
+             
+        always@(posedge RD_CLK)
+          begin
           rst_delayed_sft1 <= #`TCQ rd_rst_i;
           rst_delayed_sft2 <= #`TCQ rst_delayed_sft1;
           rst_delayed_sft3 <= #`TCQ rst_delayed_sft2; 
           rst_delayed_sft4 <= #`TCQ rst_delayed_sft3;
-        end
-        always@(posedge rst_delayed_sft4 or posedge rd_rst_i or posedge RD_CLK) begin
+          end
+        always@(posedge rst_delayed_sft4 or posedge rd_rst_i or posedge RD_CLK)
+          begin
           if( rst_delayed_sft4 == 1'b1 || rd_rst_i == 1'b1) 
               ram_rd_en_d1 <= #`TCQ 1'b0;
-          else begin
+          else 
                ram_rd_en_d1 <= #`TCQ ram_rd_en;
                fab_rd_en_d1 <= #`TCQ ram_rd_en_d1;
           end
-        end
           
-        always@(posedge rst_delayed_sft2 or posedge RD_CLK) begin
+        always@(posedge rst_delayed_sft2 or posedge RD_CLK) 
+           begin
            if (rst_delayed_sft2 == 1'b1) begin
               if (C_USE_DOUT_RST == 1'b1) begin
                    @(posedge RD_CLK)
                    ideal_dout_d1 <= #`TCQ dout_reset_val;
                    ideal_dout_both <= #`TCQ dout_reset_val;
               end
-           end else begin
-             if (ram_rd_en_d1) begin
-               ideal_dout_both   <= #`TCQ ideal_dout;
-               err_type_both[0] <= #`TCQ err_type[0];
-               err_type_both[1] <= #`TCQ err_type[1];
-             end
-              
-             if (fab_rd_en_d1) begin
-               ideal_dout_d1   <= #`TCQ ideal_dout_both;
-               err_type_d1[0] <= #`TCQ err_type_both[0];
-               err_type_d1[1] <= #`TCQ err_type_both[1];
-             end
-           end 
-         end      
+           end
+           else begin
+                   if (ram_rd_en_d1) begin
+                   ideal_dout_both   <= #`TCQ ideal_dout;
+                   err_type_both[0] <= #`TCQ err_type[0];
+                   err_type_both[1] <= #`TCQ err_type[1];
+                   end
+                    
+                   if (fab_rd_en_d1) begin
+                   ideal_dout_d1   <= #`TCQ ideal_dout_both;
+                   err_type_d1[0] <= #`TCQ err_type_both[0];
+                   err_type_d1[1] <= #`TCQ err_type_both[1];
+                   end
+             end 
+           end      
       end 
       endgenerate    
  
@@ -6193,7 +6174,7 @@ endgenerate
     *embedded/fabric reg with no safety ckt
     **************************************************************************/
   generate 
-       if (C_USE_EMBEDDED_REG < 3) begin
+       if (C_EN_SAFETY_CKT==0 && C_USE_EMBEDDED_REG < 3) begin
   always @(posedge RD_CLK or posedge rd_rst_i) begin
     if (rd_rst_i == 1'b1) begin
        if (C_USE_DOUT_RST == 1'b1) begin
@@ -6217,32 +6198,29 @@ endgenerate
     **************************************************************************/
 
 generate 
-  if (C_USE_EMBEDDED_REG == 3) begin
-    always @(posedge RD_CLK or posedge rd_rst_i) begin
-      if (rd_rst_i == 1'b1) begin
-        if (C_USE_DOUT_RST == 1'b1) begin
-           @(posedge RD_CLK)
-             ideal_dout    <= #`TCQ dout_reset_val;
-             ideal_dout_d1   <= #`TCQ dout_reset_val;
-             ideal_dout_both   <= #`TCQ dout_reset_val;
-        end
-        // Reset err_type only if ECC is not selected
-        if (C_USE_ECC == 0) begin
-          err_type_d1     <= #`TCQ 0;
-          err_type_both   <= #`TCQ 0;
-        end
-      end else begin
-         if (ram_rd_en_d1) begin
-           ideal_dout_both   <= #`TCQ ideal_dout;
-           err_type_both     <= #`TCQ err_type;
-         end    
-         if (fab_rd_en_d1) begin
-           ideal_dout_d1   <= #`TCQ ideal_dout_both;
-           err_type_d1     <= #`TCQ err_type_both;
-         end
+       if (C_EN_SAFETY_CKT==0 && C_USE_EMBEDDED_REG == 3) begin
+  always @(posedge RD_CLK or posedge rd_rst_i) begin
+    if (rd_rst_i == 1'b1) begin
+      if (C_USE_DOUT_RST == 1'b1) begin
+         @(posedge RD_CLK)
+           ideal_dout    <= #`TCQ dout_reset_val;
+           ideal_dout_d1   <= #`TCQ dout_reset_val;
+           ideal_dout_both   <= #`TCQ dout_reset_val;
       end
-    end  
+      // Reset err_type only if ECC is not selected
+      if (C_USE_ECC == 0)
+        err_type_d1     <= #`TCQ 0;
+     end else if (ram_rd_en_d1) begin
+      ideal_dout_both   <= #`TCQ ideal_dout;
+      err_type_both     <= #`TCQ err_type;
+          end    
+          if (fab_rd_en_d1) begin
+               ideal_dout_d1   <= #`TCQ ideal_dout_both;
+                err_type_d1     <= #`TCQ err_type_both;
+          end
   end  
+   
+end  
 endgenerate 
 
   
@@ -6661,6 +6639,22 @@ endgenerate
                                 C_PROG_EMPTY_THRESH_NEGATE_VAL - 2'h2 : C_PROG_EMPTY_THRESH_NEGATE_VAL;
    end endgenerate // single_multiple_pe_thr_const
 
+  // // block memory has a synchronous reset
+  // always @(posedge RD_CLK) begin : gen_fifo_blkmemdout
+  //    // make it consistent with the core.
+  //    if (rd_rst_i) begin
+  //       // Reset err_type only if ECC is not selected
+  //       if (C_USE_ECC == 0 && C_MEMORY_TYPE < 2)
+  //          err_type <= #`TCQ 0;
+  // 
+  //       // BRAM resets synchronously
+  //       if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE < 2) begin
+  //          //ideal_dout    <= #`TCQ dout_reset_val;
+  //          //ideal_dout_d1 <= #`TCQ dout_reset_val;
+  //       end
+  //    end
+  // end //always
+
    always @(posedge RD_CLK or posedge rd_rst_i) begin : gen_fifo_rp
      if (rd_rst_i && C_EN_SAFETY_CKT == 0)
        rd_pntr            <= 0;
@@ -6682,11 +6676,8 @@ endgenerate
           ideal_dout    <= dout_reset_val;
   
        // Reset err_type only if ECC is not selected
-       if (C_USE_ECC == 0) begin
+       if (C_USE_ECC == 0)
          err_type         <= 0;
-         err_type_d1      <= 0;
-         err_type_both    <= 0;
-       end
        ideal_valid        <= 1'b0;
        ideal_rd_count     <= 0;
 
@@ -7350,7 +7341,7 @@ module fifo_generator_v13_1_2_bhv_ver_ss
    //which behaves like an ideal FIFO.
    reg [1:0]                      err_type           = 0;
    reg [1:0]                      err_type_d1        = 0;
-   reg [1:0]                      err_type_both      = 0;
+   reg [1:0]                      err_type_both        = 0;
    reg  [C_DOUT_WIDTH-1:0]        ideal_dout         = 0;
    reg  [C_DOUT_WIDTH-1:0]        ideal_dout_d1      = 0;
    reg  [C_DOUT_WIDTH-1:0]        ideal_dout_both      = 0;
@@ -7616,8 +7607,6 @@ module fifo_generator_v13_1_2_bhv_ver_ss
       dout_reset_val     = hexstr_conv(C_DOUT_RST_VAL);
       ideal_dout         = dout_reset_val;
       err_type           = 0;
-      err_type_d1        = 0;
-      err_type_both      = 0;
       ideal_dout_d1      = dout_reset_val;
       ideal_dout_both    = dout_reset_val;
       ideal_wr_ack       = 1'b0;
@@ -7753,47 +7742,54 @@ generate
          reg [1:0] rst_delayed_sft3              =1;
          reg [1:0] rst_delayed_sft4              =1;
          
-        always@(posedge CLK) begin
+        always@(posedge CLK)
+          begin
           rst_delayed_sft1 <= #`TCQ rst_i;
           rst_delayed_sft2 <= #`TCQ rst_delayed_sft1;
           rst_delayed_sft3 <= #`TCQ rst_delayed_sft2; 
           rst_delayed_sft4 <= #`TCQ rst_delayed_sft3;
-        end
-        always@(posedge rst_delayed_sft2 or posedge rst_i or posedge CLK) begin
-          if (rst_delayed_sft2 == 1'b1 || rst_i == 1'b1) begin 
-            ram_rd_en_d1 <= #`TCQ 1'b0;
-            valid_d1 <= #`TCQ 1'b0;
-          end else begin
-            ram_rd_en_d1 <= #`TCQ (RD_EN && ~(empty_i));
-            fab_rd_en_d1 <= #`TCQ ram_rd_en_d1;
-            valid_both <= #`TCQ valid_i;
-            valid_d1 <= #`TCQ valid_both;
           end
-        end
-
-        always@(posedge rst_delayed_sft2 or posedge CLK) begin
-          if (rst_delayed_sft2 == 1'b1) begin
-             if (C_USE_DOUT_RST == 1'b1) begin
-                   @(posedge CLK)
-                  ideal_dout_d1 <= #`TCQ dout_reset_val;
-             end
-          end else if (srst_rrst_busy == 1'b1) begin
-             if (C_USE_DOUT_RST == 1'b1) begin
-               ideal_dout_d1 <= #`TCQ dout_reset_val;
-             end
-          end else begin 
-            if (ram_rd_en_d1) begin
-               ideal_dout_both   <= #`TCQ ideal_dout;
-               err_type_both[0] <= #`TCQ err_type[0];
-               err_type_both[1] <= #`TCQ err_type[1];
-             end
-             if (fab_rd_en_d1) begin
-               ideal_dout_d1   <= #`TCQ ideal_dout_both;
-               err_type_d1[0] <= #`TCQ err_type_both[0];
-               err_type_d1[1] <= #`TCQ err_type_both[1];
-            end
+        always@(posedge rst_delayed_sft2 or posedge rst_i or posedge CLK)
+          begin
+          if( rst_delayed_sft2 == 1'b1 || rst_i == 1'b1) begin 
+              ram_rd_en_d1 <= #`TCQ 1'b0;
+              valid_d1 <= #`TCQ 1'b0;
           end
-        end
+          else begin
+               ram_rd_en_d1 <= #`TCQ (RD_EN && ~(empty_i));
+               fab_rd_en_d1 <= #`TCQ ram_rd_en_d1;
+               valid_both <= #`TCQ valid_i;
+               valid_d1 <= #`TCQ valid_both;
+          end
+          end
+          
+           always@(posedge rst_delayed_sft2 or posedge CLK) 
+           begin
+           if (rst_delayed_sft2 == 1'b1) begin
+              if (C_USE_DOUT_RST == 1'b1) begin
+                    @(posedge CLK)
+                   ideal_dout_d1 <= #`TCQ dout_reset_val;
+              end
+              end
+           else if (srst_rrst_busy == 1'b1) begin
+                   if (C_USE_DOUT_RST == 1'b1) begin
+                   ideal_dout_d1 <= #`TCQ dout_reset_val;
+                   end
+           end else if (ram_rd_en_d1) begin
+                   ideal_dout_both   <= #`TCQ ideal_dout;
+                   err_type_both[0] <= #`TCQ err_type[0];
+                   err_type_both[1] <= #`TCQ err_type[1];
+                   end
+                   if (fab_rd_en_d1) begin
+                    ideal_dout_d1   <= #`TCQ ideal_dout_both;
+                   err_type_d1[0] <= #`TCQ err_type_both[0];
+                   err_type_d1[1] <= #`TCQ err_type_both[1];
+                  end
+            
+           end
+         //assign SBITERR = (C_USE_ECC == 0) ? err_type[0]:err_type_d1[0];
+         //assign DBITERR = (C_USE_ECC == 0) ? err_type[1]:err_type_d1[1];
+         //assign DOUT[C_DOUT_WIDTH-1:0] = ideal_dout_d1;      
       end //if 
       endgenerate    
  
@@ -7853,10 +7849,10 @@ generate
   /*****************************************************************************
    * Internal reset logic 
    ****************************************************************************/
-  assign srst_i        = C_EN_SAFETY_CKT ? SAFETY_CKT_WR_RST : C_HAS_SRST ? (SRST | WR_RST_BUSY) : 0;
+  assign srst_i        = C_EN_SAFETY_CKT ? SAFETY_CKT_WR_RST : C_HAS_SRST ? SRST : 0;
   assign rst_i            = C_HAS_RST ? RST : 0;
-  assign srst_wrst_busy   = srst_i;
-  assign srst_rrst_busy   = srst_i;
+  assign srst_wrst_busy   = C_HAS_SRST ? (SRST || WR_RST_BUSY)  : 0;
+  assign srst_rrst_busy   = C_HAS_SRST ? (SRST || RD_RST_BUSY)  : 0;
 
    /**************************************************************************
     * Assorted registers for delayed versions of signals
@@ -7985,6 +7981,21 @@ generate
    assign WR_DATA_COUNT[C_WR_DATA_COUNT_WIDTH-1:0] = {C_WR_DATA_COUNT_WIDTH{1'b0}};
       end
    endgenerate
+
+
+  
+   
+   // block memory has a synchronous reset
+   // no safety ckt with emb/fabric reg
+   //generate if (C_MEMORY_TYPE < 2 && C_EN_SAFETY_CKT == 0) begin : gen_fifo_blkmemdout_emb
+   //  always @(posedge CLK) begin
+   //    // BRAM resets synchronously
+   //    // make it consistent with the core.
+   //    if ((rst_i || srst_rrst_busy) && (C_USE_DOUT_RST == 1))
+   //      ideal_dout_d1 <= #`TCQ dout_reset_val;
+   //      ideal_dout_both <= #`TCQ dout_reset_val;
+   //  end //always
+   //end endgenerate // gen_fifo_blkmemdout_emb
    
    //reg ram_rd_en_d1 = 1'b0;
    //Capture delayed version of dout
@@ -7992,10 +8003,9 @@ generate
    always @(posedge CLK or posedge rst_i) begin
       if (rst_i == 1'b1) begin
          // Reset err_type only if ECC is not selected
-         if (C_USE_ECC == 0) begin
+         if (C_USE_ECC == 0)
             err_type_d1      <= #`TCQ 0;
-            err_type_both    <= #`TCQ 0;
-         end
+  
          // DRAM and SRAM reset asynchronously
          if ((C_MEMORY_TYPE == 2 || C_MEMORY_TYPE == 3) && C_USE_DOUT_RST == 1) begin
             ideal_dout_d1 <= #`TCQ dout_reset_val;
@@ -8012,7 +8022,6 @@ generate
             // Reset err_type only if ECC is not selected
             if (C_USE_ECC == 0) begin
                err_type_d1   <= #`TCQ 0;
-               err_type_both <= #`TCQ 0;
             end
             // Reset DRAM and SRAM based FIFO, BRAM based FIFO is reset above
             if ((C_MEMORY_TYPE == 2 || C_MEMORY_TYPE == 3) && C_USE_DOUT_RST == 1) begin
@@ -8040,10 +8049,9 @@ endgenerate
           ram_rd_en_d1 <= #`TCQ 1'b0;
           fab_rd_en_d1 <= #`TCQ 1'b0;
          // Reset err_type only if ECC is not selected
-         if (C_USE_ECC == 0) begin
+         if (C_USE_ECC == 0)
             err_type_d1      <= #`TCQ 0;
-            err_type_both    <= #`TCQ 0;
-         end
+  
          // DRAM and SRAM reset asynchronously
          if ((C_MEMORY_TYPE == 2 || C_MEMORY_TYPE == 3) && C_USE_DOUT_RST == 1) begin
             ideal_dout_d1 <= #`TCQ dout_reset_val;
@@ -8056,32 +8064,33 @@ endgenerate
             ideal_dout_both <= #`TCQ dout_reset_val;
        end
       end else begin
+         ram_rd_en_d1 <= #`TCQ RD_EN & ~EMPTY;
+         fab_rd_en_d1 <= #`TCQ (ram_rd_en_d1);
          if (srst_rrst_busy) begin 
-           ram_rd_en_d1 <= #`TCQ 1'b0;
-           fab_rd_en_d1 <= #`TCQ 1'b0;
-           // Reset err_type only if ECC is not selected
-           if (C_USE_ECC == 0) begin
-              err_type_d1   <= #`TCQ 0;
-              err_type_both <= #`TCQ 0;
-           end
-           // Reset DRAM and SRAM based FIFO, BRAM based FIFO is reset above
-           if ((C_MEMORY_TYPE == 2 || C_MEMORY_TYPE == 3) && C_USE_DOUT_RST == 1) begin
-              ideal_dout_d1 <= #`TCQ dout_reset_val;
-           end 
-           if (C_USE_DOUT_RST == 1) begin
-             ideal_dout_d1 <= #`TCQ dout_reset_val;
-           end
+            ram_rd_en_d1 <= #`TCQ 1'b0;
+            // Reset err_type only if ECC is not selected
+            if (C_USE_ECC == 0) begin
+               err_type_d1   <= #`TCQ 0;
+            end
+            // Reset DRAM and SRAM based FIFO, BRAM based FIFO is reset above
+            if ((C_MEMORY_TYPE == 2 || C_MEMORY_TYPE == 3) && C_USE_DOUT_RST == 1) begin
+               ideal_dout_d1 <= #`TCQ dout_reset_val;
+          //     ideal_dout_both <= #`TCQ dout_reset_val;
+         end 
+          if (C_USE_DOUT_RST == 1) begin
+         //   @(posedge CLK)
+            ideal_dout_d1 <= #`TCQ dout_reset_val;
+         //   ideal_dout_both <= #`TCQ dout_reset_val;
+            end
          end else begin
-           ram_rd_en_d1 <= #`TCQ RD_EN & ~EMPTY;
-           fab_rd_en_d1 <= #`TCQ (ram_rd_en_d1);
-           if (ram_rd_en_d1 ) begin
-             ideal_dout_both <= #`TCQ ideal_dout;
-             err_type_both   <= #`TCQ err_type;
-           end
-           if (fab_rd_en_d1 ) begin
-             ideal_dout_d1 <= #`TCQ ideal_dout_both;
-             err_type_d1   <= #`TCQ err_type_both;
-           end
+            if (ram_rd_en_d1 ) begin
+            ideal_dout_both <= #`TCQ ideal_dout;
+            err_type_both   <= #`TCQ err_type;
+         end
+            if (fab_rd_en_d1 ) begin
+            ideal_dout_d1 <= #`TCQ ideal_dout_both;
+            err_type_d1   <= #`TCQ err_type_both;
+            end
          end
       end    
    end   // always
@@ -8387,15 +8396,14 @@ endgenerate
    end // gen_fifo_w
     end endgenerate
 
-   generate if (C_FIFO_TYPE < 2 && C_MEMORY_TYPE < 2) begin : gnll_dm_dout
+   generate if (C_FIFO_TYPE < 2 && C_MEMORY_TYPE < 2 && C_EN_SAFETY_CKT == 0) begin : gnll_dm_dout
      always @(posedge CLK) begin
        if (rst_i || srst_rrst_busy) begin
-         if (C_USE_DOUT_RST == 1) begin
+         if (C_USE_DOUT_RST == 1)
            ideal_dout <= #`TCQ dout_reset_val;
            ideal_dout_both <= #`TCQ dout_reset_val;
          end
        end
-     end
     end endgenerate
 
 
@@ -8418,11 +8426,8 @@ endgenerate
           ideal_dout    <= #`TCQ dout_reset_val;
   
        // Reset err_type only if ECC is not selected
-       if (C_USE_ECC == 0) begin
+       if (C_USE_ECC == 0)
          err_type         <= #`TCQ 0;
-         err_type_d1      <= 0;
-         err_type_both    <= 0;
-       end
        ideal_valid        <= #`TCQ 1'b0;
        ideal_rd_count     <= #`TCQ 0;
 
@@ -8440,11 +8445,8 @@ endgenerate
           ideal_dout    <= #`TCQ dout_reset_val;
   
        // Reset err_type only if ECC is not selected
-       if (C_USE_ECC == 0) begin
+       if (C_USE_ECC == 0)
          err_type         <= #`TCQ 0;
-         err_type_d1      <= #`TCQ 0;
-         err_type_both    <= #`TCQ 0;
-       end
        ideal_valid        <= #`TCQ 1'b0;
        ideal_rd_count     <= #`TCQ 0;
       end //srst_i
@@ -9314,8 +9316,6 @@ module fifo_generator_v13_1_2_bhv_ver_preload0
  reg  [C_DOUT_WIDTH-1:0]   userdata_both;
  wire                      uservalid_both;
  wire                      uservalid_one;
- reg                       user_sbiterr_both = 1'b0;
- reg                       user_dbiterr_both = 1'b0;
   
 assign ram_valid_i_o = ram_valid_i;
 assign read_data_valid_i_o = read_data_valid_i;
@@ -9402,8 +9402,6 @@ assign fab_read_data_valid_i_o = fab_read_data_valid_i;
       userdata_both          = hexstr_conv(C_DOUT_RST_VAL);
       USERSBITERR       = 1'b0;
       USERDBITERR       = 1'b0;
-      user_sbiterr_both = 1'b0;
-      user_dbiterr_both = 1'b0;
    end //initial
 
    //***************************************************************************
@@ -10213,10 +10211,8 @@ generate
      begin
         if (rd_rst_i || srst_i) begin
           if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE < 2)
-            USERDATA          <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+            USERDATA     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
             userdata_both     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-            user_sbiterr_both <= #`TCQ 0;
-            user_dbiterr_both <= #`TCQ 0;
         end
      end //always
 
@@ -10227,43 +10223,31 @@ generate
           if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
             USERSBITERR    <= #`TCQ 0;
             USERDBITERR    <= #`TCQ 0;
-            user_sbiterr_both <= #`TCQ 0;
-            user_dbiterr_both <= #`TCQ 0;
           end
           // DRAM resets asynchronously
           if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2) begin  //asynchronous reset (active high)
             USERDATA     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
             userdata_both     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-            user_sbiterr_both <= #`TCQ 0;
-            user_dbiterr_both <= #`TCQ 0;
         end
         end  else begin // rising clock edge
           if (srst_i) begin
             if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
               USERSBITERR  <= #`TCQ 0;
               USERDBITERR  <= #`TCQ 0;
-              user_sbiterr_both <= #`TCQ 0;
-              user_dbiterr_both <= #`TCQ 0;
             end
             if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2) begin
               USERDATA   <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
               userdata_both   <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-              user_sbiterr_both <= #`TCQ 0;
-              user_dbiterr_both <= #`TCQ 0;
+          end
+          end  else if (fwft_rst_done) begin
+            if (ram_regout_en) begin
+               userdata_both     <= #`TCQ FIFODATA; 
+               USERDBITERR <= #`TCQ FIFODBITERR;
+               USERSBITERR  <= #`TCQ FIFOSBITERR; 
             end
-          end else begin
-            if (fwft_rst_done) begin
-              if (ram_regout_en) begin
-                 userdata_both     <= #`TCQ FIFODATA; 
-                 user_dbiterr_both <= #`TCQ FIFODBITERR;
-                 user_sbiterr_both <= #`TCQ FIFOSBITERR; 
-              end
-              if (fab_regout_en) begin
-                 USERDATA     <= #`TCQ userdata_both;
-                 USERDBITERR  <= #`TCQ user_dbiterr_both;
-                 USERSBITERR  <= #`TCQ user_sbiterr_both; 
-              end             
-            end             
+            if (fab_regout_en) begin
+               USERDATA     <= #`TCQ userdata_both;
+             end             
           end
         end
      end //always
@@ -10280,64 +10264,59 @@ generate
          reg [1:0] rst_delayed_sft3              =1;
          reg [1:0] rst_delayed_sft4              =1;
          
-        always@(posedge RD_CLK) begin
+        always@(posedge RD_CLK)
+          begin
           rst_delayed_sft1 <= #`TCQ rd_rst_i;
           rst_delayed_sft2 <= #`TCQ rst_delayed_sft1;
           rst_delayed_sft3 <= #`TCQ rst_delayed_sft2; 
           rst_delayed_sft4 <= #`TCQ rst_delayed_sft3;
-        end
-        always @ (posedge RD_CLK) begin
-          if (rd_rst_i || srst_i) begin
-            if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE < 2 && rst_delayed_sft1 == 1'b1) begin
-              @(posedge RD_CLK)
-              USERDATA     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-               userdata_both     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-              user_sbiterr_both <= #`TCQ 0;
-              user_dbiterr_both <= #`TCQ 0;
-            end
           end
-        end //always
+        always @ (posedge RD_CLK)
+     begin
+        if (rd_rst_i || srst_i) begin
+          if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE < 2 && rst_delayed_sft1 == 1'b1) begin
+            @(posedge RD_CLK)
+            USERDATA     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+             userdata_both     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+          end
+        end
+     end //always
  
-   always @ (posedge RD_CLK or posedge rd_rst_i) begin
-     if (rd_rst_i) begin //asynchronous reset (active high)
-       if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
-         USERSBITERR       <= #`TCQ 0;
-         USERDBITERR       <= #`TCQ 0;
-         user_sbiterr_both <= #`TCQ 0;
-         user_dbiterr_both <= #`TCQ 0;
+   always @ (posedge RD_CLK or posedge rd_rst_i)
+     begin
+        if (rd_rst_i) begin //asynchronous reset (active high)
+          if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
+            USERSBITERR    <= #`TCQ 0;
+            USERDBITERR    <= #`TCQ 0;
+          end
+          // DRAM resets asynchronously
+          if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2)begin  //asynchronous reset (active high)
+            USERDATA     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+             userdata_both    <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+         end 
        end
-       // DRAM resets asynchronously
-       if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2)begin  //asynchronous reset (active high)
-         USERDATA          <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-         userdata_both     <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-         user_sbiterr_both <= #`TCQ 0;
-         user_dbiterr_both <= #`TCQ 0;
-       end 
-     end else begin // rising clock edge
-       if (srst_i) begin
-         if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
-           USERSBITERR       <= #`TCQ 0;
-           USERDBITERR       <= #`TCQ 0;
-           user_sbiterr_both <= #`TCQ 0;
-           user_dbiterr_both <= #`TCQ 0;
-         end
-         if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2) begin
-           USERDATA   <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
-         end
-       end else if (fwft_rst_done) begin
-         if (ram_regout_en == 1'b1 && rd_rst_i == 1'b0) begin
-            userdata_both     <= #`TCQ FIFODATA;
-            user_dbiterr_both <= #`TCQ FIFODBITERR;
-            user_sbiterr_both <= #`TCQ FIFOSBITERR; 
-         end
-         if (fab_regout_en == 1'b1 && rd_rst_i == 1'b0) begin
-            USERDATA          <= #`TCQ userdata_both;
-            USERDBITERR       <= #`TCQ user_dbiterr_both;
-            USERSBITERR       <= #`TCQ user_sbiterr_both;
-         end
-       end
-     end
-   end //always
+        else begin // rising clock edge
+          if (srst_i) begin
+            if (C_USE_ECC == 0) begin // Reset S/DBITERR only if ECC is OFF
+              USERSBITERR  <= #`TCQ 0;
+              USERDBITERR  <= #`TCQ 0;
+            end
+            if (C_USE_DOUT_RST == 1 && C_MEMORY_TYPE == 2) begin
+              USERDATA   <= #`TCQ hexstr_conv(C_DOUT_RST_VAL);
+          end
+          end else if (fwft_rst_done) begin
+            if (ram_regout_en == 1'b1 && rd_rst_i == 1'b0) begin
+               userdata_both     <= #`TCQ FIFODATA;
+               USERDBITERR <= #`TCQ FIFODBITERR;
+               USERSBITERR  <= #`TCQ FIFOSBITERR;
+              end
+            if (fab_regout_en == 1'b1 && rd_rst_i == 1'b0) begin
+               USERDATA     <= #`TCQ userdata_both;
+             end
+              
+          end
+        end
+       end //always
   end //if
 endgenerate
 

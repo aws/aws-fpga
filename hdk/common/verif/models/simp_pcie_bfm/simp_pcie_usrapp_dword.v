@@ -1073,8 +1073,58 @@ module simp_pcie_usrapp #(C_DATA_WIDTH = 256,
    task wait_for_msix_intr(input logic [15:0] comp_id, logic [7:0] vector_num = 8'h00, bit clear = 1'b0, int timeout = 2000);
       int dummy;
 
+`ifdef VIVADO_SIM
+      automatic bit interrupt_detected = 1'b0;
+`endif
+
       if (debug) $display("[%t] : (simp_pcie_usrapp) Waiting for MSI-X interrupt (Comp ID 0x%04x)", $realtime, comp_id);
 
+`ifdef VIVADO_SIM
+      // Vivado does not support "disable fork"
+      fork
+         begin
+            case (comp_id)
+              EP_BUS_DEV_FNS:
+                begin
+                   pf0_msix_mbx.get(dummy);
+                   if (dummy !== vector_num) begin
+                      $display("[%t] : *** FATAL *** Received unexpected MSI-X interrupt (Comp ID 0x%04x, Vector %2d)", $realtime, comp_id, dummy);
+                      #100 $finish;
+                   end
+                   if (clear) msix_intr[0] = 1'b0;
+                end
+              EP_BUS_DEV_FNS_PF1:
+                begin
+                   pf1_msix_mbx.get(dummy);
+                   if (clear) msix_intr[1] = 1'b0;
+                end
+              EP_BUS_DEV_FNS_PF2:
+                begin
+                   pf2_msix_mbx.get(dummy);
+                   if (clear) msix_intr[2] = 1'b0;
+                end
+              EP_BUS_DEV_FNS_PF3:
+                begin
+                   pf3_msix_mbx.get(dummy);
+                   if (clear) msix_intr[3] = 1'b0;
+                end
+              default:
+                begin
+                   $display("[%t] : *** FATAL *** Attempted to wait for MSI-X interrupt from unsupported Comp ID 0x%04x", $realtime, comp_id);
+                   #100 $finish;
+                end
+            endcase
+            interrupt_detected = 1'b1;
+         end
+         begin
+            TSK_TX_CLK_EAT(timeout);
+            if (interrupt_detected == 1'b0) begin
+               $display("[%t] : *** ERROR *** Timeout waiting for MSI-X interrupt (Comp ID 0x%04x)", $realtime, comp_id);
+               $finish;
+            end
+         end
+      join_any
+`else
       fork
          begin
             case (comp_id)
@@ -1116,7 +1166,7 @@ module simp_pcie_usrapp #(C_DATA_WIDTH = 256,
          end
       join_any
       disable fork;
-
+`endif
    endtask
 
 

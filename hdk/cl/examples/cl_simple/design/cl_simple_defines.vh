@@ -4,7 +4,13 @@
 // Amazon Confidential information
 // Restricted NDA Material
 // =============================================================================
-`define CL_NAME cl_simple
-`define FPGA_LESS_RST
-`define NO_XDMA
 
+//Put module name of the CL design here.  This is used to instantiate in top.sv
+`define CL_NAME cl_simple
+
+//Highly recommeneded.  For lib FIFO block, uses less async reset (take advantage of
+// FPGA flop init capability).  This will help with routing resources.
+`define FPGA_LESS_RST
+
+//Must have this define or will get syntax errors.  Curretly XDMA not supported.
+`define NO_XDMA

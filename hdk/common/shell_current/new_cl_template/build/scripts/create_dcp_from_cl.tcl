@@ -146,7 +146,7 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 puts "AWS FPGA: Start design synthesis";
 
-synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -verilog_define CL_SECOND -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {

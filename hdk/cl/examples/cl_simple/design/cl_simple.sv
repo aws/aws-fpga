@@ -21,6 +21,9 @@ module cl_simple #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=
    localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
    localparam NUM_CFG_STGS_PCIE_ATG = 4;
    localparam NUM_CFG_STGS_AURORA_ATG = 4;
+   localparam NUM_CFG_STGS_XDCFG = 4;
+   localparam NUM_CFG_STGS_XDMA = 4;
+   
 `ifdef SIM
    localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
    localparam HMC_SCRB_MAX_ADDR = 64'h7FF;
@@ -647,7 +650,7 @@ always_ff @(negedge rst_n or posedge clk)
 //parameter NUM_TST = (NUM_PCIE + NUM_DDR + NUM_HMC + NUM_GTY);
 //`endif   
 
-parameter NUM_TST = (1 + 4 + 4 + 4 + 1);
+parameter NUM_TST = (1 + 4 + 4 + 4 + 1 + 2);
 
 typedef enum logic[2:0] {
    SLV_IDLE = 0,
@@ -1393,6 +1396,10 @@ generate
 endgenerate
 `else // !`ifdef HMC_PRESENT
    assign hmc_scrb_done_pipe[1:0] = 2'd3;
+   assign hmc_stat_ack = 1;
+   assign hmc_stat_rdata = 32'h0;
+   assign hmc_stat_int = 0;
+
 `endif //  `ifdef HMC_PRESENT
    
 `ifdef AURORA
@@ -1455,6 +1462,7 @@ generate
        );
    end // block: gen_qsfp_tst
 endgenerate
+
 `endif //  `ifdef AURORA
    
 `ifndef VU190
@@ -1487,21 +1495,349 @@ endgenerate
        .cfg_wr              (slv_tst_wr_pipe[1+4+4+4]),
        .cfg_rd              (slv_tst_rd_pipe[1+4+4+4]),
        .tst_cfg_ack         (tst_slv_ack[1+4+4+4]),
-       .tst_cfg_rdata       (tst_slv_rdata[1+4+4+4]),
+       .tst_cfg_rdata       (tst_slv_rdata[1+4+4+4])
 
-`ifndef NO_XDMA
+ `ifndef NO_XDMA
+       ,
        .cl_sh_irq_req       (cl_sh_irq_req),
        .sh_cl_irq_ack       (sh_cl_irq_ack)
-`else 
+ `else
+  `ifdef MSIX_PRESENT
+       ,
        .cl_sh_msix_int      (cl_sh_msix_int),
        .cl_sh_msix_vec      (cl_sh_msix_vec),
        .sh_cl_msix_int_sent (sh_cl_msix_int_sent),
        .sh_cl_msix_int_ack  (sh_cl_msix_int_ack)
-`endif
+  `endif
+       
+ `endif // !`ifndef NO_XDMA
+       
        
        );
 
 `endif //  `ifndef VU190
+
+
+`ifndef NO_XDMA
+
+   logic [31:0] cl_sh_xdcfg_awaddr_q;
+   logic        cl_sh_xdcfg_awvalid_q;
+   logic        sh_cl_xdcfg_awready_q;
+   logic [31:0] cl_sh_xdcfg_wdata_q;
+   logic [3:0]  cl_sh_xdcfg_wstrb_q;
+   logic        cl_sh_xdcfg_wvalid_q;
+   logic        sh_cl_xdcfg_wready_q;
+   logic        sh_cl_xdcfg_bvalid_q;
+   logic [1:0]  sh_cl_xdcfg_bresp_q;
+   logic        cl_sh_xdcfg_bready_q;
+
+   logic [31:0] cl_sh_xdcfg_araddr_q;
+   logic        cl_sh_xdcfg_arvalid_q;
+   logic        sh_cl_xdcfg_arready_q;
+   logic [31:0] sh_cl_xdcfg_rdata_q;
+   logic [1:0]  sh_cl_xdcfg_rresp_q;
+   logic        sh_cl_xdcfg_rvalid_q;
+   logic        cl_sh_xdcfg_rready_q;
+
+   // XDCFG AXI Master
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_XDCFG)) PIPE_SLV_REQ_XDCFG (.clk (clk), 
+                                                                                  .rst_n (sync_rst_n), 
+                                                                                  .in_bus({slv_tst_addr[1+4+4+4+1], slv_tst_wdata[1+4+4+4+1], slv_tst_wr[1+4+4+4+1], slv_tst_rd[1+4+4+4+1]}),
+                                                                                  .out_bus({slv_tst_addr_pipe[1+4+4+4+1], slv_tst_wdata_pipe[1+4+4+4+1], slv_tst_wr_pipe[1+4+4+4+1], slv_tst_rd_pipe[1+4+4+4+1]})
+                                                                                  );
+   
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_XDCFG)) PIPE_SLV_ACK_XDCFG (.clk (clk), 
+                                                                             .rst_n (sync_rst_n), 
+                                                                             .in_bus({tst_slv_ack[1+4+4+4+1], tst_slv_rdata[1+4+4+4+1]}),
+                                                                             .out_bus({tst_slv_ack_pipe[1+4+4+4+1], tst_slv_rdata_pipe[1+4+4+4+1]})
+                                                                             );
+   
+   // AXI4 register slice - For signals between CL and HL
+   axi4_flop_fifo #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) XDCFG_TST_AXIL_REG_SLC (
+       .aclk           (clk),
+       .aresetn        (sync_rst_n),
+       .sync_rst_n     (1'b1),
+       .s_axi_awid     (1'd0),
+       .s_axi_awaddr   (cl_sh_xdcfg_awaddr_q),
+       .s_axi_awlen    (8'd0),
+       .s_axi_awuser   (1'd0),
+       .s_axi_awvalid  (cl_sh_xdcfg_awvalid_q),
+       .s_axi_awready  (sh_cl_xdcfg_awready_q),
+       .s_axi_wdata    (cl_sh_xdcfg_wdata_q),
+       .s_axi_wstrb    (cl_sh_xdcfg_wstrb_q),
+       .s_axi_wlast    (1'd0),
+       .s_axi_wvalid   (cl_sh_xdcfg_wvalid_q),
+       .s_axi_wuser    (1'd0),
+       .s_axi_wready   (sh_cl_xdcfg_wready_q),
+       .s_axi_bid      (),
+       .s_axi_bresp    (sh_cl_xdcfg_bresp_q),
+       .s_axi_buser    (),
+       .s_axi_bvalid   (sh_cl_xdcfg_bvalid_q),
+       .s_axi_bready   (cl_sh_xdcfg_bready_q),
+       .s_axi_arid     (1'd0),
+       .s_axi_araddr   (cl_sh_xdcfg_araddr_q),
+       .s_axi_arlen    (8'd0),
+       .s_axi_aruser   (1'd0),
+       .s_axi_arvalid  (cl_sh_xdcfg_arvalid_q),
+       .s_axi_arready  (sh_cl_xdcfg_arready_q),
+       .s_axi_rid      (),
+       .s_axi_ruser    (),
+       .s_axi_rdata    (sh_cl_xdcfg_rdata_q),
+       .s_axi_rresp    (sh_cl_xdcfg_rresp_q),
+       .s_axi_rlast    (),
+       .s_axi_rvalid   (sh_cl_xdcfg_rvalid_q),
+       .s_axi_rready   (cl_sh_xdcfg_rready_q),  
+       .m_axi_awid     (),   
+       .m_axi_awaddr   (cl_sh_xdcfg_awaddr), 
+       .m_axi_awlen    (),  
+       .m_axi_awuser   (),
+       .m_axi_awvalid  (cl_sh_xdcfg_awvalid),
+       .m_axi_awready  (sh_cl_xdcfg_awready),
+       .m_axi_wdata    (cl_sh_xdcfg_wdata),  
+       .m_axi_wstrb    (cl_sh_xdcfg_wstrb),  
+       .m_axi_wlast    (),  
+       .m_axi_wuser    (),
+       .m_axi_wvalid   (cl_sh_xdcfg_wvalid), 
+       .m_axi_wready   (sh_cl_xdcfg_wready), 
+       .m_axi_bid      (1'd0),    
+       .m_axi_bresp    (sh_cl_xdcfg_bresp),  
+       .m_axi_buser    (1'd0),
+       .m_axi_bvalid   (sh_cl_xdcfg_bvalid), 
+       .m_axi_bready   (cl_sh_xdcfg_bready), 
+       .m_axi_arid     (),   
+       .m_axi_araddr   (cl_sh_xdcfg_araddr), 
+       .m_axi_arlen    (),  
+       .m_axi_aruser   (),
+       .m_axi_arvalid  (cl_sh_xdcfg_arvalid),
+       .m_axi_arready  (sh_cl_xdcfg_arready),
+       .m_axi_rid      (1'd0),    
+       .m_axi_rdata    (sh_cl_xdcfg_rdata),  
+       .m_axi_rresp    (sh_cl_xdcfg_rresp),  
+       .m_axi_rlast    (1'd0),  
+       .m_axi_ruser    (1'd0),
+       .m_axi_rvalid   (sh_cl_xdcfg_rvalid), 
+       .m_axi_rready   (cl_sh_xdcfg_rready)
+       );
+   
+   cl_mstr_axi_tst #(.DATA_WIDTH(32),
+                     .ADDR_WIDTH(32),
+                     .A_ID_WIDTH(1),
+                     .D_ID_WIDTH(1),
+                     .LEN_WIDTH(1),
+                     .A_USER_WIDTH(1),
+                     .W_USER_WIDTH(1),
+                     .B_USER_WIDTH(1),
+                     .R_USER_WIDTH(1)
+                     ) 
+   CL_XDCFG_TST (.clk(clk),
+                 .rst_n(sync_rst_n),
+                 
+                 .cfg_addr(slv_tst_addr_pipe[1+4+4+4+1]),
+                 .cfg_wdata(slv_tst_wdata_pipe[1+4+4+4+1]),
+                 .cfg_wr(slv_tst_wr_pipe[1+4+4+4+1]),
+                 .cfg_rd(slv_tst_rd_pipe[1+4+4+4+1]),
+                 .tst_cfg_ack(tst_slv_ack[1+4+4+4+1]),
+                 .tst_cfg_rdata(tst_slv_rdata[1+4+4+4+1]),
+      
+                 .awid     (),   
+                 .awaddr   (cl_sh_xdcfg_awaddr_q), 
+                 .awlen    (),  
+                 .awuser   (),
+                 .awvalid  (cl_sh_xdcfg_awvalid_q),
+                 .awready  (sh_cl_xdcfg_awready_q),
+                 .wdata    (cl_sh_xdcfg_wdata_q),  
+                 .wstrb    (cl_sh_xdcfg_wstrb_q),  
+                 .wlast    (),  
+                 .wuser    (),
+                 .wvalid   (cl_sh_xdcfg_wvalid_q), 
+                 .wready   (sh_cl_xdcfg_wready_q), 
+                 .bid      (1'd0),    
+                 .bresp    (sh_cl_xdcfg_bresp_q),  
+                 .buser    (1'd0),
+                 .bvalid   (sh_cl_xdcfg_bvalid_q), 
+                 .bready   (cl_sh_xdcfg_bready_q), 
+                 .arid     (),   
+                 .araddr   (cl_sh_xdcfg_araddr_q), 
+                 .arlen    (),  
+                 .aruser   (),
+                 .arvalid  (cl_sh_xdcfg_arvalid_q),
+                 .arready  (sh_cl_xdcfg_arready_q),
+                 .rid      (1'd0),    
+                 .rdata    (sh_cl_xdcfg_rdata_q),  
+                 .rresp    (sh_cl_xdcfg_rresp_q),  
+                 .rlast    (1'd0),  
+                 .ruser    (1'd0),
+                 .rvalid   (sh_cl_xdcfg_rvalid_q), 
+                 .rready   (cl_sh_xdcfg_rready_q)
+                 
+                 );
+   
+        
+   // XDMA CFG AXI-L Master
+   logic[4:0]   sh_cl_xdma_awid_q;
+   logic [63:0] sh_cl_xdma_awaddr_q;
+   logic [7:0]  sh_cl_xdma_awlen_q;
+   logic        sh_cl_xdma_awvalid_q;
+   logic        cl_sh_xdma_awready_q;
+
+   logic [511:0] sh_cl_xdma_wdata_q;
+   logic [63:0]  sh_cl_xdma_wstrb_q;
+   logic         sh_cl_xdma_wlast_q;
+   logic         sh_cl_xdma_wvalid_q;
+   logic         cl_sh_xdma_wready_q;
+
+   logic [4:0]   cl_sh_xdma_bid_q;
+   logic [1:0]   cl_sh_xdma_bresp_q;
+   logic         cl_sh_xdma_bvalid_q;
+   logic         sh_cl_xdma_bready_q;
+
+   logic [4:0]   sh_cl_xdma_arid_q;
+   logic [63:0]  sh_cl_xdma_araddr_q;
+   logic [7:0]   sh_cl_xdma_arlen_q;
+   logic         sh_cl_xdma_arvalid_q;
+   logic         cl_sh_xdma_arready_q;
+
+   logic [4:0]   cl_sh_xdma_rid_q;
+   logic [511:0] cl_sh_xdma_rdata_q;
+   logic [1:0]   cl_sh_xdma_rresp_q;
+   logic         cl_sh_xdma_rlast_q;
+   logic         cl_sh_xdma_rvalid_q;
+   logic         sh_cl_xdma_rready_q;
+
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_XDMA)) PIPE_SLV_REQ_XDMA (.clk (clk), 
+                                                                                .rst_n (sync_rst_n), 
+                                                                                .in_bus({slv_tst_addr[1+4+4+4+1+1], slv_tst_wdata[1+4+4+4+1+1], slv_tst_wr[1+4+4+4+1+1], slv_tst_rd[1+4+4+4+1+1]}),
+                                                                                .out_bus({slv_tst_addr_pipe[1+4+4+4+1+1], slv_tst_wdata_pipe[1+4+4+4+1+1], slv_tst_wr_pipe[1+4+4+4+1+1], slv_tst_rd_pipe[1+4+4+4+1+1]})
+                                                                                );
+   
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_XDMA)) PIPE_SLV_ACK_XDMA (.clk (clk), 
+                                                                           .rst_n (sync_rst_n), 
+                                                                           .in_bus({tst_slv_ack[1+4+4+4+1+1], tst_slv_rdata[1+4+4+4+1+1]}),
+                                                                           .out_bus({tst_slv_ack_pipe[1+4+4+4+1+1], tst_slv_rdata_pipe[1+4+4+4+1+1]})
+                                                                           );
+
+ // AXI-Lite Register Slice for signals between CL and HL
+   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(5), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) XDMA_TST_AXI_REG_SLC (
+    .aclk          (clk),
+    .aresetn       (sync_rst_n),
+    .sync_rst_n    (1'b1),
+    .s_axi_awid    (sh_cl_xdma_awid),
+    .s_axi_awaddr  (sh_cl_xdma_awaddr),
+    .s_axi_awlen   (sh_cl_xdma_awlen),                                            
+    .s_axi_awvalid (sh_cl_xdma_awvalid),
+    .s_axi_awuser  (1'b0),
+    .s_axi_awready (cl_sh_xdma_awready),
+    .s_axi_wdata   (sh_cl_xdma_wdata),
+    .s_axi_wstrb   (sh_cl_xdma_wstrb),
+    .s_axi_wlast   (sh_cl_xdma_wlast),
+    .s_axi_wuser   (1'b0),
+    .s_axi_wvalid  (sh_cl_xdma_wvalid),
+    .s_axi_wready  (cl_sh_xdma_wready),
+    .s_axi_bid     (cl_sh_xdma_bid),
+    .s_axi_bresp   (cl_sh_xdma_bresp),
+    .s_axi_bvalid  (cl_sh_xdma_bvalid),
+    .s_axi_buser   (),
+    .s_axi_bready  (sh_cl_xdma_bready),
+    .s_axi_arid    (sh_cl_xdma_arid),
+    .s_axi_araddr  (sh_cl_xdma_araddr),
+    .s_axi_arlen   (sh_cl_xdma_arlen), 
+    .s_axi_arvalid (sh_cl_xdma_arvalid),
+    .s_axi_aruser  (1'd0),
+    .s_axi_arready (cl_sh_xdma_arready),
+    .s_axi_rid     (cl_sh_xdma_rid),
+    .s_axi_rdata   (cl_sh_xdma_rdata),
+    .s_axi_rresp   (cl_sh_xdma_rresp),
+    .s_axi_rlast   (cl_sh_xdma_rlast),
+    .s_axi_ruser   (),
+    .s_axi_rvalid  (cl_sh_xdma_rvalid),
+    .s_axi_rready  (sh_cl_xdma_rready), 
+    .m_axi_awid    (sh_cl_xdma_awid_q),
+    .m_axi_awaddr  (sh_cl_xdma_awaddr_q), 
+    .m_axi_awlen   (sh_cl_xdma_awlen_q),
+    .m_axi_awvalid (sh_cl_xdma_awvalid_q),
+    .m_axi_awuser  (),
+    .m_axi_awready (cl_sh_xdma_awready_q),
+    .m_axi_wdata   (sh_cl_xdma_wdata_q),  
+    .m_axi_wstrb   (sh_cl_xdma_wstrb_q),
+    .m_axi_wvalid  (sh_cl_xdma_wvalid_q), 
+    .m_axi_wlast   (sh_cl_xdma_wlast_q),
+    .m_axi_wuser   (),
+    .m_axi_wready  (cl_sh_xdma_wready_q), 
+    .m_axi_bresp   (cl_sh_xdma_bresp_q),  
+    .m_axi_bvalid  (cl_sh_xdma_bvalid_q), 
+    .m_axi_bid     (cl_sh_xdma_bid_q),
+    .m_axi_buser   (1'b0),
+    .m_axi_bready  (sh_cl_xdma_bready_q), 
+    .m_axi_arid    (sh_cl_xdma_arid_q), 
+    .m_axi_araddr  (sh_cl_xdma_araddr_q), 
+    .m_axi_arlen   (sh_cl_xdma_arlen_q), 
+    .m_axi_aruser  (), 
+    .m_axi_arvalid (sh_cl_xdma_arvalid_q),
+    .m_axi_arready (cl_sh_xdma_arready_q),
+    .m_axi_rid     (cl_sh_xdma_rid_q),  
+    .m_axi_rdata   (cl_sh_xdma_rdata_q),  
+    .m_axi_rresp   (cl_sh_xdma_rresp_q),  
+    .m_axi_rlast   (cl_sh_xdma_rlast_q),  
+    .m_axi_ruser   (1'b0),
+    .m_axi_rvalid  (cl_sh_xdma_rvalid_q), 
+    .m_axi_rready  (sh_cl_xdma_rready_q)
+   );
+
+   cl_slv_axi_tst #(.DATA_WIDTH(512),
+                    .ADDR_WIDTH(64),
+                    .A_ID_WIDTH(5),
+                    .D_ID_WIDTH(5),
+                    .LEN_WIDTH(8),
+                    .A_USER_WIDTH(1),
+                    .W_USER_WIDTH(1),
+                    .B_USER_WIDTH(1),
+                    .R_USER_WIDTH(1)
+                    ) 
+   CL_XDMA_TST  (.clk(clk),
+                 .rst_n(sync_rst_n),
+                 
+                 .cfg_addr(slv_tst_addr_pipe[1+4+4+4+1+1]),
+                 .cfg_wdata(slv_tst_wdata_pipe[1+4+4+4+1+1]),
+                 .cfg_wr(slv_tst_wr_pipe[1+4+4+4+1+1]),
+                 .cfg_rd(slv_tst_rd_pipe[1+4+4+4+1+1]),
+                 .tst_cfg_ack(tst_slv_ack[1+4+4+4+1+1]),
+                 .tst_cfg_rdata(tst_slv_rdata[1+4+4+4+1+1]),
+      
+                 .awid     (sh_cl_xdma_awid_q),   
+                 .awaddr   (sh_cl_xdma_awaddr_q), 
+                 .awlen    (sh_cl_xdma_awlen_q),  
+                 .awuser   (1'b0),
+                 .awvalid  (sh_cl_xdma_awvalid_q),
+                 .awready  (cl_sh_xdma_awready_q),
+                 .wdata    (sh_cl_xdma_wdata_q),  
+                 .wstrb    (sh_cl_xdma_wstrb_q),  
+                 .wlast    (sh_cl_xdma_wlast_q),  
+                 .wuser    (1'b0),
+                 .wvalid   (sh_cl_xdma_wvalid_q), 
+                 .wready   (cl_sh_xdma_wready_q), 
+                 .bid      (cl_sh_xdma_bid_q),    
+                 .bresp    (cl_sh_xdma_bresp_q),  
+                 .buser    (),
+                 .bvalid   (cl_sh_xdma_bvalid_q), 
+                 .bready   (sh_cl_xdma_bready_q), 
+                 .arid     (sh_cl_xdma_arid_q),   
+                 .araddr   (sh_cl_xdma_araddr_q), 
+                 .arlen    (sh_cl_xdma_arlen_q),  
+                 .aruser   (1'b0),
+                 .arvalid  (sh_cl_xdma_arvalid_q),
+                 .arready  (cl_sh_xdma_arready_q),
+                 .rid      (cl_sh_xdma_rid_q),    
+                 .rdata    (cl_sh_xdma_rdata_q),  
+                 .rresp    (cl_sh_xdma_rresp_q),  
+                 .rlast    (cl_sh_xdma_rlast_q),  
+                 .ruser    (),
+                 .rvalid   (cl_sh_xdma_rvalid_q), 
+                 .rready   (sh_cl_xdma_rready_q)
+                 
+                 );
+        
+`endif //  `ifndef NO_XDMA
+   
    
 //----------------------------------------------------------
 // Interfaces 
@@ -1918,36 +2254,11 @@ always_ff @(negedge sync_rst_n or posedge clk)
                                    dbg_scrb_mem_sel == 3'd1 ? dbg_ddr_scrb_addr_pipe[1][63:32] : dbg_ddr_scrb_addr_pipe[0][63:32]) :
                                     id1;
 
-//-----------------------------------------
-// Tie off DMA interface
-//-----------------------------------------
-assign cl_sh_xdcfg_awaddr = 0;
-assign cl_sh_xdcfg_awvalid = 0;
-assign cl_sh_xdcfg_wdata = 0;
-assign cl_sh_xdcfg_wstrb = 0;
-assign cl_sh_xdcfg_wvalid = 0;
-assign cl_sh_xdcfg_bready = 0;
-assign cl_sh_xdcfg_araddr = 0;
-assign cl_sh_xdcfg_arvalid = 0;
-assign cl_sh_xdcfg_rready = 0;
-
-assign cl_sh_xdma_awready = 0;
-assign cl_sh_xdma_wready = 0;
-assign cl_sh_xdma_bid = 0;
-assign cl_sh_xdma_bresp = 0;
-assign cl_sh_xdma_bvalid = 0;
-assign cl_sh_xdma_arready = 0;
-assign cl_sh_xdma_rid = 0;
-assign cl_sh_xdma_rdata = 0;
-assign cl_sh_xdma_rresp = 0;
-assign cl_sh_xdma_rlast = 0;
-assign cl_sh_xdma_rvalid = 0;
-
 
 //-----------------------------------------------
 // Debug bridge, used if need chipscope
 //-----------------------------------------------
-`ifdef ENABLE_CS_DEBUG
+`ifdef ENABLE_CHIPSCOPE_DEBUG
    cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(clk),
       .drck(drck),

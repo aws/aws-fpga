@@ -5,7 +5,7 @@
 // signals with _n suffix are "ACTIVE LOW"
 
    //--------------------------------
-   // Global singlas
+   // Global Signals
    //--------------------------------
    input clk,                                //250MHz clock 
    input rst_n,                              //Reset sync to 250MHz clock
@@ -349,7 +349,7 @@
    //--------------------------------
    // Debug bridge to support chipscope
    //--------------------------------
-   `ifdef ENABLE_CS_DEBUG
+   `ifdef ENABLE_CHIPSCOPE_DEBUG
    ,
    input clk,
    input drck,
