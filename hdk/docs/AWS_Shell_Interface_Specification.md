@@ -1,5 +1,5 @@
-﻿
-Revision History
+
+## Revision History
 ================
 
   ---------------------------------------------------------
@@ -10,17 +10,14 @@ Revision History
                           
   ---------------------------------------------------------
 
-Overview
-========
+# Overview
 
 The AWS FPGA instance provides FPGA acceleration capability to AWS
 compute instances. Each FPGA is divided into two partitions:
 
--   Shell (SH) – AWS platform logic responsible for taking care of the
-    FPGA external peripherals, PCIe, and Interrupts.
+-   Shell (SH) – AWS platform logic responsible for taking care of the FPGA external peripherals, PCIe, and Interrupts.
 
--   Customer Logic (CL) – Custom acceleration logic created by an FPGA
-    Developer
+-   Customer Logic (CL) – Custom acceleration logic created by an FPGA Developer
 
 At the end of the development process, the Shell and CL will become an Amazon FPGA Image (AFI)
 
@@ -30,8 +27,7 @@ While there could be multiple versions and multiple generations of the FPGA-acce
 
 Full details of the available FPGA enabled instances are [here](https://aws.amazon.com/ec2/instance-types)
 
-Architecture and version
-------------------------
+## Architecture and version
 
 This specification applies to  Xilinx Virtex Ultrascale Plus platform, referred to in AWS APIs and the HDK release as FpgaImageArchitecture=xvu9p.
 
@@ -39,8 +35,8 @@ The Shell is tagged with a revision number. Note while AWS tries to keep the rev
 
 New shell versions require updated CL implementation and regenerating the AFI.
 
-Convention
-----------
+## Convention
+
 
 **CL –** Custom’s Logic: the Logic to be provided by the developer andintegrated with the Shell.
 
@@ -54,8 +50,8 @@ Convention
 
 **S –** Typical refers to the Slave side of AXI bus
 
-CL (for xvu9p architecture as in EC F1 instances)
-=================================================
+# Shell Interfaces (for xvu9p architecture as in EC F1 instances)
+
 
 The F1 FPGA platform includes the following interfaces available to the
 CL:
@@ -64,8 +60,8 @@ CL:
 
 -   Four DDR4 RDIMM interfaces (with ECC)
 
-CL/Shell Interfaces (AXI-4)
----------------------------
+## CL/Shell Interfaces (AXI-4)
+
 
 All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 interfaces in the Shell have the following restrictions:
 
@@ -84,50 +80,40 @@ All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 in
 
 -   AxREGION – Region identifier is not supported
 
-### Interfaces implemented in CL
+## External Memory Interfaces implemented in CL
 
-Some of the interfaces are implemented in the CL rather than the Shell. For
-those interfaces, the designs are provided by AWS and instantiated in
-the CL. Note this is due to physical constraints.
+Some of the DRAM controller interfaces are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA resource. For those interfaces, the designs and the constrains are provided by AWS and instantiated in the CL. 
 
-There are four DDR interfaces labeled A, B, C, and D. Interfaces A, B,
-and D are in the CL and interface C is implemented in the CL. A design
-block (sh\_ddr.sv) instantiates the three DDR interfaces in the CL (A,
-B, D).
+There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL and interface C is implemented in the CL. A design block (sh\_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
 
-For interfaces that are implemented in the CL, the AXI-4 (or AXI-Stream)
-interfaces do not connect into the SH, but connect locally inside the CL
-to the AWS provided blocks. There are also statistics interfaces that
-must be connected from SH to the interface blocks.
+For DRAM controller that are implemented in the CL, the AXI-4 interfaces do not connect into the Sheel, but connect locally inside the CL
+to the AWS provided blocks. There are also statistics interfaces that must be connected from SH to the DRAM controller blocks.
 
-Clocking/Reset
---------------
+**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether anyone of them resides in the CL or the Shell logic*
 
-A single 250MHz clock, and associated asynchronous reset is provided to
-the CL. All Shell interfaces are synchronous to the 250MHz clock. The CL
-can derive clocks off of the 250MHz clock using the Xilinx Mixed Mode
-Clock Manager (MMCM) to create clocks of other frequencies/phases. The
-reset signal combines the board reset and PCIe reset conditions. Please
-refer to the Xilinx documentation (ug974) for more information.
+**NOTE:** *The HDK will offer an option to build a CL without one or more of the 3 DRAM controllers for optimizing FPGA resource *
+
+## Clocking/Reset
+
+
+A single 250MHz clock, and associated asynchronous reset is provided to the CL. All Shell interfaces are synchronous to the 250MHz clock. The CL can derive clocks off of the 250MHz clock using the Xilinx Mixed Mode Clock Manager (MMCM) to create clocks of other frequencies/phases. The reset signal combines the board reset and PCIe reset conditions. Please refer to the Xilinx documentation (ug974) for more information.
 
 ### Function Level Reset
 
-FLR is supported for the User Physical Function using a separate FLR
-interface:
+FLR is supported for the Application Physical Function using a separate FLRinterface:
 
--   sh\_cl\_flr\_assert – Level signal that is asserted when FLR has
+-   sh_cl_flr_assert – Level signal that is asserted when FLR has
     been requested
 
--   cl\_sh\_flr\_done – Asserted for a single clock to acknowledge
-    the FLR. This must be asserted in response to sh\_cl\_flr\_assert.
-    Note due to pipeline delays it is possible sh\_cl\_flr\_assert is
-    asserted for some number of clocks after cl\_sh\_flr\_done.
+-   cl_sh_flr_done – Asserted for a single clock to acknowledge
+    the FLR. This must be asserted in response to sh_cl_flr_assert.
+    Note due to pipeline delays it is possible sh_cl_flr_assert is
+    asserted for some number of clocks after cl_sh_flr_done.
 
 PCIe Endpoint Presentation to Instance
 --------------------------------------
 
-There are two PCIe physical functions (PFs) presented to the F1
-instance:
+There are two PCIe physical functions (PFs) presented to the F1 instance:
 
 -   Management PF – This PF allows for management of the FPGA using the [FPGA Management Tools](../../sdk/management/management_tools/README.md) , including tracking FPGA state and loading CL images onto the FPGA.
 
@@ -149,8 +135,7 @@ d)  No BusMaster support
 
 e)  A range of 32-bit addressable registers
 
-The Management PF is persistent throughput the life of the instance, and
-it will not be reset or cleared (even during the AFI attach/detach
+The Management PF is persistent throughput the life of the instance, and it will not be reset or cleared (even during the AFI attach/detach
 process).
 
 ### App PF
