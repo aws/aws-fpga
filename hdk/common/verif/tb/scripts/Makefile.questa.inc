@@ -5,5 +5,5 @@ clean:
 	cd $(SIM_DIR) && rm -rf *.log
 	cd $(SIM_DIR) && rm -rf *.jou
 	cd $(SIM_DIR) && rm -rf work
-	cd $(SIM_DIR) && rm -rf transcipt
+	cd $(SIM_DIR) && rm -rf transcript
 
