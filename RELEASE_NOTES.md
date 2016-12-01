@@ -49,10 +49,12 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
 * Customizable PCIe DeviceID/VendorID
-* Capability to remove some of the DRAM interface controllers from the CL.
+* Capability to remove some of the DRAM interface controllers from the CL
+* Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
 * Synopsys RTL simulations tools
 * Xilinx SDAccel development environment
+* Additional metric counters for FPGA management tools
 
 ## Supported Tools and Environment
 
