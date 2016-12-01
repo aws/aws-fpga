@@ -5,7 +5,7 @@ Revision History
   ---------------------------------------------------------
   Revision   Date         Content
   ---------- ------------ ---------------------------------
-  0.14       11/28/2016   -   Initial HDK release version
+  0.14       2016/11/28   -   Initial HDK release version
                           
                           
   ---------------------------------------------------------
@@ -22,47 +22,33 @@ compute instances. Each FPGA is divided into two partitions:
 -   Customer Logic (CL) – Custom acceleration logic created by an FPGA
     Developer
 
-At the end of the development process, the Shell and CL will become an
-Amazon FPGA Image (AFI)
+At the end of the development process, the Shell and CL will become an Amazon FPGA Image (AFI)
 
-This document specifies the hardware interface and functional behavior
-between the Shell and the CL.
+This document specifies the hardware interface and functional behavior between the Shell and the CL.
 
-While there are multiple versions and multiple generations of the
-FPGA-accelerated EC2 instances, the rest of this document focuses on the
-Shell design for xvu9p architecture used in EC2 F1 instance.
+While there could be multiple versions and multiple generations of the FPGA-accelerated EC2 instances, the rest of this document focuses on the Shell design for xvu9p architecture used in EC2 F1 instance.
 
-For full details of the available FPGA enabled instances please refer
-to:
-
-> <http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/FPGA.html> \[TBD -
-> subject to change\]
+Full details of the available FPGA enabled instances are [here](https://aws.amazon.com/ec2/instance-types)
 
 Architecture and version
 ------------------------
 
-This specification applies to the Xilinx Virtex Ultrascale Plus
-platform, referred to in AWS APIs and the HDK release as
-FpgaImageArchitecture=xvu9p.
+This specification applies to  Xilinx Virtex Ultrascale Plus platform, referred to in AWS APIs and the HDK release as FpgaImageArchitecture=xvu9p.
 
-The Shell is tagged with a revision number. Note while AWS tries to keep
-the revision constant, sometimes it is necessary to update the revision
-due to discovered issues or added functionality. The HDK release
-includes the latest Shell version.
+The Shell is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
 
-New shell versions require updated CL implementation.
+New shell versions require updated CL implementation and regenerating the AFI.
 
 Convention
 ----------
 
-**CL –** Customer’s Logic: the Logic to be provided by the developer and
-integrated with the Shell.
+**CL –** Custom’s Logic: the Logic to be provided by the developer andintegrated with the Shell.
 
 **DW –** Doubleword: referring to 4-byte (32-bit) data size
 
-**AXI –** ARM Advanced eXtensible Interface.
+**AXI-4** ARM Advanced eXtensible Interface.
 
-**AXI Stream –** ARM Advanced eXtensible Stream Interface
+**AXI-4 Stream –** ARM Advanced eXtensible Stream Interface
 
 **M –** Typically refers to the Master side of an AXI bus
 
@@ -81,13 +67,10 @@ CL:
 CL/Shell Interfaces (AXI-4)
 ---------------------------
 
-All interfaces except the inter-FPGA links use the AXI-4 protocol. The
-AXI-4 interfaces in the Shell have the following restrictions:
+All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 interfaces in the Shell have the following restrictions:
 
--   AxSIZE – All transfers must be the entire width of the bus. While
-    byte-enables bitmap are supported, it must adhere to the interface
-    protocol (i.e. PCIe contiguous byte enables on all transfers larger
-    than 64-bits)
+-   AxSIZE – All transfers must be the entire width of the bus. While byte-enables bitmap are supported, it must adhere to the interface
+    protocol (i.e. PCIe contiguous byte enables on all transfers larger than 64-bits)
 
 -   AxBURST – Only INCR burst is supported.
 
@@ -103,7 +86,7 @@ AXI-4 interfaces in the Shell have the following restrictions:
 
 ### Interfaces implemented in CL
 
-Some of the interfaces are implemented in the CL rather than the HL. For
+Some of the interfaces are implemented in the CL rather than the Shell. For
 those interfaces, the designs are provided by AWS and instantiated in
 the CL. Note this is due to physical constraints.
 
@@ -146,21 +129,17 @@ PCIe Endpoint Presentation to Instance
 There are two PCIe physical functions (PFs) presented to the F1
 instance:
 
--   FPGA Management PF –This PF allows for management of the FPGA using
-    the FPGA Management Tools, including tracking FPGA state and loading
-    CL images onto the FPGA.
+-   Management PF – This PF allows for management of the FPGA using the [FPGA Management Tools](../../sdk/management/management_tools/README.md) , including tracking FPGA state and loading CL images onto the FPGA.
 
--   User PF – Customer’s PF for Customer specific logic (CL)
+-   Application PF – The PF for the Custom logic (CL) specific functionality
 
 ### Management PF
 
-The management PF is a separate PF from the CL PF. Details are provided
-for reference for understanding the PCIe mapping from an F1 instance.
-This interface is strictly for AWS FPGA Management Tools. No support
-exists for the CL code to interface with the Management PF. The
-Management PF exposes:
+The management PF is a separate PF from the CL PF. Details are provided for reference for understanding the PCIe mapping from an F1 instance. This interface is strictly for AWS FPGA Management Tools, and does not support any interface with the CL code. 
 
-a)  Amazon’s specific and fixed PCIe VendorID and DeviceID
+The Management PF exposes:
+
+a)  Amazon’s specific and fixed PCIe VendorID (0x1D05) and DeviceID
 
 b)  Two BARs with 4KB size
 
@@ -174,7 +153,7 @@ The Management PF is persistent throughput the life of the instance, and
 it will not be reset or cleared (even during the AFI attach/detach
 process).
 
-### User PF
+### App PF
 
 The User PF exposes the following:
 
