@@ -327,11 +327,7 @@ There are some miscellaneous generic signals between Shell and CL.
 
 ### PCIe IDs
 
-There are some signals that must have the PCIe IDs of the CL. A
-Developer’s specific PCIe VendorID, DeviceID, SystemID and SubsystemID
-are registered through aws ec2 fpgaImageCreate command to reserve the
-PCIe IDs of the CL for mapping of the device into an F1 instance when
-the AFI is loaded.
+There are some signals that must have the PCIe IDs of the CL. A Developer’s specific PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID are registered through aws ec2 fpgaImageCreate command to reserve the PCIe IDs of the CL for mapping of the device into an F1 instance when the AFI is loaded.
 
 -   cl\_sh\_id0
 
