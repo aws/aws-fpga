@@ -4,15 +4,13 @@
 ## Restricted NDA Material
 ## =============================================================================
 
-+define+QUESTA_SIM
-
 +libext+.v
 +libext+.sv
 
 +incdir+${CL_ROOT}/design
-+incdir+${CL_ROOT}/verif/sv
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
++incdir+${CL_ROOT}/verif/sv
 
 -y ${CL_ROOT}/design
 -y ${HDK_DIR}/common/shell_latest/design/mgt

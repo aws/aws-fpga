@@ -4,19 +4,18 @@
 ## Restricted NDA Material
 ## =============================================================================
 
--define NO_XDMA
+-define VIVADO_SIM
 
 -sourcelibext .v
 -sourcelibext .sv
 
 -sourcelibdir ${CL_ROOT}/design
--sourcelibdir ${HDK_SHELL_DIR}/design/mgt
--sourcelibdir ${HDK_SHELL_DIR}/design/interfaces
+-sourcelibdir ${HDK_DIR}/common/shell_latest/design/mgt
 -sourcelibdir ${SH_LIB_DIR}
+-sourcelibdir ${SH_INF_DIR}
 
--include ${HDK_SHELL_DIR}/design/interfaces
 -include ${CL_ROOT}/verif/sv
--include ${CL_ROOT}/design
+-include ${SH_INF_DIR}
 
 ${CL_ROOT}/design/cl_hello_world_defines.vh
 
