@@ -6,8 +6,6 @@
 
 +define+QUESTA_SIM
 
-+define+NO_XDMA
-
 +libext+.v
 +libext+.sv
 
@@ -20,6 +18,8 @@
 -y ${HDK_DIR}/common/shell_latest/design/mgt
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
+
+${CL_ROOT}/design/cl_simple_defines.vh
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 

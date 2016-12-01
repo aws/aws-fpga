@@ -4,7 +4,7 @@
 ## Restricted NDA Material
 ## =============================================================================
 
--define NO_XDMA
+-define VIVADO_SIM
 
 -sourcelibext .v
 -sourcelibext .sv
@@ -16,6 +16,8 @@
 
 -include ${CL_ROOT}/verif/sv
 -include ${SH_INF_DIR}
+
+${CL_ROOT}/design/cl_simple_defines.vh
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
