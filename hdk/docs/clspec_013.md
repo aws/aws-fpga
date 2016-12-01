@@ -251,7 +251,7 @@ process).
 
 The User PF exposes the following:
 
-a)  CL’s specific PCIe VendorID, DeviceID, SystemID and
+a)  CL’s specific PCIe VendorID, DeviceID, SubsystemVendorID and
     SubsystemID as registered through ***`aws ec2 CreateFpgaImage`***
     command parameters.
 

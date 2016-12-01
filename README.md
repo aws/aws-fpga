@@ -47,7 +47,7 @@ $ aws ec2 create-fpga-image TBD TBD TBD       # Step 8: Make sure you have aws a
 
 ## Using an AFI on EC2 F1
 
-Now that you have built an AFI, or if you want to use one of the example pre-built AFIs provided by AWS, you need to launch an instance on EC2 F1, and have the SDK installed:
+Now that you have built an AFI, or if you want to use one of the example pre-built AFIs provided by AWS, you need to launch an EC2 F1 Instance, and install the SDK:
 
 You can setup and install the SDK with the following few steps.  Note that the first two steps may be skipped if you have already run them in the above HDK setup.
 
@@ -63,7 +63,7 @@ $ source sdk_setup.sh                         # Set up the envronment variables,
 $ sudo yum groupinstall -y “Development Tools"
 ```
 
-## Need to build a new Custom Logic and register it as AFI?
+## Need to build a new Custom Logic and register it as an AFI?
 
 The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 F1 instance.
 

@@ -4,17 +4,20 @@
 ## Restricted NDA Material
 ## =============================================================================
 
++define+QUESTA_SIM
+
 +define+NO_XDMA
 
 +libext+.v
 +libext+.sv
 
 +incdir+${CL_ROOT}/design
++incdir+${CL_ROOT}/verif/sv
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 
 -y ${CL_ROOT}/design
--y ${HDK_DIR}/top/vu9p/design/mgt
+-y ${HDK_DIR}/common/shell_latest/design/mgt
 -y ${HDK_DIR}/top/vu9p/design/sh
 -y ${SH_LIB_DIR}
 
@@ -26,4 +29,5 @@ ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv
 ${CL_ROOT}/design/cl_simple.sv
-${CL_ROOT}/verif/tests/test_peek_poke.sv
+
+${TEST_NAME}

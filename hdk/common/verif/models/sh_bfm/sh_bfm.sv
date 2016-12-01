@@ -632,7 +632,10 @@ typedef struct {
                logic [31:0] word;
 
                if (!tb.use_c_host_memory)
-                 word = tb.sv_host_memory[wr_addr];
+                 if (tb.sv_host_memory.exists(wr_addr))
+                   word = tb.sv_host_memory[wr_addr];
+                 else
+                   word = 32'hffff_ffff;   // return a default value
                else begin
                   for(int k=0; k<4; k++) begin
                      byte t;
@@ -831,8 +834,10 @@ typedef struct {
             end
             
             if (!tb.use_c_host_memory)
-              // TODO: add code to make sure entry exists before accessing!!!!
-              c = tb.sv_host_memory[rd_addr];
+              if (tb.sv_host_memory.exists(rd_addr))
+                c = tb.sv_host_memory[rd_addr];
+              else
+                c = 32'hffffffff;
             else begin
                for(int k=0; k<4; k++) begin
                   byte t;

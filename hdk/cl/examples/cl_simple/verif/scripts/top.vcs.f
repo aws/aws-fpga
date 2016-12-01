@@ -15,7 +15,7 @@
 +incdir+${CL_ROOT}/verif/sv
 
 -y ${CL_ROOT}/design
--y ${HDK_DIR}/top/vu9p/design/mgt
+-y ${HDK_DIR}/common/shell_latest/design/mgt
 -y ${HDK_DIR}/top/vu9p/design/sh
 -y ${SH_LIB_DIR}
 
