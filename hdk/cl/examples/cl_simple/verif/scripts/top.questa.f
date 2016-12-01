@@ -18,12 +18,10 @@
 
 -y ${CL_ROOT}/design
 -y ${HDK_DIR}/common/shell_latest/design/mgt
--y ${HDK_DIR}/top/vu9p/design/sh
 -y ${SH_LIB_DIR}
+-y ${SH_INF_DIR}
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
-
-${HDK_DIR}/top/vu9p/design/sh/sh_ddr.sv
 
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
