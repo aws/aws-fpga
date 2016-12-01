@@ -18,7 +18,7 @@ echo "ATTENTION: Don't forget to change the CL_DIR variable for the directory of
 if [ ! -f $HDK_COMMON_DIR/verif/models/ddr4_model/arch_defines.v ]
 then
   echo "DDR4 model files in "$HDK_COMMON_DIR/verif/models/ddr4_model/" do NOT exist. Running model creation step.";
-  echo "This could take 5-10minutes, please be patient!";
+  echo "This could take 5-10 minutes, please be patient!";
   echo "NOTE: This step requires having Xilinx Vivado installed and running Licensing Manager";
   # Run init.sh then clean-up
   source $HDK_DIR/common/verif/scripts/init.sh
