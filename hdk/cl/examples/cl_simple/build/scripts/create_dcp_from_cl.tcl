@@ -109,17 +109,6 @@ read_ip [ list \
 $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci
 ]
 
-#Note Developer can add IP 
-
-puts "AWS FPGA: Reading CL specific constraints";
-
-# Developer should add the list of constraints here
-read_xdc [ list \
-   $CL_DIR/build/constraints/cl_synth_user.xdc \
-   $CL_DIR/build/constraints/cl_clocks_user.xdc \
-   $CL_DIR/build/constraints/cl_pnr_user.xdc
-]
-
 puts "AWS FPGA: Reading AWS constraints";
 
 
@@ -131,14 +120,10 @@ puts "AWS FPGA: Reading AWS constraints";
 read_xdc [ list \
    $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc
+   $HDK_SHELL_DIR/build/constraints/ddr.xdc \
+   $CL_DIR/build/constraints/cl_synth_user.xdc
 ]
 
-puts "AWS FPGA: Reading IP constraints";
-
-read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/ddr.xdc 
-]
 #Do not propagate local clock constraints for clocks generated in the SH
 set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
 
@@ -219,7 +204,7 @@ write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_rout
 puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
 
 #Verify PR build
-pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -o $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
+pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -file $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
 
 close_design
 
