@@ -5,7 +5,7 @@
 
 ## Content
 
-This is first public release for AWS EC2 FPGA Development Kit. The kit comes with HDK(Hardware Development Kit) and SDK(Software Development Kit). Below is the list of features included in this  release. More details about these features can be found in [AWS Shell Interface Specification]()
+This is first public release for AWS EC2 FPGA Development Kit. The kit comes with HDK(Hardware Development Kit) and SDK(Software Development Kit). Below is the list of features included in this  release. More details about these features can be found in ![AWS Shell Interface Specification](aws-fpga/hdk/docs/CLSpec_0.13.pdf)
 
 *   AWS EC2 FPGA platform feature list:
     *    Xilinx UltraScale+ VU9P
@@ -25,7 +25,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
          *    Maximum payload size set by the Shell
          *    Maximum read request size set by the Shell
          *    AXI4 error handling
-         *    Proprietary AxUSER bits implemented on address channels: please refer to [AWS Shell Interface Specification]()        
+         *    Proprietary AxUSER bits implemented on address channels: please refer to ![AWS Shell Interface Specification](aws-fpga/hdk/docs/CLSpec_0.13.pdf)        
 
 ## Implementation Restrictions
 
