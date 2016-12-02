@@ -22,7 +22,5 @@ void test_main(uint32_t *exit_code) {
     log_printf("Test FAILED");
   }
 
-  sv_pause(2);                                         // wait 2us
-
   *exit_code = 0;
 }
