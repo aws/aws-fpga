@@ -4,23 +4,25 @@
 ## Restricted NDA Material
 ## =============================================================================
 
++define+VCS_SIM
++define+CL_NAME=cl_hello_world
++define+FPGA_LESS_RST
++define+NO_XDMA
+
 +libext+.v
 +libext+.sv
-
-+incdir+${CL_ROOT}/design
-+incdir+${SH_LIB_DIR}
-+incdir+${SH_INF_DIR}
-+incdir+${CL_ROOT}/verif/sv
 
 -y ${CL_ROOT}/design
 -y ${HDK_DIR}/common/shell_latest/design/mgt
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
 
-${CL_ROOT}/design/cl_hello_world_defines.vh
-
--f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
++incdir+${CL_ROOT}/verif/sv
++incdir+${SH_LIB_DIR}
++incdir+${SH_INF_DIR}
 
 ${CL_ROOT}/design/cl_hello_world.sv
+
+-f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
 ${TEST_NAME}

@@ -5,6 +5,9 @@
 ## =============================================================================
 
 -define VIVADO_SIM
+-define CL_NAME=cl_simple
+-define FPGA_LESS_RST
+-define NO_XDMA
 
 -sourcelibext .v
 -sourcelibext .sv
@@ -15,16 +18,14 @@
 -sourcelibdir ${SH_INF_DIR}
 
 -include ${CL_ROOT}/verif/sv
+-include ${SH_LIB_DIR}
 -include ${SH_INF_DIR}
-
-${CL_ROOT}/design/cl_simple_defines.vh
-
--f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv
 ${CL_ROOT}/design/cl_simple.sv
 
-${TEST_NAME}
+-f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 
+${TEST_NAME}

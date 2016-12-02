@@ -31,7 +31,7 @@ module test_ddr();
       base_addr = 64'h0000_0000_0000_0100;
       ddr_common_test(.base_addr(base_addr), .error_count(error_count));
 
-`ifdef VCS
+`ifdef VCS_SIM
       // DDR 1
       $display("[%t] : Programming cl_tst registers for DDR 1", $realtime);
       base_addr = 64'h0000_0000_0000_0200;
