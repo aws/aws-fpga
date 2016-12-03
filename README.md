@@ -1,5 +1,4 @@
 <span style="display: inline-block;">
-[![Join the chat at https://gitter.im/aws/aws-fpga](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aws/aws-fpga?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # AWS EC2 FPGA Hardware and Software Development Kit
 
