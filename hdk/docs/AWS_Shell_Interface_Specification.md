@@ -1,10 +1,7 @@
 
 ## Revision History
 
-
-  Revision   Date         Content
-
-  0.14       2016/11/28   -   Initial HDK release version
+2016/11/28   -   Initial public release with HDK release version
                           
                           
 
