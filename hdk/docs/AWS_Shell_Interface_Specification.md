@@ -77,7 +77,7 @@ All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 in
 -   AxREGION – Region identifier is not supported.
 
 
-[!alt tag](./images/AWS_Shell_CL_overview.jpg)
+![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
 ### External Memory Interfaces implemented in CL
 
@@ -98,7 +98,7 @@ A single 250MHz clock, and associated asynchronous reset is provided to the CL. 
 
 +The Xilinx Mixed Mode Clock Manager (MMCM) IP can be used to generate slower clocks off of the 250MHz clock.
 
-[!alt tag](./images/Dividing_clocks_inside_CL.jpeg)
+![alt tag](./images/Dividing_clocks_inside_CL.jpg)
 
 The reset signal combines the board reset and PCIe reset conditions. Please refer to the Xilinx documentation (ug974) for more information.
 
