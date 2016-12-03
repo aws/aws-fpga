@@ -215,24 +215,21 @@ All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express
 
 ### AXI4 Error handling 
 
-Transaction on AXI4 interface will be terminated and reported as SLVERR
-on the RRESP/BRESP signals and will not passed to the instance in the
-following cases:
+Transaction on AXI4 interface will be terminated and reported as SLVERR on the RRESP/BRESP signals and will not passed to the instance in the following cases:
 
--   PCIe BME (BusMaster Enable) is not set in the PCIe configuration
-    space
+-   PCIe BME (BusMaster Enable) is not set in the PCIe configuration space
 
--   Illegal transaction address (Addressing memory space that’s not
-    supported by the instance)
+-   Illegal transaction address (Addressing memory space that’s not supported by the instance)
 
--   Transaction crossing 4KB boundaries
+-   Transaction crossing 4KB boundaries violating PCIe specifications
 
 -   Illegal byte-masking
 
 -   Illegal length
 
--   Illegal ARID (ARID is already been used for an outstanding
-    read transaction)
+-   Illegal ARID (ARID is already been used for an outstanding read transaction)
+
+**NOTE** Pre-GA versions of the Shell and the FPGA Magagement tools many not have some of these checks and associated metrics exposed to the developers.
 
 ### Interrupts (Future)
 
@@ -240,34 +237,21 @@ Interrupts are not supported in the current version of the Shell. Future
 versions of the Shell will have support for at least 16 interrupt
 sources.
 
-DDR-4 Interface
----------------
+## DDR4 DRAM Interface
 
-Each DDR-4 interface is accessed over an AXI-4 interface:
+Each DRAM interface is accessed via an AXI-4 interface:
 
--   AXI-4 (CL Master) – 512-bit AXI-4 interface to read/write DDR
+-   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR
 
-There is a single status signal that he DDR is trained and ready for
-access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to
-DDR Row/Col/Bank. The Read and Write channels are serviced with round
-robin priority (equal priority).
+There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with roundrobin priority (equal priority).
 
-The DDR-4 interface uses the Xilinx DDR-4 controller. The AXI-4
-interface adheres to the Xilinx specification. User bits are added to
-the read data channel to signal ECC errors with the read data.
+The DRAM interface uses  Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. User bits are added to the read data channel to signal ECC errors with the read data.
 
-In the current version of the CL, the DDR interfaces are not optional
-and have to be instanced in order to successfully place and route the
-CL. In future versions, the CL will be able to choose the number of DDR
-controllers (A/B/D). If the DDR interfaces are not used, the AXI-4
-interfaces of the sh_ddr.sv should be tied-off.
+In the current version of the CL, the four DRAM interfaces are not optional and have to be instanced in order to successfully place and route the CL. In future versions, the CL will be able to choose the number of DDR controllers (A/B/D). If the DDR interfaces are not used, the AXI-4 interfaces of the sh_ddr.sv should be tied-off.
 
-### DDR Preservation (Future)
+### DRAM Content Preservation between AFI Loads (Future)
 
-In future Shell versions a DDR preservation feature will be implemented.
-This feature allows the DDR state to be preserved when dynamically
-changing CL logic. The current Shell version will not guarantee
-preservation of DDR contents if the CL logic is re-loaded.
+In future Shell versions a DRAM content preservation feature will be implemented. This feature allows the DDR state to be preserved when dynamically changing CL logic. The current Shell version will not guarantee preservation of DRAM contents if the CL logic is re-loaded.
 
 #### Miscellaneous signals
 
@@ -275,7 +259,7 @@ There are some miscellaneous generic signals between Shell and CL.
 
 ### PCIe IDs
 
-There are some signals that must have the PCIe IDs of the CL. A Developer’s specific PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID are registered through aws ec2 fpgaImageCreate command to reserve the PCIe IDs of the CL for mapping of the device into an F1 instance when the AFI is loaded.
+Some signals must include the PCIe IDs of the CL. A Developer’s specific PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID are registered through `aws ec2 fpgaImageCreate` command to reserve the PCIe IDs of the CL for mapping of the device into an F1 instance when the AFI is loaded.
 
 -   cl_sh_id0
 
@@ -283,25 +267,25 @@ There are some signals that must have the PCIe IDs of the CL. A Developer’s sp
 
     -   [31:16] – Device ID
 
--   cl_sh\_id1
+-   cl_sh_id1
 
-    -   \[15:0\] – Subsystem Vendor ID
+    -   [15:0] – Subsystem ID
 
-    -   \[31:16\] – Subsystem Device ID
+    -  [31:16] – Subsystem Vendor ID
 
 ### General control/status
 
 The functionality of these signals is TBD.
 
--   cl\_sh\_status0\[31:0\] – CL to Shell status
+-   cl_sh_status0[31:0] – Placeholder for generic CL to Shell status
 
--   cl\_sh\_status1\[31:0\] – CL to Shell status
+-   cl_sh_status1[31:0] – Placeholder for generic CL to Shell status
 
--   sh\_cl\_ctl0\[31:0\] – Shell to CL control information
+-   sh_cl_ctl0[31:0] – Placeholder for generic Shell to CL control information
 
--   sh\_cl\_ctl1\[31:0\] – Shell to CL control information
+-   sh_cl_ctl1[31:0] – Placeholder for generic Shell to CL control information
 
--   sh\_cl\_pwr\_state\[1:0\] – This is the power state of the FPGA. 0x0
+-   sh_cl_pwr_state[1:0] – This is the power state of the FPGA. 0x0
 
     -   0x0 – Power is normal
 
@@ -309,5 +293,4 @@ The functionality of these signals is TBD.
 
     -   0x2 – Power level 2
 
-    -   0x3 – Power is critical and FPGA is subject to shutting off
-        clocks or powering down
+    -   0x3 – Power is critical and FPGA is subject to shutting off clocks or powering down
