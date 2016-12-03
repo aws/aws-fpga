@@ -77,6 +77,8 @@ All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 in
 -   AxREGION – Region identifier is not supported.
 
 
+[!alt tag](./images/AWS_Shell_CL_overview.jpg)
+
 ### External Memory Interfaces implemented in CL
 
 Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA. For those interfaces, the designs and the constrains are provided by AWS and must be instantiated in the CL (by including the `sh_ddr.sv`). 
@@ -95,6 +97,8 @@ For DRAM interface controllers that are implemented in the CL, the AXI-4 interfa
 A single 250MHz clock, and associated asynchronous reset is provided to the CL. All Shell interfaces are synchronous to the 250MHz clock. The CL can derive clocks off of the 250MHz clock.
 
 +The Xilinx Mixed Mode Clock Manager (MMCM) IP can be used to generate slower clocks off of the 250MHz clock.
+
+[!alt tag](./images/Dividing_clocks_inside_CL.jpeg)
 
 The reset signal combines the board reset and PCIe reset conditions. Please refer to the Xilinx documentation (ug974) for more information.
 
