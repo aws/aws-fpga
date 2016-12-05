@@ -5,9 +5,6 @@
 ## =============================================================================
 
 -define VIVADO_SIM
--define CL_NAME=cl_hello_world
--define FPGA_LESS_RST
--define NO_XDMA
 
 -sourcelibext .v
 -sourcelibext .sv
@@ -21,6 +18,7 @@
 -include ${SH_LIB_DIR}
 -include ${SH_INF_DIR}
 
+${CL_ROOT}/design/cl_hello_world_defines.vh
 ${CL_ROOT}/design/cl_hello_world.sv
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
