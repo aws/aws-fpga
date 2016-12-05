@@ -26,5 +26,3 @@ cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rank.sv                $HDK_COMMON_D
 cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rcd_model.sv           $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
 cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rdimm_wrapper.sv       $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
 
-#rm -rf tmp
-cd $HDK_COMMON_DIR/verif/models/
