@@ -5,9 +5,6 @@
 ## =============================================================================
 
 +define+QUESTA_SIM
-+define+CL_NAME=cl_simple
-+define+FPGA_LESS_RST
-+define+NO_XDMA
 
 +libext+.v
 +libext+.sv
@@ -21,6 +18,7 @@
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 
+${CL_ROOT}/design/cl_simple_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv

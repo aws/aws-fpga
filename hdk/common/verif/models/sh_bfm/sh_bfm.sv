@@ -864,6 +864,7 @@ typedef struct {
       if (cl_sh_pcim_rready[0] && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
          if (sh_cl_rd_data[0].len == 0) begin
             sh_cl_rd_data.pop_front();
+            cl_sh_rd_cmds.pop_front();
             first_rd_beat = 1'b1;
          end
          else
