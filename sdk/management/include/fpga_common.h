@@ -86,7 +86,7 @@ struct fpga_meta_ids {
 } __attribute__((packed));
 
 /** FPGA metrics */
-#define FPGA_METRICS_COMMON_RESERVED 376
+#define FPGA_METRICS_COMMON_RESERVED	120
 struct fpga_metrics_common {
 	uint8_t		reserved[FPGA_METRICS_COMMON_RESERVED];
 } __attribute__((packed));

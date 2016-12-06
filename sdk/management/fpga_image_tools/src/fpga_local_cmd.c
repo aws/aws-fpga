@@ -524,7 +524,7 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 	uint32_t tmp_len = 
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
 
-	fail_on_quiet(len != tmp_len, err, "total_rsp_len(%u) != calculated_len(%u)", 
+	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
 			len, tmp_len);
 
 	if (f1.show_headers) {
