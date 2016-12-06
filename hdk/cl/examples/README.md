@@ -28,11 +28,21 @@ As a pre-requested to building the AFI, the developer should have an instance/se
 
 **NOTE:** *You can skip steps 0 through 3 if you are not interested in the build process.  Step 4 through 6 will show you how to use one of the predesigned AFI*
 
-### 0. Download and configure the HDK to the source directory on the instance
+### 0. Setup the HDK and install AWS CLI
 
     $ git clone https://github.com/aws/aws-fpga
     $ cd aws-fpga
     $ source hdk_shell.sh
+    
+To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+    
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (typically us-east-1)
+
+**NOTE**: During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public. 
+To extend your AWS CLI installation, please execute the following:
+
+    $ aws configure add-model --service-model file://$(pwd)/sdk/aws-cli-preview/ec2_preview_model.json
+            
     
 ### 1. Pick one of the examples and move to its directory
 
@@ -70,12 +80,12 @@ For example, if working on a remote machine, we recommend using window managemen
 To submit the DCP, create an S3 bucket for submitting the design and upload the tar-zipped archive into that bucket. 
 You need to prepare the following information:
 
-1) Name of the logic design.
-2) Generic description of the logic design.
-3) PCI IDs: Device, Vendor, Subsystem, SubsystemVendor (these IDs should be found in the README files in the respective CL example directory).
-4) Location of the DCP object (S3 bucket name and key).
-5) Location of the directory to write logs (S3 bucket name and key).
-6) Version of the AWS Shell.
+1. Name of the logic design.
+2. Generic description of the logic design.
+3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor (these IDs should be found in the README files in the respective CL example directory).
+4. Location of the DCP object (S3 bucket name and key).
+5. Location of the directory to write logs (S3 bucket name and key).
+6. Version of the AWS Shell.
 
 To upload your DCP to S3, 
 
@@ -84,7 +94,7 @@ To upload your DCP to S3,
              s3://<bucket-name>/cl_simple.dcp
 
 To generate the AFI, follow one of the two methods listed below.
-After the AFI generation is complete, AWS will write the logs back into the bucket location provided by the developer and notify them
+After the AFI generation is complete, AWS will put the logs into the bucket location provided by the developer and notify them
 by email.
 
 #### Method 1: If you have access to AWS EC2 CLI with support for `create-fpga-image` action
@@ -109,29 +119,63 @@ The output of this command includes two identifiers that refer to your AFI:
 
 #### Method 2: During F1 preview and before AWS EC2 CLI action `create-fpga-image` is available
 
-Add a policy to the created S3 bucket granting read/write permissions to our team's account (Account ID: 682510182675). 
-This is an [example policy](../../common/shell_current/new_cl_template/build/README.md). 
-Send an email to AWS (email TBD) providing the information listed earlier. 
+Add a policy to the created S3 bucket granting [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to our team's account (Account ID: 682510182675). 
+A sample policy is shown below. 
+
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Bucket level permissions",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::682510182675:root"
+                },
+                "Action": [
+                    "s3:ListBucket"
+                ],
+                "Resource": "arn:aws:s3:::<bucket_name>"
+            },
+            {
+                "Sid": "Object read permissions",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::682510182675:root"
+                },
+                "Action": [
+                    "s3:GetObject"
+                ],
+                "Resource": "arn:aws:s3:::<dcp_bucket_name>/<dcp_filename>"
+            },
+            {
+                "Sid": "Folder write permissions",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::682510182675:root"
+                },
+                "Action": [
+                    "s3:PutObject"
+                ],
+                "Resource": "arn:aws:s3:::<log_bucket_name>/*"
+            }
+        ]
+    }
+
+Then, send an email to AWS (email TBD) providing the information listed earlier.
 
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
 
 To follow the next steps, you have to run an instance on F1. AWS recommend you run an instance with latest Amazon Linux that have the FPGA management tools included, or alternatively the FPGA Developer AMI with both the HDK and SDK.
 
-## 4. Install and configure AWS CLI and AWS FPGA management tools
+## 4. Setup AWS FPGA management tools
 
-To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+Execute the following:
 
-    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (typically us-east-1)
-    $ git clone https://github.com/aws/aws-fpga
+    $ git clone https://github.com/aws/aws-fpga     # Not needed if you have installed the HDK as in Step 0.
     $ cd aws-fpga
     $ source sdk_setup.sh
-
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public. 
-To extend your AWS CLI installation, please execute the following:
-
-    $ aws configure add-model --service-model file://$(pwd)/sdk/aws-cli-preview/ec2_preview_model.json
-        
+       
 ## 5. Associate the AFI with your AMI
 
 To start using the AFI, you need to associate it with an [AMI (Amazon Machine Image)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that you own.
