@@ -112,11 +112,11 @@ puts "AWS FPGA: Reading AWS constraints";
 #
 #  cl_synth_aws.xdc - AWS provided constraints.  ***DO NOT MODIFY***
 #  cl_clocks_aws.xdc - AWS provided clock constraint.  ***DO NOT MODIFY***
-#  ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
+#  cl_ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
    $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/ddr.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]
 
@@ -160,7 +160,7 @@ read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_
 read_xdc [ list\
 $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
 $CL_DIR/build/constraints/cl_pnr_user.xdc \
-$HDK_SHELL_DIR/build/constraints/ddr.xdc
+$HDK_SHELL_DIR/build/constraints/cl_ddr.xdc
 ]
 
 puts "AWS FPGA: Optimize design during implementation";
