@@ -24,11 +24,7 @@
 
 #include <fpga_common.h>
 
-#if defined(USE_VENOM_CL_2_COMPAT)
-#define FPGA_MBOX_MSG_DATA_LEN	256	
-#else
 #define FPGA_MBOX_MSG_DATA_LEN	4096 
-#endif
 
 /**
  * Mailbox init structure.
