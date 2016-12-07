@@ -229,11 +229,11 @@ set_param bitstream.enablePR 4123
 write_bitstream -force -bin_file $CL_DIR/build/bitstreams/${timestamp}.SH_CL_final.bit
 ### --------------------------------------------
 
-close_design
-
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
 puts "Compress files for sending back to AWS"
 
 cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob  to_aws/${timestamp}*]
+
+close_design
 
