@@ -10,7 +10,6 @@
 +libext+.sv
 
 -y ${CL_ROOT}/design
--y ${HDK_DIR}/common/shell_latest/design/mgt
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
 

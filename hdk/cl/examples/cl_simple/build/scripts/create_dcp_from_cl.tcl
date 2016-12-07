@@ -99,9 +99,8 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-$HDK_SHELL_DIR/design/mgt/mgt_acc_ccf.sv \
-$HDK_SHELL_DIR/design/mgt/mgt_acc_axl.sv  \
-$HDK_SHELL_DIR/design/mgt/mgt_gen_axl.sv  \
+$HDK_SHELL_DIR/design/lib/mgt_acc_axl.sv  \
+$HDK_SHELL_DIR/design/lib/mgt_gen_axl.sv  \
 $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
 $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]

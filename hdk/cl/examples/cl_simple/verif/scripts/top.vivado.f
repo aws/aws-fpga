@@ -10,7 +10,6 @@
 -sourcelibext .sv
 
 -sourcelibdir ${CL_ROOT}/design
--sourcelibdir ${HDK_DIR}/common/shell_latest/design/mgt
 -sourcelibdir ${SH_LIB_DIR}
 -sourcelibdir ${SH_INF_DIR}
 
