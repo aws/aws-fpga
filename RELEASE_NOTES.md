@@ -17,15 +17,17 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
     *    PCIE endpoint presentation to Custom Logic(CL)
          *    Management PF (physical function)
          *    Application PF
-         *    FLR interface for Application PF
     *    PCIE interface between Shell(SH) and Custom Logic(CL).
-         *    SH to CL inbound AXI4 interface.
-         *    CL to SH outbound AXI4 interface.
-         *    512 bit bus that supports 32-bit transactions on inbound and outbound transactions
+         *    SH to CL inbound 512-bit AXI4 interface (currently supports 32-bit accesses only).
+         *    CL to SH outbound 512-bit AXI4 interface
          *    Maximum payload size set by the Shell
          *    Maximum read request size set by the Shell
          *    AXI4 error handling
          *    Proprietary AxUSER bits implemented on address channels: please refer to ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)        
+    *    DDR interface between SH and CL
+         *     CL to SH 512-bit AXI4 interface
+         *     1 DDR controller implemented in the SH (always available)
+         *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Implementation Restrictions
 
@@ -49,12 +51,12 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
 * Customizable PCIe DeviceID/VendorID
-* Capability to remove some of the DRAM interface controllers from the CL
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
 * Synopsys RTL simulations tools
 * Xilinx SDAccel development environment
 * Additional metric counters for FPGA management tools
+* PCIe Slave interface supports 32-bit accesses only (can only do 32-bit accesses from Instance to FPGA)
 
 ## Supported Tools and Environment
 
@@ -73,7 +75,8 @@ The HDK and SDK in the development kit have different licenses. SDK is licensed 
 
 ## What's new
 
-This section will include any new features added in the future releases.
+### 2016/12/06 
+   * Add support for configurable number of DDR controllers in the CL (see ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)) 
 
 ## Bug Fixes
 

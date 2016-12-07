@@ -2,6 +2,8 @@
 ## Revision History
 
 2016/11/28   -   Initial public release with HDK release version
+
+2016/12/06   -   Added capability to remove DDR controllers in the CL through parameters in `sh_ddr.sv`
                           
                           
 
@@ -87,9 +89,23 @@ There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D ar
 
 For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shekk, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.
 
-**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether anyone of them resides in the CL or the Shell logic*
+All CL's **must** instantiate sh_ddr.sv, regardless of the number of DDR's that should be implemented.  There are three parameters (all default to '1') that define which DDR controllers are implemented:
+  * DDR_A_PRESENT
+  * DDR_B_PRESENT
+  * DDR_D_PRESENT
+  
+These parameters are used to control which DDR controllers are impemented in the CL design.  An example instantiation:
+ ```   
+    sh_ddr #(.DDR_A_PRESENT(1),
+           .DDR_B_PRESENT(1),
+           .DDR_D_PRESENT(0))
+           SH_DDR (
+              .clk(clk),
+              ...
+ ```   
+ 
 
-**NOTE:** *The HDK will offer an option to build a CL without one or more of the 3 DRAM controllers for optimizing FPGA resource *
+**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether anyone of them resides in the CL or the Shell logic*
 
 
 ### Clocking/Reset
@@ -251,7 +267,7 @@ There is a single status signal that the DRAM interface is trained and ready for
 
 The DRAM interface uses  Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. User bits are added to the read data channel to signal ECC errors with the read data.
 
-In the current version of the CL, the four DRAM interfaces are not optional and have to be instanced in order to successfully place and route the CL. In future versions, the CL will be able to choose the number of DDR controllers (A/B/D). If the DDR interfaces are not used, the AXI-4 interfaces of the sh_ddr.sv should be tied-off.
+**NOTE:** even if no DDR4 controllers are desired in the CL, the `sh_ddr.sv` block must be instantiated in the CL (parameters are used to remove DDR controllers).  If the `sh_ddr.sv` module is not instantiated the design will have build errors.
 
 ### DRAM Content Preservation between AFI Loads (Future)
 
@@ -259,7 +275,7 @@ In future Shell versions a DRAM content preservation feature will be implemented
 
 #### Miscellaneous signals
 
-There are some miscellaneous generic signals between Shell and CL.
+There are some miscellaneous generic signals between the Shell and CL.
 
 ### PCIe IDs
 
