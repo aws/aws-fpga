@@ -75,7 +75,7 @@ The HDK and SDK in the development kit have different licenses. SDK is licensed 
 
 ## What's new
 
-### 12/6/2016 
+### 2016/12/06 
    * Add support for configurable number of DDR controllers in the CL (see ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)) 
 
 ## Bug Fixes
