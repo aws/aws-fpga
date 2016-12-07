@@ -56,7 +56,9 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Synopsys RTL simulations tools
 * Xilinx SDAccel development environment
 * Additional metric counters for FPGA management tools
-* PCIe Slave interface supports 32-bit accesses only (can only do 32-bit accesses from Instance to FPGA)
+* PCIe Slave interface supports 32-bit accesses only (can only do 32-bit accesses from Instance to FPGA), future releases will go up to 512-bit
+* Wider bus on ARID/AWID on DRAM and PCIe buses to allow developers to do AXI ID based routing
+* Emulated LED display (exposed via the Management PF)
 
 ## Supported Tools and Environment
 
