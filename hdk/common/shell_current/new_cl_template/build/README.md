@@ -50,12 +50,8 @@ This performs:
  - Implementation of CL with AWS Shell.
  - Generates design checkpoint for AWS ingestion and associated logs.
   
-### 5) Validate the Results by Emulating AWS Ingestion Process
-
-To aid developers in build verification, AWS provides a script (`$CL_DIR/build/scripts/emulate_AWS_ingestion_process.tcl`) that emulates 
-the process that AWS uses to generate bitstreams from a developer DCP. The script can be run as follows:
- 
-        $ vivado -mode batch -source emulate_AWS_ingestion_process.tcl
+To aid developers in build verification, there is a final step in the build script that emulates 
+the process that AWS uses to generate bitstreams from a developer DCP.
 
 The outputs are:
  - `$CL_DIR/build/checkpoints/*`: Various checkpoints generated during the build process.
