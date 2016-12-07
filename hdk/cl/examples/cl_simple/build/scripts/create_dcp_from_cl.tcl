@@ -44,6 +44,7 @@ set_msg_config -severity INFO -suppress
 set_msg_config -severity STATUS -suppress
 set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
+set_msg_config -string {AXI_QUAD_SPI} -suppress
 
 puts "AWS FPGA: Calling the encrypt.tcl";
 
