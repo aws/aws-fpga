@@ -7,12 +7,14 @@
 ## 		developer code
 ## =============================================================================
 
+package require tar
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
+puts "Shell Version: VenomCL_unc - 0x11241611";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -115,9 +117,9 @@ puts "AWS FPGA: Reading AWS constraints";
 
 #Read all the constraints
 #
-#  cl_synth_aws.xdc - AWS provided constraints.  ***DO NOT MODIFY***
-#  cl_clocks_aws.xdc - AWS provided clock constraint.  ***DO NOT MODIFY***
-#  cl_ddr.xdc - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
+#  cl_synth_aws.xdc  - AWS provided constraints.          ***DO NOT MODIFY***
+#  cl_clocks_aws.xdc - AWS provided clock constraint.     ***DO NOT MODIFY***
+#  cl_ddr.xdc        - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
    $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
@@ -207,8 +209,35 @@ puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
 #Verify PR build
 pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -file $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
 
+### --------------------------------------------
+### Emulate what AWS will do
+### --------------------------------------------
+
+# Verify the Developer DCP is compatible with SH_BB. 
+pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+open_checkpoint $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
+report_io -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_report_io.rpt
+
+# Write out the CL DCP to integrate with SH_BB
+write_checkpoint -force -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL_routed.dcp
 close_design
 
-# created a zipped tar file, that would be used for createFpgaImage EC2 API
-exec tar cvfz ${timestamp}.Developer_CL.tar.gz $CL_DIR/build/checkpoints/to_aws/${timestamp}*
+# Integreate Developer CL with SH BB
+open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL_routed.dcp
+report_drc -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_DRC.rpt
+write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp
+pr_verify -full_check $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp 
+set_param bitstream.enablePR 4123
+write_bitstream -force -bin_file $CL_DIR/build/bitstreams/${timestamp}.SH_CL_final.bit
+### --------------------------------------------
+
+close_design
+
+# Create a zipped tar file, that would be used for createFpgaImage EC2 API
+puts "Compress files for sending back to AWS"
+
+cd $CL_DIR/build/checkpoints
+tar::create to_aws/${timestamp}.Developer_CL.tar [glob  to_aws/${timestamp}*]
 
