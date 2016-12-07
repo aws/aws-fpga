@@ -74,17 +74,27 @@ enum {
 	AFI_CMD_END
 };
 
+/** Error response specific info */
+union afi_err_info {
+	/** ACE_INVALID_API_VERSION: peer's preferred AFI command version */
+	uint32_t	afi_cmd_version;	
+};
+
 /** Error response. */
 struct afi_cmd_err_rsp {
 	/** Error, see below for error values */
-	int32_t error;
+	int32_t		error;
+	/** See afi_err_info */
+	uint8_t		error_info[];			
 } __attribute__((packed));
 
 /** AFI_CMD_ERROR opcode, error values */
 enum {
 	ACE_OK = 0,
+	ACE_INVALID_API_VERSION = 1,
 	ACE_BUSY = 3,
 	ACE_INVALID_AFI_ID = 5,
+
 	ACE_END
 };
 
