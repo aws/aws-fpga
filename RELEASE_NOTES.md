@@ -50,6 +50,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * ChipScope
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
+* Aurora and Reliabile Aurora modules for the FPGA-to-FPGA 
 * Customizable PCIe DeviceID/VendorID
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
