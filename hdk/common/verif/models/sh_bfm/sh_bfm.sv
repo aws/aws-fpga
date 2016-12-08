@@ -1144,7 +1144,7 @@ typedef struct {
       end
       host_memory_addr = addr;
       tb.use_c_host_memory = 1'b1;      
-   endtask // sv_map_host_memory
+   endtask // map_host_memory
    
    task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
       AXI_Command axi_cmd;

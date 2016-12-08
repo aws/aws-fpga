@@ -12,7 +12,6 @@ module test_null();
       
       tb.sh.power_up();
 
-      
       tb.test_main(exit_code);
       
       #50ns;
@@ -22,4 +21,4 @@ module test_null();
       $finish;
    end
 
-endmodule // test_peek_poke
+endmodule // test_null

@@ -23,4 +23,3 @@ module test_null();
    end
 
 endmodule // test_null
-
