@@ -169,7 +169,8 @@ print_usage(const char *prog_name, const char *usage[], size_t num_entries)
 static void 
 print_version(void)
 {   
-	printf("Version: %s\n", CLI_VERSION);
+	printf("AFI Management Tools Version: %s\n", CLI_VERSION);
+	printf("AFI CMD API Version: v%u\n", AFI_CMD_API_VERSION);
 }
 
 /**

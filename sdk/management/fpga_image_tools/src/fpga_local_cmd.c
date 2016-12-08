@@ -285,6 +285,7 @@ afi_cmd_hdr_set_flags(union afi_cmd *cmd, unsigned int flags)
  */
 static const char *ace_tbl[ACE_END] = {
 	[ACE_OK] = "ok",
+	[ACE_INVALID_API_VERSION] = "invalid-api-version",
 	[ACE_BUSY] = "busy",
 	[ACE_INVALID_AFI_ID] = "invalid-afi-id",
 };
@@ -311,7 +312,7 @@ handle_afi_cmd_error_rsp(const union afi_cmd *cmd,
 	uint32_t tmp_len =
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
 
-	fail_on_quiet(len != tmp_len, err, "total_rsp_len(%u) != calculated_len(%u)", 
+	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
 			len, tmp_len);
 
 	if (f1.show_headers) {
@@ -325,6 +326,18 @@ handle_afi_cmd_error_rsp(const union afi_cmd *cmd,
 		err_name = (void *)ace_tbl[err_rsp->error];
 	}
 	printf("       %-13s      %u\n", err_name, err_rsp->error);
+
+	/** Handle invalid API version error */
+	if (err_rsp->error == ACE_INVALID_API_VERSION) {
+		union afi_err_info *err_info = (void *)err_rsp->error_info;
+
+		tmp_len += sizeof(err_info->afi_cmd_version);
+		fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
+				len, tmp_len);
+
+		printf("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n", 
+				err_info->afi_cmd_version);
+	}
 
 	return 0;
 err:
@@ -524,7 +537,7 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 	uint32_t tmp_len = 
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
 
-	fail_on_quiet(len != tmp_len, err, "total_rsp_len(%u) != calculated_len(%u)", 
+	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
 			len, tmp_len);
 
 	if (f1.show_headers) {

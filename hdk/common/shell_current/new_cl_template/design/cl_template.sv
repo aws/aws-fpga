@@ -12,7 +12,6 @@ module cl_template #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HM
 
 );
   
-   localparam NUM_CL_DDR = 3;
    localparam NUM_CFG_STGS_INT_TST = 4;
    localparam NUM_CFG_STGS_HMC_ATG = 4;
    localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
@@ -59,7 +58,9 @@ always_ff @(negedge rst_n or posedge clk)
 
 // Only the DDR pins are connected. The AXI and stats interfaces are tied-off.
 
-sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
+sh_ddr #(.DDR_A_PRESENT(0),
+         .DDR_B_PRESENT(0),
+         .DDR_D_PRESENT(0)) SH_DDR
    (
    .clk(clk),
    .rst_n(sync_rst_n),

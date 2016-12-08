@@ -14,7 +14,10 @@ module cl_simple #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=
 
 );
   
-   localparam NUM_CL_DDR = 3;
+   localparam DDR_A_PRESENT = 1;
+   localparam DDR_B_PRESENT = 1;
+   localparam DDR_D_PRESENT = 1;
+   
    localparam NUM_CFG_STGS_INT_TST = 4;
    localparam NUM_CFG_STGS_HMC_ATG = 4;
    localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
@@ -45,77 +48,77 @@ module cl_simple #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=
 //---------------------------- 
 // Internal signals
 //---------------------------- 
-logic[5:0] lcl_cl_sh_ddr_awid[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_awaddr[NUM_CL_DDR-1:0];
-logic[7:0] lcl_cl_sh_ddr_awlen[NUM_CL_DDR-1:0];
-logic lcl_cl_sh_ddr_awvalid[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_awready;
+logic[5:0] lcl_cl_sh_ddr_awid[2:0];
+logic[63:0] lcl_cl_sh_ddr_awaddr[2:0];
+logic[7:0] lcl_cl_sh_ddr_awlen[2:0];
+logic lcl_cl_sh_ddr_awvalid[2:0];
+logic[2:0] lcl_sh_cl_ddr_awready;
    
-logic[5:0] lcl_cl_sh_ddr_wid[NUM_CL_DDR-1:0];
-logic[511:0] lcl_cl_sh_ddr_wdata[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_wstrb[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_wlast;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_wvalid;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_wready;
+logic[5:0] lcl_cl_sh_ddr_wid[2:0];
+logic[511:0] lcl_cl_sh_ddr_wdata[2:0];
+logic[63:0] lcl_cl_sh_ddr_wstrb[2:0];
+logic[2:0] lcl_cl_sh_ddr_wlast;
+logic[2:0] lcl_cl_sh_ddr_wvalid;
+logic[2:0] lcl_sh_cl_ddr_wready;
    
-logic[5:0] lcl_sh_cl_ddr_bid[NUM_CL_DDR-1:0];
-logic[1:0] lcl_sh_cl_ddr_bresp[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_bvalid;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_bready;
+logic[5:0] lcl_sh_cl_ddr_bid[2:0];
+logic[1:0] lcl_sh_cl_ddr_bresp[2:0];
+logic[2:0] lcl_sh_cl_ddr_bvalid;
+logic[2:0] lcl_cl_sh_ddr_bready;
    
-logic[2:0] dummy_lcl_cl_sh_ddr_arid[NUM_CL_DDR-1:0];
-logic[5:0] lcl_cl_sh_ddr_arid[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_araddr[NUM_CL_DDR-1:0];
-logic[7:0] lcl_cl_sh_ddr_arlen[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_arvalid;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_arready;
+logic[2:0] dummy_lcl_cl_sh_ddr_arid[2:0];
+logic[5:0] lcl_cl_sh_ddr_arid[2:0];
+logic[63:0] lcl_cl_sh_ddr_araddr[2:0];
+logic[7:0] lcl_cl_sh_ddr_arlen[2:0];
+logic[2:0] lcl_cl_sh_ddr_arvalid;
+logic[2:0] lcl_sh_cl_ddr_arready;
    
-logic[5:0] lcl_sh_cl_ddr_rid[NUM_CL_DDR-1:0];
-logic[511:0] lcl_sh_cl_ddr_rdata[NUM_CL_DDR-1:0];
-logic[1:0] lcl_sh_cl_ddr_rresp[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_rlast;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_rvalid;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_rready;
+logic[5:0] lcl_sh_cl_ddr_rid[2:0];
+logic[511:0] lcl_sh_cl_ddr_rdata[2:0];
+logic[1:0] lcl_sh_cl_ddr_rresp[2:0];
+logic[2:0] lcl_sh_cl_ddr_rlast;
+logic[2:0] lcl_sh_cl_ddr_rvalid;
+logic[2:0] lcl_cl_sh_ddr_rready;
 
-logic[5:0] lcl_cl_sh_ddr_awid_q[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_awaddr_q[NUM_CL_DDR-1:0];
-logic[7:0] lcl_cl_sh_ddr_awlen_q[NUM_CL_DDR-1:0];
-logic lcl_cl_sh_ddr_awvalid_q[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_awready_q;
+logic[5:0] lcl_cl_sh_ddr_awid_q[2:0];
+logic[63:0] lcl_cl_sh_ddr_awaddr_q[2:0];
+logic[7:0] lcl_cl_sh_ddr_awlen_q[2:0];
+logic lcl_cl_sh_ddr_awvalid_q[2:0];
+logic[2:0] lcl_sh_cl_ddr_awready_q;
    
-logic[5:0] lcl_cl_sh_ddr_wid_q[NUM_CL_DDR-1:0];
-logic[511:0] lcl_cl_sh_ddr_wdata_q[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_wstrb_q[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_wlast_q;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_wvalid_q;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_wready_q;
+logic[5:0] lcl_cl_sh_ddr_wid_q[2:0];
+logic[511:0] lcl_cl_sh_ddr_wdata_q[2:0];
+logic[63:0] lcl_cl_sh_ddr_wstrb_q[2:0];
+logic[2:0] lcl_cl_sh_ddr_wlast_q;
+logic[2:0] lcl_cl_sh_ddr_wvalid_q;
+logic[2:0] lcl_sh_cl_ddr_wready_q;
    
-logic[5:0] lcl_sh_cl_ddr_bid_q[NUM_CL_DDR-1:0];
-logic[1:0] lcl_sh_cl_ddr_bresp_q[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_bvalid_q;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_bready_q;
+logic[5:0] lcl_sh_cl_ddr_bid_q[2:0];
+logic[1:0] lcl_sh_cl_ddr_bresp_q[2:0];
+logic[2:0] lcl_sh_cl_ddr_bvalid_q;
+logic[2:0] lcl_cl_sh_ddr_bready_q;
    
-logic[5:0] lcl_cl_sh_ddr_arid_q[NUM_CL_DDR-1:0];
-logic[63:0] lcl_cl_sh_ddr_araddr_q[NUM_CL_DDR-1:0];
-logic[7:0] lcl_cl_sh_ddr_arlen_q[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_arvalid_q;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_arready_q;
+logic[5:0] lcl_cl_sh_ddr_arid_q[2:0];
+logic[63:0] lcl_cl_sh_ddr_araddr_q[2:0];
+logic[7:0] lcl_cl_sh_ddr_arlen_q[2:0];
+logic[2:0] lcl_cl_sh_ddr_arvalid_q;
+logic[2:0] lcl_sh_cl_ddr_arready_q;
    
-logic[5:0] lcl_sh_cl_ddr_rid_q[NUM_CL_DDR-1:0];
-logic[511:0] lcl_sh_cl_ddr_rdata_q[NUM_CL_DDR-1:0];
-logic[1:0] lcl_sh_cl_ddr_rresp_q[NUM_CL_DDR-1:0];
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_rlast_q;
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_rvalid_q;
-logic[NUM_CL_DDR-1:0] lcl_cl_sh_ddr_rready_q;
+logic[5:0] lcl_sh_cl_ddr_rid_q[2:0];
+logic[511:0] lcl_sh_cl_ddr_rdata_q[2:0];
+logic[1:0] lcl_sh_cl_ddr_rresp_q[2:0];
+logic[2:0] lcl_sh_cl_ddr_rlast_q;
+logic[2:0] lcl_sh_cl_ddr_rvalid_q;
+logic[2:0] lcl_cl_sh_ddr_rready_q;
    
-logic[NUM_CL_DDR-1:0] lcl_sh_cl_ddr_is_ready;
+logic[2:0] lcl_sh_cl_ddr_is_ready;
 
 logic[3:0] dummy_cl_sh_pcim_arid[NUM_PCIE-1:0]; 
 logic dummy_cl_sh_pcim_awid[NUM_PCIE-1:0]; 
 
    logic [2:0] dummy_cl_sh_ddr_arid;
    
-   logic [NUM_DDR-1:0] all_ddr_is_ready;
+   logic [3:0] all_ddr_is_ready;
 
 logic[5:0] cl_sh_hmc_awid[NUM_HMC-1:0];
 logic[63:0] cl_sh_hmc_awaddr[NUM_HMC-1:0];
@@ -185,6 +188,8 @@ logic sync_rst_n;
    
 // End internal signals
 //-----------------------------
+
+assign cl_sh_ddr_wid = 0;
 
    // FOR TIMING PATHS
    
@@ -1023,9 +1028,12 @@ endgenerate
 //DDR
 genvar gd;
 generate
-   for (gd=0; gd<NUM_CL_DDR; gd++)
+   for (gd=0; gd<3; gd++)
    begin: gen_ddr_tst 
 
+      if ((gd == 0 && DDR_A_PRESENT == 1) ||
+          (gd == 1 && DDR_B_PRESENT == 1) ||
+          (gd == 2 && DDR_D_PRESENT == 1)) begin
       lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_SLV_REQ_DDR (.clk (clk), 
                                                                   .rst_n (sync_rst_n), 
                                                                   .in_bus({ddr_slv_tst_addr[gd], ddr_slv_tst_wdata[gd], ddr_slv_tst_wr[gd], ddr_slv_tst_rd[gd]}),
@@ -1213,7 +1221,9 @@ generate
    assign lcl_cl_sh_ddr_rready[gd]  = lcl_cl_sh_ddr_rready_q[gd] ;
 
 `endif // !`ifndef NO_CL_DDR_TST_AXI4_REG_SLC
-      
+
+      end // if ((gd == 0 && DDR_A_PRESENT == 1) ||...
+                  
    end // block: gen_ddr_tst
    
 endgenerate
@@ -1848,7 +1858,9 @@ endgenerate
 //----------------------------------------- 
 // DDR controller instantiation   
 //----------------------------------------- 
-sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
+sh_ddr #(.DDR_A_PRESENT(DDR_A_PRESENT),
+         .DDR_B_PRESENT(DDR_B_PRESENT),
+         .DDR_D_PRESENT(DDR_D_PRESENT)) SH_DDR
    (
    .clk(clk),
    .rst_n(sync_rst_n),
@@ -1955,15 +1967,15 @@ sh_ddr #(.NUM_DDR(NUM_CL_DDR)) SH_DDR
    assign lcl_sh_cl_ddr_is_ready = 0;
 
    assign ddr_sh_stat_int[0] = 0;
-   assign ddr_sh_stat_ack[0] = 0;
+   assign ddr_sh_stat_ack[0] = 1;
    assign ddr_sh_stat_rdata[0] = 0;
 
    assign ddr_sh_stat_int[1] = 0;
-   assign ddr_sh_stat_ack[1] = 0;
+   assign ddr_sh_stat_ack[1] = 1;
    assign ddr_sh_stat_rdata[1] = 0;
 
    assign ddr_sh_stat_int[2] = 0;
-   assign ddr_sh_stat_ack[2] = 0;
+   assign ddr_sh_stat_ack[2] = 1;
    assign ddr_sh_stat_rdata[2] = 0;
    
 `endif //  `ifndef NO_CL_DDR
@@ -2183,6 +2195,10 @@ aurora_wrapper #(.NUM_GTY(NUM_GTY))
    assign hmc_sh_stat_ack = 1;
    assign hmc_sh_stat_rdata = 0;
    assign hmc_link_up_pipe = ({NUM_HMC{1'b0}});
+   assign hmc_iic_scl_o = 0;
+   assign hmc_iic_sda_o = 0;
+   assign hmc_iic_scl_t = 0;
+   assign hmc_iic_sda_t = 0;
    
 `endif
 
