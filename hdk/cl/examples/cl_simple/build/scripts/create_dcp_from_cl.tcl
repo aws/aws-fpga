@@ -235,6 +235,9 @@ write_bitstream -force -bin_file $CL_DIR/build/bitstreams/${timestamp}.SH_CL_fin
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
 puts "Compress files for sending back to AWS"
 
+# clean up vivado.log file
+exec perl clean_log.pl
+
 cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob  to_aws/${timestamp}*]
 

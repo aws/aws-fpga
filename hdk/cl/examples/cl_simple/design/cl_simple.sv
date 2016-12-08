@@ -189,6 +189,8 @@ logic sync_rst_n;
 // End internal signals
 //-----------------------------
 
+assign cl_sh_ddr_wid = 0;
+
    // FOR TIMING PATHS
    
 always_ff @(negedge rst_n or posedge clk)
@@ -2193,6 +2195,10 @@ aurora_wrapper #(.NUM_GTY(NUM_GTY))
    assign hmc_sh_stat_ack = 1;
    assign hmc_sh_stat_rdata = 0;
    assign hmc_link_up_pipe = ({NUM_HMC{1'b0}});
+   assign hmc_iic_scl_o = 0;
+   assign hmc_iic_sda_o = 0;
+   assign hmc_iic_scl_t = 0;
+   assign hmc_iic_sda_t = 0;
    
 `endif
 
