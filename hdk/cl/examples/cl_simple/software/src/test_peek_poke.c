@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+// Vivado does not support svGetScopeFromName
+#ifndef VIVADO_SIM
+#include "svdpi.h"
+#endif
+
 #include "sh_dpi_tasks.h"
 
 #define CFG_REG           UINT64_C(0x00)
@@ -35,6 +40,12 @@
 #define RD_START_BIT   0x00000002
 
 void test_main(uint32_t *exit_code) {
+
+// Vivado does not support svGetScopeFromName
+#ifndef VIVADO_SIM
+  svScope scope;
+#endif
+
   uint8_t *buffer;
   uint32_t pcim_data;
 
@@ -58,6 +69,12 @@ void test_main(uint32_t *exit_code) {
 
   error_count = 0;
   fail = 0;
+
+// Vivado does not support svGetScopeFromName
+#ifndef VIVADO_SIM
+  scope = svGetScopeFromName("tb");
+  svSetScope(scope);
+#endif
 
   buffer = (uint8_t *)malloc(1024);
   // Align to 64 byte boundary
