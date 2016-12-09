@@ -1,5 +1,5 @@
-`ifndef SH_DPI_TASKS
-`define SH_DPI_TASKS
+`ifndef SV_SH_DPI_TASKS
+`define SV_SH_DPI_TASKS
 
    import "DPI-C" context task test_main(output int unsigned exit_code);
    import "DPI-C" context function void  host_memory_putc(input longint unsigned addr, byte data);         // even though a int is used, only the lower 8b are used
@@ -13,19 +13,19 @@
 
    task sv_printf(input string msg);
       $display("%S", msg);
-   endtask // sv_printf
+   endtask
 
    task sv_map_host_memory(input longint unsigned addr);
       tb.sh.map_host_memory(addr);
-   endtask // sv_printf
+   endtask
 
    task cl_peek(input longint unsigned addr, output int unsigned data);
       tb.sh.peek(addr, data);
-   endtask // centaur_peek
+   endtask
    
    task cl_poke(input longint unsigned addr, int unsigned data);
       tb.sh.poke(addr, data);
-   endtask // centaur_peek
+   endtask
 
    task sv_pause(input int x);
       repeat (x) #1us;
