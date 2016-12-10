@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# before going too far make sure Vivado is available
+vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
+
 export HDK_DIR=${HDK_DIR:=$(pwd)/hdk}
 
 # The next variable should not be modified and should always point to the /common directory under HDK_DIR
