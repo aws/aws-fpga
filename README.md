@@ -6,6 +6,8 @@ This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Imag
 
 Execute `git clone http://github.com/aws/aws-fpga` to download this HDK+SDK release to your EC2 Instance or local server.
 
+The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environment, and known restrictions.
+
 **NOTE: The HDK and SDK are tested and supported for Linux operating systems, for the time being, other OSs haven't been tested by AWS**
 
 Please click the "Watch" button in GitHub upper right corner to stay posted.
