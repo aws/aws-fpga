@@ -1,4 +1,4 @@
-# Developing using OpenCL on AWS FPGA
+# Developing on AWS FPGA with OpenCL and SDAccel
 
 ** DRAFT ONLY **
 
@@ -30,11 +30,15 @@ c) An AFI ingestion scripts that will take the OpenCL compiler outcome and regis
 
 ## Introductionary
 
- # [OpenCL memory model video](https://www.youtube.com/watch?v=c4a8uQ4AnMI)
- # [OpenCL application structure video](https://www.youtube.com/watch?v=hUiX8rBcNzw)
- # Xilinx' [SDAccel Environment tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1021-sdaccel-intro-tutorial.pdf)
+* [OpenCL memory model video](https://www.youtube.com/watch?v=c4a8uQ4AnMI)
+
+* [OpenCL application structure video](https://www.youtube.com/watch?v=hUiX8rBcNzw)
+
+* Xilinx' [SDAccel Environment tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1021-sdaccel-intro-tutorial.pdf)
 
  
 ## Advanced
-1. Xilinx' [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1023-sdaccel-user-guide.pdf)
-3. Xilinx' [SDAccel Environment optimization guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1207-sdaccel-optimization-guide.pdf)
+
+* Xilinx' [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1023-sdaccel-user-guide.pdf)
+
+* Xilinx' [SDAccel Environment optimization guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_3/ug1207-sdaccel-optimization-guide.pdf)
