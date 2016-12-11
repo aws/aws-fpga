@@ -46,6 +46,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * DMA Engine is not included with the current version of the Shell
 * Interrupts are not supported
 * Build flow limited to RTL/Verilog source files
+* VHDL
 * HLS and OpenCL build flow not included in this HDK release
 * ChipScope
 * FPGA to FPGA communication over PCIe for F1.16xl
