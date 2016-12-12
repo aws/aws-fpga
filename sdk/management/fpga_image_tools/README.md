@@ -188,6 +188,10 @@ into the given `fpga-image-slot`.
    * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process accross all FPGAs (least level of concurrency).
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
 
+* **Q: How can I reset the AFI?**
+   * The application PF supports PCI Function Level Reset (FLR).  User-space programs may trigger a FLR for the application PF via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/reset`    
+   * Alternatively, the AFI may be reloaded via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.
+
 ## References
 * AWS FPGA SDK/HDK on github [aws-fpga](https://github.com/aws/aws-fpga)
 
