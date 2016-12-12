@@ -190,7 +190,7 @@ into the given `fpga-image-slot`.
 
 * **Q: How can I reset the AFI?**
    * The application PF supports PCI Function Level Reset (FLR).  User-space programs may trigger a FLR for the application PF via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/reset`    
-   * Alternatively, the AFI may be reloaded via fpga-load-local-image, and/or reset back to a fully clean slate via fpga-clear-local-image and fpga-load-local-image.
+   * Alternatively, the AFI may be reloaded via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.
 
 ## References
 * AWS FPGA SDK/HDK on github [aws-fpga](https://github.com/aws/aws-fpga)
