@@ -82,5 +82,5 @@ $ sudo yum groupinstall -y “Development Tools"
 
 ## Need to build a new Custom Logic and register it as an AFI?
 
-The [Getting started with CL examples](./hdk/cl/examples/Getting_Started_With_CL_Examples.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 F1 instance.
+The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 F1 instance.
 
