@@ -32,17 +32,17 @@ Procedure
 
 
    Steps: 
-   1) As a pre-cursor to the encryption and build process, set up path to developer RTL files in ‘scripts/create_cl.tcl’   
+   1) As a pre-cursor to the encryption and build process, set up path to developer RTL files in `scripts/create_cl.tcl`   
       - Modify variable "RTL_ORIGIN" to point to the "root directory" of the developer RTL.
-      - AWS provides an encryption script ('scripts/encrypt.tcl') that is called from 'scripts/create_cl.tcl'.  
+      - AWS provides an encryption script (`scripts/encrypt.tcl`) that is called from `scripts/create_cl.tcl`.  
       - 'scripts/encrypt.tcl' will copy over the specified developer RTL files and encrypt them. 
 
    2) Update 'scripts/create_cl.tcl' to include the encrypted RTL files (from step #1).
    
-   2a) Developer may include constraints in 'constraints/cl_synth_user.xdc'
+   2a) Developer may include constraints in `constraints/cl_synth_user.xdc`
 
-   3) Run the build from the 'scripts' folder as follows:
-          “vivado -mode batch -source create_cl.tcl” 
+   3) Run the build from the `scripts` folder as follows (make sure this script has eXecutable permissions, if try `chmod +x aws_build_dcp_from_cl.sh` before running it:
+          `$ ./aws_build_dcp_from_cl.sh`
 
       This runs:
          - Synthesis of CL
