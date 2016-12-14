@@ -68,7 +68,7 @@ If you like to start your own CL, check out the [How to create your own CL Readm
 The next script two steps will go through the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA
 
     $ cd $CL_DIR/build/scripts
-    $ vivado -mode batch -source create_dcp_from_cl.tcl
+    $ ./aws_build_dcp_from_cl.tcl
 
 **NOTE**: The DCP generation can take up to several hours to complete. 
 We recommend that you initiate the generation in a way that prevents interruption. 

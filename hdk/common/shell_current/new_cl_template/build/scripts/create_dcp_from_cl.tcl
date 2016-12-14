@@ -50,8 +50,6 @@ set_msg_config -string {AXI_QUAD_SPI} -suppress
 
 puts "AWS FPGA: Calling the encrypt.tcl";
 
-file mkdir ../src_post_encryption
-
 source encrypt.tcl
 
 #This sets the Device Type
@@ -95,9 +93,8 @@ $HDK_SHELL_DIR/design/lib/sync.v \
 $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
 $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-$HDK_SHELL_DIR/design/mgt/mgt_acc_ccf.sv \
-$HDK_SHELL_DIR/design/mgt/mgt_acc_axl.sv  \
-$HDK_SHELL_DIR/design/mgt/mgt_gen_axl.sv  \
+$HDK_SHELL_DIR/design/lib/mgt_acc_axl.sv  \
+$HDK_SHELL_DIR/design/lib/mgt_gen_axl.sv  \
 $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
 $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
@@ -209,6 +206,9 @@ pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed
 ### Emulate what AWS will do
 ### --------------------------------------------
 
+# Make temp dir for bitstream
+file mkdir $CL_DIR/build/aws_verify_temp_dir
+
 # Verify the Developer DCP is compatible with SH_BB. 
 pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 open_checkpoint $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
@@ -226,14 +226,21 @@ report_drc -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_DRC.rpt
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp
 pr_verify -full_check $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp 
 set_param bitstream.enablePR 4123
-write_bitstream -force -bin_file $CL_DIR/build/bitstreams/${timestamp}.SH_CL_final.bit
-### --------------------------------------------
+write_bitstream -force -bin_file $CL_DIR/build/aws_verify_temp_dir/${timestamp}.SH_CL_final.bit
 
-close_design
+# Clean-up temp dir for bitstream
+file delete -force $CL_DIR/build/aws_verify_temp_dir
+
+### --------------------------------------------
 
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
 puts "Compress files for sending back to AWS"
 
+# clean up vivado.log file
+exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl
+
 cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob  to_aws/${timestamp}*]
+
+close_design
 

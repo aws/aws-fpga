@@ -12,17 +12,17 @@ then
 	exit 1
 fi
 
-if ! [ -d ../constraints ]
+if ! [ -d $CL_DIR/build/constraints ]
 then
-	echo "ERROR: Constrains directory is not found in .. directory"
+	echo "ERROR: Constraints directory is not found in $CL_DIR/build/ directory"
 	exit 1
 fi
 
-if ! [ -d ../reports ]
+if ! [ -d $CL_DIR/build/reports ]
 then
 	echo "Creating the reports directory"
-	mkdir ../reports
-	if ! [ -d ../reports ]
+	mkdir $CL_DIR/build/reports
+	if ! [ -d $CL_DIR/build/reports ]
 	then	
 		echo "ERROR: Failed to create reports directory, please check directory permissions"
 		exit 1	
@@ -30,11 +30,11 @@ then
 fi
 
 
-if ! [ -d ../checkpoints ] 
+if ! [ -d $CL_DIR/build/checkpoints ] 
 then
         echo "Creating the checkpointss directory"
-        mkdir ../checkpoints
-        if ! [ -d ../checkpoints ]
+        mkdir $CL_DIR/build/checkpoints
+        if ! [ -d $CL_DIR/build/checkpoints ]
         then
                 echo "ERROR: Failed to create checkpoints directory, please check directory permissions"
                 exit 1
@@ -42,11 +42,11 @@ then
 fi
 
 
-if ! [ -d ../checkpoints/to_aws ]
+if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
 then
         echo "Creating the checkpoints\/to_aws directory"
-        mkdir ../checkpoints/to_aws
-        if ! [ -d ../checkpoints/to_aws ]
+        mkdir $CL_DIR/build/checkpoints/to_aws
+        if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
         then
                 echo "ERROR: Failed to create directory, please check directory permissions"
                 exit 1
@@ -54,11 +54,11 @@ then
 fi
 
 
-if ! [ -d ../src_post_encryption ]
+if ! [ -d $CL_DIR/build/src_post_encryption ]
 then
         echo "Creating the src_port_encryption directory"
-        mkdir ../src_post_encryption
-        if ! [ -d ../src_post_encryption ]
+        mkdir $CL_DIR/build/src_post_encryption
+        if ! [ -d $CL_DIR/build/src_post_encryption ]
         then
                 echo "ERROR: Failed to create directory, please check directory permissions"
                 exit 1

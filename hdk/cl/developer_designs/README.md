@@ -46,7 +46,7 @@ For example, if working on a remote machine, we recommend using window managemen
 
 Once you verified the checklist, you can run:
 
-    $ vivado -mode batch -source $CL_DIR/build/scripts/create_dcp_from_cl.tcl
+    $ ./aws_build_dcp_from_cl.tcl
          
 **NOTE** *A detailed walkthrough on how to build the CL is also available in `$CL_DIR/build/scripts/README.md`.*
 

@@ -1,4 +1,4 @@
-This checklist includes important items that the developer should check before calling the `$CL_DIR/build/create_dcp_from_cl.tcl`:
+This checklist includes important items that the developer should check before calling the `$CL_DIR/build/aws_build_dcp_from_cl.tcl`:
 
 1. Verify that the environment variables `$HDK_SHELL_DIR` and `$CL_DIR` are set correctly.
 2. Verify that the `$CL_DIR` directory has a `/build` sub-directory.

@@ -35,7 +35,7 @@ As a pre-cursor to the encryption and build process,  modify the `$CL_DIR/build/
 
 ### 3) Prepare for the CL Build 
 
-Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` scirpt to include: 
+Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` script to include: 
  1. The list of CL encrypted files in `$CL_DIR/build/src_post_encryption`.
  2. The list of CL specific timing and placement constraints in `$CL_DIR/build/constraints`.
  3. The specific constraints and design file for IP included in your CL (e.g., DDR4).
@@ -44,7 +44,7 @@ Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` scirpt to include:
 
 Run the build from the `$CL_DIR/build/scripts` directory as follows:
 
-    $ source aws_build_dcp_from_cl.sh
+    $ ./aws_build_dcp_from_cl.sh
           
 This performs:
  - Synthesis of CL.
