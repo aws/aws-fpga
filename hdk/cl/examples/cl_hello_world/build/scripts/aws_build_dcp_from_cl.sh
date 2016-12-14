@@ -28,8 +28,9 @@ then
 	exit 1
 fi
 
-echo "AWS FPGA: Starting Vivado run in the background, see vivado.log"
+echo "AWS FPGA: Finishing checking environment varilables and build directories, starting Vivado"
 
 nohup vivado -mode batch -nojournal -source create_dcp_from_cl.tcl &
 
-
+echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours"
+echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
