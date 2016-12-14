@@ -30,7 +30,7 @@ if (os.environ.get('EMAIL') == list_resp.get('Subscriptions')[0].get('Endpoint')
     print sub_resp
 
 pub_resp = sns.publish(TopicArn=topic_resp['TopicArn'],
-                       Message='build is done',
+                       Message='Your build is done',
                        Subject='test build is done')
 
 sys.exit(0)
