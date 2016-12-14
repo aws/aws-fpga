@@ -28,3 +28,8 @@ then
 	exit 1
 fi
 
+echo "AWS FPGA: Starting Vivado run in the background, see vivado.log"
+
+nohup vivado -mode batch -nojournal -source create_dcp_from_cl.tcl &
+
+
