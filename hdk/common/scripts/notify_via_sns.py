@@ -16,7 +16,8 @@ print topic_resp['TopicArn']
 
 list_resp = sns.list_subscriptions_by_topic(TopicArn=topic_resp['TopicArn'])
 
-print list_resp.get('Subscriptions')[0].get('Endpoint')
+if list_resp.get('Subscriptions'):
+    print list_resp.get('Subscriptions')
 
 if os.environ.get('EMAIL') == None:
     print 'Please set your EMAIL environment variable to your address'
@@ -24,13 +25,14 @@ if os.environ.get('EMAIL') == None:
 
 print "Your email address is %s" % os.environ.get('EMAIL')
 
-if (os.environ.get('EMAIL') == list_resp.get('Subscriptions')[0].get('Endpoint')) == False:
-
+# subscribe if email is not in list
+if not any(i['Endpoint'] == os.environ.get('EMAIL') for i in list_resp.get('Subscriptions')):
+    print "subscribing to topic"
     sub_resp = sns.subscribe(TopicArn=topic_resp['TopicArn'], Protocol='email', Endpoint=os.environ.get('EMAIL'))
     print sub_resp
 
 pub_resp = sns.publish(TopicArn=topic_resp['TopicArn'],
-                       Message='Your build is done',
-                       Subject='test build is done')
+                       Message='Your build is done.',
+                       Subject='Your build is done')
 
 sys.exit(0)
