@@ -1,0 +1,22 @@
+# Hello World CL
+
+This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the memory space of the CL inside the FPGA.
+
+Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/README.md).
+
+##Meta-data about this CL
+
+The following table displays information about the CL that is required to register it as an AFI with AWS.
+Alternatively, you can directly use a pre-generated AFI for this CL which you can associate to an instance or AMI.
+
+| Key   | Value     |
+|-----------|------|
+| FPGA Image Architecture | xvu9p |
+| Shell Version | 0x???????? |
+| PCI Device ID | 0x???? |
+| PCI Vendor ID | 0x???? |
+| PCI Subsystem ID | 0x???? |
+| PCI Subsystem Vendor ID | 0x???? |
+| Pre-generated AFI ID | afi-????????????????? |
+| Pre-generated AGFI ID | agfi-????????????????? |
+
