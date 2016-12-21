@@ -19,6 +19,8 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -223,6 +225,112 @@ cli_get_app_pf_map(uint32_t slot, uint32_t app_pf_num,
 
 err_mbox:
 	return 1;
+err:
+	return -1;
+}
+
+/**
+ * Write a '1' to the given sysfs file.
+ *
+ * @param[in]		path	the sysfs file path 
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+static int
+cli_write_one2file(char *path)
+{
+	int ret = -1;
+
+	int fd = open(path, O_WRONLY);
+	fail_on_quiet(fd == -1, err, "opening %s", path);
+
+	char buf[] = { '1', 0 };
+	ret = -!!write_loop(fd, buf, sizeof(buf)); 
+	fail_on_quiet(ret != 0, err_close, "error writing %s", path);
+
+err_close:
+	close(fd);
+err:
+	return ret;
+}
+
+/**
+ * Remove the application PF for the given mbox slot.
+ *
+ * @param[in]   slot		the fpga slot
+ * @param[in]   app_pf_num	the application PF number to check 
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+int
+cli_remove_app_pf(uint32_t slot, uint32_t app_pf_num)
+{
+	fail_on_quiet(slot >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
+	fail_on_quiet(app_pf_num > F1_APP_PF_END, err, CLI_INTERNAL_ERR_STR);
+
+	/** Setup pointers to the mbox and associated PCI resource maps */
+	struct fpga_pci_resource_map *mbox_map = &f1.mbox_slot_devs[slot].map;
+
+	/** Construct the PCI device directory name using the PCI_DEV_FMT */
+	char dir_name[NAME_MAX + 1];
+	int ret = snprintf(dir_name, sizeof(dir_name), PCI_DEV_FMT,
+		mbox_map->domain, mbox_map->bus, mbox_map->dev, app_pf_num);
+
+	fail_on_quiet(ret < 0, err, "Error building the dir_name");
+	fail_on_quiet((size_t) ret >= sizeof(dir_name), err, "dir_name too long");
+
+	/** Setup the path to the device's remove file */
+	char sysfs_name[NAME_MAX + 1];
+	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+			"/sys/bus/pci/devices/%s/remove", dir_name);
+
+	fail_on_quiet(ret < 0, err, 
+			"Error building the sysfs path for remove file");
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
+			"sysfs path too long for remove file");
+
+	/** Write a "1" to the device's remove file */
+	ret = cli_write_one2file(sysfs_name);
+	fail_on_quiet(ret != 0, err, "cli_write_one2file failed");
+
+	/** Check for file existence, should fail */
+	struct stat file_stat;
+	ret = stat(sysfs_name, &file_stat);
+	fail_on_quiet(ret == 0, err, "remove failed for path=%s", sysfs_name);
+
+	return 0;
+err:
+	return -1;
+}
+
+/**
+ * PCI rescan.
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+int
+cli_pci_rescan(void)
+{
+	/** Setup and write '1' to the PCI rescan file */
+	char sysfs_name[NAME_MAX + 1];
+	int ret = snprintf(sysfs_name, sizeof(sysfs_name), "/sys/bus/pci/rescan");
+
+	fail_on_quiet(ret < 0, err, 
+			"Error building the sysfs path for PCI rescan file");
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
+			"sysfs path too long for PCI rescan file");
+
+	/** Write a "1" to the PCI rescan file */
+	ret = cli_write_one2file(sysfs_name);
+	fail_on_quiet(ret != 0, err, "cli_write_one2file failed");
+
+	return 0;
 err:
 	return -1;
 }

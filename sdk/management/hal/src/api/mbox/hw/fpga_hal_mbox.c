@@ -111,6 +111,21 @@ err:
 	return -1;
 }
 
+int 
+fpga_hal_mbox_get_versions(struct fpga_hal_mbox_versions *ver)
+{
+	log_debug("enter");
+
+	int ret = fpga_hal_reg_read(FMB_REG_SH_VERSION, &ver->sh_version);
+	fail_on(ret != 0, err, "Error reading sh_version register");
+
+	log_debug("returning sh_version=0x%08x", ver->sh_version);
+
+	return 0;
+err:
+	return -1;
+}
+
 static int 
 fpga_hal_mbox_check_len(uint32_t len)
 {
