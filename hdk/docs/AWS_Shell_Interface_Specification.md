@@ -55,7 +55,7 @@ CL:
 
 -   One x16 PCIe Gen 3 Interface.
 
--   Four DDR4 RDIMM interfaces (with ECC).
+-   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
 
 
 ## CL/Shell Interfaces (AXI-4)
@@ -83,11 +83,11 @@ All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 in
 
 ### External Memory Interfaces implemented in CL
 
-Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA. For those interfaces, the designs and the constrains are provided by AWS and must be instantiated in the CL (by including the `sh_ddr.sv`). 
+Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usuable FPGA resources) . For those interfaces, the designs and the constrains are provided by AWS and must be instantiated in the CL (by including the `sh_ddr.sv`). 
 
 There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. A design block (sh_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
 
-For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shekk, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.
+For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.
 
 All CL's **must** instantiate sh_ddr.sv, regardless of the number of DDR's that should be implemented.  There are three parameters (all default to '1') that define which DDR controllers are implemented:
   * DDR_A_PRESENT
@@ -120,7 +120,7 @@ The reset signal combines the board reset and PCIe reset conditions. Please refe
 
 ### Function Level Reset
 
-FLR is supported for the Application Physical Function using a separate FLRinterface:
+FLR is supported for the Application Physical Function using a separate FLR interface:
 
 -   sh_cl_flr_assert – Level signal that is asserted when FLR has
     been requested
@@ -176,9 +176,9 @@ e)  CL’s specific PCIe VendorID, DeviceID, VendorSystemID and SubsystemID as r
 The Developer can write drivers for the App PF or can leverage the reference driver provided in the SDK (With plan to include the driver included in Amazon Linux by default).
 
 
-### PCIe Interface between Shell and CL
+### CL Interface to PCIe Interface via Shell 
 
-The PCIe interface between the Shell and CL is accessed over two AXI-4 interfaces:
+The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can accessed it two AXI-4 interfaces:
 
 #### AXI-4 for Inbound PCIe Transactions (Shell is master, CL is slave) 
 
@@ -186,7 +186,7 @@ This AXI-4 bus is for PCIe transactions mastered by the instance and targeting A
 
 It is a 512-bit wide AXI-4 interface that supports 32-bit transactions only. *Future revisions this interface will support larger burst sizes (up to the Maximum Payload Size)*.
 
-A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell [*May not be supported in early releases*]. If the time-out error happens on a read, the Shell will return 0`xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by FPGA Management Tools metric.
+A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell [*May not be supported in early releases*]. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by FPGA Management Tools metric.
 
 #### AXI-4 for Outbound PCIe Transactions (CL is master, Shell is slave) 
 
@@ -263,9 +263,9 @@ Each DRAM interface is accessed via an AXI-4 interface:
 
 -   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR
 
-There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with roundrobin priority (equal priority).
+There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with roundrobin arbitration (equal priority).
 
-The DRAM interface uses  Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. User bits are added to the read data channel to signal ECC errors with the read data.
+The DRAM interface uses Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. User bits are added to the read data channel to signal ECC errors with the read data.
 
 **NOTE:** even if no DDR4 controllers are desired in the CL, the `sh_ddr.sv` block must be instantiated in the CL (parameters are used to remove DDR controllers).  If the `sh_ddr.sv` module is not instantiated the design will have build errors.
 
