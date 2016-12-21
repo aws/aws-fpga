@@ -27,6 +27,13 @@
 #define FPGA_MBOX_MSG_DATA_LEN	4096 
 
 /**
+ * Mailbox version info.
+ */
+struct fpga_hal_mbox_versions {
+	uint32_t	sh_version;
+};
+
+/**
  * Mailbox init structure.
  */
 struct fpga_hal_mbox {
@@ -54,6 +61,17 @@ int fpga_hal_mbox_init(struct fpga_hal_mbox *mbox);
  * -1 on failure
  */
 int fpga_hal_mbox_reset(void);
+
+/**
+ * Get Mailbox versions.
+ *
+ * @param[in,out]	ver		Mailbox version info to return.  
+ *
+ * @returns
+ * 0 on success    
+ * -1 on failure
+ */
+int fpga_hal_mbox_get_versions(struct fpga_hal_mbox_versions *ver);
 
 /**
  * Attach the Mailbox.  Wrapper around fpga_hal_mbox_reset for attach

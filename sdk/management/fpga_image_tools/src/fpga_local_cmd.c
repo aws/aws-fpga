@@ -125,6 +125,56 @@ err:
 }
 
 /**
+ * Rescan the application PF map info for the given AFI slot.
+ *
+ * @param[in]   afi_slot	the fpga slot
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+static int 
+cli_rescan_slot_app_pfs(uint32_t afi_slot)
+{
+	fail_on_quiet(afi_slot >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
+
+	/** Retrieve and display associated application PFs (if any) */
+	bool found_app_pf = false;
+	int ret;
+	int i;
+	for (i = F1_APP_PF_START; i <= F1_APP_PF_END; i++) {
+		struct fpga_pci_resource_map app_map;
+
+		/** 
+		 * cli_get_app_pf_map will skip the Mbox PF (ret==1).
+		 * We continue up through F1_APP_PF_END (e.g. 15) for future 
+		 * compatibilty with any gaps in the PF numbering.
+		 */
+		ret = cli_get_app_pf_map(afi_slot, i, &app_map);
+		if (ret == 0) {
+			ret = cli_remove_app_pf(afi_slot, app_map.func);
+			if (ret != 0) {
+				/** Output an error but continue with the other app PFs */
+				printf("Error: could not remove application PF device " 
+						PCI_DEV_FMT "\n", 
+						app_map.domain, app_map.bus, app_map.dev, 
+						app_map.func);
+			}
+			found_app_pf = true;
+		} 
+	}
+	if (found_app_pf) {
+		ret = cli_pci_rescan();
+		fail_on_user(ret != 0, err,
+				"Error: could not rescan for application PF devices");
+	}
+
+	return 0;
+err:
+	return -1;
+}
+
+/**
  * Attach for CLI processing.
  *
  * @returns
@@ -533,6 +583,7 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 	(void)cmd;
 	/** We've already validated the header... */
 	struct afi_cmd_metrics_rsp *metrics = (void *)rsp->body;
+	int ret;
 
 	uint32_t tmp_len = 
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
@@ -541,7 +592,7 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 			len, tmp_len);
 
 	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode\n");         
+		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion\n");         
 	}
 
 	char *afi_id = (!metrics->ids.afi_id[0]) ? "none" : metrics->ids.afi_id;
@@ -551,10 +602,22 @@ handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
 	if ((metrics->status < ACMS_END) && acms_tbl[metrics->status]) {
 		status_name = (void *)acms_tbl[metrics->status]; 
 	}
-	printf("  %-8s         %2u\n", status_name, metrics->status); 
+
+	struct fpga_hal_mbox_versions ver;
+	ret = fpga_hal_mbox_get_versions(&ver);
+	fail_on_quiet(ret != 0, err, "fpga_hal_mbox_get_versions failed");
+
+	printf("  %-8s         %2u        0x%08x\n", 
+			status_name, metrics->status, ver.sh_version); 
+
+	if (f1.rescan) {
+		/** Rescan the application PFs for this slot */
+		ret = cli_rescan_slot_app_pfs(f1.afi_slot);
+		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
+	}
 
 	/** Display the application PFs for this slot */
-	int ret = cli_show_slot_app_pfs(f1.afi_slot);
+	ret = cli_show_slot_app_pfs(f1.afi_slot);
 	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	return 0;
