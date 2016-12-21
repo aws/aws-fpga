@@ -4,7 +4,7 @@
 [![Join the chat at https://gitter.im/aws/aws-fpga](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aws/aws-fpga?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-AWS FPGA HDK is the official kit for developing an Amazon FPGA Image (AFI) which can be loaded on FPGAs in FPGA-enabled EC2 instances (i.e. F1 Instance). 
+AWS FPGA HDK is the official kit for developing an Amazon FPGA Image (AFI) which can be loaded on FPGAs in FPGA-enabled EC2 instances (i.e. F1 Instance).
 
 Check out the [release notes](../RELEASE_NOTES.md) for information about the latest bug fixes, updates, and features added to the HDK.
 
@@ -42,7 +42,7 @@ The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
 
 ### Try out a "Hello World" example and others
 
-The [Getting started with CL examples](./cl/examples/Getting_Started_With_CL_Examples.md) walks you through how to build, register, and use an AFI. 
+The [Getting started with CL examples](./cl/examples/README.md) walks you through how to build, register, and use an AFI. 
 The [Hello World readme](./cl/examples/cl_hello_world/README.md) provides the steps to build an AFI from the provided Hello World example CL, and how to load it on an F1 instance.
 Other examples are available in the [examples directory](./cl/examples), each with its own README.md file.
 
@@ -77,7 +77,3 @@ The HDK does not currently support chipscope debug, but this will be enabled in 
 
 ### Does the HDK support dynamic Partial Reconfiguration?
 The HDK supports dynamic partial reconfiguration (PR) of the Custom Logic.  Each AFI is actually a partial bitstream, and AFI's can be swapped during operation.  Using [FPGA Management Tools provided by the SDK](../sdk/management/fpga_image_tools), the users can load/unload AFIs from within the instance.   **NOTE: Users can only load/unload AFI-id(s) that have been associated a priori to the instance-id or the AMI-id**
-
-
-
-
