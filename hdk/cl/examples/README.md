@@ -119,7 +119,7 @@ The output of this command includes two identifiers that refer to your AFI:
 
 #### Method 2: During F1 preview and before AWS EC2 CLI action `create-fpga-image` is available
 
-Add a policy to the created S3 bucket granting [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to our team's account (Account ID: 682510182675). 
+Add a policy to the created S3 bucket granting [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to our team's account (Account ID: 371834676912). 
 A sample policy is shown below. 
 
     {
@@ -129,7 +129,7 @@ A sample policy is shown below.
                 "Sid": "Bucket level permissions",
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::682510182675:root"
+                    "AWS": "arn:aws:iam::371834676912:root"
                 },
                 "Action": [
                     "s3:ListBucket"
@@ -140,7 +140,7 @@ A sample policy is shown below.
                 "Sid": "Object read permissions",
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::682510182675:root"
+                    "AWS": "arn:aws:iam::371834676912:root"
                 },
                 "Action": [
                     "s3:GetObject"
@@ -151,7 +151,7 @@ A sample policy is shown below.
                 "Sid": "Folder write permissions",
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::682510182675:root"
+                    "AWS": "arn:aws:iam::371834676912:root"
                 },
                 "Action": [
                     "s3:PutObject"
