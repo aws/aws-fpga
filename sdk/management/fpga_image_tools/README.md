@@ -66,8 +66,8 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
-    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
+    AFI          0       none                    cleared           1        0x11241611
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
@@ -83,8 +83,8 @@ Displays the current state for the given FPGA slot number.  The output shows the
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
-    AFI          0       agfi-0123456789abcdefg  loaded            0
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
+    AFI          0       agfi-0123456789abcdefg  loaded            0        0x11241611
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
@@ -100,8 +100,8 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
     
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode
-    AFI          0       none                    cleared           1
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
+    AFI          0       none                    cleared           1        0x11241611
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
