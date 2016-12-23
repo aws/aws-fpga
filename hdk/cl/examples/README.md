@@ -6,12 +6,12 @@ The CL must comply with the [AWS Shell specifications](../../docs/AWS_Shell_Inte
 The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
 functional CL implementation. Each example includes:
 
-1) The design source code for the example under the `/design` directory.
-2) The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instance/server that have Xilinx tools and license installed. Developers are recommended to use the "FPGA Development AMI" available free of charge on [AWS Marketplace](https://aws.amazon.com/marketplace/).
-3) The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI.
-4) An AFI-ID for a pre-generated AFI that matches the example design.
-5) Software source code required on the FPGA-enabled instance to run the example.
-6) Software binary that can be loaded on an FPGA-enabled instance to test the AFI. 
+1. The design source code for the example under the `/design` directory.
+2. The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instance/server that have Xilinx tools and license installed. Developers are recommended to use the "FPGA Development AMI" available free of charge on [AWS Marketplace](https://aws.amazon.com/marketplace/).
+3. The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI.
+4. An AFI-ID for a pre-generated AFI that matches the example design.
+5. Software source code required on the FPGA-enabled instance to run the example.
+6. Software binary that can be loaded on an FPGA-enabled instance to test the AFI. 
 
 In summary:
 
@@ -98,6 +98,11 @@ After the AFI generation is complete, AWS will put the logs into the bucket loca
 by email.
 
 #### Method 1: If you have access to AWS EC2 CLI with support for `create-fpga-image` action
+To check whether you have access to the `create-fpga-image` command, simply try executing the command as follows.
+If you get an "Invalid choice" error, then move to [Method 2](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#method-2-during-f1-preview-and-before-aws-ec2-cli-action-create-fpga-image-is-available).
+    
+    $ aws ec2 create-fpga-image
+
 To create an AFI from the generated DCP, you need to upload the tar-zipped DCP file to an S3 bucket, and execute the `aws ec2 create-fpga-image` command as follows: 
 
     $ aws ec2 create-fpga-image \                   
@@ -109,13 +114,13 @@ To create an AFI from the generated DCP, you need to upload the tar-zipped DCP f
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
 
 The output of this command includes two identifiers that refer to your AFI:
-- FPGA Image Identifier or AFI ID: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs. 
+- **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs. 
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is `afi-01234567890abcdef`. 
-- Glogal FPGA Image Identifier or AGFI ID: this is a global ID that is used to refer to an AFI from within an F1 instance.
+    An example AFI ID is **`afi-01234567890abcdef`**. 
+- **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup. 
-    An example AFI ID is `agfi-01234567890abcdef`.
+    An example AGFI ID is **`agfi-01234567890abcdef`**.
 
 #### Method 2: During F1 preview and before AWS EC2 CLI action `create-fpga-image` is available
 
@@ -161,14 +166,14 @@ A sample policy is shown below.
         ]
     }
 
-Then, send an email to AWS (email TBD) providing the information listed earlier.
+Then, send an email to AWS (email TBD) providing the information listed earlier (numbered 1-6), in addition to your **AWS Account ID number**.
 
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
 
 To follow the next steps, you have to run an instance on F1. AWS recommend you run an instance with latest Amazon Linux that have the FPGA management tools included, or alternatively the FPGA Developer AMI with both the HDK and SDK.
 
-## 4. Setup AWS FPGA management tools
+## 4. Setup AWS FPGA Management tools
 
 Execute the following:
 
@@ -185,10 +190,12 @@ There is a default limit of eight AFIs per AMI, if you need more, please reach o
 To associate, simply invoke the following AWS EC2 CLI command.
 
     $ aws ec2 associate-fpga-image --fpga-image-id <AFI_ID> --image-id <AMI_ID>
+    
+**NOTE**: The AWS CLI commands use the AFI ID (not the AGFI ID).
         
 ## 6. Load the AFI
 
-Run's the `fpga-describe-local-image` on slot 0 to confirm that the FPGA is cleared, and you should see similar output to the 4 lines below:
+Run the `fpga-describe-local-image` on slot 0 to confirm that the FPGA is cleared, and you should see similar output to the 4 lines below:
 
     $ sudo fpga-describe-local-image -S 0 -H
 
@@ -201,6 +208,8 @@ Then loading the example AFI to FPGA slot 0 (you should have the AGFI ID from St
 
     $ sudo fpga-load-local-image -S 0 -I <AGFI_ID>
 
+**NOTE**: The FPGA Management tools use the AGFI ID (not the AFI ID).
+ 
 Now, you can verify the status of the previous load command:
 
     $ sudo fpga-describe-local-image -S 0 -H
