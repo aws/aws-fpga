@@ -66,7 +66,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 
 * The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms.
 * First install of AWS FPGA SDK requires having gcc installed in the instance server. If that's not available, try `sudo yum update && sudo yum group install "Development Tools"`
-* The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running
+* The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running.  Tools and licenses are provided free of charge in AWS FPGA Developer AMI
 * Vivado License need to support VU9p ES1 FPGA
 * Vivado License need to support encryption
 * This release tested and validated with Vivado 2016.3

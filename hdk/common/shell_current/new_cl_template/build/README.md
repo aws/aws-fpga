@@ -103,7 +103,7 @@ The output of this command includes two identifiers that refer to your AFI:
 After the AFI generation is complete, AWS will put the AFI generation logs into the bucket location provided by the developer and notify them
 by email.
 
-**NOTE**: Preview-program customers without access to the AWS CLI EC2 action `create-fpga-image` should instead follow the instructions [here](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/Getting_Started_With_CL_Examples.md).  
+**NOTE**: Preview-program customers without access to the AWS CLI EC2 action `create-fpga-image` should instead follow the instructions [here](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#method-2-during-f1-preview-and-before-aws-ec2-cli-action-create-fpga-image-is-available).  
 
 ## About Encryption 
    Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  

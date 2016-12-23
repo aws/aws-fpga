@@ -51,7 +51,13 @@
          host_memory_putc(addr, d);
       else begin
          int unsigned t;
-         t = tb.sv_host_memory[{addr[63:2], 2'b00}];
+         
+         if (tb.sv_host_memory.exists({addr[63:2], 2'b00})) begin
+            t = tb.sv_host_memory[{addr[63:2], 2'b00}];
+         end
+         else
+            t = 32'hffff_ffff;
+         
          t = t & ~(32'h0000_00ff  << (addr[1:0] * 8) );
          t = t | ({24'h000000, d} << (addr[1:0] * 8) );
          tb.sv_host_memory[{addr[63:2], 2'b00}] = t;
@@ -65,9 +71,13 @@
          d = host_memory_getc(addr);
       else begin
          int unsigned t;
-         t = tb.sv_host_memory[{addr[63:2], 2'b00}];
-         t = t >> (addr[1:0] * 8);
-         d = t[7:0];
+         if (tb.sv_host_memory.exists({addr[63:2], 2'b00})) begin
+            t = tb.sv_host_memory[{addr[63:2], 2'b00}];
+            t = t >> (addr[1:0] * 8);
+            d = t[7:0];
+         end
+         else
+            d = 'hff;
       end
       return d;
    endfunction

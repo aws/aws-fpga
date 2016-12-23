@@ -63,12 +63,10 @@ for testing access to the DDR interfaces.
 
 **How do I get access to the Developer AMI?**
 
-Start with an AWS account and request access to the Developer AMI in AWS
-Marketplace. Currently, the FPGA Developer AMI is private. You will
-receive permission on the AWS account you submitted for access to the
-FPGA Developer AMI. The AMI can be launched directly from AWS
-Marketplace on any EC2 instance. See the FPGA Developer AMI README for
-more details.
+Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will
+receive permission and notifications via email.  Email aws-fpga-developer-support@amazon.com with any questions 
+See the FPGA Developer AMI README for more details.
+
 
 **What is an AFI?**
 
@@ -113,3 +111,14 @@ permission to see its code. The only reference to the AFI is through the
 AFI ID. The Customer would call fpga-local-load-image with the correct
 AFI ID for that Marketplace offering, which will result in AWS loading
 the AFI into the FPGA. No FPGA internal design code is exposed.
+
+**Why did my example job run and die without generating a DCP file?**
+
+The error message below indicates that you ran out of memory.  Restart your instance
+with a different instance type that has 8GiB or more.
+
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:06:26 ; 
+elapsed = 00:08:59 . Memory (MB): peak = 4032.184 ; gain = 3031.297 ; free physical = 1285 ; free virtual = 1957
+/opt/Xilinx/Vivado/2016.3/bin/loader: line 164:  8160 Killed                  "$RDI_PROG" "$@"
+Parent process (pid 8160) has died. This helper process will now exit
+
