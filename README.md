@@ -24,12 +24,16 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 
 ## FPGA Developer AMI
 
-AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4](https://aws.amazon.com/ec2/instance-types/) EC2 instance with atleast 8GiB Memory.  For the best performance, c4.2xlarge is recommended.  To start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs.  Make sure you are in N. Virginia (us-east-1).  
+AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4](https://aws.amazon.com/ec2/instance-types/) EC2 instance with atleast 8GiB Memory.  For the best performance, c4.2xlarge is recommended.  During private access period in order to start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs.  Make sure you are in N. Virginia (us-east-1).  
 Go to EC2->Launch Instance->My AMIs
 Tick the ‘Shared with me’ box on the Ownership tab on the left.
 FPGA developer AMI will be prefixed with F1 
 
+## Developer Support
+
 During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
+
+FPGA development forum: the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. After you are logged in, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.
  
 # Quick Start
 
