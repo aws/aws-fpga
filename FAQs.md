@@ -341,7 +341,7 @@ software to DMA data between FPGAs directly, without using Instance
 memory as a buffer. The implementation of communication across the PCIe
 interface using FPGA direct is left to the Developer.
 
-**What protocol is used for FPGA link?**
+**What is FPGA Link and how fast is it?**
 
 FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link
 is organized as a ring, with 2 x 100Gbps links to each adjacent card.
