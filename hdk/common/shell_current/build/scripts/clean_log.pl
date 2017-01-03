@@ -27,9 +27,9 @@ open(my $fh_wr, ">", "vivado.log")
       or die "Can't open > vivado.log: $!";
 
 my $match;
-my @warning_regexps = ("CRITICAL WARNING.*BRAM instance.*Please verify the instance name in the \.bmm file and the netlist. The BRAM initialization strings will not get populated with data.*",
+my @warning_regexps = ("CRITICAL WARNING.*BRAM instance.*ddr_cores.*Please verify the instance name in the \.bmm file and the netlist. The BRAM initialization strings will not get populated with data.*",
                        "CRITICAL WARNING.*Setting IOB or IOB_TRI_REG property to TRUE for instance.*conflicts with its current constrained placement.*The conflicting constraint will be removed.*",
-                       "CRITICAL WARNING.*No valid object.*found for.*get_clocks cl_clk.*cl_synth_aws.xdc.*",
+                       "CRITICAL WARNING.*No valid object.*found for.*get_clocks cl_clk.*cl_synth_aws.xdc.*",    
                        "CRITICAL WARNING.*Invalid constraint on register.*It has the property IOB=TRUE, but it is not driving or driven by any IO element.*"
                       ); 
 
