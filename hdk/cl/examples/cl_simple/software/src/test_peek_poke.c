@@ -3,8 +3,10 @@
 #include <stdint.h>
 
 // Vivado does not support svGetScopeFromName
+#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
 #include "svdpi.h"
+#endif
 #endif
 
 #include "sh_dpi_tasks.h"
@@ -42,8 +44,10 @@
 void test_main(uint32_t *exit_code) {
 
 // Vivado does not support svGetScopeFromName
+#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
   svScope scope;
+#endif
 #endif
 
   uint8_t *buffer;
@@ -71,9 +75,11 @@ void test_main(uint32_t *exit_code) {
   fail = 0;
 
 // Vivado does not support svGetScopeFromName
+#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
   scope = svGetScopeFromName("tb");
   svSetScope(scope);
+#endif
 #endif
 
   buffer = (uint8_t *)malloc(1024);
