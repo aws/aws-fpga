@@ -57,7 +57,7 @@ $ export CL_DIR=$(pwd)                          # Step 5:  Define this directory
 $ cd build/scripts                              # Step 6:  The build directory for synthesizing, placement, timing etc
 $ source aws_build_dcp_from_cl.sh               # Step 7:  Generate a placed-and-routed design checkpoint (DCP)
 $ cd $CL_DIR/build/checkpoints/to_aws           # Step 8:  This directory includes the DCP file
-$ ﻿aws s3 mb s3://<bucket-name>            # Step 9:  Create an S3 bucket (choose a unique bucket name)
+$ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (choose a unique bucket name)
 $ aws s3 cp *.SH_CL_routed.dcp \                # Step 10: Upload the DCP file to S3
         s3://<bucket-name>/cl_simple.dcp
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
