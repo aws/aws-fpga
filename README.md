@@ -1,6 +1,13 @@
 <span style="display: inline-block;">
 
-# AWS EC2 FPGA Hardware and Software Development Kit
+# Table of Contents
+
+1. [AWS EC2 FPGA Hardware and Software Development Kits] (#devkit)
+    - [FPGA Hardware Development Kit (HDK)] (hdk/README.md)
+    - [FPGA Software Development Kit (SDK)] (sdk/README.md)
+2. [Quick Start] (#quickstart)
+
+# AWS EC2 FPGA Hardware and Software Development Kits <a name="devkit"></a>
 
 This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
@@ -31,7 +38,7 @@ FPGA developer AMI will be prefixed with F1
 
 During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
  
-# Quick Start
+# Quick Start <a name="quickstart"></a>
 
 ## Building an Example AFI
 
