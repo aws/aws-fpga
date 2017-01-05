@@ -289,9 +289,9 @@ Some signals must include the PCIe IDs of the CL. A Developer’s specific PCIe 
 
 -   cl_sh_id1
 
-    -   [15:0] – Subsystem ID
+    -   [15:0] – Subsystem Vendor ID
 
-    -  [31:16] – Subsystem Vendor ID
+    -  [31:16] – Subsystem ID
 
 ### General control/status
 
