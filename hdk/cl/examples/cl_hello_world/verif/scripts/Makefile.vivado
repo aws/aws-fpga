@@ -4,7 +4,7 @@
 
 compile:
 	mkdir -p $(SIM_DIR)
-	cd $(SIM_DIR) && xsc $(C_TEST_NAME) --additional_option "-I$(C_INC_DIR)" --additional_option "-DVIVADO_SIM"
+	cd $(SIM_DIR) && xsc $(C_TEST_NAME) --additional_option "-I$(C_INC_DIR)" --additional_option "-DINCLUDE_DPI_CALLS" --additional_option "-DVIVADO_SIM"
 	cd $(SIM_DIR) && xvlog --sv -m64 --relax -f $(SCRIPTS_DIR)/top.vivado.f
 	cd $(SIM_DIR) && xelab -m64 --timescale 1ps/1ps --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -sv_lib dpi -snapshot tb work.tb work.glbl work.$(TEST)
 

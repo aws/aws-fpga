@@ -8,7 +8,7 @@
 
 compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
-	cd $(SIM_DIR) && vlog $(C_TEST_NAME) -ccflags "-I$(C_INC_DIR)"
+	cd $(SIM_DIR) && vlog $(C_TEST_NAME) -ccflags "-I$(C_INC_DIR) -DINCLUDE_DPI_CALLS"
 	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 
 run:
