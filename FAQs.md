@@ -1,74 +1,42 @@
-**Frequently Asked Questions**
+#AWS FPGA - Frequently Asked Questions
 
-**What do I need to get started on building accelerators for FPGA
-instances?**
+**Q: What do I need to get started on building accelerators for FPGA
+instances?*
 
-Getting started requires downloading the latest HDK and SDK from the AWS
-FPGA GitHub repository. The HDK and SDK provide the needed code and
-information for building FPGA code. The HDK provides all the information
-needed on building source code for use within the FPGA. The SDK provides
-all the information needed on building software for managing FPGAs on an
-F1 instance.
+Getting started requires downloading the latest HDK and SDK from the AWS FPGA GitHub repository. The HDK and SDK provide the needed code and information for building FPGA code. The HDK provides all the information needed for developing an FPGA image from source code, while the SDK provides all the runtime software for managing Amazon FPGAs image (AFI) on loaded into F1 instance FPGA.
 
-FPGA code requires a simulator to test code and a Vivado tool set for
-synthesis of source code into compiled FPGA code. The FPGA Developer AMI
-includes the Xilinx Vivado tools for simulation and synthesis of
-compiled FPGA code.
+Typically, FPGA development process requires a simulator to perform functional test on the source code,  and a Vivado tool set for synthesis of source code into compiled FPGA code. The FPGA Developer AMI provided by AWS includes the complete Xilinx Vivado tools for simulation (XSMI) and synthesis of FPGA .
 
-**How do I develop accelerator code for an FPGA in an F1 instance?**
+**Q: How do I develop accelerator code for an FPGA in an F1 instance?**
 
-Start with the Shell interface specification:
-AWS\_Shell\_Interface\_Specification.md. This document describes the
-interface between Custom Logic and the AWS Shell. All Custom Logic for
-an accelerator resides within the Custom Logic region of the F1 FPGA.
+Start with the [Shell interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md). This document describes the interface between Custom Logic and the AWS Shell. All Custom Logic for an accelerator resides within the Custom Logic region of the F1 FPGA.
 
-**What are the major areas of the GitHub repository?**
+The [HDK README](./hdk/README.md) walks the developer through the steps to build an FPGA image from one of the provided examples as well starting a new code
 
-The HDK side of the GitHub repository contains the AWS Shell code, Build
-scripts, Documentation, and Examples. Shell code is contained in
-aws-fpga/hdk/common. Build scripts are in
-aws-fpga/hdk/common/shell\_current/build. Documentation is in
-aws-fpga/hdk/docs. Custom Logic examples are in aws-fpga/hdk/cl.
+**Q: What is included in the HDK?**
 
-The SDK side of the GitHub repository contains the FPGA Management
-Tools, a preview of the AWS CLI for F1, and software for Xilinx XDMA and
-SDAccell. The FPGA Management Tools are for loading/clearing AFIs and
-getting status of the FPGAs mapped to an instance. FPGA Management Tools
-are in aws-fpga/sdk/management. The AWS CLI preview is in
-aws-fpga/sdk/aws-cli-preview.
-
-**What is included in the HDK?**
-
-The HDK includes documentation for the Shell interface and other Custom
-Logic implementation guidelines, the Shell code needed for Custom Logic
+The HDK includes major portions:
+1) Documentation for the Shell interface and other Custom Logic implementation guidelines, the Shell code needed for Custom Logic
 development, simulation models for the Shell, software for exercising
-the Custom Logic examples, a getting started guide for Custom Logic, and
+
+2) Custom Logic examples, a getting started guide for building your own Custom Logic, and
 examples for starting a Custom Logic Design.
 
-**What is in the AWS Shell?**
+3) Scripts for building and submitting Amazon FPGA Image (AFI) from a Custom Logic
 
-The AWS Shell includes the PCIe interface for the FPGA, a single DDR
-interface, and necessary FPGA management functionality. Also provided as
-part of the Shell code, but implemented within the Custom Logic region
-of the FPGA are three DDR interfaces. These interfaces are provided for
-implementation within the Custom Logic region to provide maximum
-efficiency for the developer.
+4) Reference software drivers to be used in conjunction with the Custom Logic examples
 
-**Are there examples for getting started on accelerators?**
+5) RTL Simulation models and RTL simula
 
-Yes, examples are in the aws-fpga/hdk/cl/examples directory. The
-cl\_hello\_world example is a simple example to build and test the CL
-development process. The cl\_simple example provides an expanded example
-for testing access to the DDR interfaces.
+**Q: What is in the AWS Shell?**
 
-**How do I get access to the Developer AMI?**
+The AWS Shell is a piece of code provided and managed by AWS, that does a lot of the non-differentiated heavy lefting like setting up the PCIe interface, and FPGA image loading infrastructure, security and operational isolation, metrics and debug hooks
 
-Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will
-receive permission and notifications via email.  Email aws-fpga-developer-support@amazon.com with any questions 
-See the FPGA Developer AMI README for more details.
+Every FPGA deployed in AWS cloud includes AWS shell, and the developer Custom Logic (CL) actually interfaces with the available AWS Shell interfaces.
 
+AWS itselfs includes the PCIe interface for the FPGA, and necessary FPGA management functionality.  One of the four DRAM interface controllers is included in the Shell, while the three other DRAM interface controllers is expected to be instanciated in the Custom Logic code (A design choice that was made to achieve optimal utilization of FPGA resources from placement perspective)
 
-**What is an AFI?**
+**Q: What is an AFI?**
 
 An AFI stands for Amazon FPGA Image. That is the compiled FPGA code that
 is loaded into an FPGA for performing the Custom Logic function created
@@ -76,6 +44,22 @@ by the developer. AFIs are maintained by AWS according to the AWS
 account that created them. An AFI ID is used to reference a particular
 AFI from an F1 instance. The AFI ID is used to indicate the AFI that
 should be loaded into a specific FPGA within the instance.
+
+**Q: Are there examples for getting started on accelerators?**
+
+Yes, examples are in the [examples directory](./hdk/cl/examples):
+
+The [cl_hello_world example](.hdk/cl/examples/cl_hello_world) is an RTL/Verilog simple example to build and test the CL development process, it does not use any of the external interfaces of the FPGA except the PCIe. 
+
+The [cl_simple example]((.hdk/cl/examples/cl_simple) provides an expanded example for testing access to the DRAM interfaces.
+
+**Q: How do I get access to AWS FPGA Developer AMI?**
+
+Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will receive permission and notifications via email.  Email aws-fpga-developer-support@amazon.com with any questions.
+
+Once you got access to the FPGA Developer AMI, we suggest you read the the README file within the FPGA Developer for more details.
+
+XXXXX
 
 **What is the process for creating an AFI?**
 
