@@ -1,11 +1,11 @@
 #AWS FPGA - Frequently Asked Questions
 
 **Q: What do I need to get started on building accelerators for FPGA
-instances?*
+instances?**
 
 Getting started requires downloading the latest HDK and SDK from the AWS FPGA GitHub repository. The HDK and SDK provide the needed code and information for building FPGA code. The HDK provides all the information needed for developing an FPGA image from source code, while the SDK provides all the runtime software for managing Amazon FPGAs image (AFI) on loaded into F1 instance FPGA.
 
-Typically, FPGA development process requires a simulator to perform functional test on the source code,  and a Vivado tool set for synthesis of source code into compiled FPGA code. The FPGA Developer AMI provided by AWS includes the complete Xilinx Vivado tools for simulation (XSIM) and synthesis of FPGA .
+Typically, FPGA development process requires a simulator to perform functional test on the source code,  and a Vivado tool set for synthesis of source code into compiled FPGA code. The FPGA Developer AMI provided by AWS includes the complete Xilinx Vivado tools for simulation (XSIM) and synthesis of FPGA.
 
 
 **Q: How do I develop accelerator code for an FPGA in an F1 instance?**
@@ -21,8 +21,7 @@ The HDK includes major portions:
 1) Documentation for the Shell interface and other Custom Logic implementation guidelines, the Shell code needed for Custom Logic
 development, simulation models for the Shell, software for exercising
 
-2) Custom Logic examples, a getting started guide for building your own Custom Logic, and
-examples for starting a Custom Logic Design.
+2) Custom Logic examples, a getting started guide for building your own Custom Logic, and examples for starting a Custom Logic Design.
 
 3) Scripts for building and submitting Amazon FPGA Image (AFI) from a Custom Logic
 
@@ -124,11 +123,9 @@ If a Developer uses local tools and license, the exact Xilinx Vivado tool versio
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If the Developer uses the FPGA Developer AMI, Xilinx licenses for simulation, encryption, SDAccel and DCP generation are included. Ingestion of a DCP to
-generate an AFI is handled by AWS. No license is needed for DCP to AFI
-generation. If a local machine is used for development, the Developer is
-responsible for obtaining any necessary licenses. AWS only directly
-support cloud development using the AWS Developer AMI.
+If the Developer uses the FPGA Developer AMI provided by AWS on AWS Marketpalce, Xilinx licenses for simulation, encryption, SDAccel and DCP generation are included. 
+
+If the Developer want to run on other instances or local machine, the Developer is responsible for obtaining any necessary licenses. 
 
 
 **Q: Does AWS provide actual FPGA boards for on-premise developer?**
@@ -139,6 +136,7 @@ No. AWS supports a cloud-only development model and provides the necessary eleme
 **Q: Which HDL languages are supported?**
 
 For RTL level development: Verilog and VHDL are both supported in the FPGA Developer AMI and in generating a DCP. The Xilinx Vivado tools and simulator support mixed mode simulation of Verilog and VHDL. The AWS Shell is written in Verilog. Support for mixed mode simulation may vary if Developers use other simulators. Check your simulator documentation for Verilog/VHDL/System Verilog support.
+
 
 **Q: What RTL simulators are supported?**
 
@@ -151,9 +149,9 @@ FPGA Developer AMI. AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim,
 
 **Q: Is OpenCL and/or SDAccel Supported?**
 
-Yes. OpenCL is supported through either the Xilinx SDAccel tool or any OpenCL tool capable of generating RTL supported by the Xilinx Vivado
-synthesis tool. There is a branch in the AWS SDK tree for SDAccel. Note
-that during the Preview period, SDAccel may not be available.
+Yes. OpenCL is supported through either the Xilinx SDAccel environment or any OpenCL tool capable of generating RTL supported by the Xilinx Vivado synthesis tool. There is a branch in the AWS SDK tree for SDAccel. 
+
+* Note that during the Preview period, SDAccel may not be available.*
 
 
 **Q: Can I use High Level Synthesis (HLS) Tools to generate an AFI?**
@@ -196,112 +194,75 @@ Amazon Linux and CentOS 7 are supported and tested on AWS EC2 F1 instance. Devel
 
 **Q: What support exists for host DMA?**
 
-There are two mechanisms for host DMA between the instance CPU and the
-FPGA. The first is the Xilinx XDMA engine. This engine is included in
-the AWS Shell and programmed through address space in a Physical
-Function directly mapped to the instance. There are dedicated AXI
-interfaces for data movement between the CL and the XDMA in the Shell.
-The second is the capability for Developers to create their own DMA
-engine in the CL region. Developers can create any DMA structure using
-the CL to Shell AXI master interface. Interrupt support is through
-MSI-X. See the Shell\_Interface document in HDK/docs for detailed
-information.
+There are two mechanisms for host DMA between the instance CPU and the FPGA:
 
-**What is the API for the host CPU to the FPGA?**
+The first is the Xilinx XDMA engine. This engine is included in the AWS Shell and programmed through address space in a Physical Function directly mapped to the instance. There are dedicated AXI interfaces for data movement between the CL and the XDMA in the Shell.
 
-There are two types of interface from the host (instance) CPU to the
-FPGA. The first is the API for FPGA Image Management Tools. This API is
-detailed in the SDK portion of the GitHub repository. FPGA Image
-Management tools include APIs to load, clear, and get status of the
-FPGA. The second type of interface is direct address access to the
-Physical Functions (PF) of the FPGA. There is no API for this access.
-Rather, there is direct access to resources in the CL region or Shell
-that can be accessed by software written on the instance. For example,
-the Chipscope software uses address space in a PF to provide debug
-support in the FPGA. Developers can create any API to the resources in
-their CL that is needed. See the Shell\_Interface specification for more
-details on the PF mapping.
+The second is the capability for Developers to create their own DMA engine in the CL region. Developers can create any DMA structure using
+the CL to Shell AXI master interface. Interrupt support is through MSI-X.
 
-**Is the FPGA a kernel or user space interface in the instance?**
 
-The address space in the FPGA can be interfaced via user space.
+**Q: What is the API for the host CPU to the FPGA?**
 
-**How do I change what AFI is loaded in an FPGA?**
+There are two types of interface from the host (instance) CPU to the FPGA:
 
-Changing the AFI loaded in an FPGA is done using the
-fpga-load-local-image API from the FGPA Image Management tools. This
-command takes the AFI ID and requests it to be programmed into the
-identified FPGA. The AWS infrastructure manages the actual bitstream and
-programming of the FPGA using Partial Reconfiguration. The AFI bitstream
-is not stored in the F1 instance or AMI. The bitstream can’t be read or
-modified within the FPGA by the instance. A users may call
-fpga-load-local-image at any time during the life of an instance, and
-may call fpga-load-local-image any number of times.
+The first is the API for FPGA Image Management Tools. This API is detailed in the [SDK portion](./SDK/ManagementTools) of the GitHub repository. FPGA Image Management tools include APIs to load, clear, and get status of the
+FPGA. 
 
-**Will FPGA state be scrubbed?**
+The second type of interface is direct address access to the Application PCIe Physical Functions (PF) of the FPGA. There is no API for this access. Rather, there is direct access to resources in the CL region or Shell that can be accessed by software written on the instance. For example, the Chipscope software uses address space in a PF to provide debug support in the FPGA. Developers can create any API to the resources in their CL that is needed. See the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details on the address space mapping as seen from the instance.
 
-Yes. The AWS infrastructure scrubs FPGA state on termination of an F1
-instance and any reuse of the FPGA hardware. Scrubbing includes both
-FPGA internal state and the contents of DRAM attached to the FPGA.
-Additionally, users can call the fpga-clear-local-image command from the
-FPGA Image Management tools to force a clear of FPGA and DRAM contents
-while the instance is running.
 
-**What does publishing to AWS Marketplace enable?**
+**Q: Is the FPGA address space exposed to Linux kernel or userspace in the instance?**
 
-Publishing an AFI and AMI for F1 to AWS Marketplace enables Developers
-to sell their AFI/AMI combination through the AWS Marketplace. Once in
-Marketplace, customers can launch an F1 instance with that AFI/AMI
-combination directly and be billed directly for the use of the instance
-and AFI/AMI. Contact AWS Marketplace for more details on becoming an AWS
-Marketplace seller.
+The FPGA PCIe memory address space can be mmap() to both kernel and userspace, with userspace being the recommended option for fault isolation.
 
-**How do the FPGAs connect to the Xeon CPU?**
 
-Each FPGA in F1 is connected via a x16 Gen3 PCIe interface. Physcial
-Functions (PF) within the FPGA are directly mapped into the F1 instance.
-Software on the instance can directly access the address in the PF to
-take advantage of the high performance PCIe interface.
+**Q: How do I change what AFI is loaded in an FPGA?**
 
-**What network performance is available on F1?**
+Changing the AFI loaded in an FPGA is done using the fpga-load-local-image API from the FGPA Image Management tools. This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instnace. A users may call
+fpga-load-local-image at any time during the life of an instance, and may call fpga-load-local-image any number of times.
 
-F1 supports 20Gbps Networking using the AWS ENA interface.
 
-**Can the FPGAs on F1 directly access Amazon’s network?**
+**Q: What will happen to FPGA state after my instance stops/terminates/crashes?**
 
-No. The FPGAs do not have direct access to the network. The FPGAs
-communicate via PCIe to the host CPU, where the ENA drivers are run. ENA
-provides a high-performance, low-latency network interface suitable for
-data movement to the F1 instance. See the AWS ENA driver documentation
-for more details.
+Yes. The AWS infrastructure scrubs FPGA state on termination of an F1 instance and any reuse of the FPGA hardware. Scrubbing includes both
+FPGA internal state and the contents of DRAM attached to the FPGA. Additionally, users can call the fpga-clear-local-image command from the FPGA Image Management tools to force a clear of FPGA and DRAM contentswhile the instance is running.
 
-**Can the FPGAs on F1 directly access the disks in the instance?**
 
-No. The FPGAs do not have direct access to the disks on F1. The disks on
-F1 are high-performance, NVMe SSD devices. The interface to the host CPU
-on the instance is high-performance and low-latency with NVMe.
+**Q: What does publishing to AWS Marketplace enable?**
 
-**What is FPGA direct and how fast is it?**
+Publishing an AFI and AMI for F1 to AWS Marketplace enables Developers to sell their AFI/AMI combination through the AWS Marketplace. Once in Marketplace, customers can launch an F1 instance with that AFI/AMI combination directly and be billed directly for the use of the instance and AFI/AMI. please check out [AWS Marketplace](https://aws.amazon.com/marketplace) for more details on how to become a seller, how to set price and collect metrics, and advantages.
 
-FPGA direct is FPGA to FPGA peer communication through the PCIe links on
-each FPGA. The BAR space in the Application PF (see Shell Interface
-specification for more details) allows the Developer to map regions of
-the CL (such as DDR space) to other FPGAs. The Developer can create
-software to DMA data between FPGAs directly, without using Instance
-memory as a buffer. The implementation of communication across the PCIe
-interface using FPGA direct is left to the Developer.
 
-**What is FPGA Link and how fast is it?**
+**Q: How do the FPGAs connect to the x86 CPU?**
 
-FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link
-is organized as a ring, with 2 x 100Gbps links to each adjacent card.
-This enables each FPGA card to send/receive data from an adjacent card
-at 200Gbps. Details on the FPGA Link interface are provided in the Shell
-Interface specification when available.
+Each FPGA in F1 is connected via a x16 Gen3 PCIe interface. Physcial Functions (PF) within the FPGA are directly mapped into the F1 instance. Software on the instance can directly access the address in the PF to take advantage of the high performance PCIe interface.
+
+
+**Q: Can the FPGAs on F1 directly access Amazon’s network?**
+
+No. The FPGAs do not have direct access to the network. The FPGAs communicate via PCIe to the instance CPU, where the ENA drivers are run. ENA provides a high-performance, low-latency virtualized network interface suitable for data movement to the F1 instance. See the AWS ENA driver documentation for more details. 
+
+The Developer can take advatnage of a userspace Polling-mode driver framework like DPDK, to implement fast and low latency copy between network and FPGA, with the data most probably stored in the x86 LastLevelCache (LLC).
+
+**Q: Can the FPGAs on F1 directly access the disks in the instance?**
+
+No. The FPGAs do not have direct access to the disks on F1. The disks on F1 are high-performance, NVMe SSD devices. The Developer can take advatnage of a userspace Polling-mode driver framework like SPDK, to implement fast and low latency copy between NVMe SSD and FPGA, with the data most probably stored in the x86 LastLevelCache (LLC).
+
+
+**Q: What is FPGA Direct and how fast is it?**
+
+FPGA Direct is FPGA to FPGA low latency high throughput peer communication through the PCIe links on each FPGA, where all FPGAs shared same memory space. The PCIe BAR space in the Application PF (see [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details) allows the Developer to map regions of the CL (such as external DRAM space) to other FPGA. The implementation of communication protocol and data transfer engine across the PCIe interface using FPGA direct is left to the Developer.
+
+
+**Q: What is FPGA Link and how fast is it?**
+
+FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link is organized as a ring, with 2 x 100Gbps links to each adjacent card. This enables each FPGA card to send/receive data from an adjacent card at 200Gbps. Details on the FPGA Link interface are provided in the Shell Interface specification when available.
+
 
 **Q: What protocol is used for FPGA link?**
 
-There is no transport protocol for the FPGA link. It is a generic raw streaming interface. Details on the shell interface to the FPGA Link IP blocks are provided in the Shell Interface specification when available.
+There is no transport protocol for the FPGA link. It is a generic raw streaming interface. Details on the shell interface to the FPGA Link IP blocks are provided in the [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) when available.
 
 It is expected that developers would take advantage of standard PCIe protocol, Ethernet protocol, or Xilinx's (reliable) Aurora protocol layer on this interface.
 
@@ -330,6 +291,4 @@ The FPGA for F1 is the Xilinx Ultrascale+ VU9P device with the -2 speed grade. T
 
 **Q: What memory is attached to the FPGA?**
 
-Each FPGA on F1 has 4 x DDR4-2133 interfaces, each at 72bits wide (64bit
-data). Each DDR interface has 16GiB of DRAM attached. This yields 64GB of
-total DRAM memory local to each FPGA on F1.
+Each FPGA on F1 has 4 x DDR4-2133 interfaces, each at 72bits wide (64bit data ). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory local to each FPGA on F1.
