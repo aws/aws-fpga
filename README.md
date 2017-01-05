@@ -1,6 +1,13 @@
 <span style="display: inline-block;">
 
-# AWS EC2 FPGA Hardware and Software Development Kit
+# Table of Contents
+
+1. [AWS EC2 FPGA Hardware and Software Development Kits] (#devkit)
+    - [FPGA Hardware Development Kit (HDK)] (hdk/README.md)
+    - [FPGA Software Development Kit (SDK)] (sdk/README.md)
+2. [Quick Start] (#quickstart)
+
+# AWS EC2 FPGA Hardware and Software Development Kits <a name="devkit"></a>
 
 This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
@@ -31,7 +38,7 @@ FPGA developer AMI will be prefixed with F1
 
 During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
  
-# Quick Start
+# Quick Start <a name="quickstart"></a>
 
 ## Building an Example AFI
 
@@ -49,15 +56,15 @@ We recommend that you initiate the generation in a way that prevents interruptio
 For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.  
 
 ```
-$ git clone https://github.com/aws/aws-fpga     # Step 1: Download the HDK and SDK code
-$ cd aws-fpga                                   # Step 2: Move to the root directory
-$ source hdk_setup.sh                           # Step 3: Set up the HDK environment variables
-$ cd hdk/cl/examples/cl_simple                  # Step 4: Change directory to one of the provided examples
-$ export CL_DIR=$(pwd)                          # Step 5: Define this directory as the root for the CL design
-$ cd build/scripts                              # Step 6: The build directory for synthesizing, placement, timing etc
-$ source aws_build_dcp_from_cl.sh                    # Step 7: Generate a placed-and-routed design checkpoint (DCP)
-$ cd $CL_DIR/build/checkpoints/to_aws           # Step 8: This directory includes the DCP file
-$ ﻿aws s3 mb s3://<bucket-name>                 # Step 9: Create an S3 bucket (choose a unique bucket name)
+$ git clone https://github.com/aws/aws-fpga     # Step 1:  Download the HDK and SDK code
+$ cd aws-fpga                                   # Step 2:  Move to the root directory
+$ source hdk_setup.sh                           # Step 3:  Set up the HDK environment variables
+$ cd hdk/cl/examples/cl_simple                  # Step 4:  Change directory to one of the provided examples
+$ export CL_DIR=$(pwd)                          # Step 5:  Define this directory as the root for the CL design
+$ cd build/scripts                              # Step 6:  The build directory for synthesizing, placement, timing etc
+$ source aws_build_dcp_from_cl.sh               # Step 7:  Generate a placed-and-routed design checkpoint (DCP)
+$ cd $CL_DIR/build/checkpoints/to_aws           # Step 8:  This directory includes the DCP file
+$ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (choose a unique bucket name)
 $ aws s3 cp *.SH_CL_routed.dcp \                # Step 10: Upload the DCP file to S3
         s3://<bucket-name>/cl_simple.dcp
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
