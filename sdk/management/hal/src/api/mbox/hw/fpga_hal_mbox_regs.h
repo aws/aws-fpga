@@ -24,6 +24,7 @@
 #define FMB_BASE				0x0
 
 #define FMB_REG(offset)			(FMB_BASE + (offset))
+#define FMB_REG_SH_VERSION		FMB_REG(0x0)
 #define FMB_REG_STATUS			FMB_REG(0xc)
 #define FMB_REG_WR_INDEX		FMB_REG(0x20)
 #define FMB_REG_WR_DATA			FMB_REG(0x24)

@@ -14,7 +14,7 @@ Please click the "Watch" button in GitHub upper right corner to stay posted.
 
 ## FPGA HDK
 
-The [HDK directory](./hdk) is recommended for developers wanting to start building Amazon FPGA Images (AFI). It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any server or EC2 instance. AWS recommends the use of the [FPGA Developer AMI on AWS Marketplace](https//aws.amazon.com/marketplace/AmazonFPGAAmi). The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI.
+The [HDK directory](./hdk) is recommended for developers wanting to start building Amazon FPGA Images (AFI). It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any server or EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI.
 
 Execute [`source ./hdk_setup.sh`](./hdk_setup.sh) to setup the environment variables required by the rest of the HDK scripts.
 
@@ -22,11 +22,24 @@ Execute [`source ./hdk_setup.sh`](./hdk_setup.sh) to setup the environment varia
 
 The [SDK directory](./sdk) includes the drivers and runtime environment required by any EC2 Instance running on F1. It includes the drivers and tools to interact with pre-built AFIs that are loaded to EC2 F1 FPGAs. The SDK is not required during the AFI development process; it is only required once the AFI is loaded onto an F1 instance.
 
+## FPGA Developer AMI
+
+AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4](https://aws.amazon.com/ec2/instance-types/) EC2 instance with atleast 8GiB Memory.  For the best performance, c4.2xlarge is recommended.  During private access period in order to start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs.  Make sure you are in N. Virginia (us-east-1).  
+Go to EC2->Launch Instance->My AMIs
+Tick the ‘Shared with me’ box on the Ownership tab on the left.
+FPGA developer AMI will be prefixed with F1 
+
+## Developer Support
+
+During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
+
+FPGA development forum: the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. After you are logged in, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.
+ 
 # Quick Start
 
 ## Building an Example AFI
 
-By following the next few steps, you would have downloaded the HDK, compiled and built one of the example Custom Logic (CL) designs included in this HDK, and registered it with AWS.  You can run these steps on any EC2 instance, with [C4](https://aws.amazon.com/ec2/instance-types/) and [M4](https://aws.amazon.com/ec2/instance-types/) being the recommended instance types for performance.
+By following the next few steps, you would have downloaded the HDK, compiled and built one of the example Custom Logic (CL) designs included in this HDK, and registered it with AWS.  
 
 #### Prerequisites
 * AWS FPGA HDK and SDK run in Linux environment only.

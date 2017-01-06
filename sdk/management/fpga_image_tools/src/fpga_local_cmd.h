@@ -120,6 +120,7 @@ struct ec2_fpga_cmd {
 	bool	 show_headers;
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;
+	bool	 rescan;
 };
 
 extern struct ec2_fpga_cmd f1;
@@ -160,3 +161,26 @@ void cli_pci_free(void);
  */
 int cli_get_app_pf_map(uint32_t slot, uint32_t app_pf_num, 
 		struct fpga_pci_resource_map *map);
+
+/**
+ * Remove the application PF for the given mbox slot.
+ *
+ * @param[in]   slot		the fpga slot
+ * @param[in]   app_pf_num	the application PF number to check 
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+int
+cli_remove_app_pf(uint32_t slot, uint32_t app_pf_num);
+
+/**
+ * PCI rescan.
+ *
+ * @returns
+ *  0	on success 
+ * -1	on failure
+ */
+int
+cli_pci_rescan(void);

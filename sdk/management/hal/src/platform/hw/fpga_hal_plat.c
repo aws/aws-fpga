@@ -98,8 +98,8 @@ fpga_plat_attach(struct fpga_slot_spec *spec)
 	log_debug("enter");
 	struct fpga_pci_resource_map *map = &spec->map;
 
-	log_debug("vendor_id=0x%04x, device_id=0x%04x, DBDF:" PCI_DEV_FMT 
-			", resource_num=%u, size=%u", 
+	log_info("vendor_id=0x%04x, device_id=0x%04x, DBDF:" 
+			PCI_DEV_FMT ", resource_num=%u, size=%u", 
 			map->vendor_id, map->device_id, map->domain, map->bus, 
 			map->dev, map->func, map->resource_num, map->size);
 

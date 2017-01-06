@@ -82,6 +82,13 @@ static const char *describe_afi_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image.",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -R  --rescan",
+	"          Rescan the AFIDEVICE to update the per-AFI PCI VendorId and",
+	"          DeviceId that may be dynamically modified due to a",
+	"          fpga-load-local-image or fpga-clear-local-image command.",
+	"          NOTE: this option removes the AFIDEVICE from the sysfs PCI", 
+	"          subsystem and then rescans the PCI subsystem in order for",
+	"          the modified AFI PCI IDs to be refreshed.",
 	"      -?, --help",
 	"          Display this help.",
 	"      -H, --headers",
@@ -224,7 +231,7 @@ parse_args_load_afi(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"fpga-image-id",		required_argument,	0,	'I'	},
-		{"request-timeout",		required_argument,	0,	'R'	},
+		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -232,7 +239,7 @@ parse_args_load_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:R:H?hV",
+	while ((opt = getopt_long(argc, argv, "S:I:r:H?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -249,7 +256,7 @@ parse_args_load_afi(int argc, char *argv[])
 			f1.afi_id[sizeof(f1.afi_id) - 1] = 0; 
 			break;
 		}
-		case 'R': {
+		case 'r': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
@@ -295,7 +302,7 @@ parse_args_clear_afi(int argc, char *argv[])
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
-		{"request-timeout",		required_argument,	0,	'R'	},
+		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -303,7 +310,7 @@ parse_args_clear_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:R:H?hV",
+	while ((opt = getopt_long(argc, argv, "S:r:H?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -312,7 +319,7 @@ parse_args_clear_afi(int argc, char *argv[])
 					FPGA_SLOT_MAX);
 			break;
 		}
-		case 'R': {
+		case 'r': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
@@ -357,7 +364,8 @@ parse_args_describe_afi(int argc, char *argv[])
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
-		{"request-timeout",		required_argument,	0,	'R'	},
+		{"request-timeout",		required_argument,	0,	'r'	},
+		{"rescan",				no_argument,		0,	'R'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -365,7 +373,7 @@ parse_args_describe_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:MCR:H?hV",
+	while ((opt = getopt_long(argc, argv, "S:r:RH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -374,11 +382,15 @@ parse_args_describe_afi(int argc, char *argv[])
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
-		case 'R': {
+		case 'r': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
 			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			break;
+		}
+		case 'R': {
+			f1.rescan = true;
 			break;
 		}
 		case 'H': {
@@ -418,7 +430,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 	int opt = 0;
 
 	static struct option long_options[] = {
-		{"request-timeout",		required_argument,	0,	'R'	},
+		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -426,10 +438,10 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "R:H?hV",
+	while ((opt = getopt_long(argc, argv, "r:H?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
-		case 'R': {
+		case 'r': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
