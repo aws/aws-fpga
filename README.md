@@ -1,10 +1,18 @@
 <span style="display: inline-block;">
 
-# AWS EC2 FPGA Hardware and Software Development Kit
+# Table of Contents
+
+1. [AWS EC2 FPGA Hardware and Software Development Kits] (#devkit)
+    - [FPGA Hardware Development Kit (HDK)] (hdk/README.md)
+    - [FPGA Software Development Kit (SDK)] (sdk/README.md)
+2. [Quick Start] (#quickstart)
+
+# AWS EC2 FPGA Hardware and Software Development Kits <a name="devkit"></a>
 
 This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
 Execute `git clone http://github.com/aws/aws-fpga` to download this HDK+SDK release to your EC2 Instance or local server.
+For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`.
 
 The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environment, and known restrictions.
 
@@ -24,18 +32,24 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 
 ## FPGA Developer AMI
 
-AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4](https://aws.amazon.com/ec2/instance-types/) EC2 instance with atleast 8GiB Memory.  For the best performance, c4.2xlarge is recommended.  During private access period in order to start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs.  Make sure you are in N. Virginia (us-east-1).  
-Go to EC2->Launch Instance->My AMIs
-Tick the ‘Shared with me’ box on the Ownership tab on the left.
-FPGA developer AMI will be prefixed with F1 
+AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. But given the large size of the FPGA used in F1, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge or bigger, M4.2XLarge or bigger, R4.XLarge or bigger). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively. 
+
+During private access period in order to start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs:
+
+* Make sure you are in N. Virginia (us-east-1).  
+* Go to EC2->Launch Instance->My AMIs
+* Select the ‘Shared with me’ box on the Ownership tab on the left.
+* FPGA developer AMI will be prefixed with F1 
 
 ## Developer Support
 
-During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
+*Email support during preview period* : During private access period, developers are emailed with details on how to get started with the FPGA Development AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding FPGA developer AMI.
 
-FPGA development forum: the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. After you are logged in, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.
+*HDK Issues* : Can be submitted and tracked on GitHub.
+
+*AWS FPGA Users' Forum* : the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. After you are logged in, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.
  
-# Quick Start
+# Quick Start <a name="quickstart"></a>
 
 ## Building an Example AFI
 
@@ -53,15 +67,15 @@ We recommend that you initiate the generation in a way that prevents interruptio
 For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.  
 
 ```
-$ git clone https://github.com/aws/aws-fpga     # Step 1: Download the HDK and SDK code
-$ cd aws-fpga                                   # Step 2: Move to the root directory
-$ source hdk_setup.sh                           # Step 3: Set up the HDK environment variables
-$ cd hdk/cl/examples/cl_simple                  # Step 4: Change directory to one of the provided examples
-$ export CL_DIR=$(pwd)                          # Step 5: Define this directory as the root for the CL design
-$ cd build/scripts                              # Step 6: The build directory for synthesizing, placement, timing etc
-$ source aws_build_dcp_from_cl.sh                    # Step 7: Generate a placed-and-routed design checkpoint (DCP)
-$ cd $CL_DIR/build/checkpoints/to_aws           # Step 8: This directory includes the DCP file
-$ ﻿aws s3 mb s3://<bucket-name>                 # Step 9: Create an S3 bucket (choose a unique bucket name)
+$ git clone https://github.com/aws/aws-fpga     # Step 1:  Download the HDK and SDK code
+$ cd aws-fpga                                   # Step 2:  Move to the root directory
+$ source hdk_setup.sh                           # Step 3:  Set up the HDK environment variables
+$ cd hdk/cl/examples/cl_simple                  # Step 4:  Change directory to one of the provided examples
+$ export CL_DIR=$(pwd)                          # Step 5:  Define this directory as the root for the CL design
+$ cd build/scripts                              # Step 6:  The build directory for synthesizing, placement, timing etc
+$ source aws_build_dcp_from_cl.sh               # Step 7:  Generate a placed-and-routed design checkpoint (DCP)
+$ cd $CL_DIR/build/checkpoints/to_aws           # Step 8:  This directory includes the DCP file
+$ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (choose a unique bucket name)
 $ aws s3 cp *.SH_CL_routed.dcp \                # Step 10: Upload the DCP file to S3
         s3://<bucket-name>/cl_simple.dcp
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  

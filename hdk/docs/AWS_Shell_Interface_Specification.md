@@ -116,7 +116,7 @@ A single 250MHz clock, and associated asynchronous reset is provided to the CL. 
 
 ![alt tag](./images/Dividing_clocks_inside_CL.jpg)
 
-The reset signal combines the board reset and PCIe reset conditions. Please refer to the Xilinx documentation (ug974) for more information.
+The reset signal combines the board reset and PCIe reset conditions. Please refer to the [Xilinx documentation (ug974)](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2014_1/ug974-vivado-ultrascale-libraries.pdf) for more information.
 
 ### Function Level Reset
 
@@ -289,9 +289,9 @@ Some signals must include the PCIe IDs of the CL. A Developer’s specific PCIe 
 
 -   cl_sh_id1
 
-    -   [15:0] – Subsystem ID
+    -   [15:0] – Subsystem Vendor ID
 
-    -  [31:16] – Subsystem Vendor ID
+    -  [31:16] – Subsystem ID
 
 ### General control/status
 
