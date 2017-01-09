@@ -165,7 +165,7 @@ A sample policy is shown below.
         ]
     }
 
-Then, send an email to AWS (email TBD) providing the information listed earlier (numbered 1-6), in addition to your **AWS Account ID number**.
+Then, send an email to <f1-preview-afi-generation@amazon.com> providing the information listed earlier (numbered 1-6), in addition to your **AWS Account ID number**.
 
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
