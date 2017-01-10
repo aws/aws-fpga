@@ -2,7 +2,9 @@
 
 AWS FPGA HDK is the official kit for developing an Amazon FPGA Image (AFI) which can be loaded on FPGAs in FPGA-enabled EC2 instances (i.e. F1 Instance).
 
-Check out the [release notes](../RELEASE_NOTES.md) for information about the latest bug fixes, updates, and features added to the HDK.
+Useful resources:
+* Check out the [release notes](../RELEASE_NOTES.md) for information about the latest bug fixes, updates, and features added to the HDK.
+* [FAQ](../aws-fpga/FAQs.md)
 
 ## Table of Contents
 1. [Overview] (#overview)
@@ -13,7 +15,6 @@ Check out the [release notes](../RELEASE_NOTES.md) for information about the lat
     - [Start Custom Logic (CL) Design] (#startcl)
     - [Simulate Custom Logic (CL) Design] (#simcl)
     - [Build Custom Logic (CL) Design for AWS] (#buildcl)
-3. [Frequently Asked Questions (FAQ)] (#faq)
 
 ## Overview <a name="overview"></a>
 
@@ -67,20 +68,3 @@ Follow the [verification environment setup](https://github.com/aws/aws-fpga/wiki
 
 You can follow the [build scripts readme](./common/shell_current/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
-
-## FAQ <a name="faq"></a>
-
-### Does the HDK Include DMA?
-The current release of the HDK does not include DMA. Upcoming releases will include both Xilinx's XDMA and AWS EDMA in the HDK and their respective drivers in the SDK.
-
-### Does the HDK support OpenCL?
-The current release of the HDK does not include OpenCL support.
-
-### Does the HDK support SDAccel?
-The current release of the HDK does not include SDAccel support.
-
-### Does the HDK support Chipscope?
-The HDK does not currently support chipscope debug, but this will be enabled in upcoming HDK/SDK releases.
-
-### Does the HDK support dynamic Partial Reconfiguration?
-The HDK supports dynamic partial reconfiguration (PR) of the Custom Logic.  Each AFI is actually a partial bitstream, and AFI's can be swapped during operation.  Using [FPGA Management Tools provided by the SDK](../sdk/management/fpga_image_tools), the users can load/unload AFIs from within the instance.   **NOTE: Users can only load/unload AFI-id(s) that have been associated a priori to the instance-id or the AMI-id**
