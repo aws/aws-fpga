@@ -23,14 +23,12 @@ export HDK_SHELL_DIR=$HDK_COMMON_DIR/shell_latest
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
 echo "AWS FPGA: Done setting environment variables.";
-echo "AWS FPGA: ATTENTION: Don't forget to change the CL_DIR variable for the directory of your Custom Logic.";
 
 # Create DDR and PCIe IP models and patch PCIe
 if [ ! -f $HDK_COMMON_DIR/verif/models/ddr4_model/arch_defines.v ]
 then
   echo "DDR4 model files in "$HDK_COMMON_DIR/verif/models/ddr4_model/" do NOT exist. Running model creation step.";
   echo "This could take 5-10 minutes, please be patient!";
-  echo "NOTE: This step requires having Xilinx Vivado installed and running Licensing Manager";
   # Run init.sh then clean-up
   source $HDK_DIR/common/verif/scripts/init.sh
   echo "Done with model creation step. Cleaning up temporary files.";
@@ -41,4 +39,6 @@ else
   echo "DDR4 model files exist in "$HDK_COMMON_DIR/verif/models/ddr4_model/". Skipping model creation step.";
 fi
 echo "AWS FPGA: Done with AWS HDK setup.";
+echo "AWS FPGA: ATTENTION: Don't forget to change the CL_DIR variable for the directory of your Custom Logic.";
+
 
