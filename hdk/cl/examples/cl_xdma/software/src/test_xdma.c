@@ -9,35 +9,122 @@
 
 #include "sh_dpi_tasks.h"
 
-#define CFG_REG           UINT64_C(0x00)
-#define CNTL_REG          UINT64_C(0x08)
-#define NUM_INST          UINT64_C(0x10)
-#define MAX_RD_REQ        UINT64_C(0x14)
+#include "cl_xdma.h"
 
-#define WR_INSTR_INDEX    UINT64_C(0x1c)
-#define WR_ADDR_LOW       UINT64_C(0x20)
-#define WR_ADDR_HIGH      UINT64_C(0x24)
-#define WR_DATA           UINT64_C(0x28)
-#define WR_LEN            UINT64_C(0x2c)
+XDMA_DESC *h2c_desc_list_head;
 
-#define RD_INSTR_INDEX    UINT64_C(0x3c)
-#define RD_ADDR_LOW       UINT64_C(0x40)
-#define RD_ADDR_HIGH      UINT64_C(0x44)
-#define RD_DATA           UINT64_C(0x48)
-#define RD_LEN            UINT64_C(0x4c)
+// XDMA Target IDs
+#define H2C_TGT 0x0
+#define C2H_TGT 0x1
+#define IRQ_TGT 0x2
+#define CFG_TGT 0x3
+#define H2C_SGDMA_TGT 0x4
+#define C2H_SGDMA_TGT 0x5
+#define SGDMA_CMN_TGT 0x6
+#define MSIX_TGT 0x8
 
-#define RD_ERR            UINT64_C(0xb0)
-#define RD_ERR_ADDR_LOW   UINT64_C(0xb4)
-#define RD_ERR_ADDR_HIGH  UINT64_C(0xb8)
-#define RD_ERR_INDEX      UINT64_C(0xbc)
+// XDMA H2C Channel Register Space
+#define H2C_ID           0x00
+#define H2C_CTRL0        0x04
+#define H2C_CTRL1        0x08
+#define H2C_CTRL2        0x0c
+#define H2C_STAT0        0x40
+#define H2C_STAT1        0x44
+#define H2C_CMP_DESC_CNT 0x48
+#define H2C_ALGN         0x4c
+#define H2C_POLL_ADDR_LO 0x88
+#define H2C_POLL_ADDR_HI 0x8c
+#define H2C_INT_MSK0     0x90
+#define H2C_INT_MSK1     0x94
+#define H2C_INT_MSK2     0x98
+#define H2C_PMON_CTRL    0xc0
+#define H2C_PCYC_CNT0    0xc4
+#define H2C_PCYC_CNT1    0xc4
+#define H2C_PDAT_CNT0    0xcc
+#define H2C_PDAT_CNT1    0xd0
 
-#define WR_CYCLE_CNT_LOW  UINT64_C(0xf0)
-#define WR_CYCLE_CNT_HIGH UINT64_C(0xf4)
-#define RD_CYCLE_CNT_LOW  UINT64_C(0xf8)
-#define RD_CYCLE_CNT_HIGH UINT64_C(0xfc)
+static XDMA_DESC *h2c_desc_table;
+static int h2c_desc_index = 0;
 
-#define WR_START_BIT   0x00000001
-#define RD_START_BIT   0x00000002
+uint32_t dma_reg_addr(uint32_t target, uint32_t channel, uint32_t offset) {
+  return ((target << 12) | (channel << 8) | offset);
+}
+
+void que_buffer_to_cl(int chan, uint8_t *buf, size_t len) {
+
+  // setup descriptor table if this is first call
+  if (h2c_desc_index == 0) {
+    h2c_desc_table = (XDMA_DESC *)memalign(4096, 4096);  // allocate 4k aligned to a 4k boundary
+    
+    sv_map_host_memory(h2c_desc_table);
+  
+  }
+
+  h2c_desc_table[h2c_desc_index].header.word = 0; // make sure reserved bits and unused bits are 0
+  h2c_desc_table[h2c_desc_index].header.fields.control = 0x01;
+  h2c_desc_table[h2c_desc_index].header.fields.nxt_adj = 0;
+  h2c_desc_table[h2c_desc_index].header.fields.magic = 0xad4b;
+  h2c_desc_table[h2c_desc_index].len = len;
+  h2c_desc_table[h2c_desc_index].src_adr_lo = LOW_32b(buf);
+  h2c_desc_table[h2c_desc_index].src_adr_hi = HIGH_32b(buf);
+  h2c_desc_table[h2c_desc_index].dst_adr_lo = 0;
+  h2c_desc_table[h2c_desc_index].dst_adr_hi = 0;
+  h2c_desc_table[h2c_desc_index].nxt_adr_lo = 0;
+  h2c_desc_table[h2c_desc_index].nxt_adr_hi = 0;
+
+  // remove stop bit from previous descriptor
+  if (h2c_desc_index > 0) {
+    h2c_desc_table[h2c_desc_index-1].header.fields.control &= 0xfe;
+  }
+
+  h2c_desc_index++;
+}
+
+void que_cl_to_buffer(int chan, uint8_t *buf, size_t len) {
+}
+
+void start_move_to_cl(int chan) {
+  uint64_t base_addr;
+  uint32_t data;
+
+  get_base_addr_of_func(2, 0, &base_addr);
+  log_printf("base_addr: %16lx", base_addr);
+
+  reg_read(base_addr, &data);
+  log_printf("data: %08x", data);
+
+  reg_read(base_addr+4, &data);
+  log_printf("data: %08x", data);
+
+  reg_write(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x80), LOW_32b(h2c_desc_table));
+  reg_write(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x84), HIGH_32b(h2c_desc_table));
+
+  reg_write(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x88), h2c_desc_index-1);  // don't count the first entry
+
+  reg_read(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x80), &data);
+  log_printf("data: %08x", data);
+
+  reg_read(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x84), &data);
+  log_printf("data: %08x", data);
+
+  reg_read(base_addr+dma_reg_addr(H2C_SGDMA_TGT, 0, 0x88), &data);
+  log_printf("data: %08x", data);
+
+  // sett pollmode_wb, ie_completed & run bit
+  reg_write(base_addr+dma_reg_addr(H2C_TGT, 0, H2C_CTRL0), 0x04000005);
+  reg_read(base_addr+dma_reg_addr(H2C_TGT, 0, H2C_CTRL0), &data);
+  log_printf("data: %08x", data);
+
+}
+
+void start_move_to_buffer(int chan) {
+}
+
+void is_move_to_cl_done(int chan) {
+}
+
+void is_move_to_buffer_done(int chan) {
+}
 
 void test_main(uint32_t *exit_code) {
 
@@ -45,11 +132,6 @@ void test_main(uint32_t *exit_code) {
 #ifndef VIVADO_SIM
   svScope scope;
 #endif
-
-  uint8_t *buffer;
-  uint32_t pcim_data;
-
-  uint32_t read_data;
 
   uint64_t cycle_count;
   uint64_t error_addr;
@@ -61,11 +143,7 @@ void test_main(uint32_t *exit_code) {
   int error_count;
   int fail;
 
-  int debug;
-  int j;
-
-  // NOTE: Set debug to 1 to dump buffer contents
-  debug = 0;
+  XDMA_DESC *h2c_desc;
 
   error_count = 0;
   fail = 0;
@@ -76,98 +154,19 @@ void test_main(uint32_t *exit_code) {
   svSetScope(scope);
 #endif
 
-  buffer = (uint8_t *)malloc(1024);
-  // Align to 64 byte boundary
-  buffer += 0x3fUL;
-  buffer = (uint8_t *)((uint64_t)buffer & ~(0x3fUL));
-  sv_map_host_memory(buffer);
+  {
+    uint8_t *buf;
 
-  pcim_data = 0x6c93af50;
+    buf = (uint8_t *)malloc(64);
+    que_buffer_to_cl(0, buf, 64);
 
-  log_printf("Programming cl_tst registers for PCIe\n");
+    buf = (uint8_t *)malloc(128);
+    que_buffer_to_cl(0, buf, 128);
 
-  cl_poke(CFG_REG, 0x01000018);
-
-  cl_poke(MAX_RD_REQ, 0x0000000f);
-
-  cl_poke(WR_INSTR_INDEX, 0x00000000);
-  cl_poke(WR_ADDR_LOW,   LOW_32b(buffer));
-  cl_poke(WR_ADDR_HIGH, HIGH_32b(buffer));
-  cl_poke(WR_DATA, pcim_data);
-  cl_poke(WR_LEN, 0x00000001);
-
-  cl_poke(RD_INSTR_INDEX, 0x00000000);
-  cl_poke(RD_ADDR_LOW,   LOW_32b(buffer));
-  cl_poke(RD_ADDR_HIGH, HIGH_32b(buffer));
-  cl_poke(RD_DATA, pcim_data);
-  cl_poke(RD_LEN, 0x00000001);
-
-  cl_poke(NUM_INST, 0x00000000);
-
-  cl_poke(CNTL_REG, WR_START_BIT | RD_START_BIT);      // start read & write
-
-  log_printf("Waiting for PCIe write and read activity to complete\n");
-  sv_pause(2);                                         // wait 2us
-
-  // Make sure writes and reads completed successfully
-  timeout_count = 0;
-  do {
-    cl_peek(CNTL_REG, &read_data);
-    read_data &= 0x00000007;
-    timeout_count++;
-  } while ((read_data != 0x0) && (timeout_count < 100));
-
-  if ((timeout_count == 100) && (read_data != 0x0)) {
-    log_printf("*** ERROR *** Timeout waiting for writes and reads to complete.\n");
-    error_count++;
-  } else {
-    cl_poke(CNTL_REG, 0x00000000);
-
-    log_printf("Checking some register values\n");
-
-    cycle_count = 0x0;
-    cl_peek(WR_CYCLE_CNT_LOW, &read_data);
-    cycle_count = read_data;
-    cl_peek(WR_CYCLE_CNT_HIGH, &read_data);
-    cycle_count |= (read_data << 32);
-    if (cycle_count == 0x0) {
-      log_printf("*** ERROR *** Write Timer value was 0x0 at end of test.\n");
-      error_count++;
-    }
-
-    cycle_count = 0x0;
-    cl_peek(RD_CYCLE_CNT_LOW, &read_data);
-    cycle_count = read_data;
-    cl_peek(RD_CYCLE_CNT_HIGH, &read_data);
-    cycle_count |= (read_data << 32);
-    if (cycle_count == 0x0) {
-      log_printf("*** ERROR *** Read Timer value was 0x0 at end of test.\n");
-      error_count++;
-    }
-
-    log_printf("Checking for read compare errors\n");
-
-    cl_peek(RD_ERR, &read_data);
-    if (read_data != 0x0) {
-      cl_peek(RD_ERR_ADDR_LOW, &read_data);
-      error_addr = read_data;
-      cl_peek(RD_ERR_ADDR_HIGH, &read_data);
-      error_addr |= (read_data << 32);
-      cl_peek(RD_ERR_INDEX, &read_data);
-      error_index = read_data & 0x0000000f;
-      log_printf("*** ERROR *** Read compare error from address 0x%08x %08x, index 0x%1x\n", (error_addr >> 32), error_addr, error_index);
-      error_count++;
-    }
-
-    // For debug, print out the incrementing pattern
-    //  that was written by the CL
-    if (debug == 1) {
-      printf("Printing out buffer contents\n");
-      for (j=0; j<64; j++)
-        printf("buffer[%2d] = 0x%0x\n", j, buffer[j]);
-    }
-
+    start_move_to_cl(0);
   }
+
+  sv_pause(50);
 
   // Report pass/fail status
   log_printf("Checking total error count...\n");
