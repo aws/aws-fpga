@@ -26,9 +26,9 @@ endif
 export SCRIPTS_DIR = $(PWD)
 export XILINX_IP = $(HDK_COMMON_DIR)/shell_latest/design/ip
 export SH_LIB_DIR = $(HDK_COMMON_DIR)/shell_latest/design/lib
-export SH_INF_DIR = $(HDK_COMMON_DIR)/shell_latest/design/interfaces
+export SH_INF_DIR = $(HDK_COMMON_DIR)/shell_current/design/interfaces
 
-SV_TEST_LIST = test_peek_poke
+SV_TEST_LIST = test_xdma
 C_TEST_LIST  = test_peek_poke.c
 
 all:	compile run
