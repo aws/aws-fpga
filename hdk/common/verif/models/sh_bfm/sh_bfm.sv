@@ -228,7 +228,63 @@ module sh_bfm #(
 
    inout[3:0]                 fpga_uctrl_gpio
 
+   //--------------------------------------------
+   // XDMA
+   //--------------------------------------------
 
+   ,
+   //-----------------------------------------------
+   // AXI-L interface to access XDMA configuration
+   input       [31:0]  cl_sh_xdcfg_awaddr,
+   input               cl_sh_xdcfg_awvalid,
+   output logic        sh_cl_xdcfg_awready,
+   input      [31:0]   cl_sh_xdcfg_wdata,
+   input      [3:0]    cl_sh_xdcfg_wstrb,
+   input               cl_sh_xdcfg_wvalid,
+   output logic        sh_cl_xdcfg_wready,
+   output logic        sh_cl_xdcfg_bvalid,
+   output logic [1:0]  sh_cl_xdcfg_bresp,
+   input               cl_sh_xdcfg_bready,
+
+   input      [31:0]   cl_sh_xdcfg_araddr,
+   input               cl_sh_xdcfg_arvalid,
+   output logic        sh_cl_xdcfg_arready,
+   output logic [31:0] sh_cl_xdcfg_rdata,
+   output logic [1:0]  sh_cl_xdcfg_rresp,
+   output logic        sh_cl_xdcfg_rvalid,
+   input               cl_sh_xdcfg_rready,
+
+   //----------------------------------------------------
+   // XDMA AXI-4 interface to master cycles to CL
+   output logic [4:0]   sh_cl_xdma_awid,
+   output logic [63:0]  sh_cl_xdma_awaddr,
+   output logic [7:0]   sh_cl_xdma_awlen,
+   output logic         sh_cl_xdma_awvalid,
+   input                cl_sh_xdma_awready,
+
+   output logic [511:0] sh_cl_xdma_wdata,
+   output logic [63:0]  sh_cl_xdma_wstrb,
+   output logic         sh_cl_xdma_wlast,
+   output logic         sh_cl_xdma_wvalid,
+   input                cl_sh_xdma_wready,
+
+   input      [4:0]     cl_sh_xdma_bid,
+   input      [1:0]     cl_sh_xdma_bresp,
+   input                cl_sh_xdma_bvalid,
+   output logic         sh_cl_xdma_bready,
+
+   output logic [4:0]   sh_cl_xdma_arid,
+   output logic [63:0]  sh_cl_xdma_araddr,
+   output logic [7:0]   sh_cl_xdma_arlen,
+   output logic         sh_cl_xdma_arvalid,
+   input                cl_sh_xdma_arready,
+
+   input      [4:0]     cl_sh_xdma_rid,
+   input      [511:0]   cl_sh_xdma_rdata,
+   input      [1:0]     cl_sh_xdma_rresp,
+   input                cl_sh_xdma_rlast,
+   input                cl_sh_xdma_rvalid,
+   output logic         sh_cl_xdma_rready
 
 `ifndef NO_CL_DDR
    ,
