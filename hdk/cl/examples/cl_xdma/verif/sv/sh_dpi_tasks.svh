@@ -26,6 +26,9 @@
    export "DPI-C" task cl_poke;
    export "DPI-C" task sv_pause;
 
+   static int h2c_desc_index = 0;
+   static int c2h_desc_index = 0;
+   
    task sv_printf(input string msg);
       $display("%S", msg);
    endtask
