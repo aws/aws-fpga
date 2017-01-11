@@ -1,12 +1,7 @@
 // =============================================================================
 // Copyright 2016 Amazon.com, Inc. or its affiliates.
 // All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
 // =============================================================================
-
-//FIXME -- Need to do the clocking correctly:
-//    - Async Stream between PCIe cores and User logic
 
 module sh_bfm #(
                      parameter NUM_HMC = 4,
@@ -1197,6 +1192,24 @@ typedef struct {
       
    endtask // peek
 
+   task dma_buffer_to_cl(input logic [1:0] chan, logic [7:0] buf[], logic [63:0] cl_addr);
+   endtask // dma_buffer_to_cl
+
+   task dma_cl_to_buffer(input logic [1:0] chan, output logic [7:0] buf[], input [63:0] cl_addr);
+   endtask // dma_cl_to_buffer
+   
+   task start_dma_to_cl(input int chan);
+   endtask // start_dma_to_cl
+   
+   task start_dma_to_buffer(input int chan);
+   endtask // start_dma_to_buffer
+
+   function bit is_dma_to_cl_done(input int chan);  // 1 = done
+   endfunction // is_dma_to_cl_done
+   
+   function bit is_dma_to_buffer_done(input int chan); // 1 = done
+   endfunction // is_dma_to_buffer_done
+   
 `ifdef NEVER
    
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
