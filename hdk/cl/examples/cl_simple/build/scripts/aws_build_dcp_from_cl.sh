@@ -15,6 +15,13 @@
 ## implied. See the License for the specific language governing permissions and
 ## limitations under the License.
 
+# If specified use script specified, otherwise use default vivado script
+if [ "$1" != "" ]; then
+    vivado_script="$1"
+else
+    vivado_script="create_dcp_from_cl.tcl"
+fi
+
 echo "AWS FPGA: Starting the design checkpoint build process"
 echo "AWS FPGA: Checking for proper environment variables and build directories"
 
@@ -43,6 +50,9 @@ then
 	exit 1
 fi
 
+# Use timestamp for logs and output files
+timestamp=$(date +"%y_%m_%d-%H%M%S")
+logname=$timestamp.vivado.log
 
 echo "AWS FPGA: Environment variables and directories are present. Checking for Vivado installation."
 
@@ -50,7 +60,8 @@ echo "AWS FPGA: Environment variables and directories are present. Checking for 
 vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
 
 # Run vivado
-nohup vivado -mode batch -nojournal -source create_dcp_from_cl.tcl &
+#nohup vivado -mode batch -nojournal -source create_dcp_from_cl.tcl &
+nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp > $timestamp.nohup.out 2>&1&
 
 echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
 echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
