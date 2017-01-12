@@ -140,11 +140,17 @@ The [cl_simple example](.hdk/cl/examples/cl_simple) provides an expanded example
 
 **Q: How do I get access to AWS FPGA Developer AMI?**
 
-Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will receive permission and notifications via email.  Email aws-fpga-developer-support@amazon.com with any questions.
+Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will receive permission and notifications via email.  
 
 Once you get access to the FPGA Developer AMI, we suggest you read the the README file within the FPGA Developer AMI for more details.
 
+**Q: Where do I go for support?**
 
+We encourage you to use the forum to post questions, suggestions and receive important announcements. During the preview period, the forum is limited to the preview users only; we’ll open it once F1 moves to GA.
+ 
+Please use the following direct link to enter the forum: https://forums.aws.amazon.com/forum.jspa?forumID=243. 
+ 
+To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen. 
 
 **Q: Is there any software I need on my F1 instance that will use the AFI?**
 
