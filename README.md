@@ -43,11 +43,10 @@ During private access period in order to start using the AMI your AWS account ne
 
 ## Developer Support
 
-*Email support during preview period* : During private access period, developers are emailed with details on how to get started with the FPGA Development AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding FPGA developer AMI.
+*FPGA development AMI* During private access period, developers are emailed with details on how to get started with the FPGA Development AMI, terms and conditions and additional info on how to get started using F1 instances.  
 
-*HDK Issues* : Can be submitted and tracked on GitHub.
+*AWS FPGA Users' Forum* : the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
 
-*AWS FPGA Users' Forum* : the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. After you are logged in, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.
  
 # Quick Start <a name="quickstart"></a>
 
