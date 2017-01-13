@@ -55,7 +55,6 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Customizable PCIe DeviceID/VendorID
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
-* Synopsys RTL simulations tools
 * Xilinx SDAccel development environment
 * Additional metric counters for FPGA management tools
 * PCIe Slave interface supports 32-bit accesses only (can only do 32-bit accesses from Instance to FPGA), future releases will go up to 512-bit
@@ -72,6 +71,8 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * This release tested and validated with Vivado 2016.3
 * Vivado XSIM RTL simulator supported by the HDK
 * MentorGraphic's Questa RTL simulator supported by the HDK (but requires a purchase of separate license from MentorGraphics)
+* Synopsys' VCS RTL simulator supported by the HDK (but requires a purchase of separate license from Synopsys)
+
 
 ## License Requirements
 
