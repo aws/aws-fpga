@@ -224,7 +224,7 @@ Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API
 
 
 
-**Q: I can not see the new AGFI after `fpga-load-local-image` call returned ?**
+**Q: I can not see the new AFI after `fpga-load-local-image` call returned ?**
 
 The `fpga-load-local-image` call will initiate the loading of the AFI, however a successful return of `fpga-load-local-image` is just an indication that the loading process has started. The developer should poll on the status of the AFI via `fpga-describe-local-image` until the status would show **`loaded`**.
 
