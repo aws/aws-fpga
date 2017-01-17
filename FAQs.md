@@ -6,13 +6,13 @@
 
 [Marketplace FAQs](#marketplace)
 
-[F1 Instance FAQs](#instance)
+[F1 Instance and Tools FAQs](#instance)
 
 [Development Languages FAQs](#languages)
 
 [FPGA Specific FAQs](#fpga)
 
-[General Shell FAQs](#shell) 
+[General AWS FPGA Shell FAQs](#shell) 
 
 [Troubelshooting FAQs](#troubelshooting)
 
@@ -179,7 +179,7 @@ In other words, AFIs are not published directly on AWS marketplace, rather AFI(s
 Neither: AWS Marketplace customers that pick up an AMI with one our more AFIs associated with it will not see any source code nor bitstream. Marketplace customers actually have permission to use the AFI but not permission to see its code. The only reference to the AFI is through its unique AFI ID. The AMI would call `fpga-local-load-image` with the correct AFI ID for that Marketplace offering, which will result in **AWS loading the AFI into the FPGA** in sideband and without sending the AFI code through the customer's instance. No FPGA internal design code is exposed.
 
 
-##Instance
+##F1 Instance and Tools
 **Q: What OS can run on the F1 instance?**
 
 Amazon Linux and CentOS 7 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
@@ -206,6 +206,12 @@ The second type of interface is direct address access to the Application PCIe Ph
 
 
 
+**Q: Can I integrate the FPGA Image Management Tools in my application?**
+
+Yes, In addition to providing the [FPGA Management Tools](./SDK/management/fpga_image_tools) as linux shell commands, the [SDK Management](./SDK/management) directory includes files in the `include` and `hal` to integrate the FPGA Management Tools into the developer's application(a) and  avoid calling linux shell commands.
+
+
+
 **Q: Is the FPGA address space exposed to the instance Linux kernel or userspace?**
 
 Both. The FPGA PCIe memory address space can be mmap() to both kernel and userspace, with userspace being the recommended option for fault isolation.
@@ -215,6 +221,12 @@ Both. The FPGA PCIe memory address space can be mmap() to both kernel and usersp
 **Q: How do I change what AFI is loaded in an FPGA?**
 
 Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./SDK/management/fpga_image_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
+
+
+
+**Q: I can not see the new AGFI after `fpga-load-local-image` call returned ?**
+
+The `fpga-load-local-image` call will initiate the loading of the AFI, however a successful return of `fpga-load-local-image` is just an indication that the loading process has started. The developer should poll on the status of the AFI via `fpga-describe-local-image` until the status would show **`loaded`**.
 
 
 
@@ -327,7 +339,7 @@ There are four debug capabilities supported in F1 for FPGA debug:
 
 
 
-##Shell
+##AWS FPGA Shell
 **Q: Do I need to interface to the AWS Shell?**
 
 Yes. The only way to interface to PCIe and the instance CPU is using the AWS Shell. The AWS Shell is included with all F1 FPGAs. There is no option to run the F1 FPGA without a Shell. The Shell takes care of the non-differentiating heavy lifting tasks like PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
