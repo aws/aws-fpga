@@ -50,7 +50,7 @@ The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
 
 ### Try out a "Hello World" example and others <a name="examples"></a>
 
-The [Getting started with CL examples](./cl/examples/Getting_Started_With_CL_Examples.md) walks you through how to build, register, and use an AFI. 
+The [Examples readme](./cl/examples/README.md) provides and overview on process for building a Custom Logic (CL) implementation for AWS FPGA instances, specifically it walks you through how to build, register, and use an AFI. 
 The [Hello World readme](./cl/examples/cl_hello_world/README.md) provides the steps to build an AFI from the provided Hello World example CL, and how to load it on an F1 instance.
 Other examples are available in the [examples directory](./cl/examples), each with its own README.md file.
 
