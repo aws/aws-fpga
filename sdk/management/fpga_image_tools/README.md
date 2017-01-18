@@ -1,6 +1,6 @@
 # Amazon FPGA Image (AFI) Management Tools
 
-AWS provides the following set of command-line tools for Amazon FPGA Image (AFI) managment while running on an FPGA-enabled EC2 instance (e.g., F1). **The tools currently support Linux Instances only.**
+AWS provides the following set of command-line tools for Amazon FPGA Image (AFI) management while running on an FPGA-enabled EC2 instance (e.g., F1). **The tools currently support Linux Instances only.**
 
 * **`fpga-describe-local-image-slots`**
    * Returns the FPGA image slot numbers and device mappings to use for the `fpga-load-local-image`, `fpga-clear-local-image`, and `fpga-describe-local-image` commands.
@@ -16,9 +16,9 @@ AWS provides the following set of command-line tools for Amazon FPGA Image (AFI)
 
 All of the AFI Management Tools support a `-help` option that may be used to display the full set of options.
 
-####`sudo` or root Privileges
+#### `sudo` or `root` Privileges
 
-The tools require sudo (or root) access since AFI loads and clears are modifying the underlying system hardware (also see the FAQ section "Q: How do the AFI Management Tools work?".
+The tools require sudo or root access rights since AFI loads and clears modify the underlying system hardware (also see the FAQ section "Q: How do the AFI Management Tools work?".
 
 ## Installs or Updates to the AFI Management Tools
 
@@ -34,7 +34,7 @@ The `sdk_setup.sh` script will build the AFI Management Tools and install them i
 
 ## Quickstart
 
-Once you have the AFI Management Tools installed onn your F1 instance, you can display the FPGA slot numbers and PCIe mappings for driver attachment (e.g., PCI Domain:Bus:Device:Function).
+Once you have the AFI Management Tools installed on your F1 instance, you can display the FPGA slot numbers and PCIe mappings for driver attachment (e.g., PCI Domain:Bus:Device:Function).
 
 #### Getting Inventory of the Available FPGA Slots
 
@@ -50,7 +50,7 @@ Once you have the AFI Management Tools installed onn your F1 instance, you can d
     AFIDEVICE    6       0x1d0f      0x1042      0000:00:1d.0
     AFIDEVICE    7       0x1d0f      0x1042      0000:00:1e.0
 
-* The list displayed above is for F1.16xl instance that have 8 FPGAs on slot 0 through 7.
+* The above list displayed the slots in an F1.16xl instance that has 8 FPGAs on slot 0 through 7.
 
 * The VendorId is the PCIe Configuration space Vendor ID, with 0x1d0f representing the Amazon registered PCIe Vendor ID. The developer can choose the Vendor ID for their own AFIs.
 
@@ -163,7 +163,7 @@ into the given `fpga-image-slot`.
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
 
 * **Q: What is a PF?**
-   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessable by user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
+   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessible by a user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
 
 * **Q: What is a BAR?**
    * A PCI Base Address Register (BAR) specifies the memory region where FPGA memory space may be accessed by an external entity (like the instance CPU or other FPGAs).  Multiple BARs may be supported by a given PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
@@ -172,20 +172,19 @@ into the given `fpga-image-slot`.
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
 
 * **Q: How do the AFI Management Tools work?**
-   * Though most customers do not need to understand the internals of the tools, a short overview is provided here:
    * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
    * The AFI Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
-   * The Amazon FPGA Image Tools require `sudo` (or root) access since AFI loads and clears are modifying the underlying system hardware.
-   * `sudo` (or root) privilege is also required since the tools access the sysfs PCI subsystem and `/dev/kmsg` for `dmesg` logging.
-   * For more information on the Amazon FPGA Image Mangement Tool software and FPGA hardware see [aws-fpga](https://github.com/aws/aws-fpga).
+   * The Amazon FPGA Image Tools require `sudo` or `root` access level since AFI loads and clears are modifying the underlying system hardware.
+   * `sudo` or `root` privilege is also required since the tools access the sysfs PCI subsystem and `/dev/kmsg` for `dmesg` logging.
+   * For more information on the Amazon FPGA Image Management Tool software and FPGA hardware see [AFI Management Tools readme](https://github.com/aws/aws-fpga/blob/master/sdk/management/fpga_image_tools/README.md#amazon-fpga-image-afi-management-tools).
 
 * **Q: Can the AFI Management Tools work concurently on multiple FPGA image slots?**
    * The tools can be executed on multiple FPGAs concurrently.  This may be done without synchronization between processes that are using the tools.
    
 * **Q: Can the AFI Management Tools work concurrently from multiple processes on the same FPGA?**
-   * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process accross all FPGAs (least level of concurrency).
+   * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process across all FPGAs (least level of concurrency).
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
 
 * **Q: How can I reset the AFI?**
