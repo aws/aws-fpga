@@ -15,11 +15,45 @@
 ## implied. See the License for the specific language governing permissions and
 ## limitations under the License.
 
-# If specified use script specified, otherwise use default vivado script
-if [ "$1" != "" ]; then
-    vivado_script="$1"
-else
-    vivado_script="create_dcp_from_cl.tcl"
+# Usage help
+function usage
+{
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-stratey DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h]]"
+}
+
+# Default arguments for script and strategy
+strategy=DEFAULT
+vivado_script="create_dcp_from_cl.tcl"
+
+# Parse command-line arguments
+while [ "$1" != "" ]; do
+    case $1 in
+        -script )               shift
+                                vivado_script=$1
+                                ;;
+        -strategy )             shift
+                                strategy=$1
+                                ;;
+        -h | -help )            usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+# Check that script exists
+if ! [ -f "$vivado_script" ]; then
+  echo "ERROR: $vivado_script doesn't exist." 
+  exit 1
+fi
+
+# Check that strategy is valid
+shopt -s extglob
+if [[ $strategy != @(DEFAULT|EXPLORE|TIMING|CONGESTION|OLD|APP1) ]]; then
+  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are DEFAULT, EXPLORE, TIMING and CONGESTION." 
+  exit 1
 fi
 
 echo "AWS FPGA: Starting the design checkpoint build process"
@@ -60,8 +94,7 @@ echo "AWS FPGA: Environment variables and directories are present. Checking for 
 vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
 
 # Run vivado
-#nohup vivado -mode batch -nojournal -source create_dcp_from_cl.tcl &
-nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp > $timestamp.nohup.out 2>&1&
+nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy > $timestamp.nohup.out 2>&1&
 
 echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
 echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"

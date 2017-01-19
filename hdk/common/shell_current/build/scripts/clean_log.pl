@@ -19,12 +19,15 @@ use strict;
 use warnings;
 use File::Copy;
 
-copy("vivado.log", "vivado_temp.log") or die "Copy failed: $!";
+# The timestamp is an input to the script
+my $timestamp = $ARGV[0];
+
+copy("${timestamp}.vivado.log", "vivado_temp.log") or die "Copy failed: $!";
 
 open(FILE1, "vivado_temp.log")
       or die "Can't open < vivado_temp.log: $!";
-open(my $fh_wr, ">", "vivado.log")
-      or die "Can't open > vivado.log: $!";
+open(my $fh_wr, ">", "${timestamp}.vivado.log")
+      or die "Can't open > ${timestamp}.vivado.log: $!";
 
 my $match;
 my @warning_regexps = ("CRITICAL WARNING.*BRAM instance.*Please verify the instance name in the \.bmm file and the netlist. The BRAM initialization strings will not get populated with data.*",
