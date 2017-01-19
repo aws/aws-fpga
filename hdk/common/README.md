@@ -1,7 +1,4 @@
 # AWS FPGA HDK Common Library
-<span style="display: inline-block;">
-[![API Reference](http://img.shields.io/badge/api-reference-blue.svg)](http://docs.aws.amazon.com/techdoc/fpga)
-[![Join the chat at https://gitter.im/aws/aws-fpga](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aws/aws-fpga?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This directory includes scripts, timing constraints and compile settings required during the AFI generation process. 
 Developers should not modify or remove these files.
