@@ -18,7 +18,7 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-stratey DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h]]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h] | [-H] | [-help] |  ]"
 }
 
 # Default arguments for script and strategy
@@ -34,7 +34,7 @@ while [ "$1" != "" ]; do
         -strategy )             shift
                                 strategy=$1
                                 ;;
-        -h | -help )            usage
+        -h | -H | -help )       usage
                                 exit
                                 ;;
         * )                     usage
