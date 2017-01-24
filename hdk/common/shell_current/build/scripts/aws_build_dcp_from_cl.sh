@@ -18,7 +18,7 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h] | [-H] | [-help] |  ]"
 }
 
 # Default arguments for script and strategy
@@ -51,8 +51,8 @@ fi
 
 # Check that strategy is valid
 shopt -s extglob
-if [[ $strategy != @(DEFAULT|EXPLORE|TIMING|CONGESTION|OLD|APP1) ]]; then
-  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are DEFAULT, EXPLORE, TIMING and CONGESTION." 
+if [[ $strategy != @(BASIC|DEFAULT|EXPLORE|TIMING|CONGESTION) ]]; then
+  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are BASIC, DEFAULT, EXPLORE, TIMING and CONGESTION." 
   exit 1
 fi
 
