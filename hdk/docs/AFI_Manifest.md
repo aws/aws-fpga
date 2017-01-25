@@ -28,4 +28,26 @@ The manifest file is a text file formated with KEY=VALUE pairs. Some keys are ma
 * **DATE=** YY_MM_DD-HHMM     
       *Following same format used in the automatic build reports used by AWS scripts*
       
+* **SYSCLK0=**      
+      *Frequency of system clocks 0 in Mhz. When this setting is missed, the default value would be 125*
+      
+* **SYSCLK1=**      
+      *Frequency of system clocks 1 in Mhz. It must be an integer multiple of SYSCLK0. When this setting is missing, the default value would be equal to SYSCLK0 value*
+      
+* **CL_CLK0=**      
+      *Frequency of CL clocks 0 in Mhz. When this setting is missing, When this setting is missing, the default value would be equal to SYSCLK0 value*
+      
+* **CL_CLK1=**      
+      *Frequency of CL clocks1 in Mhz.  It must be an integer multiple of CL_CLK0. When this setting is missing, the default value would be equal to CL_CLK0 value*
+
+* **CL_CLK2=**      
+      *Frequency of CL clocks 2 in Mhz. When this setting is missing, When this setting is missing, the default value would be equal to SYSCLK0 value*
+      
+* **CL_CLK3=**      
+      *Frequency of CL clocks3 in Mhz.  It must be an integer multiple of CL_CLK2. When this setting is missing, the default value would be equal to CL_CLK2 value* 
+      
+      
+      
+      
+      
  
