@@ -6,6 +6,7 @@ APIs, Hardware Abstraction Layers (HALs), and utilities needed for building the 
 
 The developer have one of two options to use the management tools:
 
-1) Compile and install the reference tools under [`/fpga_image_tool` directory](./fpga_image_tools), and use them from shell command line.
+1) Compile and install the reference tools found under [`/fpga_image_tool` directory](./fpga_image_tools). Once the install is successful, the developer can use these tools through linux shell command line.
 
-2) Integrate the provided source code into the developer application for performing FPGA management without invoking shell command line.
+2) Integrate the provided source code into the developer C/C++ application for performing FPGA management without invoking shell command line.
+
