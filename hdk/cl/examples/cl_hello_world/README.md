@@ -12,11 +12,11 @@ Alternatively, you can directly use a pre-generated AFI for this CL which you ca
 | Key   | Value     |
 |-----------|------|
 | FPGA Image Architecture | xvu9p |
-| Shell Version | 0x???????? |
-| PCI Device ID | 0x???? |
-| PCI Vendor ID | 0x???? |
-| PCI Subsystem ID | 0x???? |
-| PCI Subsystem Vendor ID | 0x???? |
+| Shell Version | 0x11241611 |
+| PCI Device ID | 0x1d50 |
+| PCI Vendor ID | 0x678A |
+| PCI Subsystem ID | 0x1d51 |
+| PCI Subsystem Vendor ID | 0xfedd |
 | Pre-generated AFI ID | afi-????????????????? |
 | Pre-generated AGFI ID | agfi-????????????????? |
 
