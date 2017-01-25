@@ -10,11 +10,19 @@
 package require tar
 
 #################################################
+## Versions
+#################################################
+set shell_version "0x11241611"
+set hdk_version "1.0.0"
+
+#################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
-puts "Shell Version: VenomCL_unc - 0x11241611";
+puts "Shell Version: VenomCL_unc - $shell_version";
+puts "Vivado Script Name: $argv0";
+puts "HDK Version: $hdk_version";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -36,10 +44,11 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
-#Convenience to set the root of the RTL directory
-set systemtime [clock seconds]
-set timestamp [clock format $systemtime -gmt 1 -format {%y_%m_%d-%H%M}]
+# Command-line Arguments
+set timestamp [lindex $argv 0]
+set strategy  [lindex $argv 1]
 
+#Convenience to set the root of the RTL directory
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
@@ -131,7 +140,31 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 puts "AWS FPGA: Start design synthesis";
 
-synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
 # Prohibit the top two URAM sites of each URAM quad.
 # These two sites cannot be used within PR designs.
@@ -153,17 +186,40 @@ if { $failval==0 } {
 	exit 1
 }
 
+########################
+# CL Optimize
+########################
 puts "AWS FPGA: Optimizing design";
-opt_design -directive Explore
 
-check_timing -file $CL_DIR/build/reports/${timestamp}.cl.synth.check_timing_report.txt
-report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.synth.timing_summary.rpt
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+        opt_design
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        opt_design -directive Explore
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        opt_design -directive Explore
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        opt_design -directive Explore
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        opt_design -directive Explore
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth_opt.dcp
 close_design
 
-#######################
 # Implementation
-#######################
 #Read in the Shell checkpoint and do the CL implementation
 puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
 
@@ -193,71 +249,209 @@ foreach uramSite $uramSites {
 
 puts "AWS FPGA: Optimize design during implementation";
 
-opt_design -directive Explore
-check_timing -file $CL_DIR/build/reports/${timestamp}.SH_CL.check_timing_report.txt
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+        opt_design
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        opt_design -directive Explore
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        opt_design -directive Explore
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        opt_design -bufg_opt -control_set_merge -hier_fanout_limit 512 -muxf_remap -propconst -retarget -sweep
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        opt_design -directive Explore
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
+########################
+# CL Place
+########################
 puts "AWS FPGA: Place design stage";
-#place_design -verbose -directive Explore
-place_design -directive WLDrivenBlockPlacement
+
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+        place_design
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        place_design -directive Explore
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        place_design -directive ExtraNetDelay_high
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        place_design -directive AltSpreadLogic_medium
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        place_design -directive WLDrivenBlockPlacement
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
+###########################
+# CL Physical Optimization
+###########################
 puts "AWS FPGA: Physical optimization stage";
 
-phys_opt_design -directive Explore
-report_timing_summary -file $CL_DIR/build/reports/${timestamp}.cl.post_place_opt.timing_summary.rpt
-write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place_opt.dcp
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        phys_opt_design -directive Explore
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        phys_opt_design -directive Explore
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        phys_opt_design -directive Explore
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        phys_opt_design -directive Explore
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
+########################
+# CL Route
+########################
 puts "AWS FPGA: Route design stage";
 
-#route_design  -verbose -directive Explore
-route_design  -directive MoreGlobalIterations
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+        route_design
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        route_design -directive Explore
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        route_design -directive Explore -tns_cleanup
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        route_design -directive Explore
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        route_design -directive MoreGlobalIterations
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
+#################################
+# CL Final Physical Optimization
+#################################
 puts "AWS FPGA: Post-route Physical optimization stage ";
 
-phys_opt_design  -directive Explore
-
-puts "AWS FPGA: Locking design ";
-
-lock_design -level routing
-
-report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL.post_route_opt.timing_summary.rpt
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        phys_opt_design  -directive Explore
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        phys_opt_design  -directive Explore
+        puts "AWS FPGA: Locking design ";
+        lock_design -level routing
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
 #This is what will deliver to AWS
 write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
-puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+# ################################################
+# Verify PR Build
+# ################################################
+switch $strategy {
+    "BASIC" {
+        puts "BASIC strategy."
+    }
+    "EXPLORE" {
+        puts "EXPLORE strategy."
+        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+    }
+    "TIMING" {
+        puts "TIMING strategy."
+        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+    }
+    "CONGESTION" {
+        puts "CONGESTION strategy."
+        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+    }
+    "DEFAULT" {
+        puts "DEFAULT strategy."
+        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
+        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+    }
+    default {
+        puts "$strategy is NOT a valid strategy."
+    }
+}
 
-#Verify PR build
-pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp -file $CL_DIR/build/checkpoints/to_aws/${timestamp}.pr_verify.log
-
-### --------------------------------------------
-### Emulate what AWS will do
-### --------------------------------------------
+# ################################################
+# Emulate AWS Bitstream Generation
+# ################################################
+puts "AWS FPGA: Emulate AWS bitstream generation"
 
 # Make temp dir for bitstream
-file mkdir $CL_DIR/build/aws_verify_temp_dir
+file mkdir $CL_DIR/build/${timestamp}_aws_verify_temp_dir
 
 # Verify the Developer DCP is compatible with SH_BB. 
 pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+
 open_checkpoint $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
-report_io -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_report_io.rpt
 
-# Write out the CL DCP to integrate with SH_BB
-write_checkpoint -force -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL_routed.dcp
-close_design
-
-# Integreate Developer CL with SH BB
-open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL_routed.dcp
-report_drc -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_DRC.rpt
-write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp
-pr_verify -full_check $CL_DIR/build/checkpoints/${timestamp}.SH_CL_final.route.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp 
 set_param bitstream.enablePR 4123
-write_bitstream -force -bin_file $CL_DIR/build/aws_verify_temp_dir/${timestamp}.SH_CL_final.bit
+write_bitstream -force -bin_file $CL_DIR/build/${timestamp}_aws_verify_temp_dir/${timestamp}.SH_CL_final.bit
 
 # Clean-up temp dir for bitstream
-file delete -force $CL_DIR/build/aws_verify_temp_dir
+file delete -force $CL_DIR/build/${timestamp}_aws_verify_temp_dir
 
 ### --------------------------------------------
 
@@ -265,10 +459,24 @@ file delete -force $CL_DIR/build/aws_verify_temp_dir
 puts "Compress files for sending back to AWS"
 
 # clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl
+exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
 
+# Create manifest file
+set manifest_file [open "$CL_DIR/build/checkpoints/to_aws/${timestamp}.manifest.txt" w]
+set hash [lindex [split [exec sha256sum $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp] ] 0]
+
+puts $manifest_file "MANIFEST_FORMAT_VERSION=1\n"
+puts $manifest_file "DCP_HASH=$hash\n"
+puts $manifest_file "SHELL_VERSION=$shell_version\n"
+puts $manifest_file "FILE_NAME=${timestamp}.SH_CL_routed.dcp\n"
+puts $manifest_file "HDK_VERSION=$hdk_version\n"
+puts $manifest_file "DATE=$timestamp\n"
+
+close $manifest_file
+
+# Tar checkpoint to aws
 cd $CL_DIR/build/checkpoints
-tar::create to_aws/${timestamp}.Developer_CL.tar [glob  to_aws/${timestamp}*]
+tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 close_design
 
