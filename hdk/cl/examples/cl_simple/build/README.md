@@ -42,14 +42,46 @@ Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` script to include:
 
 ### 4) Build 
 
-Run the build from the `$CL_DIR/build/scripts` directory as follows:
+Run the build script, aws_build_dcp_from_cl.sh, from the `$CL_DIR/build/scripts` directory.
 
-    $ ./aws_build_dcp_from_cl.sh
-          
-This performs:
+This build script performs:
  - Synthesis of CL.
  - Implementation of CL with AWS Shell.
- - Generates design checkpoint for AWS ingestion and associated logs.
+ - Generates design checkpoint (DCP) for AWS ingestion and associated logs.
+
+In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy. The strategies are described in more detail below.
+
+Build script usage:
+
+    $ aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>]
+
+Options:
+
+  -script <vivado_script>
+       Use the specified vivado script. The default script is create_dcp_from_cl.tcl.
+
+  -h, -H, -help
+       Print a usage message.
+
+  -strategy <BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT>
+       Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
+
+Strategy descriptions:
+
+  BASIC
+     This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance betwwen runtime and QOR.
+
+  EXPLORE
+     This is a high-effort flow which is designed to give improved QOR results at the expense of runtime.
+  
+  TIMING
+     This flow is designed for more aggressive timing optimization at the expense of runtime and congestion.
+  
+  CONGESTION
+     This flow is designed to insert more aggressive whitespace to alleviate routing congestion.
+  
+  DEFAULT
+     This is an additional high-effort flow that results in improved QOR results for the example design at the expense of runtime.
   
 To aid developers in build verification, there is a final step in the build script that emulates 
 the process that AWS uses to generate bitstreams from a developer DCP.
