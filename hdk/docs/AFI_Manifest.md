@@ -28,25 +28,30 @@ The manifest file is a text file formated with KEY=VALUE pairs. Some keys are ma
 * **DATE=** YY_MM_DD-HHMM     
       *Following same format used in the automatic build reports used by AWS scripts*
       
-* **SYSCLK0=**      
-      *Frequency of system clocks 0 in Mhz. When this setting is missed, the default value would be 125*
+* **CLK_MAIN=**      
+      *Frequency of main and global clk_main in Mhz. When this setting is missing, the default value would be 125.   Legal values are from 10 to 250*
       
-* **SYSCLK1=**      
-      *Frequency of system clocks 1 in Mhz. It must be an integer multiple of SYSCLK0. When this setting is missing, the default value would be equal to SYSCLK0 value*
+* **CLK_EXTRA_A1=**      
+      *Extra clock A1 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
       
-* **CL_CLK0=**      
-      *Frequency of CL clocks 0 in Mhz. When this setting is missing, When this setting is missing, the default value would be equal to SYSCLK0 value*
+* **CLK_EXTRA_A2=**      
+      *Extra clock A2 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
       
-* **CL_CLK1=**      
-      *Frequency of CL clocks1 in Mhz.  It must be an integer multiple of CL_CLK0. When this setting is missing, the default value would be equal to CL_CLK0 value*
+* **CLK_EXTRA_A3=**      
+      *Extra clock A3 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
+      
+* **CLK_EXTRA_B0=**      
+      *Extra clock B0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to CLK_MAIN value*
+      
+* **CLK_EXTRA_B1=**      
+      *Extra clock A1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_B0. When this setting is missing, the default value would be equal to CLK_EXTRA_B0 value*
+      
+* **CLK_EXTRA_C0=**      
+      *Extra clock C0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to CLK_MAIN value*
+      
+* **CLK_EXTRA_C1=**      
+      *Extra clock C1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_C1. When this setting is missing, the default value would be equal to CLK_EXTRA_C0 value*
 
-* **CL_CLK2=**      
-      *Frequency of CL clocks 2 in Mhz. When this setting is missing, When this setting is missing, the default value would be equal to SYSCLK0 value*
-      
-* **CL_CLK3=**      
-      *Frequency of CL clocks3 in Mhz.  It must be an integer multiple of CL_CLK2. When this setting is missing, the default value would be equal to CL_CLK2 value* 
-      
-      
       
       
       
