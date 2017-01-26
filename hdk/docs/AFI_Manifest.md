@@ -11,46 +11,46 @@ The manifest file is a text file formated with KEY=VALUE pairs. Some keys are ma
 
 ## Manifest file specification: Version 1
 
-* **MANIFEST_FORMAT_VERSION=**1 [Mandatory]  
+* **manifest_format_version=**1 [Mandatory]  
       
-* **DCP_HASH=**.....   [Mandatory]    
+* **dcp_hash=**.....   [Mandatory]    
       *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
 
-* **SHELL_VERSION**=......   [Mandatory]  
+* **shell_version**=......   [Mandatory]  
       *Taken from aws-fpga/hdk/common/[shell directory]/build/checkpoints/from_aws*
 
-* **FILE_NAME=**.....     
+* **dcp_file_name=**.....     
       *The .dcp file name including the file type suffix*
 
-* **HDK_VERSION=**.....     
+* **hdk_version=**.....     
       *[TBD]* 
 
-* **DATE=** YY_MM_DD-HHMM     
+* **date=** YY_MM_DD-HHMM     
       *Following same format used in the automatic build reports used by AWS scripts*
       
-* **CLK_MAIN=**      
-      *Frequency of main and global clk_main in Mhz. When this setting is missing, the default value would be 125.   Legal values are from 10 to 250*
+* **clk_main_a0=**      
+      *Frequency of main and global clk_main_a0 in Mhz. When this setting is missing, the default value would be 125.   Legal values are from 10 to 250*
       
-* **CLK_EXTRA_A1=**      
-      *Extra clock A1 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
+* **clk_extra_a1=**      
+      *CL input clock clk_extra_a1 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
       
-* **CLK_EXTRA_A2=**      
-      *Extra clock A2 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
+* **clk_extra_a2=**      
+      *CL input clock clk_extra_a2 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
       
-* **CLK_EXTRA_A3=**      
-      *Extra clock A3 frequency in Mhz. It must be an integer divider of CLK_MAIN. When this setting is missing, the default value would be equal to CLK_MAIN value*
+* **clk_extra_a3=**      
+      *CL input clock clk_extra_a3 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
       
-* **CLK_EXTRA_B0=**      
-      *Extra clock B0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to CLK_MAIN value*
+* **clk_extra_b0=**      
+      *CL input clock clk_extra_b0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to clk_main_a0 value*
       
-* **CLK_EXTRA_B1=**      
-      *Extra clock A1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_B0. When this setting is missing, the default value would be equal to CLK_EXTRA_B0 value*
+* **clk_extra_b1=**      
+      *CL input clock clk_extra_b1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_B0. When this setting is missing, the default value would be equal to clk_extra_b0 value*
       
-* **CLK_EXTRA_C0=**      
-      *Extra clock C0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to CLK_MAIN value*
+* **clk_extra_c0=**      
+      *CL input clock clk_extra_c0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to clk_main_a0 value*
       
-* **CLK_EXTRA_C1=**      
-      *Extra clock C1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_C1. When this setting is missing, the default value would be equal to CLK_EXTRA_C0 value*
+* **clk_extra_c1=**      
+      *CL input clock clk_extra_c1 in Mhz. It must be an integer divider of CLK_EXTRA_C1. When this setting is missing, the default value would be equal to clk_extra_c0 value*
 
       
       
