@@ -57,13 +57,13 @@ Build script usage:
 
 Options:
 
-  -script /<vivado_script>
-       Use the specified vivado script. The default script is create_dcp_from_cl.tcl.
+  -script (vivado_script)
+       Use the specified vivado script. The default script create_dcp_from_cl.tcl will be used if a script is not specified.
 
   -h, -H, -help
        Print a usage message.
 
-  -strategy /<BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT>
+  -strategy (BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT)
        Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
 
 Strategy descriptions:
