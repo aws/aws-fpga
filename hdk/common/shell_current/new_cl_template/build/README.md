@@ -50,20 +50,51 @@ Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` script to include:
 
 ### 4) Build 
 
-Run the build from the `$CL_DIR/build/scripts` directory as follows:
+Run the build script, aws_build_dcp_from_cl.sh, from the `$CL_DIR/build/scripts` directory.
 
-    $ ./aws_build_dcp_from_cl.sh
-          
-This performs:
+The build script performs:
  - Synthesis of CL.
  - Implementation of CL with AWS Shell.
  - Generation of Design Checkpoint (DCP) for AWS ingestion with the associated logs.
  - Generation of the corresponding manifest.txt.
   
-To aid developers in build verification, there is a final step in the build script that emulates 
-the process that AWS uses to generate bitstreams from a developer DCP.
+In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy. The strategies are described in more detail below.
 
-The outputs are:
+Build script usage:
+
+    $ ./aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>]
+
+Options:
+
+  -script (vivado_script)
+       Use the specified vivado script. The default script create_dcp_from_cl.tcl will be used if a script is not specified.
+
+  -h, -H, -help
+       Print a usage message.
+
+  -strategy (BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT)
+       Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
+
+Strategy descriptions:
+
+  BASIC
+     This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance betwwen runtime and Quality of Results (QOR).
+
+  EXPLORE
+     This is a high-effort flow which is designed to give improved QOR results at the expense of runtime.
+  
+  TIMING
+     This flow is designed for more aggressive timing optimization at the expense of runtime and congestion.
+  
+  CONGESTION
+     This flow is designed to insert more aggressive whitespace to alleviate routing congestion.
+  
+  DEFAULT
+     This is an additional high-effort flow that results in improved QOR results for the example design at the expense of runtime.
+  
+In addition, in order to aid developers with build verification, there is a final step in the build script that emulates the process that AWS uses to generate bitstreams from a developer DCP.
+
+The outputs of the build script are:
  - `$CL_DIR/build/checkpoints/*`: Various checkpoints generated during the build process.
  - `$CL_DIR/build/to_aws/SH_CL_routed.dcp`: Encrypted placed-and-routed design checkpoint for AWS ingestion.
  - `$CL_DIR/build/reports/*`: Various build reports (generally, check_timing/report_timing).
