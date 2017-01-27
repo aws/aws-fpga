@@ -66,31 +66,31 @@ Build script usage:
 
 Options:
 
-  -script (vivado_script)
-       Use the specified vivado script. The default script create_dcp_from_cl.tcl will be used if a script is not specified.
+* -script \<vivado_script>
+       * Use the specified vivado script. The default script create_dcp_from_cl.tcl will be used if a script is not specified.
 
-  -h, -H, -help
-       Print a usage message.
+* -h, -H, -help
+       * Print a usage message.
 
-  -strategy (BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT)
-       Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
+* -strategy \<BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT>
+       * Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
 
 Strategy descriptions:
 
-  BASIC
-     This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance betwwen runtime and Quality of Results (QOR).
+* BASIC
+  * This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance betwwen runtime and Quality of Results (QOR).
 
-  EXPLORE
-     This is a high-effort flow which is designed to give improved QOR results at the expense of runtime.
+* EXPLORE
+  * This is a high-effort flow which is designed to give improved QOR results at the expense of runtime.
   
-  TIMING
-     This flow is designed for more aggressive timing optimization at the expense of runtime and congestion.
+* TIMING
+  * This flow is designed for more aggressive timing optimization at the expense of runtime and congestion.
   
-  CONGESTION
-     This flow is designed to insert more aggressive whitespace to alleviate routing congestion.
+* CONGESTION
+  * This flow is designed to insert more aggressive whitespace to alleviate routing congestion.
   
-  DEFAULT
-     This is an additional high-effort flow that results in improved QOR results for the example design at the expense of runtime.
+* DEFAULT
+  * This is an additional high-effort flow that results in improved QOR results for the example design at the expense of runtime.
   
 In addition, in order to aid developers with build verification, there is a final step in the build script that emulates the process that AWS uses to generate bitstreams from a developer DCP.
 
