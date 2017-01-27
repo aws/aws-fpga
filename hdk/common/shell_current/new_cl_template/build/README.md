@@ -21,7 +21,7 @@ To assist in this process, AWS provides a reference DCP that includes the shell 
 
 AWS also provides out-of-the-box generic script called `aws_build_dcp_from_cl.sh` that is used for test compile a few examples like `CL_simple` design as if they were developer code. These reference examples can serve as starting points for new designs. The output of AWS-provided scripts will create a a tar file, with both the encrypted placed-and-routed DCP and the corresponding `manifest.txt`, which AWS will use to generate final bitstreams.
 
-To ease and experiment with multiple implementation methods for DCP to meet placement and timing constrains, the `aws_build_dcp_from_cl.sh` provides multiple choices for implementation strategy , invokved throught `-strategy` option. Please call `aws_build_dcp_from_cl.sh -help` for the list of supported capabilities
+To ease and experiment with multiple implementation methods for DCP to meet placement and timing constrains, the `aws_build_dcp_from_cl.sh` provides multiple choices for implementation strategy , invoked by the `-strategy` option. Please call `aws_build_dcp_from_cl.sh -help` for the list of supported capabilities.
 
 Advanced developers can use different scripts, tools, and techniques (e.g., regioning),  with the  condition that they submit both the `manifest.txt` and "encrypted placed-and-routed design checkpoints (DCP)" in a single tar file, that passes final checks which are included in the build scripts.  (TBD - final_check_dcp).
 
@@ -163,13 +163,13 @@ by email.
 **NOTE**: *Attempting to associate the AFI to an AMI before the AFI is ready will result in an `InvalidFpgaImageID.Unavailable` error.
 Please wait until you receive a confirmation email from AWS indicating the creation process is complete.*
 
-## Build Stratergies and Parallel Builds <a name="buildstratgies"></a>
+## Build Strategies and Parallel Builds <a name="buildstratgies"></a>
 
-Developers' may face challenges fitting the CL design into the FPGA due to routing congestion, placement congestion, or not being able to meet timing. This is a typical challenge in FPGA and chip development.
+Developers may face challenges fitting the CL design into the FPGA due to routing congestion, placement congestion, or not being able to meet timing. These are typical challenges in FPGA and chip development.
 
-AWS script `./aws_build_dcp_from_cl.sh` offer an optional flag to set one of handful implementation strategies, which would automatically different directives to various build steps. You can learn about the various strategy options by running `$ ./aws_build_dcp_from_cl.sh -help`.
+AWS script `./aws_build_dcp_from_cl.sh` offers an optional flag to set one of a few useful implementation strategies, which would automatically different directives to various build steps. You can learn about the various strategy options by running `$ ./aws_build_dcp_from_cl.sh -help`.
 
-If you are running on one EC2 instances with 31GiB or more DRAM, you could run multiple builds concurrently for the same CL, but calling the build script multiple times with different `-strategy` options, taking advantage of the large vCPU count typically available on EC2 instance, as each build would typically consume between 1 to 8 vCPUs throughout the entire run of a given build.
+If you are running on one of the EC2 compute instances with 31GiB DRAM or more, you could run multiple builds concurrently for the same CL, but calling the build script multiple times with different `-strategy` options, taking advantage of the large vCPU count typically available on EC2 instances, as each build would typically consume between 1 to 8 vCPUs throughout the entire run of a given build.
 
 ## About Encryption <a name="buildencryption"></a>
 
