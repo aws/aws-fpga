@@ -90,7 +90,7 @@ static const char *describe_afi_usage[] = {
 	"          subsystem and then rescans the PCI subsystem in order for",
 	"          the modified AFI PCI IDs to be refreshed.",
 	"          NOTE2: it is the developer's responsibility to remove any", 
-	"          driver priviously installed on the older PCIe VendorId",
+	"          driver previously installed on the older PCIe VendorId",
 	"          and DeviceId before fpga-clear-local-image,",
 	"          fpga-load-local-image, or re-scan.",
 	"      -?, --help",
