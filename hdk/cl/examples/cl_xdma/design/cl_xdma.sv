@@ -2055,7 +2055,7 @@ sh_ddr #(.DDR_A_PRESENT(DDR_A_PRESENT),
    .cl_sh_ddr_wvalid(lcl_cl_sh_ddr_wvalid),
    .sh_cl_ddr_wready(lcl_sh_cl_ddr_wready),
 
-   .sh_cl_ddr_bid(lcl_sh_cl_ddr_bid),
+    .sh_cl_ddr_bid(lcl_sh_cl_ddr_bid),
    .sh_cl_ddr_bresp(lcl_sh_cl_ddr_bresp),
    .sh_cl_ddr_bvalid(lcl_sh_cl_ddr_bvalid),
    .cl_sh_ddr_bready(lcl_cl_sh_ddr_bready),

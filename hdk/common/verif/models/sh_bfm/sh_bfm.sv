@@ -325,6 +325,10 @@ typedef struct {
    AXI_Command sh_cl_rd_data[$];
    AXI_Command cl_sh_b_resps[$];
    
+   AXI_Command sh_cl_xdma_wr_cmds[$];
+   AXI_Data    sh_cl_xdma_wr_data[$];
+   AXI_Command cl_sh_xdma_b_resps[$];
+
    logic         clk_core;
    logic         rst_n;
    logic         pre_sync0_rst_n;
@@ -402,6 +406,17 @@ typedef struct {
 
    bit           debug;
 
+   typedef struct {
+      logic [7:0] buffer[];
+      logic [63:0] cl_addr;
+   } DMA_OP;
+
+   DMA_OP h2c_dma_list[0:3][$];
+   DMA_OP c2h_dma_list[0:3][$];
+   
+   logic [3:0]     h2c_dma_started;
+   logic [3:0]     c2h_dma_started;
+   
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled
@@ -1248,24 +1263,158 @@ typedef struct {
       
    endtask // peek
 
-   task dma_buffer_to_cl(input logic [1:0] chan, logic [7:0] buf[], logic [63:0] cl_addr);
-   endtask // dma_buffer_to_cl
+   function dma_buffer_to_cl(input logic [1:0] chan, logic [7:0] buffer[], logic [63:0] cl_addr);
+      DMA_OP dop;
+      
+      dop.buffer = buffer;
+      dop.cl_addr = cl_addr;
+      h2c_dma_list[chan].push_back(dop);
+      
+   endfunction // dma_buffer_to_cl
 
-   task dma_cl_to_buffer(input logic [1:0] chan, output logic [7:0] buf[], input [63:0] cl_addr);
-   endtask // dma_cl_to_buffer
+   function dma_cl_to_buffer(input logic [1:0] chan, output logic [7:0] buffer[], input [63:0] cl_addr);
+      DMA_OP dop;
+      
+      dop.buffer = buffer;
+      dop.cl_addr = cl_addr;
+      c2h_dma_list[chan].push_back(dop);
+      
+   endfunction // dma_cl_to_buffer
    
-   task start_dma_to_cl(input int chan);
-   endtask // start_dma_to_cl
+   function void start_dma_to_cl(input int chan);
+      h2c_dma_started[chan] = 1'b1;
+   endfunction // start_dma_to_cl
    
-   task start_dma_to_buffer(input int chan);
-   endtask // start_dma_to_buffer
+   function void start_dma_to_buffer(input int chan);
+      c2h_dma_started[chan] = 1'b1;
+   endfunction // start_dma_to_buffer
 
    function bit is_dma_to_cl_done(input int chan);  // 1 = done
+      return h2c_dma_started[chan];
    endfunction // is_dma_to_cl_done
    
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
+      return c2h_dma_started[chan];
    endfunction // is_dma_to_buffer_done
    
+   //=================================================
+   //
+   // sh->cl xdma Interface
+   //
+   //=================================================
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+         h2c_dma_started <= 4'b0;
+         c2h_dma_started <= 4'b0;
+      end
+      else begin
+         AXI_Command axi_cmd;
+         AXI_Data    axi_data;
+         DMA_OP      dop;
+
+         if ((h2c_dma_started[0] != 1'b0) && (h2c_dma_list[0].size() > 0)) begin
+            dop = h2c_dma_list[0].pop_front();            
+
+            axi_cmd.addr = dop.cl_addr;
+            axi_cmd.len  = 0;
+            axi_cmd.id   = 0;
+
+            sh_cl_xdma_wr_cmds.push_back(axi_cmd);
+
+            axi_data.strb = 64'b0;
+            
+            for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
+               axi_data.data = {dop.buffer[i-dop.cl_addr[5:0]], axi_data.data[511:8]};
+               axi_data.strb = {1'b1, axi_data.strb[63:1]};
+            end
+
+            axi_data.id = 0;
+            axi_data.last = 1;
+            
+            sh_cl_xdma_wr_data.push_back(axi_data);
+            
+         end
+      end
+   end
+   
+   
+   //
+   // sh->cl xdma Address Write Channel
+   //
+
+   always @(posedge clk_core) begin
+      if (sh_cl_xdma_wr_cmds.size() != 0) begin
+
+         sh_cl_xdma_awaddr  <= sh_cl_xdma_wr_cmds[0].addr;
+         sh_cl_xdma_awid    <= sh_cl_xdma_wr_cmds[0].id;
+         sh_cl_xdma_awlen   <= sh_cl_xdma_wr_cmds[0].len;
+         
+         sh_cl_xdma_awvalid <= !sh_cl_xdma_awvalid ? 1'b1 :
+                               !cl_sh_xdma_awready ? 1'b1 : 1'b0;
+         
+         if (cl_sh_xdma_awready && sh_cl_xdma_awvalid) begin
+            if (debug) begin
+               $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_xdma_wr_cmds.size());
+            end
+            sh_cl_xdma_wr_cmds.pop_front();
+         end
+
+      end
+      else
+         sh_cl_xdma_awvalid <= 1'b0;
+   end
+
+   //
+   // write Data Channel
+   //
+
+   //
+   // sh->cl xdma data Write Channel
+   //
+
+   always @(posedge clk_core) begin
+      if (sh_cl_xdma_wr_data.size() != 0) begin
+
+         sh_cl_xdma_wdata <= sh_cl_xdma_wr_data[0].data;
+         sh_cl_xdma_wstrb <= sh_cl_xdma_wr_data[0].strb;
+         sh_cl_xdma_wlast <= sh_cl_xdma_wr_data[0].last;
+         
+         sh_cl_xdma_wvalid <= !sh_cl_xdma_wvalid[0] ? 1'b1 :
+                                 !cl_sh_xdma_wready[0] ? 1'b1 : 1'b0;
+         
+         if (cl_sh_xdma_wready && sh_cl_xdma_wvalid) begin
+            if (debug) begin
+               $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_xdma_wr_data.size());
+            end
+            sh_cl_xdma_wr_data.pop_front();
+         end
+
+      end
+      else
+         sh_cl_xdma_wvalid <= 1'b0;
+   end
+
+   //
+   // cl->sh xdma B Response Channel
+   //
+   always @(posedge clk_core) begin
+      sh_cl_xdma_bready <= 1'b1;
+   end
+
+   always @(posedge clk_core) begin
+      AXI_Command resp;
+
+      if (cl_sh_xdma_bvalid & sh_cl_xdma_bready) begin
+         resp.resp     = cl_sh_xdma_bresp;
+         resp.id       = cl_sh_xdma_bid;
+
+         cl_sh_xdma_b_resps.push_back(resp);
+      end
+
+   end
+
+
 `ifdef NEVER
    
    task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);

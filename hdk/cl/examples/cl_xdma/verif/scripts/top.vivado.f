@@ -8,6 +8,7 @@
 
 -sourcelibext .v
 -sourcelibext .sv
+-sourcelibext .svh
 
 -sourcelibdir ${CL_ROOT}/design
 -sourcelibdir ${CL_ROOT}/design/axi_crossbar_1/hdl  
@@ -17,6 +18,7 @@
 -include ${CL_ROOT}/verif/sv
 -include ${SH_LIB_DIR}
 -include ${SH_INF_DIR}
+-include ${HDK_COMMON_DIR}/verif/include
 
 ${CL_ROOT}/design/axi_crossbar_1/synth/axi_crossbar_1.v
 ${CL_ROOT}/design/axi_crossbar_1/hdl/axi_crossbar_v2_1_vl_rfs.v

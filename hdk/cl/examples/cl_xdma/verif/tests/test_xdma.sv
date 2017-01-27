@@ -1,8 +1,6 @@
 // =============================================================================
 // Copyright 2016 Amazon.com, Inc. or its affiliates.
 // All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
 // =============================================================================
 
 module test_xdma();
@@ -15,18 +13,15 @@ module test_xdma();
 
        tb.sh.power_up();
 
-       // NOTE: All of the DDR controllers are ready at about the same time
-       $display("[%t] : Waiting for DDR initialization", $realtime);
-       
-       wait (tb.CL.all_ddr_is_ready[0]);
-
        // DDR 0
        $display("[%t] : DMA buffer to DDR 0", $realtime);
 
+       desc_buf = new[64];
+       
        for (int i = 0 ; i<= 63 ; i++) begin
          desc_buf[i] = 'hAA;
        end
-          
+
        que_to_cl_ddr(0, 64'h0, desc_buf);
 
        // DDR 1
@@ -132,15 +127,17 @@ module test_xdma();
       int   timeout_count;
 
       //Queue data to be transfered to CL DDR
-      tb.sh.que_buffer_to_cl(chan, data, 64, base_addr);
+      tb.que_buffer_to_cl(chan, data, base_addr);
 
       //Start transfer of data to CL DDR
-      tb.sh.start_que_to_cl(chan);
+      tb.start_que_to_cl(chan);
 
       timeout_count = 0;
       
+      #10000ns;
+      
       do begin
-         status = tb.sh.is_que_to_cl_done(0);
+//         status = tb.sh.is_que_to_cl_done(0);
          timeout_count++;
       end while ((!status) && (timeout_count < 100)); 
 
@@ -156,15 +153,15 @@ module test_xdma();
       int   timeout_count;
 
       //Queue data to be transfered from CL DDR
-      tb.sh.que_cl_to_buffer(chan, data, 64, base_addr);
+      tb.que_cl_to_buffer(chan, data, base_addr);
 
       //Start transfer of data from CL DDR
-      tb.sh.start_que_to_buffer(chan);
+      tb.start_que_to_buffer(chan);
 
       timeout_count = 0;
       
       do begin
-         status = tb.sh.is_que_to_buffer_done(chan);
+//         status = tb.sh.is_que_to_buffer_done(chan);
          timeout_count++;
       end while ((!status) && (timeout_count < 100)); 
 

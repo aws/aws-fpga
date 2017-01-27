@@ -105,33 +105,33 @@ module tb();
    //------------------------------------------------------
    // DDR-4 Interface from CL (AXI-4)
    //------------------------------------------------------
-   logic [5:0]          cl_sh_ddr_awid;
+   logic [15:0]          cl_sh_ddr_awid;
    logic [63:0]         cl_sh_ddr_awaddr;
    logic [7:0]          cl_sh_ddr_awlen;
 
    logic                cl_sh_ddr_awvalid;
    logic                sh_cl_ddr_awready;
    
-   logic [5:0]          cl_sh_ddr_wid;
+   logic [15:0]          cl_sh_ddr_wid;
    logic [511:0]        cl_sh_ddr_wdata;
    logic [63:0]         cl_sh_ddr_wstrb;
    logic                cl_sh_ddr_wlast;
    logic                cl_sh_ddr_wvalid;
    logic                sh_cl_ddr_wready;
    
-   logic [5:0]          sh_cl_ddr_bid;
+   logic [15:0]          sh_cl_ddr_bid;
    logic [1:0]          sh_cl_ddr_bresp;
    logic                sh_cl_ddr_bvalid;
    logic                cl_sh_ddr_bready;
    
-   logic [5:0]          cl_sh_ddr_arid;
+   logic [15:0]          cl_sh_ddr_arid;
    logic [63:0]         cl_sh_ddr_araddr;
    logic [7:0]          cl_sh_ddr_arlen;
 
    logic                cl_sh_ddr_arvalid;
    logic                sh_cl_ddr_arready;
    
-   logic [5:0]          sh_cl_ddr_rid;
+   logic [15:0]          sh_cl_ddr_rid;
    logic [511:0]        sh_cl_ddr_rdata;
    logic [1:0]          sh_cl_ddr_rresp;
    logic                sh_cl_ddr_rlast;
@@ -149,6 +149,61 @@ module tb();
    
 `include "tb_ddr.svh"
    
+   //--------------------------------------------
+   // XDMA
+   //--------------------------------------------
+
+   logic       [31:0]  cl_sh_xdcfg_awaddr;
+   logic               cl_sh_xdcfg_awvalid;
+   logic               sh_cl_xdcfg_awready;
+   logic      [31:0]   cl_sh_xdcfg_wdata;
+   logic      [3:0]    cl_sh_xdcfg_wstrb;
+   logic               cl_sh_xdcfg_wvalid;
+   logic               sh_cl_xdcfg_wready;
+   logic               sh_cl_xdcfg_bvalid;
+   logic [1:0]         sh_cl_xdcfg_bresp;
+   logic               cl_sh_xdcfg_bready;
+
+   logic      [31:0]   cl_sh_xdcfg_araddr;
+   logic               cl_sh_xdcfg_arvalid;
+   logic               sh_cl_xdcfg_arready;
+   logic [31:0]        sh_cl_xdcfg_rdata;
+   logic [1:0]         sh_cl_xdcfg_rresp;
+   logic               sh_cl_xdcfg_rvalid;
+   logic               cl_sh_xdcfg_rready;
+
+   //----------------------------------------------------
+   // XDMA AXI-4 interface to master cycles to CL
+   logic [4:0]         sh_cl_xdma_awid;
+   logic [63:0]        sh_cl_xdma_awaddr;
+   logic [7:0]         sh_cl_xdma_awlen;
+   logic               sh_cl_xdma_awvalid;
+   logic               cl_sh_xdma_awready;
+
+   logic [511:0]       sh_cl_xdma_wdata;
+   logic [63:0]        sh_cl_xdma_wstrb;
+   logic               sh_cl_xdma_wlast;
+   logic               sh_cl_xdma_wvalid;
+   logic               cl_sh_xdma_wready;
+
+   logic      [4:0]    cl_sh_xdma_bid;
+   logic      [1:0]    cl_sh_xdma_bresp;
+   logic               cl_sh_xdma_bvalid;
+   logic               sh_cl_xdma_bready;
+
+   logic [4:0]         sh_cl_xdma_arid;
+   logic [63:0]        sh_cl_xdma_araddr;
+   logic [7:0]         sh_cl_xdma_arlen;
+   logic               sh_cl_xdma_arvalid;
+   logic               cl_sh_xdma_arready;
+
+   logic      [4:0]    cl_sh_xdma_rid;
+   logic      [511:0]  cl_sh_xdma_rdata;
+   logic      [1:0]    cl_sh_xdma_rresp;
+   logic               cl_sh_xdma_rlast;
+   logic               cl_sh_xdma_rvalid;
+   logic               sh_cl_xdma_rready;
+
    //------------------------------------------------------
    // HMC Stat Interface from CL
    //------------------------------------------------------
@@ -395,6 +450,58 @@ sh_bfm sh(
    .cl_sh_ddr_rready(cl_sh_ddr_rready),
    .sh_cl_ddr_is_ready(sh_cl_ddr_is_ready),
 
+
+   .cl_sh_xdcfg_awaddr(cl_sh_xdcfg_awaddr),
+   .cl_sh_xdcfg_awvalid(cl_sh_xdcfg_awvalid),
+   .sh_cl_xdcfg_awready(sh_cl_xdcfg_awready),
+   .cl_sh_xdcfg_wdata(cl_sh_xdcfg_wdata),
+   .cl_sh_xdcfg_wstrb(cl_sh_xdcfg_wstrb),
+   .cl_sh_xdcfg_wvalid(cl_sh_xdcfg_wvalid),
+   .sh_cl_xdcfg_wready(sh_cl_xdcfg_wready),
+   .sh_cl_xdcfg_bvalid(sh_cl_xdcfg_bvalid),
+   .sh_cl_xdcfg_bresp(sh_cl_xdcfg_bresp),
+   .cl_sh_xdcfg_bready(cl_sh_xdcfg_bready),
+
+   .cl_sh_xdcfg_araddr(cl_sh_xdcfg_araddr),
+   .cl_sh_xdcfg_arvalid(cl_sh_xdcfg_arvalid),
+   .sh_cl_xdcfg_arready(sh_cl_xdcfg_arready),
+   .sh_cl_xdcfg_rdata(sh_cl_xdcfg_rdata),
+   .sh_cl_xdcfg_rresp(sh_cl_xdcfg_rresp),
+   .sh_cl_xdcfg_rvalid(sh_cl_xdcfg_rvalid),
+   .cl_sh_xdcfg_rready(cl_sh_xdcfg_rready),
+
+   .sh_cl_xdma_awid(sh_cl_xdma_awid),
+   .sh_cl_xdma_awaddr(sh_cl_xdma_awaddr),
+   .sh_cl_xdma_awlen(sh_cl_xdma_awlen),
+   .sh_cl_xdma_awvalid(sh_cl_xdma_awvalid),
+   .cl_sh_xdma_awready(cl_sh_xdma_awready),
+
+   .sh_cl_xdma_wdata(sh_cl_xdma_wdata),
+   .sh_cl_xdma_wstrb(sh_cl_xdma_wstrb),
+   .sh_cl_xdma_wlast(sh_cl_xdma_wlast),
+   .sh_cl_xdma_wvalid(sh_cl_xdma_wvalid),
+   .cl_sh_xdma_wready(cl_sh_xdma_wready),
+
+   .cl_sh_xdma_bid(cl_sh_xdma_bid),
+   .cl_sh_xdma_bresp(cl_sh_xdma_bresp),
+   .cl_sh_xdma_bvalid(cl_sh_xdma_bvalid),
+   .sh_cl_xdma_bready(sh_cl_xdma_bready),
+
+   .sh_cl_xdma_arid(),
+   .sh_cl_xdma_araddr(),
+   .sh_cl_xdma_arlen(),
+   .sh_cl_xdma_arvalid(),
+   .cl_sh_xdma_arready(),
+
+   .cl_sh_xdma_rid(),
+   .cl_sh_xdma_rdata(),
+   .cl_sh_xdma_rresp(),
+   .cl_sh_xdma_rlast(),
+   .cl_sh_xdma_rvalid(),
+   .sh_cl_xdma_rready(),
+
+
+
    .sh_RST_DIMM_A_N(),
    .sh_RST_DIMM_B_N(),
    .sh_RST_DIMM_D_N()
@@ -494,6 +601,24 @@ sh_bfm sh(
       .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
       .cl_sh_pcim_rready(cl_sh_pcim_rready),
 
+
+      .sh_cl_xdma_awid(sh_cl_xdma_awid),
+      .sh_cl_xdma_awaddr(sh_cl_xdma_awaddr),
+      .sh_cl_xdma_awlen(sh_cl_xdma_awlen),
+      .sh_cl_xdma_awvalid(sh_cl_xdma_awvalid),
+      .cl_sh_xdma_awready(cl_sh_xdma_awready),
+
+      .sh_cl_xdma_wdata(sh_cl_xdma_wdata),
+      .sh_cl_xdma_wstrb(sh_cl_xdma_wstrb),
+      .sh_cl_xdma_wlast(sh_cl_xdma_wlast),
+      .sh_cl_xdma_wvalid(sh_cl_xdma_wvalid),
+      .cl_sh_xdma_wready(cl_sh_xdma_wready),
+
+      .cl_sh_xdma_bid(cl_sh_xdma_bid),
+      .cl_sh_xdma_bresp(cl_sh_xdma_bresp),
+      .cl_sh_xdma_bvalid(cl_sh_xdma_bvalid),
+      .sh_cl_xdma_bready(sh_cl_xdma_bready),
+                                                                                                
       .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
       .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
       .M_A_ACT_N(M_A_ACT_N),
