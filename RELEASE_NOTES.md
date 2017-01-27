@@ -47,7 +47,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Interrupts are not supported
 * Build flow limited to RTL/Verilog source files
 * VHDL
-* HLS and OpenCL build flow not included in this HDK release
+* OpenCL build flow not included in this HDK release
 * ChipScope
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
@@ -87,7 +87,7 @@ The HDK and SDK in the development kit have different licenses. SDK is licensed 
 
 ## Bug Fixes
 
-This section will include any bug fixes in the future releases. Please use [HDK Bug](https://github.com/aws/aws-fpga/issues/16) and [SDK Bug](https://github.com/aws/aws-fpga/issues/17) to file bugs for HDK and SDK respectively and use [HDK Feature](https://github.com/aws/aws-fpga/issues/18) and [SDK Feature](https://github.com/aws/aws-fpga/issues/19) to file feature requests for HDK and SDK respectively. For any other general purpose requests, please use [F1 FPGA general support](https://github.com/aws/aws-fpga/issues/20).
+This section will include any bug fixes in the future releases. Please use [HDK Bug](https://github.com/aws/aws-fpga/issues/16) and [SDK Bug](https://github.com/aws/aws-fpga/issues/17) to file bugs for HDK and SDK respectively and use [HDK Feature](https://github.com/aws/aws-fpga/issues/18) and [SDK Feature](https://github.com/aws/aws-fpga/issues/19) to file feature requests for HDK and SDK respectively. For any other general purpose requests, please use [F1 FPGA general support](https://github.com/aws/aws-fpga/blob/master/README.md#developer-support).
 
 ## Known Issues
 
