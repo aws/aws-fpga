@@ -1,21 +1,35 @@
 
+# EDMA Installation and Frequently Asked Questions
 
-## Q: How do I know if the `edma` driver is available and installed?**
+EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined interrupts in AWS FPGAs. Please see [EDMA README](./edma_README.md) for details.
+
+# Table of Contents
+
+1. [Q: How do I know if the EDMA driver is available and installed?](#howIKnow)
+2. [Q: How do I get the source code of the `edma` driver and compile it?](#howToCompile)
+3. [Q: Where Should I put the edma driver kernel module?](#wherToPut)    
+
+
+############
+
+
+**Q: How do I know if the EDMA driver is available and installed?** <a name="howIKnow"></a>
 
 Amazon EDMA driver could be already installed in latest releases of various Linux distributions and in [AWS FPGA Development AMI available at AWS Marketplace](./TBD)
 
 To make sure the driver is installed run next command from your linux shell:
-  `$ lsmod | grep “edma”`
+  `$ lsmod | grep edma`
   
 Running this will return EDMA only if the driver is installed and running.
 
-If running, the device /dev/afiX (X=0..7) represents an FPGA device, and each AFI exposes multiple queues under /dev/afiX/dma_queueN.
-The developer operates these queues directly from userspace application.
+If running, the device /dev/fpgaX(X=0..7) represents an FPGA device in slot X, and with each FPGA exposing multiple queues under /dev/fpgaX/dma_queueN, and multiple user-defined interrupts/events under /dev/fpgaX/eventK.
+
+The developer can operate these DMA queues and interrupts directly from Linux userspace application.
 
 
-## Q: How do I get the source code of the `edma` driver and compile it?**
+**Q: How do I get the source code of the `edma` driver and compile it?** <a name="howToCompile"></a>
 
-Amazon `edma` driver is included in [AWS FPGA SDK](https://github.com/aws/aws-fpga/master/blob/sdk/kernel_drivers/edma) for integration with other Linux distributions.
+Amazon `edma` driver is included in [AWS FPGA SDK](https://github.com/aws/aws-fpga/master/blob/sdk/kernel_drivers/edma) for integration with other Linux distributions, please follow the next set of steps:
 
 #### Step 1: Make sure you have `gcc` and `linux kernel source code` installed in your machine. For AmazonLinux/CentOS/RedHat, running the following:
 ```
@@ -39,9 +53,17 @@ Amazon `edma` driver is included in [AWS FPGA SDK](https://github.com/aws/aws-fp
   $ sudo make install
 ```
 
-The make install command will also copy the driver to /usr/local/sbin
+The make install command will also copy the driver to `/usr/local/sbin`
 
-*Note: if an EDMA driver is already installed, the last `make install` command will ask the developer if to overwrite.*
+*Note: if an EDMA driver is already installed, the last `make install` command will ask the developer if to overwrite.*  
+
+
+
+** Q: Where Should I put the edma driver kernel module?**<a name="whereToPut"></a>
+
+AWS recommend you install the `edma` driver in [TBD]
+
+
 
 #### Step 4: Make sure the installed driver will be preserved following a kernel update
 
