@@ -4,6 +4,7 @@ AWS FPGA provides options for CL (CustomLogic) in an AFI to generate user-define
 
 At hardware level, these interrupts are defined in [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md)
 
+
 # User-defined interrupts relies on EDMA driver
 
 From software perspective, AWS provides reference linux kernel driver called EDMA (shared driver between the interrupts and the DMA) which is responsbile on:
@@ -11,6 +12,7 @@ From software perspective, AWS provides reference linux kernel driver called EDM
 2) Exposes all the interrupts as file devices under /dev/fpgaX/eventY where X is the slot-id and Y is the event/interrupt
 3) Exposes each interrupt as file-descriptor for event polling in Linux userspace
 4) guarantees graceful teardown in case of developer user space process crash or improper termination
+
 
 ## Installation of EDMA Driver
 
@@ -56,13 +58,9 @@ The next example shows how an application can register to two events (aka user-d
 ```
 
 
-## How count how many interrupts/events happened ?
-
-  `cat /proc/interrupts`   and look for fpgaX_eventY  [TBD}
 
 
-# FAA
-===============
+# FAQ
 
 
 
@@ -92,6 +90,13 @@ iii) Control the interrupt request signals at the interrupt between the CL and S
 **Q: Where are the cause and mask registers for the user-defined interrupts?**
 
 The cause the mask bits, if exisit, will be part of the CL and are implementation specific. The example(s) given in this file, and the EDMA driver provides a robust way to translate an interrupts request on the CL to Shell interface to Linux kernel and userspace. It should be consider as message/event transfer mechanism.
+
+
+
+## How count how many interrupts/events happened ?
+
+  `cat /proc/interrupts`   and look for fpgaX_eventY for how many interrupts came from the CL via the corresponding MSI-X.
+  `cat /TBD` will show how many times the userspace application called poll().
 
 
 
