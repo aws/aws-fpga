@@ -80,7 +80,7 @@ $ aws s3 cp *.SH_CL_routed.dcp \                # Step 10: Upload the DCP file t
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
         --fpga-image-architecture xvu9p \
         --shell-version 0x11241611 \
-        --fpga-pci-id deviceId=0x1d50,vendorId=0x6789,subsystemId=0x1d51,subsystemVendorId=0xfedc \
+        --fpga-pci-id DeviceId=0x1d50,VendorId=0x6789,SubsystemId=0x1d51,SubsystemVendorId=0xfedc \
         --input-storage-location Bucket=<bucket-name>,Key=cl_simple.dcp
         --name MyFirstDCP
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
