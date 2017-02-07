@@ -80,7 +80,7 @@ If the `make` command was successful, you would find edma.ko.
 
 __**Step 4**__: Copy the driver to the modules directory:  
 
-__*For AmazonLinux, RedHat, Open Suse, Centos, and Ubuntu*__:
+__*For AmazonLinux, RedHat, Open Suse, and Centos*__:
 
 The next set of steps will installing the kernel driver so it get called everytime the machine boots/reboots  
 
@@ -94,7 +94,7 @@ The next set of steps will installing the kernel driver so it get called everyti
 ***NOTE:*** *steps 3 and 4 would need to be repeated for every kernel update*.  
   
   
-** Q: How can I make sure the installed driver will be preserved following a kernel update?** <a name="howToUpdateKernel"></a>  
+**Q: How can I make sure the installed driver will be preserved following a kernel update?** <a name="howToUpdateKernel"></a>  
 
 __*Step A*__ **Get DKMS**  
 
