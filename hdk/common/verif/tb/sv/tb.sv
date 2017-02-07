@@ -37,7 +37,7 @@ module tb();
    //-------------------------------------
    // PCIe Master interface from CL
    //-------------------------------------
-   logic [4:0]          cl_sh_pcim_awid[NUM_PCIE-1:0];
+   logic [15:0]          cl_sh_pcim_awid[NUM_PCIE-1:0];
    logic [63:0]         cl_sh_pcim_awaddr[NUM_PCIE-1:0];
    logic [7:0]          cl_sh_pcim_awlen[NUM_PCIE-1:0];
    logic [18:0]         cl_sh_pcim_awuser[NUM_PCIE-1:0];
@@ -50,12 +50,12 @@ module tb();
    logic [NUM_PCIE-1:0] cl_sh_pcim_wvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_wready;
    
-   logic [4:0]          sh_cl_pcim_bid[NUM_PCIE-1:0];
+   logic [15:0]          sh_cl_pcim_bid[NUM_PCIE-1:0];
    logic [1:0]          sh_cl_pcim_bresp[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcim_bready;
    
-   logic [4:0]          cl_sh_pcim_arid[NUM_PCIE-1:0];
+   logic [15:0]          cl_sh_pcim_arid[NUM_PCIE-1:0];
    logic [63:0]         cl_sh_pcim_araddr[NUM_PCIE-1:0];
    logic [7:0]          cl_sh_pcim_arlen[NUM_PCIE-1:0];
    logic [18:0]         cl_sh_pcim_aruser[NUM_PCIE-1:0];
@@ -72,35 +72,35 @@ module tb();
    //------------------------------------------------
    // PCI Slave interface to CL
    //------------------------------------------------
-   logic [63:0]         sh_cl_pcis_awaddr[NUM_PCIE-1:0];
-   logic [4:0]          sh_cl_pcis_awid[NUM_PCIE-1:0];
-   logic [7:0]          sh_cl_pcis_awlen[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] sh_cl_pcis_awvalid;
-   logic [NUM_PCIE-1:0] cl_sh_pcis_awready;
+   logic [63:0]         sh_cl_xdma_pcis_awaddr;
+   logic [4:0]          sh_cl_xdma_pcis_awid;
+   logic [7:0]          sh_cl_xdma_pcis_awlen;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_awvalid;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_awready;
 
-   logic [511:0]        sh_cl_pcis_wdata[NUM_PCIE-1:0];
-   logic [63:0]         sh_cl_pcis_wstrb[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] sh_cl_pcis_wlast;
-   logic [NUM_PCIE-1:0] sh_cl_pcis_wvalid;
-   logic [NUM_PCIE-1:0] cl_sh_pcis_wready;
+   logic [511:0]        sh_cl_xdma_pcis_wdata;
+   logic [63:0]         sh_cl_xdma_pcis_wstrb;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_wlast;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_wvalid;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_wready;
    
-   logic [1:0]          cl_sh_pcis_bresp[NUM_PCIE-1:0];
-   logic [4:0]          cl_sh_pcis_bid[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] cl_sh_pcis_bvalid;
-   logic [NUM_PCIE-1:0] sh_cl_pcis_bready;
+   logic [1:0]          cl_sh_xdma_pcis_bresp;
+   logic [4:0]          cl_sh_xdma_pcis_bid;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_bvalid;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_bready;
    
-   logic [63:0]         sh_cl_pcis_araddr[NUM_PCIE-1:0];
-   logic [4:0]          sh_cl_pcis_arid[NUM_PCIE-1:0];
-   logic [7:0]          sh_cl_pcis_arlen[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] sh_cl_pcis_arvalid;
-   logic [NUM_PCIE-1:0] cl_sh_pcis_arready;
+   logic [63:0]         sh_cl_xdma_pcis_araddr;
+   logic [4:0]          sh_cl_xdma_pcis_arid;
+   logic [7:0]          sh_cl_xdma_pcis_arlen;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_arvalid;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_arready;
    
-   logic [4:0]          cl_sh_pcis_rid[NUM_PCIE-1:0];
-   logic [511:0]        cl_sh_pcis_rdata[NUM_PCIE-1:0];
-   logic [1:0]          cl_sh_pcis_rresp[NUM_PCIE-1:0];
-   logic [NUM_PCIE-1:0] cl_sh_pcis_rlast;
-   logic [NUM_PCIE-1:0] cl_sh_pcis_rvalid;
-   logic [NUM_PCIE-1:0] sh_cl_pcis_rready;
+   logic [4:0]          cl_sh_xdma_pcis_rid;
+   logic [511:0]        cl_sh_xdma_pcis_rdata;
+   logic [1:0]          cl_sh_xdma_pcis_rresp;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_rlast;
+   logic [NUM_PCIE-1:0] cl_sh_xdma_pcis_rvalid;
+   logic [NUM_PCIE-1:0] sh_cl_xdma_pcis_rready;
 
    //------------------------------------------------------
    // DDR-4 Interface from CL (AXI-4)
@@ -335,35 +335,35 @@ sh_bfm sh(
    //-------------------------------------
    // PCIe Interface to CL (AXI-4) (CL is PCI-slave)
    //-------------------------------------
-   .sh_cl_pcis_awaddr(sh_cl_pcis_awaddr),
-   .sh_cl_pcis_awid(sh_cl_pcis_awid),
-   .sh_cl_pcis_awlen(sh_cl_pcis_awlen),
-   .sh_cl_pcis_awvalid(sh_cl_pcis_awvalid),
-   .cl_sh_pcis_awready(cl_sh_pcis_awready),
+   .sh_cl_pcis_awaddr(sh_cl_xdma_pcis_awaddr),
+   .sh_cl_pcis_awid(sh_cl_xdma_pcis_awid),
+   .sh_cl_pcis_awlen(sh_cl_xdma_pcis_awlen),
+   .sh_cl_pcis_awvalid(sh_cl_xdma_pcis_awvalid),
+   .cl_sh_pcis_awready(cl_sh_xdma_pcis_awready),
 
-   .sh_cl_pcis_wdata(sh_cl_pcis_wdata),
-   .sh_cl_pcis_wstrb(sh_cl_pcis_wstrb),
-   .sh_cl_pcis_wvalid(sh_cl_pcis_wvalid),
-   .sh_cl_pcis_wlast(sh_cl_pcis_wlast),
-   .cl_sh_pcis_wready(cl_sh_pcis_wready),
+   .sh_cl_pcis_wdata(sh_cl_xdma_pcis_wdata),
+   .sh_cl_pcis_wstrb(sh_cl_xdma_pcis_wstrb),
+   .sh_cl_pcis_wvalid(sh_cl_xdma_pcis_wvalid),
+   .sh_cl_pcis_wlast(sh_cl_xdma_pcis_wlast),
+   .cl_sh_pcis_wready(cl_sh_xdma_pcis_wready),
 
-   .cl_sh_pcis_bresp(cl_sh_pcis_bresp),
-   .cl_sh_pcis_bvalid(cl_sh_pcis_bvalid),
-   .cl_sh_pcis_bid(cl_sh_pcis_bid),
-   .sh_cl_pcis_bready(sh_cl_pcis_bready),
+   .cl_sh_pcis_bresp(cl_sh_xdma_pcis_bresp),
+   .cl_sh_pcis_bvalid(cl_sh_xdma_pcis_bvalid),
+   .cl_sh_pcis_bid(cl_sh_xdma_pcis_bid),
+   .sh_cl_pcis_bready(sh_cl_xdma_pcis_bready),
 
-   .sh_cl_pcis_araddr(sh_cl_pcis_araddr),
-   .sh_cl_pcis_arid(sh_cl_pcis_arid),
-   .sh_cl_pcis_arlen(sh_cl_pcis_arlen),
-   .sh_cl_pcis_arvalid(sh_cl_pcis_arvalid),
-   .cl_sh_pcis_arready(cl_sh_pcis_arready),
+   .sh_cl_pcis_araddr(sh_cl_xdma_pcis_araddr),
+   .sh_cl_pcis_arid(sh_cl_xdma_pcis_arid),
+   .sh_cl_pcis_arlen(sh_cl_xdma_pcis_arlen),
+   .sh_cl_pcis_arvalid(sh_cl_xdma_pcis_arvalid),
+   .cl_sh_pcis_arready(cl_sh_xdma_pcis_arready),
 
-   .cl_sh_pcis_rid(cl_sh_pcis_rid),
-   .cl_sh_pcis_rdata(cl_sh_pcis_rdata),
-   .cl_sh_pcis_rresp(cl_sh_pcis_rresp),
-   .cl_sh_pcis_rlast(cl_sh_pcis_rlast),
-   .cl_sh_pcis_rvalid(cl_sh_pcis_rvalid),
-   .sh_cl_pcis_rready(sh_cl_pcis_rready),
+   .cl_sh_pcis_rid(cl_sh_xdma_pcis_rid),
+   .cl_sh_pcis_rdata(cl_sh_xdma_pcis_rdata),
+   .cl_sh_pcis_rresp(cl_sh_xdma_pcis_rresp),
+   .cl_sh_pcis_rlast(cl_sh_xdma_pcis_rlast),
+   .cl_sh_pcis_rvalid(cl_sh_xdma_pcis_rvalid),
+   .sh_cl_pcis_rready(sh_cl_xdma_pcis_rready),
           
    //-----------------------------------------
    // CL MSIX
@@ -517,10 +517,9 @@ sh_bfm sh(
    //Developer put top level here (replace cl_simple, with top level)
    `CL_NAME #(.NUM_PCIE(NUM_PCIE), .NUM_DDR(NUM_DDR), .NUM_HMC(NUM_HMC), .NUM_GTY(NUM_GTY)) CL (
    
-      .clk(clk_out),
-      .rst_n(rst_out_n), 
-      .clk_xtra (clk_xtra),
-      .rst_xtra_n(rst_xtra_n),
+      .clk_main_a0(clk_out),
+      .rst_main_n(rst_out_n),
+      .kernel_rst_n(rst_out_n),
 
       .sh_cl_pwr_state(sh_cl_pwr_state),
 
@@ -538,35 +537,35 @@ sh_bfm sh(
       .cfg_max_payload(cfg_max_payload),
       .cfg_max_read_req(cfg_max_read_req),
  
-      .sh_cl_pcis_awaddr(sh_cl_pcis_awaddr),
-      .sh_cl_pcis_awid(sh_cl_pcis_awid),
-      .sh_cl_pcis_awlen(sh_cl_pcis_awlen),
-      .sh_cl_pcis_awvalid(sh_cl_pcis_awvalid),
-      .cl_sh_pcis_awready(cl_sh_pcis_awready),
+      .sh_cl_xdma_pcis_awaddr(sh_cl_xdma_pcis_awaddr),
+      .sh_cl_xdma_pcis_awid(sh_cl_xdma_pcis_awid),
+      .sh_cl_xdma_pcis_awlen(sh_cl_xdma_pcis_awlen),
+      .sh_cl_xdma_pcis_awvalid(sh_cl_xdma_pcis_awvalid),
+      .cl_sh_xdma_pcis_awready(cl_sh_xdma_pcis_awready),
    
-      .sh_cl_pcis_wdata(sh_cl_pcis_wdata),
-      .sh_cl_pcis_wstrb(sh_cl_pcis_wstrb),
-      .sh_cl_pcis_wlast(sh_cl_pcis_wlast),
-      .sh_cl_pcis_wvalid(sh_cl_pcis_wvalid),
-      .cl_sh_pcis_wready(cl_sh_pcis_wready),
+      .sh_cl_xdma_pcis_wdata(sh_cl_xdma_pcis_wdata),
+      .sh_cl_xdma_pcis_wstrb(sh_cl_xdma_pcis_wstrb),
+      .sh_cl_xdma_pcis_wlast(sh_cl_xdma_pcis_wlast),
+      .sh_cl_xdma_pcis_wvalid(sh_cl_xdma_pcis_wvalid),
+      .cl_sh_xdma_pcis_wready(cl_sh_xdma_pcis_wready),
    
-      .cl_sh_pcis_bresp(cl_sh_pcis_bresp),
-      .cl_sh_pcis_bid(cl_sh_pcis_bid),
-      .cl_sh_pcis_bvalid(cl_sh_pcis_bvalid),
-      .sh_cl_pcis_bready(sh_cl_pcis_bready),
+      .cl_sh_xdma_pcis_bresp(cl_sh_xdma_pcis_bresp),
+      .cl_sh_xdma_pcis_bid(cl_sh_xdma_pcis_bid),
+      .cl_sh_xdma_pcis_bvalid(cl_sh_xdma_pcis_bvalid),
+      .sh_cl_xdma_pcis_bready(sh_cl_xdma_pcis_bready),
    
-      .sh_cl_pcis_araddr(sh_cl_pcis_araddr),
-      .sh_cl_pcis_arid(sh_cl_pcis_arid),
-      .sh_cl_pcis_arlen(sh_cl_pcis_arlen),
-      .sh_cl_pcis_arvalid(sh_cl_pcis_arvalid),
-      .cl_sh_pcis_arready(cl_sh_pcis_arready),
+      .sh_cl_xdma_pcis_araddr(sh_cl_xdma_pcis_araddr),
+      .sh_cl_xdma_pcis_arid(sh_cl_xdma_pcis_arid),
+      .sh_cl_xdma_pcis_arlen(sh_cl_xdma_pcis_arlen),
+      .sh_cl_xdma_pcis_arvalid(sh_cl_xdma_pcis_arvalid),
+      .cl_sh_xdma_pcis_arready(cl_sh_xdma_pcis_arready),
    
-      .cl_sh_pcis_rid(cl_sh_pcis_rid),
-      .cl_sh_pcis_rdata(cl_sh_pcis_rdata),
-      .cl_sh_pcis_rresp(cl_sh_pcis_rresp),
-      .cl_sh_pcis_rlast(cl_sh_pcis_rlast),
-      .cl_sh_pcis_rvalid(cl_sh_pcis_rvalid),
-      .sh_cl_pcis_rready(sh_cl_pcis_rready),
+      .cl_sh_xdma_pcis_rid(cl_sh_xdma_pcis_rid),
+      .cl_sh_xdma_pcis_rdata(cl_sh_xdma_pcis_rdata),
+      .cl_sh_xdma_pcis_rresp(cl_sh_xdma_pcis_rresp),
+      .cl_sh_xdma_pcis_rlast(cl_sh_xdma_pcis_rlast),
+      .cl_sh_xdma_pcis_rvalid(cl_sh_xdma_pcis_rvalid),
+      .sh_cl_xdma_pcis_rready(sh_cl_xdma_pcis_rready),
    
    
       .cl_sh_pcim_awid(cl_sh_pcim_awid),
@@ -600,24 +599,6 @@ sh_bfm sh(
       .sh_cl_pcim_rlast(sh_cl_pcim_rlast),
       .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
       .cl_sh_pcim_rready(cl_sh_pcim_rready),
-
-
-      .sh_cl_xdma_awid(sh_cl_xdma_awid),
-      .sh_cl_xdma_awaddr(sh_cl_xdma_awaddr),
-      .sh_cl_xdma_awlen(sh_cl_xdma_awlen),
-      .sh_cl_xdma_awvalid(sh_cl_xdma_awvalid),
-      .cl_sh_xdma_awready(cl_sh_xdma_awready),
-
-      .sh_cl_xdma_wdata(sh_cl_xdma_wdata),
-      .sh_cl_xdma_wstrb(sh_cl_xdma_wstrb),
-      .sh_cl_xdma_wlast(sh_cl_xdma_wlast),
-      .sh_cl_xdma_wvalid(sh_cl_xdma_wvalid),
-      .cl_sh_xdma_wready(cl_sh_xdma_wready),
-
-      .cl_sh_xdma_bid(cl_sh_xdma_bid),
-      .cl_sh_xdma_bresp(cl_sh_xdma_bresp),
-      .cl_sh_xdma_bvalid(cl_sh_xdma_bvalid),
-      .sh_cl_xdma_bready(sh_cl_xdma_bready),
                                                                                                 
       .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
       .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),

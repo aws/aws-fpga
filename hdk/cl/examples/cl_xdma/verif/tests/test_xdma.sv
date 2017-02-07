@@ -4,6 +4,7 @@
 // =============================================================================
 
 module test_xdma();
+
     int            error_count;
     int            fail;
    
@@ -12,6 +13,11 @@ module test_xdma();
        logic [7:0] desc_buf [];
 
        tb.sh.power_up();
+       tb.sh.delay(500);
+       tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
+       tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
+       tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
+       tb.sh.delay(25000);
 
        // DDR 0
        $display("[%t] : DMA buffer to DDR 0", $realtime);
@@ -22,7 +28,7 @@ module test_xdma();
          desc_buf[i] = 'hAA;
        end
 
-       que_to_cl_ddr(0, 64'h0, desc_buf);
+       que_to_cl_ddr(0, 64'h100000, desc_buf);
 
        // DDR 1
        $display("[%t] : DMA buffer to DDR 1", $realtime);
@@ -31,7 +37,7 @@ module test_xdma();
          desc_buf[i] = 'hBB;
        end
    
-       que_to_cl_ddr(0, 64'h100, desc_buf);
+       que_to_cl_ddr(0, 64'h100100, desc_buf);
 
        // DDR 2
        $display("[%t] : DMA buffer to DDR 2", $realtime);
@@ -40,7 +46,7 @@ module test_xdma();
          desc_buf[i] = 'hCC;
        end
    
-       que_to_cl_ddr(0, 64'h200, desc_buf);
+       que_to_cl_ddr(0, 64'h100200, desc_buf);
 
        // DDR 3
        $display("[%t] : DMA buffer to DDR 3", $realtime);
@@ -49,7 +55,7 @@ module test_xdma();
          desc_buf[i] = 'hDD;
        end
    
-       que_to_cl_ddr(0, 64'h300, desc_buf);
+       que_to_cl_ddr(0, 64'h100300, desc_buf);
        
        // DDR 0
        $display("[%t] : DMA buffer from DDR 0", $realtime);

@@ -14,7 +14,9 @@ module  cl_tst #(parameter DATA_WIDTH=512, parameter NUM_RD_TAG=512) (
    input cfg_wr,
    input cfg_rd,
    output logic tst_cfg_ack,
-   output logic[31:0] tst_cfg_rdata,
+   output logic[31:0] tst_cfg_rdata = 0,
+
+   output logic atg_enable,
 
    output logic[5:0] awid,
    output logic[63:0] awaddr,
@@ -24,8 +26,8 @@ module  cl_tst #(parameter DATA_WIDTH=512, parameter NUM_RD_TAG=512) (
    input awready,
 
    output logic[5:0] wid,
-   output logic[DATA_WIDTH-1:0] wdata,
-   output logic[(DATA_WIDTH/8)-1:0] wstrb,
+   output logic[DATA_WIDTH-1:0] wdata = 0,
+   output logic[(DATA_WIDTH/8)-1:0] wstrb = 0,
    output logic wlast,
    output logic wvalid,
    input wready,
@@ -65,6 +67,8 @@ logic[63:0] wr_loop_count = 0;                      //Total number of times thro
 logic[63:0] rd_cyc_count = 0;                       //Total number of cycles (read requests)
 logic[63:0] rd_loop_count = 0;                      //Total number of times through loop
 logic[63:0] rd_resp_count = 0;                      //Total number of responses
+
+logic[63:0] wr_loop_count_wdata = 0;               //Write loop count with write data (used for read/write sync)
 
 logic[127:0] wr_cfg_inst_rdata;
 logic[127:0] rd_cfg_inst_rdata;
@@ -113,7 +117,7 @@ typedef enum logic[1:0] {
 
 wr_state_t wr_state, wr_state_nxt;
 
-logic[NUM_RD_TAG-1:0] rd_tag_avail;                 //Which tags are available
+logic[NUM_RD_TAG-1:0] rd_tag_avail = {NUM_RD_TAG{1'b1}};               //Which tags are available
 
 //logic[63:0] wr_addr_rec [31:0];
 //logic[5:0] wr_addr_rec_ptr;
@@ -279,6 +283,9 @@ logic[5:0] cfg_rd_loop_addr_shift = 0;
 logic cfg_inc_id_mode;
 logic cfg_const_data_mode = 0;
 
+logic cfg_atg_enable = 1;
+assign atg_enable = cfg_atg_enable;
+
 logic[15:0] cfg_read_start = 0;
 logic[15:0] cfg_max_write = 0;
 
@@ -328,7 +335,7 @@ logic[31:0] cfg_wdata_q = 0;
 logic cfg_ram_access;
 
 //Commands are single cycle pulse, stretch here
-always @(negedge sync_rst_n or posedge clk)
+always @(posedge clk)
    if (!sync_rst_n)
    begin
       cfg_wr_stretch <= 0;
@@ -360,6 +367,7 @@ always @(posedge clk)
 
          //cfg_inc_id_mode <= cfg_wdata_q[24];
          cfg_const_data_mode <= cfg_wdata_q[25];
+
       end
       else if (cfg_addr_q==8'h4)
       begin
@@ -379,6 +387,8 @@ always @(posedge clk)
          cfg_write_address[63:32] <= cfg_wdata_q;
       else if (cfg_addr_q==8'h28)
          cfg_write_data <= cfg_wdata_q;
+      else if (cfg_addr_q==8'h30)
+         cfg_atg_enable <= cfg_wdata_q[0];
       else if (cfg_addr_q==8'h40)
          cfg_read_address[31:0] <= cfg_wdata_q;
       else if (cfg_addr_q==8'h44)
@@ -397,8 +407,8 @@ always @(posedge clk)
          cfg_rd_loop_iter[63:32] <= cfg_wdata_q;
    end
 
-assign cfg_wr_go = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && cfg_wdata_q[0]);
-assign cfg_rd_go = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && cfg_wdata_q[1]);
+assign cfg_wr_go = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && cfg_wdata_q[0]) && !wr_inp;
+assign cfg_rd_go = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && cfg_wdata_q[1]) && !rd_inp;
 
 assign cfg_wr_stop = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && ~cfg_wdata_q[0]);
 assign cfg_rd_stop = (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'h8) && ~cfg_wdata_q[1]);
@@ -432,10 +442,8 @@ always @(posedge clk)
    end
 
 //Readback mux
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n) 
-      tst_cfg_rdata <= 0;
-   else
+always @(posedge clk)
+begin
       case (cfg_addr_q)
          8'h0:       tst_cfg_rdata <= {6'h0, cfg_const_data_mode, cfg_inc_id_mode, 
                                        2'h0, cfg_rd_loop_addr_shift[5:0], 
@@ -452,6 +460,8 @@ always_ff @(negedge sync_rst_n or posedge clk)
          8'h24:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 32; 
          8'h28:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 64; 
          8'h2c:      tst_cfg_rdata <= {wr_cfg_inst_rdata_q[127:96]};
+
+         8'h30:      tst_cfg_rdata <= {31'b0, cfg_atg_enable};
 
          8'h3c:      tst_cfg_rdata <= cfg_rd_inst_index;
          8'h40:      tst_cfg_rdata <= rd_cfg_inst_rdata_q;
@@ -505,11 +515,12 @@ always_ff @(negedge sync_rst_n or posedge clk)
 
          default:    tst_cfg_rdata <= 32'hffffffff;
       endcase
+end
 
 assign cfg_ram_access = (cfg_addr_q==8'h64) || (cfg_addr_q==8'h68) || (cfg_addr_q==8'h6c) || (cfg_addr_q==8'h70);
 
 //Ack for cycle
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       tst_cfg_ack <= 0;
    else
@@ -608,7 +619,7 @@ begin
    endcase
 end
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       wr_state <= WR_IDLE;
    else
@@ -627,15 +638,22 @@ always @( posedge clk)
 always @(posedge clk)
    if (cfg_wr_go)
    begin
-      wr_cyc_count <= 0;
+//      wr_cyc_count <= 0;
       wr_loop_count <= 0;
    end
    else if ((wr_state==WR_ADDR) && (wr_state_nxt!=WR_ADDR))
    begin
-      wr_cyc_count <= wr_cyc_count + 1;
+//      wr_cyc_count <= wr_cyc_count + 1;
       if (wr_inst_addr==cfg_wr_num_inst)
          wr_loop_count <= wr_loop_count + 1;
    end
+
+//Increment wr_cyc_count after the Write data for the read/write holdoff
+always @(posedge clk)
+   if (cfg_wr_go)
+      wr_cyc_count <= 0;
+   else if ((wr_state==WR_DAT) && (wr_state_nxt!=WR_DAT))
+      wr_cyc_count <= wr_cyc_count + 1;
 
 //Timer
 always @(posedge clk)
@@ -646,7 +664,7 @@ always @(posedge clk)
 
 
 //Stop pending
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       wr_stop_pend <= 0;
    else
@@ -681,7 +699,7 @@ parameter ADJ_DW_WIDTH =   (DATA_WIDTH==512)?   4:
 //Do adjustment for non-aligned
 wire[ADJ_DW_WIDTH-1:0] wr_first_adj = (inst_wr_rdata[63:0] >> 2);
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @( posedge clk)
    if (!sync_rst_n)
    begin
       awid <= 0;
@@ -709,7 +727,7 @@ always @(posedge clk)
    if (wr_state==WR_ADDR)
       wr_last_adj = inst_wr_rdata[111:104];
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       awvalid <= 0;
    else
@@ -764,13 +782,13 @@ begin
       wstrb_nxt = ~({(DATA_WIDTH/8){1'b1}} << (({ADJ_DW_WIDTH+2{1'b1}} + 1) - (wr_last_adj*4)));      //have to convert from DW to byte
 end
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin
-      wdata <= 0;
-      wstrb <= 0;
-   end
-   else
+always @(posedge clk)
+//   if (!sync_rst_n)
+//   begin
+//      wdata <= 0;
+//      wstrb <= 0;
+//   end
+//   else
    begin
       wdata <= wdata_nxt; 
       wstrb <= wstrb_nxt;
@@ -801,7 +819,7 @@ logic[511:0] rd_tag_mask = 0;
 logic rd_tag_pop;                         //Pop a tag
 logic rd_tag_pop_q;                       //One clock delayed to line up with ram read data.  This pushes into request FIFO
 logic rd_tag_pop_qq;                      //Two clock delayed to line up with ram read data_q.
-logic[8:0] rd_tag_inc_nxt_alloc;          //Next tag to alloc in incrementing mode
+logic[8:0] rd_tag_inc_nxt_alloc = 0;      //Next tag to alloc in incrementing mode
 
 logic rd_fifo_full;                       //Read request FIFO is full
 
@@ -872,7 +890,7 @@ always @(posedge clk)
    rd_tag_mask <= ~({512{1'b1}} << (cfg_max_read_req+1));
 
 //Stop pending
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       rd_stop_pend <= 0;
    else
@@ -883,7 +901,7 @@ wire rd_inst_done =  (cfg_iter_mode)?     ((rd_inst_addr==cfg_rd_num_inst) && ((
                                           0;
 
 //Read in progress
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       rd_inp <= 0;
    else if (cfg_rd_go)
@@ -895,10 +913,11 @@ always_ff @(negedge sync_rst_n or posedge clk)
 assign cfg_inc_id_mode = 1;
 
 //In incrementing mode, increment tag every pop
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      rd_tag_inc_nxt_alloc <= 0;
-   else if (cfg_read_reset)
+always @(posedge clk)
+   //if (!sync_rst_n)
+   //   rd_tag_inc_nxt_alloc <= 0;
+   //else if (cfg_read_reset)
+   if (cfg_read_reset)
       rd_tag_inc_nxt_alloc <= 0;
    else if (!cfg_inc_id_mode)
       rd_tag_inc_nxt_alloc <= 0;
@@ -925,7 +944,7 @@ end
 
 //assign rd_tag_some_avail = (cfg_inc_id_mode)? rd_tag_avail[rd_tag_inc_nxt_alloc]: |rd_tag_avail;
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
    begin
       rd_tag_some_avail <=0 ;
@@ -943,10 +962,11 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
 
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-      rd_tag_avail <= {NUM_RD_TAG{1'b1}};
-   else if (cfg_read_reset)
+always @(posedge clk)
+   //if (!sync_rst_n)
+   //   rd_tag_avail <= {NUM_RD_TAG{1'b1}};
+   //else if (cfg_read_reset)
+   if (cfg_read_reset)
    begin
       rd_tag_avail <= {NUM_RD_TAG{1'b1}};
    end
@@ -960,7 +980,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
 
 logic rd_cyc_holdoff;
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
       rd_cyc_holdoff <= 0;
    else
@@ -1010,7 +1030,7 @@ always @( posedge clk)
       rd_resp_count <= rd_resp_count + 1;
    end
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
    begin
       rd_tag_pop_q <= 0;
@@ -1022,7 +1042,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
       rd_tag_pop_qq <= rd_tag_pop_q;
    end
 
-always_ff @(negedge sync_rst_n or posedge clk)
+always_ff @(posedge clk)
    if (!sync_rst_n)
    begin
       pre_rd_cur_req_tag <= 0;
@@ -1034,7 +1054,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
       rd_cur_req_tag <= pre_rd_cur_req_tag;
    end
 
-//always_ff @(negedge sync_rst_n or posedge clk)
+//always_ff @(posedge clk)
 //   if (!sync_rst_n)
 //      rd_trk <= '{default:'0};
 //   else
@@ -1113,16 +1133,10 @@ begin
    end
 end
 
-logic rvalid_qq;
-logic[DATA_WIDTH-1:0] rdata_qq;
+logic rvalid_qq = 0;
+logic[DATA_WIDTH-1:0] rdata_qq = 0;
 
-always_ff @(negedge sync_rst_n or posedge clk)
-   if (!sync_rst_n)
-   begin 
-      rvalid_qq <= 0;
-      rdata_qq <= 0;
-   end
-   else
+always @(posedge clk)
    begin
       rvalid_qq <= rvalid_q;
       rdata_qq <= rdata_q;

@@ -13,83 +13,68 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This file includes the entire list of interfaces between AWS shell (sh) and Custom Logic (cl)
-// Most signals are "ACTIVE HIGH", i.e. value of 1'b1 means they are true/asserted and value of 1'b0 means they are false/deasserted
-// signals with _n suffix are "ACTIVE LOW"
-
    //--------------------------------
-   // Global Signals
+   // Globals
    //--------------------------------
-   input clk,                                //250MHz clock 
-   input rst_n,                              //Reset sync to 250MHz clock
+`ifdef SH_SDA  
+  input clk_main_a0,                   //Main clock.  This is the clock for all of the interfaces to the SH
+  input clk_extra_a1,                  //Extra clock A1 (phase aligned to "A" clock group)
+  input clk_extra_a2,                  //Extra clock A2 (phase aligned to "A" clock group)
+  input clk_extra_a3,                  //Extra clock A3 (phase aligned to "A" clock group)
+  input a_clk_locked,                  //A clock group is ready   
 
-   input clk_xtra,                           // Free running 125MHz clock
-   input rst_xtra_n,
+  input clk_extra_b0,                  //Extra clock B0 (phase aligned to "B" clock group)
+  input clk_extra_b1,                  //Extra clock B1 (phase aligned to "B" clock group)
+  input b_clk_locked,                  //B clock group is ready
 
-   input sh_cl_flr_assert,                   // A signal set when the PCIe Application PF gets Function Level Reset (FLR) 
-                                             // from host through PCIe
+  input clk_extra_c0,                  //Extra clock C0 (phase aligned to "B" clock group)
+  input clk_extra_c1,                  //Extra clock C1 (phase aligned to "B" clock group)
+  input c_clk_locked,                  //C clock group is ready
+
+  input kernel_rst_n,                  //Kernel reset (for SDA platform)
+
+`else         
+   input clk,                          //250MHz clock
+`endif // !`ifdef SH_SDA
+     
+   input rst_main_n,                   //Reset sync to main clock.
+
+// Not useful   input clk_xtra,        // Free running 125MHz clock
+// Not useful   input rst_xtra_n,
+
+   input sh_cl_flr_assert,
    output logic cl_sh_flr_done,
          
-   output logic[31:0] cl_sh_status0,         // RESERVED FOR FUTURE USE
-   output logic[31:0] cl_sh_status1,         // RESERVED FOR FUTURE USE
-   output logic[31:0] cl_sh_id0,             // RESERVED FOR FUTURE USE
-   output logic[31:0] cl_sh_id1,             // RESERVED FOR FUTURE USE
+   output logic[31:0] cl_sh_status0,
+   output logic[31:0] cl_sh_status1,
+   output logic[31:0] cl_sh_id0,
+   output logic[31:0] cl_sh_id1,
 
-   input[31:0] sh_cl_ctl0,                   // RESERVED FOR FUTURE USE
-   input[31:0] sh_cl_ctl1,                   // RESERVED FOR FUTURE USE
+   input[31:0] sh_cl_ctl0,
+   input[31:0] sh_cl_ctl1,
 
-   input[1:0] sh_cl_pwr_state,               //Power state, 2'b00: Normal, 2'b11: Critical
-                                             // Developer can ignore these signals
+   input[15:0] sh_cl_status_vdip,
+   output logic[15:0] cl_sh_status_vled,
 
-   //------------------------------------------------------------------------------------------
-   // PCL Slave interface (AXI-4)
-   //    AXI slave interface per PCIe interface.   This is for PCIe transactions
-   //    mastered from the Host targetting the CL (MMIO access), or 
-   //    PCIe transactions mastered from other FPGAs targeting this CL
-   //------------------------------------------------------------------------------------------
-   input[63:0] sh_cl_pcis_awaddr[NUM_PCIE-1:0],
-   input[4:0] sh_cl_pcis_awid[NUM_PCIE-1:0],
-   input[7:0] sh_cl_pcis_awlen[NUM_PCIE-1:0],
-   input[NUM_PCIE-1:0] sh_cl_pcis_awvalid,
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_awready,
+   input[1:0] sh_cl_pwr_state,               	//Power state, 2'b00: Normal, 2'b11: Critical
    
-   input[511:0] sh_cl_pcis_wdata[NUM_PCIE-1:0],
-   input[63:0] sh_cl_pcis_wstrb[NUM_PCIE-1:0],
-   input[NUM_PCIE-1:0] sh_cl_pcis_wlast,
-   input[NUM_PCIE-1:0] sh_cl_pcis_wvalid,
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_wready,
-   
-   output logic[1:0] cl_sh_pcis_bresp[NUM_PCIE-1:0],
-   output logic[4:0] cl_sh_pcis_bid[NUM_PCIE-1:0],
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_bvalid,
-   input[NUM_PCIE-1:0] sh_cl_pcis_bready,
-   
-   input[63:0] sh_cl_pcis_araddr[NUM_PCIE-1:0],
-   input[4:0] sh_cl_pcis_arid[NUM_PCIE-1:0],
-   input[7:0] sh_cl_pcis_arlen[NUM_PCIE-1:0],
-   input[NUM_PCIE-1:0] sh_cl_pcis_arvalid,
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_arready,
-   
-   output logic[511:0] cl_sh_pcis_rdata[NUM_PCIE-1:0],
-   output logic[1:0] cl_sh_pcis_rresp[NUM_PCIE-1:0],
-   output logic[4:0] cl_sh_pcis_rid[NUM_PCIE-1:0],
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_rlast,
-   output logic[NUM_PCIE-1:0] cl_sh_pcis_rvalid,
-   input logic[NUM_PCIE-1:0] sh_cl_pcis_rready,
 
    //-------------------------------------------------------------------------------------------
    // PCIe Master interface from CL
    //
    //    AXI-4 master interface per PCIe interface.  This is for PCIe transactions mastered
-   //    from the CL targetting the host or other FPGAs on the same PCIe Fabric.  
-   //    Its a standard AXI-4 interface except that awuser signals is required to pass
-   //    the length of the transaction in DW (32-bit) as well as the byte-enable bit-mask for the first 
-   //    and last DW. Please refer to AWS Shell Interface specifications
+   //    from the HL targetting the host (DMA access to host).  Standard AXI-4 interface.
+   //    NOTE: awuser pins have critical functionality and developer must read the detailed
+   //    functional definitions of these pins
    //-------------------------------------------------------------------------------------------
-   output logic[4:0] cl_sh_pcim_awid[NUM_PCIE-1:0],
+   output logic[15:0] cl_sh_pcim_awid[NUM_PCIE-1:0],
    output logic[63:0] cl_sh_pcim_awaddr[NUM_PCIE-1:0],
    output logic[7:0] cl_sh_pcim_awlen[NUM_PCIE-1:0],
-   output logic[18:0] cl_sh_pcim_awuser[NUM_PCIE-1:0],               //Length in DW of the transaction
+   output logic[18:0] cl_sh_pcim_awuser[NUM_PCIE-1:0],               //10:0 Length in DW of the transaction
+                                                                     //14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable, i.e. not masked)
+                                                                     //18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable, i.e. not masked)
+
+								
    output logic[NUM_PCIE-1:0] cl_sh_pcim_awvalid,
    input[NUM_PCIE-1:0] sh_cl_pcim_awready,
    
@@ -100,40 +85,39 @@
    output logic[NUM_PCIE-1:0] cl_sh_pcim_wvalid,
    input[NUM_PCIE-1:0] sh_cl_pcim_wready,
    
-   input logic[4:0] sh_cl_pcim_bid[NUM_PCIE-1:0],
+   input logic[15:0] sh_cl_pcim_bid[NUM_PCIE-1:0],
    input logic[1:0] sh_cl_pcim_bresp[NUM_PCIE-1:0],
    input logic[NUM_PCIE-1:0] sh_cl_pcim_bvalid,
    output logic[NUM_PCIE-1:0] cl_sh_pcim_bready,
   
-   output logic[4:0] cl_sh_pcim_arid[NUM_PCIE-1:0],
+   output logic[15:0] cl_sh_pcim_arid[NUM_PCIE-1:0],		            //Note max 32 outstanding txns are supported, width is larger to allow bits for AXI fabrics
    output logic[63:0] cl_sh_pcim_araddr[NUM_PCIE-1:0],
    output logic[7:0] cl_sh_pcim_arlen[NUM_PCIE-1:0],
-   output logic[18:0] cl_sh_pcim_aruser[NUM_PCIE-1:0],               //Length in DW, refer to AWS Shell specification
+   output logic[18:0] cl_sh_pcim_aruser[NUM_PCIE-1:0],               // 10:0 Length in DW of the transaction
+								     // 18:11 Must be set to 0xFF, could be ignored in next release
+
    output logic[NUM_PCIE-1:0] cl_sh_pcim_arvalid,
    input[NUM_PCIE-1:0] sh_cl_pcim_arready,
    
-   input[4:0] sh_cl_pcim_rid[NUM_PCIE-1:0],
+   input[15:0] sh_cl_pcim_rid[NUM_PCIE-1:0],
    input[511:0] sh_cl_pcim_rdata[NUM_PCIE-1:0],
    input[1:0] sh_cl_pcim_rresp[NUM_PCIE-1:0],
    input[NUM_PCIE-1:0] sh_cl_pcim_rlast,
    input[NUM_PCIE-1:0] sh_cl_pcim_rvalid,
    output logic[NUM_PCIE-1:0] cl_sh_pcim_rready,
 
-   input[1:0] cfg_max_payload[NUM_PCIE-1:0],                      //PCIe Max payload size - 00:128B, 01:256B (Default), 10:512B
-   input[2:0] cfg_max_read_req[NUM_PCIE-1:0]                      //PCIe Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   input[1:0] cfg_max_payload[NUM_PCIE-1:0],                      //Max payload size - 00:128B, 01:256B, 10:512B
+   input[2:0] cfg_max_read_req[NUM_PCIE-1:0]                      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
    
    //-----------------------------------------------------------------------------------------------
    // DDR-4 Interface 
    //
-   //  There are 3 DDR controllers that get instantiated in CL (DDR Interface A, B and D).  
-   //  The fourth DDR (Interface C) is in shell, due to resource optimization considerations
-   //  These are the signals physical I/O interface definition and connects directly to the 
-   //  DRAM Controllers (DDRC)
+   //    x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in HL)
    //-----------------------------------------------------------------------------------------------
 `ifndef NO_CL_DDR
   ,
-// ------------------- DDR4 x72 RDIMM Interface A ----------------------------------
+// ------------------- DDR4 x72 RDIMM 2100 Interface A ----------------------------------
    input                CLK_300M_DIMM0_DP,
    input                CLK_300M_DIMM0_DN,
    output               M_A_ACT_N,
@@ -151,8 +135,9 @@
    inout  [7:0]         M_A_ECC,
    inout  [17:0]        M_A_DQS_DP,
    inout  [17:0]        M_A_DQS_DN,
+   output               cl_RST_DIMM_A_N,
 
-// ------------------- DDR4 x72 RDIMM Interface B ----------------------------------
+// ------------------- DDR4 x72 RDIMM 2100 Interface B ----------------------------------
    input                CLK_300M_DIMM1_DP,
    input                CLK_300M_DIMM1_DN,
    output               M_B_ACT_N,
@@ -170,9 +155,10 @@
    inout  [7:0]         M_B_ECC,
    inout  [17:0]        M_B_DQS_DP,
    inout  [17:0]        M_B_DQS_DN,
+   output               cl_RST_DIMM_B_N,
 
 
-// ------------------- DDR4 x72 RDIMM Interface D ----------------------------------
+// ------------------- DDR4 x72 RDIMM 2100 Interface D ----------------------------------
    input                CLK_300M_DIMM3_DP,
    input                CLK_300M_DIMM3_DN,
    output               M_D_ACT_N,
@@ -189,7 +175,8 @@
    inout  [63:0]        M_D_DQ,
    inout  [7:0]         M_D_ECC,
    inout  [17:0]        M_D_DQS_DP,
-   inout  [17:0]        M_D_DQS_DN
+   inout  [17:0]        M_D_DQS_DN,
+   output               cl_RST_DIMM_D_N
 
 `endif
 
@@ -205,31 +192,31 @@
    output logic[31:0] ddr_sh_stat_rdata[2:0],
    output logic[7:0] ddr_sh_stat_int[2:0],
 
-   output [5:0] cl_sh_ddr_awid,
+   output [15:0] cl_sh_ddr_awid,
    output [63:0] cl_sh_ddr_awaddr,
    output [7:0] cl_sh_ddr_awlen,
    output  cl_sh_ddr_awvalid,
    input sh_cl_ddr_awready,
       
-   output [5:0] cl_sh_ddr_wid,
+   output [15:0] cl_sh_ddr_wid,
    output [511:0] cl_sh_ddr_wdata,
    output [63:0] cl_sh_ddr_wstrb,
    output  cl_sh_ddr_wlast,
    output  cl_sh_ddr_wvalid,
    input sh_cl_ddr_wready,
       
-   input[5:0] sh_cl_ddr_bid,
+   input[15:0] sh_cl_ddr_bid,
    input[1:0] sh_cl_ddr_bresp,
    input sh_cl_ddr_bvalid,
    output  cl_sh_ddr_bready,
       
-   output [5:0] cl_sh_ddr_arid,
+   output [15:0] cl_sh_ddr_arid,
    output [63:0] cl_sh_ddr_araddr,
    output [7:0] cl_sh_ddr_arlen,
    output  cl_sh_ddr_arvalid,
    input sh_cl_ddr_arready,
       
-   input[5:0] sh_cl_ddr_rid,
+   input[15:0] sh_cl_ddr_rid,
    input[511:0] sh_cl_ddr_rdata,
    input[1:0] sh_cl_ddr_rresp,
    input sh_cl_ddr_rlast,
@@ -237,32 +224,69 @@
    output  cl_sh_ddr_rready,
       
    input sh_cl_ddr_is_ready
+
+   `ifdef DDR_A_SH
+      //-----------------------------------
+      // AXI4 Interface for DDRA (if in the SH
+      //-----------------------------------
+      ,
+      output [15:0] cl_sh_ddra_awid,
+      output [63:0] cl_sh_ddra_awaddr,
+      output [7:0] cl_sh_ddra_awlen,
+      output  cl_sh_ddra_awvalid,
+      input sh_cl_ddra_awready,
+         
+      output [15:0] cl_sh_ddra_wid,
+      output [511:0] cl_sh_ddra_wdata,
+      output [63:0] cl_sh_ddra_wstrb,
+      output  cl_sh_ddra_wlast,
+      output  cl_sh_ddra_wvalid,
+      input sh_cl_ddra_wready,
+         
+      input[15:0] sh_cl_ddra_bid,
+      input[1:0] sh_cl_ddra_bresp,
+      input sh_cl_ddra_bvalid,
+      output  cl_sh_ddra_bready,
+         
+      output [15:0] cl_sh_ddra_arid,
+      output [63:0] cl_sh_ddra_araddr,
+      output [7:0] cl_sh_ddra_arlen,
+      output  cl_sh_ddra_arvalid,
+      input sh_cl_ddra_arready,
+         
+      input[15:0] sh_cl_ddra_rid,
+      input[511:0] sh_cl_ddra_rdata,
+      input[1:0] sh_cl_ddra_rresp,
+      input sh_cl_ddra_rlast,
+      input sh_cl_ddra_rvalid,
+      output  cl_sh_ddra_rready,
+         
+      input sh_cl_ddra_is_ready
+   `endif
                                                                                                     
 `ifndef NO_XDMA
+   //-----------------------------------------
+   // The user-defined interrupts
+   // Mapped to AppPF interrupts
+   //-----------------------------------------
     ,
-    output logic[15:0] cl_sh_irq_req,
-    input [15:0] sh_cl_irq_ack
-`else
+    output logic[15:0] cl_sh_apppf_irq_req,
+    input [15:0] sh_cl_apppf_irq_ack
+`endif
     
-`ifndef VU190    
-
 `ifdef MSIX_PRESENT
    ,
    //-----------------------------------------
-   // CL MSIX
+   // The user-defined interrupts
+   // Mapped to AppPF2 interrupts
    //-----------------------------------------
-    output logic         cl_sh_msix_int,
-    output logic [7:0]   cl_sh_msix_vec,
-    input                sh_cl_msix_int_sent,
-    input                sh_cl_msix_int_ack
+    output logic         cl_sh_apppf2_msix_int,
+    output logic [7:0]   cl_sh_apppf2_msix_vec,
+    input                sh_cl_apppf2_msix_int_sent,  
+    input                sh_cl_apppf2_msix_int_ack
 `endif //  `ifdef MSIX_PRESENT
 
-`endif //  `ifndef VU190
-         
-`endif // !`ifndef NO_XDMA
     
-   // Some FPGA designs may have high-speed Serial HMC memory
-   // Please contact AWS if you are interested in using HMC
 
 `ifdef HMC_PRESENT
    ,
@@ -360,11 +384,10 @@
    output logic[7:0] aurora_sh_stat_int
 
    //--------------------------------
-   // Debug bridge to support chipscope
+   // Debug bridge
    //--------------------------------
-   `ifdef ENABLE_CHIPSCOPE_DEBUG
+   `ifndef DISABLE_CHIPSCOPE_DEBUG
    ,
-   input clk,
    input drck,
    input shift,
    input tdi,
@@ -385,59 +408,111 @@
    `ifndef NO_XDMA
 
    ,
-   //-----------------------------------------------
-   // AXI-L interface to access XDMA configuration
-   output logic [31:0] cl_sh_xdcfg_awaddr,
-   output logic cl_sh_xdcfg_awvalid,
-   input sh_cl_xdcfg_awready,
-   output logic[31:0] cl_sh_xdcfg_wdata,
-   output logic[3:0] cl_sh_xdcfg_wstrb,
-   output logic cl_sh_xdcfg_wvalid,
-   input sh_cl_xdcfg_wready,
-   input sh_cl_xdcfg_bvalid,
-   input[1:0] sh_cl_xdcfg_bresp,
-   output logic cl_sh_xdcfg_bready,
-
-   output logic[31:0] cl_sh_xdcfg_araddr,
-   output logic cl_sh_xdcfg_arvalid,
-   input sh_cl_xdcfg_arready,
-   input[31:0] sh_cl_xdcfg_rdata,
-   input[1:0] sh_cl_xdcfg_rresp,
-   input sh_cl_xdcfg_rvalid,
-   output logic cl_sh_xdcfg_rready,
 
    //----------------------------------------------------
-   // XDMA AXI-4 interface to master cycles to CL
-   input[4:0] sh_cl_xdma_awid,
-   input[63:0] sh_cl_xdma_awaddr,
-   input[7:0] sh_cl_xdma_awlen,
-   input sh_cl_xdma_awvalid,
-   output logic cl_sh_xdma_awready,
+   // XDMA/PCIS AXI-4 interface to master cycles to CL
+   input[5:0] sh_cl_xdma_pcis_awid,
+   input[63:0] sh_cl_xdma_pcis_awaddr,
+   input[7:0] sh_cl_xdma_pcis_awlen,
+   input sh_cl_xdma_pcis_awvalid,
+   output logic cl_sh_xdma_pcis_awready,
 
-   input[511:0] sh_cl_xdma_wdata,
-   input[63:0] sh_cl_xdma_wstrb,
-   input sh_cl_xdma_wlast,
-   input sh_cl_xdma_wvalid,
-   output logic cl_sh_xdma_wready,
+   input[511:0] sh_cl_xdma_pcis_wdata,
+   input[63:0] sh_cl_xdma_pcis_wstrb,
+   input sh_cl_xdma_pcis_wlast,
+   input sh_cl_xdma_pcis_wvalid,
+   output logic cl_sh_xdma_pcis_wready,
 
-   output logic[4:0] cl_sh_xdma_bid,
-   output logic[1:0] cl_sh_xdma_bresp,
-   output logic cl_sh_xdma_bvalid,
-   input sh_cl_xdma_bready,
+   output logic[5:0] cl_sh_xdma_pcis_bid,
+   output logic[1:0] cl_sh_xdma_pcis_bresp,
+   output logic cl_sh_xdma_pcis_bvalid,
+   input sh_cl_xdma_pcis_bready,
 
-   input[4:0] sh_cl_xdma_arid,
-   input[63:0] sh_cl_xdma_araddr,
-   input[7:0] sh_cl_xdma_arlen,
-   input sh_cl_xdma_arvalid,
-   output logic cl_sh_xdma_arready,
+   input[5:0] sh_cl_xdma_pcis_arid,
+   input[63:0] sh_cl_xdma_pcis_araddr,
+   input[7:0] sh_cl_xdma_pcis_arlen,
+   input sh_cl_xdma_pcis_arvalid,
+   output logic cl_sh_xdma_pcis_arready,
 
-   output logic[4:0] cl_sh_xdma_rid,
-   output logic[511:0] cl_sh_xdma_rdata,
-   output logic[1:0] cl_sh_xdma_rresp,
-   output logic cl_sh_xdma_rlast,
-   output logic cl_sh_xdma_rvalid,
-   input sh_cl_xdma_rready
+   output logic[5:0] cl_sh_xdma_pcis_rid,
+   output logic[511:0] cl_sh_xdma_pcis_rdata,
+   output logic[1:0] cl_sh_xdma_pcis_rresp,
+   output logic cl_sh_xdma_pcis_rlast,
+   output logic cl_sh_xdma_pcis_rvalid,
+   input sh_cl_xdma_pcis_rready
 
    `endif // NO_XDMA
+
+//------------------------------------------------------------------------------------------
+   // AXI-L interface for Xilinx’s SDAccel generic logic (SmartConnect, APM etc)
+   // AXI-L maps to any inbound PCIe access through ManagementPF BAR4
+   // This would connect automatically to the required logic 
+   // if the CL is created through SDAccel flow   
+   //------------------------------------------------------------------------------------------
+`ifdef SH_SDA
+    ,
+   input sda_cl_awvalid,
+   input[63:0] sda_cl_awaddr, 
+   output logic cl_sda_awready,
+
+   //Write data
+   input sda_cl_wvalid,
+   input[31:0] sda_cl_wdata,
+   input[3:0] sda_cl_wstrb,
+   output logic cl_sda_wready,
+
+   //Write response
+   output logic cl_sda_bvalid,
+   output logic[1:0] cl_sda_bresp,
+   input sda_cl_bready,
+
+   //Read address
+   input sda_cl_arvalid,
+   input[63:0] sda_cl_araddr,
+   output logic cl_sda_arready,
+
+   //Read data/response
+   output logic cl_sda_rvalid,
+   output logic[31:0] cl_sda_rdata,
+   output logic[1:0] cl_sda_rresp,
+
+   input sda_cl_rready,
+
+//------------------------------------------------------------------------------------------
+   // AXI-L interface for OpenCL kernels
+   // AXI-L maps to any inbound PCIe access through AppPF BAR0
+   // This would connect automatically to the required logic 
+   // if the CL is created through SDAccel flow   
+   //------------------------------------------------------------------------------------------
+   input sh_ocl_awvalid,                                                                                                
+   input[31:0] sh_ocl_awaddr,                                                                                           
+   output logic ocl_sh_awready,                                                                                                       
+                                                                                                                               
+   //Write data                                                                                                                
+   input sh_ocl_wvalid,                                                                                                 
+   input[31:0] sh_ocl_wdata,                                                                                            
+   input[3:0] sh_ocl_wstrb,                                                                                             
+   output logic ocl_sh_wready,                                                                                                        
+                                                                                                                               
+   //Write response                                                                                                            
+   output logic ocl_sh_bvalid,                                                                                                        
+   output logic[1:0] ocl_sh_bresp,                                                                                                    
+   input sh_ocl_bready,                                                                                                 
+                                                                                                                               
+   //Read address                                                                                                              
+   input sh_ocl_arvalid,                                                                                                
+   input[31:0] sh_ocl_araddr,                                                                                           
+   output logic ocl_sh_arready,                                                                                                       
+                                                                                                                               
+   //Read data/response                                                                                                        
+   output logic ocl_sh_rvalid,                                                                                                        
+   output logic[31:0] ocl_sh_rdata,                                                                                                   
+   output logic[1:0] ocl_sh_rresp,                                                                                                    
+                                                                                                                               
+   input sh_ocl_rready           
+
+
+`endif //  `ifdef SH_SDA
+
 
 
