@@ -1,4 +1,4 @@
-# Overview on process for building a Custom Logic (CL) implementation for AWS FPGA instances
+# Building a Custom Logic AFI for AWS FPGA instances
 
 The developer can build their own Custom Logic (CL) and deploy it on AWS.
 The CL must comply with the [AWS Shell specifications](../../docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
