@@ -10,10 +10,41 @@ Though that all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O
 ```
 --- FPGA Slot X  
   |----- AppPF  
+  |   |------- BAR0  
+  |   |         * 32-bit BAR, non-prefetchable
+  |   |         * 32MiB (0 to 0x1FF-FFFF)
+  |   |         * Maps to OCL AXI-L of the CL
+  |   |         * Typically used for CL application registers or OpenCL kernels  
+  |   |------- BAR1
+  |   |         * 32-bit BAR, non-prefetchable
+  |   |         * 2MiB (0 to 0x1F-FFFF)
+  |   |         * Maps to BAR1 AXI-L of the CL
+  |   |         * Typically used for CL application registers 
+  |   |------- BAR2
+  |   |         * 64-bit BAR, prefetchable
+  |   |         * 64KiB (0 to 0xFFFF)
+  |   |         * NOT exposed to CL, used by internal DMA inside the Shell
+  |   |------- BAR4
+  |             * 64-bit BAR, prefetchable
+  |             * 128GiB (0 to 0x1F-FFFF-FFFF)
+  |             * First 127GiB are exposed to CL, via pcis_dma AXI bus
+  |             * The upper 1GiB is reserved for future uses
+  |
+  |
+  |----- MgmtPF  
      |------- BAR0  
-     |         * 32-bit BAR
-     |         * 0 to 0xFFFFF
-     |         * Maps to OCL AXI-L of the CL
-     |         * Typically used for CL application registers or OpenCL kernels  
-     |------- BAR1
+     |         * 32-bit BAR, non-prefetchable
+     |         * 16KiB (0 to 0x3FFF)
+     |         * Maps to internal functions used by FPGA management tools
+     |         * Not mapped to CL
+     |------- BAR2
+     |         * 32-bit BAR, non-prefetchable
+     |         * 16KiB (0 to 0x3FFF)
+     |         * Maps to internal functions used by FPGA management tools
+     |         * Not mapped to CL
+     |------- BAR4
+               * 32-bit BAR, non-prefetchable
+               * 4MiB (0 to 0x3FFFFF)
+               * Maps to CL through SDA AXI-L
+               * Could be used by Developer applications, of if using AWS Runtime Environment (Like SDAccel case), it will be used for performance monitoring.
 ```
