@@ -135,7 +135,7 @@ Most of the clocks are fixed frequencies:
    clk_extra_c0:  300MHz
    clk_extra_c1:  400MHz
 
-clk_main_a0/clk_extra_a1 can be programmed to be:????
+clk_main_a0/clk_extra_a1 can be programmed to be: **FIXME**
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
@@ -297,11 +297,17 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 **NOTE** Pre-GA versions of the Shell and the FPGA Magagement tools may not have some of these checks and associated metrics exposed to the developers.
 
-### Interrupts (Future)
+### Interrupts 
 
-Interrupts are not supported in the current version of the Shell. Future
-versions of the Shell will have support for at least 16 interrupt
-sources.
+16 user interrupt source are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers int he DMA controller map the 16 user interrupt sources to MSI-X vectors.  
+
+There are two sets of signals to generate interrupts:
+
+-   cl_sh_apppf_irq_req[15:0] (from CL to SH)
+-   sh_cl_apppf_irq_ack[15:0] (from SH to CL)
+
+The CL asserts (active high) cl_sh_apppf_irq_req[x], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
+
 
 ## DDR4 DRAM Interface
 
@@ -373,14 +379,4 @@ vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic 
 
 There is an integraged DMA controller inside the Shell.  The DMA controller can perform efficient bulk data moves between the Instance and the CL logic.  Please refer to ??? for more information on the integrated DMA controller.
 
-### Interrupt interface
-
-16 user interrupt source are supported on the IRQ interface:
-
--   cl_sh_apppf_irq_req[15:0]
--   sh_cl_apppf_irq_ack[15:0]
-
-These interrupts are mapped to MSI-X interrupts.  Mapping registers in the DMA controller map the 16 user interrupt sources to MSI-X vectors.  
-
-The CL asserts (active high) cl_sh_apppf_irq_req[x], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
 
