@@ -33,17 +33,17 @@ Though that all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O
   |
   |----- MgmtPF  
      |------- BAR0  
-     |         * 32-bit BAR, non-prefetchable
+     |         * 64-bit BAR, prefetchable
      |         * 16KiB (0 to 0x3FFF)
      |         * Maps to internal functions used by FPGA management tools
      |         * Not mapped to CL
      |------- BAR2
-     |         * 32-bit BAR, non-prefetchable
+     |         * 64-bit BAR, prefetchable
      |         * 16KiB (0 to 0x3FFF)
      |         * Maps to internal functions used by FPGA management tools
      |         * Not mapped to CL
      |------- BAR4
-               * 32-bit BAR, non-prefetchable
+               * 64-bit BAR, prefetchable
                * 4MiB (0 to 0x3FFFFF)
                * Maps to CL through SDA AXI-L
                * Could be used by Developer applications, of if using AWS Runtime Environment (Like SDAccel case), it will be used for performance monitoring.
