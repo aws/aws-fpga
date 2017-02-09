@@ -1,13 +1,11 @@
 # AWS AFI Manifest File Specification
 
-An AFI submittion to AWS through  [`aws ec2 createFpgaImage` API](./TBD), which includes a pointer to an S3 bucket with a tar file: The tar file would include the encrypted and compiled fpga image(a.k.a. Design Checkpoint or DCP) and a mandatory `manifest.txt` file.
+An AFI submittion to AWS through  [`aws ec2 create-fpga-image` API](./TBD), includes a pointer to an S3 bucket with a tar file: The tar file includes the encrypted and compiled fpga image(a.k.a. Design Checkpoint or DCP) and a mandatory `manifest.txt` file.
 
-This document provides the specification for the `manifest.txt` file.  While worth nothing that AFI built through the scripts provided by AWS would have the manifest file generated automatically.
+This document provides the specification for the `manifest.txt` file.  Note that an AFI built through the scripts provided by AWS would have the manifest file generated automatically.
 
 
-The manifest file is a text file formated with KEY=VALUE pairs. Some keys are mandatory while others are highly reocmmended
-
-##The mandatory keys are marked with [Mandatory]
+The manifest file is a text file formated with KEY/VALUE pairs. Some keys are mandatory while others are highly reocmmended. The mandatory keys are marked with [Mandatory]
 
 ## Manifest file specification: Version 1
 
@@ -16,7 +14,7 @@ The manifest file is a text file formated with KEY=VALUE pairs. Some keys are ma
 * **dcp_hash=**.....   [Mandatory]    
       *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
 
-* **shell_version**=......   [Mandatory]  
+* **shell_version**=.....   [Mandatory]  
       *Taken from aws-fpga/hdk/common/[shell directory]/build/checkpoints/from_aws*
 
 * **dcp_file_name=**.....     
