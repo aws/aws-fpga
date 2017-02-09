@@ -1,6 +1,6 @@
-# AWS FPGA: Programmer's View for the Custom Logic
+# AWS FPGA: Programmer's View of the Custom Logic
 
-This document describes how an actual application running in Linux userspace would interface with the Custom Logic (CL) during runtime.
+This document describes how an actual application running in Linux userspace would interface with the FPGA Custom Logic (CL) during runtime.
 
 There are two parts required to work with AWS FPGA: Management and Runtime, and the next figure provides high level view of these components and how they relate to the underlying FPGA hardware.
 
