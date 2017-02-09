@@ -1,10 +1,10 @@
 # AWS FPGA PCIe Memory Map
 
-FPGA are PCIe-attached to AWS EC2 instance, which each FPGA Slot presenting single FPGA with two PCIe Physical Functional, each with multiple BAR (PCIe Base Address Register), matching [AWS Shell Specification](./AWS_Shell_Interface_Spec.md)
+FPGAs are PCIe-attached to AWS EC2 instance, where each FPGA Slot is presenting a single FPGA with two PCIe Physical Functions, each with multiple PCIe Base Address Register (BARs) as defined in [AWS Shell Specification](./AWS_Shell_Interface_Spec.md).
 
-This document present the actual size and attribute of each one of the BARs, with some examples how they would be mapped in a real life application.
+This document describes the actual size and attributes of each one of the BARs, with some examples how can they be mapped in a real life application.
 
-Though that all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O (mmio) space, they need to be mapped to Linux kernel or userspace application before accessing them. Please refer to the [Software Programmer's View](./Programmers_View.md) on how the various software pieces could interact with the FPGA PCIe Memory.
+Even though all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O (MMIO) space, they need to be mapped to Linux kernel or userspace application before accessing them. Please refer to the [Software Programmer's View](./Programmers_View.md) on how the various software pieces can interact with the FPGA PCIe Memory.
 
 ## Memory map
 ```
@@ -46,5 +46,5 @@ Though that all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O
                * 64-bit BAR, prefetchable
                * 4MiB (0 to 0x3FFFFF)
                * Maps to CL through SDA AXI-L
-               * Could be used by Developer applications, of if using AWS Runtime Environment (Like SDAccel case), it will be used for performance monitoring.
+               * Could be used by Developer applications, or if using AWS Runtime Environment (Like SDAccel case), it will be used for performance monitoring.
 ```
