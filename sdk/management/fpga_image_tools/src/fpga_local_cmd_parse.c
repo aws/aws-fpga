@@ -152,6 +152,33 @@ static const char *clear_afi_usage[] = {
 	"          Specify a request timeout TIMEOUT (in seconds).",
 };
 
+static const char *start_virtual_jtag_usage[] = {
+	"  SYNOPSIS",
+	"      fpga-start-virtual-jtag [GENERAL OPTIONS] [-h]",
+	"      Example: fpga-start-virtual-jtag -S 0 [-P <tcp-port>]",
+	"  DESCRIPTION",
+	"      Loads the specified FPGA image to the specified slot number, and",
+	"      returns the status of the command.  The fpga-image-slot parameter",
+	"      is a logical index that represents a given FPGA within an instance.",
+	"      Use fpga-describe-local-image to return the FPGA image status, and",
+	"      fpga-describe-local-image-slots to return the available FPGA image",
+	"      slots for the instance.",
+	"  GENERAL OPTIONS",
+	"      -S, --fpga-image-slot",
+	"          The logical slot number for the FPGA image",
+	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -P, --tcp-port",
+	"          The tcp port number to use for virtual jtag server",
+	"      -?, --help",
+	"          Display this help.",
+	"      -H, --headers",
+	"          Display column headers.",
+	"      -V, --version",
+	"          Display version number of this program.",
+	"      --request-timeout TIMEOUT",
+	"          Specify a request timeout TIMEOUT (in seconds).",
+};
+
 /**
  * Generic usage printing engine. 
  *
@@ -413,7 +440,7 @@ parse_args_describe_afi(int argc, char *argv[])
 
 	return 0;
 err:
-	print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
+	print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
 out_ver:
 	return -1;
 }
@@ -470,6 +497,74 @@ out_ver:
 	return -1;
 }
 
+/**
+ * Parse start-fpga-virtualJtag command line arguments.
+ *
+ * @param[in]   argc    Argument count.
+ * @param[in]   argv    Argument string vector.
+ */
+static int 
+parse_args_start_virtual_jtag(int argc, char *argv[])
+{
+	int opt = 0;
+
+	static struct option long_options[] = {
+		{"fpga-image-slot",		required_argument,	0,	'S'	},
+		{"tcp-port",			required_argument,	0,	'P'	},
+		{"request-timeout",		required_argument,	0,	'r'	},
+		{"headers",				no_argument,		0,	'H'	},
+		{"help",				no_argument,		0,	'?'	},
+		{"version",				no_argument,		0,	'V'	},
+		{0,						0,					0,	0	},
+	};
+
+	int long_index = 0;
+	while ((opt = getopt_long(argc, argv, "S:P:r:RH?hV",
+			long_options, &long_index)) != -1) {
+		switch (opt) {
+		case 'S': {
+			string_to_uint(&f1.afi_slot, optarg);
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
+			break;
+		}
+		case 'P': { // FIXME
+			string_to_uint(tcp_port, optarg);
+			fail_on_user(tcp_port >= 0, err, 
+					"tcp-port must be less than %u", 0);
+			break;
+		}
+		case 'r': {
+			uint32_t value32;
+			string_to_uint(&value32, optarg);
+			int ret = config_request_timeout(value32);
+			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			break;
+		}
+		case 'H': {
+			f1.show_headers = true;
+			break;
+		}
+		case 'V': {
+			print_version();
+			goto out_ver;
+		}
+		default: {
+			goto err;   
+		}
+		}
+	}
+	
+	if (f1.afi_slot == (uint32_t) -1) { 
+		goto err;
+	}
+
+	return 0;
+err:
+	print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
+out_ver:
+	return -1;
+}
 typedef int (*parse_args_func_t)(int argc, char *argv[]);
 
 struct parse_args_str2func {
@@ -496,6 +591,7 @@ parse_args(int argc, char *argv[])
 		{"ClearFpgaImage",			AFI_CMD_CLEAR,			parse_args_clear_afi},
 		{"DescribeFpgaImageSlots",	AFI_EXT_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
 		{"DescribeFpgaImage",		AFI_CMD_METRICS,		parse_args_describe_afi},
+		{"StartVirtualJtag",		AFI_CMD_JTAG,		parse_args_start_virtual_jtag},
 	};
 
 	char *opcode_str = argv[1];
