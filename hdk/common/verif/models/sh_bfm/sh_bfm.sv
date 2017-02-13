@@ -409,9 +409,13 @@ typedef struct {
 
    DMA_OP h2c_dma_list[0:3][$];
    DMA_OP c2h_dma_list[0:3][$];
+   DMA_OP c2h_dma_data[0:3][$];
    
    logic [3:0]     h2c_dma_started;
    logic [3:0]     c2h_dma_started;
+   logic [3:0]     c2h_dma_done;
+
+   logic [7:0] read_data_buffer[];
    
    initial begin
       debug = 1'b0;
@@ -623,14 +627,14 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_rd_cmds.size() != 0) begin
 
-         sh_cl_pcis_araddr[0]  <= sh_cl_rd_cmds[0].addr;
-         sh_cl_pcis_arid[0]    <= sh_cl_rd_cmds[0].id;
-         sh_cl_pcis_arlen[0]   <= sh_cl_rd_cmds[0].len;
+         sh_cl_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
+         sh_cl_pcis_arid    <= sh_cl_rd_cmds[0].id;
+         sh_cl_pcis_arlen   <= sh_cl_rd_cmds[0].len;
          
-         sh_cl_pcis_arvalid[0] <= !sh_cl_pcis_arvalid[0] ? 1'b1 :
-                                  !cl_sh_pcis_arready[0] ? 1'b1 : 1'b0;
+         sh_cl_pcis_arvalid <= !sh_cl_pcis_arvalid ? 1'b1 :
+                               !cl_sh_pcis_arready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_arready[0] && sh_cl_pcis_arvalid[0]) begin
+         if (cl_sh_pcis_arready && sh_cl_pcis_arvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_rd_cmds.size());
             end
@@ -646,13 +650,13 @@ typedef struct {
    // cl->sh Read Data Channel
    //
    always @(posedge clk_core) begin
-      sh_cl_pcis_rready[0] <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
+      sh_cl_pcis_rready <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
    end
 
    always @(posedge clk_core) begin
       AXI_Data data;
 
-      if (cl_sh_pcis_rvalid[0] & sh_cl_pcis_rready) begin
+      if (cl_sh_pcis_rvalid & sh_cl_pcis_rready) begin
          data.data     = cl_sh_pcis_rdata;
          data.id       = cl_sh_pcis_rid;
          data.last     = cl_sh_pcis_rlast;
@@ -1272,14 +1276,20 @@ typedef struct {
       
    endfunction // dma_buffer_to_cl
 
-   function dma_cl_to_buffer(input logic [1:0] chan, output logic [7:0] buffer[], input [63:0] cl_addr);
+   function dma_cl_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[], input [63:0] cl_addr);
       DMA_OP dop;
-      
       dop.buffer = buffer;
       dop.cl_addr = cl_addr;
       c2h_dma_list[chan].push_back(dop);
-      
    endfunction // dma_cl_to_buffer
+
+   function dma_cl_data_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[]);
+      DMA_OP dop;
+      dop = c2h_dma_data[chan].pop_front();
+      buffer = dop.buffer;
+      c2h_dma_done[0] = 1'b0;
+   endfunction // dma_cl_data_to_buffer
+
    
    function void start_dma_to_cl(input int chan);
       h2c_dma_started[chan] = 1'b1;
@@ -1294,7 +1304,7 @@ typedef struct {
    endfunction // is_dma_to_cl_done
    
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
-      return c2h_dma_started[chan];
+      return c2h_dma_done[chan];
    endfunction // is_dma_to_buffer_done
    
    //=================================================
@@ -1338,7 +1348,58 @@ typedef struct {
          end
       end
    end
-   
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+        c2h_dma_done[0] <= 1'b0;
+      end
+      else begin
+        DMA_OP dop;
+        c2h_dma_done[0] = 1'b0;
+        if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[0] != 1'b0)) begin
+          for (int i = 0; i< 64 ; i++) begin
+            dop.buffer = new[i+1](dop.buffer);
+            dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
+            if (debug) begin
+              $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
+                                          $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
+            end
+          end
+          c2h_dma_data[0].push_back(dop);
+          cl_sh_rd_data.pop_front();
+          c2h_dma_done[0] = 1'b1;
+        end
+      end
+   end
+  
+   //=================================================
+   //
+   // cl->sh xdma Interface
+   //
+   //=================================================
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+         h2c_dma_started <= 4'b0;
+         c2h_dma_started <= 4'b0;
+      end
+      else begin
+         AXI_Command axi_cmd;
+         AXI_Data    axi_data;
+         DMA_OP      dop;
+         int i = 0;
+
+         if ((c2h_dma_started[0] != 1'b0) && (c2h_dma_list[0].size() > 0)) begin
+            dop = c2h_dma_list[0].pop_front();            
+            i++;
+            axi_cmd.addr = dop.cl_addr;
+            axi_cmd.len  = 0;
+            axi_cmd.id   = 0 + i;
+
+            sh_cl_rd_cmds.push_back(axi_cmd);
+         end
+      end
+   end
 
 `ifdef NEVER
    

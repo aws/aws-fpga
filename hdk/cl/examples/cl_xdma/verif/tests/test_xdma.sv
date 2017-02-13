@@ -60,11 +60,10 @@ module test_xdma();
        // DDR 0
        $display("[%t] : DMA buffer from DDR 0", $realtime);
 
-       dma_from_cl_ddr(0, 64'h0, desc_buf);
-
+       dma_from_cl_ddr(0, 64'h100000, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hAA) begin
-           $display("[%t] : *** ERROR *** DDR0 Data mismatch", $realtime);
+           $display("[%t] : *** ERROR *** DDR0 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
          end    
        end
@@ -72,11 +71,10 @@ module test_xdma();
        // DDR 1
        $display("[%t] : DMA buffer from DDR 1", $realtime);
    
-       dma_from_cl_ddr(0, 64'h100, desc_buf);
-
+       dma_from_cl_ddr(0, 64'h100100, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hBB) begin
-           $display("[%t] : *** ERROR *** DDR1 Data mismatch", $realtime);
+           $display("[%t] : *** ERROR *** DDR1 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
          end    
        end
@@ -84,11 +82,10 @@ module test_xdma();
        // DDR 2
        $display("[%t] : DMA buffer from DDR 2", $realtime);
    
-       dma_from_cl_ddr(0, 64'h200, desc_buf);
-
+       dma_from_cl_ddr(0, 64'h100200, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hCC) begin
-           $display("[%t] : *** ERROR *** DDR2 Data mismatch", $realtime);
+           $display("[%t] : *** ERROR *** DDR2 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
          end    
        end
@@ -96,11 +93,10 @@ module test_xdma();
        // DDR 3
        $display("[%t] : DMA buffer from DDR 3", $realtime);
 
-       dma_from_cl_ddr(0, 64'h300, desc_buf);
-
+       dma_from_cl_ddr(0, 64'h100300, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hDD) begin
-           $display("[%t] : *** ERROR *** DDR3 Data mismatch", $realtime);
+           $display("[%t] : *** ERROR *** DDR3 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
          end    
        end
@@ -153,7 +149,7 @@ module test_xdma();
       end
    endtask
 
-   task automatic dma_from_cl_ddr(input int chan, input logic [63:0] base_addr, output logic [7:0] data []);
+   task automatic dma_from_cl_ddr(input int chan, input logic [63:0] base_addr, ref logic [7:0] data []);
       
       logic status;
       int   timeout_count;
@@ -165,16 +161,20 @@ module test_xdma();
       tb.start_que_to_buffer(chan);
 
       timeout_count = 0;
-      
+      status = 0;
+      #10ns;
       do begin
-//         status = tb.sh.is_que_to_buffer_done(chan);
+         status = tb.sh.is_dma_to_buffer_done(chan);
          timeout_count++;
-      end while ((!status) && (timeout_count < 100)); 
+         #1ns;
+      end while ((!status) && (timeout_count < 500)); 
 
-      if ((timeout_count == 100) && (status !== 1'b1)) begin
+      if ((timeout_count >= 200) && (status !== 1'b1)) begin
          $display("[%t] : *** ERROR *** Timeout waiting for dma transfer from cl", $realtime);
          error_count++;
       end
+      else 
+        tb.data_cl_to_buffer(chan, data);
    endtask
 
 endmodule // test_xdma
