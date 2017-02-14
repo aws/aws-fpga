@@ -440,7 +440,7 @@ parse_args_describe_afi(int argc, char *argv[])
 
 	return 0;
 err:
-	print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
+        print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
 out_ver:
 	return -1;
 }
@@ -507,6 +507,8 @@ static int
 parse_args_start_virtual_jtag(int argc, char *argv[])
 {
 	int opt = 0;
+	uint16_t tcp_port = 0;
+	uint32_t temp_int = 0;
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
@@ -529,7 +531,8 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 			break;
 		}
 		case 'P': { // FIXME
-			string_to_uint(tcp_port, optarg);
+			string_to_uint(&temp_int, optarg);
+			tcp_port = (uint16_t) temp_int;
 			fail_on_user(tcp_port >= 0, err, 
 					"tcp-port must be less than %u", 0);
 			break;
@@ -561,7 +564,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 
 	return 0;
 err:
-	print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
+        print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
 out_ver:
 	return -1;
 }
@@ -591,7 +594,7 @@ parse_args(int argc, char *argv[])
 		{"ClearFpgaImage",			AFI_CMD_CLEAR,			parse_args_clear_afi},
 		{"DescribeFpgaImageSlots",	AFI_EXT_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
 		{"DescribeFpgaImage",		AFI_CMD_METRICS,		parse_args_describe_afi},
-		{"StartVirtualJtag",		AFI_CMD_JTAG,		parse_args_start_virtual_jtag},
+		{"StartVirtualJtag",		AFI_EXT_END,		parse_args_start_virtual_jtag},
 	};
 
 	char *opcode_str = argv[1];
