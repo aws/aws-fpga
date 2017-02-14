@@ -1287,7 +1287,7 @@ typedef struct {
       DMA_OP dop;
       dop = c2h_dma_data[chan].pop_front();
       buffer = dop.buffer;
-      c2h_dma_done[0] = 1'b0;
+      c2h_dma_done[chan] = 1'b0;
    endfunction // dma_cl_data_to_buffer
 
    
@@ -1322,29 +1322,28 @@ typedef struct {
          AXI_Command axi_cmd;
          AXI_Data    axi_data;
          DMA_OP      dop;
-         int i = 0;
 
-         if ((h2c_dma_started[0] != 1'b0) && (h2c_dma_list[0].size() > 0)) begin
-            dop = h2c_dma_list[0].pop_front();            
-            i++;
-            axi_cmd.addr = dop.cl_addr;
-            axi_cmd.len  = 0;
-            axi_cmd.id   = 0 + i;
-
-            sh_cl_wr_cmds.push_back(axi_cmd);
-
-            axi_data.strb = 64'b0;
-            
-            for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
-               axi_data.data = {dop.buffer[i-dop.cl_addr[5:0]], axi_data.data[511:8]};
-               axi_data.strb = {1'b1, axi_data.strb[63:1]};
-            end
-
-            axi_data.id = 0;
-            axi_data.last = 1;
-            
-            sh_cl_wr_data.push_back(axi_data);
-            
+         for (int chan = 0; chan < 4; chan++) begin
+           if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
+              dop = h2c_dma_list[chan].pop_front();            
+              axi_cmd.addr = dop.cl_addr;
+              axi_cmd.len  = 0;
+              axi_cmd.id   = chan;
+          
+              sh_cl_wr_cmds.push_back(axi_cmd);
+          
+              axi_data.strb = 64'b0;
+              
+              for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
+                 axi_data.data = {dop.buffer[i-dop.cl_addr[5:0]], axi_data.data[511:8]};
+                 axi_data.strb = {1'b1, axi_data.strb[63:1]};
+              end
+          
+              axi_data.id = 0;
+              axi_data.last = 1;
+              
+              sh_cl_wr_data.push_back(axi_data);
+           end
          end
       end
    end
@@ -1357,23 +1356,27 @@ typedef struct {
 
    always @(negedge rst_n or posedge clk_core) begin
       if (!rst_n) begin
-        c2h_dma_done[0] <= 1'b0;
+        c2h_dma_done <= 1'b0;
       end
       else begin
         DMA_OP dop;
-        c2h_dma_done[0] = 1'b0;
-        if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[0] != 1'b0)) begin
-          for (int i = 0; i< 64 ; i++) begin
-            dop.buffer = new[i+1](dop.buffer);
-            dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
-            if (debug) begin
-              $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
-                                          $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
+        for (int chan = 0; chan < 4; chan++) begin
+          c2h_dma_done[chan] = 1'b0;
+          if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
+            if(chan == cl_sh_rd_data[0].id) begin
+              for (int i = 0; i< 64 ; i++) begin
+                dop.buffer = new[i+1](dop.buffer);
+                dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
+                if (debug) begin
+                  $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
+                                            $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
+                end
+              end
+              c2h_dma_data[chan].push_back(dop);
+              cl_sh_rd_data.pop_front();
+              c2h_dma_done[chan] = 1'b1;
             end
           end
-          c2h_dma_data[0].push_back(dop);
-          cl_sh_rd_data.pop_front();
-          c2h_dma_done[0] = 1'b1;
         end
       end
    end
@@ -1393,16 +1396,16 @@ typedef struct {
          AXI_Command axi_cmd;
          AXI_Data    axi_data;
          DMA_OP      dop;
-         int i = 0;
 
-         if ((c2h_dma_started[0] != 1'b0) && (c2h_dma_list[0].size() > 0)) begin
-            dop = c2h_dma_list[0].pop_front();            
-            i++;
-            axi_cmd.addr = dop.cl_addr;
-            axi_cmd.len  = 0;
-            axi_cmd.id   = 0 + i;
+         for (int chan = 0; chan < 4; chan++) begin
+           if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
+              dop = c2h_dma_list[chan].pop_front();            
+              axi_cmd.addr = dop.cl_addr;
+              axi_cmd.len  = 0;
+              axi_cmd.id   = chan;
 
-            sh_cl_rd_cmds.push_back(axi_cmd);
+              sh_cl_rd_cmds.push_back(axi_cmd);
+           end
          end
       end
    end
