@@ -59,7 +59,7 @@
 `timescale 1ps/1ps
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_register_slice_v2_1_10_srl_rtl #
+module axi_register_slice_v2_1_11_srl_rtl #
   (
    parameter         C_A_WIDTH = 2          // Address Width (>= 1)
    )
@@ -82,7 +82,7 @@ module axi_register_slice_v2_1_10_srl_rtl #
 endmodule
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_register_slice_v2_1_10_axic_register_slice #
+module axi_register_slice_v2_1_11_axic_register_slice #
   (
    parameter C_FAMILY     = "virtex6",
    parameter C_DATA_WIDTH = 32,
@@ -285,7 +285,7 @@ module axi_register_slice_v2_1_10_axic_register_slice #
     //---------------------------------------------------------------------------
       genvar i;
       for (i=0;i<C_DATA_WIDTH;i=i+1) begin : gen_srls
-        axi_register_slice_v2_1_10_srl_rtl #
+        axi_register_slice_v2_1_11_srl_rtl #
           (
            .C_A_WIDTH (2)
           )
@@ -788,7 +788,7 @@ endmodule // reg_slice
 `timescale 1ps/1ps
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_register_slice_v2_1_10_axi_register_slice #
+module axi_register_slice_v2_1_11_axi_register_slice #
   (
    parameter C_FAMILY                            = "virtex6",
    parameter C_AXI_PROTOCOL                      = 0,
@@ -1012,7 +1012,7 @@ module axi_register_slice_v2_1_10_axi_register_slice #
     .s_rpayload  ( s_rpayload  ) 
   );
     
-  axi_register_slice_v2_1_10_axic_register_slice # (
+  axi_register_slice_v2_1_11_axic_register_slice # (
     .C_FAMILY     ( C_FAMILY              ) ,
     .C_DATA_WIDTH ( G_AXI_AWPAYLOAD_WIDTH ) ,
     .C_REG_CONFIG ( C_REG_CONFIG_AW       ) 
@@ -1033,7 +1033,7 @@ module axi_register_slice_v2_1_10_axi_register_slice #
     .M_READY(m_axi_awready)
   );
     
-  axi_register_slice_v2_1_10_axic_register_slice # (
+  axi_register_slice_v2_1_11_axic_register_slice # (
     .C_FAMILY     ( C_FAMILY             ) ,
     .C_DATA_WIDTH ( G_AXI_WPAYLOAD_WIDTH ) ,
     .C_REG_CONFIG ( C_REG_CONFIG_W       ) 
@@ -1054,7 +1054,7 @@ module axi_register_slice_v2_1_10_axi_register_slice #
     .M_READY(m_axi_wready)
   );
 
-  axi_register_slice_v2_1_10_axic_register_slice # (
+  axi_register_slice_v2_1_11_axic_register_slice # (
     .C_FAMILY     ( C_FAMILY             ) ,
     .C_DATA_WIDTH ( G_AXI_BPAYLOAD_WIDTH ) ,
     .C_REG_CONFIG ( C_REG_CONFIG_B       ) 
@@ -1076,7 +1076,7 @@ module axi_register_slice_v2_1_10_axi_register_slice #
   );
  
 
-  axi_register_slice_v2_1_10_axic_register_slice # (
+  axi_register_slice_v2_1_11_axic_register_slice # (
     .C_FAMILY     ( C_FAMILY              ) ,
     .C_DATA_WIDTH ( G_AXI_ARPAYLOAD_WIDTH ) ,
     .C_REG_CONFIG ( C_REG_CONFIG_AR       ) 
@@ -1097,7 +1097,7 @@ module axi_register_slice_v2_1_10_axi_register_slice #
     .M_READY(m_axi_arready)
   );
         
-  axi_register_slice_v2_1_10_axic_register_slice # (
+  axi_register_slice_v2_1_11_axic_register_slice # (
     .C_FAMILY     ( C_FAMILY             ) ,
     .C_DATA_WIDTH ( G_AXI_RPAYLOAD_WIDTH ) ,
     .C_REG_CONFIG ( C_REG_CONFIG_R       ) 

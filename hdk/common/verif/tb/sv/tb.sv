@@ -62,7 +62,7 @@ module tb();
    logic [NUM_PCIE-1:0] cl_sh_pcim_arvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_arready;
    
-   logic [4:0]          sh_cl_pcim_rid[NUM_PCIE-1:0];
+   logic [15:0]          sh_cl_pcim_rid[NUM_PCIE-1:0];
    logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0];
    logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0];
    logic [NUM_PCIE-1:0] sh_cl_pcim_rlast;
@@ -537,35 +537,35 @@ sh_bfm sh(
       .cfg_max_payload(cfg_max_payload),
       .cfg_max_read_req(cfg_max_read_req),
  
-      .sh_cl_xdma_pcis_awaddr(sh_cl_xdma_pcis_awaddr),
-      .sh_cl_xdma_pcis_awid(sh_cl_xdma_pcis_awid),
-      .sh_cl_xdma_pcis_awlen(sh_cl_xdma_pcis_awlen),
-      .sh_cl_xdma_pcis_awvalid(sh_cl_xdma_pcis_awvalid),
-      .cl_sh_xdma_pcis_awready(cl_sh_xdma_pcis_awready),
+      .sh_cl_dma_pcis_awaddr(sh_cl_xdma_pcis_awaddr),
+      .sh_cl_dma_pcis_awid(sh_cl_xdma_pcis_awid),
+      .sh_cl_dma_pcis_awlen(sh_cl_xdma_pcis_awlen),
+      .sh_cl_dma_pcis_awvalid(sh_cl_xdma_pcis_awvalid),
+      .cl_sh_dma_pcis_awready(cl_sh_xdma_pcis_awready),
    
-      .sh_cl_xdma_pcis_wdata(sh_cl_xdma_pcis_wdata),
-      .sh_cl_xdma_pcis_wstrb(sh_cl_xdma_pcis_wstrb),
-      .sh_cl_xdma_pcis_wlast(sh_cl_xdma_pcis_wlast),
-      .sh_cl_xdma_pcis_wvalid(sh_cl_xdma_pcis_wvalid),
-      .cl_sh_xdma_pcis_wready(cl_sh_xdma_pcis_wready),
+      .sh_cl_dma_pcis_wdata(sh_cl_xdma_pcis_wdata),
+      .sh_cl_dma_pcis_wstrb(sh_cl_xdma_pcis_wstrb),
+      .sh_cl_dma_pcis_wlast(sh_cl_xdma_pcis_wlast),
+      .sh_cl_dma_pcis_wvalid(sh_cl_xdma_pcis_wvalid),
+      .cl_sh_dma_pcis_wready(cl_sh_xdma_pcis_wready),
    
-      .cl_sh_xdma_pcis_bresp(cl_sh_xdma_pcis_bresp),
-      .cl_sh_xdma_pcis_bid(cl_sh_xdma_pcis_bid),
-      .cl_sh_xdma_pcis_bvalid(cl_sh_xdma_pcis_bvalid),
-      .sh_cl_xdma_pcis_bready(sh_cl_xdma_pcis_bready),
+      .cl_sh_dma_pcis_bresp(cl_sh_xdma_pcis_bresp),
+      .cl_sh_dma_pcis_bid(cl_sh_xdma_pcis_bid),
+      .cl_sh_dma_pcis_bvalid(cl_sh_xdma_pcis_bvalid),
+      .sh_cl_dma_pcis_bready(sh_cl_xdma_pcis_bready),
    
-      .sh_cl_xdma_pcis_araddr(sh_cl_xdma_pcis_araddr),
-      .sh_cl_xdma_pcis_arid(sh_cl_xdma_pcis_arid),
-      .sh_cl_xdma_pcis_arlen(sh_cl_xdma_pcis_arlen),
-      .sh_cl_xdma_pcis_arvalid(sh_cl_xdma_pcis_arvalid),
-      .cl_sh_xdma_pcis_arready(cl_sh_xdma_pcis_arready),
+      .sh_cl_dma_pcis_araddr(sh_cl_xdma_pcis_araddr),
+      .sh_cl_dma_pcis_arid(sh_cl_xdma_pcis_arid),
+      .sh_cl_dma_pcis_arlen(sh_cl_xdma_pcis_arlen),
+      .sh_cl_dma_pcis_arvalid(sh_cl_xdma_pcis_arvalid),
+      .cl_sh_dma_pcis_arready(cl_sh_xdma_pcis_arready),
    
-      .cl_sh_xdma_pcis_rid(cl_sh_xdma_pcis_rid),
-      .cl_sh_xdma_pcis_rdata(cl_sh_xdma_pcis_rdata),
-      .cl_sh_xdma_pcis_rresp(cl_sh_xdma_pcis_rresp),
-      .cl_sh_xdma_pcis_rlast(cl_sh_xdma_pcis_rlast),
-      .cl_sh_xdma_pcis_rvalid(cl_sh_xdma_pcis_rvalid),
-      .sh_cl_xdma_pcis_rready(sh_cl_xdma_pcis_rready),
+      .cl_sh_dma_pcis_rid(cl_sh_xdma_pcis_rid),
+      .cl_sh_dma_pcis_rdata(cl_sh_xdma_pcis_rdata),
+      .cl_sh_dma_pcis_rresp(cl_sh_xdma_pcis_rresp),
+      .cl_sh_dma_pcis_rlast(cl_sh_xdma_pcis_rlast),
+      .cl_sh_dma_pcis_rvalid(cl_sh_xdma_pcis_rvalid),
+      .sh_cl_dma_pcis_rready(sh_cl_xdma_pcis_rready),
    
    
       .cl_sh_pcim_awid(cl_sh_pcim_awid),

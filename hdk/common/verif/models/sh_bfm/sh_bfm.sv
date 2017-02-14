@@ -87,7 +87,7 @@ module sh_bfm #(
    input [NUM_PCIE-1:0]        cl_sh_pcim_arvalid,
    output logic [NUM_PCIE-1:0] sh_cl_pcim_arready,
 
-   output logic [4:0]          sh_cl_pcim_rid[NUM_PCIE-1:0],
+   output logic [15:0]          sh_cl_pcim_rid[NUM_PCIE-1:0],
    output logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0],
    output logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0],
    output logic [NUM_PCIE-1:0] sh_cl_pcim_rlast,
@@ -1276,14 +1276,14 @@ typedef struct {
       
    endfunction // dma_buffer_to_cl
 
-   function dma_cl_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[], input [63:0] cl_addr);
+   function automatic dma_cl_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[], input [63:0] cl_addr);
       DMA_OP dop;
       dop.buffer = buffer;
       dop.cl_addr = cl_addr;
       c2h_dma_list[chan].push_back(dop);
    endfunction // dma_cl_to_buffer
 
-   function dma_cl_data_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[]);
+   function automatic dma_cl_data_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[]);
       DMA_OP dop;
       dop = c2h_dma_data[chan].pop_front();
       buffer = dop.buffer;
@@ -1348,6 +1348,12 @@ typedef struct {
          end
       end
    end
+
+   //=================================================
+   //
+   // cl->sh xdma data Interface
+   //
+   //=================================================
 
    always @(negedge rst_n or posedge clk_core) begin
       if (!rst_n) begin
