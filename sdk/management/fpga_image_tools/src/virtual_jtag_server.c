@@ -26,18 +26,33 @@
 #define XVC_VERSION 10
 #endif
 
+
+extern void* open_port(uint32_t slot_id); 
+
+extern void close_port(void* jtag_pci_bar);
+
+extern void set_tck(void *jtag_pcie_bar, unsigned long nsperiod, unsigned long *result);
+
+extern void shift_tms_tdi(
+    void *jtag_pcie_bar,
+    unsigned long bitcount,
+    unsigned char *tms_buf,
+    unsigned char *tdi_buf,
+    unsigned char *tdo_buf);
+
 static unsigned max_packet_len = MAX_PACKET_LEN;
 
-struct XvcClient {
+typedef struct _XvcClient {
     unsigned buf_len;
     unsigned buf_max;
     uint8_t * buf;
+    void* jtag_pcie_bar;
     int fd;
     int locked;
     int enable_locking;
     int enable_status;
     char pending_error[1024];
-};
+} XvcClient;
 
 static XvcClient xvc_client;
 
@@ -59,7 +74,7 @@ static int closesocket(int sock)
     return close(sock);
 }
 
-static int open_server(const uint16_t* tcp_port) {
+static int open_server(const char* tcp_port) {
     int err = 0;
     int sock = -1;
     struct addrinfo hints;
@@ -115,51 +130,6 @@ static void set_uint_le(void * buf, int len, unsigned value) {
     }
 }
 
-#if XVC_VERSION >= 11
-static unsigned get_uleb128(unsigned char** buf, void *bufend) {
-    unsigned char * p = (unsigned char *)*buf;
-    unsigned value = 0;
-    int i = 0;
-    unsigned n;
-    do {
-        n = p < (unsigned char *)bufend ? *p++ : (p++, 0);
-        value |= (n & 0x7f) << i;
-        i += 7;
-    } while ((n & 0x80) != 0);
-    *buf = p;
-    return value;
-}
-
-static void reply_status(XvcClient * c) {
-    if (reply_len < max_packet_len)
-        reply_buf[reply_len] = (c->pending_error[0] != '\0');
-    reply_len++;
-}
-
-static void reply_uleb128(unsigned value) {
-    unsigned pos = 0;
-    do {
-        if (reply_len + pos < max_packet_len) {
-            if (value >= 0x80) {
-                reply_buf[reply_len + pos] = (value & 0x7f) | 0x80;
-            } else {
-                reply_buf[reply_len + pos] = value & 0x7f;
-            }
-        }
-        value >>= 7;
-        pos++;
-    } while (value);
-    reply_len += pos;
-}
-
-void xvcserver_set_error(XvcClient * c, const char *fmt, ...) {
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(c->pending_error, sizeof c->pending_error, fmt, ap);
-    c->pending_error[sizeof c->pending_error - 1] = '\0';
-    va_end(ap);
-}
-#endif
 
 static int send_packet(XvcClient * c, const void * buf, unsigned len) {
     int rval = send(c->fd, buf, len, 0);
@@ -241,7 +211,7 @@ read_more:
             if (!c->pending_error[0]) {
                 // fprintf(stdout, "bits received %d %d %x %x\n", bits, bytes, p[0], p[bytes]);
         
-                shift_tms_tdi(c->client_data, bits, p, p + bytes, reply_buf + reply_len);
+                shift_tms_tdi(c->jtag_pcie_bar, bits, p, p + bytes, reply_buf + reply_len);
             }
             if (c->pending_error[0]) {
                 printf("Problem\n");
@@ -268,7 +238,7 @@ read_more:
             p += 4;
 
             if (!c->pending_error[0])
-                set_tck(c->client_data, nsperiod, &resnsperiod);
+                set_tck(c->jtag_pcie_bar, nsperiod, &resnsperiod);
             if (c->pending_error[0])
                 resnsperiod = nsperiod;
 
@@ -319,10 +289,10 @@ error:
 
 int xvcserver_start(
     uint32_t slot_id,
-    uint16_t tcp_port,
-    void * client_data)
+    char* tcp_port)
 {
     XvcClient * c = &xvc_client;
+    void* jtag_pcie_bar;
     int sock;
     int fd;
 
@@ -331,7 +301,7 @@ int xvcserver_start(
 
     sock = open_server(tcp_port);
     if (sock < 0) {
-        perror("failed to create socket, for tcp port %u", tcp_port);
+        //perror("failed to create socket, for tcp port %s", tcp_port);
         return 1;
     }
 
@@ -341,7 +311,7 @@ int xvcserver_start(
         if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (char *)&opt, sizeof(opt)) < 0)
             fprintf(stderr, "setsockopt TCP_NODELAY failed\n");
 
-        if (open_port(slot_id) == NULL ) {
+        if ((jtag_pcie_bar=open_port(slot_id)) == NULL ) {
             fprintf(stderr, "open Virtual JTAG over PCIe failed\n");
             closesocket(fd);
             continue;
@@ -349,11 +319,11 @@ int xvcserver_start(
 
         memset(c, 0, sizeof *c);
         c->fd = fd;
-        c->client_data = client_data;
+        c->jtag_pcie_bar = jtag_pcie_bar;
         c->buf_max = max_packet_len;
         c->buf = (uint8_t *)malloc(c->buf_max);
         read_packet(c);
-        lose_port(client_data);
+        close_port(jtag_pcie_bar);
         closesocket(fd);
         free(c->buf);
     }

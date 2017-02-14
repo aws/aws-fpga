@@ -21,58 +21,153 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
+static const size_t XVC_VSEC_ID = 0x0008;
+
+#define VALID_OFFSET(a) (a < 0x1000 && a >= 0x100)
+
+struct xvc_offsets {
+	size_t debug_id_reg_offset;
+	size_t length_reg_offset;
+	size_t tms_reg_offset;
+	size_t tdi_reg_offset;
+	size_t tdo_reg_offset;
+	size_t control_reg_offset;
+};
+
+static const struct xvc_offsets xvc_offsets = 
+	{0x00, 0x00, 0x04, 0x08, 0x0C, 0x10};  // XVC_ALGO_BAR
+
+#define DEBUG_ID_REG_OFFSET (xvc_offsets.debug_id_reg_offset)
+#define LENGTH_REG_OFFSET   (xvc_offsets.length_reg_offset)
+#define TMS_REG_OFFSET      (xvc_offsets.tms_reg_offset)
+#define TDI_REG_OFFSET      (xvc_offsets.tdi_reg_offset)
+#define TDO_REG_OFFSET      (xvc_offsets.tdo_reg_offset)
+#define CONTROL_REG_OFFSET  (xvc_offsets.control_reg_offset)
 
 
-
-int open_port(uint32_t slot_id) {
+void* open_port(uint32_t slot_id) {
    
 /* attach to slot S */
 
    return (0);
 }
 
-void close_port(void* jtag_pci_bar) {
+void close_port(void* jtag_pcie_bar) {
 /* detach jtag_pci_bar */
 }
 
-void set_tck(void *client_data, unsigned long nsperiod, unsigned long *result) {
+void set_tck(void *jtag_pcie_bar, unsigned long nsperiod, unsigned long *result) {
     *result = nsperiod;
 }
 
+int pci_read32(void* a, uint32_t b, uint32_t* c ) {return 0;}
+int pci_write32(void* a ,  uint32_t b, uint32_t c) {return 0;}
+
+static int xvc_shift_bits(void* jtag_pcie_bar, uint32_t tms_bits, uint32_t tdi_bits, uint32_t *tdo_bits) {
+	int status;
+	uint32_t control_reg_data;
+	int count = 100;
+
+	// Set tms bits
+	status = pci_write32(jtag_pcie_bar, TMS_REG_OFFSET, tms_bits);
+	if (status != 0) {
+		return status;
+	}
+
+	// Set tdi bits and shift data out
+	status = pci_write32(jtag_pcie_bar, TDI_REG_OFFSET, tdi_bits);
+	if (status != 0) {
+		return status;
+	}
+	// Enable shift operation
+	status = pci_write32(jtag_pcie_bar, CONTROL_REG_OFFSET, 0x01);
+	if (status != 0) {
+		return status;
+	}
+	while (count) {
+	// Read control reg to check shift operation completion
+		status = pci_read32(jtag_pcie_bar, CONTROL_REG_OFFSET, &control_reg_data);
+		if (status != 0) {
+			return status;
+		}
+	
+		if ((control_reg_data & 0x01) == 0)	{
+			break;
+		}
+		count--;
+
+		if (count == 0)	{
+			//printk(KERN_ERR LOG_PREFIX "XVC bar transaction timed out (%0X)\n", control_reg_data);
+			return -ETIMEDOUT;
+		}
+	}// Read tdo bits back out
+	status = pci_read32(jtag_pcie_bar, TDO_REG_OFFSET, tdo_bits);
+	return status;
+}
+
+
 void shift_tms_tdi(
-    void *client_data,
-    unsigned long bitcount,
-    unsigned char *tms_buf,
-    unsigned char *tdi_buf,
-    unsigned char *tdo_buf) {
+    	void *jtag_pcie_bar,
+    	unsigned long bitcount,
+    	unsigned char *tms_buf,
+    	unsigned char *tdi_buf,
+    	unsigned char *tdo_buf) {
 
-    int ret = 0;
-    struct timeval stop, start;
+    	struct timeval  start;
+	uint32_t num_bits;
+	int current_bit;
+	uint32_t tms_store=0, tdi_store=0, tdo_store=0;
+	unsigned char* tms_buf_tmp;
+	unsigned char* tdi_buf_tmp;
+	unsigned char* tdo_buf_tmp;
 
-    if (verbose) {
-        gettimeofday(&start, NULL);
-    }
+	int status = 0;
 
-    /* struct xil_xvc_ioc xvc_ioc;
+	num_bits = bitcount;
+    	
+	gettimeofday(&start, NULL);
 
-    xvc_ioc.opcode = 0x01; // 0x01 for normal, 0x02 for bypass
-    xvc_ioc.length = bitcount;
-    xvc_ioc.tms_buf = tms_buf;
-    xvc_ioc.tdi_buf = tdi_buf;
-    xvc_ioc.tdo_buf = tdo_buf;
+	// Set length register to 32 initially if more than one word-transaction is to be done
+	if (num_bits >= 32) {
+		status = pci_write32(jtag_pcie_bar, LENGTH_REG_OFFSET, 0x20);
+		if (status) {
+			goto cleanup;
+		}
+	}
+	current_bit = 0;
+	while (current_bit < num_bits) {
+		int shift_num_bytes;
+		int shift_num_bits = 32;
+		if (num_bits - current_bit < shift_num_bits) {
+			shift_num_bits = num_bits - current_bit;
+			// do LENGTH_REG_OFFSET here
+			// Set number of bits to shift out
+			status = pci_write32(jtag_pcie_bar, LENGTH_REG_OFFSET, shift_num_bits);
+			if (status != 0) {
+				goto cleanup;
+			}
+		}
 
-    int ret = ioctl(pcie->fd, XDMA_IOCXVC, &xvc_ioc); */
-    
-    if (ret < 0)
-    {
-        int errsv = errno;
-        printf("IOC Error %d\n", errsv);
-    }
+		shift_num_bytes = (shift_num_bits + 7) / 8;
+		tms_buf_tmp = tms_buf + (current_bit / 8);
+		tdi_buf_tmp = tdi_buf + (current_bit / 8);
+		tdo_buf_tmp = tdo_buf + (current_bit / 8);
+	
+		memcpy(&tms_store, tms_buf_tmp, shift_num_bytes);
+		memcpy(&tdi_store, tdi_buf_tmp, shift_num_bytes);
 
+		// Shift data out and copy to output buffer
+		status = xvc_shift_bits(jtag_pcie_bar, tms_store, tdi_store, &tdo_store);
+		if (status) {
+			goto cleanup;
+		}
 
-    if (verbose) {
-        gettimeofday(&stop, NULL);
-        printf("IOC shift internal took %lu u-seconds with %lu bits. Return value %d\n", stop.tv_usec - start.tv_usec, bitcount, ret);
-    }
+		memcpy(tdo_buf_tmp, &tdo_store, shift_num_bytes);
+
+		current_bit += shift_num_bits;
+	}
+
+cleanup:
+	return;
 }
 
