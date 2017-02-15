@@ -136,11 +136,12 @@ module test_xdma();
 
       timeout_count = 0;
       
-      #10000ns;
+      #10ns;
       
       do begin
-//         status = tb.sh.is_que_to_cl_done(0);
+         status = tb.sh.is_dma_to_cl_done(chan);
          timeout_count++;
+         #1ns;
       end while ((!status) && (timeout_count < 100)); 
 
       if ((timeout_count == 100) && (status !== 1'b1)) begin

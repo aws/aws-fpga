@@ -62,40 +62,39 @@ module sh_bfm #(
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
    //-------------------------------------
    input [15:0]                 cl_sh_pcim_awid[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_awaddr[NUM_PCIE-1:0],
-   input [7:0]                 cl_sh_pcim_awlen[NUM_PCIE-1:0],
-   input [18:0]                cl_sh_pcim_awuser[NUM_PCIE-1:0], //DW length of transfer
-   input [NUM_PCIE-1:0]        cl_sh_pcim_awvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_awready,
+   input [63:0]                 cl_sh_pcim_awaddr[NUM_PCIE-1:0],
+   input [7:0]                  cl_sh_pcim_awlen[NUM_PCIE-1:0],
+   input [18:0]                 cl_sh_pcim_awuser[NUM_PCIE-1:0], //DW length of transfer
+   input [NUM_PCIE-1:0]         cl_sh_pcim_awvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_awready,
 
-//Not used   input [4:0]                 cl_sh_pcim_wid[NUM_PCIE-1:0],
-   input [511:0]               cl_sh_pcim_wdata[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_wstrb[NUM_PCIE-1:0],
-   input [NUM_PCIE-1:0]        cl_sh_pcim_wlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_wvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_wready,
+   input [511:0]                cl_sh_pcim_wdata[NUM_PCIE-1:0],
+   input [63:0]                 cl_sh_pcim_wstrb[NUM_PCIE-1:0],
+   input [NUM_PCIE-1:0]         cl_sh_pcim_wlast,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_wvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_wready,
 
    output logic [15:0]          sh_cl_pcim_bid[NUM_PCIE-1:0],
-   output logic [1:0]          sh_cl_pcim_bresp[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_bready,
-
+   output logic [1:0]           sh_cl_pcim_bresp[NUM_PCIE-1:0],
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_bvalid,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_bready,
+                               
    input [15:0]                 cl_sh_pcim_arid[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_araddr[NUM_PCIE-1:0],
-   input [7:0]                 cl_sh_pcim_arlen[NUM_PCIE-1:0],
-   input [18:0]                cl_sh_pcim_aruser[NUM_PCIE-1:0], //DW length of transfer
-   input [NUM_PCIE-1:0]        cl_sh_pcim_arvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_arready,
+   input [63:0]                 cl_sh_pcim_araddr[NUM_PCIE-1:0],
+   input [7:0]                  cl_sh_pcim_arlen[NUM_PCIE-1:0],
+   input [18:0]                 cl_sh_pcim_aruser[NUM_PCIE-1:0], //DW length of transfer
+   input [NUM_PCIE-1:0]         cl_sh_pcim_arvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_arready,
 
    output logic [15:0]          sh_cl_pcim_rid[NUM_PCIE-1:0],
-   output logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0],
-   output logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_rlast,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_rvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_rready,
+   output logic [511:0]         sh_cl_pcim_rdata[NUM_PCIE-1:0],
+   output logic [1:0]           sh_cl_pcim_rresp[NUM_PCIE-1:0],
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rlast,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rvalid,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_rready,
 
-   output logic[1:0] cfg_max_payload[NUM_PCIE-1:0],               //Max payload size - 00:128B, 01:256B, 10:512B
-   output logic[2:0] cfg_max_read_req[NUM_PCIE-1:0],              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   output logic[1:0]            cfg_max_payload[NUM_PCIE-1:0],       //Max payload size - 00:128B, 01:256B, 10:512B
+   output logic[2:0]            cfg_max_read_req[NUM_PCIE-1:0],      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
 
 
@@ -106,40 +105,40 @@ module sh_bfm #(
    output logic [4:0]                sh_cl_pcis_awid  ,
    output logic [7:0]                sh_cl_pcis_awlen ,
    output logic [NUM_PCIE-1:0]       sh_cl_pcis_awvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_awready,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_awready,
 
    output logic [511:0]              sh_cl_pcis_wdata,
    output logic [63:0]               sh_cl_pcis_wstrb,
    output logic [NUM_PCIE-1:0]       sh_cl_pcis_wvalid,
    output logic [NUM_PCIE-1:0]       sh_cl_pcis_wlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_wready,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_wready,
 
-   input [1:0]                 cl_sh_pcis_bresp,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_bvalid,
-   input [4:0]                 cl_sh_pcis_bid,
+   input [1:0]                       cl_sh_pcis_bresp,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_bvalid,
+   input [4:0]                       cl_sh_pcis_bid,
    output logic [NUM_PCIE-1:0]       sh_cl_pcis_bready,
 
-   output logic [63:0]         sh_cl_pcis_araddr,
-   output logic [4:0]          sh_cl_pcis_arid,
-   output logic [7:0]          sh_cl_pcis_arlen,
-   output logic [NUM_PCIE-1:0] sh_cl_pcis_arvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_arready,
-
-   input [4:0]                 cl_sh_pcis_rid,
-   input [511:0]               cl_sh_pcis_rdata,
-   input [1:0]                 cl_sh_pcis_rresp,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_rlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_rvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcis_rready,
+   output logic [63:0]               sh_cl_pcis_araddr,
+   output logic [4:0]                sh_cl_pcis_arid,
+   output logic [7:0]                sh_cl_pcis_arlen,
+   output logic [NUM_PCIE-1:0]       sh_cl_pcis_arvalid,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_arready,
+                                     
+   input [4:0]                       cl_sh_pcis_rid,
+   input [511:0]                     cl_sh_pcis_rdata,
+   input [1:0]                       cl_sh_pcis_rresp,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_rlast,
+   input [NUM_PCIE-1:0]              cl_sh_pcis_rvalid,
+   output logic [NUM_PCIE-1:0]       sh_cl_pcis_rready,
 
 `ifndef VU190    
    //-----------------------------------------
    // CL MSIX
    //-----------------------------------------
-    input               cl_sh_msix_int,
-    input [7:0]         cl_sh_msix_vec,
-    output logic        sh_cl_msix_int_sent,
-    output logic        sh_cl_msix_int_ack
+    input                     cl_sh_msix_int,
+    input [7:0]               cl_sh_msix_vec,
+    output logic              sh_cl_msix_int_sent,
+    output logic              sh_cl_msix_int_ack
 `endif
     
    ,
@@ -414,6 +413,7 @@ typedef struct {
    logic [3:0]     h2c_dma_started;
    logic [3:0]     c2h_dma_started;
    logic [3:0]     c2h_dma_done;
+   logic [3:0]     h2c_dma_done;
 
    logic [7:0] read_data_buffer[];
    
@@ -579,6 +579,10 @@ typedef struct {
    //
 
    always @(posedge clk_core) begin
+      h2c_dma_done[0] = 0;
+      h2c_dma_done[1] = 0;
+      h2c_dma_done[2] = 0;
+      h2c_dma_done[3] = 0;
       if (sh_cl_wr_data.size() != 0) begin
 
          sh_cl_pcis_wdata <= sh_cl_wr_data[0].data;
@@ -592,9 +596,10 @@ typedef struct {
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
             end
+            h2c_dma_done[sh_cl_wr_data[0].id] = 1'b1; 
             sh_cl_wr_data.pop_front();
          end
-
+         
       end
       else
          sh_cl_pcis_wvalid <= 1'b0;
@@ -1258,7 +1263,6 @@ typedef struct {
       byte_idx     = addr[5:0];
       mem_arr_idx  = byte_idx*8;
 
-//      wait(cl_sh_rd_data.size() > 0);   // TBD: This doesn't work for XSIM
       while (cl_sh_rd_data.size() == 0)
         #20ns;
       
@@ -1300,7 +1304,7 @@ typedef struct {
    endfunction // start_dma_to_buffer
 
    function bit is_dma_to_cl_done(input int chan);  // 1 = done
-      return h2c_dma_started[chan];
+      return h2c_dma_done[chan];
    endfunction // is_dma_to_cl_done
    
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
@@ -1339,7 +1343,7 @@ typedef struct {
                  axi_data.strb = {1'b1, axi_data.strb[63:1]};
               end
           
-              axi_data.id = 0;
+              axi_data.id = chan;
               axi_data.last = 1;
               
               sh_cl_wr_data.push_back(axi_data);
@@ -1459,7 +1463,6 @@ typedef struct {
       AXI_Data data;
       int byte_idx;
       int mem_arr_idx;
-//      int len;
 
       cmd.addr = start_addr;
       cmd.len  = len;
