@@ -16,8 +16,8 @@
 
 
 
-
-# Overview <a name="overview"></a>
+<a name="overview"></a>
+# Overview 
 
 EC2 FPGA platforms supports Virtual JTAG capability, by emulating JTAG over PCIe. 
 
@@ -36,8 +36,8 @@ There are three main components which enable XVC debug an AWS FPGA enabled insta
 ![alt tag](./images/Virtual_JTAG_XVC_Server.jpg)  
   
   
-
-# Embedding Debug Cores in CL <a name="embeddingDebugCores"></a>
+<a name="embeddingDebugCores"></a>
+# Embedding Debug Cores in CL 
 
 The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_latest/TBD) provided by AWS as part of the HDK, and any required standard Xilinx debug IP components like ILAs and VIOs. 
 
@@ -64,14 +64,14 @@ cl_debug_bridge CL_DEBUG_BRIDGE (
 ```  
   
   
-**Step 2:**	To instance Xilinx' [Integrated Logic Analyzer (ILA)](https://www.xilinx.com/products/intellectual-property/ila.html). An ILA IP should be created using Vivado IP Catalog and it should be customized according to the desired probes. The ILA can be instanced at any level in the hierarchy inside the CL and the nets requiring debug have to be connected probe input ports of the ILA. The clock to the ILA should be the same clock of the clock domain to which the nets under debug belong to. A separate ILA is required for nets belonging to different clock domains. (Please see section “Suggested Background” for more details).
+**Step 2:**	To instance Xilinx' [Integrated Logic Analyzer (ILA)](https://www.xilinx.com/products/intellectual-property/ila.html). An ILA IP should be created using Vivado IP Catalog and it should be customized according to the desired probes. The ILA can be instanced at any level in the hierarchy inside the CL and the nets requiring debug have to be connected probe input ports of the ILA. The clock to the ILA should be the same clock of the clock domain to which the nets under debug belong to. A separate ILA is required for nets belonging to different clock domains. (Please see Xilinx UG908 for further details)
 
-**Step 3:**	To instance Xilinx' [Virtual Input/Output (VIO)](https://www.xilinx.com/products/intellectual-property/vio.html). A VIO IP should be created using Vivado IP Catalog and it should be customized as desired. The VIO can be instanced at any level in the hierarchy inside the CL and the input/output nets should be connected as desired. The clock to the VIO should be the same clock of the clock domain to which the VIO output/input probe signals belong to. A separate VIO is required for different clock domains. Please see section [Suggested Background](#suggestios) for more details.
+**Step 3:**	To instance Xilinx' [Virtual Input/Output (VIO)](https://www.xilinx.com/products/intellectual-property/vio.html). A VIO IP should be created using Vivado IP Catalog and it should be customized as desired. The VIO can be instanced at any level in the hierarchy inside the CL and the input/output nets should be connected as desired. The clock to the VIO should be the same clock of the clock domain to which the VIO output/input probe signals belong to. A separate VIO is required for different clock domains. (Please see Xilinx UG908 for further details)
 
 **Step 4:**	Xilinx Vivado implementation tools perform the connections and wiring between the debug IP components (ILAs/VIOs) and the CL Debug Bridge. Care should be taken to set `set_param chipscope.enablePRFlow true` in the tcl command during synthesis and implementation. This is automatically included if AWS CL Build scripts are delivered with this HDK.
 
-
-# Starting Virtual JTAG (XVC) Debug Server on the Target FPGA-enabled EC2 Instance <a name="startVJtag"></a>
+<a name="startVJtag"></a>
+# Starting Virtual JTAG (XVC) Debug Server on the Target FPGA-enabled EC2 Instance 
 
 To start debugging a given FPGA slot, which has the [CL debug cores](#embeddingDebugCores), the developer need to call FPGA Management Tool `$ fpga-start-virtual-jtag` from Linux shell. This management tool starts Xilinx's Virtual Cable (XVC) service for a given FPGA slot, listening to a given TCP port.
 
@@ -111,13 +111,42 @@ $ sudo fpga-start-virtual-jtag -?
           Display version number of this program.
 ```
 
+<a name="connectToTarget"></a>
+# Connecting Vivado to the Debug Target FPGA-enabled EC2 Instance 
+
+The interactive debug can use Vivado running on the target instance (i.e. the F1 itself) or it can be running remotely on a different host. The TCP port on which the Virtual JTAG XVC Server is listening must be accessible to the host running Vivado (See [FAQ](#faq) for configuring Linux firewall and AWS EC2 Network Security Groups). 
+
+To connect the debug Vivado to Virtual JTAG XVC server, the following should be called on the machine hosting Vivado:
+
+1)	Launch Vivado  
+
+2)	Select “Open HW Manager”
+
+3)	Start Vivado hw_server using the following command in the Vivado .tcl console
+`> connect_hw_server`  
+
+4)	Connect to the target instance Virtual JTAG XVC server using the following command in the Vivado tcl console. 
+`> open_hw_target -xvc_url <hostname or IP address>:10201`
+
+The Vivado Hardware panel will be populated with a debug bridge instance. 
+ 
+**Note:** At this point the Virtual JTAG XVC-server running on the target should acknowledge the Vivado connection by printing the following in `dmesg` log:
+
+`**TBD8*`
+
+5)	Select the debug bridge instance from the Vivado Hardware panel.
+
+6)	In the Hardware Device Properties window select the appropriate “Probes file” for your design by clicking the icon next to the “Probes file” entry, selecting the file, and clicking “OK”. This will refresh the hardware device and it should now show the debug cores present in your design.
+ 
+Vivado can now be used to debug your design.
+
+The connection Vivado and the target instance can be terminated by closing the XVC server from Vivado using the right click menu. If the target FPGA PCIe connection is lost, a new AFI is loaded or the Virtual JTAG Server application stops running, the connection to the FPGA and associated debug cores will also be lost. 
+
+**NOTE:** Vivado should not be connected to the target Virtual JTAG XVC Server when the AFI is not in READY state. If the AFI going to go through `fpga-clear-image` or `fpga-load-local-image`, Vivado should be disconnected, and the Virtual JTAG XVC Server should be terminated. (TBD - how to terminate)
   
-# Connecting Vivado to the Debug Target FPGA-enabled EC2 Instance <a name="connectToTarget"></a>
-
-TBD
-
-
-# Frequently Asked Questions <a name="faq"></a>
+    
+<a name="faq"></a>
+# Frequently Asked Questions 
   
   
   
