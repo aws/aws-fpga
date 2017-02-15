@@ -76,39 +76,11 @@ cl_debug_bridge CL_DEBUG_BRIDGE (
 To start debugging a given FPGA slot, which has the [CL debug cores](#embeddingDebugCores), the developer need to call FPGA Management Tool `$ fpga-start-virtual-jtag` from Linux shell. This management tool starts Xilinx's Virtual Cable (XVC) service for a given FPGA slot, listening to a given TCP port.
 
 ``` 
-$ sudo fpga-start-virtual-jtag -?
-  SYNOPSIS
-      fpga-start-virtual-jtag [GENERAL OPTIONS] [-h]
-      Example: fpga-start-virtual-jtag -S 0 [-P <tcp-port>]
-  DESCRIPTION
-      Start Virtual JTAG spplication server, running Xilinx's Virtual
-      Cable (XVC) service,  which listens incoming command over TCP
-      port that is set by -P option (Default TCP port is 10201).
-      The fpga-image-slot parameter is a logical index that represents
-      a given FPGA within an instance.
-      This command will work only if AFI is in READY state:
-      Use fpga-describe-local-image to return the FPGA image status, and
-      fpga-describe-local-image-slots to return the AFI state.
-      The AFI should have included Xilinx's VIO/LIA debug cores
-      and AWS CL Debug Bridge inside the CustomLogic (CL)
-      Concurrent debug of multiple FPGA slots is possible as long as
-      different <tcp-port> values are used for each slot.
-      Linux firewall and/or EC2 Network Security Group rules may
-      need to change for enabling inbound access to the TCP port.
-  GENERAL OPTIONS
-      -S, --fpga-image-slot
-          The logical slot number for the FPGA image
-          Constraints: Positive integer from 0 to the total slots minus 1.
-      -P, --tcp-port
-          The TCP port number to use for virtual jtag server, default
-          TCP port is 10201.  Remember to use different TCP port for
-          different slot if debugging multiple slots concurrently
-      -?, --help
-          Display this help.
-      -H, --headers
-          Display column headers.
-      -V, --version
-          Display version number of this program.
+
+$ sudo fpga-start-virtual-jtag -P 10201 -S 0
+Starting Virtual JTAG XVC Server for FPGA slot id 0, listening to TCP port 10201.
+Press CTRL-C to stop the service.
+
 ```
 
 <a name="connectToTarget"></a>
