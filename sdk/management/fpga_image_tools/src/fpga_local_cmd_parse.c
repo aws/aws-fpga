@@ -157,26 +157,34 @@ static const char *start_virtual_jtag_usage[] = {
 	"      fpga-start-virtual-jtag [GENERAL OPTIONS] [-h]",
 	"      Example: fpga-start-virtual-jtag -S 0 [-P <tcp-port>]",
 	"  DESCRIPTION",
-	"      Loads the specified FPGA image to the specified slot number, and",
-	"      returns the status of the command.  The fpga-image-slot parameter",
-	"      is a logical index that represents a given FPGA within an instance.",
+	"      Start Virtual JTAG spplication server, running Xilinx's Virtual",
+	"      Cable (XVC) service,  which listens incoming command over TCP",
+	"      port that is set by -P option (Default TCP port is 10201).",
+	"      The fpga-image-slot parameter is a logical index that represents",
+	"      a given FPGA within an instance.",
+	"      This command will work only if AFI is in READY state:",
 	"      Use fpga-describe-local-image to return the FPGA image status, and",
-	"      fpga-describe-local-image-slots to return the available FPGA image",
-	"      slots for the instance.",
+	"      fpga-describe-local-image-slots to return the AFI state.",
+	"      The AFI should have included Xilinx's VIO/LIA debug cores",
+	"      and AWS CL Debug Bridge inside the CustomLogic (CL)",
+	"      Concurrent debug of multiple FPGA slots is possible as long as",
+	"      different <tcp-port> values are used for each slot.",
+	"      Linux firewall and/or EC2 Network Security Group rules may",
+	"      need to change for enabling inbound access to the TCP port.",
 	"  GENERAL OPTIONS",
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
 	"      -P, --tcp-port",
-	"          The tcp port number to use for virtual jtag server",
+	"          The TCP port number to use for virtual jtag server, default",
+	"          TCP port is 10201.  Remember to use different TCP port for",
+	"          different slot if debugging multiple slots concurrently",
 	"      -?, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
 	"      -V, --version",
 	"          Display version number of this program.",
-	"      --request-timeout TIMEOUT",
-	"          Specify a request timeout TIMEOUT (in seconds).",
 };
 
 /**
@@ -445,6 +453,7 @@ out_ver:
 	return -1;
 }
 
+
 /**
  * Parse describe-fpga-image-slots command line arguments.
  *
@@ -497,6 +506,9 @@ out_ver:
 	return -1;
 }
 
+
+extern int xvcserver_start(uint32_t slot_id,char* tcp_port);
+
 /**
  * Parse start-fpga-virtualJtag command line arguments.
  *
@@ -507,13 +519,12 @@ static int
 parse_args_start_virtual_jtag(int argc, char *argv[])
 {
 	int opt = 0;
-	uint16_t tcp_port = 0;
+	char*	tcp_port = "10201";
 	uint32_t temp_int = 0;
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"tcp-port",			required_argument,	0,	'P'	},
-		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -521,7 +532,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:P:r:RH?hV",
+	while ((opt = getopt_long(argc, argv, "S:P:RH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -531,17 +542,17 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 			break;
 		}
 		case 'P': { // FIXME
-			string_to_uint(&temp_int, optarg);
+			/* string_to_uint(&temp_int, optarg);
 			tcp_port = (uint16_t) temp_int;
 			fail_on_user(tcp_port >= 0, err, 
 					"tcp-port must be less than %u", 0);
-			break;
-		}
-		case 'r': {
-			uint32_t value32;
-			string_to_uint(&value32, optarg);
-			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			*/
+			tcp_port = optarg;
+			string_to_uint(&temp_int, tcp_port);
+			fail_on_user(temp_int >= (64*1024-1), err,
+                                        "tcp-port must be less than %u", 64*1024-1);
+			fail_on_user(temp_int <= (1024), err,
+                                        "tcp-port must be larger than %u",1024);
 			break;
 		}
 		case 'H': {
@@ -559,10 +570,15 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 	}
 	
 	if (f1.afi_slot == (uint32_t) -1) { 
+		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
+	
+	printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",f1.afi_slot,tcp_port);
+	printf("Press CTRL-C to stop the service.\n");
 
-	return 0;
+	return xvcserver_start(f1.afi_slot,tcp_port);
+
 err:
         print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
 out_ver:
