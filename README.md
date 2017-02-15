@@ -62,9 +62,7 @@ During the preview access period to start using the FPGA developer AMI your AWS 
 
 ## Developer Support <a name="devSupport"></a>
 
-**FPGA development AMI**: During private access period, developers are emailed with details on how to get started with the FPGA Development AMI, terms and conditions and additional information on how to get started using F1 instances.  
-
-[**AWS FPGA Users' Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
+[**AWS FPGA Users' Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Note that in some cases you will need to logout using the logout button on the forums page and log back in to see the "Your Stuff" details. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
 
  
 # Quick Start <a name="quickstart"></a>
