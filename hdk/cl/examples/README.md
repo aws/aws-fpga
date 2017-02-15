@@ -30,8 +30,8 @@ As a pre-requisite to building the AFI, the developer should have an instance/se
 
 ### 0. Setup the HDK and install AWS CLI
 
-    $ git clone https://github.com/aws/aws-fpga
-    $ cd aws-fpga
+    $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
+    $ cd $AWS_FPGA_REPO_DIR
     $ source hdk_shell.sh
 
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
@@ -41,7 +41,7 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
 To extend your AWS CLI installation, please execute the following:
 
-    $ aws configure add-model --service-model file://$(pwd)/sdk/aws-cli-preview/ec2_preview_model.json
+    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
 
 **NOTE**: *The EC2 extension JSON file has been updated to enable support for the `create-fpga-image` command used in [Step 3](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#3-submit-the-design-checkpoint-to-aws-to-register-the-afi).*
 
@@ -70,7 +70,7 @@ The output is a tarball file comprising the DCP file, and other log/manifest fil
 This file would be submitted to AWS to create an AFI.
 
     $ cd $CL_DIR/build/scripts
-    $ ./aws_build_dcp_from_cl.tcl
+    $ ./aws_build_dcp_from_cl.sh
 
 **NOTE**: *The DCP generation can take up to several hours to complete.
 We recommend that you initiate the generation in a way that prevents interruption.

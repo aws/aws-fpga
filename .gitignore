@@ -29,3 +29,16 @@ waves.shm
 .nfs*
 *.so
 *.a
+
+nohup.out
+*.nohup.out
+
+hdk/common/shell_*/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+hdk/common/verif/scripts/tmp
+hdk/common/verif/scripts/vivado*.jou
+hdk/common/verif/scripts/vivado*.log
+
+# These get created when you run vivado interactively
+vivado_pid*.str
+vivado.jou
+vivado.log
