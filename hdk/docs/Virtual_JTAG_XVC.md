@@ -140,3 +140,8 @@ The connection Vivado and the target instance can be terminated by closing the X
   
   
 **Q: Can I debug multiple FPGAs on same target EC2 instance concurrently?**
+
+
+
+**Q: What are some of the best pratices I should be aware when working with Virtual JTAG?**
+
