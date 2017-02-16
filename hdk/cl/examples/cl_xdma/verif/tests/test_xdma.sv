@@ -37,7 +37,7 @@ module test_xdma();
          desc_buf[i] = 'hBB;
        end
    
-       que_to_cl_ddr(0, 64'h10000100, desc_buf);
+       que_to_cl_ddr(1, 64'h10000100, desc_buf);
 
        // DDR 2
        $display("[%t] : DMA buffer to DDR 2", $realtime);
@@ -46,7 +46,7 @@ module test_xdma();
          desc_buf[i] = 'hCC;
        end
    
-       que_to_cl_ddr(0, 64'h10000200, desc_buf);
+       que_to_cl_ddr(2, 64'h10000200, desc_buf);
 
        // DDR 3
        $display("[%t] : DMA buffer to DDR 3", $realtime);
@@ -55,7 +55,7 @@ module test_xdma();
          desc_buf[i] = 'hDD;
        end
    
-       que_to_cl_ddr(0, 64'h10000300, desc_buf);
+       que_to_cl_ddr(3, 64'h10000300, desc_buf);
        
        // DDR 0
        $display("[%t] : DMA buffer from DDR 0", $realtime);
