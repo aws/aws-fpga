@@ -61,7 +61,7 @@
 
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_axic_fifo #
+module axi_data_fifo_v2_1_10_axic_fifo #
   (
    parameter         C_FAMILY          = "virtex6",
    parameter integer C_FIFO_DEPTH_LOG  = 5,      // FIFO depth = 2**C_FIFO_DEPTH_LOG
@@ -85,7 +85,7 @@ module axi_data_fifo_v2_1_9_axic_fifo #
    input  wire                        M_READY  // FIFO pop
    );
 
-   axi_data_fifo_v2_1_9_fifo_gen #(
+   axi_data_fifo_v2_1_10_fifo_gen #(
      .C_FAMILY(C_FAMILY),
      .C_COMMON_CLOCK(1),
      .C_FIFO_DEPTH_LOG(C_FIFO_DEPTH_LOG),
@@ -165,7 +165,7 @@ endmodule
 `timescale 1ps/1ps
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_fifo_gen #(
+module axi_data_fifo_v2_1_10_fifo_gen #(
 parameter C_FAMILY          = "virtex7",
 parameter integer C_COMMON_CLOCK    = 1,
 parameter integer C_SYNCHRONIZER_STAGE = 3,
@@ -204,7 +204,7 @@ localparam C_MEMORY_TYPE =  (C_FIFO_TYPE == "bram")? 1 : 2;
 
 localparam C_IMPLEMENTATION_TYPE = (C_COMMON_CLOCK == 1)? 0 : 2;
 
-  fifo_generator_v13_1_2 #(
+  fifo_generator_v13_1_3 #(
     .C_COMMON_CLOCK(C_COMMON_CLOCK),
     .C_DIN_WIDTH(C_FIFO_WIDTH),
     .C_DOUT_WIDTH(C_FIFO_WIDTH),
@@ -695,7 +695,7 @@ endmodule
 `default_nettype none
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_axic_srl_fifo #
+module axi_data_fifo_v2_1_10_axic_srl_fifo #
   (
    parameter         C_FAMILY   = "none", // FPGA Family
    parameter integer C_FIFO_WIDTH  = 1, // Width of S_MESG/M_MESG.
@@ -803,7 +803,7 @@ module axi_data_fifo_v2_1_9_axic_srl_fifo #
     //---------------------------------------------------------------------------
     for (i=0;i<(C_FIFO_WIDTH/C_MAX_CTRL_FANOUT)+((C_FIFO_WIDTH%C_MAX_CTRL_FANOUT)>0);i=i+1) begin : gen_srls
       for (j=0;((j<C_MAX_CTRL_FANOUT)&&(i*C_MAX_CTRL_FANOUT+j<C_FIFO_WIDTH));j=j+1) begin : gen_rep
-        axi_data_fifo_v2_1_9_ndeep_srl #
+        axi_data_fifo_v2_1_10_ndeep_srl #
           (
            .C_FAMILY  (C_FAMILY),
            .C_A_WIDTH (P_FIFO_DEPTH_LOG)
@@ -886,7 +886,7 @@ endmodule
 `default_nettype none
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_axic_reg_srl_fifo #
+module axi_data_fifo_v2_1_10_axic_reg_srl_fifo #
   (
    parameter         C_FAMILY   = "none", // FPGA Family
    parameter integer C_FIFO_WIDTH  = 1, // Width of S_MESG/M_MESG.
@@ -1051,7 +1051,7 @@ module axi_data_fifo_v2_1_9_axic_reg_srl_fifo #
     //---------------------------------------------------------------------------
     for (i=0;i<(C_FIFO_WIDTH/C_MAX_CTRL_FANOUT)+((C_FIFO_WIDTH%C_MAX_CTRL_FANOUT)>0);i=i+1) begin : gen_srls
       for (j=0;((j<C_MAX_CTRL_FANOUT)&&(i*C_MAX_CTRL_FANOUT+j<C_FIFO_WIDTH));j=j+1) begin : gen_rep
-        axi_data_fifo_v2_1_9_ndeep_srl #
+        axi_data_fifo_v2_1_10_ndeep_srl #
           (
            .C_FAMILY  (C_FAMILY),
            .C_A_WIDTH (P_FIFO_DEPTH_LOG)
@@ -1131,7 +1131,7 @@ endmodule
 `default_nettype none
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_ndeep_srl #
+module axi_data_fifo_v2_1_10_ndeep_srl #
   (
    parameter         C_FAMILY  = "rtl", // FPGA Family
    parameter         C_A_WIDTH = 1          // Address Width (>= 1)
@@ -1279,7 +1279,7 @@ endmodule
 `timescale 1ps/1ps
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_data_fifo_v2_1_9_axi_data_fifo #
+module axi_data_fifo_v2_1_10_axi_data_fifo #
   (
    parameter         C_FAMILY                    = "virtex7",
    parameter integer C_AXI_PROTOCOL              = 0,
@@ -1519,7 +1519,7 @@ module axi_data_fifo_v2_1_9_axi_data_fifo #
       assign m_axi_wid = (C_AXI_PROTOCOL == P_AXI3) ? m_axi_wid_i : {C_AXI_ID_WIDTH{1'b0}};
 
 
-      fifo_generator_v13_1_2 #(
+      fifo_generator_v13_1_3 #(
           .C_INTERFACE_TYPE(2),
           .C_AXI_TYPE((C_AXI_PROTOCOL == P_AXI4) ? 1 : 3),
           .C_AXI_DATA_WIDTH(C_AXI_DATA_WIDTH),
