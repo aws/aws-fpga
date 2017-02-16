@@ -28,7 +28,7 @@ module test_xdma();
          desc_buf[i] = 'hAA;
        end
 
-       que_to_cl_ddr(0, 64'h100000, desc_buf);
+       que_to_cl_ddr(0, 64'h10000000, desc_buf);
 
        // DDR 1
        $display("[%t] : DMA buffer to DDR 1", $realtime);
@@ -37,7 +37,7 @@ module test_xdma();
          desc_buf[i] = 'hBB;
        end
    
-       que_to_cl_ddr(1, 64'h100100, desc_buf);
+       que_to_cl_ddr(0, 64'h10000100, desc_buf);
 
        // DDR 2
        $display("[%t] : DMA buffer to DDR 2", $realtime);
@@ -46,7 +46,7 @@ module test_xdma();
          desc_buf[i] = 'hCC;
        end
    
-       que_to_cl_ddr(2, 64'h100200, desc_buf);
+       que_to_cl_ddr(0, 64'h10000200, desc_buf);
 
        // DDR 3
        $display("[%t] : DMA buffer to DDR 3", $realtime);
@@ -55,12 +55,12 @@ module test_xdma();
          desc_buf[i] = 'hDD;
        end
    
-       que_to_cl_ddr(3, 64'h100300, desc_buf);
+       que_to_cl_ddr(0, 64'h10000300, desc_buf);
        
        // DDR 0
        $display("[%t] : DMA buffer from DDR 0", $realtime);
 
-       dma_from_cl_ddr(0, 64'h100000, desc_buf);
+       dma_from_cl_ddr(0, 64'h10000000, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hAA) begin
            $display("[%t] : *** ERROR *** DDR0 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
@@ -71,7 +71,7 @@ module test_xdma();
        // DDR 1
        $display("[%t] : DMA buffer from DDR 1", $realtime);
    
-       dma_from_cl_ddr(1, 64'h100100, desc_buf);
+       dma_from_cl_ddr(1, 64'h10000100, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hBB) begin
            $display("[%t] : *** ERROR *** DDR1 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
@@ -82,7 +82,7 @@ module test_xdma();
        // DDR 2
        $display("[%t] : DMA buffer from DDR 2", $realtime);
    
-       dma_from_cl_ddr(2, 64'h100200, desc_buf);
+       dma_from_cl_ddr(2, 64'h10000200, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hCC) begin
            $display("[%t] : *** ERROR *** DDR2 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
@@ -93,7 +93,7 @@ module test_xdma();
        // DDR 3
        $display("[%t] : DMA buffer from DDR 3", $realtime);
 
-       dma_from_cl_ddr(3, 64'h100300, desc_buf);
+       dma_from_cl_ddr(3, 64'h10000300, desc_buf);
        for (int i = 0 ; i<= 63 ; i++) begin
          if (desc_buf[i] !== 'hDD) begin
            $display("[%t] : *** ERROR *** DDR3 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
@@ -135,6 +135,7 @@ module test_xdma();
       tb.start_que_to_cl(chan);
 
       timeout_count = 0;
+      status = 0;
       
       #10ns;
       
