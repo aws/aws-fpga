@@ -88,9 +88,9 @@ You could call `sudo fpga-start-virtual-jtag -?` for further details on the avai
   
 
 <a name="connectToTarget"></a>
-# Connecting Xilinx Hardware Manager(Vivado Lab Edition) to the Debug Target FPGA-enabled EC2 Instance 
+# Connecting Xilinx Hardware Manager (Vivado Lab Edition) to the Debug Target FPGA-enabled EC2 Instance 
 
-The interactive debug can use Xilinx Hardware Manager(Vivado Lab Edition) running on the target instance (i.e. the F1 itself) or it can be running remotely on a different host. The TCP port on which the Virtual JTAG XVC Server is listening must be accessible to the host running Xilinx Hardware Management (See [FAQ](#faq) for configuring Linux firewall and AWS EC2 Network Security Groups). 
+The interactive debug can use Xilinx Hardware Manager (Vivado Lab Edition) running on the target instance (i.e. the F1 itself) or it can be running remotely on a different host. The TCP port on which the Virtual JTAG XVC Server is listening must be accessible to the host running Xilinx Hardware Management (See [FAQ](#faq) for configuring Linux firewall and AWS EC2 Network Security Groups). 
 
 To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the target, the following should be called on the machine hosting Vivado:
 
@@ -118,7 +118,7 @@ Vivado can now be used to debug your design.
 
 The connection Vivado and the target instance can be terminated by closing the XVC server from Vivado using the right click menu. If the target FPGA PCIe connection is lost, a new AFI is loaded or the Virtual JTAG Server application stops running, the connection to the FPGA and associated debug cores will also be lost. 
 
-**NOTE:** Xilinx Hardware Manager(Vivado Lab Edition) should not be connected to the target Virtual JTAG XVC Server when the AFI is not in READY state. If the AFI going to go through `fpga-clear-image` or `fpga-load-local-image`, Vivado should be disconnected, and the Virtual JTAG XVC Server should be terminated. (TBD - how to terminate)
+**NOTE:** Xilinx Hardware Manager (Vivado Lab Edition) should not be connected to the target Virtual JTAG XVC Server when the AFI is not in READY state. If the AFI going to go through `fpga-clear-image` or `fpga-load-local-image`, Vivado should be disconnected, and the Virtual JTAG XVC Server should be terminated. (TBD - how to terminate)
   
     
 <a name="faq"></a>
@@ -147,14 +147,14 @@ The connection Vivado and the target instance can be terminated by closing the X
 
 
 
-**Q: What are some of the best pratices I should be aware when working with Virtual JTAG?**
+**Q: What are some of the best practices I should be aware when working with Virtual JTAG?**
 
 
-**Q: Can other instances runningo on the same F1 server access the Virtual JTAG of my instance?**
+**Q: Can other instances running on the same F1 server access the Virtual JTAG of my instance?**
 
 
-**Q: What is XVC and where can i learn about it?""
+**Q: What is XVC and where can I learn about it?""
 
-Xilinc Virtual Cable (XVC) is a protocol for transfering JTAG commands over TCP/IP network connection between a debug tool (like Vivado Lab Edition Hardware Manager) and a debug target.
+Xilinc Virtual Cable (XVC) is a protocol for transferring JTAG commands over TCP/IP network connection between a debug tool (like Vivado Lab Edition Hardware Manager) and a debug target.
 
 The full specification for XVC version 1.0 is available [here](https://github.com/Xilinx/XilinxVirtualCable/blob/master/README_XVC_v1_0.txt).  
