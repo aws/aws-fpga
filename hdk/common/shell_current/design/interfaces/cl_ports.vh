@@ -107,7 +107,6 @@
    //
    //    x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in SH)
    //-----------------------------------------------------------------------------------------------
-`ifndef NO_CL_DDR
   ,
 // ------------------- DDR4 x72 RDIMM 2100 Interface A ----------------------------------
    input                CLK_300M_DIMM0_DP,
@@ -170,8 +169,6 @@
    inout  [17:0]        M_D_DQS_DN,
    output               cl_RST_DIMM_D_N
 
-`endif
-
    //-----------------------------------------------------------------------------
    // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
    // to the sh_ddr.sv for the DDR interfaces to function.
@@ -225,46 +222,6 @@
       
    input sh_cl_ddr_is_ready
 
-   `ifdef DDR_A_SH      //THIS IS NOT DEFINED
-      //------------------------------------------------------------------------------------------
-      // AXI4 Interface for DDRA (if in the SH)  This is an expermental mode for including
-      //    DDR_A in the SH.  
-      //------------------------------------------------------------------------------------------
-      ,
-      output [15:0] cl_sh_ddra_awid,
-      output [63:0] cl_sh_ddra_awaddr,
-      output [7:0] cl_sh_ddra_awlen,
-      output  cl_sh_ddra_awvalid,
-      input sh_cl_ddra_awready,
-         
-      output [15:0] cl_sh_ddra_wid,
-      output [511:0] cl_sh_ddra_wdata,
-      output [63:0] cl_sh_ddra_wstrb,
-      output  cl_sh_ddra_wlast,
-      output  cl_sh_ddra_wvalid,
-      input sh_cl_ddra_wready,
-         
-      input[15:0] sh_cl_ddra_bid,
-      input[1:0] sh_cl_ddra_bresp,
-      input sh_cl_ddra_bvalid,
-      output  cl_sh_ddra_bready,
-         
-      output [15:0] cl_sh_ddra_arid,
-      output [63:0] cl_sh_ddra_araddr,
-      output [7:0] cl_sh_ddra_arlen,
-      output  cl_sh_ddra_arvalid,
-      input sh_cl_ddra_arready,
-         
-      input[15:0] sh_cl_ddra_rid,
-      input[511:0] sh_cl_ddra_rdata,
-      input[1:0] sh_cl_ddra_rresp,
-      input sh_cl_ddra_rlast,
-      input sh_cl_ddra_rvalid,
-      output  cl_sh_ddra_rready,
-         
-      input sh_cl_ddra_is_ready
-   `endif
-                                                                                                    
    //---------------------------------------------------------------------------------------
    // The user-defined interrupts.  These map to MSI-X vectors through mapping in the SH.
    //---------------------------------------------------------------------------------------
@@ -405,51 +362,9 @@
                                                                                                                                
    input sh_bar1_rready           
 
-
-`ifdef HMC_PRESENT
-   //-----------------------------------------------------------------
-   // HMC Interface
-   //-----------------------------------------------------------------
-   ,
-   input                       dev01_refclk_p ,
-   input                       dev01_refclk_n ,
-   input                       dev23_refclk_p ,
-   input                       dev23_refclk_n ,
-                               
-                               /* HMC0 interface */ 
-   output wire                 hmc0_dev_p_rst_n ,
-   input wire                  hmc0_rxps ,
-   output wire                 hmc0_txps ,
-   output wire [7 : 0]         hmc0_txp ,
-   output wire [7 : 0]         hmc0_txn ,
-   input wire [7 : 0]          hmc0_rxp ,
-   input wire [7 : 0]          hmc0_rxn ,
-                               /* HMC1 interface */ 
-   output wire                 hmc1_dev_p_rst_n ,
-   input wire                  hmc1_rxps ,
-   output wire                 hmc1_txps ,
-   output wire [7 : 0]         hmc1_txp ,
-   output wire [7 : 0]         hmc1_txn ,
-   input wire [7 : 0]          hmc1_rxp ,
-   input wire [7 : 0]          hmc1_rxn ,
-                               /* HMC2 interface */ 
-   output wire                 hmc2_dev_p_rst_n ,
-   input wire                  hmc2_rxps ,
-   output wire                 hmc2_txps ,
-   output wire [7 : 0]         hmc2_txp ,
-   output wire [7 : 0]         hmc2_txn ,
-   input wire [7 : 0]          hmc2_rxp ,
-   input wire [7 : 0]          hmc2_rxn ,
-                               /* HMC3 interface */ 
-   output wire                 hmc3_dev_p_rst_n ,
-   input wire                  hmc3_rxps ,
-   output wire                 hmc3_txps ,
-   output wire [7 : 0]         hmc3_txp ,
-   output wire [7 : 0]         hmc3_txn ,
-   input wire [7 : 0]          hmc3_rxp ,
-   input wire [7 : 0]          hmc3_rxn
-`endif
-
+   //------------------------------------------------------
+   // Reserved interfaces
+   //------------------------------------------------------
    ,
    input                      hmc_iic_scl_i,
    output logic               hmc_iic_scl_o,
@@ -469,32 +384,6 @@
    output logic[7:0]          hmc_sh_stat_int
 
 
-
-   //-------------------------------------------------------------------------------------
-   // Serial GTY interface
-   //    AXI-Stream interface to send/receive packets to/from Serial interfaces.
-   //    This interface TBD.
-   //-------------------------------------------------------------------------------------
-   //
-   //------------------------------------------------------
-   // Aurora Interface from CL (AXI-S)
-   //------------------------------------------------------
-`ifdef AURORA
-    ,
-   //-------------------------------
-   // GTY
-   //-------------------------------
-   output [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-   input [NUM_GTY-1:0]         gty_refclk_p,
-   input [NUM_GTY-1:0]         gty_refclk_n,
-   
-   input [(NUM_GTY*4)-1:0]     gty_txp,
-   input [(NUM_GTY*4)-1:0]     gty_txn,
-
-   input [(NUM_GTY*4)-1:0]     gty_rxp,
-   input [(NUM_GTY*4)-1:0]     gty_rxn
-`endif //  `ifdef AURORA
-
    ,
    input [7:0] sh_aurora_stat_addr,
    input sh_aurora_stat_wr, 
@@ -507,7 +396,6 @@
    //--------------------------------
    // Debug bridge
    //--------------------------------
-`ifndef DISABLE_CHIPSCOPE_DEBUG
    ,
    input drck,
    input shift,
@@ -521,9 +409,6 @@
    input reset,
    input capture,
    output logic[31:0] bscanid
-`endif
-
-
 
 
 
