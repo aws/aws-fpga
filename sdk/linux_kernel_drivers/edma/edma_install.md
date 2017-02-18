@@ -1,5 +1,5 @@
 
-# EDMA Installation and Frequently Asked Questions
+# Enhanced DMA (EDMA) Installation and Frequently Asked Questions
 
 EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined interrupts for AWS FPGAs. Please see [EDMA README](./edma_README.md) for details.
 
