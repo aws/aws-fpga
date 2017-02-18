@@ -6,7 +6,7 @@ At the hardware level, these interrupts are defined in [AWS Shell Interface Spec
 
 ## User-defined interrupts relies on EDMA driver
 
-From the software perspective, AWS provides EDMA, a reference Linux kernel driver, a shared driver between the interrupts and the DMA. EDMA is responsbile for:
+From the software perspective, AWS provides Elastic DMA (EDMA), a reference Linux kernel driver, a shared driver between the interrupts and the DMA. EDMA is responsible for:
 
 i) Initialization of the interrupt logic in the Shell to map user interrupts to MSI-X interrupts of the PCIe AppPF
 
@@ -77,6 +77,7 @@ To stop all the interrupts/events, one should disable the toggling of interrupt 
 **Q: How can I mask an interrupt/event?**
 
 There are three options to mask an interrupt/event:
+
 i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle and the kernel EDMA driver will get invoked; but the application in Linux userspace will not see it.
 
 ii) Call close() for all the file-descriptors associated with the specification interrupt/event, the EDMA driver will mask the interrupt
