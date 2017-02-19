@@ -13,8 +13,8 @@
 | Virt. DIP Sw     |   	 Used  	 | Not Used  |
 | [Virt. JTAG](../../docs/Virtual_JTAG_XVC.md)          |   	Not used     | Used 	|
 | Clocks used |    1 clock   |  2 clocks |
-| PCI VenID	|   	0x150D (Amazon)  	|  0x150F (Amazon)   	|
-| PCI DevID	|   	  	|   	|
+| PCI Vendor ID	|   	0x150F (Amazon)  	|  0x150F (Amazon)   	|
+| PCI Device ID	|   	  	|   	|
 |_***Software***_|  |  |
 | [fpga_pci lib](../../../sdk/userspace/include/fpga_pci.h)	|   	Used  	|  Used 	|
 | [fpga_mgmt lib](../../../sdk/userspace/include/fpga_mgmt.h)	|   	Used  	|  Used 	|
