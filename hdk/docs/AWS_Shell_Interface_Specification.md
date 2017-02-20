@@ -52,7 +52,7 @@ New shell versions will require updated CL implementation and regenerating the A
   
 ## Conventions
   
-**CL –** Custom’s Logic: the Logic to be provided by the developer and integrated with AWS Shell.
+**CL –** Custom Logic: the Logic to be provided by the developer and integrated with AWS Shell.
 
 **DW –** Doubleword: referring to 4-byte (32-bit) data size.
 
@@ -277,7 +277,7 @@ The following PCIe interface configuration parameters are provided from the Shel
     -   3’b100 – 2048 Byte
     -   3’b101 – 4096 Byte
 
-The PCIe CL to Shell AXI-4 interfaces **MUST** implement “USER” bits on the address channels (`AxUSER[18:0]`).
+The PCIM CL to Shell AXI-4 interfaces **MUST** implement “USER” bits on the address channels (`AxUSER[18:0]`).
 
 -   AxUSER[10:0] – DW length of the request. This is 1-based (0: zero DW, 1: one DW, 2: two DW, etc…).
 -   AxUSER[14:11] – First DW's Byte enable for the Request.
