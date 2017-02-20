@@ -182,7 +182,7 @@ The connection Vivado and the target instance can be terminated by closing the X
 **Q: Can other instances running on the same F1 server access the Virtual JTAG of my instance?**
 
 
-**Q: What is XVC and where can I learn about it?""
+**Q: What is XVC and where can I learn about it?**
 
 Xilinc Virtual Cable (XVC) is a protocol for transferring JTAG commands over TCP/IP network connection between a debug tool (like Vivado Lab Edition Hardware Manager) and a debug target.
 
