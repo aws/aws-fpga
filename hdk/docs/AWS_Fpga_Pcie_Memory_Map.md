@@ -6,7 +6,7 @@ This document describes the actual size and attributes of each one of the BARs, 
 
 Even though all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O (MMIO) space, they need to be mapped to Linux kernel or userspace application before accessing them. Please refer to the [Software Programmer's View](./Programmers_View.md) on how the various software pieces can interact with the FPGA PCIe Memory.
 
-## Memory map
+## Memory map per Slot
 ```
 --- FPGA Slot X  
   |----- AppPF  
