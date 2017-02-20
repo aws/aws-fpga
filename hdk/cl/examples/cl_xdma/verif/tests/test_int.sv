@@ -32,7 +32,7 @@ module test_int();
 
       // Check all combinations of one or two interrupts
       for (logic [7:0] vector_num = 8'h00; vector_num < 8'h10; vector_num = vector_num + 8'h01) begin
-         for (logic [7:0] vector_num2 = 8'h00; vector_num2 < 8'h10; vector_num2 = vector_num2 + 8'h01) begin
+         for (logic [7:0] vector_num2 = 8'h00; vector_num2 < 8'h01; vector_num2 = vector_num2 + 8'h01) begin
 
             if (vector_num !== vector_num2) begin
                $display("[%t] : Programming cl_int_tst to trigger interrupt vectors %2d and %2d", $realtime, vector_num, vector_num2);
