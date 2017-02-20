@@ -1,3 +1,4 @@
+# AWS Shell Interface Specification
 
 ## Revision History
 
@@ -5,21 +6,26 @@
 
 2016/12/06   -   Added capability to remove DDR controllers in the CL through parameters in `sh_ddr.sv`
 
-2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Emulated LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details
+2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Emulated LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details)
                           
   
 # Table of Content:
 
-1. Overview(#overview)
+1. [Overview](#overview)
 
-2. EC2 Instance view of FPGA PCIe(#pciPresentation)
+2. [EC2 Instance view of FPGA PCIe](#pciPresentation)
 
-3. Clocks and Reset(#ClocksNReset)
+3. [Clocks and Reset](#ClocksNReset)
 
-4. Shell/CL Interfaces(#ShellInterface)
-  4.1 Interrupts(#interrupts)
-  4.2 DDR4 DRAM Interfaces(#ddr)
-  4.3 Miscellanous Interfaces (vLED, vDIP..)(#misc)
+4. [Shell/CL Interfaces](#ShellInterface)
+
+  4.1 [Interrupts](#interrupts)
+  
+  4.2 [DDR4 DRAM Interfaces](#ddr)
+  
+  4.3 [Miscellanous Interfaces (vLED, vDIP)](#misc)
+  
+  
 
 # Overview<a name="overview"></a>
 
@@ -96,7 +102,7 @@ For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfa
 
 ## External Memory Interfaces implemented in CL
 
-Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usuable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
+Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
 
 There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. A design block (sh_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
 
@@ -128,7 +134,7 @@ There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
 -   Application PF (AppPF)– The AppPF is used for CL specific functionality.
 
-The [Software Programmers' View](./Programmers_View.md) provides the intended software programmer's view and associated software modules and libraries around the two beforementioned PFs. 
+The [Software Programmers' View](./Programmers_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs. 
 
 Please refer to [PCI Address map](AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
@@ -203,7 +209,7 @@ The maximum frequency on clk_main_a0 is 250MHz.
 
 ### Defining Clock frequencies by Developer
 
-There Developer can select among a set of available frequencies, provided in the table below. The target frequencies must defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registeration API.
+There Developer can select among a set of available frequencies, provided in the table below. The target frequencies must defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.
 
  .  **FIXME NEED TO PUT TABLE OF FREQUENCIES**
 
@@ -249,7 +255,7 @@ It is a 512-bit wide AXI-4 interface.
 
 A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by the AFI Management Tools metric.
 
-If DMA is enabled this interface also has DMA traffic targetting the CL.
+If DMA is enabled this interface also has DMA traffic targeting the CL.
 
 ### AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)  -- PCIM interface
 
@@ -310,14 +316,14 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 -   Illegal ARID; i.e ARID is already been used for an outstanding read transaction.
 
-**NOTE** Pre-GA versions of the Shell and the FPGA Magagement tools may not have some of these checks and associated metrics exposed to the developers.
+**NOTE** Pre-GA versions of the Shell and the FPGA Management tools may not have some of these checks and associated metrics exposed to the developers.
 
 
 ## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)
 
-There are three AXI-L master interfaces (Shell is master) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this info mutliple interfaces allows for different software entities to have a control interface into the CL:
+There are three AXI-L master interfaces (Shell is master) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this info multiple interfaces allows for different software entities to have a control interface into the CL:
 
--   SDA AXI-L: Associated with MmgtPF, BAR4.  If the developer is using AWS OpenCL runtime Lib (As in SDAccel case), this interface will be used for performance monitors etc.
+-   SDA AXI-L: Associated with MgmtPF, BAR4.  If the developer is using AWS OpenCL runtime Lib (As in SDAccel case), this interface will be used for performance monitors etc.
 -   OCL AXI-L: Associated with AppPF, BAR0. If the developer is using AWS OpenCL runtime lib(As in SDAccel case), this interface will be used for openCL Kernel access
 -   BAR1 AXI-L: Associated with AppPF, BAR1.
 
@@ -399,14 +405,14 @@ The functionality of these signals is TBD.
 
 ### Virtual LED/DIP
 
-There are virtual LED/DIP swtiches that can be used to control/monitor CL logic.  There are 16 LEDs and 16 DIP Switches.  Registers exposed to the Management PF are used to control/monitor the LED/DIP Switches.
+There are virtual LED/DIP switches that can be used to control/monitor CL logic.  There are 16 LEDs and 16 DIP Switches.  Registers exposed to the Management PF are used to control/monitor the LED/DIP Switches.
 
 vLED - There are 16 virtual LEDs that can be driven from the CL logic to the SH (cl_sh_status_vled[15:0]).  The value of these signals can be read by S/W in the Instance.  An API is also provided through AWS Management Software.
 
-vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic (sh_cl_status_vdip[15:0]).  These can be used to control logic in the CL.  The value of these signals can be written/read by S/W in the Intsance.  An API is also provided through AWS Management Software.
+vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic (sh_cl_status_vdip[15:0]).  These can be used to control logic in the CL.  The value of these signals can be written/read by S/W in the instance.  An API is also provided through AWS Management Software.
 
 ### DMA
 
-There is an integraged DMA controller inside the Shell.  The DMA controller can perform efficient bulk data moves between the Instance and the CL logic.  Please refer to ??? for more information on the integrated DMA controller.
+There is an integrated DMA controller inside the Shell.  The DMA controller can perform efficient bulk data moves between the Instance and the CL logic.  Please refer to TBD for more information on the integrated DMA controller.
 
 
