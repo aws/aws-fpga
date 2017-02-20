@@ -58,46 +58,48 @@
    //    NOTE: awuser pins have critical functionality and developer must read the detailed
    //    functional definitions of these pins
    //-------------------------------------------------------------------------------------------
-   output logic[15:0] cl_sh_pcim_awid[NUM_PCIE-1:0],
-   output logic[63:0] cl_sh_pcim_awaddr[NUM_PCIE-1:0],
-   output logic[7:0] cl_sh_pcim_awlen[NUM_PCIE-1:0],
-   output logic[18:0] cl_sh_pcim_awuser[NUM_PCIE-1:0],               //10:0 Length in DW of the transaction
+   output logic[15:0] cl_sh_pcim_awid,
+   output logic[63:0] cl_sh_pcim_awaddr,
+   output logic[7:0] cl_sh_pcim_awlen,
+   output logic[2:0] cl_sh_pcim_awsize,
+   output logic[18:0] cl_sh_pcim_awuser,                             //10:0 Length in DW of the transaction
                                                                      //14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable, i.e. not masked)
                                                                      //18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable, i.e. not masked)
 
 								
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_awvalid,
-   input[NUM_PCIE-1:0] sh_cl_pcim_awready,
+   output logic cl_sh_pcim_awvalid,
+   input sh_cl_pcim_awready,
    
-   output logic[511:0] cl_sh_pcim_wdata[NUM_PCIE-1:0],
-   output logic[63:0] cl_sh_pcim_wstrb[NUM_PCIE-1:0],
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_wlast,
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_wvalid,
-   input[NUM_PCIE-1:0] sh_cl_pcim_wready,
+   output logic[511:0] cl_sh_pcim_wdata,
+   output logic[63:0] cl_sh_pcim_wstrb,
+   output logic cl_sh_pcim_wlast,
+   output logic cl_sh_pcim_wvalid,
+   input sh_cl_pcim_wready,
    
-   input logic[15:0] sh_cl_pcim_bid[NUM_PCIE-1:0],
-   input logic[1:0] sh_cl_pcim_bresp[NUM_PCIE-1:0],
-   input logic[NUM_PCIE-1:0] sh_cl_pcim_bvalid,
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_bready,
+   input logic[15:0] sh_cl_pcim_bid,
+   input logic[1:0] sh_cl_pcim_bresp,
+   input logic sh_cl_pcim_bvalid,
+   output logic cl_sh_pcim_bready,
   
-   output logic[15:0] cl_sh_pcim_arid[NUM_PCIE-1:0],		            //Note max 32 outstanding txns are supported, width is larger to allow bits for AXI fabrics
-   output logic[63:0] cl_sh_pcim_araddr[NUM_PCIE-1:0],
-   output logic[7:0] cl_sh_pcim_arlen[NUM_PCIE-1:0],
-   output logic[18:0] cl_sh_pcim_aruser[NUM_PCIE-1:0],               // 10:0 Length in DW of the transaction
+   output logic[15:0] cl_sh_pcim_arid,		                           //Note max 32 outstanding txns are supported, width is larger to allow bits for AXI fabrics
+   output logic[63:0] cl_sh_pcim_araddr,
+   output logic[7:0] cl_sh_pcim_arlen,
+   output logic[2:0] cl_sh_pcim_arsize,
+   output logic[18:0] cl_sh_pcim_aruser,                             // 10:0 Length in DW of the transaction
                                                                      // 18:11 Must be set to 0xFF, could be ignored in next release
 
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_arvalid,
-   input[NUM_PCIE-1:0] sh_cl_pcim_arready,
+   output logic cl_sh_pcim_arvalid,
+   input sh_cl_pcim_arready,
    
-   input[15:0] sh_cl_pcim_rid[NUM_PCIE-1:0],
-   input[511:0] sh_cl_pcim_rdata[NUM_PCIE-1:0],
-   input[1:0] sh_cl_pcim_rresp[NUM_PCIE-1:0],
-   input[NUM_PCIE-1:0] sh_cl_pcim_rlast,
-   input[NUM_PCIE-1:0] sh_cl_pcim_rvalid,
-   output logic[NUM_PCIE-1:0] cl_sh_pcim_rready,
+   input[15:0] sh_cl_pcim_rid,
+   input[511:0] sh_cl_pcim_rdata,
+   input[1:0] sh_cl_pcim_rresp,
+   input sh_cl_pcim_rlast,
+   input sh_cl_pcim_rvalid,
+   output logic cl_sh_pcim_rready,
 
-   input[1:0] cfg_max_payload[NUM_PCIE-1:0],                      //Max payload size - 00:128B, 01:256B, 10:512B
-   input[2:0] cfg_max_read_req[NUM_PCIE-1:0]                      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   input[1:0] cfg_max_payload,                                    //Max payload size - 00:128B, 01:256B, 10:512B
+   input[2:0] cfg_max_read_req                                    //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
    
    //-----------------------------------------------------------------------------------------------
@@ -191,6 +193,7 @@
    output [15:0] cl_sh_ddr_awid,
    output [63:0] cl_sh_ddr_awaddr,
    output [7:0] cl_sh_ddr_awlen,
+   output [2:0] cl_sh_ddr_awsize,
    output  cl_sh_ddr_awvalid,
    input sh_cl_ddr_awready,
       
@@ -209,6 +212,7 @@
    output [15:0] cl_sh_ddr_arid,
    output [63:0] cl_sh_ddr_araddr,
    output [7:0] cl_sh_ddr_arlen,
+   output [2:0] cl_sh_ddr_arsize,
    output  cl_sh_ddr_arvalid,
    input sh_cl_ddr_arready,
       
@@ -275,6 +279,7 @@
    input[5:0] sh_cl_dma_pcis_awid,
    input[63:0] sh_cl_dma_pcis_awaddr,
    input[7:0] sh_cl_dma_pcis_awlen,
+   input[2:0] sh_cl_dma_pcis_awsize,
    input sh_cl_dma_pcis_awvalid,
    output logic cl_sh_dma_pcis_awready,
 
@@ -292,6 +297,7 @@
    input[5:0] sh_cl_dma_pcis_arid,
    input[63:0] sh_cl_dma_pcis_araddr,
    input[7:0] sh_cl_dma_pcis_arlen,
+   input[2:0] sh_cl_dma_pcis_arsize,
    input sh_cl_dma_pcis_arvalid,
    output logic cl_sh_dma_pcis_arready,
 
@@ -341,61 +347,61 @@
    // This would connect automatically to the required logic 
    // if the CL is created through SDAccel flow   
    //------------------------------------------------------------------------------------------
-   input sh_ocl_awvalid,                                                                                                
-   input[31:0] sh_ocl_awaddr,                                                                                           
-   output logic ocl_sh_awready,                                                                                                       
+   input sh_ocl_awvalid,
+   input[31:0] sh_ocl_awaddr,
+   output logic ocl_sh_awready,
                                                                                                                                
    //Write data                                                                                                                
-   input sh_ocl_wvalid,                                                                                                 
-   input[31:0] sh_ocl_wdata,                                                                                            
-   input[3:0] sh_ocl_wstrb,                                                                                             
-   output logic ocl_sh_wready,                                                                                                        
+   input sh_ocl_wvalid,
+   input[31:0] sh_ocl_wdata,
+   input[3:0] sh_ocl_wstrb,
+   output logic ocl_sh_wready,
                                                                                                                                
    //Write response                                                                                                            
-   output logic ocl_sh_bvalid,                                                                                                        
-   output logic[1:0] ocl_sh_bresp,                                                                                                    
-   input sh_ocl_bready,                                                                                                 
+   output logic ocl_sh_bvalid,
+   output logic[1:0] ocl_sh_bresp,
+   input sh_ocl_bready,
                                                                                                                                
    //Read address                                                                                                              
-   input sh_ocl_arvalid,                                                                                                
-   input[31:0] sh_ocl_araddr,                                                                                           
-   output logic ocl_sh_arready,                                                                                                       
+   input sh_ocl_arvalid,
+   input[31:0] sh_ocl_araddr,
+   output logic ocl_sh_arready,
                                                                                                                                
    //Read data/response                                                                                                        
-   output logic ocl_sh_rvalid,                                                                                                        
-   output logic[31:0] ocl_sh_rdata,                                                                                                   
-   output logic[1:0] ocl_sh_rresp,                                                                                                    
+   output logic ocl_sh_rvalid,
+   output logic[31:0] ocl_sh_rdata,
+   output logic[1:0] ocl_sh_rresp,
                                                                                                                                
-   input sh_ocl_rready,           
+   input sh_ocl_rready,
 
    //------------------------------------------------------------------------------------------
    // AXI-L maps to any inbound PCIe access through AppPF BAR1
-   // For example, this AXI-L interface can connect to the control port of a DMA engine
+   // For example,
    //------------------------------------------------------------------------------------------
-   input sh_bar1_awvalid,                                                                                                
-   input[31:0] sh_bar1_awaddr,                                                                                           
-   output logic bar1_sh_awready,                                                                                                       
+   input sh_bar1_awvalid,
+   input[31:0] sh_bar1_awaddr,
+   output logic bar1_sh_awready,
                                                                                                                                
    //Write data                                                                                                                
-   input sh_bar1_wvalid,                                                                                                 
-   input[31:0] sh_bar1_wdata,                                                                                            
-   input[3:0] sh_bar1_wstrb,                                                                                             
-   output logic bar1_sh_wready,                                                                                                        
+   input sh_bar1_wvalid,
+   input[31:0] sh_bar1_wdata,
+   input[3:0] sh_bar1_wstrb,
+   output logic bar1_sh_wready,
                                                                                                                                
    //Write response                                                                                                            
-   output logic bar1_sh_bvalid,                                                                                                        
-   output logic[1:0] bar1_sh_bresp,                                                                                                    
-   input sh_bar1_bready,                                                                                                 
+   output logic bar1_sh_bvalid,
+   output logic[1:0] bar1_sh_bresp,
+   input sh_bar1_bready,
                                                                                                                                
    //Read address                                                                                                              
-   input sh_bar1_arvalid,                                                                                                
-   input[31:0] sh_bar1_araddr,                                                                                           
-   output logic bar1_sh_arready,                                                                                                       
+   input sh_bar1_arvalid,
+   input[31:0] sh_bar1_araddr,
+   output logic bar1_sh_arready,
                                                                                                                                
    //Read data/response                                                                                                        
-   output logic bar1_sh_rvalid,                                                                                                        
-   output logic[31:0] bar1_sh_rdata,                                                                                                   
-   output logic[1:0] bar1_sh_rresp,                                                                                                    
+   output logic bar1_sh_rvalid,
+   output logic[31:0] bar1_sh_rdata,
+   output logic[1:0] bar1_sh_rresp,
                                                                                                                                
    input sh_bar1_rready           
 

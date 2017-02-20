@@ -3,7 +3,7 @@
 // All Rights Reserved Worldwide.
 // =============================================================================
 
-module test_xdma();
+module test_dram_dma();
 
     int            error_count;
     int            fail;
@@ -11,12 +11,20 @@ module test_xdma();
     initial begin
 
        logic [7:0] desc_buf [];
+       logic [63:0] base_addr = 64'h0000_0000_0000_0000;
 
        tb.sh.power_up();
        tb.sh.delay(500);
        tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
        tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
        tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
+
+       //tb.sh.poke(.addr(base_addr + 64'h000), .data(32'h00000000));
+       //Forcing cfg_atg_enable for now, once we have AXI_L interface we will
+       //do a config write
+       
+       tb.CL.gen_ddr_tst[0].genblk1.CL_TST_DDR.CL_TST.cfg_atg_enable = 0;
+
        tb.sh.delay(25000);
 
        // DDR 0
@@ -179,5 +187,5 @@ module test_xdma();
         tb.data_cl_to_buffer(chan, data);
    endtask
 
-endmodule // test_xdma
+endmodule // test_dram_dma
    

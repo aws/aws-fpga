@@ -20,8 +20,8 @@ module tb();
    logic rst_xtra_n;
    logic [1:0] sh_cl_pwr_state;
 
-   logic [1:0] cfg_max_payload[NUM_PCIE-1:0];               //Max payload size - 00:128B, 01:256B, 10:512B
-   logic [2:0] cfg_max_read_req[NUM_PCIE-1:0];              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   logic [1:0] cfg_max_payload ;               //Max payload size - 00:128B, 01:256B, 10:512B
+   logic [2:0] cfg_max_read_req;              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
 
    logic [31:0] sh_cl_ctl0;
    logic [31:0] sh_cl_ctl1;
@@ -37,34 +37,34 @@ module tb();
    //-------------------------------------
    // PCIe Master interface from CL
    //-------------------------------------
-   logic [15:0]          cl_sh_pcim_awid[NUM_PCIE-1:0];
-   logic [63:0]         cl_sh_pcim_awaddr[NUM_PCIE-1:0];
-   logic [7:0]          cl_sh_pcim_awlen[NUM_PCIE-1:0];
-   logic [18:0]         cl_sh_pcim_awuser[NUM_PCIE-1:0];
+   logic [15:0]          cl_sh_pcim_awid;
+   logic [63:0]         cl_sh_pcim_awaddr;
+   logic [7:0]          cl_sh_pcim_awlen;
+   logic [18:0]         cl_sh_pcim_awuser;
    logic [NUM_PCIE-1:0] cl_sh_pcim_awvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_awready;
    
-   logic [511:0]        cl_sh_pcim_wdata[NUM_PCIE-1:0];
-   logic [63:0]         cl_sh_pcim_wstrb[NUM_PCIE-1:0];
+   logic [511:0]        cl_sh_pcim_wdata;
+   logic [63:0]         cl_sh_pcim_wstrb;
    logic [NUM_PCIE-1:0] cl_sh_pcim_wlast;
    logic [NUM_PCIE-1:0] cl_sh_pcim_wvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_wready;
    
-   logic [15:0]          sh_cl_pcim_bid[NUM_PCIE-1:0];
-   logic [1:0]          sh_cl_pcim_bresp[NUM_PCIE-1:0];
+   logic [15:0]          sh_cl_pcim_bid;
+   logic [1:0]          sh_cl_pcim_bresp;
    logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcim_bready;
    
-   logic [15:0]          cl_sh_pcim_arid[NUM_PCIE-1:0];
-   logic [63:0]         cl_sh_pcim_araddr[NUM_PCIE-1:0];
-   logic [7:0]          cl_sh_pcim_arlen[NUM_PCIE-1:0];
-   logic [18:0]         cl_sh_pcim_aruser[NUM_PCIE-1:0];
+   logic [15:0]          cl_sh_pcim_arid ;
+   logic [63:0]         cl_sh_pcim_araddr;
+   logic [7:0]          cl_sh_pcim_arlen ;
+   logic [18:0]         cl_sh_pcim_aruser;
    logic [NUM_PCIE-1:0] cl_sh_pcim_arvalid;
    logic [NUM_PCIE-1:0] sh_cl_pcim_arready;
    
-   logic [15:0]          sh_cl_pcim_rid[NUM_PCIE-1:0];
-   logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0];
-   logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0];
+   logic [15:0]          sh_cl_pcim_rid ;
+   logic [511:0]        sh_cl_pcim_rdata;
+   logic [1:0]          sh_cl_pcim_rresp;
    logic [NUM_PCIE-1:0] sh_cl_pcim_rlast;
    logic [NUM_PCIE-1:0] sh_cl_pcim_rvalid;
    logic [NUM_PCIE-1:0] cl_sh_pcim_rready;
@@ -515,7 +515,7 @@ sh_bfm sh(
           );
 
 `ifndef CL_NAME
- `define CL_NAME cl_simple
+ `define CL_NAME cl_dram_dma
 `endif
 
 
