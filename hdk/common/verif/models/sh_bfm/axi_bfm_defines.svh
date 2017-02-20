@@ -3,8 +3,8 @@
 // All Rights Reserved Worldwide.
 // =============================================================================
 
-`ifndef AXI_DEFINES
-`define AXI_DEFINES
+`ifndef AXI_BFM_DEFINES
+`define AXI_BFM_DEFINES
 
 typedef struct {
    logic [63:0] addr;
