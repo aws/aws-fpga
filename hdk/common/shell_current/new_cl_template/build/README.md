@@ -5,7 +5,7 @@
 
 Once the developer has a functional design, the next steps are to: synthesize the design into basic FPGA cells, perform place-and-route, and check that the design meets the timing/frequency constraints. This could be an iterative process. Upon success, the developer will need to pass the output of the flow to AWS for final AFI creation.
 
-The developer needs to transfer to AWS the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document). The DCP includes the complete developer design that meets timing/frequency constraints, placement boundraries within the allocated CL area on the FPGA, and the functional requirements laid out in the Shell Interface Specification file.
+The developer needs to transfer to AWS the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document). The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries  within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#overview).
 
 To assist in this process, AWS provides a reference DCP that includes the shell (SH) logic with a black-boxed CL under: `$HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
 
@@ -13,21 +13,17 @@ AWS also provides out-of-the-box scripts that compile a few examples like `CL_si
 
 Advanced developers can use different scripts, tools, and techniques (e.g., regioning),  with the  condition that they submit "encrypted placed-and-routed design checkpoints", that pass final checks that are included in the build scripts.  (TBD - final_check_dcp).
 
-The following section covers the step-by-step procedure. Some of these steps can be modified or adjusted based on developer experience and design needs. 
-
 ## Build Procedure
-   
-Overview: A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` to check the environment, setup the build directory and invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL) that AWS will ingest through the CreateFpgaImage EC2 API.
 
-Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
+The following describes the step-by-step procedure to build developer CLs. Some of these steps can be modified or adjusted based on developer experience and design needs. 
 
-Steps: 
+A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` to check the environment, setup the build directory and invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL) that AWS will ingest through the CreateFpgaImage EC2 API. Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
 
 ### 1) Pre-requisite: Environment Variables and Tools
 
  1. The environment variable `HDK_SHELL_DIR` should have been set. This is usually done by executing `source hdk_setup.sh` from the HDK root directory
  2. The environment variable `CL_DIR` should have been set pointing to the root directory where the CL exists. The CL root directory should have the `/build` and `/design` subdirectories. One way to make sure to have the right directory is to execute `source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh`
- 3. Developer have Xilinx Vivado tools installed, with the supported version by the HDK, and with proper license. If the developer is using AWS supplied [FPGA Development AMI](https//aws.amazon.com/marketplace/AmazonFPGAAmi) from AWS marketplace, it includes the README.md how to setup up the tools and license.  
+ 3. Developer have Xilinx Vivado tools installed, with the supported version by the HDK, and with proper license. If the developer is using AWS supplied [FPGA Development AMI](https://aws.amazon.com/marketplace/AmazonFPGAAmi) from AWS marketplace, it includes the README.md how to setup up the tools and license.  
 
 ### 2) Encrypt Source Files
 
@@ -49,7 +45,7 @@ Run the build from the `$CL_DIR/build/scripts` directory as follows:
 This performs:
  - Synthesis of CL.
  - Implementation of CL with AWS Shell.
- - Generates design checkpoint for AWS ingestion and associated logs.
+ - Generates design checkpoint for AWS ingestion with the associated logs.
   
 To aid developers in build verification, there is a final step in the build script that emulates 
 the process that AWS uses to generate bitstreams from a developer DCP.
@@ -63,10 +59,10 @@ The outputs are:
 
 A developer may need to iterate multiple times through this process until arriving upon an error-free run.
 
-### 6) Submit your DCP to AWS to register the AFI
+### 5) Submit your DCP to AWS to register the AFI
 
 To submit the DCP, create an S3 bucket for submitting the design and upload the tar-zipped archive into that bucket. 
-You need to prepare the following information:
+You will need to prepare the following information:
 
 1. Name of the logic design.
 2. Generic description of the logic design.
@@ -92,16 +88,16 @@ To create an AFI from the generated DCP, you need to execute the `aws ec2 create
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
 
 The output of this command includes two identifiers that refer to your AFI:
-- FPGA Image Identifier or AFI ID: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs. 
+- Amazon FPGA Image Identifier or AFI ID: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs. 
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
     An example AFI ID is `afi-01234567890abcdef`. 
-- Glogal FPGA Image Identifier or AGFI ID: this is a global ID that is used to refer to an AFI from within an F1 instance.
+- Amazon Global FPGA Image Identifier or AGFI ID: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
-    Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup. 
-    An example AFI ID is `agfi-01234567890abcdef`.
+    Since the AGFI IDs are global identifiers, you can copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup. 
+    An example AGFI ID is `agfi-01234567890abcdef`.
 
 After the AFI generation is complete, AWS will put the AFI generation logs into the bucket location provided by the developer and notify them
-by email.
+by email using Amazon Simple Notification Service (Amazon SNS).
 
 **NOTE**: Preview-program customers without access to the AWS CLI EC2 action `create-fpga-image` should instead follow the instructions [here](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#method-2-during-f1-preview-and-before-aws-ec2-cli-action-create-fpga-image-is-available).  
 
@@ -110,7 +106,7 @@ by email.
 
 
 ## Advanced Notes
-   - The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, regioning) to the flow.
+   - The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, rejoining) to the flow.
    - Developers are free to modify the flow, but the final output must be a combined (AWS Shell + CL), encrypted, placed-and-routed design checkpoint.
 
 # Frequently Asked Questions

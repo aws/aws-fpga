@@ -8,6 +8,7 @@
 
 +libext+.v
 +libext+.sv
++libext+.svh
 
 -y ${CL_ROOT}/design
 -y ${SH_LIB_DIR}
@@ -16,6 +17,7 @@
 +incdir+${CL_ROOT}/verif/sv
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
++incdir+${HDK_COMMON_DIR}/verif/include
 
 ${CL_ROOT}/design/cl_simple_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv

@@ -20,3 +20,4 @@ set_clock_groups -asynchronous -group [get_clocks clk_out] -group [get_clocks CL
 
 set_clock_groups -asynchronous -group [get_clocks clk_out] -group [get_clocks mmcm_clkout0*]
 
+set_false_path -through [get_pins CL/rst_n]

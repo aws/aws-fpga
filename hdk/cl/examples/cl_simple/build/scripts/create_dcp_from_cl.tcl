@@ -66,7 +66,7 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-read_verilog [ list \
+read_verilog -sv [ list \
    $CL_DIR/build/src_post_encryption/cl_simple_defines.vh
 ]
 set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
@@ -75,7 +75,7 @@ set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
-read_verilog [ list \
+read_verilog -sv [ list \
 $CL_DIR/build/src_post_encryption/cl_simple.sv \
 $CL_DIR/build/src_post_encryption/cl_tst.sv \
 $CL_DIR/build/src_post_encryption/cl_int_tst.sv \
@@ -87,7 +87,7 @@ $CL_DIR/build/src_post_encryption/cl_tst_scrb.sv
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
-read_verilog [ list \
+read_verilog -sv [ list \
 $HDK_SHELL_DIR/design/lib/flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/flop_fifo_in.sv \
 $HDK_SHELL_DIR/design/lib/bram_2rw.sv \

@@ -8,6 +8,7 @@
 
 -sourcelibext .v
 -sourcelibext .sv
+-sourcelibext .svh
 
 -sourcelibdir ${CL_ROOT}/design
 -sourcelibdir ${SH_LIB_DIR}
@@ -16,6 +17,7 @@
 -include ${CL_ROOT}/verif/sv
 -include ${SH_LIB_DIR}
 -include ${SH_INF_DIR}
+-include ${HDK_COMMON_DIR}/verif/include
 
 ${CL_ROOT}/design/cl_simple_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv

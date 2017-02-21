@@ -12,6 +12,7 @@
 This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
 Execute `git clone http://github.com/aws/aws-fpga` to download this HDK+SDK release to your EC2 Instance or local server.
+For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`.
 
 The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environment, and known restrictions.
 
@@ -31,12 +32,21 @@ The [SDK directory](./sdk) includes the drivers and runtime environment required
 
 ## FPGA Developer AMI
 
-AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4](https://aws.amazon.com/ec2/instance-types/) EC2 instance with atleast 8GiB Memory.  For the best performance, c4.2xlarge is recommended.  To start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs.  Make sure you are in N. Virginia (us-east-1).  
-Go to EC2->Launch Instance->My AMIs
-Tick the ‘Shared with me’ box on the Ownership tab on the left.
-FPGA developer AMI will be prefixed with F1 
+AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances.  The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. But given the large size of the FPGA used in F1, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge or bigger, M4.2XLarge or bigger, R4.XLarge or bigger). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively. 
 
-During private access period, developers are emailed with details on how to get started with the AMI, terms and conditions and additional info on how to get started using F1 instances.  Please email aws-fpga-developer-support@amazon.com for questions regarding developer AMI.  
+During private access period in order to start using the AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to AMIs:
+
+* Make sure you are in N. Virginia (us-east-1).  
+* Go to EC2->Launch Instance->My AMIs
+* Select the ‘Shared with me’ box on the Ownership tab on the left.
+* FPGA developer AMI will be prefixed with F1 
+
+## Developer Support
+
+*FPGA development AMI* During private access period, developers are emailed with details on how to get started with the FPGA Development AMI, terms and conditions and additional info on how to get started using F1 instances.  
+
+*AWS FPGA Users' Forum* : the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
+
  
 # Quick Start <a name="quickstart"></a>
 
