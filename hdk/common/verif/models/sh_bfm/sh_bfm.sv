@@ -29,7 +29,18 @@ module sh_bfm #(
    output logic                rst_xtra_n,
    output logic [1:0]          sh_cl_pwr_state,
 
-   output logic                clk_out,
+   output logic                clk_main_a0,
+   output logic                clk_extra_a1,
+   output logic                clk_extra_a2,
+   output logic                clk_extra_a3,
+   
+   output logic                clk_extra_b0,
+   output logic                clk_extra_b1,
+   
+   output logic                clk_extra_c0,
+   output logic                clk_extra_c1,
+    
+//   output logic                clk_out,
    output logic                rst_out_n,
 
    output logic                sh_cl_flr_assert,
@@ -101,35 +112,35 @@ module sh_bfm #(
    //-------------------------------------
    // PCIe Interface to CL (AXI-4) (CL is PCI-slave)
    //-------------------------------------
-   output logic [63:0]               sh_cl_pcis_awaddr,
-   output logic [4:0]                sh_cl_pcis_awid  ,
-   output logic [7:0]                sh_cl_pcis_awlen ,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_awvalid,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_awready,
+   output logic [63:0]               sh_cl_dma_pcis_awaddr,
+   output logic [5:0]                sh_cl_dma_pcis_awid  ,
+   output logic [7:0]                sh_cl_dma_pcis_awlen ,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_awvalid,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_awready,
 
-   output logic [511:0]              sh_cl_pcis_wdata,
-   output logic [63:0]               sh_cl_pcis_wstrb,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_wvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_wlast,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_wready,
+   output logic [511:0]              sh_cl_dma_pcis_wdata,
+   output logic [63:0]               sh_cl_dma_pcis_wstrb,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wvalid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wlast,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_wready,
 
-   input [1:0]                       cl_sh_pcis_bresp,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_bvalid,
-   input [4:0]                       cl_sh_pcis_bid,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_bready,
+   input [1:0]                       cl_sh_dma_pcis_bresp,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_bvalid,
+   input [5:0]                       cl_sh_dma_pcis_bid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_bready,
 
-   output logic [63:0]               sh_cl_pcis_araddr,
-   output logic [4:0]                sh_cl_pcis_arid,
-   output logic [7:0]                sh_cl_pcis_arlen,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_arvalid,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_arready,
+   output logic [63:0]               sh_cl_dma_pcis_araddr,
+   output logic [5:0]                sh_cl_dma_pcis_arid,
+   output logic [7:0]                sh_cl_dma_pcis_arlen,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_arvalid,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_arready,
                                      
-   input [4:0]                       cl_sh_pcis_rid,
-   input [511:0]                     cl_sh_pcis_rdata,
-   input [1:0]                       cl_sh_pcis_rresp,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_rlast,
-   input [NUM_PCIE-1:0]              cl_sh_pcis_rvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_rready,
+   input [5:0]                       cl_sh_dma_pcis_rid,
+   input [511:0]                     cl_sh_dma_pcis_rdata,
+   input [1:0]                       cl_sh_dma_pcis_rresp,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rlast,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rvalid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_rready,
 
 `ifndef NO_XDMA
    input [15:0]         cl_sh_irq_req,
@@ -194,31 +205,31 @@ module sh_bfm #(
    input [31:0]                ddr_sh_stat_rdata[2:0],
    input [7:0]                 ddr_sh_stat_int[2:0],
 
-   input [5:0]                 cl_sh_ddr_awid,
+   input [15:0]                cl_sh_ddr_awid,
    input [63:0]                cl_sh_ddr_awaddr,
    input [7:0]                 cl_sh_ddr_awlen,
    input                       cl_sh_ddr_awvalid,
    output logic                sh_cl_ddr_awready,
 
-   input [5:0]                 cl_sh_ddr_wid,
+   input [15:0]                cl_sh_ddr_wid,
    input [511:0]               cl_sh_ddr_wdata,
    input [63:0]                cl_sh_ddr_wstrb,
    input                       cl_sh_ddr_wlast,
    input                       cl_sh_ddr_wvalid,
    output logic                sh_cl_ddr_wready,
 
-   output logic [5:0]          sh_cl_ddr_bid,
+   output logic [15:0]         sh_cl_ddr_bid,
    output logic [1:0]          sh_cl_ddr_bresp,
    output logic                sh_cl_ddr_bvalid,
    input                       cl_sh_ddr_bready,
 
-   input [5:0]                 cl_sh_ddr_arid,
+   input [15:0]                cl_sh_ddr_arid,
    input [63:0]                cl_sh_ddr_araddr,
    input [7:0]                 cl_sh_ddr_arlen,
    input                       cl_sh_ddr_arvalid,
    output logic                sh_cl_ddr_arready,
 
-   output logic [5:0]          sh_cl_ddr_rid,
+   output logic [15:0]         sh_cl_ddr_rid,
    output logic [511:0]        sh_cl_ddr_rdata,
    output logic [1:0]          sh_cl_ddr_rresp,
    output logic                sh_cl_ddr_rlast,
@@ -237,27 +248,6 @@ module sh_bfm #(
    //--------------------------------------------
 
    ,
-   //-----------------------------------------------
-   // AXI-L interface to access XDMA configuration
-   input       [31:0]  cl_sh_xdcfg_awaddr,
-   input               cl_sh_xdcfg_awvalid,
-   output logic        sh_cl_xdcfg_awready,
-   input      [31:0]   cl_sh_xdcfg_wdata,
-   input      [3:0]    cl_sh_xdcfg_wstrb,
-   input               cl_sh_xdcfg_wvalid,
-   output logic        sh_cl_xdcfg_wready,
-   output logic        sh_cl_xdcfg_bvalid,
-   output logic [1:0]  sh_cl_xdcfg_bresp,
-   input               cl_sh_xdcfg_bready,
-
-   input      [31:0]   cl_sh_xdcfg_araddr,
-   input               cl_sh_xdcfg_arvalid,
-   output logic        sh_cl_xdcfg_arready,
-   output logic [31:0] sh_cl_xdcfg_rdata,
-   output logic [1:0]  sh_cl_xdcfg_rresp,
-   output logic        sh_cl_xdcfg_rvalid,
-   input               cl_sh_xdcfg_rready,
-
    //----------------------------------------------------
    // XDMA AXI-4 interface to master cycles to CL
    output logic [4:0]   sh_cl_xdma_awid,
@@ -290,6 +280,103 @@ module sh_bfm #(
    input                cl_sh_xdma_rvalid,
    output logic         sh_cl_xdma_rready
 
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
+   // If the CL is created through  Xilinx’s SDAccel, then this configuration bus
+   // would be connected automatically to SDAccel generic logic (SmartConnect, APM etc)
+   //------------------------------------------------------------------------------------------
+    ,
+    output logic        sda_cl_awvalid,
+    output logic [31:0] sda_cl_awaddr, 
+    input               cl_sda_awready,
+
+   //Write data
+   output logic         sda_cl_wvalid,
+   output logic [31:0]  sda_cl_wdata,
+   output logic [3:0]   sda_cl_wstrb,
+   input                cl_sda_wready,
+
+   //Write response
+   input                cl_sda_bvalid,
+   input [1:0]          cl_sda_bresp,
+   output logic         sda_cl_bready,
+
+   //Read address
+   output logic         sda_cl_arvalid,
+   output logic [31:0]  sda_cl_araddr,
+   input                cl_sda_arready,
+
+   //Read data/response
+   input                cl_sda_rvalid,
+   input [31:0]         cl_sda_rdata,
+   input [1:0]          cl_sda_rresp,
+
+   output logic         sda_cl_rready,
+
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through AppPF BAR0
+   // For example, this AXI-L interface can connect to OpenCL Kernels
+   // This would connect automatically to the required logic 
+   // if the CL is created through SDAccel flow   
+   //------------------------------------------------------------------------------------------
+   output logic         sh_ocl_awvalid,
+   output logic [31:0]  sh_ocl_awaddr,
+   input                ocl_sh_awready,
+                                                                                                                            
+   //Write data             
+   output logic         sh_ocl_wvalid,
+   output logic [31:0]  sh_ocl_wdata,
+   output logic [3:0]   sh_ocl_wstrb,
+   input                ocl_sh_wready,
+
+   //Write response
+   input                ocl_sh_bvalid,
+   input [1:0]          ocl_sh_bresp,
+   output               sh_ocl_bready,
+
+   //Read address                                                                       
+   output logic         sh_ocl_arvalid,
+   output logic [31:0]  sh_ocl_araddr,
+   input                ocl_sh_arready,
+                                                                                                                            
+   //Read data/response
+   input                ocl_sh_rvalid,
+   input [31:0]         ocl_sh_rdata,
+   input [1:0]          ocl_sh_rresp,
+                                                                                                                            
+   output logic         sh_ocl_rready,
+
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through AppPF BAR1
+   // For example,
+   //------------------------------------------------------------------------------------------
+   output logic         sh_bar1_awvalid,
+   output logic [31:0]  sh_bar1_awaddr,
+   input                bar1_sh_awready,
+
+   //Write data
+   output logic         sh_bar1_wvalid,
+   output logic [31:0]  sh_bar1_wdata,
+   output logic [3:0]   sh_bar1_wstrb,
+   input                bar1_sh_wready,
+                                                                                                                     
+   //Write response      
+   input                bar1_sh_bvalid,
+   input [1:0]          bar1_sh_bresp,
+   output logic         sh_bar1_bready,
+                                                                                                                          
+   //Read address                                                                                                     
+   output logic         sh_bar1_arvalid,
+   output logic [31:0]  sh_bar1_araddr,
+   input                bar1_sh_arready,
+                                                                                                                            
+   //Read data/response      
+   input                bar1_sh_rvalid,
+   input [31:0]         bar1_sh_rdata,
+   input [1:0]          bar1_sh_rresp,
+                                                                                                                            
+   output logic         sh_bar1_rready           
+
 `ifndef NO_CL_DDR
    ,
    output logic        sh_RST_DIMM_A_N,
@@ -302,21 +389,8 @@ module sh_bfm #(
   
    );
 
-typedef struct {
-   logic [63:0] addr;
-   logic [7:0]  len;
-   logic [5:0]  id;
-   logic [1:0]  resp;
-   logic        last;
-} AXI_Command;
+`include "axi_bfm_defines.svh"
    
-typedef struct {
-   logic [511:0] data;
-   logic [63:0]  strb;
-   logic [5:0]   id;
-   logic         last;
-} AXI_Data;
-
    AXI_Command sh_cl_wr_cmds[$];
    AXI_Data    sh_cl_wr_data[$];
    AXI_Command sh_cl_rd_cmds[$];
@@ -344,7 +418,7 @@ typedef struct {
    logic         ddr_is_ready_presync;
    logic         ddr_is_ready_sync;
 
-   logic [5:0]   cl_sh_ddr_awid_q;
+   logic [15:0]  cl_sh_ddr_awid_q;
    logic [63:0]  cl_sh_ddr_awaddr_q;
    logic [7:0]   cl_sh_ddr_awlen_q;
    logic         cl_sh_ddr_awvalid_q;
@@ -356,25 +430,25 @@ typedef struct {
    logic         cl_sh_ddr_wvalid_q;
    logic         sh_cl_ddr_wready_q;
 
-   logic [5:0]   sh_cl_ddr_bid_q;
+   logic [15:0]  sh_cl_ddr_bid_q;
    logic [1:0]   sh_cl_ddr_bresp_q;
    logic         sh_cl_ddr_bvalid_q;
    logic         cl_sh_ddr_bready_q;
    
-   logic [5:0]   cl_sh_ddr_arid_q;
+   logic [15:0]  cl_sh_ddr_arid_q;
    logic [63:0]  cl_sh_ddr_araddr_q;
    logic [7:0]   cl_sh_ddr_arlen_q;
    logic         cl_sh_ddr_arvalid_q;
    logic         sh_cl_ddr_arready_q;
 
-   logic [5:0]   sh_cl_ddr_rid_q;
+   logic [15:0]  sh_cl_ddr_rid_q;
    logic [511:0] sh_cl_ddr_rdata_q;
    logic [1:0]   sh_cl_ddr_rresp_q;
    logic         sh_cl_ddr_rlast_q;
    logic         sh_cl_ddr_rvalid_q;
    logic         cl_sh_ddr_rready_q;
 
-   logic [5:0]   sync_cl_sh_ddr_awid;
+   logic [15:0]  sync_cl_sh_ddr_awid;
    logic [63:0]  sync_cl_sh_ddr_awaddr;
    logic [7:0]   sync_cl_sh_ddr_awlen;
    logic         sync_cl_sh_ddr_awvalid;
@@ -386,18 +460,18 @@ typedef struct {
    logic         sync_cl_sh_ddr_wvalid;
    logic         sync_sh_cl_ddr_wready;
 
-   logic [5:0]   sync_sh_cl_ddr_bid;
+   logic [15:0]  sync_sh_cl_ddr_bid;
    logic [1:0]   sync_sh_cl_ddr_bresp;
    logic         sync_sh_cl_ddr_bvalid;
    logic         sync_cl_sh_ddr_bready;
 
-   logic [5:0]   sync_cl_sh_ddr_arid;
+   logic [15:0]  sync_cl_sh_ddr_arid;
    logic [63:0]  sync_cl_sh_ddr_araddr;
    logic [7:0]   sync_cl_sh_ddr_arlen;
    logic         sync_cl_sh_ddr_arvalid;
    logic         sync_sh_cl_ddr_arready;
 
-   logic [5:0]   sync_sh_cl_ddr_rid;
+   logic [15:0]  sync_sh_cl_ddr_rid;
    logic [511:0] sync_sh_cl_ddr_rdata;
    logic [1:0]   sync_sh_cl_ddr_rresp;
    logic         sync_sh_cl_ddr_rlast;
@@ -555,14 +629,14 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_wr_cmds.size() != 0) begin
 
-         sh_cl_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
-         sh_cl_pcis_awid    <= sh_cl_wr_cmds[0].id;
-         sh_cl_pcis_awlen   <= sh_cl_wr_cmds[0].len;
+         sh_cl_dma_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
+         sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
+         sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
          
-         sh_cl_pcis_awvalid <= !sh_cl_pcis_awvalid ? 1'b1 :
-                               !cl_sh_pcis_awready ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
+                               !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_awready && sh_cl_pcis_awvalid) begin
+         if (cl_sh_dma_pcis_awready && sh_cl_dma_pcis_awvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_wr_cmds.size());
             end
@@ -571,7 +645,7 @@ typedef struct {
 
       end
       else
-         sh_cl_pcis_awvalid <= 1'b0;
+         sh_cl_dma_pcis_awvalid <= 1'b0;
    end
 
 
@@ -590,14 +664,14 @@ typedef struct {
       h2c_dma_done[3] = 0;
       if (sh_cl_wr_data.size() != 0) begin
 
-         sh_cl_pcis_wdata <= sh_cl_wr_data[0].data;
-         sh_cl_pcis_wstrb <= sh_cl_wr_data[0].strb;
-         sh_cl_pcis_wlast <= sh_cl_wr_data[0].last;
+         sh_cl_dma_pcis_wdata <= sh_cl_wr_data[0].data;
+         sh_cl_dma_pcis_wstrb <= sh_cl_wr_data[0].strb;
+         sh_cl_dma_pcis_wlast <= sh_cl_wr_data[0].last;
          
-         sh_cl_pcis_wvalid <= !sh_cl_pcis_wvalid ? 1'b1 :
-                              !cl_sh_pcis_wready ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_wvalid <= !sh_cl_dma_pcis_wvalid ? 1'b1 :
+                              !cl_sh_dma_pcis_wready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_wready && sh_cl_pcis_wvalid) begin
+         if (cl_sh_dma_pcis_wready && sh_cl_dma_pcis_wvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
             end
@@ -607,22 +681,22 @@ typedef struct {
          
       end
       else
-         sh_cl_pcis_wvalid <= 1'b0;
+         sh_cl_dma_pcis_wvalid <= 1'b0;
    end
 
    //
    // cl->sh B Response Channel
    //
    always @(posedge clk_core) begin
-      sh_cl_pcis_bready <= 1'b1;
+      sh_cl_dma_pcis_bready <= 1'b1;
    end
 
    always @(posedge clk_core) begin
       AXI_Command resp;
 
-      if (cl_sh_pcis_bvalid & sh_cl_pcis_bready) begin
-         resp.resp     = cl_sh_pcis_bresp[0];
-         resp.id       = cl_sh_pcis_bid[0];
+      if (cl_sh_dma_pcis_bvalid & sh_cl_dma_pcis_bready) begin
+         resp.resp     = cl_sh_dma_pcis_bresp[0];
+         resp.id       = cl_sh_dma_pcis_bid[0];
 
          cl_sh_b_resps.push_back(resp);
       end
@@ -637,14 +711,14 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_rd_cmds.size() != 0) begin
 
-         sh_cl_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
-         sh_cl_pcis_arid    <= sh_cl_rd_cmds[0].id;
-         sh_cl_pcis_arlen   <= sh_cl_rd_cmds[0].len;
+         sh_cl_dma_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
+         sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
+         sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
          
-         sh_cl_pcis_arvalid <= !sh_cl_pcis_arvalid ? 1'b1 :
-                               !cl_sh_pcis_arready ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
+                               !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_arready && sh_cl_pcis_arvalid) begin
+         if (cl_sh_dma_pcis_arready && sh_cl_dma_pcis_arvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_rd_cmds.size());
             end
@@ -653,27 +727,27 @@ typedef struct {
 
       end
       else
-         sh_cl_pcis_arvalid <= 1'b0;
+         sh_cl_dma_pcis_arvalid <= 1'b0;
    end
 
    //
    // cl->sh Read Data Channel
    //
    always @(posedge clk_core) begin
-      sh_cl_pcis_rready <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
+      sh_cl_dma_pcis_rready <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
    end
 
    always @(posedge clk_core) begin
       AXI_Data data;
 
-      if (cl_sh_pcis_rvalid & sh_cl_pcis_rready) begin
-         data.data     = cl_sh_pcis_rdata;
-         data.id       = cl_sh_pcis_rid;
-         data.last     = cl_sh_pcis_rlast;
+      if (cl_sh_dma_pcis_rvalid & sh_cl_dma_pcis_rready) begin
+         data.data     = cl_sh_dma_pcis_rdata;
+         data.id       = cl_sh_dma_pcis_rid;
+         data.last     = cl_sh_dma_pcis_rlast;
 
          if (debug) begin
             for (int i=0; i<16; i++) begin
-               $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_pcis_rdata[(i*32)+:32]);
+               $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_dma_pcis_rdata[(i*32)+:32]);
             end
          end
          
@@ -837,15 +911,15 @@ typedef struct {
    end
    
    always @(posedge clk_core) begin
-      sh_cl_pcis_bready[0] <= 1'b1;
+      sh_cl_dma_pcis_bready[0] <= 1'b1;
    end
 
    always @(posedge clk_core) begin
       AXI_Command resp;
 
-      if (cl_sh_pcis_bvalid[0] & sh_cl_pcis_bready) begin
-         resp.resp     = cl_sh_pcis_bresp[0];
-         resp.id       = cl_sh_pcis_bid[0];
+      if (cl_sh_dma_pcis_bvalid[0] & sh_cl_dma_pcis_bready) begin
+         resp.resp     = cl_sh_dma_pcis_bresp[0];
+         resp.id       = cl_sh_dma_pcis_bid[0];
 
          cl_sh_b_resps.push_back(resp);
       end
@@ -995,7 +1069,7 @@ typedef struct {
    //==========================================================
 
    // DDR Controller
-   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
+   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
      .aresetn        (sync_rst_n),
      .sync_rst_n     (intf_sync_rst_n),
@@ -1063,7 +1137,7 @@ typedef struct {
      .m_axi_rready   (cl_sh_ddr_rready_q)
      );
 
-   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
+   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
      .s_axi_aclk(clk_core),
      .s_axi_aresetn(rst_n),
 
@@ -1236,6 +1310,73 @@ typedef struct {
      else
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= {ddr_is_ready_sync, ddr_is_ready_presync, ddr_is_ready};
 
+
+   axil_bfm sda_axil_bfm(
+                         .axil_clk(),
+                         .axil_rst_n(),
+                         .axil_awvalid(sda_cl_awvalid),
+                         .axil_awaddr(sda_cl_awaddr),
+                         .axil_awready(cl_sda_awready),
+                         .axil_wvalid(sda_cl_wvalid),
+                         .axil_wdata(sda_cl_wdata),
+                         .axil_wstrb(sda_cl_wstrb),
+                         .axil_wready(cl_sda_wready),
+                         .axil_bvalid(cl_sda_bvalid),
+                         .axil_bresp(cl_sda_bresp),
+                         .axil_bready(sda_cl_bready),
+                         .axil_arvalid(sda_cl_arvalid),
+                         .axil_araddr(sda_cl_araddr),
+                         .axil_arready(cl_sda_arready),
+                         .axil_rvalid(cl_sda_rvalid),
+                         .axil_rdata(cl_sda_rdata),
+                         .axil_rresp(cl_sda_rresp),
+                         .axil_rready(sda_cl_rready));
+
+   axil_bfm ocl_axil_bfm(
+                         .axil_clk(),
+                         .axil_rst_n(),
+                         .axil_awvalid(sh_ocl_awvalid),
+                         .axil_awaddr(sh_ocl_awaddr),
+                         .axil_awready(ocl_sh_awready),
+                         .axil_wvalid(sh_ocl_wvalid),
+                         .axil_wdata(sh_ocl_wdata),
+                         .axil_wstrb(sh_ocl_wstrb),
+                         .axil_wready(ocl_sh_wready),
+                         .axil_bvalid(ocl_sh_bvalid),
+                         .axil_bresp(ocl_sh_bresp),
+                         .axil_bready(sh_ocl_bready),
+                         .axil_arvalid(sh_ocl_arvalid),
+                         .axil_araddr(sh_ocl_araddr),
+                         .axil_arready(cl_ocl_arready),
+                         .axil_rvalid(ocl_sh_rvalid),
+                         .axil_rdata(ocl_sh_rdata),
+                         .axil_rresp(ocl_sh_rresp),
+                         .axil_rready(sh_ocl_rready));
+
+   axil_bfm bar1_axil_bfm(
+                         .axil_clk(),
+                         .axil_rst_n(),
+                         .axil_awvalid(sh_bar1_awvalid),
+                         .axil_awaddr(sh_bar1_awaddr),
+                         .axil_awready(bar1_sh_awready),
+                         .axil_wvalid(sh_bar1_wvalid),
+                         .axil_wdata(sh_bar1_wdata),
+                         .axil_wstrb(sh_bar1_wstrb),
+                         .axil_wready(bar1_sh_wready),
+                         .axil_bvalid(bar1_sh_bvalid),
+                         .axil_bresp(bar1_sh_bresp),
+                         .axil_bready(sh_bar1_bready),
+                         .axil_arvalid(sh_bar1_arvalid),
+                         .axil_araddr(sh_bar1_araddr),
+                         .axil_arready(cl_bar1_arready),
+                         .axil_rvalid(bar1_sh_rvalid),
+                         .axil_rdata(bar1_sh_rdata),
+                         .axil_rresp(bar1_sh_rresp),
+                         .axil_rready(sh_bar1_rready));
+
+
+
+   
    task power_up;
       rst_n_i = 1'b0;
       rst_out_n_i = 1'b0;
