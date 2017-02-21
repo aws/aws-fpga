@@ -1413,25 +1413,26 @@ module sh_bfm #(
    endtask
 
    task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
-      AXI_Command axi_cmd;
-      AXI_Data    axi_data;
-
-      logic [1:0] resp;
-      
-      axi_cmd.addr = addr;
-      axi_cmd.len  = 0;
-      axi_cmd.id   = id;
-
-      sh_cl_wr_cmds.push_back(axi_cmd);
-
-      axi_data.data = data << (addr[5:0] * 8);
-      axi_data.strb = 64'h0f << addr[5:0];
-      
-      axi_data.id   = id;
-      axi_data.last = 1'b1;
 
       case (intf)
         0: begin
+           AXI_Command axi_cmd;
+           AXI_Data    axi_data;
+
+           logic [1:0] resp;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.id   = id;
+
+           sh_cl_wr_cmds.push_back(axi_cmd);
+
+           axi_data.data = data << (addr[5:0] * 8);
+           axi_data.strb = 64'h0f << addr[5:0];
+           
+           axi_data.id   = id;
+           axi_data.last = 1'b1;
+           
            #20ns sh_cl_wr_data.push_back(axi_data);
       
            while (cl_sh_b_resps.size() == 0)
