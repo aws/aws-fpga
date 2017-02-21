@@ -5,15 +5,13 @@
 
 #VPATH = src:include:$(HDK_DIR)/common/software/src:$(HDK_DIR)/common/software/include
 
-TOP = ../../../../../..
-SDK = $(TOP)/sdk/userspace
-INCLUDES = -I$(SDK)/include
+INCLUDES = -I$(SDK_DIR)/include
 
 CC = gcc
 CFLAGS = -g -Wall $(INCLUDES)
 
-LDFLAGS = -L$(SDK)/utils -L$(SDK)/hal/lib -L$(SDK)/fpga_libs/fpga_pci/lib -L$(SDK)/fpga_libs/fpga_mgmt/lib
-LDLIBS = -lutils -lfpga_pci -lfpga_mgmt -lfpga_hal_reg -lfpga_hal_plat -lrt -lpthread
+LDFLAGS = -L$(SDK_DIR)/lib
+LDLIBS = -lutils -lfpga_pci -lfpga_mgmt -lfpga_hal_reg -lfpga_hal_plat -lfpga_hal_mbox -lrt -lpthread
 
 SRC = test_hello_world.c
 OBJ = $(SRC:.c=.o)

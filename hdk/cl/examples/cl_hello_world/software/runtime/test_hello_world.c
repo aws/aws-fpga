@@ -17,8 +17,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <fpga_libs/fpga_pci.h>
-#include <fpga_libs/fpga_mgmt.h>
+#include <fpga_pci.h>
+#include <fpga_mgmt.h>
 #include <utils/lcd.h>
 
 /* Constants determined by the CL */
