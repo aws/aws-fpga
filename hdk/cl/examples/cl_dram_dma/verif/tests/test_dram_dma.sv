@@ -23,7 +23,8 @@ module test_dram_dma();
        //Forcing cfg_atg_enable for now, once we have AXI_L interface we will
        //do a config write
        
-       tb.CL.gen_ddr_tst[0].genblk1.CL_TST_DDR.CL_TST.cfg_atg_enable = 0;
+//       tb.CL.gen_ddr_tst[0].genblk1.CL_TST_DDR.CL_TST.cfg_atg_enable = 0;
+       tb.sh.poke(.addr(64'h130), .data(0), .intf(2));
 
        tb.sh.delay(25000);
 

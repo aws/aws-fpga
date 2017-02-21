@@ -1412,7 +1412,7 @@ module sh_bfm #(
       int_pend[int_num] = 1'b0;
    endtask
 
-   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
+   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
@@ -1430,13 +1430,30 @@ module sh_bfm #(
       axi_data.id   = id;
       axi_data.last = 1'b1;
 
-      #20ns sh_cl_wr_data.push_back(axi_data);
+      case (intf)
+        0: begin
+           #20ns sh_cl_wr_data.push_back(axi_data);
       
-      while (cl_sh_b_resps.size() == 0)
-        #20ns;
+           while (cl_sh_b_resps.size() == 0)
+             #20ns;
       
-      resp = cl_sh_b_resps[0].resp;
-      cl_sh_b_resps.pop_front();
+           resp = cl_sh_b_resps[0].resp;
+           cl_sh_b_resps.pop_front();
+        end
+        1: begin
+           sda_axil_bfm.poke(addr, data);
+        end        
+        2: begin
+           ocl_axil_bfm.poke(addr, data);
+        end
+        3: begin
+           bar1_axil_bfm.poke(addr, data);
+        end
+        default: begin
+          $display("FATAL ERROR - Invalid CL port specified");
+          $finish;
+        end
+      endcase // case (intf)
       
    endtask // poke
 
@@ -1604,76 +1621,6 @@ module sh_bfm #(
          end
       end
    end
-
-`ifdef NEVER
-   
-   task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      logic [1:0] resp;
-      
-      int byte_idx;
-      int mem_arr_idx;
-
- 
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 1;
-      
-      sh_cl_wr_cmds.push_back(cmd);
-
-      for (int n= 0; n<len;n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-
-         data.data[mem_arr_idx+:32] = dat[n];
-         data.strb[byte_idx+:4] = 'h0f;
-
-         if (n==len-1)
-           data.last = 1;
-         else
-           data.last = 0;
-      end
-
-      if (debug) begin
-         $display("[%t] DEBUG : Write data is %x strb is %x len is %x \n", $realtime, data.data, data.strb, len);
-      end
-      
-      #20ns sh_cl_wr_data.push_back(data);
-      
-      while (cl_sh_b_resps.size() == 0)
-        #20ns;
-      
-      resp = cl_sh_b_resps[0].resp;
-      cl_sh_b_resps.pop_front();
-      
-   endtask // poke_burst
-
-   task peek_burst(input logic [63:0] start_addr, logic [7:0] len, output logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      int byte_idx;
-      int mem_arr_idx;
-
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 2;
-
-      sh_cl_rd_cmds.push_back(cmd);
-
-      while (cl_sh_rd_data.size() == 0)
-        #20ns;
-      
-      for (int n= 0; n<len; n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-         dat[n] = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      end
-      cl_sh_rd_data.pop_front();
-      
-   endtask // peek_burst
-
-`endif
 
   task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
     sh_ddr_stat_wr[ddr_idx] = 1;
