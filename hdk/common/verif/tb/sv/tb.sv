@@ -247,7 +247,7 @@ sh_bfm sh(
    .sh_cl_ctl1(sh_cl_ctl1),
    .clk_xtra(clk_xtra),
    .rst_xtra_n(rst_xtra_n),
-   .clk_out(clk_out),
+   .clk_main_a0(clk_out),
    .rst_out_n(rst_out_n),
    .sh_cl_pwr_state(sh_cl_pwr_state),
 

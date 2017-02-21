@@ -418,7 +418,7 @@ module sh_bfm #(
    logic         ddr_is_ready_presync;
    logic         ddr_is_ready_sync;
 
-   logic [5:0]   cl_sh_ddr_awid_q;
+   logic [15:0]  cl_sh_ddr_awid_q;
    logic [63:0]  cl_sh_ddr_awaddr_q;
    logic [7:0]   cl_sh_ddr_awlen_q;
    logic         cl_sh_ddr_awvalid_q;
@@ -430,25 +430,25 @@ module sh_bfm #(
    logic         cl_sh_ddr_wvalid_q;
    logic         sh_cl_ddr_wready_q;
 
-   logic [5:0]   sh_cl_ddr_bid_q;
+   logic [15:0]  sh_cl_ddr_bid_q;
    logic [1:0]   sh_cl_ddr_bresp_q;
    logic         sh_cl_ddr_bvalid_q;
    logic         cl_sh_ddr_bready_q;
    
-   logic [5:0]   cl_sh_ddr_arid_q;
+   logic [15:0]  cl_sh_ddr_arid_q;
    logic [63:0]  cl_sh_ddr_araddr_q;
    logic [7:0]   cl_sh_ddr_arlen_q;
    logic         cl_sh_ddr_arvalid_q;
    logic         sh_cl_ddr_arready_q;
 
-   logic [5:0]   sh_cl_ddr_rid_q;
+   logic [15:0]  sh_cl_ddr_rid_q;
    logic [511:0] sh_cl_ddr_rdata_q;
    logic [1:0]   sh_cl_ddr_rresp_q;
    logic         sh_cl_ddr_rlast_q;
    logic         sh_cl_ddr_rvalid_q;
    logic         cl_sh_ddr_rready_q;
 
-   logic [5:0]   sync_cl_sh_ddr_awid;
+   logic [15:0]  sync_cl_sh_ddr_awid;
    logic [63:0]  sync_cl_sh_ddr_awaddr;
    logic [7:0]   sync_cl_sh_ddr_awlen;
    logic         sync_cl_sh_ddr_awvalid;
@@ -460,18 +460,18 @@ module sh_bfm #(
    logic         sync_cl_sh_ddr_wvalid;
    logic         sync_sh_cl_ddr_wready;
 
-   logic [5:0]   sync_sh_cl_ddr_bid;
+   logic [15:0]  sync_sh_cl_ddr_bid;
    logic [1:0]   sync_sh_cl_ddr_bresp;
    logic         sync_sh_cl_ddr_bvalid;
    logic         sync_cl_sh_ddr_bready;
 
-   logic [5:0]   sync_cl_sh_ddr_arid;
+   logic [15:0]  sync_cl_sh_ddr_arid;
    logic [63:0]  sync_cl_sh_ddr_araddr;
    logic [7:0]   sync_cl_sh_ddr_arlen;
    logic         sync_cl_sh_ddr_arvalid;
    logic         sync_sh_cl_ddr_arready;
 
-   logic [5:0]   sync_sh_cl_ddr_rid;
+   logic [15:0]  sync_sh_cl_ddr_rid;
    logic [511:0] sync_sh_cl_ddr_rdata;
    logic [1:0]   sync_sh_cl_ddr_rresp;
    logic         sync_sh_cl_ddr_rlast;
@@ -1069,7 +1069,7 @@ module sh_bfm #(
    //==========================================================
 
    // DDR Controller
-   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
+   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
      .aresetn        (sync_rst_n),
      .sync_rst_n     (intf_sync_rst_n),
@@ -1137,7 +1137,7 @@ module sh_bfm #(
      .m_axi_rready   (cl_sh_ddr_rready_q)
      );
 
-   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
+   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
      .s_axi_aclk(clk_core),
      .s_axi_aresetn(rst_n),
 
