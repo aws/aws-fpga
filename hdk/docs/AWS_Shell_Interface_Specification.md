@@ -11,21 +11,16 @@
   
 # Table of Content:
 
-1. [Overview](#overview)
+1. Overview(#overview)
 
-2. [EC2 Instance view of FPGA PCIe](#pciPresentation)
+2. EC2 Instance view of FPGA PCIe(#pciPresentation)
 
-3. [Clocks and Reset](#ClocksNReset)
+3. Clocks and Reset(#ClocksNReset)
 
-4. [Shell/CL Interfaces](#ShellInterface)
-
-  4.1 [Interrupts](#interrupts)
-  
-  4.2 [DDR4 DRAM Interfaces](#ddr)
-  
-  4.3 [Miscellanous Interfaces (vLED, vDIP)](#misc)
-  
-  
+4. Shell/CL Interfaces(#ShellInterface)
+  4.1 Interrupts(#interrupts)
+  4.2 DDR4 DRAM Interfaces(#ddr)
+  4.3 Miscellanous Interfaces (vLED, vDIP..)(#misc)
 
 # Overview<a name="overview"></a>
 
@@ -225,7 +220,6 @@ There Developer can select among a set of available frequencies, provided in the
 
    clk_extra_c0:  300MHz
    clk_extra_c1:  400MHz
-
 
 ## Reset
 
