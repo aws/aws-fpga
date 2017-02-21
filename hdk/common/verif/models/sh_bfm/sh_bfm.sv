@@ -1311,8 +1311,8 @@ module sh_bfm #(
 
 
    axil_bfm sda_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sda_cl_awvalid),
                          .axil_awaddr(sda_cl_awaddr),
                          .axil_awready(cl_sda_awready),
@@ -1332,8 +1332,8 @@ module sh_bfm #(
                          .axil_rready(sda_cl_rready));
 
    axil_bfm ocl_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sh_ocl_awvalid),
                          .axil_awaddr(sh_ocl_awaddr),
                          .axil_awready(ocl_sh_awready),
@@ -1353,8 +1353,8 @@ module sh_bfm #(
                          .axil_rready(sh_ocl_rready));
 
    axil_bfm bar1_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sh_bar1_awvalid),
                          .axil_awaddr(sh_bar1_awaddr),
                          .axil_awready(bar1_sh_awready),
