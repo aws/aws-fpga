@@ -40,7 +40,6 @@ module sh_bfm #(
    output logic                clk_extra_c0,
    output logic                clk_extra_c1,
     
-//   output logic                clk_out,
    output logic                rst_out_n,
 
    output logic                sh_cl_flr_assert,
@@ -512,7 +511,7 @@ module sh_bfm #(
       forever #2ns clk_core = ~clk_core;
    end
 
-   assign clk_out = clk_core;
+   assign clk_main_a0 = clk_core;
 
    initial begin
       clk_xtra = 1'b0;
@@ -526,7 +525,7 @@ module sh_bfm #(
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
-   always @(posedge clk_out)
+   always @(posedge clk_main_a0)
      rst_out_n <= rst_out_n_i;
 
    always @(posedge clk_xtra)
