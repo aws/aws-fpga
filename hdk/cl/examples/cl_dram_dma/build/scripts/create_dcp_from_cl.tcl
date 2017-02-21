@@ -67,16 +67,16 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
 read_verilog [ list \
-   $CL_DIR/build/src_post_encryption/cl_xdma_defines.vh
+   $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh
 ]
-set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_xdma_defines.vh ]
-set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_xdma_defines.vh ]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog [ list \
-$CL_DIR/build/src_post_encryption/cl_xdma.sv \
+$CL_DIR/build/src_post_encryption/cl_drma_dma.sv \
 $CL_DIR/build/src_post_encryption/cl_tst.sv \
 $CL_DIR/build/src_post_encryption/cl_int_tst.sv \
 $CL_DIR/build/src_post_encryption/mem_scrb.sv \
@@ -135,7 +135,7 @@ set_property verilog_define XSDB_SLV_DIS [current_fileset]
 ########################
 puts "AWS FPGA: Start design synthesis";
 
-synth_design -top cl_xdma -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+synth_design -top cl_dram_dma -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
 
 # Prohibit the top two URAM sites of each URAM quad.
 # These two sites cannot be used within PR designs.
