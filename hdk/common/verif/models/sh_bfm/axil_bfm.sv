@@ -6,7 +6,7 @@
 module axil_bfm 
    (
     input               axil_clk,
-    input               axil_rst_n;
+    input               axil_rst_n,
     output logic        axil_awvalid,
     output logic [31:0] axil_awaddr, 
     input               axil_awready,
@@ -68,7 +68,7 @@ module axil_bfm
    // Address Write Channel
    //
 
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       if (axil_wr_cmds.size() != 0) begin
 
          axil_awaddr  <= axil_wr_cmds[0].addr[31:0];
@@ -93,13 +93,12 @@ module axil_bfm
    // write Data Channel
    //
 
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
 
       if (axil_wr_data.size() != 0) begin
 
          axil_wdata <= axil_wr_data[0].data[31:0];
          axil_wstrb <= axil_wr_data[0].strb[3:0];
-         axil_wlast <= axil_wr_data[0].last;
          
          axil_wvalid <= !axil_wvalid ? 1'b1 :
                               !axil_wready ? 1'b1 : 1'b0;
@@ -119,11 +118,11 @@ module axil_bfm
    //
    // B Response Channel
    //
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       axil_bready <= 1'b1;
    end
 
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       AXI_Command resp;
 
       if (axil_bvalid & axil_bready) begin
@@ -139,7 +138,7 @@ module axil_bfm
    // Address Read Channel
    //
 
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       if (axil_rd_cmds.size() != 0) begin
 
          axil_araddr  <= axil_rd_cmds[0].addr[31:0];
@@ -162,16 +161,15 @@ module axil_bfm
    //
    // Read Data Channel
    //
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       axil_rready <= (axil_rd_data.size() < 16) ? 1'b1 : 1'b0;
    end
 
-   always @(posedge clk_core) begin
+   always @(posedge axil_clk) begin
       AXI_Data data;
 
       if (axil_rvalid & axil_rready) begin
          data.data     = axil_rdata[31:0];
-         data.last     = axil_rlast;
 
          if (debug) begin
             for (int i=0; i<16; i++) begin
