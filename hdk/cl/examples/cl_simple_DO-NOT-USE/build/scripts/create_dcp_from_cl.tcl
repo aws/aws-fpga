@@ -76,23 +76,27 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
 read_verilog -sv [ list \
-   $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh
+   $CL_DIR/build/src_post_encryption/cl_simple_defines.vh
 ]
-set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
-set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_simple_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog -sv [ list \
-$CL_DIR/build/src_post_encryption/cl_hello_world.sv 
+$CL_DIR/build/src_post_encryption/cl_simple.sv \
+$CL_DIR/build/src_post_encryption/cl_tst.sv \
+$CL_DIR/build/src_post_encryption/cl_int_tst.sv \
+$CL_DIR/build/src_post_encryption/mem_scrb.sv \
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv
 ]
 
 #---- End of section replaced by User ----
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
-read_verilog [ list \
+read_verilog -sv [ list \
 $HDK_SHELL_DIR/design/lib/flop_fifo.sv \
 $HDK_SHELL_DIR/design/lib/flop_fifo_in.sv \
 $HDK_SHELL_DIR/design/lib/bram_2rw.sv \
@@ -143,23 +147,23 @@ puts "AWS FPGA: Start design synthesis";
 switch $strategy {
     "BASIC" {
         puts "BASIC strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
     }
     "TIMING" {
         puts "TIMING strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
+        synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
     }
     "CONGESTION" {
         puts "CONGESTION strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
+        synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top cl_simple -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
     }
     default {
         puts "$strategy is NOT a valid strategy."
