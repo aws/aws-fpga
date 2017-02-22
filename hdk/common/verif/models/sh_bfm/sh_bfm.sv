@@ -508,21 +508,36 @@ module sh_bfm #(
 
    initial begin
       clk_core = 1'b0;
-      forever #2ns clk_core = ~clk_core;
+      forever #4ns clk_core = ~clk_core;
    end
 
    assign clk_out = clk_core;
-   assign clk_extra_b0 = clk_core;
+
+   initial begin
+      clk_extra_b0 = 1'b0;
+      forever #2ns clk_extra_b0 = ~clk_extra_b0;
+   end
+
+   initial begin
+      clk_main_a0 = 1'b0;
+      forever #4ns clk_main_a0 = ~clk_main_a0;
+   end
 
    initial begin
       clk_xtra = 1'b0;
       forever #4ns clk_xtra = ~clk_xtra;
    end
+
+   initial begin
+      clk_extra_a1 = 1'b0;
+      forever #4ns clk_extra_a1 = ~clk_extra_a1;
+   end
+
+   initial begin
+      clk_extra_b1 = 1'b0;
+      forever #4ns clk_extra_b1 = ~clk_extra_b1;
+   end
     
-   assign clk_main_a0 = clk_xtra;
-   assign clk_extra_a1 = clk_xtra;
-   assign clk_extra_b1 = clk_xtra;
-  
    initial begin
       clk_extra_a3 = 1'b0;
       forever #1ns clk_extra_a3 = ~clk_extra_a3;
