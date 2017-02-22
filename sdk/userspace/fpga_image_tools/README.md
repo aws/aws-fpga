@@ -13,6 +13,19 @@ AWS provides the following set of command-line tools for Amazon FPGA Image (AFI)
    
 * **`fpga-clear-local-image`**
    * Clears the specified FPGA image slot, including FPGA internal and external memories that are used by the slot. The *fpga-image-slot* parameter is an index that represents a given FPGA within an instance.  Use `fpga-describe-local-image` to return the FPGA image status, and `fpga-describe-local-image-slots` to return the available FPGA image slots for the instance.
+   
+* **`fpga-start-virtual-jtag`**
+   * Starts a Virtual JTAG XVC server, to debug tools like Vivado Lab Edition Hardware Manager to access debug cores inside the AFI. Please refer to [Virtual JTAG userguide](../../../hdk/docs/Virtual_JTAG_XVC.md).
+   
+* **`fpga-get-virtual-led`**
+   * Returns a bit-map representating the state (1/0) the Virtual LEDs exposed by the Custom Logic (CL) part of the AFI.
+
+* **`fpga-get-virtual-dip-switch`**
+   * Returns a bit-map representing the current setting for the Virtual DIP Switches that drives the Custom Logic (CL) part of the AFI.
+   
+* **`fpga-set-virtual-dip-switch`**
+   * Takes bit-map (in binary representation) to set for the  Virtual DIP Switches that drives the Custom Logic (CL) part of the AFI.
+   
 
 All of the AFI Management Tools support a `-help` option that may be used to display the full set of options.
 
