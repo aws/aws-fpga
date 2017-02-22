@@ -16,20 +16,19 @@
 TOP = ../..
 TOPINC_PATH = $(TOP)/include
 UTILINC_PATH = $(TOPINC_PATH)/utils
-UTILLCDLIB_PATH = $(TOP)/utils
 FPGAHALINC_PATH = $(TOPINC_PATH)/hal
-FPGAHALLIB_PATH = $(TOP)/hal/lib
+LIB_PATH = $(TOP)/lib
 
 INCLUDES = -I$(UTILINC_PATH) -I$(FPGAHALINC_PATH) -I$(TOP)/include -I../. -I.
 
 #OPT=-O2
 CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
-LDFLAGS = -L$(UTILLCDLIB_PATH) -L$(FPGAHALLIB_PATH) 
+LDFLAGS = -L$(LIB_PATH)
 LDLIBS = -lutils -lfpga_hal_mbox -lfpga_hal_reg -lfpga_hal_plat -lrt -lpthread
 
-UTILLCDLIB = $(UTILLCDLIB_PATH)/libutils.a
-FPGAHALLIB = $(FPGAHALLIB_PATH)/libfpga_hal_mbox.a $(FPGAHALLIB_PATH)/libfpga_hal_reg.a $(FPGAHALLIB_PATH)/libfpga_hal_plat.a
+UTILLCDLIB = $(LIB_PATH)/libutils.a
+FPGAHALLIB = $(LIB_PATH)/libfpga_hal_mbox.a $(LIB_PATH)/libfpga_hal_reg.a $(LIB_PATH)/libfpga_hal_plat.a
 LIBS=$(UTILLCDLIB) $(FPGAHALLIB)
 
 SRC = $(wildcard *.c)

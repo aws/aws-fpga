@@ -56,10 +56,10 @@ build_exec
 BUILD_DIR="hal/src/platform/hw"
 build_exec
 
-BUILD_DIR="fpga_libs/fpga_pci/src"
+BUILD_DIR="fpga_libs/fpga_pci"
 build_exec
 
-BUILD_DIR="fpga_libs/fpga_mgmt/src"
+BUILD_DIR="fpga_libs/fpga_mgmt"
 build_exec
 
 BUILD_DIR="fpga_image_tools/src"

@@ -13,18 +13,21 @@
 # permissions and limitations under the License.
 #
 
+TOP = ..
 INCLUDES = -I. -I../include -I/usr/include
+LIB_PATH = $(TOP)/lib
 
 #OPT=-O2
 CFLAGS=$(OPT) -g -std=gnu99  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
-UTILLIB = libutils.a
+UTILLIB = $(LIB_PATH)/libutils.a
 
 #SRC = $(wildcard *.c)
 SRC = io.c log.c logger-kmsg.c
 OBJ = $(SRC:.c=.o)
 
 $(UTILLIB): $(OBJ)
+	mkdir -p $(LIB_PATH)
 	ar rcs $(UTILLIB) $(OBJ)
 
 clean:
