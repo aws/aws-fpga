@@ -40,7 +40,6 @@ module sh_bfm #(
    output logic                clk_extra_c0,
    output logic                clk_extra_c1,
     
-//   output logic                clk_out,
    output logic                rst_out_n,
 
    output logic                sh_cl_flr_assert,
@@ -552,7 +551,7 @@ module sh_bfm #(
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
-   always @(posedge clk_out)
+   always @(posedge clk_main_a0)
      rst_out_n <= rst_out_n_i;
 
    always @(posedge clk_xtra)
@@ -1338,8 +1337,8 @@ module sh_bfm #(
 
 
    axil_bfm sda_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sda_cl_awvalid),
                          .axil_awaddr(sda_cl_awaddr),
                          .axil_awready(cl_sda_awready),
@@ -1359,8 +1358,8 @@ module sh_bfm #(
                          .axil_rready(sda_cl_rready));
 
    axil_bfm ocl_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sh_ocl_awvalid),
                          .axil_awaddr(sh_ocl_awaddr),
                          .axil_awready(ocl_sh_awready),
@@ -1373,15 +1372,15 @@ module sh_bfm #(
                          .axil_bready(sh_ocl_bready),
                          .axil_arvalid(sh_ocl_arvalid),
                          .axil_araddr(sh_ocl_araddr),
-                         .axil_arready(cl_ocl_arready),
+                         .axil_arready(ocl_sh_arready),
                          .axil_rvalid(ocl_sh_rvalid),
                          .axil_rdata(ocl_sh_rdata),
                          .axil_rresp(ocl_sh_rresp),
                          .axil_rready(sh_ocl_rready));
 
    axil_bfm bar1_axil_bfm(
-                         .axil_clk(),
-                         .axil_rst_n(),
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
                          .axil_awvalid(sh_bar1_awvalid),
                          .axil_awaddr(sh_bar1_awaddr),
                          .axil_awready(bar1_sh_awready),
@@ -1439,53 +1438,85 @@ module sh_bfm #(
       int_pend[int_num] = 1'b0;
    endtask
 
-   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
-      AXI_Command axi_cmd;
-      AXI_Data    axi_data;
+   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
-      logic [1:0] resp;
-      
-      axi_cmd.addr = addr;
-      axi_cmd.len  = 0;
-      axi_cmd.id   = id;
+      case (intf)
+        0: begin
+           AXI_Command axi_cmd;
+           AXI_Data    axi_data;
 
-      sh_cl_wr_cmds.push_back(axi_cmd);
+           logic [1:0] resp;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.id   = id;
 
-      axi_data.data = data << (addr[5:0] * 8);
-      axi_data.strb = 64'h0f << addr[5:0];
-      
-      axi_data.id   = id;
-      axi_data.last = 1'b1;
+           sh_cl_wr_cmds.push_back(axi_cmd);
 
-      #20ns sh_cl_wr_data.push_back(axi_data);
+           axi_data.data = data << (addr[5:0] * 8);
+           axi_data.strb = 64'h0f << addr[5:0];
+           
+           axi_data.id   = id;
+           axi_data.last = 1'b1;
+           
+           #20ns sh_cl_wr_data.push_back(axi_data);
       
-      while (cl_sh_b_resps.size() == 0)
-        #20ns;
+           while (cl_sh_b_resps.size() == 0)
+             #20ns;
       
-      resp = cl_sh_b_resps[0].resp;
-      cl_sh_b_resps.pop_front();
+           resp = cl_sh_b_resps[0].resp;
+           cl_sh_b_resps.pop_front();
+        end
+        1: begin
+           sda_axil_bfm.poke(addr, data);
+        end        
+        2: begin
+           ocl_axil_bfm.poke(addr, data);
+        end
+        3: begin
+           bar1_axil_bfm.poke(addr, data);
+        end
+        default: begin
+          $display("FATAL ERROR - Invalid CL port specified");
+          $finish;
+        end
+      endcase // case (intf)
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0);
-      AXI_Command axi_cmd;
-      int         byte_idx;
-      int         mem_arr_idx;
-      
-      axi_cmd.addr = addr;
-      axi_cmd.len  = 0;
-      axi_cmd.id   = id;
+   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
-      sh_cl_rd_cmds.push_back(axi_cmd);
-
-      byte_idx     = addr[5:0];
-      mem_arr_idx  = byte_idx*8;
-
-      while (cl_sh_rd_data.size() == 0)
-        #20ns;
-      
-      data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      cl_sh_rd_data.pop_front();
+      case (intf)
+        0: begin
+           AXI_Command axi_cmd;
+           int         byte_idx;
+           int         mem_arr_idx;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.id   = id;
+           
+           sh_cl_rd_cmds.push_back(axi_cmd);
+           
+           byte_idx     = addr[5:0];
+           mem_arr_idx  = byte_idx*8;
+           
+           while (cl_sh_rd_data.size() == 0)
+             #20ns;
+           
+           data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
+           cl_sh_rd_data.pop_front();
+        end // case: 0
+        1: begin
+           sda_axil_bfm.peek(addr, data);
+        end
+        2: begin
+           ocl_axil_bfm.peek(addr, data);
+        end
+        3: begin
+           bar1_axil_bfm.peek(addr, data);
+        end
+      endcase // case (intf)
       
    endtask // peek
 
@@ -1631,76 +1662,6 @@ module sh_bfm #(
          end
       end
    end
-
-`ifdef NEVER
-   
-   task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      logic [1:0] resp;
-      
-      int byte_idx;
-      int mem_arr_idx;
-
- 
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 1;
-      
-      sh_cl_wr_cmds.push_back(cmd);
-
-      for (int n= 0; n<len;n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-
-         data.data[mem_arr_idx+:32] = dat[n];
-         data.strb[byte_idx+:4] = 'h0f;
-
-         if (n==len-1)
-           data.last = 1;
-         else
-           data.last = 0;
-      end
-
-      if (debug) begin
-         $display("[%t] DEBUG : Write data is %x strb is %x len is %x \n", $realtime, data.data, data.strb, len);
-      end
-      
-      #20ns sh_cl_wr_data.push_back(data);
-      
-      while (cl_sh_b_resps.size() == 0)
-        #20ns;
-      
-      resp = cl_sh_b_resps[0].resp;
-      cl_sh_b_resps.pop_front();
-      
-   endtask // poke_burst
-
-   task peek_burst(input logic [63:0] start_addr, logic [7:0] len, output logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      int byte_idx;
-      int mem_arr_idx;
-
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 2;
-
-      sh_cl_rd_cmds.push_back(cmd);
-
-      while (cl_sh_rd_data.size() == 0)
-        #20ns;
-      
-      for (int n= 0; n<len; n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-         dat[n] = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      end
-      cl_sh_rd_data.pop_front();
-      
-   endtask // peek_burst
-
-`endif
 
   task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
     sh_ddr_stat_wr[ddr_idx] = 1;

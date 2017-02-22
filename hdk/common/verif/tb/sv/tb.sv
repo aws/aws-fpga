@@ -187,6 +187,105 @@ module tb();
    logic               cl_sh_xdma_rvalid;
    logic               sh_cl_xdma_rready;
 
+
+   //--------------------------------------------
+   // SDA
+   //--------------------------------------------
+
+   logic               sda_cl_awvalid;
+   logic [31:0]        sda_cl_awaddr; 
+   logic               cl_sda_awready;
+
+   //Write data
+   logic               sda_cl_wvalid;
+   logic [31:0]        sda_cl_wdata;
+   logic [3:0]         sda_cl_wstrb;
+   logic               cl_sda_wready;
+
+   //Write response
+   logic               cl_sda_bvalid;
+   logic [1:0]         cl_sda_bresp;
+   logic               sda_cl_bready;
+
+   //Read address
+   logic               sda_cl_arvalid;
+   logic [31:0]        sda_cl_araddr;
+   logic               cl_sda_arready;
+
+   //Read data/response
+   logic               cl_sda_rvalid;
+   logic [31:0]        cl_sda_rdata;
+   logic [1:0]         cl_sda_rresp;
+
+   logic               sda_cl_rready;
+
+
+   //--------------------------------------------
+   // OCL
+   //--------------------------------------------
+
+   logic               sh_ocl_awvalid;
+   logic [31:0]        sh_ocl_awaddr; 
+   logic               ocl_sh_awready;
+
+   //Write data
+   logic               sh_ocl_wvalid;
+   logic [31:0]        sh_ocl_wdata;
+   logic [3:0]         sh_ocl_wstrb;
+   logic               ocl_sh_wready;
+
+   //Write response
+   logic               ocl_cl_bvalid;
+   logic [1:0]         ocl_cl_bresp;
+   logic               sh_ocl_bready;
+
+   //Read address
+   logic               sh_ocl_arvalid;
+   logic [31:0]        sh_ocl_araddr;
+   logic               ocl_sh_arready;
+
+   //Read data/response
+   logic               ocl_sh_rvalid;
+   logic [31:0]        ocl_sh_rdata;
+   logic [1:0]         ocl_sh_rresp;
+
+   logic               sh_ocl_rready;
+
+
+   //--------------------------------------------
+   // BAR1
+   //--------------------------------------------
+
+   logic               sh_bar1_awvalid;
+   logic [31:0]        sh_bar1_awaddr; 
+   logic               bar1_sh_awready;
+
+   //Write data
+   logic               sh_bar1_wvalid;
+   logic [31:0]        sh_bar1_wdata;
+   logic [3:0]         sh_bar1_wstrb;
+   logic               bar1_sh_wready;
+
+   //Write response
+   logic               bar1_sh_bvalid;
+   logic [1:0]         bar1_sh_bresp;
+   logic               sh_bar1_bready;
+
+   //Read address
+   logic               sh_bar1_arvalid;
+   logic [31:0]        sh_bar1_araddr;
+   logic               bar1_sh_arready;
+
+   //Read data/response
+   logic               bar1_sh_rvalid;
+   logic [31:0]        bar1_sh_rdata;
+   logic [1:0]         bar1_sh_rresp;
+
+   logic               sh_bar1_rready;
+
+
+
+
    //------------------------------------------------------
    // HMC Stat Interface from CL
    //------------------------------------------------------
@@ -436,6 +535,89 @@ sh_bfm sh(
    .sh_cl_ddr_rvalid(sh_cl_ddr_rvalid),
    .cl_sh_ddr_rready(cl_sh_ddr_rready),
    .sh_cl_ddr_is_ready(sh_cl_ddr_is_ready),
+
+   .sda_cl_awvalid(sda_cl_awvalid),
+   .sda_cl_awaddr(sda_cl_awaddr), 
+   .cl_sda_awready(cl_sda_awready),
+
+   //Write data
+   .sda_cl_wvalid(sda_cl_wvalid),
+   .sda_cl_wdata(sda_cl_wdata),
+   .sda_cl_wstrb(sda_cl_wstrb),
+   .cl_sda_wready(cl_sda_wready),
+
+   //Write response
+   .cl_sda_bvalid(cl_sda_bvalid),
+   .cl_sda_bresp(cl_sda_bresp),
+   .sda_cl_bready(sda_cl_bready),
+
+   //Read address
+   .sda_cl_arvalid(sda_cl_arvalid),
+   .sda_cl_araddr(sda_cl_araddr),
+   .cl_sda_arready(cl_sda_arready),
+
+   //Read data/response
+   .cl_sda_rvalid(cl_sda_rvalid),
+   .cl_sda_rdata(cl_sda_rdata),
+   .cl_sda_rresp(cl_sda_rresp),
+
+   .sda_cl_rready(sda_cl_rready),
+
+   .sh_ocl_awvalid(sh_ocl_awvalid),
+   .sh_ocl_awaddr(sh_ocl_awaddr), 
+   .ocl_sh_awready(ocl_sh_awready),
+
+   //Write data
+   .sh_ocl_wvalid(sh_ocl_wvalid),
+   .sh_ocl_wdata(sh_ocl_wdata),
+   .sh_ocl_wstrb(sh_ocl_wstrb),
+   .ocl_sh_wready(ocl_sh_wready),
+
+   //Write response
+   .ocl_sh_bvalid(ocl_sh_bvalid),
+   .ocl_sh_bresp(ocl_sh_bresp),
+   .sh_ocl_bready(sh_ocl_bready),
+
+   //Read address
+   .sh_ocl_arvalid(sh_ocl_arvalid),
+   .sh_ocl_araddr(sh_ocl_araddr),
+   .ocl_sh_arready(ocl_sh_arready),
+
+   //Read data/response
+   .ocl_sh_rvalid(ocl_sh_rvalid),
+   .ocl_sh_rdata(ocl_sh_rdata),
+   .ocl_sh_rresp(ocl_sh_rresp),
+
+   .sh_ocl_rready(sh_ocl_rready),
+
+   .sh_bar1_awvalid(sh_bar1_awvalid),
+   .sh_bar1_awaddr(sh_bar1_awaddr), 
+   .bar1_sh_awready(bar1_sh_awready),
+
+   //Write data
+   .sh_bar1_wvalid(sh_bar1_wvalid),
+   .sh_bar1_wdata(sh_bar1_wdata),
+   .sh_bar1_wstrb(sh_bar1_wstrb),
+   .bar1_sh_wready(bar1_sh_wready),
+
+   //Write response
+   .bar1_sh_bvalid(bar1_sh_bvalid),
+   .bar1_sh_bresp(bar1_sh_bresp),
+   .sh_bar1_bready(sh_bar1_bready),
+
+   //Read address
+   .sh_bar1_arvalid(sh_bar1_arvalid),
+   .sh_bar1_araddr(sh_bar1_araddr),
+   .bar1_sh_arready(bar1_sh_arready),
+
+   //Read data/response
+   .bar1_sh_rvalid(bar1_sh_rvalid),
+   .bar1_sh_rdata(bar1_sh_rdata),
+   .bar1_sh_rresp(bar1_sh_rresp),
+
+   .sh_bar1_rready(sh_bar1_rready),
+
+
 /*
    .sh_cl_xdma_awid(sh_cl_xdma_awid),
    .sh_cl_xdma_awaddr(sh_cl_xdma_awaddr),
@@ -566,6 +748,87 @@ sh_bfm sh(
       .sh_cl_pcim_rlast(sh_cl_pcim_rlast),
       .sh_cl_pcim_rvalid(sh_cl_pcim_rvalid),
       .cl_sh_pcim_rready(cl_sh_pcim_rready),
+                                                                                                
+   .sda_cl_awvalid(sda_cl_awvalid),
+   .sda_cl_awaddr(sda_cl_awaddr), 
+   .cl_sda_awready(cl_sda_awready),
+
+   //Write data
+   .sda_cl_wvalid(sda_cl_wvalid),
+   .sda_cl_wdata(sda_cl_wdata),
+   .sda_cl_wstrb(sda_cl_wstrb),
+   .cl_sda_wready(cl_sda_wready),
+
+   //Write response
+   .cl_sda_bvalid(cl_sda_bvalid),
+   .cl_sda_bresp(cl_sda_bresp),
+   .sda_cl_bready(sda_cl_bready),
+
+   //Read address
+   .sda_cl_arvalid(sda_cl_arvalid),
+   .sda_cl_araddr(sda_cl_araddr),
+   .cl_sda_arready(cl_sda_arready),
+
+   //Read data/response
+   .cl_sda_rvalid(cl_sda_rvalid),
+   .cl_sda_rdata(cl_sda_rdata),
+   .cl_sda_rresp(cl_sda_rresp),
+
+   .sda_cl_rready(sda_cl_rready),
+
+   .sh_ocl_awvalid(sh_ocl_awvalid),
+   .sh_ocl_awaddr(sh_ocl_awaddr), 
+   .ocl_sh_awready(ocl_sh_awready),
+
+   //Write data
+   .sh_ocl_wvalid(sh_ocl_wvalid),
+   .sh_ocl_wdata(sh_ocl_wdata),
+   .sh_ocl_wstrb(sh_ocl_wstrb),
+   .ocl_sh_wready(ocl_sh_wready),
+
+   //Write response
+   .ocl_sh_bvalid(ocl_sh_bvalid),
+   .ocl_sh_bresp(ocl_sh_bresp),
+   .sh_ocl_bready(sh_ocl_bready),
+
+   //Read address
+   .sh_ocl_arvalid(sh_ocl_arvalid),
+   .sh_ocl_araddr(sh_ocl_araddr),
+   .ocl_sh_arready(ocl_sh_arready),
+
+   //Read data/response
+   .ocl_sh_rvalid(ocl_sh_rvalid),
+   .ocl_sh_rdata(ocl_sh_rdata),
+   .ocl_sh_rresp(ocl_sh_rresp),
+
+   .sh_ocl_rready(sh_ocl_rready),
+
+   .sh_bar1_awvalid(sh_bar1_awvalid),
+   .sh_bar1_awaddr(sh_bar1_awaddr), 
+   .bar1_sh_awready(bar1_sh_awready),
+
+   //Write data
+   .sh_bar1_wvalid(sh_bar1_wvalid),
+   .sh_bar1_wdata(sh_bar1_wdata),
+   .sh_bar1_wstrb(sh_bar1_wstrb),
+   .bar1_sh_wready(bar1_sh_wready),
+
+   //Write response
+   .bar1_sh_bvalid(bar1_sh_bvalid),
+   .bar1_sh_bresp(bar1_sh_bresp),
+   .sh_bar1_bready(sh_bar1_bready),
+
+   //Read address
+   .sh_bar1_arvalid(sh_bar1_arvalid),
+   .sh_bar1_araddr(sh_bar1_araddr),
+   .bar1_sh_arready(bar1_sh_arready),
+
+   //Read data/response
+   .bar1_sh_rvalid(bar1_sh_rvalid),
+   .bar1_sh_rdata(bar1_sh_rdata),
+   .bar1_sh_rresp(bar1_sh_rresp),
+
+   .sh_bar1_rready(sh_bar1_rready),
                                                                                                 
       .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
       .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
