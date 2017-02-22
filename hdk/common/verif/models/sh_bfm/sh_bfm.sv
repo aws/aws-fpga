@@ -1346,7 +1346,7 @@ module sh_bfm #(
                          .axil_bready(sh_ocl_bready),
                          .axil_arvalid(sh_ocl_arvalid),
                          .axil_araddr(sh_ocl_araddr),
-                         .axil_arready(cl_ocl_arready),
+                         .axil_arready(ocl_sh_arready),
                          .axil_rvalid(ocl_sh_rvalid),
                          .axil_rdata(ocl_sh_rdata),
                          .axil_rresp(ocl_sh_rresp),
@@ -1458,25 +1458,39 @@ module sh_bfm #(
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0);
-      AXI_Command axi_cmd;
-      int         byte_idx;
-      int         mem_arr_idx;
-      
-      axi_cmd.addr = addr;
-      axi_cmd.len  = 0;
-      axi_cmd.id   = id;
+   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
-      sh_cl_rd_cmds.push_back(axi_cmd);
-
-      byte_idx     = addr[5:0];
-      mem_arr_idx  = byte_idx*8;
-
-      while (cl_sh_rd_data.size() == 0)
-        #20ns;
-      
-      data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      cl_sh_rd_data.pop_front();
+      case (intf)
+        0: begin
+           AXI_Command axi_cmd;
+           int         byte_idx;
+           int         mem_arr_idx;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.id   = id;
+           
+           sh_cl_rd_cmds.push_back(axi_cmd);
+           
+           byte_idx     = addr[5:0];
+           mem_arr_idx  = byte_idx*8;
+           
+           while (cl_sh_rd_data.size() == 0)
+             #20ns;
+           
+           data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
+           cl_sh_rd_data.pop_front();
+        end // case: 0
+        1: begin
+           sda_axil_bfm.peek(addr, data);
+        end
+        2: begin
+           ocl_axil_bfm.peek(addr, data);
+        end
+        3: begin
+           bar1_axil_bfm.peek(addr, data);
+        end
+      endcase // case (intf)
       
    endtask // peek
 
