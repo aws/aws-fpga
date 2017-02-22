@@ -1023,7 +1023,6 @@ module sh_bfm #(
       
    end
 
-`ifndef NO_XDMA
    //=================================================
    //
    // Interrupt handling
@@ -1063,7 +1062,6 @@ module sh_bfm #(
          end
       end
    end
-`endif
 
    //==========================================================
 
@@ -1376,6 +1374,14 @@ module sh_bfm #(
 
 
    
+   //=================================================
+   //
+   // power_up
+   //
+   //   Description: asserts and deasserts various resets
+   //   Outputs: None
+   //
+   //=================================================
    task power_up;
       rst_n_i = 1'b0;
       rst_out_n_i = 1'b0;
@@ -1387,10 +1393,26 @@ module sh_bfm #(
       #50ns;
    endtask // power_up
   
+   //=================================================
+   //
+   // delay
+   //
+   //   Description: asserts and deasserts various resets
+   //   Outputs: None
+   //
+   //=================================================
    task delay(int dly = 10000);
       #dly;
    endtask
 
+   //=================================================
+   //
+   // power_down
+   //
+   //   Description: deasserts various resets
+   //   Outputs: None
+   //
+   //=================================================
    task power_down;
       #50ns;
       rst_n_i = 1'b0;
@@ -1399,6 +1421,14 @@ module sh_bfm #(
       #50ns;
    endtask // power_down
 
+   //=================================================
+   //
+   // map_host_memory
+   //
+   //   Description: used to connect C host memory to simulation memory.
+   //   Outputs: None
+   //
+   //=================================================
    task map_host_memory(input logic [63:0] addr);
       if (debug) begin
          $display("[%t] : DEBUG mapping host memory to 0x%16x", $realtime, addr);
@@ -1407,12 +1437,43 @@ module sh_bfm #(
       tb.use_c_host_memory = 1'b1;      
    endtask // map_host_memory
   
+   //=================================================
+   //
+   // set_ack_bit
+   //
+   //   Description: used to acknowledge an interrupt and clear pending bit
+   //   Outputs: None
+   //
+   //=================================================
    task set_ack_bit(input int int_num);
       int_ack[int_num] = 1'b1;
       int_pend[int_num] = 1'b0;
    endtask
 
-   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   //=================================================
+   //
+   // poke
+   //
+   //   Description: used to write a single beat of data at addr into one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke(input logic [63:0] addr, logic [63:0] data, logic [5:0] id = 6'h0, int size = 2, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+
+      logic [63:0] strb;
+
+      strb = {(1<<size){1'b1}};
 
       case (intf)
         0: begin
@@ -1428,7 +1489,7 @@ module sh_bfm #(
            sh_cl_wr_cmds.push_back(axi_cmd);
 
            axi_data.data = data << (addr[5:0] * 8);
-           axi_data.strb = 64'h0f << addr[5:0];
+           axi_data.strb = strb << addr[5:0];
            
            axi_data.id   = id;
            axi_data.last = 1'b1;
@@ -1458,7 +1519,26 @@ module sh_bfm #(
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   //=================================================
+   //
+   // peek
+   //
+   //   Description: used to read a single beat of data at addr from one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek(input logic [63:0] addr, output logic [63:0] data, input logic [5:0] id = 6'h0, int size = 2, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
       case (intf)
         0: begin
@@ -1494,6 +1574,21 @@ module sh_bfm #(
       
    endtask // peek
 
+   //=================================================
+   //
+   // dma_buffer_to_cl
+   //
+   //   Description: used to move a data buffer to the CL via the PCIS AXI interface using one of four channels.
+   //        The size of the transfer is determined by the number of bytes in the buffer.
+   //        
+   //        chan    = 0-3 channel number
+   //        buffer  = AXI bus ID
+   //        cl_addr = starting CL AXI addr
+   //
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
    function dma_buffer_to_cl(input logic [1:0] chan, logic [7:0] buffer[], logic [63:0] cl_addr);
       DMA_OP dop;
       

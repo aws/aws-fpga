@@ -184,7 +184,7 @@ module axil_bfm
 
 
    
-   task poke(input logic [31:0] addr, logic [31:0] data);
+   task poke(input logic [31:0] addr, logic [31:0] data, int size = 2);
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
@@ -195,8 +195,8 @@ module axil_bfm
 
       axil_wr_cmds.push_back(axi_cmd);
 
-      axi_data.data[31:0] = data;
-      axi_data.strb = 4'h0f;
+      axi_data.data[31:0] = data << (addr[1:0] * 8);
+      axi_data.strb = {(1<<size){1'b1}} << addr[1:0];
       axi_data.last = 1'b1;
 
       #20ns axil_wr_data.push_back(axi_data);
@@ -209,8 +209,9 @@ module axil_bfm
       
    endtask // poke
 
-   task peek(input logic [31:0] addr, output logic [31:0] data);
+   task peek(input logic [31:0] addr, output logic [31:0] data, input int size = 2);
       AXI_Command axi_cmd;
+      logic [31:0] mask;
       
       axi_cmd.addr[31:0] = addr;
       axi_cmd.len  = 0;
@@ -219,8 +220,11 @@ module axil_bfm
 
       while (axil_rd_data.size() == 0)
         #20ns;
-      
-      data = axil_rd_data[0].data[31:0];
+
+      mask = {(1 << size){8'hff}};      
+      data = axil_rd_data[0].data[31:0] >> (addr[1:0] * 8);
+      data &= mask;
+
       axil_rd_data.pop_front();
       
    endtask // peek
