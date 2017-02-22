@@ -226,7 +226,7 @@ int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value) {
 	/* fpga_hal_reg_read(...) */
 }
 
-int fpga_mgmt_get_virtual_jtag_state(int slot_id, bool *enabled) {
+int fpga_mgmt_start_virtual_jtag(int slot_id) {
 	(void) slot_id;
 	(void) enabled;
 
@@ -234,10 +234,3 @@ int fpga_mgmt_get_virtual_jtag_state(int slot_id, bool *enabled) {
 	return 1;
 }
 
-int fpga_mgmt_set_virtual_jtag(int slot_id, bool enabled) {
-	(void) slot_id;
-	(void) enabled;
-
-	/* not implemented */
-	return 1;
-}
