@@ -875,7 +875,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		goto err;
 	}
 	
-	if (ret = fpga_mgmt_gset_vDIP_status(f1.afi_slot,status)) {
+	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot,status)) {
 		printf("Error trying to set virtual DIP Switch \n");
 		goto err;
 	}
