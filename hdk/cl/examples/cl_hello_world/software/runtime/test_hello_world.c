@@ -25,8 +25,8 @@
 /* a set of register offsets; this CL has only one */
 #define HELLO_WORLD_REG_ADDR UINT64_C(0x00)
 
-static uint16_t pci_vendor_id = 0x1041;
-static uint16_t pci_device_id = 0xdef0;
+static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
+static uint16_t pci_device_id = 0xF000; /* PCI Device ID allocated by Amazon for F1 applications */
 /* */
 
 /* use the stdout logger */
@@ -49,7 +49,8 @@ int main(int argc, char **argv) {
     fail_on(rc, out, "Unable to initialize the fpga_plat library");
 
     slot_id = 0;
-    return peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR4);
+    /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus */
+    return peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0); 
 
 
 out:
