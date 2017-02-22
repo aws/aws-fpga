@@ -37,7 +37,9 @@
 
 module sh_ddr #( parameter DDR_A_PRESENT = 1,
                  parameter DDR_B_PRESENT = 1,
-                 parameter DDR_D_PRESENT = 1)
+                 parameter DDR_D_PRESENT = 1,
+                 parameter DDR_A_IO = 1,           //When not Present to include IO buffers
+                 parameter DDR_D_IO = 1)
    (
 
    //---------------------------

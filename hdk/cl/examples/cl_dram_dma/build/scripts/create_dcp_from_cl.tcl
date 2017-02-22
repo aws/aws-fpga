@@ -76,11 +76,22 @@ puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog [ list \
-$CL_DIR/build/src_post_encryption/cl_drma_dma.sv \
+$CL_DIR/build/src_post_encryption/cl_dram_dma.sv \
 $CL_DIR/build/src_post_encryption/cl_tst.sv \
 $CL_DIR/build/src_post_encryption/cl_int_tst.sv \
 $CL_DIR/build/src_post_encryption/mem_scrb.sv \
-$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv \
+$CL_DIR/build/src_post_encryption/axil_slave.sv \
+$CL_DIR/build/src_post_encryption/src_register_slice.v \
+$CL_DIR/build/src_post_encryption/dest_register_slice.v \
+$CL_DIR/build/src_post_encryption/axi_crossbar_0.v \
+$CL_DIR/build/src_post_encryption/axi_register_slice_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_crossbar_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_data_fifo_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_infrastructure_v1_1_0.vh \
+$CL_DIR/build/src_post_encryption/axi_infrastructure_v1_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/generic_baseblocks_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/fifo_generator_v13_1_rfs.v
 ]
 
 #---- End of section replaced by User ----
