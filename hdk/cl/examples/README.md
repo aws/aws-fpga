@@ -65,12 +65,12 @@ If you like to start your own CL, check out the [How to create your own CL](../d
 
     $ vivado -mode batch        # Verify Vivado is installed.
 
-Executing the `aws_build_dcp_from_cl.tcl` script will perform the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA.
+Executing the `aws_build_dcp_from_cl.sh` script will perform the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA.
 The output is a tarball file comprising the DCP file, and other log/manifest files, formatted as `YY_MM_DD-hhmm.Developer_CL.tar`.
 This file would be submitted to AWS to create an AFI.
 
     $ cd $CL_DIR/build/scripts
-    $ ./aws_build_dcp_from_cl.tcl
+    $ ./aws_build_dcp_from_cl.sh
 
 **NOTE**: *The DCP generation can take up to several hours to complete.
 We recommend that you initiate the generation in a way that prevents interruption.
