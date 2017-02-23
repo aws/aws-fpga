@@ -36,12 +36,23 @@ file copy -force $CL_DIR/design/axi_crossbar_0/generic_baseblocks_v2_1_vl_rfs.v 
 file copy -force $CL_DIR/design/axi_crossbar_0/fifo_generator_v13_1_rfs.v $CL_DIR/build/src_post_encryption
 
 
-#encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
-#$CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh \
-#$CL_DIR/build/src_post_encryption/cl_dram_dma.sv \
-#$CL_DIR/build/src_post_encryption/cl_tst.sv  \
-#$CL_DIR/build/src_post_encryption/mem_scrb.sv  \
-#$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv  \
-#$CL_DIR/build/src_post_encryption/cl_int_tst.sv  
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
+$CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh \
+$CL_DIR/build/src_post_encryption/cl_dram_dma.sv \
+$CL_DIR/build/src_post_encryption/cl_tst.sv  \
+$CL_DIR/build/src_post_encryption/mem_scrb.sv  \
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv  \
+$CL_DIR/build/src_post_encryption/cl_int_tst.sv \
+$CL_DIR/build/src_post_encryption/axil_slave.sv \
+$CL_DIR/build/src_post_encryption/src_register_slice.v \
+$CL_DIR/build/src_post_encryption/dest_register_slice.v \
+$CL_DIR/build/src_post_encryption/axi_crossbar_0.v \
+$CL_DIR/build/src_post_encryption/axi_register_slice_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_crossbar_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_data_fifo_v2_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/axi_infrastructure_v1_1_0.vh \
+$CL_DIR/build/src_post_encryption/axi_infrastructure_v1_1_vl_rfs.v \
+$CL_DIR/build/src_post_encryption/generic_baseblocks_v2_1_vl_rfs.v 
+#$CL_DIR/build/src_post_encryption/fifo_generator_v13_1_rfs.v
 
 #---- End of section replaced by Developr ---
