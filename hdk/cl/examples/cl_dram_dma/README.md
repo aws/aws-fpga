@@ -37,7 +37,7 @@ The DRAM space is 64GiB, and is mapped to the pcis_dma AXI4 bus.
 
 sh_cl_pcis_dma_ exposes a address windows of 128GiB matching AppPF BAR4.
 
-This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/common/shell_current/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to TBD.
+This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/common/shell_current/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to DDRA (base_addr=0x000000000, range=16GB), DDRB(base_addr=0x400000000, range=16GB), DDRC(base_addr=0x800000000, range=16GB), DDRD(base_addr=0xC00000000, range=16GB).
 
 
 ### ocl_ AXI-Lite
@@ -65,7 +65,7 @@ Address bits [9:0] will be used to access the location of the RAM, but the upper
 
 ### pcim_ AXI4
 
-The cl_sh_pcim_  AXI4 TBD.
+The cl_sh_pcim_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/cl_pcim_mstr.sv). It can be used to read/write from the host memory. 
 
 
 ### FPGA to FPGA communication over PCIe
@@ -79,8 +79,7 @@ This example does not use FPGA to FPGA Ring
 
 ### Virtual JTAG
 
-A [TBD] ILA cores are integrated, one to monitoring the sh_cl_pcis_dma\* bus and the other to monitor the signals on DDR_A.
-VIO is not used.
+2 ILA cores are integrated, one to monitoring the sh_cl_pcis_dma\* bus and the other to monitor the AXI4 signals on DDR_A.
 
 ### Clocks
 
