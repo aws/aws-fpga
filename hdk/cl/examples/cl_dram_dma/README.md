@@ -42,7 +42,7 @@ This memory space is mapped to the 64GiB DRAM space (the upper half of the 128Gi
 
 ### ocl_ AXI-Lite
 
-The sh_cl_ocl_ AXI-Lite bus is connected to [TBD] module [cl_ocl_slv.sv](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/cl_ocl_slv.sv), and is used for register access to the Automatic Test Generator (ATG) etc.
+The sh_cl_ocl_ AXI-Lite bus is connected to [cl_ocl_slv.sv](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/cl_ocl_slv.sv) module, and is used for register access to the Automatic Test Generator (ATG) etc.
 
 The valid address map is found [here](./TBD).
 
