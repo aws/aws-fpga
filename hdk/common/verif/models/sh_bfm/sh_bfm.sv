@@ -761,23 +761,6 @@ typedef struct {
       
    end
    
-   always @(posedge clk_core) begin
-      sh_cl_pcis_bready[0] <= 1'b1;
-   end
-
-   always @(posedge clk_core) begin
-      AXI_Command resp;
-
-      if (cl_sh_pcis_bvalid[0] & sh_cl_pcis_bready) begin
-         resp.resp     = cl_sh_pcis_bresp[0];
-         resp.id       = cl_sh_pcis_bid[0];
-
-         cl_sh_b_resps.push_back(resp);
-      end
-
-   end
-
-
    //
    // sh->cl Address Read Channel
    //
