@@ -12,7 +12,7 @@
 
 The CL_DRAM_DMA example demonstrate the use and connectivity for many of the Shell/CL interface and functionality, including:
 
-1) [Register Access over ocl_ and bar1_ AXI-Lite interfaces]  
+1) [Register Access over ocl_ AXI-Lite interface]  
 2) [Mapping of the external four DRAM channel to instance memory via PCIe AppPF BAR4, and the 512-bit pcis_dma_ AXI4 bus]
 3) [Virtual JTAG and Xilinx Integrated Logic Analyzer cores]
 4) [User-defined interrupts]
@@ -29,7 +29,7 @@ The CL_DRAM_DMA example demonstrate the use and connectivity for many of the She
 
 ### DRAM Interfaces
 
-All four DRAM channels are used.... (TBD - how to instiate DRAM, should we set the DDR_A_PRESENT etc ?)
+All four DRAM channels are used.
 
 The DRAM space is 64GiB, and is mapped to the pcis_dma AXI4 bus.
 
@@ -37,7 +37,7 @@ The DRAM space is 64GiB, and is mapped to the pcis_dma AXI4 bus.
 
 sh_cl_pcis_dma_ exposes a address windows of 128GiB matching AppPF BAR4.
 
-This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [internal fabric] (TBD LINK) will interleave inbound addresses according to TBD.
+This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/axi_crossbar_0/axi_crossbar_0.v) will interleave inbound addresses according to TBD.
 
 
 ### ocl_ AXI-Lite
@@ -58,7 +58,7 @@ Address bits [9:0] will be used to access the location of the RAM, but the upper
 
 ### sda_ AXI-Lite
 
-The sh_cl_sda_ AXI-Lite bus is connected to [TBD] module[Add link], which provides 1KiB of scratch RAM.
+The sh_cl_sda_ AXI-Lite bus is connected to [cl_sda_slv.sv](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/cl_sda_slv.sv) module, which provides 1KiB of scratch RAM.
 
 Address bits [9:0] will be used to access the location of the RAM, but the upper bits of the address are ignored.
 
