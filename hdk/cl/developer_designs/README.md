@@ -1,4 +1,4 @@
-# Starting your own Custom Logic
+# Starting Your Own Custom Logic (CL)
 
 ## 1. Make sure you have the FPGA HDK installed and the environment variables set up
 
@@ -21,11 +21,11 @@ The developer has two ways to start a new Custom Logic design:
     $ export CL_DIR=$(pwd)
     $ source $HDK_DIR/cl/developer_designs/prepare_new_cl.sh 
         
-Setting up the `$CL_DIR` environment variable is crucial as the build scripts rely on that value.
+Setting up the `$CL_DIR` environment variable is a must as the build scripts rely on that value.
 
-The `prepare_new_cl.sh` would set up the directory structure to match what's expected by the HDK simulation and build scripts. Execute `source $HDK_DIR/cl/developer_designs/prepare_new_cl.sh` from within the directory you want to use for your CL development.
+The `prepare_new_cl.sh` will setup the directory structure to match what's expected by the HDK simulation and build scripts. Execute `source $HDK_DIR/cl/developer_designs/prepare_new_cl.sh` from within the directory you want to use for your CL development.
 
-In both cases, double check that the `$CL_DIR` is set correctly by calling and checking the result of:
+In both cases, double-check that the `$CL_DIR` is set correctly by calling and checking the result of:
 
     $ echo $CL_DIR
 

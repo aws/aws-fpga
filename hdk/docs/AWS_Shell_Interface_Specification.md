@@ -1,70 +1,84 @@
+# AWS Shell Interface Specification
 
 ## Revision History
 
 2016/11/28   -   Initial public release with HDK release version
 
 2016/12/06   -   Added capability to remove DDR controllers in the CL through parameters in `sh_ddr.sv`
+
+2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Virtual LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details)
                           
-                          
+  
+# Table of Content:
 
-# Overview
+1. Overview(#overview)
 
-The AWS FPGA instance provides FPGA acceleration capability to AWS
-compute instances. Each FPGA is divided into two partitions:
+2. EC2 Instance view of FPGA PCIe(#pciPresentation)
 
--   Shell (SH) – AWS platform logic responsible for taking care of the FPGA external peripherals, PCIe, and Interrupts.
+3. Clocks and Reset(#ClocksNReset)
 
--   Customer Logic (CL) – Custom acceleration logic created by an FPGA Developer
+4. Shell/CL Interfaces(#ShellInterface)
+  4.1 Interrupts(#interrupts)
+  4.2 DDR4 DRAM Interfaces(#ddr)
+  4.3 Miscellanous Interfaces (vLED, vDIP..)(#misc)
 
-At the end of the development process, the Shell and CL will become an Amazon FPGA Image (AFI)
+# Overview<a name="overview"></a>
 
-This document specifies the hardware interface and functional behavior between the Shell and the CL.
+With F1, each FPGA is divided into two partitions:
 
-While there could be multiple versions and multiple generations of the FPGA-accelerated EC2 instances, the rest of this document focuses on the Shell design for xvu9p architecture used in EC2 F1 instance.
+-   Shell (SH) – AWS platform logic responsible for taking care of the FPGA external peripherals, PCIe, DRAM, and Interrupts.
 
-Full details of the available FPGA enabled instances are [here](https://aws.amazon.com/ec2/instance-types)
+-   Custom Logic (CL) – Custom acceleration logic created by an FPGA Developer.
 
+At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI)
+
+This document specifies the hardware interface and functional behavior between the SH and the CL; specifically the Shell design for xvu9p architecture used in EC2 F1 instance.
+
+Full details of the available FPGA enabled instances are [here](https://aws.amazon.com/ec2/instance-types/f1/)
+  
+  
 ## Architecture and Version
 
-This specification applies to  Xilinx Virtex Ultrascale Plus platform, referred to in AWS APIs and the HDK release as `FpgaImageArchitecture=xvu9p`.
+This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell 
+ is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
 
-The Shell is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
-
-New shell versions require updated CL implementation and regenerating the AFI.
-
-## Convention
-
-
-**CL –** Custom’s Logic: the Logic to be provided by the developer and integrated with AWS Shell.
+New shell versions will require updated CL implementation and regenerating the AFI.
+  
+  
+## Conventions
+  
+**CL –** Custom Logic: the Logic to be provided by the developer and integrated with AWS Shell.
 
 **DW –** Doubleword: referring to 4-byte (32-bit) data size.
 
-**AXI-4** ARM Advanced eXtensible Interface.
+[**AXI-4** ARM Advanced eXtensible Interface.](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.set.amba/index.html)
 
-**AXI-4 Stream –** ARM Advanced eXtensible Stream Interface.
+[**AXI-4 Stream –** ARM Advanced eXtensible Stream Interface.](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.set.amba/index.html)
 
 **M –** Typically refers to the Master side of an AXI bus.
 
-**S –** Typical refers to the Slave side of AXI bus.
+**S –** Typical refers to the Slave side of AXI bus.  
+  
+  
 
-# Shell Interfaces (for xvu9p architecture as in EC F1 instances)
+# Shell Interfaces<a name="ShellInterfaces"></a>
 
 
 The F1 FPGA platform includes the following interfaces available to the
 CL:
 
--   One x16 PCIe Gen 3 Interface.
+-   One x16 PCI Express 3.0 Interface.
 
 -   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
 
 
-## CL/Shell Interfaces (AXI-4)
+## CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
 
+All interfaces except the inter-FPGA links use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can run off lower speed control interfaces that use the AXI-Lite protocol. 
 
-All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 interfaces in the Shell have the following restrictions:
+For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfaces have the following restrictions:
 
--   AxSIZE – All transfers must be the entire width of the bus. While byte-enables bitmap are supported, it must adhere to the interface
-    protocol (i.e. PCIe contiguous byte enables on all transfers larger than 64-bits).
+-   AxSIZE – All transfers must be at the entire width of the bus. While byte-enables bitmap are supported, it must adhere to the interface protocol (i.e. PCIe contiguous byte enables on all transfers larger than 64-bits).
 
 -   AxBURST – Only INCR burst is supported.
 
@@ -81,18 +95,18 @@ All interfaces except the inter-FPGA links uses the AXI-4 protocol. The AXI-4 in
 
 ![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
-### External Memory Interfaces implemented in CL
+## External Memory Interfaces implemented in CL
 
-Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usuable FPGA resources) . For those interfaces, the designs and the constrains are provided by AWS and must be instantiated in the CL (by including the `sh_ddr.sv`). 
+Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
 
 There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. A design block (sh_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
 
-For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.
+For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.  **WARNING** if the stats interface is not hooked up, the DDR controllers will not function.
 
 All CL's **must** instantiate sh_ddr.sv, regardless of the number of DDR's that should be implemented.  There are three parameters (all default to '1') that define which DDR controllers are implemented:
-  * DDR_A_PRESENT
-  * DDR_B_PRESENT
-  * DDR_D_PRESENT
+  - DDR_A_PRESENT
+  - DDR_B_PRESENT
+  - DDR_D_PRESENT
   
 These parameters are used to control which DDR controllers are impemented in the CL design.  An example instantiation:
  ```   
@@ -105,92 +119,145 @@ These parameters are used to control which DDR controllers are impemented in the
  ```   
  
 
-**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether anyone of them resides in the CL or the Shell logic*
+**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
-
-### Clocking/Reset
-
-A single 250MHz clock, and associated asynchronous reset is provided to the CL. All Shell interfaces are synchronous to the 250MHz clock. The CL can derive clocks off of the 250MHz clock.
-
-+The Xilinx Mixed Mode Clock Manager (MMCM) IP can be used to generate slower clocks off of the 250MHz clock.
-
-![alt tag](./images/Dividing_clocks_inside_CL.jpg)
-
-The reset signal combines the board reset and PCIe reset conditions. Please refer to the Xilinx documentation (ug974) for more information.
-
-### Function Level Reset
-
-FLR is supported for the Application Physical Function using a separate FLR interface:
-
--   sh_cl_flr_assert – Level signal that is asserted when FLR has
-    been requested
-
--   cl_sh_flr_done – Asserted for a single clock to acknowledge
-    the FLR. This must be asserted in response to sh_cl_flr_assert.
-    Note due to pipeline delays it is possible sh_cl_flr_assert is
-    asserted for some number of clocks after cl_sh_flr_done.
-
-
-## PCIe Endpoint Presentation to Instance
+# FPGA PCIe Presentation to EC2 Instance<a name="pciPresentation"></a>
 
 There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
--   Management PF – This PF allows for management of the FPGA using the [FPGA Management Tools](../../sdk/management/management_tools/README.md) , including tracking FPGA state and loading CL images onto the FPGA.
+-   Management PF – This PF is used for management of the FPGA using the [FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md), [FPGA Management Libraries](../../sdk/userspace/include/), and various control functions like Virtual-LED, Virtual-DIPSwitch, [Virtual JTAG](./Virtual_JTAG_XVC.md), and including monitoring FPGA metrics and performing AFI management actions.
 
--   Application PF – The PF for the Custom Logic (CL) specific functionality
+-   Application PF (AppPF)– The AppPF is used for CL specific functionality.
 
+The [Software Programmers' View](./Programmers_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs. 
 
-### Management PF
+Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
-The management PF is a separate PF from the CL PF. Details are provided for reference for understanding the PCIe mapping from an F1 instance. This interface is strictly for AWS FPGA Management Tools, and does not support any interface with the CL code. 
+## Management PF (MgmtPF)
+
+The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used for [AWS FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ application, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
 
 The Management PF exposes:
 
-a)  Amazon’s specific and fixed PCIe VendorID (0x1D05) and DeviceID.
+a)  Amazon’s specific and fixed PCIe VendorID (0x1D0F) and DeviceID.
 
-b)  Two BARs with 4KB size
+b)  Three BARs:
 
-c)  Single MSI-X interrupt.
+      - BAR0 - 16KiB
+      - BAR2 - 16KiB
+      - BAR4 - 4MiB  
 
-d)  No BusMaster support.
+c)  No BusMaster support.
 
-e)  A range of 32-bit addressable registers.
+d)  A range of 32-bit addressable registers.
 
-The Management PF is persistent throughout the lifetime of the instance, and it will not be reset or cleared (even during the AFI attach/detach process).
+The Management PF is persistent throughout the lifetime of the instance, and it will not be reset or cleared (even during the AFI Load/Clear process).  
 
-### Application PF (AppPF)
 
-The Application PF exposes the following:
+## Application PF (AppPF)
 
-a)  PCIe BAR0 as a 64-bit prefetchable BAR sized as 128MB (*note the BAR size is subject to change, goal is 64GB, but will be no smaller
-    than 128MB)*. This BAR may be used to map the entire External/Internal memory space to the instance address space if desired, through `mmap()` type calls.
+The Application PF exposes:
 
-b)  PCIe BAR2 as a 64-bit prefetchable BAR sized as 4KB for the MSI-X interrupt tables.
+a)  PCIe BAR0 as a 32-bit non-prefetchable BAR sized as 32MiB.  This BAR maps to the the OCL AXI-Lite interface.
+
+b)  PCIe BAR1 as a 32-bit non-prefetchable BAR sized as 2MiB.  This BAR maps to the the BAR1 AXI-Lite interface.
+
+c)  PCIe BAR2 as a 64-bit prefetchable BAR sized as 64KiB. This BAR is not CL visible.  This BAR maps to the MSI-X tables and XDMA (if enabled).
+
+d)  PCIe BAR4 as a 64-bit prefetchable BAR sized as 128GiB. This BAR may be used to map the entire External/Internal memory space to the instance address space if desired, through `mmap()` type calls or use `fpga_pci_lib` APIs.
 
 c)  FLR capability that will reset the CL.
 
 d)  BusMaster capability to allow the CL to master transactions towards the instance memory.
     
-e)  CL’s specific PCIe VendorID, DeviceID, VendorSystemID and SubsystemID as registered through `aws ec2 fpgaImageCreate` [*Available soon*]
+e)  CL’s specific PCIe VendorID, DeviceID, VendorSystemID and SubsystemID as registered through `aws ec2 fpgaImageCreate`
 
-The Developer can write drivers for the App PF or can leverage the reference driver provided in the SDK (With plan to include the driver included in Amazon Linux by default).
+The Developer can write drivers for the AppPF or can leverage the reference driver provided in the SDK.
 
 
-### CL Interface to PCIe Interface via Shell 
+# Clocks and Reset<a name="ClocksNReset"></a>
 
-The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can accessed it two AXI-4 interfaces:
+## Clocks
 
-#### AXI-4 for Inbound PCIe Transactions (Shell is master, CL is slave) 
+There are multiple clocks provided by the Shell to the CL, grouped in 3 groups marked \_a, \_b and \_c suffix: 
 
-This AXI-4 bus is for PCIe transactions mastered by the instance and targeting AppPF BAR0.
+   - clk_main_a0
+   - clk_extra_a1
+   - clk_extra_a2
+   - clk_extra_a3
 
-It is a 512-bit wide AXI-4 interface that supports 32-bit transactions only. *Future revisions this interface will support larger burst sizes (up to the Maximum Payload Size)*.
+   - clk_extra_b0
+   - clk_extra_b1
 
-A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell [*May not be supported in early releases*]. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by FPGA Management Tools metric.
+   - clk_extra_c0
+   - clk_extra_c1
 
-#### AXI-4 for Outbound PCIe Transactions (CL is master, Shell is slave) 
+**clk_main_a0** is the main clock and used, since all interfaces between CL and SH are clocked with clk_main_a0.
 
-This is a 512-bit wide AXI-4 Interface for the CL to master cycles to the PCIe bus. This is used, for example, to DMA data to/from instance memory.
+The clocks within each group are generated from a common VCO/PLL, which restrict what combinations of frequencies are allowed within a group.
+
+The maximum frequency on clk_main_a0 is 250MHz.
+
+** *Note: The Developer must NOT assume any phase alignment between clock sources* **
+** *Note: The Developer must NOT assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies * **  
+
+
+### Defining Clock frequencies by Developer
+
+There Developer can select among a set of available frequencies, provided in the table below. The target frequencies must defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.
+
+ .  **FIXME NEED TO PUT TABLE OF FREQUENCIES**
+
+### Default Clock Frequency setting if a clock group is missing from the AFI Manifest
+
+   clk_main_a0:   125MHz
+   clk_extra_a1:  125MHz
+   clk_extra_a2:  375MHz
+   clk_extra_a3:  500MHz
+
+   clk_extra_b0:  250MHz
+   clk_extra_b1:  125MHz
+
+   clk_extra_c0:  300MHz
+   clk_extra_c1:  400MHz
+
+## Reset
+
+The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
+
+### PCIe Function Level Reset (FLR)
+
+PCIe FLR is supported for the Application Physical Function (PF) using a separate FLR signal:
+
+-   sh_cl_flr_assert – Active-high Level signal that is asserted when FLR has been requested
+
+-   cl_sh_flr_done – Asserted (active-high) for a single clock to acknowledge the FLR. This must be asserted ** within 4 miliseconds ** in response to sh_cl_flr_assert. Note due to pipeline delays it is possible sh_cl_flr_assert is asserted for some number of clocks after cl_sh_flr_done. 
+
+A failure to respond to flr_assert with flr_done with 4 millisecond will leave the CL in an unknown state.
+
+
+# Interfaces between Shell and CL
+
+## CL Interface to PCIe Interface via Shell  
+
+The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can access it through two AXI-4 interfaces:
+  
+  
+### AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) -- DMA_PCIS interface 
+
+This AXI-4 bus is used for PCIe transactions mastered by the instance and targeting AppPF BAR4.
+
+It is a 512-bit wide AXI-4 interface. 
+
+A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by the AFI Management Tools metric.
+
+If DMA is enabled this interface also has DMA traffic targeting the CL.
+
+### AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)  -- PCIM interface
+
+This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory. The same bus is used for FPGA to FPGA communication over PCIe.
+
+__** NOTE: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual address.** __
 
 The following PCIe interface configuration parameters are provided from the Shell to the CL, and the CL logic must respect these maximum limits:
 
@@ -208,104 +275,122 @@ The following PCIe interface configuration parameters are provided from the Shel
     -   3’b100 – 2048 Byte
     -   3’b101 – 4096 Byte
 
-The PCIe CL to Shell AXI-4 interfaces **MUST** implement “USER” bits on the address channels (`AxUSER[18:0]`).
-
--   AxUSER[10:0] – DW length of the request. This is 1-based (0: zero DW, 1: one DW, 2: two DW, etc…)
--   AxUSER[14:11] – First DW's Byte enable for the Request
--   AxUSER[18:15] – Last DW's Byte enable for the Request
 
 ##### Outbound PCIe AXI-4 Interface Restrictions:
 
--   Transfers must not violate PCIe byte enable rules (see byte enables below).
--   Transfers must not cross a 4Kbyte address boundary (PCIe restriction).
+-   Transfers must not violate PCIe byte enable rules (see byte enable rules below).
+-   Transfers must not cross a 4Kbyte address boundary (a PCIe restriction).
 -   Transfers must not violate Max Payload Size.
 -   Read requests must not violate Max Read Request Size.
--   A read request transaction must not be issued using the same ARID (AXI4 Read ID), if that ARID is already outstanding. **NOTE:** *The Shell does not enforce ordering between individual read transactions and read response could could in arbiterary order*.
--   The PCIe interface supports 5-bit ARID (32 outstanding read transactions maximum), as PCIe extended tag is not supported on the PCIe interface.
 -   The address on the AXI-4 interface must reflect the correct byte address of the transfer. The Shell does not support using a 64-bit
     aligned address, and using STRB to signal the actual starting DW.
--   The first/last byte enables are determined from the AxUSER bits. In addition, for writesm the WSTRB signal must be correct and reflect the appropriate valid bytes on the WDATA bus even if it was provided on AxUSER. 
+
 
 ##### Byte Enable Rules
 
 All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express Base specification). Rules are summarized below:
 
--   All transactions larger than two DW must have contiguous byte enables
--   Transactions that are less than two DW may have non-contiguous byte enables
+-   All transactions larger than two DW must have contiguous byte enables.
+-   Transactions that are less than two DW may have non-contiguous byte enables.
 
-### AXI4 Error handling 
+#### AXI4 Error Handling for CL outbound transactions 
 
-Transaction on AXI4 interface will be terminated and reported as SLVERR on the RRESP/BRESP signals and will not passed to the instance in the following cases:
+Transactions on AXI4 interface will be terminated and reported as SLVERR on the RRESP/BRESP signals and will not be passed to the instance in the following cases:
 
--   PCIe BME (BusMaster Enable) is not set in the PCIe configuration space
+-   PCIe BusMaster Enable (BME) is not set in the PCIe configuration space.
 
--   Illegal transaction address (Addressing memory space that’s not supported by the instance)
+-   Illegal transaction address; i.e. addressing memory space that isn't supported by the instance.
 
--   Transaction crossing 4KB boundaries violating PCIe specifications
+-   Transaction crossing 4KB boundaries violating PCIe specifications.
 
--   Illegal byte-masking
+-   Illegal byte-masking.
 
--   Illegal length
+-   Illegal length.
 
--   Illegal ARID (ARID is already been used for an outstanding read transaction)
+-   Illegal ARID; i.e ARID is already been used for an outstanding read transaction.
 
-**NOTE** Pre-GA versions of the Shell and the FPGA Magagement tools many not have some of these checks and associated metrics exposed to the developers.
+**NOTE** Pre-GA versions of the Shell and the FPGA Management tools may not have some of these checks and associated metrics exposed to the developers.
 
-### Interrupts (Future)
 
-Interrupts are not supported in the current version of the Shell. Future
-versions of the Shell will have support for at least 16 interrupt
-sources.
+## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)
 
-## DDR4 DRAM Interface
+There are three AXI-L master interfaces (Shell is master) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this info multiple interfaces allows for different software entities to have a control interface into the CL:
+
+-   SDA AXI-L: Associated with MgmtPF, BAR4.  If the developer is using AWS OpenCL runtime Lib (As in SDAccel case), this interface will be used for performance monitors etc.
+-   OCL AXI-L: Associated with AppPF, BAR0. If the developer is using AWS OpenCL runtime lib(As in SDAccel case), this interface will be used for openCL Kernel access
+-   BAR1 AXI-L: Associated with AppPF, BAR1.
+
+Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
+
+
+## Interrupts <a name="interrupts"></a>
+
+16 user interrupt source are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers int he DMA controller map the 16 user interrupt sources to MSI-X vectors.  
+
+There are two sets of signals to generate interrupts:
+
+-   cl_sh_apppf_irq_req\[15:0\] (from CL to SH)
+-   sh_cl_apppf_irq_ack\[15:0\] (from SH to CL)
+
+The CL asserts (active high) cl_sh_apppf_irq_req\[x\], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
+
+
+## DDR4 DRAM Interface<a name="ddr"></a>
 
 Each DRAM interface is accessed via an AXI-4 interface:
 
--   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR
+-   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR.
 
-There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with roundrobin arbitration (equal priority).
+There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
 
 The DRAM interface uses Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. User bits are added to the read data channel to signal ECC errors with the read data.
 
 **NOTE:** even if no DDR4 controllers are desired in the CL, the `sh_ddr.sv` block must be instantiated in the CL (parameters are used to remove DDR controllers).  If the `sh_ddr.sv` module is not instantiated the design will have build errors.
-
+  
+  
 ### DRAM Content Preservation between AFI Loads (Future)
-
+  
+  
 In future Shell versions a DRAM content preservation feature will be implemented. This feature allows the DDR state to be preserved when dynamically changing CL logic. The current Shell version will not guarantee preservation of DRAM contents if the CL logic is re-loaded.
-
-#### Miscellaneous signals
+  
+  
+## Miscellaneous signals<a name="misc"></a>
 
 There are some miscellaneous generic signals between the Shell and CL.
 
-### PCIe IDs
+### Integrity Check
 
-Some signals must include the PCIe IDs of the CL. A Developer’s specific PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID are registered through `aws ec2 fpgaImageCreate` command to reserve the PCIe IDs of the CL for mapping of the device into an F1 instance when the AFI is loaded.
+The 64-bit ch_sh_id0/id1 are used by AWS to validate the signature of the DCP while being loaded into an FPGA in AWS.
+
+Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID (which are used during AFI registerion via `aws ec2 create-fpga-image` API) as the Integrity check mechanism, following the next mapping
 
 -   cl_sh_id0
 
-    -   [15:0] – Vendor ID
+    -   \[15:0\] – Vendor ID
 
-    -   [31:16] – Device ID
+    -   \[31:16\] – Device ID
 
 -   cl_sh_id1
 
-    -   [15:0] – Subsystem ID
+    -   \[15:0\] – Subsystem Vendor ID
 
-    -  [31:16] – Subsystem Vendor ID
+    -  \[31:16\] – Subsystem ID
+    
+In future revisions of the HDK, AWS scripts may override the cl_sh_id0/id1 to include an integrity hash function.
 
-### General control/status
+### General Control/Status
 
 The functionality of these signals is TBD.
 
--   cl_sh_status0[31:0] – Placeholder for generic CL to Shell status
+-   cl_sh_status0[31:0] – Placeholder for generic CL to Shell status.
 
--   cl_sh_status1[31:0] – Placeholder for generic CL to Shell status
+-   cl_sh_status1[31:0] – Placeholder for generic CL to Shell status.
 
--   sh_cl_ctl0[31:0] – Placeholder for generic Shell to CL control information
+-   sh_cl_ctl0[31:0] – Placeholder for generic Shell to CL control information.
 
--   sh_cl_ctl1[31:0] – Placeholder for generic Shell to CL control information
+-   sh_cl_ctl1[31:0] – Placeholder for generic Shell to CL control information.
 
--   sh_cl_pwr_state[1:0] – This is the power state of the FPGA. 0x0
+-   sh_cl_pwr_state[1:0] – This is the power state of the FPGA. 
 
     -   0x0 – Power is normal
 
@@ -313,4 +398,21 @@ The functionality of these signals is TBD.
 
     -   0x2 – Power level 2
 
-    -   0x3 – Power is critical and FPGA is subject to shutting off clocks or powering down
+    -   0x3 – Power is critical and FPGA may be shutting off clocks or powering down
+
+### Virtual LED/DIP
+
+There are virtual LED/DIP switches that can be used to control/monitor CL logic.  There are 16 LEDs and 16 DIP Switches.  Registers exposed to the Management PF are used to control/monitor the LED/DIP Switches.
+
+vLED - There are 16 virtual LEDs that can be driven from the CL logic to the SH (cl_sh_status_vled[15:0]).  The value of these signals can be read by S/W in the Instance.  An API is also provided through AWS Management Software.
+
+vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic (sh_cl_status_vdip[15:0]).  These can be used to control logic in the CL.  The value of these signals can be written/read by S/W in the instance.  An API is also provided through AWS Management Software.
+
+### DMA
+
+There is an integrated DMA controller inside the Shell, and writes/reads data to/from the CL via the sh_cl_pcis_dma bus, and maps to the same address space exposed by the AppPF BAR4 address.
+
+### Global Counters
+
+There are two global counter outputs that increment every 4ns.  These can be used to measure time inside of the CL.  They are synchronized to clk_main_a0.  Note if clk_main_a0 is running slower than 250MHz, the counters will appear to skip values.
+

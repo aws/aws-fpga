@@ -804,6 +804,7 @@ module sh_bfm #(
    logic [63:0] host_memory_addr = 0;
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
+   int          wr_last_cnt = 0;
    logic [63:0] wr_addr;
    
    always @(posedge clk_core) begin
@@ -914,7 +915,7 @@ module sh_bfm #(
          cl_sh_wr_data.push_back(wr_data);
 
          if (wr_data.last == 1)
-           sh_cl_b_resps[0].last = 1;
+           wr_last_cnt += 1;
          
       end
       if (cl_sh_wr_data.size() > 64)
@@ -931,15 +932,17 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       if (sh_cl_b_resps.size() != 0) begin
          if (debug) begin
-            $display("[%t] : DEBUG resp.size  %2d  %1d", $realtime, sh_cl_b_resps.size(), sh_cl_b_resps[0].last);
+            $display("[%t] : DEBUG resp.size  %2d ", $realtime, sh_cl_b_resps.size());
          end
-         if (sh_cl_b_resps[0].last != 0) begin
-            sh_cl_pcim_bid   <= sh_cl_b_resps[0].id;
-            sh_cl_pcim_bresp <= 2'b00;
+         if (wr_last_cnt != 0) begin
+            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp[0] <= 2'b00;
+
             sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
                                    !cl_sh_pcim_bready ? 1'b1 : 1'b0;
 
             if (cl_sh_pcim_bready && sh_cl_pcim_bvalid) begin
+               wr_last_cnt -= 1;
                sh_cl_b_resps.pop_front();
                cl_sh_wr_cmds.pop_front();
             end

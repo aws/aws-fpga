@@ -47,7 +47,7 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Interrupts are not supported
 * Build flow limited to RTL/Verilog source files
 * VHDL
-* HLS and OpenCL build flow not included in this HDK release
+* OpenCL build flow not included in this HDK release
 * ChipScope
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
@@ -55,7 +55,6 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * Customizable PCIe DeviceID/VendorID
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
-* Synopsys RTL simulations tools
 * Xilinx SDAccel development environment
 * Additional metric counters for FPGA management tools
 * PCIe Slave interface supports 32-bit accesses only (can only do 32-bit accesses from Instance to FPGA), future releases will go up to 512-bit
@@ -72,19 +71,23 @@ This is first public release for AWS EC2 FPGA Development Kit. The kit comes wit
 * This release tested and validated with Vivado 2016.3
 * Vivado XSIM RTL simulator supported by the HDK
 * MentorGraphic's Questa RTL simulator supported by the HDK (but requires a purchase of separate license from MentorGraphics)
+* Synopsys' VCS RTL simulator supported by the HDK (but requires a purchase of separate license from Synopsys)
+
 
 ## License Requirements
 
 The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to [HDK License](./hdk/LICENSE.txt) and [SDK License](./sdk/LICENSE.txt).
 
-## What's new
+## What's New
 
 ### 2016/12/06 
-   * Add support for configurable number of DDR controllers in the CL (see ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)) 
+   * Add support for configurable number of DDR controllers in the CL (see ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md))
+### 2017/01/26
+   * Add support for `create-fpga-image` AFI generation AWS API. For more details please read the forum announcement [here](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0).
 
 ## Bug Fixes
 
-This section will include any bug fixes in the future releases. Please use [HDK Bug](https://github.com/aws/aws-fpga/issues/16) and [SDK Bug](https://github.com/aws/aws-fpga/issues/17) to file bugs for HDK and SDK respectively and use [HDK Feature](https://github.com/aws/aws-fpga/issues/18) and [SDK Feature](https://github.com/aws/aws-fpga/issues/19) to file feature requests for HDK and SDK respectively. For any other general purpose requests, please use [F1 FPGA general support](https://github.com/aws/aws-fpga/issues/20).
+This section will include any bug fixes in the future releases. Please use [HDK Bug](https://github.com/aws/aws-fpga/issues/16) and [SDK Bug](https://github.com/aws/aws-fpga/issues/17) to file bugs for HDK and SDK respectively and use [HDK Feature](https://github.com/aws/aws-fpga/issues/18) and [SDK Feature](https://github.com/aws/aws-fpga/issues/19) to file feature requests for HDK and SDK respectively. For any other general purpose requests, please use [F1 FPGA general support](https://github.com/aws/aws-fpga/blob/master/README.md#developer-support).
 
 ## Known Issues
 
