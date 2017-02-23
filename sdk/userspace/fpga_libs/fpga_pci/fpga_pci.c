@@ -23,7 +23,7 @@ fpga_pci_init() {
 }
 
 int
-fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, int *handle) {
+fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_handle_t *handle) {
 	int rc;
 	struct fpga_slot_spec spec;
 
@@ -40,33 +40,33 @@ out:
 }
 
 int
-fpga_pci_detatch(int handle) {
+fpga_pci_detatch(pci_bar_handle_t handle) {
 	return fpga_plat_dev_detach(handle);
 }
 
 int
-fpga_pci_poke(int handle, uint64_t offset, uint32_t value) {
+fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value) {
 	return fpga_hal_dev_reg_write(handle, offset, value);
 }
 
 int
-fpga_pci_poke64(int handle, uint64_t offset, uint64_t value) {
+fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value) {
 	/* not implemened */
 	return 1;
 }
 
 int
-fpga_pci_peek(int handle, uint64_t offset, uint32_t *value) {
+fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
 	return fpga_hal_dev_reg_read(handle, offset, value);
 }
 
 int
-fpga_pci_peek64(int handle, uint64_t offset, uint64_t *value) {
+fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
 	/* not implemented */
 	return 1;
 }
 
-int fpga_pci_write_burst(int handle, uint64_t offset, uint32_t* datap, uint32_t dword_len) {
+int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len) {
 	/* not implemented */
 	return 1;
 }

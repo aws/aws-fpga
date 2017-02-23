@@ -26,6 +26,18 @@ else
 	CONFIG_LOGLEVEL=$LOGLEVEL
 fi
 
+#
+# The max number of FPGA HAL Platform Devices that may be attached,
+# e.g. (FPGA_SLOT_MAX * FPGA_BARS_MAX) is the upper bound.
+#
+FPGA_PLAT_DEVS_DFLT=256
+FPGA_PLAT_DEVS_MAX=$2
+if [ -z "$FPGA_PLAT_DEVS_MAX" ]; then
+	FPGA_PLAT_DEVS_MAX=$FPGA_PLAT_DEVS_DFLT
+else
+	FPGA_PLAT_DEVS_MAX=$FPGA_PLAT_DEVS_MAX
+fi
+
 function build_exec {
 	cd $TOP/$BUILD_DIR 
 	echo "Entering $TOP/$BUILD_DIR"
@@ -40,7 +52,7 @@ function build_exec {
 		echo "make clean failed"
 		exit 1
 	fi
-	make OPT=-DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL"
+	make OPT="-DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PLAT_DEVS_MAX="$FPGA_PLAT_DEVS_MAX""
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "make failed"
@@ -62,10 +74,10 @@ build_exec
 BUILD_DIR="hal/src/platform/hw"
 build_exec
 
-BUILD_DIR="fpga_libs/fpga_pci/src"
+BUILD_DIR="fpga_libs/fpga_pci"
 build_exec
 
-BUILD_DIR="fpga_libs/fpga_mgmt/src"
+BUILD_DIR="fpga_libs/fpga_mgmt"
 build_exec
 
 BUILD_DIR="fpga_image_tools/src"

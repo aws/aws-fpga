@@ -19,14 +19,14 @@ TOPINC_PATH = $(TOP)/include
 FPGADINC_PATH = $(TOP)/fpgad/include
 UTILINC_PATH = $(TOPINC_PATH)/utils
 HALINC_PATH = $(TOPINC_PATH)/hal
-HALLIB_PATH = $(HALTOP)/lib
+HALLIB_PATH = $(TOP)/lib
 
 INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_PATH) -I/usr/include
 
 #OPT=-O2
 CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
-SRC = fpga_hal_mbox.c 
+SRC = fpga_hal_mbox.c fpga_hal_mbox_private.c   
 OBJ = $(SRC:.c=.o)
 FPGAHALLIB = $(HALLIB_PATH)/libfpga_hal_mbox.a
 

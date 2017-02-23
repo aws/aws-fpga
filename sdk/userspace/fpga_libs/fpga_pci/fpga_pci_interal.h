@@ -20,7 +20,7 @@
 #include <hal/fpga_hal_plat.h>
 #include <hal/fpga_hal_reg.h>
 
-#include <fpga_libs/fpga_pci.h>
+#include <fpga_pci.h>
 
 /** F1 Mailbox PF defines */
 #define F1_MBOX_VENDOR_ID       0x1d0f

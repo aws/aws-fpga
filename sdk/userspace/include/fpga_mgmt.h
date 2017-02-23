@@ -17,7 +17,7 @@
 
 #include <stdbool.h>
 #include <fpga_common.h>
-#include <fpga_libs/fpga_pci.h>
+#include <fpga_pci.h>
 
 /**
  * Initialize the fpga_mgmt library.
@@ -28,12 +28,25 @@
  */
 int fpga_mgmt_init(void);
 
+/**
+ * Sets the command timeout value in multiples of the delay_msec value.
+ *
+ * @param[in] value timeout, n * delay_msec
+ */
+void fpag_mgmt_set_cmd_timeout(uint32_t value);
+
+/**
+ *
+ */
+void fpag_mgmt_set_cmd_delay_msec(uint32_t value);
+
 /* fpga-describe-local-image */
 
 enum fpga_status {
 	FPGA_STATUS_LOADED,
 	FPGA_STATUS_CLEARED,
 	FPGA_STATUS_BUSY,
+	FPGA_STATUS_NOT_PROGRAMMED,
 	FPGA_STATUS_MAX
 };
 
@@ -46,9 +59,10 @@ enum fpga_status {
 struct fpga_mgmt_image_info {
 	int status;
 	int slot_id;
-	const char afi_id[AFI_MAX_LEN];
+	char afi_id[AFI_MAX_LEN];
 	struct fpga_slot_spec spec;
 	uint32_t sh_version;
+	struct fpga_metrics_common metrics;
 };
 
 /**
@@ -103,7 +117,7 @@ int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
 /**
  * getting the status of the 16 virtual LED
  */
-int fpga_mgmt_get_vLED_status(int slot_id, int *status);
+int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status);
 
 /**
  * set the value for the 16 virtual DIP switchs
@@ -114,6 +128,11 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value);
  * get the value for the 16 virtual DIP switchs
  */
 int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *);
+
+/**
+ *
+ */
+int fpga_mgmt_start_virtual_jtag(int slot_id, char *tcp_port);
 
 /**
  * state: enabled, disabled, error if not supported

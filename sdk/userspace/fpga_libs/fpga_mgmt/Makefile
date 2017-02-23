@@ -13,11 +13,10 @@
 # permissions and limitations under the License.
 #
 
-TOP = ../../..
+TOP = ../..
 TOPINC_PATH = $(TOP)/include
 UTILLIB_PATH = $(TOP)/util
-MGMTLIB_PATH = ../lib
-FPGAPCILIB_PATH = $(TOP)/fpga_libs/fpga_pci/lib
+LIB_PATH = $(TOP)/lib
 
 INCLUDES = -I$(TOPINC_PATH) -I/usr/include
 
@@ -26,12 +25,15 @@ CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-protot
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-FPGAMGMTLIB = $(MGMTLIB_PATH)/libfpga_mgmt.a
-FPGAPCILIB = $(FPGAPCILIB_PATH)/libfpga_pci.a
+FPGAMGMTLIB_SO = $(LIB_PATH)/libfpga_mgmt.so
+FPGAMGMTLIB = $(LIB_PATH)/libfpga_mgmt.a
+FPGAPCILIB = $(LIB_PATH)/libfpga_pci.a
 
 $(FPGAMGMTLIB): $(OBJ)
-	mkdir -p $(MGMTLIB_PATH)
-	ar rcs $(FPGAMGMTLIB) $(OBJ) $(FPGAPCILIB)
+	mkdir -p $(LIB_PATH)
+	ar rcs $(FPGAMGMTLIB) $(OBJ)
+
+
 
 clean:
-	rm -f *.o $(FPGAMGMTLIB)
+	rm -f *.o $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)
