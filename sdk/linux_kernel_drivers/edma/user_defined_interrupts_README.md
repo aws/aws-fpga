@@ -1,16 +1,19 @@
 # Using AWS FPGA user-defined interrupts in C/C++ application
 
-AWS FPGA provides options for Custom Logic (CL) to generate user-defined interrupts.
-At the hardware level, these interrupts are defined in [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md)
+AWS FPGA provides options for Custom Logic (CL) to generate user-defined interrupt events, sent to the instance via MSI-X message.
+
+At the hardware level, these interrupt event are defined in [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md)
 
 
 ## User-defined interrupts relies on EDMA driver
 
-From the software perspective, AWS provides Elastic DMA (EDMA), a reference Linux kernel driver, a shared driver between the interrupts and the DMA. EDMA is responsible for:
+AWS provides Elastic DMA (EDMA) (A reference Linux kernel driver) services both CL interrupt events and the DMA between instance's CPU memory and CL. 
 
-i) Initialization of the interrupt logic in the Shell to map user interrupts to MSI-X interrupts of the PCIe AppPF
+For interrupt events, EDMA is responsible for:
 
-ii) Exposing all the interrupts as file devices under /dev/fpgaX/eventY where X is the slot-id and Y is the event/interrupt
+i) Initialization of the MSI-X interrupt logic in the Shell to map cl_sh_apppf_int interrupts events to MSI-X interrupts of the PCIe AppPF
+
+ii) Exposing all the interrupt events as file devices under /dev/fpgaX/eventY where X is the slot-id and Y is the event/interrupt
 
 iii) Exposing each interrupt as a file-descriptor for event polling in Linux userspace
 
@@ -19,7 +22,7 @@ iv) Guarantees graceful teardown in case of a userspace process crashes or impro
 
 ## Installation of EDMA Driver
 
-Please follow the [EDMA driver installation guide](./edma.md) for compiling and installing the driver.
+Please follow the [EDMA driver installation guide](./edma_install.md) for compiling and installing the driver.
 The driver needs to be installed once, regardless of how many FPGA slots are available.
 
 
@@ -29,8 +32,8 @@ The driver needs to be installed once, regardless of how many FPGA slots are ava
 The next example shows how an application can register to two events (aka user-defined interrupts) on slot 0
 
 ```
-  fd4=open(“/dev/fpga0/event4”, R);
-  fd6=open(“/dev/fpga0/event6”, R);
+  fd4=open(“/dev/fpga0/event4”, O_RDONLY);
+  fd6=open(“/dev/fpga0/event6”, O_RDONLY);
 
   //polling on event4 and event6
 
@@ -62,23 +65,23 @@ The next example shows how an application can register to two events (aka user-d
 # FAQ
 
 
-**Q: How can I toggle an interrupt from within the CL?**
+**Q: How can I toggle an interrupt event from within the CL?**
 
-Toggling of user interrupts on the CL<=>Shell interface will generate an MSI-X that gets translated to an event in Linux userspace that an application can poll() on. Follow https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md) for the hardware interface details.
+Toggling of user interrupt event by toggling the `cl_sh_apppf_int_req` interface to an MSI-X, which gets translated to an event in Linux userspace that an application can poll() on. Follow https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md) for the hardware interface details.
 
 
 
 **Q: How do I stop interrupts/events?**
 
-To stop all the interrupts/events, one should disable the toggling of interrupt pins at the CL side (implementation specific)
+To stop all the interrupts/events, one should disable the toggling of interrupt pins at the CL side (implementation specific).
 
 
 
-**Q: How can I mask an interrupt/event?**
+**Q: How can I stop receiving interrupt events?**
 
 There are three options to mask an interrupt/event:
 
-i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle and the kernel EDMA driver will get invoked; but the application in Linux userspace will not see it.
+i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle and thekernel EDMA driver will get invoked; but the application in Linux userspace will not see it.
 
 ii) Call close() for all the file-descriptors associated with the specification interrupt/event, the EDMA driver will mask the interrupt
 
@@ -100,13 +103,12 @@ The cause the mask bits, if exist, will be part of the CL and are implementation
 
 
 
-**Q: Can the userspace application miss an interrupt?**
+**Q: Can the userspace application miss an interrupt event?**
 
 Yes, that can happen if: 
 i) The EDMA driver is not installed
 
 ii) The interrupt was delivered to Linux while the corresponding file-descriptor was not open by any process.
-[TBD]
 
 
 
@@ -114,7 +116,7 @@ ii) The interrupt was delivered to Linux while the corresponding file-descriptor
 
 It all depends on the timing when the interrupt request was sent and when the poll() is called.
 
-EDMA implementation keeps a state per interrupt if it was asserted from the last time a poll() was called.  If the same interrupt is sent by the CL multiple times before the poll() is called, the next call to the poll() will just indicate that there was one or more interrupts, but it doesn't provide the interrupt count, and it doesn't keep a queue.
+EDMA implementation keeps a state per interrupt event if it was asserted from the last time a poll() was called.  If the same interrupt is sent by the CL multiple times before the poll() is called, the next call to the poll() will just indicate that there was an interrupt event, but it doesn't provide the interrupt count, and it doesn't keep a queue.
 
 
 
@@ -124,6 +126,6 @@ The EDMA Linux kernel driver will map the CL user-defined interrupts to MSI-X en
 
 
 
-**Q: What if I want to built an in-kernel interrupt service routine for some of the user-defined interrupts?** 
+**Q: What if I want to build an in-kernel interrupt service routine for some of the user-defined interrupts?** 
 
-A reference in-kernel driver interrupt handler is provided for user modification in [TBD] directory.
+A reference in-kernel driver interrupt handler is provided for user modification in [EDMA source directory](./src/example_kernel_interrupt.c).
