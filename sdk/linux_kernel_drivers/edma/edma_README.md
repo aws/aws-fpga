@@ -124,10 +124,11 @@ A corresponding close() is used to release the DMA queue
 
 ## Read APIs 
 
-ssize_t read(int fd, void \*buf, size_t count)
-ssize_t pread(int fd, void \*buf, size_t count, off_t offset)
+** *ssize_t read(int fd, void \*buf, size_t count)* ** 
 
-## READ-WRITE (lack of) ordering and fsync()
+** *ssize_t pread(int fd, void \*buf, size_t count, off_t offset)* **
+
+## Read-after-Write (lack of) ordering and fsync()
 
 To improve write performance and minimize blocking the userspace application calling write()/pwrite() system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
 
