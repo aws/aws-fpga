@@ -13,10 +13,10 @@
 # permissions and limitations under the License.
 #
 
-TOP = ../../..
+TOP = ../..
 TOPINC_PATH = $(TOP)/include
 UTILLIB_PATH = $(TOP)/util
-PCILIB_PATH = ../lib
+LIB_PATH = $(TOP)/lib
 
 INCLUDES = -I$(TOPINC_PATH) -I/usr/include
 
@@ -25,10 +25,10 @@ CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-protot
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-FPGAPCILIB = $(PCILIB_PATH)/libfpga_pci.a
+FPGAPCILIB = $(LIB_PATH)/libfpga_pci.a
 
 $(FPGAPCILIB): $(OBJ)
-	mkdir -p $(PCILIB_PATH)
+	mkdir -p $(LIB_PATH)
 	ar rcs $(FPGAPCILIB) $(OBJ)
 
 clean:

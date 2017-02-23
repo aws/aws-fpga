@@ -210,7 +210,7 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 	struct fpga_pci_resource_map *map = &spec->map;
 
 	log_info("vendor_id=0x%04x, device_id=0x%04x, DBDF:" 
-			PCI_DEV_FMT ", resource_num=%u, size=%u", 
+			PCI_DEV_FMT ", resource_num=%u, size=%" PRIu64, 
 			map->vendor_id, map->device_id, map->domain, map->bus, 
 			map->dev, map->func, map->resource_num, map->size);
 
