@@ -42,7 +42,7 @@ __*For AmazonLinux,RedHat,Centos*__
   $ sudo yum install kernel-devel
 ```  
 
-__*For Ubunto*__  
+__*For Ubuntu*__  
 
 ```
   $ sudo apt-get install make
