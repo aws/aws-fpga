@@ -427,6 +427,6 @@
    input capture,
    output logic[31:0] bscanid,
 
-   input[63:0] cl_sh_glcount0,                  //Global counter 0
-   input[63:0] cl_sh_glcount1                   //Global counter 1
+   input[63:0] sh_cl_glcount0,                  //Global counter 0
+   input[63:0] sh_cl_glcount1                   //Global counter 1
 
