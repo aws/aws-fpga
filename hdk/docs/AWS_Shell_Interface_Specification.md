@@ -412,3 +412,7 @@ vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic 
 
 There is an integrated DMA controller inside the Shell, and writes/reads data to/from the CL via the sh_cl_pcis_dma bus, and maps to the same address space exposed by the AppPF BAR4 address.
 
+### Global Counters
+
+There are two global counter outputs that increment every 4ns.  These can be used to measure time inside of the CL.  They are synchronized to clk_main_a0.  Note if clk_main_a0 is running slower than 250MHz, the counters will appear to skip values.
+
