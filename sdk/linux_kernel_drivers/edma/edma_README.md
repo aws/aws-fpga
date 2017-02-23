@@ -1,67 +1,40 @@
-# Using AWS FPGA EDMA in C/C++ application
-EDMA Reference Driver for Amazon FPGA User Guide
-Abbreviations
+# Using AWS EDMA in C/C++ application
 
-Abbreviations
-Meaning
-EDMA
-Elastic Direct Memory Access
-FD
-File Descriptor
-AFI
-Amazon FPGA Image
-FPGA
-Fast Programmable gate Array
-HDK
-Hardware Development Kit
-VM
-Virtual Machine
-CL
-Custom Logic
-M2S
-Memory to Stream
-S2M
-Stream to Memory
-IOCTL
-Input/Output Control
-API
-Application Programming Interface
-IRQ
-Interrupt Request
+## Table of Content
 
+1. [Overview](#overview)
+2. [Quick Example](#quickExample)
+3. [Detailed Description](#detailed)
+4. [Frequently Asked Questions](#faqs)
 
-Overview
+# Overview
 
-Amazon Elastic-DMA (EDMA) Driver is easy to use the driver to facilitate low CPU overhead for data transfer between the FPGA and the OS.  
+Amazon Elastic-DMA (EDMA) Driver is provided as an option transfer data between the FPGA and the Instance's CPU memory.
 
-The EDMA RTL and the source code of the EDMA driver are distributed with AWS HDK.
-
-When the developer includes Amazon Elastic-DMA in the AFI, thenthe AWS EDMA driver would need to be installed in Linux.
-
-Amazon EDMA driver highlights includes:
+Amazon EDMA driver objectives:
 1. Open source driver
 2. Easy to install and use, and does not require driver development expertise to use
-3. Support multiple FPGAs per single VM and multiple queues per FPGA
+3. Support multiple FPGAs per instance, and multiple queues per FPGA
 4. Expandable by developers
-5. High-performance multi-queue interface.
+5. High-performance multi-queue interface, to lower CPU overhead.
 
-The next few sections instruct the developer on how to detect if a driver is installed, how to compile and install the latest version of the driver, and how to use it.  The last section includes common pitfalls and best practices.
+EDMA driver source code is distributed with AWS FPGA HDK and SDK.
+
+[EDMA Installation Guide](./edma_install.md) provides detailed guidelines how to compile, install and trouble shoot EDMA instalation.
+
+** NOTE: Usage of EDMA is not mandatory, and AWS FPGA provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
+
+For a complete description of the various CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
 
 
+# Quick Example
+
+Before diving into the detail specification of the EDMA, here’s a short intuitive example how the developer could use the EDMA in a process:
+
+The Program below will uses standard linux system call open() to  create a file descriptor (fd), mapping to a pair of EDMA queues (one for read and one for write).
 
 
-Quickstart
-
-Here is the list of prerequisites for using this user guide:
-1. AWS EC2 instance with FPGA (e.g. F1 instance).
-2. Have an Amazon FPGA Image (AFI) that includes the EDMA core.
-3. The AFI needs to be associated with the EC2 instance
-
-Example
-Before diving into the details, here’s a short intuitive example how the user could use the EDMA in a process:
-The pProgram below willuses open( ) to  create a file descriptor (FD) with an EDMA queue and doessends one host to CL transaction (also called m2sM2S)  using the write( ) functionsyscall, and one s2mS2M transaction using the read( ) functioncall.
-The FPGA implementation in the example is reversing the bytes of the stream, so the Hello World turns into dlroW olleH.
-
+```
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -70,7 +43,7 @@ int main(){
     char *dstBug[12] ;
 
     int fd;
-    if((fd = open("/dev/edma0/queue0",O_RDWR)) == -1)
+    if((fd = open("/dev/edma0_queue0",O_RDWR)) == -1)
     {
               perror("open failed with errno %d\n",errno);
     }
@@ -98,118 +71,19 @@ int main(){
     printf("Data read is %s\n", dstBuf);
 
 } 
+```
 
-System Overview
+# Detailed Description
 
+## Userspace API
 
-
-
-
-
-
-Frequently asked questions:
-
-How do I know if the driver is available and installed? 
-
-To make sure the driver is installed run
-
-[ec2 user~$]  lsmod | grep “edma”
-Running this will return EDMA only if the driver is installed and running.
-
-
-The device /dev/edmaX represents an FPGA device, and each device exposes multiple queues under /dev/edmaX/queueN. The developer operates these queues directly.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-How do I get the Source code of the EDMA driver and compile it
-
-Amazon EDMA driver is included in the latest Amazon Linux distribution (Version XXXX TBD), as well as on http://github.com/amzn/amzn-drivers/fpga/hdk/driver/edma for integration with other Linux distributions.
-
-Clone the git repo locally under my_fpga_dir for example:
- 
-[ec2-user ~]$ mkdir -p ~/my_fpga_dir
-[ec2-user ~]$ cd ~/my_fpga_dir
-[ec2-user ~]$ git clone http://github.com/amzn/amzn-drivers/fpga/hdk/driver/edma
-Note: the above mentioned git call would fail if the local git repository already exists.
-Enter the directory and compile the code:
-[ec2-user ~]$ cd ~/my_fpga_dir/edma
-[ec2-user ~]$ make
-[ec2-user ~]$ sudo make install
-The make install command will also copy the driver to /usr/local/sbin
-Note: if an EDMA driver is already installed, the last make command will ask the developer if to overwrite.
-
-Running the EDMA driver
-
-insmod is the Linux command to run a driver. Calling insmod will trigger a scan of all the FPGAs attached to the OS, and will prompt success/fail on for each FPGA.
-[ec2-user ~]$ sudo insmod edma.ko 
-To check for any errors or warnings that might occur during the insmod refer to dmesg
-
-[ec2-user ~]$ dmesg
-How to Enable EDMA on non-Amazon Linux ?
-
-The normalstandard installing flow mentioned previouslyabove should work for other Linux distributions. 
-However, the driver may not be installed automatically upon kernel update. 
-Please refer to Appendix B for Ubuntu/Debian and CentOS/RedHat
-
-How to Discover the Available FPGAs with EDMA
-
-When the driver starts to run it reads from the configuration space looking for a vendor specific capability that will indicate that edma is available.
-
-Once the edma driver is running, then all the available devices would be found in /dev directory as /dev/edmaX.
-[ec2-user ~]$ ls /dev/edma* 
-Each edma would expose multiple queues under /dev/edmaX/queueN (depending how many queues are supported by the AFI) and the developer could work directly with these queues.
-
-How to use the EDMA driver?
-
-First, there is a need to check how many EDMA drivers are installed and how many queues per each EDMA driver.
-
-The developer can find all the EDMAs using
-
-[ec2 user~$] ls -l /dev/edma*
-The above lists the available EDMA devices in the instance. The first EDMA will be listed as /dev/edma0.
-
-To find which PCI Bus/Device/Function ID is hosting this EDMA
-
-[ec2 user~$] cat /sys/edma/<pci_bdf>/device 
-to list the available queues for edma0….  for example /dev/edma0/queue0:
-
-[ec2 user~$] ls /dev/edma0/*
-
-once the developer has established that a queue exists, he/she can start using this as a char device.
-
-
-
-How to use the EDMA Driver API
-
-The EDMA can be used in any developer program (running in user space) using simple device operations. 
-The payload of the write operation is FPGA CL-specific and treated by the EDMA driver as a black box.
-
-Write operation might be used for the following purposes:
-Instruct the FPGA to perform a particular action.
-Deliver data to the FPGA for processing.
-A combination of both of the above.
-
-The payload of the read operation is also FPGA CL-specific. Read operation might be used for receiving a response from the FPGA device after write() with some action request.
-
-After opening a device, issuing a write will cause an M2S transaction to the FPGA CL and a read will cause an S2M transaction from the FPGA CL.
+The EDMA can be used in any developer program (running in user space) using simple device operations following standard linux/posix system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support linux character device APIs.
 
 Here are all the supported functions:
 
- int (*open) (struct inode *, struct file *) - opens an FD of a queue to interact with.
+_int (\*open) (struct inode \*, struct file \*) - opens an FD of a queue to interact with._
 
-int (*release) (struct inode *, struct file *) - Called when a close() is called. This function is in charge of graceful queue cleanup.
+_int (\*release) (struct inode \*, struct file \*) - Called when a close() is called. This function is in charge of graceful queue cleanup._
 
 ssize_t(*read) (struct file *, char __user *, size_t, loff_t *) - Read is an S2M (Stream to Memory) transaction from the FPGA CL to DRAM memory.
 
@@ -228,7 +102,7 @@ unsigned int (*poll) (struct file *, struct poll_table_struct *) - Poll function
 int (*ioctl) (struct inode *, struct file *, unsigned int, unsigned long) – IOCTL could be used for scatter-gather operation and potentially for registering a user-specific interrupt (which is different from the the dedicated interrupts for EDMA). 
 
 
-Error Handling
+## Error Handling
 
 The driver handles some error cases and passes other errors to the user.
 
@@ -249,6 +123,26 @@ To see what available stats are there simply run
 to read a specific start use cat utility
 
 [ec2 user~$]  cat /sys/edma/edma4/queue0/s2m_count
+
+
+
+# FAQ
+
+
+**Q: How do I get the Source code of the EDMA driver and compile it?**
+
+Amazon EDMA driver is included [AWS FPGA HDK/SDK](http://github.com/aws/aws-fpga/blob/master/sdk/linux_device_driver/edma), and may be included pre-installed in some Amazon Linux distribution.
+
+Follow the [installation guide](./edma_install.md) for more details.
+
+**Q: How to Discover the Available FPGAs with EDMA?**
+
+Once the edma driver is running, then all the available devices would be found in /dev directory as /dev/edmaX.
+
+    `$ ls /dev/edma*`
+    
+Each edma would expose multiple queues under /dev/edmaX_queueN (depending how many queues are supported by the AFI) and the developer could work directly with these queues.
+
 
 
 Internal FAQ
