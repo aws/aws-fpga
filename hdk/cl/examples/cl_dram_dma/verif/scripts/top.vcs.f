@@ -35,6 +35,14 @@ ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv
+${CL_ROOT}/design/cl_dram_dma_pkg.sv
+${CL_ROOT}/design/cl_dma_pcis_slv.sv
+${CL_ROOT}/design/cl_pcim_mstr.sv
+${CL_ROOT}/design/cl_ila.sv
+${CL_ROOT}/design/cl_vio.sv
+${CL_ROOT}/design/cl_int_slv.sv
+${CL_ROOT}/design/cl_ocl_slv.sv
+${CL_ROOT}/design/cl_sda_slv.sv
 ${CL_ROOT}/design/cl_dram_dma.sv
 
 ${CL_ROOT}/design/src_register_slice/src_register_slice.v
