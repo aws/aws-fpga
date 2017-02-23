@@ -188,15 +188,27 @@ module axil_bfm
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
-      logic [1:0] resp;
-      
+      logic [1:0] resp;      
+      logic [63:0] strb;
+
       axi_cmd.addr[31:0] = addr;
       axi_cmd.len  = 0;
 
       axil_wr_cmds.push_back(axi_cmd);
 
       axi_data.data[31:0] = data << (addr[1:0] * 8);
-      axi_data.strb = {(1<<size){1'b1}} << addr[1:0];
+
+      case (size)
+        0: strb = 64'b0000_0000_0000_0001;
+        1: strb = 64'b0000_0000_0000_0011;
+        2: strb = 64'b0000_0000_0000_1111;
+        default: begin
+           $display("FATAL ERROR - Invalid size specified");
+           $finish;
+        end
+      endcase // case (size)
+      axi_data.strb = strb << addr[1:0];
+
       axi_data.last = 1'b1;
 
       #20ns axil_wr_data.push_back(axi_data);
@@ -221,7 +233,16 @@ module axil_bfm
       while (axil_rd_data.size() == 0)
         #20ns;
 
-      mask = {(1 << size){8'hff}};      
+      case (size)
+        0: mask = 32'h0000_00ff;
+        1: mask = 32'h0000_ffff;
+        2: mask = 32'hffff_ffff;
+        default: begin
+           $display("FATAL ERROR - Invalid size specified");
+           $finish;
+        end
+      endcase // case (size)
+
       data = axil_rd_data[0].data[31:0] >> (addr[1:0] * 8);
       data &= mask;
 
