@@ -18,17 +18,17 @@
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 +incdir+${HDK_COMMON_DIR}/verif/include
-+incdir+${CL_ROOT}/design/axi_crossbar_0  
 +incdir+${CL_ROOT}/design/src_register_slice  
 +incdir+${CL_ROOT}/design/dest_register_slice  
 
-${CL_ROOT}/design/axi_crossbar_0/axi_crossbar_0.v
-${CL_ROOT}/design/axi_crossbar_0/axi_crossbar_v2_1_vl_rfs.v
-${CL_ROOT}/design/axi_crossbar_0/axi_data_fifo_v2_1_vl_rfs.v
-${CL_ROOT}/design/axi_crossbar_0/axi_infrastructure_v1_1_vl_rfs.v
-${CL_ROOT}/design/axi_crossbar_0/axi_register_slice_v2_1_vl_rfs.v
-${CL_ROOT}/design/axi_crossbar_0/generic_baseblocks_v2_1_vl_rfs.v
-${CL_ROOT}/design/axi_crossbar_0/fifo_generator_v13_1_rfs.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s00_regslice_0/sim/cl_axi_interconnect_s00_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m00_regslice_0/sim/cl_axi_interconnect_m00_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m01_regslice_0/sim/cl_axi_interconnect_m01_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m02_regslice_0/sim/cl_axi_interconnect_m02_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m03_regslice_0/sim/cl_axi_interconnect_m03_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v
+
 
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh

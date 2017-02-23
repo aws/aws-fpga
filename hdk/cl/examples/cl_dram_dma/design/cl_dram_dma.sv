@@ -396,6 +396,29 @@ lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK2 
                                                .in_bus({ddr_sh_stat_ack_q[2], ddr_sh_stat_int_q[2], ddr_sh_stat_rdata_q[2]}),
                                                .out_bus({ddr_sh_stat_ack2, ddr_sh_stat_int2, ddr_sh_stat_rdata2})
                                                ); 
+
+//assign statements to remove VCS warnings
+logic [15:0] sh_cl_ddr_bid_temp[2:0];
+logic [1:0] sh_cl_ddr_bresp_temp[2:0];
+logic [15:0] sh_cl_ddr_rid_temp[2:0];
+logic [511:0] sh_cl_ddr_rdata_temp[2:0];
+logic [1:0] sh_cl_ddr_rresp_temp[2:0];
+
+assign  lcl_cl_sh_ddr0.bid = sh_cl_ddr_bid_temp[0];
+assign  lcl_cl_sh_ddr1.bid = sh_cl_ddr_bid_temp[1];
+assign  lcl_cl_sh_ddr2.bid = sh_cl_ddr_bid_temp[2];
+assign  lcl_cl_sh_ddr0.bresp = sh_cl_ddr_bresp_temp[0];
+assign  lcl_cl_sh_ddr1.bresp = sh_cl_ddr_bresp_temp[1];
+assign  lcl_cl_sh_ddr2.bresp = sh_cl_ddr_bresp_temp[2];
+assign  lcl_cl_sh_ddr0.rid = sh_cl_ddr_rid_temp[0];
+assign  lcl_cl_sh_ddr1.rid = sh_cl_ddr_rid_temp[1];
+assign  lcl_cl_sh_ddr2.rid = sh_cl_ddr_rid_temp[2];
+assign  lcl_cl_sh_ddr0.rdata = sh_cl_ddr_rdata_temp[0];
+assign  lcl_cl_sh_ddr1.rdata = sh_cl_ddr_rdata_temp[1];
+assign  lcl_cl_sh_ddr2.rdata = sh_cl_ddr_rdata_temp[2];
+assign  lcl_cl_sh_ddr0.rresp = sh_cl_ddr_rresp_temp[0];
+assign  lcl_cl_sh_ddr1.rresp = sh_cl_ddr_rresp_temp[1];
+assign  lcl_cl_sh_ddr2.rresp = sh_cl_ddr_rresp_temp[2];
  
 sh_ddr #(
          .DDR_A_PRESENT(DDR_A_PRESENT),
@@ -485,8 +508,8 @@ sh_ddr #(
    .cl_sh_ddr_wvalid({lcl_cl_sh_ddr2.wvalid, lcl_cl_sh_ddr1.wvalid, lcl_cl_sh_ddr0.wvalid}),
    .sh_cl_ddr_wready({lcl_cl_sh_ddr2.wready, lcl_cl_sh_ddr1.wready, lcl_cl_sh_ddr0.wready}),
 
-   .sh_cl_ddr_bid({lcl_cl_sh_ddr2.bid, lcl_cl_sh_ddr1.bid, lcl_cl_sh_ddr0.bid}),
-   .sh_cl_ddr_bresp({lcl_cl_sh_ddr2.bresp, lcl_cl_sh_ddr1.bresp, lcl_cl_sh_ddr0.bresp}),
+   .sh_cl_ddr_bid(sh_cl_ddr_bid_temp),
+   .sh_cl_ddr_bresp(sh_cl_ddr_bresp_temp),
    .sh_cl_ddr_bvalid({lcl_cl_sh_ddr2.bvalid, lcl_cl_sh_ddr1.bvalid, lcl_cl_sh_ddr0.bvalid}),
    .cl_sh_ddr_bready({lcl_cl_sh_ddr2.bready, lcl_cl_sh_ddr1.bready, lcl_cl_sh_ddr0.bready}),
 
@@ -496,9 +519,9 @@ sh_ddr #(
    .cl_sh_ddr_arvalid({lcl_cl_sh_ddr2.arvalid, lcl_cl_sh_ddr1.arvalid, lcl_cl_sh_ddr0.arvalid}),
    .sh_cl_ddr_arready({lcl_cl_sh_ddr2.arready, lcl_cl_sh_ddr1.arready, lcl_cl_sh_ddr0.arready}),
 
-   .sh_cl_ddr_rid({lcl_cl_sh_ddr2.rid, lcl_cl_sh_ddr1.rid, lcl_cl_sh_ddr0.rid}),
-   .sh_cl_ddr_rdata({lcl_cl_sh_ddr2.rdata, lcl_cl_sh_ddr1.rdata, lcl_cl_sh_ddr0.rdata}),
-   .sh_cl_ddr_rresp({lcl_cl_sh_ddr2.rresp, lcl_cl_sh_ddr1.rresp, lcl_cl_sh_ddr0.rresp}),
+   .sh_cl_ddr_rid(sh_cl_ddr_rid_temp),
+   .sh_cl_ddr_rdata(sh_cl_ddr_rdata_temp),
+   .sh_cl_ddr_rresp(sh_cl_ddr_rresp_temp),
    .sh_cl_ddr_rlast({lcl_cl_sh_ddr2.rlast, lcl_cl_sh_ddr1.rlast, lcl_cl_sh_ddr0.rlast}),
    .sh_cl_ddr_rvalid({lcl_cl_sh_ddr2.rvalid, lcl_cl_sh_ddr1.rvalid, lcl_cl_sh_ddr0.rvalid}),
    .cl_sh_ddr_rready({lcl_cl_sh_ddr2.rready, lcl_cl_sh_ddr1.rready, lcl_cl_sh_ddr0.rready}),

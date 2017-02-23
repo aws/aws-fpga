@@ -121,14 +121,14 @@ bram_2rw #(.WIDTH(32), .ADDR_WIDTH(8), .DEPTH(256) ) AXIL_RAM (
 //   .da(wdata),
    .wea(wready),
    .ena(wready),
-   .addra(wr_addr[10:2]),
+   .addra(wr_addr[9:2]),
    .da(wdata),
 
    .qa(),
 
    .web(1'b0),
    .enb(arvalid),
-   .addrb(araddr[10:2]),
+   .addrb(araddr[9:2]),
    .db(32'h0),
    .qb(ram_rdata)
    );
