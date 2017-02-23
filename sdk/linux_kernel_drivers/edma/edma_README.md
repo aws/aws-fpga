@@ -38,31 +38,53 @@ The Program below will uses standard linux system call open() to  create a file 
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
-int main(){
-    char *srcBuf[12] = “Hello World”;
-    char *dstBug[12] ;
+#include <unistd.h>
 
+#define BUF_SIZE    256
+#define OFFSET_IN_FPGA_DRAM 1024
+
+int main(){
+    char* srcBuf;
+    char* dstBuf;
     int fd;
+    int i;
+    int ret;
+    
+    srcBuf = malloc(BUF_SIZE);
+    dstBuf = malloc(BUF_SIZE);
+    
+    /* Initialize srcBuf */
+    for(i=0;i<BUF_SIZE;i++)
+        srcBuf[i]=(char) (i%256);
+        
     if((fd = open("/dev/edma0_queue0",O_RDWR)) == -1)
     {
               perror("open failed with errno %d\n",errno);
     }
-        //Write the size of the string first for the CL.
-    if(write(fd , strlen(srcBuf), 4) != 4)
+    
+    /* Write the entire source buffer to offset OFFSET_IN_FPGA_DRAM */
+    
+    ret = pwrite(fd , srcBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
+    
+    if( ret < 0)
     {
               perror("write failed with errno %d\n",errno);
     }
-    if(write(fd, srcBuf, 12) != 12)
-    {
-              perror("write failed with errno %d\n",errno);
-    }
-
+    
+    printf("Tried to write %u bytes, succeeded in writing %u bytes\n", BUF_SIZE, ret);
+    
+    /* ensure the write made it to the Shell/CL interface */
     fsync(fd);
-    if(read(fd, dstBuf, 12) < 0)
+    
+    ret = pread(fd, dstBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
+    
+    if(ret < 0)
     {
               perror("read failed with errno %d\n",errno);
     }
 
+    printf("Tried reading %u byte, succeeded in read %u bytes\n", BUF_SIZE,ret);
+    
     if(close(fd) < 0)
     {
               perror("close failed with errno %d\n",errno);
@@ -75,38 +97,72 @@ int main(){
 
 # Detailed Description
 
-## Userspace API
+## Using file operations to perform DMA
 
 The EDMA can be used in any developer program (running in user space) using simple device operations following standard linux/posix system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support linux character device APIs.
 
-Here are all the supported functions:
+As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like read() and write() ) would use a buffer pointer _(void*)_ to the instance CPU memory, while using file offset _(off\_t)_ to present the write-to/read-from address in the FPGA.
 
-_int (\*open) (struct inode \*, struct file \*) - opens an FD of a queue to interact with._
-
-_int (\*release) (struct inode \*, struct file \*) - Called when a close() is called. This function is in charge of graceful queue cleanup._
-
-ssize_t(*read) (struct file *, char __user *, size_t, loff_t *) - Read is an S2M (Stream to Memory) transaction from the FPGA CL to DRAM memory.
-
- ssize_t(*write) (struct file *, const char __user *, size_t, loff_t *) - Write is an M2S (Memory to Stream) transaction to the FPGA  from the DRAM memory to the FPGA CL.
-
-int (*fsync) (struct file *, struct dentry *, int datasync) – Flush the driver data to the CL. Only after calling this function it is safe to assume that the CL processed write() transaction.
+**NOTE: In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).
 
 
-Unsupported features/apiAPI that are under future consideration:
- ssize_t(*aio_read) (struct kiocb *, char __user *, size_t, loff_t) – Same as read only non-blocking
+## Initialization and tear down API
 
- ssize_t(*aio_write) (struct kiocb *, const char __user *, size_t, loff_t) -  Same as write only non-blocking
+Using the standard:
+`int open(const char *pathname, int flags);`
 
-unsigned int (*poll) (struct file *, struct poll_table_struct *) - Poll function is used for interrupts. An application will poll on an FD until it becomes ready. An FD is changed to ready when interrupt triggers.
+To open up a DMA queue, with the only flags recommended is `O_RDWR`, **and all other flags will be ignored.**
 
-int (*ioctl) (struct inode *, struct file *, unsigned int, unsigned long) – IOCTL could be used for scatter-gather operation and potentially for registering a user-specific interrupt (which is different from the the dedicated interrupts for EDMA). 
+A corresponding close() is used to release the DMA queue
+
+
+## Write APIs
+
+### Asynchronous Writes
+
+### Write transaction size re
+
+## Read APIs 
+
+ssize_t read(int fd, void \*buf, size_t count)
+ssize_t pread(int fd, void \*buf, size_t count, off_t offset)
+
+## READ-WRITE (lack of) ordering and fsync()
+
+To improve write performance and minimize blocking the userspace application calling write()/pwrite() system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
+
+If the developer want to issue read()/pread() from an address range that was previously written, the developer should issue fsync() to ensure the intermediate write buffer is flushed to the FPGA before the read is executed.
+
+
+
+## Seek API
+
+The EDMA driver implements the standard lseek() linux/posix system call, which will modify the current read/write pointer from the FPGA memory space. 
+
+**WARNING: ** Calling lseek() without proper locking is pronged for errors, as concurrent/multi-threaded design could call lseek() concurrently and without an atomic followup with read/write().
+
+** Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in atomic way **
+  
+## poll()
+
+
+
+
+## Concurrency and Multi-threading
+
+EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call open()/close() to the same file-descriptor.
+
+It is the developer's responsibility to make sure write to same memory region from different threads/processes is coordinated and not overlapping.
+
+Worth re-iterating the recommended use of pread()/pwrite() over a sequency of lseek() + read()/write().
 
 
 ## Error Handling
 
 The driver handles some error cases and passes other errors to the user.
 
-Error Type
+
+## Error Type
 Behavior
 Application process crashes
 OS takes care of all open FD (EDMA queues) associated with the process. Release is called for every open file descriptor when OS closes them. The driver release function would free and release all in transient data from the CL to the application. The driver will also try to drain all outstanding write data to the CL.  If either of these tasks don’t finish after a timeout process, an error is reported in linux dmesg() and the EDMA should be reseted by the user.OS takes care of all open FD (EDMA queues) associated with the process. The release is called for every open file descriptor when OS closes them. The driver release function would free and release all the data in the transient buffer data from the CL to the application. The driver will also try to drain all outstanding write data to the CL.  If either of these tasks doesn't finish after a timeout process, an error is reported in Linux dmesg() and the EDMA should be reset by the user.
@@ -145,145 +201,58 @@ Each edma would expose multiple queues under /dev/edmaX_queueN (depending how ma
 
 
 
-Internal FAQ
+**Q: When my write()/pwrite() call is returned, am I guaranteed that the data reached the FPGA?** 
 
-Why did we pick this approach?
-We wanted to offer a solution with the following tenants:
-1. Max compatibility with all OSes and no dependencies on external packages.
-2. Use commonly known (userspace system-call) APIs like read/write.  Familiar and  (userspace system-call) which are intuitive and widely adopted by for developers.
-3. Robust against process/application crash (Ctrl^C,  segmentation fault, etc.). which expected to happen often
-4. Robust against address violations.
-5. Developers would not need to change or worry about kernel driversAllow developers to focus on custom and application core logic, and avoid the need to develop or modify the kernel driver.
-
-
-When my write() call is return, am I guaranteed that the data reached the FPGA?
 Not necessary, the write() function will move the data from the user process to the kernel, which uses a 4MByte transient buffer per queue to transfer to the FPGA.   To optimize performance, the write() is returned to the user process once all data copies to the write transient buffer.  This is a common practice in modern OS where writes are stored in cache/transient buffer
 
 
-What happens if write() have a length larger than the transient buffer?
+**Q: What happens if write()/pwrite() have a length larger than the transient buffer?**
+
 In this case, the process calling the write() will be blocked while the EDMA is writing data to the FPGA and freeing buffer
 
 
-How do i know that last write did go to the FPGA?
+**Q: How do i know that last write did go to the FPGA?**
+
 For performance optimization a write() call returns after the data has been copied to the kernel space. The only way to make sure the CL has processed the data is by calling fsync(). fsync() is a blocking call that will return only after all the data in the kernel transient buffers is written.
 
 
-Could I get an interrupt once a specific transfer is done?
-We are considering to add a poll() (or select()) support or alternative support (e.g. sigevent) to
-notify the userspace on specific events. This will be available in future releases.
+**Q: What will happen if the CL is not able to accept all write data? **
+
+In this case, the EDMA will stop writing and drainingthe transient buffer, eventually causing the process that uses this particular queue to stall on a future write()/pwrite() command.  Paramount to note that this will not block the PCIe and other instance MMIO access to the CL through PCIe BAR will go through, as well EDMA for other queues.
 
 
-Will read() the dataHow will read() get data from the CL?
-The CL EDMA will pass the S2M data to transient buffers in the kernel, and read() will read the data from the transient buffer.  If there is no data in the transient buffer the read() call will return with an error after a timeout will occur.
 
+**Q: Will EDMA drop data?**
 
-What will happen if the CL is not able to accept all write data?
-In this case, the EDMA will stop fetching from the transient buffer, eventually causing the process that uses this particular queue to stall on a future write() command.  Paramount to note that this will not block the PCIe and other OS MMIO access to the CL through PCIe BAR will go through, as well EDMA for other queues.
-
-
-What will happen if the user process can’t read the data?
-This scenario could occur if a process doesn’t call read(), or the process is abruptly stopped, or calling read() with a buffer that is smaller than the expected data from the CL, or if the OS has scheduled out the process. In all these cases, the EDMA driver will accommodate some of the read data in the transient buffer until the transient buffer is ALMOST_FULL.
-When the transient buffer is almost full, the EDMA will send out-of-band per-queue indicating there is no room for Data, and the CL is expected to step sending data on S2M for this particular queue.
-
-What will happen if the CL doesn’t obey the ALMOST_FULL indication from the EDMA?
-This could cause the EDMA AXI-stream bus to pause and push back on all the other queues, causing head-of-line blocking.  Hence AWS highly recommend the CL developers to use the ALMOST_FULL interface
-
-
-Will EDMA drop data?
 During normal operations, the EDMA will NOT drop data, even when the CL is not able to accept data or running out of the transient buffer.  Both these scenarios are considered transient, and EDMA will not drop any data.
+
 The only two cases the EDMA will drop data area:
 1. Abrupt crash of the user process managing this queue
-2. A close() function that times-out (could happen if the CL is willing to accept data from EDMA)
+2. A close() function that times-out (could happen if the CL is not willing to accept data from EDMA)
+  
+  
 
+**Q: Will my read()/pread() time out?**
 
-Will my read() time out?
 If the read() function return -1, an error has occurred, and this error is reported in errno pseudo variable.
-please refer to the README file for a list of supported errno values
+please refer to TBD for a list of supported errno values
 
 
-How would I check if EDMA encountered errors?
-EDMA would output its log through the standard Linux dmesg service
+**Q: How would I check if EDMA encountered errors?**
 
-[ec2 user~$] dmesg | grep “edma”
+EDMA would output its log through the standard Linux dmesg service.
 
-Will EDMA use interrupts?
-EDMA in kernel driver uses MSI-X interrupts,  one interrupt per M2S queue and one per S2M queue.
+`$ dmesg | grep “edma” `
+
+**Q: Will EDMA use interrupts during data transfers?**
+
+EDMA in kernel driver uses MSI-X interrupts,  one interrupt pair of EDMA read/write queues.
 To know what IRQ number is used for EDMA, the user can 
 
-[ec2 user~$] cat /proc/interrupts
-
-Would interrupts be issued on every byte sent/received?
-EDMA has an adaptive interrupt implementation, where if there are a continuous stream of data coming from AFI to the user, an interrupt is only issued on the first transfer.  For lightly loaded system or infrequency access, the interrupt is issued almost on every access to minimize latency
+`$ cat /proc/interrupts`
 
 
-Would EDMA support transfer of Scatter-gather list?
-Future versions of EDMA may include scatter-gather-list (SGL) based transfers using IOCTL API. 
+**Q: Would EDMA support transfer of Scatter-gather list?**
 
-Appendix B
-
-How to install the driver in CentOS/REHL and survive kernel updates?
-
-1. Connect to your instance.
-2. Update the package cache and packages.
-centOS:~$ yum update
-3. Install gcc and kernel-devel
-centOS:~$ yum install kernel-devel
-4. Get DKMS
-centOS:~$ wget http://linux.dell.com/dkms/permalink/dkms-2.2.0.3-1.noarch.rpm
-5. Get DKMS
-centOS:~$ rpm -i dkms-2.2.0.3-1.noarch.rpm
-6. Follow step 4 – 9 in the Ubuntu instructions
-
-How to install the driver in Ubuntu and survive kernel updates?
-
-1. Connect to your instance.
-2. Update the package cache and packages.
-ubuntu:~$ sudo apt-get update && sudo apt-get upgrade -y
-Important
-If during the update process you are prompted to install grub, use /dev/xvda to install grub onto, and then choose to keep the current version of /boot/grub/menu.lst.
-3. Install the build-essential packages to compile the kernel module and the dkms package so that your edmamodule is rebuilt every time your kernel is updated.
-ubuntu:~$ sudo apt-get install -y build-essential dkms
-4. Clone the source code for the edma module on your instance from GitHub at http://github.com/amzn/amzn-drivers/fpga/hdk/driver/edma.
-ubuntu:~$ git clone http://github.com/amzn/amzn-drivers/fpga/hdk/driver/edma
-5. Move the edma package to the /usr/src/ directory so dkms can find it and build it for each kernel update. 
-Append the version number (you can find the current version number in the release notes) of the source code to the directory name. For example, version 1.0.0 is shown in the example below.
-ubuntu:~$ sudo mv amzn-drivers /usr/src/edma-1.0.0
-6. Create the dkms configuration file with the following values, substituting your version of edma.
-a. Create the file.
-ubuntu:~$ sudo touch /usr/src/edma-1.0.0/dkms.conf
-b. Edit the file and add the following values.
-ubuntu:~$ sudo vim /usr/src/edma-1.0.0/dkms.conf
-PACKAGE_NAME="edma"
-PACKAGE_VERSION="1.0.0"
-CLEAN="make -C kernel/linux/edma clean"
-MAKE="make -C kernel/linux/edma/ BUILD_KERNEL=${kernelver}"
-BUILT_MODULE_NAME[0]="edma"
-BUILT_MODULE_LOCATION="kernel/linux/edma"
-DEST_MODULE_LOCATION[0]="/updates"
-DEST_MODULE_NAME[0]="edma"
-AUTOINSTALL="yes"
-7. Add, build, and install the edma module on your instance with dkms.
-a. Add the module to dkms.
-ubuntu:~$ sudo dkms add -m edma -v 1.0.0
-b. Build the module with dkms.
-ubuntu:~$ sudo dkms build -m edma -v 1.0.0
-c. Install the module with dkms.
-ubuntu:~$ sudo dkms install -m edma -v 1.0.0
-8. Rebuild the initramfs so the correct module is loaded at boot time.
-ubuntu:~$ sudo update-initramfs -c -k all
-9. Verify that the edma module is installed using the modinfo edma.
-ubuntu:~$ modinfo edma
-filename:       /lib/modules/3.13.0-74-generic/updates/dkms/edma.ko
-version:        1.0.0
-license:        GPL
-description:    Elastic Direct Memory Access
-author:         Amazon.com, Inc. or its affiliates
-srcversion:     9693C876C54CA64AE48F0CA
-alias:          pci:v00001D0Fd0000EC21sv*sd*bc*sc*i*
-alias:          pci:v00001D0Fd0000EC20sv*sd*bc*sc*i*
-alias:          pci:v00001D0Fd00001EC2sv*sd*bc*sc*i*
-alias:          pci:v00001D0Fd00000EC2sv*sd*bc*sc*i*
-depends:
-vermagic:       3.13.0-74-generic SMP mod_unload modversions
-parm:           debug:Debug level (0=none,...,16=all) (int)
+AWS is considering this for future versions of EDMA to include scatter-gather-list (SGL) based transfers using IOCTL API. 
 
