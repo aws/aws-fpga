@@ -1343,6 +1343,42 @@ always_ff @(negedge sync_rst_n or posedge clk)
    
 `ifndef NO_CL_DDR
 //DDR
+
+lib_pipe #(.WIDTH(1+1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT0 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({sh_ddr_stat_wr0, sh_ddr_stat_rd0, sh_ddr_stat_addr0, sh_ddr_stat_wdata0}),
+                                                         .out_bus({sh_ddr_stat_wr_q[0], sh_ddr_stat_rd_q[0], sh_ddr_stat_addr_q[0], sh_ddr_stat_wdata_q[0]})
+                                                         );
+
+
+lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK0 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({ddr_sh_stat_ack_q[0], ddr_sh_stat_int_q[0], ddr_sh_stat_rdata_q[0]}),
+                                                         .out_bus({ddr_sh_stat_ack0, ddr_sh_stat_int0, ddr_sh_stat_rdata0})
+                                                         );
+
+
+lib_pipe #(.WIDTH(1+1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT1 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({sh_ddr_stat_wr1, sh_ddr_stat_rd1, sh_ddr_stat_addr1, sh_ddr_stat_wdata1}),
+                                                         .out_bus({sh_ddr_stat_wr_q[1], sh_ddr_stat_rd_q[1], sh_ddr_stat_addr_q[1], sh_ddr_stat_wdata_q[1]})
+                                                         );
+
+
+lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK1 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({ddr_sh_stat_ack_q[1], ddr_sh_stat_int_q[1], ddr_sh_stat_rdata_q[1]}),
+                                                         .out_bus({ddr_sh_stat_ack1, ddr_sh_stat_int1, ddr_sh_stat_rdata1})
+                                                         );
+
+lib_pipe #(.WIDTH(1+1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT2 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({sh_ddr_stat_wr2, sh_ddr_stat_rd2, sh_ddr_stat_addr2, sh_ddr_stat_wdata2}),
+                                                         .out_bus({sh_ddr_stat_wr_q[2], sh_ddr_stat_rd_q[2], sh_ddr_stat_addr_q[2], sh_ddr_stat_wdata_q[2]})
+                                                         );
+
+
+lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK2 (.clk(clk), .rst_n(sync_rst_n),
+                                                         .in_bus({ddr_sh_stat_ack_q[2], ddr_sh_stat_int_q[2], ddr_sh_stat_rdata_q[2]}),
+                                                         .out_bus({ddr_sh_stat_ack2, ddr_sh_stat_int2, ddr_sh_stat_rdata2})
+                                                         );
+
+
 genvar gd;
 generate
    for (gd=0; gd<3; gd++)
@@ -1363,16 +1399,6 @@ generate
                                                               .out_bus({ddr_tst_slv_ack_pipe[gd], ddr_tst_slv_rdata_pipe[gd]})
                                                               );
 
-      lib_pipe #(.WIDTH(1+1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT (.clk(clk), .rst_n(sync_rst_n),
-                                                               .in_bus({sh_ddr_stat_wr[gd], sh_ddr_stat_rd[gd], sh_ddr_stat_addr[gd], sh_ddr_stat_wdata[gd]}),
-                                                               .out_bus({sh_ddr_stat_wr_q[gd], sh_ddr_stat_rd_q[gd], sh_ddr_stat_addr_q[gd], sh_ddr_stat_wdata_q[gd]})
-                                                               );
-
-
-      lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK (.clk(clk), .rst_n(sync_rst_n),
-                                                               .in_bus({ddr_sh_stat_ack_q[gd], ddr_sh_stat_int_q[gd], ddr_sh_stat_rdata_q[gd]}),
-                                                               .out_bus({ddr_sh_stat_ack[gd], ddr_sh_stat_int[gd], ddr_sh_stat_rdata[gd]})
-                                                               );
 
       lib_pipe #(.WIDTH(2+3+64), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_SCRB_DDR (.clk(clk), .rst_n(sync_rst_n),
                                                                              .in_bus({ddr_scrb_en[gd], ddr_scrb_done[gd], dbg_ddr_scrb_state[gd], dbg_ddr_scrb_addr[gd]}),
@@ -2479,6 +2505,7 @@ endgenerate
   assign cl_sh_pcis_rvalid = 0;
 `endif
 
+
    axi_crossbar_0 AXI_CROSSBAR (
        .aclk(clk),
        .aresetn(sync_rst_n),
@@ -2569,6 +2596,7 @@ endgenerate
        .m_axi_rvalid({cl_sh_pcis_rvalid, lcl_sh_cl_ddr_rvalid_q[2], sh_cl_ddr_rvalid_q, lcl_sh_cl_ddr_rvalid_q[1], lcl_sh_cl_ddr_rvalid_q[0]}),
        .m_axi_rready({sh_cl_pcis_rready, lcl_cl_sh_ddr_rready_q[2], cl_sh_ddr_rready_q, lcl_cl_sh_ddr_rready_q[1], lcl_cl_sh_ddr_rready_q[0]})
    );
+
    
 `endif //  `ifndef NO_XDMA
    
@@ -2695,13 +2723,30 @@ sh_ddr #(
 
    .sh_cl_ddr_is_ready(lcl_sh_cl_ddr_is_ready),
 
-   .sh_ddr_stat_addr   (sh_ddr_stat_addr_q) ,
-   .sh_ddr_stat_wr     (sh_ddr_stat_wr_q     ) , 
-   .sh_ddr_stat_rd     (sh_ddr_stat_rd_q     ) , 
-   .sh_ddr_stat_wdata  (sh_ddr_stat_wdata_q  ) , 
-   .ddr_sh_stat_ack    (ddr_sh_stat_ack_q    ) ,
-   .ddr_sh_stat_rdata  (ddr_sh_stat_rdata_q  ),
-   .ddr_sh_stat_int    (ddr_sh_stat_int_q    )
+   .sh_ddr_stat_addr0  (sh_ddr_stat_addr_q[0]) ,
+   .sh_ddr_stat_wr0    (sh_ddr_stat_wr_q[0]     ) , 
+   .sh_ddr_stat_rd0    (sh_ddr_stat_rd_q[0]     ) , 
+   .sh_ddr_stat_wdata0 (sh_ddr_stat_wdata_q[0]  ) , 
+   .ddr_sh_stat_ack0   (ddr_sh_stat_ack_q[0]    ) ,
+   .ddr_sh_stat_rdata0 (ddr_sh_stat_rdata_q[0]  ),
+   .ddr_sh_stat_int0   (ddr_sh_stat_int_q[0]    ),
+
+   .sh_ddr_stat_addr1  (sh_ddr_stat_addr_q[1]) ,
+   .sh_ddr_stat_wr1    (sh_ddr_stat_wr_q[1]     ) , 
+   .sh_ddr_stat_rd1    (sh_ddr_stat_rd_q[1]     ) , 
+   .sh_ddr_stat_wdata1 (sh_ddr_stat_wdata_q[1]  ) , 
+   .ddr_sh_stat_ack1   (ddr_sh_stat_ack_q[1]    ) ,
+   .ddr_sh_stat_rdata1 (ddr_sh_stat_rdata_q[1]  ),
+   .ddr_sh_stat_int1   (ddr_sh_stat_int_q[1]    ),
+
+   .sh_ddr_stat_addr2  (sh_ddr_stat_addr_q[2]) ,
+   .sh_ddr_stat_wr2    (sh_ddr_stat_wr_q[2]     ) , 
+   .sh_ddr_stat_rd2    (sh_ddr_stat_rd_q[2]     ) , 
+   .sh_ddr_stat_wdata2 (sh_ddr_stat_wdata_q[2]  ) , 
+   .ddr_sh_stat_ack2   (ddr_sh_stat_ack_q[2]    ) ,
+   .ddr_sh_stat_rdata2 (ddr_sh_stat_rdata_q[2]  ),
+   .ddr_sh_stat_int2   (ddr_sh_stat_int_q[2]    )
+
    );
 `else // !`ifndef NO_CL_DDR
    assign lcl_sh_cl_ddr_is_ready = 3'b111;
@@ -3317,7 +3362,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
     .s_axi_rid     (),
     .s_axi_rdata   (bar1_sh_rdata),
     .s_axi_rresp   (bar1_sh_rresp),
-    .s_axi_rlast   (),
+    .s_axi_rlast   (1'h0),
     .s_axi_ruser   (),
     .s_axi_rvalid  (bar1_sh_rvalid),
     .s_axi_rready  (sh_bar1_rready), 
@@ -3529,7 +3574,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
                    .probe9  (vo_cnt_load_value_q),
                    .probe10 (vo_cnt_watermark_q)
                    );
-  */ 
+*/   
 `endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 
    
