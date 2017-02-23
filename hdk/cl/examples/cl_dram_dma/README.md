@@ -37,7 +37,7 @@ The DRAM space is 64GiB, and is mapped to the pcis_dma AXI4 bus.
 
 sh_cl_pcis_dma_ exposes a address windows of 128GiB matching AppPF BAR4.
 
-This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/cl/examples/cl_dram_dma/design/axi_crossbar_0/axi_crossbar_0.v) will interleave inbound addresses according to TBD.
+This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/develop_xdma/hdk/common/shell_current/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to TBD.
 
 
 ### ocl_ AXI-Lite
