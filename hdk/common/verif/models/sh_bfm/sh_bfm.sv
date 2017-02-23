@@ -204,6 +204,34 @@ module sh_bfm #(
    input [31:0]                ddr_sh_stat_rdata[2:0],
    input [7:0]                 ddr_sh_stat_int[2:0],
 
+   //-----------------------------------------------------------------------------
+   // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
+   // to the sh_ddr.sv for the DDR interfaces to function.
+   //-----------------------------------------------------------------------------
+   output logic [7:0]          sh_ddr_stat_addr0,
+   output logic                sh_ddr_stat_wr0, 
+   output logic                sh_ddr_stat_rd0, 
+   output logic [31:0]         sh_ddr_stat_wdata0,
+   input                       ddr_sh_stat_ack0,
+   input [31:0]                ddr_sh_stat_rdata0,
+   input [7:0]                 ddr_sh_stat_int0,
+
+   output logic [7:0]          sh_ddr_stat_addr1,
+   output logic                sh_ddr_stat_wr1, 
+   output logic                sh_ddr_stat_rd1, 
+   output logic [31:0]         sh_ddr_stat_wdata1,
+   input                       ddr_sh_stat_ack1,
+   input [31:0]                ddr_sh_stat_rdata1,
+   input [7:0]                 ddr_sh_stat_int1,
+
+   output logic [7:0]          sh_ddr_stat_addr2,
+   output logic                sh_ddr_stat_wr2, 
+   output logic                sh_ddr_stat_rd2, 
+   output logic [31:0]         sh_ddr_stat_wdata2,
+   input                       ddr_sh_stat_ack2,
+   input [31:0]                ddr_sh_stat_rdata2,
+   input [7:0]                 ddr_sh_stat_int2,
+    
    input [15:0]                cl_sh_ddr_awid,
    input [63:0]                cl_sh_ddr_awaddr,
    input [7:0]                 cl_sh_ddr_awlen,
@@ -640,20 +668,20 @@ module sh_bfm #(
 
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
-      sh_ddr_stat_addr[0] <= 8'h00;
-      sh_ddr_stat_wr[0] <= 1'b0;
-      sh_ddr_stat_rd[0] <= 1'b0;
-      sh_ddr_stat_wdata[0] <= 32'h0;
+      sh_ddr_stat_addr0  = 8'h00;
+      sh_ddr_stat_wr0    = 1'b0;
+      sh_ddr_stat_rd0    = 1'b0;
+      sh_ddr_stat_wdata0 = 32'h0;
 
-      sh_ddr_stat_addr[1] <= 8'h00;
-      sh_ddr_stat_wr[1] <= 1'b0;
-      sh_ddr_stat_rd[1] <= 1'b0;
-      sh_ddr_stat_wdata[1] <= 32'h0;
+      sh_ddr_stat_addr1  = 8'h00;
+      sh_ddr_stat_wr1    = 1'b0;
+      sh_ddr_stat_rd1    = 1'b0;
+      sh_ddr_stat_wdata1 = 32'h0;
 
-      sh_ddr_stat_addr[2] <= 8'h00;
-      sh_ddr_stat_wr[2] <= 1'b0;
-      sh_ddr_stat_rd[2] <= 1'b0;
-      sh_ddr_stat_wdata[2] <= 32'h0;
+      sh_ddr_stat_addr2  = 8'h00;
+      sh_ddr_stat_wr2    = 1'b0;
+      sh_ddr_stat_rd2    = 1'b0;
+      sh_ddr_stat_wdata2 = 32'h0;
    end
 
    //=================================================
@@ -1777,12 +1805,33 @@ module sh_bfm #(
    end
 
   task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
-    sh_ddr_stat_wr[ddr_idx] = 1;
-    sh_ddr_stat_addr[ddr_idx] = stat_addr;
-    sh_ddr_stat_wdata[ddr_idx] = data;
-    sh_ddr_stat_rd[ddr_idx] = 0;
-    #8ns;
-    sh_ddr_stat_wr[ddr_idx] = 0;
+     case (ddr_idx)
+       0: begin
+          sh_ddr_stat_wr0    = 1;
+          sh_ddr_stat_addr0  = stat_addr;
+          sh_ddr_stat_wdata0 = data;
+          sh_ddr_stat_rd0    = 0;
+          #8ns;
+          sh_ddr_stat_wr0    = 0;
+       end
+       1: begin
+          sh_ddr_stat_wr1    = 1;
+          sh_ddr_stat_addr1  = stat_addr;
+          sh_ddr_stat_wdata1 = data;
+          sh_ddr_stat_rd1    = 0;
+          #8ns;
+          sh_ddr_stat_wr1    = 0;
+       end
+       2: begin
+          sh_ddr_stat_wr2    = 1;
+          sh_ddr_stat_addr2  = stat_addr;
+          sh_ddr_stat_wdata2 = data;
+          sh_ddr_stat_rd2    = 0;
+          #8ns;
+          sh_ddr_stat_wr2    = 0;
+       end
+     endcase // case (ddr_idx)
+     
   endtask
 
 endmodule // sh_bfm

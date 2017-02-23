@@ -495,14 +495,32 @@ sh_bfm sh(
    //----------------------------------------------
    // DDR stats
    //----------------------------------------------
-   .sh_ddr_stat_addr(sh_ddr_stat_addr),
-   .sh_ddr_stat_wr(sh_ddr_stat_wr),
-   .sh_ddr_stat_rd(sh_ddr_stat_rd),
-   .sh_ddr_stat_wdata(sh_ddr_stat_wdata),
+   .sh_ddr_stat_addr0(sh_ddr_stat_addr[0]),
+   .sh_ddr_stat_wr0(sh_ddr_stat_wr[0]),
+   .sh_ddr_stat_rd0(sh_ddr_stat_rd[0]),
+   .sh_ddr_stat_wdata0(sh_ddr_stat_wdata[0]),
 
-   .ddr_sh_stat_ack(ddr_sh_stat_ack),
-   .ddr_sh_stat_rdata(ddr_sh_stat_rdata),
-   .ddr_sh_stat_int(ddr_sh_stat_int),
+   .ddr_sh_stat_ack0(ddr_sh_stat_ack[0]),
+   .ddr_sh_stat_rdata0(ddr_sh_stat_rdata[0]),
+   .ddr_sh_stat_int0(ddr_sh_stat_int[0]),
+
+   .sh_ddr_stat_addr1(sh_ddr_stat_addr[1]),
+   .sh_ddr_stat_wr1(sh_ddr_stat_wr[1]),
+   .sh_ddr_stat_rd1(sh_ddr_stat_rd[1]),
+   .sh_ddr_stat_wdata1(sh_ddr_stat_wdata[1]),
+
+   .ddr_sh_stat_ack1(ddr_sh_stat_ack[1]),
+   .ddr_sh_stat_rdata1(ddr_sh_stat_rdata[1]),
+   .ddr_sh_stat_int1(ddr_sh_stat_int[1]),
+
+   .sh_ddr_stat_addr2(sh_ddr_stat_addr[2]),
+   .sh_ddr_stat_wr2(sh_ddr_stat_wr[2]),
+   .sh_ddr_stat_rd2(sh_ddr_stat_rd[2]),
+   .sh_ddr_stat_wdata2(sh_ddr_stat_wdata[2]),
+
+   .ddr_sh_stat_ack2(ddr_sh_stat_ack[2]),
+   .ddr_sh_stat_rdata2(ddr_sh_stat_rdata[2]),
+   .ddr_sh_stat_int2(ddr_sh_stat_int[2]),
 
    .cl_sh_ddr_awid(cl_sh_ddr_awid),
    .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
@@ -616,40 +634,6 @@ sh_bfm sh(
    .bar1_sh_rresp(bar1_sh_rresp),
 
    .sh_bar1_rready(sh_bar1_rready),
-
-
-/*
-   .sh_cl_xdma_awid(sh_cl_xdma_awid),
-   .sh_cl_xdma_awaddr(sh_cl_xdma_awaddr),
-   .sh_cl_xdma_awlen(sh_cl_xdma_awlen),
-   .sh_cl_xdma_awvalid(sh_cl_xdma_awvalid),
-   .cl_sh_xdma_awready(cl_sh_xdma_awready),
-
-   .sh_cl_xdma_wdata(sh_cl_xdma_wdata),
-   .sh_cl_xdma_wstrb(sh_cl_xdma_wstrb),
-   .sh_cl_xdma_wlast(sh_cl_xdma_wlast),
-   .sh_cl_xdma_wvalid(sh_cl_xdma_wvalid),
-   .cl_sh_xdma_wready(cl_sh_xdma_wready),
-
-   .cl_sh_xdma_bid(cl_sh_xdma_bid),
-   .cl_sh_xdma_bresp(cl_sh_xdma_bresp),
-   .cl_sh_xdma_bvalid(cl_sh_xdma_bvalid),
-   .sh_cl_xdma_bready(sh_cl_xdma_bready),
-
-   .sh_cl_xdma_arid(),
-   .sh_cl_xdma_araddr(),
-   .sh_cl_xdma_arlen(),
-   .sh_cl_xdma_arvalid(),
-   .cl_sh_xdma_arready(),
-
-   .cl_sh_xdma_rid(),
-   .cl_sh_xdma_rdata(),
-   .cl_sh_xdma_rresp(),
-   .cl_sh_xdma_rlast(),
-   .cl_sh_xdma_rvalid(),
-   .sh_cl_xdma_rready(),
-*/
-
 
    .sh_RST_DIMM_A_N(),
    .sh_RST_DIMM_B_N(),
@@ -885,14 +869,32 @@ sh_bfm sh(
       .M_D_DQS_DP(M_D_DQS_DP),
       .M_D_DQS_DN(M_D_DQS_DN), 
 
-      .sh_ddr_stat_addr(sh_ddr_stat_addr),
-      .sh_ddr_stat_wr(sh_ddr_stat_wr),
-      .sh_ddr_stat_rd(sh_ddr_stat_rd),
-      .sh_ddr_stat_wdata(sh_ddr_stat_wdata),
+      .sh_ddr_stat_addr0(sh_ddr_stat_addr[0]),
+      .sh_ddr_stat_wr0(sh_ddr_stat_wr[0]),
+      .sh_ddr_stat_rd0(sh_ddr_stat_rd[0]),
+      .sh_ddr_stat_wdata0(sh_ddr_stat_wdata[0]),
 
-      .ddr_sh_stat_ack(ddr_sh_stat_ack),
-      .ddr_sh_stat_rdata(ddr_sh_stat_rdata),
-      .ddr_sh_stat_int(ddr_sh_stat_int),
+      .ddr_sh_stat_ack0(ddr_sh_stat_ack[0]),
+      .ddr_sh_stat_rdata0(ddr_sh_stat_rdata[0]),
+      .ddr_sh_stat_int0(ddr_sh_stat_int[0]),
+
+      .sh_ddr_stat_addr1(sh_ddr_stat_addr[1]),
+      .sh_ddr_stat_wr1(sh_ddr_stat_wr[1]),
+      .sh_ddr_stat_rd1(sh_ddr_stat_rd[1]),
+      .sh_ddr_stat_wdata1(sh_ddr_stat_wdata[1]),
+
+      .ddr_sh_stat_ack1(ddr_sh_stat_ack[1]),
+      .ddr_sh_stat_rdata1(ddr_sh_stat_rdata[1]),
+      .ddr_sh_stat_int1(ddr_sh_stat_int[1]),
+
+      .sh_ddr_stat_addr2(sh_ddr_stat_addr[2]),
+      .sh_ddr_stat_wr2(sh_ddr_stat_wr[2]),
+      .sh_ddr_stat_rd2(sh_ddr_stat_rd[2]),
+      .sh_ddr_stat_wdata2(sh_ddr_stat_wdata[2]),
+
+      .ddr_sh_stat_ack2(ddr_sh_stat_ack[2]),
+      .ddr_sh_stat_rdata2(ddr_sh_stat_rdata[2]),
+      .ddr_sh_stat_int2(ddr_sh_stat_int[2]),
 
       .cl_sh_ddr_awid(cl_sh_ddr_awid),
       .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
