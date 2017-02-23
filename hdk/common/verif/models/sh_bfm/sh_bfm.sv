@@ -981,23 +981,6 @@ module sh_bfm #(
       
    end
    
-   always @(posedge clk_core) begin
-      sh_cl_dma_pcis_bready[0] <= 1'b1;
-   end
-
-   always @(posedge clk_core) begin
-      AXI_Command resp;
-
-      if (cl_sh_dma_pcis_bvalid[0] & sh_cl_dma_pcis_bready) begin
-         resp.resp     = cl_sh_dma_pcis_bresp[0];
-         resp.id       = cl_sh_dma_pcis_bid[0];
-
-         cl_sh_b_resps.push_back(resp);
-      end
-
-   end
-
-
    //
    // sh->cl Address Read Channel
    //
@@ -1545,8 +1528,18 @@ module sh_bfm #(
 
       logic [63:0] strb;
 
-      strb = {(1<<size){1'b1}};
-
+//      strb = {(1<<size){1'b1}};
+      case (size)
+        0: strb = 64'b0000_0000_0000_0001;
+        1: strb = 64'b0000_0000_0000_0011;
+        2: strb = 64'b0000_0000_0000_1111;
+        3: strb = 64'b0000_0000_1111_1111;
+        default: begin
+           $display("FATAL ERROR - Invalid size specified");
+           $finish;
+        end
+      endcase // case (size)
+      
       case (intf)
         0: begin
            AXI_Command axi_cmd;
