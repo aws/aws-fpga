@@ -128,7 +128,7 @@ int main(){
 <a name="fd"></a>
 ## Using file operations to perform DMA
 
-The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support Linux character device APIs.
+The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueY` filename, hence it support Linux character device APIs.
 
 As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like `read()` and `write()` ) would use a buffer pointer `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
 
@@ -157,7 +157,7 @@ The two standard linux/posix APIs for write are listed below:
 
 ***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explaination](#seek))
 
-The file-descriptor (fd) must have been opened successfully before calling write()/pwrite().
+The file-descriptor (fd) must have been opened successfully before calling `write()/pwrite()`.
 
 `buf`, the pointer to the source buffer to write to FPGA can have arbitrary size and alignment.
 
@@ -169,7 +169,7 @@ EDMA driver will take care of copying and/or pinning the user-space `buf` memory
 
 To improve write performance, and allow the application to write small messages and increase concurrency, the `write()`/`pwrite()` **may** copy the write data to an intermediate transmit buffer in the kernel, that will later be drained to the FPGA.
 
-** Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`. See [Fsync description](#FSync)**
+Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`. See [Fsync description](#fsync).
 
 fsync will wait for 1-4 seconds for all DMA transaction to complete and will return EIO if not all transactions are completed.
 
@@ -182,11 +182,13 @@ fsync will wait for 1-4 seconds for all DMA transaction to complete and will ret
 
 Both `read()` and `pread()` are blocking calls, and the call will wait until data is returned.
 
-Read will return the number of successful bytes, and it is the user responsibility to call read() with the correct offset again if the return value is not equal to count. In a case of DMA timeout (3 seconds), EIO will be returned to the user.
+Read will return the number of successful bytes, and it is the user responsibility to call `read()` with the correct offset again if the return value is not equal to count. In a case of DMA timeout (3 seconds), EIO will be returned. 
 
 Possible errors:
 EIO - DMA timeout or transaction failure.
 ENOMEM - System is out of memory.
+
+**NOTE:** In case of any of the before mentioned errors, the FPGA and EDMA will be left in unknown state, with linux `dmesg` log potentially providing more insight on the error.
 
 <a name="fsync"></a>
 ## Write synchronization, Read-after-Write (lack of) ordering and fsync()
@@ -198,13 +200,13 @@ If the developer wants to issue `read()/pread()` from an address range that was 
 <a name="seek"></a>
 ## Seek API
 
-The EDMA driver implements the standard lseek() Linux/POSIX system call, which will modify the current read/write pointer from the FPGA memory space. 
+The EDMA driver implements the standard `lseek()` Linux/POSIX system call, which will modify the current read/write pointer from the FPGA memory space. 
 
-**WARNING: ** Calling lseek() without proper locking is pronged for errors, as concurrent/multi-threaded design could call lseek() concurrently and without an atomic follow up with read/write().
+**WARNING: ** Calling `lseek()` without proper locking is pronged for errors, as concurrent/multi-threaded design could call `lseek()` concurrently and without an atomic follow up with `read()/write()`.
 
-The file_pos is a file attribute; therefore, it is incremented by both write() and read() operations by the number of bytes that were successfully written or read.
+The file_pos is a file attribute; therefore, it is incremented by both `write()` and `read()` operations by the number of bytes that were successfully written or read.
 
-** Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in an atomic way **
+**Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in an atomic way**
 
 <a name="poll"></a>
 ## poll()
