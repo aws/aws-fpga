@@ -10,7 +10,19 @@ The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are m
 ## Manifest file specification: Version 1
 
 * **manifest_format_version=**1 [Mandatory]  
+
+* **pci_vendor_id=** [Mandatory]
+      * 0x1D0F for Amazon
+
+* **pci_device_id=** [Mandatory]
+      * 0xF000 through 0xF0FF for example CLs.
+
+* **pci_subsystem_id=** [Optional]
+      * defaults to 0 if not available
       
+* **pci_subsystem_vendor_id=** [Optional]
+      * defaults to 0 if not available
+       
 * **dcp_hash=**.....   [Mandatory]    
       *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
 
