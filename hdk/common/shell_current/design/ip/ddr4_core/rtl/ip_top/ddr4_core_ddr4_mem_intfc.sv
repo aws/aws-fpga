@@ -316,6 +316,8 @@ module ddr4_core_ddr4_mem_intfc #
    ,input                           app_zq_req
    ,output                          app_zq_ack
 
+   , output                         ALT_ddr4_reset_n                       //AK Added
+
    ,input [36:0]                    sl_iport0
    ,output [16:0]                   sl_oport0
 
@@ -630,6 +632,8 @@ reg                      [1:0] winRank_phy;
   wire [2:0]          lr = {{(3-LR_WIDTH){1'b0}}, lr_int};
   assign row_mc_phy = {{(18-ROW_WIDTH){1'b0}}, row};
 
+  assign ALT_ddr4_reset_n = cal_RESET_n[0]; //AK Added: __SRAI (added for PR compitibility)
+   
 ddr4_core_phy u_mig_ddr4_phy
     (
       .sys_clk_p           (sys_clk_p)

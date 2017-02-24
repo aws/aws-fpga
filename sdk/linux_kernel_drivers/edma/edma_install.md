@@ -44,6 +44,7 @@ __*For AmazonLinux,RedHat,Centos*__
 
 __*For Ubuntu*__  
 
+
 ```
   $ sudo apt-get install make
   $ sudo apt-get install gcc
@@ -56,6 +57,7 @@ __*For Suse*__
   $ sudo zypper install gcc
   $ sudo zypper update
   $ sudo zypper install kernel-devel
+
 ```
 
 __**Step 2**__: Clone the git repo locally under my_fpga_dir for example:  
@@ -85,7 +87,9 @@ __*For AmazonLinux, RedHat, Open Suse, and Centos*__:
 The next set of steps will installing the kernel driver so it get called everytime the machine boots/reboots  
 
 ```
+
   $ echo 'edma' | sudo tee --append /etc/modules-load.d/edma.conf
+
   $ cp edma.ko /lib/modules/(uname -r)/
   $ sudo depmod
 ```  
@@ -152,7 +156,8 @@ __*Step F:*__ **Verify that the edma module is installed using the modinfo edma.
 
 **Q: What PCIe Vendor-ID and Device-ID does EDMA driver support?** <a name="howToDIDnVID"></a>  
 
-For the time being EDMA supports - 1d0f:1042.
+Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:1042.
+
 
 
 **Q: How to troubleshoot EDMA compilation or installing?** <a name="howToTroubleshoot"></a>

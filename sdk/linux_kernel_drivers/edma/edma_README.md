@@ -1,3 +1,4 @@
+
 # Using AWS EDMA in C/C++ application
 
 ## Table of Content
@@ -353,4 +354,5 @@ To know what IRQ number is used for EDMA, the user can
 **Q: Would EDMA support transfer of Scatter-gather list?**
 
 AWS is considering this for future versions of EDMA to include scatter-gather-list (SGL) based transfers using IOCTL API. 
+
 

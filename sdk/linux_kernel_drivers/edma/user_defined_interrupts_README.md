@@ -5,6 +5,7 @@ AWS FPGA provides options for Custom Logic (CL) to generate user-defined interru
 At the hardware level, these interrupt event are defined in [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md)
 
 
+
 ## User-defined interrupts relies on EDMA driver
 
 AWS provides Elastic DMA (EDMA) (A reference Linux kernel driver) services both CL interrupt events and the DMA between instance's CPU memory and CL. 
@@ -15,6 +16,7 @@ i) Initialization of the MSI-X interrupt logic in the Shell to map cl_sh_apppf_i
 
 ii) Exposing all the interrupt events as file devices under /dev/fpgaX/eventY where X is the slot-id and Y is the event/interrupt
 
+
 iii) Exposing each interrupt as a file-descriptor for event polling in Linux userspace
 
 iv) Guarantees graceful teardown in case of a userspace process crashes or improper termination
@@ -23,6 +25,7 @@ iv) Guarantees graceful teardown in case of a userspace process crashes or impro
 ## Installation of EDMA Driver
 
 Please follow the [EDMA driver installation guide](./edma_install.md) for compiling and installing the driver.
+
 The driver needs to be installed once, regardless of how many FPGA slots are available.
 
 
@@ -35,11 +38,12 @@ The next example shows how an application can register to two events (aka user-d
   fd4=open(“/dev/fpga0/event4”, O_RDONLY);
   fd6=open(“/dev/fpga0/event6”, O_RDONLY);
 
+
   //polling on event4 and event6
 
   struct pollfd fds[] = {
-      { fd4, POLLIN | POLLERR },
-      { fd6, POLLIN | POLLERR }
+      { fd4, POLLIN },
+      { fd6, POLLIN }
   };
 
   int r = poll(fds, 2, 0);
@@ -71,7 +75,9 @@ Toggling of user interrupt event by toggling the `cl_sh_apppf_int_req` interface
 
 
 
+
 **Q: How do I stop interrupts/events?**
+
 
 To stop all the interrupts/events, one should disable the toggling of interrupt pins at the CL side (implementation specific).
 
@@ -82,6 +88,8 @@ To stop all the interrupts/events, one should disable the toggling of interrupt 
 There are three options to mask an interrupt/event:
 
 i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle and thekernel EDMA driver will get invoked; but the application in Linux userspace will not see it.
+
+
 
 ii) Call close() for all the file-descriptors associated with the specification interrupt/event, the EDMA driver will mask the interrupt
 
@@ -105,10 +113,12 @@ The cause the mask bits, if exist, will be part of the CL and are implementation
 
 **Q: Can the userspace application miss an interrupt event?**
 
+
 Yes, that can happen if: 
 i) The EDMA driver is not installed
 
 ii) The interrupt was delivered to Linux while the corresponding file-descriptor was not open by any process.
+
 
 
 
@@ -117,6 +127,7 @@ ii) The interrupt was delivered to Linux while the corresponding file-descriptor
 It all depends on the timing when the interrupt request was sent and when the poll() is called.
 
 EDMA implementation keeps a state per interrupt event if it was asserted from the last time a poll() was called.  If the same interrupt is sent by the CL multiple times before the poll() is called, the next call to the poll() will just indicate that there was an interrupt event, but it doesn't provide the interrupt count, and it doesn't keep a queue.
+
 
 
 
@@ -129,3 +140,4 @@ The EDMA Linux kernel driver will map the CL user-defined interrupts to MSI-X en
 **Q: What if I want to build an in-kernel interrupt service routine for some of the user-defined interrupts?** 
 
 A reference in-kernel driver interrupt handler is provided for user modification in [EDMA source directory](./src/example_kernel_interrupt.c).
+
