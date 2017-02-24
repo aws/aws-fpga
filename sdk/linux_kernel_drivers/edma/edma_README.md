@@ -146,7 +146,7 @@ Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the 
 Multiple threads or processes can open the same file, and it is the developer's responsibility to ensure coordination/serialization, if required, using `lock` system call.
 
 A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return an error. 
-If `close()` waits for more than 3 seconds and all other pending calls did not finish, it will panic.
+If `close()` waits for more than 3 seconds and all other pending calls did not finish, it will panic, and the FPGA will be left in undefined state. Linux `dmesg` log service would include more debug information.
 
 <a name="write"></a>
 ## Write APIs
@@ -171,7 +171,6 @@ To improve write performance, and allow the application to write small messages 
 
 Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`. See [Fsync description](#fsync).
 
-fsync will wait for 1-4 seconds for all DMA transaction to complete and will return EIO if not all transactions are completed.
 
 <a name="read"></a>
 ## Read APIs 
@@ -196,6 +195,9 @@ ENOMEM - System is out of memory.
 To improve write performance and minimize blocking the userspace application calling `write()/pwrite()` system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
 
 If the developer wants to issue `read()/pread()` from an address range that was previously written, the developer should issue fsync() to ensure the intermediate write buffer is flushed to the FPGA before the read is executed.
+
+`fsync()` will wait between 1-4 seconds for all pending DMA write transaction to complete, and will return EIO if not all transactions are completed. In EIO is returned, the FPGA and EDMA driver are left in unknown state, linux `dmesg` log service could have additional debug infromation.
+
 
 <a name="seek"></a>
 ## Seek API
