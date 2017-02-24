@@ -14,6 +14,7 @@
   - [Poll call](#poll)
   - [Concurrency, multi-threading](#concurrency)
   - [Error handling](#error)
+  - [Statistics](#stats)
 4. [Frequently Asked Questions](#faqs)
 
 <a name="overview"></a>
@@ -41,7 +42,7 @@ For a complete description of the different CPU to FPGA communication options an
 
 Before diving into the detail specification of the EDMA, here’s a short, intuitive example how the developer could use the EDMA in a process:
 
-The Program below will use standard Linux system call open() to create a file descriptor (fd), mapping to a pair of EDMA queues (one for read() and one for write()).
+The Program below will use standard Linux system call open() to create a file descriptor (fd), mapping to a pair of EDMA queues (one for `read()` and one for `write()`).
 
 
 ```
@@ -129,17 +130,18 @@ int main(){
 
 The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support Linux character device APIs.
 
-As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like read() and write() ) would use a buffer pointer _(void*)_ to the instance CPU memory, while using file offset _(off\_t)_ to present the write-to/read-from address in the FPGA.
+As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like `read()` and `write()` ) would use a buffer pointer `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
 
-**NOTE: In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space.** Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).
+**NOTE: ** In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).  
+
 
 <a name="openclose"></a>
 ## Initialization and tear down API
 
 Using the standard:
-`int open(const char \*pathname, int flags);`
+`int open(const char *pathname, int flags);`
 
-Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the specific queue), with the only flags recommended is `O_RDWR`, **and all other flags will be ignored.**  
+Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the specific queue), with the only flags recommended is `O_RDWR`, and all other flags will be ignored.
 
 Multiple threads or processes can open the same file, and it is the developer's responsibility to ensure coordination/serialization, if required, using `lock` system call.
 
@@ -167,7 +169,7 @@ EDMA driver will take care of copying and/or pinning the user-space `buf` memory
 
 To improve write performance, and allow the application to write small messages and increase concurrency, the `write()`/`pwrite()` **may** copy the write data to an intermediate transmit buffer in the kernel, that will later be drained to the FPGA.
 
-** Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`.**
+** Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`. See [Fsync description](#FSync)**
 
 fsync will wait for 1-4 seconds for all DMA transaction to complete and will return EIO if not all transactions are completed.
 
@@ -240,18 +242,22 @@ Timeout errors can occur in few place including:
 
 The EDMA queue have a timeout mechanism for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
 
-
+<a name="stats"></a>
 ## Statistics Gathering
 
-Statistics are gathered using SysFS. Each edma has a sysfs entry matching the device (i.e. /dev/edma4 will have /sys/edma/edma4), and all the stats will be under that sysfs entry.
-To see what available stats are there simply run 
+Statistics are gathered using SysFS. Each edma has a sysfs entry matching the FPGA slow (i.e. /dev/edmaX_queueY will have /sys/edma/edmaX_queueY), and all the stats will be under that sysfs entry.
 
-`ls -l /sys/class/edma/edma0_queue0/*`
+To see what available stats for a specific EDMA queue, simply run:
+
+`$ ls -l /sys/class/edma/edma0_queue0/*`
+  
+
 to read a specific start use cat utility
 
-`cat /sys/class/edma/edma0_queue0/stats`
+```
+$ cat /sys/class/edma/edma0_queue0/stats
 
-***read_requests_submitted - 152
+read_requests_submitted - 152
 read_requests_completed - 152
 write_requests_submitted - 87
 write_requests_completed - 87
@@ -259,8 +265,13 @@ fsync_count - 6
 no_space_left_error - 0
 fsync_busy_count - 1
 read_timeouts_error - 0
-opened_times - 1***
+opened_times - 1
 
+$ 
+```
+
+
+<a name="faq"></a>
 # FAQ
 
 
@@ -320,14 +331,14 @@ Please refer to the API read description for a list of supported errno values
 
 EDMA would output its log through the standard Linux dmesg service.
 
-`$ dmesg | grep “edma” `
+` $ dmesg | grep “edma” `
 
 **Q: Will EDMA use interrupts during data transfers?**
 
 EDMA in kernel driver uses MSI-X interrupts,  one interrupt pair of EDMA read/write queues.
 To know what IRQ number is used for EDMA, the user can 
 
-`$ cat /proc/interrupts`
+` $ cat /proc/interrupts`
 
 
 **Q: Would EDMA support transfer of Scatter-gather list?**
