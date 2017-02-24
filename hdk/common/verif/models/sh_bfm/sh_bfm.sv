@@ -508,7 +508,8 @@ module sh_bfm #(
    bit           debug;
 
    typedef struct {
-      logic [7:0] buffer[];
+      logic [63:0] buffer;
+      logic [27:0] len;
       logic [63:0] cl_addr;
    } DMA_OP;
 
@@ -1654,29 +1655,33 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   function dma_buffer_to_cl(input logic [1:0] chan, logic [7:0] buffer[], logic [63:0] cl_addr);
+   function dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
       
-      dop.buffer = buffer;
+      dop.buffer = src_addr;
       dop.cl_addr = cl_addr;
+      dop.len = len;
+      
       h2c_dma_list[chan].push_back(dop);
       
    endfunction // dma_buffer_to_cl
 
-   function automatic dma_cl_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[], input [63:0] cl_addr);
+   function automatic dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
-      dop.buffer = buffer;
+      dop.buffer = dst_addr;
       dop.cl_addr = cl_addr;
+      dop.len = len;
       c2h_dma_list[chan].push_back(dop);
    endfunction // dma_cl_to_buffer
 
+/*
    function automatic dma_cl_data_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[]);
       DMA_OP dop;
       dop = c2h_dma_data[chan].pop_front();
       buffer = dop.buffer;
       c2h_dma_done[chan] = 1'b0;
    endfunction // dma_cl_data_to_buffer
-
+*/
    
    function void start_dma_to_cl(input int chan);
       h2c_dma_started[chan] = 1'b1;
@@ -1709,7 +1714,8 @@ module sh_bfm #(
          AXI_Command axi_cmd;
          AXI_Data    axi_data;
          DMA_OP      dop;
-
+         logic [63:0] host_memory;
+         
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();            

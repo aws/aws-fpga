@@ -91,12 +91,12 @@
       return d;
    endfunction
 
-   function void que_buffer_to_cl(input int chan, logic [7:0] data[], logic [63:0] cl_addr);
-      tb.sh.dma_buffer_to_cl(chan, data, cl_addr);
+   function void que_buffer_to_cl(input int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+      tb.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
    endfunction
 
-   function automatic void que_cl_to_buffer(input int chan, ref logic [7:0] data[], input logic [63:0] cl_addr);
-      tb.sh.dma_cl_to_buffer(chan, data, cl_addr);
+   function void que_cl_to_buffer(input int chan, ref logic [7:0] data[], input logic [63:0] cl_addr, logic [27:0] len);
+      tb.sh.dma_cl_to_buffer(chan, data, cl_addr, len);
    endfunction
 
    function void start_que_to_cl(input int chan);
