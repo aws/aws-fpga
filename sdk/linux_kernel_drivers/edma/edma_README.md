@@ -211,16 +211,21 @@ The file_pos is a file attribute; therefore, it is incremented by both `write()`
 <a name="poll"></a>
 ## poll()
 
-The poll() function provides applications with a mechanism for multiplexing input over a set of file descriptors for matching user events. Only the POLLIN mask is supported and is used to notify that an event has occuer.
+The poll() function provides applications with a mechanism for multiplexing input over a set of file descriptors for matching user events. This is used by the EDMA driver for user generated interrupts events, and not used for data transfers.
+
+Only the POLLIN mask is supported and is used to notify that an event has occuer.
+
+Refer to [User-defined interrupts events README](./user_defined_interrupts_README.md)
+
 
 <a name="concurrency"></a>
 ## Concurrency and Multi-threading
 
-EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call open()/close() to the same file descriptor.
+EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call `open()/close()` to the same file descriptor.
 
 It is the developer's responsibility to make sure write to same memory region from different threads/processes is coordinated and not overlapping.
 
-Worth re-iterating the recommended use of pread()/pwrite() over a sequency of lseek() + read()/write().
+Worth re-iterating the recommended use of `pread()/pwrite()` over a sequency of `lseek()` + `read()/write()`.
 
 <a name="error"></a>
 ## Error Handling
@@ -242,7 +247,7 @@ Timeout errors can occur in few place including:
 
 2. A read() from CL portion of the FPGA that is stuck, causing the read() to block forever.
 
-The EDMA queue have a timeout mechanism for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
+The EDMA queue have a timeout mechanism (3 seconds)for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
 
 <a name="stats"></a>
 ## Statistics Gathering
