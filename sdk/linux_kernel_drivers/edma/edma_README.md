@@ -23,7 +23,7 @@
 
 Amazon Elastic-DMA (EDMA) Driver is provided as an option transfer data between the FPGA and the Instance's CPU memory.
 
-Amazon EDMA driver objectives:
+Amazon EDMA driver objectives: <br />
 1. Open-source driver <br />
 2. Easy to install and use, and does not require driver development expertise to use <br />
 3. High-performance multi-queue interface, to lower CPU overhead. <br />
