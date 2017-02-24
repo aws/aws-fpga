@@ -1685,6 +1685,7 @@ module sh_bfm #(
    
    function void start_dma_to_cl(input int chan);
       h2c_dma_started[chan] = 1'b1;
+      h2c_dma_done[chan] = 1'b0;
    endfunction // start_dma_to_cl
    
    function void start_dma_to_buffer(input int chan);
