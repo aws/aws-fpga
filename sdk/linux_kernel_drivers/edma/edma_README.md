@@ -115,7 +115,8 @@ Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the 
 
 Multiple threads or processes can open the same file, and it is the developer's responsibility to ensure coordination/serialization, if required, using `lock` system call.
 
-A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return an error. If `close()` waits for more than 3seconds and all other pending calls did not finish, it will force a close, and the FPGA and its edma driver will be in an unknown state.
+A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return an error. 
+If `close()` waits for more than 3 seconds and all other pending calls did not finish, it will panic.
 
 
 ## Write APIs
@@ -176,8 +177,7 @@ The file_pos is a file attribute; therefore, it is incremented by both write() a
   
 ## poll()
 
-//TBD - alex - pls update
-
+The poll() function provides applications with a mechanism for multiplexing input over a set of file descriptors for matching user events. Only the POLLIN mask is supported and is used to notify that an event has occuer.
 
 ## Concurrency and Multi-threading
 
