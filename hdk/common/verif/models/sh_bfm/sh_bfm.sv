@@ -1421,7 +1421,7 @@ module sh_bfm #(
                          .axil_bready(sh_bar1_bready),
                          .axil_arvalid(sh_bar1_arvalid),
                          .axil_araddr(sh_bar1_araddr),
-                         .axil_arready(cl_bar1_arready),
+                         .axil_arready(bar1_sh_arready),
                          .axil_rvalid(bar1_sh_rvalid),
                          .axil_rdata(bar1_sh_rdata),
                          .axil_rresp(bar1_sh_rresp),
@@ -1689,6 +1689,7 @@ module sh_bfm #(
    
    function void start_dma_to_buffer(input int chan);
       c2h_dma_started[chan] = 1'b1;
+      c2h_dma_done[chan] = 1'b0;
    endfunction // start_dma_to_buffer
 
    function bit is_dma_to_cl_done(input int chan);  // 1 = done
@@ -1754,18 +1755,19 @@ module sh_bfm #(
       else begin
         DMA_OP dop;
         for (int chan = 0; chan < 4; chan++) begin
-          c2h_dma_done[chan] = 1'b0;
+//          c2h_dma_done[chan] = 1'b0;
           if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
             if(chan == cl_sh_rd_data[0].id) begin
-              for (int i = 0; i< 64 ; i++) begin
-                dop.buffer = new[i+1](dop.buffer);
-                dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
+              for (int i = 0; i< dop.len ; i++) begin
+//                dop.buffer = new[i+1](dop.buffer);
+//                dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
+                 tb.hm_put_byte(dop.buffer + i, cl_sh_rd_data[0].data[(i*8)+:8]);
                 if (debug) begin
                   $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
                                             $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
                 end
               end
-              c2h_dma_data[chan].push_back(dop);
+//              c2h_dma_data[chan].push_back(dop);
               cl_sh_rd_data.pop_front();
               c2h_dma_done[chan] = 1'b1;
             end

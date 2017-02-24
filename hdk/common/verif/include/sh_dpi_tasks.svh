@@ -60,7 +60,7 @@
          host_memory_putc(addr, d);
       else begin
          int unsigned t;
-         
+
          if (tb.sv_host_memory.exists({addr[63:2], 2'b00})) begin
             t = tb.sv_host_memory[{addr[63:2], 2'b00}];
          end
@@ -95,8 +95,8 @@
       tb.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
    endfunction
 
-   function void que_cl_to_buffer(input int chan, ref logic [7:0] data[], input logic [63:0] cl_addr, logic [27:0] len);
-      tb.sh.dma_cl_to_buffer(chan, data, cl_addr, len);
+   function void que_cl_to_buffer(input int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
+      tb.sh.dma_cl_to_buffer(chan, dst_addr, cl_addr, len);
    endfunction
 
    function void start_que_to_cl(input int chan);
@@ -105,10 +105,6 @@
 
    function void start_que_to_buffer(input int chan);
       tb.sh.start_dma_to_buffer(chan);
-   endfunction
-
-   function automatic void data_cl_to_buffer(input int chan, ref logic [7:0] data[]);
-      tb.sh.dma_cl_data_to_buffer(chan, data);
    endfunction
 
 `endif
