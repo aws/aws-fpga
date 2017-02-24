@@ -122,9 +122,9 @@ int main(){
 <a name="fd"></a>
 ## Using file operations to perform DMA
 
-The EDMA can be used in any user-space developer program, using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueY` filename, hence it support Linux character device APIs.
+The EDMA can be used in any user-space developer program, using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueY` filename, hence it supports Linux character device APIs.
 
-As EDMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like `read()` and `write()` ) would use a buffer pointer `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
+EDMA data movement commands (like `read()` and `write()` ) use a buffer pointers `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
 
 **NOTE: ** In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).  
 
@@ -132,7 +132,7 @@ As EDMA channel/queue would get a file-descriptors in the userspace applications
 <a name="openclose"></a>
 ## Initialization and Tear Down API
 
-Using the standard:
+Initialization is done using the standard file-open API:
 `int open(const char *pathname, int flags);`
 
 Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the specific queue), with the only flags recommended is `O_RDWR`, and all other flags will be ignored.
@@ -145,7 +145,7 @@ If `close()` waits for more than 3 seconds and all other pending calls did not f
 <a name="write"></a>
 ## Write APIs
 
-The two standard linux/posix APIs for write are listed below:
+The two standard Linux/POSIX APIs for write are listed below:
 
 ***ssize_t write(int fd, void\* buf, size_t count)*** 
 
