@@ -5,8 +5,18 @@
 1. [Overview](#overview)
 2. [Quick Example](#quickExample)
 3. [Detailed Description](#detailed)
+  - [File Descriptors](#fd)
+  - [Setup and tear down](#openclose)
+  - [Write calls](#write)
+  - [Read calls](#read)
+  - [FSync call](#fsync)
+  - [Seek call](#seek)
+  - [Poll call](#poll)
+  - [Concurrency, multi-threading](#concurrency)
+  - [Error handling](#error)
 4. [Frequently Asked Questions](#faqs)
 
+<a name="overview"></a>
 # Overview
 
 Amazon Elastic-DMA (EDMA) Driver is provided as an option transfer data between the FPGA and the Instance's CPU memory.
@@ -26,7 +36,7 @@ EDMA driver source code is distributed with AWS FPGA HDK and SDK.
 
 For a complete description of the different CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
 
-
+<a name="quickExample"></a>
 # Quick Example
 
 Before diving into the detail specification of the EDMA, here’s a short, intuitive example how the developer could use the EDMA in a process:
@@ -111,8 +121,10 @@ int main(){
 } 
 ```
 
+<a name="detailed"></a>
 # Detailed Description
 
+<a name="fd"></a>
 ## Using file operations to perform DMA
 
 The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support Linux character device APIs.
@@ -121,7 +133,7 @@ As DMA channel/queue would get a file-descriptors in the userspace applications,
 
 **NOTE: In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space.** Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).
 
-
+<a name="openclose"></a>
 ## Initialization and tear down API
 
 Using the standard:
@@ -134,7 +146,7 @@ Multiple threads or processes can open the same file, and it is the developer's 
 A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return an error. 
 If `close()` waits for more than 3 seconds and all other pending calls did not finish, it will panic.
 
-
+<a name="write"></a>
 ## Write APIs
 
 The two standard linux/posix APIs for write are listed below:
@@ -159,6 +171,7 @@ To improve write performance, and allow the application to write small messages 
 
 fsync will wait for 1-4 seconds for all DMA transaction to complete and will return EIO if not all transactions are completed.
 
+<a name="read"></a>
 ## Read APIs 
 
 ***ssize_t read(int fd, void\* buf, size_t count)*** 
@@ -173,14 +186,14 @@ Possible errors:
 EIO - DMA timeout or transaction failure.
 ENOMEM - System is out of memory.
 
-
-## Read-after-Write (lack of) ordering and fsync()
+<a name="fsync"></a>
+## Write synchronization, Read-after-Write (lack of) ordering and fsync()
 
 To improve write performance and minimize blocking the userspace application calling `write()/pwrite()` system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
 
 If the developer wants to issue `read()/pread()` from an address range that was previously written, the developer should issue fsync() to ensure the intermediate write buffer is flushed to the FPGA before the read is executed.
 
-
+<a name="seek"></a>
 ## Seek API
 
 The EDMA driver implements the standard lseek() Linux/POSIX system call, which will modify the current read/write pointer from the FPGA memory space. 
@@ -190,11 +203,13 @@ The EDMA driver implements the standard lseek() Linux/POSIX system call, which w
 The file_pos is a file attribute; therefore, it is incremented by both write() and read() operations by the number of bytes that were successfully written or read.
 
 ** Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in an atomic way **
-  
+
+<a name="poll"></a>
 ## poll()
 
 The poll() function provides applications with a mechanism for multiplexing input over a set of file descriptors for matching user events. Only the POLLIN mask is supported and is used to notify that an event has occuer.
 
+<a name="concurrency"></a>
 ## Concurrency and Multi-threading
 
 EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call open()/close() to the same file descriptor.
@@ -203,7 +218,7 @@ It is the developer's responsibility to make sure write to same memory region fr
 
 Worth re-iterating the recommended use of pread()/pwrite() over a sequency of lseek() + read()/write().
 
-
+<a name="error"></a>
 ## Error Handling
 
 The driver handles some error cases and passes other errors to the user.
@@ -219,11 +234,11 @@ In case a crash in the developer's user-space application, the operating system 
 
 Timeout errors can occur in few place including:
 
-1. Application stuck on `write()/pwrite()`, or its data that is stuck in transient buffer for too long because the CL is not accepting the data
+1. Application stuck on `write()/pwrite()`, or its data that is stuck in transient buffer for too long because the CL is not accepting the data.
 
-2. A read() from CL portion of the FPGA that is stuck, causing the read() to block forever
+2. A read() from CL portion of the FPGA that is stuck, causing the read() to block forever.
 
-The EDMA queue will have a timeout mechanism for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash.” 
+The EDMA queue have a timeout mechanism for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
 
 
 ## Statistics Gathering
