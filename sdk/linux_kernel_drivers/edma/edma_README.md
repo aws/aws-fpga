@@ -53,15 +53,15 @@ The Program below will use standard Linux system call open() to create a file de
 #include <errno.h>
 #include <unistd.h>
 
-#define BUF_SIZE    256
-#define OFFSET_IN_FPGA_DRAM 0x10000000
+#define BUF_SIZE              256
+#define OFFSET_IN_FPGA_DRAM   0x10000000
 
-static char *rand_str(char *str, size_t size)
+static char *rand_str(char *str, size_t size)  // randomize a string of size <size>
 {
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRTSUVWXYZ1234567890";
     int i;
 
-    for(i = 0; i < size; i++){
+    for (i = 0; i < size; i++) {
         int key = rand() % (int) (sizeof charset - 1);
         str[i] = charset[key];
     }
@@ -85,20 +85,17 @@ int main(){
     /* Initialize srcBuf */
     rand_str(srcBuf, BUF_SIZE);
 
-    if((fd = open("/dev/edma0_queue_0",O_RDWR)) == -1)
-    {
-              perror("open failed with errno");
+    /* Open an EDMA queue for read/write */
+    if((fd = open("/dev/edma0_queue_0",O_RDWR)) == -1) {
+        perror("open failed with errno");
     }
 
     /* Write the entire source buffer to offset OFFSET_IN_FPGA_DRAM */
 
     ret = pwrite(fd , srcBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
-
-    if( ret < 0)
-    {
-              perror("write failed with errno");
+    if( ret < 0) {
+        perror("write failed with errno");
     }
-
     printf("Tried to write %u bytes, succeeded in writing %u bytes\n", BUF_SIZE, ret);
 
     /* ensure the write made it to the Shell/CL interface */
@@ -106,20 +103,16 @@ int main(){
 
     ret = pread(fd, dstBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
 
-    if(ret < 0)
-    {
-              perror("read failed with errno");
+    if(ret < 0) {
+        perror("read failed with errno");
     }
-
     printf("Tried reading %u byte, succeeded in read %u bytes\n", BUF_SIZE,ret);
 
-    if(close(fd) < 0)
-    {
-              perror("close failed with errno");
+    if(close(fd) < 0) {
+        perror("close failed with errno");
     }
 
     printf("Data read is %s\n", dstBuf);
-
 } 
 ```
 
@@ -129,9 +122,9 @@ int main(){
 <a name="fd"></a>
 ## Using file operations to perform DMA
 
-The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueY` filename, hence it support Linux character device APIs.
+The EDMA can be used in any user-space developer program, using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueY` filename, hence it support Linux character device APIs.
 
-As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like `read()` and `write()` ) would use a buffer pointer `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
+As EDMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like `read()` and `write()` ) would use a buffer pointer `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
 
 **NOTE: ** In EC2 F1 instances, the file offset represent the write-to/read-from address in the FPGA relative to AppPF BAR4 128GiB address space. The DMA can not access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](aws-fpga/hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).  
 
