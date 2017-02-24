@@ -20,18 +20,18 @@ Amazon EDMA driver objectives:
 
 EDMA driver source code is distributed with AWS FPGA HDK and SDK.
 
-[EDMA Installation Guide](./edma_install.md) provides detailed guidelines how to compile, install and trouble shoot EDMA instalation.
+[EDMA Installation Guide](./edma_install.md) provides detailed guidelines how to compile, install and troubleshoot EDMA installation.
 
 ** NOTE: Usage of EDMA is not mandatory, and AWS FPGA provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
 
-For a complete description of the various CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
+For a complete description of the different CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
 
 
 # Quick Example
 
-Before diving into the detail specification of the EDMA, here’s a short intuitive example how the developer could use the EDMA in a process:
+Before diving into the detail specification of the EDMA, here’s a short, intuitive example how the developer could use the EDMA in a process:
 
-The Program below will uses standard linux system call open() to  create a file descriptor (fd), mapping to a pair of EDMA queues (one for read and one for write).
+The Program below will use standard Linux system call open() to create a file descriptor (fd), mapping to a pair of EDMA queues (one for read() and one for write()).
 
 
 ```
@@ -99,7 +99,7 @@ int main(){
 
 ## Using file operations to perform DMA
 
-The EDMA can be used in any developer program (running in user space) using simple device operations following standard linux/posix system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support linux character device APIs.
+The EDMA can be used in any developer program (running in user space) using simple device operations following standard Linux/POSIX system calls.  Each EDMA queue is has a `/dev/edmaX_queueN` filename, hence it support Linux character device APIs.
 
 As DMA channel/queue would get a file-descriptors in the userspace applications, and data movement application (like read() and write() ) would use a buffer pointer _(void*)_ to the instance CPU memory, while using file offset _(off\_t)_ to present the write-to/read-from address in the FPGA.
 
@@ -115,7 +115,7 @@ Where file name is one of the `/dev/edmaX_queueY` (X is the FPGA slot, Y is the 
 
 Multiple threads or processes can open the same file, and it is the developer's responsibility to ensure coordination/serialization, if required, using `lock` system call.
 
-A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return error. If `close()` waits for more than 3seconds and all other pending calls did not finish, it will force a close, and the FPGA and its edma driver will be in unknown state.
+A corresponding `close()` is used to release the DMA queue.  The `close()` call will block until all other pending calls (like read or write) finish, any call to the file-descriptor following close() will return an error. If `close()` waits for more than 3seconds and all other pending calls did not finish, it will force a close, and the FPGA and its edma driver will be in an unknown state.
 
 
 ## Write APIs
@@ -128,9 +128,9 @@ The two standard linux/posix APIs for write are listed below:
 
 The file-descriptor (fd) must have been opened successfully before calling write()/pwrite().
 
-`buf`, the poiter to the source buffer to write to FPGA can have arbiterary size and alignment.
+`buf`, the pointer to the source buffer to write to FPGA can have arbitrary size and alignment.
 
-EDMA driver is responsible on mapping the `buf` memory range to list of physical addresses that the hardware DMA can use. 
+EDMA driver is responsible for mapping the `buf` memory range to list of physical addresses that the hardware DMA can use. 
 
 EDMA driver will take care of copying and/or pinning the user-space `buf` memory, and the developer doesn't need to worry about it.
 
@@ -140,7 +140,7 @@ To improve write performance, and allow the application to write small messages 
 
 ** Developers' who want to guarantee that the writen data has reached the CL (Custom Logic) portion of the FPGA, must call `fsync()` after `write()`/`pwrite()`.**
 
-//TBD - talk about return error values
+fsync will wait for 1-4 seconds for all DMA transaction to complete and will return EIO if not all transactions are completed.
 
 ## Read APIs 
 
@@ -150,26 +150,29 @@ To improve write performance, and allow the application to write small messages 
 
 Both `read()` and `pread()` are blocking calls, and the call will wait until data is returned.
 
-//TBD - talk about read timeout and read error
+Read will return the number of successful bytes, and it is the user responsibility to call read() with the correct offset again if the return value is not equal to count. In a case of DMA timeout (3 seconds), EIO will be returned to the user.
 
-//TBD - talk about return error values
+Possible errors:
+EIO - DMA timeout or transaction failure.
+ENOMEM - System is out of memory.
+
 
 ## Read-after-Write (lack of) ordering and fsync()
 
 To improve write performance and minimize blocking the userspace application calling `write()/pwrite()` system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
 
-If the developer want to issue `read()/pread()` from an address range that was previously written, the developer should issue fsync() to ensure the intermediate write buffer is flushed to the FPGA before the read is executed.
+If the developer wants to issue `read()/pread()` from an address range that was previously written, the developer should issue fsync() to ensure the intermediate write buffer is flushed to the FPGA before the read is executed.
 
 
 ## Seek API
 
-The EDMA driver implements the standard lseek() linux/posix system call, which will modify the current read/write pointer from the FPGA memory space. 
+The EDMA driver implements the standard lseek() Linux/POSIX system call, which will modify the current read/write pointer from the FPGA memory space. 
 
-**WARNING: ** Calling lseek() without proper locking is pronged for errors, as concurrent/multi-threaded design could call lseek() concurrently and without an atomic followup with read/write().
+**WARNING: ** Calling lseek() without proper locking is pronged for errors, as concurrent/multi-threaded design could call lseek() concurrently and without an atomic follow up with read/write().
 
-//TBD - talk whether we have same position for read and write or they are separate
+The file_pos is a file attribute; therefore, it is incremented by both write() and read() operations by the number of bytes that were successfully written or read.
 
-** Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in atomic way **
+** Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in an atomic way **
   
 ## poll()
 
@@ -178,7 +181,7 @@ The EDMA driver implements the standard lseek() linux/posix system call, which w
 
 ## Concurrency and Multi-threading
 
-EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call open()/close() to the same file-descriptor.
+EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call open()/close() to the same file descriptor.
 
 It is the developer's responsibility to make sure write to same memory region from different threads/processes is coordinated and not overlapping.
 
@@ -189,12 +192,12 @@ Worth re-iterating the recommended use of pread()/pwrite() over a sequency of ls
 
 The driver handles some error cases and passes other errors to the user.
 
-The EDMA and its driver is designed to try to recover gracefully from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design tries to cover all known cases, there may be corner cases that are not recovered. The EDMA will print errors and logis to linux `dmesg` service indicating unrecoverable error.
+The EDMA and its driver is designed to try to recover gracefully from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design tries to cover all known cases, there may be corner cases that are not recovered. The EDMA will print errors and logic to Linux `dmesg` service indicating a unrecoverable error.
 
 
 #### Error: Application process crash 
 
-In case a crash in the developer's user-space application, the operating system kernel takes care of all open file-descriptors (EDMA queues) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor. When kernel closes them, the driver free and release all the transient read data and interrupt events from the FPGA to the application. The driver will also try to drain all outstanding write data to the FPGA.  If either of these tasks don’t finish after a timeout process, an error is reported in linux `dmesg` and the FPGA itself and EDMA driver may be in unknown.
+In case a crash in the developer's user-space application, the operating system kernel takes care of all open file descriptors (EDMA queues) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor. When the kernel closes them, the driver frees and releases all the transient read data and interrupt events from the FPGA to the application. The driver will also try to drain all outstanding write data to the FPGA.  If either of these tasks don’t finish after a timeout process, an error is reported in Linux `dmesg` and the FPGA itself and EDMA driver may be in unknown.
 
 #### Error: API Time-out
 
@@ -209,17 +212,23 @@ The EDMA queue will have a timeout mechanism for this cases, and will automatica
 
 ## Statistics Gathering
 
-// TBD - alex, pls update all the information below
-
-Stattistics are gathered using SysFS. Each edma has a sysfs entry matching the device (i.e. /dev/edma4 will have /sys/edma/edma4), and all the stats will be under that sysfs entry.
+Statistics are gathered using SysFS. Each edma has a sysfs entry matching the device (i.e. /dev/edma4 will have /sys/edma/edma4), and all the stats will be under that sysfs entry.
 To see what available stats are there simply run 
 
-`ls -l /sys/edma/edma4/*`
+`ls -l /sys/class/edma/edma0_queue0/*`
 to read a specific start use cat utility
 
-`cat /sys/edma/edma4/queue0/s2m_count`
+`cat /sys/class/edma/edma0_queue0/stats`
 
-
+***read_requests_submitted - 152
+read_requests_completed - 152
+write_requests_submitted - 87
+write_requests_completed - 87
+fsync_count - 6
+no_space_left_error - 0
+fsync_busy_count - 1
+read_timeouts_error - 0
+opened_times - 1***
 
 # FAQ
 
@@ -252,12 +261,12 @@ In this case, the process calling the write() will be blocked while the EDMA is 
 
 **Q: How do i know that last write did go to the FPGA?**
 
-For performance optimization a write() call returns after the data has been copied to the kernel space. The only way to make sure the CL has processed the data is by calling fsync(). fsync() is a blocking call that will return only after all the data in the kernel transient buffers is written.
+For performance optimization, a write() call returns after the data has been copied to the kernel space. The only way to make sure the CL has processed the data is by calling fsync(). fsync() is a blocking call that will return only after all the data in the kernel transient buffers is written.
 
 
 **Q: What will happen if the CL is not able to accept all write data? **
 
-In this case, the EDMA will stop writing and drainingthe transient buffer, eventually causing the process that uses this particular queue to stall on a future write()/pwrite() command.  Paramount to note that this will not block the PCIe and other instance MMIO access to the CL through PCIe BAR will go through, as well EDMA for other queues.
+In this case, the EDMA will stop writing and drain the transient buffer, eventually causing the process that uses this particular queue to stall on a future write()/pwrite() command.  Paramount to note that this will not block the PCIe and other instance MMIO access to the CL through PCIe BAR will go through, as well EDMA for other queues.
 
 
 
@@ -270,13 +279,11 @@ The only two cases the EDMA will drop data area:
 2. A close() function that times-out (could happen if the CL is not willing to accept data from EDMA)
   
   
-
 **Q: Will my read()/pread() time out?**
 
 If the read() function return -1, an error has occurred, and this error is reported in errno pseudo variable.
-please refer to TBD for a list of supported errno values
+Please refer to the API read description for a list of supported errno values
 
-// TBD - alex, pls update
 
 **Q: How would I check if EDMA encountered errors?**
 
