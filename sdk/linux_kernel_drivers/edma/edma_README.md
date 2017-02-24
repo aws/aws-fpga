@@ -136,7 +136,7 @@ As DMA channel/queue would get a file-descriptors in the userspace applications,
 
 
 <a name="openclose"></a>
-## Initialization and tear down API
+## Initialization and Tear Down API
 
 Using the standard:
 `int open(const char *pathname, int flags);`
@@ -165,7 +165,7 @@ EDMA driver is responsible for mapping the `buf` memory range to list of physica
 
 EDMA driver will take care of copying and/or pinning the user-space `buf` memory, and the developer doesn't need to worry about it.
 
-### Writes are semi-asynchronous
+### Writes are Semi-asynchronous
 
 To improve write performance, and allow the application to write small messages and increase concurrency, the `write()`/`pwrite()` **may** copy the write data to an intermediate transmit buffer in the kernel, that will later be drained to the FPGA.
 
@@ -191,7 +191,7 @@ ENOMEM - System is out of memory.
 **NOTE:** In case of any of the before mentioned errors, the FPGA and EDMA will be left in unknown state, with linux `dmesg` log potentially providing more insight on the error.
 
 <a name="fsync"></a>
-## Write synchronization, Read-after-Write (lack of) ordering and fsync()
+## Write Synchronization, Read-after-Write (lack of) Ordering and fsync()
 
 To improve write performance and minimize blocking the userspace application calling `write()/pwrite()` system call, EDMA implement an intermediate write buffer before data is written to the FPGA Shell/CL interface.
 
@@ -209,7 +209,7 @@ The file_pos is a file attribute; therefore, it is incremented by both `write()`
 **Developers are encouraged to use pwrite() and pread(), which will perform lseek and write/read in an atomic way**
 
 <a name="poll"></a>
-## poll()
+## Poll API
 
 The poll() function provides applications with a mechanism for multiplexing input over a set of file descriptors for matching user events. This is used by the EDMA driver for user generated interrupts events, and not used for data transfers.
 
@@ -219,7 +219,7 @@ Refer to [User-defined interrupts events README](./user_defined_interrupts_READM
 
 
 <a name="concurrency"></a>
-## Concurrency and Multi-threading
+## Concurrency and Multi-Threading
 
 EDMA support concurrent multiple access from multiple processes and multiple threads within one process.  Multiple processes can call `open()/close()` to the same file descriptor.
 
@@ -235,7 +235,7 @@ The driver handles some error cases and passes other errors to the user.
 The EDMA and its driver is designed to try to recover gracefully from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design tries to cover all known cases, there may be corner cases that are not recovered. The EDMA will print errors and logic to Linux `dmesg` service indicating a unrecoverable error.
 
 
-#### Error: Application process crash 
+#### Error: Application Process Crash 
 
 In case a crash in the developer's user-space application, the operating system kernel takes care of all open file descriptors (EDMA queues) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor. When the kernel closes them, the driver frees and releases all the transient read data and interrupt events from the FPGA to the application. The driver will also try to drain all outstanding write data to the FPGA.  If either of these tasks don’t finish after a timeout process, an error is reported in Linux `dmesg` and the FPGA itself and EDMA driver may be in unknown.
 
@@ -278,7 +278,7 @@ $
 ```
 
 
-<a name="faq"></a>
+<a name="faqs"></a>
 # FAQ
 
 
@@ -288,7 +288,7 @@ Amazon EDMA driver is included [AWS FPGA HDK/SDK](http://github.com/aws/aws-fpga
 
 Follow the [installation guide](./edma_install.md) for more details.
 
-**Q: How to Discover the Available FPGAs with EDMA?**
+**Q: How to discover the available FPGAs with EDMA?**
 
 Once the edma driver is running, then all the available devices would be found in /dev directory as /dev/edmaX.
 
