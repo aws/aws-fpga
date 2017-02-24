@@ -1,4 +1,5 @@
 
+# AWS FPGA HDK
 
 AWS FPGA HDK is the official kit for developing an Amazon FPGA Image (AFI) which can be loaded on FPGAs in FPGA-enabled EC2 instances (i.e. F1 Instance).
 
@@ -16,7 +17,8 @@ Useful resources:
     - [Simulate Custom Logic (CL) Design] (#simcl)
     - [Build Custom Logic (CL) Design for AWS] (#buildcl)
 
-## Overview <a name="overview"></a>
+<a name="overview"></a>
+## Overview 
 
 The AWS FPGA HDK includes all the design files and scripts required to generate an Amazon FPGA Image (AFI). Developers can download the HDK and use it in their preferred design environment. AWS offers the `FPGA Developer AMI` on the [AWS Marketplace](https://aws.amazon.com/marketplace) with the required tools to develop, simulate, and build an AFI.
 
@@ -32,7 +34,8 @@ The [Custom Logic (cl) directory](./cl) is where the Custom Logic is expected to
 
 The HDK also includes test benches for each provided example, and instructions on how to run RTL-level simulations.
 
-## Getting Started <a name="gettingstarted"></a>
+<a name="gettingstarted"></a>
+## Getting Started 
 
 ### Have an instance or server with Xilinx Vivado tools and License <a name="vivado"></a>
 
@@ -40,7 +43,8 @@ To get started, the developer needs to have a development environment with Xilin
 
 Please refer to the [release notes](../RELEASE_NOTES.md) for the exact version of Vivado tools, and the required license components.
 
-### Install the HDK and setup environment <a name="setup"></a>
+ <a name="setup"></a>
+### Install the HDK and setup environment
 
 The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
 
@@ -48,18 +52,21 @@ The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
     $ cd aws-fpga
     $ source hdk_setup.sh
 
+
 ### Try out a "Hello World" example and others <a name="examples"></a>
 
 The [Examples readme](./cl/examples/README.md) provides and overview on process for building a Custom Logic (CL) implementation for AWS FPGA instances, specifically it walks you through how to build, register, and use an AFI. 
+
 The [Hello World readme](./cl/examples/cl_hello_world/README.md) provides the steps to build an AFI from the provided Hello World example CL, and how to load it on an F1 instance.
 Other examples are available in the [examples directory](./cl/examples), each with its own README.md file.
 
-
-### Start your own Custom Logic design <a name="startcl"></a>
+<a name="startcl"></a>
+### Start your own Custom Logic design 
 
 The [start your own CL design](./cl/developer_designs/README.md) will guide you on how to setup your own CL project environment.
 
-### Simulate your Custom Logic design <a name="simcl"></a>
+<a name="simcl"></a>
+### Simulate your Custom Logic design 
 
 You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys', Mentor's, or Cadence).
 Follow the [verification environment setup](https://github.com/aws/aws-fpga/wiki/Simulating-CL-Designs-(RTL-Simulation)#introduction) to run these simulations
@@ -68,3 +75,4 @@ Follow the [verification environment setup](https://github.com/aws/aws-fpga/wiki
 
 You can follow the [build scripts readme](./common/shell_current/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
+

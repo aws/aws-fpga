@@ -69,8 +69,8 @@
 
 `timescale 1ns/1ps
 
-(* CORE_GENERATION_INFO = "DDR4_SDRAM, DDR4_SDRAM,{x_ipProduct=Vivado 2016.1.0,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=DDR4_SDRAM,x_ipVersion=2.1, Controller_Type = DDR4_SDRAM, Time_Period = 875, Input_Clock_Period = 3281, Memory_Type = RDIMMs, Memory_Part = MTA18ASF2G72PZ-2G3, Ecc = true, Cas_Latency = 17, Cas_Write_Latency = 12, DQ_Width = 72, Chip_Select = true, Data_Mask = NONE, MEM_ADDR_ORDER = ROW_COLUMN_BANK,  Is_AXI_Enabled = true , Slot_cofiguration =  Single , Clamshell_cofiguration =  false ,IS_FASTER_SPEED_RAM = No, Is_custom_part = false, Memory_Voltage = 1.2V, Phy_Only = Complete_Memory_Controller, Debug_Port = Disable}" *)
-(* X_CORE_INFO = "ddr4_v2_1_0,Vivado 2016.3" *)
+(* CORE_GENERATION_INFO = "DDR4_SDRAM, DDR4_SDRAM,{x_ipProduct=Vivado 2016.1.0,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=DDR4_SDRAM,x_ipVersion=2.1, Controller_Type = DDR4_SDRAM, Time_Period = 833, Input_Clock_Period = 3332, Memory_Type = RDIMMs, Memory_Part = MTA18ASF2G72PZ-2G3, Ecc = true, Cas_Latency = 17, Cas_Write_Latency = 12, DQ_Width = 72, Chip_Select = true, Data_Mask = NONE, MEM_ADDR_ORDER = ROW_COLUMN_BANK,  Is_AXI_Enabled = true , Slot_cofiguration =  Single , Clamshell_cofiguration =  false ,IS_FASTER_SPEED_RAM = No, Is_custom_part = false, Memory_Voltage = 1.2V, Phy_Only = Complete_Memory_Controller, Debug_Port = Disable}" *)
+(* X_CORE_INFO = "ddr4_v2_1_0,Vivado 2016.3_AR68473_AR68140_AR68140" *)
 module ddr4_core
    (
    input  sys_rst,
@@ -78,6 +78,23 @@ module ddr4_core
    input                 c0_sys_clk_p,
    input                 c0_sys_clk_n,
 
+   output                ALT_ddr4_reset_n, //AK Added __SRAI (added for PR compatibility)
+   
+   // Self-Refresh
+    input         c0_ddr4_app_sref_req,        // application interface self-refresh request (to memory controller)
+    output        c0_ddr4_app_sref_ack,        // application interface self-refresh acknowledgement (from memory controller)
+    input         c0_ddr4_app_mem_init_skip,  
+    // Save-Restore
+    input         c0_ddr4_app_restore_en,  
+    input         c0_ddr4_app_restore_complete,
+    input         c0_ddr4_app_xsdb_select,
+    input         c0_ddr4_app_xsdb_rd_en,
+    input         c0_ddr4_app_xsdb_wr_en,
+    input  [15:0] c0_ddr4_app_xsdb_addr,
+    input  [8:0]  c0_ddr4_app_xsdb_wr_data,
+    output [8:0]  c0_ddr4_app_xsdb_rd_data,
+    output        c0_ddr4_app_xsdb_rdy,
+    output [31:0] c0_ddr4_app_dbg_out,
 
    output                c0_ddr4_act_n,
    output [16:0]          c0_ddr4_adr,
@@ -125,7 +142,7 @@ module ddr4_core
     output                             c0_ddr4_interrupt,
    // Slave Interface Write Address Ports
    input                 c0_ddr4_aresetn,
-   input  [5:0]      c0_ddr4_s_axi_awid,
+   input  [15:0]      c0_ddr4_s_axi_awid,
    input  [33:0]    c0_ddr4_s_axi_awaddr,
    input  [7:0]                       c0_ddr4_s_axi_awlen,
    input  [2:0]                       c0_ddr4_s_axi_awsize,
@@ -144,11 +161,11 @@ module ddr4_core
    output                             c0_ddr4_s_axi_wready,
    // Slave Interface Write Response Ports
    input                              c0_ddr4_s_axi_bready,
-   output [5:0]      c0_ddr4_s_axi_bid,
+   output [15:0]      c0_ddr4_s_axi_bid,
    output [1:0]                       c0_ddr4_s_axi_bresp,
    output                             c0_ddr4_s_axi_bvalid,
    // Slave Interface Read Address Ports
-   input  [5:0]      c0_ddr4_s_axi_arid,
+   input  [15:0]      c0_ddr4_s_axi_arid,
    input  [33:0]    c0_ddr4_s_axi_araddr,
    input  [7:0]                       c0_ddr4_s_axi_arlen,
    input  [2:0]                       c0_ddr4_s_axi_arsize,
@@ -161,7 +178,7 @@ module ddr4_core
    output                             c0_ddr4_s_axi_arready,
    // Slave Interface Read Data Ports
    input                              c0_ddr4_s_axi_rready,
-   output [5:0]      c0_ddr4_s_axi_rid,
+   output [15:0]      c0_ddr4_s_axi_rid,
    output [511:0]    c0_ddr4_s_axi_rdata,
    output [1:0]                       c0_ddr4_s_axi_rresp,
    output                             c0_ddr4_s_axi_rlast,
@@ -179,6 +196,21 @@ ddr4_core_ddr4
    .c0_sys_clk_p                   (c0_sys_clk_p),
    .c0_sys_clk_n                   (c0_sys_clk_n),
 
+   .ALT_ddr4_reset_n       (ALT_ddr4_reset_n), //AK Added __SRAI (added for PR compitibility)
+
+   .c0_ddr4_app_sref_req         (c0_ddr4_app_sref_req),
+   .c0_ddr4_app_sref_ack         (c0_ddr4_app_sref_ack), 
+   .c0_ddr4_app_mem_init_skip    (c0_ddr4_app_mem_init_skip),
+  .c0_ddr4_app_restore_en         (c0_ddr4_app_restore_en),
+  .c0_ddr4_app_restore_complete   (c0_ddr4_app_restore_complete),
+  .c0_ddr4_app_xsdb_select        (c0_ddr4_app_xsdb_select),
+  .c0_ddr4_app_xsdb_rd_en         (c0_ddr4_app_xsdb_rd_en),
+  .c0_ddr4_app_xsdb_wr_en         (c0_ddr4_app_xsdb_wr_en ),
+  .c0_ddr4_app_xsdb_addr          (c0_ddr4_app_xsdb_addr),
+  .c0_ddr4_app_xsdb_wr_data       (c0_ddr4_app_xsdb_wr_data),
+  .c0_ddr4_app_xsdb_rd_data       (c0_ddr4_app_xsdb_rd_data),
+  .c0_ddr4_app_xsdb_rdy           (c0_ddr4_app_xsdb_rdy ),
+  .c0_ddr4_app_dbg_out            (c0_ddr4_app_dbg_out ),
    .c0_init_calib_complete (c0_init_calib_complete),
    .c0_ddr4_act_n          (c0_ddr4_act_n),
    .c0_ddr4_adr            (c0_ddr4_adr),

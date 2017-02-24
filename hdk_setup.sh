@@ -11,6 +11,12 @@ echo "AWS FPGA: Vivado check successed"
 
 echo "AWS FPGA: Setting up environment variables"
 
+# Clear environment variables
+unset HDK_DIR
+unset HDK_COMMON_DIR
+unset HDK_SHELL_DIR
+unset CL_DIR
+
 export HDK_DIR=${HDK_DIR:=$(pwd)/hdk}
 
 # The next variable should not be modified and should always point to the /common directory under HDK_DIR

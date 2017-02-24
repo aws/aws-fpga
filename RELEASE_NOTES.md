@@ -295,12 +295,18 @@ This release fixes the following issues:
 The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to [HDK License](./hdk/LICENSE.txt) and [SDK License](./sdk/LICENSE.txt).
 
 
-## Known Issues
-There are no known issues with this release.
+## What's New
+
+### 2016/12/06 
+   * Add support for configurable number of DDR controllers in the CL (see ![AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md))
+### 2017/01/26
+   * Add support for `create-fpga-image` AFI generation AWS API. For more details please read the forum announcement [here](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0).
+
 
 ## Release Notes FAQ
 
 **Q: Is this a required update?**
+
 
 Yes.  This update is required for all F1 instances. 
  

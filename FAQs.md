@@ -14,14 +14,14 @@
 
 [General AWS FPGA Shell FAQs](#shell) 
 
-[Troubelshooting FAQs](#troubelshooting)
+[Troubleshooting FAQs](#troubleshooting)
 
 
 ##General
 
 **Q: What is included in the HDK?**
 
-The HDK includes major portions:
+The HDK includes the following major components::
 
 1) Documentation for the Shell interface and other Custom Logic implementation guidelines, the Shell code needed for Custom Logic development, simulation models for the Shell, software for exercising.
 
@@ -37,27 +37,27 @@ The HDK includes major portions:
 
 **Q: What is in the AWS Shell?**
 
-The AWS Shell is a piece of code provided and managed by AWS, that does a lot of the non-differentiated heavy lifting like setting up the PCIe interface, and FPGA image loading infrastructure, security and operational isolation, metrics and debug hooks
+The AWS Shell is a piece of code provided and managed by AWS, that implements the non-differentiated development heavy lifting tasks like setting up the PCIe interface, FPGA image infrastructure, security and operational isolation, metrics and debug hooks.
 
-Every FPGA deployed in AWS cloud includes AWS shell, and the developer Custom Logic (CL) actually interfaces with the available AWS Shell interfaces.
+Every FPGA deployed in AWS cloud includes an AWS shell, and the developer Custom Logic (CL) interfaces with the available AWS Shell interfaces.
 
-AWS itselfs includes the PCIe interface for the FPGA, and necessary FPGA management functionality.  One of the four DRAM interface controllers is included in the Shell, while the three other DRAM interface controllers is expected to be instanciated in the CL code (A design choice that was made to achieve optimal utilization of FPGA resources from placement perspective)
+The AWS shell includes the PCIe interface for the FPGA, and necessary FPGA management functionality.  One of the four DRAM interface controllers is included in the Shell, while the three other DRAM interface controllers is expected to be instantiated in the CL code (A design choice that was made to achieve optimal utilization of FPGA resources from placement perspective)
 
 
 
 **Q: What is an AFI?**
 
-An AFI stands for Amazon FPGA Image. That is the compiled FPGA code that is loaded into an FPGA in AWS for performing the Custom Logic function created by the developer. AFIs are maintained by AWS according to the AWS account that created them. An AFI ID is used to reference a particular AFI from an F1 instance.
+An AFI stands for Amazon FPGA Image. It is the compiled FPGA code that is loaded into an FPGA in AWS for performing the Custom Logic (CL) function created by the developer. AFIs are maintained by AWS according to the AWS account that created them. An AFI ID is used to reference a particular AFI from an F1 instance.
 
-The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per AWS account). An AFI can be loaded into as many FPGAs as the developer wants. 
+The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per AWS account). An AFI can be loaded into as many FPGAs as needed. 
 
-A given instance can only load AFIs that have been assoicated with the instance or with the AMI that created the instance. Please refer to AFI documentation in [AWS AFI docs](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AFI)
+A given instance can only load AFIs that have been associated with the instance or with the AMI that created the instance. Please refer to AFI documentation in [AWS AFI docs](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AFI)
 
 
 
 **Q: What is the process for creating an AFI?**
 
-The AFI process starts by creating Custom Logic code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the Custom Logic must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint. That Design Checkpoint is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
+The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
 
 
@@ -69,7 +69,7 @@ No. There is no mechanism for loading a bitstream directly onto the FPGAs of an 
 
 **Q: Can I generate my bitstream on my own desktop/server (not on AWS cloud)?**
 
-Yes, on-premise tools can be used to develop the Design Checkpoint needed for creating an AFI. The developer needs to download HDK can be downloaded from GitHub and run on any local machine. 
+Yes, on-premises tools can be used to develop the Design Checkpoint needed for creating an AFI. The developer needs to download HDK can be downloaded from GitHub and run on any local machine. 
 
 If a developer uses local tools and license, the exact Xilinx Vivado tool version specified in the HDK and FPGA Developer AMI will need to be used. 
 
@@ -83,9 +83,9 @@ If the developer want to run on other instances or local machine, the developer 
 
 
 
-**Q: Does AWS provide actual FPGA boards for on-premise development?**
+**Q: Does AWS provide actual FPGA boards for on-premises development?**
 
-No. AWS supports a cloud-only development model and provides the necessary elements for doing 100% cloud development including Virtual JTAG (Vivado ChipScope), Emulated LED and Emulated DIP-switch. No development board is provided for on-premise development.
+No. AWS supports a cloud-only development model and provides the necessary elements for doing 100% cloud development including Virtual JTAG (Vivado ChipScope), Emulated LED and Emulated DIP-switch. No development board is provided for on-premises development.
 
 
 
@@ -98,7 +98,7 @@ those as part of providing the power envelop for the CL region.
 
 **Q: What IP blocks are provided in the HDK?**
 
-The HDK includes IP for the Shell and DRAM interface controllers. Inside the Shell there is a PCIe interface, the a DMA Engine, and one DRAM interface controller. These blocks are only accessible via the AXI interfaces defined by the Shell-Custom Logic interface. The HDK provides additional IP blocks for the other DRAM interfaces, enabling up to 3 additional DRAM interfaces instantiated by the developer in the Custom Logic region. 
+The HDK includes IP for the Shell and DRAM interface controllers. Inside the Shell there is a PCIe interface, DMA Engine, and one DRAM interface controller. These blocks are only accessible via the AXI interfaces defined by the Shell-Custom Logic interface. The HDK provides additional IP blocks for the other DRAM interfaces, enabling up to 3 additional DRAM interfaces instantiated by the developer in the Custom Logic region. 
 
 * Note that future versions of the HDK will include IP for the FPGA Link interface.
 
@@ -357,7 +357,7 @@ The Shell consumes about 20% of the FPGA resources, and that includes the PCIe G
 
 
 
-##Troubelshooting
+##Troubleshooting
 **Q: Why do I see error “vivado not found” while running hdk_setup.sh*?**
 
 This is an indication that Xilinx Vivado tool set are not installed. Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.
