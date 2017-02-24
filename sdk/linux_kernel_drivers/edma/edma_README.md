@@ -24,24 +24,24 @@
 Amazon Elastic-DMA (EDMA) Driver is provided as an option transfer data between the FPGA and the Instance's CPU memory.
 
 Amazon EDMA driver objectives:
-1. Open source driver
-2. Easy to install and use, and does not require driver development expertise to use
-3. Support multiple FPGAs per instance, and multiple queues per FPGA
-4. Expandable by developers
-5. High-performance multi-queue interface, to lower CPU overhead.
+1. Open-source driver <br />
+2. Easy to install and use, and does not require driver development expertise to use <br />
+3. High-performance multi-queue interface, to lower CPU overhead. <br />
+4. Support multiple FPGAs per instance, and multiple queues per FPGA <br />
+5. Expandable by developers <br />
 
 EDMA driver source code is distributed with AWS FPGA HDK and SDK.
 
-[EDMA Installation Guide](./edma_install.md) provides detailed guidelines how to compile, install and troubleshoot EDMA installation.
+[EDMA Installation Guide](./edma_install.md) provides detailed guidelines on how to compile, install and troubleshoot EDMA installation.
 
-** NOTE: Usage of EDMA is not mandatory, and AWS FPGA provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
+** NOTE: Usage of EDMA is not mandatory. AWS provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
 
 For a complete description of the different CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
 
 <a name="quickExample"></a>
 # Quick Example
 
-Before diving into the detail specification of the EDMA, here’s a short, intuitive example how the developer could use the EDMA in a process:
+Before diving into the detail specification of the EDMA, here’s a short, intuitive example on how the developer could use the EDMA in a process:
 
 The Program below will use standard Linux system call open() to create a file descriptor (fd), mapping to a pair of EDMA queues (one for `read()` and one for `write()`).
 
