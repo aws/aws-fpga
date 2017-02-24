@@ -25,5 +25,4 @@ set_clock_groups -asynchronous -group [get_clocks cl_clk0] -group [get_clocks CL
 #######################################################################
 # False paths - These are CL Specific Constraints (Will generate warnings at top level)
 #######################################################################
-set_false_path -from [get_ports rst_n]
 

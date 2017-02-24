@@ -204,6 +204,34 @@ module sh_bfm #(
    input [31:0]                ddr_sh_stat_rdata[2:0],
    input [7:0]                 ddr_sh_stat_int[2:0],
 
+   //-----------------------------------------------------------------------------
+   // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
+   // to the sh_ddr.sv for the DDR interfaces to function.
+   //-----------------------------------------------------------------------------
+   output logic [7:0]          sh_ddr_stat_addr0,
+   output logic                sh_ddr_stat_wr0, 
+   output logic                sh_ddr_stat_rd0, 
+   output logic [31:0]         sh_ddr_stat_wdata0,
+   input                       ddr_sh_stat_ack0,
+   input [31:0]                ddr_sh_stat_rdata0,
+   input [7:0]                 ddr_sh_stat_int0,
+
+   output logic [7:0]          sh_ddr_stat_addr1,
+   output logic                sh_ddr_stat_wr1, 
+   output logic                sh_ddr_stat_rd1, 
+   output logic [31:0]         sh_ddr_stat_wdata1,
+   input                       ddr_sh_stat_ack1,
+   input [31:0]                ddr_sh_stat_rdata1,
+   input [7:0]                 ddr_sh_stat_int1,
+
+   output logic [7:0]          sh_ddr_stat_addr2,
+   output logic                sh_ddr_stat_wr2, 
+   output logic                sh_ddr_stat_rd2, 
+   output logic [31:0]         sh_ddr_stat_wdata2,
+   input                       ddr_sh_stat_ack2,
+   input [31:0]                ddr_sh_stat_rdata2,
+   input [7:0]                 ddr_sh_stat_int2,
+    
    input [15:0]                cl_sh_ddr_awid,
    input [63:0]                cl_sh_ddr_awaddr,
    input [7:0]                 cl_sh_ddr_awlen,
@@ -640,20 +668,20 @@ module sh_bfm #(
 
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
-      sh_ddr_stat_addr[0] <= 8'h00;
-      sh_ddr_stat_wr[0] <= 1'b0;
-      sh_ddr_stat_rd[0] <= 1'b0;
-      sh_ddr_stat_wdata[0] <= 32'h0;
+      sh_ddr_stat_addr0  = 8'h00;
+      sh_ddr_stat_wr0    = 1'b0;
+      sh_ddr_stat_rd0    = 1'b0;
+      sh_ddr_stat_wdata0 = 32'h0;
 
-      sh_ddr_stat_addr[1] <= 8'h00;
-      sh_ddr_stat_wr[1] <= 1'b0;
-      sh_ddr_stat_rd[1] <= 1'b0;
-      sh_ddr_stat_wdata[1] <= 32'h0;
+      sh_ddr_stat_addr1  = 8'h00;
+      sh_ddr_stat_wr1    = 1'b0;
+      sh_ddr_stat_rd1    = 1'b0;
+      sh_ddr_stat_wdata1 = 32'h0;
 
-      sh_ddr_stat_addr[2] <= 8'h00;
-      sh_ddr_stat_wr[2] <= 1'b0;
-      sh_ddr_stat_rd[2] <= 1'b0;
-      sh_ddr_stat_wdata[2] <= 32'h0;
+      sh_ddr_stat_addr2  = 8'h00;
+      sh_ddr_stat_wr2    = 1'b0;
+      sh_ddr_stat_rd2    = 1'b0;
+      sh_ddr_stat_wdata2 = 32'h0;
    end
 
    //=================================================
@@ -804,6 +832,7 @@ module sh_bfm #(
    logic [63:0] host_memory_addr = 0;
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
+   int          wr_last_cnt = 0;
    logic [63:0] wr_addr;
    
    always @(posedge clk_core) begin
@@ -914,7 +943,7 @@ module sh_bfm #(
          cl_sh_wr_data.push_back(wr_data);
 
          if (wr_data.last == 1)
-           sh_cl_b_resps[0].last = 1;
+           wr_last_cnt += 1;
          
       end
       if (cl_sh_wr_data.size() > 64)
@@ -931,15 +960,17 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       if (sh_cl_b_resps.size() != 0) begin
          if (debug) begin
-            $display("[%t] : DEBUG resp.size  %2d  %1d", $realtime, sh_cl_b_resps.size(), sh_cl_b_resps[0].last);
+            $display("[%t] : DEBUG resp.size  %2d ", $realtime, sh_cl_b_resps.size());
          end
-         if (sh_cl_b_resps[0].last != 0) begin
-            sh_cl_pcim_bid   <= sh_cl_b_resps[0].id;
-            sh_cl_pcim_bresp <= 2'b00;
+         if (wr_last_cnt != 0) begin
+            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp[0] <= 2'b00;
+
             sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
                                    !cl_sh_pcim_bready ? 1'b1 : 1'b0;
 
             if (cl_sh_pcim_bready && sh_cl_pcim_bvalid) begin
+               wr_last_cnt -= 1;
                sh_cl_b_resps.pop_front();
                cl_sh_wr_cmds.pop_front();
             end
@@ -950,23 +981,6 @@ module sh_bfm #(
       
    end
    
-   always @(posedge clk_core) begin
-      sh_cl_dma_pcis_bready[0] <= 1'b1;
-   end
-
-   always @(posedge clk_core) begin
-      AXI_Command resp;
-
-      if (cl_sh_dma_pcis_bvalid[0] & sh_cl_dma_pcis_bready) begin
-         resp.resp     = cl_sh_dma_pcis_bresp[0];
-         resp.id       = cl_sh_dma_pcis_bid[0];
-
-         cl_sh_b_resps.push_back(resp);
-      end
-
-   end
-
-
    //
    // sh->cl Address Read Channel
    //
@@ -1514,8 +1528,18 @@ module sh_bfm #(
 
       logic [63:0] strb;
 
-      strb = {(1<<size){1'b1}};
-
+//      strb = {(1<<size){1'b1}};
+      case (size)
+        0: strb = 64'b0000_0000_0000_0001;
+        1: strb = 64'b0000_0000_0000_0011;
+        2: strb = 64'b0000_0000_0000_1111;
+        3: strb = 64'b0000_0000_1111_1111;
+        default: begin
+           $display("FATAL ERROR - Invalid size specified");
+           $finish;
+        end
+      endcase // case (size)
+      
       case (intf)
         0: begin
            AXI_Command axi_cmd;
@@ -1774,12 +1798,33 @@ module sh_bfm #(
    end
 
   task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
-    sh_ddr_stat_wr[ddr_idx] = 1;
-    sh_ddr_stat_addr[ddr_idx] = stat_addr;
-    sh_ddr_stat_wdata[ddr_idx] = data;
-    sh_ddr_stat_rd[ddr_idx] = 0;
-    #8ns;
-    sh_ddr_stat_wr[ddr_idx] = 0;
+     case (ddr_idx)
+       0: begin
+          sh_ddr_stat_wr0    = 1;
+          sh_ddr_stat_addr0  = stat_addr;
+          sh_ddr_stat_wdata0 = data;
+          sh_ddr_stat_rd0    = 0;
+          #8ns;
+          sh_ddr_stat_wr0    = 0;
+       end
+       1: begin
+          sh_ddr_stat_wr1    = 1;
+          sh_ddr_stat_addr1  = stat_addr;
+          sh_ddr_stat_wdata1 = data;
+          sh_ddr_stat_rd1    = 0;
+          #8ns;
+          sh_ddr_stat_wr1    = 0;
+       end
+       2: begin
+          sh_ddr_stat_wr2    = 1;
+          sh_ddr_stat_addr2  = stat_addr;
+          sh_ddr_stat_wdata2 = data;
+          sh_ddr_stat_rd2    = 0;
+          #8ns;
+          sh_ddr_stat_wr2    = 0;
+       end
+     endcase // case (ddr_idx)
+     
   endtask
 
 endmodule // sh_bfm

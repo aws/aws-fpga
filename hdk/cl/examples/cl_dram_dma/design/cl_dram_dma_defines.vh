@@ -18,3 +18,6 @@
 `define SH_SDA
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
+
+//uncomment below to enable chipscope
+`define DISABLE_CHIPSCOPE_DEBUG
