@@ -35,13 +35,30 @@ The Program below will use standard Linux system call open() to create a file de
 
 
 ```
+#include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 
 #define BUF_SIZE    256
-#define OFFSET_IN_FPGA_DRAM 1024
+#define OFFSET_IN_FPGA_DRAM 0x10000000
+
+static char *rand_str(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRTSUVWXYZ1234567890";
+    int i;
+
+    for(i = 0; i < size; i++){
+        int key = rand() % (int) (sizeof charset - 1);
+        str[i] = charset[key];
+    }
+
+    str[size-1] = '\0';
+
+    return str;
+}
+
 
 int main(){
     char* srcBuf;
@@ -49,45 +66,44 @@ int main(){
     int fd;
     int i;
     int ret;
-    
-    srcBuf = malloc(BUF_SIZE);
-    dstBuf = malloc(BUF_SIZE);
-    
+
+    srcBuf = (char*)malloc(BUF_SIZE * sizeof(char));
+    dstBuf = (char*)malloc(BUF_SIZE * sizeof(char));
+
     /* Initialize srcBuf */
-    for(i=0;i<BUF_SIZE;i++)
-        srcBuf[i]=(char) (i%256);
-        
-    if((fd = open("/dev/edma0_queue0",O_RDWR)) == -1)
+    rand_str(srcBuf, BUF_SIZE);
+
+    if((fd = open("/dev/edma0_queue_0",O_RDWR)) == -1)
     {
-              perror("open failed with errno %d\n",errno);
+              perror("open failed with errno");
     }
-    
+
     /* Write the entire source buffer to offset OFFSET_IN_FPGA_DRAM */
-    
+
     ret = pwrite(fd , srcBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
-    
+
     if( ret < 0)
     {
-              perror("write failed with errno %d\n",errno);
+              perror("write failed with errno");
     }
-    
+
     printf("Tried to write %u bytes, succeeded in writing %u bytes\n", BUF_SIZE, ret);
-    
+
     /* ensure the write made it to the Shell/CL interface */
     fsync(fd);
-    
+
     ret = pread(fd, dstBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
-    
+
     if(ret < 0)
     {
-              perror("read failed with errno %d\n",errno);
+              perror("read failed with errno");
     }
 
     printf("Tried reading %u byte, succeeded in read %u bytes\n", BUF_SIZE,ret);
-    
+
     if(close(fd) < 0)
     {
-              perror("close failed with errno %d\n",errno);
+              perror("close failed with errno");
     }
 
     printf("Data read is %s\n", dstBuf);
