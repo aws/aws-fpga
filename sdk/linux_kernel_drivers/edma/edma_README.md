@@ -177,9 +177,9 @@ Both `read()` and `pread()` are blocking calls, and the call will wait until dat
 
 Read will return the number of successful bytes, and it is the user responsibility to call `read()` with the correct offset again if the return value is not equal to count. In a case of DMA timeout (3 seconds), EIO will be returned. 
 
-Possible errors:
-EIO - DMA timeout or transaction failure.
-ENOMEM - System is out of memory.
+Possible errors:<br />
+EIO - DMA timeout or transaction failure.<br />
+ENOMEM - System is out of memory.<br />
 
 **NOTE:** In case of any of the before mentioned errors, the FPGA and EDMA will be left in unknown state, with linux `dmesg` log potentially providing more insight on the error.
 
@@ -198,7 +198,7 @@ If the developer wants to issue `read()/pread()` from an address range that was 
 
 The EDMA driver implements the standard `lseek()` Linux/POSIX system call, which will modify the current read/write pointer from the FPGA memory space. 
 
-**WARNING: ** Calling `lseek()` without proper locking is pronged for errors, as concurrent/multi-threaded design could call `lseek()` concurrently and without an atomic follow up with `read()/write()`.
+**WARNING: ** Calling `lseek()` without proper locking is prone to errors, as concurrent/multi-threaded design could call `lseek()` concurrently and without an atomic follow up with `read()/write()`.
 
 The file_pos is a file attribute; therefore, it is incremented by both `write()` and `read()` operations by the number of bytes that were successfully written or read.
 
@@ -228,16 +228,16 @@ Worth re-iterating the recommended use of `pread()/pwrite()` over a sequency of 
 
 The driver handles some error cases and passes other errors to the user.
 
-The EDMA and its driver is designed to try to recover gracefully from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design tries to cover all known cases, there may be corner cases that are not recovered. The EDMA will print errors and logic to Linux `dmesg` service indicating a unrecoverable error.
+The EDMA and its driver are designed to attempt graceful recovery from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design attempts to cover all known cases, there may be corner cases that are not recoverable. The EDMA will print errors and logic to Linux `dmesg` service indicating an unrecoverable error.
 
 
 #### Error: Application Process Crash 
 
-In case a crash in the developer's user-space application, the operating system kernel takes care of all open file descriptors (EDMA queues) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor. When the kernel closes them, the driver frees and releases all the transient read data and interrupt events from the FPGA to the application. The driver will also try to drain all outstanding write data to the FPGA.  If either of these tasks don’t finish after a timeout process, an error is reported in Linux `dmesg` and the FPGA itself and EDMA driver may be in unknown.
+In case of a crash in the developer's user-space application, the operating system kernel tears down of all open file descriptors (EDMA queues) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor. When the kernel closes them, the driver frees and releases all the transient read-data and interrupt events. The driver will also try to drain all outstanding writes towards the FPGA.  If either of these tasks don’t finish after a timeout, an error is reported in Linux `dmesg` and the FPGA itself and EDMA driver may be left in an unknown state.
 
 #### Error: API Time-out
 
-Timeout errors can occur in few place including:
+Timeout errors can occur in few places including:
 
 1. Application stuck on `write()/pwrite()`, or its data that is stuck in transient buffer for too long because the CL is not accepting the data.
 
