@@ -243,19 +243,19 @@ Timeout errors can occur in few places including:
 
 2. A read() from CL portion of the FPGA that is stuck, causing the read() to block forever.
 
-The EDMA queue have a timeout mechanism (3 seconds)for this cases, and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
+The EDMA queue have a timeout mechanism for this cases (3 seconds), and will automatically trigger tear-down process, and following the same procedure description in “Application process crash” mentioned previously. 
 
 <a name="stats"></a>
 ## Statistics Gathering
 
-Statistics are gathered using SysFS. Each edma has a sysfs entry matching the FPGA slow (i.e. /dev/edmaX_queueY will have /sys/edma/edmaX_queueY), and all the stats will be under that sysfs entry.
+Statistics are gathered using SysFS. Each EDMA queue has a SysFS entry (i.e. /dev/edmaX_queueY will have /sys/edma/edmaX_queueY), and all the stats will be under that SysFS entry.
 
 To see what available stats for a specific EDMA queue, simply run:
 
 `$ ls -l /sys/class/edma/edma0_queue0/*`
   
 
-to read a specific start use cat utility
+to read a specific statistic use cat utility
 
 ```
 $ cat /sys/class/edma/edma0_queue0/stats
@@ -286,38 +286,38 @@ Follow the [installation guide](./edma_install.md) for more details.
 
 **Q: How to discover the available FPGAs with EDMA?**
 
-Once the edma driver is running, then all the available devices would be found in /dev directory as /dev/edmaX.
+Once the EDMA driver is running, all the available devices would be found in /dev directory as /dev/edmaX.
 
     `$ ls /dev/edma*`
     
-Each edma would expose multiple queues under /dev/edmaX_queueN (depending how many queues are supported by the AFI) and the developer could work directly with these queues.
+Each EDMA will expose multiple queues under /dev/edmaX_queueN (depending how many queues are supported by the AFI) and the developer could work directly with these queues.
 
 
 
 **Q: When my write()/pwrite() call is returned, am I guaranteed that the data reached the FPGA?** 
 
-Not necessary, the write() function will move the data from the user process to the kernel, which uses a 4MByte transient buffer per queue to transfer to the FPGA.   To optimize performance, the write() is returned to the user process once all data copies to the write transient buffer.  This is a common practice in modern OS where writes are stored in cache/transient buffer
+Not necessarily, the write() function will move the data from the user process to the kernel, which uses a 4MByte transient buffer per queue to transfer to the FPGA. To optimize performance, the write() is returned to the user process once all data is copied to the write transient buffer. This is a common practice in modern OS where writes are stored in cache / transient buffer
 
 
 **Q: What happens if write()/pwrite() have a length larger than the transient buffer?**
 
-In this case, the process calling the write() will be blocked while the EDMA is writing data to the FPGA and freeing buffer
+In this case, the process calling the write() will be blocked while the EDMA is writing data to the FPGA and freeing the transient-buffer. write() will return when *all* data is copied to the transient buffer.
 
 
-**Q: How do i know that last write did go to the FPGA?**
+**Q: How do i know that last write did reach the FPGA?**
 
-For performance optimization, a write() call returns after the data has been copied to the kernel space. The only way to make sure the CL has processed the data is by calling fsync(). fsync() is a blocking call that will return only after all the data in the kernel transient buffers is written.
+For performance optimization, a write() call returns after the data has been copied to the kernel space. The only way to make sure the CL has processed the data is by calling fsync(). fsync() is a blocking call that will return only after all the data in the kernel transient buffers is written to the FPGA.
 
 
 **Q: What will happen if the CL is not able to accept all write data? **
 
-In this case, the EDMA will stop writing and drain the transient buffer, eventually causing the process that uses this particular queue to stall on a future write()/pwrite() command.  Paramount to note that this will not block the PCIe and other instance MMIO access to the CL through PCIe BAR will go through, as well EDMA for other queues.
+In this case, the EDMA will stop writing and drain the transient buffer, eventually causing the process that uses this particular queue to stall on a future write()/pwrite() command.  It is paramount to note that this will not block the PCIe, and other instance MMIO accesses to the CL through PCIe BAR will go through, as well EDMA transfers intiated by other queues.
 
 
 
 **Q: Will EDMA drop data?**
 
-During normal operations, the EDMA will NOT drop data, even when the CL is not able to accept data or running out of the transient buffer.  Both these scenarios are considered transient, and EDMA will not drop any data.
+During normal operations, the EDMA will NOT drop data, even when the CL is not able to accept data or running out of the transient buffer. Both these scenarios are considered transient, and EDMA will not drop any data.
 
 The only two cases the EDMA will drop data area:
 1. Abrupt crash of the user process managing this queue
@@ -338,7 +338,7 @@ EDMA would output its log through the standard Linux dmesg service.
 
 **Q: Will EDMA use interrupts during data transfers?**
 
-EDMA in kernel driver uses MSI-X interrupts,  one interrupt pair of EDMA read/write queues.
+EDMA in kernel driver uses MSI-X interrupts, one interrupt pair of EDMA read/write queues.
 To know what IRQ number is used for EDMA, the user can 
 
 ` $ cat /proc/interrupts`
@@ -346,6 +346,6 @@ To know what IRQ number is used for EDMA, the user can
 
 **Q: Would EDMA support transfer of Scatter-gather list?**
 
-AWS is considering this for future versions of EDMA to include scatter-gather-list (SGL) based transfers using IOCTL API. 
+AWS is considering to include scatter-gather-list (SGL) based transfers for future versions of EDMA, using IOCTL API. 
 
 
