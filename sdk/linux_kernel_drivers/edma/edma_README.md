@@ -248,7 +248,7 @@ The EDMA queue have a timeout mechanism for this cases (3 seconds), and will aut
 <a name="stats"></a>
 ## Statistics Gathering
 
-Statistics are gathered using SysFS. Each EDMA queue has a SysFS entry (i.e. /dev/edmaX_queueY will have /sys/edma/edmaX_queueY), and all the stats will be under that SysFS entry.
+Statistics are gathered using sysfs. Each EDMA queue has a sysfs entry (i.e. /dev/edmaX_queueY will have /sys/edma/edmaX_queueY), and all the stats will be under that sysfs entry.
 
 To see what available stats for a specific EDMA queue, simply run:
 
