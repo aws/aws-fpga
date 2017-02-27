@@ -6,7 +6,9 @@
 module test_dram_dma();
 
     int            error_count;
+    int            timeout_count;
     int            fail;
+    logic [3:0]    status;
    
     initial begin
 
@@ -26,6 +28,8 @@ module test_dram_dma();
 
        // allow memory to initialize
        tb.sh.delay(25000);
+
+       $display("[%t] : Initializing buffers", $realtime);
 
        host_memory_buffer_address = 64'h0;
 
@@ -61,51 +65,55 @@ module test_dram_dma();
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hDD));
           host_memory_buffer_address++;
        end
-/*
-      //Start transfers of data to CL DDR
-      tb.start_que_to_cl(.chan(0));   
-      tb.start_que_to_cl(.chan(1));   
-      tb.start_que_to_cl(.chan(2));   
-      tb.start_que_to_cl(.chan(3));   
-*/
-/*
-       $display("[%t] : DMA buffer to DDR 0", $realtime);
 
-       desc_buf = new[64];
+       $display("[%t] : starting H2C DMA channels ", $realtime);
        
-       for (int i = 0 ; i<= 63 ; i++) begin
-         desc_buf[i] = 'hAA;
+       //Start transfers of data to CL DDR
+       tb.start_que_to_cl(.chan(0));   
+       tb.start_que_to_cl(.chan(1));   
+       tb.start_que_to_cl(.chan(2));   
+       tb.start_que_to_cl(.chan(3));   
+
+       // wait for dma transfers to complete
+       timeout_count = 0;       
+       do begin
+          status[0] = tb.sh.is_dma_to_cl_done(0);
+          status[1] = tb.sh.is_dma_to_cl_done(1);
+          status[2] = tb.sh.is_dma_to_cl_done(2);
+          status[3] = tb.sh.is_dma_to_cl_done(3);
+          #10ns;
+          timeout_count++;
+       end while ((status != 4'hf) && (timeout_count < 50));
+       
+       if (timeout_count >= 50) begin
+          $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+          error_count++;
        end
 
-       que_to_cl_ddr(0, 64'h0, desc_buf);
+       $display("[%t] : starting C2H DMA channels ", $realtime);
 
-       // DDR 1
-       $display("[%t] : DMA buffer to DDR 1", $realtime);
+       //Start transfers of data from CL DDR
+       tb.start_que_to_buffer(.chan(0));   
+       tb.start_que_to_buffer(.chan(1));   
+       tb.start_que_to_buffer(.chan(2));   
+       tb.start_que_to_buffer(.chan(3));   
 
-       for (int i = 0 ; i<= 63 ; i++) begin
-         desc_buf[i] = 'hBB;
+       // wait for dma transfers to complete
+       timeout_count = 0;       
+       do begin
+          status[0] = tb.sh.is_dma_to_buffer_done(0);
+          status[1] = tb.sh.is_dma_to_buffer_done(1);
+          status[2] = tb.sh.is_dma_to_buffer_done(2);
+          status[3] = tb.sh.is_dma_to_buffer_done(3);
+          #10ns;
+          timeout_count++;          
+       end while ((status != 4'hf) && (timeout_count < 50));
+       
+       if (timeout_count >= 50) begin
+          $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+          error_count++;
        end
-   
-       que_to_cl_ddr(1, 64'h100, desc_buf);
 
-       // DDR 2
-       $display("[%t] : DMA buffer to DDR 2", $realtime);
-
-       for (int i = 0 ; i<= 63 ; i++) begin
-         desc_buf[i] = 'hCC;
-       end
-   
-       que_to_cl_ddr(2, 64'h200, desc_buf);
-
-       // DDR 3
-       $display("[%t] : DMA buffer to DDR 3", $realtime);
-
-       for (int i = 0 ; i<= 63 ; i++) begin
-         desc_buf[i] = 'hDD;
-       end
-   
-       que_to_cl_ddr(3, 64'h300, desc_buf);
-*/
 
        // DDR 0
        $display("[%t] : DMA buffer from DDR 0", $realtime);
@@ -122,7 +130,7 @@ module test_dram_dma();
        $display("[%t] : DMA buffer from DDR 1", $realtime);
    
        host_memory_buffer_address = 64'h0_0000_1800;
-       for (int i = 0 ; i<= 63 ; i++) begin
+       for (int i = 0 ; i< 64 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hBB) begin
            $display("[%t] : *** ERROR *** DDR1 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
@@ -133,7 +141,7 @@ module test_dram_dma();
        $display("[%t] : DMA buffer from DDR 2", $realtime);
    
        host_memory_buffer_address = 64'h0_0000_2800;
-       for (int i = 0 ; i<= 63 ; i++) begin
+       for (int i = 0 ; i< 64 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hCC) begin
            $display("[%t] : *** ERROR *** DDR2 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
@@ -144,7 +152,7 @@ module test_dram_dma();
        $display("[%t] : DMA buffer from DDR 3", $realtime);
 
        host_memory_buffer_address = 64'h0_0000_3800;
-       for (int i = 0 ; i<= 63 ; i++) begin
+       for (int i = 0 ; i< 64 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hDD) begin
            $display("[%t] : *** ERROR *** DDR3 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
            error_count++;
