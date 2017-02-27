@@ -174,6 +174,5 @@ module test_dram_dma();
        $finish;
     end // initial begin
 
-
 endmodule // test_dram_dma
    

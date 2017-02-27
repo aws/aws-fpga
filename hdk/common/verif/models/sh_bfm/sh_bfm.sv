@@ -1716,6 +1716,8 @@ module sh_bfm #(
          AXI_Data    axi_data;
          DMA_OP      dop;
          logic [63:0] host_memory;
+         //int num_of_data_beats = 0;
+         //logic [63:0] start_addr = 0
          
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
@@ -1727,11 +1729,31 @@ module sh_bfm #(
               sh_cl_wr_cmds.push_back(axi_cmd);
           
               axi_data.strb = 64'b0;
-              
-              for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
-                 axi_data.data = {dop.buffer[i-dop.cl_addr[5:0]], axi_data.data[511:8]};
-                 axi_data.strb = {1'b1, axi_data.strb[63:1]};
+              //start_addr = dop.cl_addr[5:0];
+              //num_of_data_beats = ((dop.len + dop.cl_addr[5:0])/64) + 1;
+
+              //for(int i=0; i < num_of_data_beats; i++) begin
+              //  for(int byte = start_addr; byte < 64; byte++) begin
+              //    axi_data.data = {tb.hm_get_byte(.addr(dop.src_addr + (byte-dop.cl_addr[5:0]))), axi_data.data[511:8]};
+              //    axi_data.strb = {1'b1, axi_data.strb[63:1]};
+              //  end
+              //  start_addr = 0;
+              //end
+
+              for(int i = dop.cl_addr[5:0]; i < dop.len; i++) begin
+                axi_data.data = {tb.hm_get_byte(.addr(dop.buffer + (i-dop.cl_addr[5:0]))), axi_data.data[511:8]};
+                axi_data.strb = {1'b1, axi_data.strb[63:1]};
+                if ((dop.cl_addr[5:0] + i)%64 == 0) begin
+                  axi_data.id = chan;
+                  axi_data.last = ((dop.len - 1) - i == 0) ? 1 : 0; 
+                  sh_cl_wr_data.push_back(axi_data);
+                end
               end
+              
+              //for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
+              //   axi_data.data = {tb.hm_get_byte(.addr(dop.src_addr + (i-dop.cl_addr[5:0]))), axi_data.data[511:8]};
+              //   axi_data.strb = {1'b1, axi_data.strb[63:1]};
+              //end
           
               axi_data.id = chan;
               axi_data.last = 1;
@@ -1759,8 +1781,6 @@ module sh_bfm #(
           if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
             if(chan == cl_sh_rd_data[0].id) begin
               for (int i = 0; i< dop.len ; i++) begin
-//                dop.buffer = new[i+1](dop.buffer);
-//                dop.buffer[i] = cl_sh_rd_data[0].data[(i*8)+:8];
                  tb.hm_put_byte(dop.buffer + i, cl_sh_rd_data[0].data[(i*8)+:8]);
                 if (debug) begin
                   $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
