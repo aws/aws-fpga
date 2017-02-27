@@ -35,8 +35,8 @@ The driver needs to be installed once, regardless of how many FPGA slots are ava
 The next example shows how an application can register to two events (aka user-defined interrupts) on slot 0
 
 ```
-  fd4=open(“/dev/fpga0/event4”, O_RDONLY);
-  fd6=open(“/dev/fpga0/event6”, O_RDONLY);
+  fd4=open(“/dev/fpga0_event4”, O_RDONLY);
+  fd6=open(“/dev/fpga0_event6”, O_RDONLY);
 
 
   //polling on event4 and event6
@@ -64,8 +64,6 @@ The next example shows how an application can register to two events (aka user-d
 ```
 
 
-
-
 # FAQ
 
 
@@ -87,11 +85,11 @@ To stop all the interrupts/events, one should disable the toggling of interrupt 
 
 There are three options to mask an interrupt/event:
 
-i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle and thekernel EDMA driver will get invoked; but the application in Linux userspace will not see it.
+i) An application can stop calling poll() on the event file-descriptor. The interrupt may still toggle, and the kernel EDMA driver is invoked, but the application in Linux userspace does not see it.
 
 
 
-ii) Call close() for all the file-descriptors associated with the specification interrupt/event, the EDMA driver will mask the interrupt
+ii) Call close() for all the file descriptors associated with the specification interrupt/event, the EDMA driver masks the interrupt
 
 iii) Control the interrupt request signals at the interrupt between the CL and Shell.
 
@@ -99,7 +97,7 @@ iii) Control the interrupt request signals at the interrupt between the CL and S
 
 **Q: Where are the cause and mask bits for the user-defined interrupts?**
 
-The cause the mask bits, if exist, will be part of the CL and are implementation specific. In the example(s) given in this file, and the EDMA driver provides a robust way to translate interrupts request on the CL to Shell interface to Linux kernel and userspace. It should be considered as a message/event transfer mechanism.
+The cause the mask bits, if exist, is part of the CL and are implementation specific. In the example(s) given in this file, and the EDMA driver provides a robust way to translate interrupts request on the CL to Shell interface to Linux kernel and userspace. It should be considered as a message/event transfer mechanism.
 
 
 
@@ -107,7 +105,7 @@ The cause the mask bits, if exist, will be part of the CL and are implementation
 
   Run `cat /proc/interrupts` and look for fpgaX_eventY (where X is the slot-id and Y is the event/interrupt) for how many interrupts came from the CL via the corresponding MSI-X.
   
-  Run `cat /TBD` will show how many times the userspace application called poll().
+  Run `cat /TBD` shows how many times the userspace application called poll().
 
 
 
@@ -117,23 +115,23 @@ The cause the mask bits, if exist, will be part of the CL and are implementation
 Yes, that can happen if: 
 i) The EDMA driver is not installed
 
-ii) The interrupt was delivered to Linux while the corresponding file-descriptor was not open by any process.
+ii) The interrupt was delivered to Linux while the corresponding file descriptor was not open by any process.
 
 
 
 
-**Q: If I send multiple interupt requests, will I need to poll() multiple times?**
+**Q: If I send multiple interrupt requests, do I need to poll() multiple times?**
 
 It all depends on the timing when the interrupt request was sent and when the poll() is called.
 
-EDMA implementation keeps a state per interrupt event if it was asserted from the last time a poll() was called.  If the same interrupt is sent by the CL multiple times before the poll() is called, the next call to the poll() will just indicate that there was an interrupt event, but it doesn't provide the interrupt count, and it doesn't keep a queue.
+EDMA implementation keeps a state per interrupt event that indicates it has been asserted from the last time a poll() was called.  If the same interrupt is sent by the CL multiple times before the poll() is called, the next call to the poll() indicates that there was an interrupt event, but it doesn't provide the interrupt count, and it doesn't keep a queue.
 
 
 
 
 **Q: Which MSI-X entries are used for the user-defined interrupts?**
 
-The EDMA Linux kernel driver will map the CL user-defined interrupts to MSI-X entries 16 to 31, which will be mapped to /dev/fpgaX/event0 through 15.  This is handled by the EDMA driver and user intervention is not required.
+The EDMA Linux kernel driver maps the CL user-defined interrupts to MSI-X entries 16 to 31, which is mapped to /dev/fpgaX/event0 through 15.  This is handled by the EDMA driver and user intervention is not required.
 
 
 
