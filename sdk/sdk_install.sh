@@ -28,10 +28,10 @@ if [ $RET != 0 ]; then
     exit $RET 
 fi
 
-SDK_MGMT_DIR=$SDK_DIR/management
+SDK_USERSPACE_DIR=$SDK_DIR/userspace
 
 # Build and install the Amazon FPGA Image (AFI) Management Tools
-$SDK_MGMT_DIR/install_fpga_image_tools.sh
+$SDK_USERSPACE_DIR/install_fpga_image_tools.sh
 RET=$?
 if [ $RET != 0 ]; then
     echo "Error: install_fpga_image_tools.sh returned $RET"
