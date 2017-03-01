@@ -23,7 +23,7 @@ export HDK_DIR=${HDK_DIR:=$(pwd)/hdk}
 export HDK_COMMON_DIR=$HDK_DIR/common
 
 # Point to the latest version of AWS shell
-export HDK_SHELL_DIR=$HDK_COMMON_DIR/shell_latest
+export HDK_SHELL_DIR=$HDK_COMMON_DIR/shell_stable
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
