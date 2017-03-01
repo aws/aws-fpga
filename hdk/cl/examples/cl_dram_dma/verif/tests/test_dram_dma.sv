@@ -34,10 +34,10 @@ module test_dram_dma();
        host_memory_buffer_address = 64'h0;
 
        //Queue data to be transfered to CL DDR
-       tb.que_buffer_to_cl(.chan(0), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0000), .len(64) );  // move buffer to DDR 0
+       tb.que_buffer_to_cl(.chan(0), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0000), .len(128) );  // move buffer to DDR 0
 
        // Put test pattern in host memory       
-       for (int i = 0 ; i < 64 ; i++) begin
+       for (int i = 0 ; i < 128 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hAA));
           host_memory_buffer_address++;
        end
@@ -83,9 +83,9 @@ module test_dram_dma();
           status[3] = tb.sh.is_dma_to_cl_done(3);
           #10ns;
           timeout_count++;
-       end while ((status != 4'hf) && (timeout_count < 50));
+       end while ((status != 4'hf) && (timeout_count < 100));
        
-       if (timeout_count >= 50) begin
+       if (timeout_count >= 100) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
@@ -98,6 +98,19 @@ module test_dram_dma();
        tb.start_que_to_buffer(.chan(2));   
        tb.start_que_to_buffer(.chan(3));   
 
+       
+       host_memory_buffer_address = 64'h0_0000_0800;
+       tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0000), .len(64) );  // move DDR0 to buffer
+                                                                                                                                            
+       host_memory_buffer_address = 64'h0_0000_1800;                                                                                        
+       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_1000_0000), .len(64) );  // move DDR1 to buffer
+                                                                                                                                            
+       host_memory_buffer_address = 64'h0_0000_2800;                                                                                        
+       tb.que_cl_to_buffer(.chan(2), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0000), .len(64) );  // move DDR2 to buffer
+                                                                                                                                            
+       host_memory_buffer_address = 64'h0_0000_3800;                                                                                        
+       tb.que_cl_to_buffer(.chan(3), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_3000_0000), .len(64) );  // move DDR3 to buffer
+       
        // wait for dma transfers to complete
        timeout_count = 0;       
        do begin
@@ -107,9 +120,9 @@ module test_dram_dma();
           status[3] = tb.sh.is_dma_to_buffer_done(3);
           #10ns;
           timeout_count++;          
-       end while ((status != 4'hf) && (timeout_count < 50));
+       end while ((status != 4'hf) && (timeout_count < 100));
        
-       if (timeout_count >= 50) begin
+       if (timeout_count >= 100) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
@@ -120,8 +133,9 @@ module test_dram_dma();
 
        host_memory_buffer_address = 64'h0_0000_0800;
        for (int i = 0 ; i<64 ; i++) begin
-         if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hAA) begin
-           $display("[%t] : *** ERROR *** DDR0 Data mismatch, read data is: %0x", $realtime, desc_buf[i]);
+         if (tb.hm_get_byte(.addr(host_memory_buffer_address + i)) !== 8'hAA) begin
+           $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x", 
+                            $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
            error_count++;
          end    
        end
