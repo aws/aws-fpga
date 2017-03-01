@@ -24,4 +24,7 @@ encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
 $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh \
 $CL_DIR/build/src_post_encryption/cl_hello_world.sv
 
+#Use the command below to encrypt VHDL files.
+#encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl
+
 #---- End of section replaced by Developr ---
