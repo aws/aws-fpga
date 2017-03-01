@@ -515,7 +515,7 @@ module sh_bfm #(
 
    DMA_OP h2c_dma_list[0:3][$];
    DMA_OP c2h_dma_list[0:3][$];
-   DMA_OP c2h_dma_data[0:3][$];
+   DMA_OP c2h_data_dma_list[0:3][$];
    
    logic [3:0]     h2c_dma_started;
    logic [3:0]     c2h_dma_started;
@@ -1670,15 +1670,6 @@ module sh_bfm #(
       c2h_dma_list[chan].push_back(dop);
    endfunction // dma_cl_to_buffer
 
-/*
-   function automatic dma_cl_data_to_buffer(input logic [1:0] chan, ref logic [7:0] buffer[]);
-      DMA_OP dop;
-      dop = c2h_dma_data[chan].pop_front();
-      buffer = dop.buffer;
-      c2h_dma_done[chan] = 1'b0;
-   endfunction // dma_cl_data_to_buffer
-*/
-   
    function void start_dma_to_cl(input int chan);
       h2c_dma_started[chan] = 1'b1;
       h2c_dma_done[chan] = 1'b0;
@@ -1715,15 +1706,20 @@ module sh_bfm #(
          logic [63:0] host_memory;
          int num_of_data_beats = 0;
          int byte_cnt = 0;
-         logic [63:0] aligned_addr = 0;
+         bit aligned = 0;
+         int num_bytes = 0;
+         logic [5:0] aligned_addr = 0;
          
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
          
               aligned_addr = (dop.cl_addr[5:0]/64) * 64;
-              num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;              
+              num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
+              num_of_data_beats = (num_of_data_beats > 3) ? 3 : num_of_data_beats;
+              num_of_data_beats = num_of_data_beats + (dop.len/256);
               byte_cnt = 0;
+              aligned = (aligned_addr == dop.cl_addr[5:0]);
               
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; burst_cnt++) begin
                 if(burst_cnt == 0) begin   // if first data beat
@@ -1740,21 +1736,22 @@ module sh_bfm #(
                   end
                 end
                 else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
-                  axi_cmd.addr = aligned_addr + dop.len;
+                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
                   axi_cmd.len  = 0;
                   axi_cmd.id   = chan;
                   sh_cl_wr_cmds.push_back(axi_cmd);
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
-                  for(int i=0; i < (dop.cl_addr[5:0] - aligned_addr); i++) begin
+                  num_bytes = aligned ? 64 : (dop.cl_addr[5:0] - aligned_addr);
+                  for(int i=0; i < num_bytes; i++) begin
                     axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
                     axi_data.strb = axi_data.strb | 1 << i;
                     byte_cnt++;
                   end 
                 end
                 else begin                                              // intermediate data beats
-                  axi_cmd.addr = aligned_addr + (burst_cnt * 64);
+                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
                   axi_cmd.len  = num_of_data_beats - 3;
                   axi_cmd.id   = chan;
                   sh_cl_wr_cmds.push_back(axi_cmd);
@@ -1787,21 +1784,23 @@ module sh_bfm #(
       end
       else begin
         DMA_OP dop;
+        static int byte_cnt[4];
+        
         for (int chan = 0; chan < 4; chan++) begin
-//          c2h_dma_done[chan] = 1'b0;
           if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
             if(chan == cl_sh_rd_data[0].id) begin
-              dop = c2h_dma_list[chan].pop_front();            
-              for (int i = 0; i< dop.len ; i++) begin
-                 tb.hm_put_byte(.addr(dop.buffer + i), .d(cl_sh_rd_data[0].data[(i*8)+:8]));
+              dop = c2h_data_dma_list[chan].pop_front();            
+              
+              for (int i = dop.cl_addr[5:0]; i < 64 ; i++) begin
+                tb.hm_put_byte(.addr(dop.buffer + byte_cnt[chan]), .d(cl_sh_rd_data[0].data[(i*8)+:8]));
                 if (debug) begin
                   $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
                                             $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
                 end
+                byte_cnt[chan]++;
               end
-//              c2h_dma_data[chan].push_back(dop);
-              cl_sh_rd_data.pop_front();
               c2h_dma_done[chan] = 1'b1;
+              cl_sh_rd_data.pop_front();
             end
           end
         end
@@ -1823,17 +1822,16 @@ module sh_bfm #(
          AXI_Command axi_cmd;
          AXI_Data    axi_data;
          DMA_OP      dop;
+         DMA_OP      data_dop;
          int num_of_data_beats = 0;
-         logic [63:0] aligned_addr = 0;
+         logic [5:0] aligned_addr = 0;
 
          for (int chan = 0; chan < 4; chan++) begin
            if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
-              dop = c2h_dma_list[chan][0];            
-              
+              dop = c2h_dma_list[chan].pop_front();
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
               aligned_addr = (dop.cl_addr[5:0]/64) * 64;
 
-               
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; burst_cnt++) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
@@ -1841,16 +1839,20 @@ module sh_bfm #(
                   axi_cmd.id   = chan;
                 end
                 else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
-                  axi_cmd.addr = aligned_addr + dop.len;
+                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
                   axi_cmd.len  = 0;
                   axi_cmd.id   = chan;
                 end
                 else begin                                              // intermediate data beats
-                  axi_cmd.addr = aligned_addr + (burst_cnt * 64);
+                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
                   axi_cmd.len  = num_of_data_beats - 3;
                   axi_cmd.id   = chan;
                 end
                 sh_cl_rd_cmds.push_back(axi_cmd);
+                data_dop.buffer = dop.buffer;
+                data_dop.cl_addr = axi_cmd.addr;
+                data_dop.len = dop.len;
+                c2h_data_dma_list[chan].push_back(data_dop);
               end
            end
          end
