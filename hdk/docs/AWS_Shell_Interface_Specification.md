@@ -322,6 +322,84 @@ There are three AXI-L master interfaces (Shell is master) that can be used for r
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
+### Accessing Aligned/Unaligned addresses from PCIe (Shell is Master, CL is Slave):
+
+Shell supports DW aligned and unaligned transfers from PCIe (address is aligned/not aligned to DW-4byte boundary)
+
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on DMA_PCIS interface work: 
+
+ 1) Writing 8 bytes to DW aligned address through PCIe on AXI4 Interface(DMA_PCIS- 512 bit interface):
+ 
+    If the transaction on the pcie is as follows:                                                              
+    Addr      : 0x0000002000000000
+    dw_cnt    : 2
+    first_be  : 4’b1111
+    last_be   : 4’b1111
+
+    Then the transaction on the AXI4 interface will have the following axi attributes:
+    awaddr     64’h0000_0000_0000_0000
+    awlen     = 0
+    wstrb     = 64’h0000_0000_0000_00ff
+
+ 2) Writing 8 bytes to DW un-aligned address on AXI4 Interface(DMA_PCIS- 512 bit interface):
+ 
+    If the transaction on the pcie is as follows:                                                          
+    Addr      : 0x0000002000000001
+    dw_cnt    : 3
+    first_be  : 4’b1110
+    last_be   : 4’b0001
+
+    Then the transaction on the AXI4 interface will have the following axi attributes:
+    awddr    = 64’h0000_0000_0000_0001
+    awlen    = 0
+    wstrb    = 64’h0000_0000_0000_01fe
+
+The addresses for the Read transactions will work similar to writes.
+
+**Note**:
+If a transaction from PCIe is initiated on AXI-Lite (SDA/OCL/BAR1) interfaces with dw_cnt greater than 1, i.e. >32bits,
+the transaction is split into multipe 32 bit transactions by the Shell.
+
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL/BAR1 AXI-Lite interfaces work: 
+
+ 1) Writing 8 bytes to DW aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface): 
+ 
+    If the transaction on the pcie is as follows:     
+    Addr      : 0x0000000002000000
+    dw_cnt    : 2
+    first_be  : 4’b1111
+    last_be   : 4’b1111
+ 
+    Then the transaction on the AXI-Lite interface will be split and will have the following axi attributes:
+    Transaction is split into 2 transfers.
+ 
+    1st transfer awaddr = 32’h0000_0000
+    wstrb = 4’hf
+ 
+    2nd  transfer awaddr = 32’h0000_0004
+    wstrb = 4’hf
+
+  2) Writing 64 bits to DW un aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface):
+  
+     If the transaction on the pcie is as follows:     
+      Addr      : 0x0000000002000001
+      dw_cnt    : 3
+      first_be  : 4’b1110
+      last_be   : 4’b0001
+
+     Transaction on AXI-Lite interface will be split and will have the following axi attributes:
+     Transaction is split into 3 transfers.
+ 
+     1st transfer awaddr = 32’h0000_0001
+     wstrb = 4’he
+ 
+     2nd  transfer awaddr = 32’h0000_0004
+     wstrb = 4’hf
+ 
+     3rd  transfer awaddr = 32’h0000_0008
+     wstrb = 4’h1
+
+ The transaction splitting and addresses for the Read transactions will work similar to writes.
 
 ## Interrupts <a name="interrupts"></a>
 
