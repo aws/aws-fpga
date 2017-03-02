@@ -40,8 +40,8 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
   logic [  7:0] tie_zero_len[2:0];
   logic [511:0] tie_zero_data[2:0];
   logic [ 63:0] tie_zero_strb[2:0];
-  logic [  7:0] tie_zero_stat_addr[2:0];
-  logic [ 31:0] tie_zero_stat_data[2:0];
+//logic [  7:0] tie_zero_stat_addr;
+//logic [ 31:0] tie_zero_stat_data[2:0];
 
 //-------------------------------------------------
 // Reset Synchronization
@@ -580,13 +580,27 @@ sh_ddr #(.DDR_A_PRESENT(0),
 
    .sh_cl_ddr_is_ready (),
 
-   .sh_ddr_stat_addr   (tie_zero_stat_addr),
-   .sh_ddr_stat_wr     (3'b0), 
-   .sh_ddr_stat_rd     (3'b0), 
-   .sh_ddr_stat_wdata  (tie_zero_stat_data),
-   .ddr_sh_stat_ack    (),
-   .ddr_sh_stat_rdata  (),
-   .ddr_sh_stat_int    ()
+   .sh_ddr_stat_addr0   (8'h00),
+   .sh_ddr_stat_wr0     (3'b0), 
+   .sh_ddr_stat_rd0     (3'b0), 
+   .sh_ddr_stat_wdata0  (32'b0),
+   .sh_ddr_stat_addr1   (8'h00),
+   .sh_ddr_stat_wr1     (3'b0), 
+   .sh_ddr_stat_rd1     (3'b0), 
+   .sh_ddr_stat_wdata1  (32'b0),
+   .sh_ddr_stat_addr2   (8'h00),
+   .sh_ddr_stat_wr2     (3'b0), 
+   .sh_ddr_stat_rd2     (3'b0), 
+   .sh_ddr_stat_wdata2  (32'b0),
+   .ddr_sh_stat_ack0   (),
+   .ddr_sh_stat_rdata0 (),
+   .ddr_sh_stat_int0   (),
+   .ddr_sh_stat_ack1   (),
+   .ddr_sh_stat_rdata1 (),
+   .ddr_sh_stat_int1   (),
+   .ddr_sh_stat_ack2   (),
+   .ddr_sh_stat_rdata2 (),
+   .ddr_sh_stat_int2   ()
    );
 
 //-------------------------------------------
@@ -629,13 +643,13 @@ sh_ddr #(.DDR_A_PRESENT(0),
    assign cl_sh_pcim_rready  =   1'b0;
 
    // DDRC Interface from CL to SH
-   assign ddr_sh_stat_ack[2:0]  =   3'b111; // Needed in order not to hang the interface
-   assign ddr_sh_stat_rdata[2]  =  32'b0;
-   assign ddr_sh_stat_rdata[1]  =  32'b0;
-   assign ddr_sh_stat_rdata[0]  =  32'b0;
-   assign ddr_sh_stat_int[2]    =   8'b0;
-   assign ddr_sh_stat_int[1]    =   8'b0;
-   assign ddr_sh_stat_int[0]    =   8'b0;
+ //assign ddr_sh_stat_ack[2:0]  =   3'b111; // Needed in order not to hang the interface
+ //assign ddr_sh_stat_rdata[2]  =  32'b0;
+ //assign ddr_sh_stat_rdata[1]  =  32'b0;
+ //assign ddr_sh_stat_rdata[0]  =  32'b0;
+ //assign ddr_sh_stat_int[2]    =   8'b0;
+ //assign ddr_sh_stat_int[1]    =   8'b0;
+ //assign ddr_sh_stat_int[0]    =   8'b0;
                                    
    assign cl_sh_ddr_awid        =   6'b0;
    assign cl_sh_ddr_awaddr      =  64'b0;

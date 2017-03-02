@@ -5,7 +5,7 @@
 // Restricted NDA Material
 // =============================================================================
 
-module cl_dram_dma #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=4, parameter NUM_GTY = 4) 
+module cl_dram_dma #(parameter NUM_DDR=4) 
 
 (
    `include "cl_ports.vh"
@@ -19,8 +19,6 @@ module cl_dram_dma #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HM
    localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
    localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
    localparam NUM_CFG_STGS_PCIE_ATG = 4;
-   localparam NUM_CFG_STGS_XDCFG = 4;
-   localparam NUM_CFG_STGS_XDMA = 4;
    
 `ifdef SIM
    localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
@@ -38,27 +36,31 @@ module cl_dram_dma #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HM
 //---------------------------- 
 // Internal signals
 //---------------------------- 
-axi_bus_t lcl_cl_sh_ddr0();
-axi_bus_t lcl_cl_sh_ddr1();
-axi_bus_t lcl_cl_sh_ddr2();
+axi_bus_t lcl_cl_sh_ddra();
+axi_bus_t lcl_cl_sh_ddrb();
+axi_bus_t lcl_cl_sh_ddrd();
 
+axi_bus_t sh_cl_dma_pcis_bus();
 axi_bus_t sh_cl_dma_pcis_q();
 
+axi_bus_t cl_sh_pcim_bus();
+axi_bus_t cl_sh_ddr_bus();
+
+axi_bus_t sda_cl_bus();
+axi_bus_t sh_ocl_bus();
+
 cfg_bus_t pcim_tst_cfg_bus();
-cfg_bus_t ddr0_tst_cfg_bus();
-cfg_bus_t ddr1_tst_cfg_bus();
-cfg_bus_t ddr2_tst_cfg_bus();
-cfg_bus_t ddr3_tst_cfg_bus();
+cfg_bus_t ddra_tst_cfg_bus();
+cfg_bus_t ddrb_tst_cfg_bus();
+cfg_bus_t ddrc_tst_cfg_bus();
+cfg_bus_t ddrd_tst_cfg_bus();
 cfg_bus_t int_tst_cfg_bus();
 
-scrb_bus_t ddr0_scrb_bus();
-scrb_bus_t ddr1_scrb_bus();
-scrb_bus_t ddr2_scrb_bus();
-scrb_bus_t ddr3_scrb_bus();
+scrb_bus_t ddra_scrb_bus();
+scrb_bus_t ddrb_scrb_bus();
+scrb_bus_t ddrc_scrb_bus();
+scrb_bus_t ddrd_scrb_bus();
 
-scrb_bus_t hmc0_scrb_bus();
-scrb_bus_t hmc1_scrb_bus();
-logic [1:0] hmc_link_up_pipe;
 
 logic clk;
 logic pipe_rst_n;
@@ -115,12 +117,10 @@ always_ff @(negedge sync_rst_n or posedge clk)
 // Bit 31: Debug enable (for cl_sh_id0 and cl_sh_id1)
 // Bit 30:28: Debug Scrb memory select
    
-// Bit 5 : HMC1 Scrub enable
-// Bit 4 : HMC0 Scrub enable
-// Bit 3 : DDR3 Scrub enable
-// Bit 2 : DDR2 Scrub enable
-// Bit 1 : DDR1 Scrub enable
-// Bit 0 : DDR0 Scrub enable
+// Bit 3 : DDRC Scrub enable
+// Bit 2 : DDRD Scrub enable
+// Bit 1 : DDRB Scrub enable
+// Bit 0 : DDRA Scrub enable
 logic [31:0] sh_cl_ctl0_q;
 always_ff @(posedge clk or negedge sync_rst_n)
   if (!sync_rst_n)
@@ -128,13 +128,11 @@ always_ff @(posedge clk or negedge sync_rst_n)
   else
     sh_cl_ctl0_q <= sh_cl_ctl0;
 
-assign ddr0_scrb_bus.enable = sh_cl_ctl0_q[0];
-assign ddr1_scrb_bus.enable = sh_cl_ctl0_q[1];
-assign ddr3_scrb_bus.enable = sh_cl_ctl0_q[2];
-assign ddr2_scrb_bus.enable = sh_cl_ctl0_q[3];
+assign ddra_scrb_bus.enable = sh_cl_ctl0_q[0];
+assign ddrb_scrb_bus.enable = sh_cl_ctl0_q[1];
+assign ddrd_scrb_bus.enable = sh_cl_ctl0_q[2];
+assign ddrc_scrb_bus.enable = sh_cl_ctl0_q[3];
 
-assign hmc0_scrb_bus.enable = sh_cl_ctl0_q[4];
-assign hmc1_scrb_bus.enable = sh_cl_ctl0_q[5];
 
 assign dbg_scrb_en = sh_cl_ctl0_q[31];
 assign dbg_scrb_mem_sel[2:0] = sh_cl_ctl0_q[30:28];
@@ -147,24 +145,24 @@ wire[31:0] id0 = 32'h1d50_6789;
 wire[31:0] id1 = 32'h1d51_fedc; 
    
 always_ff @(posedge clk)
-    cl_sh_status0 <= dbg_scrb_en ? {1'b0, ddr2_scrb_bus.state, 
-                                    1'b0, ddr3_scrb_bus.state, 
-                                    1'b0, ddr1_scrb_bus.state, 
-                                    1'b0, ddr0_scrb_bus.state,
-                                    4'd0, hmc1_scrb_bus.done, hmc0_scrb_bus.done, hmc_link_up_pipe[1:0], all_ddr_scrb_done, all_ddr_is_ready} :
-                        {20'ha111_1, hmc1_scrb_bus.done, hmc0_scrb_bus.done, hmc_link_up_pipe[1:0], all_ddr_scrb_done, all_ddr_is_ready};
+    cl_sh_status0 <= dbg_scrb_en ? {1'b0, ddrc_scrb_bus.state, 
+                                    1'b0, ddrd_scrb_bus.state, 
+                                    1'b0, ddrb_scrb_bus.state, 
+                                    1'b0, ddra_scrb_bus.state,
+                                    8'd0, all_ddr_scrb_done, all_ddr_is_ready} :
+                        {20'ha111_1, 4'b0, all_ddr_scrb_done, all_ddr_is_ready};
 assign cl_sh_status1 = `CL_VERSION;
 
 
 always_ff @(posedge clk)
-    cl_sh_id0 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddr2_scrb_bus.addr[31:0] :
-                                dbg_scrb_mem_sel == 3'd2 ? ddr3_scrb_bus.addr[31:0] :
-                                dbg_scrb_mem_sel == 3'd1 ? ddr1_scrb_bus.addr[31:0] : ddr0_scrb_bus.addr[31:0]) :
+    cl_sh_id0 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddrc_scrb_bus.addr[31:0] :
+                                dbg_scrb_mem_sel == 3'd2 ? ddrd_scrb_bus.addr[31:0] :
+                                dbg_scrb_mem_sel == 3'd1 ? ddrb_scrb_bus.addr[31:0] : ddra_scrb_bus.addr[31:0]) :
                                 id0; 
 always_ff @(posedge clk)
-    cl_sh_id1 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddr2_scrb_bus.addr[63:32] :
-                                dbg_scrb_mem_sel == 3'd2 ? ddr3_scrb_bus.addr[63:32] :
-                                dbg_scrb_mem_sel == 3'd1 ? ddr1_scrb_bus.addr[63:32] : ddr0_scrb_bus.addr[63:32]) :
+    cl_sh_id1 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddrc_scrb_bus.addr[63:32] :
+                                dbg_scrb_mem_sel == 3'd2 ? ddrd_scrb_bus.addr[63:32] :
+                                dbg_scrb_mem_sel == 3'd1 ? ddrb_scrb_bus.addr[63:32] : ddra_scrb_bus.addr[63:32]) :
                                 id1;
 
 logic sh_cl_ddr_is_ready_q;
@@ -180,105 +178,123 @@ always_ff @(posedge clk or negedge sync_rst_n)
 
 assign all_ddr_is_ready = {lcl_sh_cl_ddr_is_ready[2], sh_cl_ddr_is_ready_q, lcl_sh_cl_ddr_is_ready[1:0]};
 
-assign all_ddr_scrb_done = {ddr2_scrb_bus.done, ddr3_scrb_bus.done, ddr1_scrb_bus.done, ddr0_scrb_bus.done};
+assign all_ddr_scrb_done = {ddrc_scrb_bus.done, ddrd_scrb_bus.done, ddrb_scrb_bus.done, ddra_scrb_bus.done};
 
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////// Scrubber enable and status //////////////////////////
 ///////////////////////////////////////////////////////////////////////
  
+assign sh_cl_dma_pcis_bus.awvalid = sh_cl_dma_pcis_awvalid;
+assign sh_cl_dma_pcis_bus.awaddr = sh_cl_dma_pcis_awaddr;
+assign sh_cl_dma_pcis_bus.awid[5:0] = sh_cl_dma_pcis_awid;
+assign sh_cl_dma_pcis_bus.awlen = sh_cl_dma_pcis_awlen;
+assign sh_cl_dma_pcis_bus.awsize = sh_cl_dma_pcis_awsize;
+assign cl_sh_dma_pcis_awready = sh_cl_dma_pcis_bus.awready;
+assign sh_cl_dma_pcis_bus.wvalid = sh_cl_dma_pcis_wvalid;
+assign sh_cl_dma_pcis_bus.wdata = sh_cl_dma_pcis_wdata;
+assign sh_cl_dma_pcis_bus.wstrb = sh_cl_dma_pcis_wstrb;
+assign sh_cl_dma_pcis_bus.wlast = sh_cl_dma_pcis_wlast;
+assign cl_sh_dma_pcis_wready = sh_cl_dma_pcis_bus.wready;
+assign cl_sh_dma_pcis_bvalid = sh_cl_dma_pcis_bus.bvalid;
+assign cl_sh_dma_pcis_bresp = sh_cl_dma_pcis_bus.bresp;
+assign sh_cl_dma_pcis_bus.bready = sh_cl_dma_pcis_bready;
+assign cl_sh_dma_pcis_bid = sh_cl_dma_pcis_bus.bid[5:0];
+assign sh_cl_dma_pcis_bus.arvalid = sh_cl_dma_pcis_arvalid;
+assign sh_cl_dma_pcis_bus.araddr = sh_cl_dma_pcis_araddr;
+assign sh_cl_dma_pcis_bus.arid[5:0] = sh_cl_dma_pcis_arid;
+assign sh_cl_dma_pcis_bus.arlen = sh_cl_dma_pcis_arlen;
+assign sh_cl_dma_pcis_bus.arsize = sh_cl_dma_pcis_arsize;
+assign cl_sh_dma_pcis_arready = sh_cl_dma_pcis_bus.arready;
+assign cl_sh_dma_pcis_rvalid = sh_cl_dma_pcis_bus.rvalid;
+assign cl_sh_dma_pcis_rid = sh_cl_dma_pcis_bus.rid[5:0];
+assign cl_sh_dma_pcis_rlast = sh_cl_dma_pcis_bus.rlast;
+assign cl_sh_dma_pcis_rresp = sh_cl_dma_pcis_bus.rresp;
+assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
+assign sh_cl_dma_pcis_bus.rready = sh_cl_dma_pcis_rready;
 
+assign cl_sh_ddr_awid = cl_sh_ddr_bus.awid;
+assign cl_sh_ddr_awaddr = cl_sh_ddr_bus.awaddr;
+assign cl_sh_ddr_awlen = cl_sh_ddr_bus.awlen;
+assign cl_sh_ddr_awsize = cl_sh_ddr_bus.awsize;
+assign cl_sh_ddr_awvalid = cl_sh_ddr_bus.awvalid;
+assign cl_sh_ddr_bus.awready = sh_cl_ddr_awready;
+assign cl_sh_ddr_wid = 16'b0;
+assign cl_sh_ddr_wdata = cl_sh_ddr_bus.wdata;
+assign cl_sh_ddr_wstrb = cl_sh_ddr_bus.wstrb;
+assign cl_sh_ddr_wlast = cl_sh_ddr_bus.wlast;
+assign cl_sh_ddr_wvalid = cl_sh_ddr_bus.wvalid;
+assign cl_sh_ddr_bus.wready = sh_cl_ddr_wready;
+assign cl_sh_ddr_bus.bid = sh_cl_ddr_bid;
+assign cl_sh_ddr_bus.bresp = sh_cl_ddr_bresp;
+assign cl_sh_ddr_bus.bvalid = sh_cl_ddr_bvalid;
+assign cl_sh_ddr_bready = cl_sh_ddr_bus.bready;
+assign cl_sh_ddr_arid = cl_sh_ddr_bus.arid;
+assign cl_sh_ddr_araddr = cl_sh_ddr_bus.araddr;
+assign cl_sh_ddr_arlen = cl_sh_ddr_bus.arlen;
+assign cl_sh_ddr_arsize = cl_sh_ddr_bus.arsize;
+assign cl_sh_ddr_arvalid = cl_sh_ddr_bus.arvalid;
+assign cl_sh_ddr_bus.arready = sh_cl_ddr_arready;
+assign cl_sh_ddr_bus.rid = sh_cl_ddr_rid;
+assign cl_sh_ddr_bus.rresp = sh_cl_ddr_rresp;
+assign cl_sh_ddr_bus.rvalid = sh_cl_ddr_rvalid;
+assign cl_sh_ddr_bus.rdata = sh_cl_ddr_rdata;
+assign cl_sh_ddr_bus.rlast = sh_cl_ddr_rlast;
+assign cl_sh_ddr_rready = cl_sh_ddr_bus.rready;
 cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(DDR_SCRB_MAX_ADDR),
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_DMA_PCIS_SLV (
     .aclk(clk),
     .aresetn(sync_rst_n),
 
-    .ddr0_tst_cfg_bus(ddr0_tst_cfg_bus),
-    .ddr1_tst_cfg_bus(ddr1_tst_cfg_bus),
-    .ddr2_tst_cfg_bus(ddr2_tst_cfg_bus),
-    .ddr3_tst_cfg_bus(ddr3_tst_cfg_bus),
+    .ddra_tst_cfg_bus(ddra_tst_cfg_bus),
+    .ddrb_tst_cfg_bus(ddrb_tst_cfg_bus),
+    .ddrc_tst_cfg_bus(ddrc_tst_cfg_bus),
+    .ddrd_tst_cfg_bus(ddrd_tst_cfg_bus),
 
-    .ddr0_scrb_bus(ddr0_scrb_bus),
-    .ddr1_scrb_bus(ddr1_scrb_bus),
-    .ddr2_scrb_bus(ddr2_scrb_bus),
-    .ddr3_scrb_bus(ddr3_scrb_bus),
+    .ddra_scrb_bus(ddra_scrb_bus),
+    .ddrb_scrb_bus(ddrb_scrb_bus),
+    .ddrc_scrb_bus(ddrc_scrb_bus),
+    .ddrd_scrb_bus(ddrd_scrb_bus),
 
-    .sh_cl_dma_pcis_awid(sh_cl_dma_pcis_awid),
-    .sh_cl_dma_pcis_awaddr(sh_cl_dma_pcis_awaddr),
-    .sh_cl_dma_pcis_awlen(sh_cl_dma_pcis_awlen),
-    .sh_cl_dma_pcis_awsize(sh_cl_dma_pcis_awsize),
-    .sh_cl_dma_pcis_awvalid(sh_cl_dma_pcis_awvalid),
-    .cl_sh_dma_pcis_awready(cl_sh_dma_pcis_awready),
+    .sh_cl_dma_pcis_bus(sh_cl_dma_pcis_bus),
 
-    .sh_cl_dma_pcis_wdata(sh_cl_dma_pcis_wdata),
-    .sh_cl_dma_pcis_wstrb(sh_cl_dma_pcis_wstrb),
-    .sh_cl_dma_pcis_wlast(sh_cl_dma_pcis_wlast),
-    .sh_cl_dma_pcis_wvalid(sh_cl_dma_pcis_wvalid),
-    .cl_sh_dma_pcis_wready(cl_sh_dma_pcis_wready),
-
-    .cl_sh_dma_pcis_bid(cl_sh_dma_pcis_bid),
-    .cl_sh_dma_pcis_bresp(cl_sh_dma_pcis_bresp),
-    .cl_sh_dma_pcis_bvalid(cl_sh_dma_pcis_bvalid),
-    .sh_cl_dma_pcis_bready(sh_cl_dma_pcis_bready),
-
-    .sh_cl_dma_pcis_arid(sh_cl_dma_pcis_arid),
-    .sh_cl_dma_pcis_araddr(sh_cl_dma_pcis_araddr),
-    .sh_cl_dma_pcis_arlen(sh_cl_dma_pcis_arlen),
-    .sh_cl_dma_pcis_arsize(sh_cl_dma_pcis_arsize),
-    .sh_cl_dma_pcis_arvalid(sh_cl_dma_pcis_arvalid),
-    .cl_sh_dma_pcis_arready(cl_sh_dma_pcis_arready),
-
-    .cl_sh_dma_pcis_rid(cl_sh_dma_pcis_rid),
-    .cl_sh_dma_pcis_rdata(cl_sh_dma_pcis_rdata),
-    .cl_sh_dma_pcis_rresp(cl_sh_dma_pcis_rresp),
-    .cl_sh_dma_pcis_rlast(cl_sh_dma_pcis_rlast),
-    .cl_sh_dma_pcis_rvalid(cl_sh_dma_pcis_rvalid),
-    .sh_cl_dma_pcis_rready(sh_cl_dma_pcis_rready),
-
-    
-
-    .lcl_cl_sh_ddr0(lcl_cl_sh_ddr0),
-    .lcl_cl_sh_ddr1(lcl_cl_sh_ddr1),
-    .lcl_cl_sh_ddr2(lcl_cl_sh_ddr2),
+    .lcl_cl_sh_ddra(lcl_cl_sh_ddra),
+    .lcl_cl_sh_ddrb(lcl_cl_sh_ddrb),
+    .lcl_cl_sh_ddrd(lcl_cl_sh_ddrd),
 
     .sh_cl_dma_pcis_q(sh_cl_dma_pcis_q),
 
-    .cl_sh_ddr_awid     (cl_sh_ddr_awid),   
-    .cl_sh_ddr_awaddr   (cl_sh_ddr_awaddr), 
-    .cl_sh_ddr_awlen    (cl_sh_ddr_awlen),
-    .cl_sh_ddr_awsize   (cl_sh_ddr_awsize), 
-    .cl_sh_ddr_awvalid  (cl_sh_ddr_awvalid),
-    .sh_cl_ddr_awready  (sh_cl_ddr_awready),
-
-    .cl_sh_ddr_wid      (cl_sh_ddr_wid), 
-    .cl_sh_ddr_wdata    (cl_sh_ddr_wdata),  
-    .cl_sh_ddr_wstrb    (cl_sh_ddr_wstrb),  
-    .cl_sh_ddr_wlast    (cl_sh_ddr_wlast),  
-    .cl_sh_ddr_wvalid   (cl_sh_ddr_wvalid), 
-    .sh_cl_ddr_wready   (sh_cl_ddr_wready), 
-
-    .sh_cl_ddr_bid      (sh_cl_ddr_bid),    
-    .sh_cl_ddr_bresp    (sh_cl_ddr_bresp),  
-    .sh_cl_ddr_bvalid   (sh_cl_ddr_bvalid), 
-    .cl_sh_ddr_bready   (cl_sh_ddr_bready), 
-
-    .cl_sh_ddr_arid     (cl_sh_ddr_arid),   
-    .cl_sh_ddr_araddr   (cl_sh_ddr_araddr), 
-    .cl_sh_ddr_arlen    (cl_sh_ddr_arlen),
-    .cl_sh_ddr_arsize   (cl_sh_ddr_arsize),  
-    .cl_sh_ddr_arvalid  (cl_sh_ddr_arvalid),
-    .sh_cl_ddr_arready  (sh_cl_ddr_arready),
-
-    .sh_cl_ddr_rid      (sh_cl_ddr_rid),    
-    .sh_cl_ddr_rdata    (sh_cl_ddr_rdata),  
-    .sh_cl_ddr_rresp    (sh_cl_ddr_rresp),  
-    .sh_cl_ddr_rlast    (sh_cl_ddr_rlast),  
-    .sh_cl_ddr_rvalid   (sh_cl_ddr_rvalid), 
-    .cl_sh_ddr_rready   (cl_sh_ddr_rready)
+    .cl_sh_ddr_bus     (cl_sh_ddr_bus)
   );
 
-
+assign cl_sh_pcim_awid = cl_sh_pcim_bus.awid;
+assign cl_sh_pcim_awaddr = cl_sh_pcim_bus.awaddr;
+assign cl_sh_pcim_awlen = cl_sh_pcim_bus.awlen;
+assign cl_sh_pcim_awsize = cl_sh_pcim_bus.awsize;
+assign cl_sh_pcim_awvalid = cl_sh_pcim_bus.awvalid;
+assign cl_sh_pcim_bus.awready = sh_cl_pcim_awready;
+assign cl_sh_pcim_wdata = cl_sh_pcim_bus.wdata;
+assign cl_sh_pcim_wstrb = cl_sh_pcim_bus.wstrb;
+assign cl_sh_pcim_wlast = cl_sh_pcim_bus.wlast;
+assign cl_sh_pcim_wvalid = cl_sh_pcim_bus.wvalid;
+assign cl_sh_pcim_bus.wready = sh_cl_pcim_wready;
+assign cl_sh_pcim_bus.bid = sh_cl_pcim_bid;
+assign cl_sh_pcim_bus.bresp = sh_cl_pcim_bresp;
+assign cl_sh_pcim_bus.bvalid = sh_cl_pcim_bvalid;
+assign cl_sh_pcim_bready = cl_sh_pcim_bus.bready;
+assign cl_sh_pcim_arid = cl_sh_pcim_bus.arid;
+assign cl_sh_pcim_araddr = cl_sh_pcim_bus.araddr;
+assign cl_sh_pcim_arlen = cl_sh_pcim_bus.arlen;
+assign cl_sh_pcim_arsize = cl_sh_pcim_bus.arsize;
+assign cl_sh_pcim_arvalid = cl_sh_pcim_bus.arvalid;
+assign cl_sh_pcim_bus.arready = sh_cl_pcim_arready;
+assign cl_sh_pcim_bus.rid = sh_cl_pcim_rid;
+assign cl_sh_pcim_bus.rresp = sh_cl_pcim_rresp;
+assign cl_sh_pcim_bus.rvalid = sh_cl_pcim_rvalid;
+assign cl_sh_pcim_bus.rdata = sh_cl_pcim_rdata;
+assign cl_sh_pcim_bus.rlast = sh_cl_pcim_rlast;
+assign cl_sh_pcim_rready = cl_sh_pcim_bus.rready;
 cl_pcim_mstr CL_PCIM_MSTR (
 
      .aclk(clk),
@@ -286,35 +302,26 @@ cl_pcim_mstr CL_PCIM_MSTR (
 
      .cfg_bus(pcim_tst_cfg_bus),
 
-     .cl_sh_pcim_awid     (cl_sh_pcim_awid),   
-     .cl_sh_pcim_awaddr   (cl_sh_pcim_awaddr), 
-     .cl_sh_pcim_awlen    (cl_sh_pcim_awlen),
-     .cl_sh_pcim_awsize   (cl_sh_pcim_awsize), 
-     .cl_sh_pcim_awvalid  (cl_sh_pcim_awvalid),
-     .sh_cl_pcim_awready  (sh_cl_pcim_awready),
-     .cl_sh_pcim_wdata    (cl_sh_pcim_wdata),  
-     .cl_sh_pcim_wstrb    (cl_sh_pcim_wstrb),  
-     .cl_sh_pcim_wlast    (cl_sh_pcim_wlast),  
-     .cl_sh_pcim_wvalid   (cl_sh_pcim_wvalid), 
-     .sh_cl_pcim_wready   (sh_cl_pcim_wready), 
-     .sh_cl_pcim_bid      (sh_cl_pcim_bid),    
-     .sh_cl_pcim_bresp    (sh_cl_pcim_bresp),  
-     .sh_cl_pcim_bvalid   (sh_cl_pcim_bvalid), 
-     .cl_sh_pcim_bready   (cl_sh_pcim_bready), 
-     .cl_sh_pcim_arid     (cl_sh_pcim_arid),   
-     .cl_sh_pcim_araddr   (cl_sh_pcim_araddr), 
-     .cl_sh_pcim_arlen    (cl_sh_pcim_arlen),  
-     .cl_sh_pcim_arsize   (cl_sh_pcim_arsize),
-     .cl_sh_pcim_arvalid  (cl_sh_pcim_arvalid),
-     .sh_cl_pcim_arready  (sh_cl_pcim_arready),
-     .sh_cl_pcim_rid      (sh_cl_pcim_rid),    
-     .sh_cl_pcim_rdata    (sh_cl_pcim_rdata),  
-     .sh_cl_pcim_rresp    (sh_cl_pcim_rresp),  
-     .sh_cl_pcim_rlast    (sh_cl_pcim_rlast),  
-     .sh_cl_pcim_rvalid   (sh_cl_pcim_rvalid), 
-     .cl_sh_pcim_rready   (cl_sh_pcim_rready)
+     .cl_sh_pcim_bus     (cl_sh_pcim_bus)
 );
 
+assign sh_ocl_bus.awvalid = sh_ocl_awvalid;
+assign sh_ocl_bus.awaddr[31:0] = sh_ocl_awaddr;
+assign ocl_sh_awready = sh_ocl_bus.awready;
+assign sh_ocl_bus.wvalid = sh_ocl_wvalid;
+assign sh_ocl_bus.wdata[31:0] = sh_ocl_wdata;
+assign sh_ocl_bus.wstrb[3:0] = sh_ocl_wstrb;
+assign ocl_sh_wready = sh_ocl_bus.wready;
+assign ocl_sh_bvalid = sh_ocl_bus.bvalid;
+assign ocl_sh_bresp = sh_ocl_bus.bresp;
+assign sh_ocl_bus.bready = sh_ocl_bready;
+assign sh_ocl_bus.arvalid = sh_ocl_arvalid;
+assign sh_ocl_bus.araddr[31:0] = sh_ocl_araddr;
+assign ocl_sh_arready = sh_ocl_bus.arready;
+assign ocl_sh_rvalid = sh_ocl_bus.rvalid;
+assign ocl_sh_rresp = sh_ocl_bus.rresp;
+assign ocl_sh_rdata = sh_ocl_bus.rdata[31:0];
+assign sh_ocl_bus.rready = sh_ocl_rready;
 cl_ocl_slv CL_OCL_SLV (
 
    .clk(clk),
@@ -322,29 +329,13 @@ cl_ocl_slv CL_OCL_SLV (
 
    .sh_cl_flr_assert_q(sh_cl_flr_assert_q),
 
-   .sh_ocl_awaddr  (sh_ocl_awaddr),
-   .sh_ocl_awvalid (sh_ocl_awvalid),
-   .ocl_sh_awready (ocl_sh_awready),
-   .sh_ocl_wdata   (sh_ocl_wdata),
-   .sh_ocl_wstrb   (sh_ocl_wstrb),
-   .sh_ocl_wvalid  (sh_ocl_wvalid),
-   .ocl_sh_wready  (ocl_sh_wready),
-   .ocl_sh_bresp   (ocl_sh_bresp),
-   .ocl_sh_bvalid  (ocl_sh_bvalid),
-   .sh_ocl_bready  (sh_ocl_bready),
-   .sh_ocl_araddr  (sh_ocl_araddr),
-   .sh_ocl_arvalid (sh_ocl_arvalid),
-   .ocl_sh_arready (ocl_sh_arready),
-   .ocl_sh_rdata   (ocl_sh_rdata),
-   .ocl_sh_rresp   (ocl_sh_rresp),
-   .ocl_sh_rvalid  (ocl_sh_rvalid),
-   .sh_ocl_rready  (sh_ocl_rready),
+   .sh_ocl_bus  (sh_ocl_bus),
 
    .pcim_tst_cfg_bus(pcim_tst_cfg_bus),
-   .ddr0_tst_cfg_bus(ddr0_tst_cfg_bus),
-   .ddr1_tst_cfg_bus(ddr1_tst_cfg_bus),
-   .ddr2_tst_cfg_bus(ddr2_tst_cfg_bus),
-   .ddr3_tst_cfg_bus(ddr3_tst_cfg_bus),
+   .ddra_tst_cfg_bus(ddra_tst_cfg_bus),
+   .ddrb_tst_cfg_bus(ddrb_tst_cfg_bus),
+   .ddrc_tst_cfg_bus(ddrc_tst_cfg_bus),
+   .ddrd_tst_cfg_bus(ddrd_tst_cfg_bus),
    .int_tst_cfg_bus(int_tst_cfg_bus)
 
 );
@@ -396,6 +387,29 @@ lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK2 
                                                .in_bus({ddr_sh_stat_ack_q[2], ddr_sh_stat_int_q[2], ddr_sh_stat_rdata_q[2]}),
                                                .out_bus({ddr_sh_stat_ack2, ddr_sh_stat_int2, ddr_sh_stat_rdata2})
                                                ); 
+
+//assign statements to remove VCS warnings
+logic [15:0] sh_cl_ddr_bid_temp[2:0];
+logic [1:0] sh_cl_ddr_bresp_temp[2:0];
+logic [15:0] sh_cl_ddr_rid_temp[2:0];
+logic [511:0] sh_cl_ddr_rdata_temp[2:0];
+logic [1:0] sh_cl_ddr_rresp_temp[2:0];
+
+assign  lcl_cl_sh_ddra.bid = sh_cl_ddr_bid_temp[0];
+assign  lcl_cl_sh_ddrb.bid = sh_cl_ddr_bid_temp[1];
+assign  lcl_cl_sh_ddrd.bid = sh_cl_ddr_bid_temp[2];
+assign  lcl_cl_sh_ddra.bresp = sh_cl_ddr_bresp_temp[0];
+assign  lcl_cl_sh_ddrb.bresp = sh_cl_ddr_bresp_temp[1];
+assign  lcl_cl_sh_ddrd.bresp = sh_cl_ddr_bresp_temp[2];
+assign  lcl_cl_sh_ddra.rid = sh_cl_ddr_rid_temp[0];
+assign  lcl_cl_sh_ddrb.rid = sh_cl_ddr_rid_temp[1];
+assign  lcl_cl_sh_ddrd.rid = sh_cl_ddr_rid_temp[2];
+assign  lcl_cl_sh_ddra.rdata = sh_cl_ddr_rdata_temp[0];
+assign  lcl_cl_sh_ddrb.rdata = sh_cl_ddr_rdata_temp[1];
+assign  lcl_cl_sh_ddrd.rdata = sh_cl_ddr_rdata_temp[2];
+assign  lcl_cl_sh_ddra.rresp = sh_cl_ddr_rresp_temp[0];
+assign  lcl_cl_sh_ddrb.rresp = sh_cl_ddr_rresp_temp[1];
+assign  lcl_cl_sh_ddrd.rresp = sh_cl_ddr_rresp_temp[2];
  
 sh_ddr #(
          .DDR_A_PRESENT(DDR_A_PRESENT),
@@ -472,36 +486,36 @@ sh_ddr #(
    //------------------------------------------------------
    // DDR-4 Interface from CL (AXI-4)
    //------------------------------------------------------
-   .cl_sh_ddr_awid({lcl_cl_sh_ddr2.awid, lcl_cl_sh_ddr1.awid, lcl_cl_sh_ddr0.awid}),
-   .cl_sh_ddr_awaddr({lcl_cl_sh_ddr2.awaddr, lcl_cl_sh_ddr1.awaddr, lcl_cl_sh_ddr0.awaddr}),
-   .cl_sh_ddr_awlen({lcl_cl_sh_ddr2.awlen, lcl_cl_sh_ddr1.awlen, lcl_cl_sh_ddr0.awlen}),
-   .cl_sh_ddr_awvalid({lcl_cl_sh_ddr2.awvalid, lcl_cl_sh_ddr1.awvalid, lcl_cl_sh_ddr0.awvalid}),
-   .sh_cl_ddr_awready({lcl_cl_sh_ddr2.awready, lcl_cl_sh_ddr1.awready, lcl_cl_sh_ddr0.awready}),
+   .cl_sh_ddr_awid({lcl_cl_sh_ddrd.awid, lcl_cl_sh_ddrb.awid, lcl_cl_sh_ddra.awid}),
+   .cl_sh_ddr_awaddr({lcl_cl_sh_ddrd.awaddr, lcl_cl_sh_ddrb.awaddr, lcl_cl_sh_ddra.awaddr}),
+   .cl_sh_ddr_awlen({lcl_cl_sh_ddrd.awlen, lcl_cl_sh_ddrb.awlen, lcl_cl_sh_ddra.awlen}),
+   .cl_sh_ddr_awvalid({lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid}),
+   .sh_cl_ddr_awready({lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready}),
 
-   .cl_sh_ddr_wid({lcl_cl_sh_ddr2.wid, lcl_cl_sh_ddr1.wid, lcl_cl_sh_ddr0.wid}),
-   .cl_sh_ddr_wdata({lcl_cl_sh_ddr2.wdata, lcl_cl_sh_ddr1.wdata, lcl_cl_sh_ddr0.wdata}),
-   .cl_sh_ddr_wstrb({lcl_cl_sh_ddr2.wstrb, lcl_cl_sh_ddr1.wstrb, lcl_cl_sh_ddr0.wstrb}),
-   .cl_sh_ddr_wlast({lcl_cl_sh_ddr2.wlast, lcl_cl_sh_ddr1.wlast, lcl_cl_sh_ddr0.wlast}),
-   .cl_sh_ddr_wvalid({lcl_cl_sh_ddr2.wvalid, lcl_cl_sh_ddr1.wvalid, lcl_cl_sh_ddr0.wvalid}),
-   .sh_cl_ddr_wready({lcl_cl_sh_ddr2.wready, lcl_cl_sh_ddr1.wready, lcl_cl_sh_ddr0.wready}),
+   .cl_sh_ddr_wid({lcl_cl_sh_ddrd.wid, lcl_cl_sh_ddrb.wid, lcl_cl_sh_ddra.wid}),
+   .cl_sh_ddr_wdata({lcl_cl_sh_ddrd.wdata, lcl_cl_sh_ddrb.wdata, lcl_cl_sh_ddra.wdata}),
+   .cl_sh_ddr_wstrb({lcl_cl_sh_ddrd.wstrb, lcl_cl_sh_ddrb.wstrb, lcl_cl_sh_ddra.wstrb}),
+   .cl_sh_ddr_wlast({lcl_cl_sh_ddrd.wlast, lcl_cl_sh_ddrb.wlast, lcl_cl_sh_ddra.wlast}),
+   .cl_sh_ddr_wvalid({lcl_cl_sh_ddrd.wvalid, lcl_cl_sh_ddrb.wvalid, lcl_cl_sh_ddra.wvalid}),
+   .sh_cl_ddr_wready({lcl_cl_sh_ddrd.wready, lcl_cl_sh_ddrb.wready, lcl_cl_sh_ddra.wready}),
 
-   .sh_cl_ddr_bid({lcl_cl_sh_ddr2.bid, lcl_cl_sh_ddr1.bid, lcl_cl_sh_ddr0.bid}),
-   .sh_cl_ddr_bresp({lcl_cl_sh_ddr2.bresp, lcl_cl_sh_ddr1.bresp, lcl_cl_sh_ddr0.bresp}),
-   .sh_cl_ddr_bvalid({lcl_cl_sh_ddr2.bvalid, lcl_cl_sh_ddr1.bvalid, lcl_cl_sh_ddr0.bvalid}),
-   .cl_sh_ddr_bready({lcl_cl_sh_ddr2.bready, lcl_cl_sh_ddr1.bready, lcl_cl_sh_ddr0.bready}),
+   .sh_cl_ddr_bid(sh_cl_ddr_bid_temp),
+   .sh_cl_ddr_bresp(sh_cl_ddr_bresp_temp),
+   .sh_cl_ddr_bvalid({lcl_cl_sh_ddrd.bvalid, lcl_cl_sh_ddrb.bvalid, lcl_cl_sh_ddra.bvalid}),
+   .cl_sh_ddr_bready({lcl_cl_sh_ddrd.bready, lcl_cl_sh_ddrb.bready, lcl_cl_sh_ddra.bready}),
 
-   .cl_sh_ddr_arid({lcl_cl_sh_ddr2.arid, lcl_cl_sh_ddr1.arid, lcl_cl_sh_ddr0.arid}),
-   .cl_sh_ddr_araddr({lcl_cl_sh_ddr2.araddr, lcl_cl_sh_ddr1.araddr, lcl_cl_sh_ddr0.araddr}),
-   .cl_sh_ddr_arlen({lcl_cl_sh_ddr2.arlen, lcl_cl_sh_ddr1.arlen, lcl_cl_sh_ddr0.arlen}),
-   .cl_sh_ddr_arvalid({lcl_cl_sh_ddr2.arvalid, lcl_cl_sh_ddr1.arvalid, lcl_cl_sh_ddr0.arvalid}),
-   .sh_cl_ddr_arready({lcl_cl_sh_ddr2.arready, lcl_cl_sh_ddr1.arready, lcl_cl_sh_ddr0.arready}),
+   .cl_sh_ddr_arid({lcl_cl_sh_ddrd.arid, lcl_cl_sh_ddrb.arid, lcl_cl_sh_ddra.arid}),
+   .cl_sh_ddr_araddr({lcl_cl_sh_ddrd.araddr, lcl_cl_sh_ddrb.araddr, lcl_cl_sh_ddra.araddr}),
+   .cl_sh_ddr_arlen({lcl_cl_sh_ddrd.arlen, lcl_cl_sh_ddrb.arlen, lcl_cl_sh_ddra.arlen}),
+   .cl_sh_ddr_arvalid({lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid}),
+   .sh_cl_ddr_arready({lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready}),
 
-   .sh_cl_ddr_rid({lcl_cl_sh_ddr2.rid, lcl_cl_sh_ddr1.rid, lcl_cl_sh_ddr0.rid}),
-   .sh_cl_ddr_rdata({lcl_cl_sh_ddr2.rdata, lcl_cl_sh_ddr1.rdata, lcl_cl_sh_ddr0.rdata}),
-   .sh_cl_ddr_rresp({lcl_cl_sh_ddr2.rresp, lcl_cl_sh_ddr1.rresp, lcl_cl_sh_ddr0.rresp}),
-   .sh_cl_ddr_rlast({lcl_cl_sh_ddr2.rlast, lcl_cl_sh_ddr1.rlast, lcl_cl_sh_ddr0.rlast}),
-   .sh_cl_ddr_rvalid({lcl_cl_sh_ddr2.rvalid, lcl_cl_sh_ddr1.rvalid, lcl_cl_sh_ddr0.rvalid}),
-   .cl_sh_ddr_rready({lcl_cl_sh_ddr2.rready, lcl_cl_sh_ddr1.rready, lcl_cl_sh_ddr0.rready}),
+   .sh_cl_ddr_rid(sh_cl_ddr_rid_temp),
+   .sh_cl_ddr_rdata(sh_cl_ddr_rdata_temp),
+   .sh_cl_ddr_rresp(sh_cl_ddr_rresp_temp),
+   .sh_cl_ddr_rlast({lcl_cl_sh_ddrd.rlast, lcl_cl_sh_ddrb.rlast, lcl_cl_sh_ddra.rlast}),
+   .sh_cl_ddr_rvalid({lcl_cl_sh_ddrd.rvalid, lcl_cl_sh_ddrb.rvalid, lcl_cl_sh_ddra.rvalid}),
+   .cl_sh_ddr_rready({lcl_cl_sh_ddrd.rready, lcl_cl_sh_ddrb.rready, lcl_cl_sh_ddra.rready}),
 
    .sh_cl_ddr_is_ready(lcl_sh_cl_ddr_is_ready),
 
@@ -543,32 +557,29 @@ cl_int_slv CL_INT_TST
        
 );
 
+assign sda_cl_bus.awvalid = sda_cl_awvalid;
+assign sda_cl_bus.awaddr[31:0] = sda_cl_awaddr;
+assign cl_sda_awready = sda_cl_bus.awready;
+assign sda_cl_bus.wvalid = sda_cl_wvalid;
+assign sda_cl_bus.wdata[31:0] = sda_cl_wdata;
+assign sda_cl_bus.wstrb[3:0] = sda_cl_wstrb;
+assign cl_sda_wready = sda_cl_bus.wready;
+assign cl_sda_bvalid = sda_cl_bus.bvalid;
+assign cl_sda_bresp = sda_cl_bus.bresp;
+assign sda_cl_bus.bready = sda_cl_bready;
+assign sda_cl_bus.arvalid = sda_cl_arvalid;
+assign sda_cl_bus.araddr[31:0] = sda_cl_araddr;
+assign cl_sda_arready = sda_cl_bus.arready;
+assign cl_sda_rvalid = sda_cl_bus.rvalid;
+assign cl_sda_rresp = sda_cl_bus.rresp;
+assign cl_sda_rdata = sda_cl_bus.rdata[31:0];
+assign sda_cl_bus.rready = sda_cl_rready;
 cl_sda_slv CL_SDA_SLV (
 
   .aclk(clk),
   .aresetn(sync_rst_n),
   
-  .sda_cl_awvalid(sda_cl_awvalid), 
-  .sda_cl_awaddr(sda_cl_awaddr),
-  .cl_sda_awready(cl_sda_awready),
-      
-  .sda_cl_wvalid(sda_cl_wvalid),
-  .sda_cl_wdata(sda_cl_wdata),
-  .sda_cl_wstrb(sda_cl_wstrb),
-  .cl_sda_wready(cl_sda_wready),
-     
-  .cl_sda_bvalid(cl_sda_bvalid), 
-  .cl_sda_bresp(cl_sda_bresp),
-  .sda_cl_bready(sda_cl_bready),
-                 
-  .sda_cl_arvalid(sda_cl_arvalid),
-  .sda_cl_araddr(sda_cl_araddr),
-  .cl_sda_arready(cl_sda_arready),
-                    
-  .cl_sda_rvalid(cl_sda_rvalid),
-  .cl_sda_rdata(cl_sda_rdata),
-  .cl_sda_rresp(cl_sda_rresp),        
-  .sda_cl_rready(sda_cl_rready)
+  .sda_cl_bus(sda_cl_bus)
 );
 
 `ifndef DISABLE_CHIPSCOPE_DEBUG
@@ -591,7 +602,7 @@ cl_ila CL_ILA (
    .bscanid(bscanid),
  
    .sh_cl_dma_pcis_q(sh_cl_dma_pcis_q),
-   .lcl_cl_sh_ddr0(lcl_cl_sh_ddr0)
+   .lcl_cl_sh_ddra(lcl_cl_sh_ddra)
 
 );
 
