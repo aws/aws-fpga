@@ -10,14 +10,14 @@
 6. [Build Frequently Asked Questions] (#buildfaq)
 
 
-
-## Overview <a name="buildoverview"></a>
+<a name="buildoverview"></a>
+## Overview 
 
 Once the developer has a functional RTL design, the next steps are to: synthesize the design into basic FPGA cells, perform place-and-route, and check that the design meets the timing/frequency constraints. This could be an iterative process. Upon success, the developer will need to pass the output of the flow to AWS for final AFI creation.
 
-The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document) and [manifest](https://github.com/aws/aws-fpga/tree/master/hdk/docs/AFI_manifest.md): The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](https://github.com/aws/aws-fpga/tree/master/hdk/docs/AFI_manifest.md) should include key parameters needed for registering and loading the AFI like target frequency.
+The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document) and [manifest](./../../../../docs/AFI_Manifest.md): The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](./../../../../docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](./../../../../docs/AFI_manifest.md) should include key parameters needed for registering and loading the AFI like target frequency.
 
-Few reference [CL examples](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples) can serve as starting points for new designs.  
+Few reference [CL examples](./../../../../cl/examples) can serve as starting points for new designs.  
 
 AWS provides out-of-the-box generic script called `aws_build_dcp_from_cl.sh` that performs complete build process from RTL (verilog for example). The output of AWS-provided scripts will create a a tar file, with both the encrypted placed-and-routed DCP and the corresponding `manifest.txt`, which AWS will use to generate final bitstreams.
 
@@ -25,11 +25,12 @@ To ease and experiment with multiple implementation methods for DCP to meet plac
 
 Advanced developers can use different scripts, tools, and techniques (e.g., regioning),  with the  condition that they submit both the `manifest.txt` and **encrypted placed-and-routed design checkpoints (DCP)** in a single tar file, that passes final checks which are included in the build scripts.  (TBD - final_check_dcp).
 
-## Build Procedure <a name="stepbystep"></a>
+<a name="stepbystep"></a>
+## Build Procedure 
 
 The following describes the step-by-step procedure to build developer CLs. Some of these steps can be modified or adjusted based on developer experience and design needs. 
 
-A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` which validates that the environment variables and directory structure is set properly, setup the build directory, invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL), create the [`manifest.txt`](https://github.com/aws/aws-fpga/tree/master/hdk/docs/AFI_manifest.md) that AWS will ingest through the `create-fpga-mage` EC2 API. Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
+A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` which validates that the environment variables and directory structure is set properly, setup the build directory, invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL), create the [`manifest.txt`](./../../../../docs/AFI_Manifest.md) that AWS will ingest through the `create-fpga-mage` EC2 API. Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
 
 ### 1) Pre-requisite: Environment Variables and Tools
 
@@ -37,7 +38,7 @@ A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` 
  
  2. The environment variable `CL_DIR` should have been set pointing to the root directory where the CL exists. The CL root directory should have the `/build` and `/design` subdirectories. One way to make sure to have the right directory is to execute `source $(HDK_DIR)/cl/developer_designs/prepare_new_cl.sh`
  
- 3. Developer have Xilinx Vivado tools installed, with the supported version by the HDK, and with proper license. If the developer is using AWS supplied [FPGA Development AMI](https://aws.amazon.com/marketplace/AmazonFPGAAmi) from AWS marketplace, it already include Vivado tools and license.  
+ 3. Developer have Xilinx Vivado tools installed, with the supported version by the HDK, and with proper license. If the developer is using AWS supplied [FPGA Development AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) from AWS marketplace, it already include Vivado tools and license.  
 
 ### 2) Encrypt Source Files
 
@@ -50,7 +51,7 @@ Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` script to include:
  2. The list of CL specific timing and placement constraints in `$CL_DIR/build/constraints`.
  3. The specific constraints and design file for IP any included in your CL (e.g., DDR4).
 
-### 4) Build <a name="strategies"></a>
+### 4) Build 
 
 Run the build script, aws_build_dcp_from_cl.sh, from the `$CL_DIR/build/scripts` directory.
 
@@ -59,7 +60,9 @@ The build script performs:
  - Implementation of CL with AWS Shell.
  - Generation of Design Checkpoint (DCP) for AWS ingestion with the associated logs.
  - Generation of the corresponding manifest.txt.
-  
+ 
+<a name="strategies"></a>
+#### Build Strategies
 In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy. The strategies are described in more detail below.
 
 Build script usage:
@@ -112,13 +115,13 @@ You need to prepare the following information:
 
 1. Name of the logic design *(Optional)*.
 2. Generic description of the logic design *(Optional)*.
-3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor (See https://github.com/aws/aws-fpga/blob/master/hdk/docs/Choosing_PCIe_ID_for_AFI.md)
+3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor (See [Choosing PCI IDs](./../../../../docs/Choosing_PCIe_ID_for_AFI.md)).
 4. Location of the tarball file object in S3.
 5. Location of an S3 directory where AWS would write back logs of the AFI creation *(Optional)*. This would be required to get the **.ltx** file needed if Virtual JTAG and Xilinx LIA/VIO debug cores to be used.
 6. Update mandatory parameters in the [manifest file](./../../../../docs/AFI_Manifest.md)
 
 **NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.*
-If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
+If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#pcie-ids).
 
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
@@ -202,17 +205,19 @@ AWS script `./aws_build_dcp_from_cl.sh` offers an optional flag to set one of a 
 
 If you are running on one of the EC2 compute instances with 31GiB DRAM or more, you could run multiple builds concurrently for the same CL, but calling the build script multiple times with different `-strategy` options, taking advantage of the large vCPU count typically available on EC2 instances, as each build would typically consume between 1 to 8 vCPUs throughout the entire run of a given build.
 
-## About Encryption <a name="buildencryption"></a>
+<a name="buildencryption"></a>
+## About Encryption 
 
 Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
 
-
-## Advanced Notes <a name="buildadvanced notes"></a>
+<a name="buildadvanced notes"></a>
+## Advanced Notes 
 
 * The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, rejoining) to the flow.
-* Developers are free to modify the flow, but the final output must be a tar file with manifest.txt and the combined (AWS Shell + CL), encrypted, placed-and-routed design checkpoint,.
+* Developers are free to modify the flow, but the final output must be a tar file with manifest.txt and the combined (AWS Shell + CL), encrypted, placed-and-routed design checkpoint.
 
-# Frequently Asked Questions <a name="buildfaq"></a>
+<a name="buildfaq"></a>
+# Frequently Asked Questions 
 
 
 1. What are the different files that a developer needs to provide to AWS?
