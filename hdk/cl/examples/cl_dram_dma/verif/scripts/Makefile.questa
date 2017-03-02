@@ -1,0 +1,23 @@
+##################################################################
+## Makefile For Questa compiles and simulations
+## Step to run :
+## 1. make create_libs QUESTA=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all QUESTA=1  -> Runs the test
+##################################################################
+
+compile: $(COMPLIB_DIR)
+	mkdir -p $(SIM_DIR)
+	cd ${SIM_DIR} && ln -s -f ../questa_complib/modelsim.ini 
+	cd $(SIM_DIR) && vlog $(C_TEST_NAME) -ccflags "-I$(C_INC_DIR)"
+	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
+
+run:
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -do "run -all; quit -f" tb glbl $(TEST)
+
+$(COMPLIB_DIR):
+	cd $(SIM_ROOT)/.. && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT)/.. && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT)/.. && rm -rf create_libs.tcl 
+
+
