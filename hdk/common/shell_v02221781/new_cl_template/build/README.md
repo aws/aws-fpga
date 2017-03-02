@@ -6,7 +6,7 @@
 2. [Build procedure step by step] (#stepbystep)
 3. [Build strategies and parallel builds] (#strategies)
 4. [About Encrption during build process] (#buildencryption)
-5. [Advanced Notes] (#buildadvanced notes)
+5. [Advanced Notes] (#buildadvanced)
 6. [Build Frequently Asked Questions] (#buildfaq)
 
 
@@ -58,6 +58,9 @@ The build script performs:
  - Generation of Design Checkpoint (DCP) for AWS ingestion with the associated logs.
  - Generation of the corresponding manifest.txt.
   
+<a name="strategies"></a>
+#### Build Strategies
+
 In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy. The strategies are described in more detail below.
 
 Build script usage:
@@ -110,7 +113,7 @@ You need to prepare the following information:
 
 1. Name of the logic design *(Optional)*.
 2. Generic description of the logic design *(Optional)*.
-3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor.
+3. Updated mandatory parameters in the [manifest file](./../../../../docs/AFI_Manifest.md).
 4. Location of the tarball file object in S3.
 5. Location of an S3 directory where AWS would write back logs of the AFI creation.
 6. Version of the AWS Shell.
@@ -205,7 +208,7 @@ If you are running on one of the EC2 compute instances with 31GiB DRAM or more, 
 Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
 
 
-## Advanced Notes <a name="buildadvancednotes"></a>
+## Advanced Notes <a name="buildadvanced"></a>
 
 * The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, rejoining) to the flow.
 * Developers are free to modify the flow, but the final output must be a tar file with manifest.txt and the combined (AWS Shell + CL), encrypted, placed-and-routed design checkpoint,.
