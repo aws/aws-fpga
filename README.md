@@ -107,4 +107,4 @@ Now that you have built an AFI, or if you want to use one of the example pre-bui
 ## Need to build a new Custom Logic and register it as an AFI?<a name="clExamples"></a>
 
 The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 F1 instance.
-
+ 
