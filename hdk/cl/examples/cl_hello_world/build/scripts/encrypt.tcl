@@ -20,6 +20,9 @@ set CL_DIR $::env(CL_DIR)
 file copy -force $CL_DIR/design/cl_hello_world_defines.vh $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_hello_world.sv $CL_DIR/build/src_post_encryption
 
+# Make sure files have write permissions for the encryption
+exec chmod +w {*}[glob ../src_post_encryption/*.*v*]
+
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
 $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh \
 $CL_DIR/build/src_post_encryption/cl_hello_world.sv

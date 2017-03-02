@@ -177,13 +177,29 @@
    // to the sh_ddr.sv for the DDR interfaces to function.
    //-----------------------------------------------------------------------------
    ,
-   input [7:0] sh_ddr_stat_addr[2:0],
-   input[2:0] sh_ddr_stat_wr, 
-   input[2:0] sh_ddr_stat_rd, 
-   input [31:0] sh_ddr_stat_wdata[2:0], 
-   output logic[2:0] ddr_sh_stat_ack,
-   output logic[31:0] ddr_sh_stat_rdata[2:0],
-   output logic[7:0] ddr_sh_stat_int[2:0],
+   input [7:0] sh_ddr_stat_addr0,
+   input sh_ddr_stat_wr0, 
+   input sh_ddr_stat_rd0, 
+   input [31:0] sh_ddr_stat_wdata0,
+   output logic ddr_sh_stat_ack0,
+   output logic[31:0] ddr_sh_stat_rdata0,
+   output logic[7:0] ddr_sh_stat_int0,
+
+   input [7:0] sh_ddr_stat_addr1,
+   input sh_ddr_stat_wr1, 
+   input sh_ddr_stat_rd1, 
+   input [31:0] sh_ddr_stat_wdata1,
+   output logic ddr_sh_stat_ack1,
+   output logic[31:0] ddr_sh_stat_rdata1,
+   output logic[7:0] ddr_sh_stat_int1,
+
+   input [7:0] sh_ddr_stat_addr2,
+   input sh_ddr_stat_wr2, 
+   input sh_ddr_stat_rd2, 
+   input [31:0] sh_ddr_stat_wdata2,
+   output logic ddr_sh_stat_ack2,
+   output logic[31:0] ddr_sh_stat_rdata2,
+   output logic[7:0] ddr_sh_stat_int2,
 
    //-----------------------------------------------------------------------------------
    // AXI4 Interface for DDR_C 
@@ -522,6 +538,10 @@
    input capture,
    output logic[31:0] bscanid
 `endif
+
+   ,
+   input[63:0] sh_cl_glcount0,                  //Global counter 0
+   input[63:0] sh_cl_glcount1                   //Global counter 1
 
 
 

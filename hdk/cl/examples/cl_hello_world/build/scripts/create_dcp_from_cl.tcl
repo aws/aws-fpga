@@ -122,6 +122,7 @@ read_ip [ list \
   $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
   $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
   $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
+  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
 ]
 
@@ -133,8 +134,8 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_clocks_aws.xdc - AWS provided clock constraint.     ***DO NOT MODIFY***
 #  cl_ddr.xdc        - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]

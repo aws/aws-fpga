@@ -18,30 +18,41 @@ set CL_DIR $::env(CL_DIR)
 
 ## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.
 file copy -force $CL_DIR/design/cl_dram_dma_defines.vh $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_dram_dma_pkg.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_dram_dma.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_tst.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_int_tst.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/mem_scrb.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_tst_scrb.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/axil_slave.sv $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/src_register_slice/src_register_slice.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/dest_register_slice/dest_register_slice.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_crossbar_0.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_register_slice_v2_1_vl_rfs.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_crossbar_v2_1_vl_rfs.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_data_fifo_v2_1_vl_rfs.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_infrastructure_v1_1_0.vh $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/axi_infrastructure_v1_1_vl_rfs.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/generic_baseblocks_v2_1_vl_rfs.v $CL_DIR/build/src_post_encryption
-file copy -force $CL_DIR/design/axi_crossbar_0/fifo_generator_v13_1_rfs.v $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_int_slv.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_mstr_axi_tst.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_pcim_mstr.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_vio.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_dma_pcis_slv.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_ila.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_ocl_slv.sv $CL_DIR/build/src_post_encryption
+file copy -force $CL_DIR/design/cl_sda_slv.sv $CL_DIR/build/src_post_encryption
 
+# Make sure files have write permissions for the encryption
+exec chmod +w {*}[glob ../src_post_encryption/*.*v*]
 
-#encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
-#$CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh \
-#$CL_DIR/build/src_post_encryption/cl_dram_dma.sv \
-#$CL_DIR/build/src_post_encryption/cl_tst.sv  \
-#$CL_DIR/build/src_post_encryption/mem_scrb.sv  \
-#$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv  \
-#$CL_DIR/build/src_post_encryption/cl_int_tst.sv  
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
+$CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh \
+$CL_DIR/build/src_post_encryption/cl_dram_dma_pkg.sv \
+$CL_DIR/build/src_post_encryption/cl_dram_dma.sv \
+$CL_DIR/build/src_post_encryption/cl_tst.sv \
+$CL_DIR/build/src_post_encryption/cl_int_tst.sv \
+$CL_DIR/build/src_post_encryption/mem_scrb.sv \
+$CL_DIR/build/src_post_encryption/cl_tst_scrb.sv \
+$CL_DIR/build/src_post_encryption/axil_slave.sv \
+$CL_DIR/build/src_post_encryption/cl_int_slv.sv \
+$CL_DIR/build/src_post_encryption/cl_mstr_axi_tst.sv \
+$CL_DIR/build/src_post_encryption/cl_pcim_mstr.sv \
+$CL_DIR/build/src_post_encryption/cl_vio.sv \
+$CL_DIR/build/src_post_encryption/cl_dma_pcis_slv.sv \
+$CL_DIR/build/src_post_encryption/cl_ila.sv \
+$CL_DIR/build/src_post_encryption/cl_ocl_slv.sv \
+$CL_DIR/build/src_post_encryption/cl_sda_slv.sv
 
 #---- End of section replaced by Developr ---
