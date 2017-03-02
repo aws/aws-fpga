@@ -50,7 +50,7 @@ Modify the `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` script to include:
  2. The list of CL specific timing and placement constraints in `$CL_DIR/build/constraints`.
  3. The specific constraints and design file for IP any included in your CL (e.g., DDR4).
 
-### 4) Build 
+### 4) Build <a name="strategies"></a>
 
 Run the build script, aws_build_dcp_from_cl.sh, from the `$CL_DIR/build/scripts` directory.
 
@@ -115,7 +115,7 @@ You need to prepare the following information:
 3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor (See https://github.com/aws/aws-fpga/blob/master/hdk/docs/Choosing_PCIe_ID_for_AFI.md)
 4. Location of the tarball file object in S3.
 5. Location of an S3 directory where AWS would write back logs of the AFI creation *(Optional)*. This would be required to get the **.ltx** file needed if Virtual JTAG and Xilinx LIA/VIO debug cores to be used.
-6. Version of the AWS Shell. (Eventually AWS will use the shell_version in the manifest.txt and ignore the parameter passed to create-fpga-image)
+6. Update mandatory parameters in the [manifest file](./../../../../docs/AFI_Manifest.md)
 
 **NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.*
 If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
@@ -171,11 +171,9 @@ Below is a sample policy.
         ]
     }
 
-To create an AFI execute the `create-fpga-image` command as follows:
+To create an AFI execute, make sure you update needed parameters in the [manifest file](./../../../../docs/AFI_Manifest.md) and then call the `create-fpga-image` command as follows:
 
     $ aws ec2 create-fpga-image \
-        --shell-version <shell_version> \
-        --fpga-pci-id DeviceId=<device_id>,VendorId=<vendor_id>,SubsystemId=<subsystem_id>,SubsystemVendorId=<subsystem_vendor_id> \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name <cl-name> \
         --description <description> \
@@ -209,7 +207,7 @@ If you are running on one of the EC2 compute instances with 31GiB DRAM or more, 
 Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
 
 
-## Advanced Notes <a name="buildadvancednotes"></a>
+## Advanced Notes <a name="buildadvanced notes"></a>
 
 * The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, rejoining) to the flow.
 * Developers are free to modify the flow, but the final output must be a tar file with manifest.txt and the combined (AWS Shell + CL), encrypted, placed-and-routed design checkpoint,.
