@@ -15,7 +15,7 @@
 
 Once the developer has a functional RTL design, the next steps are to: synthesize the design into basic FPGA cells, perform place-and-route, and check that the design meets the timing/frequency constraints. This could be an iterative process. Upon success, the developer will need to pass the output of the flow to AWS for final AFI creation.
 
-The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document) and [manifest](./../../../../docs/AFI_Manifest.md): The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](./../../../../docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](./../../../../docs/AFI_manifest.md) should include key parameters needed for registering and loading the AFI like target frequency.
+The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document) and [manifest](./../../../../docs/AFI_Manifest.md): The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](./../../../../docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](./../../../../docs/AFI_Manifest.md) should include key parameters needed for registering and loading the AFI like target frequency.
 
 Few reference [CL examples](./../../../../cl/examples) can serve as starting points for new designs.  
 
@@ -63,7 +63,7 @@ The build script performs:
  
 <a name="strategies"></a>
 #### Build Strategies
-In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy. The strategies are described in more detail below.
+In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that to try a different strategy, or even run a few strategies in parallel to save time. The strategies are described in more detail below.
 
 Build script usage:
 
