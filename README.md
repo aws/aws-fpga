@@ -62,8 +62,12 @@ During the preview access period to start using the FPGA developer AMI your AWS 
 
 ## Developer Support <a name="devSupport"></a>
 
-[**AWS FPGA Users' Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Note that in some cases you will need to logout using the logout button on the forums page and log back in to see the "Your Stuff" details. Please email these to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
+[**AWS FPGA Users' Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and read announcements from the F1 team. To gain access to the user forum:
 
+* Login to https://forums.aws.amazon.com/index.jspa 
+* During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Email your userID to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access. 
+* To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
+* In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
  
 # Quick Start <a name="quickstart"></a>
 
@@ -91,8 +95,6 @@ $ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (
 $ aws s3 cp *.Developer_CL.tar \                # Step 10: Upload the file to S3
          s3://<bucket-name>/
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
-        --shell-version 0x11241611 \
-        --fpga-pci-id DeviceId=0x1d50,VendorId=0x6789,SubsystemId=0x1d51,SubsystemVendorId=0xfedc \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name MyFirstDCP \ 
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
