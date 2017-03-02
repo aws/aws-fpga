@@ -91,8 +91,6 @@ $ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (
 $ aws s3 cp *.Developer_CL.tar \                # Step 10: Upload the file to S3
          s3://<bucket-name>/
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
-        --shell-version 0x11241611 \
-        --fpga-pci-id DeviceId=0x1d50,VendorId=0x6789,SubsystemId=0x1d51,SubsystemVendorId=0xfedc \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name MyFirstDCP \ 
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
