@@ -2,7 +2,7 @@
 
 This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the memory space of the CL inside the FPGA.
 
-Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](https://github.com/aws/aws-fpga/blob/master/hdk/cl/examples/README.md).
+Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
 ##Meta-data about this CL
 
