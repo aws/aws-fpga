@@ -67,7 +67,7 @@ axi_bus_t cl_sh_pcim_q();
      .aresetn        (aresetn),
      .sync_rst_n     (1'b1),
                                                                                                                          
-     .s_axi_awid     ({10'b0, cl_sh_pcim_q.awid[5:0]}),
+     .s_axi_awid     ({7'b0, cl_sh_pcim_q.awid[8:0]}),
      .s_axi_awaddr   (cl_sh_pcim_q.awaddr),
      .s_axi_awlen    (cl_sh_pcim_q.awlen),
      .s_axi_awuser   (1'b0),
