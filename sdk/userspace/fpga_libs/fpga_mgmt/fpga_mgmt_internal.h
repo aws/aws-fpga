@@ -31,9 +31,15 @@
 
 #define CLI_INTERNAL_ERR_STR "Error: Internal error "
 
+/** F1 Mailbox PF defines */
+#define F1_MBOX_VENDOR_ID		0x1d0f
+#define F1_MBOX_DEVICE_ID		0x1041
+#define F1_MBOX_RESOURCE_NUM	0
+
 extern struct fgpa_mgmt_state_s {
-	bool plat_attached;
-	int slot_id;
+	struct {
+		pci_bar_handle_t handle;
+	} slots[FPGA_SLOT_MAX];
 	uint32_t timeout;
 	uint32_t delay_msec;
 } fpga_mgmt_state;
@@ -50,3 +56,13 @@ void fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len);
 int
 fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 	struct afi_cmd_metrics_rsp **metrics);
+
+int fpga_mgmt_detach_all(void);
+
+#define fail_slot_id(slot_id, label, ret) do {               \
+	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX) {           \
+		log_error("slot_id is out of range: %d", slot_id);   \
+		ret = -EINVAL;                                       \
+		goto label;                                          \
+	}	                                                     \
+} while (0)

@@ -27,14 +27,16 @@ fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_hand
 	int rc;
 	struct fpga_slot_spec spec;
 
+	if (!handle || pf_id < 0 || pf_id >= FPGA_MAX_PF) {
+		return -EINVAL;
+	}
+
 	memset(&spec, 0, sizeof(struct fpga_slot_spec));
 
-	rc = fpga_pci_get_slot_spec(slot_id, pf_id, bar_id, &spec);
+	rc = fpga_pci_get_slot_spec(slot_id, &spec);
 	fail_on(rc, out, "Unable to prefill the slot spec\n");
-	spec.map.resource_num = bar_id;
 
-	return fpga_plat_dev_attach(&spec, handle);
-
+	return fpga_plat_dev_attach(&spec, pf_id, bar_id, handle);
 out:
 	return 1;
 }
@@ -51,6 +53,9 @@ fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value) {
 
 int
 fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value) {
+	(void) handle;
+	(void) offset;
+	(void) value;
 	/* not implemened */
 	return 1;
 }
@@ -62,11 +67,18 @@ fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
 
 int
 fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
+	(void) handle;
+	(void) offset;
+	(void) value;
 	/* not implemented */
 	return 1;
 }
 
 int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len) {
+	(void) handle;
+	(void) offset;
+	(void) datap;
+	(void) dword_len;
 	/* not implemented */
 	return 1;
 }
