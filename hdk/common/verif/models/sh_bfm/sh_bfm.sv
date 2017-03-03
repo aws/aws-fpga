@@ -1706,67 +1706,70 @@ module sh_bfm #(
          logic [63:0] host_memory;
          int num_of_data_beats = 0;
          int byte_cnt = 0;
-         bit aligned = 0;
          int num_bytes = 0;
-         logic [5:0] aligned_addr = 0;
+         logic [63:0] aligned_addr = 0;
+         bit last_beat = 0;
+         logic [5:0] start_addr = 0;
+         bit aligned = 0;
          
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
          
-              aligned_addr = (dop.cl_addr[5:0]/64) * 64;
+              aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
-              num_of_data_beats = (num_of_data_beats > 3) ? 3 : num_of_data_beats;
-              num_of_data_beats = num_of_data_beats + (dop.len/256);
               byte_cnt = 0;
-              aligned = (aligned_addr == dop.cl_addr[5:0]);
-              
-              for(int burst_cnt=0; burst_cnt < num_of_data_beats; burst_cnt++) begin
+              last_beat = ((dop.len + dop.cl_addr[5:0])%64 > 0);
+              start_addr = dop.cl_addr[5:0];
+              aligned = (aligned_addr == dop.cl_addr);
+
+              for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = 0;
-                  axi_cmd.id   = chan;
-                  sh_cl_wr_cmds.push_back(axi_cmd);
-                  axi_data.strb = 64'b0;
-                  axi_data.id   = chan;
-                  for(int i=dop.cl_addr[5:0]; i < 64; i++) begin
-                    axi_data.data = {tb.hm_get_byte(.addr(dop.buffer + byte_cnt)), axi_data.data[511:8]};
-                    axi_data.strb = {1'b1, axi_data.strb[63:1]};
-                    byte_cnt++;
+                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
+                    axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
                 end
                 else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
-                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = 0;
-                  axi_cmd.id   = chan;
-                  sh_cl_wr_cmds.push_back(axi_cmd);
+                end
+                else begin                                              // intermediate data beats
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  end
+                end
+                axi_cmd.id   = chan;
+                sh_cl_wr_cmds.push_back(axi_cmd);
+
+                for(int j = 0; j <= axi_cmd.len; j++) begin
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
-                  num_bytes = aligned ? 64 : (dop.cl_addr[5:0] - aligned_addr);
-                  for(int i=0; i < num_bytes; i++) begin
-                    axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
-                    axi_data.strb = axi_data.strb | 1 << i;
-                    byte_cnt++;
-                  end 
-                end
-                else begin                                              // intermediate data beats
-                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
-                  axi_cmd.len  = num_of_data_beats - 3;
-                  axi_cmd.id   = chan;
-                  sh_cl_wr_cmds.push_back(axi_cmd);
-                  axi_data.data = 0;
-                  axi_data.strb = 64'h0;
-                  axi_data.id   = chan;
-                  for(int i=0; i < 64; i++) begin
-                    axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
-                    axi_data.strb = axi_data.strb | 1 << i;
-                    byte_cnt++;
+                  axi_data.last = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
+                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
+                  if(axi_data.last)  begin
+                    for(int i=0; i < num_bytes; i++) begin
+                      axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
+                      axi_data.strb = axi_data.strb | 1 << i;
+                      byte_cnt++;
+                    end
                   end
-                end
-                axi_data.last = ((num_of_data_beats - 1) - burst_cnt == 0) ? 1 : 0;              
-                sh_cl_wr_data.push_back(axi_data);
-              end // for(int burst_cnt=0; burst_cnt < num_of_data_beats; burst_cnt++)
+                  else begin
+                    for(int i=start_addr[5:0]; i < 64; i++) begin
+                      axi_data.data = {tb.hm_get_byte(.addr(dop.buffer + byte_cnt)), axi_data.data[511:8]};
+                      axi_data.strb = {1'b1, axi_data.strb[63:1]};
+                      byte_cnt++;
+                    end
+                  end
+                  sh_cl_wr_data.push_back(axi_data);
+                  start_addr = 0;
+                  burst_cnt++;
+                end // for(int j = 0; j <= axi_cmd.len; j++) begin
+              end // for(int burst_cnt=0; burst_cnt < num_of_data_beats; )
            end // if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0))
          end // for (int chan = 0; chan < 4; chan++)
       end // else
@@ -1824,35 +1827,48 @@ module sh_bfm #(
          DMA_OP      dop;
          DMA_OP      data_dop;
          int num_of_data_beats = 0;
-         logic [5:0] aligned_addr = 0;
+         bit aligned = 0;
+         logic [63:0] aligned_addr = 0;
+         bit last_beat = 0;
 
          for (int chan = 0; chan < 4; chan++) begin
            if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
               dop = c2h_dma_list[chan].pop_front();
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
-              aligned_addr = (dop.cl_addr[5:0]/64) * 64;
+              aligned_addr =  {dop.cl_addr[63:6], 6'h00};
+              aligned = (aligned_addr == dop.cl_addr);
+              last_beat = ((dop.len + dop.cl_addr[5:0])%64 > 0);
 
-              for(int burst_cnt=0; burst_cnt < num_of_data_beats; burst_cnt++) begin
+              for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = 0;
+                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
+                    axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
+                  end
                   axi_cmd.id   = chan;
                 end
                 else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
-                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = 0;
                   axi_cmd.id   = chan;
                 end
                 else begin                                              // intermediate data beats
-                  axi_cmd.addr = {dop.cl_addr[63:6], (aligned_addr[5:0] + (burst_cnt * 64))};
-                  axi_cmd.len  = num_of_data_beats - 3;
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  end
                   axi_cmd.id   = chan;
                 end
                 sh_cl_rd_cmds.push_back(axi_cmd);
-                data_dop.buffer = dop.buffer;
-                data_dop.cl_addr = axi_cmd.addr;
-                data_dop.len = dop.len;
-                c2h_data_dma_list[chan].push_back(data_dop);
+                for(int i = 0; i <= axi_cmd.len; i++) begin
+                  data_dop.buffer = dop.buffer;
+                  data_dop.cl_addr = (axi_cmd.addr + (i*64));
+                  data_dop.len = dop.len;
+                  c2h_data_dma_list[chan].push_back(data_dop);
+                  burst_cnt++;
+                end
               end
            end
          end
