@@ -3,7 +3,7 @@ module cl_sda_slv (
    input aclk,
    input aresetn,
 
-   axi_bus_t sda_cl_bus
+   axi_bus_t.master sda_cl_bus
 
 );
 

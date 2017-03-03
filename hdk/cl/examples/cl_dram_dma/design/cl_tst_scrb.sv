@@ -69,21 +69,21 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    output [10:0]                     slv_ruser,
    input logic                       slv_rready,
    
-   output logic [5:0]                awid,
+   output logic [8:0]                awid,
    output logic [63:0]               awaddr,
    output logic [7:0]                awlen,
    output logic                      awvalid,
    output logic [10:0]               awuser,
    input                             awready,
 
-   output logic [5:0]                wid,
+   output logic [8:0]                wid,
    output logic [DATA_WIDTH-1:0]     wdata,
    output logic [(DATA_WIDTH/8)-1:0] wstrb,
    output logic                      wlast,
    output logic                      wvalid,
    input                             wready,
 
-   input [5:0]                       bid,
+   input [8:0]                       bid,
    input [1:0]                       bresp,
    input                             bvalid,
    input [17:0]                      buser, //This is specific to HMC, other interfaces should tie to '0'
@@ -226,21 +226,21 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    
    
    // Instance cl_tst
-   logic [5:0]                       atg_awid;
+   logic [8:0]                       atg_awid;
    logic [63:0]                      atg_awaddr;
    logic [7:0]                       atg_awlen;
    logic                             atg_awvalid;
    logic [10:0]                       atg_awuser;
    logic                             atg_awready;
 
-   logic [5:0]                       atg_wid;
+   logic [8:0]                       atg_wid;
    logic [DATA_WIDTH-1:0]            atg_wdata;
    logic [(DATA_WIDTH/8)-1:0]        atg_wstrb;
    logic                             atg_wlast;
    logic                             atg_wvalid;
    logic                             atg_wready;
 
-   logic [5:0]                       atg_bid;
+   logic [8:0]                       atg_bid;
    logic [1:0]                       atg_bresp;
    logic                             atg_bvalid;
    logic [17:0]                      atg_buser; //This is specific to HMC; other interfaces should tie to '0'
@@ -318,7 +318,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
 
 assign awid    = scrb_enable ? scrb_awid    : 
                  atg_enable  ? atg_awid     :
-                 slv_awid    ;
+                 {3'b0, slv_awid}    ;
 assign awaddr  = scrb_enable ? scrb_awaddr  : 
                  atg_enable  ? atg_awaddr   :
                  slv_awaddr;
@@ -337,7 +337,7 @@ assign slv_awready = ~atg_enable & ~scrb_enable & awready;
 
 assign wid     = scrb_enable ? scrb_wid    : 
                  atg_enable  ? atg_wid     :
-                 slv_wid   ;
+                 {3'b0, slv_wid}   ;
 assign wdata   = scrb_enable ? scrb_wdata  : 
                  atg_enable  ? atg_wdata   :
                  slv_wdata;

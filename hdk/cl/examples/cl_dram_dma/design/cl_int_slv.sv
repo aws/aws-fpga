@@ -3,7 +3,7 @@ module cl_int_slv (
    input clk,
    input rst_n,
 
-   cfg_bus_t cfg_bus,
+   cfg_bus_t.master cfg_bus,
 
    input [15:0] sh_cl_apppf_irq_ack,
    output logic [15:0] cl_sh_apppf_irq_req

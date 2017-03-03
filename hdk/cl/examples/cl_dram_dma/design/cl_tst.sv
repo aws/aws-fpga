@@ -18,21 +18,21 @@ module  cl_tst #(parameter DATA_WIDTH=512, parameter NUM_RD_TAG=512) (
 
    output logic atg_enable,
 
-   output logic[5:0] awid,
+   output logic[8:0] awid,
    output logic[63:0] awaddr,
    output logic[7:0] awlen,
    output logic awvalid,
    output logic[10:0] awuser,
    input awready,
 
-   output logic[5:0] wid,
+   output logic[8:0] wid,
    output logic[DATA_WIDTH-1:0] wdata = 0,
    output logic[(DATA_WIDTH/8)-1:0] wstrb = 0,
    output logic wlast,
    output logic wvalid,
    input wready,
 
-   input[5:0] bid,
+   input[8:0] bid,
    input[1:0] bresp,
    input bvalid,
    input[17:0] buser,                  //This is specific to HMC, other interfaces should tie to '0'
@@ -188,6 +188,7 @@ always_ff @(negedge rst_n or posedge clk)
 //       15:8 - Last data adj -- Number of DW to adj last data phase (0 means all DW are valid, 1 means all but 1DW valid, etc...)
 //       31:16 - User
 //
+// Offset 0x30: 0 - A value of 1 will drive ATG transactions to DDR. A value of 0 will drive PCIS/XDMA transactions to DDR.
 // Offset 0x3c: Read Index - Read instruction index
 // Offset 0x40: Read address low - REad instruction address
 // Offset 0x44: Read address high - REad instruction address

@@ -11,28 +11,30 @@ module cl_dma_pcis_slv #(parameter SCRB_MAX_ADDR = 64'h3FFFFFFFF, parameter SCRB
     input aclk,
     input aresetn,
 
-    cfg_bus_t ddra_tst_cfg_bus,
-    cfg_bus_t ddrb_tst_cfg_bus,
-    cfg_bus_t ddrc_tst_cfg_bus,
-    cfg_bus_t ddrd_tst_cfg_bus,
+    cfg_bus_t.master ddra_tst_cfg_bus,
+    cfg_bus_t.master ddrb_tst_cfg_bus,
+    cfg_bus_t.master ddrc_tst_cfg_bus,
+    cfg_bus_t.master ddrd_tst_cfg_bus,
 
-    scrb_bus_t ddra_scrb_bus,
-    scrb_bus_t ddrb_scrb_bus,
-    scrb_bus_t ddrc_scrb_bus,
-    scrb_bus_t ddrd_scrb_bus,
+    scrb_bus_t.master ddra_scrb_bus,
+    scrb_bus_t.master ddrb_scrb_bus,
+    scrb_bus_t.master ddrc_scrb_bus,
+    scrb_bus_t.master ddrd_scrb_bus,
 
-    axi_bus_t sh_cl_dma_pcis_bus,
+    axi_bus_t.master sh_cl_dma_pcis_bus,
 
-    axi_bus_t lcl_cl_sh_ddra,
-    axi_bus_t lcl_cl_sh_ddrb,
-    axi_bus_t lcl_cl_sh_ddrd,
+    axi_bus_t.slave lcl_cl_sh_ddra,
+    axi_bus_t.slave lcl_cl_sh_ddrb,
+    axi_bus_t.slave lcl_cl_sh_ddrd,
 
     axi_bus_t sh_cl_dma_pcis_q,
 
-    axi_bus_t cl_sh_ddr_bus
+    axi_bus_t.slave cl_sh_ddr_bus
 
  
 );
+localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
+localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
 
 //---------------------------- 
 // Internal signals
@@ -50,7 +52,16 @@ axi_bus_t cl_sh_ddr_q();
 axi_bus_t cl_sh_ddr_q2();
 axi_bus_t cl_sh_ddr_q3();
 axi_bus_t sh_cl_pcis();
+    
+cfg_bus_t ddra_tst_cfg_bus_q();
+cfg_bus_t ddrb_tst_cfg_bus_q();
+cfg_bus_t ddrc_tst_cfg_bus_q();
+cfg_bus_t ddrd_tst_cfg_bus_q();
 
+scrb_bus_t ddra_scrb_bus_q();
+scrb_bus_t ddrb_scrb_bus_q();
+scrb_bus_t ddrc_scrb_bus_q();
+scrb_bus_t ddrd_scrb_bus_q();
 
 //---------------------------- 
 // End Internal signals
@@ -402,7 +413,24 @@ axi_bus_t sh_cl_pcis();
    );
 
 
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_SH_DDR_ATG)) PIPE_CFG_REQ_DDR_C (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrc_tst_cfg_bus.addr, ddrc_tst_cfg_bus.wdata, ddrc_tst_cfg_bus.wr, ddrc_tst_cfg_bus.rd}),
+                                                              .out_bus({ddrc_tst_cfg_bus_q.addr, ddrc_tst_cfg_bus_q.wdata, ddrc_tst_cfg_bus_q.wr, ddrc_tst_cfg_bus_q.rd})
+                                                              );
+      
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_SH_DDR_ATG)) PIPE_CFG_ACK_DDR_C (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrc_tst_cfg_bus_q.ack, ddrc_tst_cfg_bus_q.rdata}),
+                                                              .out_bus({ddrc_tst_cfg_bus.ack, ddrc_tst_cfg_bus.rdata})
+                                                              );
 
+
+   lib_pipe #(.WIDTH(2+3+64), .STAGES(NUM_CFG_STGS_SH_DDR_ATG)) PIPE_SCRB_DDR_C (.clk(aclk), 
+                                                              .rst_n(aresetn),
+                                                              .in_bus({ddrc_scrb_bus.enable, ddrc_scrb_bus_q.done, ddrc_scrb_bus_q.state, ddrc_scrb_bus_q.addr}),
+                                                              .out_bus({ddrc_scrb_bus_q.enable, ddrc_scrb_bus.done, ddrc_scrb_bus.state, ddrc_scrb_bus.addr})
+                                                              );
    cl_tst_scrb #(.DATA_WIDTH(512),
                     .SCRB_BURST_LEN_MINUS1(SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(SCRB_MAX_ADDR),
@@ -411,12 +439,12 @@ axi_bus_t sh_cl_pcis();
          .clk(aclk),
          .rst_n(aresetn),
 
-         .cfg_addr(ddrc_tst_cfg_bus.addr),
-         .cfg_wdata(ddrc_tst_cfg_bus.wdata),
-         .cfg_wr(ddrc_tst_cfg_bus.wr),
-         .cfg_rd(ddrc_tst_cfg_bus.rd),
-         .tst_cfg_ack(ddrc_tst_cfg_bus.ack),
-         .tst_cfg_rdata(ddrc_tst_cfg_bus.rdata), 
+         .cfg_addr(ddrc_tst_cfg_bus_q.addr),
+         .cfg_wdata(ddrc_tst_cfg_bus_q.wdata),
+         .cfg_wr(ddrc_tst_cfg_bus_q.wr),
+         .cfg_rd(ddrc_tst_cfg_bus_q.rd),
+         .tst_cfg_ack(ddrc_tst_cfg_bus_q.ack),
+         .tst_cfg_rdata(ddrc_tst_cfg_bus_q.rdata), 
 
          .slv_awid(cl_sh_ddr_q2.awid[5:0]),
          .slv_awaddr(cl_sh_ddr_q2.awaddr), 
@@ -454,7 +482,7 @@ axi_bus_t sh_cl_pcis();
          .slv_rready(cl_sh_ddr_q2.rready),
 
                                                
-         .awid(cl_sh_ddr_q3.awid[5:0]),
+         .awid(cl_sh_ddr_q3.awid[8:0]),
          .awaddr(cl_sh_ddr_q3.awaddr), 
          .awlen(cl_sh_ddr_q3.awlen),
          .awvalid(cl_sh_ddr_q3.awvalid),
@@ -469,7 +497,7 @@ axi_bus_t sh_cl_pcis();
          .wvalid(cl_sh_ddr_q3.wvalid),
          .wready(cl_sh_ddr_q3.wready),
 
-         .bid(cl_sh_ddr_q3.bid[5:0]),
+         .bid(cl_sh_ddr_q3.bid[8:0]),
          .bresp(cl_sh_ddr_q3.bresp),
          .buser(18'h0),
          .bvalid(cl_sh_ddr_q3.bvalid),
@@ -490,11 +518,11 @@ axi_bus_t sh_cl_pcis();
          .rvalid(cl_sh_ddr_q3.rvalid),
          .rready(cl_sh_ddr_q3.rready),
 
-         .scrb_enable(ddrc_scrb_bus.enable),
-         .scrb_done  (ddrc_scrb_bus.done),
+         .scrb_enable(ddrc_scrb_bus_q.enable),
+         .scrb_done  (ddrc_scrb_bus_q.done),
 
-         .scrb_dbg_state(ddrc_scrb_bus.state),
-         .scrb_dbg_addr (ddrc_scrb_bus.addr)
+         .scrb_dbg_state(ddrc_scrb_bus_q.state),
+         .scrb_dbg_addr (ddrc_scrb_bus_q.addr)
    );
 
    axi4_flop_fifo #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_C_TST_AXI4_REG_SLC_1 (
@@ -732,6 +760,25 @@ axi_bus_t sh_cl_pcis();
        .m_axi_rready   (lcl_cl_sh_ddra_q3.rready)
        );
 
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_A (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddra_tst_cfg_bus.addr, ddra_tst_cfg_bus.wdata, ddra_tst_cfg_bus.wr, ddra_tst_cfg_bus.rd}),
+                                                              .out_bus({ddra_tst_cfg_bus_q.addr, ddra_tst_cfg_bus_q.wdata, ddra_tst_cfg_bus_q.wr, ddra_tst_cfg_bus_q.rd})
+                                                              );
+      
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_ACK_DDR_A (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddra_tst_cfg_bus_q.ack, ddra_tst_cfg_bus_q.rdata}),
+                                                              .out_bus({ddra_tst_cfg_bus.ack, ddra_tst_cfg_bus.rdata})
+                                                              );
+
+
+   lib_pipe #(.WIDTH(2+3+64), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_SCRB_DDR_A (.clk(aclk), 
+                                                              .rst_n(aresetn),
+                                                              .in_bus({ddra_scrb_bus.enable, ddra_scrb_bus_q.done, ddra_scrb_bus_q.state, ddra_scrb_bus_q.addr}),
+                                                              .out_bus({ddra_scrb_bus_q.enable, ddra_scrb_bus.done, ddra_scrb_bus.state, ddra_scrb_bus.addr})
+                                                              );
+
    cl_tst_scrb #(.DATA_WIDTH(512),
                     .SCRB_BURST_LEN_MINUS1(SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(SCRB_MAX_ADDR),
@@ -740,12 +787,12 @@ axi_bus_t sh_cl_pcis();
          .clk(aclk),
          .rst_n(aresetn),
 
-         .cfg_addr(ddra_tst_cfg_bus.addr),
-         .cfg_wdata(ddra_tst_cfg_bus.wdata),
-         .cfg_wr(ddra_tst_cfg_bus.wr),
-         .cfg_rd(ddra_tst_cfg_bus.rd),
-         .tst_cfg_ack(ddra_tst_cfg_bus.ack),
-         .tst_cfg_rdata(ddra_tst_cfg_bus.rdata),
+         .cfg_addr(ddra_tst_cfg_bus_q.addr),
+         .cfg_wdata(ddra_tst_cfg_bus_q.wdata),
+         .cfg_wr(ddra_tst_cfg_bus_q.wr),
+         .cfg_rd(ddra_tst_cfg_bus_q.rd),
+         .tst_cfg_ack(ddra_tst_cfg_bus_q.ack),
+         .tst_cfg_rdata(ddra_tst_cfg_bus_q.rdata),
 
          .slv_awid(lcl_cl_sh_ddra_q3.awid[5:0]),
          .slv_awaddr(lcl_cl_sh_ddra_q3.awaddr), 
@@ -783,21 +830,21 @@ axi_bus_t sh_cl_pcis();
          .slv_rready(lcl_cl_sh_ddra_q3.rready),
 
    
-         .awid(lcl_cl_sh_ddra.awid[5:0]),
+         .awid(lcl_cl_sh_ddra.awid[8:0]),
          .awaddr(lcl_cl_sh_ddra.awaddr), 
          .awlen(lcl_cl_sh_ddra.awlen),
          .awvalid(lcl_cl_sh_ddra.awvalid),
          .awuser(),
          .awready(lcl_cl_sh_ddra.awready),
 
-         .wid(lcl_cl_sh_ddra.wid[5:0]),
+         .wid(lcl_cl_sh_ddra.wid[8:0]),
          .wdata(lcl_cl_sh_ddra.wdata),
          .wstrb(lcl_cl_sh_ddra.wstrb),
          .wlast(lcl_cl_sh_ddra.wlast),
          .wvalid(lcl_cl_sh_ddra.wvalid),
          .wready(lcl_cl_sh_ddra.wready),
 
-         .bid(lcl_cl_sh_ddra.bid[5:0]),
+         .bid(lcl_cl_sh_ddra.bid[8:0]),
          .bresp(lcl_cl_sh_ddra.bresp),
          .buser(18'h0),
          .bvalid(lcl_cl_sh_ddra.bvalid),
@@ -818,14 +865,14 @@ axi_bus_t sh_cl_pcis();
          .rvalid(lcl_cl_sh_ddra.rvalid),
          .rready(lcl_cl_sh_ddra.rready),
 
-         .scrb_enable(ddra_scrb_bus.enable),
-         .scrb_done  (ddra_scrb_bus.done),
+         .scrb_enable(ddra_scrb_bus_q.enable),
+         .scrb_done  (ddra_scrb_bus_q.done),
 
-         .scrb_dbg_state(ddra_scrb_bus.state),
-         .scrb_dbg_addr (ddra_scrb_bus.addr)
+         .scrb_dbg_state(ddra_scrb_bus_q.state),
+         .scrb_dbg_addr (ddra_scrb_bus_q.addr)
       );
-      assign lcl_cl_sh_ddra.awid[15:6] = 10'b0;
-      assign lcl_cl_sh_ddra.wid[15:6] = 10'b0;
+      assign lcl_cl_sh_ddra.awid[15:9] = 7'b0;
+      assign lcl_cl_sh_ddra.wid[15:9] = 7'b0;
       assign lcl_cl_sh_ddra.arid[15:9] = 7'b0;
 
 
@@ -995,6 +1042,25 @@ axi_bus_t sh_cl_pcis();
        .m_axi_rready   (lcl_cl_sh_ddrb_q3.rready)
        );
 
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_B (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrb_tst_cfg_bus.addr, ddrb_tst_cfg_bus.wdata, ddrb_tst_cfg_bus.wr, ddrb_tst_cfg_bus.rd}),
+                                                              .out_bus({ddrb_tst_cfg_bus_q.addr, ddrb_tst_cfg_bus_q.wdata, ddrb_tst_cfg_bus_q.wr, ddrb_tst_cfg_bus_q.rd})
+                                                              );
+      
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_ACK_DDR_B (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrb_tst_cfg_bus_q.ack, ddrb_tst_cfg_bus_q.rdata}),
+                                                              .out_bus({ddrb_tst_cfg_bus.ack, ddrb_tst_cfg_bus.rdata})
+                                                              );
+
+
+   lib_pipe #(.WIDTH(2+3+64), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_SCRB_DDR_B (.clk(aclk), 
+                                                              .rst_n(aresetn),
+                                                              .in_bus({ddrb_scrb_bus.enable, ddrb_scrb_bus_q.done, ddrb_scrb_bus_q.state, ddrb_scrb_bus_q.addr}),
+                                                              .out_bus({ddrb_scrb_bus_q.enable, ddrb_scrb_bus.done, ddrb_scrb_bus.state, ddrb_scrb_bus.addr})
+                                                              );
+
    cl_tst_scrb #(.DATA_WIDTH(512),
                     .SCRB_BURST_LEN_MINUS1(SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(SCRB_MAX_ADDR),
@@ -1003,12 +1069,12 @@ axi_bus_t sh_cl_pcis();
          .clk(aclk),
          .rst_n(aresetn),
 
-         .cfg_addr(ddrb_tst_cfg_bus.addr),
-         .cfg_wdata(ddrb_tst_cfg_bus.wdata),
-         .cfg_wr(ddrb_tst_cfg_bus.wr),
-         .cfg_rd(ddrb_tst_cfg_bus.rd),
-         .tst_cfg_ack(ddrb_tst_cfg_bus.ack),
-         .tst_cfg_rdata(ddrb_tst_cfg_bus.rdata),
+         .cfg_addr(ddrb_tst_cfg_bus_q.addr),
+         .cfg_wdata(ddrb_tst_cfg_bus_q.wdata),
+         .cfg_wr(ddrb_tst_cfg_bus_q.wr),
+         .cfg_rd(ddrb_tst_cfg_bus_q.rd),
+         .tst_cfg_ack(ddrb_tst_cfg_bus_q.ack),
+         .tst_cfg_rdata(ddrb_tst_cfg_bus_q.rdata),
 
          .slv_awid(lcl_cl_sh_ddrb_q3.awid[5:0]),
          .slv_awaddr(lcl_cl_sh_ddrb_q3.awaddr), 
@@ -1046,21 +1112,21 @@ axi_bus_t sh_cl_pcis();
          .slv_rready(lcl_cl_sh_ddrb_q3.rready),
 
    
-         .awid(lcl_cl_sh_ddrb.awid[5:0]),
+         .awid(lcl_cl_sh_ddrb.awid[8:0]),
          .awaddr(lcl_cl_sh_ddrb.awaddr), 
          .awlen(lcl_cl_sh_ddrb.awlen),
          .awvalid(lcl_cl_sh_ddrb.awvalid),
          .awuser(),
          .awready(lcl_cl_sh_ddrb.awready),
 
-         .wid(lcl_cl_sh_ddrb.wid[5:0]),
+         .wid(lcl_cl_sh_ddrb.wid[8:0]),
          .wdata(lcl_cl_sh_ddrb.wdata),
          .wstrb(lcl_cl_sh_ddrb.wstrb),
          .wlast(lcl_cl_sh_ddrb.wlast),
          .wvalid(lcl_cl_sh_ddrb.wvalid),
          .wready(lcl_cl_sh_ddrb.wready),
 
-         .bid(lcl_cl_sh_ddrb.bid[5:0]),
+         .bid(lcl_cl_sh_ddrb.bid[8:0]),
          .bresp(lcl_cl_sh_ddrb.bresp),
          .buser(18'h0),
          .bvalid(lcl_cl_sh_ddrb.bvalid),
@@ -1081,14 +1147,14 @@ axi_bus_t sh_cl_pcis();
          .rvalid(lcl_cl_sh_ddrb.rvalid),
          .rready(lcl_cl_sh_ddrb.rready),
 
-         .scrb_enable(ddrb_scrb_bus.enable),
-         .scrb_done  (ddrb_scrb_bus.done),
+         .scrb_enable(ddrb_scrb_bus_q.enable),
+         .scrb_done  (ddrb_scrb_bus_q.done),
 
-         .scrb_dbg_state(ddrb_scrb_bus.state),
-         .scrb_dbg_addr (ddrb_scrb_bus.addr)
+         .scrb_dbg_state(ddrb_scrb_bus_q.state),
+         .scrb_dbg_addr (ddrb_scrb_bus_q.addr)
       );
-      assign lcl_cl_sh_ddrb.awid[15:6] = 10'b0;
-      assign lcl_cl_sh_ddrb.wid[15:6] = 10'b0;
+      assign lcl_cl_sh_ddrb.awid[15:9] = 7'b0;
+      assign lcl_cl_sh_ddrb.wid[15:9] = 7'b0;
       assign lcl_cl_sh_ddrb.arid[15:9] = 7'b0;
 
 
@@ -1259,6 +1325,25 @@ axi_bus_t sh_cl_pcis();
        .m_axi_rready   (lcl_cl_sh_ddrd_q3.rready)
        );
 
+   lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_D (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrd_tst_cfg_bus.addr, ddrd_tst_cfg_bus.wdata, ddrd_tst_cfg_bus.wr, ddrd_tst_cfg_bus.rd}),
+                                                              .out_bus({ddrd_tst_cfg_bus_q.addr, ddrd_tst_cfg_bus_q.wdata, ddrd_tst_cfg_bus_q.wr, ddrd_tst_cfg_bus_q.rd})
+                                                              );
+      
+   lib_pipe #(.WIDTH(32+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_ACK_DDR_D (.clk (aclk), 
+                                                              .rst_n (aresetn), 
+                                                              .in_bus({ddrd_tst_cfg_bus_q.ack, ddrd_tst_cfg_bus_q.rdata}),
+                                                              .out_bus({ddrd_tst_cfg_bus.ack, ddrd_tst_cfg_bus.rdata})
+                                                              );
+
+
+   lib_pipe #(.WIDTH(2+3+64), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_SCRB_DDR_D (.clk(aclk), 
+                                                              .rst_n(aresetn),
+                                                              .in_bus({ddrd_scrb_bus.enable, ddrd_scrb_bus_q.done, ddrd_scrb_bus_q.state, ddrd_scrb_bus_q.addr}),
+                                                              .out_bus({ddrd_scrb_bus_q.enable, ddrd_scrb_bus.done, ddrd_scrb_bus.state, ddrd_scrb_bus.addr})
+                                                              );
+
    cl_tst_scrb #(.DATA_WIDTH(512),
                     .SCRB_BURST_LEN_MINUS1(SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(SCRB_MAX_ADDR),
@@ -1267,12 +1352,12 @@ axi_bus_t sh_cl_pcis();
          .clk(aclk),
          .rst_n(aresetn),
 
-         .cfg_addr(ddrd_tst_cfg_bus.addr),
-         .cfg_wdata(ddrd_tst_cfg_bus.wdata),
-         .cfg_wr(ddrd_tst_cfg_bus.wr),
-         .cfg_rd(ddrd_tst_cfg_bus.rd),
-         .tst_cfg_ack(ddrd_tst_cfg_bus.ack),
-         .tst_cfg_rdata(ddrd_tst_cfg_bus.rdata),
+         .cfg_addr(ddrd_tst_cfg_bus_q.addr),
+         .cfg_wdata(ddrd_tst_cfg_bus_q.wdata),
+         .cfg_wr(ddrd_tst_cfg_bus_q.wr),
+         .cfg_rd(ddrd_tst_cfg_bus_q.rd),
+         .tst_cfg_ack(ddrd_tst_cfg_bus_q.ack),
+         .tst_cfg_rdata(ddrd_tst_cfg_bus_q.rdata),
 
          .slv_awid(lcl_cl_sh_ddrd_q3.awid[5:0]),
          .slv_awaddr(lcl_cl_sh_ddrd_q3.awaddr), 
@@ -1310,21 +1395,21 @@ axi_bus_t sh_cl_pcis();
          .slv_rready(lcl_cl_sh_ddrd_q3.rready),
 
    
-         .awid(lcl_cl_sh_ddrd.awid[5:0]),
+         .awid(lcl_cl_sh_ddrd.awid[8:0]),
          .awaddr(lcl_cl_sh_ddrd.awaddr), 
          .awlen(lcl_cl_sh_ddrd.awlen),
          .awvalid(lcl_cl_sh_ddrd.awvalid),
          .awuser(),
          .awready(lcl_cl_sh_ddrd.awready),
 
-         .wid(lcl_cl_sh_ddrd.wid[5:0]),
+         .wid(lcl_cl_sh_ddrd.wid[8:0]),
          .wdata(lcl_cl_sh_ddrd.wdata),
          .wstrb(lcl_cl_sh_ddrd.wstrb),
          .wlast(lcl_cl_sh_ddrd.wlast),
          .wvalid(lcl_cl_sh_ddrd.wvalid),
          .wready(lcl_cl_sh_ddrd.wready),
 
-         .bid(lcl_cl_sh_ddrd.bid[5:0]),
+         .bid(lcl_cl_sh_ddrd.bid[8:0]),
          .bresp(lcl_cl_sh_ddrd.bresp),
          .buser(18'h0),
          .bvalid(lcl_cl_sh_ddrd.bvalid),
@@ -1345,14 +1430,14 @@ axi_bus_t sh_cl_pcis();
          .rvalid(lcl_cl_sh_ddrd.rvalid),
          .rready(lcl_cl_sh_ddrd.rready),
 
-         .scrb_enable(ddrd_scrb_bus.enable),
-         .scrb_done  (ddrd_scrb_bus.done),
+         .scrb_enable(ddrd_scrb_bus_q.enable),
+         .scrb_done  (ddrd_scrb_bus_q.done),
 
-         .scrb_dbg_state(ddrd_scrb_bus.state),
-         .scrb_dbg_addr (ddrd_scrb_bus.addr)
+         .scrb_dbg_state(ddrd_scrb_bus_q.state),
+         .scrb_dbg_addr (ddrd_scrb_bus_q.addr)
       );
-      assign lcl_cl_sh_ddrd.awid[15:6] = 10'b0;
-      assign lcl_cl_sh_ddrd.wid[15:6] = 10'b0;
+      assign lcl_cl_sh_ddrd.awid[15:9] = 7'b0;
+      assign lcl_cl_sh_ddrd.wid[15:9] = 7'b0;
       assign lcl_cl_sh_ddrd.arid[15:9] = 7'b0;
 
 

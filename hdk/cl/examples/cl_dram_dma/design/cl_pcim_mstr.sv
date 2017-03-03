@@ -2,9 +2,9 @@ module cl_pcim_mstr (
    input aclk,
    input aresetn,
 
-   cfg_bus_t cfg_bus,
+   cfg_bus_t.master cfg_bus,
 
-   axi_bus_t cl_sh_pcim_bus
+   axi_bus_t.slave cl_sh_pcim_bus
 
 );
 
@@ -24,7 +24,7 @@ axi_bus_t cl_sh_pcim_q();
 
          .atg_enable(),
   
-         .awid(cl_sh_pcim_q.awid[5:0]),
+         .awid(cl_sh_pcim_q.awid[8:0]),
          .awaddr(cl_sh_pcim_q.awaddr), 
          .awlen(cl_sh_pcim_q.awlen),
          .awvalid(cl_sh_pcim_q.awvalid),
@@ -38,7 +38,7 @@ axi_bus_t cl_sh_pcim_q();
          .wvalid(cl_sh_pcim_q.wvalid),
          .wready(cl_sh_pcim_q.wready),
 
-         .bid(cl_sh_pcim_q.bid[5:0]),
+         .bid(cl_sh_pcim_q.bid[8:0]),
          .bresp(cl_sh_pcim_q.bresp),
          .bvalid(cl_sh_pcim_q.bvalid),
          .buser(18'h0),
@@ -84,7 +84,7 @@ axi_bus_t cl_sh_pcim_q();
      .s_axi_buser    (),
      .s_axi_bvalid   (cl_sh_pcim_q.bvalid),
      .s_axi_bready   (cl_sh_pcim_q.bready),
-     .s_axi_arid     ({10'b0, cl_sh_pcim_q.arid[5:0]}),
+     .s_axi_arid     ({7'b0, cl_sh_pcim_q.arid[8:0]}),
      .s_axi_araddr   (cl_sh_pcim_q.araddr),
      .s_axi_arlen    (cl_sh_pcim_q.arlen),
      .s_axi_aruser   (1'b0),

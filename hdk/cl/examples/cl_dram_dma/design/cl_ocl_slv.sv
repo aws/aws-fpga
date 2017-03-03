@@ -5,14 +5,14 @@ module cl_ocl_slv (
 
    input sh_cl_flr_assert_q,
 
-   axi_bus_t sh_ocl_bus,
+   axi_bus_t.master sh_ocl_bus,
 
-   cfg_bus_t pcim_tst_cfg_bus,
-   cfg_bus_t ddra_tst_cfg_bus,
-   cfg_bus_t ddrb_tst_cfg_bus,
-   cfg_bus_t ddrc_tst_cfg_bus,
-   cfg_bus_t ddrd_tst_cfg_bus,
-   cfg_bus_t int_tst_cfg_bus
+   cfg_bus_t.slave pcim_tst_cfg_bus,
+   cfg_bus_t.slave ddra_tst_cfg_bus,
+   cfg_bus_t.slave ddrb_tst_cfg_bus,
+   cfg_bus_t.slave ddrc_tst_cfg_bus,
+   cfg_bus_t.slave ddrd_tst_cfg_bus,
+   cfg_bus_t.slave int_tst_cfg_bus
 
 );
 
