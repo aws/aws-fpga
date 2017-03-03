@@ -217,7 +217,7 @@ err:
 }
 
 int
-fpga_pci_get_slot_spec(int slot_id, int pf_id, int bar_id, struct fpga_slot_spec *spec)
+fpga_pci_get_slot_spec(int slot_id, int pf_id, struct fpga_slot_spec *spec)
 {
 	bool found_afi_slot = false;
 	char *path = "/sys/bus/pci/devices";
@@ -262,7 +262,6 @@ fpga_pci_get_slot_spec(int slot_id, int pf_id, int bar_id, struct fpga_slot_spec
 	fail_on_user(!found_afi_slot, err, "No fpga-image-slots found");
 
 	*spec = search_spec;
-	spec->map.resource_num = bar_id;
 	spec->map.func = pf_id;
 	return 0;
 

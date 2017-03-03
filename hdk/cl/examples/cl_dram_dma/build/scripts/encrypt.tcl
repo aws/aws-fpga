@@ -34,6 +34,9 @@ file copy -force $CL_DIR/design/cl_ila.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_ocl_slv.sv $CL_DIR/build/src_post_encryption
 file copy -force $CL_DIR/design/cl_sda_slv.sv $CL_DIR/build/src_post_encryption
 
+# Make sure files have write permissions for the encryption
+exec chmod +w {*}[glob ../src_post_encryption/*.*v*]
+
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
 $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh \
 $CL_DIR/build/src_post_encryption/cl_dram_dma_pkg.sv \
@@ -51,6 +54,5 @@ $CL_DIR/build/src_post_encryption/cl_dma_pcis_slv.sv \
 $CL_DIR/build/src_post_encryption/cl_ila.sv \
 $CL_DIR/build/src_post_encryption/cl_ocl_slv.sv \
 $CL_DIR/build/src_post_encryption/cl_sda_slv.sv
-
 
 #---- End of section replaced by Developr ---

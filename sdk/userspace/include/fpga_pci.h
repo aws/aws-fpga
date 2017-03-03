@@ -142,4 +142,4 @@ int fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value);
  * @param[out] spec     Pointer to fpga_slot spec to populate
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_get_slot_spec(int slot_id, int pf_id, int bar_id, struct fpga_slot_spec *spec);
+int fpga_pci_get_slot_spec(int slot_id, int pf_id, struct fpga_slot_spec *spec);

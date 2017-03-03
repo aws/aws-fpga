@@ -14,7 +14,6 @@ module test_dram_dma();
     int            len2 = 6000;
     int            len3 = 300;
 
-   
     initial begin
 
        logic [63:0] host_memory_buffer_address;
