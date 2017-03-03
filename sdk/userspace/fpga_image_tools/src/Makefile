@@ -30,7 +30,7 @@ UTILLCDLIB = $(LIB_PATH)/libutils.a
 FPGAHALLIB = $(LIB_PATH)/libfpga_hal_mbox.a $(LIB_PATH)/libfpga_hal_reg.a $(LIB_PATH)/libfpga_hal_plat.a
 LIBS=$(UTILLCDLIB) $(FPGAHALLIB)
 
-SRC = $(wildcard *.c)
+SRC = fpga_local_cmd.c fpga_local_cmd_parse.c
 OBJ = $(SRC:.c=.o)
 BIN = fpga-local-cmd
 

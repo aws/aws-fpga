@@ -26,7 +26,7 @@ INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_
 #OPT=-O2
 CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
-SRC = fpga_hal_mbox.c fpga_hal_mbox_private.c   
+SRC = fpga_hal_mbox.c
 OBJ = $(SRC:.c=.o)
 FPGAHALLIB = $(HALLIB_PATH)/libfpga_hal_mbox.a
 
