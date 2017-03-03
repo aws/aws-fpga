@@ -53,7 +53,7 @@ module test_dram_dma();
        end
 
        host_memory_buffer_address = 64'h0_0000_6000;
-       tb.que_buffer_to_cl(.chan(2), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0000), .len(len2) );  // move buffer to DDR 0
+       tb.que_buffer_to_cl(.chan(2), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0005), .len(len2) );  // move buffer to DDR 0
 
        for (int i = 0 ; i < len2 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hCC));
