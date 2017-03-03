@@ -14,10 +14,10 @@ EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined 
 
 ############
 
+<a name="howIKnow"></a>
+**Q: How do I know if the EDMA driver is available and installed?** 
 
-**Q: How do I know if the EDMA driver is available and installed?** <a name="howIKnow"></a>
-
-Amazon EDMA driver could be already installed in latest releases of various Linux distributions and in [AWS FPGA Development AMI available at AWS Marketplace](./TBD)
+Amazon EDMA driver could be already installed in latest releases of various Linux distributions and in [AWS FPGA Development AMI available at AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
 To make sure the driver is installed run next command from your linux shell:
   `$ lsmod | grep edma`
@@ -28,8 +28,8 @@ If running, the device /dev/fpgaX(X=0..7) represents an FPGA device in slot X, a
 
 The developer can operate these DMA queues and interrupts directly from Linux userspace application.
 
-
-**Q: How do I get the source code of the `edma` driver and compile it?** <a name="howToCompile"></a>
+<a name="howToCompile"></a>
+**Q: How do I get the source code of the `edma` driver and compile it?** 
 
 Amazon `edma` driver is included in [AWS FPGA SDK](https://github.com/aws/aws-fpga/master/blob/sdk/kernel_drivers/edma) for integration with other Linux distributions, please follow the next set of steps:
 
@@ -96,8 +96,8 @@ The next set of steps will installing the kernel driver so it get called everyti
 
 ***NOTE:*** *steps 3 and 4 would need to be repeated for every kernel update*.  
   
-  
-**Q: How can I make sure the installed driver will be preserved following a kernel update?** <a name="howToUpdateKernel"></a>  
+<a name="howToUpdateKernel"></a>  
+**Q: How can I make sure the installed driver will be preserved following a kernel update?**   
 
 __*Step A*__ **Get DKMS**  
 
@@ -154,12 +154,11 @@ __*Step F:*__ **Verify that the edma module is installed using the modinfo edma.
   parm:           debug:Debug level (0=none,...,16=all) (int)
 ```
 
-**Q: What PCIe Vendor-ID and Device-ID does EDMA driver support?** <a name="howToDIDnVID"></a>  
+<a name="howToDIDnVID"></a>  
+**Q: What PCIe Vendor-ID and Device-ID does EDMA driver support?** 
 
 Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:1042.
 
 
-
-**Q: How to troubleshoot EDMA compilation or installing?** <a name="howToTroubleshoot"></a>
-
-
+<a name="howToTroubleshoot"></a>
+**Q: How to troubleshoot EDMA compilation or installing?** 
