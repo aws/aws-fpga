@@ -1704,13 +1704,21 @@ module sh_bfm #(
          AXI_Data    axi_data;
          DMA_OP      dop;
          logic [63:0] host_memory;
-         int num_of_data_beats = 0;
-         int byte_cnt = 0;
-         int num_bytes = 0;
-         logic [63:0] aligned_addr = 0;
-         bit last_beat = 0;
-         logic [5:0] start_addr = 0;
-         bit aligned = 0;
+         int num_of_data_beats;
+         int byte_cnt;
+         int num_bytes;
+         logic [63:0] aligned_addr;
+         bit last_beat;
+         logic [5:0] start_addr;
+         bit aligned;
+         
+         num_of_data_beats = 0;
+         byte_cnt = 0;
+         num_bytes = 0;
+         aligned_addr = 0;
+         last_beat = 0;
+         start_addr = 0;
+         aligned = 0;
          
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
@@ -1826,10 +1834,15 @@ module sh_bfm #(
          AXI_Data    axi_data;
          DMA_OP      dop;
          DMA_OP      data_dop;
-         int num_of_data_beats = 0;
-         bit aligned = 0;
-         logic [63:0] aligned_addr = 0;
-         bit last_beat = 0;
+         int num_of_data_beats;
+         bit aligned;
+         logic [63:0] aligned_addr;
+         bit last_beat;
+
+         num_of_data_beats = 0;
+         aligned = 0;
+         aligned_addr = 0;
+         last_beat = 0;
 
          for (int chan = 0; chan < 4; chan++) begin
            if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
