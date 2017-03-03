@@ -29,7 +29,7 @@ Advanced developers can use different scripts, tools, and techniques (e.g., regi
 
 The following describes the step-by-step procedure to build developer CLs. Some of these steps can be modified or adjusted based on developer experience and design needs. 
 
-A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` to check the environment, setup the build directory, invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL), create the [`manifest.txt`](https://github.com/aws/aws-fpga/tree/master/hdk/docs/AFI_manifest.md) that AWS will ingest through the CreateFpgaImage EC2 API. Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
+A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` to check the environment, setup the build directory, invoke Xilinx Vivado to create the encrypted placed-and-routed DCP (which include AWS Shell + Developer CL), create the [`manifest.txt`](https://github.com/aws/aws-fpga/tree/master/hdk/docs/AFI_manifest.md) that AWS will ingest through the `create-fpga-image` EC2 API. Executing this script also entails encryption of developer-specified RTL files. Further details on invoking the script from Vivado are provided below.
 
 ### 1) Pre-requisite: Environment Variables and Tools
 
@@ -169,11 +169,9 @@ Below is a sample policy.
         ]
     }
 
-To create an AFI execute the `create-fpga-image` command as follows:
+To create a new AFI execute the `create-fpga-image` command as follows:
 
     $ aws ec2 create-fpga-image \
-        --shell-version <shell_version> \
-        --fpga-pci-id DeviceId=<device_id>,VendorId=<vendor_id>,SubsystemId=<subsystem_id>,SubsystemVendorId=<subsystem_vendor_id> \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name <cl-name> \
         --description <description> \
@@ -219,9 +217,9 @@ Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encrypt
 
 2. How do I ensure that the DCP I create will generate a good bistream at AWS?
 
-3. What should I do my design is not meeting timing?
+3. What should I do if my design is not meeting timing?
 
-4. My design was meeting timing, but even without changes, subsequent builds are not meeting timing?
+4. My design was meeting timing, but even without changes, subsequent builds are not meeting timing, what should I do?
 
 5. "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?
 
