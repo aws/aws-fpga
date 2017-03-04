@@ -187,39 +187,55 @@ out:
 }
 
 int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status) {
-	(void)slot_id;
-	(void)status;
+	int ret;
+	pci_bar_handle_t	led_pci_bar;
+	uint32_t	read_data;
 
-	/* not implemented */
-	return -ENOSYS;
+	ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR2, 0, &led_pci_bar);
+	if (ret) 
+		return -1;
+	
+	ret = fpga_pci_peek(led_pci_bar,F1_VIRTUAL_LED_REG_OFFSET,&read_data);
 
-	/* fpga_hal_reg_read(...) */
+	*(status) = (uint16_t)read_data;
+
+	fpga_pci_detatch(led_pci_bar);
+	return ret;	
 }
 
 int fpga_mgmt_set_vDIP(int slot_id, uint16_t value) {
-	(void) slot_id;
-	(void) value;
+        int ret;
+        pci_bar_handle_t        led_pci_bar;
+        uint32_t        write_data;
 
-	/* not implemented */
-	return -ENOSYS;
+        ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR2, 0, &led_pci_bar);
+        if (ret)
+                return -1;
 
-	/* fpga_hal_reg_write(...) */
+	write_data = (uint32_t) value;
+
+        ret = fpga_pci_poke(led_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,write_data);
+
+
+        fpga_pci_detatch(led_pci_bar);
+        return ret;
 }
 
 int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value) {
-	(void) slot_id;
-	(void) value;
 
-	/* not implemented */
-	return -ENOSYS;
+        int ret;
+        pci_bar_handle_t        led_pci_bar;
+        uint32_t        read_data;
 
-	/* fpga_hal_reg_read(...) */
+        ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR2, 0, &led_pci_bar);
+        if (ret)
+                return -1;
+
+        ret = fpga_pci_peek(led_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,&read_data);
+
+        *(value) = (uint16_t)read_data;
+
+        fpga_pci_detatch(led_pci_bar);
+        return ret;
+
 }
-
-int fpga_mgmt_set_virtual_jtag(int slot_id) {
-	(void) slot_id;
-
-	/* not implemented */
-	return -ENOSYS;
-}
-

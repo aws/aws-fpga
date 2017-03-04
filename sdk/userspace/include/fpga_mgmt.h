@@ -121,12 +121,3 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value);
  */
 int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *);
 
-/**
- * state: enabled, disabled, error if not supported
- */
-int fpga_mgmt_get_virtual_jtag_state(int slot_id, bool *enabled);
-
-/**
- * enable/disable
- */
-int fpga_mgmt_set_virtual_jtag(int slot_id);
