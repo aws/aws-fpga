@@ -140,6 +140,10 @@ cli_detach(void)
 	fpga_mgmt_close();
 	return 0;
 }
+static int do_nothing(void)
+{
+	return 0;
+}
 
 static int command_load(void)
 {
@@ -358,6 +362,10 @@ static const command_func_t command_table[AFI_EXT_END] = {
 	[AFI_CMD_METRICS] = command_metrics,
 	[AFI_CMD_CLEAR] = command_clear,
 	[AFI_EXT_DESCRIBE_SLOTS] = command_describe_slots,
+	[AFI_START_VJTAG] = do_nothing,
+	[AFI_GET_LED] = do_nothing,
+	[AFI_GET_DIP] = do_nothing,
+	[AFI_SET_DIP] = do_nothing,
 };
 
 /**

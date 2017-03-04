@@ -200,11 +200,10 @@ static const char *get_virtual_led_usage[] = {
 	"      fpga-get-virtual-led [GENERAL OPTIONS] [-h]",
 	"      Example: fpga-get-virtual-led -S 0",
 	"  DESCRIPTION",
-	"      Returns the current status of the virtual LED exposed by",
-	"      in the AFI, a series of 0 (Zeros) and 1 (ones)",
-	"      First digit from the right maps to cl_sh_vled[0]",
-	"      For example, a return value 0000000001000000",
-	"      indicates that cl_sh_vled[6] is set/on",
+	"      Returns the current status of the virtual LED exposed by the AFI, a",
+	"      series of 0 (zeros) and 1 (ones), first digit from the righti maps", 
+	"      to cl_sh_vled[0]. For example, a return value 0000000001000000",
+	"      indicates that cl_sh_vled[6] is set(on)",
 	"  GENERAL OPTIONS",
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
@@ -222,12 +221,11 @@ static const char *get_virtual_dip_usage[] = {
 	"      fpga-get-virtual-dip-switch [GENERAL OPTIONS] [-h]",
 	"      Example: fpga-get-virtual-dip-switch -S 0",
 	"  DESCRIPTION",
-	"      Returns the current status of the virtual DIP Switches exposed by",
-	"      driven to the AFI", 
-	"      a series of 0 (Zeros) and 1 (ones)",
+	"      Returns the current status of the virtual DIP Switches by",
+	"      driven to the AFI. A series of 0 (Zeros) and 1 (ones)",
 	"      First digit from the right maps to sh_cl_vdip[0]",
 	"      For example, a return value 0000000001000000",
-	"      indicates that sh_cl_vdip[6] is set/on",
+	"      indicates that sh_cl_vdip[6] is set(on)",
 	"  GENERAL OPTIONS",
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
@@ -722,7 +720,6 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
-
 	if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot,&status)) {
 		printf("Error trying to get virtual LED state\n");
 		goto err;
@@ -736,6 +733,8 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		status = status << 1;
 	}
 	printf("\n");
+	return 0;
+
 err:
         print_usage(argv[0], get_virtual_led_usage, sizeof_array(get_virtual_led_usage));
 out_ver:
@@ -795,10 +794,11 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 	}
 	
 	if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot,&status)) {
-		printf("Error trying to get virtual DIP Switch state\n");
+		printf("Error: can not get virtual DIP Switch state\n");
 		goto err;
 	}
-	printf("FPGA slot id %u have the following Virtual DIP Switches:\n",f1.afi_slot);
+
+	printf("FPGA slot id %u has the following Virtual DIP Switches:\n",f1.afi_slot);
 	for(i=0;i<16;i++) {
 		if (status & 0x8000)
 			printf("1");
@@ -807,6 +807,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		status = status << 1;
 	}
 	printf("\n");
+	return 0;
 err:
         print_usage(argv[0], get_virtual_dip_usage, sizeof_array(get_virtual_dip_usage));
 out_ver:
@@ -920,10 +921,10 @@ parse_args(int argc, char *argv[])
 		{"ClearFpgaImage",			AFI_CMD_CLEAR,			parse_args_clear_afi},
 		{"DescribeFpgaImageSlots",	AFI_EXT_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
 		{"DescribeFpgaImage",		AFI_CMD_METRICS,		parse_args_describe_afi},
-		{"StartVirtualJtag",		AFI_EXT_END,		parse_args_start_virtual_jtag},
-		{"GetVirtualLED",		AFI_EXT_END,		parse_args_get_virtual_led},
-		{"GetVirtualDIP",		AFI_EXT_END,		parse_args_get_virtual_dip},
-		{"SetVirtualDIP",		AFI_EXT_END,		parse_args_set_virtual_dip},
+		{"StartVirtualJtag",		AFI_START_VJTAG,		parse_args_start_virtual_jtag},
+		{"GetVirtualLED",		AFI_GET_LED,		parse_args_get_virtual_led},
+		{"GetVirtualDIP",		AFI_GET_DIP,		parse_args_get_virtual_dip},
+		{"SetVirtualDIP",		AFI_SET_DIP,		parse_args_set_virtual_dip},
 
 	};
 
