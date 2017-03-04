@@ -29,15 +29,11 @@
 
 #include <utils/lcd.h>
 
-// #include <fpga_common.h>
-// #include <afi_cmd_api.h>
-// #include <fpga_hal_plat.h>
-// #include <fpga_hal_mbox.h>
-
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
 
 #include "fpga_local_cmd.h"
+#include "virtual_jtag.h"
 
 #define TYPE_FMT	"%-10s"
 
@@ -140,9 +136,66 @@ cli_detach(void)
 	fpga_mgmt_close();
 	return 0;
 }
-static int do_nothing(void)
+
+static int command_get_virtual_led(void)
 {
+uint16_t	status;
+int		ret;
+int		i;
+        if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot,&status)) {
+                printf("Error trying to get virtual LED state\n");
+                return ret;
+        }
+
+        printf("FPGA slot id %u have the following Virtual LED:\n",f1.afi_slot);
+        for(i=0;i<16;i++) {
+                if (status & 0x8000)
+                        printf("1");
+                else
+                        printf("0");
+                status = status << 1;
+        }
+	printf("\n");
 	return 0;
+}
+
+static int command_get_virtual_dip(void)
+{
+uint16_t        status;
+int             ret;
+int             i;
+        if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot,&status)) {
+                printf("Error: can not get virtual DIP Switch state\n");
+                return ret;
+        }
+
+        printf("FPGA slot id %u has the following Virtual DIP Switches:\n",f1.afi_slot);
+        for(i=0;i<16;i++) {
+                if (status & 0x8000)
+                        printf("1");
+                else
+                        printf("0");
+                status = status << 1;
+        }
+        printf("\n");
+	return 0;
+}
+
+static int command_set_virtual_dip(void)
+{
+int             ret;
+	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot,f1.v_dip_switch)) {
+		printf("Error trying to set virtual DIP Switch \n");
+	}
+	return ret;
+}
+
+static int command_start_virtual_jtag(void)
+{
+        printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",f1.afi_slot,f1.tcp_port);
+        printf("Press CTRL-C to stop the service.\n");
+
+        return xvcserver_start(f1.afi_slot,f1.tcp_port);
 }
 
 static int command_load(void)
@@ -362,10 +415,10 @@ static const command_func_t command_table[AFI_EXT_END] = {
 	[AFI_CMD_METRICS] = command_metrics,
 	[AFI_CMD_CLEAR] = command_clear,
 	[AFI_EXT_DESCRIBE_SLOTS] = command_describe_slots,
-	[AFI_START_VJTAG] = do_nothing,
-	[AFI_GET_LED] = do_nothing,
-	[AFI_GET_DIP] = do_nothing,
-	[AFI_SET_DIP] = do_nothing,
+	[AFI_START_VJTAG] = command_start_virtual_jtag,
+	[AFI_GET_LED] = command_get_virtual_led,
+	[AFI_GET_DIP] = command_get_virtual_dip,
+	[AFI_SET_DIP] = command_set_virtual_dip,
 };
 
 /**

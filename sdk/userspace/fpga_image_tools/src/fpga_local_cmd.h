@@ -127,6 +127,8 @@ struct ec2_fpga_cmd {
 	bool	 clear_hw_metrics;
 	bool	 rescan;
 	bool     show_mbox_device;
+	uint16_t v_dip_switch;
+	char*    tcp_port;
 };
 
 extern struct ec2_fpga_cmd f1;
