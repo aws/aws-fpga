@@ -244,8 +244,7 @@ static const char *set_virtual_dip_usage[] = {
 	"      Example: fpga-set-virtual-dip-switch -S 0 -D 0101000011000000",
 	"  DESCRIPTION",
 	"      Drive the AFI in a given slot with the specified virtual DIP Switches",
-	"      driven to the AFI", 
-	"      a series of 0 (Zeros) and 1 (ones)",
+	"      A 16 digit value is require: a series of 0 (zeros) and 1 (ones)",
 	"      First digit from the right maps to sh_cl_vdip[0]",
 	"      For example, a value 0101000011000000",
 	"      indicates that sh_cl_vdip[6], [7], [12], and [14] is set/on",
@@ -254,7 +253,9 @@ static const char *set_virtual_dip_usage[] = {
 	"          The logical slot number for the FPGA image",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
 	"      -D, --virtual-dip",
-	"          A bitmap representation of the desired setting for Virtual DIP Switches",
+	"          A 16 digit bitmap representation of the desired setting for Virtual DIP Switches",
+	"          This argument is mandatory and must be 16 digits made of any combinations of ",
+	"          zeros or ones.",
 	"      -?, --help",
 	"          Display this help.",
 	"      -H, --headers",
@@ -787,6 +788,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 	int opt;
 	uint16_t status=0;
 	int i;
+	int vdip_arg_found=0;
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
@@ -821,6 +823,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 				if (i!=15)
 					status = status << 1;
 			}
+			vdip_arg_found=1;
 			f1.v_dip_switch=status;
 			break;
 		}
@@ -842,6 +845,10 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 	
 	if (f1.afi_slot == (uint32_t) -1) { 
 		printf("Error: Invalid Slot Id !");
+		goto err;
+	}
+	if (!vdip_arg_found) {
+		printf("Error: Missing DIP Switch values !");
 		goto err;
 	}
 	
