@@ -666,7 +666,7 @@ sh_bfm sh(
 
 
    //Developer put top level here (replace cl_simple, with top level)
-   `CL_NAME #(.NUM_PCIE(NUM_PCIE), .NUM_DDR(NUM_DDR), .NUM_HMC(NUM_HMC), .NUM_GTY(NUM_GTY)) CL (
+   `CL_NAME #(.NUM_DDR(NUM_DDR)) CL (
    
       .clk_main_a0(clk_main_a0),
       .clk_extra_a1(clk_extra_a1),
