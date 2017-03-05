@@ -7,6 +7,18 @@ echo "AWS FPGA: Checking for vivado install:"
 # before going too far make sure Vivado is available
 vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
 
+export VIVADO_VER=`vivado -version | head -1`
+
+echo "AWS FPGA: Found $VIVADO_VER"
+
+if grep -Fxq "$VIVADO_VER" $(pwd)/hdk/supported_vivado_versions.txt
+then
+    echo "AWS FPGA: $VIVADO_VER is supported by this HDK release."
+else
+    echo "AWS FPGA: ERROR - $VIVADO_VER is not supported by this HDK release."
+    return 1
+fi
+
 echo "AWS FPGA: Vivado check successed"
 
 echo "AWS FPGA: Setting up environment variables"
