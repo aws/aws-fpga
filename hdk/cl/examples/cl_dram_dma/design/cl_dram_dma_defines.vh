@@ -12,9 +12,6 @@
 // FPGA flop init capability).  This will help with routing resources.
 `define FPGA_LESS_RST
 
-//Must have this define or will get syntax errors.  Curretly XDMA not supported.
-//`define NO_XDMA
-
 `define SH_SDA
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
