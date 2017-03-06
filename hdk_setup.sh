@@ -7,7 +7,7 @@ echo "AWS FPGA: Checking for vivado install:"
 # before going too far make sure Vivado is available
 vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
 
-export VIVADO_VER=`vivado -version | head -1`
+export VIVADO_VER=`vivado -version | grep Vivado | head -1`
 
 echo "AWS FPGA: Found $VIVADO_VER"
 
