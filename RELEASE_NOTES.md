@@ -50,53 +50,53 @@ The following new features are included in this HDK release:
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 
-*	cl_ports.vh have the updated port list 
-*	Removed all the `ifdef and `ifndef from the cl_ports.vh (WIP)
-*	Added all the interfaces required for SDAccel platform support 
-*	AWS_Shell_Interface_Spec.md has been updated
-*	Updated the xdc timing constrains under [constraints](./hdk/common/shell_stable/build/constraints) to match the new interfaces (WIP)
-*	Updated CL HELLO WORLD example to use the new cl_ports.vh (WIP) 
-*	Updated clean_log.pl [scripts](./hdk/common/shell_current/build/scripts/clean_log.pl) (WIP)
-*	DCP for the new shell (NA)
+* cl_ports.vh have the updated port list 
+* Removed all the `ifdef and `ifndef from the cl_ports.vh (WIP)
+* Added all the interfaces required for SDAccel platform support 
+* AWS_Shell_Interface_Spec.md has been updated
+* Updated the xdc timing constrains under [constraints](./hdk/common/shell_stable/build/constraints) to match the new interfaces (WIP)
+* Updated CL HELLO WORLD example to use the new cl_ports.vh (WIP) 
+* Updated clean_log.pl [scripts](./hdk/common/shell_current/build/scripts/clean_log.pl) (WIP)
+* DCP for the new shell (NA)
 
 
 ### 2.	New Integrated DMA. AWS Shell now includes DMA capabilities on behalf of the CL
-*	Renamed sh_cl_pcis to sh_cl_dma_pcis
-*	The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
-*	DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software (WIP)
-*	A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided.
-*	[EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
-*	The initial release supports a single queue in each direction
+* Renamed sh_cl_pcis to sh_cl_dma_pcis
+* The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
+* DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software (WIP)
+* A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided. (WIP)
+* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
+* The initial release supports a single queue in each direction
 
 
 ### 3.	CL  User-defined interrupt events.  The CL can now request sending MSI-X to the instance CPU
-*	Added new req/ack interface on Shell/CL interface
-*	Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software (WIP)
-*	A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
-*	[EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
-*	The initial release supports a single user-defined interrupt 
+* Added new req/ack interface on Shell/CL interface
+* Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software (WIP)
+* A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
+* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
+* The initial release supports a single user-defined interrupt 
 
 
 ### 4.	Added mandatory Manifest.txt file submitted with each DCP via create-fpga-image API
 
-*	[AFI manifest](./hdk/docs/AFI_manifest.md) file content defined in /hdk/docs/AFI_manifest.md (WIP)
-*	Manifest.txt is created automatically if the developer is using aws_build_dcp_from_cl.sh scripts
-*	PCI Vendor ID and Device ID should be part of the manifest and no longer needed in `create-fpga-image`
-*	Shell Version is part of the manifest and no longer needed in `create-fpga-image`
-*	All the examples and documentations for build includes the description and dependency on the Manifest.txt
+* [AFI manifest](./hdk/docs/AFI_manifest.md) file content defined in /hdk/docs/AFI_manifest.md (WIP)
+* Manifest.txt is created automatically if the developer is using aws_build_dcp_from_cl.sh scripts
+* PCI Vendor ID and Device ID should be part of the manifest and no longer needed in `create-fpga-image`
+* Shell Version is part of the manifest and no longer needed in `create-fpga-image`
+* All the examples and documentations for build includes the description and dependency on the Manifest.txt
 	
 ### 5.	Create-fpga-image `-shell_version` and `--pci*` arguments are obsolete 
 
-*	shell_version, pci_vendor_id, pci_device_id are now become a mandatory parameter in manifest.md
+* shell_version, pci_vendor_id, pci_device_id are now become a mandatory parameter in manifest.md
 
 ### 6.	Decoupling Shell/CL interface clocking from the internal Shell Clock 
 
 * All the Shell/CL interfaces running off the newly introduced clk_main_a0, and no longer required to be 250Mhz. 
-*	The default frequency for `clk_main_a0` is 125Mhz. Allowing CL designs to have flexible frequency and not be constrained to 250Mhz only. The default frequency can be overridden by changes in the manifest.txt file
-*	All xdc scripts have been updated to clk_main_a0 and to reference a table with the possible clocks’ frequencies combinations (WIP)
-*	Obsolete the cl_clk interface
-*	The developer can change the parameter for overriding default frequency
-*	Updated CL_HELLO_WORLD and CL_DRAM_DMA examples to use the `clk_main_a0` (WIP)
+* The default frequency for `clk_main_a0` is 125Mhz. Allowing CL designs to have flexible frequency and not be constrained to 250Mhz only. The default frequency can be overridden by changes in the manifest.txt file
+* All xdc scripts have been updated to clk_main_a0 and to reference a table with the possible clocks’ frequencies combinations (WIP)
+* Obsolete the cl_clk interface
+* The developer can change the parameter for overriding default frequency
+* Updated CL_HELLO_WORLD and CL_DRAM_DMA examples to use the `clk_main_a0` (WIP)
 
 ### 7.	Additional User-defined Auxiliary Clocks
 
@@ -151,7 +151,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 * Additional error conditions detected on the CL to Shell Interface and reported through fpga-describe-image tool
 * See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
-* FPGA Management Tool [metrics output](./sdk/userspace/fpga_management_tools/README.md) covers the additional error handling (WIP)
+* FPGA Management Tool [metrics output](./sdk/userspace/fpga_image_tools/README.md) covers the additional error handling (WIP)
 
 ### 13.	Expanded AXI ID space throughout the design
 
@@ -161,13 +161,13 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 ### 14.	Shell to CL interface metrics.  
 
 * New metrics for monitoring the Shell to CL are available from the AFI Management Tools.  (WIP)
-* See [fpga_image_tools readme](./sdk/management/fpga_image_tools/README.md) for more details. (WIP)
+* See [fpga_image_tools readme](./sdk/userspace/fpga_image_tools/README.md) for more details. (WIP)
 
 
 ### 15.	Virtual LED/DIP Switches.  
 
 * Added CL capability to present virtual LEDs and push virtual DIP switches indications to the CL, set and read by FPGA management Tools and without involving CL logic, providing the developer an environment similar to developing on local boards with LED and DIP switches
-* See new commands in [FPGA Image Tools](.sdk/userspace/fpga_image_tools/README.md) for description of the new functionality
+* See new commands in [FPGA Image Tools](./sdk/userspace/fpga_image_tools/README.md) for description of the new functionality
 * CL_HELLO_WORLD example includes some logic to set LED and adjust according to vDIP (WIP)
 * See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
 
@@ -183,7 +183,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 ### 17.	Examples summary table
 
-* [Example Summary Table](./hdk/cl/examples/cl_examples_tables.md) covers which CL capabilities is demonstrated in each example.
+* [Example Summary Table](./hdk/cl/examples/cl_examples_list.md) covers which CL capabilities is demonstrated in each example.
 
 
 ### 18.	Updated CL_HELLO_WORLD Example
@@ -204,8 +204,8 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 * Using SystemVerilog Bus constructs to simplify the code
 * Demonstrate the use of User interrupts (WIP)
 * Demonstrate the use of bar1\_ AXI-L bus
-* Includes Runtime C-code application under [CL_DRAM_DMA software](./hdk/cl/examples/CL_DRAM_DMA/software) (WIP)
-* See [CL_DRAM_DMA README](./hdk/cl/example/cl_dram_dma/README.md) (WIP)
+* Includes Runtime C-code application under [CL_DRAM_DMA software](./hdk/cl/examples/cl_dram_dma/software) (WIP)
+* See [CL_DRAM_DMA README](./hdk/cl/examples/cl_dram_dma/README.md) (WIP)
 
 
 ### 20.	Removed the CL_SIMPLE example
@@ -214,7 +214,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 ### 21.	Software Programmer View document 
 
-* The [Software Programmer View document](./hdk/docs/Programmers_View.md) is added to explain the various ways a linux user-space application can work with AWS FPGAs
+* The [Software Programmer View document](./hdk/docs/Programmer_View.md) is added to explain the various ways a linux user-space application can work with AWS FPGAs
 
 
 ### 22.	Two C-libraries for FPGA PCIe access and for FPGA Management
@@ -231,7 +231,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 ### 24.	Additional FPGA Management Tools added
 
-*	See [FPGA Management Tools](./sdk/userspace/fpga_management_tools/README.md) for more details
+*	See [FPGA Management Tools](./sdk/userspace/fpga_image_tools/README.md) for more details
 
 ### 25.	Upgrade to Vivado 2016.04 Build 
 
