@@ -152,7 +152,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
   end
   else if ((slv_state == SLV_IDLE) && (sh_ocl_bus_q.arvalid || sh_ocl_bus_q.awvalid))
   begin
-    {slv_req_rd_addr[31:0], slv_req_wr_addr[31:0]} <= {sh_ocl_bus_q.araddr, sh_ocl_bus_q.awaddr};
+    {slv_req_rd_addr[31:0], slv_req_wr_addr[31:0]} <= {sh_ocl_bus_q.araddr[31:0], sh_ocl_bus_q.awaddr[31:0]};
     {slv_req_rd_id, slv_req_wr_id} <= 0;
   end
    
