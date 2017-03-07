@@ -23,8 +23,12 @@ INCLUDES = -I$(FPGAHALINC_PATH) -I$(TOP)/include -I../. -I.
 #OPT=-O2
 CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
-LDFLAGS = -L$(LIB_PATH)
-LDLIBS = -lfpga_mgmt -lfpga_pci -lfpga_hal_mbox -lfpga_hal_reg -lfpga_hal_plat -lutils -lrt -lpthread
+LDFLAGS = -L$(LIB_PATH)/so
+LDLIBS = -lfpga_mgmt
+
+# flags for compiling a staticly linked version
+LDFLAGS_STATIC = -L$(LIB_PATH)
+LDLIBS_STATIC = -lfpga_mgmt -lrt -lpthread
 
 UTILLCDLIB = $(LIB_PATH)/libutils.a
 FPGAHALLIB = $(LIB_PATH)/libfpga_hal_mbox.a $(LIB_PATH)/libfpga_hal_reg.a $(LIB_PATH)/libfpga_hal_plat.a
@@ -34,11 +38,15 @@ VTAG_XVC_SRC = virtual_jtag_pcie.c virtual_jtag_server.c
 SRC = fpga_local_cmd.c fpga_local_cmd_parse.c $(VTAG_XVC_SRC)
 OBJ = $(SRC:.c=.o)
 BIN = fpga-local-cmd
+BIN_STATIC = fpga-local-cmd-static
 
-all: $(BIN)
+all: $(BIN) $(BIN_STATIC)
 
 $(BIN): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS) 
 
+$(BIN_STATIC): $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS_STATIC) $(LDLIBS_STATIC)
+
 clean:
-	rm -f *.o *.a $(BIN)
+	rm -f *.o *.a $(BIN) $(BIN_STATIC)

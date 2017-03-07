@@ -70,6 +70,8 @@ static const char *describe_afi_slots_usage[] = {
 	"          Display version number of this program.",
 	"      --request-timeout TIMEOUT",
 	"          Specify a request timeout TIMEOUT (in seconds).",
+	"      -M, --show-mbox",
+	"          Show the mbox physical function in the list of devices."
 };
 
 static const char *describe_afi_usage[] = {
@@ -556,11 +558,12 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
+		{"show-mbox",           no_argument,        0,  'M' },
 		{0,						0,					0,	0	},
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "r:H?hV",
+	while ((opt = getopt_long(argc, argv, "r:H?hVM",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'r': {
@@ -577,6 +580,10 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 		case 'V': {
 			print_version();
 			goto out_ver;
+		}
+		case 'M': {
+			f1.show_mbox_device = true;
+			break;
 		}
 		default: {
 			goto err;   

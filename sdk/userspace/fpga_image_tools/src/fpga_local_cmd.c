@@ -45,7 +45,7 @@ struct ec2_fpga_cmd f1;
 /** 
  * Use dmesg as the default logger, stdout is available for debug.
  */
-#if 0
+#if 1
 const struct logger *logger = &logger_kmsg;
 #else
 const struct logger *logger = &logger_stdout;
@@ -397,6 +397,8 @@ command_describe_slots(void)
 	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
 
 	for (i = 0; i < sizeof_array(spec_array); ++i) {
+		if (spec_array[i].map[FPGA_APP_PF].vendor_id == 0)
+			continue;
 
 		/** Display the application PFs for this slot */
 		ret = cli_show_slot_app_pfs(i, &spec_array[i]);
@@ -455,7 +457,7 @@ cli_init_f1(void)
 	f1.afi_slot = -1;
 	f1.mbox_timeout = CLI_TIMEOUT_DFLT;
 	f1.mbox_delay_msec = CLI_DELAY_MSEC_DFLT;
-	f1.show_mbox_device = true;
+	f1.show_mbox_device = false;
 
 	srand((unsigned)time(NULL));
 
