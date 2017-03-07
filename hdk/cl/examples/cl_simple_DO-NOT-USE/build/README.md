@@ -1,1 +1,0 @@
-../../../../common/shell_current/new_cl_template/build/README.md
