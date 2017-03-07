@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <errno.h>
+
 #include <utils/lcd.h>
 #include <fpga_common.h>
 #include <hal/fpga_hal_plat.h>
@@ -39,11 +41,12 @@
  * to still be displayed for development if needed, by re-defining
  * fail_on_quiet as fail_on.
  */
-#define fail_on_quiet(CONDITION, LABEL, ...)	\
-	do {					\
-		if (CONDITION) {	\
-			goto LABEL;		\
-		}					\
+#define fail_on_quiet(CONDITION, LABEL, ...)    \
+	do {					                    \
+		if (CONDITION) {	                    \
+			log_info(__VA_ARGS__);             \
+			goto LABEL;		                    \
+		}					                    \
 	} while (0)
 
 /** 

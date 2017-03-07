@@ -61,10 +61,8 @@ out:
  * An example to attach to an arbitrary slot, pf, and bar with register access.
  */
 int peek_poke_example(int slot_id, int pf_id, int bar_id) {
-    bool ready;
     int rc;
-    int state;
-    int pci_bar_handle = -1;
+    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct fpga_mgmt_image_info info = {0};
 
     /* get local image description, contains status, vendor id, and device id. */
@@ -77,9 +75,12 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
         fail_on(rc, out, "Slot %d is not ready", slot_id);
     }
 
+    printf("CL vendor_id: 0x%x, device_id 0x%x\n",
+        info.spec.map[FPGA_APP_PF].vendor_id,
+        info.spec.map[FPGA_APP_PF].device_id);
     /* confirm that the AFI that we expect is in fact loaded */
-    if (info.spec.map.vendor_id != pci_vendor_id ||
-        info.spec.map.device_id != pci_device_id) {
+    if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
+        info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
         rc = 1;
         fail_on(rc, out, "The PCI vendor id and device of the loaded image are not "
                          "the expected values.");
@@ -108,7 +109,7 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
 out:
     /* clean up */
     if (pci_bar_handle >= 0) {
-        rc = fpga_plat_dev_detach(pci_bar_handle);
+        rc = fpga_pci_detatch(pci_bar_handle);
         if (rc) {
             printf("Failure while detaching from the fpga.\n");
         }
