@@ -1735,7 +1735,8 @@ module sh_bfm #(
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
                   axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
-                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
+                  // handle the condition if addr is crossing 4k page boundry
+                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
                 end
@@ -1746,6 +1747,7 @@ module sh_bfm #(
                 else begin                                              // intermediate data beats
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  // handle the condition if addr is crossing 4k page boundry
                   if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
                     axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
                   end
@@ -1753,6 +1755,7 @@ module sh_bfm #(
                 axi_cmd.id   = chan;
                 sh_cl_wr_cmds.push_back(axi_cmd);
 
+                // loop to do multiple data beats
                 for(int j = 0; j <= axi_cmd.len; j++) begin
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
@@ -1856,6 +1859,7 @@ module sh_bfm #(
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
                   axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  // handle the condition if addr is crossing 4k page boundry
                   if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
@@ -1869,6 +1873,7 @@ module sh_bfm #(
                 else begin                                              // intermediate data beats
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  // handle the condition if addr is crossing 4k page boundry
                   if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
                     axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
                   end
@@ -1881,12 +1886,12 @@ module sh_bfm #(
                   data_dop.len = dop.len;
                   c2h_data_dma_list[chan].push_back(data_dop);
                   burst_cnt++;
-                end
-              end
-           end
-         end
-      end
-   end
+                end // for(int i = 0; i <= axi_cmd.len; i++)
+              end // for(int burst_cnt=0; burst_cnt < num_of_data_beats; )
+           end // if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0))
+         end // for (int chan = 0; chan < 4; chan++)
+      end // else begin
+   end // always
 
   task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
      case (ddr_idx)
