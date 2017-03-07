@@ -33,7 +33,7 @@
  *  -FPGA_BARS_MAX is driven by the FPGA Shell release.
  */
 #if ! defined(FPGA_PLAT_DEVS_MAX)
-#define FPGA_PLAT_DEVS_MAX	1
+#define FPGA_PLAT_DEVS_MAX    (FPGA_SLOT_MAX * FPGA_BAR_PER_PF_MAX	4 * FPGA_PF_MAX)
 #endif
 
 /*
@@ -75,7 +75,7 @@ int fpga_plat_init(void);
  * 0 on success    
  * -1 on failure
  */
-int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index);
+int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index);
 
 /**
  * Platform layer detach using the given slot specification.
@@ -141,7 +141,7 @@ void *fpga_plat_dev_get_mem_base(int dev_index);
  * 0 on success    
  * -1 on failure
  */
-int fpga_plat_attach(struct fpga_slot_spec *spec);
+int fpga_plat_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id);
 
 /**
  * Platform layer detach using the given slot specification.

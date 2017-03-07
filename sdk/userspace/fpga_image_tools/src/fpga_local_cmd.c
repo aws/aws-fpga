@@ -27,14 +27,13 @@
 #include <stdio.h>
 #include <getopt.h>
 
-#include <lcd.h>
+#include <utils/lcd.h>
 
-#include <fpga_common.h>
-#include <afi_cmd_api.h>
-#include <fpga_hal_plat.h>
-#include <fpga_hal_mbox.h>
+#include <fpga_pci.h>
+#include <fpga_mgmt.h>
 
 #include "fpga_local_cmd.h"
+#include "virtual_jtag.h"
 
 #define TYPE_FMT	"%-10s"
 
@@ -42,9 +41,6 @@
  * Globals 
  */
 struct ec2_fpga_cmd f1;
-
-static union afi_cmd cmd;
-static union afi_cmd rsp;
 
 /** 
  * Use dmesg as the default logger, stdout is available for debug.
@@ -56,29 +52,6 @@ const struct logger *logger = &logger_stdout;
 #endif
 
 /**
- * Fill in the given FPGA slot specification.
- *
- * @param[in]   afi_slot	the fpga slot
- * @param[in]   spec		the slot spec to fill in 
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-cli_fill_slot_spec(uint32_t afi_slot, struct fpga_slot_spec *spec)
-{
-	fail_on_user(afi_slot >= FPGA_SLOT_MAX, err, "Error: fpga-image-slot must be less than %u", 
-			FPGA_SLOT_MAX);
-
-	*spec = f1.mbox_slot_devs[afi_slot];
-	
-	return 0;
-err:
-	return -1;
-}
-
-/**
  * Display the application PFs for the given AFI slot.
  *
  * @param[in]   afi_slot	the fpga slot
@@ -88,9 +61,9 @@ err:
  * -1	on failure
  */
 static int 
-cli_show_slot_app_pfs(uint32_t afi_slot)
+cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 {
-	fail_on_quiet(afi_slot >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
+	fail_on_quiet(slot_id >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");         
@@ -99,74 +72,21 @@ cli_show_slot_app_pfs(uint32_t afi_slot)
 	/** Retrieve and display associated application PFs (if any) */
 	bool found_app_pf = false;
 	int i;
-	for (i = F1_APP_PF_START; i <= F1_APP_PF_END; i++) {
-		struct fpga_pci_resource_map app_map;
+	for (i = 0; i < FPGA_MAX_PF; i++) {
+		struct fpga_pci_resource_map *app_map = &spec->map[i];
 
-		/** 
-		 * cli_get_app_pf_map will skip the Mbox PF (ret==1).
-		 * We continue up through F1_APP_PF_END (e.g. 15) for future 
-		 * compatibilty with any gaps in the PF numbering.
-		 */
-		int ret = cli_get_app_pf_map(afi_slot, i, &app_map);
-		if (ret == 0) {
-			printf(TYPE_FMT "  %2u       0x%04x      0x%04x      " PCI_DEV_FMT "\n",
-					"AFIDEVICE", afi_slot, app_map.vendor_id, app_map.device_id, 
-					app_map.domain, app_map.bus, app_map.dev, app_map.func);
-			found_app_pf = true;
-		} 
+		if (i == FPGA_MGMT_PF && !f1.show_mbox_device) {
+			/* skip the mbox pf */
+			continue;
+		}
+
+		printf(TYPE_FMT "  %2u       0x%04x      0x%04x      " PCI_DEV_FMT "\n",
+				"AFIDEVICE", slot_id, app_map->vendor_id, app_map->device_id, 
+				app_map->domain, app_map->bus, app_map->dev, app_map->func);
+		found_app_pf = true;
 	}
 	if (!found_app_pf) {
 		printf(TYPE_FMT "    unknown    unknown    unknown\n", "AFIDEVICE"); 
-	}
-
-	return 0;
-err:
-	return -1;
-}
-
-/**
- * Rescan the application PF map info for the given AFI slot.
- *
- * @param[in]   afi_slot	the fpga slot
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int 
-cli_rescan_slot_app_pfs(uint32_t afi_slot)
-{
-	fail_on_quiet(afi_slot >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
-
-	/** Retrieve and display associated application PFs (if any) */
-	bool found_app_pf = false;
-	int ret;
-	int i;
-	for (i = F1_APP_PF_START; i <= F1_APP_PF_END; i++) {
-		struct fpga_pci_resource_map app_map;
-
-		/** 
-		 * cli_get_app_pf_map will skip the Mbox PF (ret==1).
-		 * We continue up through F1_APP_PF_END (e.g. 15) for future 
-		 * compatibilty with any gaps in the PF numbering.
-		 */
-		ret = cli_get_app_pf_map(afi_slot, i, &app_map);
-		if (ret == 0) {
-			ret = cli_remove_app_pf(afi_slot, app_map.func);
-			if (ret != 0) {
-				/** Output an error but continue with the other app PFs */
-				printf("Error: could not remove application PF device " 
-						PCI_DEV_FMT "\n", 
-						app_map.domain, app_map.bus, app_map.dev, 
-						app_map.func);
-			}
-			found_app_pf = true;
-		} 
-	}
-	if (found_app_pf) {
-		ret = cli_pci_rescan();
-		fail_on_user(ret != 0, err,
-				"Error: could not rescan for application PF devices");
 	}
 
 	return 0;
@@ -184,9 +104,7 @@ err:
 static int
 cli_attach(void)
 {
-	int ret = cli_pci_init();
-	fail_on_quiet(ret != 0, err, 
-			"Error: Could not initialize for slot discovery");
+	int ret;
 
 	if (f1.opcode == AFI_EXT_DESCRIBE_SLOTS) {
 		/** 
@@ -196,28 +114,7 @@ cli_attach(void)
 		goto out;
 	}
 
-	ret = fpga_plat_init();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-	struct fpga_slot_spec spec;
-	ret = cli_fill_slot_spec(f1.afi_slot, &spec);
-	fail_on_quiet(ret != 0, err, "Error: Could not fill the slot spec");
-
-	ret = fpga_plat_attach(&spec);
-	fail_on_user(ret != 0, err, "%s", CLI_ROOT_ACCESS_ERR_STR);
-
-	f1.plat_attached = true;
-
-	struct fpga_hal_mbox mbox = {
-		.slot = f1.afi_slot,
-		.timeout = f1.mbox_timeout,
-		.delay_msec = f1.mbox_delay_msec,
-	};
-
-	ret = fpga_hal_mbox_init(&mbox);
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-	ret = fpga_hal_mbox_attach(true); /**< clear_state=true */
+	ret = fpga_mgmt_init();
 	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 out:
@@ -236,295 +133,76 @@ err:
 static int
 cli_detach(void)
 {
-	cli_pci_free();
-
-	if (f1.plat_attached) {
-		int ret = fpga_hal_mbox_detach(true); /**< clear_state=true */
-		if (ret != 0) {
-			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
-			/** Continue with plat detach */
-		}
-
-		ret = fpga_plat_detach();
-		fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-		f1.plat_attached = false;
-	}
-
-	return 0;
-err:
-	return -1;
-}
-
-/**
- * AFI command get payload length utility.
- *
- * @param[in]  cmd		the command buffer
- *
- * @returns
- * len	the command payload length
- */
-static uint32_t
-afi_cmd_hdr_get_len(const union afi_cmd *cmd)
-{
-	return cmd ? (cmd->hdr.len_flags & AFI_CMD_HDR_LEN_MASK) : ~0u;
-}
-
-/**
- * AFI command get flags utility.
- *
- * @param[in]  cmd		the command buffer
- *
- * @returns
- * flags	the command flags
- */
-static uint32_t
-afi_cmd_hdr_get_flags(const union afi_cmd *cmd)
-{
-	return cmd ? (cmd->hdr.len_flags >> AFI_CMD_HDR_FLAGS_SHIFT) : ~0u;
-}
-
-/**
- * AFI command set payload length utility.
- *
- * @param[in]  cmd		the command buffer
- * @param[in]  len		the payload length to set
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-afi_cmd_hdr_set_len(union afi_cmd *cmd, size_t len)
-{
-	/* Null pointer or overflow? */
-	if (!cmd || (len & ~AFI_CMD_HDR_LEN_MASK)) {
-		return -1;
-	}
-
-	cmd->hdr.len_flags &= ~AFI_CMD_HDR_LEN_MASK;
-	cmd->hdr.len_flags |= (uint32_t)len;
+	fpga_mgmt_close();
 	return 0;
 }
 
-/**
- * AFI command set flags utility.
- *
- * @param[in]  cmd		the command buffer
- * @param[in]  flags	the flags to set
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-afi_cmd_hdr_set_flags(union afi_cmd *cmd, unsigned int flags)
+static int command_get_virtual_led(void)
 {
-	/* Null pointer or overflow? */
-	if (!cmd || (flags & ~AFI_CMD_HDR_ALL_FLAGS)) {
-		return -1;
-	}
+uint16_t	status;
+int		ret;
+int		i;
+        if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot,&status)) {
+                printf("Error trying to get virtual LED state\n");
+                return ret;
+        }
 
-	cmd->hdr.len_flags &= AFI_CMD_HDR_LEN_MASK;
-	cmd->hdr.len_flags |= flags << AFI_CMD_HDR_FLAGS_SHIFT;
+        printf("FPGA slot id %u have the following Virtual LED:\n",f1.afi_slot);
+        for(i=0;i<16;i++) {
+                if (status & 0x8000)
+                        printf("1");
+                else
+                        printf("0");
+                status = status << 1;
+        }
+	printf("\n");
 	return 0;
 }
 
-/**
- * Table of AFI_CMD_ERROR opcode, error values.
- */
-static const char *ace_tbl[ACE_END] = {
-	[ACE_OK] = "ok",
-	[ACE_INVALID_API_VERSION] = "invalid-api-version",
-	[ACE_BUSY] = "busy",
-	[ACE_INVALID_AFI_ID] = "invalid-afi-id",
-};
+static int command_get_virtual_dip(void)
+{
+uint16_t        status;
+int             ret;
+int             i;
+        if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot,&status)) {
+                printf("Error: can not get virtual DIP Switch state\n");
+                return ret;
+        }
 
-/**
- * Handle AFI error response 
- *
- * @param[in]  cmd		the command that was sent.
- * @param[in]  rsp		the response that was received.
- * @param[in]  len		the expected response payload len.
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int 
-handle_afi_cmd_error_rsp(const union afi_cmd *cmd, 
-		const union afi_cmd *rsp, uint32_t len)
-{		
-	(void)cmd;
-
-	struct afi_cmd_err_rsp *err_rsp = (void *)rsp->body;
-
-	uint32_t tmp_len =
-		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
-
-	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
-			len, tmp_len);
-
-	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot  ErrorName       ErrorCode\n");
-	}
-
-	printf(TYPE_FMT "  %2u", "AFI", f1.afi_slot);
-
-	char *err_name = "internal-error";
-	if ((err_rsp->error < ACE_END) && ace_tbl[err_rsp->error]) {
-		err_name = (void *)ace_tbl[err_rsp->error];
-	}
-	printf("       %-13s      %u\n", err_name, err_rsp->error);
-
-	/** Handle invalid API version error */
-	if (err_rsp->error == ACE_INVALID_API_VERSION) {
-		union afi_err_info *err_info = (void *)err_rsp->error_info;
-
-		tmp_len += sizeof(err_info->afi_cmd_version);
-		fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
-				len, tmp_len);
-
-		printf("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n", 
-				err_info->afi_cmd_version);
-	}
-
+        printf("FPGA slot id %u has the following Virtual DIP Switches:\n",f1.afi_slot);
+        for(i=0;i<16;i++) {
+                if (status & 0x8000)
+                        printf("1");
+                else
+                        printf("0");
+                status = status << 1;
+        }
+        printf("\n");
 	return 0;
-err:
-	return -1;
 }
 
-/**
- * Validate the AFI response header, using the command header.
- *
- * @param[in]  cmd		the command that was sent.
- * @param[in]  rsp		the response that was received.
- * @param[in]  len		the expected response payload len.
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int 
-afi_validate_header(const union afi_cmd *cmd, 
-		const union afi_cmd *rsp, uint32_t len)
+static int command_set_virtual_dip(void)
 {
-	uint32_t stored_flags = afi_cmd_hdr_get_flags(rsp);
-	uint32_t is_response = stored_flags & AFI_CMD_HDR_IS_RSP;
-	uint32_t payload_len = afi_cmd_hdr_get_len(rsp);
-
-	fail_on_quiet(!cmd, err, "cmd == NULL");
-	fail_on_quiet(!rsp, err, "rsp == NULL");
-
-	/** Version */
-	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err, 
-			"cmd_ver(%u) != rsp_ver(%u)", 
-			cmd->hdr.version, rsp->hdr.version);
-
-	/** Opcode */
-	fail_on_quiet(cmd->hdr.op != rsp->hdr.op, op_err, "cmd_op(%u) != rsp_op(%u)",
-			cmd->hdr.op, rsp->hdr.op);
-
-	/** Id */
-	fail_on_quiet(cmd->hdr.id != rsp->hdr.id, id_err, "cmd_id(%u) != rsp_id(%u)",
-			cmd->hdr.id, rsp->hdr.id);
-
-	/** Received len too small */
-	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err, 
-			"Received length %u too small", len);
-
-	/** Payload len too big */
-	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN, 
-			err, "Payload length %u too big", payload_len);
-
-	/** Not a response */
-	fail_on_quiet(!is_response, err, "Command is not a response");
-	return 0;
-
-id_err:
-	return -EAGAIN;
-op_err:
-	if (rsp->hdr.op == AFI_CMD_ERROR) {
-		return handle_afi_cmd_error_rsp(cmd, rsp, len);
+int             ret;
+	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot,f1.v_dip_switch)) {
+		printf("Error trying to set virtual DIP Switch \n");
 	}
-err:
-	return -1;
+	return ret;
 }
 
-/**
- * Get the next command id.
- *
- * @returns
- * id
- */
-static uint32_t
-afi_get_next_id(void)
+static int command_start_virtual_jtag(void)
 {
-	static uint32_t id = 0;
+        printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",f1.afi_slot,f1.tcp_port);
+        printf("Press CTRL-C to stop the service.\n");
 
-	if (id == 0) {
-		id = rand();
-	}
-
-	return id++;
+        return xvcserver_start(f1.afi_slot,f1.tcp_port);
 }
 
-/**
- * Generate the AFI_CMD_LOAD.
- *
- * @param[in]		cmd		cmd buffer 
- * @param[in,out]	len		cmd len
- */
-static void 
-make_afi_cmd_load(union afi_cmd *cmd, uint32_t *len)
+static int command_load(void)
 {
-	assert(cmd);
-	assert(len);
-	struct afi_cmd_load_req *req = (void *)cmd->body;
-	uint32_t payload_len = sizeof(struct afi_cmd_load_req);
-
-	/** Fill in cmd header */
-	cmd->hdr.version = AFI_CMD_API_VERSION;
-	cmd->hdr.op = AFI_CMD_LOAD;
-	cmd->hdr.id = afi_get_next_id();
-	afi_cmd_hdr_set_len(cmd, payload_len);
-	afi_cmd_hdr_set_flags(cmd, 0);
-		
-	/** Fill in cmd body */
-	strncpy(req->ids.afi_id, f1.afi_id, sizeof(req->ids.afi_id)); 
-    req->ids.afi_id[sizeof(req->ids.afi_id) - 1] = 0; 
-
-	req->fpga_cmd_flags = 0;
-
-	*len = sizeof(struct afi_cmd_hdr) + payload_len;
-}
-
-/**
- * Generate the AFI_CMD_METRICS.
- *
- * @param[in]		cmd		cmd buffer 
- * @param[in,out]	len		cmd len
- */
-static void 
-make_afi_cmd_metrics(union afi_cmd *cmd, uint32_t *len)
-{
-	assert(cmd);
-	assert(len);
-
-	struct afi_cmd_metrics_req *req = (void *)cmd->body;
-	uint32_t payload_len = sizeof(struct afi_cmd_metrics_req);
-
-	/** Fill in cmd header */
-	cmd->hdr.version = AFI_CMD_API_VERSION;
-	cmd->hdr.op = AFI_CMD_METRICS;
-	cmd->hdr.id = afi_get_next_id();
-	afi_cmd_hdr_set_len(cmd, payload_len);
-	afi_cmd_hdr_set_flags(cmd, 0);
-
-	/** Fill in cmd body */
-	req->fpga_cmd_flags = 0;
-
-	*len = sizeof(struct afi_cmd_hdr) + payload_len;
+	int ret;
+	ret = fpga_mgmt_load_local_image(f1.afi_slot, f1.afi_id);
+	return ret;
 }
 
 /**
@@ -533,37 +211,11 @@ make_afi_cmd_metrics(union afi_cmd *cmd, uint32_t *len)
  * @param[in]		cmd		cmd buffer 
  * @param[in,out]	len		cmd len
  */
-static void 
-make_afi_cmd_clear(union afi_cmd *cmd, uint32_t *len)
+static int 
+command_clear(void)
 {
-	assert(cmd);
-	assert(len);
-
-	struct afi_cmd_clear_req *req = (void *)cmd->body;
-	uint32_t payload_len = sizeof(struct afi_cmd_clear_req);
-
-	/** Fill in cmd header */
-	cmd->hdr.version = AFI_CMD_API_VERSION;
-	cmd->hdr.op = AFI_CMD_CLEAR;
-	cmd->hdr.id = afi_get_next_id();
-	afi_cmd_hdr_set_len(cmd, payload_len);
-	afi_cmd_hdr_set_flags(cmd, 0);
-
-	/** Fill in cmd body */
-	req->fpga_cmd_flags = 0;
-
-	*len = sizeof(struct afi_cmd_hdr) + payload_len;
+	return fpga_mgmt_clear_local_image(f1.afi_slot);
 }
-
-/**
- * Table of AFI_CMD_METRICS opcode, status values.
- */
-static const char *acms_tbl[ACMS_END] = {
-	[ACMS_LOADED] = "loaded",
-	[ACMS_CLEARED] = "cleared",
-	[ACMS_BUSY] = "busy",
-	[ACMS_NOT_PROGRAMMED] = "not-programmed",
-};
 
 /**
  * Handle the AFI_CMD_METRICS response.
@@ -577,49 +229,145 @@ static const char *acms_tbl[ACMS_END] = {
  * -1	on failure
  */
 static int
-handle_afi_cmd_metrics_rsp(const union afi_cmd *cmd,
-		const union afi_cmd *rsp, uint32_t len)
+command_metrics(void)
 {
-	(void)cmd;
-	/** We've already validated the header... */
-	struct afi_cmd_metrics_rsp *metrics = (void *)rsp->body;
-	uint32_t i;
 	int ret;
+	uint32_t i;
+	struct fpga_mgmt_image_info info;
 
-	uint32_t tmp_len = 
-		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
+	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
-			len, tmp_len);
+	// todo:
+	// req->fpga_cmd_flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+	// req->fpga_cmd_flags |= (f1.clear_hw_metrics) ?  
+	//	FPGA_CMD_CLEAR_HW_METRICS : 0;
+
+	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info);
+	fail_on(ret, err, "Unable to describe local image");
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion\n");         
 	}
 
-	char *afi_id = (!metrics->ids.afi_id[0]) ? "none" : metrics->ids.afi_id;
+	char *afi_id = (!info.ids.afi_id[0]) ? "none" : info.ids.afi_id;
 	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
-	char *status_name = "internal-error";
-	if ((metrics->status < ACMS_END) && acms_tbl[metrics->status]) {
-		status_name = (void *)acms_tbl[metrics->status]; 
-	}
-
-	struct fpga_hal_mbox_versions ver;
-	ret = fpga_hal_mbox_get_versions(&ver);
-	fail_on_quiet(ret != 0, err, "fpga_hal_mbox_get_versions failed");
-
 	printf("  %-8s         %2u        0x%08x\n", 
-			status_name, metrics->status, ver.sh_version); 
+			FPGA_STATUS2STR(info.status), info.status, info.sh_version); 
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
-		ret = cli_rescan_slot_app_pfs(f1.afi_slot);
+		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot); // todo: implement this in the library
 		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
-	ret = cli_show_slot_app_pfs(f1.afi_slot);
-	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+	// ret = cli_show_slot_app_pfs(f1.afi_slot); // todo
+	//fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+
+	if (f1.get_hw_metrics) {
+		if (f1.show_headers) {
+			printf("Metrics\n");
+		}
+
+		struct fpga_metrics_common *fmc = &info.metrics;
+		printf("pci-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT) ?
+				1 : 0); 
+
+		printf("pci-slave-sda-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT) ?
+				1 : 0); 
+
+		printf("pci-slave-ocl-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT) ?
+				1 : 0); 
+
+		printf("pci-slave-edma-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT) ?
+				1 : 0); 
+
+		printf("pci-range-error=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_RANGE_ERROR) ? 
+				1 : 0); 
+
+		printf("pci-axi-protocol-error=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-len-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LEN_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-4K-cross-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-bus-master-enable-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BM_EN_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-request-size-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_REQ_SIZE_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-write-incomplete-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-first-byte-enable-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-last-byte-enable-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-write-strobe-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WSTRB_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-bready-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-rready-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ?
+				1 : 0); 
+
+		printf("pci-axi-protocol-wchannel-error=%u\n", 
+				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
+				1 : 0); 
+
+		printf("ps-timeout-addr=0x%" PRIx64 "\n", fmc->ps_timeout_addr); 
+		printf("ps-timeout-count=%u\n", fmc->ps_timeout_count); 
+
+		printf("ps-sda-timeout-addr=0x%" PRIx64 "\n", fmc->ps_sda_timeout_addr); 
+		printf("ps-sda-timeout-count=%u\n", fmc->ps_sda_timeout_count); 
+
+		printf("ps-ocl-timeout-addr=0x%" PRIx64 "\n", fmc->ps_ocl_timeout_addr); 
+		printf("ps-ocl-timeout-count=%u\n", fmc->ps_ocl_timeout_count); 
+
+		printf("ps-edma-timeout-addr=0x%" PRIx64 "\n", fmc->ps_edma_timeout_addr); 
+		printf("ps-edma-timeout-count=%u\n", fmc->ps_edma_timeout_count); 
+
+		printf("pm-range-error-addr=0x%" PRIx64 "\n", fmc->pm_range_error_addr); 
+		printf("pm-range-error-count=%u\n", fmc->pm_range_error_count); 
+
+		printf("pm-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pm_axi_protocol_error_addr); 
+		printf("pm-axi-protocol-error-count=%u\n", fmc->pm_axi_protocol_error_count); 
+
+		printf("pm-write-count=%" PRIu64 "\n", fmc->pm_write_count); 
+		printf("pm-read-count=%" PRIu64 "\n", fmc->pm_read_count); 
+
+		for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
+			struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];
+
+			printf("DDR%u\n", i);
+			printf("   write-count=%" PRIu64 "\n", ddr_if->write_count); 
+			printf("   read-count=%" PRIu64 "\n", ddr_if->read_count); 
+		}
+	}
 
 	return 0;
 err:
@@ -639,46 +387,40 @@ err:
  * -1	on failure
  */
 static int
-handle_afi_describe_slots(const union afi_cmd *cmd,
-		const union afi_cmd *rsp, uint32_t len)
+command_describe_slots(void)
 {
-	(void)cmd;
-	(void)rsp;
-	(void)len;
+	int i, ret;
+	struct fpga_slot_spec spec_array[FPGA_SLOT_MAX];
 
-	int i;
-	for (i = 0; i < FPGA_SLOT_MAX; i++) {
-		struct fpga_pci_resource_map *mbox_map = &f1.mbox_slot_devs[i].map;
+	memset(spec_array, 0, sizeof(spec_array));
 
-		if (mbox_map->vendor_id) {
-			/** Display the application PFs for this slot */
-			int ret = cli_show_slot_app_pfs(i);
-			fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
-		}
+	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
+
+	for (i = 0; i < sizeof_array(spec_array); ++i) {
+		if (spec_array[i].map[FPGA_APP_PF].vendor_id == 0)
+			continue;
+
+		/** Display the application PFs for this slot */
+		ret = cli_show_slot_app_pfs(i, &spec_array[i]);
+		fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+
 	}
 	return 0;
 err:
 	return -1;
 }
 
-typedef void (*cmd_generator_t)(union afi_cmd *cmd, uint32_t *len);
+typedef int (*command_func_t)(void);
 
-/** Table of AFI commands to cli */
-static const cmd_generator_t cmd_tbl[AFI_EXT_END] = {
-	[AFI_CMD_LOAD] = make_afi_cmd_load,
-	[AFI_CMD_METRICS] = make_afi_cmd_metrics,
-	[AFI_CMD_CLEAR] = make_afi_cmd_clear,
-};
-
-typedef int (*rsp_handler_t)(const union afi_cmd *cmd, 
-		const union afi_cmd *rsp, uint32_t len);
-
-/** 
- * Table of AFI response handlers
- */
-static const rsp_handler_t rsp_tbl[AFI_EXT_END] = {
-	[AFI_CMD_METRICS] = handle_afi_cmd_metrics_rsp,
-	[AFI_EXT_DESCRIBE_SLOTS] = handle_afi_describe_slots,
+static const command_func_t command_table[AFI_EXT_END] = {
+	[AFI_CMD_LOAD] = command_load,
+	[AFI_CMD_METRICS] = command_metrics,
+	[AFI_CMD_CLEAR] = command_clear,
+	[AFI_EXT_DESCRIBE_SLOTS] = command_describe_slots,
+	[AFI_START_VJTAG] = command_start_virtual_jtag,
+	[AFI_GET_LED] = command_get_virtual_led,
+	[AFI_GET_DIP] = command_get_virtual_dip,
+	[AFI_SET_DIP] = command_set_virtual_dip,
 };
 
 /**
@@ -691,43 +433,11 @@ static const rsp_handler_t rsp_tbl[AFI_EXT_END] = {
 static int
 cli_main(void)
 {
-	uint32_t len = 0;
-
 	fail_on_quiet(f1.opcode >= AFI_EXT_END, err, "Invalid opcode %u", f1.opcode);
+	fail_on_user(command_table[f1.opcode] == NULL, err, "Action not defined for "
+	             "opcode %u", f1.opcode);
 
-	int ret;
-	if (cmd_tbl[f1.opcode]) {
-		cmd_tbl[f1.opcode](&cmd, &len);
-
-		/** Write the AFI cmd to the mailbox */
-		ret = fpga_hal_mbox_write(&cmd, len);
-		fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-		/** 
-		 * Read the AFI rsp from the mailbox.
-		 *  -also make a minimal attempt to drain stale responses 
-		 *   (if any).
-		 */
-		uint32_t id_retries = 0;
-		ret = -EAGAIN;
-		while (ret == -EAGAIN) {
-			ret = fpga_hal_mbox_read(&rsp, &len);
-			fail_on_user(ret != 0, err, "Error: operation timed out");
-
-			ret = afi_validate_header(&cmd, &rsp, len);
-
-			fail_on_internal(id_retries >= AFI_MAX_ID_RETRIES, err, 
-					CLI_INTERNAL_ERR_STR);
-			id_retries++;
-		}
-		fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-	}
-
-	if (rsp_tbl[f1.opcode]) {
-		ret = rsp_tbl[f1.opcode](&cmd, &rsp, len);
-		fail_on_quiet(ret != 0, err, "Error: AFI mgmt channel invalid message");
-	} 
-	return 0;
+	return command_table[f1.opcode]();
 err:
 	return -1;
 }
@@ -747,6 +457,7 @@ cli_init_f1(void)
 	f1.afi_slot = -1;
 	f1.mbox_timeout = CLI_TIMEOUT_DFLT;
 	f1.mbox_delay_msec = CLI_DELAY_MSEC_DFLT;
+	f1.show_mbox_device = false;
 
 	srand((unsigned)time(NULL));
 
