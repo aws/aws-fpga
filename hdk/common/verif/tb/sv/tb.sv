@@ -14,7 +14,15 @@ module tb();
    parameter NUM_I2C = 2;
    parameter NUM_POWER = 4;
 
-   logic clk_out;
+   logic clk_main_a0;
+   logic clk_extra_a1;
+   logic clk_extra_a2;
+   logic clk_extra_a3;
+   logic clk_extra_b0;
+   logic clk_extra_b1;
+   logic clk_extra_c0;
+   logic clk_extra_c1;
+   
    logic rst_out_n; 
    logic clk_xtra;
    logic rst_xtra_n;
@@ -346,7 +354,17 @@ sh_bfm sh(
    .sh_cl_ctl1(sh_cl_ctl1),
    .clk_xtra(clk_xtra),
    .rst_xtra_n(rst_xtra_n),
-   .clk_main_a0(clk_out),
+   .clk_main_a0(clk_main_a0),
+   .clk_extra_a1(clk_extra_a1),
+   .clk_extra_a2(clk_extra_a2),
+   .clk_extra_a3(clk_extra_a3),
+   
+   .clk_extra_b0(clk_extra_b0),
+   .clk_extra_b1(clk_extra_b1),
+   
+   .clk_extra_c0(clk_extra_c0),
+   .clk_extra_c1(clk_extra_c1),
+          
    .rst_out_n(rst_out_n),
    .sh_cl_pwr_state(sh_cl_pwr_state),
 
@@ -648,9 +666,19 @@ sh_bfm sh(
 
 
    //Developer put top level here (replace cl_simple, with top level)
-   `CL_NAME #(.NUM_PCIE(NUM_PCIE), .NUM_DDR(NUM_DDR), .NUM_HMC(NUM_HMC), .NUM_GTY(NUM_GTY)) CL (
+   `CL_NAME #(.NUM_DDR(NUM_DDR)) CL (
    
-      .clk_main_a0(clk_out),
+      .clk_main_a0(clk_main_a0),
+      .clk_extra_a1(clk_extra_a1),
+      .clk_extra_a2(clk_extra_a2),
+      .clk_extra_a3(clk_extra_a3),
+   
+      .clk_extra_b0(clk_extra_b0),
+      .clk_extra_b1(clk_extra_b1),
+   
+      .clk_extra_c0(clk_extra_c0),
+      .clk_extra_c1(clk_extra_c1),
+          
       .rst_main_n(rst_out_n),
       .kernel_rst_n(rst_out_n),
 

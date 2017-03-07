@@ -31,11 +31,16 @@ ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m03_regslice_0/si
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v
 ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 
+${SH_LIB_DIR}/bram_2rw.sv
+${SH_LIB_DIR}/flop_fifo.sv
 
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv
+
+
 ${CL_ROOT}/design/cl_tst.sv
+
 ${CL_ROOT}/design/cl_int_tst.sv
 ${CL_ROOT}/design/cl_dram_dma_pkg.sv
 ${CL_ROOT}/design/cl_dma_pcis_slv.sv
