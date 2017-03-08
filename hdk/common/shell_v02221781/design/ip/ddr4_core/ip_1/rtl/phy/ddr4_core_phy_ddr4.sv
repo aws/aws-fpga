@@ -100,7 +100,7 @@ module ddr4_core_phy_ddr4 #
    ,parameter integer DQS_WIDTH            = 18
    ,parameter integer DM_WIDTH             = 9
 
-   ,parameter         tCK                  = 833
+   ,parameter         tCK                  = 937
    ,parameter real    TCQ                  = 100
 
    ,parameter         USE_DYNAMIC_DCI      = 1

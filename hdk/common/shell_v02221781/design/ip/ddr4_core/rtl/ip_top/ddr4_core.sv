@@ -69,7 +69,7 @@
 
 `timescale 1ns/1ps
 
-(* CORE_GENERATION_INFO = "DDR4_SDRAM, DDR4_SDRAM,{x_ipProduct=Vivado 2016.1.0,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=DDR4_SDRAM,x_ipVersion=2.1, Controller_Type = DDR4_SDRAM, Time_Period = 833, Input_Clock_Period = 3332, Memory_Type = RDIMMs, Memory_Part = MTA18ASF2G72PZ-2G3, Ecc = true, Cas_Latency = 17, Cas_Write_Latency = 12, DQ_Width = 72, Chip_Select = true, Data_Mask = NONE, MEM_ADDR_ORDER = ROW_COLUMN_BANK,  Is_AXI_Enabled = true , Slot_cofiguration =  Single , Clamshell_cofiguration =  false ,IS_FASTER_SPEED_RAM = No, Is_custom_part = false, Memory_Voltage = 1.2V, Phy_Only = Complete_Memory_Controller, Debug_Port = Disable}" *)
+(* CORE_GENERATION_INFO = "DDR4_SDRAM, DDR4_SDRAM,{x_ipProduct=Vivado 2016.1.0,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=DDR4_SDRAM,x_ipVersion=2.1, Controller_Type = DDR4_SDRAM, Time_Period = 937, Input_Clock_Period = 3332, Memory_Type = RDIMMs, Memory_Part = MTA18ASF2G72PZ-2G3, Ecc = true, Cas_Latency = 17, Cas_Write_Latency = 12, DQ_Width = 72, Chip_Select = true, Data_Mask = NONE, MEM_ADDR_ORDER = ROW_COLUMN_BANK_INTLV,  Is_AXI_Enabled = true , Slot_cofiguration =  Single , Clamshell_cofiguration =  false ,IS_FASTER_SPEED_RAM = No, Is_custom_part = false, Memory_Voltage = 1.2V, Phy_Only = Complete_Memory_Controller, Debug_Port = Disable}" *)
 (* X_CORE_INFO = "ddr4_v2_1_1,Vivado 2016.4_sdx" *)
 module ddr4_core
    (
@@ -79,7 +79,7 @@ module ddr4_core
    input                 c0_sys_clk_n,
 
    output                ALT_ddr4_reset_n, //AK Added __SRAI (added for PR compatibility)
-      
+  
    // Self-Refresh
     input         c0_ddr4_app_sref_req,        // application interface self-refresh request (to memory controller)
     output        c0_ddr4_app_sref_ack,        // application interface self-refresh acknowledgement (from memory controller)
@@ -196,7 +196,7 @@ ddr4_core_ddr4
    .c0_sys_clk_p                   (c0_sys_clk_p),
    .c0_sys_clk_n                   (c0_sys_clk_n),
 
-   .ALT_ddr4_reset_n       (ALT_ddr4_reset_n), //AK Added __SRAI (added for PR compitibility)
+  .ALT_ddr4_reset_n       (ALT_ddr4_reset_n), //AK Added __SRAI (added for PR compitibility)
 
    .c0_ddr4_app_sref_req         (c0_ddr4_app_sref_req),
    .c0_ddr4_app_sref_ack         (c0_ddr4_app_sref_ack), 
