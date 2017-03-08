@@ -31,8 +31,11 @@
  */
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
 static uint16_t pci_device_id = 0xF000; /* PCI Device ID allocated by Amazon for F1 applications */
-                                        
-/* use the stdout logger */
+
+/* */
+
+/* use the stdout logger for printing debug information  */
+
 const struct logger *logger = &logger_stdout;
 
 int peek_poke_example(int slot, int pf_id, int bar_id);
@@ -42,18 +45,22 @@ int main(int argc, char **argv) {
     int slot_id;
 
     /* setup logging to print to stdout */
+    /* This code is provided to help debug the software and not required by AWS FPGA */
     rc = log_init("test_hello_world");
     fail_on(rc, out, "Unable to initialize the log.");
     rc = log_attach(logger, NULL, 0);
     fail_on(rc, out, "%s", "Unable to attach to the log.");
 
-    /* initialize the fpga_plat library */
+    /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
-    fail_on(rc, out, "Unable to initialize the fpga_plat library");
+    fail_on(rc, out, "Unable to initialize the fpga_pci library");
+
+    /* This demo works with single FPGA slot, we pick slot #0 as it works for both f1.2xl and f1.16xl */
 
     slot_id = 0;
 
-    /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus */
+
+    /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
     return peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0); 
 
 out:
@@ -65,20 +72,22 @@ out:
  */
 int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     int rc;
+    /* pci_bar_handle_t is a handler for an address space exposed by one PCI BAR on one of the PCI PFs of the FPGA */
+
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct fpga_mgmt_image_info info = {0};
 
     /* get local image description, contains status, vendor id, and device id. */
     rc = fpga_mgmt_describe_local_image(slot_id, &info);
-    fail_on(rc, out, "Unable to get local image information");
+    fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
 
     /* check to see if the slot is ready */
     if (info.status != FPGA_STATUS_LOADED) {
         rc = 1;
-        fail_on(rc, out, "Slot %d is not ready", slot_id);
+        fail_on(rc, out, "AFI in Slot %d is not in READY state !", slot_id);
     }
 
-    printf("CL vendor_id: 0x%x, device_id 0x%x\n",
+    printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
         info.spec.map[FPGA_APP_PF].vendor_id,
         info.spec.map[FPGA_APP_PF].device_id);
     
@@ -86,7 +95,7 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
         info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
         rc = 1;
-        fail_on(rc, out, "The PCI vendor id and device of the loaded image are not "
+        fail_on(rc, out, "The PCI vendor id and device of the loaded AFI are not "
                          "the expected values.");
     }
 
@@ -97,17 +106,17 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
      * This function accepts the slot_id, physical function, and bar number
      */
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the fpga");
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
     /* write a value into the mapped address space */
     uint32_t value = 0xefbeadde;
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
-    fail_on(rc, out, "Unable to write to the fpga");
+    fail_on(rc, out, "Unable to write to the fpga !");
 
     /* read it back and print it out; you should expect the byte order to be
      * reversed (That's what this CL does) */
     rc = fpga_pci_peek(pci_bar_handle, HELLO_WORLD_REG_ADDR, &value);
-    fail_on(rc, out, "Unable to read read from the fpga");
+    fail_on(rc, out, "Unable to read read from the fpga !");
     printf("register: 0x%x\n", value);
 
 out:
