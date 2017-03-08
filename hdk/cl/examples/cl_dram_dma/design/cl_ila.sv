@@ -20,6 +20,9 @@ module cl_ila (
 
 );
 
+//---------------------------- 
+// Debug bridge
+//---------------------------- 
  cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(aclk),
       .drck(drck),
@@ -36,6 +39,9 @@ module cl_ila (
       .bscanid(bscanid)
  );
 
+//---------------------------- 
+// Debug Core ILA for dmm pcis AXI4 interface 
+//---------------------------- 
    ila_1 CL_DMA_ILA_0 (
                    .clk    (aclk),
                    .probe0 (sh_cl_dma_pcis_q.awvalid),
@@ -83,7 +89,9 @@ module cl_ila (
                    .probe42 (1'b0),
                    .probe43 (1'b0)
                    );
-
+//---------------------------- 
+// Debug Core ILA for DDRA AXI4 interface monitoring 
+//---------------------------- 
       ila_1 CL_DDRC_ILA_0 (
                    .clk    (aclk),
                    .probe0 (lcl_cl_sh_ddra.awvalid),

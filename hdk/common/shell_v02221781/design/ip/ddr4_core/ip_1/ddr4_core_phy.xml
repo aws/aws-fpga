@@ -16,7 +16,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 01 22:13:56 UTC 2017</spirit:value>
+            <spirit:value>Wed Mar 01 15:29:11 UTC 2017</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>boundaryCRC</spirit:name>
@@ -28,7 +28,7 @@
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-            <spirit:value>6113c638</spirit:value>
+            <spirit:value>69834aee</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>
@@ -46,7 +46,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 01 22:13:56 UTC 2017</spirit:value>
+            <spirit:value>Wed Mar 01 15:29:12 UTC 2017</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>boundaryCRC</spirit:name>
@@ -58,7 +58,7 @@
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-            <spirit:value>6113c638</spirit:value>
+            <spirit:value>69834aee</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>
@@ -77,7 +77,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 01 22:13:56 UTC 2017</spirit:value>
+            <spirit:value>Wed Mar 01 15:29:12 UTC 2017</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>boundaryCRC</spirit:name>
@@ -89,7 +89,7 @@
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRC</spirit:name>
-            <spirit:value>62558454</spirit:value>
+            <spirit:value>51375dd7</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>customizationCRCversion</spirit:name>
@@ -2573,12 +2573,12 @@
       <spirit:modelParameter>
         <spirit:name>tCK</spirit:name>
         <spirit:displayName>tCK</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tCK">833</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tCK">937</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter>
         <spirit:name>tXPR</spirit:name>
         <spirit:displayName>tXPR</spirit:displayName>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tXPR">109</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tXPR">97</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter>
         <spirit:name>nCK_PER_CLK</spirit:name>
@@ -2838,12 +2838,12 @@
       <spirit:modelParameter>
         <spirit:name>tWR</spirit:name>
         <spirit:displayName>tWR</spirit:displayName>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tWR">19</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tWR">17</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter>
         <spirit:name>tRTP</spirit:name>
         <spirit:displayName>tRTP</spirit:displayName>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tRTP">10</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.tRTP">9</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter>
         <spirit:name>RANK_WIDTH</spirit:name>
@@ -3133,7 +3133,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_TimePeriod</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_TimePeriod" spirit:order="16">833</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_TimePeriod" spirit:order="16">937</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_InputClockPeriod</spirit:name>
@@ -3141,15 +3141,15 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_CLKFBOUT_MULT</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_CLKFBOUT_MULT" spirit:order="18">5</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_CLKFBOUT_MULT" spirit:order="18">8</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_DIVCLK_DIVIDE</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_DIVCLK_DIVIDE" spirit:order="19">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_DIVCLK_DIVIDE" spirit:order="19">3</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_CLKOUT0_DIVIDE</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_CLKOUT0_DIVIDE" spirit:order="20">5</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C0.DDR4_CLKOUT0_DIVIDE" spirit:order="20">3</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C0.DDR4_PhyClockRatio</spirit:name>

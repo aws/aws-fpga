@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Feb  1 14:13:51 2017" VIVADOVERSION="2016.4_sdx">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Mar  1 07:29:08 2017" VIVADOVERSION="2016.4_sdx">
 
   <SYSTEMINFO ARCH="virtexuplus" DEVICE="xcvu9p" NAME="bd_bf3f" PACKAGE="flgb2104" SPEEDGRADE="-2"/>
 

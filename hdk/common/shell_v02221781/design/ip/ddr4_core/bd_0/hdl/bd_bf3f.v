@@ -1,7 +1,7 @@
 //Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
-//Tool Version: Vivado v.2016.4_sdx (lin64) Build 1752585 Wed Jan 18 17:34:57 MST 2017
-//Date        : Wed Feb  1 14:13:49 2017
+//Tool Version: Vivado v.2016.4_sdx (lin64) Build 1765467 Wed Feb  1 13:16:54 MST 2017
+//Date        : Wed Mar  1 07:29:05 2017
 //Host        : ip-10-206-21-184 running 64-bit CentOS release 6.5 (Final)
 //Command     : generate_target bd_bf3f.bd
 //Design      : bd_bf3f
@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------------
 `timescale 1 ps / 1 ps
 
-(* CORE_GENERATION_INFO = "bd_bf3f,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=bd_bf3f,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=11,numReposBlks=11,numNonXlnxBlks=0,numHierBlks=0,maxHierDepth=0,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SBD,synth_mode=Global}" *) (* HW_HANDOFF = "ddr4_core_microblaze_mcs.hwdef" *) 
+(* CORE_GENERATION_INFO = "bd_bf3f,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=bd_bf3f,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=11,numReposBlks=11,numNonXlnxBlks=0,numHierBlks=0,maxHierDepth=0,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SBD,synth_mode=OOC_per_IP}" *) (* HW_HANDOFF = "ddr4_core_microblaze_mcs.hwdef" *) 
 module bd_bf3f
    (Clk,
     IO_addr_strobe,
