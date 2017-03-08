@@ -10,8 +10,7 @@ INCLUDES = -I$(SDK_DIR)/userspace/include
 CC = gcc
 CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
 
-LDFLAGS = -L$(SDK_DIR)/userspace/lib
-LDLIBS = -lfpga_pci -lfpga_mgmt -lfpga_hal_reg -lfpga_hal_plat -lfpga_hal_mbox -lutils -lrt -lpthread
+LDLIBS = -lfpga_mgmt -lrt -lpthread
 
 SRC = test_hello_world.c
 OBJ = $(SRC:.c=.o)

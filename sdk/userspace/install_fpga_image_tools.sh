@@ -25,6 +25,8 @@ fi
 SDK_MGMT_DIR=$SDK_DIR/userspace
 AFI_MGMT_TOOLS_SRC_DIR=$SDK_MGMT_DIR/fpga_image_tools/src
 AFI_MGMT_TOOLS_DST_DIR=/usr/bin
+AFI_MGMT_TOOLS_LIB_DIR=$SDK_MGMT_DIR/lib/so
+AFI_MGMT_LIBS_DST_DIR=/usr/lib64
 
 # Build and install the Amazon FPGA Image (AFI) Management Tools
 cd $SDK_MGMT_DIR
@@ -37,5 +39,6 @@ fi
 # /usr/bin requires sudo permissions 
 echo "AWS FPGA: Copying Amazon FPGA Image (AFI) Management Tools to $AFI_MGMT_TOOLS_DST_DIR"
 sudo cp -f $AFI_MGMT_TOOLS_SRC_DIR/fpga-* $AFI_MGMT_TOOLS_DST_DIR
+sudo cp -f $AFI_MGMT_TOOLS_LIB_DIR/libfpga_mgmt.so $AFI_MGMT_LIBS_DST_DIR
 
 echo "AWS FPGA: Done with Amazon FPGA Image (AFI) Management Tools install."
