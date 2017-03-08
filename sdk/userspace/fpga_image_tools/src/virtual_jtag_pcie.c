@@ -22,34 +22,13 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-static const size_t XVC_VSEC_ID = 0x0008;
-
-#define VALID_OFFSET(a) (a < 0x1000 && a >= 0x100)
-
-struct xvc_offsets {
-	size_t debug_id_reg_offset;
-	size_t length_reg_offset;
-	size_t tms_reg_offset;
-	size_t tdi_reg_offset;
-	size_t tdo_reg_offset;
-	size_t control_reg_offset;
-};
-
-static const struct xvc_offsets xvc_offsets = 
-	{0x00, 0x00, 0x04, 0x08, 0x0C, 0x10};  // XVC_ALGO_BAR
-
-#define DEBUG_ID_REG_OFFSET (xvc_offsets.debug_id_reg_offset)
-#define LENGTH_REG_OFFSET   (xvc_offsets.length_reg_offset)
-#define TMS_REG_OFFSET      (xvc_offsets.tms_reg_offset)
-#define TDI_REG_OFFSET      (xvc_offsets.tdi_reg_offset)
-#define TDO_REG_OFFSET      (xvc_offsets.tdo_reg_offset)
-#define CONTROL_REG_OFFSET  (xvc_offsets.control_reg_offset)
+#include "virtual_jtag.h"
 
 
 int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar) {
    int ret;
 /* attach to slot S */
-  ret = fpga_pci_attach(FPGA_MGMT_PF, MGMT_PF_2, jtag_pci_bar);
+  ret = fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR2,0, jtag_pci_bar);
   
   if (ret) {
   // FIXME
@@ -61,11 +40,11 @@ int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar) {
 
 void close_port(pci_bar_handle_t jtag_pci_bar) {
   if (jtag_pci_bar >=0)
-    fpga_pci_detach(jtag_pci_bar);
+    fpga_pci_detatch(jtag_pci_bar);
   
 }
 
-void set_tck(pci_bar_handle_t jtag_pci_bar, unsigned long nsperiod, unsigned long *result) {
+void set_tck( unsigned long nsperiod, unsigned long *result) {
     *result = nsperiod;
 }
 
@@ -117,14 +96,14 @@ static int xvc_shift_bits(pci_bar_handle_t jtag_pci_bar, uint32_t tms_bits, uint
 
 void shift_tms_tdi(
     	pci_bar_handle_t jtag_pci_bar,
-    	unsigned long bitcount,
+    	uint32_t bitcount,
     	unsigned char *tms_buf,
     	unsigned char *tdi_buf,
     	unsigned char *tdo_buf) {
 
     	struct timeval  start;
 	uint32_t num_bits;
-	int current_bit;
+	uint32_t current_bit;
 	uint32_t tms_store=0, tdi_store=0, tdo_store=0;
 	unsigned char* tms_buf_tmp;
 	unsigned char* tdi_buf_tmp;
@@ -146,7 +125,7 @@ void shift_tms_tdi(
 	current_bit = 0;
 	while (current_bit < num_bits) {
 		int shift_num_bytes;
-		int shift_num_bits = 32;
+		unsigned int shift_num_bits = 32;
 		if (num_bits - current_bit < shift_num_bits) {
 			shift_num_bits = num_bits - current_bit;
 			// do LENGTH_REG_OFFSET here

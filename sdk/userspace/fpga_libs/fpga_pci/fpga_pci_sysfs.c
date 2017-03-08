@@ -110,14 +110,16 @@ err:
  * -1	on failure
  */
 static int
-fpga_pci_get_pci_resource_size(char *dir_name,
-		uint32_t resource_num, size_t *resource_size)
+fpga_pci_get_pci_resource_info(char *dir_name,
+		uint8_t resource_num, uint64_t *resource_size, bool *burstable)
 {
+	int ret;
+
 	fail_on_internal(!dir_name, err, CLI_INTERNAL_ERR_STR);
 	fail_on_internal(!resource_size, err, CLI_INTERNAL_ERR_STR);
 
 	char sysfs_name[NAME_MAX + 1];
-	int ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
 			"/sys/bus/pci/devices/%s/resource%u", dir_name, 
 			resource_num);
 
@@ -133,6 +135,46 @@ fpga_pci_get_pci_resource_size(char *dir_name,
 
 	*resource_size = file_stat.st_size;
 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+			"/sys/bus/pci/devices/%s/resource%u_wc", dir_name, 
+			resource_num);
+
+	fail_on_quiet(ret < 0, err, "Error building the sysfs path for resource%u",
+			resource_num);
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
+			"sysfs path too long for resource%u", resource_num);
+
+	memset(&file_stat, 0, sizeof(struct stat));
+	ret = stat(sysfs_name, &file_stat);
+	*burstable = (ret == 0);
+
+	return 0;
+err:
+	return -1;
+}
+
+static int
+fpga_pci_handle_resources(char *dir_name, struct fpga_pci_resource_map *map)
+{
+	int ret;
+	static const uint8_t resource_nums[4] = {0, 1, 2, 4};
+
+	for (unsigned int i = 0; i < sizeof_array(resource_nums); ++i) {
+		bool burstable = false;
+		uint64_t resource_size = 0;
+		uint8_t resource_num = resource_nums[i];
+		if (resource_num > sizeof_array(map->resource_size)) {
+			continue;
+		}
+		ret = fpga_pci_get_pci_resource_info(dir_name, resource_num,
+		                                     &resource_size,
+		                                     &burstable);
+		if (ret) {
+			log_debug("Unable to read resource information for %d", resource_num);
+		}
+		map->resource_size[resource_num] = resource_size;
+		map->resource_burstable[resource_num] = burstable;
+	}
 	return 0;
 err:
 	return -1;
@@ -151,7 +193,7 @@ err:
  * -1	on failure
  */
 static int
-fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_slot_spec *spec)
+fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 {
 	uint16_t vendor_id = 0;
 	uint16_t device_id = 0;
@@ -181,51 +223,42 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_slot_spec *spec)
 	ret = fpga_pci_get_id(sysfs_name, &device_id);
 	fail_on_quiet(ret != 0, err, "Error retrieving device_id");
 
-	/** Check for a match to the FPGA Mbox Vendor ID and Device ID */
-	if ((vendor_id == F1_MBOX_VENDOR_ID) &&
-		(device_id == F1_MBOX_DEVICE_ID)) {
-		//log_debug("AFI mgmt channel found, using slot_dev_index=%u\n", 
-		//		f1.slot_dev_index); // <<<<
+	// /** Check for a match to the FPGA Mbox Vendor ID and Device ID */
+	// if ((vendor_id != F1_MBOX_VENDOR_ID) || (device_id != F1_MBOX_DEVICE_ID)) {
+	// 	/* the device did not match */
+	// 	return 1;
+	// }
 
-		/** Fill in the FPGA mbox slot dev, using slot_dev_index */
-		struct fpga_pci_resource_map *map = &spec->map;
+	/** Fill in the DBDF */
+	ret = fpga_pci_get_dbdf(dir_name, map);
+	fail_on_quiet(ret != 0, err, "Error retrieving DBDF from dir_name=%s",
+			dir_name);
 
-		/** Fill in the DBDF */
-		ret = fpga_pci_get_dbdf(dir_name, map);
-		fail_on_quiet(ret != 0, err, "Error retrieving DBDF from dir_name=%s",
-				dir_name);
+	/** Retrieve the PCI resource size for plat attach */
+	ret = fpga_pci_handle_resources(dir_name, map);
+	fail_on_quiet(ret != 0, err, "Error retrieving resource information");
 
-		/** Retrieve the PCI resource size for plat attach */
-		size_t resource_size = 0;
-		ret = fpga_pci_get_pci_resource_size(dir_name, F1_MBOX_RESOURCE_NUM, 
-				&resource_size);
-		fail_on_quiet(ret != 0, err, "Error retrieving resource size");
+	map->vendor_id = vendor_id;
+	map->device_id = device_id;
 
-		map->vendor_id = vendor_id;
-		map->device_id = device_id;
-		map->resource_num = F1_MBOX_RESOURCE_NUM;
-		map->size = resource_size;
-
-		return 0;
-	} else {
-		/* the device did not match */
-		return 1;
-	}
-
+	return 0;
 err:
 	return -1;
 }
 
 int
-fpga_pci_get_slot_spec(int slot_id, int pf_id, struct fpga_slot_spec *spec)
+fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 {
 	bool found_afi_slot = false;
 	char *path = "/sys/bus/pci/devices";
 	DIR *dirp = opendir(path);
 	fail_on_internal(!dirp, err, CLI_INTERNAL_ERR_STR);
 	int slot_dev_index = 0;
-	int search_max = min(FPGA_SLOT_MAX, slot_id);
 	struct fpga_slot_spec search_spec;
+	struct fpga_pci_resource_map search_map, previous_map;
+
+	memset(&search_spec, 0, sizeof(struct fpga_slot_spec));
+	memset(&previous_map, 0, sizeof(struct fpga_pci_resource_map));
 
 	/** Loop through the sysfs device directories */
 	for (;;) {
@@ -240,31 +273,86 @@ fpga_pci_get_slot_spec(int slot_id, int pf_id, struct fpga_slot_spec *spec)
 		}
 
 		/** Handle the current directory entry */
-		memset(&search_spec, 0, sizeof(struct fpga_slot_spec));
-		int ret = fpga_pci_handle_pci_dir_name(entry.d_name, &search_spec);
-		if (ret == 0) {
-			found_afi_slot = true;
-			slot_dev_index++;
+		memset(&search_map, 0, sizeof(struct fpga_pci_resource_map));
+		int ret = fpga_pci_handle_pci_dir_name(entry.d_name, &search_map);
+		if (ret != 0) {
+			continue;
+		}
+		found_afi_slot = true;
+		if (search_map.domain != previous_map.domain ||
+			search_map.bus    != previous_map.bus    ||
+			search_map.dev    != previous_map.dev) {
 
-			if (slot_dev_index >= search_max) {
-				break;
+
+			/* domain, bus, device do not match: this is the next slot */
+			if (search_spec.map[FPGA_MGMT_PF].vendor_id == F1_MBOX_VENDOR_ID &&
+				search_spec.map[FPGA_MGMT_PF].device_id == F1_MBOX_DEVICE_ID) {
+
+				spec_array[slot_dev_index] = search_spec;
+				++slot_dev_index;
+				if (slot_dev_index >= size) {
+					break;
+				}
 			}
 		}
+		if (search_map.func >= FPGA_MAX_PF) {
+			/* unexpected pf */
+			continue;
+		}
+		/* copy the map into the spec array */
+		search_spec.map[search_map.func] = search_map;
+		previous_map = search_map;
 	}
+	/* TODO: this has a bug in it: if there are no PCI devices after the last
+	 * FPGA, it will fail to find that FPGA. */
 
 	closedir(dirp);
 
-	/** 
-	 * Return errors back to the user:
-	 *  -no AFI slots found.
-	 *  -invalid AFI slot specified.
-	 */
-	fail_on_user(!found_afi_slot, err, "No fpga-image-slots found");
+	fail_on_quiet(!found_afi_slot, err, "No fpga-image-slots found");
 
-	*spec = search_spec;
-	spec->map.func = pf_id;
 	return 0;
-
 err:
 	return -1;
+}
+
+int
+fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
+{
+	int ret;
+	struct fpga_slot_spec spec_array[FPGA_SLOT_MAX];
+
+	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX || !spec) {
+		return -EINVAL;
+	}
+
+	memset(spec_array, 0, sizeof(spec_array));
+
+	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
+	fail_on_quiet(ret, err, "Unable to read PCI device information.");
+
+	if (spec_array[slot_id].map[FPGA_APP_PF].vendor_id == 0) {
+		log_error("No device matching specified id: %d", slot_id);
+		return -ENOENT;
+	}
+
+	*spec = spec_array[slot_id];
+	return 0;
+err:
+	return -1;
+}
+
+int
+fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map)
+{
+	(void) slot_id;
+	(void) pf_id;
+	(void) map;
+	return -ENOSYS;
+}
+
+int
+fpga_pci_rescan_slot_app_pfs(int slot_id)
+{
+	(void) slot_id;
+	return -ENOSYS;
 }

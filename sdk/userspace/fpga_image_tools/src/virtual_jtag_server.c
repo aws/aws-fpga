@@ -18,6 +18,7 @@
 #include <sys/time.h>
 
 #include <fpga_pci.h>
+#include "virtual_jtag.h"
 
 #define MAX_PACKET_LEN 10000
 
@@ -28,33 +29,7 @@
 #define XVC_VERSION 10
 #endif
 
-
-extern int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar); 
-
-extern void close_port(pci_bar_handle_t jtag_pci_bar);
-
-extern void set_tck(pci_bar_handle_t jtag_pci_bar, unsigned long nsperiod, unsigned long *result);
-
-extern void shift_tms_tdi(
-    pci_bar_handle_t jtag_pci_bar,
-    unsigned long bitcount,
-    unsigned char *tms_buf,
-    unsigned char *tdi_buf,
-    unsigned char *tdo_buf);
-
 static unsigned max_packet_len = MAX_PACKET_LEN;
-
-typedef struct _XvcClient {
-    unsigned buf_len;
-    unsigned buf_max;
-    uint8_t * buf;
-    jtag_pci_bar jtag_pci_bar;
-    int fd;
-    int locked;
-    int enable_locking;
-    int enable_status;
-    char pending_error[1024];
-} XvcClient;
 
 static XvcClient xvc_client;
 
@@ -164,7 +139,7 @@ read_more:
     for (;;) {
         unsigned char * p = cbuf;
         unsigned char * e = p + 30 < cend ? p + 30 : cend;
-        unsigned len;
+        int len;
 
         while (p < e && *p != ':') {
             // printf("cycle: %d at %x ", *p, p);
@@ -213,7 +188,7 @@ read_more:
             if (!c->pending_error[0]) {
                 // fprintf(stdout, "bits received %d %d %x %x\n", bits, bytes, p[0], p[bytes]);
         
-                shift_tms_tdi(c->jtag_pcie_bar, bits, p, p + bytes, reply_buf + reply_len);
+                shift_tms_tdi(c->jtag_pci_bar, bits, p, p + bytes, reply_buf + reply_len);
             }
             if (c->pending_error[0]) {
                 printf("Problem\n");
@@ -240,7 +215,7 @@ read_more:
             p += 4;
 
             if (!c->pending_error[0])
-                set_tck(c->jtag_pcie_bar, nsperiod, &resnsperiod);
+                set_tck(nsperiod, &resnsperiod);
             if (c->pending_error[0])
                 resnsperiod = nsperiod;
 
@@ -276,7 +251,7 @@ read_more:
     }
 
     {
-        unsigned len = recv(c->fd, c->buf + c->buf_len, c->buf_max - c->buf_len, 0);
+        int len = recv(c->fd, c->buf + c->buf_len, c->buf_max - c->buf_len, 0);
         if (len > 0) {
             c->buf_len += len;
             goto read_more;
@@ -325,7 +300,7 @@ int xvcserver_start(
         c->buf_max = max_packet_len;
         c->buf = (uint8_t *)malloc(c->buf_max);
         read_packet(c);
-        close_port(jtag_pcie_bar);
+        close_port(jtag_pci_bar);
         closesocket(fd);
         free(c->buf);
     }
