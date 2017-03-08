@@ -4,23 +4,24 @@
 ## Restricted NDA Material
 ## =============================================================================
 
--define VIVADO_SIM
+--define VIVADO_SIM
 
--sourcelibext .v
--sourcelibext .sv
--sourcelibext .svh
+--sourcelibext .v
+--sourcelibext .sv
+--sourcelibext .svh
 
--sourcelibdir ${CL_ROOT}/design
--sourcelibdir ${SH_LIB_DIR}
--sourcelibdir ${SH_INF_DIR}
+--sourcelibdir ${CL_ROOT}/design
+--sourcelibdir ${SH_LIB_DIR}
+--sourcelibdir ${SH_INF_DIR}
 
--include ${CL_ROOT}/verif/sv
--include ${SH_LIB_DIR}
--include ${SH_INF_DIR}
--include ${HDK_COMMON_DIR}/verif/include
--include ${CL_ROOT}/design/axi_crossbar_0
--include ${CL_ROOT}/design/src_register_slice
--include ${CL_ROOT}/design/dest_register_slice
+--include ${CL_ROOT}/verif/sv
+--include ${SH_LIB_DIR}
+--include ${SH_INF_DIR}
+--include ${HDK_COMMON_DIR}/verif/include
+--include ${CL_ROOT}/design/axi_crossbar_0
+--include ${CL_ROOT}/design/src_register_slice
+--include ${CL_ROOT}/design/dest_register_slice
+--include ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ipshared/7e3a/hdl
 
 
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
