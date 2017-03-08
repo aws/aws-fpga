@@ -99,7 +99,7 @@
    output logic cl_sh_pcim_rready,
 
    input[1:0] cfg_max_payload,                                    //Max payload size - 00:128B, 01:256B, 10:512B
-   input[2:0] cfg_max_read_req                                    //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   input[2:0] cfg_max_read_req,                                   //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
    
    //-----------------------------------------------------------------------------------------------
@@ -107,8 +107,7 @@
    //
    //    x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in SH)
    //-----------------------------------------------------------------------------------------------
-`ifndef NO_CL_DDR
-  ,
+
 // ------------------- DDR4 x72 RDIMM 2100 Interface A ----------------------------------
    input                CLK_300M_DIMM0_DP,
    input                CLK_300M_DIMM0_DN,
@@ -169,8 +168,6 @@
    inout  [17:0]        M_D_DQS_DP,
    inout  [17:0]        M_D_DQS_DN,
    output               cl_RST_DIMM_D_N
-
-`endif
 
    //-----------------------------------------------------------------------------
    // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up

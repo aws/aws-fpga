@@ -18,7 +18,7 @@ INCLUDES = -I. -I../include -I/usr/include
 LIB_PATH = $(TOP)/lib
 
 #OPT=-O2
-CFLAGS=$(OPT) -g -std=gnu99  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
 UTILLIB = $(LIB_PATH)/libutils.a
 

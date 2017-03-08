@@ -198,7 +198,7 @@ err:
  ************************************************************************/ 
 
 int 
-fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
+fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index)
 {
 	log_debug("enter");
 
@@ -207,12 +207,13 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 	fail_on(!spec, err, "spec is NULL");
 	fail_on(!dev_index, err, "dev_index is NULL");
 
-	struct fpga_pci_resource_map *map = &spec->map;
+	struct fpga_pci_resource_map *map = &spec->map[pf_id];
 
 	log_info("vendor_id=0x%04x, device_id=0x%04x, DBDF:" 
-			PCI_DEV_FMT ", resource_num=%u, size=%" PRIu64, 
+			PCI_DEV_FMT ", resource_num=%u, size=%" PRIu64 ", burstable=%u",
 			map->vendor_id, map->device_id, map->domain, map->bus, 
-			map->dev, map->func, map->resource_num, map->size);
+			map->dev, map->func, bar_id, map->resource_size[bar_id],
+			map->resource_burstable[bar_id]);
 
 	/** Invalid dev_index for error returns */
 	*dev_index = -1;
@@ -245,10 +246,16 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 			"fpga_plat_check_file_id failed, sysfs_name=%s, device_id=0x%04x",
 			sysfs_name, map->device_id);
 
+	char wc_suffix[3] = "\0";
+	if (map->resource_burstable[bar_id]) {
+		strncpy(wc_suffix, "_wc", sizeof(wc_suffix));
+	}
+	
 	/** Open and memory map the resource */
+	/* adding _wc if the memory bar is burstable */
 	snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/" PCI_DEV_FMT "/resource%u", 
-			map->domain, map->bus, map->dev, map->func, map->resource_num);
+			"/sys/bus/pci/devices/" PCI_DEV_FMT "/resource%u%s", 
+			map->domain, map->bus, map->dev, map->func, bar_id, wc_suffix);
 
 	fail_on(ret < 0, err, "Error building the sysfs path for resource");
 	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for resource");
@@ -258,7 +265,8 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 	int fd = open(sysfs_name, O_RDWR | O_SYNC);
 	fail_on(fd == -1, err, "open failed");
 
-	mem_base = mmap(0, map->size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	mem_base = mmap(0, map->resource_size[bar_id], PROT_READ | PROT_WRITE,
+		MAP_SHARED, fd, 0);
 	fail_on(mem_base == MAP_FAILED, err, "mmap failed");
 
 	/** Allocate a dev */
@@ -266,7 +274,8 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 	fail_on(tmp_dev_index < 0, err_unmap, "fpga_plat_dev_alloc failed");
 
 	/** Set the dev's mem base and size */
-	ret = fpga_plat_dev_set_mem_base_size(tmp_dev_index, mem_base, map->size);
+	ret = fpga_plat_dev_set_mem_base_size(tmp_dev_index, mem_base,
+		map->resource_size[bar_id]);
 	fail_on(ret != 0, err_unmap, "fpga_plat_set_mem_base_size failed");
 
 	/** Setup dev_index for return */
@@ -275,7 +284,7 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int *dev_index)
 	return 0;
 err_unmap:
 	if (mem_base) {
-		ret = munmap(mem_base, map->size);
+		ret = munmap(mem_base, map->resource_size[bar_id]);
 		fail_on(ret != 0, err, "munmap failed");
 	}
 err:
@@ -352,12 +361,12 @@ err:
  ************************************************************************/
 
 int 
-fpga_plat_attach(struct fpga_slot_spec *spec)
+fpga_plat_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id)
 {
 	log_debug("enter");
 
 	int dev_index = -1;
-	int ret = fpga_plat_dev_attach(spec, &dev_index);
+	int ret = fpga_plat_dev_attach(spec, pf_id, bar_id, &dev_index);
 	fail_on(ret != 0, err, "fpga_plat_dev_attach failed");
 
 	if (dev_index != 0) {

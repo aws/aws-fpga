@@ -8,6 +8,7 @@
 module test_hello_world();
 
 `define HELLO_WORLD_REG_ADDR 64'h00
+`define VLED_REG_ADDR        64'h04
 
 logic [31:0] rdata;
 
@@ -22,6 +23,14 @@ logic [31:0] rdata;
       $display ("Reading 0x%x from address 0x%x", rdata, `HELLO_WORLD_REG_ADDR);
 
       if (rdata == 32'hEFBE_ADDE) // Check for byte swap in register read
+        $display ("Test PASSED");
+      else
+        $display ("Test FAILED");
+
+      tb.sh.peek(`VLED_REG_ADDR, rdata);         // start read & write
+      $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
+
+      if (rdata == 32'h0000_BEEF) // Check for byte swap in register read
         $display ("Test PASSED");
       else
         $display ("Test FAILED");

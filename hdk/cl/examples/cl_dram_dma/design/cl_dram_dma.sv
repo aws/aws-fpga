@@ -586,7 +586,7 @@ cl_sda_slv CL_SDA_SLV (
 
 cl_ila CL_ILA (
 
-   .aclk(aclk),
+   .aclk(clk),
 
    .drck(drck),
    .shift(shift),

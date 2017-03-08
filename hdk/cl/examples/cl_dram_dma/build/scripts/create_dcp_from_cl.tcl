@@ -128,7 +128,11 @@ read_ip [ list \
   $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci \
   $HDK_SHELL_DIR/design/ip/src_register_slice/src_register_slice.xci \
   $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
-  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci
+  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci \
+  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci \
+  $HDK_SHELL_DIR/design/ip/ila_1/ila_1.xci \
+  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci \
+  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
 ]
 read_bd [ list \
 $HDK_SHELL_DIR/design/ip/cl_axi_interconnect/cl_axi_interconnect.bd
