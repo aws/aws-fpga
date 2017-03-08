@@ -82,6 +82,7 @@ logic [2:0] dbg_scrb_mem_sel;
 assign clk = clk_main_a0;
 assign cl_sh_ddr_wid = 0;
 
+//reset synchronizer
 lib_pipe #(.WIDTH(1), .STAGES(4)) PIPE_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(rst_main_n), .out_bus(pipe_rst_n));
    
 always_ff @(negedge pipe_rst_n or posedge clk)
@@ -97,7 +98,6 @@ always_ff @(negedge pipe_rst_n or posedge clk)
    end
 
 //FLR response 
-
 always_ff @(negedge sync_rst_n or posedge clk)
    if (!sync_rst_n)
    begin
@@ -184,6 +184,11 @@ assign all_ddr_scrb_done = {ddrc_scrb_bus.done, ddrd_scrb_bus.done, ddrb_scrb_bu
 ///////////////////////////////////////////////////////////////////////
 ///////////////// Scrubber enable and status //////////////////////////
 ///////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////
+///////////////// DMA PCIS SLAVE module ///////////////////////////////
+///////////////////////////////////////////////////////////////////////
  
 assign sh_cl_dma_pcis_bus.awvalid = sh_cl_dma_pcis_awvalid;
 assign sh_cl_dma_pcis_bus.awaddr = sh_cl_dma_pcis_awaddr;
@@ -268,6 +273,14 @@ cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
     .cl_sh_ddr_bus     (cl_sh_ddr_bus)
   );
 
+///////////////////////////////////////////////////////////////////////
+///////////////// DMA PCIS SLAVE module ///////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+///////////////// PCIM MSTR module ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
 assign cl_sh_pcim_awid = cl_sh_pcim_bus.awid;
 assign cl_sh_pcim_awaddr = cl_sh_pcim_bus.awaddr;
 assign cl_sh_pcim_awlen = cl_sh_pcim_bus.awlen;
@@ -305,6 +318,14 @@ cl_pcim_mstr CL_PCIM_MSTR (
      .cl_sh_pcim_bus     (cl_sh_pcim_bus)
 );
 
+///////////////////////////////////////////////////////////////////////
+///////////////// PCIM MSTR module ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+///////////////// OCL SLAVE module ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
 assign sh_ocl_bus.awvalid = sh_ocl_awvalid;
 assign sh_ocl_bus.awaddr[31:0] = sh_ocl_awaddr;
 assign ocl_sh_awready = sh_ocl_bus.awready;
@@ -340,7 +361,9 @@ cl_ocl_slv CL_OCL_SLV (
 
 );
 
-
+///////////////////////////////////////////////////////////////////////
+///////////////// OCL SLAVE module ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 //----------------------------------------- 
 // DDR controller instantiation   
@@ -544,6 +567,14 @@ sh_ddr #(
    .ddr_sh_stat_int2   (ddr_sh_stat_int_q[2]    ) 
    );
 
+//----------------------------------------- 
+// DDR controller instantiation   
+//-----------------------------------------
+
+
+//----------------------------------------- 
+// Interrrupt example  
+//-----------------------------------------
 
 cl_int_slv CL_INT_TST 
 (
@@ -556,6 +587,15 @@ cl_int_slv CL_INT_TST
   .sh_cl_apppf_irq_ack (sh_cl_apppf_irq_ack)
        
 );
+
+//----------------------------------------- 
+// Interrrupt example  
+//-----------------------------------------
+
+//----------------------------------------- 
+// SDA SLAVE module 
+//-----------------------------------------
+
 
 assign sda_cl_bus.awvalid = sda_cl_awvalid;
 assign sda_cl_bus.awaddr[31:0] = sda_cl_awaddr;
@@ -582,6 +622,16 @@ cl_sda_slv CL_SDA_SLV (
   .sda_cl_bus(sda_cl_bus)
 );
 
+//----------------------------------------- 
+// SDA SLAVE module 
+//-----------------------------------------
+
+
+//----------------------------------------- 
+// Virtual JTAG ILA Debug core example 
+//-----------------------------------------
+
+
 `ifndef DISABLE_CHIPSCOPE_DEBUG
 
 cl_ila CL_ILA (
@@ -606,7 +656,6 @@ cl_ila CL_ILA (
 
 );
 
-
 cl_vio CL_VIO (
 
    .clk_extra_a1(clk_extra_a1)
@@ -614,6 +663,11 @@ cl_vio CL_VIO (
 );
 
 `endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
+
+//----------------------------------------- 
+// Virtual JATG ILA Debug core example 
+//-----------------------------------------
+
 
 
 endmodule   
