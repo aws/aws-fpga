@@ -45,8 +45,8 @@ extern struct fgpa_mgmt_state_s {
 } fpga_mgmt_state;
 
 // FIXME
-#define	F1_VIRTUAL_LED_REG_OFFSET	0x0UL
-#define F1_VIRTUAL_DIP_REG_OFFSET       0x4UL
+#define	F1_VIRTUAL_LED_REG_OFFSET	0xD0UL
+#define F1_VIRTUAL_DIP_REG_OFFSET       0xD4UL
 
 /** */
 int fpga_mgmt_process_cmd(int slot_id,
