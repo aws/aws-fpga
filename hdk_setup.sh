@@ -24,7 +24,7 @@ function debug_msg {
 }
 
 function err_msg {
-  echo -e >&2 "AWS FPGA-ERROR: - $1"
+  echo -e >&2 "AWS FPGA-ERROR: $1"
 }
 
 function usage {
@@ -72,8 +72,22 @@ debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
 
 debug_msg "Checking for vivado install:"
 
+# On the FPGA Developer AMI use module load to use the correct version of vivado
+if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
+  # Module command is installed.
+  # This branch requires sdx, not vivado
+  # Load and unload the modules just to make sure have the environment set correctly
+  module unload vivado
+  module unload sdx
+  module load sdx
+fi
+
 # before going too far make sure Vivado is available
-vivado -version > /dev/null 2>&1 || { err_msg "Please install/enable Vivado."; return 1; }
+if ! vivado -version > /dev/null 2>&1; then
+    err_msg "Please install/enable Vivado."
+    err_msg "  If you are using the FPGA Developer AMI then please request support."
+    return 1
+fi
 
 #Searching for Vivado version and comparing it with the list of supported versions
 
@@ -86,6 +100,8 @@ then
     debug_msg "$VIVADO_VER is supported by this HDK release."
 else
     err_msg "$VIVADO_VER is not supported by this HDK release."
+    err_msg "Supported versions are:"
+    cat $AWS_FPGA_REPO_DIR/hdk/supported_vivado_versions.txt
     return 1
 fi
 
