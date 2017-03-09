@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <fpga_common.h>
 
-#define AFI_CMD_API_VERSION	1
+#define AFI_CMD_API_VERSION	2
 #define AFI_CMD_DATA_LEN	512 
 
 /** 
@@ -76,32 +76,25 @@ enum {
 
 /** Error response specific info */
 union afi_err_info {
-	/** ACE_INVALID_API_VERSION: peer's preferred AFI command version */
+	/** 
+	 * FPGA_ERR_AFI_CMD_API_VERSION_INVALID: peer's preferred AFI command version.
+	 */
 	uint32_t	afi_cmd_version;	
 };
 
-/** Error response. */
+/** Error response */
 struct afi_cmd_err_rsp {
-	/** Error, see below for error values */
+	/** See FPGA_ERR_XXX in fpga_common.h */
 	int32_t		error;
 	/** See afi_err_info */
 	uint8_t		error_info[];			
 } __attribute__((packed));
 
-/** AFI_CMD_ERROR opcode, error values */
-enum {
-	ACE_OK = 0,
-	ACE_INVALID_API_VERSION = 1,
-	ACE_BUSY = 3,
-	ACE_INVALID_AFI_ID = 5,
-
-	ACE_END
-};
-
 /**< Load AFI request */
 struct afi_cmd_load_req {
 	struct fpga_meta_ids	ids;
 	uint32_t				fpga_cmd_flags; /**< e.g. see FPGA_CMD_ALL_FLAGS */
+	struct fpga_common_cfg  cfg;
 } __attribute__((packed));
 
 /**< Metrics AFI request */
@@ -112,7 +105,7 @@ struct afi_cmd_metrics_req {
 /** Metrics AFI response */
 struct afi_cmd_metrics_rsp {
 	struct fpga_meta_ids	ids;
-	int32_t					status; /**< e.g. see ACMS_LOADED */
+	int32_t					status; /**< e.g. see FPGA_STATUS_LOADED, fpga_common.h */
 	struct fpga_metrics_common	fmc;
 } __attribute__((packed));
 
@@ -120,12 +113,3 @@ struct afi_cmd_metrics_rsp {
 struct afi_cmd_clear_req {
 	uint32_t				fpga_cmd_flags; /**< e.g. see FPGA_CMD_ALL_FLAGS */
 } __attribute__((packed));
-
-/** AFI_CMD_METRICS opcode, status values */
-enum {
-	ACMS_LOADED = 0,			/**< afi-slot has AFI loaded */
-	ACMS_CLEARED = 1,			/**< afi-slot is cleared */
-	ACMS_BUSY = 2,				/**< afi-slot is busy (e.g. loading an AFI) */ 
-	ACMS_NOT_PROGRAMMED = 3,	/**< afi-slot is not programmed */
-	ACMS_END,
-};

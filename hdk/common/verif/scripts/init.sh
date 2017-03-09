@@ -15,29 +15,46 @@
 ## implied. See the License for the specific language governing permissions and
 ## limitations under the License.
 
-vivado -mode batch -source $HDK_COMMON_DIR/verif/scripts/init.tcl
+models_dir=$1
+if [[ ":$models_dir" == ":" ]]; then
+  models_dir=$HDK_COMMON_DIR/verif/models
+fi
+if [ ! -e $models_dir ]; then
+  mkdir -p $models_dir
+fi
 
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/arch_defines.v              $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/arch_package.sv              $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_model.sv               $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_sdram_model_wrapper.sv $HDK_COMMON_DIR/verif/models/ddr4_model/
-#cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/dimm_interface.sv           $HDK_COMMON_DIR/verif/models/ddr4_model/
-#cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/dimm_subtest.vh             $HDK_COMMON_DIR/verif/models/ddr4_model/
-#cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/dimm.vh                     $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/interface.sv                $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/MemoryArray.sv              $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/proj_package.sv             $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/StateTableCore.sv           $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/StateTable.sv               $HDK_COMMON_DIR/verif/models/ddr4_model/
-#cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/subtest.vh                  $HDK_COMMON_DIR/verif/models/ddr4_model/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/timing_tasks.sv             $HDK_COMMON_DIR/verif/models/ddr4_model/
+if ! vivado -mode batch -source $HDK_COMMON_DIR/verif/scripts/init.tcl; then
+  exit 2
+fi
 
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_bi_delay.sv            $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_db_delay_model.sv      $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_db_dly_dir.sv          $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_dimm.sv                $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_dir_detect.sv          $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rank.sv                $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rcd_model.sv           $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
-cp tmp/tmp_ddr_ex/ddr4_core_ex/imports/ddr4_rdimm_wrapper.sv       $HDK_COMMON_DIR/verif/models/ddr4_rdimm_wrapper/
+ddr4_imports_dir=tmp/tmp_ddr_ex/ddr4_core_ex/imports
+ddr4_model_dir=$models_dir/ddr4_model
+ddr4_rdimm_model_dir=$models_dir/ddr4_rdimm_wrapper
+if [ ! -d $ddr4_model_dir ]; then mkdir -p $ddr4_model_dir; fi
+if [ ! -d $ddr4_rdimm_model_dir ]; then mkdir -p $ddr4_rdimm_model_dir; fi
+echo "Copying files to $ddr4_model_dir"
+cp $ddr4_imports_dir/arch_defines.v              $ddr4_model_dir/
+cp $ddr4_imports_dir/arch_package.sv              $ddr4_model_dir/
+cp $ddr4_imports_dir/ddr4_model.sv               $ddr4_model_dir/
+cp $ddr4_imports_dir/ddr4_sdram_model_wrapper.sv $ddr4_model_dir/
+#cp $ddr4_imports_dir/dimm_interface.sv           $ddr4_model_dir/
+#cp $ddr4_imports_dir/dimm_subtest.vh             $ddr4_model_dir/
+#cp $ddr4_imports_dir/dimm.vh                     $ddr4_model_dir/
+cp $ddr4_imports_dir/interface.sv                $ddr4_model_dir/
+cp $ddr4_imports_dir/MemoryArray.sv              $ddr4_model_dir/
+cp $ddr4_imports_dir/proj_package.sv             $ddr4_model_dir/
+cp $ddr4_imports_dir/StateTableCore.sv           $ddr4_model_dir/
+cp $ddr4_imports_dir/StateTable.sv               $ddr4_model_dir/
+#cp $ddr4_imports_dir/subtest.vh                  $ddr4_model_dir/
+cp $ddr4_imports_dir/timing_tasks.sv             $ddr4_model_dir/
+
+echo "Copying files to $ddr4_rdimm_model_dir"
+cp $ddr4_imports_dir/ddr4_bi_delay.sv            $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_db_delay_model.sv      $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_db_dly_dir.sv          $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_dimm.sv                $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_dir_detect.sv          $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_rank.sv                $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_rcd_model.sv           $ddr4_rdimm_model_dir/
+cp $ddr4_imports_dir/ddr4_rdimm_wrapper.sv       $ddr4_rdimm_model_dir/
 

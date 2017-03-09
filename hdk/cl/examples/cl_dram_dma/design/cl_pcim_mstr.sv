@@ -10,6 +10,10 @@ module cl_pcim_mstr (
 
 axi_bus_t cl_sh_pcim_q();
 
+
+//-------------------------------------
+// ATG for genrating PCIM AXI transfers
+//-------------------------------------
    cl_tst #(.DATA_WIDTH(512)) CL_TST_PCI (
    
          .clk(aclk),
@@ -60,7 +64,9 @@ axi_bus_t cl_sh_pcim_q();
          .rready(cl_sh_pcim_q.rready)
       );
 
-
+//-------------------------------------
+// flop the output of ATG
+//-------------------------------------
    // AXI4 register slice - For signals between CL and HL
    axi4_flop_fifo #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) PCI_AXI4_REG_SLC (
      .aclk           (aclk),

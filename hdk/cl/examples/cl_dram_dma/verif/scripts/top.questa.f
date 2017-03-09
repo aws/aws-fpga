@@ -34,6 +34,7 @@ ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${SH_LIB_DIR}/bram_2rw.sv
 ${SH_LIB_DIR}/flop_fifo.sv
 
++define+DISABLE_CHIPSCOPE_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv

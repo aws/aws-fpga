@@ -28,6 +28,8 @@
  */
 int fpga_mgmt_init(void);
 
+int fpga_mgmt_close(void);
+
 /**
  * Sets the command timeout value in multiples of the delay_msec value.
  *
@@ -42,16 +44,6 @@ void fpag_mgmt_set_cmd_delay_msec(uint32_t value);
 
 /* fpga-describe-local-image */
 
-enum fpga_status {
-	FPGA_STATUS_LOADED,
-	FPGA_STATUS_CLEARED,
-	FPGA_STATUS_BUSY,
-	FPGA_STATUS_NOT_PROGRAMMED,
-	FPGA_STATUS_MAX
-};
-
-#define AFI_MAX_LEN 32
-
 /**
  * This structure provides all of the information for
  * fpga_mgmt_describe_local_image.
@@ -59,7 +51,7 @@ enum fpga_status {
 struct fpga_mgmt_image_info {
 	int status;
 	int slot_id;
-	char afi_id[AFI_MAX_LEN];
+	struct fpga_meta_ids  ids;
 	struct fpga_slot_spec spec;
 	uint32_t sh_version;
 	struct fpga_metrics_common metrics;
@@ -129,17 +121,3 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value);
  */
 int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *);
 
-/**
- *
- */
-int fpga_mgmt_start_virtual_jtag(int slot_id, char *tcp_port);
-
-/**
- * state: enabled, disabled, error if not supported
- */
-int fpga_mgmt_get_virtual_jtag_state(int slot_id, bool *enabled);
-
-/**
- * enable/disable
- */
-int fpga_mgmt_set_virtual_jtag(int slot_id, bool enabled);

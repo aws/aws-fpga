@@ -24,7 +24,7 @@ HALLIB_PATH = $(TOP)/lib
 INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_PATH) -I/usr/include
 
 #OPT=-O2
-CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+CFLAGS=$(OPT) -g -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)

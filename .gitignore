@@ -29,3 +29,14 @@ waves.shm
 .nfs*
 *.so
 *.a
+
+nohup.out
+*.nohup.out
+
+# Shell DCP files are stored in S3 and downloaded by hdk_setup.sh
+hdk/common/shell_*/build/checkpoints/from_aws/SH_CL_BB_routed.dcp*
+
+# These get created when you run vivado interactively or batch
+vivado_pid*.str
+vivado*.jou
+vivado*.log

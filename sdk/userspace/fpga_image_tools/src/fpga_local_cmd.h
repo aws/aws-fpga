@@ -37,6 +37,10 @@
  */
 enum {
 	AFI_EXT_DESCRIBE_SLOTS = AFI_CMD_END,
+	AFI_START_VJTAG,
+	AFI_GET_LED,
+	AFI_GET_DIP,
+	AFI_SET_DIP,
 	AFI_EXT_END
 };
 
@@ -57,12 +61,13 @@ enum {
  * to still be displayed for development if needed, by re-defining
  * fail_on_quiet as fail_on.
  */
-#define fail_on_quiet(CONDITION, LABEL, ...)	\
-	do {					\
-		if (CONDITION) {	\
-			goto LABEL;		\
-		}					\
-	} while (0)
+#define fail_on_quiet fail_on_user
+// #define fail_on_quiet(CONDITION, LABEL, ...)	\
+// 	do {					\
+// 		if (CONDITION) {	\
+// 			goto LABEL;		\
+// 		}					\
+// 	} while (0)
 
 /** 
  * This should be used for the sanitized first level errors to be
@@ -110,7 +115,7 @@ enum {
  */
 struct ec2_fpga_cmd {
 	uint32_t slot_dev_index;
-	struct fpga_slot_spec mbox_slot_devs[FPGA_SLOT_MAX];
+	struct fpga_slot_spec mbox_slot_devs[FPGA_SLOT_MAX]; /* todo: do we need this still? */
 	uint32_t opcode;
 	uint32_t afi_slot;
 	char	 afi_id[AFI_ID_STR_MAX];
@@ -121,6 +126,9 @@ struct ec2_fpga_cmd {
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;
 	bool	 rescan;
+	bool     show_mbox_device;
+	uint16_t v_dip_switch;
+	char*    tcp_port;
 };
 
 extern struct ec2_fpga_cmd f1;

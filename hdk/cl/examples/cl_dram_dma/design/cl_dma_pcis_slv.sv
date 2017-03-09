@@ -68,6 +68,10 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
 
 
+//---------------------------- 
+// flop the dma_pcis interface input of CL 
+//---------------------------- 
+
    // AXI4 Register Slice for dma_pcis interface
    axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) PCI_AXL_REG_SLC (
        .aclk          (aclk),
@@ -137,6 +141,9 @@ scrb_bus_t ddrd_scrb_bus_q();
    );
 
 
+//---------------------------- 
+// axi interconnect for DDR address decodes 
+//---------------------------- 
  cl_axi_interconnect AXI_CROSSBAR 
        (.ACLK(aclk),
         .ARESETN(aresetn),
@@ -344,7 +351,9 @@ scrb_bus_t ddrd_scrb_bus_q();
         .S00_AXI_wstrb(sh_cl_dma_pcis_q.wstrb),
         .S00_AXI_wvalid(sh_cl_dma_pcis_q.wvalid));
 
-
+//---------------------------- 
+// flop the output of interconnect for DDRC 
+//---------------------------- 
    axi4_flop_fifo #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_C_TST_AXI4_REG_SLC (
        .aclk           (aclk),
        .aresetn        (aresetn),
@@ -412,6 +421,10 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready   (cl_sh_ddr_q2.rready)
    );
 
+
+//---------------------------- 
+// ATG/scrubber for DDRC 
+//---------------------------- 
 
    lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_SH_DDR_ATG)) PIPE_CFG_REQ_DDR_C (.clk (aclk), 
                                                               .rst_n (aresetn), 
@@ -525,6 +538,10 @@ scrb_bus_t ddrd_scrb_bus_q();
          .scrb_dbg_addr (ddrc_scrb_bus_q.addr)
    );
 
+//---------------------------- 
+// flop the output of ATG/Scrubber for DDRC 
+//---------------------------- 
+
    axi4_flop_fifo #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_C_TST_AXI4_REG_SLC_1 (
      .aclk           (aclk),
      .aresetn        (aresetn),
@@ -594,6 +611,10 @@ scrb_bus_t ddrd_scrb_bus_q();
    );
 
 
+//---------------------------- 
+// flop the output of interconnect for DDRA 
+// back to back for SLR crossing
+//---------------------------- 
    //back to back register slices for SLR crossing
    src_register_slice DDR_A_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
@@ -760,6 +781,9 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready   (lcl_cl_sh_ddra_q3.rready)
        );
 
+//---------------------------- 
+// ATG/scrubber for DDRA 
+//---------------------------- 
    lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_A (.clk (aclk), 
                                                               .rst_n (aresetn), 
                                                               .in_bus({ddra_tst_cfg_bus.addr, ddra_tst_cfg_bus.wdata, ddra_tst_cfg_bus.wr, ddra_tst_cfg_bus.rd}),
@@ -875,6 +899,10 @@ scrb_bus_t ddrd_scrb_bus_q();
       assign lcl_cl_sh_ddra.wid[15:9] = 7'b0;
       assign lcl_cl_sh_ddra.arid[15:9] = 7'b0;
 
+//---------------------------- 
+// flop the output of interconnect for DDRB
+// back to back for SLR crossing
+//---------------------------- 
 
   //back to back register slices for SLR crossing
    src_register_slice DDR_B_TST_AXI4_REG_SLC_1 (
@@ -1042,6 +1070,9 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready   (lcl_cl_sh_ddrb_q3.rready)
        );
 
+//---------------------------- 
+// ATG/scrubber for DDRB 
+//---------------------------- 
    lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_B (.clk (aclk), 
                                                               .rst_n (aresetn), 
                                                               .in_bus({ddrb_tst_cfg_bus.addr, ddrb_tst_cfg_bus.wdata, ddrb_tst_cfg_bus.wr, ddrb_tst_cfg_bus.rd}),
@@ -1158,6 +1189,10 @@ scrb_bus_t ddrd_scrb_bus_q();
       assign lcl_cl_sh_ddrb.arid[15:9] = 7'b0;
 
 
+//---------------------------- 
+// flop the output of interconnect for DDRD 
+// back to back for SLR crossing
+//---------------------------- 
 
   //back to back register slices for SLR crossing
    src_register_slice DDR_D_TST_AXI4_REG_SLC_1 (
@@ -1325,6 +1360,9 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready   (lcl_cl_sh_ddrd_q3.rready)
        );
 
+//---------------------------- 
+// ATG/scrubber for DDRD 
+//---------------------------- 
    lib_pipe #(.WIDTH(32+32+1+1), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_CFG_REQ_DDR_D (.clk (aclk), 
                                                               .rst_n (aresetn), 
                                                               .in_bus({ddrd_tst_cfg_bus.addr, ddrd_tst_cfg_bus.wdata, ddrd_tst_cfg_bus.wr, ddrd_tst_cfg_bus.rd}),
