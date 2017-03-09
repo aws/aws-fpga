@@ -27,7 +27,7 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 
 ### System diagram  
 
-[Diagram](https://github.com/aws/aws-fpga/blob/AWSamirinen-patch-1/hdk/cl/examples/cl_dram_dma/design/cl_dram_dma.jpg)
+[Diagram](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_dram_dma.jpg)
 
   
 <a name="functionalDescription"></a>
@@ -52,17 +52,15 @@ This memory space is mapped to the 64GiB DRAM space (the upper half of the 128Gi
 ### ocl_ AXI-Lite
 
 
-The sh_cl_ocl\_ AXI-Lite bus is connected to [cl_ocl_slv.sv](design/cl_ocl_slv.sv) module, and is used for register access to the Automatic Test Generator (ATG) etc.
+The sh_cl_ocl\_ AXI-Lite bus is connected to [cl_ocl_slv.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_ocl_slv.sv) module, and is used for register access to the Automatic Test Generator (ATG) etc.
 
-
-The valid address map is found [here](./TBD).
 
 Any access invalid address with return 32'hdeadbeef
 
 
 ### sda_ AXI-Lite
 
-The sh_cl_sda\_ AXI-Lite bus is connected to [cl_sda_slv.sv](design/cl_sda_slv.sv) module, which provides 1KiB of scratch RAM.
+The sh_cl_sda\_ AXI-Lite bus is connected to [cl_sda_slv.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_sda_slv.sv) module, which provides 1KiB of scratch RAM.
 
 
 Address bits [9:0] will be used to access the location of the RAM, but the upper bits of the address are ignored.
@@ -71,10 +69,10 @@ Address bits [9:0] will be used to access the location of the RAM, but the upper
 ### pcim_ AXI4
 
 
-The cl_sh_pcim\_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](design/cl_pcim_mstr.sv). It can be used to read/write from the host memory. 
+The cl_sh_pcim\_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_pcim_mstr.sv). It can be used to read/write from the host memory. 
 
 ### irq/ack
-[cl_int_slv.sv](design/cl_int_slv.sv) provides an example for generating the IRQ requests and checks if ACK has been received.
+[cl_int_slv.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_int_slv.sv) provides an example for generating the IRQ requests and checks if ACK has been received.
 
 ### FPGA to FPGA communication over PCIe
 
@@ -87,8 +85,8 @@ This example does not use FPGA to FPGA Ring
 
 ### Virtual JTAG
 
-2 ILA cores are integrated, one to monitoring the sh_cl_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. An example usage is provided in [cl_ila.sv](design/cl_ila.sv).
-An example usage for Xilinx VIO is provided in [cl_vio.sv](design/cl_vio.sv)
+2 ILA cores are integrated, one to monitoring the sh_cl_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. An example usage is provided in [cl_ila.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_ila.sv).
+An example usage for Xilinx VIO is provided in [cl_vio.sv](https://github.com/aws/aws-fpga/blob/prelease/hdk/cl/examples/cl_dram_dma/design/cl_vio.sv)
 
 
 ### Clocks
