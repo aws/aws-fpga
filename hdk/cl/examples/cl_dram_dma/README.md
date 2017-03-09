@@ -27,7 +27,7 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 
 ### System diagram  
 
-TBD - visio to be added
+[Diagram](https://github.com/aws/aws-fpga/blob/AWSamirinen-patch-1/hdk/cl/examples/cl_dram_dma/design/cl_dram_dma.jpg)
 
   
 <a name="functionalDescription"></a>
