@@ -9,9 +9,6 @@ fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
-if [[ ':$AWS_FPGA_REPO_DIR' == ':' ]]; then
-  export AWS_FPGA_REPO_DIR=$script_dir
-fi
 
 debug=0
 
@@ -66,6 +63,12 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
       return 1
   esac
 done
+
+if [[ ":$AWS_FPGA_REPO_DIR" == ':' ]]; then
+  debug_msg "AWS_FPGA_REPO_DIR not set so setting"
+  export AWS_FPGA_REPO_DIR=$script_dir
+fi
+debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
 
 debug_msg "Checking for vivado install:"
 

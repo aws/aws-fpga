@@ -6,6 +6,11 @@ if [[ ":$hdk_shell_version" == ":" ]]; then
   exit 2
 fi
 
+if [[ ":$HDK_COMMON_DIR" == ":" ]]; then
+  echo "error: HDK_COMMON_DIR is not set. Run hdk_setup.sh"
+  exit 2
+fi
+
 hdk_shell_dir=$HDK_COMMON_DIR/$hdk_shell_version
 if [ ! -d $hdk_shell_dir ]; then
   echo "error: Shell dir doesn't exist: $hdk_shell_dir"
