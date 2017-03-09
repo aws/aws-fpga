@@ -7,8 +7,7 @@
 
 module test_hello_world();
 
-`define HELLO_WORLD_REG_ADDR 64'h500
-`define VLED_REG_ADDR        64'h504
+`include "cl_common_defines.vh" // CL Defines with register addresses
 
 logic [31:0] rdata;
 

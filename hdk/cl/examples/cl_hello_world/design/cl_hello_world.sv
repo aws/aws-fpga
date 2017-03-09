@@ -450,7 +450,7 @@ sh_ddr #(.DDR_A_PRESENT(0),
 `endif  
 
   assign cl_sh_flr_done      =   1'b0;
-  assign cl_sh_status0[31:0] =  32'h0000_0000;
+  assign cl_sh_status0[31:0] =  32'h0000_0FF0;
   assign cl_sh_status1[31:0] = `CL_VERSION;
 
 //------------------------------------
