@@ -52,14 +52,32 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
   logic        arvalid_q;
   logic [31:0] araddr_q;
   logic [31:0] hello_world_q_byte_swapped;
-  logic [15:0] vled_q;
-  logic [31:0] hello_world_q;
+  logic [15:0] vled_q        = 32'b0;
+  logic [31:0] hello_world_q = 32'b0;
 
 //-------------------------------------------------
 // ID Values (cl_hello_world_defines.vh)
 //-------------------------------------------------
   assign cl_sh_id0[31:0] = `CL_SH_ID0;
   assign cl_sh_id1[31:0] = `CL_SH_ID1;
+
+//-------------------------------------------------
+// Reset Synchronization
+//-------------------------------------------------
+logic pre_sync_rst_n;
+logic rst_main_n_sync;
+
+always_ff @(negedge rst_main_n or posedge clk_main_a0)
+   if (!rst_main_n)
+   begin
+      pre_sync_rst_n  <= 0;
+      rst_main_n_sync <= 0;
+   end
+   else
+   begin
+      pre_sync_rst_n  <= 1;
+      rst_main_n_sync <= pre_sync_rst_n;
+   end
 
 //-------------------------------------------------
 // PCIe OCL AXI-L (SH to CL) Timing Flops
@@ -94,8 +112,8 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
 
   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) AXIL_OCL_REG_SLC (
    .aclk          (clk_main_a0),
-   .aresetn       (rst_main_n),
-   .sync_rst_n    (rst_main_n),
+   .aresetn       (rst_main_n_sync),
+   .sync_rst_n    (rst_main_n_sync),
    .s_axi_awid    (1'b0),
    .s_axi_awaddr  (sh_ocl_awaddr),
    .s_axi_awlen   (8'h00),
@@ -207,8 +225,8 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
 logic        wr_active;
 logic [31:0] wr_addr;
 
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-  if (!rst_main_n) begin
+always_ff @(posedge clk_main_a0)
+  if (!rst_main_n_sync) begin
      wr_active <= 0;
      wr_addr   <= 0;
   end
@@ -223,8 +241,8 @@ assign awready = ~wr_active;
 assign wready  =  wr_active && wvalid;
 
 // Write Response
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-  if (!rst_main_n) 
+always_ff @(posedge clk_main_a0)
+  if (!rst_main_n_sync) 
     bvalid <= 0;
   else
     bvalid <=  bvalid &&  bready           ? 1'b0  : 
@@ -233,8 +251,8 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
 assign bresp = 0;
 
 // Read Request
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-   if (!rst_main_n) begin
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin
       arvalid_q <= 0;
       araddr_q  <= 0;
    end
@@ -246,8 +264,8 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
 assign arready = !arvalid_q && !rvalid;
 
 // Read Response
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-   if (!rst_main_n)
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync)
    begin
       rvalid <= 0;
       rdata  <= 0;
@@ -274,8 +292,8 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
 // The register resides at offset 0x00. When read it
 // returns the byte-flipped value.
 
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-   if (!rst_main_n) begin                    // Reset
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
       hello_world_q[31:0] <= 32'h0000_0000;
    end
    else if (wready & (wr_addr == `HELLO_WORLD_REG_ADDR)) begin  // Cfg Write to offset 0x00
@@ -297,8 +315,8 @@ assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[1
 // For this example, the virtual LED register shadows the hello_world
 // register.
 
-always_ff @(negedge rst_main_n or posedge clk_main_a0)
-   if (!rst_main_n) begin                    // Reset
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
       vled_q[15:0] <= 16'h0000;
    end
    else begin
@@ -322,7 +340,7 @@ sh_ddr #(.DDR_A_PRESENT(0),
          .DDR_D_PRESENT(0)) SH_DDR
    (
    .clk(clk_main_a0),
-   .rst_n(rst_main_n),
+   .rst_n(rst_main_n_sync),
    .stat_clk(clk_main_a0),
    .stat_rst_n(clk_main_a0),
 
