@@ -87,7 +87,8 @@ This example does not use FPGA to FPGA Ring
 
 ### Virtual JTAG
 
-2 ILA cores are integrated, one to monitoring the sh_cl_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. VIO is not used. An example usage is provided in [cl_ila.sv](design/cl_ila.sv).
+2 ILA cores are integrated, one to monitoring the sh_cl_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. An example usage is provided in [cl_ila.sv](design/cl_ila.sv).
+An example usage for Xilinx VIO is provided in [cl_vio.sv](design/cl_vio.sv)
 
 
 ### Clocks
