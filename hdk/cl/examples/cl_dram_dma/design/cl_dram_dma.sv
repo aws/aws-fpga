@@ -80,7 +80,6 @@ logic [2:0] dbg_scrb_mem_sel;
 //----------------------------
 
 assign clk = clk_main_a0;
-assign cl_sh_ddr_wid = 0;
 
 //reset synchronizer
 lib_pipe #(.WIDTH(1), .STAGES(4)) PIPE_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(rst_main_n), .out_bus(pipe_rst_n));
@@ -669,5 +668,13 @@ cl_vio CL_VIO (
 //-----------------------------------------
 
 
+//tie-off unused CL outputs
+assign hmc_iic_scl_t = 1'b0;
+assign hmc_iic_sda_t = 1'b0;
+assign hmc_iic_sda_o = 1'b0;
+assign hmc_iic_scl_o = 1'b0;
+assign cl_sh_pcim_awuser = 0;
+assign cl_sh_pcim_aruser = 0;
+assign cl_sh_ddr_wid = 0;
 
 endmodule   
