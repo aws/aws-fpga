@@ -51,14 +51,7 @@ The [SDK directory](./sdk) includes the runtime environment required to run on F
 
 ## FPGA Developer AMI <a name="devAmi"></a>
 
-AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances. The FPGA Developer AMI comes with all needed Xilinx's Vivado tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. But given the large size of the FPGA used in F1, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge or bigger, M4.2XLarge or bigger, R4.XLarge or bigger). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively. 
-
-During the preview access period to start using the FPGA developer AMI your AWS account needs to be whitelisted.  Once you are whitelisted, from the AWS console you will have access to the AMI:
-
-* Make sure you are in N. Virginia (us-east-1).  
-* Go to EC2->Launch Instance->My AMIs
-* Select the ‘Shared with me’ box on the Ownership tab on the left.
-* FPGA developer AMI will be prefixed with F1 
+AWS recommends the use of the F1 FPGA developer AMI for development on EC2 instances. The FPGA Developer AMI comes with all needed Xilinx's Vivado tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. But given the large size of the FPGA used in F1, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge or bigger, M4.2XLarge or bigger, R4.XLarge or bigger). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.  To get started, subscribe/launch via AWS Marketplace:  https://aws.amazon.com/marketplace/pp/B06VVYBLZZ
 
 ## Developer Support <a name="devSupport"></a>
 
