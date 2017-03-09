@@ -29,3 +29,6 @@ waves.shm
 .nfs*
 *.so
 *.a
+
+build.lock
+hdk/common/verif/models/.vivado_version
