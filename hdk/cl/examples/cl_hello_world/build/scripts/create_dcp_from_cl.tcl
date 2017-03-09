@@ -423,7 +423,7 @@ set_param bitstream.enablePR 4123
 write_bitstream -force -bin_file $CL_DIR/build/${timestamp}_aws_verify_temp_dir/${timestamp}.SH_CL_final.bit
 
 # Clean-up temp dir for bitstream
-#file delete -force $CL_DIR/build/${timestamp}_aws_verify_temp_dir
+file delete -force $CL_DIR/build/${timestamp}_aws_verify_temp_dir
 
 ### --------------------------------------------
 
