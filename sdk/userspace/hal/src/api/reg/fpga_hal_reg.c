@@ -41,6 +41,20 @@ fpga_hal_dev_reg_write(int dev_index, uint64_t offset, uint32_t value)
 	return fpga_plat_dev_reg_write(dev_index, offset, value);
 }
 
+int
+fpga_hal_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value)
+{
+	log_debug("enter");
+	return fpga_plat_dev_reg_read64(dev_index, offset, value);
+}
+
+int
+fpga_hal_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value)
+{
+	log_debug("enter");
+	return fpga_plat_dev_reg_write64(dev_index, offset, value);
+}
+
 /************************************************************************ 
  * Single device attachment and use.
  * e.g. for applications that only attach to one FPGA at a time,

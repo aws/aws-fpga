@@ -54,22 +54,6 @@ enum {
 #define F1_APP_PF_END			15
 
 /** 
- * Generally, we allow a sanitized first level error to be displayed
- * for the user.  We do not want low-level mailbox related errors
- * to be displayed (since we are abstracting the mailbox interface).
- * The fail_on_quiet define allows the multi-level trace debug info
- * to still be displayed for development if needed, by re-defining
- * fail_on_quiet as fail_on.
- */
-#define fail_on_quiet fail_on_user
-// #define fail_on_quiet(CONDITION, LABEL, ...)	\
-// 	do {					\
-// 		if (CONDITION) {	\
-// 			goto LABEL;		\
-// 		}					\
-// 	} while (0)
-
-/** 
  * This should be used for the sanitized first level errors to be
  * displayed for the user.
  */
@@ -115,13 +99,11 @@ enum {
  */
 struct ec2_fpga_cmd {
 	uint32_t slot_dev_index;
-	struct fpga_slot_spec mbox_slot_devs[FPGA_SLOT_MAX]; /* todo: do we need this still? */
 	uint32_t opcode;
 	uint32_t afi_slot;
 	char	 afi_id[AFI_ID_STR_MAX];
 	uint32_t mbox_timeout;
 	uint32_t mbox_delay_msec;
-	bool	 plat_attached;
 	bool	 show_headers;
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;

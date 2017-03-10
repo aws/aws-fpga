@@ -163,6 +163,14 @@ static inline __printf(1, 2) void log_dummy(const char *fmt, ...)
 		}                               \
 	} while (0)
 
+#define fail_on_quiet(CONDITION, LABEL, ...)          \
+    do {                                              \
+        if (CONDITION) {                              \
+            log_debug(__VA_ARGS__);                   \
+            goto LABEL;                               \
+        }                                             \
+    } while (0)
+
 extern const struct logger logger_stdout;
 extern const struct logger logger_kmsg;
 extern const struct logger *logger_default;

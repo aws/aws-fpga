@@ -67,7 +67,7 @@ static int open_server(const char* tcp_port) {
     if (err) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err));
         errno = EINVAL;
-        return -1;
+        return FPGA_ERR_FAIL;
     }
 
     for (res = reslist; res != NULL; res = res->ai_next) {

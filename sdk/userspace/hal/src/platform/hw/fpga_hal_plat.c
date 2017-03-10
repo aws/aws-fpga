@@ -198,7 +198,8 @@ err:
  ************************************************************************/ 
 
 int 
-fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index)
+fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
+	bool write_combining, int *dev_index)
 {
 	log_debug("enter");
 
@@ -247,7 +248,7 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *de
 			sysfs_name, map->device_id);
 
 	char wc_suffix[3] = "\0";
-	if (map->resource_burstable[bar_id]) {
+	if (map->resource_burstable[bar_id] && write_combining) {
 		strncpy(wc_suffix, "_wc", sizeof(wc_suffix));
 	}
 	
@@ -353,6 +354,84 @@ err:
 	return -1;
 }
 
+int
+fpga_plat_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value)
+{
+	log_debug("dev_index=%d", dev_index);
+	fail_on(!value, err, "value is NULL");
+
+	int ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
+	fail_on(ret != 0, err, "Invalid offset 0x%" PRIx64 ", or not attached", offset);
+
+	uint64_t *reg_ptr = (uint64_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
+			offset);
+	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
+
+	*value = *reg_ptr;
+
+	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, *value);
+	return 0;
+err:
+	return -1;
+}
+
+int
+fpga_plat_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value)
+{
+	log_debug("dev_index=%d", dev_index);
+
+	int ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
+	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 ", or not attached",
+			offset);
+
+	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, value);
+	uint64_t *reg_ptr = (uint64_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
+			offset);
+	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
+
+	*reg_ptr = value;
+
+	return 0;
+err:
+	return -1;
+}
+
+int
+fpga_plat_dev_reg_write_burst(int dev_index, uint64_t offset, uint32_t* datap,
+	uint32_t dword_len)
+{
+	int ret;
+	uint32_t i;
+	static const uint32_t dword_mult = 4;
+	log_debug("dev_index=%d", dev_index);
+
+	/* validate the beginning of the data range */
+	ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
+	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 ", or not attached",
+			offset);
+
+	/* validate the end of the data range */
+	ret = fpga_plat_dev_check_mem_offset(dev_index,
+		offset + dword_len * dword_mult - 1);
+	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 " (out of range)",
+			offset);
+
+	/* get the pointer to the beginning of the range */
+	log_debug("offset=0x%" PRIx64, offset);
+	uint32_t *reg_ptr = (uint32_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
+			offset);
+	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
+
+	/* memcpy */
+	for (i = 0; i < dword_len; ++i) {
+		reg_ptr[i] = datap[i];
+	}
+
+	return 0;
+err:
+	return -1;
+}
+
 /************************************************************************ 
  * Single device attachment and use.
  * e.g. for applications that only attach to one FPGA at a time,
@@ -366,7 +445,7 @@ fpga_plat_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id)
 	log_debug("enter");
 
 	int dev_index = -1;
-	int ret = fpga_plat_dev_attach(spec, pf_id, bar_id, &dev_index);
+	int ret = fpga_plat_dev_attach(spec, pf_id, bar_id, false, &dev_index);
 	fail_on(ret != 0, err, "fpga_plat_dev_attach failed");
 
 	if (dev_index != 0) {

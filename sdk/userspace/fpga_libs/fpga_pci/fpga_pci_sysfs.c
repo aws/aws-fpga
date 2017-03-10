@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-#include "fpga_pci_interal.h"
+#include "fpga_pci_internal.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -31,18 +31,18 @@
 /**
  * Return the ID from the given sysfs file (e.g. Vendor ID, Device ID).
  *
- * @param[in]		path	the sysfs file path 
+ * @param[in]		path	the sysfs file path
  * @param[in,out]   id		the returned id
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 static int
 fpga_pci_get_id(char *path, uint16_t *id)
 {
-	fail_on_internal(!path, err, CLI_INTERNAL_ERR_STR);
-	fail_on_internal(!id, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!path, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!id, err, CLI_INTERNAL_ERR_STR);
 
 	int ret = 0;
 	FILE *fp = fopen(path, "r");
@@ -61,32 +61,59 @@ err_close:
 	fclose(fp);
 err:
 	errno = 0;
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
- * Fill in the DBDF within the PCI resource map using the given PCI device 
- * directory name.
+ * Write a '1' to the given sysfs file.
  *
- * @param[in]		dir_name	the PCI device directory name 
- * @param[in,out]   map			the PCI resource map to fill in 
+ * @param[in]		path	the sysfs file path
  *
  * @returns
- *  0	on success 
+ *  0	on success
+ * -1	on failure
+ */
+static int
+fpga_pci_write_one2file(char *path)
+{
+	int ret = -1;
+
+	int fd = open(path, O_WRONLY);
+	fail_on_quiet(fd == -1, err, "opening %s", path);
+
+	char buf[] = { '1', 0 };
+	ret = -!!write_loop(fd, buf, sizeof(buf));
+	fail_on_quiet(ret != 0, err_close, "error writing %s", path);
+
+err_close:
+	close(fd);
+err:
+	return ret;
+}
+
+/**
+ * Fill in the DBDF within the PCI resource map using the given PCI device
+ * directory name.
+ *
+ * @param[in]		dir_name	the PCI device directory name
+ * @param[in,out]   map			the PCI resource map to fill in
+ *
+ * @returns
+ *  0	on success
  * -1	on failure
  */
 static int
 fpga_pci_get_dbdf(char *dir_name, struct fpga_pci_resource_map *map)
 {
-	fail_on_internal(!dir_name, err, CLI_INTERNAL_ERR_STR);
-	fail_on_internal(!map, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!dir_name, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!map, err, CLI_INTERNAL_ERR_STR);
 
 	uint32_t domain;
 	uint32_t bus;
 	uint32_t dev;
 	int func;
 	int ret = sscanf(dir_name, PCI_DEV_FMT, &domain, &bus, &dev, &func);
-	fail_on_internal(ret != 4, err, CLI_INTERNAL_ERR_STR); 
+	fail_on(ret != 4, err, CLI_INTERNAL_ERR_STR);
 
 	map->domain = domain;
 	map->bus = bus;
@@ -94,19 +121,19 @@ fpga_pci_get_dbdf(char *dir_name, struct fpga_pci_resource_map *map)
 	map->func = func;
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
- * Return the PCI resource size using the PCI directory name and resource 
+ * Return the PCI resource size using the PCI directory name and resource
  * number.
  *
- * @param[in]		dir_name		the PCI device directory name 
- * @param[in]		resource_num	the resource number 
+ * @param[in]		dir_name		the PCI device directory name
+ * @param[in]		resource_num	the resource number
  * @param[in,out]   resource_size	the returned resource size
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 static int
@@ -115,17 +142,17 @@ fpga_pci_get_pci_resource_info(char *dir_name,
 {
 	int ret;
 
-	fail_on_internal(!dir_name, err, CLI_INTERNAL_ERR_STR);
-	fail_on_internal(!resource_size, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!dir_name, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!resource_size, err, CLI_INTERNAL_ERR_STR);
 
 	char sysfs_name[NAME_MAX + 1];
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/%s/resource%u", dir_name, 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name),
+			"/sys/bus/pci/devices/%s/resource%u", dir_name,
 			resource_num);
 
 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for resource%u",
 			resource_num);
-	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
 			"sysfs path too long for resource%u", resource_num);
 
 	/** Check for file existence, obtain the file size */
@@ -135,13 +162,13 @@ fpga_pci_get_pci_resource_info(char *dir_name,
 
 	*resource_size = file_stat.st_size;
 
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/%s/resource%u_wc", dir_name, 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name),
+			"/sys/bus/pci/devices/%s/resource%u_wc", dir_name,
 			resource_num);
 
 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for resource%u",
 			resource_num);
-	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
 			"sysfs path too long for resource%u", resource_num);
 
 	memset(&file_stat, 0, sizeof(struct stat));
@@ -150,7 +177,7 @@ fpga_pci_get_pci_resource_info(char *dir_name,
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 static int
@@ -176,20 +203,18 @@ fpga_pci_handle_resources(char *dir_name, struct fpga_pci_resource_map *map)
 		map->resource_burstable[resource_num] = burstable;
 	}
 	return 0;
-err:
-	return -1;
 }
 
 
 /**
- * Handle one PCI device directory with the given directory name, and see if 
- * it is an AFI mbox slot.  If so, initialize a slot device structure for it 
+ * Handle one PCI device directory with the given directory name, and see if
+ * it is an AFI mbox slot.  If so, initialize a slot device structure for it
  * and its associated slot device (if any).
  *
- * @param[in]		dir_name	the PCI device directory name 
+ * @param[in]		dir_name	the PCI device directory name
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 static int
@@ -199,12 +224,12 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 	uint16_t device_id = 0;
 
 	fail_on_quiet(!dir_name, err, CLI_INTERNAL_ERR_STR);
-	// fail_on_quiet(f1.slot_dev_index >= FPGA_SLOT_MAX, err, 
+	// fail_on_quiet(f1.slot_dev_index >= FPGA_SLOT_MAX, err,
 	// 		CLI_INTERNAL_ERR_STR);
 
 	/** Setup and read the PCI Vendor ID */
 	char sysfs_name[NAME_MAX + 1];
-	int ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+	int ret = snprintf(sysfs_name, sizeof(sysfs_name),
 			"/sys/bus/pci/devices/%s/vendor", dir_name);
 
 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for vendor");
@@ -214,7 +239,7 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 	fail_on_quiet(ret != 0, err, "Error retrieving vendor_id");
 
 	/** Setup and read the PCI Device ID */
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name),
 			"/sys/bus/pci/devices/%s/device", dir_name);
 
 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for device");
@@ -243,7 +268,7 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 int
@@ -252,7 +277,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	bool found_afi_slot = false;
 	char *path = "/sys/bus/pci/devices";
 	DIR *dirp = opendir(path);
-	fail_on_internal(!dirp, err, CLI_INTERNAL_ERR_STR);
+	fail_on(!dirp, err, CLI_INTERNAL_ERR_STR);
 	int slot_dev_index = 0;
 	struct fpga_slot_spec search_spec;
 	struct fpga_pci_resource_map search_map, previous_map;
@@ -262,7 +287,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 
 	/** Loop through the sysfs device directories */
 	for (;;) {
-		struct dirent entry; 
+		struct dirent entry;
 		struct dirent *result;
 		memset(&entry, 0, sizeof(entry));
 
@@ -312,13 +337,14 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 int
 fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 {
 	int ret;
+	unsigned int size;
 	struct fpga_slot_spec spec_array[FPGA_SLOT_MAX];
 
 	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX || !spec) {
@@ -327,7 +353,9 @@ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 
 	memset(spec_array, 0, sizeof(spec_array));
 
-	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
+	/* tell fpga_pci_get_all_slot_specs not to search past the slot number */
+	size = min(sizeof_array(spec_array), (unsigned) slot_id);
+	ret = fpga_pci_get_all_slot_specs(spec_array, size);
 	fail_on_quiet(ret, err, "Unable to read PCI device information.");
 
 	if (spec_array[slot_id].map[FPGA_APP_PF].vendor_id == 0) {
@@ -338,21 +366,49 @@ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 	*spec = spec_array[slot_id];
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 int
-fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map)
+fpga_pci_get_resource_map(int slot_id, int pf_id,
+	struct fpga_pci_resource_map *map)
 {
-	(void) slot_id;
-	(void) pf_id;
-	(void) map;
-	return -ENOSYS;
+	int ret;
+
+	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX ||
+		pf_id < 0 || pf_id >= FPGA_MAX_PF ||
+		!map) {
+		return -EINVAL;
+	}
+
+	struct fpga_slot_spec slot_spec;
+	memset(&slot_spec, 0, sizeof(struct fpga_slot_spec));
+
+	ret = fpga_pci_get_slot_spec(slot_id, &slot_spec);
+	fail_on_quiet(ret, out, "fpga_pci_get_slot_spec failed");
+
+	*map = slot_spec.map[pf_id];
+out:
+	return ret;
 }
 
 int
-fpga_pci_rescan_slot_app_pfs(int slot_id)
+fpga_pci_rescan_slot_app_pfs(void)
 {
-	(void) slot_id;
-	return -ENOSYS;
+	/** Setup and write '1' to the PCI rescan file */
+	char sysfs_name[NAME_MAX + 1];
+	int ret = snprintf(sysfs_name, sizeof(sysfs_name), "/sys/bus/pci/rescan");
+
+	fail_on_quiet(ret < 0, err,
+			"Error building the sysfs path for PCI rescan file");
+	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
+			"sysfs path too long for PCI rescan file");
+
+	/** Write a "1" to the PCI rescan file */
+	ret = fpga_pci_write_one2file(sysfs_name);
+	fail_on_quiet(ret != 0, err, "fpga_pci_write_one2file failed");
+
+	return 0;
+err:
+	return FPGA_ERR_FAIL;
 }

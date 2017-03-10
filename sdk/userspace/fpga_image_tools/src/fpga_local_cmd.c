@@ -91,7 +91,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -120,7 +120,7 @@ cli_attach(void)
 out:
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -236,17 +236,17 @@ static int
 command_metrics(void)
 {
 	int ret;
-	uint32_t i;
+	uint32_t i, flags;
 	struct fpga_mgmt_image_info info;
+	struct fpga_slot_spec slot_spec;
 
 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-	// todo:
-	// req->fpga_cmd_flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
-	// req->fpga_cmd_flags |= (f1.clear_hw_metrics) ?  
-	//	FPGA_CMD_CLEAR_HW_METRICS : 0;
+	flags = 0;
+	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
 
-	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info);
+	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
 	fail_on(ret, err, "Unable to describe local image");
 
 	if (f1.show_headers) {
@@ -261,13 +261,15 @@ command_metrics(void)
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
-		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot); // todo: implement this in the library
+		ret = fpga_pci_rescan_slot_app_pfs();
 		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
-	// ret = cli_show_slot_app_pfs(f1.afi_slot); // todo
-	//fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
+	fail_on_quiet(ret != 0, err, "fpga_pci_get_slot_spec failed");
+	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
+	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	if (f1.get_hw_metrics) {
 		if (f1.show_headers) {
@@ -375,7 +377,7 @@ command_metrics(void)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -411,7 +413,7 @@ command_describe_slots(void)
 	}
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 typedef int (*command_func_t)(void);
@@ -443,7 +445,7 @@ cli_main(void)
 
 	return command_table[f1.opcode]();
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -525,6 +527,9 @@ main(int argc, char *argv[])
 	ret = cli_main();
 	fail_on_quiet(ret != 0, err, "cli_main failed");
 err:
+	if (ret) {
+		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
+	}
 	cli_detach();
 	cli_destroy();
 	return ret;

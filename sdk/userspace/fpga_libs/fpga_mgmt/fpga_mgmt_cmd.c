@@ -25,13 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "fpga_mgmt_internal.h"
-
-#include <assert.h> // todo: get rid of this?
-#define fail_on_quiet fail_on
-#define fail_on_internal fail_on
-#define fail_on_user fail_on
 
 /**
  * AFI command get payload length utility.
@@ -76,7 +72,7 @@ afi_cmd_hdr_set_len(union afi_cmd *cmd, size_t len)
 {
 	/* Null pointer or overflow? */
 	if (!cmd || (len & ~AFI_CMD_HDR_LEN_MASK)) {
-		return -1;
+		return FPGA_ERR_FAIL;
 	}
 
 	cmd->hdr.len_flags &= ~AFI_CMD_HDR_LEN_MASK;
@@ -99,7 +95,7 @@ afi_cmd_hdr_set_flags(union afi_cmd *cmd, unsigned int flags)
 {
 	/* Null pointer or overflow? */
 	if (!cmd || (flags & ~AFI_CMD_HDR_ALL_FLAGS)) {
-		return -1;
+		return FPGA_ERR_FAIL;
 	}
 
 	cmd->hdr.len_flags &= AFI_CMD_HDR_LEN_MASK;
@@ -164,8 +160,7 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id)
  * @param[in,out]	len		cmd len
  */
 void
-fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
-	bool get_hw_metrics, bool clear_hw_metrics)
+fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len, uint32_t flags)
 {
 	assert(cmd);
 	assert(len);
@@ -180,10 +175,9 @@ fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
 	afi_cmd_hdr_set_len(cmd, payload_len);
 	afi_cmd_hdr_set_flags(cmd, 0);
 
-	/** Fill in cmd body */
-	req->fpga_cmd_flags = 0;
-	req->fpga_cmd_flags |= (get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
-	req->fpga_cmd_flags |= (clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
+	/** Fill in cmd body; only allow specific flags to be set */
+	req->fpga_cmd_flags = flags &
+		(FPGA_CMD_GET_HW_METRICS | FPGA_CMD_CLEAR_HW_METRICS);
 
 	*len = sizeof(struct afi_cmd_hdr) + payload_len;
 }
@@ -243,7 +237,7 @@ fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 
@@ -270,14 +264,14 @@ fpga_mgmt_mbox_attach(int slot_id)
 	};
 
 	ret = fpga_hal_mbox_init(&mbox);
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	ret = fpga_hal_mbox_attach(true); /**< clear_state=true */
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 static int
@@ -290,7 +284,7 @@ fpga_mgmt_mbox_detach(int slot_id)
 			/** Continue with plat detach */
 		}
 
-		ret = fpga_pci_detatch(fpga_mgmt_state.slots[slot_id].handle);
+		ret = fpga_pci_detach(fpga_mgmt_state.slots[slot_id].handle);
 		if (ret != 0) {
 			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
 			/* Continue with detach */
@@ -311,18 +305,54 @@ int fpga_mgmt_detach_all(void)
 }
 
 /**
- * Validate the AFI response header, using the command header.
+ * Handle AFI error response
  *
- * @param[in]  cmd      the command that was sent.
- * @param[in]  rsp      the response that was received.
- * @param[in]  len      the expected response payload len.
+ * @param[in] rsp   the response that was received.
+ * @param[in] len   the expected response payload len.
  *
  * @returns
- *  0   on success 
- * -1   on failure
+ *  zero on success, non-zero on failure
  */
-static int 
-fpga_mgmt_afi_validate_header(const union afi_cmd *cmd, 
+static int
+fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
+{
+	struct afi_cmd_err_rsp *err_rsp = (void *)rsp->body;
+
+	uint32_t tmp_len =
+		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
+
+	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
+			len, tmp_len);
+
+	/** Handle invalid API version error */
+	if (err_rsp->error == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) {
+		union afi_err_info *err_info = (void *)err_rsp->error_info;
+
+		tmp_len += sizeof(err_info->afi_cmd_version);
+		fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
+				len, tmp_len);
+
+		log_error("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n",
+				err_info->afi_cmd_version);
+	}
+
+	return err_rsp->error;
+err:
+	return FPGA_ERR_FAIL;
+}
+
+/**
+ * Validate the AFI response header, using the command header.
+ *
+ * @param[in] cmd   the command that was sent.
+ * @param[in] rsp   the response that was received.
+ * @param[in] len   the expected response payload len.
+ *
+ * @returns
+ *  zero on success, non-zero on failure
+ */
+static int
+fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 		const union afi_cmd *rsp, uint32_t len)
 {
 	uint32_t stored_flags = afi_cmd_hdr_get_flags(rsp);
@@ -333,8 +363,8 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 	fail_on_quiet(!rsp, err, "rsp == NULL");
 
 	/** Version */
-	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err, 
-			"cmd_ver(%u) != rsp_ver(%u)", 
+	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err,
+			"cmd_ver(%u) != rsp_ver(%u)",
 			cmd->hdr.version, rsp->hdr.version);
 
 	/** Opcode */
@@ -346,11 +376,11 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 			cmd->hdr.id, rsp->hdr.id);
 
 	/** Received len too small */
-	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err, 
+	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err,
 			"Received length %u too small", len);
 
 	/** Payload len too big */
-	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN, 
+	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN,
 			err, "Payload length %u too big", payload_len);
 
 	/** Not a response */
@@ -361,10 +391,10 @@ id_err:
 	return -EAGAIN;
 op_err:
 	if (rsp->hdr.op == AFI_CMD_ERROR) {
-		//return (cmd, rsp, len); // TODO
+		return fpga_mgmt_handle_afi_cmd_error_rsp(rsp, len);
 	}
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 static int
@@ -375,30 +405,33 @@ fpga_mgmt_send_cmd(
 
 	/** Write the AFI cmd to the mailbox */
 	ret = fpga_hal_mbox_write((void *)cmd, *len);
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
-	/** 
+	/**
 	 * Read the AFI rsp from the mailbox.
-	 *  -also make a minimal attempt to drain stale responses 
+	 *  -also make a minimal attempt to drain stale responses
 	 *   (if any).
 	 */
 	uint32_t id_retries = 0;
 	ret = -EAGAIN;
 	while (ret == -EAGAIN) {
 		ret = fpga_hal_mbox_read((void *)rsp, len);
-		fail_on_user(ret != 0, err, "Error: operation timed out");
+		fail_on(ret = (ret) ? ETIMEDOUT : 0, err_code, "Error: operation timed out");
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
+		fail_on(ret, err_code, CLI_INTERNAL_ERR_STR);
 
-		fail_on_internal(id_retries >= AFI_MAX_ID_RETRIES, err, 
+		fail_on(id_retries >= AFI_MAX_ID_RETRIES, err,
 				CLI_INTERNAL_ERR_STR);
 		id_retries++;
 	}
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
- 
+	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
+err_code:
+	return ret;
 }
 
 int
