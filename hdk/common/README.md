@@ -11,7 +11,7 @@ The [scripts] (./scripts) contains a script used to notify a developer that thei
 
 The shell_stable soft link points to the shell version contained in this directory that is the current, qualified shell version that can be used by developers. Other shell versions are available for use, but may either be older, or exploratory.
 
-## /shell_v########
+## /shell_v#\#\#\#\#\#\#\# #
 
 Each shell release constains files specific to that release. These files are stored in a shell directory with the version included in the directory name. For example, the [shell_v11241611](shell_v11241611) directory contains files specific to Shell Version 0x11241611.
 
