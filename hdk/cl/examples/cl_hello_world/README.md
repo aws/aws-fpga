@@ -20,7 +20,7 @@ The cl_hello_world example demonstrates basic Shell-to-CL connectivity, memory-m
 
 The Hello World Register is a 32-bit read/write register. However, in order to demonstrate that the register is being accessed correctly, the read data returned for the register will be byte swapped.
 
-The Virtual LED register shadows the Hello World Register such that it will hold the same value as the Hello World Register.
+The Virtual LED register is a 16-bit read-only register that shadows the lower 16 bits of the Hello World Register such that it will hold the same value as bits 15:0 of the Hello World Register.
 
 The cl_hello_world design utilizes the Virtual LED and DIP switch interface which consistes of two signals described in the [cl_ports.vh] (./../../../common/shell_v02221781/design/interfaces/cl_ports.vh) file:
 
@@ -29,7 +29,7 @@ The cl_hello_world design utilizes the Virtual LED and DIP switch interface whic
    output logic[15:0] cl_sh_status_vled,        //Virtual LEDs, monitored through FPGA management PF and tools
 ```
 
-In this example the Virtual LED Register is used to drive the Virtual LED signal, cl_sh_status_vled. In addition, the Virtual DIP switch, sh_cl_status_vdip, is used to gate the Virtual LED Register value sent to the Virtual LEDs. So, for example, if the sh_cl_status_vdip is set to 16'hF0, then only the upper 8 bits of the Virtual LED Register will be signaled on the Virtual LED signal cl_sh_status_vled. 
+In this example the Virtual LED Register is used to drive the Virtual LED signal, cl_sh_status_vled. In addition, the Virtual DIP switch, sh_cl_status_vdip, is used to gate the Virtual LED Register value sent to the Virtual LEDs. So, for example, if the sh_cl_status_vdip is set to 16'h00FF, then only the lower 8 bits of the Virtual LED Register will be signaled on the Virtual LED signal cl_sh_status_vled. 
 
 ## <a name="metadata"> Hello World Example Metadata
 
