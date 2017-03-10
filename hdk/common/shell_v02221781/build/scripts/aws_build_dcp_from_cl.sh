@@ -65,6 +65,12 @@ then
 	exit 1
 fi
 
+if ! [ $HDK_DIR ]
+then
+	echo "ERROR: HDK_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
+	exit 1
+fi
+
 if ! [ -x $HDK_SHELL_DIR/build/scripts/prepare_build_environment.sh ]
 then
 	echo "prepare_build_env.sh script is not eXecutable, trying to apply chmod +x"
@@ -90,11 +96,17 @@ logname=$timestamp.vivado.log
 
 echo "AWS FPGA: Environment variables and directories are present. Checking for Vivado installation."
 
-# before going too far make sure Vivado is available
+# Before going too far make sure Vivado is available
 vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
 
+# Get the HDK Version
+hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
+
+# Get the Shell Version
+shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
+
 # Run vivado
-nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy > $timestamp.nohup.out 2>&1&
+nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version > $timestamp.nohup.out 2>&1&
 
 echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
 echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
