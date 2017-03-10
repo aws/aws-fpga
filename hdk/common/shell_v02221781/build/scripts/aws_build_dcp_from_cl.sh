@@ -18,12 +18,13 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-block] | [-h] | [-H] | [-help] |  ]"
 }
 
 # Default arguments for script and strategy
 strategy=DEFAULT
 vivado_script="create_dcp_from_cl.tcl"
+block=0
 
 # Parse command-line arguments
 while [ "$1" != "" ]; do
@@ -33,6 +34,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -strategy )             shift
                                 strategy=$1
+                                ;;
+        -block )                block=1
                                 ;;
         -h | -H | -help )       usage
                                 exit
@@ -106,8 +109,12 @@ hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk 
 shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
 
 # Run vivado
-nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version > $timestamp.nohup.out 2>&1&
-
-echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
-echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
-
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version"
+if [[ "$block" == "0" ]]; then
+  nohup $cmd > $timestamp.nohup.out 2>&1 &
+  
+  echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
+  echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
+else
+  $cmd
+fi
