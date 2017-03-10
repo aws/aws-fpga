@@ -27,7 +27,7 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 
 ### System diagram  
 
-[Diagram](https://github.com/aws/aws-fpga/blob/AWSamirinen-patch-1/hdk/cl/examples/cl_dram_dma/design/cl_dram_dma.jpg)
+![Diagram](https://github.com/aws/aws-fpga/blob/AWSamirinen-patch-1/hdk/cl/examples/cl_dram_dma/design/cl_dram_dma.jpg)
 
   
 <a name="functionalDescription"></a>
@@ -39,20 +39,20 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 All four DRAM channels are used.
 
 
-The DRAM space is 64GiB, and is mapped to the pcis_dma AXI4 bus.
+The DRAM space is 64GiB, and is mapped to the sh_cl_dma_pcis AXI4 bus.
 
-### pcis_dma AXI4 bus
+### dma_pcis AXI4 bus
 
-sh_cl_pcis_dma_ exposes a address windows of 128GiB matching AppPF BAR4.
-
-
-This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](https://github.com/aws/aws-fpga/blob/prelease/hdk/common/shell_v02221781/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB), DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB), DDR_D(base_addr=0xC_0000_0000, range=16GB).
+sh\_cl\_dma\_pcis exposes a address windows of 128GiB matching AppPF BAR4.
 
 
-### ocl_ AXI-Lite
+This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](../../../common/shell_stable/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB), DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB), DDR_D(base_addr=0xC_0000_0000, range=16GB).
 
 
-The sh_cl_ocl\_ AXI-Lite bus is connected to [cl_ocl_slv.sv](design/cl_ocl_slv.sv) module, and is used for register access to the Automatic Test Generator (ATG) etc.
+### ocl\_ AXI-Lite
+
+
+The cl_ocl\_ AXI-Lite bus is connected to [cl_ocl_slv.sv](design/cl_ocl_slv.sv) module, and is used for register access to the Automatic Test Generator (ATG) etc.
 
 
 The valid address map is found [here](./TBD).
@@ -60,7 +60,7 @@ The valid address map is found [here](./TBD).
 Any access invalid address with return 32'hdeadbeef
 
 
-### sda_ AXI-Lite
+### sda\_ AXI-Lite
 
 The sh_cl_sda\_ AXI-Lite bus is connected to [cl_sda_slv.sv](design/cl_sda_slv.sv) module, which provides 1KiB of scratch RAM.
 
@@ -68,7 +68,7 @@ The sh_cl_sda\_ AXI-Lite bus is connected to [cl_sda_slv.sv](design/cl_sda_slv.s
 Address bits [9:0] will be used to access the location of the RAM, but the upper bits of the address are ignored.
 
 
-### pcim_ AXI4
+### pcim\_ AXI4
 
 
 The cl_sh_pcim\_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](design/cl_pcim_mstr.sv). It can be used to read/write from the host memory. 
@@ -87,7 +87,7 @@ This example does not use FPGA to FPGA Ring
 
 ### Virtual JTAG
 
-2 ILA cores are integrated, one to monitoring the sh_cl_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. An example usage is provided in [cl_ila.sv](design/cl_ila.sv).
+2 ILA cores are integrated, one to monitoring the sh\_c_dma\_pcis bus and the other to monitor the AXI4 signals on DDR_A. An example usage is provided in [cl_ila.sv](design/cl_ila.sv).
 An example usage for Xilinx VIO is provided in [cl_vio.sv](design/cl_vio.sv)
 
 
