@@ -15,15 +15,42 @@
 ## implied. See the License for the specific language governing permissions and
 ## limitations under the License.
 
+if [[ ":$HDK_COMMON_DIR" == ":" ]]; then
+  echo "error: HDK_COMMON_DIR not set. Source hdk_setup.sh first."
+  exit 2
+fi
+
+if [[ ":$VIVADO_VER" == ":" ]]; then
+  echo "error: VIVADO_VER not set. Source hdk_setup.sh first."
+  exit 2
+fi
+
 models_dir=$1
 if [[ ":$models_dir" == ":" ]]; then
   models_dir=$HDK_COMMON_DIR/verif/models
 fi
+
 if [ ! -e $models_dir ]; then
   mkdir -p $models_dir
 fi
 
+lockfile_filename=$models_dir/build.lock
+
+# Prevent multiple users from building in the same directory.
+# Set the number of retries to 0 so that we will just fail
+# and let the other process complete the build.
+if [ -e /bin/lockfile ]; then
+  if ! lockfile -r 0 $lockfile_filename; then
+    echo "error: $lockfile_filename exists"
+    echo "error: Another process is already building the models."
+    exit 2
+  fi
+fi
+
+echo "$VIVADO_VER" > $models_dir/.vivado_version
+
 if ! vivado -mode batch -source $HDK_COMMON_DIR/verif/scripts/init.tcl; then
+  rm -f $lockfile_filename
   exit 2
 fi
 
@@ -58,3 +85,4 @@ cp $ddr4_imports_dir/ddr4_rank.sv                $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_rcd_model.sv           $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_rdimm_wrapper.sv       $ddr4_rdimm_model_dir/
 
+rm -f $lockfile_filename
