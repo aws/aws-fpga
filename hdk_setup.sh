@@ -142,7 +142,8 @@ hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
 # Download the sha1
-aws s3 cp s3://$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp.sha1 $hdk_shell.sha1 --only-show-errors || { err_msg "Failed to download HDK shell's checkpoint version."; return 2; }
+# Use curl instead of AWS CLI so that credentials aren't required.
+curl -s https://s3.amazonaws.com/$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp.sha1 -o $hdk_shell.sha1 || { err_msg "Failed to download HDK shell's checkpoint version."; return 2; }
 exp_sha1=$(cat $hdk_shell.sha1)
 debug_msg "  latest   version=$exp_sha1"
 # If shell already downloaded check its sha1
@@ -158,9 +159,10 @@ else
   info_msg "HDK shell's checkpoint hasn't been downloaded yet."
 fi
 if [ ! -e $hdk_shell ]; then
-  s3_hdk_shell=s3://$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+  s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
   info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
-  aws s3 cp $s3_hdk_shell $hdk_shell --only-show-errors || { err_msg "HDK shell checkpoint download failed"; return 2; }
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
 fi
 # Check sha1
 act_sha1=$( sha1sum $hdk_shell | awk '{ print $1 }' )
