@@ -210,6 +210,7 @@ module tb();
    logic               ocl_cl_bvalid;
    logic [1:0]         ocl_cl_bresp;
    logic               sh_ocl_bready;
+   logic [1:0]         ocl_sh_bresp;
 
    //Read address
    logic               sh_ocl_arvalid;

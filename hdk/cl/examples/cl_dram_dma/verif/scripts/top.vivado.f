@@ -34,7 +34,6 @@ ${SH_LIB_DIR}/../ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v
 ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 
 --define DISABLE_CHIPSCOPE_DEBUG
-
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv

@@ -75,7 +75,7 @@ set_param chipscope.enablePRFlow true
 #---- User would replace this section -----
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-read_verilog [ list \
+read_verilog -sv [ list \
    $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh
 ]
 set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_dram_dma_defines.vh ]
@@ -186,6 +186,20 @@ switch $strategy {
     }
 }
 
+## Prohibit the top two URAM sites of each URAM quad.
+## These two sites cannot be used within PR designs.
+#set uramSites [get_sites -filter { SITE_TYPE == "URAM288" } ]
+#foreach uramSite $uramSites {
+#  # Get the URAM location within a quad
+#  set quadLoc [expr  [string range $uramSite [expr [string first Y $uramSite] + 1] end] % 4]
+#  # The top-two sites have usage restrictions
+#  if {$quadLoc == 2 || $quadLoc == 3} {
+#    # Prohibit the appropriate site
+#    set_property PROHIBIT true $uramSite
+#    puts "Setting Placement Prohibit on $uramSite"
+#  }
+#}
+
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
 	puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
@@ -201,6 +215,7 @@ close_project
 puts "AWS FPGA: Optimizing design";
 
 # Implementation
+
 #Read in the Shell checkpoint and do the CL implementation
 puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
 
@@ -467,4 +482,5 @@ cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 close_design
+
 

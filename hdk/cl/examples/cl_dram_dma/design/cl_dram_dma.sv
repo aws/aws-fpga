@@ -148,8 +148,8 @@ always_ff @(posedge clk)
                                     1'b0, ddrd_scrb_bus.state, 
                                     1'b0, ddrb_scrb_bus.state, 
                                     1'b0, ddra_scrb_bus.state,
-                                    8'd0, all_ddr_scrb_done, all_ddr_is_ready} :
-                        {20'ha111_1, 4'b0, all_ddr_scrb_done, all_ddr_is_ready};
+                                    4'b0, 4'hf, all_ddr_scrb_done, all_ddr_is_ready} :
+                        {20'ha111_1, 4'hf, all_ddr_scrb_done, all_ddr_is_ready};
 assign cl_sh_status1 = `CL_VERSION;
 
 
