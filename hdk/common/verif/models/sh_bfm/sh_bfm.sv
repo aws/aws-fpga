@@ -270,42 +270,6 @@ module sh_bfm #(
 
    inout[3:0]                 fpga_uctrl_gpio
 
-   //--------------------------------------------
-   // XDMA
-   //--------------------------------------------
-
-   ,
-   //----------------------------------------------------
-   // XDMA AXI-4 interface to master cycles to CL
-   output logic [4:0]   sh_cl_xdma_awid,
-   output logic [63:0]  sh_cl_xdma_awaddr,
-   output logic [7:0]   sh_cl_xdma_awlen,
-   output logic         sh_cl_xdma_awvalid,
-   input                cl_sh_xdma_awready,
-
-   output logic [511:0] sh_cl_xdma_wdata,
-   output logic [63:0]  sh_cl_xdma_wstrb,
-   output logic         sh_cl_xdma_wlast,
-   output logic         sh_cl_xdma_wvalid,
-   input                cl_sh_xdma_wready,
-
-   input      [4:0]     cl_sh_xdma_bid,
-   input      [1:0]     cl_sh_xdma_bresp,
-   input                cl_sh_xdma_bvalid,
-   output logic         sh_cl_xdma_bready,
-
-   output logic [4:0]   sh_cl_xdma_arid,
-   output logic [63:0]  sh_cl_xdma_araddr,
-   output logic [7:0]   sh_cl_xdma_arlen,
-   output logic         sh_cl_xdma_arvalid,
-   input                cl_sh_xdma_arready,
-
-   input      [4:0]     cl_sh_xdma_rid,
-   input      [511:0]   cl_sh_xdma_rdata,
-   input      [1:0]     cl_sh_xdma_rresp,
-   input                cl_sh_xdma_rlast,
-   input                cl_sh_xdma_rvalid,
-   output logic         sh_cl_xdma_rready
 
    //------------------------------------------------------------------------------------------
    // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
