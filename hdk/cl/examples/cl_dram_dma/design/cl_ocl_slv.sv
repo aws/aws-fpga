@@ -311,48 +311,54 @@ assign pcim_tst_cfg_bus.addr = slv_tst_addr[0];
 assign pcim_tst_cfg_bus.wdata = slv_tst_wdata[0];
 assign pcim_tst_cfg_bus.wr = slv_tst_wr[0];
 assign pcim_tst_cfg_bus.rd = slv_tst_rd[0];
-assign tst_slv_ack[0] = pcim_tst_cfg_bus.ack;
-assign tst_slv_rdata[0] = pcim_tst_cfg_bus.rdata;
 
 assign ddra_tst_cfg_bus.addr = slv_tst_addr[1];
 assign ddra_tst_cfg_bus.wdata = slv_tst_wdata[1];
 assign ddra_tst_cfg_bus.wr = slv_tst_wr[1];
 assign ddra_tst_cfg_bus.rd = slv_tst_rd[1];
-assign tst_slv_ack[1] = ddra_tst_cfg_bus.ack;
-assign tst_slv_rdata[1] = ddra_tst_cfg_bus.rdata;
 
 assign ddrb_tst_cfg_bus.addr = slv_tst_addr[2];
 assign ddrb_tst_cfg_bus.wdata = slv_tst_wdata[2];
 assign ddrb_tst_cfg_bus.wr = slv_tst_wr[2];
 assign ddrb_tst_cfg_bus.rd = slv_tst_rd[2];
-assign tst_slv_ack[2] = ddrb_tst_cfg_bus.ack;
-assign tst_slv_rdata[2] = ddrb_tst_cfg_bus.rdata;
 
 assign ddrc_tst_cfg_bus.addr = slv_tst_addr[3];
 assign ddrc_tst_cfg_bus.wdata = slv_tst_wdata[3];
 assign ddrc_tst_cfg_bus.wr = slv_tst_wr[3];
 assign ddrc_tst_cfg_bus.rd = slv_tst_rd[3];
-assign tst_slv_ack[3] = ddrc_tst_cfg_bus.ack;
-assign tst_slv_rdata[3] = ddrc_tst_cfg_bus.rdata;
 
 assign ddrd_tst_cfg_bus.addr = slv_tst_addr[4];
 assign ddrd_tst_cfg_bus.wdata = slv_tst_wdata[4];
 assign ddrd_tst_cfg_bus.wr = slv_tst_wr[4];
 assign ddrd_tst_cfg_bus.rd = slv_tst_rd[4];
-assign tst_slv_ack[4] = ddrd_tst_cfg_bus.ack;
-assign tst_slv_rdata[4] = ddrd_tst_cfg_bus.rdata;
 
 
 assign int_tst_cfg_bus.addr = slv_tst_addr[13];
 assign int_tst_cfg_bus.wdata = slv_tst_wdata[13];
 assign int_tst_cfg_bus.wr = slv_tst_wr[13];
 assign int_tst_cfg_bus.rd = slv_tst_rd[13];
-assign tst_slv_ack[13] = int_tst_cfg_bus.ack;
-assign tst_slv_rdata[13] = int_tst_cfg_bus.rdata;
 
 
 //respond back with deadbeef for addresses not implemented
 always_comb begin
+  //for pcim
+  tst_slv_ack[0] = pcim_tst_cfg_bus.ack;
+  tst_slv_rdata[0] = pcim_tst_cfg_bus.rdata;
+  //for DDRA
+  tst_slv_ack[1] = ddra_tst_cfg_bus.ack;
+  tst_slv_rdata[1] = ddra_tst_cfg_bus.rdata; 
+  //for DDRB
+  tst_slv_ack[2] = ddrb_tst_cfg_bus.ack;
+  tst_slv_rdata[2] = ddrb_tst_cfg_bus.rdata;
+  //for DDRC
+  tst_slv_ack[3] = ddrc_tst_cfg_bus.ack;
+  tst_slv_rdata[3] = ddrc_tst_cfg_bus.rdata; 
+  //for DDRD
+  tst_slv_ack[4] = ddrd_tst_cfg_bus.ack;
+  tst_slv_rdata[4] = ddrd_tst_cfg_bus.rdata;
+  //for int ATG
+  tst_slv_ack[13] = int_tst_cfg_bus.ack;
+  tst_slv_rdata[13] = int_tst_cfg_bus.rdata;
   for(int i=5; i<13; i++) begin
     tst_slv_ack[i] = 1'b1;
     tst_slv_rdata[i] = 32'hdead_beef;

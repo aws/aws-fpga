@@ -92,7 +92,7 @@ module cl_ila (
 //---------------------------- 
 // Debug Core ILA for DDRA AXI4 interface monitoring 
 //---------------------------- 
-      ila_1 CL_DDRC_ILA_0 (
+      ila_1 CL_DDRA_ILA_0 (
                    .clk    (aclk),
                    .probe0 (lcl_cl_sh_ddra.awvalid),
                    .probe1 (lcl_cl_sh_ddra.awaddr),

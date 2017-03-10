@@ -39,6 +39,10 @@ hdk/common/shell_*/build/checkpoints/from_aws/SH_CL_BB_routed.dcp*
 # Generated checkpoints
 checkpoints
 
+# Created when building DDR4 models
+build.lock
+hdk/common/verif/models/.vivado_version
+
 # These get created when you run vivado interactively or batch
 vivado_pid*.str
 vivado*.jou
