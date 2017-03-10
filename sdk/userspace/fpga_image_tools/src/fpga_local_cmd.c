@@ -154,7 +154,9 @@ int		i;
                 else
                         printf("0");
                 status = status << 1;
-        }
+                if ((i%4 == 3) && (i!=15))
+                        printf("-");
+	}
 	printf("\n");
 	return 0;
 }
@@ -176,6 +178,8 @@ int             i;
                 else
                         printf("0");
                 status = status << 1;
+		if ((i%4 == 3) && (i!=15))
+			printf("-");
         }
         printf("\n");
 	return 0;
