@@ -27,6 +27,10 @@ cfg_bus_t cfg_bus_q();
                                                            .in_bus({cfg_bus_q.ack, cfg_bus_q.rdata}),
                                                            .out_bus({cfg_bus.ack, cfg_bus.rdata})
                                                            );
+
+//---------------------------- 
+// Example block for generating IRQ and checking for ack
+//---------------------------- 
     
     cl_int_tst CL_INT_TST 
     (

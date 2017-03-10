@@ -7,8 +7,7 @@
 
 module test_hello_world();
 
-`define HELLO_WORLD_REG_ADDR 64'h00
-`define VLED_REG_ADDR        64'h04
+`include "cl_common_defines.vh" // CL Defines with register addresses
 
 logic [31:0] rdata;
 
@@ -17,9 +16,9 @@ logic [31:0] rdata;
       tb.sh.power_up();
 
       $display ("Writing 0xDEAD_BEEF to address 0x%x", `HELLO_WORLD_REG_ADDR);
-      tb.sh.poke(`HELLO_WORLD_REG_ADDR, 32'hDEAD_BEEF); // write register
+      tb.sh.poke(`HELLO_WORLD_REG_ADDR, 32'hDEAD_BEEF, 6'h0, 2, 2); // write register
 
-      tb.sh.peek(`HELLO_WORLD_REG_ADDR, rdata);         // start read & write
+      tb.sh.peek(`HELLO_WORLD_REG_ADDR, rdata, 6'h0, 2, 2);         // start read & write
       $display ("Reading 0x%x from address 0x%x", rdata, `HELLO_WORLD_REG_ADDR);
 
       if (rdata == 32'hEFBE_ADDE) // Check for byte swap in register read
@@ -27,7 +26,7 @@ logic [31:0] rdata;
       else
         $display ("Test FAILED");
 
-      tb.sh.peek(`VLED_REG_ADDR, rdata);         // start read & write
+      tb.sh.peek(`VLED_REG_ADDR, rdata, 6'h0, 2, 2);         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
       if (rdata == 32'h0000_BEEF) // Check for byte swap in register read

@@ -19,7 +19,9 @@ module cl_ocl_slv (
 
 axi_bus_t sh_ocl_bus_q();
 
-
+//---------------------------------
+// flop the input OCL bus
+//---------------------------------
    axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) AXIL_OCL_REG_SLC (
     .aclk          (clk),
     .aresetn       (sync_rst_n),
@@ -89,7 +91,7 @@ axi_bus_t sh_ocl_bus_q();
 
 
 //-------------------------------------------------
-// Slave state machine (accesses from PCIe)
+// Slave state machine (accesses from PCIe on BAR0 for CL registers)
 //-------------------------------------------------
 
 parameter NUM_TST = (1 + 4 + 4 + 4 + 1 + 2);
@@ -115,7 +117,7 @@ logic slv_cyc_done;              //Cycle is done
 
 logic[31:0] slv_rdata;           //Latch rdata
 
-logic[7:0] slv_sel;              //Slave select
+logic[17:0] slv_sel;              //Slave select
 
 logic[31:0] slv_tst_addr[NUM_TST-1:0];
 logic[31:0] slv_tst_wdata[NUM_TST-1:0];
@@ -160,7 +162,7 @@ always_ff @(negedge sync_rst_n or posedge clk)
 assign slv_mx_addr = (slv_cyc_wr)? slv_req_wr_addr : slv_req_rd_addr;
    
 //Slave select (256B per slave)
-assign slv_sel = slv_mx_addr[15:8];
+assign slv_sel = slv_mx_addr[24:8];
    
 //Latch the winner
 always_ff @(negedge sync_rst_n or posedge clk)
@@ -263,18 +265,20 @@ always_ff @(negedge sync_rst_n or posedge clk)
    end
    else
    begin
-      slv_tst_wr <= ((slv_state==SLV_CYC) & slv_mx_req_valid & slv_cyc_wr & !slv_did_req) << slv_sel;
-      slv_tst_rd <= ((slv_state==SLV_CYC) & slv_mx_req_valid & !slv_cyc_wr & !slv_did_req) << slv_sel;
+      slv_tst_wr <= (slv_sel<NUM_TST) ? ((slv_state==SLV_CYC) & slv_mx_req_valid & slv_cyc_wr & !slv_did_req) << slv_sel
+                                      : 0;
+      slv_tst_rd <= (slv_sel<NUM_TST) ? ((slv_state==SLV_CYC) & slv_mx_req_valid & !slv_cyc_wr & !slv_did_req) << slv_sel
+                                      : 0;
    end
 
-assign slv_cyc_done = tst_slv_ack[slv_sel];
+assign slv_cyc_done = (slv_sel<NUM_TST) ? tst_slv_ack[slv_sel] : 1'b1;
 
 //Latch the return data
 always_ff @(negedge sync_rst_n or posedge clk)
    if (!sync_rst_n)
       slv_rdata <= 0;
    else if (slv_cyc_done)
-      slv_rdata <= tst_slv_rdata[slv_sel];
+      slv_rdata <= (slv_sel<NUM_TST) ? tst_slv_rdata[slv_sel] : 32'hdead_beef;
 
 //Ready back to AXI for request
 always_ff @(negedge sync_rst_n or posedge clk)
@@ -307,44 +311,63 @@ assign pcim_tst_cfg_bus.addr = slv_tst_addr[0];
 assign pcim_tst_cfg_bus.wdata = slv_tst_wdata[0];
 assign pcim_tst_cfg_bus.wr = slv_tst_wr[0];
 assign pcim_tst_cfg_bus.rd = slv_tst_rd[0];
-assign tst_slv_ack[0] = pcim_tst_cfg_bus.ack;
-assign tst_slv_rdata[0] = pcim_tst_cfg_bus.rdata;
 
 assign ddra_tst_cfg_bus.addr = slv_tst_addr[1];
 assign ddra_tst_cfg_bus.wdata = slv_tst_wdata[1];
 assign ddra_tst_cfg_bus.wr = slv_tst_wr[1];
 assign ddra_tst_cfg_bus.rd = slv_tst_rd[1];
-assign tst_slv_ack[1] = ddra_tst_cfg_bus.ack;
-assign tst_slv_rdata[1] = ddra_tst_cfg_bus.rdata;
 
 assign ddrb_tst_cfg_bus.addr = slv_tst_addr[2];
 assign ddrb_tst_cfg_bus.wdata = slv_tst_wdata[2];
 assign ddrb_tst_cfg_bus.wr = slv_tst_wr[2];
 assign ddrb_tst_cfg_bus.rd = slv_tst_rd[2];
-assign tst_slv_ack[2] = ddrb_tst_cfg_bus.ack;
-assign tst_slv_rdata[2] = ddrb_tst_cfg_bus.rdata;
 
 assign ddrc_tst_cfg_bus.addr = slv_tst_addr[3];
 assign ddrc_tst_cfg_bus.wdata = slv_tst_wdata[3];
 assign ddrc_tst_cfg_bus.wr = slv_tst_wr[3];
 assign ddrc_tst_cfg_bus.rd = slv_tst_rd[3];
-assign tst_slv_ack[3] = ddrc_tst_cfg_bus.ack;
-assign tst_slv_rdata[3] = ddrc_tst_cfg_bus.rdata;
 
 assign ddrd_tst_cfg_bus.addr = slv_tst_addr[4];
 assign ddrd_tst_cfg_bus.wdata = slv_tst_wdata[4];
 assign ddrd_tst_cfg_bus.wr = slv_tst_wr[4];
 assign ddrd_tst_cfg_bus.rd = slv_tst_rd[4];
-assign tst_slv_ack[4] = ddrd_tst_cfg_bus.ack;
-assign tst_slv_rdata[4] = ddrd_tst_cfg_bus.rdata;
 
 
 assign int_tst_cfg_bus.addr = slv_tst_addr[13];
 assign int_tst_cfg_bus.wdata = slv_tst_wdata[13];
 assign int_tst_cfg_bus.wr = slv_tst_wr[13];
 assign int_tst_cfg_bus.rd = slv_tst_rd[13];
-assign tst_slv_ack[13] = int_tst_cfg_bus.ack;
-assign tst_slv_rdata[13] = int_tst_cfg_bus.rdata;
+
+
+//respond back with deadbeef for addresses not implemented
+always_comb begin
+  //for pcim
+  tst_slv_ack[0] = pcim_tst_cfg_bus.ack;
+  tst_slv_rdata[0] = pcim_tst_cfg_bus.rdata;
+  //for DDRA
+  tst_slv_ack[1] = ddra_tst_cfg_bus.ack;
+  tst_slv_rdata[1] = ddra_tst_cfg_bus.rdata; 
+  //for DDRB
+  tst_slv_ack[2] = ddrb_tst_cfg_bus.ack;
+  tst_slv_rdata[2] = ddrb_tst_cfg_bus.rdata;
+  //for DDRC
+  tst_slv_ack[3] = ddrc_tst_cfg_bus.ack;
+  tst_slv_rdata[3] = ddrc_tst_cfg_bus.rdata; 
+  //for DDRD
+  tst_slv_ack[4] = ddrd_tst_cfg_bus.ack;
+  tst_slv_rdata[4] = ddrd_tst_cfg_bus.rdata;
+  //for int ATG
+  tst_slv_ack[13] = int_tst_cfg_bus.ack;
+  tst_slv_rdata[13] = int_tst_cfg_bus.rdata;
+  for(int i=5; i<13; i++) begin
+    tst_slv_ack[i] = 1'b1;
+    tst_slv_rdata[i] = 32'hdead_beef;
+  end
+  for(int i=14; i<16; i++) begin
+    tst_slv_ack[i] = 1'b1;
+    tst_slv_rdata[i] = 32'hdead_beef;
+  end
+end
 
 
 endmodule

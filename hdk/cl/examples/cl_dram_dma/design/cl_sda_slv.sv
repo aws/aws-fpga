@@ -9,6 +9,9 @@ module cl_sda_slv (
 
 axi_bus_t sda_cl_q();
 
+//---------------------------------
+// flop the input SDA bus
+//---------------------------------
    axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) AXIL_SDA_REG_SLC (
     .aclk          (aclk),
     .aresetn       (aresetn),
@@ -76,7 +79,9 @@ axi_bus_t sda_cl_q();
     .m_axi_rready  (sda_cl_q.rready)
    );
 
-
+//---------------------------------
+// RAM slave for SDA accesses
+//---------------------------------
    axil_slave  AXIL_SLAVE(
       .clk(aclk),
       .rst_n(aresetn),
