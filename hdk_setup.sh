@@ -175,12 +175,29 @@ if [[ $act_sha1 != $exp_sha1 ]]; then
 fi
 info_msg "HDK shell is up-to-date"
 
-# Create DDR and PCIe IP models and patch PCIe\
+# Create DDR and PCIe IP models and patch PCIe
 models_dir=$HDK_COMMON_DIR/verif/models
 ddr4_model_dir=$models_dir/ddr4_model
-if [ ! -f $ddr4_model_dir/arch_defines.v ]; then
-  ddr4_build_dir=$AWS_FPGA_REPO_DIR/ddr4_model_build
+if [ -f $ddr4_model_dir/arch_defines.v ]; then
+  # Models already built
+  # Check to make sure they were built with this version of vivado
+  if [[ -f $models_dir/.vivado_version ]]; then
+    models_vivado_version=$(cat $models_dir/.vivado_version)
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with $models_vivado_version"
+    if [[ $models_vivado_version != $VIVADO_VER ]]; then
+      info_msg "  Wrong vivado version so rebuilding with $VIVADO_VER"
+    fi
+  else
+    models_vivado_version=UNKNOWN
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN vivado version so rebuilding."
+  fi
+else
+  # Models haven't been built
+  models_vivado_version=NOT_BUILT
   info_msg "DDR4 model files in "$ddr4_model_dir/" do NOT exist. Running model creation step.";
+fi
+if [[ $models_vivado_version != $VIVADO_VER ]]; then
+  ddr4_build_dir=$AWS_FPGA_REPO_DIR/ddr4_model_build
   info_msg "  Building in $ddr4_build_dir"
   info_msg "  This could take 5-10 minutes, please be patient!";
   mkdir -p $ddr4_build_dir
