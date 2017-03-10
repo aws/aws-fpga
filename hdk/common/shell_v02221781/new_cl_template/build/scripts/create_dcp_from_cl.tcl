@@ -10,19 +10,21 @@
 package require tar
 
 #################################################
-## Versions
+## Command-line Arguments
 #################################################
-set shell_version "0x02221781"
-set hdk_version "1.0.0"
+set timestamp     [lindex $argv 0]
+set strategy      [lindex $argv 1]
+set hdk_version   [lindex $argv 2]
+set shell_version [lindex $argv 3]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
-puts "Shell Version: VenomCL_unc - $shell_version";
+puts "HDK Version:        $hdk_version";
+puts "Shell Version:      $shell_version";
 puts "Vivado Script Name: $argv0";
-puts "HDK Version: $hdk_version";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -43,10 +45,6 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
         exit 2
 }
-
-# Command-line Arguments
-set timestamp [lindex $argv 0]
-set strategy  [lindex $argv 1]
 
 #Convenience to set the root of the RTL directory
 puts "All reports and intermediate results will be time stamped with $timestamp";
@@ -76,10 +74,14 @@ set_param chipscope.enablePRFlow true
 
 #Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
 read_verilog -sv [ list \
-  $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh
+  $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh\
+  $CL_DIR/build/src_post_encryption/cl_common_defines.vh
 ]
 set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
 set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
+
+set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_common_defines.vh ]
+set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_common_defines.vh ]
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
@@ -122,6 +124,7 @@ read_ip [ list \
   $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
   $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
   $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
+  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
 ]
 
@@ -133,8 +136,8 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_clocks_aws.xdc - AWS provided clock constraint.     ***DO NOT MODIFY***
 #  cl_ddr.xdc        - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]

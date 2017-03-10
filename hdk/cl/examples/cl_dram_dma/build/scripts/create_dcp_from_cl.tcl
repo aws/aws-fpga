@@ -10,19 +10,21 @@
 package require tar
 
 #################################################
-## Versions
+## Command-line Arguments
 #################################################
-set shell_version "0x02221781"
-set hdk_version "1.0.0"
+set timestamp     [lindex $argv 0]
+set strategy      [lindex $argv 1]
+set hdk_version   [lindex $argv 2]
+set shell_version [lindex $argv 3]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
-puts "Shell Version: VenomCL_unc - $shell_version";
+puts "HDK Version:        $hdk_version";
+puts "Shell Version:      $shell_version";
 puts "Vivado Script Name: $argv0";
-puts "HDK Version: $hdk_version";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -43,10 +45,6 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
         exit 2
 }
-
-# Command-line Arguments
-set timestamp [lindex $argv 0]
-set strategy  [lindex $argv 1]
 
 #Convenience to set the root of the RTL directory
 puts "All reports and intermediate results will be time stamped with $timestamp";
