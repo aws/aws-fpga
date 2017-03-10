@@ -1651,7 +1651,7 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   function dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+   function void dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
       
       dop.buffer = src_addr;
@@ -1662,7 +1662,7 @@ module sh_bfm #(
       
    endfunction // dma_buffer_to_cl
 
-   function automatic dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
+   function automatic void dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
       dop.buffer = dst_addr;
       dop.cl_addr = cl_addr;
