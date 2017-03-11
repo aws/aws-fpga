@@ -141,16 +141,22 @@ debug_msg "Checking HDK shell's checkpoint version"
 hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
-# Download the sha1
+s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+# Download the sha256
 # Use curl instead of AWS CLI so that credentials aren't required.
-curl -s https://s3.amazonaws.com/$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp.sha1 -o $hdk_shell.sha1 || { err_msg "Failed to download HDK shell's checkpoint version."; return 2; }
-exp_sha1=$(cat $hdk_shell.sha1)
-debug_msg "  latest   version=$exp_sha1"
-# If shell already downloaded check its sha1
+curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
+if grep -q '<?xml version' $hdk_shell.sha256; then
+  err_msg "Failed to downlonad HDK shell's checkpoint version from $s3_hdk_shell.sha256"
+  cat hdk_shell.sha256
+  return 2
+fi
+exp_sha256=$(cat $hdk_shell.sha256)
+debug_msg "  latest   version=$exp_sha256"
+# If shell already downloaded check its sha256
 if [ -e $hdk_shell ]; then
-  act_sha1=$( sha1sum $hdk_shell | awk '{ print $1 }' )
-  debug_msg "  existing version=$act_sha1"
-  if [[ $act_sha1 != $exp_sha1 ]]; then
+  act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+  debug_msg "  existing version=$act_sha256"
+  if [[ $act_sha256 != $exp_sha256 ]]; then
     info_msg "HDK shell's checkpoint version is incorrect"
     info_msg "  Saving old checkpoint to $hdk_shell.back"
     mv $hdk_shell $hdk_shell.back
@@ -159,18 +165,17 @@ else
   info_msg "HDK shell's checkpoint hasn't been downloaded yet."
 fi
 if [ ! -e $hdk_shell ]; then
-  s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
   info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
   # Use curl instead of AWS CLI so that credentials aren't required.
   curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
 fi
-# Check sha1
-act_sha1=$( sha1sum $hdk_shell | awk '{ print $1 }' )
-if [[ $act_sha1 != $exp_sha1 ]]; then
+# Check sha256
+act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+if [[ $act_sha256 != $exp_sha256 ]]; then
   err_msg "Incorrect HDK shell checkpoint version:"
-  err_msg "  expected version=$exp_sha1"
-  err_msg "  actual   version=$act_sha1"
-  err_msg "  There may be an issue with the uploaded checkpoint."
+  err_msg "  expected version=$exp_sha256"
+  err_msg "  actual   version=$act_sha256"
+  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
   return 2
 fi
 info_msg "HDK shell is up-to-date"
