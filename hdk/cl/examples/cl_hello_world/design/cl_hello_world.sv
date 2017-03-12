@@ -15,7 +15,7 @@
 // limitations under the License.
 //---------------------------------------------------------------------------------------
 
-module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HMC=4, parameter NUM_GTY = 4) 
+module cl_hello_world 
 
 (
    `include "cl_ports.vh" // Fixed port definition
@@ -27,34 +27,6 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
 // // Value to return for PCIS access to unimplemented register address 
 // parameter  UNIMPLEMENTED_REG_VALUE = 32'hdeaddead;
 
-   localparam NUM_CFG_STGS_INT_TST = 4;
-   localparam NUM_CFG_STGS_HMC_ATG = 4;
-   localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
-   localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
-   localparam NUM_CFG_STGS_PCIE_ATG = 4;
-   localparam NUM_CFG_STGS_AURORA_ATG = 4;
-   localparam NUM_CFG_STGS_XDCFG = 4;
-   localparam NUM_CFG_STGS_XDMA = 4;
-   
-`ifdef SIM
-   localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
-   localparam HMC_SCRB_MAX_ADDR = 64'h7FF;
-`else   
-   localparam DDR_SCRB_MAX_ADDR = 64'h3FFFFFFFF; //16GB 
-   localparam HMC_SCRB_MAX_ADDR = 64'h7FFFFFFF;  // 2GB
-`endif
-   localparam DDR_SCRB_BURST_LEN_MINUS1 = 15;
-   localparam HMC_SCRB_BURST_LEN_MINUS1 = 3;
-
-//-------------------------------------------------
-// Array Signals to Tie-off AXI interfaces to sh_ddr module
-//-------------------------------------------------
-  logic         tie_zero[2:0];
-  logic [ 15:0] tie_zero_id[2:0];
-  logic [ 63:0] tie_zero_addr[2:0];
-  logic [  7:0] tie_zero_len[2:0];
-  logic [511:0] tie_zero_data[2:0];
-  logic [ 63:0] tie_zero_strb[2:0];
 
 //-------------------------------------------------
 // Wires
@@ -62,7 +34,7 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
   logic        arvalid_q;
   logic [31:0] araddr_q;
   logic [31:0] hello_world_q_byte_swapped;
-  logic [15:0] vled_q        = 32'b0;
+  logic [15:0] vled_q        = 16'b0;
   logic [31:0] hello_world_q = 32'b0;
 
 //-------------------------------------------------
@@ -186,9 +158,9 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
    .m_axi_rready  (sh_ocl_rready_q)
   );
 
-//-------------------------------------------------
-// PCIe OCL AXI-L Slave Accesses (accesses from PCIe)
-//-------------------------------------------------
+//--------------------------------------------------------------
+// PCIe OCL AXI-L Slave Accesses (accesses from PCIe AppPF BAR0)
+//--------------------------------------------------------------
 // Only supports single-beat accesses.
 
    logic        awvalid;
@@ -299,14 +271,13 @@ always_ff @(posedge clk_main_a0)
 //-------------------------------------------------
 // Hello World Register
 //-------------------------------------------------
-// The register resides at offset 0x00. When read it
-// returns the byte-flipped value.
+// When read it, returns the byte-flipped value.
 
 always_ff @(posedge clk_main_a0)
    if (!rst_main_n_sync) begin                    // Reset
       hello_world_q[31:0] <= 32'h0000_0000;
    end
-   else if (wready & (wr_addr == `HELLO_WORLD_REG_ADDR)) begin  // Cfg Write to offset 0x00
+   else if (wready & (wr_addr == `HELLO_WORLD_REG_ADDR)) begin  
       hello_world_q[31:0] <= wdata[31:0];
    end
    else begin                                // Hold Value
@@ -319,11 +290,12 @@ assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[1
 //-------------------------------------------------
 // Virtual LED Register
 //-------------------------------------------------
-// The Virtual LED register resides at offset 0x04.
 
 // The register contains 16 read-only bits corresponding to 16 LED's.
 // For this example, the virtual LED register shadows the hello_world
 // register.
+// The same LED values can be read from the CL to Shell interface
+// by using the linux FPGA tool: $ fpga-get-virtual-led -S 0
 
 always_ff @(posedge clk_main_a0)
    if (!rst_main_n_sync) begin                    // Reset
@@ -335,140 +307,6 @@ always_ff @(posedge clk_main_a0)
 
 // The Virtual LED outputs will be masked with the Virtual DIP switches.
 assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
-
-//----------------------------------------- 
-// DDR controller instantiation   
-//----------------------------------------- 
-// Although we are not using the DDR controllers in this cl_hello_world
-// design, it must be instantiated in order to prevent build errors related to
-// DDR pin constraints.
-
-// Only the DDR pins are connected. The AXI and stats interfaces are tied-off.
-
-sh_ddr #(.DDR_A_PRESENT(0),
-         .DDR_B_PRESENT(0),
-         .DDR_D_PRESENT(0)) SH_DDR
-   (
-   .clk(clk_main_a0),
-   .rst_n(rst_main_n_sync),
-   .stat_clk(clk_main_a0),
-   .stat_rst_n(clk_main_a0),
-
-   .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
-   .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
-   .M_A_ACT_N(M_A_ACT_N),
-   .M_A_MA(M_A_MA),
-   .M_A_BA(M_A_BA),
-   .M_A_BG(M_A_BG),
-   .M_A_CKE(M_A_CKE),
-   .M_A_ODT(M_A_ODT),
-   .M_A_CS_N(M_A_CS_N),
-   .M_A_CLK_DN(M_A_CLK_DN),
-   .M_A_CLK_DP(M_A_CLK_DP),
-   .RST_DIMM_A_N(RST_DIMM_A_N),
-   .M_A_PAR(M_A_PAR),
-   .M_A_DQ(M_A_DQ),
-   .M_A_ECC(M_A_ECC),
-   .M_A_DQS_DP(M_A_DQS_DP),
-   .M_A_DQS_DN(M_A_DQS_DN),
-   .cl_RST_DIMM_A_N(),
-   
-   .CLK_300M_DIMM1_DP(CLK_300M_DIMM1_DP),
-   .CLK_300M_DIMM1_DN(CLK_300M_DIMM1_DN),
-   .M_B_ACT_N(M_B_ACT_N),
-   .M_B_MA(M_B_MA),
-   .M_B_BA(M_B_BA),
-   .M_B_BG(M_B_BG),
-   .M_B_CKE(M_B_CKE),
-   .M_B_ODT(M_B_ODT),
-   .M_B_CS_N(M_B_CS_N),
-   .M_B_CLK_DN(M_B_CLK_DN),
-   .M_B_CLK_DP(M_B_CLK_DP),
-   .RST_DIMM_B_N(RST_DIMM_B_N),
-   .M_B_PAR(M_B_PAR),
-   .M_B_DQ(M_B_DQ),
-   .M_B_ECC(M_B_ECC),
-   .M_B_DQS_DP(M_B_DQS_DP),
-   .M_B_DQS_DN(M_B_DQS_DN),
-   .cl_RST_DIMM_B_N(),
-
-   .CLK_300M_DIMM3_DP(CLK_300M_DIMM3_DP),
-   .CLK_300M_DIMM3_DN(CLK_300M_DIMM3_DN),
-   .M_D_ACT_N(M_D_ACT_N),
-   .M_D_MA(M_D_MA),
-   .M_D_BA(M_D_BA),
-   .M_D_BG(M_D_BG),
-   .M_D_CKE(M_D_CKE),
-   .M_D_ODT(M_D_ODT),
-   .M_D_CS_N(M_D_CS_N),
-   .M_D_CLK_DN(M_D_CLK_DN),
-   .M_D_CLK_DP(M_D_CLK_DP),
-   .RST_DIMM_D_N(RST_DIMM_D_N),
-   .M_D_PAR(M_D_PAR),
-   .M_D_DQ(M_D_DQ),
-   .M_D_ECC(M_D_ECC),
-   .M_D_DQS_DP(M_D_DQS_DP),
-   .M_D_DQS_DN(M_D_DQS_DN),
-   .cl_RST_DIMM_D_N(),
-
-   //------------------------------------------------------
-   // DDR-4 Interface from CL (AXI-4)
-   //------------------------------------------------------
-   .cl_sh_ddr_awid     (tie_zero_id),
-   .cl_sh_ddr_awaddr   (tie_zero_addr),
-   .cl_sh_ddr_awlen    (tie_zero_len),
-   .cl_sh_ddr_awvalid  (tie_zero),
-   .sh_cl_ddr_awready  (),
-
-   .cl_sh_ddr_wid      (tie_zero_id),
-   .cl_sh_ddr_wdata    (tie_zero_data),
-   .cl_sh_ddr_wstrb    (tie_zero_strb),
-   .cl_sh_ddr_wlast    (3'b0),
-   .cl_sh_ddr_wvalid   (3'b0),
-   .sh_cl_ddr_wready   (),
-
-   .sh_cl_ddr_bid      (),
-   .sh_cl_ddr_bresp    (),
-   .sh_cl_ddr_bvalid   (),
-   .cl_sh_ddr_bready   (3'b0),
-
-   .cl_sh_ddr_arid     (tie_zero_id),
-   .cl_sh_ddr_araddr   (tie_zero_addr),
-   .cl_sh_ddr_arlen    (tie_zero_len),
-   .cl_sh_ddr_arvalid  (3'b0),
-   .sh_cl_ddr_arready  (),
-
-   .sh_cl_ddr_rid      (),
-   .sh_cl_ddr_rdata    (),
-   .sh_cl_ddr_rresp    (),
-   .sh_cl_ddr_rlast    (),
-   .sh_cl_ddr_rvalid   (),
-   .cl_sh_ddr_rready   (3'b0),
-
-   .sh_cl_ddr_is_ready (),
-
-   .sh_ddr_stat_addr0   (8'h00),
-   .sh_ddr_stat_wr0     (1'b0), 
-   .sh_ddr_stat_rd0     (1'b0), 
-   .sh_ddr_stat_wdata0  (32'b0),
-   .ddr_sh_stat_ack0   (),
-   .ddr_sh_stat_rdata0 (),
-   .ddr_sh_stat_int0   (),
-   .sh_ddr_stat_addr1   (8'h00),
-   .sh_ddr_stat_wr1     (1'b0), 
-   .sh_ddr_stat_rd1     (1'b0), 
-   .sh_ddr_stat_wdata1  (32'b0),
-   .ddr_sh_stat_ack1   (),
-   .ddr_sh_stat_rdata1 (),
-   .ddr_sh_stat_int1   (),
-   .sh_ddr_stat_addr2   (8'h00),
-   .sh_ddr_stat_wr2     (1'b0), 
-   .sh_ddr_stat_rd2     (1'b0), 
-   .sh_ddr_stat_wdata2  (32'b0),
-   .ddr_sh_stat_ack2   (),
-   .ddr_sh_stat_rdata2 (),
-   .ddr_sh_stat_int2   ()
-   );
 
 //-------------------------------------------
 // Tie-Off Global Signals
@@ -484,160 +322,27 @@ sh_ddr #(.DDR_A_PRESENT(0),
 //------------------------------------
 // Tie-Off Unused Interfaces
 //------------------------------------
+// the developer should use the next set of `include
+// to properly tie-off any unused interface
+ 
 
-  // PCIe Master (pcim) Interface from CL to SH
-  assign cl_sh_pcim_awid             =  16'b0;
-  assign cl_sh_pcim_awaddr           =  64'b0;
-  assign cl_sh_pcim_awlen            =   8'b0;
-  assign cl_sh_pcim_awsize           =   3'h0;
-  assign cl_sh_pcim_awuser           =  19'b0;
-  assign cl_sh_pcim_awvalid          =   1'b0;
+`include "unused_ddr_a_b_d_template.vh"
 
-  assign cl_sh_pcim_wdata            = 512'b0;
-  assign cl_sh_pcim_wstrb            =  64'b0;
-  assign cl_sh_pcim_wlast            =   1'b0;
-  assign cl_sh_pcim_wvalid           =   1'b0;
+`include "unused_ddr_c_template.vh"
 
-  assign cl_sh_pcim_bready           =   1'b0;
+`include "unused_pcim_template.vh"
 
-  assign cl_sh_pcim_arid             =  16'b0;
-  assign cl_sh_pcim_araddr           =  64'b0;
-  assign cl_sh_pcim_arlen            =   8'b0;
-  assign cl_sh_pcim_arsize           =   3'h0;
-  assign cl_sh_pcim_aruser           =  19'b0;
-  assign cl_sh_pcim_arvalid          =   1'b0;
+`include "unused_dma_pcis_template.vh"
 
-  assign cl_sh_pcim_rready           =   1'b0;
+`include "unused_cl_sda_template.vh"
 
-  // PCIe Slave (pcis) Interface from SH to CL
-  assign cl_sh_dma_pcis_awready      =   1'b0;
+`include "unused_sh_bar1_template.vh"
 
-  assign cl_sh_dma_pcis_wready       =   1'b0;
+`include "unused_apppf_irq_template.vh"
 
-  assign cl_sh_dma_pcis_bid[5:0]     =   6'b0;
-  assign cl_sh_dma_pcis_bresp[1:0]   =   2'b0;
-  assign cl_sh_dma_pcis_bvalid       =   1'b0;
+`include "unused_hmc_template.vh"
 
-  assign cl_sh_dma_pcis_arready      =   1'b0;
-
-  assign cl_sh_dma_pcis_rid[5:0]     =   6'b0;
-  assign cl_sh_dma_pcis_rdata[511:0] = 512'b0;
-  assign cl_sh_dma_pcis_rresp[1:0]   =   2'b0;
-  assign cl_sh_dma_pcis_rlast        =   1'b0;
-  assign cl_sh_dma_pcis_rvalid       =   1'b0;
-
-  // PCIe Slave (sda) Interface from SH to CL
-  assign cl_sda_awready              =   1'b0;
-
-  assign cl_sda_wready               =   1'b0;
-
-  assign cl_sda_bvalid               =   1'b0;
-  assign cl_sda_bresp[1:0]           =   2'b0;
-
-  assign cl_sda_arready              =   1'b0;
-
-  assign cl_sda_rvalid               =   1'b0;
-  assign cl_sda_rdata[31:0]          =  32'b0;
-  assign cl_sda_rresp[1:0]           =   2'b0;
-
-  // PCIe Slave (bar1) Interface from SH to CL
-  assign bar1_sh_awready             =   1'b0;
-
-  assign bar1_sh_wready              =   1'b0;
-
-  assign bar1_sh_bvalid              =   1'b0;
-  assign bar1_sh_bresp[1:0]          =   2'b0;
-
-  assign bar1_sh_arready             =   1'b0;
-
-  assign bar1_sh_rvalid              =   1'b0;
-  assign bar1_sh_rdata[31:0]         =  32'b0;
-  assign bar1_sh_rresp[1:0]          =   2'b0;
-
-  // DDRC Interface from CL to SH
-  assign ddr_sh_stat_ack0   =   1'b1; // Needed in order not to hang the interface
-  assign ddr_sh_stat_rdata0 =  32'b0;
-  assign ddr_sh_stat_int0   =   8'b0;
-
-  assign ddr_sh_stat_ack1   =   1'b1; // Needed in order not to hang the interface
-  assign ddr_sh_stat_rdata1 =  32'b0;
-  assign ddr_sh_stat_int1   =   8'b0;
-
-  assign ddr_sh_stat_ack2   =   1'b1; // Needed in order not to hang the interface
-  assign ddr_sh_stat_rdata2 =  32'b0;
-  assign ddr_sh_stat_int2   =   8'b0;
-
-  assign cl_sh_ddr_awid     =  16'b0;
-  assign cl_sh_ddr_awaddr   =  64'b0;
-  assign cl_sh_ddr_awlen    =   8'b0;
-  assign cl_sh_ddr_awsize   =   3'b0;
-  assign cl_sh_ddr_awvalid  =   1'b0;
-
-  assign cl_sh_ddr_wid      =  16'b0;
-  assign cl_sh_ddr_wdata    = 512'b0;
-  assign cl_sh_ddr_wstrb    =  64'b0;
-  assign cl_sh_ddr_wlast    =   1'b0;
-  assign cl_sh_ddr_wvalid   =   1'b0;
-
-  assign cl_sh_ddr_bready   =   1'b0;
-
-  assign cl_sh_ddr_arid     =  16'b0;
-  assign cl_sh_ddr_araddr   =  64'b0;
-  assign cl_sh_ddr_arlen    =   8'b0;
-  assign cl_sh_ddr_arsize   =   3'b0;
-  assign cl_sh_ddr_arvalid  =   1'b0;
-
-  assign cl_sh_ddr_rready   =   1'b0;
-
-  // Tie-off AXI interfaces to sh_ddr module
-  assign tie_zero[2]        =   1'b0;
-  assign tie_zero[1]        =   1'b0;
-  assign tie_zero[0]        =   1'b0;
-
-  assign tie_zero_id[2]     =  16'b0;
-  assign tie_zero_id[1]     =  16'b0;
-  assign tie_zero_id[0]     =  16'b0;
-
-  assign tie_zero_addr[2]   =  64'b0;
-  assign tie_zero_addr[1]   =  64'b0;
-  assign tie_zero_addr[0]   =  64'b0;
-
-  assign tie_zero_len[2]    =   8'b0;
-  assign tie_zero_len[1]    =   8'b0;
-  assign tie_zero_len[0]    =   8'b0;
-
-  assign tie_zero_data[2]   = 512'b0;
-  assign tie_zero_data[1]   = 512'b0;
-  assign tie_zero_data[0]   = 512'b0;
-
-  assign tie_zero_strb[2]   =  64'b0;
-  assign tie_zero_strb[1]   =  64'b0;
-  assign tie_zero_strb[0]   =  64'b0;
-
-//------------------------------------
-// Tie-Off Interrupts
-//------------------------------------
-  assign cl_sh_apppf_irq_req = 16'b0;
-
-//------------------------------------
-// Tie-Off HMC Interfaces
-//------------------------------------
-  assign hmc_iic_scl_o           =  1'b0;
-  assign hmc_iic_scl_t           =  1'b0;
-  assign hmc_iic_sda_o           =  1'b0;
-  assign hmc_iic_sda_t           =  1'b0;
-
-  assign hmc_sh_stat_ack         =  1'b0;
-  assign hmc_sh_stat_rdata[31:0] = 32'b0;
-
-  assign hmc_sh_stat_int[7:0]    =  8'b0;
-
-//------------------------------------
-// Tie-Off Aurora Interfaces
-//------------------------------------
-  assign aurora_sh_stat_ack   =  1'b0;
-  assign aurora_sh_stat_rdata = 32'b0;
-  assign aurora_sh_stat_int   =  8'b0;
+`include "unused_aurora_template.vh"
 
 endmodule
 
