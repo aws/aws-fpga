@@ -29,19 +29,6 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.vh	$TARGET_DIR
 # Make sure files have write permissions for the encryption
 exec chmod +w {*}[glob ../src_post_encryption/*.*v*]
 
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog \
-$TARGET_DIR/cl_hello_world_defines.vh \
-$TARGET_DIR/cl_common_defines.vh \
-$TARGET_DIR/cl_hello_world.sv \
-$TARGET_DIR/unused_apppf_irq_template.vh \
-$TARGET_DIR/unused_aurora_template.vh \
-$TARGET_DIR/unused_cl_sda_template.vh \
-$TARGET_DIR/unused_ddr_a_b_d_template.vh \
-$TARGET_DIR/unused_ddr_c_template.vh \
-$TARGET_DIR/unused_dma_pcis_template.vh \
-$TARGET_DIR/unused_hmc_template.vh \
-$TARGET_DIR/unused_pcim_template.vh \
-$TARGET_DIR/unused_sh_bar1_template.vh
-
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog [glob $TARGET_DIR/*.*]
 
 #---- End of section replaced by Developr ---
