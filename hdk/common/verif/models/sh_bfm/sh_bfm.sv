@@ -1,7 +1,19 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// =============================================================================
+//---------------------------------------------------------------------------------------
+// Amazon FGPA Hardware Development Kit
+// 
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// 
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+// 
+//    http://aws.amazon.com/asl/
+// 
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+//---------------------------------------------------------------------------------------
 
 module sh_bfm #(
                      parameter NUM_HMC = 4,
@@ -25,8 +37,6 @@ module sh_bfm #(
 
    output logic [31:0]         sh_cl_ctl0,
    output logic [31:0]         sh_cl_ctl1,
-   output logic                clk_xtra,
-   output logic                rst_xtra_n,
    output logic [1:0]          sh_cl_pwr_state,
 
    output logic                clk_main_a0,
@@ -40,8 +50,9 @@ module sh_bfm #(
    output logic                clk_extra_c0,
    output logic                clk_extra_c1,
     
-   output logic                rst_out_n,
-
+   output logic                rst_main_n,
+   output logic                kernel_rst_n,
+    
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
@@ -517,11 +528,6 @@ module sh_bfm #(
    end
 
    initial begin
-      clk_xtra = 1'b0;
-      forever #4ns clk_xtra = ~clk_xtra;
-   end
-
-   initial begin
       clk_extra_a1 = 1'b0;
       forever #4ns clk_extra_a1 = ~clk_extra_a1;
    end
@@ -553,18 +559,17 @@ module sh_bfm #(
    
 
    logic rst_n_i;
-   logic rst_out_n_i;
+   logic rst_main_n_i;
    logic rst_xtra_n_i;
 
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
    always @(posedge clk_main_a0)
-     rst_out_n <= rst_out_n_i;
+     rst_main_n <= rst_main_n_i;
 
-   always @(posedge clk_xtra)
-     rst_xtra_n <= rst_xtra_n_i;
-
+   assign kernel_rst_n = 1'b0;  // kernel reset is not used for non-SDAccel simulations.
+   
    always_ff @(negedge rst_n or posedge clk_core)
      if (!rst_n)
        begin
@@ -1400,11 +1405,11 @@ module sh_bfm #(
    //=================================================
    task power_up;
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       rst_xtra_n_i = 1'b0;
       #5000ns;
       rst_n_i = 1'b1;
-      rst_out_n_i = 1'b1;
+      rst_main_n_i = 1'b1;
       rst_xtra_n_i = 1'b1;
       #50ns;
    endtask // power_up
@@ -1432,8 +1437,7 @@ module sh_bfm #(
    task power_down;
       #50ns;
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
-      rst_xtra_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       #50ns;
    endtask // power_down
 
