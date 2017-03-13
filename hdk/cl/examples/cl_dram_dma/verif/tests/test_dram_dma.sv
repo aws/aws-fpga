@@ -30,6 +30,9 @@ module test_dram_dma();
        // allow memory to initialize
        tb.card.fpga.sh.delay(25000);
 
+       // issuing flr
+       tb.card.fpga.sh.issue_flr(0);
+
        $display("[%t] : Initializing buffers", $realtime);
 
        host_memory_buffer_address = 64'h0;

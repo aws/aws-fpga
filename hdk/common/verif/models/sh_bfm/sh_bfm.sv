@@ -1531,6 +1531,12 @@ module sh_bfm #(
       #50ns;
    endtask // power_down
 
+   task issue_flr(int slot_id = 0);
+      sh_cl_flr_assert <= 1'b1;
+      wait(cl_sh_flr_done == 1);
+      sh_cl_flr_assert <= 1'b0;
+   endtask
+
    //=================================================
    //
    // map_host_memory
