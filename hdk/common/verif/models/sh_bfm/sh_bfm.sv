@@ -569,11 +569,6 @@ module sh_bfm #(
       forever #EXTRA_C1_DLY clk_extra_c1 = ~clk_extra_c1;
    end
    
-   initial begin
-      clk_xtra = 1'b0;
-      forever #CORE_DLY clk_xtra = ~clk_xtra;
-   end
-
    logic rst_n_i;
    logic rst_main_n_i;
    logic rst_xtra_n_i;
@@ -1419,18 +1414,14 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up(int clk_profile = 0);
-      case (clk_profile)
+   task power_up(int clk_profile_a = 0, int clk_profile_b = 0, int clk_profile_c = 0);
+      case (clk_profile_a)
          0: begin
             MAIN_A0_DLY  = 4ns;
             CORE_DLY     = 4ns;
             EXTRA_A1_DLY = 8ns;
             EXTRA_A2_DLY = 2.66ns;
             EXTRA_A3_DLY = 2ns;
-            EXTRA_B0_DLY = 2ns;
-            EXTRA_B1_DLY = 4ns;
-            EXTRA_C0_DLY = 1.66ns;
-            EXTRA_C1_DLY = 1.25ns;
          end
          1: begin
             MAIN_A0_DLY  = 2ns;
@@ -1438,10 +1429,6 @@ module sh_bfm #(
             EXTRA_A1_DLY = 4ns;
             EXTRA_A2_DLY = 1.33ns;
             EXTRA_A3_DLY = 1ns;
-            EXTRA_B0_DLY = 4ns;
-            EXTRA_B1_DLY = 8ns;
-            EXTRA_C0_DLY = 3.33ns;
-            EXTRA_C1_DLY = 2.5ns;
          end
          2: begin
             MAIN_A0_DLY  = 8ns;
@@ -1477,12 +1464,36 @@ module sh_bfm #(
             EXTRA_A1_DLY = 8ns;
             EXTRA_A2_DLY = 2.66ns;
             EXTRA_A3_DLY = 2ns;
+         end
+      endcase 
+      case (clk_profile_b)
+         0: begin
             EXTRA_B0_DLY = 2ns;
             EXTRA_B1_DLY = 4ns;
+         end
+         1: begin
+            EXTRA_B0_DLY = 4ns;
+            EXTRA_B1_DLY = 8ns;
+         end
+         default: begin
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 4ns;
+         end
+      endcase
+      case (clk_profile_c)
+         0: begin
             EXTRA_C0_DLY = 1.66ns;
             EXTRA_C1_DLY = 1.25ns;
          end
-      endcase 
+         1: begin
+            EXTRA_C0_DLY = 3.33ns;
+            EXTRA_C1_DLY = 2.5ns;
+         end
+         default: begin
+            EXTRA_C0_DLY = 1.66ns;
+            EXTRA_C1_DLY = 1.25ns;
+         end
+      endcase
       rst_n_i = 1'b0;
       rst_main_n_i = 1'b0;
       rst_xtra_n_i = 1'b0;

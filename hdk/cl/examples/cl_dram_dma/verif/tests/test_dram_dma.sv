@@ -18,7 +18,7 @@ module test_dram_dma();
 
        logic [63:0] host_memory_buffer_address;
        
-       tb.card.fpga.sh.power_up(0);
+       tb.card.fpga.sh.power_up(1,0,0);
        tb.card.fpga.sh.delay(500);
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
