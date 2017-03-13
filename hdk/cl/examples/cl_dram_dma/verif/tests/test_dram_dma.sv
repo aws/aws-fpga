@@ -18,7 +18,7 @@ module test_dram_dma();
 
        logic [63:0] host_memory_buffer_address;
        
-       tb.sh.power_up();
+       tb.sh.power_up(0);
        tb.sh.delay(500);
        tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
        tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));

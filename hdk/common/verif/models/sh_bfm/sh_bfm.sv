@@ -523,7 +523,18 @@ module sh_bfm #(
    logic [3:0]     h2c_dma_done;
 
    logic [7:0] read_data_buffer[];
-   
+  
+   real MAIN_A0_DLY  = 4ns;
+   real CORE_DLY     = 4ns;
+   real EXTRA_A1_DLY = 8ns;
+   real EXTRA_A2_DLY = 2.66ns;
+   real EXTRA_A3_DLY = 2ns;
+   real EXTRA_B0_DLY = 2ns;
+   real EXTRA_B1_DLY = 4ns;
+   real EXTRA_C0_DLY = 1.66ns;
+   real EXTRA_C1_DLY = 1.25ns;
+
+
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled
@@ -537,56 +548,53 @@ module sh_bfm #(
 
    initial begin
       clk_core = 1'b0;
-      forever #4ns clk_core = ~clk_core;
-   end
-
-   assign clk_out = clk_core;
-
-   initial begin
-      clk_extra_b0 = 1'b0;
-      forever #2ns clk_extra_b0 = ~clk_extra_b0;
-   end
-
-   initial begin
-      clk_main_a0 = 1'b0;
-      forever #4ns clk_main_a0 = ~clk_main_a0;
-   end
-
-   initial begin
-      clk_xtra = 1'b0;
-      forever #4ns clk_xtra = ~clk_xtra;
-   end
-
-   initial begin
-      clk_extra_a1 = 1'b0;
-      forever #4ns clk_extra_a1 = ~clk_extra_a1;
-   end
-
-   initial begin
-      clk_extra_b1 = 1'b0;
-      forever #4ns clk_extra_b1 = ~clk_extra_b1;
-   end
-    
-   initial begin
-      clk_extra_a3 = 1'b0;
-      forever #1ns clk_extra_a3 = ~clk_extra_a3;
-   end
-
-   initial begin
-      clk_extra_a2 = 1'b0;
-      forever #1.33ns clk_extra_a2 = ~clk_extra_a2;
-   end
-
-   initial begin
-      clk_extra_c0 = 1'b0;
-      forever #1.625ns clk_extra_c0 = ~clk_extra_c0;
-   end
-
-   initial begin
-      clk_extra_c1 = 1'b0;
-      forever #1.25ns clk_extra_c1 = ~clk_extra_c1;
+      forever #CORE_DLY clk_core = ~clk_core;
    end
    
+   initial begin
+      clk_main_a0 = 1'b0;
+      forever #MAIN_A0_DLY clk_main_a0 = ~clk_main_a0;
+   end
+   
+   initial begin
+      clk_extra_a1 = 1'b0;
+      forever #EXTRA_A1_DLY clk_extra_a1 = ~clk_extra_a1;
+   end
+   
+   initial begin
+      clk_extra_a2 = 1'b0;
+      forever #EXTRA_A2_DLY clk_extra_a2 = ~clk_extra_a2;
+   end
+   
+   initial begin
+      clk_extra_a3 = 1'b0;
+      forever #EXTRA_A3_DLY clk_extra_a3 = ~clk_extra_a3;
+   end
+   
+   initial begin
+      clk_extra_b0 = 1'b0;
+      forever #EXTRA_B0_DLY clk_extra_b0 = ~clk_extra_b0;
+   end
+   
+   initial begin
+      clk_extra_b1 = 1'b0;
+      forever #EXTRA_B1_DLY clk_extra_b1 = ~clk_extra_b1;
+   end      
+   
+   initial begin
+      clk_extra_c0 = 1'b0;
+      forever #EXTRA_C0_DLY clk_extra_c0 = ~clk_extra_c0;
+   end
+   
+   initial begin
+      clk_extra_c1 = 1'b0;
+      forever #EXTRA_C1_DLY clk_extra_c1 = ~clk_extra_c1;
+   end
+   
+   initial begin
+      clk_xtra = 1'b0;
+      forever #CORE_DLY clk_xtra = ~clk_xtra;
+   end
 
    logic rst_n_i;
    logic rst_out_n_i;
@@ -1434,7 +1442,70 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up;
+   task power_up(int clk_profile = 0);
+      case (clk_profile)
+         0: begin
+            MAIN_A0_DLY  = 4ns;
+            CORE_DLY     = 4ns;
+            EXTRA_A1_DLY = 8ns;
+            EXTRA_A2_DLY = 2.66ns;
+            EXTRA_A3_DLY = 2ns;
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 4ns;
+            EXTRA_C0_DLY = 1.66ns;
+            EXTRA_C1_DLY = 1.25ns;
+         end
+         1: begin
+            MAIN_A0_DLY  = 2ns;
+            CORE_DLY     = 2ns;
+            EXTRA_A1_DLY = 4ns;
+            EXTRA_A2_DLY = 1.33ns;
+            EXTRA_A3_DLY = 1ns;
+            EXTRA_B0_DLY = 4ns;
+            EXTRA_B1_DLY = 8ns;
+            EXTRA_C0_DLY = 3.33ns;
+            EXTRA_C1_DLY = 2.5ns;
+         end
+         2: begin
+            MAIN_A0_DLY  = 8ns;
+            CORE_DLY     = 8ns;
+            EXTRA_A1_DLY = 16ns;
+            EXTRA_A2_DLY = 2ns;
+            EXTRA_A3_DLY = 4ns;
+         end
+         3: begin
+            MAIN_A0_DLY  = 32ns;
+            CORE_DLY     = 32ns;
+            EXTRA_A1_DLY = 64ns;
+            EXTRA_A2_DLY = 4ns;
+            EXTRA_A3_DLY = 8ns;
+         end
+         4: begin
+            MAIN_A0_DLY  = 2.22ns;
+            CORE_DLY     = 2.22ns;
+            EXTRA_A1_DLY = 4.44ns;
+            EXTRA_A2_DLY = 1.48ns;
+            EXTRA_A3_DLY = 1.11ns;
+         end
+         5: begin
+            MAIN_A0_DLY  = 2.5ns;
+            CORE_DLY     = 2.5ns;
+            EXTRA_A1_DLY = 5ns;
+            EXTRA_A2_DLY = 1.66ns;
+            EXTRA_A3_DLY = 1.25ns;
+         end
+         default: begin
+            MAIN_A0_DLY  = 4ns;
+            CORE_DLY     = 4ns;
+            EXTRA_A1_DLY = 8ns;
+            EXTRA_A2_DLY = 2.66ns;
+            EXTRA_A3_DLY = 2ns;
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 4ns;
+            EXTRA_C0_DLY = 1.66ns;
+            EXTRA_C1_DLY = 1.25ns;
+         end
+      endcase 
       rst_n_i = 1'b0;
       rst_out_n_i = 1'b0;
       rst_xtra_n_i = 1'b0;
