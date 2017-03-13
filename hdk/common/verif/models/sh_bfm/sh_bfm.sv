@@ -533,11 +533,7 @@ module sh_bfm #(
       clk_main_a0 = 1'b0;
       forever #MAIN_A0_DLY clk_main_a0 = ~clk_main_a0;
    end
-<<<<<<< HEAD
    
-=======
-
->>>>>>> fb379ebf9fda8a624e9892778de419c62b0d7c3a
    initial begin
       clk_extra_a1 = 1'b0;
       forever #EXTRA_A1_DLY clk_extra_a1 = ~clk_extra_a1;
