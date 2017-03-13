@@ -103,6 +103,8 @@ module fpga(
             
             );
 
+   parameter NUM_DDR = 4;
+   
    // PCIe IDs
    logic [31:0] cl_sh_id0;
    logic [31:0] cl_sh_id1;
@@ -179,33 +181,33 @@ module fpga(
    logic [63:0]         cl_sh_pcim_awaddr;
    logic [7:0]          cl_sh_pcim_awlen;
    logic [18:0]         cl_sh_pcim_awuser;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_awvalid;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_awready;
+   logic                cl_sh_pcim_awvalid;
+   logic                sh_cl_pcim_awready;
    
    logic [511:0]        cl_sh_pcim_wdata;
    logic [63:0]         cl_sh_pcim_wstrb;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_wlast;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_wvalid;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_wready;
+   logic                cl_sh_pcim_wlast;
+   logic                cl_sh_pcim_wvalid;
+   logic                sh_cl_pcim_wready;
    
    logic [15:0]          sh_cl_pcim_bid;
    logic [1:0]          sh_cl_pcim_bresp;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_bready;
+   logic                sh_cl_pcim_bvalid;
+   logic                cl_sh_pcim_bready;
    
    logic [15:0]          cl_sh_pcim_arid ;
    logic [63:0]         cl_sh_pcim_araddr;
    logic [7:0]          cl_sh_pcim_arlen ;
    logic [18:0]         cl_sh_pcim_aruser;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_arvalid;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_arready;
+   logic                cl_sh_pcim_arvalid;
+   logic                sh_cl_pcim_arready;
    
    logic [15:0]          sh_cl_pcim_rid ;
    logic [511:0]        sh_cl_pcim_rdata;
    logic [1:0]          sh_cl_pcim_rresp;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_rlast;
-   logic [NUM_PCIE-1:0] sh_cl_pcim_rvalid;
-   logic [NUM_PCIE-1:0] cl_sh_pcim_rready;
+   logic                sh_cl_pcim_rlast;
+   logic                sh_cl_pcim_rvalid;
+   logic                cl_sh_pcim_rready;
 
    //------------------------------------------------
    // PCI Slave interface to CL
@@ -213,32 +215,32 @@ module fpga(
    logic [63:0]         sh_cl_dma_pcis_awaddr;
    logic [5:0]          sh_cl_dma_pcis_awid;
    logic [7:0]          sh_cl_dma_pcis_awlen;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_awvalid;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_awready;
+   logic                sh_cl_dma_pcis_awvalid;
+   logic                cl_sh_dma_pcis_awready;
 
    logic [511:0]        sh_cl_dma_pcis_wdata;
    logic [63:0]         sh_cl_dma_pcis_wstrb;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_wlast;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_wvalid;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_wready;
+   logic                sh_cl_dma_pcis_wlast;
+   logic                sh_cl_dma_pcis_wvalid;
+   logic                cl_sh_dma_pcis_wready;
    
    logic [1:0]          cl_sh_dma_pcis_bresp;
    logic [5:0]          cl_sh_dma_pcis_bid;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_bvalid;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_bready;
+   logic                cl_sh_dma_pcis_bvalid;
+   logic                sh_cl_dma_pcis_bready;
    
    logic [63:0]         sh_cl_dma_pcis_araddr;
    logic [5:0]          sh_cl_dma_pcis_arid;
    logic [7:0]          sh_cl_dma_pcis_arlen;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_arvalid;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_arready;
+   logic                sh_cl_dma_pcis_arvalid;
+   logic                cl_sh_dma_pcis_arready;
    
    logic [5:0]          cl_sh_dma_pcis_rid;
    logic [511:0]        cl_sh_dma_pcis_rdata;
    logic [1:0]          cl_sh_dma_pcis_rresp;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_rlast;
-   logic [NUM_PCIE-1:0] cl_sh_dma_pcis_rvalid;
-   logic [NUM_PCIE-1:0] sh_cl_dma_pcis_rready;
+   logic                cl_sh_dma_pcis_rlast;
+   logic                cl_sh_dma_pcis_rvalid;
+   logic                sh_cl_dma_pcis_rready;
 
    //--------------------------------------------
    // DDR4 Status Interface

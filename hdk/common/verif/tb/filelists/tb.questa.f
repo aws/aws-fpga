@@ -14,6 +14,7 @@ $XILINX_VIVADO/data/verilog/src/glbl.v
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/axi_bfm_defines.svh
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/sh_bfm.sv
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/axil_bfm.sv
+${HDK_COMMON_DIR}/verif/models/fpga/fpga.sv
 ${HDK_COMMON_DIR}/verif/tb/sv/tb.sv
 
 

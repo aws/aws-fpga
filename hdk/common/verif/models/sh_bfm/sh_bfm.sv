@@ -377,6 +377,9 @@ module sh_bfm #(
    input [31:0]         bar1_sh_rdata,
    input [1:0]          bar1_sh_rresp,
                                                                                                                             
+   output logic [15:0]  sh_cl_status_vdip,
+   input [15:0]         cl_sh_status_vled,
+ 
    output logic         sh_bar1_rready           
 
 `ifndef NO_CL_DDR

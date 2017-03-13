@@ -17,7 +17,6 @@
 
 module tb();
 
-   parameter NUM_DDR = 4;
    parameter NUM_HMC = 4;
    parameter NUM_PCIE = 1;
    parameter NUM_GTY = 4;
@@ -42,7 +41,7 @@ end
 
 `include "sh_dpi_tasks.svh"
    
-module fpga(
+fpga fpga  (
             .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
             .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
             .M_A_ACT_N(M_A_ACT_N),
