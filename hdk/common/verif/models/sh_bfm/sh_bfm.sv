@@ -1,7 +1,19 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// =============================================================================
+//---------------------------------------------------------------------------------------
+// Amazon FGPA Hardware Development Kit
+// 
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// 
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+// 
+//    http://aws.amazon.com/asl/
+// 
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+//---------------------------------------------------------------------------------------
 
 module sh_bfm #(
                      parameter NUM_HMC = 4,
@@ -25,8 +37,6 @@ module sh_bfm #(
 
    output logic [31:0]         sh_cl_ctl0,
    output logic [31:0]         sh_cl_ctl1,
-   output logic                clk_xtra,
-   output logic                rst_xtra_n,
    output logic [1:0]          sh_cl_pwr_state,
 
    output logic                clk_main_a0,
@@ -40,8 +50,9 @@ module sh_bfm #(
    output logic                clk_extra_c0,
    output logic                clk_extra_c1,
     
-   output logic                rst_out_n,
-
+   output logic                rst_main_n,
+   output logic                kernel_rst_n,
+    
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
@@ -270,42 +281,6 @@ module sh_bfm #(
 
    inout[3:0]                 fpga_uctrl_gpio
 
-   //--------------------------------------------
-   // XDMA
-   //--------------------------------------------
-
-   ,
-   //----------------------------------------------------
-   // XDMA AXI-4 interface to master cycles to CL
-   output logic [4:0]   sh_cl_xdma_awid,
-   output logic [63:0]  sh_cl_xdma_awaddr,
-   output logic [7:0]   sh_cl_xdma_awlen,
-   output logic         sh_cl_xdma_awvalid,
-   input                cl_sh_xdma_awready,
-
-   output logic [511:0] sh_cl_xdma_wdata,
-   output logic [63:0]  sh_cl_xdma_wstrb,
-   output logic         sh_cl_xdma_wlast,
-   output logic         sh_cl_xdma_wvalid,
-   input                cl_sh_xdma_wready,
-
-   input      [4:0]     cl_sh_xdma_bid,
-   input      [1:0]     cl_sh_xdma_bresp,
-   input                cl_sh_xdma_bvalid,
-   output logic         sh_cl_xdma_bready,
-
-   output logic [4:0]   sh_cl_xdma_arid,
-   output logic [63:0]  sh_cl_xdma_araddr,
-   output logic [7:0]   sh_cl_xdma_arlen,
-   output logic         sh_cl_xdma_arvalid,
-   input                cl_sh_xdma_arready,
-
-   input      [4:0]     cl_sh_xdma_rid,
-   input      [511:0]   cl_sh_xdma_rdata,
-   input      [1:0]     cl_sh_xdma_rresp,
-   input                cl_sh_xdma_rlast,
-   input                cl_sh_xdma_rvalid,
-   output logic         sh_cl_xdma_rready
 
    //------------------------------------------------------------------------------------------
    // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
@@ -402,6 +377,9 @@ module sh_bfm #(
    input [31:0]         bar1_sh_rdata,
    input [1:0]          bar1_sh_rresp,
                                                                                                                             
+   output logic [15:0]  sh_cl_status_vdip,
+   input [15:0]         cl_sh_status_vled,
+ 
    output logic         sh_bar1_rready           
 
 `ifndef NO_CL_DDR
@@ -555,7 +533,11 @@ module sh_bfm #(
       clk_main_a0 = 1'b0;
       forever #MAIN_A0_DLY clk_main_a0 = ~clk_main_a0;
    end
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> fb379ebf9fda8a624e9892778de419c62b0d7c3a
    initial begin
       clk_extra_a1 = 1'b0;
       forever #EXTRA_A1_DLY clk_extra_a1 = ~clk_extra_a1;
@@ -597,18 +579,17 @@ module sh_bfm #(
    end
 
    logic rst_n_i;
-   logic rst_out_n_i;
+   logic rst_main_n_i;
    logic rst_xtra_n_i;
 
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
    always @(posedge clk_main_a0)
-     rst_out_n <= rst_out_n_i;
+     rst_main_n <= rst_main_n_i;
 
-   always @(posedge clk_xtra)
-     rst_xtra_n <= rst_xtra_n_i;
-
+   assign kernel_rst_n = 1'b0;  // kernel reset is not used for non-SDAccel simulations.
+   
    always_ff @(negedge rst_n or posedge clk_core)
      if (!rst_n)
        begin
@@ -1507,11 +1488,11 @@ module sh_bfm #(
          end
       endcase 
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       rst_xtra_n_i = 1'b0;
       #5000ns;
       rst_n_i = 1'b1;
-      rst_out_n_i = 1'b1;
+      rst_main_n_i = 1'b1;
       rst_xtra_n_i = 1'b1;
       #50ns;
    endtask // power_up
@@ -1539,8 +1520,7 @@ module sh_bfm #(
    task power_down;
       #50ns;
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
-      rst_xtra_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       #50ns;
    endtask // power_down
 

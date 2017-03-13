@@ -10,6 +10,7 @@
 -y $XILINX_VIVADO/data/verilog/src/unisims
 +incdir+$XILINX_VIVADO/data/verilog/src
 +incdir+${HDK_COMMON_DIR}/verif/models/sh_bfm
++incdir+${HDK_COMMON_DIR}/verif/models/fpga
 
 $XILINX_VIVADO/data/verilog/src/glbl.v
 -v $XILINX_VIVADO/data/verilog/src/unisim_retarget_comp.v
@@ -20,6 +21,8 @@ ${HDK_COMMON_DIR}/verif/models/sh_bfm/axi_bfm_defines.svh
 
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/axil_bfm.sv
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/sh_bfm.sv
+${HDK_COMMON_DIR}/verif/models/fpga/fpga.sv
+${HDK_COMMON_DIR}/verif/models/fpga/card.sv
 ${HDK_COMMON_DIR}/verif/tb/sv/tb.sv
 
 

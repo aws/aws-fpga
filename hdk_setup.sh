@@ -141,15 +141,22 @@ debug_msg "Checking HDK shell's checkpoint version"
 hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
-# Download the sha1
-aws s3 cp s3://$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp.sha1 $hdk_shell.sha1 --only-show-errors || { err_msg "Failed to download HDK shell's checkpoint version."; return 2; }
-exp_sha1=$(cat $hdk_shell.sha1)
-debug_msg "  latest   version=$exp_sha1"
-# If shell already downloaded check its sha1
+s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+# Download the sha256
+# Use curl instead of AWS CLI so that credentials aren't required.
+curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
+if grep -q '<?xml version' $hdk_shell.sha256; then
+  err_msg "Failed to downlonad HDK shell's checkpoint version from $s3_hdk_shell.sha256"
+  cat hdk_shell.sha256
+  return 2
+fi
+exp_sha256=$(cat $hdk_shell.sha256)
+debug_msg "  latest   version=$exp_sha256"
+# If shell already downloaded check its sha256
 if [ -e $hdk_shell ]; then
-  act_sha1=$( sha1sum $hdk_shell | awk '{ print $1 }' )
-  debug_msg "  existing version=$act_sha1"
-  if [[ $act_sha1 != $exp_sha1 ]]; then
+  act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+  debug_msg "  existing version=$act_sha256"
+  if [[ $act_sha256 != $exp_sha256 ]]; then
     info_msg "HDK shell's checkpoint version is incorrect"
     info_msg "  Saving old checkpoint to $hdk_shell.back"
     mv $hdk_shell $hdk_shell.back
@@ -158,27 +165,44 @@ else
   info_msg "HDK shell's checkpoint hasn't been downloaded yet."
 fi
 if [ ! -e $hdk_shell ]; then
-  s3_hdk_shell=s3://$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
   info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
-  aws s3 cp $s3_hdk_shell $hdk_shell --only-show-errors || { err_msg "HDK shell checkpoint download failed"; return 2; }
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
 fi
-# Check sha1
-act_sha1=$( sha1sum $hdk_shell | awk '{ print $1 }' )
-if [[ $act_sha1 != $exp_sha1 ]]; then
+# Check sha256
+act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+if [[ $act_sha256 != $exp_sha256 ]]; then
   err_msg "Incorrect HDK shell checkpoint version:"
-  err_msg "  expected version=$exp_sha1"
-  err_msg "  actual   version=$act_sha1"
-  err_msg "  There may be an issue with the uploaded checkpoint."
+  err_msg "  expected version=$exp_sha256"
+  err_msg "  actual   version=$act_sha256"
+  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
   return 2
 fi
 info_msg "HDK shell is up-to-date"
 
-# Create DDR and PCIe IP models and patch PCIe\
+# Create DDR and PCIe IP models and patch PCIe
 models_dir=$HDK_COMMON_DIR/verif/models
 ddr4_model_dir=$models_dir/ddr4_model
-if [ ! -f $ddr4_model_dir/arch_defines.v ]; then
-  ddr4_build_dir=$AWS_FPGA_REPO_DIR/ddr4_model_build
+if [ -f $ddr4_model_dir/arch_defines.v ]; then
+  # Models already built
+  # Check to make sure they were built with this version of vivado
+  if [[ -f $models_dir/.vivado_version ]]; then
+    models_vivado_version=$(cat $models_dir/.vivado_version)
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with $models_vivado_version"
+    if [[ $models_vivado_version != $VIVADO_VER ]]; then
+      info_msg "  Wrong vivado version so rebuilding with $VIVADO_VER"
+    fi
+  else
+    models_vivado_version=UNKNOWN
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN vivado version so rebuilding."
+  fi
+else
+  # Models haven't been built
+  models_vivado_version=NOT_BUILT
   info_msg "DDR4 model files in "$ddr4_model_dir/" do NOT exist. Running model creation step.";
+fi
+if [[ $models_vivado_version != $VIVADO_VER ]]; then
+  ddr4_build_dir=$AWS_FPGA_REPO_DIR/ddr4_model_build
   info_msg "  Building in $ddr4_build_dir"
   info_msg "  This could take 5-10 minutes, please be patient!";
   mkdir -p $ddr4_build_dir

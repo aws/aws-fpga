@@ -36,19 +36,19 @@
    endtask
 
    task sv_map_host_memory(input longint unsigned addr);
-      tb.sh.map_host_memory(addr);
+      tb.card.fpga.sh.map_host_memory(addr);
    endtask
 
    task cl_peek(input longint unsigned addr, output int unsigned data);
-      tb.sh.peek(addr, data);
+      tb.card.fpga.sh.peek(addr, data);
    endtask
    
    task cl_poke(input longint unsigned addr, int unsigned data);
-      tb.sh.poke(addr, data);
+      tb.card.fpga.sh.poke(addr, data);
    endtask
 
    task sv_int_ack(input int unsigned int_num);
-      tb.sh.set_ack_bit(int_num);
+      tb.card.fpga.sh.set_ack_bit(int_num);
    endtask
    
    task sv_pause(input int x);
@@ -92,19 +92,19 @@
    endfunction
 
    function void que_buffer_to_cl(input int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
+      tb.card.fpga.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
    endfunction
 
    function void que_cl_to_buffer(input int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.sh.dma_cl_to_buffer(chan, dst_addr, cl_addr, len);
+      tb.card.fpga.sh.dma_cl_to_buffer(chan, dst_addr, cl_addr, len);
    endfunction
 
    function void start_que_to_cl(input int chan);
-      tb.sh.start_dma_to_cl(chan);
+      tb.card.fpga.sh.start_dma_to_cl(chan);
    endfunction
 
    function void start_que_to_buffer(input int chan);
-      tb.sh.start_dma_to_buffer(chan);
+      tb.card.fpga.sh.start_dma_to_buffer(chan);
    endfunction
 
 `endif
