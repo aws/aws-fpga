@@ -107,4 +107,41 @@
       tb.card.fpga.sh.start_dma_to_buffer(chan);
    endfunction
 
+   task power_up(input slot_id = 0, int clk_profile = 0);
+      case (slot_id)
+      0: tb.card.fpga.sh.power_up(clk_profile);
+`ifdef CARD_1
+      1: tb.`CARD_1.fpga.sh.power_up(clk_profile);
+`endif
+`ifdef CARD_2
+      1: tb.`CARD_2.fpga.sh.power_up(clk_profile);
+`endif
+`ifdef CARD_3
+      1: tb.`CARD_3.fpga.sh.power_up(clk_profile);
+`endif
+      default: begin
+         $display("Error: Invalid Slot ID specified.");
+         $finish;
+      end
+      endcase
+   endtask
+
+   task power_down(input slot_id = 0);
+      case (slot_id)
+      0: tb.card.fpga.sh.power_down();
+`ifdef CARD_1
+      1: tb.`CARD_1.fpga.sh.power_down();
+`endif
+`ifdef CARD_2
+      1: tb.`CARD_2.fpga.sh.power_down();
+`endif
+`ifdef CARD_3
+      1: tb.`CARD_3.fpga.sh.power_down();
+`endif
+      default: begin
+         $display("Error: Invalid Slot ID specified.");
+         $finish;
+      end
+      endcase
+   endtask
 `endif
