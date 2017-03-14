@@ -159,42 +159,6 @@ module tb();
    logic [15:0]         sh_cl_irq_ack;
 `include "tb_ddr.svh"
    
-   //--------------------------------------------
-   // XDMA
-   //--------------------------------------------
-
-   //----------------------------------------------------
-   // XDMA AXI-4 interface to master cycles to CL
-   logic [4:0]         sh_cl_xdma_awid;
-   logic [63:0]        sh_cl_xdma_awaddr;
-   logic [7:0]         sh_cl_xdma_awlen;
-   logic               sh_cl_xdma_awvalid;
-   logic               cl_sh_xdma_awready;
-
-   logic [511:0]       sh_cl_xdma_wdata;
-   logic [63:0]        sh_cl_xdma_wstrb;
-   logic               sh_cl_xdma_wlast;
-   logic               sh_cl_xdma_wvalid;
-   logic               cl_sh_xdma_wready;
-
-   logic      [4:0]    cl_sh_xdma_bid;
-   logic      [1:0]    cl_sh_xdma_bresp;
-   logic               cl_sh_xdma_bvalid;
-   logic               sh_cl_xdma_bready;
-
-   logic [4:0]         sh_cl_xdma_arid;
-   logic [63:0]        sh_cl_xdma_araddr;
-   logic [7:0]         sh_cl_xdma_arlen;
-   logic               sh_cl_xdma_arvalid;
-   logic               cl_sh_xdma_arready;
-
-   logic      [4:0]    cl_sh_xdma_rid;
-   logic      [511:0]  cl_sh_xdma_rdata;
-   logic      [1:0]    cl_sh_xdma_rresp;
-   logic               cl_sh_xdma_rlast;
-   logic               cl_sh_xdma_rvalid;
-   logic               sh_cl_xdma_rready;
-
 
    //--------------------------------------------
    // SDA
@@ -246,6 +210,7 @@ module tb();
    logic               ocl_cl_bvalid;
    logic [1:0]         ocl_cl_bresp;
    logic               sh_ocl_bready;
+   logic [1:0]         ocl_sh_bresp;
 
    //Read address
    logic               sh_ocl_arvalid;

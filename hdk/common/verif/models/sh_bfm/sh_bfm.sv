@@ -270,42 +270,6 @@ module sh_bfm #(
 
    inout[3:0]                 fpga_uctrl_gpio
 
-   //--------------------------------------------
-   // XDMA
-   //--------------------------------------------
-
-   ,
-   //----------------------------------------------------
-   // XDMA AXI-4 interface to master cycles to CL
-   output logic [4:0]   sh_cl_xdma_awid,
-   output logic [63:0]  sh_cl_xdma_awaddr,
-   output logic [7:0]   sh_cl_xdma_awlen,
-   output logic         sh_cl_xdma_awvalid,
-   input                cl_sh_xdma_awready,
-
-   output logic [511:0] sh_cl_xdma_wdata,
-   output logic [63:0]  sh_cl_xdma_wstrb,
-   output logic         sh_cl_xdma_wlast,
-   output logic         sh_cl_xdma_wvalid,
-   input                cl_sh_xdma_wready,
-
-   input      [4:0]     cl_sh_xdma_bid,
-   input      [1:0]     cl_sh_xdma_bresp,
-   input                cl_sh_xdma_bvalid,
-   output logic         sh_cl_xdma_bready,
-
-   output logic [4:0]   sh_cl_xdma_arid,
-   output logic [63:0]  sh_cl_xdma_araddr,
-   output logic [7:0]   sh_cl_xdma_arlen,
-   output logic         sh_cl_xdma_arvalid,
-   input                cl_sh_xdma_arready,
-
-   input      [4:0]     cl_sh_xdma_rid,
-   input      [511:0]   cl_sh_xdma_rdata,
-   input      [1:0]     cl_sh_xdma_rresp,
-   input                cl_sh_xdma_rlast,
-   input                cl_sh_xdma_rvalid,
-   output logic         sh_cl_xdma_rready
 
    //------------------------------------------------------------------------------------------
    // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
@@ -960,8 +924,8 @@ module sh_bfm #(
             $display("[%t] : DEBUG resp.size  %2d ", $realtime, sh_cl_b_resps.size());
          end
          if (wr_last_cnt != 0) begin
-            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
-            sh_cl_pcim_bresp[0] <= 2'b00;
+            sh_cl_pcim_bid    <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp  <= 2'b00;
 
             sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
                                    !cl_sh_pcim_bready ? 1'b1 : 1'b0;
@@ -1651,7 +1615,7 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   function dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+   function void dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
       
       dop.buffer = src_addr;
@@ -1662,7 +1626,7 @@ module sh_bfm #(
       
    endfunction // dma_buffer_to_cl
 
-   function automatic dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
+   function automatic void dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
       dop.buffer = dst_addr;
       dop.cl_addr = cl_addr;

@@ -228,6 +228,8 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M01_AXI_wstrb(lcl_cl_sh_ddrb_q.wstrb),
         .M01_AXI_wvalid(lcl_cl_sh_ddrb_q.wvalid),
 
+// Interface to DDR_C, the controller inside AWS Shell
+// hence the bus name does not include "lcl"
 
         .M02_AXI_araddr(cl_sh_ddr_q.araddr),
         .M02_AXI_arburst(),
@@ -239,7 +241,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M02_AXI_arqos(),
         .M02_AXI_arready(cl_sh_ddr_q.arready),
         .M02_AXI_arregion(),
-        .M02_AXI_arsize(),
+        .M02_AXI_arsize(3'h6),
         .M02_AXI_arvalid(cl_sh_ddr_q.arvalid),
         .M02_AXI_awaddr(cl_sh_ddr_q.awaddr),
         .M02_AXI_awburst(),
@@ -251,7 +253,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M02_AXI_awqos(),
         .M02_AXI_awready(cl_sh_ddr_q.awready),
         .M02_AXI_awregion(),
-        .M02_AXI_awsize(),
+        .M02_AXI_awsize(3'h6),
         .M02_AXI_awvalid(cl_sh_ddr_q.awvalid),
         .M02_AXI_bid(cl_sh_ddr_q.bid[5:0]),
         .M02_AXI_bready(cl_sh_ddr_q.bready),

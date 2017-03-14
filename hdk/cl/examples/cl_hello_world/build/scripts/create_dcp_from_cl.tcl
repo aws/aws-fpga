@@ -46,7 +46,6 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
-#Convenience to set the root of the RTL directory
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
@@ -72,25 +71,13 @@ set_param chipscope.enablePRFlow true
 
 #---- User would replace this section -----
 
-#Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-read_verilog -sv [ list \
-  $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh\
-  $CL_DIR/build/src_post_encryption/cl_common_defines.vh
-]
-set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
-set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_hello_world_defines.vh ]
-
-set_property file_type {Verilog Header} [get_files $CL_DIR/build/src_post_encryption/cl_common_defines.vh ]
-set_property is_global_include true [get_files $CL_DIR/build/src_post_encryption/cl_common_defines.vh ]
+#Convenience to set the root of the RTL directory
+set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
-#User design files (these are the files that were encrypted by encrypt.tcl)
-read_verilog -sv [ list \
-  $CL_DIR/build/src_post_encryption/cl_hello_world.sv 
-]
+read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
 
-#---- End of section replaced by User ----
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
@@ -117,16 +104,17 @@ read_verilog [ list \
   $HDK_SHELL_DIR/design/interfaces/cl_ports.vh
 ]
 
-puts "AWS FPGA: Reading IP blocks";
+# Since no IP is used in CL_HELLO_WORLD, the next few linese are commented out
+#puts "AWS FPGA: Reading IP blocks";
 #Read DDR IP
-read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci\
-  $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
-  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
-  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
-  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
-  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
-]
+#read_ip [ list \
+#  $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci\
+#  $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
+#  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
+#  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
+#  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
+#  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
+#]
 
 puts "AWS FPGA: Reading AWS constraints";
 

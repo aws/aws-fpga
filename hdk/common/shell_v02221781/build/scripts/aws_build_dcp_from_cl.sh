@@ -18,12 +18,25 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-foreground] | [-h] | [-H] | [-help] |  ]"
+    echo " "
+    echo "By default the build is run in the background using nohup so that the"
+    echo "process will not be terminated if the terminal window is closed."
+    echo "The window can be closed if it is running on your computer and the"
+    echo "network connection is lost. All build output will be redirected to a"
+    echo "log file called *.nohup.out."
+    echo " "
+    echo "The -foreground option runs the build in the foreground. All output will"
+    echo "go to the terminal and the build may be terminated if the terminal"
+    echo "is closed. This option is useful if you want to wait for the build"
+    echo "to complete. This option is safe if the terminal is running on the"
+    echo "AWS instance, for example on a GUI desktop on the instance."
 }
 
 # Default arguments for script and strategy
 strategy=DEFAULT
 vivado_script="create_dcp_from_cl.tcl"
+foreground=0
 
 # Parse command-line arguments
 while [ "$1" != "" ]; do
@@ -33,6 +46,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -strategy )             shift
                                 strategy=$1
+                                ;;
+        -foreground )           foreground=1
                                 ;;
         -h | -H | -help )       usage
                                 exit
@@ -106,8 +121,15 @@ hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk 
 shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
 
 # Run vivado
-nohup vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version > $timestamp.nohup.out 2>&1&
-
-echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
-echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
-
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version"
+if [[ "$foreground" == "0" ]]; then
+  nohup $cmd > $timestamp.nohup.out 2>&1 &
+  
+  echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
+  echo "AWS FPGA: Output is being redirected to $timestamp.nohup.out"
+  echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
+else
+  echo "AWS FPGA: Build through Vivado is running in the foreground, this may take a few hours."
+  echo "AWS FPGA: The build may be terminated if the network connection to this terminal window is lost."
+  $cmd
+fi

@@ -32,10 +32,9 @@ axi_bus_t cl_sh_pcim_q();
          .awaddr(cl_sh_pcim_q.awaddr), 
          .awlen(cl_sh_pcim_q.awlen),
          .awvalid(cl_sh_pcim_q.awvalid),
-         .awuser(),
+         .awuser(0),
          .awready(cl_sh_pcim_q.awready),
-
-         .wid(),
+         .wid(0),
          .wdata(cl_sh_pcim_q.wdata),
          .wstrb(cl_sh_pcim_q.wstrb),
          .wlast(cl_sh_pcim_q.wlast),
@@ -51,7 +50,7 @@ axi_bus_t cl_sh_pcim_q();
          .arid(cl_sh_pcim_q.arid[8:0]),
          .araddr(cl_sh_pcim_q.araddr),
          .arlen(cl_sh_pcim_q.arlen),
-         .aruser(),
+         .aruser(0),
          .arvalid(cl_sh_pcim_q.arvalid),
          .arready(cl_sh_pcim_q.arready),
 
@@ -136,5 +135,8 @@ axi_bus_t cl_sh_pcim_q();
      .m_axi_rready   (cl_sh_pcim_bus.rready)
      );
 
+
+     assign cl_sh_pcim_bus.awsize = 3'h6;
+     assign cl_sh_pcim_bus.arsize = 3'h6;
 
 endmodule
