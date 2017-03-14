@@ -1,9 +1,5 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
-// =============================================================================
+`ifndef CL_DRAM_DMA_DEFINES
+`define CL_DRAM_DMA_DEFINES
 
 //Put module name of the CL design here.  This is used to instantiate in top.sv
 `define CL_NAME cl_dram_dma
@@ -15,4 +11,6 @@
 `define SH_SDA
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
+
+`endif
 

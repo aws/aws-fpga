@@ -22,11 +22,28 @@ module cl_hello_world
 
 );
 
-   `include "cl_common_defines.vh" // CL Defines
+   `include "cl_common_defines.vh" // CL Defines for all examples
+   `include "cl_hello_world_defines.vh"
 
-// // Value to return for PCIS access to unimplemented register address 
-// parameter  UNIMPLEMENTED_REG_VALUE = 32'hdeaddead;
+//--------------------------------------------0
+// Start with Tie-Off of Unused Interfaces
+//---------------------------------------------
+// the developer should use the next set of `include
+// to properly tie-off any unused interface
+// The list is put in the top of the module
+// to avoid cases where developer may forget to
+// remove it from the end of the file
 
+`include "unused_flr_template.inc"
+`include "unused_ddr_a_b_d_template.inc"
+`include "unused_ddr_c_template.inc"
+`include "unused_pcim_template.inc"
+`include "unused_dma_pcis_template.inc"
+`include "unused_cl_sda_template.inc"
+`include "unused_sh_bar1_template.inc"
+`include "unused_apppf_irq_template.inc"
+`include "unused_hmc_template.inc"
+`include "unused_aurora_template.inc"
 
 //-------------------------------------------------
 // Wires
@@ -315,6 +332,8 @@ assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
    `define CL_VERSION 32'hee_ee_ee_00
 `endif  
 
+<<<<<<< HEAD
+=======
   assign cl_sh_flr_done      =   1'b0;
   assign cl_sh_status0[31:0] =  32'h0000_0FF0;
   assign cl_sh_status1[31:0] = `CL_VERSION;
@@ -343,6 +362,7 @@ assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
 `include "unused_hmc_template.vh"
 
 `include "unused_aurora_template.vh"
+>>>>>>> origin/prelease
 
 endmodule
 

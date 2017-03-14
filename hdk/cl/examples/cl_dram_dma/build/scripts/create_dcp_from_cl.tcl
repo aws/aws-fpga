@@ -91,7 +91,7 @@ set_property file_type {Verilog Header} [get_files $ENC_SRC_DIR/cl_dram_dma_defi
 set_property is_global_include true [get_files $ENC_SRC_DIR/cl_dram_dma_defines.vh ]
 
 #User design files (these are the files that were encrypted by encrypt.tcl)
-read_verilog -sv [ glob $ENC_SRC_DIR/*.sv ]
+read_verilog -sv [ glob $ENC_SRC_DIR/*.?v ]
 
 #---- End of section replaced by User ----
 puts "AWS FPGA: Reading AWS Shell design";
