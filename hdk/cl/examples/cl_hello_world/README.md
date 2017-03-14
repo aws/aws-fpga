@@ -6,6 +6,7 @@
 2. [Functional Description] (#description)
 3. [Hello World Example Metadata] (#metadata)
 
+
 <a name="overview"></a>
 ## Overview
 This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the CustomLogic. These registers will be in the memory space before AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus.
@@ -16,8 +17,9 @@ All of the unused interfaces between AWS Shell and the CL are tied to fixed valu
 
 Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
-  
-## <a name="description"> Functional Description
+
+<a name="description"></a]
+## Functional Description
 
 The cl_hello_world example demonstrates basic Shell-to-CL connectivity, memory-mapped register instantiations and the use of the Virtual LED and DIP switches. The cl_hello_world example implements two registers in the FPGA AppPF BAR0 memory space connected to the OCL AXI-L interface. The two registers are:
 
@@ -48,8 +50,9 @@ While running on F1, the developer can use the FPGA tools `fpga-get-virtual-led`
 The Hello World example does not use most of AWS Shell interface, hence the unused signals are tied off.
 At the end of `cl_hello_world.sv` file, there is a specific `\`include` for each unused interface to handle the tie-off's.
 
- 
-## <a name="metadata"> Hello World Example Metadata
+
+<a name="metadata"></a>
+## Hello World Example Metadata
 The following table displays information about the CL that is required to register it as an AFI with AWS.
 Alternatively, you can directly use a pre-generated AFI for this CL which you can associate to an instance or AMI.
 
