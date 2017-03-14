@@ -1427,42 +1427,42 @@ module sh_bfm #(
                        ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0, 
                        ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
       case (clk_profile_a)
-         0: begin
+         ClockProfile::PROFILE_0: begin
             MAIN_A0_DLY  = 4ns;
             CORE_DLY     = 4ns;
             EXTRA_A1_DLY = 8ns;
             EXTRA_A2_DLY = 2.66ns;
             EXTRA_A3_DLY = 2ns;
          end
-         1: begin
+         ClockProfile::PROFILE_1: begin
             MAIN_A0_DLY  = 2ns;
             CORE_DLY     = 2ns;
             EXTRA_A1_DLY = 4ns;
             EXTRA_A2_DLY = 1.33ns;
             EXTRA_A3_DLY = 1ns;
          end
-         2: begin
+         ClockProfile::PROFILE_2: begin
             MAIN_A0_DLY  = 8ns;
             CORE_DLY     = 8ns;
             EXTRA_A1_DLY = 16ns;
             EXTRA_A2_DLY = 2ns;
             EXTRA_A3_DLY = 4ns;
          end
-         3: begin
+         ClockProfile::PROFILE_3: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
             EXTRA_A1_DLY = 64ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
-         4: begin
+         ClockProfile::PROFILE_4: begin
             MAIN_A0_DLY  = 2.22ns;
             CORE_DLY     = 2.22ns;
             EXTRA_A1_DLY = 4.44ns;
             EXTRA_A2_DLY = 1.48ns;
             EXTRA_A3_DLY = 1.11ns;
          end
-         5: begin
+         ClockProfile::PROFILE_5: begin
             MAIN_A0_DLY  = 2.5ns;
             CORE_DLY     = 2.5ns;
             EXTRA_A1_DLY = 5ns;
@@ -1480,11 +1480,11 @@ module sh_bfm #(
          end
       endcase 
       case (clk_profile_b)
-         0: begin
+         ClockProfile::PROFILE_0: begin
             EXTRA_B0_DLY = 2ns;
             EXTRA_B1_DLY = 4ns;
          end
-         1: begin
+         ClockProfile::PROFILE_1: begin
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
          end
@@ -1496,11 +1496,11 @@ module sh_bfm #(
          end
       endcase
       case (clk_profile_c)
-         0: begin
+         ClockProfile::PROFILE_0: begin
             EXTRA_C0_DLY = 1.66ns;
             EXTRA_C1_DLY = 1.25ns;
          end
-         1: begin
+         ClockProfile::PROFILE_1: begin
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
          end
@@ -1650,7 +1650,7 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task poke(input logic [63:0] addr, logic [63:0] data, logic [5:0] id = 6'h0, int size = 2, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   task poke(input logic [63:0] addr, logic [63:0] data, logic [5:0] id = 6'h0, int size = 2, AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
       logic [63:0] strb;
 
@@ -1667,7 +1667,7 @@ module sh_bfm #(
       endcase // case (size)
       
       case (intf)
-        0: begin
+        AxiPort::PORT_PCIS: begin
            AXI_Command axi_cmd;
            AXI_Data    axi_data;
 
@@ -1693,13 +1693,13 @@ module sh_bfm #(
            resp = cl_sh_b_resps[0].resp;
            cl_sh_b_resps.pop_front();
         end
-        1: begin
+        AxiPort::PORT_SDA: begin
            sda_axil_bfm.poke(addr, data);
         end        
-        2: begin
+        AxiPort::PORT_OCL: begin
            ocl_axil_bfm.poke(addr, data);
         end
-        3: begin
+        AxiPort::PORT_BAR1: begin
            bar1_axil_bfm.poke(addr, data);
         end
         default: begin
@@ -1729,10 +1729,10 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   task peek(input logic [63:0] addr, output logic [63:0] data, input logic [5:0] id = 6'h0, int size = 2, int intf = 0);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   task peek(input logic [63:0] addr, output logic [63:0] data, input logic [5:0] id = 6'h0, int size = 2, AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
 
       case (intf)
-        0: begin
+        AxiPort::PORT_PCIS : begin
            AXI_Command axi_cmd;
            int         byte_idx;
            int         mem_arr_idx;
@@ -1752,13 +1752,13 @@ module sh_bfm #(
            data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
            cl_sh_rd_data.pop_front();
         end // case: 0
-        1: begin
+        AxiPort::PORT_SDA : begin
            sda_axil_bfm.peek(addr, data);
         end
-        2: begin
+        AxiPort::PORT_OCL : begin
            ocl_axil_bfm.peek(addr, data);
         end
-        3: begin
+        AxiPort::PORT_BAR1 : begin
            bar1_axil_bfm.peek(addr, data);
         end
       endcase // case (intf)

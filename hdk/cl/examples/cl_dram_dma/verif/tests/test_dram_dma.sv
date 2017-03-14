@@ -44,7 +44,7 @@ module test_dram_dma();
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
        // de-select the ATG hardware
-       tb.card.fpga.sh.poke(.addr(64'h130), .data(0), .intf(2));
+       tb.card.fpga.sh.poke(.addr(64'h130), .data(0), .intf(AxiPort::PORT_OCL));
 
        // allow memory to initialize
        tb.card.fpga.sh.delay(25000);
