@@ -16,6 +16,8 @@
 `ifndef SV_SH_DPI_TASKS
 `define SV_SH_DPI_TASKS
 
+import tb_type_defines_pkg::*;
+
    import "DPI-C" context task test_main(output int unsigned exit_code);
    import "DPI-C" context task int_handler(input int unsigned int_num);
    import "DPI-C" context function void  host_memory_putc(input longint unsigned addr, byte data);         // even though a int is used, only the lower 8b are used
@@ -107,17 +109,20 @@
       tb.card.fpga.sh.start_dma_to_buffer(chan);
    endfunction
 
-   task power_up(input slot_id = 0, int clk_profile = 0);
+   task power_up(input slot_id = 0, 
+                       ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0,
+                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0,
+                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
       case (slot_id)
-      0: tb.card.fpga.sh.power_up(clk_profile);
+      0: tb.card.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
 `ifdef CARD_1
-      1: tb.`CARD_1.fpga.sh.power_up(clk_profile);
+      1: tb.`CARD_1.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
 `endif
 `ifdef CARD_2
-      1: tb.`CARD_2.fpga.sh.power_up(clk_profile);
+      1: tb.`CARD_2.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
 `endif
 `ifdef CARD_3
-      1: tb.`CARD_3.fpga.sh.power_up(clk_profile);
+      1: tb.`CARD_3.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
 `endif
       default: begin
          $display("Error: Invalid Slot ID specified.");
