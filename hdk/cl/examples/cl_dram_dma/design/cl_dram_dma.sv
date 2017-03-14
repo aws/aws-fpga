@@ -700,7 +700,8 @@ cl_vio CL_VIO (
 // Virtual JATG ILA Debug core example 
 //-----------------------------------------
 
-
+`include "unused_hmc_template.vh"
+`include "unused_aurora_template.vh"
 
 // Temporal workaround until these signals removed from the shell
 

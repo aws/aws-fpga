@@ -69,6 +69,7 @@ set_param chipscope.enablePRFlow true
 ## Read design files
 #############################
 
+#---- User would replace this section -----
 
 #Convenience to set the root of the RTL directory
 set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
@@ -76,9 +77,6 @@ set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
-
-
-
 
 puts "AWS FPGA: Reading AWS Shell design";
 

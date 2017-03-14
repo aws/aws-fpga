@@ -924,8 +924,8 @@ module sh_bfm #(
             $display("[%t] : DEBUG resp.size  %2d ", $realtime, sh_cl_b_resps.size());
          end
          if (wr_last_cnt != 0) begin
-            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
-            sh_cl_pcim_bresp[0] <= 2'b00;
+            sh_cl_pcim_bid    <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp  <= 2'b00;
 
             sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
                                    !cl_sh_pcim_bready ? 1'b1 : 1'b0;
