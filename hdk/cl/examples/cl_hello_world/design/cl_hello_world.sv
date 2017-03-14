@@ -62,8 +62,8 @@ module cl_hello_world #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM
   logic        arvalid_q;
   logic [31:0] araddr_q;
   logic [31:0] hello_world_q_byte_swapped;
-  logic [15:0] vled_q        = 32'b0;
-  logic [31:0] hello_world_q = 32'b0;
+  logic [15:0] vled_q       ; //= 32'b0;
+  logic [31:0] hello_world_q; //= 32'b0;
 
 //-------------------------------------------------
 // ID Values (cl_hello_world_defines.vh)
