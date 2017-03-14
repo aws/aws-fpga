@@ -1470,11 +1470,6 @@ module sh_bfm #(
             EXTRA_A3_DLY = 1.25ns;
          end
          default: begin
-//            MAIN_A0_DLY  = 4ns;
-//            CORE_DLY     = 4ns;
-//            EXTRA_A1_DLY = 8ns;
-//            EXTRA_A2_DLY = 2.66ns;
-//            EXTRA_A3_DLY = 2ns;
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
@@ -1489,8 +1484,6 @@ module sh_bfm #(
             EXTRA_B1_DLY = 8ns;
          end
          default: begin
-//            EXTRA_B0_DLY = 2ns;
-//            EXTRA_B1_DLY = 4ns;
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
@@ -1505,8 +1498,6 @@ module sh_bfm #(
             EXTRA_C1_DLY = 2.5ns;
          end
          default: begin
-//            EXTRA_C0_DLY = 1.66ns;
-//            EXTRA_C1_DLY = 1.25ns;
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
@@ -1523,13 +1514,13 @@ module sh_bfm #(
   
    //=================================================
    //
-   // delay
+   // nsec_delay
    //
-   //   Description: asserts and deasserts various resets
+   //   Description: sets a delay in nsec
    //   Outputs: None
    //
    //=================================================
-   task delay(int dly = 10000);
+   task nsec_delay(int dly = 10000);
       #dly;
    endtask
 
@@ -1650,16 +1641,19 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task poke(input logic [63:0] addr, logic [63:0] data, logic [5:0] id = 6'h0, int size = 2, AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   task poke(input logic [63:0] addr, 
+             logic [63:0] data, 
+             logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
 
       logic [63:0] strb;
 
-//      strb = {(1<<size){1'b1}};
       case (size)
-        0: strb = 64'b0000_0000_0000_0001;
-        1: strb = 64'b0000_0000_0000_0011;
-        2: strb = 64'b0000_0000_0000_1111;
-        3: strb = 64'b0000_0000_1111_1111;
+        DataSize::UINT8 : strb = 64'b0000_0000_0000_0001;
+        DataSize::UINT16: strb = 64'b0000_0000_0000_0011;
+        DataSize::UINT32: strb = 64'b0000_0000_0000_1111;
+        DataSize::UINT64: strb = 64'b0000_0000_1111_1111;
         default: begin
            $display("FATAL ERROR - Invalid size specified");
            $finish;
@@ -1729,7 +1723,11 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   task peek(input logic [63:0] addr, output logic [63:0] data, input logic [5:0] id = 6'h0, int size = 2, AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS);  // 0 = pcis, 1 = sda, 2 = ocl, 3 = bar1
+   task peek(input logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
 
       case (intf)
         AxiPort::PORT_PCIS : begin

@@ -38,7 +38,7 @@ module test_dram_dma();
                    .clk_profile_b(ClockProfile::PROFILE_0), 
                    .clk_profile_c(ClockProfile::PROFILE_0));
 
-       tb.card.fpga.sh.delay(500);
+       tb.card.fpga.sh.nsec_delay(500);
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
@@ -47,7 +47,7 @@ module test_dram_dma();
        tb.card.fpga.sh.poke(.addr(64'h130), .data(0), .intf(AxiPort::PORT_OCL));
 
        // allow memory to initialize
-       tb.card.fpga.sh.delay(25000);
+       tb.card.fpga.sh.nsec_delay(25000);
 
        // issuing flr
        tb.card.fpga.sh.issue_flr();
