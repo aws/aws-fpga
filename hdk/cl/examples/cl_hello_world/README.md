@@ -6,8 +6,8 @@
 2. [Functional Description] (#description)
 3. [Hello World Example Metadata] (#metadata)
 
-
-## <a name="overview"> Overview
+<a name="overview"></a>
+## Overview
 This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the CustomLogic. These registers will be in the memory space before AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus.
 
 This example demonstrate a basic use-case of the Virtual LED and Virtual DIP switches.
