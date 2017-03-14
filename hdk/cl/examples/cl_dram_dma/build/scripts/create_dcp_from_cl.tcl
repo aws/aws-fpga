@@ -84,14 +84,8 @@ set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
-read_verilog -sv [ glob $ENC_SRC_DIR/*.vh ]
-
-#Global defines (this is specific to the CL design).  This file is encrypted by encrypt.tcl
-set_property file_type {Verilog Header} [get_files $ENC_SRC_DIR/cl_dram_dma_defines.vh ]
-set_property is_global_include true [get_files $ENC_SRC_DIR/cl_dram_dma_defines.vh ]
-
 #User design files (these are the files that were encrypted by encrypt.tcl)
-read_verilog -sv [ glob $ENC_SRC_DIR/*.sv ]
+read_verilog -sv [ glob $ENC_SRC_DIR/*.?v ]
 
 #---- End of section replaced by User ----
 puts "AWS FPGA: Reading AWS Shell design";

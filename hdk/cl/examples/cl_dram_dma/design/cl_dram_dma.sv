@@ -1,9 +1,18 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
-// =============================================================================
+//---------------------------------------------------------------------------------------
+// Amazon FGPA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
 
 module cl_dram_dma #(parameter NUM_DDR=4) 
 
@@ -11,15 +20,38 @@ module cl_dram_dma #(parameter NUM_DDR=4)
    `include "cl_ports.vh"
 
 );
+
+`include "cl_dram_dma_defines.vh"
+
+// TIE OFF ALL UNUSED INTERFACES
+// Including all the unused interface to tie off
+// This list is put in the top of the fie to remind
+// developers to remve the specific interfaces
+// that the CL will use
+
+`include "unused_hmc_template.inc"
+`include "unused_aurora_template.inc"
+`include "unused_sh_bar1_template.inc"
+
+// Defining local parameters that will instantiate the
+// 3 DRAM controllers inside the CL
   
    localparam DDR_A_PRESENT = 1;
    localparam DDR_B_PRESENT = 1;
    localparam DDR_D_PRESENT = 1;
+
+// Define the addition pipeline stag
+// needed to close timing for the various
+// place where ATG (Automatic Test Generator)
+// is defined
    
    localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
    localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
    localparam NUM_CFG_STGS_PCIE_ATG = 4;
-   
+
+// To reduce RTL simulation time, only 8KiB of
+// each external DRAM is scrubbed in simulations
+
 `ifdef SIM
    localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
 `else   
@@ -668,8 +700,6 @@ cl_vio CL_VIO (
 // Virtual JATG ILA Debug core example 
 //-----------------------------------------
 
-`include "unused_hmc_template.vh"
-`include "unused_aurora_template.vh"
 
 
 // Temporal workaround until these signals removed from the shell
