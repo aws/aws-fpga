@@ -15,7 +15,6 @@
 
 package tb_type_defines_pkg;
 
- 
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
 // Profile 0 (Default)       125        62.5            187.5           250
 // Profile 1	             250       125	            375             500
@@ -35,5 +34,13 @@ package tb_type_defines_pkg;
   virtual class ClockProfile;     
      typedef enum integer {PROFILE_0=0, PROFILE_1=1, PROFILE_2=2, PROFILE_3=3, PROFILE_4=4, PROFILE_5=5} CLK_PROFILE;
   endclass // Clock_Profile
+
+  virtual class DataSize;
+     typedef enum integer {UINT8=0, UINT16=1, UINT32=2, UINT64=3} DATA_SIZE;
+  endclass // DataSize
+   
+  virtual class AxiPort;
+     typedef enum integer {PORT_PCIS=0, PORT_SDA=1, PORT_OCL=2, PORT_BAR1=3} AXI_PORT;
+  endclass // AxiPort
    
 endpackage
