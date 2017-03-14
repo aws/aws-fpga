@@ -1550,7 +1550,7 @@ module sh_bfm #(
    // read_virtual_dip_switch
    //
    //   Description: reads virtual dip switch status
-   //   Outputs: None
+   //   Outputs: dip_status
    //
    //=================================================
    function logic[15:0] read_virtual_dip_switch(int dip_switch);
@@ -1562,13 +1562,21 @@ module sh_bfm #(
    // read_virtual_led
    //
    //   Description: reads virtual led status
-   //   Outputs: None
+   //   Outputs: led status
    //
    //=================================================
    function logic[15:0] read_virtual_led(int vled);
       return cl_sh_status_vled[vled];
    endfunction
 
+   //=================================================
+   //
+   // Kernel_reset
+   //
+   //   Description: sets kernel_reset
+   //   Outputs: None
+   //
+   //=================================================
    function void kernel_reset();
       kernel_rst_n = 1'b1;
    endfunction

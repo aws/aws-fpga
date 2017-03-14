@@ -17,7 +17,7 @@ package tb_type_defines_pkg;
 
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
 // Profile 0 (Default)       125        62.5            187.5           250
-// Profile 1	             250       125	            375             500
+// Profile 1	               250       125	            375             500
 // Profile 2                  62.5      31.25           250             125
 // Profile 3                  15.625     7.8125         125              62.5
 // Profile 4                 225       112.5            337.5           450
