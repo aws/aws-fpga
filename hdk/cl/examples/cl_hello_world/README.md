@@ -18,7 +18,7 @@ All of the unused interfaces between AWS Shell and the CL are tied to fixed valu
 Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
 
-<a name="description"></a]
+<a name="description"></a>
 ## Functional Description
 
 The cl_hello_world example demonstrates basic Shell-to-CL connectivity, memory-mapped register instantiations and the use of the Virtual LED and DIP switches. The cl_hello_world example implements two registers in the FPGA AppPF BAR0 memory space connected to the OCL AXI-L interface. The two registers are:
