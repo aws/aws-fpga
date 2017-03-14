@@ -15,8 +15,11 @@
 // limitations under the License.
 //---------------------------------------------------------------------------------------
 
+
 module test_dram_dma();
 
+   import tb_type_defines_pkg::*;
+   
     int            error_count;
     int            timeout_count;
     int            fail;
@@ -31,9 +34,9 @@ module test_dram_dma();
        logic [63:0] host_memory_buffer_address;
        
 
-//       tb.card.fpga.sh.power_up(0);
-       tb.power_up(.clk_profile(0));
-//       tb.card.fpga.sh.power_up(1,0,0);
+       tb.power_up(.clk_profile_a(ClockProfile::PROFILE_1), 
+                   .clk_profile_b(ClockProfile::PROFILE_0), 
+                   .clk_profile_c(ClockProfile::PROFILE_0));
 
        tb.card.fpga.sh.delay(500);
        tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));

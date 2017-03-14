@@ -396,6 +396,9 @@ module sh_bfm #(
 
 `include "axi_bfm_defines.svh"
    
+   import tb_type_defines_pkg::*;
+
+   
    AXI_Command sh_cl_wr_cmds[$];
    AXI_Data    sh_cl_wr_data[$];
    AXI_Command sh_cl_rd_cmds[$];
@@ -1414,7 +1417,9 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up(int clk_profile_a = 0, int clk_profile_b = 0, int clk_profile_c = 0);
+   task power_up(input ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0, 
+                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0, 
+                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
       case (clk_profile_a)
          0: begin
             MAIN_A0_DLY  = 4ns;
@@ -1459,11 +1464,13 @@ module sh_bfm #(
             EXTRA_A3_DLY = 1.25ns;
          end
          default: begin
-            MAIN_A0_DLY  = 4ns;
-            CORE_DLY     = 4ns;
-            EXTRA_A1_DLY = 8ns;
-            EXTRA_A2_DLY = 2.66ns;
-            EXTRA_A3_DLY = 2ns;
+//            MAIN_A0_DLY  = 4ns;
+//            CORE_DLY     = 4ns;
+//            EXTRA_A1_DLY = 8ns;
+//            EXTRA_A2_DLY = 2.66ns;
+//            EXTRA_A3_DLY = 2ns;
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
          end
       endcase 
       case (clk_profile_b)
@@ -1476,8 +1483,10 @@ module sh_bfm #(
             EXTRA_B1_DLY = 8ns;
          end
          default: begin
-            EXTRA_B0_DLY = 2ns;
-            EXTRA_B1_DLY = 4ns;
+//            EXTRA_B0_DLY = 2ns;
+//            EXTRA_B1_DLY = 4ns;
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
          end
       endcase
       case (clk_profile_c)
@@ -1490,8 +1499,10 @@ module sh_bfm #(
             EXTRA_C1_DLY = 2.5ns;
          end
          default: begin
-            EXTRA_C0_DLY = 1.66ns;
-            EXTRA_C1_DLY = 1.25ns;
+//            EXTRA_C0_DLY = 1.66ns;
+//            EXTRA_C1_DLY = 1.25ns;
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
          end
       endcase
       rst_n_i = 1'b0;
