@@ -283,8 +283,8 @@ cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
 assign cl_sh_pcim_awid = cl_sh_pcim_bus.awid;
 assign cl_sh_pcim_awaddr = cl_sh_pcim_bus.awaddr;
 assign cl_sh_pcim_awlen = cl_sh_pcim_bus.awlen;
-assign cl_sh_pcim_awsize = cl_sh_pcim_bus.awsize;
 assign cl_sh_pcim_awvalid = cl_sh_pcim_bus.awvalid;
+assign cl_sh_pcim_awsize = cl_sh_pcim_bus.awsize;
 assign cl_sh_pcim_bus.awready = sh_cl_pcim_awready;
 assign cl_sh_pcim_wdata = cl_sh_pcim_bus.wdata;
 assign cl_sh_pcim_wstrb = cl_sh_pcim_bus.wstrb;
@@ -298,15 +298,20 @@ assign cl_sh_pcim_bready = cl_sh_pcim_bus.bready;
 assign cl_sh_pcim_arid = cl_sh_pcim_bus.arid;
 assign cl_sh_pcim_araddr = cl_sh_pcim_bus.araddr;
 assign cl_sh_pcim_arlen = cl_sh_pcim_bus.arlen;
-assign cl_sh_pcim_arsize = cl_sh_pcim_bus.arsize;
 assign cl_sh_pcim_arvalid = cl_sh_pcim_bus.arvalid;
 assign cl_sh_pcim_bus.arready = sh_cl_pcim_arready;
+assign cl_sh_pcim_arsize = cl_sh_pcim_bus.arsize;
 assign cl_sh_pcim_bus.rid = sh_cl_pcim_rid;
 assign cl_sh_pcim_bus.rresp = sh_cl_pcim_rresp;
 assign cl_sh_pcim_bus.rvalid = sh_cl_pcim_rvalid;
 assign cl_sh_pcim_bus.rdata = sh_cl_pcim_rdata;
 assign cl_sh_pcim_bus.rlast = sh_cl_pcim_rlast;
 assign cl_sh_pcim_rready = cl_sh_pcim_bus.rready;
+
+// note: cl_sh_pcim_aruser/awuser are ignored by the shell
+// and the axi4 size is set fixed for 64-bytes
+//  cl_sh_pcim_arsize/awsize = 3'b6;
+
 cl_pcim_mstr CL_PCIM_MSTR (
 
      .aclk(clk),
@@ -316,10 +321,6 @@ cl_pcim_mstr CL_PCIM_MSTR (
 
      .cl_sh_pcim_bus     (cl_sh_pcim_bus)
 );
-
-///////////////////////////////////////////////////////////////////////
-///////////////// PCIM MSTR module ////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////// OCL SLAVE module ////////////////////////////////////
@@ -670,9 +671,10 @@ cl_vio CL_VIO (
 `include "unused_hmc_template.vh"
 `include "unused_aurora_template.vh"
 
-//tie-off unused CL outputs
-assign cl_sh_pcim_awuser = 0;
-assign cl_sh_pcim_aruser = 0;
-assign cl_sh_ddr_wid = 0;
+
+// Temporal workaround until these signals removed from the shell
+
+     assign cl_sh_pcim_awuser = 18'h0;
+     assign cl_sh_pcim_aruser = 18'h0;
 
 endmodule   
