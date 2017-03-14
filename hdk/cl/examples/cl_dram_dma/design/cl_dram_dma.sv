@@ -667,12 +667,10 @@ cl_vio CL_VIO (
 // Virtual JATG ILA Debug core example 
 //-----------------------------------------
 
+`include "unused_hmc_template.vh"
+`include "unused_aurora_template.vh"
 
 //tie-off unused CL outputs
-assign hmc_iic_scl_t = 1'b0;
-assign hmc_iic_sda_t = 1'b0;
-assign hmc_iic_sda_o = 1'b0;
-assign hmc_iic_scl_o = 1'b0;
 assign cl_sh_pcim_awuser = 0;
 assign cl_sh_pcim_aruser = 0;
 assign cl_sh_ddr_wid = 0;
