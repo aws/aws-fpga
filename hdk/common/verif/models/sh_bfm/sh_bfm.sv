@@ -613,6 +613,10 @@ module sh_bfm #(
       sh_cl_flr_assert <= 1'b0;
    end
 
+   initial begin
+      sh_cl_status_vdip <= 32'h0;
+   end
+
    always_ff @(posedge clk_core or negedge sync_rst_n)
      if (~sync_rst_n)
        intf_sync_rst_n <= 0;
@@ -1529,6 +1533,42 @@ module sh_bfm #(
 
    //=================================================
    //
+   // set_virtual_dip_switch
+   //
+   //   Description: writes virtual dip switches
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_virtual_dip_switch(int dip_switch);
+      sh_cl_status_vdip[dip_switch] = 1'b1;
+   endfunction
+
+   //=================================================
+   //
+   // read_virtual_dip_switch
+   //
+   //   Description: reads virtual dip switch status
+   //   Outputs: None
+   //
+   //=================================================
+   function logic[15:0] read_virtual_dip_switch(int dip_switch);
+      return sh_cl_status_vdip[dip_switch];
+   endfunction
+
+   //=================================================
+   //
+   // read_virtual_led
+   //
+   //   Description: reads virtual led status
+   //   Outputs: None
+   //
+   //=================================================
+   function logic[15:0] read_virtual_led(int vled);
+      return cl_sh_status_vled[vled];
+   endfunction
+
+   //=================================================
+   //
    // power_down
    //
    //   Description: deasserts various resets
@@ -1542,7 +1582,7 @@ module sh_bfm #(
       #50ns;
    endtask // power_down
 
-   task issue_flr(int slot_id = 0);
+   task issue_flr();
       sh_cl_flr_assert <= 1'b1;
       wait(cl_sh_flr_done == 1);
       sh_cl_flr_assert <= 1'b0;

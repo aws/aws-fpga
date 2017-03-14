@@ -50,7 +50,7 @@ module test_dram_dma();
        tb.card.fpga.sh.delay(25000);
 
        // issuing flr
-       tb.card.fpga.sh.issue_flr(0);
+       tb.card.fpga.sh.issue_flr();
 
        $display("[%t] : Initializing buffers", $realtime);
 

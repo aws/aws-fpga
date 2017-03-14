@@ -731,6 +731,9 @@ module fpga(
 
               .sh_cl_pwr_state(sh_cl_pwr_state),
 
+              .sh_cl_status_vdip(sh_cl_status_vdip),
+              .cl_sh_status_vled(cl_sh_status_vled),
+              
               .sh_cl_flr_assert(sh_cl_flr_assert),
               .cl_sh_flr_done(cl_sh_flr_done),
 
