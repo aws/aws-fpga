@@ -579,8 +579,10 @@ module sh_bfm #(
    always @(posedge clk_main_a0)
      rst_main_n <= rst_main_n_i;
 
-   assign kernel_rst_n = 1'b0;  // kernel reset is not used for non-SDAccel simulations.
-   
+   initial begin
+      kernel_rst_n = 1'b0;  // kernel reset is not used for non-SDAccel simulations.
+   end
+
    always_ff @(negedge rst_n or posedge clk_core)
      if (!rst_n)
        begin
@@ -1554,6 +1556,10 @@ module sh_bfm #(
    //=================================================
    function logic[15:0] read_virtual_led(int vled);
       return cl_sh_status_vled[vled];
+   endfunction
+
+   function void kernel_reset();
+      kernel_rst_n = 1'b1;
    endfunction
 
    //=================================================

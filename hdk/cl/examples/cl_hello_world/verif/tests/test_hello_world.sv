@@ -62,6 +62,8 @@ logic [15:0] vled_value;
 
       $display ("value of vled:%0x", vled_value);
 
+      tb.card.fpga.sh.kernel_reset();
+
       tb.card.fpga.sh.power_down();
       
       $finish;
