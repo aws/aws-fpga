@@ -13,18 +13,19 @@ set UNUSED_TEMPLATES_DIR $HDK_SHELL_DIR/design/interfaces
 #---- Developr would replace this section with design files ----
 
 ## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.
-file copy -force $CL_DIR/design/cl_hello_world_defines.vh		$TARGET_DIR
-file copy -force $CL_DIR/design/cl_hello_world.sv 			$TARGET_DIR 
-file copy -force $CL_DIR/../common/design/cl_common_defines.vh 		$TARGET_DIR 
+file copy -force $CL_DIR/design/cl_hello_world_defines.vh							$TARGET_DIR
+file copy -force $CL_DIR/design/cl_id_defines.vh		                  $TARGET_DIR
+file copy -force $CL_DIR/design/cl_hello_world.sv 			              $TARGET_DIR 
+file copy -force $CL_DIR/../common/design/cl_common_defines.vh 		    $TARGET_DIR 
 file copy -force $UNUSED_TEMPLATES_DIR/unused_apppf_irq_template.inc 	$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_aurora_template.inc 	$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_cl_sda_template.inc 	$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_aurora_template.inc 		$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_cl_sda_template.inc 		$TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_ddr_a_b_d_template.inc 	$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_ddr_c_template.inc 	$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_ddr_c_template.inc 	    $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_dma_pcis_template.inc 	$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_hmc_template.inc		$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_pcim_template.inc		$TARGET_DIR
-file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc	$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_hmc_template.inc				$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_pcim_template.inc				$TARGET_DIR
+file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc		$TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_flr_template.inc      	$TARGET_DIR
 
 # Make sure files have write permissions for the encryption

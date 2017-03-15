@@ -20,10 +20,14 @@ package require tar
 #################################################
 ## Command-line Arguments
 #################################################
-set timestamp     [lindex $argv 0]
-set strategy      [lindex $argv 1]
-set hdk_version   [lindex $argv 2]
-set shell_version [lindex $argv 3]
+set timestamp           [lindex $argv 0]
+set strategy            [lindex $argv 1]
+set hdk_version         [lindex $argv 2]
+set shell_version       [lindex $argv 3]
+set device_id           [lindex $argv 4]
+set vendor_id           [lindex $argv 5]
+set subsystem_id        [lindex $argv 6]
+set subsystem_vendor_id [lindex $argv 7]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
@@ -461,12 +465,16 @@ exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
 set manifest_file [open "$CL_DIR/build/checkpoints/to_aws/${timestamp}.manifest.txt" w]
 set hash [lindex [split [exec sha256sum $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp] ] 0]
 
-puts $manifest_file "MANIFEST_FORMAT_VERSION=1\n"
-puts $manifest_file "DCP_HASH=$hash\n"
-puts $manifest_file "SHELL_VERSION=$shell_version\n"
-puts $manifest_file "FILE_NAME=${timestamp}.SH_CL_routed.dcp\n"
-puts $manifest_file "HDK_VERSION=$hdk_version\n"
-puts $manifest_file "DATE=$timestamp\n"
+puts $manifest_file "manifest_format_version=1\n"
+puts $manifest_file "pci_vendor_id=$vendor_id\n"
+puts $manifest_file "pci_device_id=$device_id\n"
+puts $manifest_file "pci_subsystem_id=$subsystem_id\n"
+puts $manifest_file "pci_subsystem_vendor_id=$subsystem_vendor_id\n"
+puts $manifest_file "dcp_hash=$hash\n"
+puts $manifest_file "shell_version=$shell_version\n"
+puts $manifest_file "dcp_file_name=${timestamp}.SH_CL_routed.dcp\n"
+puts $manifest_file "hdk_version=$hdk_version\n"
+puts $manifest_file "date=$timestamp\n"
 
 close $manifest_file
 

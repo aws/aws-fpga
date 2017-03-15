@@ -21,6 +21,8 @@ module cl_dram_dma #(parameter NUM_DDR=4)
 
 );
 
+`include "cl_common_defines.vh"      // CL Defines for all examples
+`include "cl_id_defines.vh"          // Defines for ID0 and ID1 (PCI ID's)
 `include "cl_dram_dma_defines.vh"
 
 // TIE OFF ALL UNUSED INTERFACES
@@ -172,9 +174,6 @@ assign dbg_scrb_mem_sel[2:0] = sh_cl_ctl0_q[30:28];
    `define CL_VERSION 32'hee_ee_ee_00
 `endif  
 
-wire[31:0] id0 = 32'h1d50_6789; 
-wire[31:0] id1 = 32'h1d51_fedc; 
-   
 always_ff @(posedge clk)
     cl_sh_status0 <= dbg_scrb_en ? {1'b0, ddrc_scrb_bus.state, 
                                     1'b0, ddrd_scrb_bus.state, 
@@ -189,12 +188,12 @@ always_ff @(posedge clk)
     cl_sh_id0 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddrc_scrb_bus.addr[31:0] :
                                 dbg_scrb_mem_sel == 3'd2 ? ddrd_scrb_bus.addr[31:0] :
                                 dbg_scrb_mem_sel == 3'd1 ? ddrb_scrb_bus.addr[31:0] : ddra_scrb_bus.addr[31:0]) :
-                                id0; 
+                                `CL_SH_ID0; 
 always_ff @(posedge clk)
     cl_sh_id1 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddrc_scrb_bus.addr[63:32] :
                                 dbg_scrb_mem_sel == 3'd2 ? ddrd_scrb_bus.addr[63:32] :
                                 dbg_scrb_mem_sel == 3'd1 ? ddrb_scrb_bus.addr[63:32] : ddra_scrb_bus.addr[63:32]) :
-                                id1;
+                                `CL_SH_ID1;
 
 logic sh_cl_ddr_is_ready_q;
 always_ff @(posedge clk or negedge sync_rst_n)
