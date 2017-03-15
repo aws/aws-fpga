@@ -130,6 +130,9 @@ export HDK_COMMON_DIR=$HDK_DIR/common
 export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
 hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
 
+export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
+PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
+
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
