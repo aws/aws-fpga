@@ -86,6 +86,7 @@ set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
+
 #User design files (these are the files that were encrypted by encrypt.tcl)
 read_verilog -sv [ glob $ENC_SRC_DIR/*.?v ]
 

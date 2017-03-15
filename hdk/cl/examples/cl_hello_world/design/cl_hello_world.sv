@@ -333,6 +333,10 @@ assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
 `endif  
 
 
+  assign cl_sh_status0[31:0] =  32'h0000_0FF0;
+  assign cl_sh_status1[31:0] = `CL_VERSION;
+
+
 endmodule
 
 

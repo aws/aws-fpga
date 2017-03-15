@@ -78,8 +78,6 @@ puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
 
 
-
-
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
