@@ -4,9 +4,9 @@
 |:-----------------|:---------------:|:---------------:|
 |_***CL RTL Features***_|  |  |
 | DRAM  	         |     Not used  	 | Channel A,B,C,D  |
-| Register access (AXI-L)  | ocl_    | ocl_ , sda_ , bar1 	|
+| Register access (AXI-L)  | ocl_    | ocl_ , sda_ |
 | Bulk transfer: Instance to CL (AXI)  | Not Used    | pcis_dma 	|
-| Bulk transfer: CL to Instance (AXI)  | Not Used    | TBD 	|
+| Bulk transfer: CL to Instance (AXI)  | Not Used    | pcim | 	
 | FPGA Direct: CL to CL over PCIe  | Not Used    | Not Used 	|
 | FPGA Ring        |   	 Not used  	 |    Not Used   	 |
 | Virt. LED      	    |   	 Used  	 | Not Used |
@@ -14,7 +14,8 @@
 | [Virt. JTAG](../../docs/Virtual_JTAG_XVC.md)          |   	Not used     | Used 	|
 | Clocks used |    1 clock   |  2 clocks |
 | PCI Vendor ID	|   	0x150F (Amazon)  	|  0x150F (Amazon)   	|
-| PCI Device ID	|   	  	|   	|
+| PCI Device ID	| 0xF000  	| 0xF0FF  	|
+| PCI FLR support | Not Used | Not Used |
 |_***Software***_|  |  |
 | [fpga_pci lib](../../../sdk/userspace/include/fpga_pci.h)	|   	Used  	|  Used 	|
 | [fpga_mgmt lib](../../../sdk/userspace/include/fpga_mgmt.h)	|   	Used  	|  Used 	|
