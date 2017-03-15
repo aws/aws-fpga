@@ -1,9 +1,18 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
-// =============================================================================
+//---------------------------------------------------------------------------------------
+// Amazon FGPA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
 
 module cl_dram_dma #(parameter NUM_DDR=4) 
 
@@ -11,15 +20,38 @@ module cl_dram_dma #(parameter NUM_DDR=4)
    `include "cl_ports.vh"
 
 );
+
+`include "cl_dram_dma_defines.vh"
+
+// TIE OFF ALL UNUSED INTERFACES
+// Including all the unused interface to tie off
+// This list is put in the top of the fie to remind
+// developers to remve the specific interfaces
+// that the CL will use
+
+`include "unused_hmc_template.inc"
+`include "unused_aurora_template.inc"
+`include "unused_sh_bar1_template.inc"
+
+// Defining local parameters that will instantiate the
+// 3 DRAM controllers inside the CL
   
    localparam DDR_A_PRESENT = 1;
    localparam DDR_B_PRESENT = 1;
    localparam DDR_D_PRESENT = 1;
+
+// Define the addition pipeline stag
+// needed to close timing for the various
+// place where ATG (Automatic Test Generator)
+// is defined
    
    localparam NUM_CFG_STGS_CL_DDR_ATG = 4;
    localparam NUM_CFG_STGS_SH_DDR_ATG = 4;
    localparam NUM_CFG_STGS_PCIE_ATG = 4;
-   
+
+// To reduce RTL simulation time, only 8KiB of
+// each external DRAM is scrubbed in simulations
+
 `ifdef SIM
    localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
 `else   
@@ -283,8 +315,8 @@ cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
 assign cl_sh_pcim_awid = cl_sh_pcim_bus.awid;
 assign cl_sh_pcim_awaddr = cl_sh_pcim_bus.awaddr;
 assign cl_sh_pcim_awlen = cl_sh_pcim_bus.awlen;
-assign cl_sh_pcim_awsize = cl_sh_pcim_bus.awsize;
 assign cl_sh_pcim_awvalid = cl_sh_pcim_bus.awvalid;
+assign cl_sh_pcim_awsize = cl_sh_pcim_bus.awsize;
 assign cl_sh_pcim_bus.awready = sh_cl_pcim_awready;
 assign cl_sh_pcim_wdata = cl_sh_pcim_bus.wdata;
 assign cl_sh_pcim_wstrb = cl_sh_pcim_bus.wstrb;
@@ -298,15 +330,20 @@ assign cl_sh_pcim_bready = cl_sh_pcim_bus.bready;
 assign cl_sh_pcim_arid = cl_sh_pcim_bus.arid;
 assign cl_sh_pcim_araddr = cl_sh_pcim_bus.araddr;
 assign cl_sh_pcim_arlen = cl_sh_pcim_bus.arlen;
-assign cl_sh_pcim_arsize = cl_sh_pcim_bus.arsize;
 assign cl_sh_pcim_arvalid = cl_sh_pcim_bus.arvalid;
 assign cl_sh_pcim_bus.arready = sh_cl_pcim_arready;
+assign cl_sh_pcim_arsize = cl_sh_pcim_bus.arsize;
 assign cl_sh_pcim_bus.rid = sh_cl_pcim_rid;
 assign cl_sh_pcim_bus.rresp = sh_cl_pcim_rresp;
 assign cl_sh_pcim_bus.rvalid = sh_cl_pcim_rvalid;
 assign cl_sh_pcim_bus.rdata = sh_cl_pcim_rdata;
 assign cl_sh_pcim_bus.rlast = sh_cl_pcim_rlast;
 assign cl_sh_pcim_rready = cl_sh_pcim_bus.rready;
+
+// note: cl_sh_pcim_aruser/awuser are ignored by the shell
+// and the axi4 size is set fixed for 64-bytes
+//  cl_sh_pcim_arsize/awsize = 3'b6;
+
 cl_pcim_mstr CL_PCIM_MSTR (
 
      .aclk(clk),
@@ -316,10 +353,6 @@ cl_pcim_mstr CL_PCIM_MSTR (
 
      .cl_sh_pcim_bus     (cl_sh_pcim_bus)
 );
-
-///////////////////////////////////////////////////////////////////////
-///////////////// PCIM MSTR module ////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////// OCL SLAVE module ////////////////////////////////////
@@ -667,14 +700,9 @@ cl_vio CL_VIO (
 // Virtual JATG ILA Debug core example 
 //-----------------------------------------
 
+// Temporal workaround until these signals removed from the shell
 
-//tie-off unused CL outputs
-assign hmc_iic_scl_t = 1'b0;
-assign hmc_iic_sda_t = 1'b0;
-assign hmc_iic_sda_o = 1'b0;
-assign hmc_iic_scl_o = 1'b0;
-assign cl_sh_pcim_awuser = 0;
-assign cl_sh_pcim_aruser = 0;
-assign cl_sh_ddr_wid = 0;
+     assign cl_sh_pcim_awuser = 18'h0;
+     assign cl_sh_pcim_aruser = 18'h0;
 
 endmodule   

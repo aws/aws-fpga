@@ -15,6 +15,9 @@
 // limitations under the License.
 //---------------------------------------------------------------------------------------
 
+`ifndef CL_HELLO_WORLD_DEFINES
+`define CL_HELLO_WORLD_DEFINES
+
 //Put module name of the CL design here.  This is used to instantiate in top.sv
 `define CL_NAME cl_hello_world
 
@@ -35,4 +38,4 @@
 //    15: 0: PCIe Subsystem Vendor ID
 `define CL_SH_ID1       32'h1D51_FEDD
 
-
+`endif
