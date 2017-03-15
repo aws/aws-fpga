@@ -612,6 +612,11 @@ scrb_bus_t ddrd_scrb_bus_q();
      .m_axi_rready   (cl_sh_ddr_bus.rready)
    );
 
+// since the axi fifo module doesnt include arsize/awsize
+// we assign those manually
+// to fixed value of 6, indicated 2^6=64 bytes per beat (512-bit bus)
+assign cl_sh_ddr_bus.arsize=3'h6;
+assign cl_sh_ddr_bus.awsize=3'h6;
 
 //---------------------------- 
 // flop the output of interconnect for DDRA 

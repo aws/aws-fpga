@@ -1,13 +1,13 @@
 ## =============================================================================
 ## Copyright 2016 Amazon.com, Inc. or its affiliates.
 ## All Rights Reserved Worldwide.
-## Amazon Confidential information
-## Restricted NDA Material
 ## create_cl.tcl: Build to generate CL design checkpoint based on
 ## 		developer code
 ## =============================================================================
 
 package require tar
+
+set TOP cl_hello_world 
 
 #################################################
 ## Command-line Arguments
@@ -69,7 +69,6 @@ set_param chipscope.enablePRFlow true
 ## Read design files
 #############################
 
-#---- User would replace this section -----
 
 #Convenience to set the root of the RTL directory
 set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
@@ -77,6 +76,7 @@ set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
 read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
+
 
 puts "AWS FPGA: Reading AWS Shell design";
 
@@ -141,23 +141,23 @@ puts "AWS FPGA: Start design synthesis";
 switch $strategy {
     "BASIC" {
         puts "BASIC strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
     }
     "TIMING" {
         puts "TIMING strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
     }
     "CONGESTION" {
         puts "CONGESTION strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        synth_design -top cl_hello_world -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers
     }
     default {
         puts "$strategy is NOT a valid strategy."

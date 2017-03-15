@@ -26,6 +26,10 @@ set CL_DIR $::env(CL_DIR)
 set TARGET_DIR $CL_DIR/build/src_post_encryption
 set UNUSED_TEMPLATES_DIR $HDK_SHELL_DIR/design/interfaces
 
+
+# Remove any previously encrypted files, that may no longer be used
+exec rm -f $TARGET_DIR/*
+
 #---- Developr would replace this section with design files ----
 
 ## Change file names and paths below to reflect your CL area.  DO NOT include AWS RTL files.
@@ -54,7 +58,9 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc           $TA
 
 
 # Make sure files have write permissions for the encryption
-exec chmod +w {*}[glob $TARGET_DIR/*.*v*]
+
+exec chmod +w {*}[glob $TARGET_DIR/*]
+
 
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog [ glob $TARGET_DIR/*.* ]
 
