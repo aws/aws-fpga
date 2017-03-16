@@ -305,7 +305,8 @@ module cl_mstr_axi_tst #(parameter DATA_WIDTH = 512,
        8'h8C : tst_cfg_rdata <= cfg_r_id;
        8'h90 : tst_cfg_rdata <= cfg_r_user;
 
-       default: tst_cfg_rdata <= 32'hdeaddead;
+     //default: tst_cfg_rdata <= 32'hdeaddead;
+       default: tst_cfg_rdata <= `UNIMPLEMENTED_REG_VALUE;
      endcase // case (cfg_addr_q)
 
 
