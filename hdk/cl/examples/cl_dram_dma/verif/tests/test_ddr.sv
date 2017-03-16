@@ -7,6 +7,8 @@
 
 module test_ddr();
 
+   import tb_type_defines_pkg::*;
+
    logic [63:0]   base_addr;
 
    int            error_count;
@@ -16,15 +18,14 @@ module test_ddr();
       error_count = 0;
       fail = 0;
 
-      tb.sh.power_up();
-      tb.sh.delay(500);
-      tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
-      tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
-      tb.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
+      tb.power_up();
+      tb.card.fpga.sh.nsec_delay(500);
+      tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
+      tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
+      tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
-      // NOTE: All of the DDR controllers are ready at about the same time
-      $display("[%t] : Waiting for DDR initialization", $realtime);
-      wait (tb.CL.all_ddr_is_ready[0]);
+      // allow memory to initialize
+      tb.card.fpga.sh.nsec_delay(25000);
 
       //---------------------------
       // Program CL registers and start reads and writes
@@ -54,7 +55,7 @@ module test_ddr();
 
       // Power down
       #500ns;
-      tb.sh.power_down();
+      tb.power_down();
 
       //---------------------------
       // Report pass/fail status
@@ -92,48 +93,48 @@ module test_ddr();
 
          // CL Config
          write_data = 32'h0100_0018; // Enable Incr ID mode, Sync mode, and Read Compare
-         tb.sh.poke(.addr(base_addr + 64'h000), .data(write_data), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h000), .data(write_data), .intf(AxiPort::PORT_OCL));
 
          // Set the max number of read requests
-         tb.sh.poke(.addr(base_addr + 64'h014), .data(32'h0000_000f), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h014), .data(32'h0000_000f), .intf(AxiPort::PORT_OCL));
 
          // Initial write index
-         tb.sh.poke(.addr(base_addr + 64'h01c), .data(32'h0000_0000), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h01c), .data(32'h0000_0000), .intf(AxiPort::PORT_OCL));
 
          // Addr low
-         tb.sh.poke(.addr(base_addr + 64'h020), .data(test_addr[31:0]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h020), .data(test_addr[31:0]), .intf(AxiPort::PORT_OCL));
 
          // Addr high
-         tb.sh.poke(.addr(base_addr + 64'h024), .data(test_addr[63:32]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h024), .data(test_addr[63:32]), .intf(AxiPort::PORT_OCL));
 
          // Write data
-         tb.sh.poke(.addr(base_addr + 64'h028), .data(test_data[31:0]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h028), .data(test_data[31:0]), .intf(AxiPort::PORT_OCL));
 
          // Write user and instruction length
-         tb.sh.poke(.addr(base_addr + 64'h02c), .data(32'h0000_0007), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h02c), .data(32'h0000_0007), .intf(AxiPort::PORT_OCL));
 
          // Initial read index
-         tb.sh.poke(.addr(base_addr + 64'h03c), .data(32'h0000_0000), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h03c), .data(32'h0000_0000), .intf(AxiPort::PORT_OCL));
 
          // Addr low
-         tb.sh.poke(.addr(base_addr + 64'h040), .data(test_addr[31:0]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h040), .data(test_addr[31:0]), .intf(AxiPort::PORT_OCL));
 
          // Addr high
-         tb.sh.poke(.addr(base_addr + 64'h044), .data(test_addr[63:32]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h044), .data(test_addr[63:32]), .intf(AxiPort::PORT_OCL));
 
          // Read data (same as write data)
-         tb.sh.poke(.addr(base_addr + 64'h048), .data(test_data[31:0]), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h048), .data(test_data[31:0]), .intf(AxiPort::PORT_OCL));
 
          // Read user and instruction length
-         tb.sh.poke(.addr(base_addr + 64'h04c), .data(32'h0000_0007), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h04c), .data(32'h0000_0007), .intf(AxiPort::PORT_OCL));
 
          // Number of instructions ([31:16] for read, [15:0] for write)
-         tb.sh.poke(.addr(base_addr + 64'h010), .data(32'h0000_0000), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h010), .data(32'h0000_0000), .intf(AxiPort::PORT_OCL));
 
          $display("[%t] : Starting DDR write and read activity from cl_tst", $realtime);
 
          // Start reads and writes ([1] for reads, [0] for writes)
-         tb.sh.poke(.addr(base_addr + 64'h008), .data(32'h0000_0003), .intf(2));
+         tb.card.fpga.sh.poke(.addr(base_addr + 64'h008), .data(32'h0000_0003), .intf(AxiPort::PORT_OCL));
 
          // Wait for writes and reads to complete
          #5000ns;
@@ -142,7 +143,7 @@ module test_ddr();
 
          timeout_count = 0;
          do begin
-            tb.sh.peek(.addr(base_addr + 64'h008), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h008), .data(read_data), .intf(AxiPort::PORT_OCL));
             timeout_count++;
          end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
 
@@ -151,15 +152,15 @@ module test_ddr();
             error_count++;
          end else begin
             // Stop reads and writes ([1] for reads, [0] for writes)
-            tb.sh.poke(.addr(base_addr + 64'h008), .data(32'h0000_0000), .intf(2));
+            tb.card.fpga.sh.poke(.addr(base_addr + 64'h008), .data(32'h0000_0000), .intf(AxiPort::PORT_OCL));
 
             $display("[%t] : Checking some register values", $realtime);
 
             cycle_count = 64'h0;
             // Check that the write timer value is non-zero
-            tb.sh.peek(.addr(base_addr + 64'h0f0), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h0f0), .data(read_data), .intf(AxiPort::PORT_OCL));
             cycle_count[31:0] = read_data;
-            tb.sh.peek(.addr(base_addr + 64'h0f4), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h0f4), .data(read_data), .intf(AxiPort::PORT_OCL));
             cycle_count[63:32] = read_data;
             if (cycle_count == 64'h0) begin
                $display("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
@@ -168,9 +169,9 @@ module test_ddr();
 
             cycle_count = 64'h0;
             // Check that the read timer value is non-zero
-            tb.sh.peek(.addr(base_addr + 64'h0f8), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h0f8), .data(read_data), .intf(AxiPort::PORT_OCL));
             cycle_count[31:0] = read_data;
-            tb.sh.peek(.addr(base_addr + 64'h0fc), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h0fc), .data(read_data), .intf(AxiPort::PORT_OCL));
             cycle_count[63:32] = read_data;
             if (cycle_count == 64'h0) begin
                $display("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
@@ -180,13 +181,13 @@ module test_ddr();
             $display("[%t] : Checking for read compare errors", $realtime);
 
             // Check for compare error
-            tb.sh.peek(.addr(base_addr + 64'h0b0), .data(read_data), .intf(2));
+            tb.card.fpga.sh.peek(.addr(base_addr + 64'h0b0), .data(read_data), .intf(AxiPort::PORT_OCL));
             if (read_data != 32'h0000_0000) begin
-               tb.sh.peek(.addr(base_addr + 64'h0b4), .data(read_data), .intf(2));
+               tb.card.fpga.sh.peek(.addr(base_addr + 64'h0b4), .data(read_data), .intf(AxiPort::PORT_OCL));
                error_addr[31:0] = read_data;
-               tb.sh.peek(.addr(base_addr + 64'h0b8), .data(read_data), .intf(2));
+               tb.card.fpga.sh.peek(.addr(base_addr + 64'h0b8), .data(read_data), .intf(AxiPort::PORT_OCL));
                error_addr[63:32] = read_data;
-               tb.sh.peek(.addr(base_addr + 64'h0bc), .data(read_data), .intf(2));
+               tb.card.fpga.sh.peek(.addr(base_addr + 64'h0bc), .data(read_data), .intf(AxiPort::PORT_OCL));
                error_index = read_data[3:0];
                $display("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
                error_count++;
