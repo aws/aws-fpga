@@ -80,6 +80,12 @@ then
 	exit 1
 fi
 
+if ! [ $CL_DIR ]
+then
+	echo "ERROR: CL_DIR environment variable is not set. Set CL_DIR to a valid directory."
+	exit 1
+fi
+
 if ! [ $HDK_DIR ]
 then
 	echo "ERROR: HDK_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
@@ -120,8 +126,18 @@ hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk 
 # Get the Shell Version
 shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
 
+# Get the PCIe Device & Vendor ID from ID0
+id0_version=$(grep 'CL_SH_ID0' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+device_id=${id0_version:0:4};
+vendor_id=${id0_version:4:4};
+
+# Get the PCIe Subsystem & Subsystem Vendor ID from ID1
+id1_version=$(grep 'CL_SH_ID1' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+subsystem_id=${id1_version:0:4};
+subsystem_vendor_id=${id1_version:4:4};
+
 # Run vivado
-cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version"
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   
