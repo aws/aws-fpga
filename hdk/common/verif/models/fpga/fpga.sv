@@ -103,8 +103,6 @@ module fpga(
             
             );
 
-   parameter NUM_DDR = 4;
-   
    // PCIe IDs
    logic [31:0] cl_sh_id0;
    logic [31:0] cl_sh_id1;
@@ -713,7 +711,7 @@ module fpga(
 `endif
 
    //Developer put top level here (replace cl_simple, with top level)
-   `CL_NAME #(.NUM_DDR(NUM_DDR)) CL 
+   `CL_NAME CL 
              (
               .clk_main_a0(clk_main_a0),
               .clk_extra_a1(clk_extra_a1),

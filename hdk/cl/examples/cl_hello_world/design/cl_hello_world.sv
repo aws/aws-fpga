@@ -26,6 +26,9 @@ module cl_hello_world
 `include "cl_id_defines.vh"          // Defines for ID0 and ID1 (PCI ID's)
 `include "cl_hello_world_defines.vh" // CL Defines for cl_hello_world
 
+logic rst_main_n_sync;
+
+
 //--------------------------------------------0
 // Start with Tie-Off of Unused Interfaces
 //---------------------------------------------
@@ -65,7 +68,6 @@ module cl_hello_world
 // Reset Synchronization
 //-------------------------------------------------
 logic pre_sync_rst_n;
-logic rst_main_n_sync;
 
 always_ff @(negedge rst_main_n or posedge clk_main_a0)
    if (!rst_main_n)

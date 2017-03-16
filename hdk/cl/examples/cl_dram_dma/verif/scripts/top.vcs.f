@@ -14,6 +14,8 @@
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
 
++incdir+${CL_ROOT}/../common/design
++incdir+${CL_ROOT}/design
 +incdir+${CL_ROOT}/verif/sv
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
