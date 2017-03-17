@@ -202,28 +202,14 @@ The clocks within each group are generated from a common VCO/PLL, which restrict
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
-** *Note: The Developer must NOT assume any phase alignment between clock sources* **
 ** *Note: The Developer must NOT assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies * **  
 
 
 ### Defining Clock frequencies by Developer
 
-There Developer can select among a set of available frequencies, provided in the table below. The target frequencies must defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.
+There Developer can select among a set of available frequencies, provided in the [clock recipe table](./clock_recipes.cvs), and recipe names are called Ax, By, Cz  for group A recipe x, group B recipe y and group C recipe z respectively.
 
- .  **FIXME NEED TO PUT TABLE OF FREQUENCIES**
-
-### Default Clock Frequency setting if a clock group is missing from the AFI Manifest
-
-   clk_main_a0:   125MHz
-   clk_extra_a1:  125MHz
-   clk_extra_a2:  375MHz
-   clk_extra_a3:  500MHz
-
-   clk_extra_b0:  250MHz
-   clk_extra_b1:  125MHz
-
-   clk_extra_c0:  300MHz
-   clk_extra_c1:  400MHz
+Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.  Group B and C recipes are optional in the manifest file, and if they are missing, the recipe B0 and/or C0 are used as default.
 
 ## Reset
 
