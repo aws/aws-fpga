@@ -45,14 +45,14 @@ module test_int();
             write_data |= 1'b1 << vector_num;
             write_data |= 1'b1 << vector_num2;
             int_pend = write_data[15:0];
-            tb.card.fpga.sh.poke(.addr(base_addr + 64'h000), .data(write_data), .intf(AxiPort::PORT_OCL));
+            tb.poke(.addr(base_addr + 64'h000), .data(write_data), .intf(AxiPort::PORT_OCL));
 
             timeout_count = 0;
             do begin
-               tb.card.fpga.sh.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(AxiPort::PORT_OCL));
+               tb.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(AxiPort::PORT_OCL));
                if (|read_data[31:16]) begin
                   int_pend &= ~(read_data[31:16]);
-                  tb.card.fpga.sh.poke(.addr(base_addr + 64'h000), .data({read_data[31:16], 16'h0000}), .intf(AxiPort::PORT_OCL));
+                  tb.poke(.addr(base_addr + 64'h000), .data({read_data[31:16], 16'h0000}), .intf(AxiPort::PORT_OCL));
                end
                timeout_count++;
                if (timeout_count == 100) begin
@@ -65,7 +65,7 @@ module test_int();
                end
             end while ((int_pend !== 16'h0000) && (timeout_count < 100));
 
-            tb.card.fpga.sh.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(AxiPort::PORT_OCL));
+            tb.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(AxiPort::PORT_OCL));
             if (read_data !== 32'h0000_0000) begin
                if (vector_num !== vector_num2) begin
                   $display("[%t] : *** ERROR *** Done bits were not cleared for vectors %2d, %2d.", $realtime, vector_num, vector_num2);
