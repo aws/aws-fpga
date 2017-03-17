@@ -97,14 +97,26 @@ import tb_type_defines_pkg::*;
 begin \
    case (slot_id) \
    0: tb.card.fpga.sh.ARG; \
-`ifdef CARD_1 \
-   1: tb.`CARD_1.fpga.sh.ARG; \
+`ifdef SLOT_1 \
+   1: tb.`SLOT_1.fpga.sh.ARG; \
 `endif \
-`ifdef CARD_2 \
-   2: tb.`CARD_2.fpga.sh.ARG; \
+`ifdef SLOT_2 \
+   2: tb.`SLOT_2.fpga.sh.ARG; \
 `endif \
-`ifdef CARD_3 \
-   3: tb.`CARD_3.fpga.sh.ARG; \
+`ifdef SLOT_3 \
+   3: tb.`SLOT_3.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_4 \
+   4: tb.`SLOT_4.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_5 \
+   5: tb.`SLOT_5.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_6 \
+   6: tb.`SLOT_6.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_7 \
+   7: tb.`SLOT_7.fpga.sh.ARG; \
 `endif \
    default: begin \
       $display("Error: Invalid Slot ID specified."); \
@@ -117,14 +129,26 @@ end
 begin \
    case (slot_id) \
    0: return tb.card.fpga.sh.ARG; \
-`ifdef CARD_1 \
-   1: return tb.`CARD_1.fpga.sh.ARG; \
+`ifdef SLOT_1 \
+   1: return tb.`SLOT_1.fpga.sh.ARG; \
 `endif \
-`ifdef CARD_2 \
-   2: return tb.`CARD_2.fpga.sh.ARG; \
+`ifdef SLOT_2 \
+   2: return tb.`SLOT_2.fpga.sh.ARG; \
 `endif \
-`ifdef CARD_3 \
-   3: return tb.`CARD_3.fpga.sh.ARG; \
+`ifdef SLOT_3 \
+   3: return tb.`SLOT_3.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_4 \
+   4: return tb.`SLOT_4.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_5 \
+   5: return tb.`SLOT_5.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_6 \
+   6: return tb.`SLOT_6.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_7 \
+   7: return tb.`SLOT_7.fpga.sh.ARG; \
 `endif \
    default: begin \
       $display("Error: Invalid Slot ID specified."); \
