@@ -1533,7 +1533,7 @@ module sh_bfm #(
    //
    //=================================================
    function void set_virtual_dip_switch(int dip_switch);
-      sh_cl_status_vdip[dip_switch] = 1'b1;
+      sh_cl_status_vdip = dip_switch[15:0];
    endfunction
 
    //=================================================
@@ -1544,8 +1544,8 @@ module sh_bfm #(
    //   Outputs: dip_status
    //
    //=================================================
-   function logic[15:0] read_virtual_dip_switch(int dip_switch);
-      return sh_cl_status_vdip[dip_switch];
+   function logic[15:0] read_virtual_dip_switch();
+      return sh_cl_status_vdip;
    endfunction
 
    //=================================================
@@ -1556,8 +1556,8 @@ module sh_bfm #(
    //   Outputs: led status
    //
    //=================================================
-   function logic[15:0] read_virtual_led(int vled);
-      return cl_sh_status_vled[vled];
+   function logic[15:0] read_virtual_led();
+      return cl_sh_status_vled;
    endfunction
 
    //=================================================
@@ -1568,8 +1568,8 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   function void kernel_reset();
-      kernel_rst_n = 1'b1;
+   function void kernel_reset(input logic d = 1);
+      kernel_rst_n = d;
    endfunction
 
    //=================================================
@@ -1587,10 +1587,18 @@ module sh_bfm #(
       #50ns;
    endtask // power_down
 
+   //=================================================
+   //
+   // issue_flr
+   //
+   //   Description: issue a FLR command
+   //   Outputs: None
+   //
+   //=================================================
    task issue_flr();
-      sh_cl_flr_assert <= 1'b1;
+      sh_cl_flr_assert = 1'b1;
       wait(cl_sh_flr_done == 1);
-      sh_cl_flr_assert <= 1'b0;
+      sh_cl_flr_assert = 1'b0;
    endtask
 
    //=================================================
@@ -1617,10 +1625,10 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task set_ack_bit(input int int_num);
+   function void set_ack_bit(input int int_num);
       int_ack[int_num] = 1'b1;
       int_pend[int_num] = 1'b0;
-   endtask
+   endfunction
 
    //=================================================
    //

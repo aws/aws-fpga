@@ -20,18 +20,18 @@ logic [15:0] vled_value;
 
    initial begin
 
-      tb.card.fpga.sh.power_up();
+      tb.power_up();
       
-      tb.card.fpga.sh.set_virtual_dip_switch(0);
+      tb.set_virtual_dip_switch(.dip(0));
 
-      vdip_value = tb.card.fpga.sh.read_virtual_dip_switch(0);
+      vdip_value = tb.read_virtual_dip_switch();
 
       $display ("value of vdip:%0x", vdip_value);
 
       $display ("Writing 0xDEAD_BEEF to address 0x%x", `HELLO_WORLD_REG_ADDR);
-      tb.card.fpga.sh.poke(`HELLO_WORLD_REG_ADDR, 32'hDEAD_BEEF, AXI_ID, DataSize::UINT16, AxiPort::PORT_OCL); // write register
+      tb.poke(.addr(`HELLO_WORLD_REG_ADDR), .data(32'hDEAD_BEEF), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL)); // write register
 
-      tb.card.fpga.sh.peek(`HELLO_WORLD_REG_ADDR, rdata, AXI_ID, DataSize::UINT16, AxiPort::PORT_OCL);         // start read & write
+      tb.peek(.addr(`HELLO_WORLD_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read & write
       $display ("Reading 0x%x from address 0x%x", rdata, `HELLO_WORLD_REG_ADDR);
 
       if (rdata == 32'hEFBE_ADDE) // Check for byte swap in register read
@@ -39,7 +39,7 @@ logic [15:0] vled_value;
       else
         $display ("Test FAILED");
 
-      tb.card.fpga.sh.peek(`VLED_REG_ADDR, rdata, AXI_ID, DataSize::UINT16, AxiPort::PORT_OCL);         // start read
+      tb.peek(.addr(`VLED_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
       if (rdata == 32'h0000_BEEF) // Check for LED register read
@@ -47,13 +47,13 @@ logic [15:0] vled_value;
       else
         $display ("Test FAILED");
 
-      vled_value = tb.card.fpga.sh.read_virtual_led(0);
+      vled_value = tb.read_virtual_led();
 
       $display ("value of vled:%0x", vled_value);
 
-      tb.card.fpga.sh.kernel_reset();
+      tb.kernel_reset();
 
-      tb.card.fpga.sh.power_down();
+      tb.power_down(.slot_id(1));
       
       $finish;
    end
