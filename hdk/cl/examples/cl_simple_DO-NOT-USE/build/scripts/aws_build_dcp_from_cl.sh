@@ -1,1 +1,0 @@
-../../../../../common/shell_latest/build/scripts/aws_build_dcp_from_cl.sh

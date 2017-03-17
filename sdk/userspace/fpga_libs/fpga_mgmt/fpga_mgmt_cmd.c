@@ -250,7 +250,18 @@ err:
 static int
 fpga_mgmt_mbox_attach(int slot_id)
 {
+	/* slot_id not validated on internal function */
 	int ret;
+	pci_bar_handle_t handle;
+
+	ret = fpga_pci_attach(slot_id,
+	                      FPGA_MGMT_PF,
+	                      F1_MBOX_RESOURCE_NUM,
+	                      0 /* flags */,
+	                      &handle);
+	fail_on(ret != 0, err, "Unable to attach to mbox bar");
+
+	fpga_mgmt_state.slots[slot_id].handle = handle;
 
 	struct fpga_hal_mbox mbox = {
 		.slot = slot_id,
@@ -264,32 +275,39 @@ fpga_mgmt_mbox_attach(int slot_id)
 	ret = fpga_hal_mbox_attach(true); /**< clear_state=true */
 	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
-	fpga_mgmt_state.plat_attached = true;
-
 	return 0;
 err:
 	return -1;
 }
 
 static int
-fpga_mgmt_mbox_detach(void)
+fpga_mgmt_mbox_detach(int slot_id)
 {
-	if (fpga_mgmt_state.plat_attached) {
+	if (fpga_mgmt_state.slots[slot_id].handle != PCI_BAR_HANDLE_INIT) {
 		int ret = fpga_hal_mbox_detach(true); /**< clear_state=true */
 		if (ret != 0) {
 			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
 			/** Continue with plat detach */
 		}
 
-		ret = fpga_plat_detach();
-		fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-		fpga_mgmt_state.plat_attached = false;
+		ret = fpga_pci_detatch(fpga_mgmt_state.slots[slot_id].handle);
+		if (ret != 0) {
+			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
+			/* Continue with detach */
+		}
+		fpga_mgmt_state.slots[slot_id].handle = PCI_BAR_HANDLE_INIT;
 	}
 
 	return 0;
-err:
-	return -1;
+}
+
+int fpga_mgmt_detach_all(void)
+{
+	int ret = 0;
+	for (unsigned int i = 0; i < sizeof_array(fpga_mgmt_state.slots); ++i) {
+		ret |= fpga_mgmt_mbox_detach(i);
+	}
+	return (ret == 0) ? 0 : -1;
 }
 
 /**
@@ -389,14 +407,18 @@ fpga_mgmt_process_cmd(int slot_id,
 {
 	int ret, ret2;
 
+	fail_slot_id(slot_id, err, ret);
+
 	ret = fpga_mgmt_mbox_attach(slot_id);
-	fail_on_quiet(ret, out, "fpga_mgmt_mbox_attach failed");
+	fail_on_quiet(ret, err, "fpga_mgmt_mbox_attach failed");
 
 	ret = fpga_mgmt_send_cmd(cmd, rsp, len);
-	fail_on_quiet(ret, out, "fpga_mgmt_send_cmd failed");
+	fail_on_quiet(ret, err_detach, "fpga_mgmt_send_cmd failed");
 
-out:
-	ret2 = fpga_mgmt_mbox_detach();
+	return 0;
+err_detach:
+	ret2 = fpga_mgmt_mbox_detach(slot_id);
+err:
 	if (ret) {
 		return ret;
 	} else {

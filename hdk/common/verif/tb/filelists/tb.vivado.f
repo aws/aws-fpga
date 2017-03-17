@@ -10,8 +10,14 @@
 $XILINX_VIVADO/data/verilog/src/glbl.v
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/ddr.vivado.f
- 
+
+${HDK_COMMON_DIR}/verif/models/sh_bfm/axi_bfm_defines.svh
+${HDK_COMMON_DIR}/verif/tb/sv/tb_type_defines_pkg.sv
+
 ${HDK_COMMON_DIR}/verif/models/sh_bfm/sh_bfm.sv
+${HDK_COMMON_DIR}/verif/models/sh_bfm/axil_bfm.sv
+${HDK_COMMON_DIR}/verif/models/fpga/fpga.sv
+${HDK_COMMON_DIR}/verif/models/fpga/card.sv
 ${HDK_COMMON_DIR}/verif/tb/sv/tb.sv
 
 

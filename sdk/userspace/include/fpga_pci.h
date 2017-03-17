@@ -33,14 +33,8 @@ enum {
     MGMT_PF_BAR_MAX
 };
 
-/* physical function definitions */
-enum {
-    FPGA_APP_PF,
-    FPGA_MGMT_PF,
-    FPGA_MAX_PF
-};
-
 typedef int pci_bar_handle_t;
+#define PCI_BAR_HANDLE_INIT (-1)
 
 /**
  * Initialize the pci library.
@@ -64,6 +58,11 @@ int fpga_pci_init(void);
  * @returns 0 on success, non-zero on error
  */
 int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
+
+/**
+ */
+int fpga_pci_attach_2(struct fpga_pci_resource_map *map, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
+
 /**
  * Flags used to specify options for fpga_pci_attach.
  */
@@ -142,4 +141,16 @@ int fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value);
  * @param[out] spec     Pointer to fpga_slot spec to populate
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_get_slot_spec(int slot_id, int pf_id, int bar_id, struct fpga_slot_spec *spec);
+int fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec);
+
+/**
+ */
+int fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size);
+
+/**
+ */
+int fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map);
+
+/**
+ */
+int fpga_pci_rescan_slot_app_pfs(int slot_id);

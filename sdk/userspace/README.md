@@ -1,12 +1,18 @@
-# AWS EC2 FPGA SDK Management directories
+# AWS EC2 FPGA SDK Userspace Software
 
-The [fpga_image_tools directory](./fpga_image_tools) contains the [Amazon FPGA Image (AFI) Management Tools](./fpga_image_tools/README.md).
+The [Programmer's View](../../hdk/docs/Programmers_View.md) describes all the runtime software components that would be used in an FPGA-enabled EC2 instance like F1. It supports linux operating systems only.
 
-APIs, Hardware Abstraction Layers (HALs), and utilities needed for building the AFI Management Tools are found in the [`include`](./include), [`hal`](./hal), and [`utils`](./utils) directories.
+This directory contains the source and build files for the needed components:
 
-The developer have one of two options to use the management tools:
+1. The [fpga_image_tools directory](./fpga_image_tools) contains  [Amazon FPGA Image (AFI) Management Tools](./fpga_image_tools/README.md): A linux shell commands to manage AFI, Virtual JTAG, Virtual LED and DIPSwitches. Calling [`sdk_setup.sh`](../sdk_setup.sh) will compile and install the tools. 
 
-1) Compile and install the reference tools found under [`/fpga_image_tool` directory](./fpga_image_tools). Once the install is successful, the developer can use these tools through linux shell command line.
+2. The [Include directory](./include) contains the header files required for integration with a C/C++ application.
 
-2) Integrate the provided source code into the developer C/C++ application for performing FPGA management without invoking shell command line.
+3. The [FPGA Libraries](./fpga_libs) contains source files for fpga_pci and fpga_mgmt libraries: libraries used to integrate with C/C++ applications, and need to be compiled and statically linked with the C/C++ applications. The [CL Examples](../../hdk/cl/examples) have example applications builds that use these libraries
+
+4. The [Utility](./utils) contains source files for various utilities used by the fpga_libs and fpga_image_tools, like logging services.
+
+
+
+
 

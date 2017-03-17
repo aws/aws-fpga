@@ -15,4 +15,4 @@
 # permissions and limitations under the License.
 #
 
-fpga-local-cmd GetVirtualDIP "$@
+fpga-local-cmd GetVirtualDIP "$@"

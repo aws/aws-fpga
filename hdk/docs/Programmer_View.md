@@ -8,9 +8,9 @@ There are two parts required to work with AWS FPGA: Management and Runtime, and 
 
 1. **Management Interface**: required for loading/clearing an AFI, checking the status of an AFI, debug of the AFI, Emulated LEDs and Emulated DIP Switches. The management interface is provided in one of three options, one or more can be used concurrently:
 
-  **\[A\]** As linux shell commands called [FPGA Management Tools](../../sdk/management/fpga_image_tools/README.md).
+  **\[A\]** As linux shell commands called [FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md).
   
-  **\[B\]** As a C-library called [FPGA Management Lib](../../sdk/management/lib/) to be compiled with the developer's C/C++ application.
+  **\[B\]** As a C-library called [FPGA Management Lib](../../sdk/userspace/lib/) to be compiled with the developer's C/C++ application.
   
   **\[C\]** Pre-integrated with [OpenCL runtime library](../../sdk/SDAccel)
   

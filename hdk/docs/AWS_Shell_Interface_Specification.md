@@ -11,18 +11,23 @@
   
 # Table of Content:
 
-1. Overview(#overview)
+[1. Overview](#overview)
 
-2. EC2 Instance view of FPGA PCIe(#pciPresentation)
+[2. EC2 Instance view of FPGA PCIe](#pciPresentation)
 
-3. Clocks and Reset(#ClocksNReset)
+[3. Clocks and Reset](#ClocksNReset)
 
-4. Shell/CL Interfaces(#ShellInterface)
-  4.1 Interrupts(#interrupts)
-  4.2 DDR4 DRAM Interfaces(#ddr)
-  4.3 Miscellanous Interfaces (vLED, vDIP..)(#misc)
+[4. Shell/CL Interfaces](#ShellInterfaces)
 
-# Overview<a name="overview"></a>
+  - [Interrupts](#interrupts)
+  
+  - [DDR4 DRAM Interfaces](#ddr)
+  
+  - [Miscellanous Interfaces(vLED, vDIP..)](#misc)
+  
+
+<a name="overview"></a>
+# Overview
 
 With F1, each FPGA is divided into two partitions:
 
@@ -33,8 +38,6 @@ With F1, each FPGA is divided into two partitions:
 At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI)
 
 This document specifies the hardware interface and functional behavior between the SH and the CL; specifically the Shell design for xvu9p architecture used in EC2 F1 instance.
-
-Full details of the available FPGA enabled instances are [here](https://aws.amazon.com/ec2/instance-types/f1/)
   
   
 ## Architecture and Version
@@ -60,8 +63,8 @@ New shell versions will require updated CL implementation and regenerating the A
 **S –** Typical refers to the Slave side of AXI bus.  
   
   
-
-# Shell Interfaces<a name="ShellInterfaces"></a>
+<a name="ShellInterfaces"></a>
+# Shell Interfaces
 
 
 The F1 FPGA platform includes the following interfaces available to the
@@ -121,7 +124,8 @@ These parameters are used to control which DDR controllers are impemented in the
 
 **NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
-# FPGA PCIe Presentation to EC2 Instance<a name="pciPresentation"></a>
+<a name="pciPresentation"></a>
+# FPGA PCIe Representation to EC2 Instance
 
 There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
@@ -129,7 +133,7 @@ There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
 -   Application PF (AppPF)– The AppPF is used for CL specific functionality.
 
-The [Software Programmers' View](./Programmers_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs. 
+The [Software Programmers' View](./Programmer_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs. 
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
@@ -174,8 +178,8 @@ e)  CL’s specific PCIe VendorID, DeviceID, VendorSystemID and SubsystemID as r
 
 The Developer can write drivers for the AppPF or can leverage the reference driver provided in the SDK.
 
-
-# Clocks and Reset<a name="ClocksNReset"></a>
+<a name="ClocksNReset"></a>
+# Clocks and Reset
 
 ## Clocks
 
@@ -309,8 +313,6 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 -   Illegal ARID; i.e ARID is already been used for an outstanding read transaction.
 
-**NOTE** Pre-GA versions of the Shell and the FPGA Management tools may not have some of these checks and associated metrics exposed to the developers.
-
 
 ## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)
 
@@ -322,8 +324,87 @@ There are three AXI-L master interfaces (Shell is master) that can be used for r
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
+### Accessing Aligned/Unaligned addresses from PCIe (Shell is Master, CL is Slave):
 
-## Interrupts <a name="interrupts"></a>
+Shell supports DW aligned and unaligned transfers from PCIe (address is aligned/not aligned to DW-4byte boundary)
+
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on DMA_PCIS interface work: 
+
+ 1) Writing 8 bytes to DW aligned address through PCIe on AXI4 Interface(DMA_PCIS- 512 bit interface):
+ 
+    If the transaction on the pcie is as follows:                                                              
+    Addr      : 0x0000002000000000
+    dw_cnt    : 2
+    first_be  : 4’b1111
+    last_be   : 4’b1111
+
+    Then the transaction on the AXI4 interface will have the following axi attributes:
+    awaddr     64’h0000_0000_0000_0000
+    awlen     = 0
+    wstrb     = 64’h0000_0000_0000_00ff
+
+ 2) Writing 8 bytes to DW un-aligned address on AXI4 Interface(DMA_PCIS- 512 bit interface):
+ 
+    If the transaction on the pcie is as follows:                                                          
+    Addr      : 0x0000002000000001
+    dw_cnt    : 3
+    first_be  : 4’b1110
+    last_be   : 4’b0001
+
+    Then the transaction on the AXI4 interface will have the following axi attributes:
+    awddr    = 64’h0000_0000_0000_0001
+    awlen    = 0
+    wstrb    = 64’h0000_0000_0000_01fe
+
+The addresses for the Read transactions will work similar to writes.
+
+**Note**:
+If a transaction from PCIe is initiated on AXI-Lite (SDA/OCL/BAR1) interfaces with dw_cnt greater than 1, i.e. >32bits,
+the transaction is split into multipe 32 bit transactions by the Shell.
+
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL/BAR1 AXI-Lite interfaces work: 
+
+ 1) Writing 8 bytes to DW aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface): 
+ 
+    If the transaction on the pcie is as follows:     
+    Addr      : 0x0000000002000000
+    dw_cnt    : 2
+    first_be  : 4’b1111
+    last_be   : 4’b1111
+ 
+    Then the transaction on the AXI-Lite interface will be split and will have the following axi attributes:
+    Transaction is split into 2 transfers.
+ 
+    1st transfer awaddr = 32’h0000_0000
+    wstrb = 4’hf
+ 
+    2nd  transfer awaddr = 32’h0000_0004
+    wstrb = 4’hf
+
+  2) Writing 64 bits to DW un aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface):
+  
+     If the transaction on the pcie is as follows:     
+      Addr      : 0x0000000002000001
+      dw_cnt    : 3
+      first_be  : 4’b1110
+      last_be   : 4’b0001
+
+     Transaction on AXI-Lite interface will be split and will have the following axi attributes:
+     Transaction is split into 3 transfers.
+ 
+     1st transfer awaddr = 32’h0000_0001
+     wstrb = 4’he
+ 
+     2nd  transfer awaddr = 32’h0000_0004
+     wstrb = 4’hf
+ 
+     3rd  transfer awaddr = 32’h0000_0008
+     wstrb = 4’h1
+
+ The transaction splitting and addresses for the Read transactions will work similar to writes.
+
+<a name="interrupts"></a>
+## Interrupts 
 
 16 user interrupt source are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers int he DMA controller map the 16 user interrupt sources to MSI-X vectors.  
 
@@ -334,8 +415,8 @@ There are two sets of signals to generate interrupts:
 
 The CL asserts (active high) cl_sh_apppf_irq_req\[x\], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
 
-
-## DDR4 DRAM Interface<a name="ddr"></a>
+<a name="ddr"></a>
+## DDR4 DRAM Interface
 
 Each DRAM interface is accessed via an AXI-4 interface:
 
@@ -353,8 +434,8 @@ The DRAM interface uses Xilinx DDR-4 Interface controller. The AXI-4 interface a
   
 In future Shell versions a DRAM content preservation feature will be implemented. This feature allows the DDR state to be preserved when dynamically changing CL logic. The current Shell version will not guarantee preservation of DRAM contents if the CL logic is re-loaded.
   
-  
-## Miscellaneous signals<a name="misc"></a>
+<a name="misc"></a>
+## Miscellaneous signals
 
 There are some miscellaneous generic signals between the Shell and CL.
 
