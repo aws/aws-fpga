@@ -224,8 +224,6 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 	uint16_t device_id = 0;
 
 	fail_on_quiet(!dir_name, err, CLI_INTERNAL_ERR_STR);
-	// fail_on_quiet(f1.slot_dev_index >= FPGA_SLOT_MAX, err,
-	// 		CLI_INTERNAL_ERR_STR);
 
 	/** Setup and read the PCI Vendor ID */
 	char sysfs_name[NAME_MAX + 1];
@@ -248,20 +246,10 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
 	ret = fpga_pci_get_id(sysfs_name, &device_id);
 	fail_on_quiet(ret != 0, err, "Error retrieving device_id");
 
-	// /** Check for a match to the FPGA Mbox Vendor ID and Device ID */
-	// if ((vendor_id != F1_MBOX_VENDOR_ID) || (device_id != F1_MBOX_DEVICE_ID)) {
-	// 	/* the device did not match */
-	// 	return 1;
-	// }
-
 	/** Fill in the DBDF */
 	ret = fpga_pci_get_dbdf(dir_name, map);
 	fail_on_quiet(ret != 0, err, "Error retrieving DBDF from dir_name=%s",
 			dir_name);
-
-	/** Retrieve the PCI resource size for plat attach */
-	ret = fpga_pci_handle_resources(dir_name, map);
-	fail_on_quiet(ret != 0, err, "Error retrieving resource information");
 
 	map->vendor_id = vendor_id;
 	map->device_id = device_id;
@@ -278,58 +266,69 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	char *path = "/sys/bus/pci/devices";
 	DIR *dirp = opendir(path);
 	fail_on(!dirp, err, CLI_INTERNAL_ERR_STR);
+
+	struct dirent entry_a, entry_b, *entry, *previous_entry, *result;
 	int slot_dev_index = 0;
 	struct fpga_slot_spec search_spec;
-	struct fpga_pci_resource_map search_map, previous_map;
+	struct fpga_pci_resource_map a, b, *search_map, *previous_map;
 
 	memset(&search_spec, 0, sizeof(struct fpga_slot_spec));
-	memset(&previous_map, 0, sizeof(struct fpga_pci_resource_map));
+	memset(&a, 0, sizeof(struct fpga_pci_resource_map));
+	memset(&b, 0, sizeof(struct fpga_pci_resource_map));
+	search_map = &a;
+	previous_map = &b;
+
+	entry = &entry_a;
+	previous_entry = &entry_b;
 
 	/** Loop through the sysfs device directories */
-	for (;;) {
-		struct dirent entry;
-		struct dirent *result;
-		memset(&entry, 0, sizeof(entry));
-
-		readdir_r(dirp, &entry, &result);
+	while (true) {
+		memset(entry, 0, sizeof(entry));
+		readdir_r(dirp, entry, &result);
 		if (result == NULL) {
 			/** No more directories */
 			break;
 		}
 
 		/** Handle the current directory entry */
-		memset(&search_map, 0, sizeof(struct fpga_pci_resource_map));
-		int ret = fpga_pci_handle_pci_dir_name(entry.d_name, &search_map);
+		memset(search_map, 0, sizeof(struct fpga_pci_resource_map));
+		int ret = fpga_pci_handle_pci_dir_name(entry->d_name, search_map);
 		if (ret != 0) {
+			previous_map->device_id = 0;
 			continue;
 		}
-		found_afi_slot = true;
-		if (search_map.domain != previous_map.domain ||
-			search_map.bus    != previous_map.bus    ||
-			search_map.dev    != previous_map.dev) {
 
+		if (search_map->vendor_id == F1_MBOX_VENDOR_ID &&
+			search_map->device_id == F1_MBOX_DEVICE_ID &&
+			previous_map->device_id != 0) {
 
-			/* domain, bus, device do not match: this is the next slot */
-			if (search_spec.map[FPGA_MGMT_PF].vendor_id == F1_MBOX_VENDOR_ID &&
-				search_spec.map[FPGA_MGMT_PF].device_id == F1_MBOX_DEVICE_ID) {
+			/* Retrieve the PCI resource size for plat attach after confirming
+			 * these devices are FPGAs. */
+			/* mbox resources */
+			ret = fpga_pci_handle_resources(entry->d_name, search_map);
+			fail_on_quiet(ret != 0, err, "Error retrieving resource information");
+			/* app resources */
+			ret = fpga_pci_handle_resources(previous_entry->d_name, previous_map);
+			fail_on_quiet(ret != 0, err, "Error retrieving resource information");
 
-				spec_array[slot_dev_index] = search_spec;
-				++slot_dev_index;
-				if (slot_dev_index >= size) {
-					break;
-				}
+			/* copy the results into the spec_array */
+			spec_array[slot_dev_index].map[FPGA_APP_PF] = *previous_map;
+			spec_array[slot_dev_index].map[FPGA_MGMT_PF] = *search_map;
+
+			found_afi_slot = true;
+			slot_dev_index += 1;
+			if (slot_dev_index >= size) {
+				break;
 			}
-		}
-		if (search_map.func >= FPGA_MAX_PF) {
-			/* unexpected pf */
+
+			/* invalidate the previous_map and do not swap */
+			previous_map->device_id = 0;
 			continue;
 		}
-		/* copy the map into the spec array */
-		search_spec.map[search_map.func] = search_map;
-		previous_map = search_map;
+
+		swap(previous_map, search_map);
+		swap(previous_entry, entry);
 	}
-	/* TODO: this has a bug in it: if there are no PCI devices after the last
-	 * FPGA, it will fail to find that FPGA. */
 
 	closedir(dirp);
 

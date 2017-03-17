@@ -44,14 +44,16 @@ enum {
 	AFI_EXT_END
 };
 
-/** F1 Mailbox PF defines */
+/** F1 Mailbox Device defines */
 #define F1_MBOX_VENDOR_ID		0x1d0f
 #define F1_MBOX_DEVICE_ID		0x1041
 #define F1_MBOX_RESOURCE_NUM	0
 
-/** F1 Application PF defines */
-#define F1_APP_PF_START			0
-#define F1_APP_PF_END			15
+/** F1 Application Device defines */
+#define F1_MBOX_DEV2APP_DEV(dev)		((dev) - 1)
+#define F1_APP_PF						0
+#define F1_REMOVE_APP_DEV_DELAY_MSEC	1000
+#define F1_REMOVE_APP_DEV_MAX_RETRIES	3
 
 /** 
  * This should be used for the sanitized first level errors to be
@@ -123,54 +125,3 @@ extern struct ec2_fpga_cmd f1;
  */
 int 
 parse_args(int argc, char *argv[]);
-
-/**
- * Initialize the AFI slot devices from the PCI/sysfs layer. 
- *
- * @returns
- *  0   on success 
- * -1   on failure
- */
-int cli_pci_init(void);
-
-/**
- * De-initialize the PCI/sysfs layer.
- */
-void cli_pci_free(void);
-
-/**
- * Retrieve the application PF map for the given mbox slot.
- *
- * @param[in]   slot		the fpga slot
- * @param[in]   app_pf_num	the application PF number to check 
- * @param[out]  map			the application PF resource map to return 
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int cli_get_app_pf_map(uint32_t slot, uint32_t app_pf_num, 
-		struct fpga_pci_resource_map *map);
-
-/**
- * Remove the application PF for the given mbox slot.
- *
- * @param[in]   slot		the fpga slot
- * @param[in]   app_pf_num	the application PF number to check 
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int
-cli_remove_app_pf(uint32_t slot, uint32_t app_pf_num);
-
-/**
- * PCI rescan.
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int
-cli_pci_rescan(void);

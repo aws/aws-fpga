@@ -29,6 +29,8 @@ fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
 	int rc;
 	bool write_combining;
 	struct fpga_slot_spec spec;
+	
+	(void) flags;
 
 	if (!handle || pf_id < 0 || pf_id >= FPGA_MAX_PF ||
 		bar_id < 0 || bar_id >= FPGA_BAR_PER_PF_MAX) {

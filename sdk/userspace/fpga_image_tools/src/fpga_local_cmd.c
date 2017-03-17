@@ -402,7 +402,7 @@ command_describe_slots(void)
 
 	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
 
-	for (i = 0; i < sizeof_array(spec_array); ++i) {
+	for (i = 0; i < (int) sizeof_array(spec_array); ++i) {
 		if (spec_array[i].map[FPGA_APP_PF].vendor_id == 0)
 			continue;
 
