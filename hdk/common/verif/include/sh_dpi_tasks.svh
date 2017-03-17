@@ -198,26 +198,26 @@ end
 
    //=================================================
    //
-   // read_virtual_dip_switch
+   // get_virtual_dip_switch
    //
    //   Description: reads virtual dip switch status
    //   Outputs: dip_status
    //
    //=================================================
-   function logic [15:0] read_virtual_dip_switch(input int slot_id = 0);
-      `SLOT_MACRO_FUNC(read_virtual_dip_switch())
+   function logic [15:0] get_virtual_dip_switch(input int slot_id = 0);
+      `SLOT_MACRO_FUNC(get_virtual_dip_switch())
    endfunction
 
    //=================================================
    //
-   // read_virtual_led
+   // get_virtual_led
    //
    //   Description: reads virtual led status
    //   Outputs: led status
    //
    //=================================================
-   function logic[15:0] read_virtual_led(input int slot_id = 0);
-      `SLOT_MACRO_FUNC(read_virtual_led())
+   function logic[15:0] get_virtual_led(input int slot_id = 0);
+      `SLOT_MACRO_FUNC(get_virtual_led())
    endfunction
 
    //=================================================

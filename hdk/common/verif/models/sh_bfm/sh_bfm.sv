@@ -1538,25 +1538,25 @@ module sh_bfm #(
 
    //=================================================
    //
-   // read_virtual_dip_switch
+   // get_virtual_dip_switch
    //
    //   Description: reads virtual dip switch status
    //   Outputs: dip_status
    //
    //=================================================
-   function logic[15:0] read_virtual_dip_switch();
+   function logic[15:0] get_virtual_dip_switch();
       return sh_cl_status_vdip;
    endfunction
 
    //=================================================
    //
-   // read_virtual_led
+   // get_virtual_led
    //
    //   Description: reads virtual led status
    //   Outputs: led status
    //
    //=================================================
-   function logic[15:0] read_virtual_led();
+   function logic[15:0] get_virtual_led();
       return cl_sh_status_vled;
    endfunction
 

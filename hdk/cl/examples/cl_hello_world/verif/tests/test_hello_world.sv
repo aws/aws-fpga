@@ -24,7 +24,7 @@ logic [15:0] vled_value;
       
       tb.set_virtual_dip_switch(.dip(0));
 
-      vdip_value = tb.read_virtual_dip_switch();
+      vdip_value = tb.get_virtual_dip_switch();
 
       $display ("value of vdip:%0x", vdip_value);
 
@@ -47,7 +47,7 @@ logic [15:0] vled_value;
       else
         $display ("Test FAILED");
 
-      vled_value = tb.read_virtual_led();
+      vled_value = tb.get_virtual_led();
 
       $display ("value of vled:%0x", vled_value);
 
