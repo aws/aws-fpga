@@ -1423,63 +1423,42 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up(input ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0, 
-                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0, 
-                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
-      case (clk_profile_a)
-         ClockProfile::PROFILE_0: begin
+   task power_up(input ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0, 
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0, 
+                       ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
+      case (clk_recipe_a)
+         ClockRecipe::A0: begin
             MAIN_A0_DLY  = 4ns;
             CORE_DLY     = 4ns;
             EXTRA_A1_DLY = 8ns;
             EXTRA_A2_DLY = 2.66ns;
             EXTRA_A3_DLY = 2ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::A1: begin
             MAIN_A0_DLY  = 2ns;
             CORE_DLY     = 2ns;
             EXTRA_A1_DLY = 4ns;
             EXTRA_A2_DLY = 1.33ns;
             EXTRA_A3_DLY = 1ns;
          end
-         ClockProfile::PROFILE_2: begin
-            MAIN_A0_DLY  = 8ns;
-            CORE_DLY     = 8ns;
-            EXTRA_A1_DLY = 16ns;
-            EXTRA_A2_DLY = 2ns;
-            EXTRA_A3_DLY = 4ns;
-         end
-         ClockProfile::PROFILE_3: begin
+         ClockRecipe::A2: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
             EXTRA_A1_DLY = 64ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
-         ClockProfile::PROFILE_4: begin
-            MAIN_A0_DLY  = 2.22ns;
-            CORE_DLY     = 2.22ns;
-            EXTRA_A1_DLY = 4.44ns;
-            EXTRA_A2_DLY = 1.48ns;
-            EXTRA_A3_DLY = 1.11ns;
-         end
-         ClockProfile::PROFILE_5: begin
-            MAIN_A0_DLY  = 2.5ns;
-            CORE_DLY     = 2.5ns;
-            EXTRA_A1_DLY = 5ns;
-            EXTRA_A2_DLY = 1.66ns;
-            EXTRA_A3_DLY = 1.25ns;
-         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
       endcase 
-      case (clk_profile_b)
-         ClockProfile::PROFILE_0: begin
+      case (clk_recipe_b)
+         ClockRecipe::B0: begin
             EXTRA_B0_DLY = 2ns;
             EXTRA_B1_DLY = 4ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::B1: begin
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
          end
@@ -1488,12 +1467,12 @@ module sh_bfm #(
             $finish;
          end
       endcase
-      case (clk_profile_c)
-         ClockProfile::PROFILE_0: begin
+      case (clk_recipe_c)
+         ClockRecipe::C0: begin
             EXTRA_C0_DLY = 1.66ns;
             EXTRA_C1_DLY = 1.25ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::C1: begin
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
          end
@@ -1653,7 +1632,7 @@ module sh_bfm #(
              logic [63:0] data, 
              logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
 
       logic [63:0] strb;
 
@@ -1669,7 +1648,7 @@ module sh_bfm #(
       endcase // case (size)
       
       case (intf)
-        AxiPort::PORT_PCIS: begin
+        AxiPort::PORT_DMA_PCIS: begin
            AXI_Command axi_cmd;
            AXI_Data    axi_data;
 
@@ -1735,10 +1714,10 @@ module sh_bfm #(
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
 
       case (intf)
-        AxiPort::PORT_PCIS : begin
+        AxiPort::PORT_DMA_PCIS : begin
            AXI_Command axi_cmd;
            int         byte_idx;
            int         mem_arr_idx;

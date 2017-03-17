@@ -34,9 +34,9 @@ module test_dram_dma();
        logic [63:0] host_memory_buffer_address;
        
 
-       tb.power_up(.clk_profile_a(ClockProfile::PROFILE_1), 
-                   .clk_profile_b(ClockProfile::PROFILE_0), 
-                   .clk_profile_c(ClockProfile::PROFILE_0));
+       tb.power_up(.clk_recipe_a(ClockRecipe::A1), 
+                   .clk_recipe_b(ClockRecipe::B0), 
+                   .clk_recipe_c(ClockRecipe::C0));
 
        tb.nsec_delay(500);
        tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));

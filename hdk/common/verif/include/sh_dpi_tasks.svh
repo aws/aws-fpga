@@ -174,10 +174,12 @@ end
    endfunction
 
    task power_up(input int slot_id = 0, 
-                       ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0,
-                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0,
-                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
-   `SLOT_MACRO_TASK(power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c)))
+                       ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0,
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0,
+                       ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
+   `SLOT_MACRO_TASK(power_up(.clk_recipe_a(clk_recipe_a),
+                             .clk_recipe_b(clk_recipe_b),
+                             .clk_recipe_c(clk_recipe_c)))
    endtask
 
    task power_down(input int slot_id = 0);
@@ -256,7 +258,7 @@ end
              logic [63:0] data, 
              logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
        `SLOT_MACRO_TASK(poke(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
    endtask
 
@@ -284,7 +286,7 @@ end
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
    endtask
 
