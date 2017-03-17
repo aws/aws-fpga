@@ -6,13 +6,13 @@ A3,15.625,7.8125,125,62.5
 ,,,,
 ,,,,
 Clock Group B,,,,
-Recipe Number,clk_extra_b0,clk_extra_b1
-B0,250,125
-B1,125,62.5
+Recipe Number,clk_extra_b0,clk_extra_b1,,
+B0,250,125,,
+B1,125,62.5,,
 ,,,,
 ,,,,
 Clock Group C,,,,
-Recipe Number,clk_extra_c0,clk_extra_c1
-C0,300,400
-C1,150,200
+Recipe Number,clk_extra_c0,clk_extra_c1,,
+C0,300,400,,
+C1,150,200,,
 
