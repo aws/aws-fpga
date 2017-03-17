@@ -38,19 +38,19 @@ module test_dram_dma();
                    .clk_profile_b(ClockProfile::PROFILE_0), 
                    .clk_profile_c(ClockProfile::PROFILE_0));
 
-       tb.card.fpga.sh.nsec_delay(500);
-       tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
-       tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
-       tb.card.fpga.sh.poke_stat(.stat_addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
+       tb.nsec_delay(500);
+       tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
+       tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
+       tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
        // de-select the ATG hardware
-       tb.card.fpga.sh.poke(.addr(64'h130), .data(0), .intf(AxiPort::PORT_OCL));
+       tb.poke(.addr(64'h130), .data(0), .intf(AxiPort::PORT_OCL));
 
        // allow memory to initialize
-       tb.card.fpga.sh.nsec_delay(25000);
+       tb.nsec_delay(25000);
 
        // issuing flr
-       tb.card.fpga.sh.issue_flr();
+       tb.issue_flr();
 
        $display("[%t] : Initializing buffers", $realtime);
 
@@ -100,10 +100,10 @@ module test_dram_dma();
        // wait for dma transfers to complete
        timeout_count = 0;       
        do begin
-          status[0] = tb.card.fpga.sh.is_dma_to_cl_done(0);
-          status[1] = tb.card.fpga.sh.is_dma_to_cl_done(1);
-          status[2] = tb.card.fpga.sh.is_dma_to_cl_done(2);
-          status[3] = tb.card.fpga.sh.is_dma_to_cl_done(3);
+          status[0] = tb.is_dma_to_cl_done(.chan(0));
+          status[1] = tb.is_dma_to_cl_done(.chan(1));
+          status[2] = tb.is_dma_to_cl_done(.chan(2));
+          status[3] = tb.is_dma_to_cl_done(.chan(3));
           #10ns;
           timeout_count++;
        end while ((status != 4'hf) && (timeout_count < 500));
@@ -137,10 +137,10 @@ module test_dram_dma();
        // wait for dma transfers to complete
        timeout_count = 0;       
        do begin
-          status[0] = tb.card.fpga.sh.is_dma_to_buffer_done(0);
-          status[1] = tb.card.fpga.sh.is_dma_to_buffer_done(1);
-          status[2] = tb.card.fpga.sh.is_dma_to_buffer_done(2);
-          status[3] = tb.card.fpga.sh.is_dma_to_buffer_done(3);
+          status[0] = tb.is_dma_to_buffer_done(.chan(0));
+          status[1] = tb.is_dma_to_buffer_done(.chan(1));
+          status[2] = tb.is_dma_to_buffer_done(.chan(2));
+          status[3] = tb.is_dma_to_buffer_done(.chan(3));
           #10ns;
           timeout_count++;          
        end while ((status != 4'hf) && (timeout_count < 500));
@@ -206,7 +206,6 @@ module test_dram_dma();
        
        // Power down
        #500ns;
-//       tb.card.fpga.sh.power_down();
        tb.power_down();
 
        //---------------------------

@@ -2028,11 +2028,11 @@ module sh_bfm #(
       end // else begin
    end // always
 
-  task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
+  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
      case (ddr_idx)
        0: begin
           sh_ddr_stat_wr0    = 1;
-          sh_ddr_stat_addr0  = stat_addr;
+          sh_ddr_stat_addr0  = addr;
           sh_ddr_stat_wdata0 = data;
           sh_ddr_stat_rd0    = 0;
           #8ns;
@@ -2040,7 +2040,7 @@ module sh_bfm #(
        end
        1: begin
           sh_ddr_stat_wr1    = 1;
-          sh_ddr_stat_addr1  = stat_addr;
+          sh_ddr_stat_addr1  = addr;
           sh_ddr_stat_wdata1 = data;
           sh_ddr_stat_rd1    = 0;
           #8ns;
@@ -2048,7 +2048,7 @@ module sh_bfm #(
        end
        2: begin
           sh_ddr_stat_wr2    = 1;
-          sh_ddr_stat_addr2  = stat_addr;
+          sh_ddr_stat_addr2  = addr;
           sh_ddr_stat_wdata2 = data;
           sh_ddr_stat_rd2    = 0;
           #8ns;

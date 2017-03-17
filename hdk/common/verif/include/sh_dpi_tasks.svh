@@ -93,22 +93,6 @@ import tb_type_defines_pkg::*;
       return d;
    endfunction
 
-   function void que_buffer_to_cl(input int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.card.fpga.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
-   endfunction
-
-   function void que_cl_to_buffer(input int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.card.fpga.sh.dma_cl_to_buffer(chan, dst_addr, cl_addr, len);
-   endfunction
-
-   function void start_que_to_cl(input int chan);
-      tb.card.fpga.sh.start_dma_to_cl(chan);
-   endfunction
-
-   function void start_que_to_buffer(input int chan);
-      tb.card.fpga.sh.start_dma_to_buffer(chan);
-   endfunction
-
 `define SLOT_MACRO_TASK(ARG) \
 begin \
    case (slot_id) \
@@ -148,6 +132,22 @@ begin \
    end \
    endcase \
 end
+
+   function void que_buffer_to_cl(input int slot_id = 0, int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+      `SLOT_MACRO_TASK(dma_buffer_to_cl(.chan(chan), .src_addr(src_addr), .cl_addr(cl_addr), .len(len)))
+   endfunction
+
+   function void que_cl_to_buffer(input int slot_id = 0, int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
+      `SLOT_MACRO_TASK(dma_cl_to_buffer(.chan(chan), .dst_addr(dst_addr), .cl_addr(cl_addr), .len(len)))
+   endfunction
+
+   function void start_que_to_cl(input int slot_id = 0, int chan);
+      `SLOT_MACRO_TASK(start_dma_to_cl(chan))
+   endfunction
+
+   function void start_que_to_buffer(input int slot_id = 0, int chan);
+      `SLOT_MACRO_TASK(start_dma_to_buffer(chan))
+   endfunction
 
    task power_up(input int slot_id = 0, 
                        ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0,
@@ -301,4 +301,17 @@ end
       tb.card.fpga.sh.nsec_delay(dly);
    endtask
 
+
+   function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
+      `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
+   endfunction // is_dma_to_cl_done
+
+   function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
+      `SLOT_MACRO_FUNC(is_dma_to_buffer_done(chan))
+   endfunction // is_dma_to_buffer_done
+
+   task poke_stat(input int slot_id = 0,
+                  input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+      `SLOT_MACRO_TASK(poke_stat(.addr(addr), .ddr_idx(ddr_idx), .data(data)))
+   endtask
 `endif
