@@ -21,7 +21,7 @@ LIB_PATH = $(TOP)/lib
 INCLUDES = -I$(FPGAHALINC_PATH) -I$(TOP)/include -I../. -I.
 
 #OPT=-O2
-CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+CFLAGS=$(OPT) -g  -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
 LDFLAGS = -L$(LIB_PATH)/so
 LDLIBS = -lfpga_mgmt

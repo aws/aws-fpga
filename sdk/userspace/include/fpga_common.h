@@ -79,10 +79,8 @@ enum {
     FPGA_ERR_CL_ID_MISMATCH = 12,
     /** CL DDR calibration failed */
     FPGA_ERR_CL_DDR_CALIB_FAILED = 13,
-    /** fpga_clk_recipe is invalid */
-    FPGA_ERR_CLK_RECIPE_INVALID = 14,
-    /** fpga_clk_recipe programming failed */
-    FPGA_ERR_CLK_RECIPE_FAILED = 15,
+    /** generic/unspecified error */
+    FPGA_ERR_FAIL = 14,
 
     FPGA_ERR_END
 };
@@ -95,8 +93,7 @@ enum {
 	((error) == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) ?	"invalid-afi-cmd-api-version" : \
 	((error) == FPGA_ERR_CL_ID_MISMATCH) ?				"cl-id-mismatch" : \
 	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
-	((error) == FPGA_ERR_CLK_RECIPE_INVALID) ?			"invalid-clk-recipe" : \
-	((error) == FPGA_ERR_CLK_RECIPE_FAILED) ?			"clk-recipe-failed" : \
+	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
 														"internal-error"
 
 
