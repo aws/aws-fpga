@@ -1,6 +1,6 @@
 /**
  * Xilinx SDAccel HAL userspace driver APIs
- * Copyright (C) 2015-2016, Xilinx Inc - All rights reserved
+ * Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -50,31 +50,6 @@ extern "C" {
      * Structure used to obtain various bits of information from the device.
      */
 
-    struct xclDeviceInfo {
-        unsigned mMagic; // = 0X586C0C6C; XL OpenCL X->58(ASCII), L->6C(ASCII), O->0 C->C L->6C(ASCII);
-        char mName[256];
-        unsigned short mHALMajorVersion;
-        unsigned short mHALMinorVersion;
-        unsigned short mVendorId;
-        unsigned short mDeviceId;
-        unsigned mDeviceVersion;
-        unsigned short mSubsystemId;
-        unsigned short mSubsystemVendorId;
-        size_t mDDRSize;                    // Size of DDR memory
-        size_t mDataAlignment;              // Minimum data alignment requirement for host buffers
-        size_t mDDRFreeSize;                // Total unused/available DDR memory
-        size_t mMinTransferSize;            // Minimum DMA buffer size
-        float mTemp;
-        float mVoltage;
-        float mCurrent;
-        unsigned mDDRBankCount;
-        unsigned mOCLFrequency;
-        unsigned mPCIeLinkWidth;
-        unsigned mPCIeLinkSpeed;
-        unsigned short mDMAThreads;
-        // More properties here
-    };
-
     struct xclDeviceInfo2 {
         unsigned mMagic; // = 0X586C0C6C; XL OpenCL X->58(ASCII), L->6C(ASCII), O->0 C->C L->6C(ASCII);
         char mName[256];
@@ -85,12 +60,10 @@ extern "C" {
         unsigned short mSubsystemId;
         unsigned short mSubsystemVendorId;
         unsigned short mDeviceVersion;
-//        unsigned mDriverVersion; // Enable this after driver unification since it changes the ABI
         size_t mDDRSize;                    // Size of DDR memory
         size_t mDataAlignment;              // Minimum data alignment requirement for host buffers
         size_t mDDRFreeSize;                // Total unused/available DDR memory
         size_t mMinTransferSize;            // Minimum DMA buffer size
-//        size_t mBRAMSize; // Enable this after driver unification since it changes the ABI
         unsigned short mDDRBankCount;
         unsigned short mOCLFrequency[4];
         unsigned short mPCIeLinkWidth;
@@ -191,21 +164,7 @@ extern "C" {
      * Obtain various bits of information from the device
      */
 
-    XCL_DRIVER_DLLESPEC int xclGetDeviceInfo(xclDeviceHandle handle, xclDeviceInfo *info);
-
-    /**
-     * Obtain various bits of information from the device
-     */
-
     XCL_DRIVER_DLLESPEC int xclGetDeviceInfo2(xclDeviceHandle handle, xclDeviceInfo2 *info);
-
-    /**
-     * Download bitstream to the device. The bitstream is in xclBin format and stored in xclBinFileName.
-     * The bitstream may be PR bistream for devices which support PR and full bitstream for devices
-     * which require full configuration.
-     */
-
-    XCL_DRIVER_DLLESPEC int xclLoadBitstream(xclDeviceHandle handle, const char *xclBinFileName);
 
     /**
      * Download bitstream to the device. The bitstream is passed in memory in xclBin format. The bitstream
@@ -314,19 +273,16 @@ extern "C" {
 
     /**
      * Reset the device. All running kernels will be killed and buffers in DDR will be purged.
-     * A device would be reset if a user's application dies without waiting for running kernel(s) to finish.
+     * A device would be reset if a user's application dies without waiting for running kernel(s)
+     * to finish.
      */
 
     XCL_DRIVER_DLLESPEC int xclResetDevice(xclDeviceHandle handle, xclResetKind kind);
 
     /**
-     * Set the OCL region frequncy
-     */
-
-    XCL_DRIVER_DLLESPEC int xclReClock(xclDeviceHandle handle, unsigned targetFreqMHz);
-
-    /**
-     * Set the OCL region frequncies
+     * Set the OCL region clock frequencies. Currently only 2 clocks are supported but
+     * targetFreqMHz should be an array with 4 elements (for 4 clocks). A value of 0 for
+     * the frequncy indicates that the particular clock frequency should not be changed.
      */
 
     XCL_DRIVER_DLLESPEC int xclReClock2(xclDeviceHandle handle, unsigned short region,

@@ -1,7 +1,9 @@
-/**
- * Copyright (C) 2015-2016 Xilinx, Inc
+/*
+ * Copyright (C) 2017 Xilinx, Inc
  * Author: Sonal Santan
- * XDMA HAL Driver layered on top of XDMA kernel driver
+ * AWS HAL Driver for SDAccel/OpenCL runtime evnrionemnt, for AWS EC2 F1
+ *
+ * Code copied from SDAccel XDMA based HAL driver
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -28,39 +30,22 @@
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)
 
+//TODO: umang
+#ifdef INTERNAL_TESTING
+#define ACCELERATOR_BAR        0
+#define MMAP_SIZE_USER         0x400000
+#endif
+
+/* Aligning access to FPGA DRAM space to 64Byte */
+#define DDR_BUFFER_ALIGNMENT   0x40
+
 #include <sys/types.h>
-
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    sys/mman.h is linux only header file
-//    it is included for mmap
 #include <sys/mman.h>
-#endif
-
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    unistd.h is linux only header file
-//    it is included for read, write, close, lseek64
 #include <unistd.h>
-#endif
-
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    sys/ioctl.h is linux only header file
-//    it is included for ioctl
 #include <sys/ioctl.h>
-#endif
-
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    sys/file.h is linux only header file
-//    it is included for flock
 #include <sys/file.h>
-#endif
-
 
 #include <cstdio>
 #include <cstring>
@@ -72,79 +57,25 @@
 #include <iostream>
 #include <mutex>
 
-#include "driver/include/xclbin.h"
-#include "driver/xcldma/include/xdma-ioctl.h"
+#include "xclbin.h"
 
-#ifdef _WINDOWS
-#define __func__ __FUNCTION__
-#endif
-
-#ifdef _WINDOWS
-#define MAP_FAILED (void *)-1
-#endif
-
-#if defined(__PPC64__)
-#define OSTAG "-ppc64le"
+#ifdef INTERNAL_TESTING
+#include "xdma/include/xdma-ioctl.h"
+#include "baremetal/mgmt/mgmt-ioctl.h"
 #else
-#define OSTAG ""
+
+#include <fpga_mgmt.h>
+#include <fpga_pci.h>
+
+// TODO - define this in a header file
+extern char* get_afi_from_xclBin(const xclBin *);
+
 #endif
 
-namespace xclxdma {
-    const unsigned XDMAShim::TAG = 0X586C0C6C; // XL OpenCL X->58(ASCII), L->6C(ASCII), O->0 C->C L->6C(ASCII);
+namespace awsbwhal {
+    const unsigned AwsXcl::TAG = 0X586C0C6C; // XL OpenCL X->58(ASCII), L->6C(ASCII), O->0 C->C L->6C(ASCII);
 
-    xclDeviceInfo2 to_info2(const xclDeviceInfo info) {
-        xclDeviceInfo2 info2;
-        std::memset(&info2, 0, sizeof(info2));
-        info2.mMagic = info.mMagic;
-        std::memcpy(info2.mName, info.mName, 256);
-        info2.mHALMajorVersion = info.mHALMajorVersion;
-        info2.mHALMinorVersion = info.mHALMinorVersion;
-        info2.mVendorId = info.mVendorId;
-        info2.mDeviceId = info.mDeviceId;
-        info2.mSubsystemId = info.mSubsystemId;
-        info2.mSubsystemVendorId = info.mSubsystemVendorId;
-        info2.mDeviceVersion = info.mDeviceVersion;
-        info2.mDDRSize = info.mDDRSize;
-        info2.mDataAlignment = info.mDataAlignment;
-        info2.mDDRFreeSize = info.mDDRFreeSize;
-        info2.mMinTransferSize = info.mMinTransferSize;
-        info2.mDDRBankCount = info.mDDRBankCount;
-        info2.mOCLFrequency[0] = info.mOCLFrequency;
-        info2.mPCIeLinkWidth = info.mPCIeLinkWidth;
-        info2.mPCIeLinkSpeed = info.mPCIeLinkSpeed;
-        info2.mDMAThreads = info.mDMAThreads;
-        return info2;
-    }
-
-    int XDMAShim::xclLoadBitstream(const char *fileName) {
-        if (mLogStream.is_open()) {
-            mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << fileName << std::endl;
-        }
-
-        if (!mLocked)
-            return -EPERM;
-
-        std::ifstream stream(fileName);
-        if (!stream.is_open()) {
-            return errno;
-        }
-
-        stream.seekg(0, stream.end);
-        int length = stream.tellg();
-        stream.seekg(0, stream.beg);
-        char *buffer = new char[length];
-        stream.read(buffer, length);
-        stream.close();
-        xclBin *header = (xclBin *)buffer;
-        if (std::memcmp(header->m_magic, "xclbin0", 8)) {
-            return -EINVAL;
-        }
-
-        return xclLoadXclBin(header);
-    }
-
-
-    int XDMAShim::xclLoadXclBin(const xclBin *buffer)
+    int AwsXcl::xclLoadXclBin(const xclBin *buffer)
     {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << buffer << std::endl;
@@ -153,48 +84,33 @@ namespace xclxdma {
         if (!mLocked)
             return -EPERM;
 
-#ifndef _WINDOWS
-        const unsigned cmd = isUltraScale() ? XDMA_IOCMCAPDOWNLOAD : XDMA_IOCICAPDOWNLOAD;
-        xdma_ioc_bitstream obj = {{0X586C0C6C, cmd}, const_cast<xclBin *>(buffer)};
-        int ret = ioctl(mUserHandle, cmd, &obj);
-        if(0 != ret)
-          return ret;
-
-        // If it is an XPR DSA, zero out the DDR again as downloading the XCLBIN
-        // reinitializes the DDR and results in ECC error.
-        if(isXPR()) {
-          if (mLogStream.is_open()) {
-              mLogStream << __func__ << "XPR Device found, zeroing out DDR again.." << std::endl;
-          }
-
-          if (zeroOutDDR() == false){
-            if (mLogStream.is_open()) {
-                mLogStream <<  __func__ << "zeroing out DDR failed" << std::endl;
-            }
-            return -EIO;
-          }
-        }
-
-        return ret;
+#ifdef INTERNAL_TESTING
+        const unsigned cmd = AWSMGMT_IOCICAPDOWNLOAD;
+        awsmgmt_ioc_bitstream obj = {const_cast<xclBin *>(buffer)};
+        return ioctl(mMgtHandle, cmd, &obj);
+#else
+	char* afi_id = get_afi_from_xclBin(buffer);
+	int ret=0;
+	return fpga_mgmt_load_local_image(mBoardNumber, afi_id);
+	// TODO - add printout and eror case handing
 #endif
     }
 
-    size_t XDMAShim::xclReadModifyWrite(uint64_t offset, const void *hostBuf, size_t size) {
+    /* Accessing F1 FPGA memory space (i.e. OpenCL Global Memory) is mapped through AppPF BAR4
+     * all offsets are relative to the base address available in AppPF BAR4
+     * SDAcell XCL_ADDR_SPACE_DEVICE_RAM enum maps to AwsXcl::ocl_global_mem_bar, which is the
+     * handle for AppPF BAR4
+     */
+    size_t AwsXcl::xclReadModifyWrite(uint64_t offset, const void *hostBuf, size_t size) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", "
                        << offset << ", " << hostBuf << ", " << size << std::endl;
         }
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    alignas is defined in c++11
 #if GCC_VERSION >= 40800
         alignas(DDR_BUFFER_ALIGNMENT) char buffer[DDR_BUFFER_ALIGNMENT];
 #else
         AlignedAllocator<char> alignedBuffer(DDR_BUFFER_ALIGNMENT, DDR_BUFFER_ALIGNMENT);
         char* buffer = alignedBuffer.getBuffer();
-#endif
-#else
-        char buffer[DDR_BUFFER_ALIGNMENT];
 #endif
 
         const size_t mod_size = offset % DDR_BUFFER_ALIGNMENT;
@@ -221,7 +137,12 @@ namespace xclxdma {
         return size;
     }
 
-    size_t XDMAShim::xclWrite(xclAddressSpace space, uint64_t offset, const void *hostBuf, size_t size) {
+    /* Accessing F1 FPGA memory space mapped through AppPF PCIe BARs
+    * space = XCL_ADDR_SPACE_DEVICE_RAM maps to AppPF PCIe BAR4, (sh_cl_dma_pcis_ bus), with AwsXcl::ocl_global_mem_bar as handle
+    * space = XCL_ADDR_KERNEL_CTRL maps to AppPF PCIe BAR0 (sh_cl_ocl bus), with AwsXcl::ocl_kernel_bar as handle
+    * all offsets are relative to the base address available in AppPF
+    */
+    size_t AwsXcl::xclWrite(xclAddressSpace space, uint64_t offset, const void *hostBuf, size_t size) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << space << ", "
                        << offset << ", " << hostBuf << ", " << size << std::endl;
@@ -255,29 +176,25 @@ namespace xclxdma {
 
             const char *curr = static_cast<const char *>(hostBuf);
             while (size > maxDMASize) {
-#ifndef _WINDOWS
-// TODO: Windows build support
               if (mDataMover->pwrite64(curr,maxDMASize,offset) < 0)
                 return -1;
-#endif
-                offset += maxDMASize;
+              offset += maxDMASize;
                 curr += maxDMASize;
                 size -= maxDMASize;
             }
-#ifndef _WINDOWS
-// TODO: Windows build support
             if (mDataMover->pwrite64(curr,size,offset) < 0)
               return -1;
-#endif
             return totalSize;
         }
-        case XCL_ADDR_SPACE_DEVICE_PERFMON:
-        {
-            if (pcieBarWrite(PERFMON_BAR, offset, hostBuf, size) == 0) {
-                return size;
-            }
-            return -1;
-        }
+
+        /* Initial release does not include SDAcce performance monitors */
+//        case XCL_ADDR_SPACE_DEVICE_PERFMON:
+//        {
+//            if (pcieBarWrite(PERFMON_BAR, offset, hostBuf, size) == 0) {
+//                return size;
+//            }
+//            return -1;
+//        }
         case XCL_ADDR_KERNEL_CTRL:
         {
             if (mLogStream.is_open()) {
@@ -291,7 +208,12 @@ namespace xclxdma {
 
                 }
             }
+#ifdef INTERNAL_TESTING
             if (pcieBarWrite(ACCELERATOR_BAR, offset, hostBuf, size) == 0) {
+#else
+            if (pcieBarWrite(APP_PF_BAR0, offset, hostBuf, size) == 0) {
+
+#endif
                 return size;
             }
             return -1;
@@ -304,7 +226,7 @@ namespace xclxdma {
     }
 
 
-    size_t XDMAShim::xclReadSkipCopy(uint64_t offset, void *hostBuf, size_t size) {
+    size_t AwsXcl::xclReadSkipCopy(uint64_t offset, void *hostBuf, size_t size) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", "
                        << offset << ", " << hostBuf << ", " << size << std::endl;
@@ -312,7 +234,6 @@ namespace xclxdma {
 
         const size_t mod_size = offset % DDR_BUFFER_ALIGNMENT;
         // Need to do Read-Modify-Read
-#ifndef _WINDOWS
 // TODO: Windows build support
 //    alignas is defined in c++11
 #if GCC_VERSION >= 40800
@@ -320,9 +241,6 @@ namespace xclxdma {
 #else
         AlignedAllocator<char> alignedBuffer(DDR_BUFFER_ALIGNMENT, DDR_BUFFER_ALIGNMENT);
         char* buffer = alignedBuffer.getBuffer();
-#endif
-#else
-        char buffer[DDR_BUFFER_ALIGNMENT];
 #endif
 
         // Read back one full aligned block starting from preceding aligned address
@@ -345,7 +263,7 @@ namespace xclxdma {
         return size;
     }
 
-    size_t XDMAShim::xclRead(xclAddressSpace space, uint64_t offset, void *hostBuf, size_t size) {
+    size_t AwsXcl::xclRead(xclAddressSpace space, uint64_t offset, void *hostBuf, size_t size) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << space << ", "
                        << offset << ", " << hostBuf << ", " << size << std::endl;
@@ -380,33 +298,33 @@ namespace xclxdma {
 
             char *curr = static_cast<char*>(hostBuf);
             while (size > maxDMASize) {
-#ifndef _WINDOWS
 // TODO: Windows build support
               if (mDataMover->pread64(curr,maxDMASize,offset) < 0)
                 return -1;
-#endif
                 offset += maxDMASize;
                 curr += maxDMASize;
                 size -= maxDMASize;
             }
 
-#ifndef _WINDOWS
 // TODO: Windows build support
             if (mDataMover->pread64(curr,size,offset) < 0)
               return -1;
-#endif
             return totalSize;
         }
-        case XCL_ADDR_SPACE_DEVICE_PERFMON:
-        {
-            if (pcieBarRead(PERFMON_BAR, offset, hostBuf, size) == 0) {
-                return size;
-            }
-            return -1;
-        }
+//        case XCL_ADDR_SPACE_DEVICE_PERFMON:
+//        {
+//            if (pcieBarRead(PERFMON_BAR, offset, hostBuf, size) == 0) {
+//                return size;
+//            }
+//            return -1;
+//        }
         case XCL_ADDR_KERNEL_CTRL:
         {
+#ifdef	INTERNAL_TESTING
             int result = pcieBarRead(ACCELERATOR_BAR, offset, hostBuf, size);
+#else
+	    int result = pcieBarRead(APP_PF_BAR0, offset, hostBuf, size);
+#endif
             if (mLogStream.is_open()) {
                 const unsigned *reg = static_cast<const unsigned *>(hostBuf);
                 size_t regSize = size / 4;
@@ -426,7 +344,7 @@ namespace xclxdma {
         }
     }
 
-    uint64_t XDMAShim::xclAllocDeviceBuffer(size_t size) {
+    uint64_t AwsXcl::xclAllocDeviceBuffer(size_t size) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << size << std::endl;
         }
@@ -443,7 +361,7 @@ namespace xclxdma {
         return result;
     }
 
-    uint64_t XDMAShim::xclAllocDeviceBuffer2(size_t size, xclMemoryDomains domain, unsigned flags)
+    uint64_t AwsXcl::xclAllocDeviceBuffer2(size_t size, xclMemoryDomains domain, unsigned flags)
     {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << size << ", "
@@ -462,7 +380,7 @@ namespace xclxdma {
         return mDDRMemoryManager[flags]->alloc(size);
     }
 
-    void XDMAShim::xclFreeDeviceBuffer(uint64_t buf) {
+    void AwsXcl::xclFreeDeviceBuffer(uint64_t buf) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << buf << std::endl;
         }
@@ -477,7 +395,7 @@ namespace xclxdma {
     }
 
 
-    size_t XDMAShim::xclCopyBufferHost2Device(uint64_t dest, const void *src, size_t size, size_t seek) {
+    size_t AwsXcl::xclCopyBufferHost2Device(uint64_t dest, const void *src, size_t size, size_t seek) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << dest << ", "
                        << src << ", " << size << ", " << seek << std::endl;
@@ -508,7 +426,7 @@ namespace xclxdma {
     }
 
 
-    size_t XDMAShim::xclCopyBufferDevice2Host(void *dest, uint64_t src, size_t size, size_t skip) {
+    size_t AwsXcl::xclCopyBufferDevice2Host(void *dest, uint64_t src, size_t size, size_t skip) {
         if (mLogStream.is_open()) {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << dest << ", "
                        << src << ", " << size << ", " << skip << std::endl;
@@ -540,64 +458,85 @@ namespace xclxdma {
     }
 
 
-    XDMAShim *XDMAShim::handleCheck(void *handle) {
+    AwsXcl *AwsXcl::handleCheck(void *handle) {
         // Sanity checks
         if (!handle)
             return 0;
         if (*(unsigned *)handle != TAG)
             return 0;
-        if (!((XDMAShim *)handle)->isGood()) {
+        if (!((AwsXcl *)handle)->isGood()) {
             return 0;
         }
 
-        return (XDMAShim *)handle;
+        return (AwsXcl *)handle;
     }
 
-    unsigned XDMAShim::xclProbe() {
+    unsigned AwsXcl::xclProbe() {
         char file_name_buf[128];
         unsigned i  = 0;
-        for (i = 0; i < 64; i++) {
-            std::sprintf((char *)&file_name_buf, "/dev/xcldma/xcldma%d_user", i);
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    open, close is defined in unistd.h
+        for (i = 0; i < 16; i++) {
+#ifdef INTERNAL_TESTING
+            std::sprintf((char *)&file_name_buf, "/dev/awsmgmt%d", i);
+#else
+            std::sprintf((char *)&file_name_buf, "/dev/edma%u_queue0", i);
+#endif
             int fd = open(file_name_buf, O_RDWR);
             if (fd < 0) {
                 return i;
             }
             close(fd);
-#endif
         }
+#ifndef INTERNAL_TESTING
+	if (fpga_mgmt_init() || fpga_pci_init() ) {
+            std::cout << "xclProbe failed to initialized fpga libraries" << std::endl;
+            return 0;
+	}
+        std::cout << "xclProbe found " << i << "FPGA slots with EDMA driver running" << std::endl;
+#else
+        std::cout << "xclProbe found " << i << "FPGA slots with baremetal driver running" << std::endl;
+#endif
         return i;
     }
 
-    void XDMAShim::initMemoryManager()
+    void AwsXcl::initMemoryManager()
     {
         if (!mDeviceInfo.mDDRBankCount)
             return;
         const uint64_t bankSize = mDeviceInfo.mDDRSize / mDeviceInfo.mDDRBankCount;
-        uint64_t start = 0;
+        uint64_t start = 0x0;
         for (unsigned i = 0; i < mDeviceInfo.mDDRBankCount; i++) {
             mDDRMemoryManager.push_back(new MemoryManager(bankSize, start, DDR_BUFFER_ALIGNMENT));
             start += bankSize;
         }
     }
 
-    XDMAShim::~XDMAShim()
+    AwsXcl::~AwsXcl()
     {
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    munmap is defined in sys/mman.h
-//    close is defined in unistd.h
+#ifdef INTERNAL_TESTING
         if (mUserMap != MAP_FAILED) {
             munmap(mUserMap, MMAP_SIZE_USER);
         }
         if (mUserHandle > 0) {
             close(mUserHandle);
         }
+        if (mMgtHandle > 0)
+            close(mMgtHandle);
+#else
+//#       error "INTERNAL_TESTING macro disabled. AMZN code goes here. "
+	if (ocl_kernel_bar >=0)
+		fpga_pci_detach(ocl_kernel_bar);
+	if (ocl_global_mem_bar>=0)
+		fpga_pci_detach(ocl_global_mem_bar);
+	if (sda_mgmt_bar>=0)
+		fpga_pci_detach(sda_mgmt_bar);
 
-        delete mDataMover;
+	ocl_kernel_bar = -1;
+	ocl_global_mem_bar = -1;
+	sda_mgmt_bar = -1;
+
 #endif
+	delete mDataMover;
+
         for (auto i : mDDRMemoryManager) {
             delete i;
         }
@@ -608,80 +547,139 @@ namespace xclxdma {
         }
     }
 
-    XDMAShim::XDMAShim(unsigned index, const char *logfileName,
+    AwsXcl::AwsXcl(unsigned index, const char *logfileName,
                        xclVerbosityLevel verbosity) : mTag(TAG), mBoardNumber(index),
                                                       maxDMASize(0xfa0000),
                                                       mLocked(false),
                                                       mOffsets{0x0, 0x0, 0x0, 0x0},
                                                       mOclRegionProfilingNumberSlots(XPAR_AXI_PERF_MON_2_NUMBER_SLOTS)
     {
+        int slot_id = mBoardNumber;
         mDataMover = new DataMover(mBoardNumber, 1 /* 1 channel each dir */);
-        char file_name_buf[128];
-        std::sprintf((char *)&file_name_buf, "/dev/xcldma/xcldma%d_user", mBoardNumber);
-        mUserHandle = open(file_name_buf, O_RDWR | O_SYNC);
+// FIXME: need to revisit and change number of channels
 
+#ifdef INTERNAL_TESTING
+        char file_name_buf[128];
+        std::sprintf((char *)&file_name_buf, "/dev/xdma%d_user", mBoardNumber);
+        mUserHandle = open(file_name_buf, O_RDWR | O_SYNC);
         mUserMap = (char *)mmap(0, MMAP_SIZE_USER, PROT_READ | PROT_WRITE, MAP_SHARED, mUserHandle, 0);
         if (mUserMap == MAP_FAILED) {
             close(mUserHandle);
             mUserHandle = -1;
         }
 
+        std::string s = "u.log";
+        logfileName = s.c_str();
         if (logfileName && (logfileName[0] != '\0')) {
             mLogStream.open(logfileName);
             mLogStream << "FUNCTION, THREAD ID, ARG..."  << std::endl;
             mLogStream << __func__ << ", " << std::this_thread::get_id() << std::endl;
         }
 
-        // First try the new info2 method and if that fails fall back to legacy info
+	std::fill(&file_name_buf[0], &file_name_buf[0] + 128, 0);
+        std::sprintf((char *)&file_name_buf, "/dev/awsmgmt%d", mBoardNumber);
+        mMgtHandle = open(file_name_buf, O_RDWR | O_SYNC);
         if (xclGetDeviceInfo2(&mDeviceInfo)) {
-            xclDeviceInfo oldInfo;
-            if (xclGetDeviceInfo(&oldInfo)) {
-                close(mUserHandle);
-                mUserHandle = -1;
-            }
-            else {
-                mDeviceInfo = to_info2(oldInfo);
-            }
+          close(mUserHandle);
+          mUserHandle = -1;
         }
+#else
+	ocl_kernel_bar = -1;
+	ocl_global_mem_bar = -1;
+	sda_mgmt_bar = -1;
+
+	if (xclGetDeviceInfo2(&mDeviceInfo)) {
+		//	print error;
+	}
+	else
+	if (fpga_pci_attach(slot_id, FPGA_APP_PF, APP_PF_BAR0, 0, &ocl_kernel_bar) ) {
+		ocl_kernel_bar = -1;
+		// print error
+	}
+	else
+	if (fpga_pci_attach(slot_id, FPGA_APP_PF, APP_PF_BAR4, 0, &ocl_global_mem_bar) ) {
+		fpga_pci_detach(ocl_kernel_bar);
+		ocl_kernel_bar = -1;
+		ocl_global_mem_bar = -1;
+		sda_mgmt_bar = -1;
+		// print error
+	}
+	else
+	if (fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR4, 0, &sda_mgmt_bar) ) {
+		// print error
+		fpga_pci_detach(ocl_kernel_bar);
+		fpga_pci_detach(ocl_global_mem_bar);
+		ocl_kernel_bar = -1;
+		ocl_global_mem_bar = -1;
+		sda_mgmt_bar = -1;
+	}
+#endif
+
+
         initMemoryManager();
     }
 
-    bool XDMAShim::isGood() const {
+    bool AwsXcl::isGood() const {
         if (!mDataMover)
             return false;
+#ifdef INTERNAL_TESTING
         if (mUserHandle < 0)
             return false;
+        if (mMgtHandle < 0)
+            return false;
+#else
+	if (ocl_kernel_bar < 0)
+	     return false;
+	if (ocl_global_mem_bar < 0)
+	     return false;
+	if (sda_mgmt_bar < 0)
+	     return false;
+#endif
         return mDataMover->isGood();
         // TODO: Add sanity check for card state
     }
 
 
-    int XDMAShim::pcieBarRead(int bar_num, unsigned long long offset, void* buffer, unsigned long long length) {
+    int AwsXcl::pcieBarRead(int bar_num, unsigned long long offset, void* buffer, unsigned long long length) {
         const char *mem = 0;
+        char *qBuf = (char *)buffer;
         switch (bar_num) {
-        case 0:
-        {
-            if ((length + offset) > MMAP_SIZE_USER) {
-                return -1;
-            }
-            mem = mUserMap;
-            break;
-        }
-        default:
-        {
-            return -1;
-        }
+#ifdef INTERNAL_TESTING
+		case 0:
+		{
+            		if ((length + offset) > MMAP_SIZE_USER) {
+                		return -1;
+            		}
+            		mem = mUserMap;
+#else
+		case APP_PF_BAR0:
+		{
+#endif
+            		break;
+        	}
+		default:
+        	{
+            		return -1;
+        	}
         }
 
-        char *qBuf = (char *)buffer;
         while (length >= 4) {
+#ifdef INTERNAL_TESTING
             *(unsigned *)qBuf = *(unsigned *)(mem + offset);
+#else
+	    fpga_pci_peek(ocl_kernel_bar, (uint64_t)offset,(uint32_t*)qBuf);
+#endif
             offset += 4;
             qBuf += 4;
             length -= 4;
         }
         while (length) {
+#ifdef INTERNAL_TESTING
             *qBuf = *(mem + offset);
+#else
+
+	// TODO - add support for sub 4-byte read in AWS platform
+#endif
             offset++;
             qBuf++;
             length--;
@@ -691,32 +689,46 @@ namespace xclxdma {
         return 0;
     }
 
-    int XDMAShim::pcieBarWrite(int bar_num, unsigned long long offset, const void* buffer, unsigned long long length) {
+    int AwsXcl::pcieBarWrite(int bar_num, unsigned long long offset, const void* buffer, unsigned long long length) {
         char *mem = 0;
+        char *qBuf = (char *)buffer;
         switch (bar_num) {
-        case 0:
-        {
-            if ((length + offset) > MMAP_SIZE_USER) {
-                return -1;
-            }
-            mem = mUserMap;
-            break;
-        }
-        default:
-        {
-            return -1;
-        }
+#ifdef INTERNAL_TESTING
+        	case 0:
+        	{
+            		if ((length + offset) > MMAP_SIZE_USER) {
+                		return -1;
+            		}
+            		mem = mUserMap;
+#else
+		case APP_PF_BAR0:
+		{
+#endif
+            		break;
+        	}
+        	default:
+        	{
+            		return -1;
+        	}
         }
 
-        char *qBuf = (char *)buffer;
         while (length >= 4) {
+#ifdef INTERNAL_TESTING
             *(unsigned *)(mem + offset) = *(unsigned *)qBuf;
+#else
+	    fpga_pci_poke(ocl_kernel_bar, uint64_t (offset), *((uint32_t*) qBuf));
+#endif
             offset += 4;
             qBuf += 4;
             length -= 4;
         }
         while (length) {
+#ifdef INTERNEL_TESTING
             *(mem + offset) = *qBuf;
+#else
+          std::cout << "xclWrite - unsupported write with length not multiple of 4-bytes" << std::endl;
+
+#endif
             offset++;
             qBuf++;
             length--;
@@ -726,169 +738,56 @@ namespace xclxdma {
         return 0;
     }
 
-    bool XDMAShim::zeroOutDDR()
+    bool AwsXcl::zeroOutDDR()
     {
-      // Zero out the DDR so MIG ECC believes we have touched all the bits
-      // and it does not complain when we try to read back without explicit
-      // write. The latter usually happens as a result of read-modify-write
-      // TODO: Try and speed this up.
-      // [1] Possibly move to kernel mode driver.
-      // [2] Zero out specific buffers when they are allocated
-      static const unsigned long long BLOCK_SIZE = 0x4000000;
-      void *buf = 0;
-      if (posix_memalign(&buf, DDR_BUFFER_ALIGNMENT, BLOCK_SIZE))
-          return false;
-      memset(buf, 0, BLOCK_SIZE);
-      mDataMover->pset64(buf, BLOCK_SIZE, 0, mDeviceInfo.mDDRSize/BLOCK_SIZE);
-      free(buf);
-      return true;
+      // Zero out the FPGA external DRAM Content so memory controller
+      // will not complain about ECC error from memory regions not
+      // initialized before
+      // In AWS F1 FPGA, the DRAM is clear before loading new AFI
+      // hence this API is redundant and will return false to
+      // make sure developers dont assume it works
+
+      //      static const unsigned long long BLOCK_SIZE = 0x4000000;
+//      void *buf = 0;
+//      if (posix_memalign(&buf, DDR_BUFFER_ALIGNMENT, BLOCK_SIZE))
+//          return false;
+//      memset(buf, 0, BLOCK_SIZE);
+//      mDataMover->pset64(buf, BLOCK_SIZE, 0, mDeviceInfo.mDDRSize/BLOCK_SIZE);
+//      free(buf);
+      return false;
     }
 
-    bool XDMAShim::xclLockDevice()
+  /* Locks a given FPGA Slot
+   * By levering the available lock infrastrucutre for the DMA
+   * Driver associated with the given FPGA slot
+   */
+    bool AwsXcl::xclLockDevice()
     {
         if (mDataMover->lock() == false)
             return false;
-
+#ifdef INTERNAL_TESTING
         if (flock(mUserHandle, LOCK_EX | LOCK_NB) == -1) {
             mDataMover->unlock();
             return false;
         }
+#else
+// FIXME: do we need to flock the ocl_kernel interface as well ?
+//
+#endif
         mLocked = true;
 
-        return zeroOutDDR();
+//        return zeroOutDDR();
+      return true;
     }
 
-    std::string XDMAShim::getDSAName(unsigned short deviceId, unsigned short subsystemId)
+    std::string AwsXcl::getDSAName(unsigned short deviceId, unsigned short subsystemId)
     {
-        std::string dsa("xilinx:?:?:?");
-        const unsigned dsaNum = (deviceId << 16) | subsystemId;
-        switch(dsaNum)
-        {
-        case 0x71380121:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":2.1";
-            break;
-        case 0x71380122:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":2.2";
-            break;
-        case 0x71380123:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":2.3";
-            break;
-        case 0x71380130:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":3.0";
-            break;
-        case 0x71380131:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":3.1";
-            break;
-        case 0x71380132:
-            dsa = "xilinx:adm-pcie-7v3:1ddr" OSTAG ":3.2";
-            break;
-        case 0x71380221:
-            dsa = "xilinx:adm-pcie-7v3:2ddr" OSTAG ":2.1";
-            break;
-        case 0x81380121:
-            dsa = "xilinx:adm-pcie-ku3:1ddr" OSTAG ":2.1";
-            break;
-        case 0x81380122:
-            dsa = "xilinx:adm-pcie-ku3:1ddr" OSTAG ":2.2";
-            break;
-        case 0x81380130:
-            dsa = "xilinx:adm-pcie-ku3:1ddr" OSTAG ":3.0";
-            break;
-        case 0x81380221:
-            dsa = "xilinx:adm-pcie-ku3:2ddr" OSTAG ":2.1";
-            break;
-        case 0x81380222:
-            dsa = "xilinx:adm-pcie-ku3:2ddr" OSTAG ":2.2";
-            break;
-        case 0x81380230:
-            dsa = "xilinx:adm-pcie-ku3:2ddr" OSTAG ":3.0";
-            break;
-        case 0x81380231:
-            dsa = "xilinx:adm-pcie-ku3:2ddr" OSTAG ":3.1";
-            break;
-        case 0x81380232:
-            dsa = "xilinx:adm-pcie-ku3:2ddr" OSTAG ":3.2";
-            break;
-        case 0x81381231:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-40g:3.1";
-            break;
-        case 0x81381232:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-40g:3.2";
-            break;
-        case 0x81388221:
-            dsa = "xilinx:adm-pcie-ku3:tandem-2ddr:2.1";
-            break;
-        case 0x81388222:
-            dsa = "xilinx:adm-pcie-ku3:tandem-2ddr:2.2";
-            break;
-        case 0x81388230:
-            dsa = "xilinx:adm-pcie-ku3:tandem-2ddr:3.0";
-            break;
-        case 0x81384221:
-            dsa = "xilinx:adm-pcie-ku3:exp-pr-2ddr:2.1";
-            break;
-        case 0x81384222:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-xpr:2.2";
-            break;
-        case 0x81384230:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-xpr:3.0";
-            break;
-        case 0x81384231:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-xpr:3.1";
-            break;
-        case 0x81384232:
-            dsa = "xilinx:adm-pcie-ku3:2ddr-xpr:3.2";
-            break;
-        case 0x82380222:
-            dsa = "xilinx:tul-pcie3-ku115:2ddr:2.2";
-            break;
-        case 0x82380230:
-            dsa = "xilinx:tul-pcie3-ku115:2ddr:3.0";
-            break;
-        case 0x82380231:
-            dsa = "xilinx:tul-pcie3-ku115:2ddr:3.1";
-            break;
-        case 0x82380232:
-            dsa = "xilinx:tul-pcie3-ku115:2ddr:3.2";
-            break;
-        case 0x82384422:
-            dsa = "xilinx:tul-pcie3-ku115:4ddr-xpr:2.2";
-            break;
-        case 0x82384430:
-            dsa = "xilinx:tul-pcie3-ku115:4ddr-xpr:3.0";
-            break;
-        case 0x82384431:
-            dsa = "xilinx:tul-pcie3-ku115:4ddr-xpr:3.1";
-            break;
-        case 0x82384432:
-            dsa = "xilinx:xil-accel-rd-ku115:4ddr-xpr:3.2";
-            break;
-        case 0x83384431:
-            dsa = "xilinx:tul-pcie3-vu095:4ddr-xpr:3.1";
-            break;
-        case 0x83384432:
-            dsa = "xilinx:tul-pcie3-vu095:4ddr-xpr:3.2";
-            break;
-        case 0x84380231:
-            dsa = "xilinx:adm-pcie-8k5:2ddr:3.1";
-            break;
-        case 0x84380232:
-            dsa = "xilinx:adm-pcie-8k5:2ddr:3.2";
-            break;
-        case 0x923F4232:
-            dsa = "xilinx:minotaur-pcie-vu9p:2ddr-xpr:3.2";
-            break;
-        case 0x923F4432:
-            dsa = "xilinx:minotaur-pcie-vu9p:4ddr-xpr:3.2";
-            break;
-
-        default:
-            break;
-        }
+        // Hard coded to AWS DSA name
+        std::string dsa("xilinx:minotaur-vu9p-f1:4ddr-xpr:3.3");
         return dsa;
     }
 
-    int XDMAShim::xclGetDeviceInfo2(xclDeviceInfo2 *info)
+    int AwsXcl::xclGetDeviceInfo2(xclDeviceInfo2 *info)
     {
         std::memset(info, 0, sizeof(xclDeviceInfo2));
         info->mMagic = 0X586C0C6C;
@@ -896,35 +795,61 @@ namespace xclxdma {
         info->mHALMajorVersion = XCLHAL_MINOR_VER;
         info->mMinTransferSize = DDR_BUFFER_ALIGNMENT;
         info->mDMAThreads = mDataMover->channelCount();
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    XDMA_IOCINFO depends on _IOW, which is defined indirectly by <linux/ioctl.h>
-//    ioctl is defined in sys/ioctl.h
-        xdma_ioc_info2 obj = {{0X586C0C6C, XDMA_IOCINFO2}};
-        int ret = ioctl(mUserHandle, XDMA_IOCINFO2, &obj);
+
+#ifdef INTERNAL_TESTING
+        xdma_ioc_info obj = {{0X586C0C6C, XDMA_IOCINFO}};
+      /* Calling the underlying DMA driver to extract
+       * DMA specific configuration
+       * A non-zero value reprent at error
+       */
+        int ret = ioctl(mUserHandle, XDMA_IOCINFO, &obj);
+      // Log the return value for further debug
         if (ret)
             return ret;
+
+        awsmgmt_ioc_info mgmt_info_obj;
+        ret = ioctl(mMgtHandle, AWSMGMT_IOCINFO, &mgmt_info_obj);
+        if (ret)
+            return ret;
+
+        for (int i = 0; i < 4 ; ++i) {
+          info->mOCLFrequency[i] = mgmt_info_obj.ocl_frequency[i];
+        }
         info->mVendorId = obj.vendor;
         info->mDeviceId = obj.device;
         info->mSubsystemId = obj.subsystem_device;
         info->mSubsystemVendorId = obj.subsystem_vendor;
         info->mDeviceVersion = obj.subsystem_device & 0x00ff;
-#endif
-        // TUL cards (0x8238) have 4 GB / bank; other cards have 8 GB memory / bank
-        info->mDDRSize = (info->mDeviceId == 0x8238) ? 0x100000000 : 0x200000000;
-        info->mDataAlignment = DDR_BUFFER_ALIGNMENT;
-        info->mNumClocks = obj.num_clocks;
-        for (int i = 0; i < obj.num_clocks; ++i) {
-          info->mOCLFrequency[i] = obj.ocl_frequency[i];
-        }
-        info->mPCIeLinkWidth = obj.pcie_link_width;
-        info->mPCIeLinkSpeed = obj.pcie_link_speed;
-        info->mDDRBankCount = info->mSubsystemId & 0x0f00;
-        info->mDDRBankCount >>= 8;
-        if (info->mDDRBankCount == 0)
-            info->mDDRBankCount = 1;
+        info->mPCIeLinkWidth = mgmt_info_obj.pcie_link_width;
+        info->mPCIeLinkSpeed = mgmt_info_obj.pcie_link_speed;
+#else
+	struct fpga_slot_spec slot_info;
+	fpga_pci_get_slot_spec(mBoardNumber,  &slot_info);
+	info->mVendorId = slot_info.map[FPGA_APP_PF].vendor_id;
+	info->mDeviceId = slot_info.map[FPGA_APP_PF].device_id;
+// FIXME - update next 3 variables
+// info->mSubsystemId = 0;
+	info->mSubsystemVendorId = 0;
+	info->mDeviceVersion = 0;
 
-        info->mDDRSize *= info->mDDRBankCount;
+	for (int i = 0; i < 4 ; ++i) {
+	  info->mOCLFrequency[i] = 0;
+	}
+        info->mPCIeLinkWidth = 16;// PCIe Gen3 x16 bus
+        info->mPCIeLinkSpeed = 8; // 8Gbps Gen3 in AWS F1
+
+#endif
+
+
+        // F1 has 16 GiB per channel
+        info->mDDRSize = 0x400000000;
+        info->mDataAlignment = DDR_BUFFER_ALIGNMENT;
+        info->mNumClocks = 4;
+        // Number of available channels
+        // TODO: add support for other FPGA configurations with less
+        // than 4 DRAM channels
+        info->mDDRBankCount = 4;
+
         for (auto i : mDDRMemoryManager) {
             info->mDDRFreeSize += i->freeSize();
         }
@@ -942,116 +867,62 @@ namespace xclxdma {
               << ", clock freq 2=" << std::dec << info->mOCLFrequency[1] << std::endl;
         }
 
-        info->mOnChipTemp  = obj.onchip_temp;
-        info->mFanTemp     = obj.fan_temp;
-        info->mVInt        = obj.vcc_int;
-        info->mVAux        = obj.vcc_aux;
-        info->mVBram       = obj.vcc_bram;
-        info->mMigCalib    = obj.mig_calibration;
-
-        return 0;
-    }
-
-    int XDMAShim::xclGetDeviceInfo(xclDeviceInfo *info)
-    {
-        std::memset(info, 0, sizeof(xclDeviceInfo));
-        info->mMagic = 0X586C0C6C;
-        info->mHALMajorVersion = XCLHAL_MAJOR_VER;
-        info->mHALMajorVersion = XCLHAL_MINOR_VER;
-        info->mMinTransferSize = DDR_BUFFER_ALIGNMENT;
-        info->mDMAThreads = mDataMover->channelCount();
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    XDMA_IOCINFO depends on _IOW, which is defined indirectly by <linux/ioctl.h>
-//    ioctl is defined in sys/ioctl.h
-        xdma_ioc_info obj = {{0X586C0C6C, XDMA_IOCINFO}};
-        int ret = ioctl(mUserHandle, XDMA_IOCINFO, &obj);
-        if (ret)
-            return ret;
-        info->mVendorId = obj.vendor;
-        info->mDeviceId = obj.device;
-        info->mSubsystemId = obj.subsystem_device;
-        info->mSubsystemVendorId = obj.subsystem_vendor;
-        info->mDeviceVersion = obj.subsystem_device & 0x00ff;
+        info->mMigCalib = true;
+        for (int i = 0; i < 4; i++) {
+#ifdef INTERNAL_TEST
+            info->mMigCalib = info->mMigCalib && mgmt_info_obj.mig_calibration[i];
+#else
+	    info->mMigCalib = 1;
 #endif
-        // TUL cards (0x8238) have 4 GB / bank; other cards have 8 GB memory / bank
-        info->mDDRSize = (info->mDeviceId == 0x8238) ? 0x100000000 : 0x200000000;
-        info->mDataAlignment = DDR_BUFFER_ALIGNMENT;
-        info->mOCLFrequency = obj.ocl_frequency;
-        info->mPCIeLinkWidth = obj.pcie_link_width;
-        info->mPCIeLinkSpeed = obj.pcie_link_speed;
-        info->mDDRBankCount = info->mSubsystemId & 0x0f00;
-        info->mDDRBankCount >>= 8;
-        if (info->mDDRBankCount == 0)
-            info->mDDRBankCount = 1;
-
-        info->mDDRSize *= info->mDDRBankCount;
-        for (auto i : mDDRMemoryManager) {
-            info->mDDRFreeSize += i->freeSize();
         }
-
-        const std::string deviceName = getDSAName(info->mDeviceId, info->mSubsystemId);
-        if (mLogStream.is_open())
-            mLogStream << __func__ << ", " << std::this_thread::get_id() << ", " << deviceName << std::endl;
-
-
-        std::size_t length = deviceName.copy(info->mName, deviceName.length(),0);
-        info->mName[length] = '\0';
-
-        if (mLogStream.is_open()) {
-          mLogStream << __func__ << ": name=" << deviceName << ", version=0x" << std::hex << info->mDeviceVersion
-              << ", clock freq=" << std::dec << info->mOCLFrequency << std::endl;
-        }
+        //TODO: Umang
+        info->mOnChipTemp  = 25;
+        info->mFanTemp     = 0;
+        info->mVInt        = 0.9;
+        info->mVAux        = 0.9;
+        info->mVBram       = 0.9;
         return 0;
     }
 
-    int XDMAShim::resetDevice(xclResetKind kind) {
-#ifndef _WINDOWS
-// TODO: Windows build support
-//    XDMA_IOCRESET depends on _IOW, which is defined indirectly by <linux/ioctl.h>
-//    ioctl is defined in sys/ioctl.h
+    int AwsXcl::resetDevice(xclResetKind kind) {
         for (auto i : mDDRMemoryManager) {
             i->reset();
         }
 
         // Call a new IOCTL to just reset the OCL region
-        if (kind == XCL_RESET_FULL) {
-            xdma_ioc_base obj = {0X586C0C6C, XDMA_IOCHOTRESET};
-            return ioctl(mUserHandle, XDMA_IOCHOTRESET, &obj);
-        }
-        else if (kind == XCL_RESET_KERNEL) {
-            xdma_ioc_base obj = {0X586C0C6C, XDMA_IOCOCLRESET};
-            return ioctl(mUserHandle, XDMA_IOCOCLRESET, &obj);
-        }
-        return -EINVAL;
-#else
+        // TODO : umang
+//        if (kind == XCL_RESET_FULL) {
+//            xdma_ioc_base obj = {0X586C0C6C, XDMA_IOCHOTRESET};
+//            return ioctl(mUserHandle, XDMA_IOCHOTRESET, &obj);
+//        }
+//        else if (kind == XCL_RESET_KERNEL) {
+//            xdma_ioc_base obj = {0X586C0C6C, XDMA_IOCOCLRESET};
+//            return ioctl(mUserHandle, XDMA_IOCOCLRESET, &obj);
+//        }
+//        return -EINVAL;
+
+      // AWS FIXME - add reset
         return 0;
-#endif
     }
 
-    int XDMAShim::xclReClock(unsigned freqMHz)
+    int AwsXcl::xclReClock2(unsigned short region, const unsigned short *targetFreqMHz)
     {
-        xdma_ioc_freqscaling obj = {{0X586C0C6C, XDMA_IOCFREQSCALING}, freqMHz};
-        return ioctl(mUserHandle, XDMA_IOCFREQSCALING, &obj);
-    }
-
-    int XDMAShim::xclReClock2(unsigned short region, const unsigned short *targetFreqMHz)
-    {
-        xdma_ioc_freqscaling2 obj;
-        std::memset(&obj, 0, sizeof(xdma_ioc_freqscaling2));
-        obj.base= {0X586C0C6C, XDMA_IOCFREQSCALING2};
-        obj.ocl_region = region;
-        obj.ocl_target_freq[0] = targetFreqMHz[0];
-        obj.ocl_target_freq[1] = targetFreqMHz[1];
-        return ioctl(mUserHandle, XDMA_IOCFREQSCALING2, &obj);
+    #ifdef INTERNAL_TESTING
+            awsmgmt_ioc_freqscaling obj = {0, targetFreqMHz[0], targetFreqMHz[1], 0, 0};
+            return ioctl(mMgtHandle, AWSMGMT_IOCFREQSCALING, &obj);
+    #else
+//    #       error "INTERNAL_TESTING macro disabled. AMZN code goes here. "
+//    #       This API is not supported in AWS, the frequencies are set per AFI
+   	return -1;
+    #endif
     }
 }
 
 
 xclDeviceHandle xclOpen(unsigned index, const char *logfileName, xclVerbosityLevel level)
 {
-    xclxdma::XDMAShim *handle = new xclxdma::XDMAShim(index, logfileName, level);
-    if (!xclxdma::XDMAShim::handleCheck(handle)) {
+    awsbwhal::AwsXcl *handle = new awsbwhal::AwsXcl(index, logfileName, level);
+    if (!awsbwhal::AwsXcl::handleCheck(handle)) {
         delete handle;
         handle = 0;
     }
@@ -1061,23 +932,14 @@ xclDeviceHandle xclOpen(unsigned index, const char *logfileName, xclVerbosityLev
 
 void xclClose(xclDeviceHandle handle)
 {
-    if (xclxdma::XDMAShim::handleCheck(handle)) {
-        delete ((xclxdma::XDMAShim *)handle);
+    if (awsbwhal::AwsXcl::handleCheck(handle)) {
+        delete ((awsbwhal::AwsXcl *)handle);
     }
-}
-
-
-int xclGetDeviceInfo(xclDeviceHandle handle, xclDeviceInfo *info)
-{
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
-    if (!drv)
-        return -1;
-    return drv->xclGetDeviceInfo(info);
 }
 
 int xclGetDeviceInfo2(xclDeviceHandle handle, xclDeviceInfo2 *info)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclGetDeviceInfo2(info);
@@ -1085,15 +947,12 @@ int xclGetDeviceInfo2(xclDeviceHandle handle, xclDeviceInfo2 *info)
 
 int xclLoadBitstream(xclDeviceHandle handle, const char *xclBinFileName)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
-    if (!drv)
-        return -1;
-    return drv->xclLoadBitstream(xclBinFileName);
+    return -ENOSYS;
 }
 
 int xclLoadXclBin(xclDeviceHandle handle, const xclBin *buffer)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclLoadXclBin(buffer);
@@ -1101,7 +960,7 @@ int xclLoadXclBin(xclDeviceHandle handle, const xclBin *buffer)
 
 size_t xclWrite(xclDeviceHandle handle, xclAddressSpace space, uint64_t offset, const void *hostBuf, size_t size)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclWrite(space, offset, hostBuf, size);
@@ -1109,7 +968,7 @@ size_t xclWrite(xclDeviceHandle handle, xclAddressSpace space, uint64_t offset, 
 
 size_t xclRead(xclDeviceHandle handle, xclAddressSpace space, uint64_t offset, void *hostBuf, size_t size)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclRead(space, offset, hostBuf, size);
@@ -1118,7 +977,7 @@ size_t xclRead(xclDeviceHandle handle, xclAddressSpace space, uint64_t offset, v
 
 uint64_t xclAllocDeviceBuffer(xclDeviceHandle handle, size_t size)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclAllocDeviceBuffer(size);
@@ -1128,7 +987,7 @@ uint64_t xclAllocDeviceBuffer(xclDeviceHandle handle, size_t size)
 uint64_t xclAllocDeviceBuffer2(xclDeviceHandle handle, size_t size, xclMemoryDomains domain,
                                unsigned flags)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclAllocDeviceBuffer2(size, domain, flags);
@@ -1137,7 +996,7 @@ uint64_t xclAllocDeviceBuffer2(xclDeviceHandle handle, size_t size, xclMemoryDom
 
 void xclFreeDeviceBuffer(xclDeviceHandle handle, uint64_t buf)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return;
     return drv->xclFreeDeviceBuffer(buf);
@@ -1146,7 +1005,7 @@ void xclFreeDeviceBuffer(xclDeviceHandle handle, uint64_t buf)
 
 size_t xclCopyBufferHost2Device(xclDeviceHandle handle, uint64_t dest, const void *src, size_t size, size_t seek)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclCopyBufferHost2Device(dest, src, size, seek);
@@ -1155,7 +1014,7 @@ size_t xclCopyBufferHost2Device(xclDeviceHandle handle, uint64_t dest, const voi
 
 size_t xclCopyBufferDevice2Host(xclDeviceHandle handle, void *dest, uint64_t src, size_t size, size_t skip)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclCopyBufferDevice2Host(dest, src, size, skip);
@@ -1165,74 +1024,44 @@ size_t xclCopyBufferDevice2Host(xclDeviceHandle handle, void *dest, uint64_t src
 //This will be deprecated.
 int xclUpgradeFirmware(xclDeviceHandle handle, const char *fileName)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
-    return drv->xclUpgradeFirmware(fileName);
+    return xclUpgradeFirmware2(handle, fileName, 0);
 }
 
 int xclUpgradeFirmware2(xclDeviceHandle handle, const char *fileName1, const char* fileName2)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
-
-    if(!fileName2 || std::strlen(fileName2) == 0)
-      return drv->xclUpgradeFirmware(fileName1);
-    else
-      return drv->xclUpgradeFirmware2(fileName1, fileName2);
-}
-
-int xclUpgradeFirmwareXSpi(xclDeviceHandle handle, const char *fileName, int index)
-{
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
-    if (!drv)
-        return -1;
-    return drv->xclUpgradeFirmwareXSpi(fileName, index);
-}
-
-int xclTestXSpi(xclDeviceHandle handle, int index)
-{
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
-    if (!drv)
-        return -1;
-    return drv->xclTestXSpi(index);
+    return -ENOSYS;
 }
 
 int xclBootFPGA(xclDeviceHandle handle)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
-    return drv->xclBootFPGA();
+    return -ENOSYS;
 }
 
 unsigned xclProbe()
 {
-    return xclxdma::XDMAShim::xclProbe();
+    return awsbwhal::AwsXcl::xclProbe();
 }
-
 
 int xclResetDevice(xclDeviceHandle handle, xclResetKind kind)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
-    return drv->resetDevice(kind);
+    return -ENOSYS;
 }
-
-int xclReClock(xclDeviceHandle handle, unsigned targetFreqMHz)
-{
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
-    if (!drv)
-        return -1;
-    return drv->xclReClock(targetFreqMHz);
-}
-
 
 int xclReClock2(xclDeviceHandle handle, unsigned short region, const unsigned short *targetFreqMHz)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclReClock2(region, targetFreqMHz);
@@ -1241,10 +1070,8 @@ int xclReClock2(xclDeviceHandle handle, unsigned short region, const unsigned sh
 
 int xclLockDevice(xclDeviceHandle handle)
 {
-    xclxdma::XDMAShim *drv = xclxdma::XDMAShim::handleCheck(handle);
+    awsbwhal::AwsXcl *drv = awsbwhal::AwsXcl::handleCheck(handle);
     if (!drv)
         return -1;
     return drv->xclLockDevice() ? 0 : -1;
 }
-
-// XSIP watermark, do not delete 67d7842dbbe25473c3c32b93c0da8047785f30d78e8a024de1b57352245f9689

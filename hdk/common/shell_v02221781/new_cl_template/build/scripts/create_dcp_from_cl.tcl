@@ -76,6 +76,7 @@ set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
 puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
 
+#read the .sv and .v file, but skip .vh/.h/.inc
 read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
 
 

@@ -2,7 +2,7 @@
 #define _XDMA_MEMORY_MANAGER_H_
 
 /**
- * Copyright (C) 2015 Xilinx, Inc
+ * Copyright (C) 2015-2017 Xilinx, Inc
  * Author: Sonal Santan
  * Simple usermode XDMA DDR memory manager used by HAL
  * Eventually the common code here will be used by all HAL drivers.
@@ -23,9 +23,9 @@
 
 #include <mutex>
 #include <list>
-#include "driver/include/xclhal.h"
+#include "xclhal.h"
 
-namespace xclxdma {
+namespace awsbwhal {
     class MemoryManager {
         std::mutex mMemManagerMutex;
         std::list<std::pair<uint64_t, uint64_t> > mFreeBufferList;

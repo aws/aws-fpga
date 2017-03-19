@@ -283,7 +283,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 
 	/** Loop through the sysfs device directories */
 	while (true) {
-		memset(entry, 0, sizeof(entry));
+		memset(entry, 0, sizeof(struct dirent));
 		readdir_r(dirp, entry, &result);
 		if (result == NULL) {
 			/** No more directories */
