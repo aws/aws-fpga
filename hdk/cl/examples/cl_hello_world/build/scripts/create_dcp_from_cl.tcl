@@ -1,9 +1,19 @@
-## =============================================================================
-## Copyright 2016 Amazon.com, Inc. or its affiliates.
-## All Rights Reserved Worldwide.
-## create_cl.tcl: Build to generate CL design checkpoint based on
-## 		developer code
-## =============================================================================
+#//---------------------------------------------------------------------------------------
+#// Amazon FGPA Hardware Development Kit
+#//
+#// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#//
+#// Licensed under the Amazon Software License (the "License"). You may not use
+#// this file except in compliance with the License. A copy of the License is
+#// located at
+#//
+#//    http://aws.amazon.com/asl/
+#//
+#// or in the "license" file accompanying this file. This file is distributed on
+#// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+#// implied. See the License for the specific language governing permissions and
+#// limitations under the License.
+#//---------------------------------------------------------------------------------------
 
 package require tar
 
@@ -50,7 +60,7 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
-puts "All reports and intermediate results will be time stamped with $timestamp";
+puts "AWS FPGA: All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
 set_msg_config -severity STATUS -suppress
@@ -58,7 +68,7 @@ set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
 
-puts "AWS FPGA: Calling the encrypt.tcl";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
 source encrypt.tcl
 
@@ -77,9 +87,16 @@ set_param chipscope.enablePRFlow true
 #Convenience to set the root of the RTL directory
 set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
-puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Reading developer's Custom Logic files post encryption.";
+
+#---- User would replace this section -----
+
+# Reading the .sv and .v files, as proper designs would not require
+# reading .v, .vh, nor .inc files
 
 read_verilog -sv  [glob $ENC_SRC_DIR/*.?v] 
+
+#---- End of section replaced by User ----
 
 
 puts "AWS FPGA: Reading AWS Shell design";
@@ -140,7 +157,7 @@ set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
 ########################
 # CL Synthesis
 ########################
-puts "AWS FPGA: Start design synthesis";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthesis.";
 
 switch $strategy {
     "BASIC" {
@@ -174,17 +191,19 @@ if { $failval==0 } {
 	exit 1
 }
 
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth checkpoint.";
+
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
 close_project
 
 ########################
 # CL Optimize
 ########################
-puts "AWS FPGA: Optimizing design";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Optimizing design.";
 
 # Implementation
 #Read in the Shell checkpoint and do the CL implementation
-puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
 
 open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
@@ -196,7 +215,7 @@ $CL_DIR/build/constraints/cl_pnr_user.xdc \
 $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc
 ]
 
-puts "AWS FPGA: Optimize design during implementation";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Optimize design during implementation. ";
 
 switch $strategy {
     "BASIC" {
@@ -241,7 +260,7 @@ foreach uramSite $uramSites {
 ########################
 # CL Place
 ########################
-puts "AWS FPGA: Place design stage";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Place design stage.";
 
 switch $strategy {
     "BASIC" {
@@ -268,12 +287,16 @@ switch $strategy {
         puts "$strategy is NOT a valid strategy."
     }
 }
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Writing checkpoint post place.";
+
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
 ###########################
 # CL Physical Optimization
 ###########################
-puts "AWS FPGA: Physical optimization stage";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Physical optimization stage.";
 
 switch $strategy {
     "BASIC" {
@@ -303,7 +326,8 @@ switch $strategy {
 ########################
 # CL Route
 ########################
-puts "AWS FPGA: Route design stage";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Route design stage. ";
 
 switch $strategy {
     "BASIC" {
@@ -334,7 +358,8 @@ switch $strategy {
 #################################
 # CL Final Physical Optimization
 #################################
-puts "AWS FPGA: Post-route Physical optimization stage ";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Post-route Physical optimization stage. ";
 
 switch $strategy {
     "BASIC" {
@@ -362,9 +387,13 @@ switch $strategy {
 }
 
 #This is what will deliver to AWS
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing final DCP to to_aws directory.";
+
 write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 close_project
 
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Starting verification process of the DCP. ";
 # ################################################
 # Verify PR Build
 # ################################################
@@ -397,16 +426,10 @@ switch $strategy {
     }
 }
 
-# ################################################
-# Emulate AWS Bitstream Generation
-# ################################################
-puts "AWS FPGA: Emulate AWS bitstream generation"
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Emulate AWS bitstream generation. "
 
 # Make temp dir for bitstream
 file mkdir $CL_DIR/build/${timestamp}_aws_verify_temp_dir
-
-# Verify the Developer DCP is compatible with SH_BB. 
-pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 
 open_checkpoint $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
@@ -420,10 +443,8 @@ file delete -force $CL_DIR/build/${timestamp}_aws_verify_temp_dir
 ### --------------------------------------------
 
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
-puts "Compress files for sending back to AWS"
 
-# clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Compress files for sending to AWS. "
 
 # Create manifest file
 set manifest_file [open "$CL_DIR/build/checkpoints/to_aws/${timestamp}.manifest.txt" w]
@@ -449,8 +470,13 @@ if { [file exists $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar
 }
 
 # Tar checkpoint to aws
-cd $CL_DIR/build/checkpoints
-tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
+tar::create $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar [glob $CL_DIR/build/checkpoints/to_aws/${timestamp}*]
 
 close_design
 
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
+
+# clean up vivado.log file
+exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) finished cleaning the log file. ";

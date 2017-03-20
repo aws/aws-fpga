@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Xilinx, Inc
+ * Copyright (C) 2015-2017 Xilinx, Inc
  * Author: Sonal Santan
  * XDMA HAL Driver layered on top of XDMA kernel driver
  *
@@ -29,7 +29,7 @@
                      + __GNUC_PATCHLEVEL__)
 
 
-xclxdma::MemoryManager::MemoryManager(uint64_t size, uint64_t start,
+awsbwhal::MemoryManager::MemoryManager(uint64_t size, uint64_t start,
                                       unsigned alignment) : mSize(size), mStart(start), mAlignment(alignment),
                                                             mCoalesceThreshold(4), mFreeSize(0)
 {
@@ -38,14 +38,14 @@ xclxdma::MemoryManager::MemoryManager(uint64_t size, uint64_t start,
     mFreeSize = mSize;
 }
 
-xclxdma::MemoryManager::~MemoryManager()
+awsbwhal::MemoryManager::~MemoryManager()
 {
 
 
 }
 
 uint64_t
-xclxdma::MemoryManager::alloc(size_t size)
+awsbwhal::MemoryManager::alloc(size_t size)
 {
     if (size == 0)
         size = mAlignment;
@@ -77,7 +77,7 @@ xclxdma::MemoryManager::alloc(size_t size)
 }
 
 void
-xclxdma::MemoryManager::free(uint64_t buf)
+awsbwhal::MemoryManager::free(uint64_t buf)
 {
     std::lock_guard<std::mutex> lock(mMemManagerMutex);
     PairList::iterator i = find(buf);
@@ -93,7 +93,7 @@ xclxdma::MemoryManager::free(uint64_t buf)
 
 
 void
-xclxdma::MemoryManager::coalesce()
+awsbwhal::MemoryManager::coalesce()
 {
     // First sort the free buffers and then attempt to coalesce the neighbors
     mFreeBufferList.sort();
@@ -118,8 +118,8 @@ xclxdma::MemoryManager::coalesce()
 }
 
 // Caller should have acquired the mutex lock before calling find();
-xclxdma::MemoryManager::PairList::iterator
-xclxdma::MemoryManager::find(uint64_t buf)
+awsbwhal::MemoryManager::PairList::iterator
+awsbwhal::MemoryManager::find(uint64_t buf)
 {
 #if GCC_VERSION >= 40800
         PairList::iterator i = std::find_if(mBusyBufferList.begin(), mBusyBufferList.end(), [&] (const PairList::value_type& s)
@@ -137,7 +137,7 @@ xclxdma::MemoryManager::find(uint64_t buf)
 }
 
 void
-xclxdma::MemoryManager::reset()
+awsbwhal::MemoryManager::reset()
 {
     std::lock_guard<std::mutex> lock(mMemManagerMutex);
     mFreeBufferList.clear();
@@ -147,7 +147,7 @@ xclxdma::MemoryManager::reset()
 }
 
 std::pair<uint64_t, uint64_t>
-xclxdma::MemoryManager::lookup(uint64_t buf)
+awsbwhal::MemoryManager::lookup(uint64_t buf)
 {
     std::lock_guard<std::mutex> lock(mMemManagerMutex);
     PairList::iterator i = find(buf);
@@ -162,7 +162,7 @@ xclxdma::MemoryManager::lookup(uint64_t buf)
 
 
 bool
-xclxdma::MemoryManager::reserve(uint64_t base, size_t size)
+awsbwhal::MemoryManager::reserve(uint64_t base, size_t size)
 {
     assert(size);
     if (size > mSize)

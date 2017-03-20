@@ -1,4 +1,3 @@
-
 # TODO:
 # Add check if CL_DIR and HDK_SHELL_DIR directories exist
 # Add check if /build and /build/src_port_encryption directories exist
@@ -31,9 +30,10 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_pcim_template.inc       $TARGET_DI
 file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc    $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_flr_template.inc        $TARGET_DIR
 
+#---- End of section replaced by Developr ---
+
 # Make sure files have write permissions for the encryption
 exec chmod +w {*}[glob $TARGET_DIR/*]
 
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog [glob $TARGET_DIR/*.*]
 
-#---- End of section replaced by Developr ---

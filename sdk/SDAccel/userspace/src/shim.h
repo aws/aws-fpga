@@ -2,9 +2,11 @@
 #define _XDMA_SHIM_H_
 
 /**
- * Copyright (C) 2015-2016 Xilinx, Inc
+ * Copyright (C) 2017 Xilinx, Inc
  * Author: Sonal Santan
- * XDMA HAL Driver layered on top of XDMA kernel driver
+ * AWS HAL Driver layered on top of kernel drivers
+ *
+ * Code copied from SDAccel XDMA based HAL driver
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -19,15 +21,17 @@
  * under the License.
  */
 
-#include "driver/include/xclhal.h"
-#include "driver/include/xclperf.h"
-#include "driver/xcldma/include/xbar_sys_parameters.h"
-
+#include "xclhal.h"
+#include "xclperf.h"
 #include <fstream>
 #include <list>
 #include <vector>
 #include <string>
 #include <mutex>
+
+#ifndef INTERNAL_TESTING
+#include "fpga_pci.h"
+#endif
 
 // Work around GCC 4.8 + XDMA BAR implementation bugs
 // With -O3 PCIe BAR read/write are not reliable hence force -O2 as max
@@ -38,7 +42,7 @@
 #define SHIM_O2
 #endif
 
-namespace xclxdma {
+namespace awsbwhal {
     // Memory alignment for DDR and AXI-MM trace access
     template <typename T> class AlignedAllocator {
         void *mBuffer;
@@ -66,7 +70,7 @@ namespace xclxdma {
     class MemoryManager;
     class DataMover;
     // XDMA Shim
-    class XDMAShim {
+    class AwsXcl{
 
         struct ELARecord {
             unsigned mStartAddress;
@@ -85,7 +89,6 @@ namespace xclxdma {
     public:
 
         // Bitstreams
-        int xclLoadBitstream(const char *fileName);
         int xclLoadXclBin(const xclBin *buffer);
         int xclUpgradeFirmware(const char *fileName);
         int xclUpgradeFirmware2(const char *file1, const char* file2);
@@ -93,7 +96,6 @@ namespace xclxdma {
         int xclTestXSpi(int device_index);
         int xclBootFPGA();
         int resetDevice(xclResetKind kind);
-        int xclReClock(unsigned targetFreqMHz);
         int xclReClock2(unsigned short region, const unsigned short *targetFreqMHz);
 
         // Raw read/write
@@ -125,9 +127,8 @@ namespace xclxdma {
         size_t xclPerfMonReadTrace(xclPerfMonType type, xclTraceResultsVector& traceVector);
 
         // Sanity checks
-        int xclGetDeviceInfo(xclDeviceInfo *info);
         int xclGetDeviceInfo2(xclDeviceInfo2 *info);
-        static XDMAShim *handleCheck(void *handle);
+        static AwsXcl *handleCheck(void *handle);
         static unsigned xclProbe();
         bool xclLockDevice();
         unsigned getTAG() const {
@@ -135,8 +136,8 @@ namespace xclxdma {
         }
         bool isGood() const;
 
-        ~XDMAShim();
-        XDMAShim(unsigned index, const char *logfileName, xclVerbosityLevel verbosity);
+        ~AwsXcl();
+        AwsXcl(unsigned index, const char *logfileName, xclVerbosityLevel verbosity);
 
     private:
 
@@ -227,15 +228,16 @@ namespace xclxdma {
         const int mBoardNumber;
         const size_t maxDMASize;
         bool mLocked;
-
-#ifndef _WINDOWS
-// TODO: Windows build support
-        // mOffsets doesn't seem to be used
-        // and it caused window compilation error when we try to initialize it
         const uint64_t mOffsets[XCL_ADDR_SPACE_MAX];
-#endif
         DataMover *mDataMover;
+#ifdef INTERNAL_TESTING
         int mUserHandle;
+        int mMgtHandle;
+#else
+	pci_bar_handle_t ocl_kernel_bar; // AppPF BAR0 for OpenCL kernels
+	pci_bar_handle_t sda_mgmt_bar;; // MgmtPF BAR4, for SDAccel Perf mon etc
+	pci_bar_handle_t ocl_global_mem_bar; // AppPF BAR4
+#endif
         uint32_t mOclRegionProfilingNumberSlots;
 
         char *mUserMap;
@@ -252,5 +254,3 @@ namespace xclxdma {
 }
 
 #endif
-
-// XSIP watermark, do not delete 67d7842dbbe25473c3c32b93c0da8047785f30d78e8a024de1b57352245f9689

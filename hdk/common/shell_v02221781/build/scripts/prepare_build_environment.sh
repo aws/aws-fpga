@@ -59,7 +59,7 @@ fi
 
 if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
 then
-        echo "Creating the checkpoints\/to_aws directory"
+        echo "Creating the checkpoints /to_aws directory"
         mkdir $CL_DIR/build/checkpoints/to_aws
         if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
         then

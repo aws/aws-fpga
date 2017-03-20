@@ -2,7 +2,7 @@
 #define _XDMA_DATA_MOVER_H_
 
 /**
- * Copyright (C) 2016 Xilinx, Inc
+ * Copyright (C) 2016-2017 Xilinx, Inc
  * Author: Sonal Santan
  * XDMA HAL multi-threading safe, multi-channel DMA read/write support
  *
@@ -41,12 +41,12 @@
 #define SHIM_O2
 #endif
 
-namespace xclxdma {
+namespace awsbwhal {
     class DMAChannelManager
     {
     public:
         DMAChannelManager(unsigned deviceIndex, unsigned count, std::ios_base::openmode mode) : mCount(count) {
-            std::string baseName("/dev/xcldma/xcldma");
+            std::string baseName("/dev/xdma");
             baseName += std::to_string(deviceIndex);
             assert((mode == std::ios_base::in) || (mode == std::ios_base::out));
             const char *suffix = (mode == std::ios_base::out) ? "_h2c_" : "_c2h_";

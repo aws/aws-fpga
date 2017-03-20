@@ -1,0 +1,1862 @@
+diff --git a/sdk/userspace/fpga_image_tools/src/Makefile b/sdk/userspace/fpga_image_tools/src/Makefile
+index 522c4a5..ab475a8 100644
+--- a/sdk/userspace/fpga_image_tools/src/Makefile
++++ b/sdk/userspace/fpga_image_tools/src/Makefile
+@@ -21,7 +21,7 @@ LIB_PATH = $(TOP)/lib
+ INCLUDES = -I$(FPGAHALINC_PATH) -I$(TOP)/include -I../. -I.
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g  -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g  -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ LDFLAGS = -L$(LIB_PATH)/so
+ LDLIBS = -lfpga_mgmt
+diff --git a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.c b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.c
+index aa3a3b1..7ab30fd 100644
+--- a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.c
++++ b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.c
+@@ -91,7 +91,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+@@ -120,7 +120,7 @@ cli_attach(void)
+ out:
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+@@ -236,17 +236,17 @@ static int
+ command_metrics(void)
+ {
+ 	int ret;
+-	uint32_t i;
++	uint32_t i, flags;
+ 	struct fpga_mgmt_image_info info;
++	struct fpga_slot_spec slot_spec;
+ 
+ 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
+ 
+-	// todo:
+-	// req->fpga_cmd_flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+-	// req->fpga_cmd_flags |= (f1.clear_hw_metrics) ?  
+-	//	FPGA_CMD_CLEAR_HW_METRICS : 0;
++	flags = 0;
++	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
++	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
+ 
+-	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info);
++	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
+ 	fail_on(ret, err, "Unable to describe local image");
+ 
+ 	if (f1.show_headers) {
+@@ -261,13 +261,15 @@ command_metrics(void)
+ 
+ 	if (f1.rescan) {
+ 		/** Rescan the application PFs for this slot */
+-		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot); // todo: implement this in the library
++		ret = fpga_pci_rescan_slot_app_pfs();
+ 		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
+ 	}
+ 
+ 	/** Display the application PFs for this slot */
+-	// ret = cli_show_slot_app_pfs(f1.afi_slot); // todo
+-	//fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
++	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
++	fail_on_quiet(ret != 0, err, "fpga_pci_get_slot_spec failed");
++	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
++	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+ 
+ 	if (f1.get_hw_metrics) {
+ 		if (f1.show_headers) {
+@@ -375,7 +377,7 @@ command_metrics(void)
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+@@ -400,7 +402,7 @@ command_describe_slots(void)
+ 
+ 	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
+ 
+-	for (i = 0; i < sizeof_array(spec_array); ++i) {
++	for (i = 0; i < (int) sizeof_array(spec_array); ++i) {
+ 		if (spec_array[i].map[FPGA_APP_PF].vendor_id == 0)
+ 			continue;
+ 
+@@ -411,7 +413,7 @@ command_describe_slots(void)
+ 	}
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ typedef int (*command_func_t)(void);
+@@ -443,7 +445,7 @@ cli_main(void)
+ 
+ 	return command_table[f1.opcode]();
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+@@ -525,6 +527,9 @@ main(int argc, char *argv[])
+ 	ret = cli_main();
+ 	fail_on_quiet(ret != 0, err, "cli_main failed");
+ err:
++	if (ret) {
++		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
++	}
+ 	cli_detach();
+ 	cli_destroy();
+ 	return ret;
+diff --git a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.h b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.h
+index df222c6..bf2e06d 100644
+--- a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.h
++++ b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd.h
+@@ -44,30 +44,16 @@ enum {
+ 	AFI_EXT_END
+ };
+ 
+-/** F1 Mailbox PF defines */
++/** F1 Mailbox Device defines */
+ #define F1_MBOX_VENDOR_ID		0x1d0f
+ #define F1_MBOX_DEVICE_ID		0x1041
+ #define F1_MBOX_RESOURCE_NUM	0
+ 
+-/** F1 Application PF defines */
+-#define F1_APP_PF_START			0
+-#define F1_APP_PF_END			15
+-
+-/** 
+- * Generally, we allow a sanitized first level error to be displayed
+- * for the user.  We do not want low-level mailbox related errors
+- * to be displayed (since we are abstracting the mailbox interface).
+- * The fail_on_quiet define allows the multi-level trace debug info
+- * to still be displayed for development if needed, by re-defining
+- * fail_on_quiet as fail_on.
+- */
+-#define fail_on_quiet fail_on_user
+-// #define fail_on_quiet(CONDITION, LABEL, ...)	\
+-// 	do {					\
+-// 		if (CONDITION) {	\
+-// 			goto LABEL;		\
+-// 		}					\
+-// 	} while (0)
++/** F1 Application Device defines */
++#define F1_MBOX_DEV2APP_DEV(dev)		((dev) - 1)
++#define F1_APP_PF						0
++#define F1_REMOVE_APP_DEV_DELAY_MSEC	1000
++#define F1_REMOVE_APP_DEV_MAX_RETRIES	3
+ 
+ /** 
+  * This should be used for the sanitized first level errors to be
+@@ -115,13 +101,11 @@ enum {
+  */
+ struct ec2_fpga_cmd {
+ 	uint32_t slot_dev_index;
+-	struct fpga_slot_spec mbox_slot_devs[FPGA_SLOT_MAX]; /* todo: do we need this still? */
+ 	uint32_t opcode;
+ 	uint32_t afi_slot;
+ 	char	 afi_id[AFI_ID_STR_MAX];
+ 	uint32_t mbox_timeout;
+ 	uint32_t mbox_delay_msec;
+-	bool	 plat_attached;
+ 	bool	 show_headers;
+ 	bool	 get_hw_metrics;
+ 	bool	 clear_hw_metrics;
+@@ -141,54 +125,3 @@ extern struct ec2_fpga_cmd f1;
+  */
+ int 
+ parse_args(int argc, char *argv[]);
+-
+-/**
+- * Initialize the AFI slot devices from the PCI/sysfs layer. 
+- *
+- * @returns
+- *  0   on success 
+- * -1   on failure
+- */
+-int cli_pci_init(void);
+-
+-/**
+- * De-initialize the PCI/sysfs layer.
+- */
+-void cli_pci_free(void);
+-
+-/**
+- * Retrieve the application PF map for the given mbox slot.
+- *
+- * @param[in]   slot		the fpga slot
+- * @param[in]   app_pf_num	the application PF number to check 
+- * @param[out]  map			the application PF resource map to return 
+- *
+- * @returns
+- *  0	on success 
+- * -1	on failure
+- */
+-int cli_get_app_pf_map(uint32_t slot, uint32_t app_pf_num, 
+-		struct fpga_pci_resource_map *map);
+-
+-/**
+- * Remove the application PF for the given mbox slot.
+- *
+- * @param[in]   slot		the fpga slot
+- * @param[in]   app_pf_num	the application PF number to check 
+- *
+- * @returns
+- *  0	on success 
+- * -1	on failure
+- */
+-int
+-cli_remove_app_pf(uint32_t slot, uint32_t app_pf_num);
+-
+-/**
+- * PCI rescan.
+- *
+- * @returns
+- *  0	on success 
+- * -1	on failure
+- */
+-int
+-cli_pci_rescan(void);
+diff --git a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd_parse.c b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd_parse.c
+index ab4f371..d07630a 100644
+--- a/sdk/userspace/fpga_image_tools/src/fpga_local_cmd_parse.c
++++ b/sdk/userspace/fpga_image_tools/src/fpga_local_cmd_parse.c
+@@ -328,7 +328,7 @@ config_request_timeout(uint32_t timeout)
+ 			timeout, f1.mbox_timeout, f1.mbox_delay_msec);
+ 	return 0;
+ err:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -400,7 +400,7 @@ parse_args_load_afi(int argc, char *argv[])
+ err:
+ 	print_usage(argv[0], load_afi_usage, sizeof_array(load_afi_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -462,7 +462,7 @@ parse_args_clear_afi(int argc, char *argv[])
+ err:
+ 	print_usage(argv[0], clear_afi_usage, sizeof_array(clear_afi_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -538,7 +538,7 @@ parse_args_describe_afi(int argc, char *argv[])
+ err:
+         print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ 
+@@ -596,7 +596,7 @@ err:
+ 	print_usage(argv[0], describe_afi_slots_usage, 
+ 			sizeof_array(describe_afi_slots_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ 
+@@ -669,7 +669,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
+ err:
+         print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -724,7 +724,7 @@ parse_args_get_virtual_led(int argc, char *argv[])
+ err:
+         print_usage(argv[0], get_virtual_led_usage, sizeof_array(get_virtual_led_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -780,7 +780,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
+ err:
+         print_usage(argv[0], get_virtual_dip_usage, sizeof_array(get_virtual_dip_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 
+ /**
+@@ -863,7 +863,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
+ err:
+         print_usage(argv[0], set_virtual_dip_usage, sizeof_array(set_virtual_dip_usage));
+ out_ver:
+-	return -1;
++	return -EINVAL;
+ }
+ 	
+ typedef int (*parse_args_func_t)(int argc, char *argv[]);
+@@ -901,7 +901,7 @@ parse_args(int argc, char *argv[])
+ 
+ 	char *opcode_str = argv[1];
+ 	size_t i;
+-	int ret = -1;
++	int ret = -EINVAL;
+ 	for (i = 0; i < sizeof_array(str2func); i++) {
+ 		struct parse_args_str2func *entry = &str2func[i];
+ 
+@@ -919,5 +919,5 @@ parse_args(int argc, char *argv[])
+ 	return ret;
+ err:
+ 	print_usage(argv[0], opcode_str_usage, sizeof_array(opcode_str_usage));
+-	return -1;
++	return -EINVAL;
+ }
+diff --git a/sdk/userspace/fpga_image_tools/src/virtual_jtag_pcie.c b/sdk/userspace/fpga_image_tools/src/virtual_jtag_pcie.c
+index 260ec6c..b6f1689 100644
+--- a/sdk/userspace/fpga_image_tools/src/virtual_jtag_pcie.c
++++ b/sdk/userspace/fpga_image_tools/src/virtual_jtag_pcie.c
+@@ -40,7 +40,7 @@ int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar) {
+ 
+ void close_port(pci_bar_handle_t jtag_pci_bar) {
+   if (jtag_pci_bar >=0)
+-    fpga_pci_detatch(jtag_pci_bar);
++    fpga_pci_detach(jtag_pci_bar);
+   
+ }
+ 
+diff --git a/sdk/userspace/fpga_image_tools/src/virtual_jtag_server.c b/sdk/userspace/fpga_image_tools/src/virtual_jtag_server.c
+index 4a1d4f6..684a2b8 100644
+--- a/sdk/userspace/fpga_image_tools/src/virtual_jtag_server.c
++++ b/sdk/userspace/fpga_image_tools/src/virtual_jtag_server.c
+@@ -67,7 +67,7 @@ static int open_server(const char* tcp_port) {
+     if (err) {
+         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err));
+         errno = EINVAL;
+-        return -1;
++        return FPGA_ERR_FAIL;
+     }
+ 
+     for (res = reslist; res != NULL; res = res->ai_next) {
+diff --git a/sdk/userspace/fpga_libs/fpga_mgmt/Makefile b/sdk/userspace/fpga_libs/fpga_mgmt/Makefile
+index e4c697b..69483c8 100644
+--- a/sdk/userspace/fpga_libs/fpga_mgmt/Makefile
++++ b/sdk/userspace/fpga_libs/fpga_mgmt/Makefile
+@@ -22,7 +22,7 @@ LIB_SO_PATH = $(LIB_PATH)/so
+ INCLUDES = -I$(TOPINC_PATH) -I/usr/include
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ SRC = $(wildcard *.c)
+ OBJ = $(SRC:.c=.o)
+diff --git a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt.c b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt.c
+index e3c128c..e9d51b3 100644
+--- a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt.c
++++ b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt.c
+@@ -54,7 +54,7 @@ void fpag_mgmt_set_cmd_delay_msec(uint32_t value)
+ }
+ 
+ int fpga_mgmt_describe_local_image(int slot_id,
+-	struct fpga_mgmt_image_info *info)
++	struct fpga_mgmt_image_info *info, uint32_t flags)
+ {
+ 	int ret;
+ 	uint32_t len;
+@@ -71,9 +71,7 @@ int fpga_mgmt_describe_local_image(int slot_id,
+ 	memset(&rsp, 0, sizeof(union afi_cmd));
+ 
+ 	/* initialize the command structure */
+-	fpga_mgmt_cmd_init_metrics(&cmd, &len, 
+-		/*bool get_hw_metrics*/ false,
+-		/*bool clear_hw_metrics*/ false);
++	fpga_mgmt_cmd_init_metrics(&cmd, &len, flags);
+ 
+ 	/* send the command and wait for the response */
+ 	ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
+@@ -107,14 +105,6 @@ out:
+ 	return ret;
+ }
+ 
+-/**
+- * Gets the status of an FPGA. Status values are definted in enum fpga_status.
+- * If you need the AFI id at the same time, use fpga_mgmt_describe_local_image.
+- *
+- * @param[in]  slot_id  the logical slot index
+- * @param[out] status   populated with status value
+- * @returns 0 on success, non-zero on error
+- */
+ int fpga_mgmt_get_status(int slot_id, int *status)
+ {
+ 	int ret;
+@@ -128,7 +118,7 @@ int fpga_mgmt_get_status(int slot_id, int *status)
+ 
+ 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
+ 
+-	ret = fpga_mgmt_describe_local_image(slot_id, &info);
++	ret = fpga_mgmt_describe_local_image(slot_id, &info, 0);
+ 	fail_on(ret, out, "fpga_mgmt_describe_local_image failed");
+ 
+ 	*status = info.status;
+@@ -136,10 +126,18 @@ out:
+ 	return ret;
+ }
+ 
+-const char *fpga_mgmt_get_status_name(int status) {
++const char *fpga_mgmt_get_status_name(int status)
++{
+ 	return FPGA_STATUS2STR(status);
+ }
+ 
++const char *fpga_mgmt_strerror(int err) {
++	if (err < 0) {
++		return strerror(-err);
++	}
++	return FPGA_ERR2STR(err);
++}
++
+ int fpga_mgmt_clear_local_image(int slot_id) {
+ 	int ret;
+ 	uint32_t len;
+@@ -193,14 +191,14 @@ int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status) {
+ 
+ 	ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &led_pci_bar);
+ 	if (ret) 
+-		return -1;
++		return FPGA_ERR_FAIL;
+ 	
+ 	ret = fpga_pci_peek(led_pci_bar,F1_VIRTUAL_LED_REG_OFFSET,&read_data);
+        /* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */
+         *(status) = (uint16_t)( read_data & 0x0000FFFF);
+ 
+ 
+-	fpga_pci_detatch(led_pci_bar);
++	fpga_pci_detach(led_pci_bar);
+ 	return ret;	
+ }
+ 
+@@ -211,7 +209,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value) {
+ 
+         ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &dip_pci_bar);
+         if (ret)
+-                return -1;
++                return FPGA_ERR_FAIL;
+ 
+ 
+ 	write_data = (uint32_t) value;
+@@ -219,7 +217,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value) {
+         ret = fpga_pci_poke(dip_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,write_data);
+ 
+ 
+-        fpga_pci_detatch(dip_pci_bar);
++        fpga_pci_detach(dip_pci_bar);
+         return ret;
+ }
+ 
+@@ -231,13 +229,13 @@ int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value) {
+ 
+         ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &dip_pci_bar);
+         if (ret)
+-                return -1;
++                return FPGA_ERR_FAIL;
+ 
+         ret = fpga_pci_peek(dip_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,&read_data);
+        /* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */
+ 	 *(value) = (uint16_t)read_data; 
+ 
+-        fpga_pci_detatch(dip_pci_bar);
++        fpga_pci_detach(dip_pci_bar);
+         return ret;
+ 
+ }
+diff --git a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_cmd.c b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_cmd.c
+index 78bd0d6..ecbb8cc 100644
+--- a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_cmd.c
++++ b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_cmd.c
+@@ -25,14 +25,10 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <errno.h>
++#include <assert.h>
+ 
+ #include "fpga_mgmt_internal.h"
+ 
+-#include <assert.h> // todo: get rid of this?
+-#define fail_on_quiet fail_on
+-#define fail_on_internal fail_on
+-#define fail_on_user fail_on
+-
+ /**
+  * AFI command get payload length utility.
+  *
+@@ -76,7 +72,7 @@ afi_cmd_hdr_set_len(union afi_cmd *cmd, size_t len)
+ {
+ 	/* Null pointer or overflow? */
+ 	if (!cmd || (len & ~AFI_CMD_HDR_LEN_MASK)) {
+-		return -1;
++		return FPGA_ERR_FAIL;
+ 	}
+ 
+ 	cmd->hdr.len_flags &= ~AFI_CMD_HDR_LEN_MASK;
+@@ -99,7 +95,7 @@ afi_cmd_hdr_set_flags(union afi_cmd *cmd, unsigned int flags)
+ {
+ 	/* Null pointer or overflow? */
+ 	if (!cmd || (flags & ~AFI_CMD_HDR_ALL_FLAGS)) {
+-		return -1;
++		return FPGA_ERR_FAIL;
+ 	}
+ 
+ 	cmd->hdr.len_flags &= AFI_CMD_HDR_LEN_MASK;
+@@ -164,8 +160,7 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id)
+  * @param[in,out]	len		cmd len
+  */
+ void
+-fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
+-	bool get_hw_metrics, bool clear_hw_metrics)
++fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len, uint32_t flags)
+ {
+ 	assert(cmd);
+ 	assert(len);
+@@ -180,10 +175,9 @@ fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
+ 	afi_cmd_hdr_set_len(cmd, payload_len);
+ 	afi_cmd_hdr_set_flags(cmd, 0);
+ 
+-	/** Fill in cmd body */
+-	req->fpga_cmd_flags = 0;
+-	req->fpga_cmd_flags |= (get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+-	req->fpga_cmd_flags |= (clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
++	/** Fill in cmd body; only allow specific flags to be set */
++	req->fpga_cmd_flags = flags &
++		(FPGA_CMD_GET_HW_METRICS | FPGA_CMD_CLEAR_HW_METRICS);
+ 
+ 	*len = sizeof(struct afi_cmd_hdr) + payload_len;
+ }
+@@ -243,7 +237,7 @@ fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ 
+@@ -270,14 +264,14 @@ fpga_mgmt_mbox_attach(int slot_id)
+ 	};
+ 
+ 	ret = fpga_hal_mbox_init(&mbox);
+-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
++	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	ret = fpga_hal_mbox_attach(true); /**< clear_state=true */
+-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
++	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ static int
+@@ -290,7 +284,7 @@ fpga_mgmt_mbox_detach(int slot_id)
+ 			/** Continue with plat detach */
+ 		}
+ 
+-		ret = fpga_pci_detatch(fpga_mgmt_state.slots[slot_id].handle);
++		ret = fpga_pci_detach(fpga_mgmt_state.slots[slot_id].handle);
+ 		if (ret != 0) {
+ 			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
+ 			/* Continue with detach */
+@@ -311,18 +305,54 @@ int fpga_mgmt_detach_all(void)
+ }
+ 
+ /**
++ * Handle AFI error response
++ *
++ * @param[in] rsp   the response that was received.
++ * @param[in] len   the expected response payload len.
++ *
++ * @returns
++ *  zero on success, non-zero on failure
++ */
++static int
++fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
++{
++	struct afi_cmd_err_rsp *err_rsp = (void *)rsp->body;
++
++	uint32_t tmp_len =
++		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
++
++	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
++			len, tmp_len);
++
++	/** Handle invalid API version error */
++	if (err_rsp->error == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) {
++		union afi_err_info *err_info = (void *)err_rsp->error_info;
++
++		tmp_len += sizeof(err_info->afi_cmd_version);
++		fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
++				len, tmp_len);
++
++		log_error("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n",
++				err_info->afi_cmd_version);
++	}
++
++	return err_rsp->error;
++err:
++	return FPGA_ERR_FAIL;
++}
++
++/**
+  * Validate the AFI response header, using the command header.
+  *
+- * @param[in]  cmd      the command that was sent.
+- * @param[in]  rsp      the response that was received.
+- * @param[in]  len      the expected response payload len.
++ * @param[in] cmd   the command that was sent.
++ * @param[in] rsp   the response that was received.
++ * @param[in] len   the expected response payload len.
+  *
+  * @returns
+- *  0   on success 
+- * -1   on failure
++ *  zero on success, non-zero on failure
+  */
+-static int 
+-fpga_mgmt_afi_validate_header(const union afi_cmd *cmd, 
++static int
++fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
+ 		const union afi_cmd *rsp, uint32_t len)
+ {
+ 	uint32_t stored_flags = afi_cmd_hdr_get_flags(rsp);
+@@ -333,8 +363,8 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
+ 	fail_on_quiet(!rsp, err, "rsp == NULL");
+ 
+ 	/** Version */
+-	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err, 
+-			"cmd_ver(%u) != rsp_ver(%u)", 
++	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err,
++			"cmd_ver(%u) != rsp_ver(%u)",
+ 			cmd->hdr.version, rsp->hdr.version);
+ 
+ 	/** Opcode */
+@@ -346,11 +376,11 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
+ 			cmd->hdr.id, rsp->hdr.id);
+ 
+ 	/** Received len too small */
+-	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err, 
++	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err,
+ 			"Received length %u too small", len);
+ 
+ 	/** Payload len too big */
+-	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN, 
++	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN,
+ 			err, "Payload length %u too big", payload_len);
+ 
+ 	/** Not a response */
+@@ -361,10 +391,10 @@ id_err:
+ 	return -EAGAIN;
+ op_err:
+ 	if (rsp->hdr.op == AFI_CMD_ERROR) {
+-		//return (cmd, rsp, len); // TODO
++		return fpga_mgmt_handle_afi_cmd_error_rsp(rsp, len);
+ 	}
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ static int
+@@ -375,30 +405,33 @@ fpga_mgmt_send_cmd(
+ 
+ 	/** Write the AFI cmd to the mailbox */
+ 	ret = fpga_hal_mbox_write((void *)cmd, *len);
+-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
++	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+ 
+-	/** 
++	/**
+ 	 * Read the AFI rsp from the mailbox.
+-	 *  -also make a minimal attempt to drain stale responses 
++	 *  -also make a minimal attempt to drain stale responses
+ 	 *   (if any).
+ 	 */
+ 	uint32_t id_retries = 0;
+ 	ret = -EAGAIN;
+ 	while (ret == -EAGAIN) {
+ 		ret = fpga_hal_mbox_read((void *)rsp, len);
+-		fail_on_user(ret != 0, err, "Error: operation timed out");
++		fail_on(ret = (ret) ? ETIMEDOUT : 0, err_code, "Error: operation timed out");
+ 
+ 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
++		fail_on(ret, err_code, CLI_INTERNAL_ERR_STR);
+ 
+-		fail_on_internal(id_retries >= AFI_MAX_ID_RETRIES, err, 
++		fail_on(id_retries >= AFI_MAX_ID_RETRIES, err,
+ 				CLI_INTERNAL_ERR_STR);
+ 		id_retries++;
+ 	}
+-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+- 
++	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
++
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
++err_code:
++	return ret;
+ }
+ 
+ int
+diff --git a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_internal.h b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_internal.h
+index c06f6cd..bb6ddb1 100644
+--- a/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_internal.h
++++ b/sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt_internal.h
+@@ -52,7 +52,7 @@ extern struct fgpa_mgmt_state_s {
+ int fpga_mgmt_process_cmd(int slot_id,
+ 	const union afi_cmd *cmd, union afi_cmd *rsp, uint32_t *len);
+ void fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
+-	bool get_hw_metrics, bool clear_hw_metrics);
++	uint32_t flags);
+ void fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len,
+ 	const char *afi_id);
+ void fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len);
+diff --git a/sdk/userspace/fpga_libs/fpga_pci/Makefile b/sdk/userspace/fpga_libs/fpga_pci/Makefile
+index 2a90df5..7e81c26 100644
+--- a/sdk/userspace/fpga_libs/fpga_pci/Makefile
++++ b/sdk/userspace/fpga_libs/fpga_pci/Makefile
+@@ -21,7 +21,7 @@ LIB_PATH = $(TOP)/lib
+ INCLUDES = -I$(TOPINC_PATH) -I/usr/include
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ SRC = $(wildcard *.c)
+ OBJ = $(SRC:.c=.o)
+diff --git a/sdk/userspace/fpga_libs/fpga_pci/fpga_pci.c b/sdk/userspace/fpga_libs/fpga_pci/fpga_pci.c
+index 0289f97..fd03c35 100644
+--- a/sdk/userspace/fpga_libs/fpga_pci/fpga_pci.c
++++ b/sdk/userspace/fpga_libs/fpga_pci/fpga_pci.c
+@@ -13,7 +13,7 @@
+  * permissions and limitations under the License.
+  */
+ 
+-#include "fpga_pci_interal.h"
++#include "fpga_pci_internal.h"
+ 
+ #include <string.h>
+ 
+@@ -23,11 +23,17 @@ fpga_pci_init() {
+ }
+ 
+ int
+-fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_handle_t *handle) {
++fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
++	pci_bar_handle_t *handle)
++{
+ 	int rc;
++	bool write_combining;
+ 	struct fpga_slot_spec spec;
++	
++	(void) flags;
+ 
+-	if (!handle || pf_id < 0 || pf_id >= FPGA_MAX_PF) {
++	if (!handle || pf_id < 0 || pf_id >= FPGA_MAX_PF ||
++		bar_id < 0 || bar_id >= FPGA_BAR_PER_PF_MAX) {
+ 		return -EINVAL;
+ 	}
+ 
+@@ -36,13 +42,21 @@ fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_hand
+ 	rc = fpga_pci_get_slot_spec(slot_id, &spec);
+ 	fail_on(rc, out, "Unable to prefill the slot spec\n");
+ 
+-	return fpga_plat_dev_attach(&spec, pf_id, bar_id, handle);
++	write_combining = false;
++	if (flags & BURST_CAPABLE) {
++		rc = (spec.map[pf_id].resource_burstable[bar_id]) ? 0 : FPGA_ERR_FAIL;
++		fail_on(rc, out, "bar is not BURST_CAPABLE (does not support write "
++			"combining.)");
++		write_combining = true;
++	}
++
++	return fpga_plat_dev_attach(&spec, pf_id, bar_id, write_combining, handle);
+ out:
+-	return 1;
++	return rc;
+ }
+ 
+ int
+-fpga_pci_detatch(pci_bar_handle_t handle) {
++fpga_pci_detach(pci_bar_handle_t handle) {
+ 	return fpga_plat_dev_detach(handle);
+ }
+ 
+@@ -53,11 +67,7 @@ fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value) {
+ 
+ int
+ fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value) {
+-	(void) handle;
+-	(void) offset;
+-	(void) value;
+-	/* not implemened */
+-	return 1;
++	return fpga_hal_dev_reg_write64(handle, offset, value);
+ }
+ 
+ int
+@@ -67,18 +77,10 @@ fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
+ 
+ int
+ fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
+-	(void) handle;
+-	(void) offset;
+-	(void) value;
+-	/* not implemented */
+-	return 1;
++	return fpga_hal_dev_reg_read64(handle, offset, value);
+ }
+ 
+ int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len) {
+-	(void) handle;
+-	(void) offset;
+-	(void) datap;
+-	(void) dword_len;
+-	/* not implemented */
+-	return 1;
++	int ret = fpga_plat_dev_reg_write_burst(handle, offset, datap, dword_len);
++	return ret ? FPGA_ERR_FAIL : 0;
+ }
+diff --git a/sdk/userspace/fpga_libs/fpga_pci/fpga_pci_sysfs.c b/sdk/userspace/fpga_libs/fpga_pci/fpga_pci_sysfs.c
+index 4233896..b0abfa6 100644
+--- a/sdk/userspace/fpga_libs/fpga_pci/fpga_pci_sysfs.c
++++ b/sdk/userspace/fpga_libs/fpga_pci/fpga_pci_sysfs.c
+@@ -13,7 +13,7 @@
+  * permissions and limitations under the License.
+  */
+ 
+-#include "fpga_pci_interal.h"
++#include "fpga_pci_internal.h"
+ 
+ #include <assert.h>
+ #include <limits.h>
+@@ -31,18 +31,18 @@
+ /**
+  * Return the ID from the given sysfs file (e.g. Vendor ID, Device ID).
+  *
+- * @param[in]		path	the sysfs file path 
++ * @param[in]		path	the sysfs file path
+  * @param[in,out]   id		the returned id
+  *
+  * @returns
+- *  0	on success 
++ *  0	on success
+  * -1	on failure
+  */
+ static int
+ fpga_pci_get_id(char *path, uint16_t *id)
+ {
+-	fail_on_internal(!path, err, CLI_INTERNAL_ERR_STR);
+-	fail_on_internal(!id, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!path, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!id, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	int ret = 0;
+ 	FILE *fp = fopen(path, "r");
+@@ -61,32 +61,59 @@ err_close:
+ 	fclose(fp);
+ err:
+ 	errno = 0;
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+- * Fill in the DBDF within the PCI resource map using the given PCI device 
++ * Write a '1' to the given sysfs file.
++ *
++ * @param[in]		path	the sysfs file path
++ *
++ * @returns
++ *  0	on success
++ * -1	on failure
++ */
++static int
++fpga_pci_write_one2file(char *path)
++{
++	int ret = -1;
++
++	int fd = open(path, O_WRONLY);
++	fail_on_quiet(fd == -1, err, "opening %s", path);
++
++	char buf[] = { '1', 0 };
++	ret = -!!write_loop(fd, buf, sizeof(buf));
++	fail_on_quiet(ret != 0, err_close, "error writing %s", path);
++
++err_close:
++	close(fd);
++err:
++	return ret;
++}
++
++/**
++ * Fill in the DBDF within the PCI resource map using the given PCI device
+  * directory name.
+  *
+- * @param[in]		dir_name	the PCI device directory name 
+- * @param[in,out]   map			the PCI resource map to fill in 
++ * @param[in]		dir_name	the PCI device directory name
++ * @param[in,out]   map			the PCI resource map to fill in
+  *
+  * @returns
+- *  0	on success 
++ *  0	on success
+  * -1	on failure
+  */
+ static int
+ fpga_pci_get_dbdf(char *dir_name, struct fpga_pci_resource_map *map)
+ {
+-	fail_on_internal(!dir_name, err, CLI_INTERNAL_ERR_STR);
+-	fail_on_internal(!map, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!dir_name, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!map, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	uint32_t domain;
+ 	uint32_t bus;
+ 	uint32_t dev;
+ 	int func;
+ 	int ret = sscanf(dir_name, PCI_DEV_FMT, &domain, &bus, &dev, &func);
+-	fail_on_internal(ret != 4, err, CLI_INTERNAL_ERR_STR); 
++	fail_on(ret != 4, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	map->domain = domain;
+ 	map->bus = bus;
+@@ -94,19 +121,19 @@ fpga_pci_get_dbdf(char *dir_name, struct fpga_pci_resource_map *map)
+ 	map->func = func;
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ /**
+- * Return the PCI resource size using the PCI directory name and resource 
++ * Return the PCI resource size using the PCI directory name and resource
+  * number.
+  *
+- * @param[in]		dir_name		the PCI device directory name 
+- * @param[in]		resource_num	the resource number 
++ * @param[in]		dir_name		the PCI device directory name
++ * @param[in]		resource_num	the resource number
+  * @param[in,out]   resource_size	the returned resource size
+  *
+  * @returns
+- *  0	on success 
++ *  0	on success
+  * -1	on failure
+  */
+ static int
+@@ -115,17 +142,17 @@ fpga_pci_get_pci_resource_info(char *dir_name,
+ {
+ 	int ret;
+ 
+-	fail_on_internal(!dir_name, err, CLI_INTERNAL_ERR_STR);
+-	fail_on_internal(!resource_size, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!dir_name, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!resource_size, err, CLI_INTERNAL_ERR_STR);
+ 
+ 	char sysfs_name[NAME_MAX + 1];
+-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+-			"/sys/bus/pci/devices/%s/resource%u", dir_name, 
++	ret = snprintf(sysfs_name, sizeof(sysfs_name),
++			"/sys/bus/pci/devices/%s/resource%u", dir_name,
+ 			resource_num);
+ 
+ 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for resource%u",
+ 			resource_num);
+-	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
++	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
+ 			"sysfs path too long for resource%u", resource_num);
+ 
+ 	/** Check for file existence, obtain the file size */
+@@ -135,13 +162,13 @@ fpga_pci_get_pci_resource_info(char *dir_name,
+ 
+ 	*resource_size = file_stat.st_size;
+ 
+-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
+-			"/sys/bus/pci/devices/%s/resource%u_wc", dir_name, 
++	ret = snprintf(sysfs_name, sizeof(sysfs_name),
++			"/sys/bus/pci/devices/%s/resource%u_wc", dir_name,
+ 			resource_num);
+ 
+ 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for resource%u",
+ 			resource_num);
+-	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err, 
++	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
+ 			"sysfs path too long for resource%u", resource_num);
+ 
+ 	memset(&file_stat, 0, sizeof(struct stat));
+@@ -150,7 +177,7 @@ fpga_pci_get_pci_resource_info(char *dir_name,
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ static int
+@@ -176,20 +203,18 @@ fpga_pci_handle_resources(char *dir_name, struct fpga_pci_resource_map *map)
+ 		map->resource_burstable[resource_num] = burstable;
+ 	}
+ 	return 0;
+-err:
+-	return -1;
+ }
+ 
+ 
+ /**
+- * Handle one PCI device directory with the given directory name, and see if 
+- * it is an AFI mbox slot.  If so, initialize a slot device structure for it 
++ * Handle one PCI device directory with the given directory name, and see if
++ * it is an AFI mbox slot.  If so, initialize a slot device structure for it
+  * and its associated slot device (if any).
+  *
+- * @param[in]		dir_name	the PCI device directory name 
++ * @param[in]		dir_name	the PCI device directory name
+  *
+  * @returns
+- *  0	on success 
++ *  0	on success
+  * -1	on failure
+  */
+ static int
+@@ -199,12 +224,10 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
+ 	uint16_t device_id = 0;
+ 
+ 	fail_on_quiet(!dir_name, err, CLI_INTERNAL_ERR_STR);
+-	// fail_on_quiet(f1.slot_dev_index >= FPGA_SLOT_MAX, err, 
+-	// 		CLI_INTERNAL_ERR_STR);
+ 
+ 	/** Setup and read the PCI Vendor ID */
+ 	char sysfs_name[NAME_MAX + 1];
+-	int ret = snprintf(sysfs_name, sizeof(sysfs_name), 
++	int ret = snprintf(sysfs_name, sizeof(sysfs_name),
+ 			"/sys/bus/pci/devices/%s/vendor", dir_name);
+ 
+ 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for vendor");
+@@ -214,7 +237,7 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
+ 	fail_on_quiet(ret != 0, err, "Error retrieving vendor_id");
+ 
+ 	/** Setup and read the PCI Device ID */
+-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
++	ret = snprintf(sysfs_name, sizeof(sysfs_name),
+ 			"/sys/bus/pci/devices/%s/device", dir_name);
+ 
+ 	fail_on_quiet(ret < 0, err, "Error building the sysfs path for device");
+@@ -223,27 +246,17 @@ fpga_pci_handle_pci_dir_name(char *dir_name, struct fpga_pci_resource_map *map)
+ 	ret = fpga_pci_get_id(sysfs_name, &device_id);
+ 	fail_on_quiet(ret != 0, err, "Error retrieving device_id");
+ 
+-	// /** Check for a match to the FPGA Mbox Vendor ID and Device ID */
+-	// if ((vendor_id != F1_MBOX_VENDOR_ID) || (device_id != F1_MBOX_DEVICE_ID)) {
+-	// 	/* the device did not match */
+-	// 	return 1;
+-	// }
+-
+ 	/** Fill in the DBDF */
+ 	ret = fpga_pci_get_dbdf(dir_name, map);
+ 	fail_on_quiet(ret != 0, err, "Error retrieving DBDF from dir_name=%s",
+ 			dir_name);
+ 
+-	/** Retrieve the PCI resource size for plat attach */
+-	ret = fpga_pci_handle_resources(dir_name, map);
+-	fail_on_quiet(ret != 0, err, "Error retrieving resource information");
+-
+ 	map->vendor_id = vendor_id;
+ 	map->device_id = device_id;
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ int
+@@ -252,59 +265,70 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
+ 	bool found_afi_slot = false;
+ 	char *path = "/sys/bus/pci/devices";
+ 	DIR *dirp = opendir(path);
+-	fail_on_internal(!dirp, err, CLI_INTERNAL_ERR_STR);
++	fail_on(!dirp, err, CLI_INTERNAL_ERR_STR);
++
++	struct dirent entry_a, entry_b, *entry, *previous_entry, *result;
+ 	int slot_dev_index = 0;
+ 	struct fpga_slot_spec search_spec;
+-	struct fpga_pci_resource_map search_map, previous_map;
++	struct fpga_pci_resource_map a, b, *search_map, *previous_map;
+ 
+ 	memset(&search_spec, 0, sizeof(struct fpga_slot_spec));
+-	memset(&previous_map, 0, sizeof(struct fpga_pci_resource_map));
++	memset(&a, 0, sizeof(struct fpga_pci_resource_map));
++	memset(&b, 0, sizeof(struct fpga_pci_resource_map));
++	search_map = &a;
++	previous_map = &b;
+ 
+-	/** Loop through the sysfs device directories */
+-	for (;;) {
+-		struct dirent entry; 
+-		struct dirent *result;
+-		memset(&entry, 0, sizeof(entry));
++	entry = &entry_a;
++	previous_entry = &entry_b;
+ 
+-		readdir_r(dirp, &entry, &result);
++	/** Loop through the sysfs device directories */
++	while (true) {
++		memset(entry, 0, sizeof(entry));
++		readdir_r(dirp, entry, &result);
+ 		if (result == NULL) {
+ 			/** No more directories */
+ 			break;
+ 		}
+ 
+ 		/** Handle the current directory entry */
+-		memset(&search_map, 0, sizeof(struct fpga_pci_resource_map));
+-		int ret = fpga_pci_handle_pci_dir_name(entry.d_name, &search_map);
++		memset(search_map, 0, sizeof(struct fpga_pci_resource_map));
++		int ret = fpga_pci_handle_pci_dir_name(entry->d_name, search_map);
+ 		if (ret != 0) {
++			previous_map->device_id = 0;
+ 			continue;
+ 		}
+-		found_afi_slot = true;
+-		if (search_map.domain != previous_map.domain ||
+-			search_map.bus    != previous_map.bus    ||
+-			search_map.dev    != previous_map.dev) {
+-
+-
+-			/* domain, bus, device do not match: this is the next slot */
+-			if (search_spec.map[FPGA_MGMT_PF].vendor_id == F1_MBOX_VENDOR_ID &&
+-				search_spec.map[FPGA_MGMT_PF].device_id == F1_MBOX_DEVICE_ID) {
+ 
+-				spec_array[slot_dev_index] = search_spec;
+-				++slot_dev_index;
+-				if (slot_dev_index >= size) {
+-					break;
+-				}
++		if (search_map->vendor_id == F1_MBOX_VENDOR_ID &&
++			search_map->device_id == F1_MBOX_DEVICE_ID &&
++			previous_map->device_id != 0) {
++
++			/* Retrieve the PCI resource size for plat attach after confirming
++			 * these devices are FPGAs. */
++			/* mbox resources */
++			ret = fpga_pci_handle_resources(entry->d_name, search_map);
++			fail_on_quiet(ret != 0, err, "Error retrieving resource information");
++			/* app resources */
++			ret = fpga_pci_handle_resources(previous_entry->d_name, previous_map);
++			fail_on_quiet(ret != 0, err, "Error retrieving resource information");
++
++			/* copy the results into the spec_array */
++			spec_array[slot_dev_index].map[FPGA_APP_PF] = *previous_map;
++			spec_array[slot_dev_index].map[FPGA_MGMT_PF] = *search_map;
++
++			found_afi_slot = true;
++			slot_dev_index += 1;
++			if (slot_dev_index >= size) {
++				break;
+ 			}
+-		}
+-		if (search_map.func >= FPGA_MAX_PF) {
+-			/* unexpected pf */
++
++			/* invalidate the previous_map and do not swap */
++			previous_map->device_id = 0;
+ 			continue;
+ 		}
+-		/* copy the map into the spec array */
+-		search_spec.map[search_map.func] = search_map;
+-		previous_map = search_map;
++
++		swap(previous_map, search_map);
++		swap(previous_entry, entry);
+ 	}
+-	/* TODO: this has a bug in it: if there are no PCI devices after the last
+-	 * FPGA, it will fail to find that FPGA. */
+ 
+ 	closedir(dirp);
+ 
+@@ -312,13 +336,14 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
+ 
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ int
+ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
+ {
+ 	int ret;
++	unsigned int size;
+ 	struct fpga_slot_spec spec_array[FPGA_SLOT_MAX];
+ 
+ 	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX || !spec) {
+@@ -327,7 +352,9 @@ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
+ 
+ 	memset(spec_array, 0, sizeof(spec_array));
+ 
+-	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
++	/* tell fpga_pci_get_all_slot_specs not to search past the slot number */
++	size = min(sizeof_array(spec_array), (unsigned) slot_id);
++	ret = fpga_pci_get_all_slot_specs(spec_array, size);
+ 	fail_on_quiet(ret, err, "Unable to read PCI device information.");
+ 
+ 	if (spec_array[slot_id].map[FPGA_APP_PF].vendor_id == 0) {
+@@ -338,21 +365,49 @@ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
+ 	*spec = spec_array[slot_id];
+ 	return 0;
+ err:
+-	return -1;
++	return FPGA_ERR_FAIL;
+ }
+ 
+ int
+-fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map)
++fpga_pci_get_resource_map(int slot_id, int pf_id,
++	struct fpga_pci_resource_map *map)
+ {
+-	(void) slot_id;
+-	(void) pf_id;
+-	(void) map;
+-	return -ENOSYS;
++	int ret;
++
++	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX ||
++		pf_id < 0 || pf_id >= FPGA_MAX_PF ||
++		!map) {
++		return -EINVAL;
++	}
++
++	struct fpga_slot_spec slot_spec;
++	memset(&slot_spec, 0, sizeof(struct fpga_slot_spec));
++
++	ret = fpga_pci_get_slot_spec(slot_id, &slot_spec);
++	fail_on_quiet(ret, out, "fpga_pci_get_slot_spec failed");
++
++	*map = slot_spec.map[pf_id];
++out:
++	return ret;
+ }
+ 
+ int
+-fpga_pci_rescan_slot_app_pfs(int slot_id)
++fpga_pci_rescan_slot_app_pfs(void)
+ {
+-	(void) slot_id;
+-	return -ENOSYS;
++	/** Setup and write '1' to the PCI rescan file */
++	char sysfs_name[NAME_MAX + 1];
++	int ret = snprintf(sysfs_name, sizeof(sysfs_name), "/sys/bus/pci/rescan");
++
++	fail_on_quiet(ret < 0, err,
++			"Error building the sysfs path for PCI rescan file");
++	fail_on_quiet((size_t) ret >= sizeof(sysfs_name), err,
++			"sysfs path too long for PCI rescan file");
++
++	/** Write a "1" to the PCI rescan file */
++	ret = fpga_pci_write_one2file(sysfs_name);
++	fail_on_quiet(ret != 0, err, "fpga_pci_write_one2file failed");
++
++	return 0;
++err:
++	return FPGA_ERR_FAIL;
+ }
+diff --git a/sdk/userspace/hal/src/api/mbox/hw/Makefile b/sdk/userspace/hal/src/api/mbox/hw/Makefile
+index d7e68e5..edb667a 100644
+--- a/sdk/userspace/hal/src/api/mbox/hw/Makefile
++++ b/sdk/userspace/hal/src/api/mbox/hw/Makefile
+@@ -24,7 +24,7 @@ HALLIB_PATH = $(TOP)/lib
+ INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_PATH) -I/usr/include
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ SRC = fpga_hal_mbox.c
+ OBJ = $(SRC:.c=.o)
+diff --git a/sdk/userspace/hal/src/api/reg/Makefile b/sdk/userspace/hal/src/api/reg/Makefile
+index ead0ee4..52c9afe 100644
+--- a/sdk/userspace/hal/src/api/reg/Makefile
++++ b/sdk/userspace/hal/src/api/reg/Makefile
+@@ -24,7 +24,7 @@ HALLIB_PATH = $(TOP)/lib
+ INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_PATH) -I/usr/include
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ SRC = $(wildcard *.c)
+ OBJ = $(SRC:.c=.o)
+diff --git a/sdk/userspace/hal/src/api/reg/fpga_hal_reg.c b/sdk/userspace/hal/src/api/reg/fpga_hal_reg.c
+index 44b61b5..83e4997 100644
+--- a/sdk/userspace/hal/src/api/reg/fpga_hal_reg.c
++++ b/sdk/userspace/hal/src/api/reg/fpga_hal_reg.c
+@@ -41,6 +41,20 @@ fpga_hal_dev_reg_write(int dev_index, uint64_t offset, uint32_t value)
+ 	return fpga_plat_dev_reg_write(dev_index, offset, value);
+ }
+ 
++int
++fpga_hal_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value)
++{
++	log_debug("enter");
++	return fpga_plat_dev_reg_read64(dev_index, offset, value);
++}
++
++int
++fpga_hal_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value)
++{
++	log_debug("enter");
++	return fpga_plat_dev_reg_write64(dev_index, offset, value);
++}
++
+ /************************************************************************ 
+  * Single device attachment and use.
+  * e.g. for applications that only attach to one FPGA at a time,
+diff --git a/sdk/userspace/hal/src/platform/hw/Makefile b/sdk/userspace/hal/src/platform/hw/Makefile
+index 7d6f203..05a20cf 100644
+--- a/sdk/userspace/hal/src/platform/hw/Makefile
++++ b/sdk/userspace/hal/src/platform/hw/Makefile
+@@ -24,7 +24,7 @@ HALLIB_PATH = $(TOP)/lib
+ INCLUDES = -I. -I$(HALINC_PATH) -I$(TOPINC_PATH) -I$(FPGADINC_PATH) -I$(UTILINC_PATH) -I/usr/include
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ SRC = $(wildcard *.c)
+ OBJ = $(SRC:.c=.o)
+diff --git a/sdk/userspace/hal/src/platform/hw/fpga_hal_plat.c b/sdk/userspace/hal/src/platform/hw/fpga_hal_plat.c
+index 0dbe576..bc17b82 100644
+--- a/sdk/userspace/hal/src/platform/hw/fpga_hal_plat.c
++++ b/sdk/userspace/hal/src/platform/hw/fpga_hal_plat.c
+@@ -198,7 +198,8 @@ err:
+  ************************************************************************/ 
+ 
+ int 
+-fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index)
++fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
++	bool write_combining, int *dev_index)
+ {
+ 	log_debug("enter");
+ 
+@@ -247,7 +248,7 @@ fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *de
+ 			sysfs_name, map->device_id);
+ 
+ 	char wc_suffix[3] = "\0";
+-	if (map->resource_burstable[bar_id]) {
++	if (map->resource_burstable[bar_id] && write_combining) {
+ 		strncpy(wc_suffix, "_wc", sizeof(wc_suffix));
+ 	}
+ 	
+@@ -353,6 +354,84 @@ err:
+ 	return -1;
+ }
+ 
++int
++fpga_plat_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value)
++{
++	log_debug("dev_index=%d", dev_index);
++	fail_on(!value, err, "value is NULL");
++
++	int ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
++	fail_on(ret != 0, err, "Invalid offset 0x%" PRIx64 ", or not attached", offset);
++
++	uint64_t *reg_ptr = (uint64_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
++			offset);
++	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
++
++	*value = *reg_ptr;
++
++	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, *value);
++	return 0;
++err:
++	return -1;
++}
++
++int
++fpga_plat_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value)
++{
++	log_debug("dev_index=%d", dev_index);
++
++	int ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
++	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 ", or not attached",
++			offset);
++
++	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, value);
++	uint64_t *reg_ptr = (uint64_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
++			offset);
++	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
++
++	*reg_ptr = value;
++
++	return 0;
++err:
++	return -1;
++}
++
++int
++fpga_plat_dev_reg_write_burst(int dev_index, uint64_t offset, uint32_t* datap,
++	uint32_t dword_len)
++{
++	int ret;
++	uint32_t i;
++	static const uint32_t dword_mult = 4;
++	log_debug("dev_index=%d", dev_index);
++
++	/* validate the beginning of the data range */
++	ret = fpga_plat_dev_check_mem_offset(dev_index, offset);
++	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 ", or not attached",
++			offset);
++
++	/* validate the end of the data range */
++	ret = fpga_plat_dev_check_mem_offset(dev_index,
++		offset + dword_len * dword_mult - 1);
++	fail_on(ret != 0, err, "Invalid offset=0x%" PRIx64 " (out of range)",
++			offset);
++
++	/* get the pointer to the beginning of the range */
++	log_debug("offset=0x%" PRIx64, offset);
++	uint32_t *reg_ptr = (uint32_t *)fpga_plat_dev_get_mem_at_offset(dev_index,
++			offset);
++	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
++
++	/* memcpy */
++	for (i = 0; i < dword_len; ++i) {
++		reg_ptr[i] = datap[i];
++	}
++
++	return 0;
++err:
++	return -1;
++}
++
+ /************************************************************************ 
+  * Single device attachment and use.
+  * e.g. for applications that only attach to one FPGA at a time,
+@@ -366,7 +445,7 @@ fpga_plat_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id)
+ 	log_debug("enter");
+ 
+ 	int dev_index = -1;
+-	int ret = fpga_plat_dev_attach(spec, pf_id, bar_id, &dev_index);
++	int ret = fpga_plat_dev_attach(spec, pf_id, bar_id, false, &dev_index);
+ 	fail_on(ret != 0, err, "fpga_plat_dev_attach failed");
+ 
+ 	if (dev_index != 0) {
+diff --git a/sdk/userspace/include/fpga_common.h b/sdk/userspace/include/fpga_common.h
+index 8921fb6..46786a7 100644
+--- a/sdk/userspace/include/fpga_common.h
++++ b/sdk/userspace/include/fpga_common.h
+@@ -79,10 +79,8 @@ enum {
+     FPGA_ERR_CL_ID_MISMATCH = 12,
+     /** CL DDR calibration failed */
+     FPGA_ERR_CL_DDR_CALIB_FAILED = 13,
+-    /** fpga_clk_recipe is invalid */
+-    FPGA_ERR_CLK_RECIPE_INVALID = 14,
+-    /** fpga_clk_recipe programming failed */
+-    FPGA_ERR_CLK_RECIPE_FAILED = 15,
++    /** generic/unspecified error */
++    FPGA_ERR_FAIL = 14,
+ 
+     FPGA_ERR_END
+ };
+@@ -95,8 +93,7 @@ enum {
+ 	((error) == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) ?	"invalid-afi-cmd-api-version" : \
+ 	((error) == FPGA_ERR_CL_ID_MISMATCH) ?				"cl-id-mismatch" : \
+ 	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
+-	((error) == FPGA_ERR_CLK_RECIPE_INVALID) ?			"invalid-clk-recipe" : \
+-	((error) == FPGA_ERR_CLK_RECIPE_FAILED) ?			"clk-recipe-failed" : \
++	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
+ 														"internal-error"
+ 
+ 
+diff --git a/sdk/userspace/include/fpga_mgmt.h b/sdk/userspace/include/fpga_mgmt.h
+index 047010c..221508e 100644
+--- a/sdk/userspace/include/fpga_mgmt.h
++++ b/sdk/userspace/include/fpga_mgmt.h
+@@ -22,28 +22,42 @@
+ /**
+  * Initialize the fpga_mgmt library.
+  * Calls fpga_pci_init.
+- * @returns
+- * 0 on success
+- * -1 on failure
++ *
++ * @returns 0 on success, non-zero on error
+  */
+ int fpga_mgmt_init(void);
+ 
++/**
++ * Closes the fpga_mgmt library and its dependencies and releases any acquired
++ * resources.
++ *
++ * @returns 0 on success, non-zero on error
++ */
+ int fpga_mgmt_close(void);
+ 
+ /**
++ * Get an error code string.
++ *
++ * @param[in] err  The error code to decode
++ * @returns a string corresponding to the provided error code.
++ */
++const char *fpga_mgmt_strerror(int err);
++
++/**
+  * Sets the command timeout value in multiples of the delay_msec value.
+  *
+- * @param[in] value timeout, n * delay_msec
++ * @param[in] value  timeout, n * delay_msec
+  */
+ void fpag_mgmt_set_cmd_timeout(uint32_t value);
+ 
+ /**
++ * Sets the value of the delay_msec. The value is used as the basic unit of time
++ * used to calculate timeouts for communicating with the mailbox pf.
+  *
++ * @param[in] value  number of ms used as base time unit
+  */
+ void fpag_mgmt_set_cmd_delay_msec(uint32_t value);
+ 
+-/* fpga-describe-local-image */
+-
+ /**
+  * This structure provides all of the information for
+  * fpga_mgmt_describe_local_image.
+@@ -63,12 +77,14 @@ struct fpga_mgmt_image_info {
+  *
+  * @param[in]  slot_id  the logical slot index
+  * @param[out] info     struct to populate with the slot description
++ * @param[in]  flags    set flags for for metrics retrieval options
+  * @returns 0 on success, non-zero on error
+  */
+-int fpga_mgmt_describe_local_image(int slot_id, struct fpga_mgmt_image_info *info);
++int fpga_mgmt_describe_local_image(int slot_id,
++	struct fpga_mgmt_image_info *info, uint32_t flags);
+ 
+ /**
+- * Gets the status of an FPGA. Status values are definted in enum fpga_status.
++ * Gets the status of an FPGA. Status values are defined in enum fpga_status.
+  * If you need the AFI id at the same time, use fpga_mgmt_describe_local_image.
+  *
+  * @param[in]  slot_id  the logical slot index
+@@ -86,7 +102,6 @@ int fpga_mgmt_get_status(int slot_id, int *status);
+  */
+ const char *fpga_mgmt_get_status_name(int status);
+ 
+-/* fpga-clear-local-image */
+ /**
+  * Clears the specified FPGA image slot, including FPGA internal and external
+  * memories that are used by the slot.
+@@ -96,7 +111,6 @@ const char *fpga_mgmt_get_status_name(int status);
+  */
+ int fpga_mgmt_clear_local_image(int slot_id);
+ 
+-/* fpga-load-local-image */
+ /**
+  * Loads the specified FPGA image to the specified slot number.
+  *
+@@ -107,17 +121,32 @@ int fpga_mgmt_clear_local_image(int slot_id);
+ int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
+ 
+ /**
+- * getting the status of the 16 virtual LED
++ * Gets the status of the 16 virtual LEDs. Their statuses are returned as a
++ * 16-bit value with each bit corresponding to the on/off state of the LEDs.
++ *
++ * @param[in]   slot_id  the logical slot index
++ * @param[out]  status   16 bits describing the LED states
++ * @returns 0 on success, non-zero on error
+  */
+ int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status);
+ 
+ /**
+- * set the value for the 16 virtual DIP switchs
++ * Sets the status of the 16 virtual dip switches. Their statuses are set as a
++ * 16-bit value with each bit corresponding to the on/off state of the switches.
++ *
++ * @param[in]  slot_id  the logical slot index
++ * @param[in]  value    16 bits describing the switch states
++ * @returns 0 on success, non-zero on error
+  */
+ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value);
+ 
+ /**
+- * get the value for the 16 virtual DIP switchs
++ * Gets the status of the 16 virtual dip switches. Their statuses are returned
++ * as a 16-bit value with each bit corresponding to the on/off state of the
++ * switches.
++ *
++ * @param[in]   slot_id  the logical slot index
++ * @param[out]  value    16 bits describing the switch states
++ * @returns 0 on success, non-zero on error
+  */
+-int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *);
+-
++int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value);
+diff --git a/sdk/userspace/include/fpga_pci.h b/sdk/userspace/include/fpga_pci.h
+index dda8865..20f219a 100644
+--- a/sdk/userspace/include/fpga_pci.h
++++ b/sdk/userspace/include/fpga_pci.h
+@@ -33,15 +33,16 @@ enum {
+     MGMT_PF_BAR_MAX
+ };
+ 
++/**
++ * Type definition for a descriptor/handle used to specify a BAR. Initialize
++ * with PCI_BAR_HANDLE_INIT.
++ */
+ typedef int pci_bar_handle_t;
+ #define PCI_BAR_HANDLE_INIT (-1)
+ 
+ /**
+  * Initialize the pci library.
+- * Calls fpga_hal_plat_init.
+- * @returns
+- * 0 on success
+- * -1 on failure
++ * @returns 0 on success, non-zero on error
+  */
+ int fpga_pci_init(void);
+ 
+@@ -57,11 +58,8 @@ int fpga_pci_init(void);
+  *
+  * @returns 0 on success, non-zero on error
+  */
+-int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
+-
+-/**
+- */
+-int fpga_pci_attach_2(struct fpga_pci_resource_map *map, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
++int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
++    pci_bar_handle_t *handle);
+ 
+ /**
+  * Flags used to specify options for fpga_pci_attach.
+@@ -72,13 +70,13 @@ enum {
+ };
+ 
+ /**
+- * Detatch from an FPGA memory space.
++ * Detach from an FPGA memory space.
+  *
+  * @param[in]  handle  the value provided by fpga_pci_attach corresponding to
+  *                     the memory space to detach
+  * @returns 0 on success, non-zero on error
+  */
+-int fpga_pci_detatch(pci_bar_handle_t handle);
++int fpga_pci_detach(pci_bar_handle_t handle);
+ 
+ /**
+  * Write a value to a register.
+@@ -110,7 +108,8 @@ int fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value);
+  *
+  * @returns 0 on success, non-zero on error
+  */
+-int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len);
++int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset,
++    uint32_t* datap, uint32_t dword_len);
+ 
+ /**
+  * Read a value from a register.
+@@ -144,13 +143,30 @@ int fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value);
+ int fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec);
+ 
+ /**
++ * Populate slot specs for all FPGAs on the system. It is recommended to use
++ * FPGA_SLOT_MAX as the size of the spec_array;
++ *
++ * @param[out]  spec_array  array to populate
++ * @param[in]   size        allocated size of the provided array
+  */
+ int fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size);
+ 
+ /**
++ * Get resource map information for a single slot and physical function. This
++ * information is provided in the slot_spec, but occasionally only the resource
++ * map is needed.
++ *
++ * @param[in]   slot_id  The logical slot id of the FPGA of interest
++ * @param[in]   pf_id    physical function id (e.g. FPGA_APP_PF)
++ * @param[out]  map      resource map to populate
++ * @returns 0 on success, non-zero on error
+  */
+-int fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map);
++int fpga_pci_get_resource_map(int slot_id, int pf_id,
++    struct fpga_pci_resource_map *map);
+ 
+ /**
++ * PCI rescan.
++ *
++ * @returns 0 on success, non-zero on error
+  */
+-int fpga_pci_rescan_slot_app_pfs(int slot_id);
++int fpga_pci_rescan_slot_app_pfs(void);
+diff --git a/sdk/userspace/include/hal/fpga_hal_plat.h b/sdk/userspace/include/hal/fpga_hal_plat.h
+index a7e8088..15afbfc 100644
+--- a/sdk/userspace/include/hal/fpga_hal_plat.h
++++ b/sdk/userspace/include/hal/fpga_hal_plat.h
+@@ -75,7 +75,8 @@ int fpga_plat_init(void);
+  * 0 on success    
+  * -1 on failure
+  */
+-int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index);
++int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
++	bool write_combining, int *dev_index);
+ 
+ /**
+  * Platform layer detach using the given slot specification.
+@@ -114,6 +115,33 @@ int fpga_plat_dev_reg_read(int dev_index, uint64_t offset, uint32_t *value);
+  */
+ int fpga_plat_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
+ 
++
++/**
++ * Platform layer register read.
++ *
++ * @param[in]		dev_index	the attached fpga device index.
++ * @param[in]		offset		the register offset
++ * @param[in,out]	value		the register value to return
++ *
++ * @returns
++ * 0 on success
++ * -1 on failure
++ */
++int fpga_plat_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value);
++
++/**
++ * Platform layer register write.
++ *
++ * @param[in]	dev_index	the attached fpga device index.
++ * @param[in]	offset		the register offset
++ * @param[in]	value		the register value to write
++ *
++ * @returns
++ * 0 on success
++ * -1 on failure
++ */
++int fpga_plat_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value);
++
+ /**
+  * Platform layer get mem base.
+  *
+@@ -125,6 +153,17 @@ int fpga_plat_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
+  */
+ void *fpga_plat_dev_get_mem_base(int dev_index);
+ 
++/**
++ * Platform layer write burst.
++ *
++ * @param[in]	dev_index	the attached fpga device index.
++ * @param[in]	offset		the register offset
++ * @param[in]   datap       source pointer
++ * @param[in]   dword_len   number of 4 byte words to copy
++ */
++int fpga_plat_dev_reg_write_burst(int dev_index, uint64_t offset,
++	uint32_t* datap, uint32_t dword_len);
++
+ /************************************************************************ 
+  * Single device attachment and use.
+  * e.g. for applications that only attach to one FPGA at a time,
+diff --git a/sdk/userspace/include/hal/fpga_hal_reg.h b/sdk/userspace/include/hal/fpga_hal_reg.h
+index fa7bcad..e63cb31 100644
+--- a/sdk/userspace/include/hal/fpga_hal_reg.h
++++ b/sdk/userspace/include/hal/fpga_hal_reg.h
+@@ -51,6 +51,32 @@ int fpga_hal_dev_reg_read(int dev_index, uint64_t offset, uint32_t *value);
+  */
+ int fpga_hal_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
+ 
++/**
++ * FPGA HAL layer register read.
++ *
++ * @param[in]		dev_index	 the attached fpga device index.
++ * @param[in]		offset		the register offset
++ * @param[in,out]	value		the register value to return
++ *
++ * @returns
++ * 0 on success
++ * -1 on failure
++ */
++int fpga_hal_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value);
++
++/**
++ * FPGA HAL layer register write.
++ *
++ * @param[in]	dev_index	the attached fpga device index.
++ * @param[in]	offset		the register offset
++ * @param[in]	value		the register value to write
++ *
++ * @returns
++ * 0 on success
++ * -1 on failure
++ */
++int fpga_hal_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value);
++
+ /************************************************************************ 
+  * Single device attachment and use.
+  * e.g. for applications that only attach to one FPGA at a time,
+diff --git a/sdk/userspace/include/utils/log.h b/sdk/userspace/include/utils/log.h
+index d3cd7b4..60cec19 100644
+--- a/sdk/userspace/include/utils/log.h
++++ b/sdk/userspace/include/utils/log.h
+@@ -163,6 +163,14 @@ static inline __printf(1, 2) void log_dummy(const char *fmt, ...)
+ 		}                               \
+ 	} while (0)
+ 
++#define fail_on_quiet(CONDITION, LABEL, ...)          \
++    do {                                              \
++        if (CONDITION) {                              \
++            log_debug(__VA_ARGS__);                   \
++            goto LABEL;                               \
++        }                                             \
++    } while (0)
++
+ extern const struct logger logger_stdout;
+ extern const struct logger logger_kmsg;
+ extern const struct logger *logger_default;
+diff --git a/sdk/userspace/utils/Makefile b/sdk/userspace/utils/Makefile
+index 90b7306..af10ad3 100644
+--- a/sdk/userspace/utils/Makefile
++++ b/sdk/userspace/utils/Makefile
+@@ -18,7 +18,7 @@ INCLUDES = -I. -I../include -I/usr/include
+ LIB_PATH = $(TOP)/lib
+ 
+ #OPT=-O2
+-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
++CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+ 
+ UTILLIB = $(LIB_PATH)/libutils.a
+ 
