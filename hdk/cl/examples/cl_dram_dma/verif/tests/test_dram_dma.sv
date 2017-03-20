@@ -44,7 +44,11 @@ module test_dram_dma();
        tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
        // de-select the ATG hardware
-       tb.poke(.addr(64'h130), .data(0), .intf(AxiPort::PORT_OCL));
+       
+       tb.poke_ocl(.addr(64'h130), .data(0));
+       tb.poke_ocl(.addr(64'h230), .data(0));
+       tb.poke_ocl(.addr(64'h230), .data(0));
+       tb.poke_ocl(.addr(64'h430), .data(0));
 
        // allow memory to initialize
        tb.nsec_delay(25000);
