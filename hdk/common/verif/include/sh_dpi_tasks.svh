@@ -327,6 +327,119 @@ end
       tb.card.fpga.sh.nsec_delay(dly);
    endtask
 
+   //=================================================
+   //
+   // poke_ocl
+   //
+   //   Description: used to write a single 32b of data at addr into the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_ocl(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h0); 
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
+   endtask
+
+   //=================================================
+   //
+   // peek_ocl
+   //
+   //   Description: used to read a single 32b of data at addr from the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_ocl(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
+       data = tmp[31:0];
+   endtask
+
+   //=================================================
+   //
+   // poke_sda
+   //
+   //   Description: used to write a single 32b of data at addr into the SDA interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_sda(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h00);
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
+   endtask
+
+   //=================================================
+   //
+   // peek_sda
+   //
+   //   Description: used to read a single 32b of data at addr from the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_sda(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
+       data = tmp[31:0];
+   endtask
+
+   //=================================================
+   //
+   // poke_bar1
+   //
+   //   Description: used to write a single 32b of data at addr into the BAR1 interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_bar1(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h0);
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
+   endtask
+
+   //=================================================
+   //
+   // peek_bar1
+   //
+   //   Description: used to read a single 32b of data at addr from the BAR1 interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_bar1(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
+       data = tmp[31:0];
+   endtask
 
    function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
       `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
