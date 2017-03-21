@@ -17,18 +17,18 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
 #include <utils/lcd.h>
 
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
-static uint16_t pci_device_id = 0x1042;
+static uint16_t pci_device_id = 0xF0FF;
 /* */
+
+#define	MEM_16G		(1ULL << 34)
 
 /* use the stdout logger */
 const struct logger *logger = &logger_stdout;
@@ -85,39 +85,12 @@ out:
     return rc;
 }
 
-static int
-enable_dram_access(int slot_id)
-{
-    int rc;
-    int pci_bar_handle = PCI_BAR_HANDLE_INIT;
-    static const uint32_t DRAM_ACCESS_DISABLE_REGS[4] =
+/*    static const uint32_t DRAM_ACCESS_DISABLE_REGS[4] =
         {0x130, 0x230, 0x330, 0x430};
-
-    /* attach to the fpga, with a pci_bar_handle out param */
-    rc = fpga_pci_attach(slot_id, FPGA_APP_PF, APP_PF_BAR0, 0, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the fpga");
-
-    /* enable access to the FPGA dram by writing a zero to the DRAM disable
-     * registers. */
-    for (int i = 0; i < sizeof_array(DRAM_ACCESS_DISABLE_REGS); ++i) {
         rc = fpga_pci_poke(pci_bar_handle, DRAM_ACCESS_DISABLE_REGS[i], 0);
-        fail_on(rc, out, "Unable to write to disable register, 0x%x",
-            DRAM_ACCESS_DISABLE_REGS[i]);
-    }
+*/
 
-out:
-    /* clean up */
-    if (pci_bar_handle >= 0) {
-        rc = fpga_pci_detach(pci_bar_handle);
-        if (rc) {
-            printf("Failure while detaching from the fpga.\n");
-        }
-    }
-
-    /* if there is an error code, exit with status 1 */
-    return (rc != 0 ? 1 : 0);
-}
-
+/* helper function to initialize a buffer that would be written to the FPGA later */
 
 void
 rand_string(char *str, size_t size)
@@ -139,10 +112,16 @@ rand_string(char *str, size_t size)
     str[size-1] = '\0';
 }
 
+/* 
+ * Write 4 identical buffers to the 4 different DRAM channels of the AFI
+ * using fsync() between the writes and read to insure order
+ */
+
 int dma_example(int slot_id) {
     int fd, rc;
     char *write_buffer, *read_buffer;
     static const size_t buffer_size = 128;
+    int channel=0;
 
     read_buffer = NULL;
     write_buffer = NULL;
@@ -152,15 +131,9 @@ int dma_example(int slot_id) {
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
-    rc = enable_dram_access(slot_id);
-    fail_on(rc, out, "Unable to enable DRAM access.");
-
     fd = open("/dev/edma0_queue_0", O_RDWR);
     fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. "
         "Is the kernel driver loaded?");
-
-    rc = lseek(fd, 0x010000000, SEEK_SET);
-    fail_on((rc = (rc < 0)? 1:0), out, "call to lseek failed.");
 
     write_buffer = (char *)malloc(buffer_size);
     read_buffer = (char *)malloc(buffer_size);
@@ -171,29 +144,42 @@ int dma_example(int slot_id) {
 
     rand_string(write_buffer, buffer_size);
 
-    rc = write(fd, write_buffer, buffer_size);
+    for (channel=0;channel < 4; channel++) {
+    	
+	rc = pwrite(fd, write_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+	
+    	fail_on((rc = (rc < 0)? 1:0), out, "call to pwrite failed.");
+
+    }
+
+    /* fsync() will make sure the write made it to the target buffer 
+     * before read is done
+     */
+
     fsync(fd);
 
-    rc = lseek(fd, 0x010000000, SEEK_SET);
-    fail_on((rc = (rc < 0)? 1:0), out, "call to lseek failed.");
-    rc = read(fd, read_buffer, buffer_size);
+    for (channel=0;channel < 4; channel++) {
+    	rc = pread(fd, read_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+    	fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
 
-    if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
-        printf("DRAM DMA read the same string as it wrote (it worked correctly!)\n");
-    } else {
-        int i;
+    	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
+        	printf("DRAM DMA read the same string as it wrote on channel %d (it worked correctly!)\n", channel);
+    	} else {
+        	int i;
 
-        printf("Bytes written:\n");
-        for (i = 0; i < buffer_size; ++i) {
-            printf("%c", write_buffer[i]);
-        }
+        	printf("Bytes written to channel %d:\n", channel);
+        	for (i = 0; i < buffer_size; ++i) {
+            		printf("%c", write_buffer[i]);
+        	}
+        	
+		printf("\n\n");
+
+        	printf("Bytes read:\n");
+        	for (i = 0; i < buffer_size; ++i) {
+            		printf("%c", read_buffer[i]);
+        	}
         printf("\n\n");
-
-        printf("Bytes read:\n");
-        for (i = 0; i < buffer_size; ++i) {
-            printf("%c", read_buffer[i]);
-        }
-        printf("\n\n");
+    	}
     }
 
 out:
@@ -203,7 +189,7 @@ out:
     if (read_buffer != NULL) {
         free(read_buffer);
     }
-    if (fd != -1) {
+    if (fd >= 0) {
         close(fd);
     }
     /* if there is an error code, exit with status 1 */
