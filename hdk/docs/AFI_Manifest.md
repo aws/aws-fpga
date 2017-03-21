@@ -29,7 +29,7 @@ The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are m
 * **shell_version**=.....   [Mandatory]  
       *Taken from aws-fpga/hdk/common/[shell directory]/build/checkpoints/from_aws*
 
-* **dcp_file_name=**.....     
+* **dcp_file_name=**.....   [Mandatory]  
       *The .dcp file name including the file type suffix*
 
 * **hdk_version=**.....     
