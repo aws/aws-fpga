@@ -87,7 +87,7 @@ By following a few steps, you would have downloaded the HDK, compiled and built 
 $ git clone https://github.com/aws/aws-fpga     # Step 1:  Download the HDK and SDK code
 $ cd aws-fpga                                   # Step 2:  Move to the root directory
 $ source hdk_setup.sh                           # Step 3:  Set up the HDK environment variables
-$ cd hdk/cl/examples/cl_simple                  # Step 4:  Change directory to one of the provided examples
+$ cd hdk/cl/examples/cl_hello_world             # Step 4:  Change directory to one of the provided examples
 $ export CL_DIR=$(pwd)                          # Step 5:  Define this directory as the root for the CL design
 $ cd build/scripts                              # Step 6:  The build directory for synthesizing, placement, timing etc
 $ source aws_build_dcp_from_cl.sh               # Step 7:  Generate a placed-and-routed design checkpoint (DCP)
