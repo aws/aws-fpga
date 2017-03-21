@@ -19,6 +19,9 @@ fpga-local-cmd
 *.vcd
 *.vcdplus*
 waves.shm
+*.mod.c
+*.order
+*.symvers
 
 *~
 .\#*
@@ -29,6 +32,7 @@ waves.shm
 .nfs*
 *.so
 *.a
+*.ko
 
 nohup.out
 *.nohup.out
