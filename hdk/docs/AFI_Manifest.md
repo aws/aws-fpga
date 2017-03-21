@@ -17,11 +17,11 @@ The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are m
 * **pci_device_id=** [Mandatory]
       * 0xF000 through 0xF0FF for example CLs.
 
-* **pci_subsystem_id=** [Optional]
-      * defaults to 0 if not available
+* **pci_subsystem_id=** [Mandatory]
+      * Must be non-zero
       
-* **pci_subsystem_vendor_id=** [Optional]
-      * defaults to 0 if not available
+* **pci_subsystem_vendor_id=** [Mandatory]
+      * Must be non-zero
 
 * **dcp_hash=**.....   [Mandatory]    
       *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
@@ -37,32 +37,18 @@ The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are m
 
 * **date=** YY_MM_DD-HHMM     
       *Following same format used in the automatic build reports used by AWS scripts*
-      
-* **clk_main_a0=**      
-      *Frequency of main and global clk_main_a0 in Mhz. When this setting is missing, the default value would be 125.   Legal values are from 10 to 250*
-      
-* **clk_extra_a1=**      
-      *CL input clock clk_extra_a1 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
-      
-* **clk_extra_a2=**      
-      *CL input clock clk_extra_a2 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
-      
-* **clk_extra_a3=**      
-      *CL input clock clk_extra_a3 frequency in Mhz. It must be an integer divider of clk_main_a0. When this setting is missing, the default value would be equal to CLK_MAIN value*
-      
-* **clk_extra_b0=**      
-      *CL input clock clk_extra_b0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to clk_main_a0 value*
-      
-* **clk_extra_b1=**      
-      *CL input clock clk_extra_b1 frequency in Mhz. It must be an integer divider of CLK_EXTRA_B0. When this setting is missing, the default value would be equal to clk_extra_b0 value*
-      
-* **clk_extra_c0=**      
-      *CL input clock clk_extra_c0 frequency in Mhz. It can have any value up to 500. When this setting is missing, the default value would be equal to clk_main_a0 value*
-      
-* **clk_extra_c1=**      
-      *CL input clock clk_extra_c1 in Mhz. It must be an integer divider of CLK_EXTRA_C1. When this setting is missing, the default value would be equal to clk_extra_c0 value*
 
-      
-      
-      
+* **clock_recipe_a**=....   [Mandatory]  
+      *A clock recipe ID in the form Ax, indicating which clock settings will be used in clock group A in this CL*  
+      *Supported clock recipes are listed in Clock Group A of [supported clock recipes](./clock_recipes.csv)*
  
+* **clock_recipe_b**=....  
+      *A clock recipe ID in the form Bx, indicating which clock settings will be used in clock group B in this CL*  
+      *Supported clock recipes are listed in Clock Group B of [supported clock recipes](./clock_recipes.csv)*  
+      *If this field is missing, recipe B0 will be used*
+ 
+* **clock_recipe_c**=....   
+      *A clock recipe ID in the form Cx, indicating which clock settings will be used in clock group C in this CL*  
+      *Supported clock recipes are listed in Clock Group C of [supported clock recipes](./clock_recipes.csv)*  
+      *If this field is missing, recipe C0 will be used*
+
