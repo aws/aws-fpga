@@ -43,12 +43,12 @@ int fpga_mgmt_close(void)
 	return FPGA_ERR_OK;
 }
 
-void fpag_mgmt_set_cmd_timeout(uint32_t value)
+void fpga_mgmt_set_cmd_timeout(uint32_t value)
 {
 	fpga_mgmt_state.timeout = value;
 }
 
-void fpag_mgmt_set_cmd_delay_msec(uint32_t value)
+void fpga_mgmt_set_cmd_delay_msec(uint32_t value)
 {
 	fpga_mgmt_state.delay_msec = value;
 }

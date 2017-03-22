@@ -48,7 +48,7 @@ const char *fpga_mgmt_strerror(int err);
  *
  * @param[in] value  timeout, n * delay_msec
  */
-void fpag_mgmt_set_cmd_timeout(uint32_t value);
+void fpga_mgmt_set_cmd_timeout(uint32_t value);
 
 /**
  * Sets the value of the delay_msec. The value is used as the basic unit of time
@@ -56,7 +56,7 @@ void fpag_mgmt_set_cmd_timeout(uint32_t value);
  *
  * @param[in] value  number of ms used as base time unit
  */
-void fpag_mgmt_set_cmd_delay_msec(uint32_t value);
+void fpga_mgmt_set_cmd_delay_msec(uint32_t value);
 
 /**
  * This structure provides all of the information for
