@@ -15,7 +15,7 @@ functional CL implementation. Each example includes:
 
 In summary:
 
-- An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on premise.
+- An AFI can be created using the files in 1, 2, and 3. 
 - The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.
 
 By following the example CLs, a developer should learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load an AFI from the F1 instance for use.
@@ -146,8 +146,6 @@ Below is a sample policy.
 To create an AFI execute the `create-fpga-image` command as follows:
 
     $ aws ec2 create-fpga-image \
-        --shell-version <shell_version> \
-        --fpga-pci-id DeviceId=<device_id>,VendorId=<vendor_id>,SubsystemId=<subsystem_id>,SubsystemVendorId=<subsystem_vendor_id> \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name <cl-name> \
         --description <description> \
