@@ -23,7 +23,7 @@
 #include <stdbool.h>
 
 #define FPGA_SLOT_MAX           8
-#define FPGA_BAR_PER_PF_MAX	4
+#define FPGA_BAR_PER_PF_MAX		4
 #define FPGA_PF_MAX            	3
 
 #define AFI_ID_STR_MAX			64
@@ -75,14 +75,16 @@ enum {
 
 	/** Invalid AFI_CMD_API_VERSION, see afi_cmd_api.h */
 	FPGA_ERR_AFI_CMD_API_VERSION_INVALID = 11, 
-    /** CL PCI IDs did not match (e.g. between LF and CL reported values */
-    FPGA_ERR_CL_ID_MISMATCH = 12,
-    /** CL DDR calibration failed */
-    FPGA_ERR_CL_DDR_CALIB_FAILED = 13,
-    /** generic/unspecified error */
-    FPGA_ERR_FAIL = 14,
+	/** CL PCI IDs did not match (e.g. between LF and CL reported values */
+	FPGA_ERR_CL_ID_MISMATCH = 12,
+	/** CL DDR calibration failed */
+	FPGA_ERR_CL_DDR_CALIB_FAILED = 13,
+	/** generic/unspecified error */
+	FPGA_ERR_FAIL = 14,
 
-    FPGA_ERR_END
+	FPGA_ERR_SHELL_MISMATCH = 16,
+
+	FPGA_ERR_END
 };
 
 /** Stringify the FPGA_ERR_XXX errors */
@@ -94,6 +96,7 @@ enum {
 	((error) == FPGA_ERR_CL_ID_MISMATCH) ?				"cl-id-mismatch" : \
 	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
 	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
+	((error) == FPGA_ERR_SHELL_MISMATCH) ?			    "afi-shell-version-mismatch" : \
 														"internal-error"
 
 
@@ -112,16 +115,19 @@ enum {
     FPGA_STATUS_BUSY = 2,
 	/**< FPGA slot is not programmed */
     FPGA_STATUS_NOT_PROGRAMMED = 3,
+    /* < Load failed, or worked with errors */
+    FPGA_STATUS_LOAD_FAILED = 7,
     FPGA_STATUS_END,
 };
 
 /** Stringify the FPGA status */
 #define FPGA_STATUS2STR(status) \
 	((status) == FPGA_STATUS_LOADED) ?			"loaded" : \
-	((status) == FPGA_STATUS_CLEARED) ?		"cleared" : \
+	((status) == FPGA_STATUS_CLEARED) ?			"cleared" : \
 	((status) == FPGA_STATUS_BUSY) ?			"busy" : \
 	((status) == FPGA_STATUS_NOT_PROGRAMMED) ?	"not-programmed" : \
-										"internal-error"
+	((status) == FPGA_STATUS_LOAD_FAILED) ?		"load-failed" : \
+												"internal-error"
 
 /**
  * Common FPGA config.
@@ -213,6 +219,12 @@ struct fpga_metrics_common {
 	/** FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT: address and count */
 	uint64_t ps_edma_timeout_addr;
 	uint32_t ps_edma_timeout_count;
+	/** FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT: address and count */
+	uint32_t sdacl_timeout_addr;
+	uint32_t sdacl_timeout_count;
+	/** FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT: address and count */
+	uint32_t chipscope_timeout_addr;
+	uint32_t chipscope_timeout_count;
 	/** PCI read and write counts */
 	uint64_t pm_write_count;
 	uint64_t pm_read_count;
@@ -223,6 +235,10 @@ struct fpga_metrics_common {
 
 /** Common int_status */
 enum {
+    /** SDACL slave timeout (CL did not respond to cycle from host) */
+	FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT = 1 << 0,
+	/** Chipscope timeout */
+    FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT = 1 << 1,
 	/** CL did not respond to cycle from host */
 	FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT = 1 << 17,
 	/** PCIe master cycle from CL out of range */
@@ -236,7 +252,10 @@ enum {
 	/** CL EDMA did not respond to cycle from host */
 	FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT = 1 << 29,
 
-	FPGA_INT_STATUS_ALL = FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT |
+	FPGA_INT_STATUS_ALL = 
+		FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT |
+		FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_PCI_RANGE_ERROR | 
 		FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR |
 		FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT |
@@ -246,23 +265,21 @@ enum {
 
 /** Common pci_axi_protocol_error_status (PAP) */
 enum {
-	FPGA_PAP_LEN_ERROR = 1 << 0,
 	FPGA_PAP_4K_CROSS_ERROR = 1 << 1,
 	FPGA_PAP_BM_EN_ERROR = 1 << 2,
 	FPGA_PAP_REQ_SIZE_ERROR = 1 << 3,
 	FPGA_PAP_WR_INCOMPLETE_ERROR = 1 << 4,
 	FPGA_PAP_FIRST_BYTE_EN_ERROR = 1 << 5,
 	FPGA_PAP_LAST_BYTE_EN_ERROR = 1 << 6,
-	FPGA_PAP_WSTRB_ERROR = 1 << 7,
 	FPGA_PAP_BREADY_TIMEOUT_ERROR = 1 << 8,
 	FPGA_PAP_RREADY_TIMEOUT_ERROR = 1 << 9,
 	FPGA_PAP_WCHANNEL_TIMEOUT_ERROR = 1 << 10,
 
-	FPGA_PAP_ERROR_STATUS_ALL = FPGA_PAP_LEN_ERROR |
+	FPGA_PAP_ERROR_STATUS_ALL = 
 		FPGA_PAP_4K_CROSS_ERROR | FPGA_PAP_BM_EN_ERROR |
 		FPGA_PAP_REQ_SIZE_ERROR | FPGA_PAP_WR_INCOMPLETE_ERROR |
 		FPGA_PAP_FIRST_BYTE_EN_ERROR | FPGA_PAP_LAST_BYTE_EN_ERROR |
-		FPGA_PAP_WSTRB_ERROR | FPGA_PAP_BREADY_TIMEOUT_ERROR |
+		FPGA_PAP_BREADY_TIMEOUT_ERROR |
 		FPGA_PAP_RREADY_TIMEOUT_ERROR | 
 		FPGA_PAP_WCHANNEL_TIMEOUT_ERROR,
 };

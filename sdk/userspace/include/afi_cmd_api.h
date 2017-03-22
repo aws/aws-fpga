@@ -105,7 +105,8 @@ struct afi_cmd_metrics_req {
 /** Metrics AFI response */
 struct afi_cmd_metrics_rsp {
 	struct fpga_meta_ids	ids;
-	int32_t					status; /**< e.g. see FPGA_STATUS_LOADED, fpga_common.h */
+	int32_t					status;		/**< see FPGA_STATUS_LOADED, fpga_common.h */
+	int32_t					status_q;	/**< FPGA status qualifier, see FPGA_ERR_XXX */
 	struct fpga_metrics_common	fmc;
 } __attribute__((packed));
 

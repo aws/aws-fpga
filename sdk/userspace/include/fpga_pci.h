@@ -165,8 +165,12 @@ int fpga_pci_get_resource_map(int slot_id, int pf_id,
     struct fpga_pci_resource_map *map);
 
 /**
- * PCI rescan.
+ * Rescan the slot application physical functions.
+ * -performs both a pci device remove and a PCI rescan to refresh the device
+ *  vendor and device IDs within the OS.
+ *
+ * @param[in]   slot_id  The logical slot id of the FPGA of interest
  *
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_rescan_slot_app_pfs(void);
+int fpga_pci_rescan_slot_app_pfs(int slot_id);

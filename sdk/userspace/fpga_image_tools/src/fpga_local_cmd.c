@@ -261,7 +261,7 @@ command_metrics(void)
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
-		ret = fpga_pci_rescan_slot_app_pfs();
+		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot);
 		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
@@ -277,6 +277,12 @@ command_metrics(void)
 		}
 
 		struct fpga_metrics_common *fmc = &info.metrics;
+		printf("sdacl-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
+
+		printf("chipscope-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT) ?  1 : 0);
+
 		printf("pci-slave-timeout=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT) ?
 				1 : 0); 
@@ -299,10 +305,6 @@ command_metrics(void)
 
 		printf("pci-axi-protocol-error=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR) ?
-				1 : 0); 
-
-		printf("pci-axi-protocol-len-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LEN_ERROR) ?
 				1 : 0); 
 
 		printf("pci-axi-protocol-4K-cross-error=%u\n", 
@@ -329,10 +331,6 @@ command_metrics(void)
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-write-strobe-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WSTRB_ERROR) ?
-				1 : 0); 
-
 		printf("pci-axi-protocol-bready-error=%u\n", 
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
 				1 : 0); 
@@ -344,6 +342,12 @@ command_metrics(void)
 		printf("pci-axi-protocol-wchannel-error=%u\n", 
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
 				1 : 0); 
+
+		printf("sdacl-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_timeout_addr); 
+		printf("sdacl-timeout-count=%u\n", fmc->sdacl_timeout_count); 
+
+		printf("chipscope-timeout-addr=0x%" PRIx32 "\n", fmc->chipscope_timeout_addr); 
+		printf("chipscope-timeout-count=%u\n", fmc->chipscope_timeout_count); 
 
 		printf("ps-timeout-addr=0x%" PRIx64 "\n", fmc->ps_timeout_addr); 
 		printf("ps-timeout-count=%u\n", fmc->ps_timeout_count); 

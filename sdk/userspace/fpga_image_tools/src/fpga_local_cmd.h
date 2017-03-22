@@ -21,7 +21,7 @@
 
 #include <afi_cmd_api.h>
 
-#define CLI_VERSION  "v5.00"
+#define CLI_VERSION  "v6.00"
  
 /** First flag bit, @see afi_cmd_hdr#len_flags */
 #define AFI_CMD_HDR_FLAGS_SHIFT 24
@@ -43,17 +43,6 @@ enum {
 	AFI_SET_DIP,
 	AFI_EXT_END
 };
-
-/** F1 Mailbox Device defines */
-#define F1_MBOX_VENDOR_ID		0x1d0f
-#define F1_MBOX_DEVICE_ID		0x1041
-#define F1_MBOX_RESOURCE_NUM	0
-
-/** F1 Application Device defines */
-#define F1_MBOX_DEV2APP_DEV(dev)		((dev) - 1)
-#define F1_APP_PF						0
-#define F1_REMOVE_APP_DEV_DELAY_MSEC	1000
-#define F1_REMOVE_APP_DEV_MAX_RETRIES	3
 
 /** 
  * This should be used for the sanitized first level errors to be

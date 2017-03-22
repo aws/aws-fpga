@@ -30,7 +30,8 @@
 #define F1_MBOX_RESOURCE_NUM    0
 
 /** F1 Application PF defines */
-#define F1_APP_PF_START         0
-#define F1_APP_PF_END           15
+#define F1_MBOX_DEV2APP_DEV(dev)		((dev) - 1)
+#define F1_REMOVE_APP_PF_DELAY_MSEC		1000
+#define F1_REMOVE_APP_PF_MAX_RETRIES	3
 
 #define CLI_INTERNAL_ERR_STR "Error: Internal error "

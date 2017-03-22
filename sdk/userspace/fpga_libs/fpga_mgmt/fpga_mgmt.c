@@ -26,8 +26,8 @@
 #include "fpga_mgmt_internal.h"
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {
-	.timeout = FPAG_MGMT_TIMEOUT_DFLT,
-	.delay_msec = FPAG_MGMT_DELAY_MSEC_DFLT
+	.timeout = FPGA_MGMT_TIMEOUT_DFLT,
+	.delay_msec = FPGA_MGMT_DELAY_MSEC_DFLT
 };
 
 int fpga_mgmt_init(void)
