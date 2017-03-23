@@ -20,7 +20,7 @@
 
 #include <fpga_mgmt.h>
 #include <fpga_pci.h>
-#include <hal/afi_cmd_api.h>
+#include <afi_cmd_api.h>
 #include <fpga_hal_mbox.h>
 #include <utils/lcd.h>
 

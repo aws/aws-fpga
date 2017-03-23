@@ -289,7 +289,6 @@ static void
 print_version(void)
 {   
 	printf("AFI Management Tools Version: %s\n", CLI_VERSION);
-	printf("AFI CMD API Version: v%u\n", AFI_CMD_API_VERSION);
 }
 
 /**
@@ -797,7 +796,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
-		{"virtual-dip",		required_argument,	0,	'D'	},
+		{"virtual-dip",			required_argument,	0,	'D'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'?'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -886,14 +885,14 @@ parse_args(int argc, char *argv[])
 			"Error: program name or opcode string is NULL");
 
 	static struct parse_args_str2func str2func[] = {
-		{"LoadFpgaImage",			AFI_CMD_LOAD,			parse_args_load_afi},
-		{"ClearFpgaImage",			AFI_CMD_CLEAR,			parse_args_clear_afi},
-		{"DescribeFpgaImageSlots",	AFI_EXT_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
-		{"DescribeFpgaImage",		AFI_CMD_METRICS,		parse_args_describe_afi},
-		{"StartVirtualJtag",		AFI_START_VJTAG,		parse_args_start_virtual_jtag},
-		{"GetVirtualLED",		AFI_GET_LED,		parse_args_get_virtual_led},
-		{"GetVirtualDIP",		AFI_GET_DIP,		parse_args_get_virtual_dip},
-		{"SetVirtualDIP",		AFI_SET_DIP,		parse_args_set_virtual_dip},
+		{"LoadFpgaImage",			CLI_CMD_LOAD,			parse_args_load_afi},
+		{"ClearFpgaImage",			CLI_CMD_CLEAR,			parse_args_clear_afi},
+		{"DescribeFpgaImageSlots",	CLI_CMD_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
+		{"DescribeFpgaImage",		CLI_CMD_DESCRIBE,		parse_args_describe_afi},
+		{"StartVirtualJtag",		CLI_CMD_START_VJTAG,	parse_args_start_virtual_jtag},
+		{"GetVirtualLED",			CLI_CMD_GET_LED,		parse_args_get_virtual_led},
+		{"GetVirtualDIP",			CLI_CMD_GET_DIP,		parse_args_get_virtual_dip},
+		{"SetVirtualDIP",			CLI_CMD_SET_DIP,		parse_args_set_virtual_dip},
 
 	};
 
