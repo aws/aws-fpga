@@ -32,7 +32,7 @@ fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
 	
 	(void) flags;
 
-	if (!handle || pf_id < 0 || pf_id >= FPGA_MAX_PF ||
+	if (!handle || pf_id < 0 || pf_id >= FPGA_PF_MAX ||
 		bar_id < 0 || bar_id >= FPGA_BAR_PER_PF_MAX) {
 		return -EINVAL;
 	}

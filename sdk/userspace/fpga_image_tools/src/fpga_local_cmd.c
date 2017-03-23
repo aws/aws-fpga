@@ -72,7 +72,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 	/** Retrieve and display associated application PFs (if any) */
 	bool found_app_pf = false;
 	int i;
-	for (i = 0; i < FPGA_MAX_PF; i++) {
+	for (i = 0; i < FPGA_PF_MAX; i++) {
 		struct fpga_pci_resource_map *app_map = &spec->map[i];
 
 		if (i == FPGA_MGMT_PF && !f1.show_mbox_device) {

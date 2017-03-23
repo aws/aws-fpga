@@ -444,7 +444,7 @@ fpga_pci_get_resource_map(int slot_id, int pf_id,
 	int ret;
 
 	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX ||
-		pf_id < 0 || pf_id >= FPGA_MAX_PF ||
+		pf_id < 0 || pf_id >= FPGA_PF_MAX ||
 		!map) {
 		return -EINVAL;
 	}
