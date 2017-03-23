@@ -2,7 +2,7 @@ Clock Group A,,,,
 Recipe Number,clk_main_a0,clk_extra_a1,clk_extra_a2,clk_extra_a3
 A0,125,62.5,187.5,250
 A1,250,125,375,500
-A3,15.625,7.8125,125,62.5
+A2,15.625,7.8125,125,62.5
 ,,,,
 Clock Group B,,,,
 Recipe Number,clk_extra_b0,clk_extra_b1,,
