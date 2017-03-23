@@ -110,13 +110,8 @@ You need to prepare the following information:
 
 1. Name of the logic design *(Optional)*.
 2. Generic description of the logic design *(Optional)*.
-3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor.
-4. Location of the tarball file object in S3.
-5. Location of an S3 directory where AWS would write back logs of the AFI creation.
-6. Version of the AWS Shell.
-
-**NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.
-If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
+3. Location of the tarball file object in S3.
+4. Location of an S3 directory where AWS would write back logs of the AFI creation.
 
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
@@ -172,8 +167,6 @@ Below is a sample policy.
 To create an AFI execute the `create-fpga-image` command as follows:
 
     $ aws ec2 create-fpga-image \
-        --shell-version <shell_version> \
-        --fpga-pci-id DeviceId=<device_id>,VendorId=<vendor_id>,SubsystemId=<subsystem_id>,SubsystemVendorId=<subsystem_vendor_id> \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name <cl-name> \
         --description <description> \

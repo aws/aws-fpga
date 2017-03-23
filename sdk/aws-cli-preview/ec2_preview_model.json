@@ -88,15 +88,14 @@
       "input":{"shape":"AssociateDhcpOptionsRequest"},
       "documentation":"<p>Associates a set of DHCP options (that you've previously created) with the specified VPC, or associates no DHCP options with the VPC.</p> <p>After you associate the options with the VPC, any existing instances and all new instances that you launch in that VPC use the options. You don't need to restart or relaunch the instances. They automatically pick up the changes within a few hours, depending on how frequently the instance renews its DHCP lease. You can explicitly renew the lease using the operating system on the instance.</p> <p>For more information, see <a href=\"http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html\">DHCP Options Sets</a> in the <i>Amazon Virtual Private Cloud User Guide</i>.</p>"
     },
-    "AssociateFpgaImage":{
-      "name":"AssociateFpgaImage",
+    "AssociateIamInstanceProfile":{
+      "name":"AssociateIamInstanceProfile",
       "http":{
         "method":"POST",
         "requestUri":"/"
       },
-      "input":{"shape":"AssociateFpgaImageRequest"},
-      "output":{"shape":"AssociateFpgaImageResponse"},
-      "documentation":"<p>Associates the specified Amazon FPGA Image (AFI) with the specified Amazon Machine Image (AMI). You can use the AMI to launch an instance type that supports field-programmable gate arrays (FPGA).</p> <p>To disassociate the AFI and AMI, use <a>DisassociateFpgaImage</a>.</p>"
+      "input":{"shape":"AssociateIamInstanceProfileRequest"},
+      "output":{"shape":"AssociateIamInstanceProfileResult"}
     },
     "AssociateRouteTable":{
       "name":"AssociateRouteTable",
@@ -350,7 +349,7 @@
         "requestUri":"/"
       },
       "input":{"shape":"CreateFpgaImageRequest"},
-      "output":{"shape":"CreateFpgaImageResponse"},
+      "output":{"shape":"CreateFpgaImageResult"},
       "documentation":"<p>Creates an Amazon FPGA Image (AFI) from the specified design checkpoint (DCP).</p> <p>An AFI contains the binary image for an FPGA bitstream that is ready to download to an FPGA. You can securely deploy an AFI on one or more FPGA-accelerated instances.</p>"
     },
     "CreateImage":{
@@ -968,6 +967,15 @@
       "output":{"shape":"DescribeHostsResult"},
       "documentation":"<p>Describes one or more of your Dedicated Hosts.</p> <p>The results describe only the Dedicated Hosts in the region you're currently using. All listed instances consume capacity on your Dedicated Host. Dedicated Hosts that have recently been released will be listed with the state <code>released</code>.</p>"
     },
+    "DescribeIamInstanceProfileAssociations":{
+      "name":"DescribeIamInstanceProfileAssociations",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"DescribeIamInstanceProfileAssociationsRequest"},
+      "output":{"shape":"DescribeIamInstanceProfileAssociationsResult"}
+    },
     "DescribeIdFormat":{
       "name":"DescribeIdFormat",
       "http":{
@@ -1388,6 +1396,15 @@
       "output":{"shape":"DescribeVolumesResult"},
       "documentation":"<p>Describes the specified EBS volumes.</p> <p>If you are describing a long list of volumes, you can paginate the output to make the list more manageable. The <code>MaxResults</code> parameter sets the maximum number of results returned in a single page. If the list of results exceeds your <code>MaxResults</code> value, then that number of results is returned along with a <code>NextToken</code> value that can be passed to a subsequent <code>DescribeVolumes</code> request to retrieve the remaining results.</p> <p>For more information about EBS volumes, see <a href=\"http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumes.html\">Amazon EBS Volumes</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.</p>"
     },
+    "DescribeVolumesModifications":{
+      "name":"DescribeVolumesModifications",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"DescribeVolumesModificationsRequest"},
+      "output":{"shape":"DescribeVolumesModificationsResult"}
+    },
     "DescribeVpcAttribute":{
       "name":"DescribeVpcAttribute",
       "http":{
@@ -1563,15 +1580,14 @@
       "input":{"shape":"DisassociateAddressRequest"},
       "documentation":"<p>Disassociates an Elastic IP address from the instance or network interface it's associated with.</p> <p>An Elastic IP address is for use in either the EC2-Classic platform or in a VPC. For more information, see <a href=\"http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html\">Elastic IP Addresses</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.</p> <p>This is an idempotent operation. If you perform the operation more than once, Amazon EC2 doesn't return an error.</p>"
     },
-    "DisassociateFpgaImage":{
-      "name":"DisassociateFpgaImage",
+    "DisassociateIamInstanceProfile":{
+      "name":"DisassociateIamInstanceProfile",
       "http":{
         "method":"POST",
         "requestUri":"/"
       },
-      "input":{"shape":"DisassociateFpgaImageRequest"},
-      "output":{"shape":"DisassociateFpgaImageResponse"},
-      "documentation":"<p>Disssociates the specified Amazon FPGA Image (AFI) with the specified Amazon Machine Image (AMI).</p>"
+      "input":{"shape":"DisassociateIamInstanceProfileRequest"},
+      "output":{"shape":"DisassociateIamInstanceProfileResult"}
     },
     "DisassociateRouteTable":{
       "name":"DisassociateRouteTable",
@@ -1843,6 +1859,15 @@
       "input":{"shape":"ModifySubnetAttributeRequest"},
       "documentation":"<p>Modifies a subnet attribute. You can only modify one attribute at a time.</p>"
     },
+    "ModifyVolume":{
+      "name":"ModifyVolume",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"ModifyVolumeRequest"},
+      "output":{"shape":"ModifyVolumeResult"}
+    },
     "ModifyVolumeAttribute":{
       "name":"ModifyVolumeAttribute",
       "http":{
@@ -1978,6 +2003,15 @@
       "input":{"shape":"ReleaseHostsRequest"},
       "output":{"shape":"ReleaseHostsResult"},
       "documentation":"<p>When you no longer want to use an On-Demand Dedicated Host it can be released. On-Demand billing is stopped and the host goes into <code>released</code> state. The host ID of Dedicated Hosts that have been released can no longer be specified in another request, e.g., ModifyHosts. You must stop or terminate all instances on a host before it can be released.</p> <p>When Dedicated Hosts are released, it make take some time for them to stop counting toward your limit and you may receive capacity errors when trying to allocate new Dedicated hosts. Try waiting a few minutes, and then try again.</p> <p>Released hosts will still appear in a <a>DescribeHosts</a> response.</p>"
+    },
+    "ReplaceIamInstanceProfileAssociation":{
+      "name":"ReplaceIamInstanceProfileAssociation",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"ReplaceIamInstanceProfileAssociationRequest"},
+      "output":{"shape":"ReplaceIamInstanceProfileAssociationResult"}
     },
     "ReplaceNetworkAclAssociation":{
       "name":"ReplaceNetworkAclAssociation",
@@ -2322,6 +2356,10 @@
           "shape":"String",
           "documentation":"<p>The ID of the Spot instance request.</p>",
           "locationName":"spotInstanceRequestId"
+        },
+        "InstanceHealth":{
+          "shape":"InstanceHealthStatus",
+          "locationName":"instanceHealth"
         }
       },
       "documentation":"<p>Describes a running instance in a Spot fleet.</p>"
@@ -2651,31 +2689,23 @@
       },
       "documentation":"<p>Contains the parameters for AssociateDhcpOptions.</p>"
     },
-    "AssociateFpgaImageRequest":{
+    "AssociateIamInstanceProfileRequest":{
       "type":"structure",
-      "required":["FpgaImageId"],
+      "required":[
+        "IamInstanceProfile",
+        "InstanceId"
+      ],
       "members":{
-        "DryRun":{
-          "shape":"Boolean",
-          "documentation":"<p>Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is <code>DryRunOperation</code>. Otherwise, it is <code>UnauthorizedOperation</code>.</p>"
-        },
-        "FpgaImageId":{
-          "shape":"String",
-          "documentation":"<p>The ID of the AFI.</p>"
-        },
-        "ImageId":{
-          "shape":"String",
-          "documentation":"<p>The ID of the AMI.</p>"
-        }
+        "IamInstanceProfile":{"shape":"IamInstanceProfileSpecification"},
+        "InstanceId":{"shape":"String"}
       }
     },
-    "AssociateFpgaImageResponse":{
+    "AssociateIamInstanceProfileResult":{
       "type":"structure",
-      "required":["Result"],
       "members":{
-        "Result":{
-          "shape":"Boolean",
-          "locationName":"result"
+        "IamInstanceProfileAssociation":{
+          "shape":"IamInstanceProfileAssociation",
+          "locationName":"iamInstanceProfileAssociation"
         }
       }
     },
@@ -2778,6 +2808,13 @@
           "documentation":"<p>Information about the IPv6 CIDR block association.</p>",
           "locationName":"ipv6CidrBlockAssociation"
         }
+      }
+    },
+    "AssociationIdList":{
+      "type":"list",
+      "member":{
+        "shape":"String",
+        "locationName":"AssociationId"
       }
     },
     "AttachClassicLinkVpcRequest":{
@@ -3182,6 +3219,13 @@
         "cancelled_terminating",
         "modifying"
       ]
+    },
+    "BillingProductList":{
+      "type":"list",
+      "member":{
+        "shape":"String",
+        "locationName":"item"
+      }
     },
     "Blob":{"type":"blob"},
     "BlobAttributeValue":{
@@ -4129,16 +4173,9 @@
     },
     "CreateFpgaImageRequest":{
       "type":"structure",
-      "required":[
-        "FpgaPciId",
-        "InputStorageLocation",
-        "ShellVersion"
-      ],
+      "required":["InputStorageLocation"],
       "members":{
-        "FpgaPciId":{
-          "shape":"FpgaPciId",
-          "documentation":"<p>The PCI ID.</p>"
-        },
+        "DryRun":{"shape":"Boolean"},
         "InputStorageLocation":{
           "shape":"StorageLocation",
           "documentation":"<p>The location of the design checkpoint in Amazon S3. The input must be a tar-ball in encrypted format.</p>"
@@ -4155,31 +4192,21 @@
           "shape":"String",
           "documentation":"<p>A name for the AFI.</p>"
         },
-        "ShellVersion":{
-          "shape":"String",
-          "documentation":"<p>The version of the AWS Shell used to create the input FPGA custom logic (CL).</p>"
-        },
         "ClientToken":{
           "shape":"String",
           "documentation":"<p>Unique, case-sensitive identifier that you provide to ensure the idempotency of the request. For more information, see <a href=\"http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Run_Instance_Idempotency.html\">Ensuring Idempotency</a>.</p>"
         }
       }
     },
-    "CreateFpgaImageResponse":{
+    "CreateFpgaImageResult":{
       "type":"structure",
-      "required":[
-        "FpgaImageId",
-        "FpgaImageGlobalId"
-      ],
       "members":{
         "FpgaImageId":{
           "shape":"String",
-          "documentation":"<p>The FPGA image identifier (AFI ID).</p>",
           "locationName":"fpgaImageId"
         },
         "FpgaImageGlobalId":{
           "shape":"String",
-          "documentation":"<p>The global FPGA image identifier (AGFI ID).</p>",
           "locationName":"fpgaImageGlobalId"
         }
       }
@@ -4900,6 +4927,10 @@
         "KmsKeyId":{
           "shape":"String",
           "documentation":"<p>The full ARN of the AWS Key Management Service (AWS KMS) customer master key (CMK) to use when creating the encrypted volume. This parameter is only required if you want to use a non-default CMK; if this parameter is not specified, the default CMK for EBS is used. The ARN contains the <code>arn:aws:kms</code> namespace, followed by the region of the CMK, the AWS account ID of the CMK owner, the <code>key</code> namespace, and then the CMK ID. For example, arn:aws:kms:<i>us-east-1</i>:<i>012345678910</i>:key/<i>abcd1234-a123-456a-a12b-a123b4cd56ef</i>. If a <code>KmsKeyId</code> is specified, the <code>Encrypted</code> flag must also be set.</p>"
+        },
+        "TagSpecifications":{
+          "shape":"TagSpecificationList",
+          "locationName":"TagSpecification"
         }
       },
       "documentation":"<p>Contains the parameters for CreateVolume.</p>"
@@ -6173,6 +6204,34 @@
         }
       },
       "documentation":"<p>Contains the output of DescribeHosts.</p>"
+    },
+    "DescribeIamInstanceProfileAssociationsRequest":{
+      "type":"structure",
+      "members":{
+        "AssociationIds":{
+          "shape":"AssociationIdList",
+          "locationName":"AssociationId"
+        },
+        "Filters":{
+          "shape":"FilterList",
+          "locationName":"Filter"
+        },
+        "MaxResults":{"shape":"MaxResults"},
+        "NextToken":{"shape":"NextToken"}
+      }
+    },
+    "DescribeIamInstanceProfileAssociationsResult":{
+      "type":"structure",
+      "members":{
+        "IamInstanceProfileAssociations":{
+          "shape":"IamInstanceProfileAssociationSet",
+          "locationName":"iamInstanceProfileAssociationSet"
+        },
+        "NextToken":{
+          "shape":"NextToken",
+          "locationName":"nextToken"
+        }
+      }
     },
     "DescribeIdFormatRequest":{
       "type":"structure",
@@ -7859,6 +7918,35 @@
       },
       "documentation":"<p>Contains the output of DescribeVolumeStatus.</p>"
     },
+    "DescribeVolumesModificationsRequest":{
+      "type":"structure",
+      "members":{
+        "DryRun":{"shape":"Boolean"},
+        "VolumeIds":{
+          "shape":"VolumeIdStringList",
+          "locationName":"VolumeId"
+        },
+        "Filters":{
+          "shape":"FilterList",
+          "locationName":"Filter"
+        },
+        "NextToken":{"shape":"String"},
+        "MaxResults":{"shape":"Integer"}
+      }
+    },
+    "DescribeVolumesModificationsResult":{
+      "type":"structure",
+      "members":{
+        "VolumesModifications":{
+          "shape":"VolumeModificationList",
+          "locationName":"volumeModificationSet"
+        },
+        "NextToken":{
+          "shape":"String",
+          "locationName":"nextToken"
+        }
+      }
+    },
     "DescribeVolumesRequest":{
       "type":"structure",
       "members":{
@@ -8516,31 +8604,19 @@
       },
       "documentation":"<p>Contains the parameters for DisassociateAddress.</p>"
     },
-    "DisassociateFpgaImageRequest":{
+    "DisassociateIamInstanceProfileRequest":{
       "type":"structure",
-      "required":["FpgaImageId"],
+      "required":["AssociationId"],
       "members":{
-        "DryRun":{
-          "shape":"Boolean",
-          "documentation":"<p>Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is <code>DryRunOperation</code>. Otherwise, it is <code>UnauthorizedOperation</code>.</p>"
-        },
-        "FpgaImageId":{
-          "shape":"String",
-          "documentation":"<p>The ID of the AFI.</p>"
-        },
-        "ImageId":{
-          "shape":"String",
-          "documentation":"<p>The ID of the AMI.</p>"
-        }
+        "AssociationId":{"shape":"String"}
       }
     },
-    "DisassociateFpgaImageResponse":{
+    "DisassociateIamInstanceProfileResult":{
       "type":"structure",
-      "required":["Result"],
       "members":{
-        "Result":{
-          "shape":"Boolean",
-          "locationName":"result"
+        "IamInstanceProfileAssociation":{
+          "shape":"IamInstanceProfileAssociation",
+          "locationName":"iamInstanceProfileAssociation"
         }
       }
     },
@@ -9186,28 +9262,6 @@
         "NetworkInterface"
       ]
     },
-    "FpgaPciId":{
-      "type":"structure",
-      "members":{
-        "DeviceId":{
-          "shape":"String",
-          "documentation":"<p>The device ID.</p>"
-        },
-        "VendorId":{
-          "shape":"String",
-          "documentation":"<p>The vendor ID.</p>"
-        },
-        "SubsystemId":{
-          "shape":"String",
-          "documentation":"<p>The subsystem ID.</p>"
-        },
-        "SubsystemVendorId":{
-          "shape":"String",
-          "documentation":"<p>The vendor ID.</p>"
-        }
-      },
-      "documentation":"<p>Describes the PCI ID for an Amazon FPGA Image (AFI).</p>"
-    },
     "GatewayType":{
       "type":"string",
       "enum":["ipsec.1"]
@@ -9773,6 +9827,47 @@
         }
       },
       "documentation":"<p>Describes an IAM instance profile.</p>"
+    },
+    "IamInstanceProfileAssociation":{
+      "type":"structure",
+      "members":{
+        "AssociationId":{
+          "shape":"String",
+          "locationName":"associationId"
+        },
+        "InstanceId":{
+          "shape":"String",
+          "locationName":"instanceId"
+        },
+        "IamInstanceProfile":{
+          "shape":"IamInstanceProfile",
+          "locationName":"iamInstanceProfile"
+        },
+        "State":{
+          "shape":"IamInstanceProfileAssociationState",
+          "locationName":"state"
+        },
+        "Timestamp":{
+          "shape":"DateTime",
+          "locationName":"timestamp"
+        }
+      }
+    },
+    "IamInstanceProfileAssociationSet":{
+      "type":"list",
+      "member":{
+        "shape":"IamInstanceProfileAssociation",
+        "locationName":"item"
+      }
+    },
+    "IamInstanceProfileAssociationState":{
+      "type":"string",
+      "enum":[
+        "associating",
+        "associated",
+        "disassociating",
+        "disassociated"
+      ]
     },
     "IamInstanceProfileSpecification":{
       "type":"structure",
@@ -11074,6 +11169,13 @@
       },
       "documentation":"<p>Describes an instance to export.</p>"
     },
+    "InstanceHealthStatus":{
+      "type":"string",
+      "enum":[
+        "healthy",
+        "unhealthy"
+      ]
+    },
     "InstanceIdSet":{
       "type":"list",
       "member":{
@@ -11612,6 +11714,12 @@
         "i2.2xlarge",
         "i2.4xlarge",
         "i2.8xlarge",
+        "i3.large",
+        "i3.xlarge",
+        "i3.2xlarge",
+        "i3.4xlarge",
+        "i3.8xlarge",
+        "i3.16xlarge",
         "hi1.4xlarge",
         "hs1.8xlarge",
         "c1.medium",
@@ -12450,6 +12558,26 @@
         }
       },
       "documentation":"<p>Contains the parameters for ModifyVolumeAttribute.</p>"
+    },
+    "ModifyVolumeRequest":{
+      "type":"structure",
+      "required":["VolumeId"],
+      "members":{
+        "DryRun":{"shape":"Boolean"},
+        "VolumeId":{"shape":"String"},
+        "Size":{"shape":"Integer"},
+        "VolumeType":{"shape":"VolumeType"},
+        "Iops":{"shape":"Integer"}
+      }
+    },
+    "ModifyVolumeResult":{
+      "type":"structure",
+      "members":{
+        "VolumeModification":{
+          "shape":"VolumeModification",
+          "locationName":"volumeModification"
+        }
+      }
     },
     "ModifyVpcAttributeRequest":{
       "type":"structure",
@@ -14007,6 +14135,10 @@
           "documentation":"<p>The ID of the RAM disk.</p>",
           "locationName":"ramdiskId"
         },
+        "BillingProducts":{
+          "shape":"BillingProductList",
+          "locationName":"BillingProduct"
+        },
         "RootDeviceName":{
           "shape":"String",
           "documentation":"<p>The name of the root device (for example, <code>/dev/sda1</code>, or <code>/dev/xvda</code>).</p>",
@@ -14120,6 +14252,26 @@
         }
       },
       "documentation":"<p>Contains the output of ReleaseHosts.</p>"
+    },
+    "ReplaceIamInstanceProfileAssociationRequest":{
+      "type":"structure",
+      "required":[
+        "IamInstanceProfile",
+        "AssociationId"
+      ],
+      "members":{
+        "IamInstanceProfile":{"shape":"IamInstanceProfileSpecification"},
+        "AssociationId":{"shape":"String"}
+      }
+    },
+    "ReplaceIamInstanceProfileAssociationResult":{
+      "type":"structure",
+      "members":{
+        "IamInstanceProfileAssociation":{
+          "shape":"IamInstanceProfileAssociation",
+          "locationName":"iamInstanceProfileAssociation"
+        }
+      }
     },
     "ReplaceNetworkAclAssociationRequest":{
       "type":"structure",
@@ -15679,6 +15831,10 @@
           "shape":"Boolean",
           "documentation":"<p>Indicates whether the instance is optimized for EBS I/O. This optimization provides dedicated throughput to Amazon EBS and an optimized configuration stack to provide optimal EBS I/O performance. This optimization isn't available with all instance types. Additional usage charges apply when using an EBS-optimized instance.</p> <p>Default: <code>false</code> </p>",
           "locationName":"ebsOptimized"
+        },
+        "TagSpecifications":{
+          "shape":"TagSpecificationList",
+          "locationName":"TagSpecification"
         }
       },
       "documentation":"<p>Contains the parameters for RunInstances.</p>"
@@ -16859,6 +17015,10 @@
           "shape":"FleetType",
           "documentation":"<p>The type of request. Indicates whether the fleet will only <code>request</code> the target capacity or also attempt to <code>maintain</code> it. When you <code>request</code> a certain target capacity, the fleet will only place the required bids. It will not attempt to replenish Spot instances if capacity is diminished, nor will it submit bids in alternative Spot pools if capacity is not available. When you want to <code>maintain</code> a certain target capacity, fleet will place the required bids to meet this target capacity. It will also automatically replenish any interrupted instances. Default: <code>maintain</code>.</p>",
           "locationName":"type"
+        },
+        "ReplaceUnhealthyInstances":{
+          "shape":"Boolean",
+          "locationName":"replaceUnhealthyInstances"
         }
       },
       "documentation":"<p>Describes the configuration of a Spot fleet request.</p>"
@@ -17046,6 +17206,10 @@
           "shape":"String",
           "documentation":"<p>The name of the placement group (for cluster instances).</p>",
           "locationName":"groupName"
+        },
+        "Tenancy":{
+          "shape":"Tenancy",
+          "locationName":"tenancy"
         }
       },
       "documentation":"<p>Describes Spot instance placement.</p>"
@@ -17512,6 +17676,26 @@
       "type":"list",
       "member":{
         "shape":"Tag",
+        "locationName":"item"
+      }
+    },
+    "TagSpecification":{
+      "type":"structure",
+      "members":{
+        "ResourceType":{
+          "shape":"ResourceType",
+          "locationName":"resourceType"
+        },
+        "Tags":{
+          "shape":"TagList",
+          "locationName":"Tag"
+        }
+      }
+    },
+    "TagSpecificationList":{
+      "type":"list",
+      "member":{
+        "shape":"TagSpecification",
         "locationName":"item"
       }
     },
@@ -18067,6 +18251,75 @@
         "shape":"Volume",
         "locationName":"item"
       }
+    },
+    "VolumeModification":{
+      "type":"structure",
+      "members":{
+        "VolumeId":{
+          "shape":"String",
+          "locationName":"volumeId"
+        },
+        "ModificationState":{
+          "shape":"VolumeModificationState",
+          "locationName":"modificationState"
+        },
+        "StatusMessage":{
+          "shape":"String",
+          "locationName":"statusMessage"
+        },
+        "TargetSize":{
+          "shape":"Integer",
+          "locationName":"targetSize"
+        },
+        "TargetIops":{
+          "shape":"Integer",
+          "locationName":"targetIops"
+        },
+        "TargetVolumeType":{
+          "shape":"VolumeType",
+          "locationName":"targetVolumeType"
+        },
+        "OriginalSize":{
+          "shape":"Integer",
+          "locationName":"originalSize"
+        },
+        "OriginalIops":{
+          "shape":"Integer",
+          "locationName":"originalIops"
+        },
+        "OriginalVolumeType":{
+          "shape":"VolumeType",
+          "locationName":"originalVolumeType"
+        },
+        "Progress":{
+          "shape":"Long",
+          "locationName":"progress"
+        },
+        "StartTime":{
+          "shape":"DateTime",
+          "locationName":"startTime"
+        },
+        "EndTime":{
+          "shape":"DateTime",
+          "locationName":"endTime"
+        }
+      }
+    },
+    "VolumeModificationList":{
+      "type":"list",
+      "member":{
+        "shape":"VolumeModification",
+        "locationName":"item"
+      }
+    },
+    "VolumeModificationState":{
+      "type":"string",
+      "enum":[
+        "modifying",
+        "optimizing",
+        "completed",
+        "failed"
+      ]
     },
     "VolumeState":{
       "type":"string",
