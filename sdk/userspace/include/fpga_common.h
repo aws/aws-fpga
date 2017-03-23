@@ -24,7 +24,6 @@
 
 #define FPGA_SLOT_MAX           8
 #define FPGA_BAR_PER_PF_MAX		4
-#define FPGA_PF_MAX            	3
 
 #define AFI_ID_STR_MAX			64
 #define FPGA_DDR_IFS_MAX		4
@@ -136,11 +135,11 @@ struct fpga_common_cfg {
 	uint32_t	reserved;
 };
 
-/* physical function definitions */
+/** Physical function definitions */
 enum {
-    FPGA_APP_PF,
-    FPGA_MGMT_PF,
-    FPGA_MAX_PF
+    FPGA_APP_PF = 0,
+    FPGA_MGMT_PF = 1,
+    FPGA_PF_MAX,
 };
 /**
  * FPGA slot specification PCI resource map
@@ -164,10 +163,11 @@ struct fpga_pci_resource_map {
 } __attribute((packed));
 
 /**
- * FPGA slot specification, with 3 items representing 3 PFs 
+ * FPGA slot specification with two PFs:
+ *  Application PF, Management PF
  */
 struct fpga_slot_spec {
-	struct fpga_pci_resource_map map[FPGA_MAX_PF];
+	struct fpga_pci_resource_map map[FPGA_PF_MAX];
 } __attribute__((packed));
 
 /**
