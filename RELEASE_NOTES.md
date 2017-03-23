@@ -88,7 +88,7 @@ The following new features are included in this HDK release:
 	
 ### 5.	Create-fpga-image `-shell_version` and `--pci*` arguments are obsolete 
 
-* shell_version, pci_vendor_id, pci_device_id are a mandatory parameter in manifest.txt that should be submitted within the tar file
+* shell_version, pci_vendor_id, pci_device_id, pci_subsystem_id and pci_subsystem_vendor_id are a mandatory parameter in manifest.txt that should be submitted within the tar file
 
 ### 6.	Decoupling Shell/CL interface clocking from the internal Shell Clock 
 

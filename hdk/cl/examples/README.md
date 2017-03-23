@@ -84,13 +84,8 @@ You need to prepare the following information:
 
 1. Name of the logic design *(Optional)*.
 2. Generic description of the logic design *(Optional)*.
-3. PCI IDs: Device, Vendor, Subsystem, SubsystemVendor.
-4. Location of the tarball file object in S3.
-5. Location of an S3 directory where AWS would write back logs of the AFI creation.
-6. Version of the AWS Shell.
-
-**NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.
-If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
+3. Location of the tarball file object in S3.
+4. Location of an S3 directory where AWS would write back logs of the AFI creation.
 
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
@@ -146,8 +141,6 @@ Below is a sample policy.
 To create an AFI execute the `create-fpga-image` command as follows:
 
     $ aws ec2 create-fpga-image \
-        --shell-version <shell_version> \
-        --fpga-pci-id DeviceId=<device_id>,VendorId=<vendor_id>,SubsystemId=<subsystem_id>,SubsystemVendorId=<subsystem_vendor_id> \
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
         --name <cl-name> \
         --description <description> \
@@ -165,7 +158,7 @@ The output of this command includes two identifiers that refer to your AFI:
 After the AFI generation is complete, AWS will put the logs into the bucket location provided by the developer and notify them
 by email.
 
-**NOTE**: *Attempting to associate the AFI to an AMI before the AFI is ready will result in an `InvalidFpgaImageID.Unavailable` error.
+**NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
 Please wait until you receive a confirmation email from AWS indicating the creation process is complete.*
 
 # Step by step guide how to load and test a registered AFI from within an F1 instance
@@ -182,31 +175,7 @@ To install these tools, execute the following:
     $ cd aws-fpga
     $ source sdk_setup.sh
 
-## 5. Associate the AFI with your AMI
-
-To start using the AFI, you need to associate it with an [AMI (Amazon Machine Image)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that you own.
-Association means that any instance launched using a given AMI will be able to load the AFIs to the FPGAs as described in the next section.
-
-You can associate multiple AFIs with your AMI.
-There is a default limit of eight AFIs per AMI. If you need more, please reach out to AWS with your use case and we can adjust your limit.
-
-FPGA Developer AMI's are owned by AWS and you can not associate your AFI with them.
-If you are developing using the FPGA Developer AMI's, you will need to simply create a new image of your instance and that will create an AMI of your instance that you own.
-You can use any of [the tools supported by EC2 tools to create an AMI](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html).
-For example, you can use the AWS CLI as follows:
-
-    $ aws ec2 create-image --instance-id <Instance ID> --name <My Own Image Name>
-
-This will create a new AMI of the current state of your instance and you would be able to associate an AFI with this AMI.
-You would then have to launch an F1 Instance with this new AMI.
-
-To associate an AFI to your AMI, simply invoke the following AWS CLI command:
-
-    $ aws ec2 associate-fpga-image --fpga-image-id <AFI_ID> --image-id <AMI_ID>
-
-**NOTE**: *The AWS CLI commands use the AFI ID (not the AGFI ID).*
-
-## 6. Load the AFI
+## 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
 You can also invoke the `fpga-describe-local-image` command to learn about which AFI, if any, is loaded onto a particular slot.
@@ -233,7 +202,7 @@ Now, you can verify that the AFI was loaded properly:
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
 
-## 7. Validating using the CL Example Software
+## 6. Validating using the CL Example Software
 
 Please refer to the
 [Validating CL Designs](https://github.com/aws/aws-fpga/wiki/Validating-CL-Designs#quick-start)
