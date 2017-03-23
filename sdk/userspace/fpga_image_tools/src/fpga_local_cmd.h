@@ -17,31 +17,23 @@
  * EC2_CMD_F1
  */
 
-#include <hal/afi_cmd_api.h>
-
 #pragma once
 
 #define CLI_VERSION  "v6.00"
  
-/** First flag bit, @see afi_cmd_hdr#len_flags */
-#define AFI_CMD_HDR_FLAGS_SHIFT 24
-
-/** Mask to get the length portion, @see afi_cmd_hdr#len_flags */
-#define AFI_CMD_HDR_LEN_MASK    ((1 << AFI_CMD_HDR_FLAGS_SHIFT) - 1)
-
-/** Max retriees for draining presumed stale AFI commands */
-#define AFI_MAX_ID_RETRIES		1
-
 /**
- * AFI cmd extension
+ * CLI cmds
  */
 enum {
-	AFI_EXT_DESCRIBE_SLOTS = AFI_CMD_END,
-	AFI_START_VJTAG,
-	AFI_GET_LED,
-	AFI_GET_DIP,
-	AFI_SET_DIP,
-	AFI_EXT_END
+	CLI_CMD_LOAD,
+	CLI_CMD_CLEAR,
+	CLI_CMD_DESCRIBE,
+	CLI_CMD_DESCRIBE_SLOTS,
+	CLI_CMD_START_VJTAG,
+	CLI_CMD_GET_LED,
+	CLI_CMD_GET_DIP,
+	CLI_CMD_SET_DIP,
+	CLI_CMD_END
 };
 
 /** 
