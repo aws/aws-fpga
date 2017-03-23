@@ -27,10 +27,8 @@
 #include <stdio.h>
 #include <getopt.h>
 
-#include <utils/lcd.h>
-
-#include <fpga_pci.h>
 #include <fpga_mgmt.h>
+#include <utils/lcd.h>
 
 #include "fpga_local_cmd.h"
 #include "virtual_jtag.h"

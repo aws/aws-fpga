@@ -16,7 +16,8 @@
 #pragma once
 
 #include <stdbool.h>
-#include <fpga_common.h>
+
+#include <hal/fpga_common.h>
 #include <fpga_pci.h>
 
 /**

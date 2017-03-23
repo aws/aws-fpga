@@ -411,13 +411,13 @@ err:
 int
 fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 {
-	int ret;
 	unsigned int size;
 	struct fpga_slot_spec spec_array[FPGA_SLOT_MAX];
 
-	if (slot_id < 0 || slot_id >= FPGA_SLOT_MAX || !spec) {
-		return -EINVAL;
-	}
+	int ret = -EINVAL;
+	fail_on(slot_id < 0 || slot_id >= FPGA_SLOT_MAX, err,
+			"Invalid slot_id=%d", slot_id);
+	fail_on(!spec, err, "spec is NULL");
 
 	memset(spec_array, 0, sizeof(spec_array));
 

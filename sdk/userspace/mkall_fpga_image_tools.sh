@@ -15,7 +15,7 @@
 # permissions and limitations under the License.
 #
 
-# Build script for the Amazon FPGA Image Management Tools and associated HAL/utils. 
+# Build script for the Amazon FPGA Image Management Tools and libraries.
 
 TOP=`pwd` 
 
@@ -27,15 +27,15 @@ else
 fi
 
 #
-# The max number of FPGA HAL Platform Devices that may be attached,
-# e.g. (FPGA_SLOT_MAX * FPGA_BARS_MAX) is the upper bound.
+# The max number of FPGA BARs that may be attached,
+# e.g. (FPGA_SLOT_MAX * FPGA_PF_MAX * FPGA_BAR_PER_PF_MAX) is the upper bound.
 #
-FPGA_PLAT_DEVS_DFLT=256
-FPGA_PLAT_DEVS_MAX=$2
-if [ -z "$FPGA_PLAT_DEVS_MAX" ]; then
-	FPGA_PLAT_DEVS_MAX=$FPGA_PLAT_DEVS_DFLT
+FPGA_PCI_BARS_DFLT=64
+FPGA_PCI_BARS_MAX=$2
+if [ -z "$FPGA_PCI_BARS_MAX" ]; then
+	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_DFLT
 else
-	FPGA_PLAT_DEVS_MAX=$FPGA_PLAT_DEVS_MAX
+	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_MAX
 fi
 
 function build_exec {
@@ -52,7 +52,7 @@ function build_exec {
 		echo "make clean failed"
 		exit 1
 	fi
-	make OPT="-DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PLAT_DEVS_MAX="$FPGA_PLAT_DEVS_MAX""
+	make OPT="-DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX""
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "make failed"
@@ -63,15 +63,6 @@ function build_exec {
 
 
 BUILD_DIR="utils"
-build_exec
-
-BUILD_DIR="hal/src/api/mbox/hw"
-build_exec
-
-BUILD_DIR="hal/src/api/reg"
-build_exec
-
-BUILD_DIR="hal/src/platform/hw"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_pci"

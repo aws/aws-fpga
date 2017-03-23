@@ -13,19 +13,16 @@
  * permissions and limitations under the License.
  */
 
-
-#include <fpga_common.h>
-#include <afi_cmd_api.h>
-#include <hal/fpga_hal_mbox.h>
-#include <hal/fpga_hal_plat.h>
-#include <fpga_mgmt.h>
-#include <fpga_pci.h>
-#include <utils/lcd.h>
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+
+#include <fpga_mgmt.h>
+#include <fpga_pci.h>
+#include <hal/afi_cmd_api.h>
+#include <fpga_hal_mbox.h>
+#include <utils/lcd.h>
 
 #include "fpga_mgmt_internal.h"
 
@@ -258,7 +255,6 @@ fpga_mgmt_mbox_attach(int slot_id)
 	fpga_mgmt_state.slots[slot_id].handle = handle;
 
 	struct fpga_hal_mbox mbox = {
-		.slot = slot_id,
 		.timeout = fpga_mgmt_state.timeout,
 		.delay_msec = fpga_mgmt_state.delay_msec,
 	};
@@ -266,7 +262,7 @@ fpga_mgmt_mbox_attach(int slot_id)
 	ret = fpga_hal_mbox_init(&mbox);
 	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
-	ret = fpga_hal_mbox_attach(true); /**< clear_state=true */
+	ret = fpga_hal_mbox_attach(handle, true); /**< clear_state=true */
 	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	return 0;
@@ -278,13 +274,15 @@ static int
 fpga_mgmt_mbox_detach(int slot_id)
 {
 	if (fpga_mgmt_state.slots[slot_id].handle != PCI_BAR_HANDLE_INIT) {
-		int ret = fpga_hal_mbox_detach(true); /**< clear_state=true */
+		pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
+
+		int ret = fpga_hal_mbox_detach(handle, true); /**< clear_state=true */
 		if (ret != 0) {
 			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
 			/** Continue with plat detach */
 		}
 
-		ret = fpga_pci_detach(fpga_mgmt_state.slots[slot_id].handle);
+		ret = fpga_pci_detach(handle);
 		if (ret != 0) {
 			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
 			/* Continue with detach */
@@ -398,13 +396,14 @@ err:
 }
 
 static int
-fpga_mgmt_send_cmd(
+fpga_mgmt_send_cmd(int slot_id,
 	const union afi_cmd *cmd, union afi_cmd *rsp, uint32_t *len)
 {
 	int ret;
 
 	/** Write the AFI cmd to the mailbox */
-	ret = fpga_hal_mbox_write((void *)cmd, *len);
+	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
+	ret = fpga_hal_mbox_write(handle, (void *)cmd, *len);
 	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	/**
@@ -415,7 +414,7 @@ fpga_mgmt_send_cmd(
 	uint32_t id_retries = 0;
 	ret = -EAGAIN;
 	while (ret == -EAGAIN) {
-		ret = fpga_hal_mbox_read((void *)rsp, len);
+		ret = fpga_hal_mbox_read(handle, (void *)rsp, len);
 		fail_on(ret = (ret) ? ETIMEDOUT : 0, err_code, "Error: operation timed out");
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
@@ -445,7 +444,7 @@ fpga_mgmt_process_cmd(int slot_id,
 	ret = fpga_mgmt_mbox_attach(slot_id);
 	fail_on_quiet(ret, err, "fpga_mgmt_mbox_attach failed");
 
-	ret = fpga_mgmt_send_cmd(cmd, rsp, len);
+	ret = fpga_mgmt_send_cmd(slot_id, cmd, rsp, len);
 	fail_on_quiet(ret, err_detach, "fpga_mgmt_send_cmd failed");
 
 	return 0;

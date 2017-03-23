@@ -15,7 +15,7 @@
 # permissions and limitations under the License.
 #
 
-# Build script for the Amazon FPGA Image Management Tools and associated HAL/utils. 
+# Build script for the Amazon FPGA Image Management Tools and associated libraries. 
 
 TOP=`pwd` 
 
@@ -45,15 +45,6 @@ function build_exec {
 
 
 BUILD_DIR="utils"
-build_exec
-
-BUILD_DIR="hal/src/api/mbox/hw"
-build_exec
-
-BUILD_DIR="hal/src/api/reg"
-build_exec
-
-BUILD_DIR="hal/src/platform/hw"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_pci"

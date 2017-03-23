@@ -15,7 +15,6 @@
 
 #pragma once
 
-#include <fpga_common.h>
 #include <fpga_pci.h>
 
 int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar);
