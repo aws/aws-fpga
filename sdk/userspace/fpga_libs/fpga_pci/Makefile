@@ -18,7 +18,7 @@ TOPINC_PATH = $(TOP)/include
 UTILLIB_PATH = $(TOP)/util
 LIB_PATH = $(TOP)/lib
 
-INCLUDES = -I$(TOPINC_PATH) -I/usr/include
+INCLUDES = -I. -I$(TOPINC_PATH) -I/usr/include
 
 #OPT=-O2
 CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)

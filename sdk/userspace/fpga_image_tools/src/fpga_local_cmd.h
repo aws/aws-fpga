@@ -17,9 +17,9 @@
  * EC2_CMD_F1
  */
 
-#pragma once
+#include <hal/afi_cmd_api.h>
 
-#include <afi_cmd_api.h>
+#pragma once
 
 #define CLI_VERSION  "v6.00"
  

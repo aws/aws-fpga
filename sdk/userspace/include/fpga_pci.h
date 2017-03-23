@@ -15,8 +15,38 @@
 
 #pragma once
 
-#include <fpga_common.h>
 #include <stdint.h>
+
+#include <hal/fpga_common.h>
+
+/**
+ * FPGA_PCI_BARS_MAX:
+ *  -compile time tunable via mkall_fpga_image_tools.sh, with the below default.
+ *  -set this to the max number of FPGA BARs that the application plans
+ *   to attach at any one time.
+ *  -the upper limit is FPGA_SLOT_MAX * FPGA_BARS_MAX.
+ *  -FPGA_SLOT_MAX is driven by the EC2 FPGA system design and instance type.
+ *  -FPGA_BARS_MAX is driven by the FPGA Shell release.
+ */
+#if ! defined(FPGA_PCI_BARS_MAX)
+#define FPGA_PCI_BARS_MAX	(FPGA_SLOT_MAX * FPGA_PF_MAX * FPGA_BAR_PER_PF_MAX)
+#endif
+
+/*
+ *  Notes on platform vs application locking:
+ *
+ *  Platform Locking:
+ *  -attach/detach are protected via a pthread mutex to allow for use cases
+ *   of multi-threaded attach/detach sequences vs calling attach/detach during
+ *   one time process init/destroy.
+ *
+ *  Application Locking:
+ *  -a single process may access all of the FPGAs via the dev_index(es) without
+ *   locking.
+ *  -a single thread may access a single FPGA via the dev_index without locking.
+ *  -multi-threaded access to the same FPGA must be done with locking within
+ *   the application.
+ */
 
 /* resource number (base address register) definitions */
 enum {

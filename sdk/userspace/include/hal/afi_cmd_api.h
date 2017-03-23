@@ -20,7 +20,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <fpga_common.h>
+
+#include <hal/fpga_common.h>
 
 #define AFI_CMD_API_VERSION	2
 #define AFI_CMD_DATA_LEN	512 
