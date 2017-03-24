@@ -54,7 +54,7 @@ At the end of `cl_hello_world.sv` file, there is a specific `\`include` for each
 <a name="metadata"></a>
 ## Hello World Example Metadata
 The following table displays information about the CL that is required to register it as an AFI with AWS.
-Alternatively, you can directly use a pre-generated AFI for this CL which you can associate to an instance or AMI.
+Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|

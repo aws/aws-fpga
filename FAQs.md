@@ -165,9 +165,9 @@ Developers can sell their AFI/AMI combination through the AWS Marketplace to oth
 
 **Q: How can I publish my AFI to AWS Marketplace?**
 
-First, you should create an AMI that includes the drivers and runtime libraries needed to use the AFI. Then, you would need to associate one or more of the AFIs you developed to the AMI. And lastly, follow the standard flow for publish AMI on AWS marketplace.
+First, you should create an AMI that includes the drivers and runtime libraries needed to use the AFI. Then, follow the standard flow for publish AMI on AWS marketplace, providing your AFI IDs.
 
-In other words, AFIs are not published directly on AWS marketplace, rather AFI(s) should be associated with an AMI and the AMI get published.
+In other words, AFIs are not published directly on AWS marketplace, rather AFI(s) should be associated with an AMI that gets published.
 
 
 
