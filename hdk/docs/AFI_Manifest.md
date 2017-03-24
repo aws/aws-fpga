@@ -5,17 +5,17 @@ An AFI submission to AWS through  [`aws ec2 create-fpga-image` API](./TBD), incl
 This document provides the specification for the `manifest.txt` file.  Note that an AFI built through the scripts provided by AWS would have the manifest file generated automatically.
 
 
-The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are mandatory while others are highly recommended. The mandatory keys are marked with [Mandatory]
+The manifest file is a text file formatted with key=value pairs. Some keys are mandatory while others are highly recommended. The mandatory keys are marked with [Mandatory]
 
 ## Manifest file specification: Version 1
 
 * **manifest_format_version=** 1 [Mandatory]  
 
 * **pci_vendor_id=** [Mandatory]  
-      *0x1D0F for Amazon*
+      *0x1D0F is pre-assigned for Amazon example CLs*
 
 * **pci_device_id=** [Mandatory]  
-      *0xF000 through 0xF0FF for example CLs.*
+      *0xF000 through 0xF0FF are pre-assigned for Amazon example CLs.*
 
 * **pci_subsystem_id=** [Mandatory]  
       *Must be non-zero*
@@ -33,7 +33,7 @@ The manifest file is a text file formatted with KEY/VALUE pairs. Some keys are m
       *The .dcp file name including the file type suffix*
 
 * **hdk_version=**.....     
-      *[TBD]* 
+      *Taken from aws-fpga/hdk/hdk_version.txt* 
 
 * **date=** YY_MM_DD-HHMM     
       *Following same format used in the automatic build reports used by AWS scripts*
