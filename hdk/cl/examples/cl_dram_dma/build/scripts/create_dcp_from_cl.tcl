@@ -22,23 +22,36 @@ set TOP cl_dram_dma
 #################################################
 ## Command-line Arguments
 #################################################
-set timestamp           [lindex $argv 0]
-set strategy            [lindex $argv 1]
-set hdk_version         [lindex $argv 2]
-set shell_version       [lindex $argv 3]
-set device_id           [lindex $argv 4]
-set vendor_id           [lindex $argv 5]
-set subsystem_id        [lindex $argv 6]
-set subsystem_vendor_id [lindex $argv 7]
+set timestamp           [lindex $argv  0]
+set strategy            [lindex $argv  1]
+set hdk_version         [lindex $argv  2]
+set shell_version       [lindex $argv  3]
+set device_id           [lindex $argv  4]
+set vendor_id           [lindex $argv  5]
+set subsystem_id        [lindex $argv  6]
+set subsystem_vendor_id [lindex $argv  7]
+set clock_recipe_a      [lindex $argv  8]
+set clock_recipe_b      [lindex $argv  9]
+set clock_recipe_c      [lindex $argv 10]
+set run_aws_emulation   [lindex $argv 11]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
 #################################################
 puts "AWS FPGA Scripts";
 puts "Creating Design Checkpoint from Custom Logic source code";
-puts "HDK Version:        $hdk_version";
-puts "Shell Version:      $shell_version";
-puts "Vivado Script Name: $argv0";
+puts "HDK Version:            $hdk_version";
+puts "Shell Version:          $shell_version";
+puts "Vivado Script Name:     $argv0";
+puts "Strategy:               $strategy";
+puts "PCI Device ID           $device_id";
+puts "PCI Vendor ID           $vendor_id";
+puts "PCI Subsystem ID        $subsystem_id";
+puts "PCI Subsystem Vendor ID $subsystem_vendor_id";
+puts "Clock Recipe A:         $clock_recipe_a";
+puts "Clock Recipe B:         $clock_recipe_b";
+puts "Clock Recipe C:         $clock_recipe_c";
+puts "Run AWS Emulation:      $run_aws_emulation";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -68,7 +81,7 @@ set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
 
-puts "AWS FPGA: Calling the encrypt.tcl";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
 source encrypt.tcl
 
@@ -79,22 +92,32 @@ create_project -in_memory -part [DEVICE_TYPE] -force
 
 set_param chipscope.enablePRFlow true
 
+########################################
+## Generate clocks based on Recipe 
+########################################
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
+
+source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
+
 #############################
 ## Read design files
 #############################
 
-#---- User would replace this section -----
-
 #Convenience to set the root of the RTL directory
 set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
 
-puts "AWS FPGA: Reading developer's Custom Logic files post encryption";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Reading developer's Custom Logic files post encryption.";
 
+#---- User would replace this section -----
 
-#User design files (these are the files that were encrypted by encrypt.tcl)
+# Reading the .sv and .v files, as proper designs would not require
+# reading .v, .vh, nor .inc files
+
 read_verilog -sv [ glob $ENC_SRC_DIR/*.?v ]
 
 #---- End of section replaced by User ----
+
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
@@ -106,10 +129,10 @@ read_verilog [ list \
   $HDK_SHELL_DIR/design/lib/ccf_ctl.v \
   $HDK_SHELL_DIR/design/lib/sync.v \
   $HDK_SHELL_DIR/design/lib/axi4_ccf.sv \
-  $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
-  $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
   $HDK_SHELL_DIR/design/lib/mgt_acc_axl.sv  \
   $HDK_SHELL_DIR/design/lib/mgt_gen_axl.sv  \
+  $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv \
+  $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
   $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
   $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
 ]
@@ -135,19 +158,18 @@ read_ip [ list \
   $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
 ]
 read_bd [ list \
-$HDK_SHELL_DIR/design/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+  $HDK_SHELL_DIR/design/ip/cl_axi_interconnect/cl_axi_interconnect.bd
 ]
 
 puts "AWS FPGA: Reading AWS constraints";
 
 #Read all the constraints
 #
-#  cl_synth_aws.xdc  - AWS provided constraints.          ***DO NOT MODIFY***
-#  cl_clocks_aws.xdc - AWS provided clock constraint.     ***DO NOT MODIFY***
-#  cl_ddr.xdc        - AWS provided DDR pin constraints.  ***DO NOT MODIFY***
+#  cl_clocks_aws.xdc  - AWS auto-generated provided clock constraint.   ***DO NOT MODIFY***
+#  cl_ddr.xdc         - AWS provided DDR pin constraints.               ***DO NOT MODIFY***
+#  cl_synth_user.xdc  - Developer synthesis constraints.
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
+   $CL_DIR/build/constraints/cl_clocks_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]
@@ -158,7 +180,7 @@ set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
 ########################
 # CL Synthesis
 ########################
-puts "AWS FPGA: Start design synthesis";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthesis.";
 
 switch $strategy {
     "BASIC" {
@@ -186,25 +208,13 @@ switch $strategy {
     }
 }
 
-## Prohibit the top two URAM sites of each URAM quad.
-## These two sites cannot be used within PR designs.
-#set uramSites [get_sites -filter { SITE_TYPE == "URAM288" } ]
-#foreach uramSite $uramSites {
-#  # Get the URAM location within a quad
-#  set quadLoc [expr  [string range $uramSite [expr [string first Y $uramSite] + 1] end] % 4]
-#  # The top-two sites have usage restrictions
-#  if {$quadLoc == 2 || $quadLoc == 3} {
-#    # Prohibit the appropriate site
-#    set_property PROHIBIT true $uramSite
-#    puts "Setting Placement Prohibit on $uramSite"
-#  }
-#}
-
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
 	puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
 	exit 1
 }
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth checkpoint.";
 
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
 close_project
@@ -212,11 +222,12 @@ close_project
 ########################
 # CL Optimize
 ########################
-puts "AWS FPGA: Optimizing design";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Optimizing design.";
 
 # Implementation
-
 #Read in the Shell checkpoint and do the CL implementation
+
 puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
 
 open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
@@ -224,12 +235,17 @@ read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
 read_xdc [ list \
-$HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
-$CL_DIR/build/constraints/cl_pnr_user.xdc \
-$HDK_SHELL_DIR/build/constraints/cl_ddr.xdc
+   $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
+   $CL_DIR/build/constraints/cl_pnr_user.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc
 ]
 
-puts "AWS FPGA: Optimize design during implementation";
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Sourcing aws_clock_properties.tcl to apply properties to clocks. ";
+
+# Apply properties to clocks
+source $HDK_SHELL_DIR/build/scripts/aws_clock_properties.tcl
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Optimize design during implementation. ";
 
 switch $strategy {
     "BASIC" {
@@ -301,12 +317,16 @@ switch $strategy {
         puts "$strategy is NOT a valid strategy."
     }
 }
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Writing checkpoint post place.";
+
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_place.dcp
 
 ###########################
 # CL Physical Optimization
 ###########################
-puts "AWS FPGA: Physical optimization stage";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Physical optimization stage.";
 
 switch $strategy {
     "BASIC" {
@@ -336,7 +356,8 @@ switch $strategy {
 ########################
 # CL Route
 ########################
-puts "AWS FPGA: Route design stage";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Physical optimization stage.";
 
 switch $strategy {
     "BASIC" {
@@ -367,7 +388,8 @@ switch $strategy {
 #################################
 # CL Final Physical Optimization
 #################################
-puts "AWS FPGA: Post-route Physical optimization stage ";
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Post-route Physical optimization stage. ";
 
 switch $strategy {
     "BASIC" {
@@ -394,69 +416,34 @@ switch $strategy {
     }
 }
 
-#This is what will deliver to AWS
+# Report final timing
+report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
+
+# This is what will deliver to AWS
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing final DCP to to_aws directory.";
+
 write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 close_project
 
 # ################################################
-# Verify PR Build
+# Emulate AWS Bitstream Generation
 # ################################################
-switch $strategy {
-    "BASIC" {
-        puts "BASIC strategy."
-    }
-    "EXPLORE" {
-        puts "EXPLORE strategy."
-        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
-        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-    }
-    "TIMING" {
-        puts "TIMING strategy."
-        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
-        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-    }
-    "CONGESTION" {
-        puts "CONGESTION strategy."
-        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
-        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-    }
-    "DEFAULT" {
-        puts "DEFAULT strategy."
-        puts "AWS FPGA: Verify compatibility of generated checkpoint with SH checkpoint"
-        pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-    }
-    default {
-        puts "$strategy is NOT a valid strategy."
-    }
+
+# Only run AWS emulation step if explicitly specified.
+
+if {[string compare $run_aws_emulation "1"] == 0} {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_dcp_verify.tcl to emulate AWS bitstream generation for checking the DCP.";
+  source $HDK_SHELL_DIR/build/scripts/aws_dcp_verify.tcl
 }
 
 # ################################################
-# Emulate AWS Bitstream Generation
+# Create Manifest and Tarball for delivery
 # ################################################
-puts "AWS FPGA: Emulate AWS bitstream generation"
-
-# Make temp dir for bitstream
-file mkdir $CL_DIR/build/${timestamp}_aws_verify_temp_dir
-
-# Verify the Developer DCP is compatible with SH_BB. 
-pr_verify -full_check $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-
-open_checkpoint $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
-report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
-
-set_param bitstream.enablePR 4123
-write_bitstream -force -bin_file $CL_DIR/build/${timestamp}_aws_verify_temp_dir/${timestamp}.SH_CL_final.bit
-
-# Clean-up temp dir for bitstream
-file delete -force $CL_DIR/build/${timestamp}_aws_verify_temp_dir
-
-### --------------------------------------------
 
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
-puts "Compress files for sending back to AWS"
 
-# clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Compress files for sending to AWS. "
 
 # Create manifest file
 set manifest_file [open "$CL_DIR/build/checkpoints/to_aws/${timestamp}.manifest.txt" w]
@@ -472,6 +459,9 @@ puts $manifest_file "shell_version=$shell_version\n"
 puts $manifest_file "dcp_file_name=${timestamp}.SH_CL_routed.dcp\n"
 puts $manifest_file "hdk_version=$hdk_version\n"
 puts $manifest_file "date=$timestamp\n"
+puts $manifest_file "clock_recipe_a=$clock_recipe_a\n"
+puts $manifest_file "clock_recipe_b=$clock_recipe_b\n"
+puts $manifest_file "clock_recipe_c=$clock_recipe_c\n"
 
 close $manifest_file
 
@@ -482,9 +472,11 @@ if { [file exists $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar
 }
 
 # Tar checkpoint to aws
-cd $CL_DIR/build/checkpoints
-tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
+tar::create $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar [glob $CL_DIR/build/checkpoints/to_aws/${timestamp}*]
 
-close_design
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
 
+# Clean up vivado.log file
+exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
 
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) finished cleaning the log file. ";
