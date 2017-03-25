@@ -24,7 +24,7 @@ if {[string compare $clock_recipe_a "A1"] == 0} {
    set_property CLKOUT3_DIVIDE     3 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
 } elseif {[string compare $clock_recipe_a "A2"] == 0} {
    set_property CLKOUT0_DIVIDE_F  96 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
-   set_property CLKOUT1_DIVIDE   192 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
+   set_property CLKOUT1_DIVIDE    96 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
    set_property CLKOUT2_DIVIDE    12 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
    set_property CLKOUT3_DIVIDE    24 [get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst]
 } else { #A0
