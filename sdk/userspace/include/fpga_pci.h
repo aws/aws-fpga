@@ -33,15 +33,16 @@ enum {
     MGMT_PF_BAR_MAX
 };
 
+/**
+ * Type definition for a descriptor/handle used to specify a BAR. Initialize
+ * with PCI_BAR_HANDLE_INIT.
+ */
 typedef int pci_bar_handle_t;
 #define PCI_BAR_HANDLE_INIT (-1)
 
 /**
  * Initialize the pci library.
- * Calls fpga_hal_plat_init.
- * @returns
- * 0 on success
- * -1 on failure
+ * @returns 0 on success, non-zero on error
  */
 int fpga_pci_init(void);
 
@@ -57,11 +58,8 @@ int fpga_pci_init(void);
  *
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
-
-/**
- */
-int fpga_pci_attach_2(struct fpga_pci_resource_map *map, int bar_id, uint32_t flags, pci_bar_handle_t *handle);
+int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
+    pci_bar_handle_t *handle);
 
 /**
  * Flags used to specify options for fpga_pci_attach.
@@ -72,13 +70,13 @@ enum {
 };
 
 /**
- * Detatch from an FPGA memory space.
+ * Detach from an FPGA memory space.
  *
  * @param[in]  handle  the value provided by fpga_pci_attach corresponding to
  *                     the memory space to detach
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_detatch(pci_bar_handle_t handle);
+int fpga_pci_detach(pci_bar_handle_t handle);
 
 /**
  * Write a value to a register.
@@ -110,7 +108,8 @@ int fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value);
  *
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len);
+int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset,
+    uint32_t* datap, uint32_t dword_len);
 
 /**
  * Read a value from a register.
@@ -144,13 +143,34 @@ int fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value);
 int fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec);
 
 /**
+ * Populate slot specs for all FPGAs on the system. It is recommended to use
+ * FPGA_SLOT_MAX as the size of the spec_array;
+ *
+ * @param[out]  spec_array  array to populate
+ * @param[in]   size        allocated size of the provided array
  */
 int fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size);
 
 /**
+ * Get resource map information for a single slot and physical function. This
+ * information is provided in the slot_spec, but occasionally only the resource
+ * map is needed.
+ *
+ * @param[in]   slot_id  The logical slot id of the FPGA of interest
+ * @param[in]   pf_id    physical function id (e.g. FPGA_APP_PF)
+ * @param[out]  map      resource map to populate
+ * @returns 0 on success, non-zero on error
  */
-int fpga_pci_get_resource_map(int slot_id, int pf_id, struct fpga_pci_resource_map *map);
+int fpga_pci_get_resource_map(int slot_id, int pf_id,
+    struct fpga_pci_resource_map *map);
 
 /**
+ * Rescan the slot application physical functions.
+ * -performs both a pci device remove and a PCI rescan to refresh the device
+ *  vendor and device IDs within the OS.
+ *
+ * @param[in]   slot_id  The logical slot id of the FPGA of interest
+ *
+ * @returns 0 on success, non-zero on error
  */
 int fpga_pci_rescan_slot_app_pfs(int slot_id);

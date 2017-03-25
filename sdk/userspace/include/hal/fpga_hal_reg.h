@@ -51,6 +51,32 @@ int fpga_hal_dev_reg_read(int dev_index, uint64_t offset, uint32_t *value);
  */
 int fpga_hal_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
 
+/**
+ * FPGA HAL layer register read.
+ *
+ * @param[in]		dev_index	 the attached fpga device index.
+ * @param[in]		offset		the register offset
+ * @param[in,out]	value		the register value to return
+ *
+ * @returns
+ * 0 on success
+ * -1 on failure
+ */
+int fpga_hal_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value);
+
+/**
+ * FPGA HAL layer register write.
+ *
+ * @param[in]	dev_index	the attached fpga device index.
+ * @param[in]	offset		the register offset
+ * @param[in]	value		the register value to write
+ *
+ * @returns
+ * 0 on success
+ * -1 on failure
+ */
+int fpga_hal_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value);
+
 /************************************************************************ 
  * Single device attachment and use.
  * e.g. for applications that only attach to one FPGA at a time,

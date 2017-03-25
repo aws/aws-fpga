@@ -72,7 +72,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 	/** Retrieve and display associated application PFs (if any) */
 	bool found_app_pf = false;
 	int i;
-	for (i = 0; i < FPGA_MAX_PF; i++) {
+	for (i = 0; i < FPGA_PF_MAX; i++) {
 		struct fpga_pci_resource_map *app_map = &spec->map[i];
 
 		if (i == FPGA_MGMT_PF && !f1.show_mbox_device) {
@@ -91,7 +91,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -120,7 +120,7 @@ cli_attach(void)
 out:
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -236,17 +236,17 @@ static int
 command_metrics(void)
 {
 	int ret;
-	uint32_t i;
+	uint32_t i, flags;
 	struct fpga_mgmt_image_info info;
+	struct fpga_slot_spec slot_spec;
 
 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-	// todo:
-	// req->fpga_cmd_flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
-	// req->fpga_cmd_flags |= (f1.clear_hw_metrics) ?  
-	//	FPGA_CMD_CLEAR_HW_METRICS : 0;
+	flags = 0;
+	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
 
-	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info);
+	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
 	fail_on(ret, err, "Unable to describe local image");
 
 	if (f1.show_headers) {
@@ -261,13 +261,15 @@ command_metrics(void)
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
-		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot); // todo: implement this in the library
+		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot);
 		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
-	// ret = cli_show_slot_app_pfs(f1.afi_slot); // todo
-	//fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
+	fail_on_quiet(ret != 0, err, "fpga_pci_get_slot_spec failed");
+	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
+	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	if (f1.get_hw_metrics) {
 		if (f1.show_headers) {
@@ -275,6 +277,12 @@ command_metrics(void)
 		}
 
 		struct fpga_metrics_common *fmc = &info.metrics;
+		printf("sdacl-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
+
+		printf("chipscope-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT) ?  1 : 0);
+
 		printf("pci-slave-timeout=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT) ?
 				1 : 0); 
@@ -297,10 +305,6 @@ command_metrics(void)
 
 		printf("pci-axi-protocol-error=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR) ?
-				1 : 0); 
-
-		printf("pci-axi-protocol-len-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LEN_ERROR) ?
 				1 : 0); 
 
 		printf("pci-axi-protocol-4K-cross-error=%u\n", 
@@ -327,10 +331,6 @@ command_metrics(void)
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-write-strobe-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WSTRB_ERROR) ?
-				1 : 0); 
-
 		printf("pci-axi-protocol-bready-error=%u\n", 
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
 				1 : 0); 
@@ -342,6 +342,12 @@ command_metrics(void)
 		printf("pci-axi-protocol-wchannel-error=%u\n", 
 				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
 				1 : 0); 
+
+		printf("sdacl-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_timeout_addr); 
+		printf("sdacl-timeout-count=%u\n", fmc->sdacl_timeout_count); 
+
+		printf("chipscope-timeout-addr=0x%" PRIx32 "\n", fmc->chipscope_timeout_addr); 
+		printf("chipscope-timeout-count=%u\n", fmc->chipscope_timeout_count); 
 
 		printf("ps-timeout-addr=0x%" PRIx64 "\n", fmc->ps_timeout_addr); 
 		printf("ps-timeout-count=%u\n", fmc->ps_timeout_count); 
@@ -375,7 +381,7 @@ command_metrics(void)
 
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -400,7 +406,7 @@ command_describe_slots(void)
 
 	ret = fpga_pci_get_all_slot_specs(spec_array, sizeof_array(spec_array));
 
-	for (i = 0; i < sizeof_array(spec_array); ++i) {
+	for (i = 0; i < (int) sizeof_array(spec_array); ++i) {
 		if (spec_array[i].map[FPGA_APP_PF].vendor_id == 0)
 			continue;
 
@@ -411,7 +417,7 @@ command_describe_slots(void)
 	}
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 typedef int (*command_func_t)(void);
@@ -443,7 +449,7 @@ cli_main(void)
 
 	return command_table[f1.opcode]();
 err:
-	return -1;
+	return FPGA_ERR_FAIL;
 }
 
 /**
@@ -525,6 +531,9 @@ main(int argc, char *argv[])
 	ret = cli_main();
 	fail_on_quiet(ret != 0, err, "cli_main failed");
 err:
+	if (ret) {
+		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
+	}
 	cli_detach();
 	cli_destroy();
 	return ret;

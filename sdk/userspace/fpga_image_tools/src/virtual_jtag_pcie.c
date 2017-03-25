@@ -40,7 +40,7 @@ int open_port(uint32_t slot_id, pci_bar_handle_t* jtag_pci_bar) {
 
 void close_port(pci_bar_handle_t jtag_pci_bar) {
   if (jtag_pci_bar >=0)
-    fpga_pci_detatch(jtag_pci_bar);
+    fpga_pci_detach(jtag_pci_bar);
   
 }
 

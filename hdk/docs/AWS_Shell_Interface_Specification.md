@@ -9,21 +9,46 @@
 2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Virtual LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details)
                           
   
-# Table of Content:
+# Table of Contents:
 
-[1. Overview](#overview)
+- [Overview](#overview)
 
-[2. EC2 Instance view of FPGA PCIe](#pciPresentation)
+ - [Architecture and Version](#arch_ver)
 
-[3. Clocks and Reset](#ClocksNReset)
+ - [Conventions](#conventions)
 
-[4. Shell/CL Interfaces](#ShellInterfaces)
+- [Shell/CL Interfaces](#ShellInterfaces)
 
-  - [Interrupts](#interrupts)
+  - [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
+
+  - [External Memory Interfaces implemented in CL](#external_memory_interfaces_implemented_in_cl)
+
+- [EC2 Instance view of FPGA PCIe](#pciPresentation)
+   
+   - [Management PF](#management_pf)
+
+   - [Application PF](#application_pf)
+
+- [Clocks and Resets](#ClocksNReset)
+
+   - [Clocks](#Clocks)
+   
+   - [Reset](#Reset)
+
+- [Interfaces between Shell and CL](#interfaces_between_shell_and_cl)
+   
+   - [CL Interface to PCIe Interface via Shell](#cl_interface_to_pcie_interface_via_shell)
+
+   - [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
+
+   - [Interrupts](#interrupts)
   
-  - [DDR4 DRAM Interfaces](#ddr)
+   - [DDR4 DRAM Interfaces](#ddr)
   
-  - [Miscellanous Interfaces(vLED, vDIP..)](#misc)
+   - [Miscellanous Interfaces(vLED, vDIP..)](#misc)
+
+
+
   
 
 <a name="overview"></a>
@@ -40,6 +65,7 @@ At the end of the development process, combining the Shell and CL creates an Ama
 This document specifies the hardware interface and functional behavior between the SH and the CL; specifically the Shell design for xvu9p architecture used in EC2 F1 instance.
   
   
+<a name="arch_ver"></a>
 ## Architecture and Version
 
 This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell 
@@ -48,6 +74,7 @@ This specification applies to  Xilinx Virtex Ultrascale Plus platform available 
 New shell versions will require updated CL implementation and regenerating the AFI.
   
   
+<a name="conventions"></a>
 ## Conventions
   
 **CL –** Custom Logic: the Logic to be provided by the developer and integrated with AWS Shell.
@@ -75,13 +102,12 @@ CL:
 -   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
 
 
+<a name="cl_shell_axi_interfaces"></a>
 ## CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
 
 All interfaces except the inter-FPGA links use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can run off lower speed control interfaces that use the AXI-Lite protocol. 
 
 For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfaces have the following restrictions:
-
--   AxSIZE – All transfers must be at the entire width of the bus. While byte-enables bitmap are supported, it must adhere to the interface protocol (i.e. PCIe contiguous byte enables on all transfers larger than 64-bits).
 
 -   AxBURST – Only INCR burst is supported.
 
@@ -95,9 +121,22 @@ For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfa
 
 -   AxREGION – Region identifier is not supported.
 
+These signals are not included on the AXI-4 interfaces of the shell.  If connecting to a fabric or component that supports these signals, these vaules should be used:
+
+| Signal       | Value      |
+|:-------------|:-----------|
+|AxBURST[1:0]  | 0b01       |
+|AxLOCK[1:0]   | 0b00       |
+|AxCACHE[3:0]  | 0b000x (bit 0 is Bufferable bit and may be 0 or 1) |
+|AxPROT[2:0]   | 0b000      |
+|AxQOS[3:0]    | 0b0000     |
+|AxREGION[3:0] | 0b0000     |
+
+
 
 ![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
+<a name="external_memory_interfaces_implemented_in_cl"></a>
 ## External Memory Interfaces implemented in CL
 
 Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
@@ -137,6 +176,7 @@ The [Software Programmers' View](./Programmer_View.md) provides the intended sof
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
+<a name="management_pf"></a>
 ## Management PF (MgmtPF)
 
 The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used for [AWS FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ application, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
@@ -158,6 +198,7 @@ d)  A range of 32-bit addressable registers.
 The Management PF is persistent throughout the lifetime of the instance, and it will not be reset or cleared (even during the AFI Load/Clear process).  
 
 
+<a name="application_pf"></a>
 ## Application PF (AppPF)
 
 The Application PF exposes:
@@ -181,6 +222,7 @@ The Developer can write drivers for the AppPF or can leverage the reference driv
 <a name="ClocksNReset"></a>
 # Clocks and Reset
 
+<a name="Clocks"></a>
 ## Clocks
 
 There are multiple clocks provided by the Shell to the CL, grouped in 3 groups marked \_a, \_b and \_c suffix: 
@@ -202,29 +244,16 @@ The clocks within each group are generated from a common VCO/PLL, which restrict
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
-** *Note: The Developer must NOT assume any phase alignment between clock sources* **
 ** *Note: The Developer must NOT assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies * **  
 
 
 ### Defining Clock frequencies by Developer
 
-There Developer can select among a set of available frequencies, provided in the table below. The target frequencies must defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.
+There Developer can select among a set of available frequencies, provided in the [clock recipe table](./clock_recipes.cvs), and recipe names are called Ax, By, Cz  for group A recipe x, group B recipe y and group C recipe z respectively.
 
- .  **FIXME NEED TO PUT TABLE OF FREQUENCIES**
+Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.  Group B and C recipes are optional in the manifest file, and if they are missing, the recipe B0 and/or C0 are used as default.
 
-### Default Clock Frequency setting if a clock group is missing from the AFI Manifest
-
-   clk_main_a0:   125MHz
-   clk_extra_a1:  125MHz
-   clk_extra_a2:  375MHz
-   clk_extra_a3:  500MHz
-
-   clk_extra_b0:  250MHz
-   clk_extra_b1:  125MHz
-
-   clk_extra_c0:  300MHz
-   clk_extra_c1:  400MHz
-
+<a name="Reset"></a>
 ## Reset
 
 The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
@@ -240,8 +269,10 @@ PCIe FLR is supported for the Application Physical Function (PF) using a separat
 A failure to respond to flr_assert with flr_done with 4 millisecond will leave the CL in an unknown state.
 
 
+<a name="interfaces_between_shell_and_cl"></a>
 # Interfaces between Shell and CL
 
+<a name="cl_interface_to_pcie_interface_via_shell"></a>
 ## CL Interface to PCIe Interface via Shell  
 
 The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can access it through two AXI-4 interfaces:
@@ -253,7 +284,7 @@ This AXI-4 bus is used for PCIe transactions mastered by the instance and target
 
 It is a 512-bit wide AXI-4 interface. 
 
-A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and could be retrieved by the AFI Management Tools metric.
+A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xDEADBEEF` data back to the instance. This error is reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.
 
 If DMA is enabled this interface also has DMA traffic targeting the CL.
 
@@ -263,31 +294,33 @@ This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe b
 
 __** NOTE: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual address.** __
 
-The following PCIe interface configuration parameters are provided from the Shell to the CL, and the CL logic must respect these maximum limits:
+The following PCIe interface configuration parameters are provided from the Shell to the CL as informational:
 
--   sh_cl_cfg_max_payload[1:0] – PCIe max payload size:
-    -   2’b00 – 128 Byte
-    -   2’b01 – 256 Byte (Most probable value)
-    -   2’b10 – 512 Byte
-    -   2’b11 – Reserved
+-   sh_cl_cfg_max_payload[1:0] – PCIe maximum payload size:
 
--   sh_cl_cfg_max_read_req[2:0]
-    -   3’b000 – 128 Byte
-    -   3’b001 – 256 Byte
-    -   3’b010 – 512 Byte (Most probable value)
-    -   3’b011 – 1024 Byte
-    -   3’b100 – 2048 Byte
-    -   3’b101 – 4096 Byte
+| Value     | Max Payload Size |
+|:----------|:-----------------|
+| 0b00      | 128 Bytes |  
+| 0b01      | 256 Bytes (Most probable value) |  
+| 0b10      | 512 Bytes |  
+| 0b11      | Reserved |  
 
+-   sh_cl_cfg_max_read_req[2:0]i - PCIe maximum read request size:
+
+| Value     | Max Read Request Size |
+|:----------|:----------|
+| 0b000     | 128 Bytes |
+| 0b001     | 256 Bytes |
+| 0b010     | 512 Bytes (Most probable value) |
+| 0b011     | 1024 Bytes |
+| 0b100     | 2048 Bytes |
+| 0b101     | 4096 Bytes |
+| Others    | Reserved |
 
 ##### Outbound PCIe AXI-4 Interface Restrictions:
 
 -   Transfers must not violate PCIe byte enable rules (see byte enable rules below).
--   Transfers must not cross a 4Kbyte address boundary (a PCIe restriction).
--   Transfers must not violate Max Payload Size.
--   Read requests must not violate Max Read Request Size.
--   The address on the AXI-4 interface must reflect the correct byte address of the transfer. The Shell does not support using a 64-bit
-    aligned address, and using STRB to signal the actual starting DW.
+-   Transfers must adhere to all AXI-4 protocol rules
 
 
 ##### Byte Enable Rules
@@ -314,6 +347,7 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 -   Illegal ARID; i.e ARID is already been used for an outstanding read transaction.
 
 
+<a name="axi_lite_interfaces_for_register_access"></a>
 ## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)
 
 There are three AXI-L master interfaces (Shell is master) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this info multiple interfaces allows for different software entities to have a control interface into the CL:
@@ -323,6 +357,10 @@ There are three AXI-L master interfaces (Shell is master) that can be used for r
 -   BAR1 AXI-L: Associated with AppPF, BAR1.
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
+
+#### AXI Slave (AXI-Lite/PCIS) CL Error reporting
+
+Each AXI-4 transaction is terminated with a response (BRESP/RRESP).  The AXI-4 responses may signal an error such as Slave Error, or Decode Error.  PCIe also has error reporting for non-posted requests (Unsupported Requests/Completer Abort).  The shell does not propagate the AXI-4 error responses to the PCIe bus.  All PCIe cycles are terminated with non-errored responses.  The AXI-4 errors are reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.
 
 ### Accessing Aligned/Unaligned addresses from PCIe (Shell is Master, CL is Slave):
 

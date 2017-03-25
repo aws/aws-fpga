@@ -22,7 +22,7 @@ LIB_SO_PATH = $(LIB_PATH)/so
 INCLUDES = -I$(TOPINC_PATH) -I/usr/include
 
 #OPT=-O2
-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)

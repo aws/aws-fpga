@@ -21,7 +21,7 @@
 
 #include <afi_cmd_api.h>
 
-#define CLI_VERSION  "v5.00"
+#define CLI_VERSION  "v6.00"
  
 /** First flag bit, @see afi_cmd_hdr#len_flags */
 #define AFI_CMD_HDR_FLAGS_SHIFT 24
@@ -43,31 +43,6 @@ enum {
 	AFI_SET_DIP,
 	AFI_EXT_END
 };
-
-/** F1 Mailbox PF defines */
-#define F1_MBOX_VENDOR_ID		0x1d0f
-#define F1_MBOX_DEVICE_ID		0x1041
-#define F1_MBOX_RESOURCE_NUM	0
-
-/** F1 Application PF defines */
-#define F1_APP_PF_START			0
-#define F1_APP_PF_END			15
-
-/** 
- * Generally, we allow a sanitized first level error to be displayed
- * for the user.  We do not want low-level mailbox related errors
- * to be displayed (since we are abstracting the mailbox interface).
- * The fail_on_quiet define allows the multi-level trace debug info
- * to still be displayed for development if needed, by re-defining
- * fail_on_quiet as fail_on.
- */
-#define fail_on_quiet fail_on_user
-// #define fail_on_quiet(CONDITION, LABEL, ...)	\
-// 	do {					\
-// 		if (CONDITION) {	\
-// 			goto LABEL;		\
-// 		}					\
-// 	} while (0)
 
 /** 
  * This should be used for the sanitized first level errors to be
@@ -115,13 +90,11 @@ enum {
  */
 struct ec2_fpga_cmd {
 	uint32_t slot_dev_index;
-	struct fpga_slot_spec mbox_slot_devs[FPGA_SLOT_MAX]; /* todo: do we need this still? */
 	uint32_t opcode;
 	uint32_t afi_slot;
 	char	 afi_id[AFI_ID_STR_MAX];
 	uint32_t mbox_timeout;
 	uint32_t mbox_delay_msec;
-	bool	 plat_attached;
 	bool	 show_headers;
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;
@@ -141,54 +114,3 @@ extern struct ec2_fpga_cmd f1;
  */
 int 
 parse_args(int argc, char *argv[]);
-
-/**
- * Initialize the AFI slot devices from the PCI/sysfs layer. 
- *
- * @returns
- *  0   on success 
- * -1   on failure
- */
-int cli_pci_init(void);
-
-/**
- * De-initialize the PCI/sysfs layer.
- */
-void cli_pci_free(void);
-
-/**
- * Retrieve the application PF map for the given mbox slot.
- *
- * @param[in]   slot		the fpga slot
- * @param[in]   app_pf_num	the application PF number to check 
- * @param[out]  map			the application PF resource map to return 
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int cli_get_app_pf_map(uint32_t slot, uint32_t app_pf_num, 
-		struct fpga_pci_resource_map *map);
-
-/**
- * Remove the application PF for the given mbox slot.
- *
- * @param[in]   slot		the fpga slot
- * @param[in]   app_pf_num	the application PF number to check 
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int
-cli_remove_app_pf(uint32_t slot, uint32_t app_pf_num);
-
-/**
- * PCI rescan.
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-int
-cli_pci_rescan(void);

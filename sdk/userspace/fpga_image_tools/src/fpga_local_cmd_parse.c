@@ -328,7 +328,7 @@ config_request_timeout(uint32_t timeout)
 			timeout, f1.mbox_timeout, f1.mbox_delay_msec);
 	return 0;
 err:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -400,7 +400,7 @@ parse_args_load_afi(int argc, char *argv[])
 err:
 	print_usage(argv[0], load_afi_usage, sizeof_array(load_afi_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -462,7 +462,7 @@ parse_args_clear_afi(int argc, char *argv[])
 err:
 	print_usage(argv[0], clear_afi_usage, sizeof_array(clear_afi_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -538,7 +538,7 @@ parse_args_describe_afi(int argc, char *argv[])
 err:
         print_usage(argv[0], describe_afi_usage, sizeof_array(describe_afi_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 
@@ -596,7 +596,7 @@ err:
 	print_usage(argv[0], describe_afi_slots_usage, 
 			sizeof_array(describe_afi_slots_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 
@@ -669,7 +669,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 err:
         print_usage(argv[0], start_virtual_jtag_usage, sizeof_array(start_virtual_jtag_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -724,7 +724,7 @@ parse_args_get_virtual_led(int argc, char *argv[])
 err:
         print_usage(argv[0], get_virtual_led_usage, sizeof_array(get_virtual_led_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -780,7 +780,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 err:
         print_usage(argv[0], get_virtual_dip_usage, sizeof_array(get_virtual_dip_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 
 /**
@@ -863,7 +863,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 err:
         print_usage(argv[0], set_virtual_dip_usage, sizeof_array(set_virtual_dip_usage));
 out_ver:
-	return -1;
+	return -EINVAL;
 }
 	
 typedef int (*parse_args_func_t)(int argc, char *argv[]);
@@ -901,7 +901,7 @@ parse_args(int argc, char *argv[])
 
 	char *opcode_str = argv[1];
 	size_t i;
-	int ret = -1;
+	int ret = -EINVAL;
 	for (i = 0; i < sizeof_array(str2func); i++) {
 		struct parse_args_str2func *entry = &str2func[i];
 
@@ -919,5 +919,5 @@ parse_args(int argc, char *argv[])
 	return ret;
 err:
 	print_usage(argv[0], opcode_str_usage, sizeof_array(opcode_str_usage));
-	return -1;
+	return -EINVAL;
 }

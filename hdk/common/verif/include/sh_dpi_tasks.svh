@@ -93,60 +93,395 @@ import tb_type_defines_pkg::*;
       return d;
    endfunction
 
-   function void que_buffer_to_cl(input int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.card.fpga.sh.dma_buffer_to_cl(chan, src_addr, cl_addr, len);
+`define SLOT_MACRO_TASK(ARG) \
+begin \
+   case (slot_id) \
+   0: tb.card.fpga.sh.ARG; \
+`ifdef SLOT_1 \
+   1: tb.`SLOT_1.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_2 \
+   2: tb.`SLOT_2.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_3 \
+   3: tb.`SLOT_3.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_4 \
+   4: tb.`SLOT_4.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_5 \
+   5: tb.`SLOT_5.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_6 \
+   6: tb.`SLOT_6.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_7 \
+   7: tb.`SLOT_7.fpga.sh.ARG; \
+`endif \
+   default: begin \
+      $display("Error: Invalid Slot ID specified."); \
+      $finish; \
+   end \
+   endcase \
+end
+
+`define SLOT_MACRO_FUNC(ARG) \
+begin \
+   case (slot_id) \
+   0: return tb.card.fpga.sh.ARG; \
+`ifdef SLOT_1 \
+   1: return tb.`SLOT_1.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_2 \
+   2: return tb.`SLOT_2.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_3 \
+   3: return tb.`SLOT_3.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_4 \
+   4: return tb.`SLOT_4.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_5 \
+   5: return tb.`SLOT_5.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_6 \
+   6: return tb.`SLOT_6.fpga.sh.ARG; \
+`endif \
+`ifdef SLOT_7 \
+   7: return tb.`SLOT_7.fpga.sh.ARG; \
+`endif \
+   default: begin \
+      $display("Error: Invalid Slot ID specified."); \
+      $finish; \
+   end \
+   endcase \
+end
+
+   function void que_buffer_to_cl(input int slot_id = 0, int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+      `SLOT_MACRO_TASK(dma_buffer_to_cl(.chan(chan), .src_addr(src_addr), .cl_addr(cl_addr), .len(len)))
    endfunction
 
-   function void que_cl_to_buffer(input int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
-      tb.card.fpga.sh.dma_cl_to_buffer(chan, dst_addr, cl_addr, len);
+   function void que_cl_to_buffer(input int slot_id = 0, int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
+      `SLOT_MACRO_TASK(dma_cl_to_buffer(.chan(chan), .dst_addr(dst_addr), .cl_addr(cl_addr), .len(len)))
    endfunction
 
-   function void start_que_to_cl(input int chan);
-      tb.card.fpga.sh.start_dma_to_cl(chan);
+   function void start_que_to_cl(input int slot_id = 0, int chan);
+      `SLOT_MACRO_TASK(start_dma_to_cl(chan))
    endfunction
 
-   function void start_que_to_buffer(input int chan);
-      tb.card.fpga.sh.start_dma_to_buffer(chan);
+   function void start_que_to_buffer(input int slot_id = 0, int chan);
+      `SLOT_MACRO_TASK(start_dma_to_buffer(chan))
    endfunction
 
-   task power_up(input slot_id = 0, 
-                       ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0,
-                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0,
-                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
-      case (slot_id)
-      0: tb.card.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
-`ifdef CARD_1
-      1: tb.`CARD_1.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
-`endif
-`ifdef CARD_2
-      1: tb.`CARD_2.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
-`endif
-`ifdef CARD_3
-      1: tb.`CARD_3.fpga.sh.power_up(.clk_profile_a(clk_profile_a),.clk_profile_b(clk_profile_b),.clk_profile_c(clk_profile_c));
-`endif
-      default: begin
-         $display("Error: Invalid Slot ID specified.");
-         $finish;
-      end
-      endcase
+   task power_up(input int slot_id = 0, 
+                       ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0,
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0,
+                       ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
+   `SLOT_MACRO_TASK(power_up(.clk_recipe_a(clk_recipe_a),
+                             .clk_recipe_b(clk_recipe_b),
+                             .clk_recipe_c(clk_recipe_c)))
    endtask
 
-   task power_down(input slot_id = 0);
-      case (slot_id)
-      0: tb.card.fpga.sh.power_down();
-`ifdef CARD_1
-      1: tb.`CARD_1.fpga.sh.power_down();
-`endif
-`ifdef CARD_2
-      1: tb.`CARD_2.fpga.sh.power_down();
-`endif
-`ifdef CARD_3
-      1: tb.`CARD_3.fpga.sh.power_down();
-`endif
-      default: begin
-         $display("Error: Invalid Slot ID specified.");
-         $finish;
-      end
-      endcase
+   task power_down(input int slot_id = 0);
+   `SLOT_MACRO_TASK(power_down())
+   endtask
+
+   //=================================================
+   //
+   // set_virtual_dip_switch
+   //
+   //   Description: writes virtual dip switches
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_virtual_dip_switch(input int slot_id = 0, int dip);
+      `SLOT_MACRO_TASK(set_virtual_dip_switch(dip))
+   endfunction
+
+   //=================================================
+   //
+   // get_virtual_dip_switch
+   //
+   //   Description: reads virtual dip switch status
+   //   Outputs: dip_status
+   //
+   //=================================================
+   function logic [15:0] get_virtual_dip_switch(input int slot_id = 0);
+      `SLOT_MACRO_FUNC(get_virtual_dip_switch())
+   endfunction
+
+   //=================================================
+   //
+   // get_virtual_led
+   //
+   //   Description: reads virtual led status
+   //   Outputs: led status
+   //
+   //=================================================
+   function logic[15:0] get_virtual_led(input int slot_id = 0);
+      `SLOT_MACRO_FUNC(get_virtual_led())
+   endfunction
+
+   //=================================================
+   //
+   // Kernel_reset
+   //
+   //   Description: sets kernel_reset
+   //   Outputs: None
+   //
+   //=================================================
+   function void kernel_reset(input int slot_id = 0, logic d = 1);
+      `SLOT_MACRO_TASK(kernel_reset(d))
+   endfunction
+
+   //=================================================
+   //
+   // poke
+   //
+   //   Description: used to write a single beat of data at addr into one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [63:0] data, 
+             logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
+   endtask
+
+   //=================================================
+   //
+   // poke_pcis
+   //
+   //   Description: used to write a single beat of data at addr into CL PCIS port.
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_pcis(input int slot_id = 0,
+                  logic [63:0] addr,     
+                  logic [511:0] data,     
+                  logic [63:0] strb,     
+             logic [5:0] id = 6'h0); 
+       `SLOT_MACRO_TASK(poke_pcis(.addr(addr), .data(data), .id(id), .strb(strb)))
+   endtask
+
+   //=================================================
+   //
+   // peek
+   //
+   //   Description: used to read a single beat of data at addr from one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
+   endtask
+
+   //=================================================
+   //
+   // peek_pcis
+   //
+   //   Description: used to read a single beat of data at addr from the CL PCIS AXI port.
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_pcis(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0);
+       `SLOT_MACRO_TASK(peek_pcis(.addr(addr), .data(data), .id(id)))
+   endtask
+
+   //=================================================
+   //
+   // set_ack_bit
+   //
+   //   Description: used to acknowledge an interrupt and clear pending bit
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_ack_bit(input int slot_id = 0,
+                             int int_num);
+      `SLOT_MACRO_TASK(set_ack_bit(.int_num(int_num)))
+   endfunction
+
+   //=================================================
+   //
+   // issue_flr
+   //
+   //   Description: issue a FLR command
+   //   Outputs: None
+   //
+   //=================================================
+   task issue_flr(input int slot_id = 0);
+       `SLOT_MACRO_TASK(issue_flr())
+   endtask
+
+   //=================================================
+   //
+   // nsec_delay
+   //
+   //   Description: sets a delay in nsec
+   //   Outputs: None
+   //
+   //=================================================
+   task nsec_delay(int dly = 10000);
+      tb.card.fpga.sh.nsec_delay(dly);
+   endtask
+
+   //=================================================
+   //
+   // poke_ocl
+   //
+   //   Description: used to write a single 32b of data at addr into the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_ocl(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h0); 
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
+   endtask
+
+   //=================================================
+   //
+   // peek_ocl
+   //
+   //   Description: used to read a single 32b of data at addr from the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_ocl(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
+       data = tmp[31:0];
+   endtask
+
+   //=================================================
+   //
+   // poke_sda
+   //
+   //   Description: used to write a single 32b of data at addr into the SDA interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_sda(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h00);
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
+   endtask
+
+   //=================================================
+   //
+   // peek_sda
+   //
+   //   Description: used to read a single 32b of data at addr from the OCL interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_sda(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
+       data = tmp[31:0];
+   endtask
+
+   //=================================================
+   //
+   // poke_bar1
+   //
+   //   Description: used to write a single 32b of data at addr into the BAR1 interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_bar1(input int slot_id = 0,
+             logic [63:0] addr, 
+             logic [31:0] data, 
+             logic [5:0] id = 6'h0);
+       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
+   endtask
+
+   //=================================================
+   //
+   // peek_bar1
+   //
+   //   Description: used to read a single 32b of data at addr from the BAR1 interface.
+   //
+   //        id - AXI bus ID
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_bar1(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [63:0] data, 
+             input logic [5:0] id = 6'h0); 
+       logic [63:0] tmp;
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
+       data = tmp[31:0];
+   endtask
+
+   function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
+      `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
+   endfunction // is_dma_to_cl_done
+
+   function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
+      `SLOT_MACRO_FUNC(is_dma_to_buffer_done(chan))
+   endfunction // is_dma_to_buffer_done
+
+   task poke_stat(input int slot_id = 0,
+                  input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+      `SLOT_MACRO_TASK(poke_stat(.addr(addr), .ddr_idx(ddr_idx), .data(data)))
    endtask
 `endif

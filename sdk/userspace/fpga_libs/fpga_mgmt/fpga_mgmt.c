@@ -26,8 +26,8 @@
 #include "fpga_mgmt_internal.h"
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {
-	.timeout = FPAG_MGMT_TIMEOUT_DFLT,
-	.delay_msec = FPAG_MGMT_DELAY_MSEC_DFLT
+	.timeout = FPGA_MGMT_TIMEOUT_DFLT,
+	.delay_msec = FPGA_MGMT_DELAY_MSEC_DFLT
 };
 
 int fpga_mgmt_init(void)
@@ -43,18 +43,18 @@ int fpga_mgmt_close(void)
 	return FPGA_ERR_OK;
 }
 
-void fpag_mgmt_set_cmd_timeout(uint32_t value)
+void fpga_mgmt_set_cmd_timeout(uint32_t value)
 {
 	fpga_mgmt_state.timeout = value;
 }
 
-void fpag_mgmt_set_cmd_delay_msec(uint32_t value)
+void fpga_mgmt_set_cmd_delay_msec(uint32_t value)
 {
 	fpga_mgmt_state.delay_msec = value;
 }
 
 int fpga_mgmt_describe_local_image(int slot_id,
-	struct fpga_mgmt_image_info *info)
+	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
 	int ret;
 	uint32_t len;
@@ -71,9 +71,7 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	memset(&rsp, 0, sizeof(union afi_cmd));
 
 	/* initialize the command structure */
-	fpga_mgmt_cmd_init_metrics(&cmd, &len, 
-		/*bool get_hw_metrics*/ false,
-		/*bool clear_hw_metrics*/ false);
+	fpga_mgmt_cmd_init_metrics(&cmd, &len, flags);
 
 	/* send the command and wait for the response */
 	ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
@@ -107,14 +105,6 @@ out:
 	return ret;
 }
 
-/**
- * Gets the status of an FPGA. Status values are definted in enum fpga_status.
- * If you need the AFI id at the same time, use fpga_mgmt_describe_local_image.
- *
- * @param[in]  slot_id  the logical slot index
- * @param[out] status   populated with status value
- * @returns 0 on success, non-zero on error
- */
 int fpga_mgmt_get_status(int slot_id, int *status)
 {
 	int ret;
@@ -128,7 +118,7 @@ int fpga_mgmt_get_status(int slot_id, int *status)
 
 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-	ret = fpga_mgmt_describe_local_image(slot_id, &info);
+	ret = fpga_mgmt_describe_local_image(slot_id, &info, 0);
 	fail_on(ret, out, "fpga_mgmt_describe_local_image failed");
 
 	*status = info.status;
@@ -136,8 +126,16 @@ out:
 	return ret;
 }
 
-const char *fpga_mgmt_get_status_name(int status) {
+const char *fpga_mgmt_get_status_name(int status)
+{
 	return FPGA_STATUS2STR(status);
+}
+
+const char *fpga_mgmt_strerror(int err) {
+	if (err < 0) {
+		return strerror(-err);
+	}
+	return FPGA_ERR2STR(err);
 }
 
 int fpga_mgmt_clear_local_image(int slot_id) {
@@ -193,14 +191,14 @@ int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status) {
 
 	ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &led_pci_bar);
 	if (ret) 
-		return -1;
+		return FPGA_ERR_FAIL;
 	
 	ret = fpga_pci_peek(led_pci_bar,F1_VIRTUAL_LED_REG_OFFSET,&read_data);
        /* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */
         *(status) = (uint16_t)( read_data & 0x0000FFFF);
 
 
-	fpga_pci_detatch(led_pci_bar);
+	fpga_pci_detach(led_pci_bar);
 	return ret;	
 }
 
@@ -211,7 +209,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value) {
 
         ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &dip_pci_bar);
         if (ret)
-                return -1;
+                return FPGA_ERR_FAIL;
 
 
 	write_data = (uint32_t) value;
@@ -219,7 +217,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value) {
         ret = fpga_pci_poke(dip_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,write_data);
 
 
-        fpga_pci_detatch(dip_pci_bar);
+        fpga_pci_detach(dip_pci_bar);
         return ret;
 }
 
@@ -231,13 +229,13 @@ int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value) {
 
         ret=fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &dip_pci_bar);
         if (ret)
-                return -1;
+                return FPGA_ERR_FAIL;
 
         ret = fpga_pci_peek(dip_pci_bar,F1_VIRTUAL_DIP_REG_OFFSET,&read_data);
        /* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */
 	 *(value) = (uint16_t)read_data; 
 
-        fpga_pci_detatch(dip_pci_bar);
+        fpga_pci_detach(dip_pci_bar);
         return ret;
 
 }

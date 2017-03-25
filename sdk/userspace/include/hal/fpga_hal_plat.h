@@ -75,7 +75,8 @@ int fpga_plat_init(void);
  * 0 on success    
  * -1 on failure
  */
-int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id, int *dev_index);
+int fpga_plat_dev_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
+	bool write_combining, int *dev_index);
 
 /**
  * Platform layer detach using the given slot specification.
@@ -114,6 +115,33 @@ int fpga_plat_dev_reg_read(int dev_index, uint64_t offset, uint32_t *value);
  */
 int fpga_plat_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
 
+
+/**
+ * Platform layer register read.
+ *
+ * @param[in]		dev_index	the attached fpga device index.
+ * @param[in]		offset		the register offset
+ * @param[in,out]	value		the register value to return
+ *
+ * @returns
+ * 0 on success
+ * -1 on failure
+ */
+int fpga_plat_dev_reg_read64(int dev_index, uint64_t offset, uint64_t *value);
+
+/**
+ * Platform layer register write.
+ *
+ * @param[in]	dev_index	the attached fpga device index.
+ * @param[in]	offset		the register offset
+ * @param[in]	value		the register value to write
+ *
+ * @returns
+ * 0 on success
+ * -1 on failure
+ */
+int fpga_plat_dev_reg_write64(int dev_index, uint64_t offset, uint64_t value);
+
 /**
  * Platform layer get mem base.
  *
@@ -124,6 +152,17 @@ int fpga_plat_dev_reg_write(int dev_index, uint64_t offset, uint32_t value);
  * -1 on failure
  */
 void *fpga_plat_dev_get_mem_base(int dev_index);
+
+/**
+ * Platform layer write burst.
+ *
+ * @param[in]	dev_index	the attached fpga device index.
+ * @param[in]	offset		the register offset
+ * @param[in]   datap       source pointer
+ * @param[in]   dword_len   number of 4 byte words to copy
+ */
+int fpga_plat_dev_reg_write_burst(int dev_index, uint64_t offset,
+	uint32_t* datap, uint32_t dword_len);
 
 /************************************************************************ 
  * Single device attachment and use.

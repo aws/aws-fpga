@@ -17,8 +17,8 @@
  * Default timeout:
  *   CLI_TIMEOUT_DFLT * CLI_DELAY_MSEC_DFLT
  */
-#define FPAG_MGMT_TIMEOUT_DFLT    25
-#define FPAG_MGMT_DELAY_MSEC_DFLT 200
+#define FPGA_MGMT_TIMEOUT_DFLT    25
+#define FPGA_MGMT_DELAY_MSEC_DFLT 200
 
 /** First flag bit, @see afi_cmd_hdr#len_flags */
 #define AFI_CMD_HDR_FLAGS_SHIFT 24
@@ -52,7 +52,7 @@ extern struct fgpa_mgmt_state_s {
 int fpga_mgmt_process_cmd(int slot_id,
 	const union afi_cmd *cmd, union afi_cmd *rsp, uint32_t *len);
 void fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
-	bool get_hw_metrics, bool clear_hw_metrics);
+	uint32_t flags);
 void fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len,
 	const char *afi_id);
 void fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len);

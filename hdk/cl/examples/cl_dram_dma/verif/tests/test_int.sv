@@ -6,6 +6,8 @@
 
 module test_int();
 
+   import tb_type_defines_pkg::*;
+   
    logic [63:0]   base_addr;
 
    logic [31:0]   write_data;
@@ -22,7 +24,7 @@ module test_int();
       error_count = 0;
       fail = 0;
 
-      tb.sh.power_up();
+      tb.power_up();
 
       //---------------------------
       // Program CL registers to trigger interrupts
@@ -43,14 +45,14 @@ module test_int();
             write_data |= 1'b1 << vector_num;
             write_data |= 1'b1 << vector_num2;
             int_pend = write_data[15:0];
-            tb.sh.poke(.addr(base_addr + 64'h000), .data(write_data), .intf(2));
+            tb.poke_ocl(.addr(base_addr + 64'h000), .data(write_data));
 
             timeout_count = 0;
             do begin
-               tb.sh.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(2));
+               tb.peek_ocl(.addr(base_addr + 64'h000), .data(read_data));
                if (|read_data[31:16]) begin
                   int_pend &= ~(read_data[31:16]);
-                  tb.sh.poke(.addr(base_addr + 64'h000), .data({read_data[31:16], 16'h0000}), .intf(2));
+                  tb.poke_ocl(.addr(base_addr + 64'h000), .data({read_data[31:16], 16'h0000}));
                end
                timeout_count++;
                if (timeout_count == 100) begin
@@ -63,7 +65,7 @@ module test_int();
                end
             end while ((int_pend !== 16'h0000) && (timeout_count < 100));
 
-            tb.sh.peek(.addr(base_addr + 64'h000), .data(read_data), .intf(2));
+            tb.peek_ocl(.addr(base_addr + 64'h000), .data(read_data));
             if (read_data !== 32'h0000_0000) begin
                if (vector_num !== vector_num2) begin
                   $display("[%t] : *** ERROR *** Done bits were not cleared for vectors %2d, %2d.", $realtime, vector_num, vector_num2);
@@ -77,7 +79,7 @@ module test_int();
 
       // Power down
       #500ns;
-      tb.sh.power_down();
+      tb.power_down();
 
       //---------------------------
       // Report pass/fail status

@@ -1423,63 +1423,42 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up(input ClockProfile::CLK_PROFILE clk_profile_a = ClockProfile::PROFILE_0, 
-                       ClockProfile::CLK_PROFILE clk_profile_b = ClockProfile::PROFILE_0, 
-                       ClockProfile::CLK_PROFILE clk_profile_c = ClockProfile::PROFILE_0);
-      case (clk_profile_a)
-         ClockProfile::PROFILE_0: begin
+   task power_up(input ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0, 
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0, 
+                       ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
+      case (clk_recipe_a)
+         ClockRecipe::A0: begin
             MAIN_A0_DLY  = 4ns;
             CORE_DLY     = 4ns;
             EXTRA_A1_DLY = 8ns;
             EXTRA_A2_DLY = 2.66ns;
             EXTRA_A3_DLY = 2ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::A1: begin
             MAIN_A0_DLY  = 2ns;
             CORE_DLY     = 2ns;
             EXTRA_A1_DLY = 4ns;
             EXTRA_A2_DLY = 1.33ns;
             EXTRA_A3_DLY = 1ns;
          end
-         ClockProfile::PROFILE_2: begin
-            MAIN_A0_DLY  = 8ns;
-            CORE_DLY     = 8ns;
-            EXTRA_A1_DLY = 16ns;
-            EXTRA_A2_DLY = 2ns;
-            EXTRA_A3_DLY = 4ns;
-         end
-         ClockProfile::PROFILE_3: begin
+         ClockRecipe::A2: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
             EXTRA_A1_DLY = 64ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
-         ClockProfile::PROFILE_4: begin
-            MAIN_A0_DLY  = 2.22ns;
-            CORE_DLY     = 2.22ns;
-            EXTRA_A1_DLY = 4.44ns;
-            EXTRA_A2_DLY = 1.48ns;
-            EXTRA_A3_DLY = 1.11ns;
-         end
-         ClockProfile::PROFILE_5: begin
-            MAIN_A0_DLY  = 2.5ns;
-            CORE_DLY     = 2.5ns;
-            EXTRA_A1_DLY = 5ns;
-            EXTRA_A2_DLY = 1.66ns;
-            EXTRA_A3_DLY = 1.25ns;
-         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
       endcase 
-      case (clk_profile_b)
-         ClockProfile::PROFILE_0: begin
+      case (clk_recipe_b)
+         ClockRecipe::B0: begin
             EXTRA_B0_DLY = 2ns;
             EXTRA_B1_DLY = 4ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::B1: begin
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
          end
@@ -1488,12 +1467,12 @@ module sh_bfm #(
             $finish;
          end
       endcase
-      case (clk_profile_c)
-         ClockProfile::PROFILE_0: begin
+      case (clk_recipe_c)
+         ClockRecipe::C0: begin
             EXTRA_C0_DLY = 1.66ns;
             EXTRA_C1_DLY = 1.25ns;
          end
-         ClockProfile::PROFILE_1: begin
+         ClockRecipe::C1: begin
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
          end
@@ -1533,31 +1512,31 @@ module sh_bfm #(
    //
    //=================================================
    function void set_virtual_dip_switch(int dip_switch);
-      sh_cl_status_vdip[dip_switch] = 1'b1;
+      sh_cl_status_vdip = dip_switch[15:0];
    endfunction
 
    //=================================================
    //
-   // read_virtual_dip_switch
+   // get_virtual_dip_switch
    //
    //   Description: reads virtual dip switch status
    //   Outputs: dip_status
    //
    //=================================================
-   function logic[15:0] read_virtual_dip_switch(int dip_switch);
-      return sh_cl_status_vdip[dip_switch];
+   function logic[15:0] get_virtual_dip_switch();
+      return sh_cl_status_vdip;
    endfunction
 
    //=================================================
    //
-   // read_virtual_led
+   // get_virtual_led
    //
    //   Description: reads virtual led status
    //   Outputs: led status
    //
    //=================================================
-   function logic[15:0] read_virtual_led(int vled);
-      return cl_sh_status_vled[vled];
+   function logic[15:0] get_virtual_led();
+      return cl_sh_status_vled;
    endfunction
 
    //=================================================
@@ -1568,8 +1547,8 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   function void kernel_reset();
-      kernel_rst_n = 1'b1;
+   function void kernel_reset(input logic d = 1);
+      kernel_rst_n = d;
    endfunction
 
    //=================================================
@@ -1587,10 +1566,18 @@ module sh_bfm #(
       #50ns;
    endtask // power_down
 
+   //=================================================
+   //
+   // issue_flr
+   //
+   //   Description: issue a FLR command
+   //   Outputs: None
+   //
+   //=================================================
    task issue_flr();
-      sh_cl_flr_assert <= 1'b1;
+      sh_cl_flr_assert = 1'b1;
       wait(cl_sh_flr_done == 1);
-      sh_cl_flr_assert <= 1'b0;
+      sh_cl_flr_assert = 1'b0;
    endtask
 
    //=================================================
@@ -1617,10 +1604,10 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task set_ack_bit(input int int_num);
+   function void set_ack_bit(input int int_num);
       int_ack[int_num] = 1'b1;
       int_pend[int_num] = 1'b0;
-   endtask
+   endfunction
 
    //=================================================
    //
@@ -1645,7 +1632,7 @@ module sh_bfm #(
              logic [63:0] data, 
              logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
 
       logic [63:0] strb;
 
@@ -1661,7 +1648,7 @@ module sh_bfm #(
       endcase // case (size)
       
       case (intf)
-        AxiPort::PORT_PCIS: begin
+        AxiPort::PORT_DMA_PCIS: begin
            AXI_Command axi_cmd;
            AXI_Data    axi_data;
 
@@ -1704,6 +1691,38 @@ module sh_bfm #(
       
    endtask // poke
 
+   task poke_pcis(input logic [63:0] addr, 
+                  logic [511:0] data, 
+                  logic [63:0] strb, 
+                  logic [5:0] id = 6'h0);
+      
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+
+      logic [1:0]             resp;
+           
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
+
+      sh_cl_wr_cmds.push_back(axi_cmd);
+
+      axi_data.data = data;
+      axi_data.strb = strb;
+           
+      axi_data.id   = id;
+      axi_data.last = 1'b1;
+           
+      #20ns sh_cl_wr_data.push_back(axi_data);
+      
+      while (cl_sh_b_resps.size() == 0)
+        #20ns;
+      
+      resp = cl_sh_b_resps[0].resp;
+      cl_sh_b_resps.pop_front();
+      
+   endtask // poke
+
    //=================================================
    //
    // peek
@@ -1727,10 +1746,10 @@ module sh_bfm #(
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_PCIS); 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
 
       case (intf)
-        AxiPort::PORT_PCIS : begin
+        AxiPort::PORT_DMA_PCIS : begin
            AXI_Command axi_cmd;
            int         byte_idx;
            int         mem_arr_idx;
@@ -1762,6 +1781,26 @@ module sh_bfm #(
       endcase // case (intf)
       
    endtask // peek
+
+   task peek_pcis(input logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0);
+      
+      AXI_Command axi_cmd;
+           
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
+      
+      sh_cl_rd_cmds.push_back(axi_cmd);
+      
+      while (cl_sh_rd_data.size() == 0)
+        #20ns;
+      
+      data = cl_sh_rd_data[0].data;
+      cl_sh_rd_data.pop_front();
+      
+   endtask // peek_pcis
 
    //=================================================
    //
@@ -2020,11 +2059,11 @@ module sh_bfm #(
       end // else begin
    end // always
 
-  task poke_stat(input logic [7:0] stat_addr, logic [1:0] ddr_idx, logic[31:0] data);
+  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
      case (ddr_idx)
        0: begin
           sh_ddr_stat_wr0    = 1;
-          sh_ddr_stat_addr0  = stat_addr;
+          sh_ddr_stat_addr0  = addr;
           sh_ddr_stat_wdata0 = data;
           sh_ddr_stat_rd0    = 0;
           #8ns;
@@ -2032,7 +2071,7 @@ module sh_bfm #(
        end
        1: begin
           sh_ddr_stat_wr1    = 1;
-          sh_ddr_stat_addr1  = stat_addr;
+          sh_ddr_stat_addr1  = addr;
           sh_ddr_stat_wdata1 = data;
           sh_ddr_stat_rd1    = 0;
           #8ns;
@@ -2040,7 +2079,7 @@ module sh_bfm #(
        end
        2: begin
           sh_ddr_stat_wr2    = 1;
-          sh_ddr_stat_addr2  = stat_addr;
+          sh_ddr_stat_addr2  = addr;
           sh_ddr_stat_wdata2 = data;
           sh_ddr_stat_rd2    = 0;
           #8ns;
