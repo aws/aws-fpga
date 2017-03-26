@@ -264,6 +264,22 @@ end
 
    //=================================================
    //
+   // poke_pcis
+   //
+   //   Description: used to write a single beat of data at addr into CL PCIS port.
+   //   Outputs: None
+   //
+   //=================================================
+   task poke_pcis(input int slot_id = 0,
+                  logic [63:0] addr,     
+                  logic [511:0] data,     
+                  logic [63:0] strb,     
+             logic [5:0] id = 6'h0); 
+       `SLOT_MACRO_TASK(poke_pcis(.addr(addr), .data(data), .id(id), .strb(strb)))
+   endtask
+
+   //=================================================
+   //
    // peek
    //
    //   Description: used to read a single beat of data at addr from one of the four CL AXI ports specified by intf.
@@ -288,6 +304,21 @@ end
              DataSize::DATA_SIZE size = DataSize::UINT32, 
              AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
+   endtask
+
+   //=================================================
+   //
+   // peek_pcis
+   //
+   //   Description: used to read a single beat of data at addr from the CL PCIS AXI port.
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek_pcis(input int slot_id = 0,
+             logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0);
+       `SLOT_MACRO_TASK(peek_pcis(.addr(addr), .data(data), .id(id)))
    endtask
 
    //=================================================

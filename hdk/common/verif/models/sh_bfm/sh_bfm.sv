@@ -1691,6 +1691,38 @@ module sh_bfm #(
       
    endtask // poke
 
+   task poke_pcis(input logic [63:0] addr, 
+                  logic [511:0] data, 
+                  logic [63:0] strb, 
+                  logic [5:0] id = 6'h0);
+      
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+
+      logic [1:0]             resp;
+           
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
+
+      sh_cl_wr_cmds.push_back(axi_cmd);
+
+      axi_data.data = data;
+      axi_data.strb = strb;
+           
+      axi_data.id   = id;
+      axi_data.last = 1'b1;
+           
+      #20ns sh_cl_wr_data.push_back(axi_data);
+      
+      while (cl_sh_b_resps.size() == 0)
+        #20ns;
+      
+      resp = cl_sh_b_resps[0].resp;
+      cl_sh_b_resps.pop_front();
+      
+   endtask // poke
+
    //=================================================
    //
    // peek
@@ -1749,6 +1781,26 @@ module sh_bfm #(
       endcase // case (intf)
       
    endtask // peek
+
+   task peek_pcis(input logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0);
+      
+      AXI_Command axi_cmd;
+           
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
+      
+      sh_cl_rd_cmds.push_back(axi_cmd);
+      
+      while (cl_sh_rd_data.size() == 0)
+        #20ns;
+      
+      data = cl_sh_rd_data[0].data;
+      cl_sh_rd_data.pop_front();
+      
+   endtask // peek_pcis
 
    //=================================================
    //
