@@ -339,6 +339,145 @@ assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
   assign cl_sh_status0[31:0] =  32'h0000_0FF0;
   assign cl_sh_status1[31:0] = `CL_VERSION;
 
+//-----------------------------------------------
+// Debug bridge, used if need chipscope
+//-----------------------------------------------
+`ifndef DISABLE_CHIPSCOPE_DEBUG
+
+// Flop for timing global clock counter
+logic[63:0] sh_cl_glcount0_q;
+
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync)
+      sh_cl_glcount0_q <= 0;
+   else
+      sh_cl_glcount0_q <= sh_cl_glcount0;
+
+
+// Integrated Logic Analyzers (ILA)
+   ila_0 CL_ILA_0 (
+                   .clk    (clk_main_a0),
+                   .probe0 (sh_ocl_awvalid_q),
+                   .probe1 (sh_ocl_awaddr_q ),
+                   .probe2 (ocl_sh_awready_q),
+                   .probe3 (sh_ocl_arvalid_q),
+                   .probe4 (sh_ocl_araddr_q ),
+                   .probe5 (ocl_sh_arready_q)
+                   );
+
+   ila_0 CL_ILA_1 (
+                   .clk    (clk_main_a0),
+                   .probe0 (ocl_sh_bvalid_q),
+                   .probe1 (sh_cl_glcount0_q),
+                   .probe2 (sh_ocl_bready_q),
+                   .probe3 (ocl_sh_rvalid_q),
+                   .probe4 ({32'b0,ocl_sh_rdata_q[31:0]}),
+                   .probe5 (sh_ocl_rready_q)
+                   );
+
+// Debug Bridge 
+   cl_debug_bridge CL_DEBUG_BRIDGE (
+      .clk(clk_main_a0),
+      .drck(drck),
+      .shift(shift),
+      .tdi(tdi),
+      .update(update),
+      .sel(sel),
+      .tdo(tdo),
+      .tms(tms),
+      .tck(tck),
+      .runtest(runtest),
+      .reset(reset),
+      .capture(capture),
+      .bscanid(bscanid)
+   );
+
+//-----------------------------------------------
+// VIO Example - Needs Chipscope
+//-----------------------------------------------
+   // Counter running at 125MHz
+   
+   logic      vo_cnt_enable;
+   logic      vo_cnt_load;
+   logic      vo_cnt_clear;
+   logic      vo_cnt_oneshot;
+   logic [7:0]  vo_tick_value;
+   logic [15:0] vo_cnt_load_value;
+   logic [15:0] vo_cnt_watermark;
+
+   logic      vo_cnt_enable_q = 0;
+   logic      vo_cnt_load_q = 0;
+   logic      vo_cnt_clear_q = 0;
+   logic      vo_cnt_oneshot_q = 0;
+   logic [7:0]  vo_tick_value_q = 0;
+   logic [15:0] vo_cnt_load_value_q = 0;
+   logic [15:0] vo_cnt_watermark_q = 0;
+
+   logic        vi_tick;
+   logic        vi_cnt_ge_watermark;
+   logic [7:0]  vi_tick_cnt = 0;
+   logic [15:0] vi_cnt = 0;
+   
+   // Tick counter and main counter
+   always @(posedge clk_extra_a1) begin
+
+      vo_cnt_enable_q     <= vo_cnt_enable    ;
+      vo_cnt_load_q       <= vo_cnt_load      ;
+      vo_cnt_clear_q      <= vo_cnt_clear     ;
+      vo_cnt_oneshot_q    <= vo_cnt_oneshot   ;
+      vo_tick_value_q     <= vo_tick_value    ;
+      vo_cnt_load_value_q <= vo_cnt_load_value;
+      vo_cnt_watermark_q  <= vo_cnt_watermark ;
+
+      vi_tick_cnt = vo_cnt_clear_q ? 0 :
+                    ~vo_cnt_enable_q ? vi_tick_cnt :
+                    (vi_tick_cnt >= vo_tick_value_q) ? 0 :
+                    vi_tick_cnt + 1;
+
+      vi_cnt = vo_cnt_clear_q ? 0 :
+               vo_cnt_load_q ? vo_cnt_load_value_q :
+               ~vo_cnt_enable_q ? vi_cnt :
+               (vi_tick_cnt >= vo_tick_value_q) && (~vo_cnt_oneshot_q || (vi_cnt <= 16'hFFFF)) ? vi_cnt + 1 :
+               vi_cnt;
+
+      vi_tick = (vi_tick_cnt >= vo_tick_value_q);
+
+      vi_cnt_ge_watermark = (vi_cnt >= vo_cnt_watermark_q);
+      
+   end // always @ (posedge clk_extra_a1)
+   
+
+   vio_0 CL_VIO_0 (
+                   .clk    (clk_main_a0),
+                   .probe_in0  (vi_tick),
+                   .probe_in1  (vi_cnt_ge_watermark),
+                   .probe_in2  (vi_tick_cnt),
+                   .probe_in3  (vi_cnt),
+                   .probe_out0 (vo_cnt_enable),
+                   .probe_out1 (vo_cnt_load),
+                   .probe_out2 (vo_cnt_clear),
+                   .probe_out3 (vo_cnt_oneshot),
+                   .probe_out4 (vo_tick_value),
+                   .probe_out5 (vo_cnt_load_value),
+                   .probe_out6 (vo_cnt_watermark)
+                   );
+   
+   ila_vio_counter CL_VIO_ILA (
+                   .clk     (clk_main_a0),
+                   .probe0  (vi_tick),
+                   .probe1  (vi_cnt_ge_watermark),
+                   .probe2  (vi_tick_cnt),
+                   .probe3  (vi_cnt),
+                   .probe4  (vo_cnt_enable_q),
+                   .probe5  (vo_cnt_load_q),
+                   .probe6  (vo_cnt_clear_q),
+                   .probe7  (vo_cnt_oneshot_q),
+                   .probe8  (vo_tick_value_q),
+                   .probe9  (vo_cnt_load_value_q),
+                   .probe10 (vo_cnt_watermark_q)
+                   );
+   
+`endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 
 endmodule
 

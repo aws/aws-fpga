@@ -17,12 +17,9 @@
 
 #include <errno.h>
 
-#include <utils/lcd.h>
-#include <fpga_common.h>
-#include <hal/fpga_hal_plat.h>
-#include <hal/fpga_hal_reg.h>
-
 #include <fpga_pci.h>
+
+#include <utils/lcd.h>
 
 /** F1 Mailbox PF defines */
 #define F1_MBOX_VENDOR_ID       0x1d0f
