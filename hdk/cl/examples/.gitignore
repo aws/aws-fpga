@@ -3,7 +3,7 @@
 */build/bitstreams/*.log
 */build/bitstreams/*.bin
 *.bin
-*/build/checkpoints/
+*/build/checkpoints
 */build/checkpoints/*.dcp
 */build/reports/*.rpt
 */build/reports/*.txt

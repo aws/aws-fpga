@@ -57,7 +57,6 @@ AWS offers the use of the [FPGA developer AMI](https://aws.amazon.com/marketplac
 
 **Note** *During the preview access period to start using the FPGA developer AMI your AWS account needs to be whitelisted.* Once you are whitelisted, from the AWS console you will have access to the AMI:
 
-
 <a name="devSupport"></a>
 ## Developer Support 
 

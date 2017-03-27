@@ -6,7 +6,7 @@ The [SDK management directory](./userspace) contains the [Amazon FPGA Image (AFI
 
 The SDK is **NOT** used to build or register AFI, rather it is only used for managing and deploying pre-built AFIs. For building and registering AFIs, please refer to the [HDK](../hdk/README.md).
 
-**NOTE:** This SDK is designed and testing for Linux environments only.
+**NOTE:** This SDK is designed and tested for Linux environments only.
 
 # Quick Start
 
@@ -17,3 +17,10 @@ You can setup and install the SDK with the following few steps.  Note that the f
     $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
     $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
     $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
+
+
+**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./sdk/management/fpga_image_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
+
+```
+$ sudo yum groupinstall -y “Development Tools"
+```
