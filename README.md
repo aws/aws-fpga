@@ -13,7 +13,7 @@
     - [Starting a new CL](#clExamples)
 
 <a name="devkit"></a>
-# AWS EC2 FPGA Hardware and Software Development Kits 
+# AWS EC2 FPGA Hardware and Software Development Kits
 
 This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
@@ -27,18 +27,18 @@ The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported fe
 Please click the "Watch" button in GitHub upper right corner to stay posted.
 
 <a name="fpgahdk"></a>
-## FPGA HDK 
+## FPGA HDK
 
 The [HDK directory](./hdk) is recommended for developers wanting to start building Amazon FPGA Images (AFI). It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any server or EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
 
 [HDK readme](./hdk/README.md)
-        
+
 [AWS FPGA Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
-        
+
 [Developing with OpenCL/SDAccel](./hdk/docs/OpenCL_SDAccel_Development.md)
-        
+
 [FPGA PCIe Address Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
-        
+
 <a name="fpgasdk"></a>
 ## FPGA SDK
 
@@ -51,28 +51,27 @@ The [SDK directory](./sdk) includes the runtime environment required to run on E
 [AFI Management Tools](./sdk/management/fpga_image_tools/README.md)
 
 <a name="devAmi"></a>
-## FPGA Developer AMI 
+## FPGA Developer AMI
 
-AWS offers the use of the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances through AWS Marketplace. The FPGA Developer AMI comes with all needed licensed Xilinx's Vivado tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge, M4.2XLarge, R4.XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
+AWS offers the use of the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances through the AWS Marketplace. The FPGA Developer AMI comes with all needed licensed Xilinx's Vivado tools and AWS CLI pre-installed.
 
-**Note** *During the preview access period to start using the FPGA developer AMI your AWS account needs to be whitelisted.* Once you are whitelisted, from the AWS console you will have access to the AMI:
-
+The HDK examples and quick start can be run on any [C4/M4/R4](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require a minimum 15GiB Memory while 32GiB is optimal (C4.4XLarge, M4.2XLarge, R4.XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
 
 <a name="devSupport"></a>
-## Developer Support 
+## Developer Support
 
 [**AWS FPGA Development User Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and read announcements from the AWS FPGA team. To gain access to the user forum:
 
-* Login to https://forums.aws.amazon.com/index.jspa 
+* Login to https://forums.aws.amazon.com/index.jspa
 * **Note** *During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Email your userID to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.*
 * To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
-* In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
- 
+* In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again.
+
 <a name="quickstart"></a>
-# Quick Start 
+# Quick Start
 
 <a name="buildingAnExample"></a>
-## Building an Example AFI 
+## Building an Example AFI
 
 By following a few steps, you would have downloaded the HDK, compiled and built one of the example Custom Logic (CL) designs included with the HDK, and registered it with AWS. [Building a Custom Logic (CL) implementation for AWS FPGA instances](./hdk/cl/examples#overview-on-process-for-building-a-custom-logic-cl-implementation-for-aws-fpga-instances)
 
@@ -80,7 +79,7 @@ By following a few steps, you would have downloaded the HDK, compiled and built 
 * AWS FPGA HDK and SDK run in Linux environment only.
 * If you can not access GitHub repository, please request access permission from your AWS representative.
 * The build stage uses Xilinx's Vivado tool set. You should have an installed Vivado and Vivado License Manager (See [Release Notes](./RELEASE_NOTES.md) for details on the version).
-* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region. 
+* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region.
 
 
 ```
@@ -97,7 +96,7 @@ $ aws s3 cp *.Developer_CL.tar \                # Step 10: Upload the file to S3
          s3://<bucket-name>/
 $ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
         --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
-        --name MyFirstDCP \ 
+        --name MyFirstDCP \
         --logs-storage-location Bucket=<bucket-name>,Key=logs/
 ```
 **NOTE**: The DCP generation (`Step 7` above) can take up to several hours to complete.  We recommend to initiate the generation in a way that prevents interruption.  For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.  
