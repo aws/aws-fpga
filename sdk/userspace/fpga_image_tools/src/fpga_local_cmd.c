@@ -27,10 +27,8 @@
 #include <stdio.h>
 #include <getopt.h>
 
-#include <utils/lcd.h>
-
-#include <fpga_pci.h>
 #include <fpga_mgmt.h>
+#include <utils/lcd.h>
 
 #include "fpga_local_cmd.h"
 #include "virtual_jtag.h"
@@ -106,7 +104,7 @@ cli_attach(void)
 {
 	int ret;
 
-	if (f1.opcode == AFI_EXT_DESCRIBE_SLOTS) {
+	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
 		/** 
 		 * ec2-afi-describe-slots does not use the Mbox logic, local
 		 * information only 
@@ -202,6 +200,9 @@ static int command_start_virtual_jtag(void)
         return xvcserver_start(f1.afi_slot,f1.tcp_port);
 }
 
+/**
+ * Generate the load local image command.
+ */
 static int command_load(void)
 {
 	int ret;
@@ -210,10 +211,7 @@ static int command_load(void)
 }
 
 /**
- * Generate the AFI_CMD_CLEAR.
- *
- * @param[in]		cmd		cmd buffer 
- * @param[in,out]	len		cmd len
+ * Generate the clear local image command.
  */
 static int 
 command_clear(void)
@@ -222,7 +220,7 @@ command_clear(void)
 }
 
 /**
- * Handle the AFI_CMD_METRICS response.
+ * Generate the describe local image command and handle the response.
  *
  * @param[in]	cmd		cmd buffer 
  * @param[in]	rsp		rsp buffer 
@@ -233,7 +231,7 @@ command_clear(void)
  * -1	on failure
  */
 static int
-command_metrics(void)
+command_describe(void)
 {
 	int ret;
 	uint32_t i, flags;
@@ -385,12 +383,8 @@ err:
 }
 
 /**
- * Handle the AFI_EXT_DESCRIBE_SLOTS "response".
+ * Handle the describe local image slots "response".
  *  -this response uses local (not mbox) information only.
- *
- * @param[in]	cmd		cmd buffer 
- * @param[in]	rsp		rsp buffer 
- * @param[in]	len		rsp len
  *
  * @returns
  *  0	on success 
@@ -422,15 +416,15 @@ err:
 
 typedef int (*command_func_t)(void);
 
-static const command_func_t command_table[AFI_EXT_END] = {
-	[AFI_CMD_LOAD] = command_load,
-	[AFI_CMD_METRICS] = command_metrics,
-	[AFI_CMD_CLEAR] = command_clear,
-	[AFI_EXT_DESCRIBE_SLOTS] = command_describe_slots,
-	[AFI_START_VJTAG] = command_start_virtual_jtag,
-	[AFI_GET_LED] = command_get_virtual_led,
-	[AFI_GET_DIP] = command_get_virtual_dip,
-	[AFI_SET_DIP] = command_set_virtual_dip,
+static const command_func_t command_table[CLI_CMD_END] = {
+	[CLI_CMD_LOAD] = command_load,
+	[CLI_CMD_CLEAR] = command_clear,
+	[CLI_CMD_DESCRIBE] = command_describe,
+	[CLI_CMD_DESCRIBE_SLOTS] = command_describe_slots,
+	[CLI_CMD_START_VJTAG] = command_start_virtual_jtag,
+	[CLI_CMD_GET_LED] = command_get_virtual_led,
+	[CLI_CMD_GET_DIP] = command_get_virtual_dip,
+	[CLI_CMD_SET_DIP] = command_set_virtual_dip,
 };
 
 /**
@@ -443,7 +437,7 @@ static const command_func_t command_table[AFI_EXT_END] = {
 static int
 cli_main(void)
 {
-	fail_on_quiet(f1.opcode >= AFI_EXT_END, err, "Invalid opcode %u", f1.opcode);
+	fail_on_quiet(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
 	fail_on_user(command_table[f1.opcode] == NULL, err, "Action not defined for "
 	             "opcode %u", f1.opcode);
 

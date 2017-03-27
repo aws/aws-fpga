@@ -19,7 +19,7 @@ UTILLIB_PATH = $(TOP)/util
 LIB_PATH = $(TOP)/lib
 LIB_SO_PATH = $(LIB_PATH)/so
 
-INCLUDES = -I$(TOPINC_PATH) -I/usr/include
+INCLUDES = -I. -I$(TOPINC_PATH) -I/usr/include
 
 #OPT=-O2
 CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
@@ -32,7 +32,6 @@ FPGAMGMTLIB = $(LIB_PATH)/libfpga_mgmt.a
 LDLIBS = -lrt -lpthread
 
 FPGAAUXLIBS = $(LIB_PATH)/libfpga_pci.a
-FPGAAUXLIBS += $(LIB_PATH)/libfpga_hal_mbox.a $(LIB_PATH)/libfpga_hal_reg.a $(LIB_PATH)/libfpga_hal_plat.a
 FPGAAUXLIBS += $(LIB_PATH)/libutils.a
 
 all: $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)

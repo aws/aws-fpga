@@ -13,15 +13,13 @@
  * permissions and limitations under the License.
  */
 
-#include <fpga_common.h>
-#include <afi_cmd_api.h>
-#include <hal/fpga_hal_mbox.h>
-#include <fpga_mgmt.h>
-#include <fpga_pci.h>
-#include <utils/lcd.h>
-
 #include <string.h>
 #include <errno.h>
+
+#include <fpga_mgmt.h>
+#include <afi_cmd_api.h>
+#include <fpga_hal_mbox.h>
+#include <utils/lcd.h>
 
 #include "fpga_mgmt_internal.h"
 
@@ -90,8 +88,9 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	info->ids = metrics->ids;
 	strncpy(info->ids.afi_id, afi_id, sizeof(info->ids.afi_id));
 
+	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
 	struct fpga_hal_mbox_versions ver;
-	ret = fpga_hal_mbox_get_versions(&ver);
+	ret = fpga_hal_mbox_get_versions(handle, &ver);
 	fail_on(ret, out, "fpga_hal_mbox_get_versions failed");
 	info->sh_version = ver.sh_version;
 

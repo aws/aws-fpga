@@ -31,8 +31,7 @@ LDFLAGS_STATIC = -L$(LIB_PATH)
 LDLIBS_STATIC = -lfpga_mgmt -lrt -lpthread
 
 UTILLCDLIB = $(LIB_PATH)/libutils.a
-FPGAHALLIB = $(LIB_PATH)/libfpga_hal_mbox.a $(LIB_PATH)/libfpga_hal_reg.a $(LIB_PATH)/libfpga_hal_plat.a
-LIBS=$(UTILLCDLIB) $(FPGAHALLIB)
+LIBS=$(UTILLCDLIB)
 VTAG_XVC_SRC = virtual_jtag_pcie.c virtual_jtag_server.c
 
 SRC = fpga_local_cmd.c fpga_local_cmd_parse.c $(VTAG_XVC_SRC)
