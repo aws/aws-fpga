@@ -23,7 +23,6 @@ else
 endif
 
 
-#export SH_VER = shell_v02221781
 export SCRIPTS_DIR = $(PWD)
 export XILINX_IP = $(HDK_SHELL_DIR)/design/ip
 export SH_LIB_DIR = $(HDK_SHELL_DIR)/design/lib
