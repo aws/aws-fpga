@@ -10,14 +10,14 @@ module test_null();
    initial begin
       int exit_code;
       
-      tb.sh.power_up();
+      tb.power_up();
 
       
       tb.test_main(exit_code);
       
       #50ns;
 
-      tb.sh.power_down();
+      tb.power_down();
       
       $finish;
    end
