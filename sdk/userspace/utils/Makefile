@@ -31,4 +31,4 @@ $(UTILLIB): $(OBJ)
 	ar rcs $(UTILLIB) $(OBJ)
 
 clean:
-	rm -f *.o *.a 
+	rm -f *.o *.a $(UTILLIB)
