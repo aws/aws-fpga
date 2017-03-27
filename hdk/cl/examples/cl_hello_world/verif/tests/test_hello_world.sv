@@ -39,7 +39,7 @@ logic [15:0] vled_value;
       else
         $display ("Test FAILED");
 
-      tb.peek(.addr(`VLED_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read
+      tb.peek_ocl(.addr(`VLED_REG_ADDR), .data(rdata));         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
       if (rdata == 32'h0000_BEEF) // Check for LED register read
@@ -53,7 +53,7 @@ logic [15:0] vled_value;
 
       tb.kernel_reset();
 
-      tb.power_down(.slot_id(1));
+      tb.power_down();
       
       $finish;
    end
