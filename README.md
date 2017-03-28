@@ -97,10 +97,13 @@ $ cd $CL_DIR/build/checkpoints/to_aws           # Step 8:  This directory includ
 $ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (choose a unique bucket name)
 $ aws s3 cp *.Developer_CL.tar \                # Step 10: Upload the file to S3
          s3://<bucket-name>/
-$ aws ec2 create-fpga-image \                   # Step 11: Ingest the generated DCP to create an AFI  
-        --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
-        --name MyFirstDCP \ 
-        --logs-storage-location Bucket=<bucket-name>,Key=logs/
+$ create-fpga-image \                           # Step 11: Ingest the generated DCP to create an AFI
+        --afi-name <afi-name> \
+	--afi-description <afi-description> \
+	--dcp-bucket <dcp-bucket-name> \
+	--dcp-key <tarball-name> \
+	--logs-bucket <logs-bucket-name> \
+	--logs-key <logs-folder>
 ```
 **NOTE**: The DCP generation (`Step 7` above) can take up to several hours to complete.  We recommend to initiate the generation in a way that prevents interruption.  For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.  
 
