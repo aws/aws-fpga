@@ -69,15 +69,16 @@ No. There is no mechanism for loading a bitstream directly onto the FPGAs of an 
 
 Yes, on-premises tools can be used to develop the Design Checkpoint needed for creating an AFI. The developer needs to download HDK can be downloaded from GitHub and run on any local machine. 
 
-If a developer uses local tools and license, the exact Xilinx Vivado tool version specified in the HDK and FPGA Developer AMI will need to be used. [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
+If a developer uses local tools and license, please check the [supported versions of Vivado](./hdk/supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
 
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If the developer uses the FPGA Developer AMI provided by AWS on [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
+If the developer uses the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
 
-If the developer want to run on other instances or local machine, the developer is responsible for obtaining any necessary licenses. 
+If the developer want to run using other methods or on a local machine, the developer is responsible for obtaining any necessary licenses. 
+Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
 
@@ -132,14 +133,12 @@ Yes, examples are in the [examples directory](./hdk/cl/examples):
 
 The [cl_hello_world example](./hdk/cl/examples/cl_hello_world) is an RTL/Verilog simple example to build and test the Custom Logic development process, it does not use any of the external interfaces of the FPGA except the PCIe to "peek" and "poke" registers in the memory space of the CL inside the FPGA.
 
-The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides an expanded that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
+The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides expanded features that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
 
 
 **Q: How do I get access to AWS FPGA Developer AMI?**
 
-Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will receive permission and notifications via email.  
-
-Once you get access to the FPGA Developer AMI, we suggest you read the the README file within the FPGA Developer AMI for more details.
+[FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
 **Q: Where do I go for support?**
 
@@ -179,7 +178,7 @@ Neither: AWS Marketplace customers that pick up an AMI with one our more AFIs as
 ##Instance
 **Q: What OS can run on the F1 instance?**
 
-Amazon Linux and CentOS 7 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
+Amazon Linux 2016.09 and CentOS 7.3 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
 
 
 
@@ -279,7 +278,7 @@ Yes. Vivado HLS and SDAccel are directly supported through the FPGA Developer AM
 The FPGA Developer AMI has built-in support for the Xilinx XSIM simulator. All licensing and software for XSIM is included in the
 FPGA Developer AMI when launched. 
 
-Support for other simulators is included through the bring-your-own license in the license manager for the
+Support for other simulators is included through the bring-your-own license in the
 FPGA Developer AMI. AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim, and Cadence Incisive. Licenses for these simulators must be acquired by the developer and not available with AWS FPGA Developer AMI.
 
 
@@ -348,7 +347,6 @@ Yes. The only way to interface to PCIe and the instance CPU is using the AWS She
 **Q: Is a simulation model of the AWS Shell available?**
 
 Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common tree](./hdk/common/verif) for more information on the Shell simulation model.
-
 
 
 **Q: What resources within the FPGA does the AWS Shell consume?**

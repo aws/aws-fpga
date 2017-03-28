@@ -481,7 +481,7 @@ There are some miscellaneous generic signals between the Shell and CL.
 
 The 64-bit ch_sh_id0/id1 are used by AWS to validate the signature of the DCP while being loaded into an FPGA in AWS.
 
-Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID (which are used during AFI registerion via `aws ec2 create-fpga-image` API) as the Integrity check mechanism, following the next mapping
+Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID (which are used during AFI registration via `aws ec2 create-fpga-image` API) as the Integrity check mechanism, following the next mapping
 
 -   cl_sh_id0
 
