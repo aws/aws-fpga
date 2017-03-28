@@ -9,7 +9,7 @@ The [scripts] (./scripts) contains a script used to notify a developer that thei
 
 ## /shell_stable
 
-The shell_stable soft link points to the shell version contained in this directory that is the current, qualified shell version that can be used by developers. Other shell versions are available for use, but may either be older, or exploratory.
+The shell_stable soft link points to the shell version contained in this directory that is the current, qualified shell version that can be used by developers. Other shell versions may be available for reference but they are likely older, or exploratory.
 
 ## /shell_v#\#\#\#\#\#\#\# #
 
