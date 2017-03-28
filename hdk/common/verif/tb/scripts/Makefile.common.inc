@@ -28,3 +28,5 @@ $(SV_TEST_LIST):
 $(C_TEST_LIST):
 	make C_TEST=$(*F)
 
+make_sim_dir:
+	mkdir -p $(SIM_ROOT)

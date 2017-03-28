@@ -23,16 +23,15 @@ else
 endif
 
 
-export SH_VER = shell_v02221781
 export SCRIPTS_DIR = $(PWD)
-export XILINX_IP = $(HDK_COMMON_DIR)/$(SH_VER)/design/ip
-export SH_LIB_DIR = $(HDK_COMMON_DIR)/$(SH_VER)/design/lib
-export SH_INF_DIR = $(HDK_COMMON_DIR)/$(SH_VER)/design/interfaces
+export XILINX_IP = $(HDK_SHELL_DIR)/design/ip
+export SH_LIB_DIR = $(HDK_SHELL_DIR)/design/lib
+export SH_INF_DIR = $(HDK_SHELL_DIR)/design/interfaces
 
 SV_TEST_LIST = test_hello_world
 C_TEST_LIST  = test_hello_world.c
 
-all:	compile run
+all:	make_sim_dir compile run
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.common.inc
 

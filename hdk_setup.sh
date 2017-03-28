@@ -1,3 +1,18 @@
+# Amazon FGPA Hardware Development Kit
+# 
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+# 
+#    http://aws.amazon.com/asl/
+# 
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+#
 # Script must be sourced from a bash shell or it will not work
 # When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
 # When being run $0 and $_ will be the same.
@@ -130,6 +145,9 @@ export HDK_COMMON_DIR=$HDK_DIR/common
 export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
 hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
 
+export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
+PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
+
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
@@ -143,6 +161,9 @@ hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
 s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 # Download the sha256
+if [ ! -e $hdk_shell_dir ]; then
+	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
+fi
 # Use curl instead of AWS CLI so that credentials aren't required.
 curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
 if grep -q '<?xml version' $hdk_shell.sha256; then
