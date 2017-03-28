@@ -191,7 +191,7 @@ into the given `fpga-image-slot`.
    * The AFI Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
    * The Amazon FPGA Image Tools require `sudo` or `root` access level since AFI loads and clears are modifying the underlying system hardware.
    * `sudo` or `root` privilege is also required since the tools access the sysfs PCI subsystem and `/dev/kmsg` for `dmesg` logging.
-   * For more information on the Amazon FPGA Image Management Tool software and FPGA hardware see [AFI Management Tools readme](https://github.com/aws/aws-fpga/blob/master/sdk/management/fpga_image_tools/README.md#amazon-fpga-image-afi-management-tools).
+   * For more information on the Amazon FPGA Image Management Tool software and FPGA hardware see [AFI Management Tools readme](https://github.com/aws/aws-fpga/blob/master/sdk/management/fpga_mgmt_tools/README.md#amazon-fpga-image-afi-management-tools).
 
 * **Q: Can the AFI Management Tools work concurently on multiple FPGA image slots?**
    * The tools can be executed on multiple FPGAs concurrently.  This may be done without synchronization between processes that are using the tools.

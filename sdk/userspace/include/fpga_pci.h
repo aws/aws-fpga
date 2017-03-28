@@ -21,7 +21,7 @@
 
 /**
  * FPGA_PCI_BARS_MAX:
- *  -compile time tunable via mkall_fpga_image_tools.sh, with the below default.
+ *  -compile time tunable via mkall_fpga_mgmt_tools.sh, with the below default.
  *  -set this to the max number of FPGA BARs that the application plans
  *   to attach at any one time.
  *  -the upper limit is FPGA_SLOT_MAX * FPGA_BARS_MAX.

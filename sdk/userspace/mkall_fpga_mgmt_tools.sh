@@ -71,5 +71,5 @@ build_exec
 BUILD_DIR="fpga_libs/fpga_mgmt"
 build_exec
 
-BUILD_DIR="fpga_image_tools/src"
+BUILD_DIR="fpga_mgmt_tools/src"
 build_exec
