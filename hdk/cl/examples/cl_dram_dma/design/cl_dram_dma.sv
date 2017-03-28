@@ -14,6 +14,12 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+//This enables encryption to mask LUT logic viewing – DO NOT REMOVE
+(* secure_config="PROTECT" *)
+
+//This enables encryption to encrypt netlists generated for this design – DO NOT REMOVE
+(* secure_netlist="ENCRYPT" *)
+
 module cl_dram_dma #(parameter NUM_DDR=4) 
 
 (
