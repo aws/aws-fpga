@@ -78,7 +78,7 @@ If a developer uses local tools and license, please check the [supported version
 If the developer uses the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
 
 If the developer want to run using other methods or on a local machine, the developer is responsible for obtaining any necessary licenses. 
-Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/on_premise_licensing_help.md)
+Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
 
