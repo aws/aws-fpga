@@ -247,15 +247,18 @@ command_describe(void)
 	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
 	fail_on(ret, err, "Unable to describe local image");
 
+
 	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion\n");         
+		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion\n");
 	}
 
 	char *afi_id = (!info.ids.afi_id[0]) ? "none" : info.ids.afi_id;
 	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
-	printf("  %-8s         %2u        0x%08x\n", 
-			FPGA_STATUS2STR(info.status), info.status, info.sh_version); 
+	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n", 
+			FPGA_STATUS2STR(info.status), info.status, 
+			FPGA_ERR2STR(info.status_q), info.status_q, 
+			info.sh_version);
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
