@@ -44,7 +44,7 @@ The [SDK directory](./sdk) includes the runtime environment required to run on E
 
 [SDK readme](./sdk/README.md)
 
-[Access FPGA From Linux Applications](./hdk/docs/Programmers_View.md)
+[Access FPGA From Linux Applications](./hdk/docs/Programmer_View.md)
 
 [AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
 
