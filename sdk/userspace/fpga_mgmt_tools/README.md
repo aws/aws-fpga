@@ -162,14 +162,23 @@ The following FPGA image hardware metrics are provided. PCIe related counters co
    * The CustomLogic violated the AXI-4 protocol.  (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
    * Specific AXI-4 protocol violation status indicators are listed below: 
      * pcim-axi-protocol-4K-cross-error
+       * AXI Requests on PCIM AXI bus crosses 4K boundary
      * pcim-axi-protocol-bus-master-enable-error
+       * AXI Requests on PCIM AXI bus are initiated when PCIE bus-master-enable is not enabled
      * pcim-axi-protocol-request-size-error
+       * PCIE Core request violates PCIE max-payload-size (writes) or max-read-req-size (reads). This error cannot be triggered by errors on the PCIM AXI bus
      * pcim-axi-protocol-write-incomplete-error
+       * For AXI Write Requests on PCIM AXI bus, WLAST was asserted pre-maturely or WLAST was not asserted for the last wdata beat 
      * pcim-axi-protocol-first-byte-enable-error
+       * AXI Requests on PCIM AXI bus has illegal first-byte-enable.
      * pcim-axi-protocol-last-byte-enable-error
+       * AXI Requests on PCIM AXI bus has illegal last-byte-enable
      * pcim-axi-protocol-bready-error
+       * For AXI Requests on PCIM AXI bus, timeout waiting for BREADY to be asserted by master (CL) after BVALID is asserted by the slave (SH)
      * pcim-axi-protocol-rready-error
+       * For AXI Requests on PCIM AXI bus, timeout waiting for RREADY to be asserted by master (CL) after RVALID is asserted by the slave (SH)
      * pcim-axi-protocol-wchannel-error
+       * For AXI Write Requests on PCIM AXI bus, timeout waiting for WVALID to be asserted by master (CL) 
    
 * `pcim-axi-protocol-error-addr` (64-bit)
    * The first address that triggered a `pm-axi-protocol-error-count` event.
