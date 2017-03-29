@@ -87,8 +87,8 @@ functional CL implementation. Each example includes:
 
 In summary:
 
-- An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on premise.
-- The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.
+- An AFI can be created using the files in #1, #2, and #3. The AFI creation can take place on any EC2 instance or on premise.
+- The AFI can be used in an EC2 F1 instance by using the files in #4, #5 and #6.
 
 By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
 
@@ -97,7 +97,7 @@ By following the example CLs, a developer will learn how to interface to the AWS
 * AWS FPGA HDK and SDK run in Linux environment only.
 * If you can not access GitHub repository, please request access permission from your AWS representative.
 * The build stage uses Xilinx's Vivado tool set. You should have an installed Vivado that is supported.  Please check for [supported versions of Vivado](./hdk/supported_vivado_versions.txt). [Release Notes](./RELEASE_NOTES.md) may contain additional information.
-* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region. 
+* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region.  Please refer to [AWS documentation for help with configuring the AWS CLI.](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)   
 
 The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 FPGA instance.
 
