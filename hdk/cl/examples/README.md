@@ -206,10 +206,10 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       none                    cleared           1        <shell_version>
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       none                    cleared           1        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 
@@ -220,10 +220,10 @@ Now, let us try loading your AFI to FPGA `slot 0`:
 Now, you can verify that the AFI was loaded properly:
 
     $ sudo fpga-describe-local-image -S 0 -H
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       <AGFI_ID>               loaded            0        <shell_version>
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       <AGFI_ID>               loaded            0        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 ## 6. Validating using the CL Example Software
 

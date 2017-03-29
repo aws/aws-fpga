@@ -168,7 +168,7 @@ These parameters are used to control which DDR controllers are impemented in the
 
 There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
--   Management PF – This PF is used for management of the FPGA using the [FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md), [FPGA Management Libraries](../../sdk/userspace/include/), and various control functions like Virtual-LED, Virtual-DIPSwitch, [Virtual JTAG](./Virtual_JTAG_XVC.md), and including monitoring FPGA metrics and performing AFI management actions.
+-   Management PF – This PF is used for management of the FPGA using the [FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md), [FPGA Management Libraries](../../sdk/userspace/include/), and various control functions like Virtual-LED, Virtual-DIPSwitch, [Virtual JTAG](./Virtual_JTAG_XVC.md), and including monitoring FPGA metrics and performing AFI management actions.
 
 -   Application PF (AppPF)– The AppPF is used for CL specific functionality.
 
@@ -179,7 +179,7 @@ Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more deta
 <a name="management_pf"></a>
 ## Management PF (MgmtPF)
 
-The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used for [AWS FPGA Management Tools](../../sdk/userspace/fpga_image_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ application, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
+The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used for [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ application, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
 
 The Management PF exposes:
 

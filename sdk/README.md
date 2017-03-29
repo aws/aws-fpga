@@ -2,7 +2,7 @@
 
 This directory includes the drivers and runtime environment required by any EC2 FPGA Instance. The drivers and tools are used to interact with pre-built AFIs that are loaded to EC2 FPGA Instance FPGAs.
 
-The [SDK management directory](./userspace) contains the [Amazon FPGA Image (AFI) Management Tools](./userspace/fpga_image_tools/README.md), which includes both the source code to the AFI Management Tools as well as detailed descriptions of the commands to use on an F1 instance.
+The [SDK userspace directory](./userspace) contains the [Amazon FPGA Image (AFI) Management Tools](./userspace/fpga_mgmt_tools/README.md), which includes both the source code to the AFI Management Tools as well as detailed descriptions of the commands to use on an F1 instance.
 
 The SDK is **NOT** used to build or register AFI, rather it is only used for managing and deploying pre-built AFIs. For building and registering AFIs, please refer to the [HDK](../hdk/README.md).
 
@@ -19,7 +19,7 @@ You can setup and install the SDK with the following few steps.  Note that the f
     $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
 
 
-**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./sdk/management/fpga_image_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
+**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./userspace/fpga_mgmt_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
 
 ```
 $ sudo yum groupinstall -y “Development Tools"

@@ -150,7 +150,7 @@ To be notified on important messages, posts you will need to click the “Watch 
 
 **Q: Is there any software I need on my F1 instance that will use the AFI?**
 
-The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_image_tools). This software manages loading and clearing AFIs for FPGAs in the instance. It also allows developers to retrieve status on the FPGAs from within the instance. Users will want to load to F1 AMI the drivers and runtime libraries needed for their application.
+The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_mgmt_tools). This software manages loading and clearing AFIs for FPGAs in the instance. It also allows developers to retrieve status on the FPGAs from within the instance. Users will want to load to F1 AMI the drivers and runtime libraries needed for their application.
 
 Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope.
 
@@ -196,7 +196,7 @@ The second is the capability for developers to create their own DMA engine in th
 
 There are two types of interface from the host (instance) CPU to the FPGA:
 
-The first is the FPGA Image Management Tools. These APIs are detailed in the [SDK portion](./sdk/userspace/fpga_image_tools) of the GitHub repository. FPGA Image Management Tools include APIs to load, clear, and get status of the FPGA. 
+The first is the FPGA Image Management Tools. These APIs are detailed in the [SDK portion](./sdk/userspace/fpga_mgmt_tools) of the GitHub repository. FPGA Image Management Tools include APIs to load, clear, and get status of the FPGA. 
 
 The second type of interface is direct address access to the Application PCIe Physical Functions (PF) of the FPGA. There is no API for this access. Rather, there is direct access to resources in the Custom Logic (CL) region or Shell that can be accessed by software written on the instance. For example, the ChipScope software uses address space in a PF to provide FPGA debug support. Developers can create any API to the resources in their CL. See the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details on the address space mapping as seen from the instance.
 
@@ -204,7 +204,7 @@ The second type of interface is direct address access to the Application PCIe Ph
 
 **Q: Can I integrate the FPGA Image Management Tools in my application?**
 
-Yes, In addition to providing the [FPGA Management Tools](./sdk/userspace/fpga_image_tools) as linux shell commands, the [SDK Userspace](./sdk/userspace) directory includes files in the `include` and `hal` to integrate the FPGA Management Tools into the developer's application(a) and  avoid calling linux shell commands.
+Yes, In addition to providing the [FPGA Management Tools](./sdk/userspace/fpga_mgmt_tools) as linux shell commands, the [SDK Userspace](./sdk/userspace) directory includes files in the `include` and `hal` to integrate the FPGA Management Tools into the developer's application(a) and  avoid calling linux shell commands.
 
 
 
@@ -216,7 +216,7 @@ Both. The FPGA PCIe memory address space can be mmap() to both kernel and usersp
 
 **Q: How do I change what AFI is loaded in an FPGA?**
 
-Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./sdk/userspace/fpga_image_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
+Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
 
 
 
