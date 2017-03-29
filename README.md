@@ -7,7 +7,7 @@
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [Building an example AFI] (#buildingAnExample)
+2. [Building an example AFI](#buildingAnExample)
     - [Prerequisites](#buildingafiprereq)
     - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
@@ -73,9 +73,9 @@ AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketpla
 # Building a Custom Logic AFI for AWS FPGA instances
 
 The developer can build their own Custom Logic (CL) and deploy it on AWS.
-The CL must comply with the [AWS Shell specifications](../../docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
+The CL must comply with the [AWS Shell specifications](./hdk/docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
 
-The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
+The [CL Examples directory](./hdk/cl/examples) is provided to assist developers in creating a
 functional CL implementation. Each example includes:
 
 1. The design source code for the example under the `/design` directory.
@@ -90,7 +90,7 @@ In summary:
 - An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on premise.
 - The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.
 
-By following the example CLs, a developer should learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load an AFI from the F1 instance for use.
+By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
 
 <a name="buildingafiprereq"></a>
 ### Prerequisites
