@@ -7,8 +7,7 @@
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [Overview] (#overview)
-    - [Building an example AFI](#buildingAnExample)
+2. [Building an example AFI] (#buildingAnExample)
     - [Prerequisites](#buildingafiprereq)
     - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
@@ -70,11 +69,8 @@ AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketpla
 * To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
  
-<a name="overview"></a>
-# Overview 
-
 <a name="buildingAnExample"></a>
-## Building a Custom Logic AFI for AWS FPGA instances
+# Building a Custom Logic AFI for AWS FPGA instances
 
 The developer can build their own Custom Logic (CL) and deploy it on AWS.
 The CL must comply with the [AWS Shell specifications](../../docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
