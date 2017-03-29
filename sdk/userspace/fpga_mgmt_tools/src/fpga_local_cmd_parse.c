@@ -46,9 +46,12 @@ static const char *opcode_str_usage[] = {
 	"     This program is normally executed via the wrapper scripts.",
 	"     See fpga-load-local-image, fpga-clear-local-image,",
 	"     fpga-describe-local-image, fpga-describe-local-image-slots.",
+	"     fpga-start-virtual-jtag, fpga-get-virtual-led",
+	"     fpga-get-virtual-dip-switch, fpga-set-virtual-dip-switch",
 	"  GENERAL OPTIONS",
 	"     LoadFpgaImage, ClearFpgaImage, DescribeFpgaImage,",
-	"     DescribeFpgaImageSlots",
+	"     DescribeFpgaImageSlots, StartVirtualJtag, GetVirtualLED,",
+	"     GetVirtualDIP, SetVirtualDIP",
 };
 
 static const char *describe_afi_slots_usage[] = {
@@ -298,6 +301,26 @@ print_version(void)
 }
 
 /**
+ * Check the given option and set the f1.parser_completed flag.
+ *
+ * -parser_completed is set when the parser will complete the option 
+ *  (help or version output) and no further command processing is necessary, 
+ *  though a non-zero return value is still returned from parse_args.
+ * -the parser_completed flag may then be used to skip the "Error" output
+ *  that is generically used for parsing or other errors beyond the parsing 
+ *  stage.
+ *
+ * @param[in]	opt		the option to check
+ */
+static void 
+get_parser_completed(char opt)
+{
+	if ((opt == 'h') || (opt == '?') || (opt == 'V')) {
+		f1.parser_completed = true;
+	}
+}
+
+/**
  * Configure the request timeout
  *
  * @param[in]   timeout		timeout in seconds
@@ -386,9 +409,11 @@ parse_args_load_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -449,9 +474,11 @@ parse_args_clear_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -527,9 +554,11 @@ parse_args_describe_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -584,6 +613,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		case 'M': {
@@ -591,6 +621,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			break;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -656,9 +687,11 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -713,9 +746,11 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -768,9 +803,11 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -846,10 +883,12 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}

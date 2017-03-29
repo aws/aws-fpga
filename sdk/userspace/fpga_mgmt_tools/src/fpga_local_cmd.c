@@ -521,7 +521,13 @@ main(int argc, char *argv[])
 	ret = cli_main();
 	fail_on_quiet(ret != 0, err, "cli_main failed");
 err:
-	if (ret) {
+	/** 
+	 * f1.no_error may be set by parse_args when it internally completes the 
+	 * command without error due to help or version output.
+	 * In this case a non-zero error is returned by parse_args and we do not
+	 * want to print the "Error" below.
+	 */
+	if (ret && !f1.parser_completed) {
 		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
 	}
 	cli_detach();
