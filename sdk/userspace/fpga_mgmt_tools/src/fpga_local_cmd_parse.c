@@ -86,6 +86,12 @@ static const char *describe_afi_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image.",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -M  --metrics",
+	"          Return FPGA image hardware metrics.",
+	"          Examples: FPGA PCI and DDR metrics.",
+	"      -C  --clear-metrics",
+	"          Return FPGA image hardware metrics (clear on read).",
+	"          Examples: FPGA PCI and DDR metrics.",
 	"      -R  --rescan",
 	"          Rescan the AFIDEVICE to update the per-AFI PCI VendorId and",
 	"          DeviceId that may be dynamically modified due to a",
@@ -475,6 +481,8 @@ parse_args_describe_afi(int argc, char *argv[])
 
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
+		{"metrics",				no_argument,		0,	'M' },
+		{"clear-metrics",		no_argument,		0,	'C' },
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"rescan",				no_argument,		0,	'R'	},
 		{"headers",				no_argument,		0,	'H'	},
