@@ -50,7 +50,7 @@ The following new features are included in this HDK release:
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 
-* [New Shell Stable: 0x032117b1](./hdk/common/shell_stable)
+* [New Shell Stable: 0x032117d7](./hdk/common/shell_stable)
 * cl_ports.vh have the updated port list 
 * Removed all the `ifdef and `ifndef from the cl_ports.vh
 * Added all the interfaces required for SDAccel platform support 
@@ -315,6 +315,7 @@ This release fixes (HDK 1.1.0, Shell 0x0222....) fixes the following issues in p
 * Aurora and Reliabile Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
+* All AXI-4 interfaces (PCIM, DDR4) do not support AxSIZE other than 0b110 (64B)
 
 ## Supported Tools and Environment
 
