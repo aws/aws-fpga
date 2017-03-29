@@ -64,7 +64,10 @@ void fpga_mgmt_set_cmd_delay_msec(uint32_t value);
  * fpga_mgmt_describe_local_image.
  */
 struct fpga_mgmt_image_info {
+	/** FPGA status: see FPGA_STATUS_XYZ in fpga_common.h */
 	int status;
+	/** FPGA status qualifier: see FPGA_ERR_XYZ in fpga_common.h */
+	int status_q;
 	int slot_id;
 	struct fpga_meta_ids  ids;
 	struct fpga_slot_spec spec;
@@ -85,14 +88,18 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags);
 
 /**
- * Gets the status of an FPGA. Status values are defined in enum fpga_status.
+ * Gets the status of an FPGA. 
+ *
+ * Status values are defined in fpga_common.h, see FPGA_STATUS_XYZ.
+ * Status qualifier values are defined in fpga_common.h, see FPGA_ERR_XYZ.
  * If you need the AFI id at the same time, use fpga_mgmt_describe_local_image.
  *
- * @param[in]  slot_id  the logical slot index
- * @param[out] status   populated with status value
+ * @param[in]  slot_id    the logical slot index
+ * @param[out] status     populated with status value
+ * @param[out] status_q   populated with status qualifier value
  * @returns 0 on success, non-zero on error
  */
-int fpga_mgmt_get_status(int slot_id, int *status);
+int fpga_mgmt_get_status(int slot_id, int *status, int *status_q);
 
 /**
  * Maps status codes provided by fpga_mgmt_get_status to a human readable

@@ -82,6 +82,7 @@ int fpga_mgmt_describe_local_image(int slot_id,
 
 	/* translate the response structure to the API structure */
 	info->status = metrics->status;
+	info->status_q = metrics->status_q;
 	info->slot_id = slot_id;
 
 	char *afi_id = (!metrics->ids.afi_id[0]) ? "none" : metrics->ids.afi_id;
@@ -104,7 +105,7 @@ out:
 	return ret;
 }
 
-int fpga_mgmt_get_status(int slot_id, int *status)
+int fpga_mgmt_get_status(int slot_id, int *status, int *status_q)
 {
 	int ret;
 	struct fpga_mgmt_image_info info;
@@ -121,6 +122,7 @@ int fpga_mgmt_get_status(int slot_id, int *status)
 	fail_on(ret, out, "fpga_mgmt_describe_local_image failed");
 
 	*status = info.status;
+	*status_q = info.status_q;
 out:
 	return ret;
 }
