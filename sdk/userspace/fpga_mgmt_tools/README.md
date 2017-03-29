@@ -126,7 +126,7 @@ Additionally, the `fpga-describe-local-image` **`clear-metrics`** option may be 
 
 ##### Supported Metrics
 
-The following FPGA image hardware metrics are provided. PCIe related counters have `pcis` or `pcim` prefix which indicates a PCIe slave access (the instance CPU or other FPGAs accessing this FPGA) or PCIe master access (the FPGA is mastering an outbound transaction toward the instance memory or other FPGAs).
+The following FPGA image hardware metrics are provided. PCIe related counters contain the `pcis` or `pcim` prefix which indicates a PCIe slave access (the instance CPU or other FPGAs accessing this FPGA) or PCIe master access (the FPGA is mastering an outbound transaction toward the instance memory or other FPGAs).
 
 * `sdacl-slave-timeout-count` (32-bit)
   * The CustomLogic (CL) did not respond to SDACL read access from the instance. In most cases this indicated a design flaw in the AFI.
