@@ -7,10 +7,10 @@
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [Quick Start] (#quickstart)
+2. [Overview] (#overview)
     - [Building an example AFI](#buildingAnExample)
-    - [Using an AFI on EC2 FPGA instace](#usingAfi)
-    - [Starting a new CL](#clExamples)
+    - [Prerequisites](#buildingafiprereq)
+    - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
 <a name="devkit"></a>
 # AWS EC2 FPGA Hardware and Software Development Kits 
