@@ -46,7 +46,7 @@ The [SDK directory](./sdk) includes the runtime environment required to run on E
 
 [Access FPGA From Linux Applications](./hdk/docs/Programmers_View.md)
 
-[AFI Management Tools](./sdk/management/fpga_mgmt_tools/README.md)
+[AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
 
 <a name="fpgasdaccel"></a>
 ## SDAccel - Comming soon

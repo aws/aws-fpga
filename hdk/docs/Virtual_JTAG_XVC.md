@@ -21,7 +21,7 @@
 
 EC2 FPGA platforms supports Virtual JTAG capability, by emulating JTAG over PCIe
 
-To take advantage of this capability, [AWS FPGA Management Tools](./../../sdk/management/fpga_mgmt_tools/README.md) enables running an in-target service (in Linux userspace), implementing Xilinx Virtual Cable (XVC) protocol, which allows (local or remote) Vivado to connect to a target FPGA for debug leveraging standard Xilinx standard debug cores like [Integrated Logic Analyzer - ILA](https://www.xilinx.com/products/intellectual-property/ila.html), [Virtual Input/Output - VIO](https://www.xilinx.com/products/intellectual-property/vio.html), and others. 
+To take advantage of this capability, [AWS FPGA Management Tools](./../../sdk/userspace/fpga_mgmt_tools/README.md) enables running an in-target service (in Linux userspace), implementing Xilinx Virtual Cable (XVC) protocol, which allows (local or remote) Vivado to connect to a target FPGA for debug leveraging standard Xilinx standard debug cores like [Integrated Logic Analyzer - ILA](https://www.xilinx.com/products/intellectual-property/ila.html), [Virtual Input/Output - VIO](https://www.xilinx.com/products/intellectual-property/vio.html), and others. 
 
 Traditionally, a physical JTAG connection is used to debug FPGAs.  AWS has developed a virtual JTAG, leveraging Xilinx XVC, for a debug flow that enables debug in the cloud.
 
