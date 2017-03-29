@@ -69,15 +69,16 @@ No. There is no mechanism for loading a bitstream directly onto the FPGAs of an 
 
 Yes, on-premises tools can be used to develop the Design Checkpoint needed for creating an AFI. The developer needs to download HDK can be downloaded from GitHub and run on any local machine. 
 
-If a developer uses local tools and license, the exact Xilinx Vivado tool version specified in the HDK and FPGA Developer AMI will need to be used. [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
+If a developer uses local tools and license, please check the [supported versions of Vivado](./hdk/supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
 
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If the developer uses the FPGA Developer AMI provided by AWS on [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
+If the developer uses the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
 
-If the developer want to run on other instances or local machine, the developer is responsible for obtaining any necessary licenses. 
+If the developer want to run using other methods or on a local machine, the developer is responsible for obtaining any necessary licenses. 
+Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
 
@@ -132,14 +133,12 @@ Yes, examples are in the [examples directory](./hdk/cl/examples):
 
 The [cl_hello_world example](./hdk/cl/examples/cl_hello_world) is an RTL/Verilog simple example to build and test the Custom Logic development process, it does not use any of the external interfaces of the FPGA except the PCIe to "peek" and "poke" registers in the memory space of the CL inside the FPGA.
 
-The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides an expanded that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
+The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides expanded features that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
 
 
 **Q: How do I get access to AWS FPGA Developer AMI?**
 
-Currently, the FPGA Developer AMI is private and you will need to be whitelisted. You will receive permission and notifications via email.  
-
-Once you get access to the FPGA Developer AMI, we suggest you read the the README file within the FPGA Developer AMI for more details.
+[FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
 **Q: Where do I go for support?**
 
@@ -151,7 +150,7 @@ To be notified on important messages, posts you will need to click the “Watch 
 
 **Q: Is there any software I need on my F1 instance that will use the AFI?**
 
-The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_image_tools). This software manages loading and clearing AFIs for FPGAs in the instance. It also allows developers to retrieve status on the FPGAs from within the instance. Users will want to load to F1 AMI the drivers and runtime libraries needed for their application.
+The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_mgmt_tools). This software manages loading and clearing AFIs for FPGAs in the instance. It also allows developers to retrieve status on the FPGAs from within the instance. Users will want to load to F1 AMI the drivers and runtime libraries needed for their application.
 
 Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope.
 
@@ -179,7 +178,7 @@ Neither: AWS Marketplace customers that pick up an AMI with one our more AFIs as
 ##Instance
 **Q: What OS can run on the F1 instance?**
 
-Amazon Linux and CentOS 7 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
+Amazon Linux 2016.09 and CentOS 7.3 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
 
 
 
@@ -197,7 +196,7 @@ The second is the capability for developers to create their own DMA engine in th
 
 There are two types of interface from the host (instance) CPU to the FPGA:
 
-The first is the FPGA Image Management Tools. These APIs are detailed in the [SDK portion](./sdk/userspace/fpga_image_tools) of the GitHub repository. FPGA Image Management Tools include APIs to load, clear, and get status of the FPGA. 
+The first is the FPGA Image Management Tools. These APIs are detailed in the [SDK portion](./sdk/userspace/fpga_mgmt_tools) of the GitHub repository. FPGA Image Management Tools include APIs to load, clear, and get status of the FPGA. 
 
 The second type of interface is direct address access to the Application PCIe Physical Functions (PF) of the FPGA. There is no API for this access. Rather, there is direct access to resources in the Custom Logic (CL) region or Shell that can be accessed by software written on the instance. For example, the ChipScope software uses address space in a PF to provide FPGA debug support. Developers can create any API to the resources in their CL. See the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details on the address space mapping as seen from the instance.
 
@@ -205,7 +204,7 @@ The second type of interface is direct address access to the Application PCIe Ph
 
 **Q: Can I integrate the FPGA Image Management Tools in my application?**
 
-Yes, In addition to providing the [FPGA Management Tools](./sdk/userspace/fpga_image_tools) as linux shell commands, the [SDK Userspace](./sdk/userspace) directory includes files in the `include` and `hal` to integrate the FPGA Management Tools into the developer's application(a) and  avoid calling linux shell commands.
+Yes, In addition to providing the [FPGA Management Tools](./sdk/userspace/fpga_mgmt_tools) as linux shell commands, the [SDK Userspace](./sdk/userspace) directory includes files in the `include` and `hal` to integrate the FPGA Management Tools into the developer's application(a) and  avoid calling linux shell commands.
 
 
 
@@ -217,7 +216,7 @@ Both. The FPGA PCIe memory address space can be mmap() to both kernel and usersp
 
 **Q: How do I change what AFI is loaded in an FPGA?**
 
-Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./sdk/userspace/fpga_image_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
+Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
 
 
 
@@ -279,7 +278,7 @@ Yes. Vivado HLS and SDAccel are directly supported through the FPGA Developer AM
 The FPGA Developer AMI has built-in support for the Xilinx XSIM simulator. All licensing and software for XSIM is included in the
 FPGA Developer AMI when launched. 
 
-Support for other simulators is included through the bring-your-own license in the license manager for the
+Support for other simulators is included through the bring-your-own license in the
 FPGA Developer AMI. AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim, and Cadence Incisive. Licenses for these simulators must be acquired by the developer and not available with AWS FPGA Developer AMI.
 
 
@@ -348,7 +347,6 @@ Yes. The only way to interface to PCIe and the instance CPU is using the AWS She
 **Q: Is a simulation model of the AWS Shell available?**
 
 Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common tree](./hdk/common/verif) for more information on the Shell simulation model.
-
 
 
 **Q: What resources within the FPGA does the AWS Shell consume?**

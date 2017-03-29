@@ -138,13 +138,36 @@ Below is a sample policy.
         ]
     }
 
-To create an AFI execute the `create-fpga-image` command as follows:
+You can verify that the bucket policy grants the required permissions by running the following script (which is also called by create-fpga-image):
+
+    $ check_s3_bucket_policy.py \
+	--dcp-bucket <dcp-bucket-name> \
+	--dcp-key <tarball-name> \
+	--logs-bucket <logs-bucket-name> \
+	--logs-key <logs-folder>
+
+To create an AFI execute the `create-fpga-image` script as follows:
+
+    $ create-fpga-image \
+        --afi-name <afi-name> \
+	--afi-description <afi-description> \
+	--dcp-bucket <dcp-bucket-name> \
+	--dcp-key <tarball-name> \
+	--logs-bucket <logs-bucket-name> \
+	--logs-key <logs-folder> \
+	[ --client-token <value> ] \
+	[ --dry-run | --no-dry-run ]
+
+This will check that the DCP has been uploaded, that you have granted AWS access to read the DCP, and that 
+you have granted AWS write permissions to the S3 logs folder. Then it will call the AWS CLI to create the AFI:
 
     $ aws ec2 create-fpga-image \
-        --input-storage-location Bucket=<bucket-name>,Key=<tarball-name> \
-        --name <cl-name> \
-        --description <description> \
-        --logs-storage-location Bucket=<bucket-name>,Key=logs/
+        --name <afi-name> \
+        --description <afi-description> \
+        --input-storage-location Bucket=<dcp-bucket-name>,Key=<tarball-name> \
+        --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
+	[ --client-token <value> ] \
+	[ --dry-run | --no-dry-run ]
 
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
@@ -183,10 +206,10 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       none                    cleared           1        <shell_version>
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       none                    cleared           1        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 
@@ -197,10 +220,10 @@ Now, let us try loading your AFI to FPGA `slot 0`:
 Now, you can verify that the AFI was loaded properly:
 
     $ sudo fpga-describe-local-image -S 0 -H
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       <AGFI_ID>               loaded            0        <shell_version>
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       <AGFI_ID>               loaded            0        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 ## 6. Validating using the CL Example Software
 

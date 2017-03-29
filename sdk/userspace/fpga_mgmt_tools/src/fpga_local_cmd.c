@@ -247,15 +247,18 @@ command_describe(void)
 	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
 	fail_on(ret, err, "Unable to describe local image");
 
+
 	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion\n");         
+		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion\n");
 	}
 
 	char *afi_id = (!info.ids.afi_id[0]) ? "none" : info.ids.afi_id;
 	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
-	printf("  %-8s         %2u        0x%08x\n", 
-			FPGA_STATUS2STR(info.status), info.status, info.sh_version); 
+	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n", 
+			FPGA_STATUS2STR(info.status), info.status, 
+			FPGA_ERR2STR(info.status_q), info.status_q, 
+			info.sh_version);
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
@@ -278,95 +281,88 @@ command_describe(void)
 		printf("sdacl-slave-timeout=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
 
-		printf("chipscope-timeout=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT) ?  1 : 0);
+		printf("virtual-jtag-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT) ?  1 : 0);
 
-		printf("pci-slave-timeout=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT) ?
+		printf("ocl-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT) ?
 				1 : 0); 
 
-		printf("pci-slave-sda-timeout=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT) ?
+		printf("bar1-slave-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT) ?
 				1 : 0); 
 
-		printf("pci-slave-ocl-timeout=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT) ?
+		printf("dma-pcis-timeout=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT) ?
 				1 : 0); 
 
-		printf("pci-slave-edma-timeout=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT) ?
+		printf("pcim-range-error=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR) ? 
 				1 : 0); 
 
-		printf("pci-range-error=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_RANGE_ERROR) ? 
+		printf("pcim-axi-protocol-error=%u\n", 
+				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-error=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR) ?
+		printf("pcim-axi-protocol-4K-cross-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-4K-cross-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
+		printf("pcim-axi-protocol-bus-master-enable-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BM_EN_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-bus-master-enable-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BM_EN_ERROR) ?
+		printf("pcim-axi-protocol-request-size-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_REQ_SIZE_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-request-size-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_REQ_SIZE_ERROR) ?
+		printf("pcim-axi-protocol-write-incomplete-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-write-incomplete-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ?
+		printf("pcim-axi-protocol-first-byte-enable-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-first-byte-enable-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ?
+		printf("pcim-axi-protocol-last-byte-enable-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-last-byte-enable-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
+		printf("pcim-axi-protocol-bready-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-bready-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
+		printf("pcim-axi-protocol-rready-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-rready-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ?
+		printf("pcim-axi-protocol-wchannel-error=%u\n", 
+				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
 				1 : 0); 
 
-		printf("pci-axi-protocol-wchannel-error=%u\n", 
-				(fmc->pci_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
-				1 : 0); 
+		printf("sdacl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_slave_timeout_addr); 
+		printf("sdacl-slave-timeout-count=%u\n", fmc->sdacl_slave_timeout_count); 
 
-		printf("sdacl-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_timeout_addr); 
-		printf("sdacl-timeout-count=%u\n", fmc->sdacl_timeout_count); 
+		printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr); 
+		printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count); 
 
-		printf("chipscope-timeout-addr=0x%" PRIx32 "\n", fmc->chipscope_timeout_addr); 
-		printf("chipscope-timeout-count=%u\n", fmc->chipscope_timeout_count); 
+		printf("ocl-slave-timeout-addr=0x%" PRIx64 "\n", fmc->ocl_slave_timeout_addr); 
+		printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count); 
 
-		printf("ps-timeout-addr=0x%" PRIx64 "\n", fmc->ps_timeout_addr); 
-		printf("ps-timeout-count=%u\n", fmc->ps_timeout_count); 
+		printf("bar1-slave-timeout-addr=0x%" PRIx64 "\n", fmc->bar1_slave_timeout_addr); 
+		printf("bar1-slave-timeout-count=%u\n", fmc->bar1_slave_timeout_count); 
 
-		printf("ps-sda-timeout-addr=0x%" PRIx64 "\n", fmc->ps_sda_timeout_addr); 
-		printf("ps-sda-timeout-count=%u\n", fmc->ps_sda_timeout_count); 
+		printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr); 
+		printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count); 
 
-		printf("ps-ocl-timeout-addr=0x%" PRIx64 "\n", fmc->ps_ocl_timeout_addr); 
-		printf("ps-ocl-timeout-count=%u\n", fmc->ps_ocl_timeout_count); 
+		printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr); 
+		printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count); 
 
-		printf("ps-edma-timeout-addr=0x%" PRIx64 "\n", fmc->ps_edma_timeout_addr); 
-		printf("ps-edma-timeout-count=%u\n", fmc->ps_edma_timeout_count); 
+		printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr); 
+		printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count); 
 
-		printf("pm-range-error-addr=0x%" PRIx64 "\n", fmc->pm_range_error_addr); 
-		printf("pm-range-error-count=%u\n", fmc->pm_range_error_count); 
-
-		printf("pm-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pm_axi_protocol_error_addr); 
-		printf("pm-axi-protocol-error-count=%u\n", fmc->pm_axi_protocol_error_count); 
-
-		printf("pm-write-count=%" PRIu64 "\n", fmc->pm_write_count); 
-		printf("pm-read-count=%" PRIu64 "\n", fmc->pm_read_count); 
+		printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count); 
+		printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count); 
 
 		for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
 			struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];

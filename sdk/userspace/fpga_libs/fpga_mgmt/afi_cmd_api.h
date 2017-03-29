@@ -85,7 +85,7 @@ union afi_err_info {
 
 /** Error response */
 struct afi_cmd_err_rsp {
-	/** See FPGA_ERR_XXX in fpga_common.h */
+	/** See FPGA_ERR_XYZ in fpga_common.h */
 	int32_t		error;
 	/** See afi_err_info */
 	uint8_t		error_info[];			
@@ -106,8 +106,10 @@ struct afi_cmd_metrics_req {
 /** Metrics AFI response */
 struct afi_cmd_metrics_rsp {
 	struct fpga_meta_ids	ids;
-	int32_t					status;		/**< see FPGA_STATUS_LOADED, fpga_common.h */
-	int32_t					status_q;	/**< FPGA status qualifier, see FPGA_ERR_XXX */
+    /** FPGA status: see FPGA_STATUS_XYZ in fpga_common.h */
+	int32_t					status;
+    /** FPGA status qualifier: see FPGA_ERR_XYZ in fpga_common.h */
+	int32_t					status_q;
 	struct fpga_metrics_common	fmc;
 } __attribute__((packed));
 

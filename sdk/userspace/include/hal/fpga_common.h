@@ -200,34 +200,33 @@ struct fpga_metrics_common {
 	/** See FPGA_INT_STATUS_XYZ below */
 	uint32_t int_status;
 	/** See FPGA_PAP_XYZ below */
-	uint32_t pci_axi_protocol_error_status;
-	/** FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT: address and count */
-	uint64_t ps_timeout_addr; 
-	uint32_t ps_timeout_count;
-	/** FPGA_INT_STATUS_PCI_RANGE_ERROR: address and count */
-	uint64_t pm_range_error_addr;
-	uint32_t pm_range_error_count;
-	/** FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR: address and count */
-	uint64_t pm_axi_protocol_error_addr;
-	uint32_t pm_axi_protocol_error_count;
-	/** FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT: address and count */
-	uint64_t ps_sda_timeout_addr;
-	uint32_t ps_sda_timeout_count;
-	/** FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT: address and count */
-	uint64_t ps_ocl_timeout_addr;
-	uint32_t ps_ocl_timeout_count;
-	/** FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT: address and count */
-	uint64_t ps_edma_timeout_addr;
-	uint32_t ps_edma_timeout_count;
+	uint32_t pcim_axi_protocol_error_status;
+	/** FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT: address and count */
+	uint64_t dma_pcis_timeout_addr;
+	uint32_t dma_pcis_timeout_count;
+	/** FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR: address and count */
+	uint64_t pcim_range_error_addr;
+	uint32_t pcim_range_error_count;
+	/** FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR: address and count */
+	uint64_t pcim_axi_protocol_error_addr;
+	uint32_t pcim_axi_protocol_error_count;
+	/** reserved */
+	uint8_t reserved2[12]; 
+	/** FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT: address and count */
+	uint64_t ocl_slave_timeout_addr;
+	uint32_t ocl_slave_timeout_count;
+	/** FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT: address and count */
+	uint64_t bar1_slave_timeout_addr;
+	uint32_t bar1_slave_timeout_count;
 	/** FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT: address and count */
-	uint32_t sdacl_timeout_addr;
-	uint32_t sdacl_timeout_count;
-	/** FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT: address and count */
-	uint32_t chipscope_timeout_addr;
-	uint32_t chipscope_timeout_count;
+	uint32_t sdacl_slave_timeout_addr;
+	uint32_t sdacl_slave_timeout_count;
+	/** FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT: address and count */
+	uint32_t virtual_jtag_slave_timeout_addr;
+	uint32_t virtual_jtag_slave_timeout_count;
 	/** PCI read and write counts */
-	uint64_t pm_write_count;
-	uint64_t pm_read_count;
+	uint64_t pcim_write_count;
+	uint64_t pcim_read_count;
 
 	/** FPGA DDR interface metrics */
 	struct fpga_ddr_if_metrics_common ddr_ifs[FPGA_DDR_IFS_MAX];
@@ -237,33 +236,30 @@ struct fpga_metrics_common {
 enum {
     /** SDACL slave timeout (CL did not respond to cycle from host) */
 	FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT = 1 << 0,
-	/** Chipscope timeout */
-    FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT = 1 << 1,
-	/** CL did not respond to cycle from host */
-	FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT = 1 << 17,
+	/** Virtual JTAG timeout */
+    FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT = 1 << 1,
+	/** CL did not respond to DMA cycle from host */
+	FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT = 1 << 17,
 	/** PCIe master cycle from CL out of range */
-	FPGA_INT_STATUS_PCI_RANGE_ERROR = 1 << 18,
+	FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR = 1 << 18,
 	/** PCIe master cycle from CL - dw_cnt and len mismatch */
-	FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR = 1 << 19,
-	/** CL SDA did not respond to cycle from host */
-	FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT = 1 << 27,
+	FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR = 1 << 19,
 	/** CL OCL did not respond to cycle from host */
-	FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT = 1 << 28,
-	/** CL EDMA did not respond to cycle from host */
-	FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT = 1 << 29,
+	FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT = 1 << 28,
+	/** CL BAR1 did not respond to cycle from host */
+	FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT = 1 << 29,
 
 	FPGA_INT_STATUS_ALL = 
 		FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT |
-		FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT |
-		FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT |
-		FPGA_INT_STATUS_PCI_RANGE_ERROR | 
-		FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR |
-		FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT |
-		FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT |
-		FPGA_INT_STATUS_PCI_SLAVE_EDMA_TIMEOUT,
+		FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR | 
+		FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR |
+		FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT,
 };
 
-/** Common pci_axi_protocol_error_status (PAP) */
+/** Common pcim_axi_protocol_error_status (PAP) */
 enum {
 	FPGA_PAP_4K_CROSS_ERROR = 1 << 1,
 	FPGA_PAP_BM_EN_ERROR = 1 << 2,

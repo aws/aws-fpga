@@ -54,14 +54,14 @@ Once you have the AFI Management Tools installed on your F1 instance, you can di
     $ sudo fpga-describe-local-image-slots -H
 
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
-    AFIDEVICE    1       0x1d0f      0x1042      0000:00:18.0
-    AFIDEVICE    2       0x1d0f      0x1042      0000:00:19.0
-    AFIDEVICE    3       0x1d0f      0x1042      0000:00:1a.0
-    AFIDEVICE    4       0x1d0f      0x1042      0000:00:1b.0
-    AFIDEVICE    5       0x1d0f      0x1042      0000:00:1c.0
-    AFIDEVICE    6       0x1d0f      0x1042      0000:00:1d.0
-    AFIDEVICE    7       0x1d0f      0x1042      0000:00:1e.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
+    AFIDEVICE    1       0x1d0f      0x1042      0000:00:11.0
+    AFIDEVICE    2       0x1d0f      0x1042      0000:00:13.0
+    AFIDEVICE    3       0x1d0f      0x1042      0000:00:15.0
+    AFIDEVICE    4       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    5       0x1d0f      0x1042      0000:00:19.0
+    AFIDEVICE    6       0x1d0f      0x1042      0000:00:1b.0
+    AFIDEVICE    7       0x1d0f      0x1042      0000:00:1d.0
 
 * The above list displayed the slots in an F1.16xl instance that has 8 FPGAs on slot 0 through 7.
 
@@ -79,10 +79,10 @@ The following command displays the current state for the given FPGA slot number.
 
     $ sudo fpga-describe-local-image -S 0 -H
 
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       none                    cleared           1        0x11241611
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       none                    cleared           1        ok               0       <shell version> 
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 #### Loading an AFI to a Specific FPGA Slot
 
@@ -92,14 +92,14 @@ To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parame
 
 #### Describing the AFI content loaded on a specific FPGA slot after load
 
-Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.
+Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
 
-    $ sudo fpga-describe-local-image -S 0 -H
+    $ sudo fpga-describe-local-image -S 0 -R -H 
     
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       agfi-0123456789abcdefg  loaded            0        0x11241611
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version> 
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
 
 #### Clearing the FPGA Image on Specific Slot
 
@@ -109,14 +109,14 @@ The following command will clear the FPGA image, including internal and external
 
 #### Describing the AFI content loaded on a specific FPGA slot after clear
 
-The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.
+The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.  The "-R" option performs a PCI device remove and recan in order to expose the default AFI Vendor and Device Id.
 
-    $ sudo fpga-describe-local-image -S 0 -H
+    $ sudo fpga-describe-local-image -S 0 -R -H
     
-    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ShVersion
-    AFI          0       none                    cleared           1        0x11241611
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       none                    cleared           1        ok               0       <shell version> 
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:17.0
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
 #### Looking at Metrics
 
@@ -176,7 +176,7 @@ into the given `fpga-image-slot`.
    * A DBDF is simply an acronym for Domain:Bus:Device.Function (also see PF). 
 
 * **Q: What is a PF?**
-   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessible by a user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:17.0`, **FPGA management PF** `0000:00:17.1`.  
+   * A PF refers to a PCI Physical Function that is exposed by the FPGA hardware.  For example, it is accessible by a user-space programs via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function`.  The `Domain:Bus:Device.Function` syntax is the same as returned from `lspci` program output.  Examples: **FPGA application PF** `0000:00:0f.0`, **FPGA management PF** `0000:00:10.0`.  
 
 * **Q: What is a BAR?**
    * A PCI Base Address Register (BAR) specifies the memory region where FPGA memory space may be accessed by an external entity (like the instance CPU or other FPGAs).  Multiple BARs may be supported by a given PCI device.  In this FAQ section (also see PF), BAR0 from a device may be accessed (for example) by opening and memory mapping the resource0 sysfs file in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/resource0`.  Once BAR0 has been memory mapped, the BAR0 registers may be accessed through a pointer to the memory mapped region (refer to the open and mmap system calls).
@@ -185,13 +185,12 @@ into the given `fpga-image-slot`.
    * Within the `fpga-describe-local-image-slots` and `fpga-describe-local-image` commands the AFIDEVICE represents the PCI PF that is used to communicate with the AFI.  The AFIDEVICE functionality exposed through the PF is dependent on the AFI that is loaded via the `fpga-load-local-image` command.  For example, DMA and/or memory-mapped IO (MMIO) may be supported depending on the loaded AFI, which is then used to communicate with the AFI in order to perform an accelerated application-dependent task within the FPGA.  User-space applications may access the AFIDEVICE PF through sysfs as is noted above in this FAQ section (also see PF).
 
 * **Q: How do the AFI Management Tools work?**
-   * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:17.1`) that is used for control channel communication between the instance and AWS.
+   * Within the F1 instance, the FPGAs expose a management PF (e.g. `0000:00:10.0`) that is used for control channel communication between the instance and AWS.
    * The FPGA management PF BAR0 is **reserved** for this communication path.
    * The FPGA application drivers **should not** access the FPGA management PF BAR0.
    * The AFI Management Tools memory map the FPGA management PF BAR0 and communicate with AWS using internally defined messages and hardware registers.
    * The Amazon FPGA Image Tools require `sudo` or `root` access level since AFI loads and clears are modifying the underlying system hardware.
    * `sudo` or `root` privilege is also required since the tools access the sysfs PCI subsystem and `/dev/kmsg` for `dmesg` logging.
-   * For more information on the Amazon FPGA Image Management Tool software and FPGA hardware see [AFI Management Tools readme](https://github.com/aws/aws-fpga/blob/master/sdk/management/fpga_image_tools/README.md#amazon-fpga-image-afi-management-tools).
 
 * **Q: Can the AFI Management Tools work concurently on multiple FPGA image slots?**
    * The tools can be executed on multiple FPGAs concurrently.  This may be done without synchronization between processes that are using the tools.
@@ -201,8 +200,7 @@ into the given `fpga-image-slot`.
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
 
 * **Q: How can I reset the AFI?**
-   * The application PF supports PCI Function Level Reset (FLR).  User-space programs may trigger a FLR for the application PF via the sysfs filesystem in the path `/sys/bus/pci/devices/Domain:Bus:Device.Function/reset`    
-   * Alternatively, the AFI may be reloaded via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.
+   * The AFI may be reset (reloaded) via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.
 
 ## References
 * AWS FPGA SDK/HDK on github [aws-fpga](https://github.com/aws/aws-fpga)
