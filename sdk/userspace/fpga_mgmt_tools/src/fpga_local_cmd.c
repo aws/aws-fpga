@@ -522,8 +522,8 @@ main(int argc, char *argv[])
 	fail_on_quiet(ret != 0, err, "cli_main failed");
 err:
 	/** 
-	 * f1.no_error may be set by parse_args when it internally completes the 
-	 * command without error due to help or version output.
+	 * f1.parser_completed may be set by parse_args when it internally 
+	 * completes the command without error due to help or version output.
 	 * In this case a non-zero error is returned by parse_args and we do not
 	 * want to print the "Error" below.
 	 */
