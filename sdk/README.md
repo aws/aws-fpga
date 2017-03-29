@@ -19,7 +19,7 @@ You can setup and install the SDK with the following few steps.  Note that the f
     $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
 
 
-**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./sdk/userspace/fpga_mgmt_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
+**NOTE:** The `sdk_setup.sh` would install the [FPGA management tools](./userspace/fpga_mgmt_tools/README.md) if they are not already available in `/usr/bin`. The `sdk_setup.sh` requires having `gcc` installed.  if it is not installed, try running the next command to install it on Amazon Linux, Centos or Redhat distributions:
 
 ```
 $ sudo yum groupinstall -y “Development Tools"
