@@ -161,7 +161,7 @@ The following FPGA image hardware metrics are provided. PCIe related counters co
 * `pcim-axi-protocol-error-count` (32-bit)
    * The CustomLogic violated the AXI-4 protocol.  (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
    * Specific AXI-4 protocol violation status indicators are listed below: 
-     * pcim-axi-protocol-4K-cross-error: 
+     * pcim-axi-protocol-4K-cross-error
      * pcim-axi-protocol-bus-master-enable-error
      * pcim-axi-protocol-request-size-error
      * pcim-axi-protocol-write-incomplete-error
