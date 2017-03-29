@@ -10,7 +10,7 @@ INCA_libs
 irun.log
 irun.key
 
-fpga-local-cmd
+fpga-local-cmd*
 
 *_compile.log
 *_run.log
