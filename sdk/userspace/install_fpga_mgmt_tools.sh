@@ -23,14 +23,14 @@ if [ -z "$SDK_DIR" ]; then
 fi  
 
 SDK_MGMT_DIR=$SDK_DIR/userspace
-AFI_MGMT_TOOLS_SRC_DIR=$SDK_MGMT_DIR/fpga_image_tools/src
+AFI_MGMT_TOOLS_SRC_DIR=$SDK_MGMT_DIR/fpga_mgmt_tools/src
 AFI_MGMT_TOOLS_DST_DIR=/usr/bin
 AFI_MGMT_TOOLS_LIB_DIR=$SDK_MGMT_DIR/lib/so
 AFI_MGMT_LIBS_DST_DIR=/usr/lib64
 
 # Build and install the Amazon FPGA Image (AFI) Management Tools
 cd $SDK_MGMT_DIR
-$SDK_MGMT_DIR/mkall_fpga_image_tools.sh
+$SDK_MGMT_DIR/mkall_fpga_mgmt_tools.sh
 
 if [ ! -d "$AFI_MGMT_TOOLS_DST_DIR" ]; then
     mkdir -p $AFI_MGMT_TOOLS_DST_DIR
