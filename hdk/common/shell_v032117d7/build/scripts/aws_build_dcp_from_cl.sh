@@ -164,16 +164,16 @@ shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=
 
 # Get the PCIe Device & Vendor ID from ID0
 id0_version=$(grep 'CL_SH_ID0' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
-device_id=${id0_version:0:4};
-vendor_id=${id0_version:4:4};
+device_id="0x${id0_version:0:4}";
+vendor_id="0x${id0_version:4:4}";
 
 # Get the PCIe Subsystem & Subsystem Vendor ID from ID1
 id1_version=$(grep 'CL_SH_ID1' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
-subsystem_id=${id1_version:0:4};
-subsystem_vendor_id=${id1_version:4:4};
+subsystem_id="0x${id1_version:0:4}";
+subsystem_vendor_id="0x${id1_version:4:4}";
 
 # Run vivado
-cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $run_aws_emulation"
+#cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $run_aws_emulation"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   
