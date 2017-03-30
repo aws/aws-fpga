@@ -50,8 +50,8 @@
 #define QUEUE_DEVICE_NAME "edma"
 #define EVENT_DEVICE_NAME "fpga"
 #define NUMBER_OF_REQUESTS		(512)
-#define SLEEP_MINIMUM_USEC 		(1 * 1000 * 1000)
-#define SLEEP_MAXIMUM_USEC 		(4 * 1000 * 1000)
+#define SLEEP_MINIMUM_USEC 		(1 * 100)
+#define SLEEP_MAXIMUM_USEC 		(4 * 100)
 #define MAX_NUMBER_OF_EDMA_DEVICE 	(16)
 #define MAX_NUMBER_OF_EDMA_QUEUES 	(4)
 //TODO: move to a mutable and unite across
@@ -305,7 +305,7 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
-	pr_info("\n-->%s opening %s\n", __func__, filp->f_path.dentry->d_name.name);
+	pr_info("\n-->%s Releasing %s\n", __func__, filp->f_path.dentry->d_name.name);
 
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
 	device_private_data = edma_char->device_private_data;
@@ -414,6 +414,8 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 		// once we reached here, we know that we can release
 
+		recycle_completed_descriptors(&device_private_data->write_ebcs, device_private_data);
+
 		edma_dev_release_resources(&device_private_data->write_ebcs);
 		edma_dev_release_resources(&device_private_data->read_ebcs);
 
@@ -470,7 +472,9 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 
 #ifdef SUPPORT_M2M
 		//for m2m before completing a descriptor we need to submit one
-		ret = edma_backend_submit_s2m_request((u64*)request_to_clean->phys_data, copy_size, read_ebcs->dma_queue_handle, *off);
+		ret = edma_backend_submit_s2m_request(
+				(u64*)request_to_clean->phys_data, copy_size,
+				read_ebcs->dma_queue_handle, *off);
 		if (ret < 0) {
 			if (ret == -EIO) {
 				u64_stats_update_begin(&private_data->stats.syncp);
