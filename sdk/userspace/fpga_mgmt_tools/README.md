@@ -124,33 +124,75 @@ The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA
 
 Additionally, the `fpga-describe-local-image` **`clear-metrics`** option may be used to display and clear FPGA image hardware metrics (clear on read).
 
- 
 ##### Supported Metrics
 
-The following FPGA image hardware metrics are provided. PCIe related counters have `ps` or `pm` prefix which indicates a PCIe slave access (the instance CPU or other FPGAs accessing this FPGA) or PCIe master access (the FPGA is mastering an outbound transaction toward the instance memory or other FPGAs).
+The following FPGA image hardware metrics are provided. PCIe related counters contain the `pcis` or `pcim` prefix which indicates a PCIe slave access (the instance CPU or other FPGAs accessing this FPGA) or PCIe master access (the FPGA is mastering an outbound transaction toward the instance memory or other FPGAs).
 
-* `ps-timeout-count` (32-bit)
-  * The CustomLogic (CL) did not respond to memory-mapped I/O (MMIO) read access from the instance. In most cases this indicated a design flaw in the AFI.
+* `sdacl-slave-timeout-count` (32-bit)
+  * The CustomLogic (CL) did not respond to SDACL read access from the instance. In most cases this indicated a design flaw in the AFI.
 
-* `ps-timeout-addr` (64-bit)
-  * The first address that triggered a `ps-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
+* `sdacl-slave-timeout-addr` (32-bit)
+  * The first address that triggered a `sdacl-slave-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
 
-* `pm-range-error-count` (32-bit)
+* `virtual-jtag-slave-timeout-count` (32-bit)
+  * The CustomLogic (CL) did not respond to Virtual JTAG read access from the instance. In most cases this indicated a design flaw in the AFI.
+
+* `virtual-jtag-slave-timeout-addr` (32-bit)
+  * The first address that triggered a `virtual-jtag-slave-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
+
+* `ocl-slave-timeout-count` (32-bit)
+  * The CustomLogic (CL) did not respond to OCL read access from the instance. In most cases this indicated a design flaw in the AFI.
+
+* `ocl-slave-timeout-addr` (64-bit)
+  * The first address that triggered a `ocl-slave-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
+
+* `bar1-slave-timeout-count` (32-bit)
+  * The CustomLogic (CL) did not respond to BAR1 read access from the instance. In most cases this indicated a design flaw in the AFI.
+
+* `bar1-slave-timeout-addr` (64-bit)
+  * The first address that triggered a `bar1-slave-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
+
+* `dma-pcis-timeout-count` (32-bit)
+  * The CustomLogic (CL) did not respond to DMA read access from the instance. In most cases this indicated a design flaw in the AFI.
+
+* `dma-pcis-timeout-addr` (64-bit)
+  * The first address that triggered a `dma-pcis-timeout-count` event. This is a relative address as the upper bits of the address matching the PCIe BAR are set to zero.
+
+* `pcim-axi-protocol-error-count` (32-bit)
+   * The CustomLogic violated the AXI-4 protocol.  (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
+   * Specific AXI-4 protocol violation status indicators are listed below: 
+     * pcim-axi-protocol-4K-cross-error
+       * AXI Requests on PCIM AXI bus crosses 4K boundary
+     * pcim-axi-protocol-bus-master-enable-error
+       * AXI Requests on PCIM AXI bus are initiated when PCIE bus-master-enable is not enabled
+     * pcim-axi-protocol-request-size-error
+       * PCIE Core request violates PCIE max-payload-size (writes) or max-read-req-size (reads). This error cannot be triggered by errors on the PCIM AXI bus
+     * pcim-axi-protocol-write-incomplete-error
+       * For AXI Write Requests on PCIM AXI bus, WLAST was asserted pre-maturely or WLAST was not asserted for the last wdata beat 
+     * pcim-axi-protocol-first-byte-enable-error
+       * AXI Requests on PCIM AXI bus has illegal first-byte-enable.
+     * pcim-axi-protocol-last-byte-enable-error
+       * AXI Requests on PCIM AXI bus has illegal last-byte-enable
+     * pcim-axi-protocol-bready-error
+       * For AXI Requests on PCIM AXI bus, timeout waiting for BREADY to be asserted by master (CL) after BVALID is asserted by the slave (SH)
+     * pcim-axi-protocol-rready-error
+       * For AXI Requests on PCIM AXI bus, timeout waiting for RREADY to be asserted by master (CL) after RVALID is asserted by the slave (SH)
+     * pcim-axi-protocol-wchannel-error
+       * For AXI Write Requests on PCIM AXI bus, timeout waiting for WVALID to be asserted by master (CL) 
+   
+* `pcim-axi-protocol-error-addr` (64-bit)
+   * The first address that triggered a `pm-axi-protocol-error-count` event.
+
+* `pcim-range-error-count` (32-bit)
    * The CustomLogic (CL) trying to initiate outbound Read/Write (PCI master) to instance memory space or other FPGAs on the PCIe fabric, but has illegal address  
    
-* `pm-range-error-addr` (64-bit)
-   * The first address that triggered a `pm-range-error-count` event. 
+* `pcim-range-error-addr` (64-bit)
+   * The first address that triggered a `pcim-range-error-count` event. 
 
-* `pm-len-error-count` (32-bit)
-   * The CustomLogic violated AXI-4 protocol/length (Refer to [AWS Shell Interface Specifications](https://github.com/aws/aws-fpga/tree/master/hdk/docs))
-   
-* `pm-len-error-addr` (64-bit)
-   * The first address that triggered a `pm-len-error-count` event.
-
-* `pm-write-count` (64-bit)
+* `pcim-write-count` (64-bit)
     * The number of Doublewords/DW (4 Bytes) data written by the AFI toward the instance memory or other FPGAs. DW with partial byte-enable bit-vector is still counted as whole DW in this counter. This counter will not increment when any of the `pm-???-error-count` events happen.
     
-* `pm-read-count` (64-bit)
+* `pcim-read-count` (64-bit)
     * The number of Doublewords/DW (4 Bytes) data read by the AFI from the instance memory or other FPGAs. DW with partial byte-enable bit-vector is still counted as whole DW in this counter. This counter will not increment when any of the `pm-???-error-count` events happen.
     
 * `DDR-A write-count` or `DDR-A read-count` (64-bit) (same for `DDR-B`, `DDR-C` or `DDR-D`)

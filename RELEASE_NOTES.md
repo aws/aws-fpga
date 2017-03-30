@@ -315,6 +315,7 @@ This release fixes (HDK 1.1.0, Shell 0x0222....) fixes the following issues in p
 * Aurora and Reliabile Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
+* All AXI-4 interfaces (PCIM, DDR4) do not support AxSIZE other than 0b110 (64B)
 
 ## Supported Tools and Environment
 
