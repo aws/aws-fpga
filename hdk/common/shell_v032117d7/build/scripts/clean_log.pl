@@ -21,13 +21,14 @@ use File::Copy;
 
 # The timestamp is an input to the script
 my $timestamp = $ARGV[0];
+my $CL_DIR    = $ARGV[1];
 
-copy("${timestamp}.vivado.log", "vivado_temp.log") or die "Copy failed: $!";
+copy("${CL_DIR}/build/scripts/${timestamp}.vivado.log", "${CL_DIR}/build/scripts/vivado_temp.log") or die "Copy failed: $!";
 
-open(FILE1, "vivado_temp.log")
-      or die "Can't open < vivado_temp.log: $!";
-open(my $fh_wr, ">", "${timestamp}.vivado.log")
-      or die "Can't open > ${timestamp}.vivado.log: $!";
+open(FILE1, "${CL_DIR}/build/scripts/vivado_temp.log")
+      or die "Can't open < ${CL_DIR}/build/scripts/vivado_temp.log: $!";
+open(my $fh_wr, ">", "${CL_DIR}/build/scripts/${timestamp}.vivado.log")
+      or die "Can't open > ${CL_DIR}/build/scripts/${timestamp}.vivado.log: $!";
 
 my $match;
 my @warning_regexps = ("CRITICAL WARNING.*BRAM instance.*ddr_cores.*Please verify the instance name in the \.bmm file and the netlist. The BRAM initialization strings will not get populated with data.*",
@@ -51,4 +52,4 @@ while (<FILE1>) {
 
 close(FILE1);
 close($fh_wr);
-unlink("vivado_temp.log");
+unlink("${CL_DIR}/build/scripts/vivado_temp.log");

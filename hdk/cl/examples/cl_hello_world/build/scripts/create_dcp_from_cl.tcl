@@ -469,6 +469,6 @@ tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
 
 # Clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp}
+exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp} ${CL_DIR}
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) finished cleaning the log file. ";

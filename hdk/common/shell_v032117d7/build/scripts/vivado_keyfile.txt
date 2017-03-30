@@ -1,24 +1,21 @@
-`pragma protect version=1
-`pragma protect key_keyowner="Xilinx", key_method="rsa",
-key_keyname="xilinx_2014_03", key_public_key
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsxu4TFE4oPjAHK2SAvQf
-hR0rGSWlzDZq/tzDJ9PWiuVZ46qSImiYtuzW14VXBiXLV61gjbEzrYNMS/OOfKUf
-zj8+G25NWTSfikUjh02KXIAMLmUsZmYVJcW5oLyOrxg9IwTErAwFOdKfdGLeeI6l
-dyznQ82Oinl5piEOHiizwsTDIRtIrByuSfiVl7p/Qskkqph2ZGg87dLplFeYzcvO
-4RBsHXcoZzOUmJ6xlfvgJqYMRy+ci3gFc/fD8qOYldkG/7zxfRDYVb0pRuNzaSYX
-TbX/qKdsO5LYVIv8K/muTkkwHz5Y2KU6d/zO+8rqop22hGI7F0hKu1cAWWWAa/aN
-AwIDAQAB
-`pragma protect version=1
-`pragma protect key_keyowner="Synopsys", key_method="rsa",
-key_keyname="SNPS-VCS-RSA-1", key_public_key
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjJMv7PI1V+DJDaHZuVI
-FbAXvr6/tEpuM8cAKFuvpIoO6PE3DRqEwaHEJRyIsFnJnavVJ33+Kub54
-Cr/9JCh6fnQhtAmKt/nAznESOLExCKO1tmjYNCXLJ+QqWFoCuDuI4QS8Ru
-y1u3RwABCw7ESQwwIuVSZpOghOvjrPHzvlc0QIDAQAB
-`pragma protect key_keyowner = "Mentor Graphics Corporation"
-`pragma protect key_method = "rsa"
-`pragma protect key_keyname = "MGC-VERIF-SIM-RSA-1"
-`pragma protect key_public_key
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnJfQb+LLzTMX3NRARsv7A8+LV5SgMEJCvI
-f9Tif2emi4z0qtp8E+nX7QFzocTlClC6Dcq2qIvEJcpqUgTTD+mJ6grJSJ+R4AxxCgvHYUwoT
-80Xs0QgRqkrGYxW1RUnNBcJm4ZULexYz8972Oj6rQ99n5e1kDa/eBcszMJyOkcGQIDAQAB
+`pragma protect version = 2
+`pragma protect encrypt_agent = "XILINX"
+`pragma protect encrypt_agent_info = "Xilinx Encryption Tool 2015"
+`pragma protect begin_commonblock
+`pragma protect control error_handling="delegated"
+`pragma protect end_commonblock
+`pragma protect begin_toolblock
+`pragma protect rights_digest_method="sha256"
+`pragma protect key_keyowner = "Xilinx", key_keyname= "xilinx_2016_05", key_method = "rsa", key_public_key
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZhNmo1lcKpLYPA4vXVI
+shhj9wquP/jqwNK2XQFYkOoko3u7cVusEV500SZDkSc5oW7XJ6xG7dtlrQuh5jyV
+NaKryVeFowXf2LTRteboQ1HsrCRICdpR+qyU9JBg8lRS7LhaqJq0r1EeFJ6W8xof
+io9ggEvdWvPGGpZu0hv/fykuRWevDCC5ITcx2GeHeHEKpEsqqBGMUOEyv+MRRdzp
+pakAIldB2MRGf2CJqC2Lptcdxry0PQDQHmCsrQi7VxDGdPQp9iq+e6r+wXSqJb7r
+yzFcHXII4N4IlaZsBomALCVnsBxLyx1ilKWXsdwOSH0IH1EjTLIqxSx2pJBfkFRr
+xQIDAQAB
+`pragma protect control xilinx_configuration_visible = "false"
+`pragma protect control xilinx_enable_modification = "false"
+`pragma protect control xilinx_enable_probing = "false"
+`pragma protect end_toolblock=""
+
