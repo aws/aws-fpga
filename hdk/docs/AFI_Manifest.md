@@ -2,7 +2,7 @@
 
 An AFI submission to AWS through  [`aws ec2 create-fpga-image` API](./TBD), includes a pointer to an S3 bucket with a tar file: The tar file includes the encrypted and compiled fpga image(a.k.a. Design Checkpoint or DCP) and a mandatory `manifest.txt` file.
 
-This document provides the specification for the `manifest.txt` file.  Note that an AFI built through the scripts provided by AWS would have the manifest file generated automatically.
+This document provides the specification for the `manifest.txt` file.  Note that an AFI built through the scripts provided by AWS will generate the manifest file automatically.
 
 
 The manifest file is a text file formatted with key=value pairs. Some keys are mandatory while others are highly recommended. The mandatory keys are marked with [Mandatory]
@@ -12,10 +12,10 @@ The manifest file is a text file formatted with key=value pairs. Some keys are m
 * **manifest_format_version=** 1 [Mandatory]  
 
 * **pci_vendor_id=** [Mandatory]  
-      *0x1D0F is pre-assigned for Amazon example CLs*
+      *0x1D0F is the detault value that is pre-assigned by Amazon*
 
 * **pci_device_id=** [Mandatory]  
-      *0xF000 through 0xF0FF are pre-assigned for Amazon example CLs.*
+      *0xF000 is the detault value that is pre-assigned by Amazon*
 
 * **pci_subsystem_id=** [Mandatory]  
       *Must be non-zero*
