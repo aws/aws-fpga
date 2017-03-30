@@ -1,10 +1,10 @@
 
-# AWS EC2 FPGA HDK+SDK Release notes
+# AWS EC2 FPGA HDK+SDK Release Notes
 
 
 ##  AWS EC2 F1 Platform Features:
-   *    Xilinx UltraScale+ VU9P
-   *    Interfaces available for Custom Logic(CL):
+   *    1-8 Xilinx UltraScale+ VU9P based FPGA slots
+   *    Per FPGA Slot, Interfaces available for Custom Logic(CL):
          *    One x16 PCIe Gen 3 Interface
          *    Four DDR4 RDIMM interfaces (with ECC)
          *    AXI4 protocol support on all interfaces
@@ -50,46 +50,43 @@ The following new features are included in this HDK release:
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 
-* [New Shell Stable: 0x032117d7](./hdk/common/shell_stable)
+* [New Shell Stable: 0x032117d7](./hdk/common/shell_v032117d7)
 * cl_ports.vh have the updated port list 
 * Removed all the `ifdef and `ifndef from the cl_ports.vh
 * Added all the interfaces required for SDAccel platform support 
-* AWS_Shell_Interface_Spec.md has been updated
-* Updated the xdc timing constrains under [constraints](./hdk/common/shell_stable/build/constraints) to match the new interfaces (WIP)
-* Updated CL HELLO WORLD example to use the new cl_ports.vh
-* Updated clean_log.pl [scripts](./hdk/common/shell_current/build/scripts/clean_log.pl) (WIP)
-* DCP for the new shell (NA)
-* AWS Shell DCP is now stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
+* [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated
+* Updated the xdc timing constrains under [constraints](./hdk/common/shell_v032117d7/build/constraints) to match the new interfaces (WIP)
+* Updated [CL HELLO WORLD](./hdk/cl/examples/cl_hello_world) example to use the new cl_ports.vh
+* Updated clean_log.pl [scripts](./hdk/common/shell_v032117d7/build/scripts/clean_log.pl) (WIP)
+* DCP for the latest shell v032117d7. AWS Shell DCP is now stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
 
 ### 2.	New Integrated DMA. AWS Shell now includes DMA capabilities on behalf of the CL
-* Renamed sh_cl_pcis to sh_cl_dma_pcis
 * The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
 * DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software 
 * A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided.
-* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
+* [EDMA Installation Readme](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
 * The initial release supports a single queue in each direction
-
+* Renamed sh_cl_pcis to sh_cl_dma_pcis
 
 ### 3.	CL  User-defined interrupt events.  The CL can now request sending MSI-X to the instance CPU
 * Added new req/ack interface on Shell/CL interface
 * Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software (WIP)
 * A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
-* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_installation.md) provides installation and usage guidlines
+* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
 * The initial release supports a single user-defined interrupt 
 
+### 4.	Added a Mandatory Manifest.txt file submitted with each DCP via create-fpga-image API
 
-### 4.	Added mandatory Manifest.txt file submitted with each DCP via create-fpga-image API
-
-* [AFI manifest](./hdk/docs/AFI_manifest.md) file content defined in /hdk/docs/AFI_manifest.md
-* Manifest.txt is created automatically if the developer is using aws_build_dcp_from_cl.sh scripts
-* PCI Vendor ID and Device ID should be part of the manifest and no longer needed in `create-fpga-image`
+* File content defined in [AFI Manifest](./hdk/docs/AFI_Manifest.md)
+* AFI_Manifest.txt is created automatically if the developer is using the aws_build_dcp_from_cl.sh script
+* PCI Vendor ID and Device ID are now part of the manifest and no longer needed in `create-fpga-image`
 * Shell Version is part of the manifest and no longer needed in `create-fpga-image`
-* All the examples and documentations for build includes the description and dependency on the Manifest.txt
+* All the examples and documentations for build include the description and dependency on the Manifest.txt
 	
-### 5.	Create-fpga-image `-shell_version` and `--pci*` arguments are obsolete 
+### 5.	create-fpga-image `-shell_version` and `--pci*` arguments are obsolete 
 
-* shell_version, pci_vendor_id, pci_device_id, pci_subsystem_id and pci_subsystem_vendor_id are a mandatory parameter in manifest.txt that should be submitted within the tar file
+* From this version the shell_version, pci_vendor_id, pci_device_id, pci_subsystem_id and pci_subsystem_vendor_id arguments are mandatory parameters in manifest.txt that should be submitted within the tar file
 
 ### 6.	Decoupling Shell/CL interface clocking from the internal Shell Clock 
 
@@ -97,17 +94,15 @@ The following new features are included in this HDK release:
 * The default frequency for `clk_main_a0` is 125Mhz. Allowing CL designs to have flexible frequency and not be constrained to 250Mhz only. The default frequency can be overridden by changes in the manifest.txt file
 * All xdc scripts have been updated to clk_main_a0 and to reference a table with the possible clocks’ frequencies combinations
 * Obsolete the cl_clk interface
-* The developer can change the parameter for overriding default frequency
 * Updated CL_HELLO_WORLD and CL_DRAM_DMA examples to use the `clk_main_a0` 
 
 ### 7.	Additional User-defined Auxiliary Clocks
+Additional tunable auxiliary clocks are generated by the Shell and fed to the CL. The clocks frequencies are set by choosing a clock recipe per group from a set of predefined frequencies combination in [clock recipes table](./hdk/docs/clock_recipes.cvs)
 
-Additional tunable auxiliary clocks are generated by the Shell and fed to the CL. The clocks frequencies are set by choosing clock recipe per group from a set of predefined frequencies combination in [clocks recipe table](./hdk/docs/clock_recipes.cvs)
-
-* Clock frequency selection is set during build time, and recorded in the manifest.txt (which should include the clock_recipe_a/b/c parameters).
+* Clock frequency selection is set during build time, and recorded in the manifest.txt (which should include the clock_recipe_a/b/c parameters)
 * Clock frequency programming in the FPGA slot itself occurs when the AFI is loaded. The list of supported frequencies is available [here](./hdk/docs/clock_recipes.cvs)
-* See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for details on the clocking to the CL.  
-* See [AFI_Manifest](./hdk/docs/AFI_Manifest.md) for details on the AFI manifest data. 
+* See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for details on the clocking to the CL  
+* See [AFI Manifest](./hdk/docs/AFI_Manifest.md) for details on the AFI manifest data
 * xdc is automatically updated with the target frequency (WIP)
 
 ### 8.	Additional PCIe BARs and update PCIe Physical Function mapping
@@ -123,22 +118,21 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 * BAR2 is used for Virtual JTAG
 * BAR4 is used for SDAccel management 
-* [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) covers these changes in detail
-* [AWS_Fpga_Pcie_Memory_Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md) covers the address map details
-* The [fpga_pci library](./sdk/userspace/include/fpga_pci.h) provides simple APIs to take advantage of these BARs
+* [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) covers these changes in detail
+* [AWS FPGA PCIe Memory Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md) covers the address map details
+* The [FPGA PCI library](./sdk/userspace/include/fpga_pci.h) provides simple APIs to take advantage of these BARs
 
 
 ** MgmtPF and AppPF are now represented as different PCIe devices in F1 instances:**
-
-* An FPGA Slot will now occupy two PCIe buses, one for AppPF and one for MgmtPF
+* Each FPGA Slot will now occupy two PCIe buses, one for AppPF and one for MgmtPF
 * No change is required on the developer's side as long as the developer is using `fpga-image-tools` linux shell commands and/or `fpgamgmt.lib` C-APIs.
 
 
 ### 9.	Expanded AppPF BAR4 space to 128GiB 
 
 * BAR4 has expanded addressing space to enable a CL to fully map FPGA card DRAM into the AppPF address space.  AppPF BAR4 is now a 128GB BAR  
-* [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) covers these changes in detail
-* [AWS_Fpga_Pcie_Memory_Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md) covers the address map in detail
+* [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) covers these changes in detail
+* [AWS FPGA PCIe Memory Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md) covers the address map in detail
 
   
 ### 10.	Added wider access on the Shell to CL AXI4 512-bit bus (sh_cl_dma_pcis)
@@ -146,7 +140,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 * Wider access provides higher bandwidth DMA and host to FPGA access
 * Instance CPU can now burst full 64-byte write burst to AppPF PCIe BAR4 if mapped as Burstable (a.k.a WC: WriteCombine) (WIP)
 * pci_poke_burst() and pci_poke64() calls were added to [fpga_pci library](./sdk/userspace/include/fpga_pci.h) to take advantage of this
-* CL_DRAM_DMA and CL_HELLO_WORLD examples support a wider access was added
+* CL_DRAM_DMA and CL_HELLO_WORLD examples support for a wider access was added
 
 
 ### 11.	Support larger than 32-bit access to PCIe space
@@ -158,26 +152,26 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 ### 12.	Enhanced AXI4 error handling and reporting
 
 * Additional error conditions detected on the CL to Shell Interface and reported through fpga-describe-image tool
-* See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
-* FPGA Management Tool [metrics output](./sdk/userspace/fpga_mgmt_tools/README.md) covers the additional error handling
+* See [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
+* FPGA Management Tool [metrics output](./sdk/userspace/fpga_mgmt_tools/README.md) covers the additional error handling details
 
 ### 13.	Expanded AXI ID space throughout the design
 
-* The AXI buses between Shell and CL support an expanded number of AXI ID bits to allow for bits to be added by AXI fabrics  See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
+* The AXI buses between Shell and CL support an expanded number of AXI ID bits to allow for bits to be added by AXI fabrics  See [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
 
 
 ### 14.	Shell to CL interface metrics.  
 
 * New metrics for monitoring the Shell to CL are available from the AFI Management Tools. 
-* See [fpga_mgmt_tools readme](./sdk/userspace/fpga_mgmt_tools/README.md) for more details
+* See [fpga mgmt tools readme](./sdk/userspace/fpga_mgmt_tools/README.md) for more details
 
 
 ### 15.	Virtual LED/DIP Switches.  
 
-* Added CL capability to present virtual LEDs and push virtual DIP switches indications to the CL, set and read by FPGA management Tools and without involving CL logic, providing the developer an environment similar to developing on local boards with LED and DIP switches
+* Added CL capability to present virtual LEDs and push virtual DIP switches indications to the CL, set and read by FPGA Management Tools and without involving CL logic, providing the developer an environment similar to developing on local boards with LED and DIP switches
 * See new commands in [FPGA Image Tools](./sdk/userspace/fpga_mgmt_tools/README.md) for description of the new functionality
 * CL_HELLO_WORLD example includes some logic to set LED and adjust according to vDIP
-* See [AWS_Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
+* See [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details
 
 
 ### 16.	Virtual JTAG
@@ -222,7 +216,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 ### 21.	Software Programmer View document 
 
-* The [Software Programmer View document](./hdk/docs/Programmer_View.md) is added to explain the various ways a linux user-space application can work with AWS FPGAs
+* The [Software Programmer View document](./hdk/docs/Programmer_View.md) is added to explain the various ways a linux user-space application can work with AWS FPGA Slots
 
 
 ### 22.	Two C-libraries for FPGA PCIe access and for FPGA Management
@@ -244,7 +238,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 ### 25.	Upgrade to Vivado 2016.04-SDx Build 
 
-* The FPGA Development AMI will include Vivado 2016.4-SDx
+* The FPGA Development AMI includes Vivado 2016.4-SDx
 * Older Vivado versions will not be supported
 
 ### 26.	Embed the HDK version and Shell Version as part of git tree
@@ -286,7 +280,7 @@ Additional tunable auxiliary clocks are generated by the Shell and fed to the CL
 
 
 ## Bug Fixes with this release
-This release fixes (HDK 1.1.0, Shell 0x0222....) fixes the following issues in previous HDK and SHell:
+This release fixes (HDK 1.1.0, Shell 0x032117d7) fixes the following issues in previous HDK and Shell:
 
 * Unaligned 32-bit addressed accesses cause instance crash
    o Shell version 0X11241611 would cause an instance crash with unaligned 32-bit addresses.  This bug is fixed in the current release.  No address restrictions exit
