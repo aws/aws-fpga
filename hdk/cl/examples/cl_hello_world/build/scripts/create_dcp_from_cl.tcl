@@ -463,7 +463,8 @@ if { [file exists $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar
 }
 
 # Tar checkpoint to aws
-tar::create $CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar [glob $CL_DIR/build/checkpoints/to_aws/${timestamp}*]
+cd $CL_DIR/build/checkpoints
+tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
 
