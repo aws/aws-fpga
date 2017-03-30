@@ -10,7 +10,7 @@ As a pre-requisite to building the AFI, the developer should have an instance/se
 
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
-    $ source hdk_shell.sh
+    $ source hdk_setup.sh
 
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
