@@ -136,8 +136,8 @@ err:
 static int
 fpga_pci_check_file_id(char *path, uint16_t id)
 {
-	log_debug("enter");
 	fail_on(!path, err, "path is NULL");
+	log_debug("path=%s", path);
 
 	int ret = 0;
 	FILE *fp = fopen(path, "r");
@@ -161,7 +161,7 @@ err:
 
 static int 
 fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
-	bool write_combining, int *handle)
+	bool write_combining, int *handle) 
 {
 	log_debug("enter");
 
@@ -265,7 +265,7 @@ fpga_pci_init() {
 
 int
 fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
-	pci_bar_handle_t *handle)
+	pci_bar_handle_t *handle) 
 {
 	bool write_combining;
 	struct fpga_slot_spec spec;
@@ -316,8 +316,8 @@ err:
 
 int
 fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value) {
-	log_debug("handle=%d", handle);
-	log_debug("offset=0x%" PRIx64 ", value=0x%08x", offset, value);
+	log_debug("handle=%d, offset=0x%" PRIx64 ", value=0x%08x", 
+			handle, offset, value);
 
 	uint32_t *reg_ptr = (uint32_t *)fpga_pci_bar_get_mem_at_offset(handle, 
 			offset, sizeof(uint32_t));
@@ -332,8 +332,8 @@ err:
 
 int
 fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value) {
-	log_debug("handle=%d", handle);
-	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, value);
+	log_debug("handle=%d, offset=0x%" PRIx64 ", value=0x%" PRIx64, 
+			handle, offset, value);
 
 	uint64_t *reg_ptr = (uint64_t *)fpga_pci_bar_get_mem_at_offset(handle,
 			offset, sizeof(uint64_t));
@@ -348,7 +348,6 @@ err:
 
 int
 fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
-	log_debug("handle=%d", handle);
 	fail_on(!value, err, "value is NULL");
 
 	uint32_t *reg_ptr = (uint32_t *)fpga_pci_bar_get_mem_at_offset(handle, 
@@ -357,7 +356,8 @@ fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
 
 	*value = *reg_ptr;
 
-	log_debug("offset=0x%" PRIx64 ", value=0x%08x", offset, *value);
+	log_debug("handle=%d, offset=0x%" PRIx64 ", value=0x%08x", 
+			handle, offset, *value);
 	return 0;
 err:
 	return FPGA_ERR_FAIL;
@@ -365,7 +365,6 @@ err:
 
 int
 fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
-	log_debug("handle=%d", handle);
 	fail_on(!value, err, "value is NULL");
 
 	uint64_t *reg_ptr = (uint64_t *)fpga_pci_bar_get_mem_at_offset(handle,
@@ -374,7 +373,8 @@ fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
 
 	*value = *reg_ptr;
 
-	log_debug("offset=0x%" PRIx64 ", value=0x%" PRIx64, offset, *value);
+	log_debug("handle=%d, offset=0x%" PRIx64 ", value=0x%" PRIx64, 
+			handle, offset, *value);
 	return 0;
 err:
 	return FPGA_ERR_FAIL;
@@ -382,10 +382,9 @@ err:
 
 int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint32_t dword_len) {
 	uint32_t i;
-	log_debug("handle=%d", handle);
+	log_debug("handle=%d, offset=0x%" PRIx64, handle, offset);
 
 	/** get the pointer to the beginning of the range */
-	log_debug("offset=0x%" PRIx64, offset);
 	uint32_t *reg_ptr = (uint32_t *)fpga_pci_bar_get_mem_at_offset(handle,
 			offset,sizeof(uint32_t)*dword_len);
 	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
