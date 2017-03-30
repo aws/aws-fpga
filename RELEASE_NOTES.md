@@ -50,7 +50,7 @@ The following new features are included in this HDK release:
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 
-* [New Shell Stable: 0x032117b1](./hdk/common/shell_stable)
+* [New Shell Stable: 0x032117d7](./hdk/common/shell_stable)
 * cl_ports.vh have the updated port list 
 * Removed all the `ifdef and `ifndef from the cl_ports.vh
 * Added all the interfaces required for SDAccel platform support 
