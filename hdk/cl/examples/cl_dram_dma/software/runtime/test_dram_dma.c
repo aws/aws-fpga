@@ -25,7 +25,7 @@
 #include <utils/lcd.h>
 
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
-static uint16_t pci_device_id = 0xF0FF;
+static uint16_t pci_device_id = 0xF001;
 /* */
 
 #define	MEM_16G		(1ULL << 34)
