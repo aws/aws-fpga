@@ -115,8 +115,8 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-TBD |
-| Pre-generated AGFI ID | agfi-TBD |
+| Pre-generated AFI ID | afi-0ecaea0acb378de34 |
+| Pre-generated AGFI ID | agfi-05df3e62433b421e0 |
 
 
 <a name="runtmieSoftware"></a>
