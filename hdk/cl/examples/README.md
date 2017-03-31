@@ -1,25 +1,3 @@
-# Building a Custom Logic AFI for AWS FPGA instances
-
-The developer can build their own Custom Logic (CL) and deploy it on AWS.
-The CL must comply with the [AWS Shell specifications](../../docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
-
-The [CL Examples directory](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples) is provided to assist developers in creating a
-functional CL implementation. Each example includes:
-
-1. The design source code for the example under the `/design` directory.
-2. The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instance/server that have Xilinx tools and license installed. Developers are recommended to use the "FPGA Development AMI" available free of charge on [AWS Marketplace](https://aws.amazon.com/marketplace/).
-3. The final build, called Design CheckPoint (DCP) that can be submitted for AWS to generate the AFI.
-4. An AFI-ID for a pre-generated AFI that matches the example design.
-5. Software source code required on the FPGA-enabled instance to run the example.
-6. Software binary that can be loaded on an FPGA-enabled instance to test the AFI.
-
-In summary:
-
-- An AFI can be created using the files in 1, 2, and 3. The AFI creation can take place on any EC2 instance or on premise.
-- The AFI can be used in an EC2 F1 instance by using the files in 4, 5 and 6.
-
-By following the example CLs, a developer should learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load an AFI from the F1 instance for use.
-
 # Step by step guide on how to create an AFI from one of the CL examples
 
 As a pre-requisite to building the AFI, the developer should have an instance/server with Xilinx Vivado Tools and the necessary Licenses. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
@@ -32,7 +10,7 @@ As a pre-requisite to building the AFI, the developer should have an instance/se
 
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
-    $ source hdk_shell.sh
+    $ source hdk_setup.sh
 
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 

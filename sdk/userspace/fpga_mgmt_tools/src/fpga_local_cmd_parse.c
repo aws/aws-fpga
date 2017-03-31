@@ -46,9 +46,12 @@ static const char *opcode_str_usage[] = {
 	"     This program is normally executed via the wrapper scripts.",
 	"     See fpga-load-local-image, fpga-clear-local-image,",
 	"     fpga-describe-local-image, fpga-describe-local-image-slots.",
+	"     fpga-start-virtual-jtag, fpga-get-virtual-led",
+	"     fpga-get-virtual-dip-switch, fpga-set-virtual-dip-switch",
 	"  GENERAL OPTIONS",
 	"     LoadFpgaImage, ClearFpgaImage, DescribeFpgaImage,",
-	"     DescribeFpgaImageSlots",
+	"     DescribeFpgaImageSlots, StartVirtualJtag, GetVirtualLED,",
+	"     GetVirtualDIP, SetVirtualDIP",
 };
 
 static const char *describe_afi_slots_usage[] = {
@@ -60,7 +63,7 @@ static const char *describe_afi_slots_usage[] = {
 	"      the fpga-load-local-image, fpga-clear-local-image, and",
 	"      fpga-describe-local-image commands.",
 	"  GENERAL OPTIONS",
-	"      -?, --help",
+	"      -h, --help",
     "          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -103,7 +106,7 @@ static const char *describe_afi_usage[] = {
 	"          driver previously installed on the older PCIe VendorId",
 	"          and DeviceId before fpga-clear-local-image,",
 	"          fpga-load-local-image, or re-scan.",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -130,7 +133,7 @@ static const char *load_afi_usage[] = {
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
 	"      -I, --fpga-image-id",
 	"          The ID of the FPGA image. agfi-<number>",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -156,7 +159,7 @@ static const char *clear_afi_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image.",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -193,7 +196,7 @@ static const char *start_virtual_jtag_usage[] = {
 	"          The TCP port number to use for virtual jtag server, default",
 	"          TCP port is 10201.  Remember to use different TCP port for",
 	"          different slot if debugging multiple slots concurrently",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -214,7 +217,7 @@ static const char *get_virtual_led_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -236,7 +239,7 @@ static const char *get_virtual_dip_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -262,7 +265,7 @@ static const char *set_virtual_dip_usage[] = {
 	"          A 16 digit bitmap representation of the desired setting for Virtual DIP Switches",
 	"          This argument is mandatory and must be 16 digits made of any combinations of ",
 	"          zeros or ones.",
-	"      -?, --help",
+	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
 	"          Display column headers.",
@@ -295,6 +298,26 @@ static void
 print_version(void)
 {   
 	printf("AFI Management Tools Version: %s\n", CLI_VERSION);
+}
+
+/**
+ * Check the given option and set the f1.parser_completed flag.
+ *
+ * -parser_completed is set when the parser will complete the option 
+ *  (help or version output) and no further command processing is necessary, 
+ *  though a non-zero return value is still returned from parse_args.
+ * -the parser_completed flag may then be used to skip the "Error" output
+ *  that is generically used for parsing or other errors beyond the parsing 
+ *  stage.
+ *
+ * @param[in]	opt		the option to check
+ */
+static void 
+get_parser_completed(char opt)
+{
+	if ((opt == 'h') || (opt == 'V')) {
+		f1.parser_completed = true;
+	}
 }
 
 /**
@@ -350,7 +373,7 @@ parse_args_load_afi(int argc, char *argv[])
 		{"fpga-image-id",		required_argument,	0,	'I'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -386,9 +409,11 @@ parse_args_load_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -421,7 +446,7 @@ parse_args_clear_afi(int argc, char *argv[])
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -449,9 +474,11 @@ parse_args_clear_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -486,7 +513,7 @@ parse_args_describe_afi(int argc, char *argv[])
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"rescan",				no_argument,		0,	'R'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -527,9 +554,11 @@ parse_args_describe_afi(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -561,7 +590,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{"show-mbox",           no_argument,        0,  'M' },
 		{0,						0,					0,	0	},
@@ -584,6 +613,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		case 'M': {
@@ -591,6 +621,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			break;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -623,7 +654,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"tcp-port",			required_argument,	0,	'P'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -656,9 +687,11 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -691,7 +724,7 @@ parse_args_get_virtual_led(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -713,9 +746,11 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -746,7 +781,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -768,9 +803,11 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}
@@ -806,7 +843,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"virtual-dip",			required_argument,	0,	'D'	},
 		{"headers",				no_argument,		0,	'H'	},
-		{"help",				no_argument,		0,	'?'	},
+		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{0,						0,					0,	0	},
 	};
@@ -846,10 +883,12 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		}
 		case 'V': {
 			print_version();
+			get_parser_completed(opt);
 			goto out_ver;
 		}
 
 		default: {
+			get_parser_completed(opt);
 			goto err;   
 		}
 		}

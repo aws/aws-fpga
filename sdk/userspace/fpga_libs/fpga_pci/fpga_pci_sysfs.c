@@ -76,7 +76,7 @@ err:
 static int
 fpga_pci_write_one2file(char *path)
 {
-	int ret = -1;
+	int ret = FPGA_ERR_FAIL;
 
 	int fd = open(path, O_WRONLY);
 	fail_on_quiet(fd == -1, err, "opening %s", path);
@@ -88,6 +88,7 @@ fpga_pci_write_one2file(char *path)
 err_close:
 	close(fd);
 err:
+	errno = 0;
 	return ret;
 }
 
@@ -175,8 +176,10 @@ fpga_pci_get_pci_resource_info(char *dir_name,
 	ret = stat(sysfs_name, &file_stat);
 	*burstable = (ret == 0);
 
+	errno = 0;
 	return 0;
 err:
+	errno = 0;
 	return FPGA_ERR_FAIL;
 }
 
@@ -400,11 +403,13 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 
 	closedir(dirp);
 
+	errno = 0;
 	return 0;
 err:
 	if (dirp) {
 		closedir(dirp);
 	}
+	errno = 0;
 	return FPGA_ERR_FAIL;
 }
 
@@ -512,8 +517,10 @@ fpga_pci_remove_app_pf(struct fpga_pci_resource_map *app_map)
         }
     }
     
+	errno = 0;
     return 0;
 err:
+	errno = 0;
     return FPGA_ERR_FAIL;
 }   
 

@@ -87,6 +87,7 @@ struct ec2_fpga_cmd {
 	char	 afi_id[AFI_ID_STR_MAX];
 	uint32_t mbox_timeout;
 	uint32_t mbox_delay_msec;
+	bool	 parser_completed;	
 	bool	 show_headers;
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;

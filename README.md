@@ -7,18 +7,17 @@
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [Quick Start] (#quickstart)
-    - [Building an example AFI](#buildingAnExample)
-    - [Using an AFI on EC2 FPGA instace](#usingAfi)
-    - [Starting a new CL](#clExamples)
+2. [Building an example AFI](#buildingAnExample)
+    - [Prerequisites](#buildingafiprereq)
+    - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
 <a name="devkit"></a>
 # AWS EC2 FPGA Hardware and Software Development Kits 
 
-This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFI on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
+This release includes two portions: [HDK](./hdk) for developing Amazon FPGA Image (AFI),  and [SDK](./sdk) for using AFIs on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
 Execute `git clone https://github.com/aws/aws-fpga.git` to download this HDK+SDK release to your EC2 Instance or local server.
-For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`. [Help with connecting to Github via SSH] (https://help.github.com/articles/connecting-to-github-with-ssh/)
+For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`. [Help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
 The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environment, and known restrictions.
 
@@ -29,18 +28,19 @@ Please click the "Watch" button in GitHub upper right corner to stay posted.
 <a name="fpgahdk"></a>
 ## FPGA HDK 
 
-The [HDK directory](./hdk) is recommended for developers wanting to start building Amazon FPGA Images (AFI). It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any server or EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
+The [HDK directory](./hdk) contains usuful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
 
 [HDK README](./hdk/README.md)
         
-[AWS FPGA Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
+[AWS FPGA Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
         
 [FPGA PCIe Address Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
+
         
 <a name="fpgasdk"></a>
 ## FPGA SDK
 
-The [SDK directory](./sdk) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to interact with AFIs that are loaded to EC2 FPGA instance slots. The SDK is not required during the AFI development process; it is only required once the AFI is loaded onto an EC2 FPGA instance. The following resources provide further details:
+The [SDK directory](./sdk) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded to EC2 FPGA instance slots. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following resources provide further details:
 
 [SDK readme](./sdk/README.md)
 
@@ -49,9 +49,9 @@ The [SDK directory](./sdk) includes the runtime environment required to run on E
 [AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
 
 <a name="fpgasdaccel"></a>
-## SDAccel - Comming soon
+## SDAccel - Coming Soon
 
-The [sdaccel directory](./sdaccel) includes the environment required to run opencl/sdaccel flow on EC2 instances. It includes the drivers and tools to interact with AFIs that are loaded to EC2 FPGA instance slots. 
+The [SDAccel directory](./sdaccel) includes the environment required to run OpenCL/SDAccel flow on EC2 instances. It includes the drivers and tools to interact with AFIs that are loaded to EC2 FPGA instance slots. 
 
 [Developing with OpenCL/SDAccel](./hdk/docs/OpenCL_SDAccel_Development.md)
 
@@ -63,57 +63,50 @@ AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketpla
 <a name="devSupport"></a>
 ## Developer Support 
 
-[**AWS FPGA Development User Forum**](https://forums.aws.amazon.com/index.jspa): the FPGA development user forum is the first place to go to post questions, suggestions and read announcements from the AWS FPGA team. To gain access to the user forum:
+The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) is the first place to go to post questions, learn from other users and read announcements from the EC2 FPGA team. 
+
+* To be notified on important messages click on the “Watch Forum” button on the right side of the screen.
+* In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
+
+During the Preview to gain access to the user forum:
 
 * Login to https://forums.aws.amazon.com/index.jspa 
-* **Note** *During the preview, the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Email your userID to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.*
-* To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
-* In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
+* **Note** *the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Email your userID to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.*
+
  
-<a name="quickstart"></a>
-# Quick Start 
-
 <a name="buildingAnExample"></a>
-## Building an Example AFI 
+# Building a Custom Logic AFI for AWS FPGA Instances
 
-By following a few steps, you would have downloaded the HDK, compiled and built one of the example Custom Logic (CL) designs included with the HDK, and registered it with AWS. [Building a Custom Logic (CL) implementation for AWS FPGA instances](./hdk/cl/examples#overview-on-process-for-building-a-custom-logic-cl-implementation-for-aws-fpga-instances)
+Developers can build their own Custom Logic (CL) and deploy it on AWS.
+The CL must comply with the [AWS Shell Interface Specifications](./hdk/docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
 
-#### Prerequisites
+The [CL Examples directory](./hdk/cl/examples) is provided to assist developers in creating a functional CL implementation. Each example includes:
+
+1. The source code for the example under the `/design` directory.
+2. The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instance/server that have Xilinx tools and license installed. Developers are recommended to use the FPGA Development AMI available free of charge on [AWS Marketplace](#devAmi).
+3. The final build, called Design Checkpoint (DCP) that can be submitted for AWS to generate the AFI.
+4. An AFI-ID for a pre-generated AFI that matches the example design.
+5. Software source code required on the FPGA-enabled instance to run the example.
+6. Software binary that can be loaded on an FPGA-enabled instance to test the AFI.
+
+In summary:
+
+- An AFI can be created using the files in #1, #2, and #3. The AFI creation can take place on any EC2 instance or on-premises.
+- The AFI can be used in an EC2 F1 instance by using the files in #4, #5 and #6.
+
+By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
+
+<a name="buildingafiprereq"></a>
+### Prerequisites
 * AWS FPGA HDK and SDK run in Linux environment only.
-* If you can not access GitHub repository, please request access permission from your AWS representative.
-* The build stage uses Xilinx's Vivado tool set. You should have an installed Vivado that is supported.  Please check for [supported versions of Vivado](./hdk/supported_vivado_versions.txt). [Release Notes](./RELEASE_NOTES.md) may contain additional information.
-* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region. 
+* During the F1 Preview preiod, if you can not access GitHub repository, please request access permission from your AWS representative.
+* The build stage uses Xilinx's Vivado tool set. In case you build on-premises you should have an installed Vivado that has the correct license.  Please check for [supported versions of Vivado](./hdk/supported_vivado_versions.txt). [Release Notes](./RELEASE_NOTES.md) may contain additional information.
+* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region.  Please refer to [AWS documentation for help with configuring the AWS CLI.](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)   
 
-
-```
-$ git clone https://github.com/aws/aws-fpga.git # Step 1:  Download the HDK and SDK code
-$ cd aws-fpga                                   # Step 2:  Move to the root directory
-$ source hdk_setup.sh                           # Step 3:  Set up the HDK environment variables, downloads shell from S3, runs tool version checks
-$ cd hdk/cl/examples/cl_hello_world             # Step 4:  Change directory to one of the provided examples
-$ export CL_DIR=$(pwd)                          # Step 5:  Define this directory as the root for the CL design
-$ cd build/scripts                              # Step 6:  The build directory for synthesizing, placement, timing etc
-$ source aws_build_dcp_from_cl.sh               # Step 7:  Generate a placed-and-routed design checkpoint (DCP)
-$ cd $CL_DIR/build/checkpoints/to_aws           # Step 8:  This directory includes the DCP file
-$ aws s3 mb s3://<bucket-name>                  # Step 9:  Create an S3 bucket (choose a unique bucket name)
-$ aws s3 cp *.Developer_CL.tar \                # Step 10: Upload the file to S3
-         s3://<bucket-name>/
-$ create-fpga-image \                           # Step 11: Ingest the generated DCP to create an AFI
-        --afi-name <afi-name> \
-	--afi-description <afi-description> \
-	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
-	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder>
-```
-**NOTE**: The DCP generation (`Step 7` above) can take up to several hours to complete.  We recommend to initiate the generation in a way that prevents interruption.  For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.  
+The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 FPGA instance.
 
 <a name="usingAfi"></a>
 ## Using an AFI on EC2 FPGA Instances
-
 Now that you have built an AFI, or if you want to use one of the example pre-built AFIs provided by AWS, you need to launch an EC2 FGPA Instance, and install the SDK as detailed at: [SDK Quick Start](./sdk/README.md)
 
 
-<a name="clExamples"></a>
-## Need to build a new Custom Logic and register it as an AFI?
-
-The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 FPGA instance.

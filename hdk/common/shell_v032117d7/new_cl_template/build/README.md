@@ -65,7 +65,7 @@ In order to help developers close timing goals and successfully build their desi
 
 Build script usage:
 
-    $ ./aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>]
+    $ ./aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-run_aws_emulation] [-foreground]
 
 Options:
 
@@ -77,6 +77,21 @@ Options:
 
 * -strategy \<BASIC | EXPLORE | TIMING | CONGESTION | DEFAULT>
        * Use the specified strategy to alter the directives used during synthesis. The DEFAULT strategy will be used if a strategy is not specified.
+
+* -clock_recipe_a \<A0 ... An>
+       * Use the Clock Group A clock frequencies defined for the specified Clock Group A recipe. This is an optional argument and the default value will be A0. Refer to the [Clock Group Recipes Table](./../../../../docs/clock_recipes.csv).
+
+* -clock_recipe_b \<B0 ... Bn>
+       * Use the Clock Group B clock frequencies defined for the specified Clock Group B recipe. This is an optional argument and the default value will be B0. Refer to the [Clock Group Recipes Table](./../../../../docs/clock_recipes.csv).
+
+* -clock_recipe_c \<C0 ... Cn>
+       * Use the Clock Group C clock frequencies defined for the specified Clock Group C recipe. This is an optional argument and the default value will be C0. Refer to the [Clock Group Recipes Table](./../../../../docs/clock_recipes.csv).
+
+* -run_aws_emulation
+       * Run the AWS emulation step to verify your generated DCP. The step emulates what AWS will do to generate a bitstream from the developer DCP.
+
+* -foreground
+       * Run the build in the foreground such that all output will go to the terminal and the build may be terminated if the terminal is closed. This option is useful if you want to wait for the build to complete. This option is safe if the terminal is running on the AWS instance, for example on a GUI desktop on the instance.
 
 Strategy descriptions:
 
