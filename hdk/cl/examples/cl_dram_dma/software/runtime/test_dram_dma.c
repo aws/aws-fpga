@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     slot_id = 0;
 
-    rc = dma_example(slot_id);
+//    rc = dma_example(slot_id);
     fail_on(rc, out, "DMA example failed");
 
     rc = interrupt_example(slot_id);
@@ -138,7 +138,7 @@ int dma_example(int slot_id) {
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
-    fd = open("/dev/edma0_queue_0", O_RDWR);
+    fd = open("/dev/edma2_queue_0", O_RDWR);
     fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. "
         "Is the kernel driver loaded?");
 
@@ -207,9 +207,10 @@ int interrupt_example(int slot_id){
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct pollfd fds[1];
     uint32_t fd, rd, value, read_data;
-    char event_file_name[256] = "/dev/fpga0_event0";
+//    char event_file_name[256] = "/dev/fpga2_event0";
+    char event_file_name[256] = "/dev/xdma0_events_0";
     int rc = 0;
-    int poll_timeout = 500;
+    int poll_timeout = 3000;
     int num_fds = 1;
     int exp_intr_count = 1;
     uint32_t interrupt_reg_offset = 0xd00;
@@ -217,6 +218,10 @@ int interrupt_example(int slot_id){
     printf("Starting MSI-X Interrupt test \n");
     rc = fpga_pci_attach(slot_id, 0, 0, 0, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
+
+    /*Clear the interrupt register*/
+    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 <<16 );
+    fail_on(rc, out, "Unable to write to the fpga !");
 
     //Generate and check the MSI-X Interrupts
     printf("Checking to make sure Interrupt trigger and status bits are initially 0 \n");
@@ -226,9 +231,8 @@ int interrupt_example(int slot_id){
     if(read_data != 0) {
         printf("Error: Initial values of Interrupt trigger and status bits is not 0 .Actual data = %x \n", read_data);
         rc = 1;
-        fail_on(rc, out, "Interrupt trigger or status bits have unexpected values");
     }
-    if((fd = open(event_file_name, O_RDONLY)) == -1) {
+    if((fd = open(event_file_name, O_RDWR)) == -1) {
         printf("Error: invalid device\n");
         rc = 1;
         fail_on(rc, out, "Unable to open event device");
@@ -251,30 +255,45 @@ int interrupt_example(int slot_id){
     fail_on(rc, out, "Unable to write to the fpga !");
 
     printf("Polling device file: %s for interrupt events \n", event_file_name);
-    if((fd = open(event_file_name, O_RDONLY)) == -1) {
+    if((fd = open(event_file_name, O_RDWR)) == -1) {
         printf("Error - invalid device\n");
         rc = 1;
         fail_on(rc, out, "Unable to open event device");
     }
     fds[0].fd = fd;
-    fds[0].events = 0xffff; // get all events
-    rd = poll(fds, num_fds, poll_timeout);
+    fds[0].events = 0xffff;
+    rd = 0;
+    while(rd == 0){
+
+    sleep(3);
+    rc = fpga_pci_peek(pci_bar_handle, interrupt_reg_offset, &read_data);
+    fail_on(rc, out, "Unable to read read from the fpga !");
+
+        printf("Error: Initial values of Interrupt trigger and status bits not 0 .Actual data = %x \n", read_data);
+    if(read_data == 0) {
+        printf("Error: Initial values of Interrupt trigger and status bits not 0 .Actual data = %x \n", read_data);
+        rc = 1;
+    }
+    rd = poll(fds, num_fds, 0);
 
     if (rd > 0) {
+        if(fds[0].revents & POLLIN){
+            printf("Number of Interrupt events present for Interrupt 1 = %x. It worked!\n", value);
+        }
         rd = read(fd, &value, 4);
         if(value != exp_intr_count) {
             printf("Number of Interrupt events did not match for Interrupt 1. Actual = %x, Expected = %x \n", value, exp_intr_count);
             rc = 1;
-            fail_on(rc, out, "Unable to open event device");
         }
         else {
            printf("Number of Interrupt events present for Interrupt 1 = %x. It worked!\n", value);
         }
     }
     else {
-        printf("ERROR: Device file: %s does not have any Interrupt events reported", event_file_name);
+        printf("ERROR: Device file: %s does not have any Interrupt events reported (got rc %x)", event_file_name, rc);
+        printf("Events = %x\n",fds[0].revents);
         rc = 1;
-        fail_on(rc, out, "No interrupts reported");
+    }
     }
 
 out:
