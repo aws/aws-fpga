@@ -4,7 +4,8 @@
 
 1. [Overview](#overview)
 2. [Functional Description of the example RTL](#functionalDescription)
-3. [Runtime Software](#runtmieSoftware)
+3. [Software](#software)
+4. [DRAM DMA Example Metadata] (#metadata)
 
 
 <a name="overview"></a>
@@ -101,10 +102,25 @@ CL_DRAM_DMA uses the main `clk_main_a0`.  It's frequency is set in the cl_clk un
 
 flr_reset is ignored in this design
   
-  
-  
+<a name="software"></a>
+## Runtime software
 
+DMA accesses rely on the edma driver- see the [edma driver readme](../../../../sdk/linux_kernel_drivers/edma/README.md)
 
-<a name="runtmieSoftware"></a>
-# Runtime Software
+The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
+  
+<a name="metadata"></a>
+## DRAM DMA Example Metadata
+The following table displays information about the CL that is required to register it as an AFI with AWS.
+Alternatively, you can directly use a pre-generated AFI for this CL.
+
+| Key   | Value     |
+|-----------|------|
+| Shell Version | 0x032117d7 |
+| PCI Device ID | 0xF001 |
+| PCI Vendor ID | 0x1D0F (Amazon) |
+| PCI Subsystem ID | 0x1D51 |
+| PCI Subsystem Vendor ID | 0xFEDC |
+| Pre-generated AFI ID | afi-0ecaea0acb378de34 |
+| Pre-generated AGFI ID | agfi-05df3e62433b421e0 |
 
