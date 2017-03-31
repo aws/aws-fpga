@@ -257,14 +257,21 @@ Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encrypt
 # Frequently Asked Questions 
 
 
-1. What are the different files that a developer needs to provide to AWS?
+**Q: What are the different files that a developer needs to provide to AWS?**
+The developer should submit a tar file that contains the placed-and-routed DCP along with the required manifest.txt file.
 
-2. How do I ensure that the DCP I create will generate a good bistream at AWS?
+**Q: How do I ensure that the DCP I create will generate a good bistream at AWS?**
+The developer can enable the AWS emulation step by setting the `run_aws_emulation` argument when calling `aws_build_dcp_from_cl.sh`.
 
-3. What should I do my design is not meeting timing?
+**Q: What should I do my design is not meeting timing?**
+The developer should evaluate the timing path to identify a solution that may include design changes or additional constraints. Additionally, the developer can try using one of the different build strategies that may help resolve the timing violations.
 
-4. My design was meeting timing, but even without changes, subsequent builds are not meeting timing?
+**Q: My design was meeting timing, but even without changes, subsequent builds are not meeting timing?**
+This may happen due to various reasons. The developer should investigate the timing violation regardless of the lack of design changes. Additionally, the developer can try using one of the different build strategies that may help resolve the timing violations.
 
-5. "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?
+**Q: "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?**
+The developer can double-check that the [AWS Shell DCP] (checkpoints/from_aws/SH_CL_BB_routed.dcp), was copied properly from the S3 bucket during the [hdk_setup.sh] (../../../../hdk_setup.sh) step and that there aren't errors in the build log. 
 
-6. What version of Vivado do I need to use?
+**Q: What version of Vivado do I need to use?**
+The valid version of Vivado is verified during the [hdk_setup.sh] (../../../../hdk_setup.sh) step.
+
