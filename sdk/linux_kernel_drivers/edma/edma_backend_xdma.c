@@ -14,6 +14,8 @@
 #define DRV_MODULE_NAME					"emda_xdma_backend"
 //FIXME: move to mutable
 #define XDMA_TIMEOUT_IN_MSEC				(3 * 1000)
+#define SLEEP_MIN_USEC					(100)
+#define SLEEP_MAX_USEC					(500)
 #define XDMA_WORKER_SLEEPING_STATUS_BIT			(0)
 #define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT		(1)
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
@@ -25,19 +27,15 @@
 struct class* edma_class;
 
 
-typedef struct
-{
-	//avoid allocation
+typedef struct {
 	struct sg_table sgt;
 	struct scatterlist sgl;
 	u64 target_addr;
 	u32 completed;
-
 }command_t;
 
-typedef struct
-{
-	void*		channel_handle;
+typedef struct {
+	void* channel_handle;
 	command_t* 	queue;
 	u32		head;
 	u32		tail;
@@ -45,6 +43,12 @@ typedef struct
 	struct task_struct *worker_thread;
 	unsigned long   thread_status;
 }command_queue_t;
+
+typedef struct {
+	void* channel_handle;
+	void* buffer;
+	u32 size;
+} c2h_handle_t;
 
 //TODO: add a thread that monitors the XDMA state (check that not failed)
 
@@ -57,8 +61,6 @@ MODULE_DEVICE_TABLE(pci, edma_pci_tbl);
 
 static frontend_callback frontend_init_callback;
 static frontend_callback frontend_cleanup_callback;
-static void* read_submitted_buffer;
-static u32 read_submitted_size;
 extern int edma_queue_depth;
 
 static int write_worker_function(void *data)
@@ -68,8 +70,6 @@ static int write_worker_function(void *data)
 
 	while(!kthread_should_stop())
 	{
-		clear_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
-
 		if(command_queue-> head != command_queue->tail)
 		{
 			int ret = xdma_xfer_submit(
@@ -92,17 +92,20 @@ static int write_worker_function(void *data)
 			queue[command_queue->head].completed = 1;
 
 			command_queue->head =
-					(command_queue->head + 1) % edma_queue_depth;
-
-			set_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+					EDMA_RING_IDX_NEXT(
+							command_queue->head,edma_queue_depth);
 
 			//are there still requests in the queue?
 			if(command_queue->head != command_queue->tail)
 				continue;
 		}
 
+		set_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule();
+
+		clear_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
 	}
 
 	set_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT,
@@ -120,6 +123,7 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	struct backend_device* backend_device = NULL;
 	int number_of_xdma_channels = 0;
 	command_queue_t* command_queue = NULL;
+	c2h_handle_t* c2h_handles = NULL;
 
 	dev_dbg(dev, ">> %s\n", __func__);
 
@@ -152,20 +156,25 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev_info(dev, "xdma opened %d channels\n", number_of_xdma_channels);
 
 	command_queue = (command_queue_t*)kzalloc(
-			number_of_xdma_channels * sizeof(command_queue_t), GFP_KERNEL);
+			number_of_xdma_channels * sizeof(command_queue_t),
+			GFP_KERNEL);
 	if(!command_queue) {
 		ret = -ENOMEM;
 		goto done;
 	}
 
-	backend_device = (struct backend_device*)kzalloc(sizeof(struct backend_device), GFP_KERNEL);
+	backend_device = (struct backend_device*)kzalloc(
+			sizeof(struct backend_device), GFP_KERNEL);
 	if(!backend_device) {
 		ret = -ENOMEM;
 		kfree(command_queue);
 		goto done;
 	}
 
-	backend_device->queues = (struct edma_queue_handle*)kzalloc(number_of_xdma_channels * sizeof(struct edma_queue_handle), GFP_KERNEL);
+	backend_device->queues = (struct edma_queue_handle*)kzalloc(
+			number_of_xdma_channels
+					* sizeof(struct edma_queue_handle),
+			GFP_KERNEL);
 	if(!backend_device->queues) {
 		ret = -ENOMEM;
 		kfree(backend_device);
@@ -173,14 +182,26 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto done;
 	}
 
+	c2h_handles = (c2h_handle_t*)kzalloc(
+			number_of_xdma_channels * sizeof(c2h_handle_t),
+			GFP_KERNEL);
+	if(!c2h_handles) {
+			ret = -ENOMEM;
+			kfree(backend_device->queues);
+			kfree(backend_device);
+			kfree(command_queue);
+			goto done;
+		}
+
 	for( i = 0; i < number_of_xdma_channels; i++)
 	{
 		command_queue[i].channel_handle = channel_list[i].h2c;
 		command_queue[i].queue = (command_t*)kzalloc(
 				edma_queue_depth * sizeof(command_t), GFP_KERNEL);
-		command_queue[i].head = command_queue[i].tail = 0;
 
-		backend_device->queues[i].rx = channel_list[i].c2h;
+		c2h_handles[i].channel_handle = channel_list[i].c2h;
+
+		backend_device->queues[i].rx = &(c2h_handles[i]);
 		backend_device->queues[i].tx = &(command_queue[i]);
 
 		smp_wmb();
@@ -217,6 +238,7 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 	int i;
 	struct backend_device* backend_device;
 	command_queue_t* command_queue;
+	c2h_handle_t* c2h_handle;
 
 	dev_dbg(dev, ">> %s\n", __func__);
 
@@ -225,15 +247,16 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 
 	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
 	command_queue = (command_queue_t*)(backend_device->queues[0].tx);
+	c2h_handle = (c2h_handle_t *) (backend_device->queues[0].rx);
 
 	for( i = 0; i < backend_device->number_of_queues; i++)
 		if(command_queue[i].worker_thread->state > 0)
 			kthread_stop(command_queue[i].worker_thread);
 
+	xdma_device_close(pdev, backend_device->backend_device_handle);
+
 	for( i = 0; i < backend_device->number_of_queues; i++)
 	{
-		xdma_device_close(pdev, backend_device->backend_device_handle);
-
 		if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
 				!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
 			msleep(XDMA_TIMEOUT_IN_MSEC);
@@ -248,14 +271,17 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 
 	frontend_cleanup_callback(backend_device);
 
-	kfree(command_queue);
-	command_queue = NULL;
+	kfree(c2h_handle);
+	c2h_handle = NULL;
 
 	kfree(backend_device->queues);
 	backend_device->queues = NULL;
 
 	kfree(backend_device);
 	backend_device = NULL;
+
+	kfree(command_queue);
+	command_queue = NULL;
 
 	dev_dbg(dev, "<< %s\n", __func__);
 
@@ -304,8 +330,9 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 
 	//32-bit is atomic
 	command_queue->tail =
-			(command_queue->tail + 1)
-					% edma_queue_depth;
+			EDMA_RING_IDX_NEXT(
+					command_queue->tail,
+					edma_queue_depth);
 
 	smp_wmb();
 
@@ -315,12 +342,10 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 	 *
 	 */
 
-	while((command_queue->worker_thread->state == TASK_RUNNING)
+	while((wake_up_process(command_queue->worker_thread) == 0)
 			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
 					&command_queue->thread_status))
-		msleep(XDMA_TIMEOUT_IN_MSEC);
-
-	wake_up_process(command_queue->worker_thread);
+		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
 
 	pr_info("<< %s\n", __func__);
 
@@ -343,9 +368,14 @@ int edma_backend_get_completed_m2s_request(u64** buffer, u32* size, void *q_hand
 		completed_buffer = (void*)(sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl));
 		completed_size = queue[command_queue->next_to_recycle].sgt.sgl->length;
 		queue[command_queue->next_to_recycle].completed = 0;
+
+		queue[command_queue->next_to_recycle].sgt.sgl->length = 0;
+		sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl) = 0;
+
 		command_queue->next_to_recycle =
-				(command_queue->next_to_recycle + 1)
-						% edma_queue_depth;
+				EDMA_RING_IDX_NEXT(
+				command_queue->next_to_recycle,
+				edma_queue_depth);
 	}
 
 	if(size)
@@ -365,6 +395,7 @@ int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 t
 	struct scatterlist sg;
 	int size_read = 0;
 	int ret = 0;
+	c2h_handle_t* c2h_handle = (c2h_handle_t*)q_handle;
 
 	sg_init_table(&sg, 1);
 
@@ -374,7 +405,7 @@ int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 t
 	sg_table.sgl = &sg;
 	sg_table.nents = 1;
 
-	size_read = xdma_xfer_submit(q_handle, DMA_FROM_DEVICE, target_addr, &sg_table, true, XDMA_TIMEOUT_IN_MSEC);
+	size_read = xdma_xfer_submit(c2h_handle->channel_handle, DMA_FROM_DEVICE, target_addr, &sg_table, true, XDMA_TIMEOUT_IN_MSEC);
 	if (size_read < 0) {
 		ret = size_read;
 		if (ret != -ENOMEM && ret != -EIO)
@@ -383,8 +414,8 @@ int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 t
 		goto edma_backend_submit_s2m_request_done;
 	}
 
-	read_submitted_buffer = buffer;
-	read_submitted_size = size_read;
+	c2h_handle->buffer = buffer;
+	c2h_handle->size = size_read;
 
 edma_backend_submit_s2m_request_done:
 	return ret;
@@ -394,15 +425,13 @@ edma_backend_submit_s2m_request_done:
 
 int edma_backend_get_completed_s2m_request(u64** buffer, u32* size, void *q_handle)
 {
-	(void)buffer;
-	(void)size;
-	(void)q_handle;
+	c2h_handle_t* c2h_handle = (c2h_handle_t*)q_handle;
 
-	*buffer = (u64*)read_submitted_buffer;
-	*size = read_submitted_size;
+	*buffer = c2h_handle->buffer;
+	*size = c2h_handle->size;
 
-	read_submitted_buffer = NULL;
-	read_submitted_size = 0;
+	c2h_handle->buffer = NULL;
+	c2h_handle->size = 0;
 
     return 0;
 }

@@ -1,5 +1,4 @@
-//---------------------------------------------------------------------------------------
-// Amazon FGPA Hardware Development Kit
+// Amazon FPGA Hardware Development Kit
 //
 // Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
@@ -13,12 +12,6 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
-//This enables encryption to mask LUT logic viewing – DO NOT REMOVE
-(* secure_config="PROTECT" *)
-
-//This enables encryption to encrypt netlists generated for this design – DO NOT REMOVE
-(* secure_netlist="ENCRYPT" *)
 
 module cl_dram_dma #(parameter NUM_DDR=4) 
 
