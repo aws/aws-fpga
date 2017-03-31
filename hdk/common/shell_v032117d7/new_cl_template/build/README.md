@@ -270,8 +270,8 @@ The developer should evaluate the timing path to identify a solution that may in
 This may happen due to various reasons. The developer should investigate the timing violation regardless of the lack of design changes. Additionally, the developer can try using one of the different build strategies that may help resolve the timing violations.
 
 **Q: "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?**
-The developer can double-check that the [AWS Shell DCP] (checkpoints/from_aws/SH_CL_BB_routed.dcp), was copied properly from the S3 bucket during the [hdk_setup.sh] (../../../../hdk_setup.sh) step and that there aren't errors in the build log. 
+The developer can double-check that the AWS Shell DCP, SH_CL_BB_routed.dcp, was downloaded properly from the S3 bucket to the `hdk/common/shell_stable/build/checkpoints/from_aws` directory during the [hdk_setup.sh](../../../../hdk_setup.sh) step and that there aren't errors in the build log. 
 
 **Q: What version of Vivado do I need to use?**
-The valid version of Vivado is verified during the [hdk_setup.sh] (../../../../hdk_setup.sh) step.
+The valid version of Vivado is verified during the [hdk_setup.sh](../../../../hdk_setup.sh) step.
 
