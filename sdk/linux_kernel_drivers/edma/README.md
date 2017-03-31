@@ -225,7 +225,7 @@ EDMA support concurrent multiple access from multiple processes and multiple thr
 
 It is the developer's responsibility to make sure write to same memory region from different threads/processes is coordinated and not overlapping.
 
-Worth re-iterating the recommended use of `pread()/pwrite()` over a sequency of `lseek()` + `read()/write()`.
+To re-iterate, use of `pread()/pwrite()` is recommended over a sequency of `lseek()` + `read()/write()`.
 
 <a name="error"></a>
 ## Error Handling
@@ -262,15 +262,15 @@ Release waits for 3 seconds and if any of the syscalls is not done - it dumps an
 
 Statistics are gathered using sysfs. Each EDMA queue has a sysfs entry (i.e. /dev/edmaX_queueY has /sys/edma/edmaX_queueY), and all the stats are under that sysfs entry.
 
-To see what available stats for a specific EDMA queue, simply run:
+To see what stats are available for a specific EDMA queue, simply run:
 
-`$ ls -l /sys/class/edma/edma0_queue0/*`
+`$ ls -l /sys/class/edma/edma0_queue_0/*`
   
 
 to read a specific statistic use cat utility
 
 ```
-$ cat /sys/class/edma/edma0_queue0/stats
+$ cat /sys/class/edma/edma0_queue_0/stats
 
 read_requests_submitted - 152
 read_requests_completed - 152
