@@ -58,7 +58,7 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x02221781 |
+| Shell Version | 0x032117d7 |
 | PCI Device ID | 0xF000 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
