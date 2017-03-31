@@ -175,7 +175,8 @@ int check_afi_ready(int slot_id) {
         printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
                "was just loaded, it might need a rescan. Rescanning now.\n");
 
-        fpga_pci_rescan_slot_app_pfs(slot_id);
+        rc = fpga_pci_rescan_slot_app_pfs(slot_id);
+        fail_on(rc, out, "Unable to update PF for slot %d",slot_id);
         /* get local image description, contains status, vendor id, and device id. */
         rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
         fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
