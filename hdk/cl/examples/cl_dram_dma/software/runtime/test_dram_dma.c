@@ -146,7 +146,7 @@ int dma_example(int slot_id) {
 
     for (channel=0;channel < 4; channel++) {
     	
-	rc = pwrite(fd, write_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+	rc = pwrite(fd, write_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
 	
     	fail_on((rc = (rc < 0)? 1:0), out, "call to pwrite failed.");
 
@@ -159,7 +159,7 @@ int dma_example(int slot_id) {
     fsync(fd);
 
     for (channel=0;channel < 4; channel++) {
-    	rc = pread(fd, read_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+    	rc = pread(fd, read_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
     	fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
 
     	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
