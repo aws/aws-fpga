@@ -4,7 +4,7 @@
 
 1. [Overview](#overview)
 2. [Functional Description of the example RTL](#functionalDescription)
-3. [Hello World Example Metadata] (#metadata)
+3. [DRAM DMA Example Metadata](#metadata)
 4. [Runtime Software](#runtmieSoftware)
 
 
