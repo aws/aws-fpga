@@ -1,4 +1,4 @@
-This directory have the files that the CL build scripts will instantiate
+This directory contains the interface files that the CL designs will instantiate.
 
-These files must not be changed by the developer
+These files must not be changed by the developer.
 

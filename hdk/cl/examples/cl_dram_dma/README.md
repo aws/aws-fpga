@@ -5,7 +5,7 @@
 1. [Overview](#overview)
 2. [Functional Description of the example RTL](#functionalDescription)
 3. [Software](#software)
-4. [DRAM DMA Example Metadata] (#metadata)
+4. [DRAM DMA Example Metadata](#metadata)
 
 
 <a name="overview"></a>
@@ -102,9 +102,9 @@ CL_DRAM_DMA uses the main `clk_main_a0`.  It's frequency is set in the cl_clk un
 
 flr_reset is ignored in this design
   
+
 <a name="software"></a>
 ## Runtime software
-
 DMA accesses rely on the edma driver- see the [edma driver readme](../../../../sdk/linux_kernel_drivers/edma/README.md)
 
 The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)

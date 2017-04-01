@@ -29,8 +29,6 @@
 --include ${SH_INF_DIR}
 --include ${HDK_COMMON_DIR}/verif/include
 --include ${CL_ROOT}/design/axi_crossbar_0
---include ${CL_ROOT}/design/src_register_slice
---include ${CL_ROOT}/design/dest_register_slice
 --include ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ipshared/7e3a/hdl
 
 
@@ -42,6 +40,8 @@ ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m02_regslice_0/si
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m03_regslice_0/sim/cl_axi_interconnect_m03_regslice_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v
 ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
+${SH_LIB_DIR}/../ip/dest_register_slice/sim/dest_register_slice.v
+${SH_LIB_DIR}/../ip/src_register_slice/sim/src_register_slice.v
 
 --define DISABLE_CHIPSCOPE_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
@@ -58,9 +58,6 @@ ${CL_ROOT}/design/cl_int_slv.sv
 ${CL_ROOT}/design/cl_ocl_slv.sv
 ${CL_ROOT}/design/cl_sda_slv.sv
 ${CL_ROOT}/design/cl_dram_dma.sv
-
-${CL_ROOT}/design/src_register_slice/src_register_slice.v
-${CL_ROOT}/design/dest_register_slice/dest_register_slice.v
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 

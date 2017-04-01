@@ -15,15 +15,15 @@
 
 Once the developer has a functional design, the next steps are to: synthesize the design into basic FPGA cells, perform place-and-route, and check that the design meets the timing/frequency constraints. This could be an iterative process. Upon success, the developer will need to pass the output of the flow to AWS for final AFI creation.
 
-The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoints (referred to as DCP throughout this document) and [manifest](./../../../../docs/AFI_Manifest.md): The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries  within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](./../../../../docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](./../../../../docs/AFI_Manifest.md) should include key parameters needed for registering and loading the AFI like target frequency.
+The developer needs to transfer to AWS a tar file that includes the encrypted placed-and-routed design checkpoint (referred to as DCP throughout this document) and [manifest](./../../../../docs/AFI_Manifest.md). The DCP includes the complete developer design that meets timing/frequency constraints, placement boundaries  within the allocated CL area on the FPGA, and the functional requirements laid out in the [Shell Interface Specification](./../../../../docs/AWS_Shell_Interface_Specification.md#overview).  The [manifest.txt](./../../../../docs/AFI_Manifest.md) should include key parameters needed for registering and loading the AFI, such as target frequency.
 
 To assist in this process, AWS provides a reference DCP that includes the shell (SH) logic with a black-boxed CL under: `$HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
 
-AWS also provides out-of-the-box generic script called `aws_build_dcp_from_cl.sh` that is used for test compile a few examples like `CL_simple` design as if they were developer code. These reference examples can serve as starting points for new designs. The output of AWS-provided scripts will create a a tar file, with both the encrypted placed-and-routed DCP and the corresponding `manifest.txt`, which AWS will use to generate final the bitstream.
+AWS also provides an out-of-the-box generic script called `aws_build_dcp_from_cl.sh` that is used to test compile a few examples, such as the `cl_hello_world` design, as if they were developer code. These reference examples can serve as starting points for new designs. The output of the AWS-provided scripts will create a tar file, with both the encrypted placed-and-routed DCP and the corresponding `manifest.txt`, which AWS will use to generate the final bitstream.
 
-AWS provides with multiple implementation methods for DCP to meet placement and timing constrains. The `aws_build_dcp_from_cl.sh` provides multiple choices for implementation strategy , invoked by the `-strategy` option. For more details refer to [Build Strategies](#strategies) below or call `aws_build_dcp_from_cl.sh -help` for the list of supported capabilities.
+AWS provides multiple options to generate a DCP that meets placement and timing constraints. The `aws_build_dcp_from_cl.sh` provides multiple choices for implementation strategies, invoked by the `-strategy` option. For more details refer to [Build Strategies](#strategies) below or call `aws_build_dcp_from_cl.sh -help` for the list of supported capabilities.
 
-Advanced developers can use different scripts, tools, and techniques (e.g., regioning),  with the  condition that they submit both the `manifest.txt` and "encrypted placed-and-routed design checkpoints (DCP)" in a single tar file, that passes final checks which are included in the build scripts.  (TBD - final_check_dcp).
+Advanced developers can use different scripts, tools, and techniques (e.g., regioning),  with the  condition that they submit both the `manifest.txt` and "encrypted placed-and-routed design checkpoint (DCP)" in a single tar file that passes final checks. In order to reduce build time the AWS emulation step that performs these checks is disabled during the build process. In order to enable the check, a developer can set the `run_aws_emulation` argument when calling `aws_build_dcp_from_cl.sh`.
 
 <a name="stepbystep"></a>
 ## Build Procedure 
@@ -257,14 +257,21 @@ Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encrypt
 # Frequently Asked Questions 
 
 
-1. What are the different files that a developer needs to provide to AWS?
+**Q: What are the different files that a developer needs to provide to AWS?**
+The developer should submit a tar file that contains the placed-and-routed DCP along with the required manifest.txt file.
 
-2. How do I ensure that the DCP I create will generate a good bistream at AWS?
+**Q: How do I ensure that the DCP I create will generate a good bistream at AWS?**
+The developer can enable the AWS emulation step by setting the `run_aws_emulation` argument when calling `aws_build_dcp_from_cl.sh`.
 
-3. What should I do my design is not meeting timing?
+**Q: What should I do my design is not meeting timing?**
+The developer should evaluate the timing path to identify a solution that may include design changes or additional constraints. Additionally, the developer can try using one of the different build strategies that may help resolve the timing violations.
 
-4. My design was meeting timing, but even without changes, subsequent builds are not meeting timing?
+**Q: My design was meeting timing, but even without changes, subsequent builds are not meeting timing?**
+This may happen due to various reasons. The developer should investigate the timing violation regardless of the lack of design changes. Additionally, the developer can try using one of the different build strategies that may help resolve the timing violations.
 
-5. "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?
+**Q: "pr_verify" is complaining that the design checkpoints are incompatible. What should I do?**
+The developer can double-check that the AWS Shell DCP, SH_CL_BB_routed.dcp, was downloaded properly from the S3 bucket to the `hdk/common/shell_stable/build/checkpoints/from_aws` directory during the [hdk_setup.sh](../../../../../hdk_setup.sh) step and that there aren't errors in the build log. 
 
-6. What version of Vivado do I need to use?
+**Q: What version of Vivado do I need to use?**
+The valid version of Vivado is verified during the [hdk_setup.sh](../../../../../hdk_setup.sh) step.
+
