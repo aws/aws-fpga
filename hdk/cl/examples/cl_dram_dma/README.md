@@ -4,13 +4,8 @@
 
 1. [Overview](#overview)
 2. [Functional Description of the example RTL](#functionalDescription)
-<<<<<<< HEAD
 3. [Software](#software)
 4. [DRAM DMA Example Metadata] (#metadata)
-=======
-3. [DRAM DMA Example Metadata](#metadata)
-4. [Runtime Software](#runtmieSoftware)
->>>>>>> origin/prelease
 
 
 <a name="overview"></a>
