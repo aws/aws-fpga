@@ -311,6 +311,10 @@ This release fixes (HDK 1.1.0, Shell 0x032117d7) fixes the following issues in p
 * Cadence RTL simulations tools
 * All AXI-4 interfaces (PCIM, DDR4) do not support AxSIZE other than 0b110 (64B)
 
+## Known Bugs/Issues
+
+* The Shell does not meet timing.  There are two failing paths, the worst case fails by 24ps.
+
 ## Supported Tools and Environment
 
 * The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms

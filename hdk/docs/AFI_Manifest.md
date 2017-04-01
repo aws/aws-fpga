@@ -35,7 +35,7 @@ The manifest file is a text file formatted with key=value pairs. Some keys are m
 * **hdk_version=**.....     
       *Taken from aws-fpga/hdk/hdk_version.txt* 
 
-* **date=** YY_MM_DD-HHMM     
+* **date=** YY_MM_DD-HHMMSS     
       *Following same format used in the automatic build reports used by AWS scripts*
 
 * **clock_recipe_a**=....   [Mandatory]  

@@ -293,13 +293,13 @@ logic[5:0] cfg_rd_loop_addr_shift = 0;
 logic cfg_inc_id_mode;
 logic cfg_const_data_mode = 0;
 
-logic cfg_atg_enable = 1;
+logic cfg_atg_enable = 0;
 assign atg_enable = cfg_atg_enable;
 
 logic[15:0] cfg_read_start = 0;
 logic[15:0] cfg_max_write = 0;
 
-logic[8:0] cfg_max_read_req = 0;        //Number of tags allowed (0-based)
+logic[8:0] cfg_max_read_req = (NUM_RD_TAG>32)? 31: NUM_RD_TAG-1;        //Number of tags allowed (0-based)
 
 logic cfg_wr_go;
 logic cfg_rd_go;
