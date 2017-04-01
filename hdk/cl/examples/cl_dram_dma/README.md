@@ -5,7 +5,7 @@
 1. [Overview](#overview)
 2. [Functional Description of the example RTL](#functionalDescription)
 3. [Software](#software)
-4. [DRAM DMA Example Metadata] (#metadata)
+4. [DRAM DMA Example Metadata](#metadata)
 
 
 <a name="overview"></a>
