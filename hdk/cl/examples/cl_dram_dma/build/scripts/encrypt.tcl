@@ -61,6 +61,9 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc $TARGET_DIR
 
 exec chmod +w {*}[glob $TARGET_DIR/*]
 
+# encrypt .v/.sv/.vh/inc as verilog files
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.?v] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
 
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog [ glob $TARGET_DIR/*.* ]
+#---- VHDL DEVELOPER - uncomment the next command
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
 
