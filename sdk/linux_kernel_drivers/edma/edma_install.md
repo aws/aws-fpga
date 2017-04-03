@@ -89,13 +89,12 @@ The next set of steps will installing the kernel driver so it get called everyti
 ```
 
   $ echo 'edma' | sudo tee --append /etc/modules-load.d/edma.conf
-
   $ cp edma-drv.ko /lib/modules/`uname -r`/
   $ sudo depmod
 ```  
 
-To make the driver accessible, a reboot is required.
-  `$ sudo reboot`
+To install the driver without rebooting, run
+  `$ sudo modprobe edma-drv`
 
 ***NOTE:*** *steps 3 and 4 would need to be repeated for every kernel update*.  
   

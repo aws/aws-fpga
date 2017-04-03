@@ -55,10 +55,6 @@ int main(int argc, char **argv) {
     int rc;
     int slot_id;
 
-    /* setup logging to print to stdout */
-    /* This code is provided to help debug the software and not required by AWS FPGA */
-    initialize_log("test_hello_world");
-
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
     fail_on(rc, out, "Unable to initialize the fpga_pci library");
@@ -67,20 +63,31 @@ int main(int argc, char **argv) {
 
     slot_id = 0;
 
-    check_afi_ready(slot_id);
+    rc = check_afi_ready(slot_id);
+    fail_on(rc, out, "AFI not ready");
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    printf("Developers are encourged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
-    printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
-
     printf("===== Starting with peek_poke_example =====\n");	
     rc = peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0);
-    if (rc)
-	return rc;
+    fail_on(rc, out, "peek-poke example failed");
 
-    printf("===== Starting with vLED example =====\n");
-    rc = vled_example(slot_id); 
+
+    printf("Developers are encourged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
+    printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
+    printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
+     
+    printf(
+        "# fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
+        "# fpga-get-virtual-led  -S 0\n"
+        "FPGA slot id 0 have the following Virtual LED:\n"
+        "1010-1101-1101-1110\n"
+        "# fpga-set-virtual-dip-switch -S 0 -D 0000000000000000\n"
+        "# fpga-get-virtual-led  -S 0\n"
+        "FPGA slot id 0 have the following Virtual LED:\n"
+        "0000-0000-0000-0000\n"
+    );
+
   
     return rc;
     
@@ -111,6 +118,7 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
 
     /* write a value into the mapped address space */
     uint32_t value = 0xefbeadde;
+    uint32_t expected = 0xdeadbeef;
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
     fail_on(rc, out, "Unable to write to the fpga !");
 
@@ -119,48 +127,12 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     rc = fpga_pci_peek(pci_bar_handle, HELLO_WORLD_REG_ADDR, &value);
     fail_on(rc, out, "Unable to read read from the fpga !");
     printf("register: 0x%x\n", value);
-
-out:
-    /* clean up */
-    if (pci_bar_handle >= 0) {
-        rc = fpga_pci_detach(pci_bar_handle);
-        if (rc) {
-            printf("Failure while detaching from the fpga.\n");
-        }
+    if(value == expected) {
+        printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
     }
-
-    /* if there is an error code, exit with status 1 */
-    return (rc != 0 ? 1 : 0);
-}
-
-int vled_example(int slot_id) {
-   int rc;
-   pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
-
-    /* attach to the fpga, with a pci_bar_handle out param
-     * To attach to multiple slots or BARs, call this function multiple times,
-     * saving the pci_bar_handle to specify which address space to interact with in
-     * other API calls.
-     * This function accepts the slot_id, physical function, and bar number
-     * for the specific Virtual LED register in this CL design, it is 
-     * mapped behind the ocl_ bus, which maps to BAR0 in the FPGA application PF
-     */
-    rc = fpga_pci_attach(slot_id, FPGA_APP_PF, APP_PF_BAR0, 0, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
-
-    /* write this value to the led register
-     * The developer can later read the Virtual LED through
-     * linux shell command: $ fpga-get-virtual-led 
-     */
-
-    uint32_t led_reg_value = 0x5555;
-    rc = fpga_pci_poke(pci_bar_handle, VLED_REG_ADDR, led_reg_value);
-    fail_on(rc, out, "Unable to write to the fpga !");
-
-    printf("Wrote 0x%x to the LED trigger register in Hello World CL\n", led_reg_value);
-    printf("Please call AWS FPGA tool: $ fpga-get-virtual-led\n");
-    printf("to see what LED is being set on the CL to shell cl_shell_vled interface\n");
-
+    else{
+        printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
+    }
 out:
     /* clean up */
     if (pci_bar_handle >= 0) {
@@ -200,32 +172,28 @@ int check_afi_ready(int slot_id) {
     /* confirm that the AFI that we expect is in fact loaded */
     if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
         info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
-        rc = 1;
-        fail_on(rc, out, "The PCI vendor id and device of the loaded AFI are not "
-                         "the expected values.");
+        printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
+               "was just loaded, it might need a rescan. Rescanning now.\n");
+
+        rc = fpga_pci_rescan_slot_app_pfs(slot_id);
+        fail_on(rc, out, "Unable to update PF for slot %d",slot_id);
+        /* get local image description, contains status, vendor id, and device id. */
+        rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
+        fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
+
+        printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
+            info.spec.map[FPGA_APP_PF].vendor_id,
+            info.spec.map[FPGA_APP_PF].device_id);
+
+        /* confirm that the AFI that we expect is in fact loaded after rescan */
+        if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
+             info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
+            rc = 1;
+            fail_on(rc, out, "The PCI vendor id and device of the loaded AFI are not "
+                             "the expected values.");
+        }
     }
     
-    return rc;
-
-out:
-    return 1;
-}
-
-
-/*
- * Auxilary functin to set up a logger for printing
- * in this case, it redirect log to stdout
- */
-
-int initialize_log(char* log_name) {
-    int rc;
-    /* setup logging to print to stdout */
-    /* This code is provided to help debug the software and not required by AWS FPGA */
-    rc = log_init(log_name);
-    fail_on(rc, out, "Unable to initialize the log.");
-    rc = log_attach(logger, NULL, 0);
-    fail_on(rc, out, "%s", "Unable to attach to the log.");
-
     return rc;
 
 out:
