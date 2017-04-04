@@ -37,69 +37,42 @@ axi_bus_t sh_ocl_bus_q();
 //---------------------------------
 // flop the input OCL bus
 //---------------------------------
-   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) AXIL_OCL_REG_SLC (
+   axi_register_slice_light AXIL_OCL_REG_SLC (
     .aclk          (clk),
     .aresetn       (sync_rst_n),
-    .sync_rst_n    (1'b1),
-    .s_axi_awid    (1'b0),
     .s_axi_awaddr  (sh_ocl_bus.awaddr[31:0]),
-    .s_axi_awlen   (8'h00),                                            
     .s_axi_awvalid (sh_ocl_bus.awvalid),
-    .s_axi_awuser  (1'b0),
     .s_axi_awready (sh_ocl_bus.awready),
     .s_axi_wdata   (sh_ocl_bus.wdata[31:0]),
     .s_axi_wstrb   (sh_ocl_bus.wstrb[3:0]),
-    .s_axi_wlast   (1'b0),
-    .s_axi_wuser   (1'b0),
     .s_axi_wvalid  (sh_ocl_bus.wvalid),
     .s_axi_wready  (sh_ocl_bus.wready),
-    .s_axi_bid     (),
     .s_axi_bresp   (sh_ocl_bus.bresp),
     .s_axi_bvalid  (sh_ocl_bus.bvalid),
-    .s_axi_buser   (),
     .s_axi_bready  (sh_ocl_bus.bready),
-    .s_axi_arid    (1'h0),
     .s_axi_araddr  (sh_ocl_bus.araddr[31:0]),
-    .s_axi_arlen   (8'h0), 
     .s_axi_arvalid (sh_ocl_bus.arvalid),
-    .s_axi_aruser  (1'd0),
     .s_axi_arready (sh_ocl_bus.arready),
-    .s_axi_rid     (),
     .s_axi_rdata   (sh_ocl_bus.rdata[31:0]),
     .s_axi_rresp   (sh_ocl_bus.rresp),
-    .s_axi_rlast   (),
-    .s_axi_ruser   (),
     .s_axi_rvalid  (sh_ocl_bus.rvalid),
     .s_axi_rready  (sh_ocl_bus.rready),
  
-    .m_axi_awid    (),
     .m_axi_awaddr  (sh_ocl_bus_q.awaddr[31:0]), 
-    .m_axi_awlen   (),
     .m_axi_awvalid (sh_ocl_bus_q.awvalid),
-    .m_axi_awuser  (),
     .m_axi_awready (sh_ocl_bus_q.awready),
     .m_axi_wdata   (sh_ocl_bus_q.wdata[31:0]),  
     .m_axi_wstrb   (sh_ocl_bus_q.wstrb[3:0]),
     .m_axi_wvalid  (sh_ocl_bus_q.wvalid), 
-    .m_axi_wlast   (),
-    .m_axi_wuser   (),
     .m_axi_wready  (sh_ocl_bus_q.wready), 
     .m_axi_bresp   (sh_ocl_bus_q.bresp),  
     .m_axi_bvalid  (sh_ocl_bus_q.bvalid), 
-    .m_axi_bid     (),
-    .m_axi_buser   (1'b0),
     .m_axi_bready  (sh_ocl_bus_q.bready), 
-    .m_axi_arid    (), 
     .m_axi_araddr  (sh_ocl_bus_q.araddr[31:0]), 
-    .m_axi_arlen   (), 
-    .m_axi_aruser  (), 
     .m_axi_arvalid (sh_ocl_bus_q.arvalid),
     .m_axi_arready (sh_ocl_bus_q.arready),
-    .m_axi_rid     (),  
     .m_axi_rdata   (sh_ocl_bus_q.rdata[31:0]),  
     .m_axi_rresp   (sh_ocl_bus_q.rresp),  
-    .m_axi_rlast   (),  
-    .m_axi_ruser   (1'b0),
     .m_axi_rvalid  (sh_ocl_bus_q.rvalid), 
     .m_axi_rready  (sh_ocl_bus_q.rready)
    );
@@ -167,11 +140,17 @@ always_ff @(negedge sync_rst_n or posedge clk)
     {slv_req_rd_addr, slv_req_wr_addr} <= 128'd0;
     {slv_req_rd_id, slv_req_wr_id} <= 0;
   end
-  else if ((slv_state == SLV_IDLE) && (sh_ocl_bus_q.arvalid || sh_ocl_bus_q.awvalid))
+  else if ((slv_state == SLV_IDLE) && sh_ocl_bus_q.awvalid)
   begin
-    {slv_req_rd_addr[31:0], slv_req_wr_addr[31:0]} <= {sh_ocl_bus_q.araddr[31:0], sh_ocl_bus_q.awaddr[31:0]};
-    {slv_req_rd_id, slv_req_wr_id} <= 0;
+    slv_req_wr_addr[31:0] <= sh_ocl_bus_q.awaddr[31:0];
+    slv_req_wr_id <= 0;
   end
+  else if ((slv_state == SLV_IDLE) && sh_ocl_bus_q.arvalid)
+  begin
+    slv_req_rd_addr[31:0] <= sh_ocl_bus_q.araddr[31:0];
+    slv_req_rd_id <= 0;
+  end
+
    
 //Mux address
 assign slv_mx_addr = (slv_cyc_wr)? slv_req_wr_addr : slv_req_rd_addr;

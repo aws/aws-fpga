@@ -40,6 +40,8 @@ ${SH_LIB_DIR}/../ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v
 ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${SH_LIB_DIR}/../ip/dest_register_slice/sim/dest_register_slice.v
 ${SH_LIB_DIR}/../ip/src_register_slice/sim/src_register_slice.v
+${SH_LIB_DIR}/../ip/axi_register_slice/sim/axi_register_slice.v
+${SH_LIB_DIR}/../ip/axi_register_slice_light/sim/axi_register_slice_light.v
 
 +define+DISABLE_CHIPSCOPE_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
