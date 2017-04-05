@@ -34,12 +34,12 @@ static uint16_t pci_device_id = 0xF001;
 /* use the stdout logger */
 const struct logger *logger = &logger_stdout;
 
-int dma_example(int slot_id, char* device_file);
+int dma_example(int slot_id, int dma_queue);
 int interrupt_example(int slot_id, int device_file_number, int interrupt_number);
 
 int main(int argc, char **argv) {
     int rc;
-    int slot_id;
+    int slot_id, dma_queue;
 
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
@@ -52,14 +52,10 @@ int main(int argc, char **argv) {
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
     slot_id = 0;
+    dma_queue = 0;
 
-    rc = dma_example(slot_id, "/dev/edma1_queue_0");
+    rc = dma_example(slot_id, dma_queue);
     fail_on(rc, out, "DMA example failed");
-    int i;
-    for( i= 0; i<16; i++)
-      rc = interrupt_example(slot_id, 1, i);
-    fail_on(rc, out, "Interrupt example failed");
-
 
 out:
     return 1;
@@ -88,7 +84,10 @@ check_slot_config(int slot_id)
         printf("The slot appears loaded, but the pci vendor or device ID doesn't "
                "match the expected values. You may need to rescan the fpga with \n"
                "fpga-describe-local-image -S %i -R\n"
-               "and check /dev/ for the new device file\n",slot_id);
+               "Note that rescanning can change which device file in /dev/ a FPGA will map to.\n"
+               "To remove and re-add your edma driver and reset the device file mappings, run\n"
+               "`sudo rmmod edma-drv && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/edma/edma-drv.ko`\n",
+               slot_id);
         fail_on(rc, out, "The PCI vendor id and device of the loaded image are "
                          "not the expected values.");
     }
@@ -125,8 +124,9 @@ rand_string(char *str, size_t size)
  * using fsync() between the writes and read to insure order
  */
 
-int dma_example(int slot_id, char* device_file) {
+int dma_example(int slot_id, int dma_queue) {
     int fd, rc;
+    char device_file_name[256];
     char *write_buffer, *read_buffer;
     static const size_t buffer_size = 128;
     int channel=0;
@@ -135,17 +135,24 @@ int dma_example(int slot_id, char* device_file) {
     write_buffer = NULL;
     fd = -1;
 
+    rc = sprintf(device_file_name, "/dev/fpga%i_event%i", slot_id, dma_queue);
+    fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
+
+
     /* make sure the AFI is loaded and ready */
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
-    fd = open(device_file, O_RDWR);
+    fd = open(device_file_name, O_RDWR);
     if(fd<0){
         printf("Cannot open device file %s.\nMaybe the EDMA "
                "driver isn't installed, isn't modified to attach to the PCI ID of "
                "your CL, or you're using a device file that doesn't exist?\n"
-               "Remember that rescanning your FPGA can change the device file.\n",
-               device_file);
+               "See the edma_install manual at <aws-fpga>/sdk/linux_kernel_drivers/edma/edma_install.md\n"
+               "Remember that rescanning your FPGA can change the device file.\n"
+               "To remove and re-add your edma driver and reset the device file mappings, run\n"
+               "`sudo rmmod edma-drv && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/edma/edma-drv.ko`\n",
+               device_file_name);
         fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. ");
     }
 
@@ -179,20 +186,22 @@ int dma_example(int slot_id, char* device_file) {
     	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
         	printf("DRAM DMA read the same string as it wrote on channel %d (it worked correctly!)\n", channel);
     	} else {
-        	int i;
+            int i;
+            printf("Bytes written to channel %d:\n", channel);
+            for (i = 0; i < buffer_size; ++i) {
+                printf("%c", write_buffer[i]);
+            }
 
-        	printf("Bytes written to channel %d:\n", channel);
-        	for (i = 0; i < buffer_size; ++i) {
-            		printf("%c", write_buffer[i]);
-        	}
-        	
-		printf("\n\n");
+            printf("\n\n");
 
-        	printf("Bytes read:\n");
-        	for (i = 0; i < buffer_size; ++i) {
-            		printf("%c", read_buffer[i]);
-        	}
-        printf("\n\n");
+            printf("Bytes read:\n");
+            for (i = 0; i < buffer_size; ++i) {
+                printf("%c", read_buffer[i]);
+            }
+            printf("\n\n");
+         
+            rc = 1; 
+            fail_on(rc, out, "Data read from DMA did not match data written with DMA. Was there an fsync() between the read and write?");
     	}
     }
 
@@ -209,88 +218,3 @@ out:
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
-
-int interrupt_example(int slot_id,int device_file_number, int interrupt_number){
-    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
-    struct pollfd fds[1];
-    uint32_t fd, rd,  read_data;
-    char event_file_name[256];
-//    char event_file_name[256] = "/dev/xdma0_events_0";
-    int rc = 0;
-    int poll_timeout = 10000;
-    int num_fds = 1;
-    //int exp_intr_count = 1;
-    int pf_id = 0;
-    int bar_id = 0;
-    int fpga_attach_flags = 0;
-    uint32_t interrupt_reg_offset = 0xd00;
-
-
-    printf("Starting MSI-X Interrupt test \n");
-
-
-    rc = sprintf(event_file_name,"/dev/fpga%i_event%i",device_file_number, interrupt_number);
-    //rc = sprintf(event_file_name,"/dev/fpga1_event0");
-    fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
-
-    rc = fpga_pci_attach(slot_id, pf_id, bar_id, fpga_attach_flags, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
-
-    printf("Polling device file: %s for interrupt events \n", event_file_name);
-    if((fd = open(event_file_name, O_RDONLY)) == -1) {
-        printf("Error - invalid device\n");
-        rc = 1;
-        fail_on(rc, out, "Unable to open event device");
-    }
-    fds[0].fd = fd;
-    fds[0].events = POLLIN;
-
-
-    //Clear the interrupt register
-    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 <<(16 + interrupt_number) );
-    fail_on(rc, out, "Unable to write to the fpga !");
-    rd = poll(fds, num_fds, poll_timeout);
-
-    //Generate and check the MSI-X Interrupts
-    printf("Checking to make sure Interrupt trigger and status bits are initially 0 \n");
-    rc = fpga_pci_peek(pci_bar_handle, interrupt_reg_offset, &read_data);
-    fail_on(rc, out, "Unable to read read from the fpga !");
-
-    if(read_data != 0) {
-        printf("Error: Initial values of Interrupt trigger and status bits is not 0 .Actual data = %x \n", read_data);
-        rc = 1;
-    }
-//Try clearing
-    rd = poll(fds, num_fds, poll_timeout);
-    rd = poll(fds, num_fds, poll_timeout);
-    if (rd & POLLIN) {
-        printf("Error: Unexpected interrupt events found in the events file: %s\n", event_file_name);
-        rc = 1;
-        fail_on(rc, out, "Unexpected interrupts found, not triggered by test");
-    }
-    close(fd);
-
-    printf("Triggering MSI-X Interrupt 0\n");
-    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
-    fail_on(rc, out, "Unable to write to the fpga !");
-
-    rd = poll(fds, num_fds, poll_timeout);
-    if( rd >0 && fds[0].revents & POLLIN){
-        printf("Interrupt present for Interrupt 0 It worked!\n");
-        //Clear the interrupt register
-        rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
-        fail_on(rc, out, "Unable to write to the fpga !");
-    }
-    else{
-        printf("No interrupt generated- something went wrong.\n");
-        rc = 1;
-        fail_on(rc, out, "Interrupt generation failed");
-    }
-
-out:
-    if(fd){
-        close(fd);
-    }
-    return rc;
-}
-
