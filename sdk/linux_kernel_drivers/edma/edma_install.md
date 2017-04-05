@@ -78,7 +78,7 @@ __**Step 3**__: Enter the directory and compile the code:
   $ make
 ```
 
-If the `make` command was successful, you would find edma.ko.
+If the `make` command was successful, you would find edma-drv.ko.
 
 __**Step 4**__: Copy the driver to the modules directory:  
 
@@ -89,10 +89,12 @@ The next set of steps will installing the kernel driver so it get called everyti
 ```
 
   $ echo 'edma' | sudo tee --append /etc/modules-load.d/edma.conf
-
-  $ cp edma.ko /lib/modules/(uname -r)/
+  $ cp edma-drv.ko /lib/modules/`uname -r`/
   $ sudo depmod
 ```  
+
+To install the driver without rebooting, run
+  `$ sudo modprobe edma-drv`
 
 ***NOTE:*** *steps 3 and 4 would need to be repeated for every kernel update*.  
   
@@ -108,7 +110,7 @@ __*Step B:*__	**Move the `edma` source package to the `/usr/src/` directory**
 
 so dkms can find it and build it for each kernel update: Append the version number (you can find the current version number in the release notes) of the source code to the directory name. For example, version 1.0.0 is shown in the example below:  
 
-  `$ sudo mv <my_fpga_repo/aws-fpga/sdk/linux_kernel_drivers/edma /usr/src/edma-1.0.0`
+  `$ sudo cp -R <my_fpga_repo/aws-fpga/sdk/linux_kernel_drivers/edma /usr/src/edma-1.0.0`
 
 __*Step C:*__	**Create the dkms configuration file with the following values, substituting your version of edma.**  
 
@@ -139,7 +141,7 @@ __*Step E:*__	**Rebuild the initramfs so the correct module is loaded at boot ti
 __*Step F:*__ **Verify that the edma module is installed using the modinfo edma.**
 ```
   $ modinfo edma
-  filename:       /lib/modules/3.13.0-74-generic/updates/dkms/edma.ko
+  filename:       /lib/modules/3.13.0-74-generic/updates/dkms/edma-drv.ko
   version:        1.0.0
   license:        GPL
   description:    Elastic Direct Memory Access

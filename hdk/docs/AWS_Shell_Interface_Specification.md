@@ -11,41 +11,41 @@
   
 # Table of Contents:
 
-- [Overview](#overview)
+1. [Overview](#overview)
 
- - [Architecture and Version](#arch_ver)
+   1a. [Architecture and Version](#arch_ver)
 
- - [Conventions](#conventions)
+   1b. [Conventions](#conventions)
 
-- [Shell/CL Interfaces](#ShellInterfaces)
+2. [Shell/CL Interfaces](#ShellInterfaces)
 
-  - [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
+   2a. [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
 
-  - [External Memory Interfaces implemented in CL](#external_memory_interfaces_implemented_in_cl)
+   2b. [External Memory Interfaces implemented in CL](#external_memory_interfaces_implemented_in_cl)
 
-- [EC2 Instance view of FPGA PCIe](#pciPresentation)
+3. [EC2 Instance view of FPGA PCIe](#pciPresentation)
    
-   - [Management PF](#management_pf)
+   3a. [Management PF](#management_pf)
 
-   - [Application PF](#application_pf)
+   3b. [Application PF](#application_pf)
 
-- [Clocks and Resets](#ClocksNReset)
+4. [Clocks and Resets](#ClocksNReset)
 
-   - [Clocks](#Clocks)
+   4a. [Clocks](#Clocks)
    
-   - [Reset](#Reset)
+   4b. [Reset](#Reset)
 
-- [Interfaces between Shell and CL](#interfaces_between_shell_and_cl)
+5. [Interfaces between Shell and CL](#interfaces_between_shell_and_cl)
    
-   - [CL Interface to PCIe Interface via Shell](#cl_interface_to_pcie_interface_via_shell)
+   5a. [CL Interface to PCIe Interface via Shell](#cl_interface_to_pcie_interface_via_shell)
 
-   - [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
+   5b. [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
 
-   - [Interrupts](#interrupts)
+   5c. [Interrupts](#interrupts)
   
-   - [DDR4 DRAM Interfaces](#ddr)
+   5d. [DDR4 DRAM Interfaces](#ddr)
   
-   - [Miscellanous Interfaces(vLED, vDIP..)](#misc)
+   5e. [Miscellanous Interfaces(vLED, vDIP..)](#misc)
 
 
 
@@ -249,7 +249,7 @@ The maximum frequency on clk_main_a0 is 250MHz.
 
 ### Defining Clock frequencies by Developer
 
-There Developer can select among a set of available frequencies, provided in the [clock recipe table](./clock_recipes.cvs), and recipe names are called Ax, By, Cz  for group A recipe x, group B recipe y and group C recipe z respectively.
+There Developer can select among a set of available frequencies, provided in the [clock recipe table](./clock_recipes.csv), and recipe names are called Ax, By, Cz  for group A recipe x, group B recipe y and group C recipe z respectively.
 
 Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which would be included in the tar file passed to `aws ec2 create-fpga-image` AFI registration API.  Group B and C recipes are optional in the manifest file, and if they are missing, the recipe B0 and/or C0 are used as default.
 
@@ -325,10 +325,12 @@ The following PCIe interface configuration parameters are provided from the Shel
 
 ##### Byte Enable Rules
 
-All PCIe transactions must adhere to the PCIe Byte Enable rules (see PCI Express Base specification). Rules are summarized below:
+All AXI-4 transactions to the PCIe interface must adhere to the PCIe Byte Enable rules (see PCI Express Base specification). Rules are summarized below:
 
 -   All transactions larger than two DW must have contiguous byte enables.
 -   Transactions that are less than two DW may have non-contiguous byte enables.
+
+Note on AXI-4 byte enables are signaled using WSTRB.
 
 #### AXI4 Error Handling for CL outbound transactions 
 
@@ -338,13 +340,11 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 -   Illegal transaction address; i.e. addressing memory space that isn't supported by the instance.
 
--   Transaction crossing 4KB boundaries violating PCIe specifications.
+-   Transaction crossing 4KB boundaries violating AXI-4/PCIe specifications.
 
--   Illegal byte-masking.
+-   Illegal byte-enable.
 
--   Illegal length.
-
--   Illegal ARID; i.e ARID is already been used for an outstanding read transaction.
+-   Illegal length (AXI-4 write doesn't match length).
 
 
 <a name="axi_lite_interfaces_for_register_access"></a>

@@ -130,10 +130,10 @@
 	#define dbg_fops(...)
 	#define dbg_perf(fmt, ...)
 	#define dbg_sg(...)
-	#define dbg_tfr		//pr_info
-	#define dbg_irq		//pr_info
-	#define dbg_init	//pr_info
-	#define dbg_desc	//pr_info
+	#define dbg_tfr(...)	//pr_info
+	#define dbg_irq(...)	//pr_info
+	#define dbg_init(...)	//pr_info
+	#define dbg_desc(...)	//pr_info
 #else
 	#define dbg_io		pr_info
 	#define dbg_fops	pr_info

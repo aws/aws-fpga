@@ -1,17 +1,17 @@
-/*
- * Copyright 2015-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"). You may
- * not use this file except in compliance with the License. A copy of the
- * License is located at
- *
- *     http://aws.amazon.com/apache2.0/
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -25,7 +25,7 @@
 #include <utils/lcd.h>
 
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
-static uint16_t pci_device_id = 0xF0FF;
+static uint16_t pci_device_id = 0xF001;
 /* */
 
 #define	MEM_16G		(1ULL << 34)
@@ -146,7 +146,7 @@ int dma_example(int slot_id) {
 
     for (channel=0;channel < 4; channel++) {
     	
-	rc = pwrite(fd, write_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+	rc = pwrite(fd, write_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
 	
     	fail_on((rc = (rc < 0)? 1:0), out, "call to pwrite failed.");
 
@@ -159,7 +159,7 @@ int dma_example(int slot_id) {
     fsync(fd);
 
     for (channel=0;channel < 4; channel++) {
-    	rc = pread(fd, read_buffer, buffer_size, 0x010000000 + channel*MEM_16G);
+    	rc = pread(fd, read_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
     	fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
 
     	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
