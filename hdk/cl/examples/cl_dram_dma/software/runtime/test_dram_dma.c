@@ -135,7 +135,7 @@ int dma_example(int slot_id, int dma_queue) {
     write_buffer = NULL;
     fd = -1;
 
-    rc = sprintf(device_file_name, "/dev/fpga%i_event%i", slot_id, dma_queue);
+    rc = sprintf(device_file_name, "/dev/edma%i_queue_%i", slot_id, dma_queue);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
 
 
