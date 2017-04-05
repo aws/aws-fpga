@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <poll.h>
 
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
@@ -35,7 +34,6 @@ static uint16_t pci_device_id = 0xF001;
 const struct logger *logger = &logger_stdout;
 
 int dma_example(int slot_id, int dma_queue);
-int interrupt_example(int slot_id, int device_file_number, int interrupt_number);
 
 int main(int argc, char **argv) {
     int rc;
