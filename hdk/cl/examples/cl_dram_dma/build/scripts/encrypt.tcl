@@ -64,6 +64,6 @@ exec chmod +w {*}[glob $TARGET_DIR/*]
 # encrypt .v/.sv/.vh/inc as verilog files
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.?v] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
 
-#---- VHDL DEVELOPER - uncomment the next command
+# encrypt *vhdl files
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
 
