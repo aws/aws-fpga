@@ -35,7 +35,6 @@ static uint16_t pci_device_id = 0xF001;
 const struct logger *logger = &logger_stdout;
 
 int dma_example(int slot_id, char* device_file);
-int interrupt_example(int slot_id);
 
 int main(int argc, char **argv) {
     int rc;
@@ -55,10 +54,6 @@ int main(int argc, char **argv) {
 
     rc = dma_example(slot_id, "/dev/edma0_queue_0");
     fail_on(rc, out, "DMA example failed");
-
-    rc = interrupt_example(slot_id);
-    fail_on(rc, out, "Interrupt example failed");
-
 
 out:
     return 1;
@@ -208,83 +203,3 @@ out:
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
-
-int interrupt_example(int slot_id){
-    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
-    struct pollfd fds[1];
-    uint32_t fd, rd,  read_data;
-    char event_file_name[256] = "/dev/fpga0_event0";
-//    char event_file_name[256] = "/dev/xdma0_events_0";
-    int rc = 0;
-    int poll_timeout = 3000;
-    int num_fds = 1;
-    //int exp_intr_count = 1;
-    int pf_id = 0;
-    int bar_id = 0;
-    int fpga_attach_flags = 0;
-    uint32_t interrupt_reg_offset = 0xd00;
-    int interrupt_number = 0;
-
-
-    printf("Starting MSI-X Interrupt test \n");
-    rc = fpga_pci_attach(slot_id, pf_id, bar_id, fpga_attach_flags, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
-
-    printf("Polling device file: %s for interrupt events \n", event_file_name);
-    if((fd = open(event_file_name, O_RDONLY)) == -1) {
-        printf("Error - invalid device\n");
-        rc = 1;
-        fail_on(rc, out, "Unable to open event device");
-    }
-    fds[0].fd = fd;
-    fds[0].events = POLLIN;
-
-
-    //Clear the interrupt register
-    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 <<(16 + interrupt_number) );
-    fail_on(rc, out, "Unable to write to the fpga !");
-    rd = poll(fds, num_fds, poll_timeout);
-
-    //Generate and check the MSI-X Interrupts
-    printf("Checking to make sure Interrupt trigger and status bits are initially 0 \n");
-    rc = fpga_pci_peek(pci_bar_handle, interrupt_reg_offset, &read_data);
-    fail_on(rc, out, "Unable to read read from the fpga !");
-
-    if(read_data != 0) {
-        printf("Error: Initial values of Interrupt trigger and status bits is not 0 .Actual data = %x \n", read_data);
-        rc = 1;
-    }
-//Try clearing
-    rd = poll(fds, num_fds, poll_timeout);
-    rd = poll(fds, num_fds, poll_timeout);
-    if (rd & POLLIN) {
-        printf("Error: Unexpected interrupt events found in the events file: %s\n", event_file_name);
-        rc = 1;
-//        fail_on(rc, out, "Unexpected interrupts found, not triggered by test");
-    }
-    close(fd);
-
-    printf("Triggering MSI-X Interrupt 0\n");
-    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
-    fail_on(rc, out, "Unable to write to the fpga !");
-
-    rd = poll(fds, num_fds, poll_timeout);
-    if( rd >0 && fds[0].revents & POLLIN){
-        printf("Interrupt present for Interrupt 0 It worked!\n");
-        //Clear the interrupt register
-        rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
-        fail_on(rc, out, "Unable to write to the fpga !");
-    }
-    else{
-        printf("No interrupt generated- something went wrong.\n");
-        rc = 1;
-        fail_on(rc, out, "Interrupt generation failed");
-    }
-
-out:
-    if(fd){
-        close(fd);
-    }
-    return rc;
-}
-
