@@ -8,7 +8,7 @@ Usage:
 $(basename "$0") -- a script to compile and run multithreaded tests on the below sizes and max chunk size"
 
 data_size=(0x1000 0x5000 0x10000 0x100000)
-max_chnuk=(0x10 0x100 0x500) #0x1000 fails - probably xdma bug.
+max_chnuk=(0x10 0x100 0x500 0x2000) 
 
 for ((i=0;i<${#data_size[@]};i++))
 do

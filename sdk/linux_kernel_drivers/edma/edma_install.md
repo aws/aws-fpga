@@ -159,7 +159,7 @@ __*Step F:*__ **Verify that the edma module is installed using the modinfo edma.
 <a name="howToDIDnVID"></a>  
 **Q: What PCIe Vendor-ID and Device-ID does EDMA driver support?** 
 
-Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:1042.
+Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:f001 (the ID's of the DMA example).
 
 
 <a name="howToTroubleshoot"></a>
