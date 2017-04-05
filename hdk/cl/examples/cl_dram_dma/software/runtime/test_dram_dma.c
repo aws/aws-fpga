@@ -34,7 +34,7 @@ static uint16_t pci_device_id = 0xF001;
 /* use the stdout logger */
 const struct logger *logger = &logger_stdout;
 
-int dma_example(int slot_id);
+int dma_example(int slot_id, char* device_file);
 int interrupt_example(int slot_id);
 
 int main(int argc, char **argv) {
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     slot_id = 0;
 
-//    rc = dma_example(slot_id);
+    rc = dma_example(slot_id, "/dev/edma0_queue_0");
     fail_on(rc, out, "DMA example failed");
 
     rc = interrupt_example(slot_id);
@@ -84,6 +84,10 @@ check_slot_config(int slot_id)
     if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
         info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
         rc = 1;
+        printf("The slot appears loaded, but the pci vendor or device ID doesn't "
+               "match the expected values. You may need to rescan the fpga with \n"
+               "fpga-describe-local-image -S %i -R\n"
+               "and check /dev/ for the new device file\n",slot_id);
         fail_on(rc, out, "The PCI vendor id and device of the loaded image are "
                          "not the expected values.");
     }
@@ -120,7 +124,7 @@ rand_string(char *str, size_t size)
  * using fsync() between the writes and read to insure order
  */
 
-int dma_example(int slot_id) {
+int dma_example(int slot_id, char* device_file) {
     int fd, rc;
     char *write_buffer, *read_buffer;
     static const size_t buffer_size = 128;
@@ -134,9 +138,15 @@ int dma_example(int slot_id) {
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
-    fd = open("/dev/edma2_queue_0", O_RDWR);
-    fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. "
-        "Is the kernel driver loaded?");
+    fd = open(device_file, O_RDWR);
+    if(fd<0){
+        printf("Cannot open device file %s.\nMaybe the EDMA "
+               "driver isn't installed, isn't modified to attach to the PCI ID of "
+               "your CL, or you're using a device file that doesn't exist?\n"
+               "Remember that rescanning your FPGA can change the device file.\n",
+               device_file);
+        fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. ");
+    }
 
     write_buffer = (char *)malloc(buffer_size);
     read_buffer = (char *)malloc(buffer_size);
@@ -203,8 +213,8 @@ int interrupt_example(int slot_id){
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct pollfd fds[1];
     uint32_t fd, rd,  read_data;
-//    char event_file_name[256] = "/dev/fpga2_event0";
-    char event_file_name[256] = "/dev/xdma0_events_0";
+    char event_file_name[256] = "/dev/fpga0_event0";
+//    char event_file_name[256] = "/dev/xdma0_events_0";
     int rc = 0;
     int poll_timeout = 3000;
     int num_fds = 1;
