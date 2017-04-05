@@ -542,6 +542,7 @@ sh_ddr #(
    .cl_sh_ddr_awid({lcl_cl_sh_ddrd.awid, lcl_cl_sh_ddrb.awid, lcl_cl_sh_ddra.awid}),
    .cl_sh_ddr_awaddr({lcl_cl_sh_ddrd.awaddr, lcl_cl_sh_ddrb.awaddr, lcl_cl_sh_ddra.awaddr}),
    .cl_sh_ddr_awlen({lcl_cl_sh_ddrd.awlen, lcl_cl_sh_ddrb.awlen, lcl_cl_sh_ddra.awlen}),
+   .cl_sh_ddr_awsize({lcl_cl_sh_ddrd.awsize, lcl_cl_sh_ddrb.awsize, lcl_cl_sh_ddra.awsize}),
    .cl_sh_ddr_awvalid({lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid}),
    .sh_cl_ddr_awready({lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready}),
 
@@ -560,6 +561,7 @@ sh_ddr #(
    .cl_sh_ddr_arid({lcl_cl_sh_ddrd.arid, lcl_cl_sh_ddrb.arid, lcl_cl_sh_ddra.arid}),
    .cl_sh_ddr_araddr({lcl_cl_sh_ddrd.araddr, lcl_cl_sh_ddrb.araddr, lcl_cl_sh_ddra.araddr}),
    .cl_sh_ddr_arlen({lcl_cl_sh_ddrd.arlen, lcl_cl_sh_ddrb.arlen, lcl_cl_sh_ddra.arlen}),
+   .cl_sh_ddr_arsize({lcl_cl_sh_ddrd.arsize, lcl_cl_sh_ddrb.arsize, lcl_cl_sh_ddra.arsize}),
    .cl_sh_ddr_arvalid({lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid}),
    .sh_cl_ddr_arready({lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready}),
 

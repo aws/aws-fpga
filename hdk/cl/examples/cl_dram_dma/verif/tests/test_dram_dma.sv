@@ -45,7 +45,7 @@ module test_dram_dma();
        
        tb.poke_ocl(.addr(64'h130), .data(0));
        tb.poke_ocl(.addr(64'h230), .data(0));
-       tb.poke_ocl(.addr(64'h230), .data(0));
+       tb.poke_ocl(.addr(64'h330), .data(0));
        tb.poke_ocl(.addr(64'h430), .data(0));
 
        // allow memory to initialize

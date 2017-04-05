@@ -74,6 +74,8 @@ module cl_mstr_axi_tst #(parameter DATA_WIDTH = 512,
     output logic                      rready
    );
 
+`include "cl_common_defines.vh"      // CL Defines for all examples
+
    // Registers
 
    // Write Address Channel

@@ -70,7 +70,7 @@ static int write_worker_function(void *data)
 
 	while(!kthread_should_stop())
 	{
-		if(command_queue-> head != command_queue->tail)
+		if(command_queue->head != command_queue->tail)
 		{
 			int ret = xdma_xfer_submit(
 					command_queue->channel_handle,
@@ -314,7 +314,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 
 	pr_info(">> %s\n", __func__);
 
-	if( (command_queue->tail + 1) % edma_queue_depth == command_queue->next_to_recycle)
+	if( EDMA_RING_IDX_NEXT(command_queue->tail, edma_queue_depth) == command_queue->next_to_recycle)
 		BUG();
 
 	sg_init_table(sgl, 1);
@@ -433,7 +433,7 @@ int edma_backend_get_completed_s2m_request(u64** buffer, u32* size, void *q_hand
 	c2h_handle->buffer = NULL;
 	c2h_handle->size = 0;
 
-    return 0;
+	return 0;
 }
 
 

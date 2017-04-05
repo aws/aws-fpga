@@ -49,7 +49,6 @@
 
 #define QUEUE_DEVICE_NAME "edma"
 #define EVENT_DEVICE_NAME "fpga"
-#define NUMBER_OF_REQUESTS		(512)
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
 #define MAX_NUMBER_OF_EDMA_DEVICE 	(16)
@@ -514,6 +513,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 				request_to_clean->virt_data
 						+ request_to_clean->offset,
 				copy_size);
+
 		if(unlikely(ret)){
 			//if copy to user failed - we try again once and change the offset and break without further cleaning
 			//ret is the number of bytes that were not copied.
@@ -551,6 +551,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 
 #ifdef SUPPORT_M2M
 			if(total_data_copied < len) {
+				copy_size = len - total_data_copied;
 				ret = edma_backend_submit_s2m_request(
 						(u64*)request_to_clean->phys_data,
 						copy_size, read_ebcs->dma_queue_handle, *off);

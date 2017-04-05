@@ -98,25 +98,24 @@ int main()
 						+ (after.tv_nsec - before.tv_nsec)
 								* CLOCK_PRECISION;
 		}
-	}
 
 #if defined(WRITE_PERF_VERIFY) && defined(WRITE_PERF)
-#error ds;ksdg
-	clock_gettime(CLOCK_REALTIME, &before);
-	ret = fsync(fd);
-	clock_gettime(CLOCK_REALTIME, &after);
+		clock_gettime(CLOCK_REALTIME, &before);
+		ret = fsync(fd);
+		clock_gettime(CLOCK_REALTIME, &after);
 
-	if((after.tv_nsec - before.tv_nsec) < 0)
-		global_time += (after.tv_sec - before.tv_sec - 1)
-				+ (after.tv_nsec - before.tv_nsec
-						+ NANOSECONDS_PER_SECOND)
-						* CLOCK_PRECISION;
-	else
-		global_time += (after.tv_sec - before.tv_sec)
-				+ (after.tv_nsec - before.tv_nsec)
-						* CLOCK_PRECISION;
+		if((after.tv_nsec - before.tv_nsec) < 0)
+			global_time += (after.tv_sec - before.tv_sec - 1)
+			+ (after.tv_nsec - before.tv_nsec
+					+ NANOSECONDS_PER_SECOND)
+					* CLOCK_PRECISION;
+		else
+			global_time += (after.tv_sec - before.tv_sec)
+			+ (after.tv_nsec - before.tv_nsec)
+			* CLOCK_PRECISION;
 #endif
 
+	}
 
 	printf("For block size of %llu:\n"
 		"-----------------------\n", SIZE_OF_DATA);
