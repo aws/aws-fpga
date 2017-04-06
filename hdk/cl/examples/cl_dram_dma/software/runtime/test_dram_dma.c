@@ -40,7 +40,7 @@ int interrupt_example(int slot_id, int interrupt_number);
 int main(int argc, char **argv) {
     int rc;
     int slot_id;
-    int interrupt_number=0;
+    int interrupt_number;
 
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
@@ -56,6 +56,8 @@ int main(int argc, char **argv) {
 
     rc = dma_example(slot_id);
     fail_on(rc, out, "DMA example failed");
+
+    interrupt_number = 0;
 
     rc = interrupt_example(slot_id, interrupt_number);
     fail_on(rc, out, "Interrupt example failed");
@@ -261,7 +263,7 @@ int interrupt_example(int slot_id, int interrupt_number){
     rd = poll(fds, num_fds, poll_timeout);
     if( rd >0 && fds[0].revents & POLLIN){
         // Check how many interrupts were generated
-        printf("Interrupt present for Interrupt 0 It worked!\n");
+        printf("Interrupt present for Interrupt %i. It worked!\n", interrupt_number);
         //Clear the interrupt register
         rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
         fail_on(rc, out, "Unable to write to the fpga !");
