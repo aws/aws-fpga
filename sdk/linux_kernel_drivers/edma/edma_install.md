@@ -9,7 +9,6 @@ EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined 
 2. [Q: How do I get the source code of the `edma` driver and compile it?](#howToCompile)
 3. [Q: How can I make sure the installed driver will be preserved following a kernel update?](#howToUpgradeKernel) 
 4. [Q: What PCIe Vendor-ID and Device-ID does EDMA driver support](#howToDIDnVID)
-5. [Q: How to troubleshoot EDMA compilation or installing?](#howToTroubleshoot)
 
 
 ############
@@ -159,8 +158,22 @@ __*Step F:*__ **Verify that the edma module is installed using the modinfo edma.
 <a name="howToDIDnVID"></a>  
 **Q: What PCIe Vendor-ID and Device-ID does EDMA driver support?** 
 
-Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:1042.
+Initial, EDMA supports PCIe VendorID:DeviceID 1d0f:f001 (the ID's of the DMA example).
+To use the device driver on another CL, please add the Vendor ID and Device to the device table in [edma_backend_xdma.c](./edma_backend_xdma.c)
 
+For example:
 
-<a name="howToTroubleshoot"></a>
-**Q: How to troubleshoot EDMA compilation or installing?** 
+```
+static DEFINE_PCI_DEVICE_TABLE(edma_pci_tbl) = {
+        { PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_FPGA,
+          PCI_ANY_ID, PCI_ANY_ID, 0, 0, PCI_ANY_ID},
+        { 0x1d0f, 0xf000,
+          PCI_ANY_ID, PCI_ANY_ID, 0, 0, PCI_ANY_ID},
+        { 0, }
+};
+```
+where 0x1d0f is the vendor ID for Amazon and 0xf000 is the device ID for the Hello World example CL (which does not actually support DMA).
+
+Be sure to remake and re-install the EDMA driver after modifying the device table.
+
+Amazon encourages pull requests to this github to add CL ID's to the driver, so there is no need to fork the driver or SDK.
