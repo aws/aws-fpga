@@ -1,13 +1,13 @@
-// Amazon FPGA Hardware Development Kit
-//
+// Amazon FGPA Hardware Development Kit
+// 
 // Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-//
+// 
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
 // located at
-//
+// 
 //    http://aws.amazon.com/asl/
-//
+// 
 // or in the "license" file accompanying this file. This file is distributed on
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
@@ -37,6 +37,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    input logic [5:0]                 slv_awid,
    input logic [63:0]                slv_awaddr,
    input logic [7:0]                 slv_awlen,
+   input logic [2:0]                 slv_awsize,
    input logic                       slv_awvalid,
    input logic [10:0]                slv_awuser,
    output                            slv_awready,
@@ -57,6 +58,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    input logic [5:0]                 slv_arid,
    input logic [63:0]                slv_araddr,
    input logic [7:0]                 slv_arlen,
+   input logic [2:0]                 slv_arsize,
    input logic                       slv_arvalid,
    input logic [10:0]                slv_aruser,
    output                            slv_arready,
@@ -72,6 +74,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    output logic [8:0]                awid,
    output logic [63:0]               awaddr,
    output logic [7:0]                awlen,
+   output logic [2:0]                awsize,
    output logic                      awvalid,
    output logic [10:0]               awuser,
    input                             awready,
@@ -92,6 +95,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    output logic [8:0]                arid,
    output logic [63:0]               araddr,
    output logic [7:0]                arlen,
+   output logic [2:0]                arsize,
    output logic                      arvalid,
    output logic [10:0]               aruser,
    input                             arready,
@@ -325,6 +329,9 @@ assign awaddr  = scrb_enable ? scrb_awaddr  :
 assign awlen   = scrb_enable ? scrb_awlen   : 
                  atg_enable  ? atg_awlen    :
                  slv_awlen   ;
+assign awsize   = scrb_enable ? 3'b110   : 
+                  atg_enable  ? 3'b110   :
+                  slv_awsize   ;
 assign awvalid = scrb_enable ? scrb_awvalid : 
                  atg_enable  ? atg_awvalid  :
                  slv_awvalid;
@@ -379,6 +386,9 @@ assign araddr  = scrb_enable ? scrb_araddr  :
 assign arlen   = scrb_enable ? scrb_arlen   : 
                  atg_enable  ? atg_arlen    :
                  slv_arlen;
+assign arsize  = scrb_enable ? 3'b110 :
+                 atg_enable  ? 3'b110 :
+                 slv_arsize;
 assign arvalid = scrb_enable ? scrb_arvalid : 
                  atg_enable  ? atg_arvalid  :
                  slv_arvalid;

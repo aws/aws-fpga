@@ -33,11 +33,11 @@ static uint16_t pci_device_id = 0xF001;
 /* use the stdout logger */
 const struct logger *logger = &logger_stdout;
 
-int dma_example(int slot_id);
+int dma_example(int slot_id, int dma_queue);
 
 int main(int argc, char **argv) {
     int rc;
-    int slot_id;
+    int slot_id, dma_queue;
 
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
@@ -50,8 +50,10 @@ int main(int argc, char **argv) {
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
     slot_id = 0;
-    return dma_example(slot_id);
+    dma_queue = 0;
 
+    rc = dma_example(slot_id, dma_queue);
+    fail_on(rc, out, "DMA example failed");
 
 out:
     return 1;
@@ -77,6 +79,13 @@ check_slot_config(int slot_id)
     if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
         info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
         rc = 1;
+        printf("The slot appears loaded, but the pci vendor or device ID doesn't "
+               "match the expected values. You may need to rescan the fpga with \n"
+               "fpga-describe-local-image -S %i -R\n"
+               "Note that rescanning can change which device file in /dev/ a FPGA will map to.\n"
+               "To remove and re-add your edma driver and reset the device file mappings, run\n"
+               "`sudo rmmod edma-drv && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/edma/edma-drv.ko`\n",
+               slot_id);
         fail_on(rc, out, "The PCI vendor id and device of the loaded image are "
                          "not the expected values.");
     }
@@ -85,10 +94,6 @@ out:
     return rc;
 }
 
-/*    static const uint32_t DRAM_ACCESS_DISABLE_REGS[4] =
-        {0x130, 0x230, 0x330, 0x430};
-        rc = fpga_pci_poke(pci_bar_handle, DRAM_ACCESS_DISABLE_REGS[i], 0);
-*/
 
 /* helper function to initialize a buffer that would be written to the FPGA later */
 
@@ -117,8 +122,9 @@ rand_string(char *str, size_t size)
  * using fsync() between the writes and read to insure order
  */
 
-int dma_example(int slot_id) {
+int dma_example(int slot_id, int dma_queue) {
     int fd, rc;
+    char device_file_name[256];
     char *write_buffer, *read_buffer;
     static const size_t buffer_size = 128;
     int channel=0;
@@ -127,13 +133,26 @@ int dma_example(int slot_id) {
     write_buffer = NULL;
     fd = -1;
 
+    rc = sprintf(device_file_name, "/dev/edma%i_queue_%i", slot_id, dma_queue);
+    fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
+
+
     /* make sure the AFI is loaded and ready */
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
-    fd = open("/dev/edma0_queue_0", O_RDWR);
-    fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. "
-        "Is the kernel driver loaded?");
+    fd = open(device_file_name, O_RDWR);
+    if(fd<0){
+        printf("Cannot open device file %s.\nMaybe the EDMA "
+               "driver isn't installed, isn't modified to attach to the PCI ID of "
+               "your CL, or you're using a device file that doesn't exist?\n"
+               "See the edma_install manual at <aws-fpga>/sdk/linux_kernel_drivers/edma/edma_install.md\n"
+               "Remember that rescanning your FPGA can change the device file.\n"
+               "To remove and re-add your edma driver and reset the device file mappings, run\n"
+               "`sudo rmmod edma-drv && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/edma/edma-drv.ko`\n",
+               device_file_name);
+        fail_on((rc = (fd < 0)? 1:0), out, "unable to open DMA queue. ");
+    }
 
     write_buffer = (char *)malloc(buffer_size);
     read_buffer = (char *)malloc(buffer_size);
@@ -165,20 +184,22 @@ int dma_example(int slot_id) {
     	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
         	printf("DRAM DMA read the same string as it wrote on channel %d (it worked correctly!)\n", channel);
     	} else {
-        	int i;
+            int i;
+            printf("Bytes written to channel %d:\n", channel);
+            for (i = 0; i < buffer_size; ++i) {
+                printf("%c", write_buffer[i]);
+            }
 
-        	printf("Bytes written to channel %d:\n", channel);
-        	for (i = 0; i < buffer_size; ++i) {
-            		printf("%c", write_buffer[i]);
-        	}
-        	
-		printf("\n\n");
+            printf("\n\n");
 
-        	printf("Bytes read:\n");
-        	for (i = 0; i < buffer_size; ++i) {
-            		printf("%c", read_buffer[i]);
-        	}
-        printf("\n\n");
+            printf("Bytes read:\n");
+            for (i = 0; i < buffer_size; ++i) {
+                printf("%c", read_buffer[i]);
+            }
+            printf("\n\n");
+         
+            rc = 1; 
+            fail_on(rc, out, "Data read from DMA did not match data written with DMA. Was there an fsync() between the read and write?");
     	}
     }
 

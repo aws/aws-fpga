@@ -142,7 +142,9 @@ read_ip [ list \
 read_ip [ list \
   $HDK_SHELL_DIR/design/ip/src_register_slice/src_register_slice.xci \
   $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
-  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci 
+  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci \
+  $HDK_SHELL_DIR/design/ip/axi_register_slice/axi_register_slice.xci \
+  $HDK_SHELL_DIR/design/ip/axi_register_slice_light/axi_register_slice_light.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO
