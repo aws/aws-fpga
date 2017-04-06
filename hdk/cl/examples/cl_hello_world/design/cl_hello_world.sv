@@ -1,17 +1,19 @@
-// Amazon FPGA Hardware Development Kit
-//
+//---------------------------------------------------------------------------------------
+// Amazon FGPA Hardware Development Kit
+// 
 // Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-//
+// 
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
 // located at
-//
+// 
 //    http://aws.amazon.com/asl/
-//
+// 
 // or in the "license" file accompanying this file. This file is distributed on
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+//---------------------------------------------------------------------------------------
 
 module cl_hello_world 
 
@@ -110,68 +112,43 @@ always_ff @(negedge rst_main_n or posedge clk_main_a0)
   logic [ 1:0] ocl_sh_rresp_q;
   logic        sh_ocl_rready_q;
 
-  axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(32), .DATA_WIDTH(32), .ID_WIDTH(1), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) AXIL_OCL_REG_SLC (
+  axi_register_slice_light AXIL_OCL_REG_SLC (
    .aclk          (clk_main_a0),
    .aresetn       (rst_main_n_sync),
-   .sync_rst_n    (rst_main_n_sync),
-   .s_axi_awid    (1'b0),
    .s_axi_awaddr  (sh_ocl_awaddr),
-   .s_axi_awlen   (8'h00),
+   .s_axi_awprot   (2'h0),
    .s_axi_awvalid (sh_ocl_awvalid),
-   .s_axi_awuser  (1'b0),
    .s_axi_awready (ocl_sh_awready),
    .s_axi_wdata   (sh_ocl_wdata),
    .s_axi_wstrb   (sh_ocl_wstrb),
-   .s_axi_wlast   (1'b0),
-   .s_axi_wuser   (1'b0),
    .s_axi_wvalid  (sh_ocl_wvalid),
    .s_axi_wready  (ocl_sh_wready),
-   .s_axi_bid     (),
    .s_axi_bresp   (ocl_sh_bresp),
    .s_axi_bvalid  (ocl_sh_bvalid),
-   .s_axi_buser   (),
    .s_axi_bready  (sh_ocl_bready),
-   .s_axi_arid    (1'h0),
    .s_axi_araddr  (sh_ocl_araddr),
-   .s_axi_arlen   (8'h0),
    .s_axi_arvalid (sh_ocl_arvalid),
-   .s_axi_aruser  (1'd0),
    .s_axi_arready (ocl_sh_arready),
-   .s_axi_rid     (),
    .s_axi_rdata   (ocl_sh_rdata),
    .s_axi_rresp   (ocl_sh_rresp),
-   .s_axi_rlast   (),
-   .s_axi_ruser   (),
    .s_axi_rvalid  (ocl_sh_rvalid),
    .s_axi_rready  (sh_ocl_rready),
-   .m_axi_awid    (),
    .m_axi_awaddr  (sh_ocl_awaddr_q),
-   .m_axi_awlen   (),
+   .m_axi_awprot  (),
    .m_axi_awvalid (sh_ocl_awvalid_q),
-   .m_axi_awuser  (),
    .m_axi_awready (ocl_sh_awready_q),
    .m_axi_wdata   (sh_ocl_wdata_q),
    .m_axi_wstrb   (sh_ocl_wstrb_q),
    .m_axi_wvalid  (sh_ocl_wvalid_q),
-   .m_axi_wlast   (),
-   .m_axi_wuser   (),
    .m_axi_wready  (ocl_sh_wready_q),
    .m_axi_bresp   (ocl_sh_bresp_q),
    .m_axi_bvalid  (ocl_sh_bvalid_q),
-   .m_axi_bid     (),
-   .m_axi_buser   (1'b0),
    .m_axi_bready  (sh_ocl_bready_q),
-   .m_axi_arid    (),
    .m_axi_araddr  (sh_ocl_araddr_q),
-   .m_axi_arlen   (),
-   .m_axi_aruser  (),
    .m_axi_arvalid (sh_ocl_arvalid_q),
    .m_axi_arready (ocl_sh_arready_q),
-   .m_axi_rid     (),
    .m_axi_rdata   (ocl_sh_rdata_q),
    .m_axi_rresp   (ocl_sh_rresp_q),
-   .m_axi_rlast   (),
-   .m_axi_ruser   (1'b0),
    .m_axi_rvalid  (ocl_sh_rvalid_q),
    .m_axi_rready  (sh_ocl_rready_q)
   );
