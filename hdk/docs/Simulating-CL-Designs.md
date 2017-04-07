@@ -203,7 +203,7 @@ Your design may share data between host memory and logic within the CL. To verif
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
 
-[[ppts/simulation/Slide3.PNG|alt=C/SV Host Memory]]
+<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory">
 
 
 Backdoor access to host memory is provided by two functions:
