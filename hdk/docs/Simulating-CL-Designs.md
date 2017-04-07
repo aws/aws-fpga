@@ -360,8 +360,130 @@ Wait dly nanoseconds.
 | --- | --- |
 | dly | delay in nanoseconds |
 
+## _set_virtual_dip_switch_
+## Description
+Writes virtual dip switches.
+## Declaration
+#### task set_virtual_dip_switch(input int slot_id=0, int dip);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| dip | 16bit dip switch setting |
+
+## _get_virtual_dip_switch_
+## Description
+Reads virtual dip switches.
+## Declaration
+#### function logic [15:0] get_virtual_dip_switch(input int slot_id=0);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+
+## _get_virtual_led_
+## Description
+Reads virtual LEDs.
+## Declaration
+#### function logic [15:0] get_virtual_led(input int slot_id=0);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+
+## _kernel_reset_
+## Description
+Issues a kernel reset.
+## Declaration
+#### function void kernel_reset(input int slot_id=0, logic d = 1);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| d | reset value |
+
+## _issue_flr_
+## Description
+Issues a PCIe Function Level Reset (FLR).
+## Declaration
+#### task issue_flr(input int slot_id=0);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+
+## _que_buffer_to_cl_
+## Description
+Queues a buffer for the DMA to send data to the CL.
+## Declaration
+#### function void que_buffer_to_cl(input int slot_id = 0, int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
+| src_addr | Data's Source Address |
+| cl_addr | Custom Logic Address |
+| len | Length of DMA in bytes |
 
 
+## _que_cl_to_buffer_
+## Description
+Queues a buffer for the DMA to receive data from the CL.
+## Declaration
+#### function void que_cl_to_buffer(input int slot_id = 0, int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
+| dst_addr | Data's Destination Address |
+| cl_addr | Custom Logic Address |
+| len | Length of DMA in bytes |
+
+## _start_que_to_cl_
+## Description
+Starts the DMA operation to the CL.
+## Declaration
+#### function void start_que_to_cl(input int slot_id = 0, int chan);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
+
+## _start_que_to_buffer_
+## Description
+Starts the DMA operation from the CL.
+## Declaration
+#### function void start_que_to_buffer(input int slot_id = 0, int chan);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
+
+## _is_dma_to_cl_done_
+## Description
+Returns non-zero if the DMA to the CL is complete.
+## Declaration
+#### function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
+
+## _is_dma_to_buffer_done_
+## Description
+Returns non-zero if the DMA to the buffer is complete.
+## Declaration
+#### function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel to use (0-3) |
 
 ## _map_host_memory_
 ## Description
