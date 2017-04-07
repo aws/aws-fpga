@@ -48,21 +48,6 @@
  *   the application.
  */
 
-/* resource number (base address register) definitions */
-enum {
-    APP_PF_BAR0 = 0,
-    APP_PF_BAR1 = 1,
-    APP_PF_BAR4 = 4,
-    APP_PF_BAR_MAX
-};
-
-enum {
-    MGMT_PF_BAR0 = 0,
-    MGMT_PF_BAR2 = 2,
-    MGMT_PF_BAR4 = 4,
-    MGMT_PF_BAR_MAX
-};
-
 /**
  * Type definition for a descriptor/handle used to specify a BAR. Initialize
  * with PCI_BAR_HANDLE_INIT.
