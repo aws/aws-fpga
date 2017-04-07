@@ -1,7 +1,7 @@
 # Introduction
 Before finalizing your CL design and registering it with AWS EC2 as Amazon FPGA Image (AFI), you probably want to simulate the design to validate the functionality. The HDK supports RTL-level simulation using Vivado XSIM and MentorGraphics Questa simulators. You can write your tests in SystemVerilog and C languages. If you choose to use the supplied C framework, you can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
 
-[[ppts/simulation/Slide2.PNG|alt=Testbench Top-Level Diagram]]
+<img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
 
 # Quick Start
 ### Have an EC2 instance or other server with Xilinx Vivado tools and an active license.
@@ -203,7 +203,7 @@ Your design may share data between host memory and logic within the CL. To verif
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
 
-[[ppts/simulation/Slide3.PNG|alt=C/SV Host Memory]]
+<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory">
 
 
 Backdoor access to host memory is provided by two functions:
