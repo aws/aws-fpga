@@ -350,6 +350,15 @@ The SV Test API task 'poke_pcis' writes 512 bits of data to the CL via the AXI P
 | data | Write Data |
 | id | AXI ID |
 
+## _nsec_delay_
+## Description
+Wait dly nanoseconds.
+## Declaration
+#### task nsec_delay(input int dly = 10000);
+
+| Argument | Description |
+| --- | --- |
+| dly | delay in nanoseconds |
 
 
 
