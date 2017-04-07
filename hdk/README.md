@@ -69,7 +69,7 @@ The [start your own CL design](./cl/developer_designs/README.md) will guide you 
 ### Simulate your Custom Logic design 
 
 You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys', Mentor's, or Cadence).
-Follow the [verification environment setup](https://github.com/aws/aws-fpga/wiki/Simulating-CL-Designs-(RTL-Simulation)#introduction) to run these simulations
+Follow the [verification environment setup](./docs/Simulating-CL-Designs-(RTL-Simulation)#introduction) to run these simulations
 
 ### Build and submit the Custom Logic to AWS for generating an AFI <a name="buildcl"></a>
 

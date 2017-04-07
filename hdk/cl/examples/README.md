@@ -205,6 +205,4 @@ Now, you can verify that the AFI was loaded properly:
 
 ## 6. Validating using the CL Example Software
 
-Please refer to the
-[Validating CL Designs](https://github.com/aws/aws-fpga/wiki/Validating-CL-Designs#quick-start)
-Wiki page for methods to validate that your CL example design functions as expected.
+Please refer to the README.md included with each example.
