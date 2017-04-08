@@ -120,17 +120,17 @@ You can verify that the bucket policy grants the required permissions by running
 
     $ check_s3_bucket_policy.py \
 	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
+	--dcp-key <path-to-tarball> \
 	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder>
+	--logs-key <path-to-logs-folder>
 
 To create an AFI execute the following command:
 
     $ aws ec2 create-fpga-image \
         --name <afi-name> \
         --description <afi-description> \
-        --input-storage-location Bucket=<dcp-bucket-name>,Key=<tarball-name> \
-        --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
+        --input-storage-location Bucket=<dcp-bucket-name>,Key=<path-to-tarball> \
+        --logs-storage-location Bucket=<logs-bucket-name>,Key=<path-to-logs> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
 
