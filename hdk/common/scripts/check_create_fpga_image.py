@@ -106,6 +106,6 @@ if __name__ == '__main__':
     elif args.dry_run:
         cmd += " --dry-run"
 
-    logger.info("Run the following command to generate AFI: " + cmd)
+    logger.info("Run the following command to generate AFI:\n" + cmd)
 
     sys.exit(0)
