@@ -10,7 +10,7 @@ Useful resources:
 ## Table of Contents
 1. [Overview](#overview)
 2. [Getting Started](#gettingstarted)
-    - [Xilinx Vivado Tools and License Requirements] (#vivado)
+    - [Xilinx Vivado Tools and License Requirements](#vivado)
     - [HDK Installation and Environment Setup](#setup)
     - [Custom Logic (CL) Examples](#examples)
     - [Start Custom Logic (CL) Design](#startcl)
