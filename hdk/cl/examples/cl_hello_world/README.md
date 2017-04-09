@@ -49,7 +49,7 @@ While running on F1, the developer can use the FPGA tools `fpga-get-virtual-led`
 ### Unused interfaces
 
 The Hello World example does not use most of AWS Shell interface, hence the unused signals are tied off.
-At the end of `cl_hello_world.sv` file, there is a specific `/include` for each unused interface to handle the tie-off\'s.
+At the end of `cl_hello_world.sv` file, there is a specific `include` command for an interface-specific `.inc` file, to handle the tie-off\'s for every unused interface.
 
 
 <a name="metadata"></a>
