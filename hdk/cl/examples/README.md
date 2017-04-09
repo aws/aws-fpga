@@ -1,4 +1,4 @@
-# Step by step guide on how to create an AFI from one of the CL examples
+# How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide
 
 As a pre-requisite to building the AFI, the developer should have an instance/server with Xilinx Vivado Tools and the necessary Licenses. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
@@ -50,9 +50,7 @@ This file would be submitted to AWS to create an AFI.
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
 
-**NOTE**: *The DCP generation can take up to several hours to complete.
-We recommend that you initiate the generation in a way that prevents interruption.
-For example, if working on a remote machine, we recommend using window management tools such as [`screen`](https://www.gnu.org/software/screen/manual/screen.html) to mitigate potential network disconnects.*
+**NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` wil run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
 
 ### 3. Submit the Design Checkpoint to AWS to Register the AFI
@@ -75,8 +73,7 @@ For example, you can use the AWS CLI as follows:
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
 Below is a sample policy.
 
-**NOTE**: *The AWS Account ID has changed, please ensure you are using the correct Account ID listed here.*
-
+```
     {
         "Version": "2012-10-17",
         "Statement": [
@@ -115,17 +112,21 @@ Below is a sample policy.
             }
         ]
     }
+```
 
 You can verify that the bucket policy grants the required permissions by running the following script (which is also called by create-fpga-image):
 
+```
     $ check_s3_bucket_policy.py \
 	--dcp-bucket <dcp-bucket-name> \
 	--dcp-key <tarball-name> \
 	--logs-bucket <logs-bucket-name> \
 	--logs-key <logs-folder>
+```
 
 To create an AFI execute the `create-fpga-image` script as follows:
 
+```
     $ create-fpga-image \
         --afi-name <afi-name> \
 	--afi-description <afi-description> \
@@ -135,10 +136,12 @@ To create an AFI execute the `create-fpga-image` script as follows:
 	--logs-key <logs-folder> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
+```
 
 This will check that the DCP has been uploaded, that you have granted AWS access to read the DCP, and that 
 you have granted AWS write permissions to the S3 logs folder. Then it will call the AWS CLI to create the AFI:
 
+```
     $ aws ec2 create-fpga-image \
         --name <afi-name> \
         --description <afi-description> \
@@ -146,6 +149,7 @@ you have granted AWS write permissions to the S3 logs folder. Then it will call 
         --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
+```
 
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
@@ -172,37 +176,48 @@ AWS recommends that you launch an instance with latest Amazon Linux that has the
 The FPGA Management tools are required to load an AFI onto an FPGA.
 To install these tools, execute the following:
 
+```
     $ git clone https://github.com/aws/aws-fpga     # Not needed if you have installed the HDK as in Step 0.
     $ cd aws-fpga
     $ source sdk_setup.sh
-
+```  
+  
 ## 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
 You can also invoke the `fpga-describe-local-image` command to learn about which AFI, if any, is loaded onto a particular slot.
 For example, if the slot is cleared (`slot 0` in this example), you should get an output similar to the following:
 
+```
     $ sudo fpga-describe-local-image -S 0 -H
 
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
     AFI          0       none                    cleared           1        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
+```
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 
+```
     $ sudo fpga-load-local-image -S 0 -I <AGFI_ID>
+```
 
 **NOTE**: *The FPGA Management tools use the AGFI ID (not the AFI ID).*
 
 Now, you can verify that the AFI was loaded properly:
 
+```
     $ sudo fpga-describe-local-image -S 0 -H
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
     AFI          0       <AGFI_ID>               loaded            0        ok               0       <shell_version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
+```
+
 
 ## 6. Validating using the CL Example Software
+
+Each CL Example comes with a runtime software under `/software/runtime/` subdirectory. Calling `$ make` will trigger a build of the runtime application to be used on F1 instance in conjunction with the matching AFI
 
 Please refer to the README.md included with each example.
