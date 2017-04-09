@@ -8,14 +8,14 @@ Useful resources:
 * [FAQ](../aws-fpga/FAQs.md)
 
 ## Table of Contents
-1. [Overview] (#overview)
-2. [Getting Started] (#gettingstarted)
+1. [Overview](#overview)
+2. [Getting Started](#gettingstarted)
     - [Xilinx Vivado Tools and License Requirements] (#vivado)
-    - [HDK Installation and Environment Setup] (#setup)
-    - [Custom Logic (CL) Examples] (#examples)
-    - [Start Custom Logic (CL) Design] (#startcl)
-    - [Simulate Custom Logic (CL) Design] (#simcl)
-    - [Build Custom Logic (CL) Design for AWS] (#buildcl)
+    - [HDK Installation and Environment Setup](#setup)
+    - [Custom Logic (CL) Examples](#examples)
+    - [Start Custom Logic (CL) Design](#startcl)
+    - [Simulate Custom Logic (CL) RTL Design](#simcl)
+    - [Build Custom Logic (CL) Design to send to AWS](#buildcl)
 
 <a name="overview"></a>
 ## Overview 
@@ -73,13 +73,13 @@ The [Examples Table](./cl/examples/cl_examples_list.md) summarize which capabili
 The [start your own CL design](./cl/developer_designs/README.md) will guide you on how to setup your own CL project environment once the HDK is set up.
 
 <a name="simcl"></a>
-### Simulate your Custom Logic design 
+### Simulate your Custom Logic design (RTL Simulation)
 
-You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys', Mentor's, or Cadence).
-Follow the [verification environment setup](./docs/Simulating-CL-Designs.md#introduction) to run these simulations
+You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys' VCS, Mentor's Questa, or Cadence Incisive).
+Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.md#introduction) to run these simulations
 
 ### Build and submit the Custom Logic to AWS for generating an AFI <a name="buildcl"></a>
 
-You can follow the [build scripts readme](./common/shell_current/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
+You can follow the [build scripts readme](./common/shell_stable/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
