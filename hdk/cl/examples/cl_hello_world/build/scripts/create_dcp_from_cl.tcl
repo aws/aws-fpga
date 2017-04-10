@@ -79,6 +79,9 @@ set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
 
 # Suppress Warnings
+# These are to avoid warning messages that may not be real issues. A developer
+# may comment them out if they wish to see more information from warning
+# messages.
 set_msg_config -id {Constraints 18-550} -suppress
 set_msg_config -id {Constraints 18-619} -suppress
 set_msg_config -id {DRC 23-20}          -suppress
