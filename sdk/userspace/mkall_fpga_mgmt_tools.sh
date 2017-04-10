@@ -27,6 +27,10 @@ else
 fi
 
 #
+# gcc optimizations
+#OPT="-O3 -fno-strict-aliasing"
+
+#
 # The max number of FPGA BARs that may be attached,
 # e.g. (FPGA_SLOT_MAX * FPGA_PF_MAX * FPGA_BAR_PER_PF_MAX) is the upper bound.
 #
@@ -52,7 +56,7 @@ function build_exec {
 		echo "make clean failed"
 		exit 1
 	fi
-	make OPT="-DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX""
+	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX""
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "make failed"
