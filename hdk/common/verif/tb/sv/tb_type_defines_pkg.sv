@@ -35,7 +35,7 @@ package tb_type_defines_pkg;
   endclass // ClockRecipe
 
   virtual class DataSize;
-     typedef enum integer {UINT8=0, UINT16=1, UINT32=2, UINT64=3} DATA_SIZE;
+     typedef enum integer {UINT8=0, UINT16=1, UINT32=2, UINT64=3, UINT128=4, UINT256=5, UINT512=6} DATA_SIZE;
   endclass // DataSize
    
   virtual class AxiPort;

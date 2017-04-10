@@ -123,6 +123,7 @@ module sh_bfm #(
    output logic [63:0]               sh_cl_dma_pcis_awaddr,
    output logic [5:0]                sh_cl_dma_pcis_awid  ,
    output logic [7:0]                sh_cl_dma_pcis_awlen ,
+   output logic [2:0]                sh_cl_dma_pcis_awsize,
    output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_awvalid,
    input [NUM_PCIE-1:0]              cl_sh_dma_pcis_awready,
 
@@ -140,6 +141,7 @@ module sh_bfm #(
    output logic [63:0]               sh_cl_dma_pcis_araddr,
    output logic [5:0]                sh_cl_dma_pcis_arid,
    output logic [7:0]                sh_cl_dma_pcis_arlen,
+   output logic [2:0]                sh_cl_dma_pcis_arsize,
    output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_arvalid,
    input [NUM_PCIE-1:0]              cl_sh_dma_pcis_arready,
                                      
@@ -688,6 +690,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
          sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
          sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
+         sh_cl_dma_pcis_awsize  <= sh_cl_wr_cmds[0].size;
          
          sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
                                !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
@@ -766,6 +769,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
          sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
          sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
+         sh_cl_dma_pcis_arsize  <= sh_cl_rd_cmds[0].size;
          
          sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
                                !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
@@ -1627,7 +1631,7 @@ module sh_bfm #(
    //
    //=================================================
    task poke(input logic [63:0] addr, 
-             logic [63:0] data, 
+             logic [511:0] data, 
              logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
              AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
@@ -1635,10 +1639,13 @@ module sh_bfm #(
       logic [63:0] strb;
 
       case (size)
-        DataSize::UINT8 : strb = 64'b0000_0000_0000_0001;
-        DataSize::UINT16: strb = 64'b0000_0000_0000_0011;
-        DataSize::UINT32: strb = 64'b0000_0000_0000_1111;
-        DataSize::UINT64: strb = 64'b0000_0000_1111_1111;
+        DataSize::UINT8  : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001;
+        DataSize::UINT16 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0011;
+        DataSize::UINT32 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111;
+        DataSize::UINT64 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111_1111;
+        DataSize::UINT128: strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111;
+        DataSize::UINT256: strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111_1111_1111_1111_1111;
+        DataSize::UINT512: strb = 64'b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111;
         default: begin
            $display("FATAL ERROR - Invalid size specified");
            $finish;
@@ -1654,11 +1661,12 @@ module sh_bfm #(
            
            axi_cmd.addr = addr;
            axi_cmd.len  = 0;
+           axi_cmd.size = size;
            axi_cmd.id   = id;
-
+    
            sh_cl_wr_cmds.push_back(axi_cmd);
 
-           axi_data.data = data << (addr[5:0] * 8);
+           axi_data.data = data;
            axi_data.strb = strb << addr[5:0];
            
            axi_data.id   = id;
@@ -1741,11 +1749,11 @@ module sh_bfm #(
    //
    //=================================================
    task peek(input logic [63:0] addr, 
-             output logic [63:0] data, 
+             output logic [511:0] data, 
              input logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
              AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
-
+      data = 0;
       case (intf)
         AxiPort::PORT_DMA_PCIS : begin
            AXI_Command axi_cmd;
@@ -1754,6 +1762,7 @@ module sh_bfm #(
            
            axi_cmd.addr = addr;
            axi_cmd.len  = 0;
+           axi_cmd.size = size;
            axi_cmd.id   = id;
            
            sh_cl_rd_cmds.push_back(axi_cmd);
@@ -1763,8 +1772,9 @@ module sh_bfm #(
            
            while (cl_sh_rd_data.size() == 0)
              #20ns;
-           
-           data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
+           for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
+              data[(num_bytes*8)+:8] = cl_sh_rd_data[0].data[(mem_arr_idx+(num_bytes*8))+:8];
+           end
            cl_sh_rd_data.pop_front();
         end // case: 0
         AxiPort::PORT_SDA : begin

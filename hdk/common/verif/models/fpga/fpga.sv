@@ -747,6 +747,7 @@ module fpga(
               .sh_cl_dma_pcis_awaddr(sh_cl_dma_pcis_awaddr),
               .sh_cl_dma_pcis_awid(sh_cl_dma_pcis_awid),
               .sh_cl_dma_pcis_awlen(sh_cl_dma_pcis_awlen),
+              .sh_cl_dma_pcis_awsize(sh_cl_dma_pcis_awsize),
               .sh_cl_dma_pcis_awvalid(sh_cl_dma_pcis_awvalid),
               .cl_sh_dma_pcis_awready(cl_sh_dma_pcis_awready),
               
@@ -764,6 +765,7 @@ module fpga(
               .sh_cl_dma_pcis_araddr(sh_cl_dma_pcis_araddr),
               .sh_cl_dma_pcis_arid(sh_cl_dma_pcis_arid),
               .sh_cl_dma_pcis_arlen(sh_cl_dma_pcis_arlen),
+              .sh_cl_dma_pcis_arsize(sh_cl_dma_pcis_arsize),
               .sh_cl_dma_pcis_arvalid(sh_cl_dma_pcis_arvalid),
               .cl_sh_dma_pcis_arready(cl_sh_dma_pcis_arready),
    
