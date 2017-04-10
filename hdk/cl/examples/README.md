@@ -116,34 +116,21 @@ Below is a sample policy.
         ]
     }
 
-You can verify that the bucket policy grants the required permissions by running the following script (which is also called by create-fpga-image):
+You can verify that the bucket policy grants the required permissions by running the following script:
 
     $ check_s3_bucket_policy.py \
 	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
+	--dcp-key <path-to-tarball> \
 	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder>
+	--logs-key <path-to-logs-folder>
 
-To create an AFI execute the `create-fpga-image` script as follows:
-
-    $ create-fpga-image \
-        --afi-name <afi-name> \
-	--afi-description <afi-description> \
-	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
-	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder> \
-	[ --client-token <value> ] \
-	[ --dry-run | --no-dry-run ]
-
-This will check that the DCP has been uploaded, that you have granted AWS access to read the DCP, and that 
-you have granted AWS write permissions to the S3 logs folder. Then it will call the AWS CLI to create the AFI:
+To create an AFI execute the following command:
 
     $ aws ec2 create-fpga-image \
         --name <afi-name> \
         --description <afi-description> \
-        --input-storage-location Bucket=<dcp-bucket-name>,Key=<tarball-name> \
-        --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
+        --input-storage-location Bucket=<dcp-bucket-name>,Key=<path-to-tarball> \
+        --logs-storage-location Bucket=<logs-bucket-name>,Key=<path-to-logs> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
 
