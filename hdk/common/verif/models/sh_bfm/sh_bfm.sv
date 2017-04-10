@@ -1666,7 +1666,7 @@ module sh_bfm #(
     
            sh_cl_wr_cmds.push_back(axi_cmd);
 
-           axi_data.data = data;
+           axi_data.data = data << (addr[5:0] * 8);
            axi_data.strb = strb << addr[5:0];
            
            axi_data.id   = id;

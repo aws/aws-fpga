@@ -176,6 +176,7 @@ module fpga(
    logic [15:0]          cl_sh_pcim_awid;
    logic [63:0]         cl_sh_pcim_awaddr;
    logic [7:0]          cl_sh_pcim_awlen;
+   logic [2:0]          cl_sh_pcim_awsize;
    logic [18:0]         cl_sh_pcim_awuser;
    logic                cl_sh_pcim_awvalid;
    logic                sh_cl_pcim_awready;
@@ -194,6 +195,7 @@ module fpga(
    logic [15:0]          cl_sh_pcim_arid ;
    logic [63:0]         cl_sh_pcim_araddr;
    logic [7:0]          cl_sh_pcim_arlen ;
+   logic [2:0]          cl_sh_pcim_arsize ;
    logic [18:0]         cl_sh_pcim_aruser;
    logic                cl_sh_pcim_arvalid;
    logic                sh_cl_pcim_arready;
@@ -211,6 +213,7 @@ module fpga(
    logic [63:0]         sh_cl_dma_pcis_awaddr;
    logic [5:0]          sh_cl_dma_pcis_awid;
    logic [7:0]          sh_cl_dma_pcis_awlen;
+   logic [2:0]          sh_cl_dma_pcis_awsize;
    logic                sh_cl_dma_pcis_awvalid;
    logic                cl_sh_dma_pcis_awready;
 
@@ -228,6 +231,7 @@ module fpga(
    logic [63:0]         sh_cl_dma_pcis_araddr;
    logic [5:0]          sh_cl_dma_pcis_arid;
    logic [7:0]          sh_cl_dma_pcis_arlen;
+   logic [2:0]          sh_cl_dma_pcis_arsize;
    logic                sh_cl_dma_pcis_arvalid;
    logic                cl_sh_dma_pcis_arready;
    
@@ -445,6 +449,7 @@ module fpga(
              .cl_sh_pcim_awid(cl_sh_pcim_awid),
              .cl_sh_pcim_awaddr(cl_sh_pcim_awaddr),
              .cl_sh_pcim_awlen(cl_sh_pcim_awlen),
+             .cl_sh_pcim_awsize(cl_sh_pcim_awsize),
              .cl_sh_pcim_awuser(cl_sh_pcim_awuser), // DW length of transfer
              .cl_sh_pcim_awvalid(cl_sh_pcim_awvalid),
              .sh_cl_pcim_awready(sh_cl_pcim_awready),
@@ -463,6 +468,7 @@ module fpga(
              .cl_sh_pcim_arid(cl_sh_pcim_arid),
              .cl_sh_pcim_araddr(cl_sh_pcim_araddr),
              .cl_sh_pcim_arlen(cl_sh_pcim_arlen),
+             .cl_sh_pcim_arsize(cl_sh_pcim_arsize),
              .cl_sh_pcim_aruser(cl_sh_pcim_aruser), //DW length of transfer
              .cl_sh_pcim_arvalid(cl_sh_pcim_arvalid),
              .sh_cl_pcim_arready(sh_cl_pcim_arready),
@@ -484,6 +490,7 @@ module fpga(
              .sh_cl_dma_pcis_awaddr(sh_cl_dma_pcis_awaddr),
              .sh_cl_dma_pcis_awid(sh_cl_dma_pcis_awid),
              .sh_cl_dma_pcis_awlen(sh_cl_dma_pcis_awlen),
+             .sh_cl_dma_pcis_awsize(sh_cl_dma_pcis_awsize),
              .sh_cl_dma_pcis_awvalid(sh_cl_dma_pcis_awvalid),
              .cl_sh_dma_pcis_awready(cl_sh_dma_pcis_awready),
              
@@ -501,6 +508,7 @@ module fpga(
              .sh_cl_dma_pcis_araddr(sh_cl_dma_pcis_araddr),
              .sh_cl_dma_pcis_arid(sh_cl_dma_pcis_arid),
              .sh_cl_dma_pcis_arlen(sh_cl_dma_pcis_arlen),
+             .sh_cl_dma_pcis_arsize(sh_cl_dma_pcis_arsize),
              .sh_cl_dma_pcis_arvalid(sh_cl_dma_pcis_arvalid),
              .cl_sh_dma_pcis_arready(cl_sh_dma_pcis_arready),
              
@@ -779,6 +787,7 @@ module fpga(
               .cl_sh_pcim_awid(cl_sh_pcim_awid),
               .cl_sh_pcim_awaddr(cl_sh_pcim_awaddr),
               .cl_sh_pcim_awlen(cl_sh_pcim_awlen),
+              .cl_sh_pcim_awsize(cl_sh_pcim_awsize),
               .cl_sh_pcim_awuser(cl_sh_pcim_awuser),
               .cl_sh_pcim_awvalid(cl_sh_pcim_awvalid),
               .sh_cl_pcim_awready(sh_cl_pcim_awready),
@@ -797,6 +806,7 @@ module fpga(
               .cl_sh_pcim_arid(cl_sh_pcim_arid),
               .cl_sh_pcim_araddr(cl_sh_pcim_araddr),
               .cl_sh_pcim_arlen(cl_sh_pcim_arlen),
+              .cl_sh_pcim_arsize(cl_sh_pcim_arsize),
               .cl_sh_pcim_aruser(cl_sh_pcim_aruser),
               .cl_sh_pcim_arvalid(cl_sh_pcim_arvalid),
               .sh_cl_pcim_arready(sh_cl_pcim_arready),

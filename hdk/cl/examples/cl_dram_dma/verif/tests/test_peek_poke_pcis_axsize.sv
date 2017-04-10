@@ -22,6 +22,7 @@ module test_peek_poke_pcis_axsize();
    logic [511:0] pcis_wr_data;
    logic [511:0] pcis_rd_data;
    bit   [511:0] pcis_exp_data;
+   bit   [511:0] pcis_act_data;
 
    logic [63:0]  cycle_count;
    logic [63:0]  error_addr;
@@ -29,6 +30,7 @@ module test_peek_poke_pcis_axsize();
    logic [3:0]   error_index;
    logic [7:0]   data_array[];
 
+   int           data;
    int           timeout_count;
 
    int           error_count;
@@ -46,20 +48,24 @@ module test_peek_poke_pcis_axsize();
       tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
-      void'(std::randomize(pcis_wr_data));
-      $display("Random wr data = %0h", pcis_wr_data);
+      pcis_wr_data =0; 
+      data =1; 
       for(int size =0; size <=6; size++) begin
           $display("[%t] : Size of peek/poke = %0d", $realtime, size);
-          for(int addr =0; addr <=63; addr = addr+(2**size)) begin
+          for(int addr =0; addr <=15; addr = addr+(2**size)) begin
              $display("[%t] : Address of peek/poke = %0h", $realtime, addr);
+             for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
+                  pcis_wr_data[(num_bytes*8)+:8] = data;
+                  data ++;
+             end 
              tb.poke(.addr(addr), .data(pcis_wr_data), .size(size));
              tb.peek(.addr(addr), .data(pcis_rd_data), .size(size));
-             for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
-                  pcis_exp_data[(num_bytes*8)+:8] = pcis_wr_data[((addr[5:0]*8)+(num_bytes*8))+:8]; 
+             for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin           
+                 pcis_exp_data[((addr+num_bytes)*8)+:8] = pcis_wr_data[(num_bytes*8)+:8];
+                 pcis_act_data[((addr+num_bytes)*8)+:8] = pcis_rd_data[(num_bytes*8)+:8];
              end
-             compare_data(.act_data(pcis_rd_data), .exp_data(pcis_exp_data));
-             pcis_exp_data =0; 
           end
+          compare_data(.act_data(pcis_act_data), .exp_data(pcis_exp_data));
           $display("[%t] : Clear the memory before next size iteration", $realtime);
           tb.poke(.addr(64'h0), .data(512'h0), .size(3));
       end
