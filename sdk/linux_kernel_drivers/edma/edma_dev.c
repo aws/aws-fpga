@@ -912,8 +912,11 @@ static unsigned int edma_dev_event_poll(struct file *file, poll_table *wait)
 
 	spin_lock_irqsave(&(edma_event->events_private_data[event_number].event_lock), flags);
 
-	if (edma_event->events_private_data[event_number].event_happend)
-		mask = POLLIN;
+
+       if (edma_event->events_private_data[event_number].event_happend){
+               mask = POLLIN;
+               edma_event->events_private_data[event_number].event_happend = false;
+       }
 
 	spin_unlock_irqrestore(&(edma_event->events_private_data[event_number].event_lock), flags);
 

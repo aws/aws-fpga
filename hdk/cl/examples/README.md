@@ -116,34 +116,21 @@ Below is a sample policy.
         ]
     }
 
-You can verify that the bucket policy grants the required permissions by running the following script (which is also called by create-fpga-image):
+You can verify that the bucket policy grants the required permissions by running the following script:
 
     $ check_s3_bucket_policy.py \
 	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
+	--dcp-key <path-to-tarball> \
 	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder>
+	--logs-key <path-to-logs-folder>
 
-To create an AFI execute the `create-fpga-image` script as follows:
-
-    $ create-fpga-image \
-        --afi-name <afi-name> \
-	--afi-description <afi-description> \
-	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
-	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder> \
-	[ --client-token <value> ] \
-	[ --dry-run | --no-dry-run ]
-
-This will check that the DCP has been uploaded, that you have granted AWS access to read the DCP, and that 
-you have granted AWS write permissions to the S3 logs folder. Then it will call the AWS CLI to create the AFI:
+To create an AFI execute the following command:
 
     $ aws ec2 create-fpga-image \
         --name <afi-name> \
         --description <afi-description> \
-        --input-storage-location Bucket=<dcp-bucket-name>,Key=<tarball-name> \
-        --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
+        --input-storage-location Bucket=<dcp-bucket-name>,Key=<path-to-tarball> \
+        --logs-storage-location Bucket=<logs-bucket-name>,Key=<path-to-logs> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
 
@@ -191,20 +178,19 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 
-    $ sudo fpga-load-local-image -S 0 -I <AGFI_ID>
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
 
 **NOTE**: *The FPGA Management tools use the AGFI ID (not the AFI ID).*
 
-Now, you can verify that the AFI was loaded properly:
+Now, you can verify that the AFI was loaded properly.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
 
-    $ sudo fpga-describe-local-image -S 0 -H
+    $ sudo fpga-describe-local-image -S 0 -R -H
+
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-    AFI          0       <AGFI_ID>               loaded            0        ok               0       <shell_version>
+    AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
+    AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
 
 ## 6. Validating using the CL Example Software
 
-Please refer to the
-[Validating CL Designs](https://github.com/aws/aws-fpga/wiki/Validating-CL-Designs#quick-start)
-Wiki page for methods to validate that your CL example design functions as expected.
+Please refer to the README.md included with each example.

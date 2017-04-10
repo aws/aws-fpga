@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
@@ -33,11 +34,13 @@ static uint16_t pci_device_id = 0xF001;
 /* use the stdout logger */
 const struct logger *logger = &logger_stdout;
 
-int dma_example(int slot_id, int dma_queue);
+int dma_example(int slot_i);
+int interrupt_example(int slot_id, int interrupt_number);
 
 int main(int argc, char **argv) {
     int rc;
-    int slot_id, dma_queue;
+    int slot_id;
+    int interrupt_number;
 
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
@@ -50,10 +53,14 @@ int main(int argc, char **argv) {
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
     slot_id = 0;
-    dma_queue = 0;
 
-    rc = dma_example(slot_id, dma_queue);
+    rc = dma_example(slot_id);
     fail_on(rc, out, "DMA example failed");
+
+    interrupt_number = 0;
+
+    rc = interrupt_example(slot_id, interrupt_number);
+    fail_on(rc, out, "Interrupt example failed");
 
 out:
     return 1;
@@ -122,7 +129,7 @@ rand_string(char *str, size_t size)
  * using fsync() between the writes and read to insure order
  */
 
-int dma_example(int slot_id, int dma_queue) {
+int dma_example(int slot_id) {
     int fd, rc;
     char device_file_name[256];
     char *write_buffer, *read_buffer;
@@ -133,7 +140,7 @@ int dma_example(int slot_id, int dma_queue) {
     write_buffer = NULL;
     fd = -1;
 
-    rc = sprintf(device_file_name, "/dev/edma%i_queue_%i", slot_id, dma_queue);
+    rc = sprintf(device_file_name, "/dev/edma%i_queue_0", slot_id);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
 
 
@@ -216,3 +223,76 @@ out:
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
+
+int interrupt_example(int slot_id, int interrupt_number){
+    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
+    struct pollfd fds[1];
+    uint32_t fd, rd,  read_data;
+    char event_file_name[256];
+    int rc = 0;
+    int poll_timeout = 1000;
+    int num_fds = 1;
+    int pf_id = 0;
+    int bar_id = 0;
+    int fpga_attach_flags = 0;
+    int poll_limit = 20;
+    uint32_t interrupt_reg_offset = 0xd00;
+
+  
+    rc = sprintf(event_file_name, "/dev/fpga%i_event%i", slot_id, interrupt_number);
+    fail_on((rc = (rc < 0)? 1:0), out, "Unable to format event file name.");
+
+    printf("Starting MSI-X Interrupt test \n");
+    rc = fpga_pci_attach(slot_id, pf_id, bar_id, fpga_attach_flags, &pci_bar_handle);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
+
+    printf("Polling device file: %s for interrupt events \n", event_file_name);
+    if((fd = open(event_file_name, O_RDONLY)) == -1) {
+        printf("Error - invalid device\n");
+        rc = 1;
+        fail_on(rc, out, "Unable to open event device");
+    }
+    fds[0].fd = fd;
+    fds[0].events = POLLIN;
+
+    printf("Triggering MSI-X Interrupt 0\n");
+    rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
+    fail_on(rc, out, "Unable to write to the fpga !");
+
+    // Poll checks whether an interrupt was generated, and also clears the interrupt in the device file, so we can detect future interrupts
+    rd = poll(fds, num_fds, poll_timeout);
+    if( rd >0 && fds[0].revents & POLLIN){
+        // Check how many interrupts were generated
+        printf("Interrupt present for Interrupt %i. It worked!\n", interrupt_number);
+        //Clear the interrupt register
+        rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
+        fail_on(rc, out, "Unable to write to the fpga !");
+    }
+    else{
+        printf("No interrupt generated- something went wrong.\n");
+        rc = 1;
+        fail_on(rc, out, "Interrupt generation failed");
+    }
+    close(fd);
+
+    //Clear the interrupt register
+    do{
+        // In this CL, a successful interrupt is indicated by the CL setting bit <interrupt_number + 16>
+        // of the interrupt register. Here we check that bit is set and write 1 to it to clear.
+        rc = fpga_pci_peek(pci_bar_handle, interrupt_reg_offset, &read_data);
+        fail_on(rc, out, "Unable to read from the fpga !");
+        read_data = read_data & (1 << (interrupt_number + 16));
+
+        rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , read_data );
+        fail_on(rc, out, "Unable to write to the fpga !");
+
+        poll_limit--;
+    } while (!read_data && poll_limit > 0);
+
+out:
+    if(fd){
+        close(fd);
+    }
+    return rc;
+}
+

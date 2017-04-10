@@ -23,8 +23,6 @@
 #include <stdbool.h>
 
 #define FPGA_SLOT_MAX           8
-#define FPGA_BAR_PER_PF_MAX		4
-
 #define AFI_ID_STR_MAX			64
 #define FPGA_DDR_IFS_MAX		4
 
@@ -141,6 +139,25 @@ enum {
     FPGA_MGMT_PF = 1,
     FPGA_PF_MAX,
 };
+
+/* resource number (base address register) definitions */
+enum {
+    APP_PF_BAR0 = 0,
+    APP_PF_BAR1 = 1,
+    APP_PF_BAR4 = 4,
+    APP_PF_BAR_MAX
+};
+
+enum {
+    MGMT_PF_BAR0 = 0,
+    MGMT_PF_BAR2 = 2,
+    MGMT_PF_BAR4 = 4,
+    MGMT_PF_BAR_MAX
+};
+
+/* must be the larger of APP_PF_BAR_MAX and MGMT_PF_BAR_MAX */
+#define FPGA_BAR_PER_PF_MAX 5
+
 /**
  * FPGA slot specification PCI resource map
  */
@@ -158,8 +175,8 @@ struct fpga_pci_resource_map {
 	uint8_t   func;
 
 	/** resource for each bar */
-	bool      resource_burstable[6]; /* if the PCI BAR has WC attribute */
-	uint64_t  resource_size[6];
+	bool      resource_burstable[FPGA_BAR_PER_PF_MAX]; /* if the PCI BAR has WC attribute */
+	uint64_t  resource_size[FPGA_BAR_PER_PF_MAX];
 } __attribute((packed));
 
 /**
