@@ -75,9 +75,33 @@ puts "All reports and intermediate results will be time stamped with $timestamp"
 
 set_msg_config -severity INFO -suppress
 set_msg_config -severity STATUS -suppress
-set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
+
+# Suppress Warnings
+set_msg_config -id {Common 17-55}         -suppress
+set_msg_config -id {Constraints 18-4434}  -suppress
+set_msg_config -id {Constraints 18-550}   -suppress
+set_msg_config -id {Constraints 18-619}   -suppress
+set_msg_config -id {Coretcl 2-64}         -suppress
+set_msg_config -id {Designutils 20-1567}  -suppress
+set_msg_config -id {DRC 23-20}            -suppress
+set_msg_config -id {Opt 31-155}           -suppress
+set_msg_config -id {Physopt 32-742}       -suppress
+set_msg_config -id {Place 46-14}          -suppress
+set_msg_config -id {Route 35-39}          -suppress
+set_msg_config -id {Synth 8-115}          -suppress
+set_msg_config -id {Synth 8-152}          -suppress
+set_msg_config -id {Synth 8-3295}         -suppress
+set_msg_config -id {Synth 8-3321}         -suppress
+set_msg_config -id {Synth 8-3331}         -suppress
+set_msg_config -id {Synth 8-3332}         -suppress
+set_msg_config -id {Synth 8-350}          -suppress
+set_msg_config -id {Synth 8-3848}         -suppress
+set_msg_config -id {Synth 8-3917}         -suppress
+set_msg_config -id {Synth 8-3936}         -suppress
+set_msg_config -id {Timing 38-436}        -suppress
+set_msg_config -id {Vivado 12-1008}       -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
@@ -474,7 +498,3 @@ tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
 
-# Clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp} ${CL_DIR}
-
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) finished cleaning the log file. ";
