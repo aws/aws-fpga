@@ -1,23 +1,34 @@
+# RTL Simulation for Verilog/VHDL Custom Logic Design with AWS HDK
+
 # Introduction
-Before finalizing your CL design and registering it with AWS EC2 as Amazon FPGA Image (AFI), you probably want to simulate the design to validate the functionality. The HDK supports RTL-level simulation using Vivado XSIM and MentorGraphics Questa simulators. You can write your tests in SystemVerilog and C languages. If you choose to use the supplied C framework, you can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
+
+Developers' ten to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, and Synopsys' VCS RTL simulators. Developers can write their tests in SystemVerilog and/or C languages. If a developer choose to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
 
 <img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
 
 # Quick Start
+
 ### Have an EC2 instance or other server with Xilinx Vivado tools and an active license.
 
-One easy way is to have a pre-installed environment is to use the AWS FPGA Developer AMI available on AWS Marketplace [add link to instructions], and follow the README.md provided within that AMI
+One easy way is to have a pre-installed environment is to use the [AWS FPGA Developer AMI available on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes with pre-installed Vivado tools and license.
+
+For developers who like to work on-premise or different AMI in the cloud, AWS recommend to follow the [required license for on-premise document](./on_premise_licensing_help.md).
+
+Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vivado version](../supported_vivado_versions.txt) for the exact version of Vivado tools, and the required license components.
 
 ### Install the HDK and setup environment
 
 AWS FPGA HDK can be cloned and installed on your EC2 instance or server by calling:
 
+```
     $ git clone https://github.com/aws/aws-fpga
     $ cd aws-fpga
     $ source hdk_setup.sh
+```
 
-### Try out our examples or write your own
+### Try out one of HDK examples or write your own
 
+```
     $ cd cl/examples/cl_hello_world/verif/scripts    # simulations are launched from the scripts subdir of the design
     $ make                                       # run the default test using the Vivado XSIM
          Running compilation flow
@@ -28,6 +39,7 @@ AWS FPGA HDK can be cloned and installed on your EC2 instance or server by calli
          ...
          $finish called
     $ cd ../sim                                  # to view the test log files
+```
 
 # Writing and Running Your Own Tests for RTL simulation
 
@@ -35,19 +47,22 @@ AWS FPGA HDK can be cloned and installed on your EC2 instance or server by calli
 
 One fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All SV tests must be placed in the verif/tests sub-directory of CL design root and use the ".sv" file extension.
 
+```
     cl_my_design                 # Custom Logic (CL) design root directory
     |-- build
     |-- design
     |-- software
-    |   |-- include              # C header files
-    |   `-- src                  # C source
+    |   |--verif_rtl
+    |       |-- include              # C header files for simulations
+    |       `-- src                  # C source files for simulation
     `-- verif
         |-- scripts              # Makefiles and filelists
         |-- sim                  # sim results directory
         |-- sv                   # additional CL-specific test bench source
         `-- tests                # test directory
+```
 
-**NOTE: All the tests are written to run on 64-bit instances/servers and 64-bit linux, Many of the test and reference CustomLogic (CL) examples use 64-bit address formats**
+**NOTE: All the tests are written to run on 64-bit instances/servers and 64-bit linux, Many of the test and reference Custom Logic (CL) examples use 64-bit address formats**
 
 ```
 module test_peek_poke();
@@ -124,7 +139,7 @@ The AWS Shell Interface specification can be found [here](https://github.com/aws
 
 ## C Tests
 
-As with the SV testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/src sub-directory of CL design root and use the ".c" file extension.
+As with the SystemVerilog (SV) testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/src sub-directory of CL design root and use the ".c" file extension.
 
 
 ```
