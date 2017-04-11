@@ -78,9 +78,8 @@ if __name__ == '__main__':
     logger.addHandler(fh)
 
     logger.info("Checking bucket permissions for the dcp and logs.")
-    cmd = os.environ[
-              'HDK_DIR'] + "/common/scripts/check_s3_bucket_policy.py --dcp-bucket {} --dcp-key {} --logs-bucket {} --logs-key {}".format(
-        args.dcp_bucket, args.dcp_key, args.logs_bucket, args.logs_key)
+    cmd = "{0} {1}/common/scripts/check_s3_bucket_policy.py --dcp-bucket {2} --dcp-key {3} --logs-bucket {4} --logs-key {5}".format(
+        sys.executable, os.environ['HDK_DIR'], args.dcp_bucket, args.dcp_key, args.logs_bucket, args.logs_key)
     if args.debug:
         cmd += ' --debug'
     logger.debug(cmd)
@@ -92,15 +91,15 @@ if __name__ == '__main__':
 
     # Check that input dcp tarball has been uploaded to S3
     if not s3_exists(args.dcp_bucket, args.dcp_key):
-        logger.error("DCP tarball hasn't been uploaded to S3: s3://{}/{}".format(args.dcp_bucket, args.dcp_key))
+        logger.error("DCP tarball hasn't been uploaded to S3: s3://{0}/{1}".format(args.dcp_bucket, args.dcp_key))
         sys.exit(2)
     if not s3_exists(args.logs_bucket, args.logs_key):
-        logger.error("Logs directory doesn't exist in S3: s3://{}/{}".format(args.logs_bucket, args.logs_key))
+        logger.error("Logs directory doesn't exist in S3: s3://{0}/{1}".format(args.logs_bucket, args.logs_key))
         sys.exit(2)
-    cmd = "aws ec2 create-fpga-image --name {} --description '{}' --input-storage-location Bucket={},Key={} --logs-storage-location Bucket={},Key={}".format(
+    cmd = "aws ec2 create-fpga-image --name {0} --description '{1}' --input-storage-location Bucket={2},Key={3} --logs-storage-location Bucket={4},Key={5}".format(
         args.afi_name, args.afi_description, args.dcp_bucket, args.dcp_key, args.logs_bucket, args.logs_key)
     if args.client_token:
-        cmd += " --client_token {}".format(args.client_token)
+        cmd += " --client_token {0}".format(args.client_token)
     if args.no_dry_run:
         cmd += " --no-dry-run"
     elif args.dry_run:

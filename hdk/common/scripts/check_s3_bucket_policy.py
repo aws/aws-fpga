@@ -30,7 +30,7 @@ logger = logging.getLogger('logger')
 pp = pprint.PrettyPrinter(indent = 4)
 
 aws_account = '365015490807'
-aws_account_arn = 'arn:aws:iam::{}:root'.format(aws_account)
+aws_account_arn = 'arn:aws:iam::{0}:root'.format(aws_account)
 
 description = '''Checks S3 permissions required for create-fpga-image.
 
@@ -116,9 +116,9 @@ if __name__ == '__main__':
         logger.error("Invalid logs bucket name. Cannot contain '/' characters. Path should be in the key.")
         sys.exit(2)
     
-    dcp_bucket_resource = 'arn:aws:s3:::{}'.format(args.dcp_bucket)
-    dcp_resource = 'arn:aws:s3:::{}/{}'.format(args.dcp_bucket, args.dcp_key)
-    logs_bucket_resource = 'arn:aws:s3:::{}'.format(args.logs_bucket)
+    dcp_bucket_resource = 'arn:aws:s3:::{0}'.format(args.dcp_bucket)
+    dcp_resource = 'arn:aws:s3:::{0}/{1}'.format(args.dcp_bucket, args.dcp_key)
+    logs_bucket_resource = 'arn:aws:s3:::{0}'.format(args.logs_bucket)
     # logs_key should begin and end in a /
     # logs_resource should end in a /
     if args.logs_key == '':
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             args.logs_key = '/' + args.logs_key
         if args.logs_key[-1] != '/':
             args.logs_key += '/'
-    logs_resource = 'arn:aws:s3:::{}{}'.format(args.logs_bucket, args.logs_key)
+    logs_resource = 'arn:aws:s3:::{0}{1}'.format(args.logs_bucket, args.logs_key)
     
     iam = boto3.client('iam')
     
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     user_account = response['Account']
     user_account_arn = response['Arn']
     user_id = response['UserId']
-    logger.debug("User arn={}".format(user_account_arn))
+    logger.debug("User arn={0}".format(user_account_arn))
     
     # Get all policy statements for the user
     user_policy_statements = []
@@ -152,7 +152,7 @@ if __name__ == '__main__':
             role = matches.group(2)
             role_fields = role.split('/')
             role_name = role_fields[0]
-            logger.debug("Assumed role={}".format(role_name))
+            logger.debug("Assumed role={0}".format(role_name))
             #role_response = iam.get_role(RoleName = role_name)
             response = iam.list_attached_role_policies(RoleName = role_name)
             for attached_policy_info in response['AttachedPolicies']:
@@ -170,11 +170,11 @@ if __name__ == '__main__':
                 user_policy_statements.extend(policy_statement)
         elif user_type == 'user':
             user_name = matches.group(2)
-            logger.debug("User name={}".format(user_name))
+            logger.debug("User name={0}".format(user_name))
             response = iam.list_attached_user_policies(UserName = user_name)
             for attached_policy_info in response['AttachedPolicies']:
                 policy_name = attached_policy_info['PolicyName']
-                logger.debug("Attached policy: {}".format(policy_name))
+                logger.debug("Attached policy: {0}".format(policy_name))
                 policy_arn = attached_policy_info['PolicyArn']
                 policy_response = iam.get_policy(PolicyArn = attached_policy_info['PolicyArn'])
                 policy_version = policy_response['Policy']['DefaultVersionId']
@@ -184,7 +184,7 @@ if __name__ == '__main__':
             # Retrieve inline policies
             response = iam.list_user_policies(UserName = user_name)
             for policy_name in response['PolicyNames']:
-                logger.debug("Inline policy: {}".format(policy_name))
+                logger.debug("Inline policy: {0}".format(policy_name))
                 policy_statement = iam.get_user_policy(UserName = user_name, PolicyName = policy_name)['PolicyDocument']['Statement']
                 user_policy_statements.extend(policy_statement)
             # Retrieve groups that user belongs to and get their policies
@@ -192,12 +192,12 @@ if __name__ == '__main__':
             for group_info in response['Groups']:
                 group_name = group_info['GroupName']
                 group_arn = group_info['Arn']
-                logger.debug("User belongs to group: {}".format(group_name))
+                logger.debug("User belongs to group: {0}".format(group_name))
                 response = iam.list_attached_group_policies(GroupName = group_name)
                 for attached_policy_info in response['AttachedPolicies']:
                     policy_name = attached_policy_info['PolicyName']
                     policy_arn = attached_policy_info['PolicyArn']
-                    logger.debug("{} attached policy: {}".format(group_name, policy_name))
+                    logger.debug("{0} attached policy: {1}".format(group_name, policy_name))
                     policy_response = iam.get_policy(PolicyArn = attached_policy_info['PolicyArn'])
                     policy_version = policy_response['Policy']['DefaultVersionId']
                     policy_details = iam.get_policy_version(PolicyArn = policy_arn, VersionId = policy_version)
@@ -206,7 +206,7 @@ if __name__ == '__main__':
                 # Retrieve inline policies for group
                 response = iam.list_group_policies(GroupName = group_name)
                 for policy_name in response['PolicyNames']:
-                    logger.debug("{} inline policy: {}".format(policy_name))
+                    logger.debug("{0} inline policy: {1}".format(policy_name))
                     policy_statement = iam.get_group_policy(GroupName = group_name, PolicyName = policy_name)['PolicyDocument']['Statement']
                     user_policy_statements.extend(policy_statement)
     
@@ -214,11 +214,11 @@ if __name__ == '__main__':
     try:
         response = s3.get_bucket_policy(Bucket = args.dcp_bucket)
         dcp_bucket_policy = json.loads(response['Policy'])
-        logger.debug("The S3 bucket policy of {} is:".format(args.dcp_bucket))
+        logger.debug("The S3 bucket policy of {0} is:".format(args.dcp_bucket))
         logger.debug(pp.pformat(dcp_bucket_policy))
     except:
         num_errors += 1
-        logger.info("Couldn't get the bucket policy for {}.\nEither the bucket policy doesn't exist or you don't have permission to access the bucket policy.".format(args.dcp_bucket))
+        logger.info("Couldn't get the bucket policy for {0}.\nEither the bucket policy doesn't exist or you don't have permission to access the bucket policy.".format(args.dcp_bucket))
         dcp_bucket_policy = None
     
     # If the logs are going into a different bucket then get the policy for the logs bucket.
@@ -228,11 +228,11 @@ if __name__ == '__main__':
         try:
             response = s3.get_bucket_policy(Bucket = args.logs_bucket)
             logs_bucket_policy = json.loads(response['Policy'])
-            logger.debug("The S3 bucket policy of {} is:".format(args.logs_bucket))
+            logger.debug("The S3 bucket policy of {0} is:".format(args.logs_bucket))
             logger.debug(pp.pformat(logs_bucket_policy))
         except:
             num_errors += 1
-            logger.info("Couldn't get the bucket policy for {}.\nEither the bucket policy doesn't exist or you don't have permission to access the bucket policy.".format(args.logs_bucket))
+            logger.info("Couldn't get the bucket policy for {0}.\nEither the bucket policy doesn't exist or you don't have permission to access the bucket policy.".format(args.logs_bucket))
             logs_bucket_policy = None
         
     # Check DCP bucket for required permissions for user and AWS account
@@ -250,7 +250,7 @@ if __name__ == '__main__':
             (principals_re, actions_re, resources_re, effect) = process_policy_statement(statement)
             for principal_re in principals_re:
                 if re.match(principal_re, aws_account_arn):
-                    logger.debug("Found a policy for AWS F1 account:\n{}".format(pp.pformat(statement)))
+                    logger.debug("Found a policy for AWS F1 account:\n{0}".format(pp.pformat(statement)))
                     for resource_re in resources_re:
                         if re.match(resource_re, dcp_bucket_resource):
                             for action_re in actions_re:
@@ -261,7 +261,7 @@ if __name__ == '__main__':
                                     else:
                                         aws_cannot_list_dcp_bucket = True
                                         num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent AWS from listing the DCP bucket:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following DCP bucket policy statement will prevent AWS from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
                         if re.match(resource_re, dcp_resource):
                             for action_re in actions_re:
                                 if re.match(action_re, 's3:GetObject'):
@@ -271,7 +271,7 @@ if __name__ == '__main__':
                                     else:
                                         aws_cannot_get_dcp = True
                                         num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent AWS from reading the DCP:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following DCP bucket policy statement will prevent AWS from reading the DCP:\n{0}".format(pp.pformat(statement)))
                 if re.match(principal_re, user_account_arn):
                     logger.debug("Found a policy for user account")
                     logger.debug(pp.pformat(statement))
@@ -285,7 +285,7 @@ if __name__ == '__main__':
                                     else:
                                         user_cannot_list_dcp_bucket = True
                                         num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from listing the DCP bucket:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following DCP bucket policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
                         if re.match(resource_re, dcp_resource):
                             for action_re in actions_re:
                                 if re.match(action_re, 's3:PutObject'):
@@ -295,7 +295,7 @@ if __name__ == '__main__':
                                     else:
                                         user_cannot_put_dcp = True
                                         num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from writing the DCP:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following DCP bucket policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement)))
     
     aws_can_list_logs_bucket = False
     aws_cannot_list_logs_bucket = False
@@ -312,7 +312,7 @@ if __name__ == '__main__':
             (principals_re, actions_re, resources_re, effect) = process_policy_statement(statement)
             for principal_re in principals_re:
                 if re.match(principal_re, aws_account_arn):
-                    logger.debug("Found a policy for AWS F1 account:\n{}".format(pp.pformat(statement)))
+                    logger.debug("Found a policy for AWS F1 account:\n{0}".format(pp.pformat(statement)))
                     for resource_re in resources_re:
                         if re.match(resource_re, logs_bucket_resource):
                             for action_re in actions_re:
@@ -323,7 +323,7 @@ if __name__ == '__main__':
                                     else:
                                         aws_cannot_list_logs_bucket = True
                                         num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent AWS from listing the logs bucket:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following logs bucket policy statement will prevent AWS from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
                         if re.match(resource_re, logs_resource):
                             for action_re in actions_re:
                                 if re.match(action_re, 's3:PutObject'):
@@ -333,7 +333,7 @@ if __name__ == '__main__':
                                     else:
                                         aws_cannot_put_logs = True
                                         num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent AWS from writing the AFI creation logs:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following logs bucket policy statement will prevent AWS from writing the AFI creation logs:\n{0}".format(pp.pformat(statement)))
                 if re.match(principal_re, user_account_arn):
                     logger.debug("Found a policy for user account")
                     logger.debug(pp.pformat(statement))
@@ -347,7 +347,7 @@ if __name__ == '__main__':
                                     else:
                                         user_cannot_list_logs_bucket = True
                                         num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from listing the logs bucket:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following DCP bucket policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
                         if re.match(resource_re, logs_resource):
                             for action_re in actions_re:
                                 if re.match(action_re, 's3:GetObject'):
@@ -357,7 +357,7 @@ if __name__ == '__main__':
                                     else:
                                         user_cannot_get_logs = True
                                         num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent you from getting the AFI creation logs:\n{}".format(pp.pformat(statement)))
+                                        logger.error("The following logs bucket policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement)))
     
     # Test user's or role's permissions from IAM
     logger.debug("Checking user's permissions from IAM")
@@ -370,41 +370,41 @@ if __name__ == '__main__':
                     if re.match(action_re, 's3:ListBucket'):
                         if effect == 'Allow':
                             user_can_list_dcp_bucket = True
-                            logger.debug("Allows you to list the DCP bucket:\n{}".format(pp.pformat(statement)))
+                            logger.debug("Allows you to list the DCP bucket:\n{0}".format(pp.pformat(statement)))
                         else:
                             user_cannot_list_dcp_bucket = True
                             num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from listing the DCP bucket:\n{}".format(pp.pformat(statement)))
+                            logger.error("The following IAM policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
             if re.match(resource_re, dcp_resource):
                 for action_re in actions_re:
                     if re.match(action_re, 's3:PutObject'):
                         if effect == 'Allow':
                             user_can_put_dcp = True
-                            logger.debug("Allows you to write the DCP:\n{}".format(pp.pformat(statement)))
+                            logger.debug("Allows you to write the DCP:\n{0}".format(pp.pformat(statement)))
                         else:
                             user_cannot_put_dcp = True
                             num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from writing the DCP:\n{}".format(pp.pformat(statement)))
+                            logger.error("The following IAM policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement)))
             if re.match(resource_re, logs_bucket_resource):
                 for action_re in actions_re:
                     if re.match(action_re, 's3:ListBucket'):
                         if effect == 'Allow':
                             user_can_list_logs_bucket = True
-                            logger.debug("Allows you to list the logs bucket:\n{}".format(pp.pformat(statement)))
+                            logger.debug("Allows you to list the logs bucket:\n{0}".format(pp.pformat(statement)))
                         else:
                             user_cannot_list_logs_bucket = True
                             num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from listing the logs bucket:\n{}".format(pp.pformat(statement)))
+                            logger.error("The following IAM policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
             if re.match(resource_re, logs_resource):
                 for action_re in actions_re:
                     if re.match(action_re, 's3:GetObject'):
                         if effect == 'Allow':
                             user_can_get_logs = True
-                            logger.debug("Allows you to get the AFI creation logs:\n{}".format(pp.pformat(statement)))
+                            logger.debug("Allows you to get the AFI creation logs:\n{0}".format(pp.pformat(statement)))
                         else:
                             user_cannot_get_logs = True
                             num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from getting the AFI creation logs:\n{}".format(pp.pformat(statement)))
+                            logger.error("The following IAM policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement)))
     
     extra_dcp_statements = []
     extra_logs_statements = []
@@ -577,11 +577,11 @@ See $HDK_DIR/cl/examples/README.md'''.format(aws_account=aws_account))
 
     if len(extra_dcp_statements):
         if dcp_bucket_policy:
-            logger.info("Add the following statements to the {} bucket policy:".format(args.dcp_bucket))
+            logger.info("Add the following statements to the {0} bucket policy:".format(args.dcp_bucket))
             for statement_str in extra_dcp_statements:
                 logger.info(statement_str)
         else:
-            logger.info("You currently don't have a bucket policy for {}".format(args.dcp_bucket))
+            logger.info("You currently don't have a bucket policy for {0}".format(args.dcp_bucket))
             policy_str = '''
     {{
         "Version": "2012-10-17",
@@ -624,15 +624,15 @@ See $HDK_DIR/cl/examples/README.md'''.format(aws_account=aws_account))
         policy_str += '''
         ]
     }'''
-        logger.info("The following bucket policy will resolve the problem:\n{}".format(policy_str))
+        logger.info("The following bucket policy will resolve the problem:\n{0}".format(policy_str))
         
     if (args.logs_bucket != args.dcp_bucket) and len(extra_logs_statements):
         if logs_bucket_policy:
-            logger.info("Add the following statements to the {} bucket policy:".format(args.logs_bucket))
+            logger.info("Add the following statements to the {0} bucket policy:".format(args.logs_bucket))
             for statement_str in extra_logs_statements:
                 logger.info(statement_str)
         else:
-            logger.info("You currently don't have a bucket policy for {}".format(args.logs_bucket))
+            logger.info("You currently don't have a bucket policy for {0}".format(args.logs_bucket))
             policy_str = '''
     {{
         "Version": "2012-10-17",
@@ -662,7 +662,7 @@ See $HDK_DIR/cl/examples/README.md'''.format(aws_account=aws_account))
         ]
     }}
 '''.format(aws_account=aws_account, logs_bucket=args.logs_bucket, logs_resource=logs_resource)
-            logger.info("The following bucket policy will resolve the problem:\n{}".format(policy_str))
+            logger.info("The following bucket policy will resolve the problem:\n{0}".format(policy_str))
 
     if num_errors:
         logger.error("Failed")
