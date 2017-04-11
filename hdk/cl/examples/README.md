@@ -76,7 +76,8 @@ Create a bucket and folder for your tarball, then copy to S3
     $ aws s3 cp $CL_DIR/build/checkpoints/to_aws/*.Developer_CL.tar \       # Upload the file to S3
              s3://<bucket-name>/<dcp-folder-name>/
 ```
-Create a folder for your log files            
+Create a folder for your log files        
+```    
     $ aws s3 mb s3://<bucket-name>/<logs-folder-name>  # Create a folder to keep your logs
     $ touch LOGS_FILES_GO_HERE.txt                     # Create a temp file
     $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/  #Which creates the folder on S3
@@ -169,20 +170,20 @@ AWS recommends that you launch an instance with latest Amazon Linux that has the
 ### 4. Setup AWS FPGA Management tools
 
 The FPGA Management tools are required to load an AFI onto an FPGA.  Depending on your AMI used to run the F1 instance, these steps may have been completed already.
-
+```
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
     $ source sdk_setup.sh
-
+```
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
-
+```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
-
+```
 During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
 To extend your AWS CLI installation, please execute the following:
-
+```
     $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-
+```
   
 ### 5. Load the AFI
 
