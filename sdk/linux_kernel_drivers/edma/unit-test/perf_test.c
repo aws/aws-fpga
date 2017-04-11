@@ -117,15 +117,15 @@ int main()
 
 	}
 
-	printf("For block size of %llu:\n"
-		"-----------------------\n", SIZE_OF_DATA);
+	printf("For block size of %llu and %u repetitions :\n"
+		"-----------------------\n", SIZE_OF_DATA, NUMBER_OF_REPETITIONS);
 	printf("Average %s Latency is %lf Seconds\n",
 			transaction_type,
 			(global_time/number_of_succesful_writes));
 
-	printf("%s bandwidth is %lf Kb/s\n",
+	printf("%s bandwidth is %lf Mega-Bytes/s\n",
 			transaction_type,
-			((number_of_succesful_writes * SIZE_OF_DATA)/ global_time)/1024);
+			((number_of_succesful_writes * SIZE_OF_DATA)/ global_time)/(1024*1024));
 
 	free(write_buf);
 	free(read_buf);

@@ -9,6 +9,8 @@
 #include "edma.h"
 #include "edma_backend.h"
 #include "libxdma_api.h"
+#include <linux/string.h>
+
 
 #define MASTER_PF					(0)
 #define DRV_MODULE_NAME					"emda_xdma_backend"
@@ -454,8 +456,36 @@ static struct pci_driver edma_pci_driver = {
 };
 
 
-int edma_backend_reset(void *dma_q)
+int edma_backend_reset(void *q_handle)
 {
+	int i;
+	command_queue_t* command_queue = (command_queue_t*)q_handle;
+	command_t* queue = command_queue->queue;
+
+	//Stop the kthread before reset and make sure it was stopped.
+	kthread_stop(command_queue->worker_thread);
+	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
+			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
+		msleep(XDMA_TIMEOUT_IN_MSEC);
+
+	//if still not stopped - panic
+	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
+					!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
+		BUG();
+
+	for(i = 0; i < edma_queue_depth; i++)
+	{
+		memset(&(queue[i]), 0, sizeof(command_t));
+	}
+
+	command_queue->head = 0;
+	command_queue->tail = 0;
+	command_queue->next_to_recycle = 0;
+
+	//Re-launch the worker thread again
+	command_queue->worker_thread = kthread_run(write_worker_function, command_queue,
+			"write_worker_thread_%d", i);
+
 	return 0;
 }
 

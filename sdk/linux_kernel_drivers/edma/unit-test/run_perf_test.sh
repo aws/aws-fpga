@@ -16,16 +16,16 @@ do
 	for ((j=0;j<${#number_of_repetitions[@]};j++))
 	do
 		#first build the test
-		gcc $test_filename -DSIZE_OF_DATA=${data_size[$i]} -DNUMBER_OF_REPETITIONS=${number_of_repetitions[$j]} -o perf_read_${data_size[$i]}_${number_of_repetitions[$j]}
-gcc $test_filename -DSIZE_OF_DATA=${data_size[$i]} -DNUMBER_OF_REPETITIONS=${number_of_repetitions[$j]} -DWRITE_PERF=1 -DWRITE_PERF_VERIFY -o perf_write_${data_size[$i]}_${number_of_repetitions[$j]}
+		gcc $test_filename -DSIZE_OF_DATA=${data_size[$i]} -DNUMBER_OF_REPETITIONS=${number_of_repetitions[$j]} -o perf_test_read_${data_size[$i]}_${number_of_repetitions[$j]}
+		gcc $test_filename -DSIZE_OF_DATA=${data_size[$i]} -DNUMBER_OF_REPETITIONS=${number_of_repetitions[$j]} -DWRITE_PERF=1 -DWRITE_PERF_VERIFY -o perf_test_write_${data_size[$i]}_${number_of_repetitions[$j]}
 
 		#clear dmesh		
 		dmesg -C
 		
 		#run test and fump dmesg
-		./perf_read_${data_size[$i]}_${number_of_repetitions[$j]} >> $result_filename
+		./perf_test_read_${data_size[$i]}_${number_of_repetitions[$j]} >> $result_filename
 		echo " " >> $result_filename
-		./perf_write_${data_size[$i]}_${number_of_repetitions[$j]} >> $result_filename
+		./perf_test_write_${data_size[$i]}_${number_of_repetitions[$j]} >> $result_filename
 		echo " " >> $result_filename
 						
 		dmesg > perf_${data_size[$i]}_${number_of_repetitions[$j]}.dmesg
