@@ -70,7 +70,7 @@ The [Examples Table](./cl/examples/cl_examples_list.md) summarize which capabili
 <a name="startcl"></a>
 ### Start your own Custom Logic design (RTL flow, using Verilog/VHDL)
 
-The [start your own CL design](./cl/developer_designs/README.md) will guide you on how to setup your own CL project environment once the HDK is set up.
+The [start your own CL design](./cl/developer_designs/Starting_Your_Own_CL.md) will guide you on how to setup your own CL project environment once the HDK is set up.
 
 <a name="simcl"></a>
 ### Simulate your Custom Logic design (RTL Simulation)
@@ -80,6 +80,6 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 
 ### Build and submit the Custom Logic to AWS for generating an AFI <a name="buildcl"></a>
 
-You can follow the [build scripts readme](./common/shell_stable/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
+You can follow the [build scripts readme](./common/shell_v032117d7/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 

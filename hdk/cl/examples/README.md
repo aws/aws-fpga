@@ -2,19 +2,22 @@
 
 As a pre-requisite to building the AFI, the developer should have an instance/server with Xilinx Vivado Tools and the necessary Licenses. The "FPGA Developer AMI" provided free of charge on AWS Marketplace will be an ideal place to start an instance from. See the README.md on the AMI for the details how to launch the FPGA Developer's AMI, install the tools and set up the license.
 
-**NOTE:** *Steps 1 through 3 can be done on any server or EC2 instance. C4/C5 instances are recommended for fastest build time.*
+**NOTE:** *It is recommended that steps 1 through 3 be done on an EC2 instance with 32GiB or greater. C4/C5 instances are recommended for fastest build time.*
 
 **NOTE:** *You can skip steps 0 through 3 if you are not interested in the build process.  Step 4 through 6 will show you how to use one of the predesigned AFI examples.*
 
+
 ### 0. Setup the HDK and install AWS CLI
 
+When using the developer AMI:  ```AWS_FPGA_REPO_DIR=/home/centos/src/project_data/aws-fpga```
+    
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
     $ source hdk_setup.sh
 
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
-    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (typically us-east-1)
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (Required: us-east-1)
 
 During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
 To extend your AWS CLI installation, please execute the following:
@@ -66,12 +69,22 @@ You need to prepare the following information:
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
 
-    $ aws s3 mb s3://<bucket-name>                # Create an S3 bucket (choose a unique bucket name)
-    $ aws s3 cp *.Developer_CL.tar \              # Upload the file to S3
-             s3://<bucket-name>/
+Create a bucket and folder for your tarball, then copy to S3
+```
+    $ aws s3 mb s3://<bucket-name> --region us-east-1  # Create an S3 bucket (choose a unique bucket name)
+    $ aws s3 mb s3://<bucket-name>/<dcp-folder-name>   # Create folder for your tarball files
+    $ aws s3 cp $CL_DIR/build/checkpoints/to_aws/*.Developer_CL.tar \       # Upload the file to S3
+             s3://<bucket-name>/<dcp-folder-name>/
+```
+Create a folder for your log files        
+```    
+    $ aws s3 mb s3://<bucket-name>/<logs-folder-name>  # Create a folder to keep your logs
+    $ touch LOGS_FILES_GO_HERE.txt                     # Create a temp file
+    $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/  #Which creates the folder on S3
+```             
 
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is a sample policy.
+Below is the policy you must use, except you will need to change <bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
 
 ```
     {
@@ -86,7 +99,7 @@ Below is a sample policy.
                 "Action": [
                     "s3:ListBucket"
                 ],
-                "Resource": "arn:aws:s3:::<bucket_name>"
+                "Resource": "arn:aws:s3:::<bucket-name>"
             },
             {
                 "Sid": "Object read permissions",
@@ -97,7 +110,7 @@ Below is a sample policy.
                 "Action": [
                     "s3:GetObject"
                 ],
-                "Resource": "arn:aws:s3:::<dcp_bucket_name>/<dcp_filename>"
+                "Resource": "arn:aws:s3:::<bucket-name>/<dcp-folder-name>/<tar-file-name>"
             },
             {
                 "Sid": "Folder write permissions",
@@ -108,7 +121,7 @@ Below is a sample policy.
                 "Action": [
                     "s3:PutObject"
                 ],
-                "Resource": "arn:aws:s3:::<log_bucket_name>/*"
+                "Resource": "arn:aws:s3:::<bucket-name>/<logs-folder-name>/*"
             }
         ]
     }
@@ -118,12 +131,13 @@ You can verify that the bucket policy grants the required permissions by running
 
 ```
     $ check_s3_bucket_policy.py \
-	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <path-to-tarball> \
-	--logs-bucket <logs-bucket-name> \
-	--logs-key <path-to-logs-folder>
+	--dcp-bucket <bucket-name> \
+	--dcp-key <dcp-folder-name>/<tar-file-name> \
+	--logs-bucket <bucket-name> \
+	--logs-key <logs-folder-name>
 
-
+```
+Once your policy passes the checks, your ready to start AFI creation. 
 ```
     $ aws ec2 create-fpga-image \
         --name <afi-name> \
@@ -143,29 +157,35 @@ The output of this command includes two identifiers that refer to your AFI:
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-01234567890abcdef`**.
 
-After the AFI generation is complete, AWS will put the logs into the bucket location provided by the developer and notify them
-by email.
-
+After the AFI generation is complete, AWS will put the logs into the bucket location (s3://<bucket-name>/<logs-folder-name>) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.
+ 
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
-Please wait until you receive a confirmation email from AWS indicating the creation process is complete.*
+Please wait until you confirm the AFI is created successfully.*
 
-# Step by step guide how to load and test a registered AFI from within an F1 instance
+## Step by step guide how to load and test a registered AFI from within an F1 instance
 
 To follow the next steps, you have to launch an F1 instance.
 AWS recommends that you launch an instance with latest Amazon Linux that has the FPGA Management tools included, or alternatively the FPGA Developer AMI with both the HDK and SDK.
 
-## 4. Setup AWS FPGA Management tools
+### 4. Setup AWS FPGA Management tools
 
-The FPGA Management tools are required to load an AFI onto an FPGA.
-To install these tools, execute the following:
-
+The FPGA Management tools are required to load an AFI onto an FPGA.  Depending on your AMI used to run the F1 instance, these steps may have been completed already.
 ```
-    $ git clone https://github.com/aws/aws-fpga     # Not needed if you have installed the HDK as in Step 0.
-    $ cd aws-fpga
+    $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
+    $ cd $AWS_FPGA_REPO_DIR
     $ source sdk_setup.sh
-```  
+```
+To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+```
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
+```
+During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
+To extend your AWS CLI installation, please execute the following:
+```
+    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
+```
   
-## 5. Load the AFI
+### 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
 You can also invoke the `fpga-describe-local-image` command to learn about which AFI, if any, is loaded onto a particular slot.
@@ -182,23 +202,32 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 
-
+```
     $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+```
 
 
 **NOTE**: *The FPGA Management tools use the AGFI ID (not the AFI ID).*
 
 Now, you can verify that the AFI was loaded properly.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
-
+```
     $ sudo fpga-describe-local-image -S 0 -R -H
 
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
     AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
+```
+    
 
-## 6. Validating using the CL Example Software
+### 6. Validating using the CL Example Software
 
-Each CL Example comes with a runtime software under `/software/runtime/` subdirectory. Calling `$ make` will trigger a build of the runtime application to be used on F1 instance in conjunction with the matching AFI
+Each CL Example comes with a runtime software under `$CL_DIR/software/runtime/` subdirectory. You will need to build the runtime application that matches your loaded AFI.   
 
-Please refer to the README.md included with each example.
+```
+    $ cd $CL_DIR/software/runtime/
+    $ make all
+    $ sudo ./test_hello_world
+```
+
+For additional information, see the README.md located in the $CL_DIR/README.md
