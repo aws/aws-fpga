@@ -2,14 +2,15 @@
 
 ## Table of Contents
 
-1. [Overview] (#overview)
-2. [Functional Description] (#description)
-3. [Hello World Example Metadata] (#metadata)
+1. [Overview](#overview)
+2. [Functional Description](#description)
+3. [Hello World Example Metadata](#metadata)
 
 
 <a name="overview"></a>
 ## Overview
-This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the CustomLogic. These registers will be in the memory space before AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus.
+
+This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (C). These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
 
 This example demonstrate a basic use-case of the Virtual LED and Virtual DIP switches.
 
@@ -48,13 +49,15 @@ While running on F1, the developer can use the FPGA tools `fpga-get-virtual-led`
 ### Unused interfaces
 
 The Hello World example does not use most of AWS Shell interface, hence the unused signals are tied off.
-At the end of `cl_hello_world.sv` file, there is a specific `\`include` for each unused interface to handle the tie-off's.
+At the end of `cl_hello_world.sv` file, there is a specific `include` command for an interface-specific `.inc` file, to handle the tie-off\'s for every unused interface.
 
 
 <a name="metadata"></a>
 ## Hello World Example Metadata
+
 The following table displays information about the CL that is required to register it as an AFI with AWS.
 Alternatively, you can directly use a pre-generated AFI for this CL.
+
 
 | Key   | Value     |
 |-----------|------|
