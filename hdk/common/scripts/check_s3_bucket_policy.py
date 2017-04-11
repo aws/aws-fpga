@@ -18,6 +18,7 @@
 import argparse
 import boto3
 #from botocore.exceptions import ClientError
+from exceptions import ValueError
 import json
 import logging
 #import os
@@ -38,46 +39,101 @@ This program uses the AWS CLI and requires credentials to be configured.
 See $AWS_FPGA_REPO_DIR/README.md for instructions to configure your credentials.
 '''
 
-# Convert the policy pattern to a regular expression
-# Escape '.' and replace * with '.*'
-# Append a '$' so an exact match is required
-def escape_policy_pattern(policy_pattern):
-    policy_pattern = re.sub(r'\.', '\.', policy_pattern)
-    policy_pattern = re.sub(r'\*', '.*', policy_pattern)
-    policy_pattern += '$'
-    return policy_pattern
+class PolicyStatement:
+    def __init__(self, statement, principal=None):
+        self.statement = statement
+        self.process_policy_statement(statement, principal)
+        
+    # Convert the policy pattern to a regular expression
+    # Escape '.' and replace * with '.*'
+    # Append a '$' so an exact match is required
+    def escape_policy_pattern(self, policy_pattern):
+        policy_pattern = re.sub(r'\.', '\.', policy_pattern)
+        policy_pattern = re.sub(r'\*', '.*', policy_pattern)
+        policy_pattern += '$'
+        return policy_pattern
 
-def process_policy_statement(statement):
-    principals_re = []
-    if 'Principal' in statement:
-        principals = statement['Principal']['AWS']
-        if not isinstance(principals, list):
-            principals = [principals]
+    def process_policy_statement(self, statement, principal=None):
+        # If a principal is provided then it means that this is a role policy and there
+        # should not be a 'Principal' clause in the statement because it is implicit
+        self.principals_re = []
+        if principal:
+            if 'Principal' in statement:
+                raise ValueError("'Principal not allowed in a role policy:\n{0}".format(pp.pformat(statement)))
+            principals = [principal]
+        else:
+            principals = statement['Principal']['AWS']
+            if not isinstance(principals, list):
+                principals = [principals]
         for principal in principals:
             principal = re.sub(r'\.', '\.', principal)
             principal = re.sub(r'\*', '.*', principal)
             principal += '$'
-            principals_re.append(principal)
-    actions = statement['Action']
-    if not isinstance(actions, list):
-        actions = [ actions ]
-    actions_re = []
-    for action in actions:
-        action = re.sub(r'\.', '\.', action)
-        action = re.sub(r'\*', '.*', action)
-        action += '$'
-        actions_re.append(action)
-    resources = statement['Resource']
-    if not isinstance(resources, list):
-        resources = [ resources ]
-    resources_re = []
-    for resource in resources:
-        resource = re.sub(r'\.', '\.', resource)
-        resource = re.sub(r'\*', '.*', resource)
-        resource += '$'
-        resources_re.append(resource)
-    effect = statement['Effect']
-    return (principals_re, actions_re, resources_re, effect)
+            self.principals_re.append(principal)
+                
+        self.actions_re = []
+        if 'Action' in statement:
+            actions = statement['Action']
+            if not isinstance(actions, list):
+                actions = [ actions ]
+            for action in actions:
+                action = re.sub(r'\.', '\.', action)
+                action = re.sub(r'\*', '.*', action)
+                action += '$'
+                self.actions_re.append(action)
+                
+        self.notactions_re = []
+        if 'NotAction' in statement:
+            notactions = statement['Action']
+            if not isinstance(notactions, list):
+                notactions = [ notactions ]
+            for notaction in notactions:
+                notaction = re.sub(r'\.', '\.', notaction)
+                notaction = re.sub(r'\*', '.*', notaction)
+                notaction += '$'
+                self.notactions_re.append(notaction)
+                
+        self.resources_re = []
+        resources = statement['Resource']
+        if not isinstance(resources, list):
+            resources = [ resources ]
+        for resource in resources:
+            resource = re.sub(r'\.', '\.', resource)
+            resource = re.sub(r'\*', '.*', resource)
+            resource += '$'
+            self.resources_re.append(resource)
+            
+        self.effect = statement['Effect']
+        return
+    
+    def check_effect(self, principal, resource, action):
+        result = ''
+        for principal_re in self.principals_re:
+            # Deny overrides any Allow
+            if result == 'Deny': break
+            if re.match(principal_re, principal):
+                logger.debug("Found a policy for {0}:\n{1}".format(principal, pp.pformat(self.statement)))
+                for resource_re in self.resources_re:
+                    # Deny overrides any Allow
+                    if result == 'Deny': break
+                    if re.match(resource_re, resource):
+                        for action_re in self.actions_re:
+                            if re.match(action_re, action):
+                                if self.effect == 'Allow':
+                                    result = 'Allow'
+                                else:
+                                    result = 'Deny'
+                                    # Deny overrides any Allow
+                                    break
+                        for notaction_re in self.notactions_re:
+                            if not re.match(notaction_re, action):
+                                if self.effect == 'Allow':
+                                    result = 'Allow'
+                                else:
+                                    result = 'Deny'
+                                    # Deny overrides any Allow
+                                    break
+        return result
     
 if __name__ == '__main__':
     num_errors = 0
@@ -247,55 +303,43 @@ if __name__ == '__main__':
     if dcp_bucket_policy:
         logger.debug("Checking DCP bucket permissions")
         for statement in dcp_bucket_policy['Statement']:
-            (principals_re, actions_re, resources_re, effect) = process_policy_statement(statement)
-            for principal_re in principals_re:
-                if re.match(principal_re, aws_account_arn):
-                    logger.debug("Found a policy for AWS F1 account:\n{0}".format(pp.pformat(statement)))
-                    for resource_re in resources_re:
-                        if re.match(resource_re, dcp_bucket_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:ListBucket'):
-                                    if effect == 'Allow':
-                                        aws_can_list_dcp_bucket = True
-                                        logger.debug("Allows AWS to list the DCP bucket")
-                                    else:
-                                        aws_cannot_list_dcp_bucket = True
-                                        num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent AWS from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
-                        if re.match(resource_re, dcp_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:GetObject'):
-                                    if effect == 'Allow':
-                                        aws_can_get_dcp = True
-                                        logger.debug("Allows AWS to get the DCP")
-                                    else:
-                                        aws_cannot_get_dcp = True
-                                        num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent AWS from reading the DCP:\n{0}".format(pp.pformat(statement)))
-                if re.match(principal_re, user_account_arn):
-                    logger.debug("Found a policy for user account")
-                    logger.debug(pp.pformat(statement))
-                    for resource_re in resources_re:
-                        if re.match(resource_re, dcp_bucket_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:ListBucket'):
-                                    if effect == 'Allow':
-                                        user_can_list_dcp_bucket = True
-                                        logger.debug("Allows you to list the DCP bucket")
-                                    else:
-                                        user_cannot_list_dcp_bucket = True
-                                        num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
-                        if re.match(resource_re, dcp_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:PutObject'):
-                                    if effect == 'Allow':
-                                        user_can_put_dcp = True
-                                        logger.debug("Allows you to write the DCP")
-                                    else:
-                                        user_cannot_put_dcp = True
-                                        num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement)))
+            statement = PolicyStatement(statement)
+            
+            effect = statement.check_effect(aws_account_arn, dcp_bucket_resource, 's3:ListBucket')
+            if effect == 'Allow':
+                aws_can_list_dcp_bucket = True
+                logger.debug("Allows AWS to list the DCP bucket")
+            elif effect == 'Deny':
+                aws_cannot_list_dcp_bucket = True
+                num_errors += 1
+                logger.error("The following DCP bucket policy statement will prevent AWS from listing the DCP bucket:\n{0}".format(pp.pformat(statement.statement)))
+                
+            effect = statement.check_effect(aws_account_arn, dcp_resource, 's3:GetObject')
+            if effect == 'Allow':
+                aws_can_get_dcp = True
+                logger.debug("Allows AWS to get the DCP")
+            elif effect == 'Deny':
+                aws_cannot_get_dcp = True
+                num_errors += 1
+                logger.error("The following DCP bucket policy statement will prevent AWS from reading the DCP:\n{0}".format(pp.pformat(statement.statement)))
+            
+            effect = statement.check_effect(user_account_arn, dcp_bucket_resource, 's3:ListBucket')
+            if effect == 'Allow':
+                user_can_list_dcp_bucket = True
+                logger.debug("Allows you to list the DCP bucket")
+            elif effect == 'Deny':
+                user_cannot_list_dcp_bucket = True
+                num_errors += 1
+                logger.error("The following DCP bucket policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement.statement)))
+                
+            effect = statement.check_effect(user_account_arn, dcp_resource, 's3:PutObject')
+            if effect == 'Allow':
+                user_can_put_dcp = True
+                logger.debug("Allows you to write the DCP")
+            elif effect == 'Deny':
+                user_cannot_put_dcp = True
+                num_errors += 1
+                logger.error("The following DCP bucket policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement.statement)))
     
     aws_can_list_logs_bucket = False
     aws_cannot_list_logs_bucket = False
@@ -309,102 +353,85 @@ if __name__ == '__main__':
         # Check logs bucket for required permissions for user and AWS account
         logger.debug("Checking logs bucket permissions")
         for statement in logs_bucket_policy['Statement']:
-            (principals_re, actions_re, resources_re, effect) = process_policy_statement(statement)
-            for principal_re in principals_re:
-                if re.match(principal_re, aws_account_arn):
-                    logger.debug("Found a policy for AWS F1 account:\n{0}".format(pp.pformat(statement)))
-                    for resource_re in resources_re:
-                        if re.match(resource_re, logs_bucket_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:ListBucket'):
-                                    if effect == 'Allow':
-                                        aws_can_list_logs_bucket = True
-                                        logger.debug("Allows AWS to list the logs bucket")
-                                    else:
-                                        aws_cannot_list_logs_bucket = True
-                                        num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent AWS from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
-                        if re.match(resource_re, logs_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:PutObject'):
-                                    if effect == 'Allow':
-                                        aws_can_put_logs = True
-                                        logger.debug("Allows AWS to write the AFI creation logs")
-                                    else:
-                                        aws_cannot_put_logs = True
-                                        num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent AWS from writing the AFI creation logs:\n{0}".format(pp.pformat(statement)))
-                if re.match(principal_re, user_account_arn):
-                    logger.debug("Found a policy for user account")
-                    logger.debug(pp.pformat(statement))
-                    for resource_re in resources_re:
-                        if re.match(resource_re, logs_bucket_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:ListBucket'):
-                                    if effect == 'Allow':
-                                        user_can_list_logs_bucket = True
-                                        logger.debug("Allows you to list the logs bucket")
-                                    else:
-                                        user_cannot_list_logs_bucket = True
-                                        num_errors += 1
-                                        logger.error("The following DCP bucket policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
-                        if re.match(resource_re, logs_resource):
-                            for action_re in actions_re:
-                                if re.match(action_re, 's3:GetObject'):
-                                    if effect == 'Allow':
-                                        user_can_get_logs = True
-                                        logger.debug("Allows you to get the AFI creation logs.")
-                                    else:
-                                        user_cannot_get_logs = True
-                                        num_errors += 1
-                                        logger.error("The following logs bucket policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement)))
+            statement = PolicyStatement(statement)
+            
+            effect = statement.check_effect(aws_account_arn, logs_bucket_resource, 's3:ListBucket')
+            if effect == 'Allow':
+                aws_can_list_logs_bucket = True
+                logger.debug("Allows AWS to list the logs bucket")
+            elif effect == 'Deny':
+                aws_cannot_list_logs_bucket = True
+                num_errors += 1
+                logger.error("The following logs bucket policy statement will prevent AWS from listing the logs bucket:\n{0}".format(pp.pformat(statement.statement)))
+            
+            effect = statement.check_effect(aws_account_arn, logs_resource, 's3:PutObject')
+            if effect == 'Allow':
+                aws_can_put_logs = True
+                logger.debug("Allows AWS to write the AFI creation logs")
+            elif effect == 'Deny':
+                aws_cannot_put_logs = True
+                num_errors += 1
+                logger.error("The following logs bucket policy statement will prevent AWS from writing the AFI creation logs:\n{0}".format(pp.pformat(statement.statement)))
+            
+            effect = statement.check_effect(user_account_arn, logs_bucket_resource, 's3:ListBucket')
+            if effect == 'Allow':
+                user_can_list_logs_bucket = True
+                logger.debug("Allows you to list the logs bucket")
+            elif effect == 'Deny':
+                user_cannot_list_logs_bucket = True
+                num_errors += 1
+                logger.error("The following DCP bucket policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement.statement)))
+            
+            effect = statement.check_effect(user_account_arn, logs_resource, 's3:GetObject')
+            if effect == 'Allow':
+                user_can_get_logs = True
+                logger.debug("Allows you to get the AFI creation logs.")
+            elif effect == 'Deny':
+                user_cannot_get_logs = True
+                num_errors += 1
+                logger.error("The following logs bucket policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement.statement)))
     
     # Test user's or role's permissions from IAM
     logger.debug("Checking user's permissions from IAM")
     for statement in user_policy_statements:
         # The principal is implicit because these are policies associated with the user or role
-        (principals_re, actions_re, resources_re, effect) = process_policy_statement(statement)
-        for resource_re in resources_re:
-            if re.match(resource_re, dcp_bucket_resource):
-                for action_re in actions_re:
-                    if re.match(action_re, 's3:ListBucket'):
-                        if effect == 'Allow':
-                            user_can_list_dcp_bucket = True
-                            logger.debug("Allows you to list the DCP bucket:\n{0}".format(pp.pformat(statement)))
-                        else:
-                            user_cannot_list_dcp_bucket = True
-                            num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement)))
-            if re.match(resource_re, dcp_resource):
-                for action_re in actions_re:
-                    if re.match(action_re, 's3:PutObject'):
-                        if effect == 'Allow':
-                            user_can_put_dcp = True
-                            logger.debug("Allows you to write the DCP:\n{0}".format(pp.pformat(statement)))
-                        else:
-                            user_cannot_put_dcp = True
-                            num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement)))
-            if re.match(resource_re, logs_bucket_resource):
-                for action_re in actions_re:
-                    if re.match(action_re, 's3:ListBucket'):
-                        if effect == 'Allow':
-                            user_can_list_logs_bucket = True
-                            logger.debug("Allows you to list the logs bucket:\n{0}".format(pp.pformat(statement)))
-                        else:
-                            user_cannot_list_logs_bucket = True
-                            num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement)))
-            if re.match(resource_re, logs_resource):
-                for action_re in actions_re:
-                    if re.match(action_re, 's3:GetObject'):
-                        if effect == 'Allow':
-                            user_can_get_logs = True
-                            logger.debug("Allows you to get the AFI creation logs:\n{0}".format(pp.pformat(statement)))
-                        else:
-                            user_cannot_get_logs = True
-                            num_errors += 1
-                            logger.error("The following IAM policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement)))
+        statement = PolicyStatement(statement, user_account_arn)
+        
+        effect = statement.check_effect(user_account_arn, dcp_bucket_resource, 's3:ListBucket')
+        if effect == 'Allow':
+            user_can_list_dcp_bucket = True
+            logger.debug("Allows you to list the DCP bucket:\n{0}".format(pp.pformat(statement.statement)))
+        elif effect == 'Deny':
+            user_cannot_list_dcp_bucket = True
+            num_errors += 1
+            logger.error("The following IAM policy statement will prevent you from listing the DCP bucket:\n{0}".format(pp.pformat(statement.statement)))
+        
+        effect = statement.check_effect(user_account_arn, dcp_resource, 's3:PutObject')
+        if effect == 'Allow':
+            user_can_put_dcp = True
+            logger.debug("Allows you to write the DCP:\n{0}".format(pp.pformat(statement.statement)))
+        elif effect == 'Deny':
+            user_cannot_put_dcp = True
+            num_errors += 1
+            logger.error("The following IAM policy statement will prevent you from writing the DCP:\n{0}".format(pp.pformat(statement.statement)))
+        
+        effect = statement.check_effect(user_account_arn, logs_bucket_resource, 's3:ListBucket')
+        if effect == 'Allow':
+            user_can_list_logs_bucket = True
+            logger.debug("Allows you to list the logs bucket:\n{0}".format(pp.pformat(statement.statement)))
+        elif effect =='Deny':
+            user_cannot_list_logs_bucket = True
+            num_errors += 1
+            logger.error("The following IAM policy statement will prevent you from listing the logs bucket:\n{0}".format(pp.pformat(statement.statement)))
+        
+        effect = statement.check_effect(user_account_arn, logs_resource, 's3:GetObject')
+        if effect == 'Allow':
+            user_can_get_logs = True
+            logger.debug("Allows you to get the AFI creation logs:\n{0}".format(pp.pformat(statement.statement)))
+        elif effect == 'Deny':
+            user_cannot_get_logs = True
+            num_errors += 1
+            logger.error("The following IAM policy statement will prevent you from getting the AFI creation logs:\n{0}".format(pp.pformat(statement.statement)))
     
     extra_dcp_statements = []
     extra_logs_statements = []
