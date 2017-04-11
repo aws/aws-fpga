@@ -255,7 +255,7 @@ end
    //=================================================
    task poke(input int slot_id = 0,
              logic [63:0] addr, 
-             logic [63:0] data, 
+             logic [511:0] data, 
              logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
              AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
@@ -299,7 +299,7 @@ end
    //=================================================
    task peek(input int slot_id = 0,
              logic [63:0] addr, 
-             output logic [63:0] data, 
+             output logic [511:0] data, 
              input logic [5:0] id = 6'h0, 
              DataSize::DATA_SIZE size = DataSize::UINT32, 
              AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 

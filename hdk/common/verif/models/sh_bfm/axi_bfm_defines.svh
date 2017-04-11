@@ -19,6 +19,7 @@
 typedef struct {
    logic [63:0] addr;
    logic [7:0]  len;
+   logic [2:0]  size;
    logic [5:0]  id;
    logic [1:0]  resp;
    logic        last;
