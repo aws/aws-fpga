@@ -52,14 +52,14 @@ module test_peek_poke_pcis_axsize();
       data =1; 
       for(int size =0; size <=6; size++) begin
           $display("[%t] : Size of peek/poke = %0d", $realtime, size);
-          for(int addr =0; addr <=15; addr = addr+(2**size)) begin
+          for(int addr =0; addr <=63; addr = addr+(2**size)) begin
              $display("[%t] : Address of peek/poke = %0h", $realtime, addr);
              for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
                   pcis_wr_data[(num_bytes*8)+:8] = data;
                   data ++;
              end 
-             tb.poke(.addr(addr), .data(pcis_wr_data), .size(size));
-             tb.peek(.addr(addr), .data(pcis_rd_data), .size(size));
+             tb.poke(.addr(addr), .data(pcis_wr_data), .size(DataSize::DATA_SIZE'(size)));
+             tb.peek(.addr(addr), .data(pcis_rd_data), .size(DataSize::DATA_SIZE'(size)));
              for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin           
                  pcis_exp_data[((addr+num_bytes)*8)+:8] = pcis_wr_data[(num_bytes*8)+:8];
                  pcis_act_data[((addr+num_bytes)*8)+:8] = pcis_rd_data[(num_bytes*8)+:8];
@@ -67,7 +67,7 @@ module test_peek_poke_pcis_axsize();
           end
           compare_data(.act_data(pcis_act_data), .exp_data(pcis_exp_data));
           $display("[%t] : Clear the memory before next size iteration", $realtime);
-          tb.poke(.addr(64'h0), .data(512'h0), .size(3));
+          tb.poke(.addr(64'h0), .data(512'h0), .size(DataSize::DATA_SIZE'(3)));
       end
     
       $display("[%t] : Waiting for PCIS write and read activity to complete", $realtime);

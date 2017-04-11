@@ -83,6 +83,7 @@ module sh_bfm #(
    input [15:0]                 cl_sh_pcim_awid  ,
    input [63:0]                 cl_sh_pcim_awaddr,
    input [7:0]                  cl_sh_pcim_awlen ,
+   input [2:0]                  cl_sh_pcim_awsize ,
    input [18:0]                 cl_sh_pcim_awuser, //DW length of transfer
    input [NUM_PCIE-1:0]         cl_sh_pcim_awvalid,
    output logic [NUM_PCIE-1:0]  sh_cl_pcim_awready,
@@ -101,6 +102,7 @@ module sh_bfm #(
    input [15:0]                 cl_sh_pcim_arid,
    input [63:0]                 cl_sh_pcim_araddr,
    input [7:0]                  cl_sh_pcim_arlen ,
+   input [2:0]                  cl_sh_pcim_arsize ,
    input [18:0]                 cl_sh_pcim_aruser, //DW length of transfer
    input [NUM_PCIE-1:0]         cl_sh_pcim_arvalid,
    output logic [NUM_PCIE-1:0]  sh_cl_pcim_arready,
@@ -901,6 +903,7 @@ module sh_bfm #(
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
+         cmd.size  = cl_sh_pcim_awsize;
          cmd.last = 0;
          
          cl_sh_wr_cmds.push_back(cmd);         
@@ -980,6 +983,7 @@ module sh_bfm #(
          cmd.addr = cl_sh_pcim_araddr;
          cmd.id   = cl_sh_pcim_arid;
          cmd.len  = cl_sh_pcim_arlen;
+         cmd.size = cl_sh_pcim_arsize;
          cmd.last = 0;
          
          cl_sh_rd_cmds.push_back(cmd);
