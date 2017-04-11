@@ -314,9 +314,6 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 
 	if(device_private_data[MINOR(inode->i_rdev)].stats.opened_times == 0) {
 
-		edma_backend_reset(device_private_data[MINOR(inode->i_rdev)].write_ebcs.dma_queue_handle);
-		edma_backend_reset(device_private_data[MINOR(inode->i_rdev)].read_ebcs.dma_queue_handle);
-
 		device_private_data[MINOR(inode->i_rdev)].state = EDMA_STATE_RUNNING;
 
 		ret = edma_dev_allocate_resources(&device_private_data[MINOR(inode->i_rdev)].read_ebcs);
@@ -403,9 +400,6 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
 		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
 
-		//FIXME:should add backend reset channel
-//		edma_backend_cleanup();
-
 		// First, set the DEV_RELEASING flag so all other tasks are notified
 		// disable hardware interrupts (note - we could still have interrupts inflights or interrupts routine in execution
 		// wait_on interrupt_routine test_bit(INT_RUNNING) - wait for X seconds
@@ -413,7 +407,7 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 		// once we reached here, we know that we can release
 
-		recycle_completed_descriptors(&device_private_data->write_ebcs, device_private_data);
+		edma_backend_reset(device_private_data->write_ebcs.dma_queue_handle);
 
 		edma_dev_release_resources(&device_private_data->write_ebcs);
 		edma_dev_release_resources(&device_private_data->read_ebcs);
@@ -474,6 +468,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 		ret = edma_backend_submit_s2m_request(
 				(u64*)request_to_clean->phys_data, copy_size,
 				read_ebcs->dma_queue_handle, *off);
+
 		if (ret < 0) {
 			if (ret == -EIO) {
 				u64_stats_update_begin(&private_data->stats.syncp);
