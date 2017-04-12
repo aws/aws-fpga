@@ -18,7 +18,7 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-run_aws_emulation] [-foreground] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-run_aws_emulation] [-foreground] [-notify] | [-h] | [-H] | [-help] |  ]"
     echo " "
     echo "By default the build is run in the background using nohup so that the"
     echo "process will not be terminated if the terminal window is closed."
@@ -41,6 +41,7 @@ clock_recipe_c=C0
 vivado_script="create_dcp_from_cl.tcl"
 foreground=0
 run_aws_emulation=0
+notify=1
 
 # Parse command-line arguments
 while [ "$1" != "" ]; do
@@ -63,6 +64,8 @@ while [ "$1" != "" ]; do
         -run_aws_emulation )    run_aws_emulation=1
                                 ;;
         -foreground )           foreground=1
+                                ;;
+        -notify )               notify=1
                                 ;;
         -h | -H | -help )       usage
                                 exit
@@ -173,13 +176,14 @@ subsystem_id="0x${id1_version:0:4}";
 subsystem_vendor_id="0x${id1_version:4:4}";
 
 # Run vivado
-cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $run_aws_emulation"
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $run_aws_emulation $notify"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   
   echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
   echo "AWS FPGA: Output is being redirected to $timestamp.nohup.out"
-  echo "AWS FPGA: You can set up an email notification upon Vivado run finish by following the instructions in TBD"
+  echo "AWS FPGA: If you have set your EMAIL environment variable, you will receive a notification when complete."
+  echo "AWS FPGA:   (See \$HDK_DIR/cl/examples/README.md for details)"
 else
   echo "AWS FPGA: Build through Vivado is running in the foreground, this may take a few hours."
   echo "AWS FPGA: The build may be terminated if the network connection to this terminal window is lost."
