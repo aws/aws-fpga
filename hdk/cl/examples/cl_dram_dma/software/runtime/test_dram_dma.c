@@ -74,7 +74,7 @@ check_slot_config(int slot_id)
 
     /* get local image description, contains status, vendor id, and device id */
     rc = fpga_mgmt_describe_local_image(slot_id, &info, 0);
-    fail_on(rc, out, "Unable to get local image information");
+    fail_on(rc, out, "Unable to get local image information. Are you running as root?");
 
     /* check to see if the slot is ready */
     if (info.status != FPGA_STATUS_LOADED) {

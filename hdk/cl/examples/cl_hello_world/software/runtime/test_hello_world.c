@@ -157,7 +157,7 @@ int check_afi_ready(int slot_id) {
 
     /* get local image description, contains status, vendor id, and device id. */
     rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
-    fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
+    fail_on(rc, out, "Unable to get AFI information from slot %d. Are you running as root?",slot_id);
 
     /* check to see if the slot is ready */
     if (info.status != FPGA_STATUS_LOADED) {
