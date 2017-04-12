@@ -329,6 +329,7 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 			goto edma_open_done;
 		}
 
+		edma_backend_start(device_private_data->write_ebcs.dma_queue_handle, MINOR(inode->i_rdev));
 		u64_stats_init(&device_private_data->stats.syncp);
 	}
 
@@ -397,13 +398,13 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
 
 		// First, set the DEV_RELEASING flag so all other tasks are notified
-		// disable hardware interrupts (note - we could still have interrupts inflights or interrupts routine in execution
+		// disable hardware interrupts (note - we could still have interrupts inflight or interrupt routine in execution
 		// wait_on interrupt_routine test_bit(INT_RUNNING) - wait for X seconds
-		// deassociate MSIX with interrupt routine
+		// disassociate MSIX with an interrupt routine
 
 		// once we reached here, we know that we can release
 
-		edma_backend_reset(device_private_data->write_ebcs.dma_queue_handle);
+		edma_backend_stop(device_private_data->write_ebcs.dma_queue_handle);
 
 		edma_dev_release_resources(&device_private_data->write_ebcs);
 		edma_dev_release_resources(&device_private_data->read_ebcs);
@@ -678,9 +679,20 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 			if(unlikely(is_releasing(&private_data->state)))
 				goto edma_dev_write_done;
 
-			if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,write_ebcs->ebcs_size)
-							== write_ebcs->next_to_clean)
-				break;
+			if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,
+					write_ebcs->ebcs_size)
+					== write_ebcs->next_to_clean) {
+				//if we have no requests left - try to recycle completed descriptors
+				recycle_completed_descriptors(write_ebcs, private_data);
+
+				//if still no requests left - we are done.
+				if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,
+						write_ebcs->ebcs_size)
+						== write_ebcs->next_to_clean) {
+					break;
+				}
+
+			}
 		}
 
 		request = write_ebcs->request + write_ebcs->next_to_use;

@@ -16,8 +16,8 @@
 #define DRV_MODULE_NAME					"emda_xdma_backend"
 //FIXME: move to mutable
 #define XDMA_TIMEOUT_IN_MSEC				(3 * 1000)
-#define SLEEP_MIN_USEC					(100)
-#define SLEEP_MAX_USEC					(500)
+#define SLEEP_MIN_USEC					(1)
+#define SLEEP_MAX_USEC					(20)
 #define XDMA_WORKER_SLEEPING_STATUS_BIT			(0)
 #define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT		(1)
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
@@ -207,9 +207,6 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		backend_device->queues[i].tx = &(command_queue[i]);
 
 		smp_wmb();
-
-		command_queue[i].worker_thread = kthread_run(write_worker_function, &command_queue[i],
-				"write_worker_thread_%d", i);
 	}
 
 	backend_device->pdev = pdev;
@@ -237,7 +234,6 @@ done:
 static void edma_xdma_remove(struct pci_dev *pdev)
 {
 	struct device *dev = &pdev->dev;
-	int i;
 	struct backend_device* backend_device;
 	command_queue_t* command_queue;
 	c2h_handle_t* c2h_handle;
@@ -251,26 +247,7 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 	command_queue = (command_queue_t*)(backend_device->queues[0].tx);
 	c2h_handle = (c2h_handle_t *) (backend_device->queues[0].rx);
 
-	for( i = 0; i < backend_device->number_of_queues; i++)
-		if(command_queue[i].worker_thread->state > 0)
-			kthread_stop(command_queue[i].worker_thread);
-
 	xdma_device_close(pdev, backend_device->backend_device_handle);
-
-	for( i = 0; i < backend_device->number_of_queues; i++)
-	{
-		if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
-				!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
-			msleep(XDMA_TIMEOUT_IN_MSEC);
-
-		//if still not stopped - panic
-		if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
-						!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
-			BUG();
-
-		kfree(command_queue[i].queue);
-	}
-
 	frontend_cleanup_callback(backend_device);
 
 	kfree(c2h_handle);
@@ -456,14 +433,15 @@ static struct pci_driver edma_pci_driver = {
 };
 
 
-int edma_backend_reset(void *q_handle)
+int edma_backend_stop(void *q_handle)
 {
-	int i;
 	command_queue_t* command_queue = (command_queue_t*)q_handle;
 	command_t* queue = command_queue->queue;
+	int i;
 
 	//Stop the kthread before reset and make sure it was stopped.
 	kthread_stop(command_queue->worker_thread);
+
 	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
 			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
 		msleep(XDMA_TIMEOUT_IN_MSEC);
@@ -482,9 +460,16 @@ int edma_backend_reset(void *q_handle)
 	command_queue->tail = 0;
 	command_queue->next_to_recycle = 0;
 
-	//Re-launch the worker thread again
+	return 0;
+}
+
+int edma_backend_start(void *q_handle, int minor)
+{
+	command_queue_t* command_queue = (command_queue_t*)q_handle;
+
+	//launch the worker thread
 	command_queue->worker_thread = kthread_run(write_worker_function, command_queue,
-			"write_worker_thread_%d", i);
+			"write_worker_thread_%d", minor);
 
 	return 0;
 }
