@@ -132,7 +132,12 @@ Upon successful connection, Vivado's Hardware panel will be populated with a deb
  
 5)	Select the debug bridge instance from the Vivado Hardware panel
 
-6)	In the Hardware Device Properties window select the appropriate “Probes file” for your design by clicking the icon next to the “Probes file” entry, selecting the file, and clicking “OK”. This will refresh the hardware device and it should now show the debug cores present in your design.  Note the Probes file is written out during the design implementation, and is typically has the extension ".ltx".
+6)      You will need a "Probes file" in the next step.  Once you run the EC2 API create-fpga-image, this file will generate a "Probes file" that has a ".ltx" extension.   
+```
+        $ aws s3 cp s3://<bucket-name>/<logs-folder-name>/*_debug_probes.ltx $CL_DIR   #copy to the example directory
+```        
+
+7)	In the Hardware Device Properties window select the appropriate “Probes file” for your design by clicking the icon next to the “Probes file” entry, selecting the file, and clicking “OK”. This will refresh the hardware device and it should now show the debug cores present in your design.  Note the Probes file is written out during the design implementation, and is typically has the extension ".ltx".
 
 <img src="./images/select_probes_file.jpg" width="600">  
 
