@@ -55,7 +55,8 @@ int edma_backend_m2s_dma_action(void *q_handle);
 int edma_backend_init(frontend_callback frontend_init, frontend_callback frontend_cleanup);
 
 void edma_backend_cleanup(void);
-int edma_backend_reset(void *q_handle);
+int edma_backend_start(void *q_handle, int minor);
+int edma_backend_stop(void *q_handle);
 
 int edma_backend_enable_isr(struct pci_dev *pdev, u32 event_number);
 int edma_backend_disable_isr(struct pci_dev *pdev, u32 event_number);
