@@ -11,6 +11,7 @@ As a pre-requisite to building the AFI, the developer should have an instance/se
 For developers that want to skip the build flow and start running the examples on the FPGA instance.  [Public AFIs are available for each example.](./cl_hello_world/README.md#metadata).  By using the public AFIs, developers can skip the build flow steps and jump to step 4.
 
 
+
 ### 0. Setup the HDK and install AWS CLI
 
 When using the developer AMI:  ```AWS_FPGA_REPO_DIR=/home/centos/src/project_data/aws-fpga```
@@ -58,6 +59,18 @@ This file would be submitted to AWS to create an AFI.
     $ ./aws_build_dcp_from_cl.sh
 
 **NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` wil run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
+
+To be notified via e-mail when the build completes:
+
+1. Set up notification via SNS:
+```
+export EMAIL=your.email@example.com
+$HDK_COMMON_DIR/scripts/notify_via_sns.py
+
+```
+
+2. Check your e-mail address and confirm subscription
+3. An e-mail stating "Your build is done." will be sent to you once the build is complete
 
 
 ### 3. Submit the Design Checkpoint to AWS to Register the AFI

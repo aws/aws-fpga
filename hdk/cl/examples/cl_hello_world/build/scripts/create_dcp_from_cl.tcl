@@ -32,6 +32,7 @@ set clock_recipe_a      [lindex $argv  8]
 set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set run_aws_emulation   [lindex $argv 11]
+set notify_via_sns      [lindex $argv 12]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
@@ -50,6 +51,7 @@ puts "Clock Recipe A:         $clock_recipe_a";
 puts "Clock Recipe B:         $clock_recipe_b";
 puts "Clock Recipe C:         $clock_recipe_c";
 puts "Run AWS Emulation:      $run_aws_emulation";
+puts "Notify when done:       $notify_via_sns";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -97,6 +99,15 @@ set_msg_config -id {Synth 8-3917}       -suppress
 set_msg_config -id {Timing 38-436}      -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
+
+# Check that an email address has been set, else unset notify_via_sns
+
+if {![info exists env(EMAIL)]} {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL variable empty!  Completition notification will *not* be sent!";
+  set notify_via_sns 0;
+} else {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
+}
 
 source encrypt.tcl
 
@@ -470,4 +481,10 @@ cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
+
+if {[string compare $notify_via_sns "1"] == 0} {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling notification script to send e-mail to $env(EMAIL)";
+  exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+}
+
 
