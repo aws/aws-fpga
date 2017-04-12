@@ -157,7 +157,7 @@ The output of this command includes two identifiers that refer to your AFI:
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-01234567890abcdef`**.
 
-After the AFI generation is complete, AWS will put the logs into the bucket location (s3://<bucket-name>/<logs-folder-name>) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.
+After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.
  
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
 Please wait until you confirm the AFI is created successfully.*
