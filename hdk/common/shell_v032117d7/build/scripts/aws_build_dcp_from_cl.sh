@@ -41,7 +41,7 @@ clock_recipe_c=C0
 vivado_script="create_dcp_from_cl.tcl"
 foreground=0
 run_aws_emulation=0
-notify=1
+notify=0
 
 # Parse command-line arguments
 while [ "$1" != "" ]; do
@@ -182,7 +182,7 @@ if [[ "$foreground" == "0" ]]; then
   
   echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
   echo "AWS FPGA: Output is being redirected to $timestamp.nohup.out"
-  echo "AWS FPGA: If you have set your EMAIL environment variable, you will receive a notification when complete."
+  echo "AWS FPGA: If you have set your EMAIL environment variable and -notify is specified, you will receive a notification when complete."
   echo "AWS FPGA:   (See \$HDK_DIR/cl/examples/README.md for details)"
 else
   echo "AWS FPGA: Build through Vivado is running in the foreground, this may take a few hours."
