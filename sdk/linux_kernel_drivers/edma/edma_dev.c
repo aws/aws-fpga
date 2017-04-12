@@ -304,40 +304,40 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
-	pr_info("\n-->%s Releasing %s\n", __func__, filp->f_path.dentry->d_name.name);
+	pr_info("\n-->%s Openning %s\n", __func__, filp->f_path.dentry->d_name.name);
 
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
-	device_private_data = edma_char->device_private_data;
+	device_private_data = &(edma_char->device_private_data[MINOR(inode->i_rdev)]);
 
-	spin_lock(&device_private_data[MINOR(inode->i_rdev)].edma_spin_lock);
-	filp->private_data = &device_private_data[MINOR(inode->i_rdev)];
+	spin_lock(&device_private_data->edma_spin_lock);
+	filp->private_data = device_private_data;
 
-	if(device_private_data[MINOR(inode->i_rdev)].stats.opened_times == 0) {
+	if(device_private_data->stats.opened_times == 0) {
 
-		device_private_data[MINOR(inode->i_rdev)].state = EDMA_STATE_RUNNING;
+		device_private_data->state = EDMA_STATE_RUNNING;
 
-		ret = edma_dev_allocate_resources(&device_private_data[MINOR(inode->i_rdev)].read_ebcs);
+		ret = edma_dev_allocate_resources(&device_private_data->read_ebcs);
 		if(unlikely(ret))
 			goto edma_open_done;
 
-		edma_dev_initialize_read_ebcs(&device_private_data[MINOR(inode->i_rdev)].read_ebcs);
-		ret = edma_dev_allocate_resources(&(device_private_data[MINOR(inode->i_rdev)].write_ebcs));
+		edma_dev_initialize_read_ebcs(&device_private_data->read_ebcs);
+		ret = edma_dev_allocate_resources(&(device_private_data->write_ebcs));
 
 		if(unlikely(ret))
 		{
-			edma_dev_release_resources(&device_private_data[MINOR(inode->i_rdev)].read_ebcs);
+			edma_dev_release_resources(&device_private_data->read_ebcs);
 			goto edma_open_done;
 		}
 
-		u64_stats_init(&device_private_data[MINOR(inode->i_rdev)].stats.syncp);
+		u64_stats_init(&device_private_data->stats.syncp);
 	}
 
 	u64_stats_update_begin(&device_private_data->stats.syncp);
-	device_private_data[MINOR(inode->i_rdev)].stats.opened_times++;
+	device_private_data->stats.opened_times++;
 	u64_stats_update_end(&device_private_data->stats.syncp);
 
 edma_open_done:
-	spin_unlock(&device_private_data[MINOR(inode->i_rdev)].edma_spin_lock);
+	spin_unlock(&device_private_data->edma_spin_lock);
 
 	pr_info("\n-->%s Done\n", __func__);
 
@@ -353,11 +353,11 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
 
-	device_private_data = edma_char->device_private_data;
+	device_private_data = &(edma_char->device_private_data[MINOR(inode->i_rdev)]);
 
 	BUG_ON(!file->private_data);
 
-	spin_lock(&device_private_data[MINOR(inode->i_rdev)].edma_spin_lock);
+	spin_lock(&device_private_data->edma_spin_lock);
 
 	BUG_ON(device_private_data->stats.opened_times < 1);
 
@@ -378,24 +378,20 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 		set_bit(EDMA_STATE_QUEUE_RELEASING_BIT, &device_private_data->state);
 
 		if(test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
-				&device_private_data[MINOR(inode->i_rdev)].state)
+				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
-						&device_private_data[MINOR(
-								inode->i_rdev)].state)
+						&device_private_data->state)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
-						&device_private_data[MINOR(
-								inode->i_rdev)].state))
+						&device_private_data->state))
 			msleep(SLEEP_MAXIMUM_USEC);
 
 		//if still running - panic
 		BUG_ON( test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
-				&device_private_data[MINOR(inode->i_rdev)].state)
+				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
-						&device_private_data[MINOR(
-								inode->i_rdev)].state)
+						&device_private_data->state)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
-						&device_private_data[MINOR(
-								inode->i_rdev)].state));
+						&device_private_data->state));
 
 		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
 		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
@@ -415,14 +411,13 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 		file->private_data = NULL;
 	}
 
-	spin_unlock(&device_private_data[MINOR(inode->i_rdev)].edma_spin_lock);
+	spin_unlock(&device_private_data->edma_spin_lock);
 
 	return ret;
 }
 
 
 //TODO: reminder -the interrupt routing/write/read should have the following in-order code:
-// if (test_Bit (DEV_RELEASING)) return;
 // set_bit (INT_RUNNING/READ/WRITE)
 static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 		loff_t * off)
