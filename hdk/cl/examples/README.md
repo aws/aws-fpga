@@ -6,6 +6,10 @@ As a pre-requisite to building the AFI, the developer should have an instance/se
 
 **NOTE:** *You can skip steps 0 through 3 if you are not interested in the build process.  Step 4 through 6 will show you how to use one of the predesigned AFI examples.*
 
+### Fast path to running CL Examples on FPGA Instance
+
+For developers that want to skip the build flow and start running the examples on the FPGA instance.  [Public AFIs are available for each example.](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples/cl_hello_world/README.md#metadata).  By using the public AFIs, developers can skip the build flow steps and jump to step 4.
+
 
 ### 0. Setup the HDK and install AWS CLI
 
