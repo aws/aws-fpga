@@ -40,7 +40,7 @@ A developer can execute `$HDK_SHELL_DIR/build/scripts/aws_build_dcp_from_cl.sh` 
 
 ### 2) Encrypt Source Files
 
-As a pre-cursor to the build process,  modify the `$CL_DIR/build/scripts/encrypt.tcl` script to include all the CL source files, so the script can encrypt and copy them to the `$CL_DIR/build/src_post_encryption` directory.
+CL Encryption is required and AFI creation will fail if your CL source files are not encrypted.  As a pre-cursor to the build process,  modify the `$CL_DIR/build/scripts/encrypt.tcl` script to include all the CL source files, so the script can encrypt and copy them to the `$CL_DIR/build/src_post_encryption` directory.
 
 ### 3) Prepare for the CL Build 
 
