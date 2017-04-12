@@ -65,7 +65,7 @@ In order to help developers close timing goals and successfully build their desi
 
 Build script usage:
 
-    $ ./aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-run_aws_emulation] [-foreground]
+    $ ./aws_build_dcp_from_cl.sh  [-h | -H | -help] [-script <vivado_script>] [-strategy <BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION>] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-run_aws_emulation] [-foreground] [-notify]
 
 Options:
 
@@ -92,6 +92,9 @@ Options:
 
 * -foreground
        * Run the build in the foreground such that all output will go to the terminal and the build may be terminated if the terminal is closed. This option is useful if you want to wait for the build to complete. This option is safe if the terminal is running on the AWS instance, for example on a GUI desktop on the instance.
+
+* -notify
+       * Send e-mail to notify user once the build is complete.  Requires setup described in `$HDK_DIR/cl/examples/README.md`.
 
 Strategy descriptions:
 

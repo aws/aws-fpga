@@ -70,7 +70,8 @@ $HDK_COMMON_DIR/scripts/notify_via_sns.py
 ```
 
 2. Check your e-mail address and confirm subscription
-3. An e-mail stating "Your build is done." will be sent to you once the build is complete
+3. When calling `aws_build_dcp_from_cl.sh`, add on the `-notify` switch
+4. Once your build is complete, an e-mail will be sent to you stating "Your build is done."
 
 
 ### 3. Submit the Design Checkpoint to AWS to Register the AFI

@@ -102,12 +102,15 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.
 
 # Check that an email address has been set, else unset notify_via_sns
 
-if {![info exists env(EMAIL)]} {
-  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL variable empty!  Completition notification will *not* be sent!";
-  set notify_via_sns 0;
-} else {
-  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
+if {[string compare $notify_via_sns "1"] == 0} {
+  if {![info exists env(EMAIL)]} {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL variable empty!  Completition notification will *not* be sent!";
+    set notify_via_sns 0;
+  } else {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
+  }
 }
+
 
 source encrypt.tcl
 
