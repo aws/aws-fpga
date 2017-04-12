@@ -229,6 +229,60 @@ Backdoor access to host memory is provided by two functions:
 ```
 Use these functions when you need to access data in either SV or C domain host memory. They take zero simulation time and are useful for initializing memory or checking results stored in memory. 
 
+
+# Debugging Custom Logic using the AWS HDK
+
+If a simulation fails, developers can debug issues by dumping waves of the simulation and then view them to determine the source of the problem.
+
+The process for dumping and viewing waves can differ depending on the simulator being used.  To dump and view waves using the Xilinx Vivado tools included with the AWS HDK:
+
+1. Specify scope of logic for wave dump
+2. Re-run simulation to dump waves
+3. View waves in Vivado using .tcl 
+
+## Specify scope of logic for wave dump
+
+The file `$AWS_FPGA_REPO_DIR/hdk/cl/examples/cl_dram_dma/verif/scripts/waves.tcl` specifies the scope of logic for wave dump.  The default behavior is to dump only the signals at the very top of the design:
+
+```
+    add_wave /
+```
+
+To recursively dump waves of all signal underneath the top level of the design, add `-recursive`:
+
+```
+    add_wave -recursive /
+```
+
+Note that dumping all signals of a design will increase simulation time and will result in a large file.
+
+For more information on the syntax for `add_wave` and other tcl functions, see the [Vivado Design Suite Tcl Command Reference Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2013_1/ug835-vivado-tcl-commands.pdf)
+
+## Re-run simulation to dump waves
+
+Once `waves.tcl` has been modified, re-run the simulatio with `make` as shown at the top of this document.
+
+## View waves in Vivado using .tcl
+
+As mentioned above, all simulation results will be placed in `sim/<test_name>`.  If using the included CL examples, the waves database should appear as `tb.wdb`.  
+
+To view the waves, first create a .tcl file called `open_waves.tcl` with the following commands:
+```
+current_fileset
+open_wave_database tb.wdb
+```
+
+Then open Vivado and specify this .tcl file to execute:
+```
+vivado -source open_waves.tcl
+```
+
+The design hierarchy and waves should then be visible and can be inspected / debugged:
+
+![Example Screenshot of Waves opened in Vivado](./images/waves_in_vivado.png)
+
+The usage of Vivado for wave debug is beyond the scope of this document.  See the [Vivado Design Suite Tutorials](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2015_4/ug936-vivado-tutorial-programming-debugging.pdf) for more details.
+
 # SV Test API Reference
 
 ## _poke_
