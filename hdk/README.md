@@ -56,6 +56,7 @@ The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
     $ cd aws-fpga
     $ source hdk_setup.sh
 
+Note that sourcing `hdk_setup.sh` will set a few environment variables that are used throughout the examples in the HDK.  It should be re-sourced in each new terminal.
 
 ### Try out a "Hello World" example and others <a name="examples"></a>
 
