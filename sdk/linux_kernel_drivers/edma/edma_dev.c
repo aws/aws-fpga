@@ -304,7 +304,7 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
-	pr_info("\n-->%s Openning %s\n", __func__, filp->f_path.dentry->d_name.name);
+	pr_info("\n-->%s Opening %s\n", __func__, filp->f_path.dentry->d_name.name);
 
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
 	device_private_data = &(edma_char->device_private_data[MINOR(inode->i_rdev)]);
