@@ -55,6 +55,18 @@ This file would be submitted to AWS to create an AFI.
 
 **NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` wil run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
+To be notified via e-mail when the build completes:
+
+1. Set up notification via SNS:
+```
+export EMAIL=your.email@example.com
+$HDK_COMMON_DIR/scripts/notify_via_sns.py
+
+```
+
+2. Check your e-mail address and confirm subscription
+3. An e-mail stating "Your build is done." will be sent to you once the build is complete
+
 
 ### 3. Submit the Design Checkpoint to AWS to Register the AFI
 
