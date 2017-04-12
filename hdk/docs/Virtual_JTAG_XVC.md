@@ -132,7 +132,7 @@ Upon successful connection, Vivado's Hardware panel will be populated with a deb
  
 5)	Select the debug bridge instance from the Vivado Hardware panel
 
-6)      You will need a "Probes file" in the next step.  Once you run the EC2 API create-fpga-image, this file will generate a "Probes file" that has a ".ltx" extension.   
+6)      You will need a "Probes file" in the next step.  Once you run the EC2 API create-fpga-image and the process of creating the AFI is complete, a "Probes file" is generated that has a ".ltx" extension.   
 ```
         $ aws s3 cp s3://<bucket-name>/<logs-folder-name>/*_debug_probes.ltx $CL_DIR   #copy to the example directory
 ```        
