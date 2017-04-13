@@ -291,7 +291,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 	struct scatterlist* sgl = &command_queue->queue[command_queue->tail].sgl;
 	struct sg_table* sgt = &command_queue->queue[command_queue->tail].sgt;
 
-	pr_info(">> %s\n", __func__);
+	edma_dbg(">> %s\n", __func__);
 
 	if( EDMA_RING_IDX_NEXT(command_queue->tail, edma_queue_depth) == command_queue->next_to_recycle)
 		BUG();
@@ -326,7 +326,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 					&command_queue->thread_status))
 		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
 
-	pr_info("<< %s\n", __func__);
+	edma_dbg("<< %s\n", __func__);
 
 	return 0;
 }
@@ -339,7 +339,7 @@ int edma_backend_get_completed_m2s_request(u64** buffer, u32* size, void *q_hand
 	u32 completed_size = 0;
 	u64* completed_buffer = NULL;
 
-	pr_info( ">> %s\n", __func__);
+	edma_dbg( ">> %s\n", __func__);
 
 	if((command_queue->next_to_recycle != command_queue->head)
 			&& (queue[command_queue->next_to_recycle].completed == 1)) {
@@ -363,9 +363,9 @@ int edma_backend_get_completed_m2s_request(u64** buffer, u32* size, void *q_hand
 	if(buffer)
 		*buffer = completed_buffer;
 
-	pr_info("<< %s\n", __func__);
+	edma_dbg("<< %s\n", __func__);
 
-        return 0;
+    return 0;
 }
 
 int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 target_addr)

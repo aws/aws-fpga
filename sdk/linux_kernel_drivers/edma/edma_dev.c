@@ -93,7 +93,7 @@ static inline bool is_releasing(void* state)
 {
 	if(unlikely(test_bit(EDMA_STATE_QUEUE_RELEASING_BIT, state))) {
 		//Wait and if fsync still running - return
-		pr_info("Releasing\n");
+		edma_dbg("Releasing\n");
 			return true;
 	}
 
@@ -105,7 +105,7 @@ static inline int wait_is_fsync_running(struct edma_queue_private_data* private_
 {
 	if(unlikely(test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT, &private_data->state))) {
 		//Wait and if fsync still running - return
-		pr_info("FSync is running\n");
+		edma_dbg("FSync is running\n");
 
 		u64_stats_update_begin(&private_data->stats.syncp);
 		private_data->stats.fsync_busy_count++;
@@ -304,7 +304,7 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
-	pr_info("\n-->%s Opening %s\n", __func__, filp->f_path.dentry->d_name.name);
+	edma_dbg("\n-->%s Opening %s\n", __func__, filp->f_path.dentry->d_name.name);
 
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
 	device_private_data = &(edma_char->device_private_data[MINOR(inode->i_rdev)]);
@@ -340,7 +340,7 @@ static int edma_dev_open(struct inode *inode, struct file *filp)
 edma_open_done:
 	spin_unlock(&device_private_data->edma_spin_lock);
 
-	pr_info("\n-->%s Done\n", __func__);
+	edma_dbg("\n-->%s Done\n", __func__);
 
 	return ret;
 }
@@ -434,7 +434,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 
 	BUG_ON(!private_data);
 
-	pr_info("\n-->%s Reading %zu bytes from %s in offset 0x%llx\n", __func__, len, filp->f_path.dentry->d_name.name, *off);
+	edma_dbg("\n-->%s Reading %zu bytes from %s in offset 0x%llx\n", __func__, len, filp->f_path.dentry->d_name.name, *off);
 
 	read_ebcs = &private_data->read_ebcs;
 	spin_lock(&read_ebcs->ebcs_spin_lock);
@@ -486,7 +486,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 				&read_ebcs->completed_size, read_ebcs->dma_queue_handle);
 
 		if(ret){
-			pr_info("EDMA: Failed to send %d characters to the user\n", ret);
+			edma_dbg("EDMA: Failed to send %d characters to the user\n", ret);
 		}
 
 		u64_stats_update_begin(&private_data->stats.syncp);
@@ -512,7 +512,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 					request_to_clean->virt_data + (copy_size - ret), ret);
 
 			if(ret){
-				pr_info("EDMA: Failed to send %d characters to the user\n", ret);
+				edma_dbg("EDMA: Failed to send %d characters to the user\n", ret);
 				request_to_clean->offset = ret;
 				data_copied_from_current_transaction += (copy_size - request_to_clean->offset) - ret;
 				total_data_copied += data_copied_from_current_transaction;
@@ -617,7 +617,7 @@ edma_dev_read_done:
 	clear_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,&private_data->state);
 	spin_unlock(&read_ebcs->ebcs_spin_lock);
 
-	pr_info("\n-->%s Done\n", __func__);
+	edma_dbg("\n-->%s Done\n", __func__);
 
 	return ret == 0 ? total_data_copied : ret ;
 }
@@ -637,7 +637,7 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 
 	BUG_ON(!private_data);
 
-	pr_info("\n--> %s Writing %zu bytes to %s in offset 0x%llx\n", __func__, len, filp->f_path.dentry->d_name.name, *off);
+	edma_dbg("\n--> %s Writing %zu bytes to %s in offset 0x%llx\n", __func__, len, filp->f_path.dentry->d_name.name, *off);
 
 	write_ebcs = &private_data->write_ebcs;
 	spin_lock(&write_ebcs->ebcs_spin_lock);
@@ -702,7 +702,7 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 
 		ret = copy_from_user(request->virt_data, buff + data_copied, copy_to_rquest_size);
 		if(unlikely(ret)){
-			pr_info("EDMA: Failed to copy %d characters from the user\n", ret);
+			edma_dbg("EDMA: Failed to copy %d characters from the user\n", ret);
 			ret = copy_from_user(
 					request->virt_data + copy_to_rquest_size - ret,
 					buff + data_copied + copy_to_rquest_size - ret, ret);
@@ -763,7 +763,7 @@ edma_dev_write_done:
 
 	spin_unlock(&write_ebcs->ebcs_spin_lock);
 
-	pr_info("\n--> %s done. RetVal is %zd\n", __func__, (data_copied == 0 ? ret : data_copied));
+	edma_dbg("\n--> %s done. RetVal is %zd\n", __func__, (data_copied == 0 ? ret : data_copied));
 
 	return (data_copied == 0 ? ret : data_copied);
 }
@@ -817,7 +817,7 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 	private_data->stats.fsync_count++;
 	u64_stats_update_end(&private_data->stats.syncp);
 
-	pr_info("\n--> %s Fsyncing %s \n", __func__, filp->f_path.dentry->d_name.name);
+	edma_dbg("\n--> %s Fsyncing %s \n", __func__, filp->f_path.dentry->d_name.name);
 
 	write_ebcs = &private_data->write_ebcs;
 	spin_lock(&write_ebcs->ebcs_spin_lock);
@@ -856,7 +856,7 @@ edma_dev_fsync_done:
 
 	spin_unlock(&write_ebcs->ebcs_spin_lock);
 
-	pr_info("\n--> %s done.\n", __func__);
+	edma_dbg("\n--> %s done.\n", __func__);
 
 	return ret;
 }
@@ -885,14 +885,14 @@ irqreturn_t edma_dev_irq_handler(int irq, void *dev)
 
 	BUG_ON(!events_private_data);
 
-	pr_info("\n--> %s IRQ number is %d \n", __func__, irq);
+	edma_dbg("\n--> %s IRQ number is %d \n", __func__, irq);
 
 	spin_lock_irqsave(&(events_private_data[irq].event_lock), flags);
 	events_private_data[irq].event_happend = true;
 	wake_up_interruptible(&(events_private_data[irq].event_wq));
 	spin_unlock_irqrestore(&(events_private_data[irq].event_lock), flags);
 
-	pr_info("\n--> %s done.\n", __func__);
+	edma_dbg("\n--> %s done.\n", __func__);
 
 	return IRQ_HANDLED;
 
@@ -908,7 +908,7 @@ static unsigned int edma_dev_event_poll(struct file *file, poll_table *wait)
 
 	BUG_ON(!edma_event);
 
-	pr_info("\n--> %s\n", __func__);
+	edma_dbg("\n--> %s\n", __func__);
 
 	poll_wait(file, &(edma_event->events_private_data[event_number].event_wq),  wait);
 
@@ -922,7 +922,7 @@ static unsigned int edma_dev_event_poll(struct file *file, poll_table *wait)
 
 	spin_unlock_irqrestore(&(edma_event->events_private_data[event_number].event_lock), flags);
 
-	pr_info("\n--> %s done.\n", __func__);
+	edma_dbg("\n--> %s done.\n", __func__);
 
 	return mask;
 }
@@ -939,7 +939,7 @@ static int edma_dev_event_open(struct inode *inode, struct file *file)
 	edma_event = container_of(inode->i_cdev, struct edma_char_event_device, cdev);
 	BUG_ON(!edma_event);
 
-	pr_info("\n--> %s\n", __func__);
+	edma_dbg("\n--> %s\n", __func__);
 
 	file->private_data = edma_event;
 	edma_event->events_private_data[event_number].stats.opened_times++;
@@ -947,7 +947,7 @@ static int edma_dev_event_open(struct inode *inode, struct file *file)
 	//better to enable extra time than to branch
 	ret = edma_backend_enable_isr(edma_event->pdev, event_number);
 
-	pr_info("\n--> %s done.\n", __func__);
+	edma_dbg("\n--> %s done.\n", __func__);
 
 	return ret;
 
@@ -962,13 +962,13 @@ static int edma_dev_event_release(struct inode *inode, struct file *file)
 
 	BUG_ON(!edma_event);
 
-	pr_info("\n--> %s\n", __func__);
+	edma_dbg("\n--> %s\n", __func__);
 
 	edma_event->events_private_data[event_number].stats.opened_times--;
 	if(!edma_event->events_private_data[event_number].stats.opened_times)
 		ret = edma_backend_disable_isr(edma_event->pdev, event_number);
 
-	pr_info("\n--> %s done.\n", __func__);
+	edma_dbg("\n--> %s done.\n", __func__);
 
 	return ret;
 }
@@ -1215,7 +1215,7 @@ int edma_dev_cleanup(struct backend_device* backend_device)
 		struct device* dev = (struct device*) (backend_device->queues[i].char_device_handle);
 		//if device was allocated
 		if(dev) {
-			pr_info("Releasing queue device %s \n", dev->kobj.name);
+			edma_dbg("Releasing queue device %s \n", dev->kobj.name);
 			queue_Major = MAJOR (dev->devt);
 			device_remove_file(dev, &dev_attr_stats);
 			device_destroy(edma_class, dev->devt);
@@ -1226,7 +1226,7 @@ int edma_dev_cleanup(struct backend_device* backend_device)
 	for(i = 0; i< backend_device->number_of_events; i++)
 	{
 		if(edmaEventDevices[i]){
-			pr_info("Releasing event device %s \n", edmaEventDevices[i]->kobj.name);
+			edma_dbg("Releasing event device %s \n", edmaEventDevices[i]->kobj.name);
 			events_Major = MAJOR(edmaEventDevices[i]->devt);
 			device_remove_file(edmaEventDevices[i], &dev_attr_stats);
 			device_destroy(edma_class, edmaEventDevices[i]->devt);

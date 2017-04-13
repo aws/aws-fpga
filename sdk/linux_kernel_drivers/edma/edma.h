@@ -7,6 +7,12 @@
 #define EDMA_RING_IDX_NEXT(idx, ring_size) (((idx) + 1) & ((ring_size) - 1))
 #define EDMA_NUM_OF_QUEUES				(4)
 
+#ifdef EDMA_DEBUG_PRINTS
+#define edma_dbg pr_info
+#else
+#define edma_dbg(...)
+#endif
+
 struct edma_queue_handle {
 	void* tx;
 	void* rx;

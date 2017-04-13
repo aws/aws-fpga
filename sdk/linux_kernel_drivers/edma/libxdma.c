@@ -62,7 +62,7 @@ static inline void xdev_list_add(struct xdma_dev *xdev)
 	list_add_tail(&xdev->list_head, &xdev_list);
 	mutex_unlock(&xdev_mutex);
 
-pr_info("xdev 0x%p, idx %d.\n", xdev, xdev->idx);
+	dbg_init("xdev 0x%p, idx %d.\n", xdev, xdev->idx);
 
 	spin_lock(&xdev_rcu_lock);
 	list_add_tail_rcu(&xdev->rcu_node, &xdev_rcu_list);
@@ -220,35 +220,35 @@ static void engine_reg_dump(struct xdma_engine *engine)
 	BUG_ON(!engine);
 
 	w = read_register(&engine->regs->identifier);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (id).\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (id).\n",
 		engine->name, &engine->regs->identifier, w);
 	w &= BLOCK_ID_MASK;
 	if (w != BLOCK_ID_HEAD) {
-		pr_info("%s: engine id missing, 0x%08x exp. 0xad4bXX01.\n",
+		dbg_init("%s: engine id missing, 0x%08x exp. 0xad4bXX01.\n",
 			 engine->name, w);
 		return;
 	}
 	/* extra debugging; inspect complete engine set of registers */
 	w = read_register(&engine->regs->status);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (status).\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (status).\n",
 		engine->name, &engine->regs->status, w);
 	w = read_register(&engine->regs->control);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (control)\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (control)\n",
 		engine->name, &engine->regs->control, w);
 	w = read_register(&engine->sgdma_regs->first_desc_lo);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_lo)\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (first_desc_lo)\n",
 		engine->name, &engine->sgdma_regs->first_desc_lo, w);
 	w = read_register(&engine->sgdma_regs->first_desc_hi);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_hi)\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (first_desc_hi)\n",
 		engine->name, &engine->sgdma_regs->first_desc_hi, w);
 	w = read_register(&engine->sgdma_regs->first_desc_adjacent);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_adjacent).\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (first_desc_adjacent).\n",
 		engine->name, &engine->sgdma_regs->first_desc_adjacent, w);
 	w = read_register(&engine->regs->completed_desc_count);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (completed_desc_count).\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (completed_desc_count).\n",
 		engine->name, &engine->regs->completed_desc_count, w);
 	w = read_register(&engine->regs->interrupt_enable_mask);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (interrupt_enable_mask)\n",
+	dbg_init("%s: ioread32(0x%p) = 0x%08x (interrupt_enable_mask)\n",
 		engine->name, &engine->regs->interrupt_enable_mask, w);
 }
 
@@ -276,7 +276,7 @@ static u32 engine_status_read(struct xdma_engine *engine, int clear, int dump)
 		value = engine->status = read_register(&engine->regs->status);
 
 	if (dump)
-		pr_info("SG engine %s status: 0x%08x: %s%s%s%s%s%s%s%s%s.\n",
+		dbg_sg("SG engine %s status: 0x%08x: %s%s%s%s%s%s%s%s%s.\n",
 			engine->name, (u32)engine->status,
 			(value & XDMA_STAT_BUSY) ? "BUSY " : "IDLE ",
 			(value & XDMA_STAT_DESC_STOPPED) ?
@@ -513,14 +513,14 @@ static void engine_err_handle(struct xdma_engine *engine,
 	if (engine->status & XDMA_STAT_BUSY) {
 		value = read_register(&engine->regs->status);
 		if (value & XDMA_STAT_BUSY)
-			pr_info("%s engine has errors but is still BUSY\n",
+			dbg_tfr("%s engine has errors but is still BUSY\n",
 				engine->name);
 	}
 
-	pr_info("Aborted %s engine transfer 0x%p\n", engine->name, transfer);
-	pr_info("%s engine was %d descriptors into transfer (with %d desc)\n",
+	dbg_tfr("Aborted %s engine transfer 0x%p\n", engine->name, transfer);
+	dbg_tfr("%s engine was %d descriptors into transfer (with %d desc)\n",
 		engine->name, desc_completed, transfer->desc_num);
-	pr_info("%s engine status = %d\n", engine->name, engine->status);
+	dbg_tfr("%s engine status = %d\n", engine->name, engine->status);
 	
 	/* mark transfer as failed */
 	transfer->state = TRANSFER_STATE_FAILED;
@@ -554,7 +554,7 @@ struct xdma_transfer *engine_service_final_transfer(struct xdma_engine *engine,
 		/* the engine stopped on current transfer? */
 		if (*pdesc_completed < transfer->desc_num) {
 			transfer->state = TRANSFER_STATE_FAILED;
-			pr_info("%s, xfer 0x%p, stopped half-way, %d/%d.\n",
+			dbg_tfr("%s, xfer 0x%p, stopped half-way, %d/%d.\n",
 				engine->name, transfer, *pdesc_completed,
 				transfer->desc_num);
 		} else {
@@ -908,13 +908,13 @@ static int map_single_bar(struct xdma_dev *lro, struct pci_dev *dev, int idx)
 
 	/* do not map BARs with length 0. Note that start MAY be 0! */
 	if (!bar_len) {
-		pr_info("BAR #%d is not present - skipping\n", idx);
+		dbg_init("BAR #%d is not present - skipping\n", idx);
 		return 0;
 	}
 
 	/* BAR size exceeds maximum desired mapping? */
 	if (bar_len > INT_MAX) {
-		pr_info("Limit BAR %d mapping from %llu to %d bytes\n", idx,
+		dbg_init("Limit BAR %d mapping from %llu to %d bytes\n", idx,
 			(u64)bar_len, INT_MAX);
 		map_len = (resource_size_t)INT_MAX;
 	}
@@ -922,15 +922,15 @@ static int map_single_bar(struct xdma_dev *lro, struct pci_dev *dev, int idx)
 	 * map the full device memory or IO region into kernel virtual
 	 * address space
 	 */
-	pr_info("BAR%d: %llu bytes to be mapped.\n", idx, (u64)map_len);
+	dbg_init("BAR%d: %llu bytes to be mapped.\n", idx, (u64)map_len);
 	lro->bar[idx] = pci_iomap(dev, idx, map_len);
 
 	if (!lro->bar[idx]) {
-		pr_info("Could not map BAR %d.\n", idx);
+		dbg_init("Could not map BAR %d.\n", idx);
 		return -1;
 	}
 
-	pr_info("BAR%d at 0x%llx mapped at 0x%p, length=%llu(/%llu)\n", idx,
+	dbg_init("BAR%d at 0x%llx mapped at 0x%p, length=%llu(/%llu)\n", idx,
 		(u64)bar_start, lro->bar[idx], (u64)map_len, (u64)bar_len);
 
 	return (int)map_len;
@@ -951,11 +951,11 @@ static int is_config_bar(struct xdma_dev *lro, int idx)
 	cfg_id = read_register(&cfg_regs->identifier);
 
 	if (((irq_id & mask)== IRQ_BLOCK_ID) && ((cfg_id & mask)== CONFIG_BLOCK_ID)) {
-		pr_info("BAR %d is the XDMA config BAR\n", idx);
+		dbg_init("BAR %d is the XDMA config BAR\n", idx);
 		flag = 1;
 	} else {
 		dbg_init("BAR %d is not XDMA config BAR\n", idx);
-		pr_info("BAR %d is NOT the XDMA config BAR: 0x%x, 0x%x.\n", idx, irq_id, cfg_id);
+		dbg_init("BAR %d is NOT the XDMA config BAR: 0x%x, 0x%x.\n", idx, irq_id, cfg_id);
 		flag = 0;
 	}
 
@@ -982,7 +982,7 @@ static void identify_bars(struct xdma_dev *lro, int *bar_id_list, int num_bars,
 	BUG_ON(!lro);
 	BUG_ON(!bar_id_list);
 
-	pr_info("lro 0x%p, bars %d, config at %d.\n",
+	dbg_init("lro 0x%p, bars %d, config at %d.\n",
 		lro, num_bars, config_bar_pos);
 
 	switch (num_bars) {
@@ -993,12 +993,12 @@ static void identify_bars(struct xdma_dev *lro, int *bar_id_list, int num_bars,
 	case 2:
 		if (config_bar_pos == 0) {
 			lro->bypass_bar_idx = bar_id_list[1];
-			pr_info("bypass bar %d.\n", lro->bypass_bar_idx);
+			dbg_init("bypass bar %d.\n", lro->bypass_bar_idx);
 		} else if (config_bar_pos == 1) {
 			lro->user_bar_idx = bar_id_list[0];
-			pr_info("user bar %d.\n", lro->user_bar_idx);
+			dbg_init("user bar %d.\n", lro->user_bar_idx);
 		} else {
-			pr_info("2, XDMA config BAR unexpected %d.\n",
+			dbg_init("2, XDMA config BAR unexpected %d.\n",
 				config_bar_pos);
 		}
 		break;
@@ -1010,18 +1010,18 @@ static void identify_bars(struct xdma_dev *lro, int *bar_id_list, int num_bars,
 			lro->user_bar_idx = bar_id_list[0];
 			/* bypass bar at the last bar */
 			lro->bypass_bar_idx = bar_id_list[num_bars - 1];
-			pr_info("bypass bar %d, user bar %d.\n",
+			dbg_init("bypass bar %d, user bar %d.\n",
 				 lro->bypass_bar_idx, lro->user_bar_idx);
 		} else {
-			pr_info("3/4, XDMA config BAR unexpected %d.\n",
+			dbg_init("3/4, XDMA config BAR unexpected %d.\n",
 				config_bar_pos);
 		}
 		break;
 
 	default:
 		/* Should not occur - warn user but safe to continue */
-		pr_info("Unexpected number of BARs (%d)\n", num_bars);
-		pr_info("Only XDMA config BAR accessible\n");
+		dbg_init("Unexpected number of BARs (%d)\n", num_bars);
+		dbg_init("Only XDMA config BAR accessible\n");
 		break;
 
 	}
@@ -1058,7 +1058,7 @@ static int map_bars(struct xdma_dev *lro, struct pci_dev *dev)
 			if (is_config_bar(lro, i)) {
 				lro->config_bar_idx = i;
 				config_bar_pos = bar_id_idx;
-				pr_info("config bar %d, pos %d.\n",
+				dbg_init("config bar %d, pos %d.\n",
 					lro->config_bar_idx, config_bar_pos);
 			}
 		}
@@ -1069,7 +1069,7 @@ static int map_bars(struct xdma_dev *lro, struct pci_dev *dev)
 
 	/* The XDMA config BAR must always be present */
 	if (lro->config_bar_idx < 0) {
-		pr_info("Failed to detect XDMA config BAR\n");
+		dbg_init("Failed to detect XDMA config BAR\n");
 		rc = -1;
 		goto fail;
 	}
@@ -1630,7 +1630,7 @@ static struct xdma_transfer *transfer_create(struct xdma_engine *engine,
 
 	transfer = kzalloc(sizeof(struct xdma_transfer), GFP_KERNEL);
 	if (!transfer) {
-		pr_info("OOM.\n");
+		dbg_tfr("OOM.\n");
 		return NULL;
 	}
 
@@ -1687,7 +1687,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 	lro = engine->lro;
 	/* check the direction */
 	if (engine->dir != dir) {
-		pr_info("channel 0x%p, %s, dir 0x%x/0x%x mismatch.\n",
+		dbg_tfr("channel 0x%p, %s, dir 0x%x/0x%x mismatch.\n",
 			channel, engine->name, engine->dir, dir);
 		return -EINVAL;
 	}
@@ -1695,7 +1695,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 	if (!dma_mapped) {
 		nents = pci_map_sg(lro->pci_dev, sg, sgt->orig_nents, dir);
 		if (!nents) {
-			pr_info("map sgl failed, sgt 0x%p.\n", sgt);
+			dbg_tfr("map sgl failed, sgt 0x%p.\n", sgt);
 			return -EIO;
 		}
 		sgt->nents = nents;
@@ -1712,7 +1712,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 		/* build transfer */	
 		transfer = transfer_create(engine, ep_addr, &sg, xfer_nents);
 		if (!transfer) {
-			pr_info("OOM.\n");
+			dbg_tfr("OOM.\n");
 			rv = -ENOMEM;
 			goto unmap;
 		}
@@ -1731,7 +1731,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 
 		rv = transfer_queue(engine, transfer);
 		if (rv < 0) {
-			pr_info("unable to submit %s.\n", engine->name);
+			dbg_tfr("unable to submit %s.\n", engine->name);
 			transfer_destroy(lro, transfer);
 			rv = -ERESTARTSYS;
 			goto unmap;
@@ -1755,7 +1755,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 			return -EIO;
 		default:
 			/* transfer can still be in-flight */
-			pr_info("xfer 0x%p,%u, state 0x%x.\n",
+			dbg_tfr("xfer 0x%p,%u, state 0x%x.\n",
 				 transfer, transfer->xfer_len,
 				transfer->state);
 			engine_status_read(engine, 0, 1);
@@ -2137,7 +2137,7 @@ static int probe_for_engine(struct xdma_dev *lro, enum dma_data_direction dir,
 	channel_id = get_engine_channel_id(regs);
 
 	if ((engine_id != engine_id_expected) || (channel_id != channel)) {
-		pr_info("%s %d engine, reg off 0x%x, id mismatch 0x%x,0x%x,"
+		dbg_tfr("%s %d engine, reg off 0x%x, id mismatch 0x%x,0x%x,"
 			"exp 0x%x,0x%x, SKIP.\n",
 		 	dir == DMA_TO_DEVICE ? "H2C" : "C2H",
 			 channel, offset, engine_id, channel_id,
@@ -2145,14 +2145,14 @@ static int probe_for_engine(struct xdma_dev *lro, enum dma_data_direction dir,
 		return 0;
 	}
 
-	pr_info("found AXI %s %d engine, reg. off 0x%x, id 0x%x,0x%x.\n",
+	dbg_tfr("found AXI %s %d engine, reg. off 0x%x, id 0x%x,0x%x.\n",
 		 dir == DMA_TO_DEVICE ? "H2C" : "C2H", channel,
 		 offset, engine_id, channel_id);
 
 	/* allocate and initialize engine */
 	rv = engine_init(engine, lro, offset, dir, channel);
 	if (rv != 0) {
-		pr_info("failed to create AXI %s %d engine.\n",
+		dbg_tfr("failed to create AXI %s %d engine.\n",
 			dir == DMA_TO_DEVICE ? "H2C" : "C2H",
 			channel);
 		return rv;
@@ -2292,7 +2292,7 @@ void xdma_device_close(struct pci_dev *pdev, xdma_channel_tuple *tuple)
 
 	lro = xdev_find_by_pdev(pdev);
 	if (!lro) {
-		pr_info("remove(dev = 0x%p) empty.\n", pdev);
+		dbg_sg("remove(dev = 0x%p) empty.\n", pdev);
 		return;
 	}
 	dbg_sg("remove(dev = 0x%p) where pdev->dev.driver_data = 0x%p\n",
@@ -2342,10 +2342,10 @@ int xdma_device_restart(struct pci_dev *pdev)
 
 	lro = xdev_find_by_pdev(pdev);
 	if (!lro) {
-		pr_info("pdev 0x%p, no match found.\n", pdev);
+		dbg_sg("pdev 0x%p, no match found.\n", pdev);
 		return -EINVAL;
 	}
-	pr_info("NOT implemented.\n");
+	dbg_sg("NOT implemented.\n");
 	return -EINVAL;
 }
 EXPORT_SYMBOL_GPL(xdma_device_restart);
@@ -2361,7 +2361,7 @@ int xdma_user_isr_register(struct pci_dev *pdev, unsigned int mask,
 
 	lro = xdev_find_by_pdev(pdev);
 	if (!lro) {
-		pr_info("pdev 0x%p, no match found.\n", pdev);
+		dbg_irq("pdev 0x%p, no match found.\n", pdev);
 		return -EINVAL;
 	}
 
@@ -2390,7 +2390,7 @@ int xdma_user_isr_enable(struct pci_dev *pdev, unsigned int mask)
 
 	lro = xdev_find_by_pdev(pdev);
 	if (!lro) {
-		pr_info("pdev 0x%p, no match found.\n", pdev);
+		dbg_irq("pdev 0x%p, no match found.\n", pdev);
 		return -EINVAL;
 	}
 
@@ -2411,7 +2411,7 @@ int xdma_user_isr_disable(struct pci_dev *pdev, unsigned int mask)
 
 	lro = xdev_find_by_pdev(pdev);
 	if (!lro) {
-		pr_info("pdev 0x%p, no match found.\n", pdev);
+		dbg_irq("pdev 0x%p, no match found.\n", pdev);
 		return -EINVAL;
 	}
 
