@@ -125,15 +125,14 @@
 
 /* disable debugging */
 #if (XDMA_DEBUG == 0)
-	//#define dbg_desc(...)
 	#define dbg_io(...)
 	#define dbg_fops(...)
 	#define dbg_perf(fmt, ...)
 	#define dbg_sg(...)
-	#define dbg_tfr(...)	//pr_info
-	#define dbg_irq(...)	//pr_info
-	#define dbg_init(...)	//pr_info
-	#define dbg_desc(...)	//pr_info
+	#define dbg_tfr(...)
+	#define dbg_irq(...)
+	#define dbg_init(...)
+	#define dbg_desc(...)
 #else
 	#define dbg_io		pr_info
 	#define dbg_fops	pr_info
