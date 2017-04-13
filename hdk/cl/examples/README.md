@@ -58,14 +58,15 @@ This file would be submitted to AWS to create an AFI.
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
 
-**NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` wil run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
+**NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` will run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
 To be notified via e-mail when the build completes:
 
 1. Set up notification via SNS:
+
 ```
-export EMAIL=your.email@example.com
-$HDK_COMMON_DIR/scripts/notify_via_sns.py
+    $ export EMAIL=your.email@example.com
+    $ ./$HDK_COMMON_DIR/scripts/notify_via_sns.py
 
 ```
 
@@ -175,7 +176,7 @@ The output of this command includes two identifiers that refer to your AFI:
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-01234567890abcdef`**.
 
-After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.
+After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 
  
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
