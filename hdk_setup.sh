@@ -1,3 +1,18 @@
+# Amazon FGPA Hardware Development Kit
+# 
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+# 
+#    http://aws.amazon.com/asl/
+# 
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+#
 # Script must be sourced from a bash shell or it will not work
 # When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
 # When being run $0 and $_ will be the same.
@@ -84,7 +99,7 @@ if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Load and unload the modules just to make sure have the environment set correctly
   module unload vivado
   module unload sdx
-  module load vivado
+  module load sdx
 fi
 
 # before going too far make sure Vivado is available
@@ -127,13 +142,64 @@ export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
 export HDK_COMMON_DIR=$HDK_DIR/common
 
 # Point to the latest version of AWS shell
-export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_latest)
-hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_latest)
+export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
+hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
+
+export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
+PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
 debug_msg "Done setting environment variables.";
+
+# Download correct shell DCP
+info_msg "Using HDK shell version $hdk_shell_version"
+debug_msg "Checking HDK shell's checkpoint version"
+hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
+hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
+hdk_shell_s3_bucket=aws-fpga-hdk-resources
+s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+# Download the sha256
+if [ ! -e $hdk_shell_dir ]; then
+	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
+fi
+# Use curl instead of AWS CLI so that credentials aren't required.
+curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
+if grep -q '<?xml version' $hdk_shell.sha256; then
+  err_msg "Failed to downlonad HDK shell's checkpoint version from $s3_hdk_shell.sha256"
+  cat hdk_shell.sha256
+  return 2
+fi
+exp_sha256=$(cat $hdk_shell.sha256)
+debug_msg "  latest   version=$exp_sha256"
+# If shell already downloaded check its sha256
+if [ -e $hdk_shell ]; then
+  act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+  debug_msg "  existing version=$act_sha256"
+  if [[ $act_sha256 != $exp_sha256 ]]; then
+    info_msg "HDK shell's checkpoint version is incorrect"
+    info_msg "  Saving old checkpoint to $hdk_shell.back"
+    mv $hdk_shell $hdk_shell.back
+  fi
+else
+  info_msg "HDK shell's checkpoint hasn't been downloaded yet."
+fi
+if [ ! -e $hdk_shell ]; then
+  info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
+fi
+# Check sha256
+act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
+if [[ $act_sha256 != $exp_sha256 ]]; then
+  err_msg "Incorrect HDK shell checkpoint version:"
+  err_msg "  expected version=$exp_sha256"
+  err_msg "  actual   version=$act_sha256"
+  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
+  return 2
+fi
+info_msg "HDK shell is up-to-date"
 
 # Create DDR and PCIe IP models and patch PCIe
 models_dir=$HDK_COMMON_DIR/verif/models

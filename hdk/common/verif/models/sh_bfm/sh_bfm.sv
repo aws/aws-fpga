@@ -1,11 +1,17 @@
-// =============================================================================
-// Copyright 2016 Amazon.com, Inc. or its affiliates.
-// All Rights Reserved Worldwide.
-// Amazon Confidential information
-// =============================================================================
-
-//FIXME -- Need to do the clocking correctly:
-//    - Async Stream between PCIe cores and User logic
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
 
 module sh_bfm #(
                      parameter NUM_HMC = 4,
@@ -29,13 +35,22 @@ module sh_bfm #(
 
    output logic [31:0]         sh_cl_ctl0,
    output logic [31:0]         sh_cl_ctl1,
-   output logic                clk_xtra,
-   output logic                rst_xtra_n,
    output logic [1:0]          sh_cl_pwr_state,
 
-   output logic                clk_out,
-   output logic                rst_out_n,
-
+   output logic                clk_main_a0,
+   output logic                clk_extra_a1,
+   output logic                clk_extra_a2,
+   output logic                clk_extra_a3,
+   
+   output logic                clk_extra_b0,
+   output logic                clk_extra_b1,
+   
+   output logic                clk_extra_c0,
+   output logic                clk_extra_c1,
+    
+   output logic                rst_main_n,
+   output logic                kernel_rst_n,
+    
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
@@ -65,85 +80,93 @@ module sh_bfm #(
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
    //-------------------------------------
-   input [4:0]                 cl_sh_pcim_awid[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_awaddr[NUM_PCIE-1:0],
-   input [7:0]                 cl_sh_pcim_awlen[NUM_PCIE-1:0],
-   input [18:0]                cl_sh_pcim_awuser[NUM_PCIE-1:0], //DW length of transfer
-   input [NUM_PCIE-1:0]        cl_sh_pcim_awvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_awready,
+   input [15:0]                 cl_sh_pcim_awid  ,
+   input [63:0]                 cl_sh_pcim_awaddr,
+   input [7:0]                  cl_sh_pcim_awlen ,
+   input [2:0]                  cl_sh_pcim_awsize ,
+   input [18:0]                 cl_sh_pcim_awuser, //DW length of transfer
+   input [NUM_PCIE-1:0]         cl_sh_pcim_awvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_awready,
 
-//Not used   input [4:0]                 cl_sh_pcim_wid[NUM_PCIE-1:0],
-   input [511:0]               cl_sh_pcim_wdata[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_wstrb[NUM_PCIE-1:0],
-   input [NUM_PCIE-1:0]        cl_sh_pcim_wlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_wvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_wready,
+   input [511:0]                cl_sh_pcim_wdata,
+   input [63:0]                 cl_sh_pcim_wstrb,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_wlast,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_wvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_wready,
 
-   output logic [4:0]          sh_cl_pcim_bid[NUM_PCIE-1:0],
-   output logic [1:0]          sh_cl_pcim_bresp[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_bvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_bready,
+   output logic [15:0]          sh_cl_pcim_bid,
+   output logic [1:0]           sh_cl_pcim_bresp,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_bvalid,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_bready,
+                               
+   input [15:0]                 cl_sh_pcim_arid,
+   input [63:0]                 cl_sh_pcim_araddr,
+   input [7:0]                  cl_sh_pcim_arlen ,
+   input [2:0]                  cl_sh_pcim_arsize ,
+   input [18:0]                 cl_sh_pcim_aruser, //DW length of transfer
+   input [NUM_PCIE-1:0]         cl_sh_pcim_arvalid,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_arready,
 
-   input [4:0]                 cl_sh_pcim_arid[NUM_PCIE-1:0],
-   input [63:0]                cl_sh_pcim_araddr[NUM_PCIE-1:0],
-   input [7:0]                 cl_sh_pcim_arlen[NUM_PCIE-1:0],
-   input [18:0]                cl_sh_pcim_aruser[NUM_PCIE-1:0], //DW length of transfer
-   input [NUM_PCIE-1:0]        cl_sh_pcim_arvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_arready,
+   output logic [15:0]          sh_cl_pcim_rid,
+   output logic [511:0]         sh_cl_pcim_rdata,
+   output logic [1:0]           sh_cl_pcim_rresp,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rlast,
+   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rvalid,
+   input [NUM_PCIE-1:0]         cl_sh_pcim_rready,
 
-   output logic [4:0]          sh_cl_pcim_rid[NUM_PCIE-1:0],
-   output logic [511:0]        sh_cl_pcim_rdata[NUM_PCIE-1:0],
-   output logic [1:0]          sh_cl_pcim_rresp[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_rlast,
-   output logic [NUM_PCIE-1:0] sh_cl_pcim_rvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcim_rready,
-
-   output logic[1:0] cfg_max_payload[NUM_PCIE-1:0],               //Max payload size - 00:128B, 01:256B, 10:512B
-   output logic[2:0] cfg_max_read_req[NUM_PCIE-1:0],              //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
+   output logic[1:0]            cfg_max_payload ,       //Max payload size - 00:128B, 01:256B, 10:512B
+   output logic[2:0]            cfg_max_read_req,      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
                                                                   // 100b-2048B, 101b:4096B
 
 
    //-------------------------------------
    // PCIe Interface to CL (AXI-4) (CL is PCI-slave)
    //-------------------------------------
-   output logic [63:0]               sh_cl_pcis_awaddr[NUM_PCIE-1:0],
-   output logic [4:0]                sh_cl_pcis_awid[NUM_PCIE-1:0],
-   output logic [7:0]                sh_cl_pcis_awlen[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_awvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_awready,
+   output logic [63:0]               sh_cl_dma_pcis_awaddr,
+   output logic [5:0]                sh_cl_dma_pcis_awid  ,
+   output logic [7:0]                sh_cl_dma_pcis_awlen ,
+   output logic [2:0]                sh_cl_dma_pcis_awsize,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_awvalid,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_awready,
 
-   output logic [511:0]              sh_cl_pcis_wdata[NUM_PCIE-1:0],
-   output logic [63:0]               sh_cl_pcis_wstrb[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_wvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_wlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_wready,
+   output logic [511:0]              sh_cl_dma_pcis_wdata,
+   output logic [63:0]               sh_cl_dma_pcis_wstrb,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wvalid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wlast,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_wready,
 
-   input [1:0]                 cl_sh_pcis_bresp[NUM_PCIE-1:0],
-   input [NUM_PCIE-1:0]        cl_sh_pcis_bvalid,
-   input [4:0]                 cl_sh_pcis_bid[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0]       sh_cl_pcis_bready,
+   input [1:0]                       cl_sh_dma_pcis_bresp,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_bvalid,
+   input [5:0]                       cl_sh_dma_pcis_bid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_bready,
 
-   output logic [63:0]         sh_cl_pcis_araddr[NUM_PCIE-1:0],
-   output logic [4:0]          sh_cl_pcis_arid[NUM_PCIE-1:0],
-   output logic [7:0]          sh_cl_pcis_arlen[NUM_PCIE-1:0],
-   output logic [NUM_PCIE-1:0] sh_cl_pcis_arvalid,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_arready,
+   output logic [63:0]               sh_cl_dma_pcis_araddr,
+   output logic [5:0]                sh_cl_dma_pcis_arid,
+   output logic [7:0]                sh_cl_dma_pcis_arlen,
+   output logic [2:0]                sh_cl_dma_pcis_arsize,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_arvalid,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_arready,
+                                     
+   input [5:0]                       cl_sh_dma_pcis_rid,
+   input [511:0]                     cl_sh_dma_pcis_rdata,
+   input [1:0]                       cl_sh_dma_pcis_rresp,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rlast,
+   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rvalid,
+   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_rready,
 
-   input [4:0]                 cl_sh_pcis_rid[NUM_PCIE-1:0],
-   input [511:0]               cl_sh_pcis_rdata[NUM_PCIE-1:0],
-   input [1:0]                 cl_sh_pcis_rresp[NUM_PCIE-1:0],
-   input [NUM_PCIE-1:0]        cl_sh_pcis_rlast,
-   input [NUM_PCIE-1:0]        cl_sh_pcis_rvalid,
-   output logic [NUM_PCIE-1:0] sh_cl_pcis_rready,
-
-`ifndef VU190    
+`ifndef NO_XDMA
+   input [15:0]         cl_sh_irq_req,
+   output logic [15:0]  sh_cl_irq_ack,
+`endif   
+   
+`ifndef VU190   
    //-----------------------------------------
    // CL MSIX
    //-----------------------------------------
-    input               cl_sh_msix_int,
-    input [7:0]         cl_sh_msix_vec,
-    output logic        sh_cl_msix_int_sent,
-    output logic        sh_cl_msix_int_ack
+    input                     cl_sh_msix_int,
+    input [7:0]               cl_sh_msix_vec,
+    output logic              sh_cl_msix_int_sent,
+    output logic              sh_cl_msix_int_ack
 `endif
     
    ,
@@ -194,31 +217,59 @@ module sh_bfm #(
    input [31:0]                ddr_sh_stat_rdata[2:0],
    input [7:0]                 ddr_sh_stat_int[2:0],
 
-   input [5:0]                 cl_sh_ddr_awid,
+   //-----------------------------------------------------------------------------
+   // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
+   // to the sh_ddr.sv for the DDR interfaces to function.
+   //-----------------------------------------------------------------------------
+   output logic [7:0]          sh_ddr_stat_addr0,
+   output logic                sh_ddr_stat_wr0, 
+   output logic                sh_ddr_stat_rd0, 
+   output logic [31:0]         sh_ddr_stat_wdata0,
+   input                       ddr_sh_stat_ack0,
+   input [31:0]                ddr_sh_stat_rdata0,
+   input [7:0]                 ddr_sh_stat_int0,
+
+   output logic [7:0]          sh_ddr_stat_addr1,
+   output logic                sh_ddr_stat_wr1, 
+   output logic                sh_ddr_stat_rd1, 
+   output logic [31:0]         sh_ddr_stat_wdata1,
+   input                       ddr_sh_stat_ack1,
+   input [31:0]                ddr_sh_stat_rdata1,
+   input [7:0]                 ddr_sh_stat_int1,
+
+   output logic [7:0]          sh_ddr_stat_addr2,
+   output logic                sh_ddr_stat_wr2, 
+   output logic                sh_ddr_stat_rd2, 
+   output logic [31:0]         sh_ddr_stat_wdata2,
+   input                       ddr_sh_stat_ack2,
+   input [31:0]                ddr_sh_stat_rdata2,
+   input [7:0]                 ddr_sh_stat_int2,
+    
+   input [15:0]                cl_sh_ddr_awid,
    input [63:0]                cl_sh_ddr_awaddr,
    input [7:0]                 cl_sh_ddr_awlen,
    input                       cl_sh_ddr_awvalid,
    output logic                sh_cl_ddr_awready,
 
-   input [5:0]                 cl_sh_ddr_wid,
+   input [15:0]                cl_sh_ddr_wid,
    input [511:0]               cl_sh_ddr_wdata,
    input [63:0]                cl_sh_ddr_wstrb,
    input                       cl_sh_ddr_wlast,
    input                       cl_sh_ddr_wvalid,
    output logic                sh_cl_ddr_wready,
 
-   output logic [5:0]          sh_cl_ddr_bid,
+   output logic [15:0]         sh_cl_ddr_bid,
    output logic [1:0]          sh_cl_ddr_bresp,
    output logic                sh_cl_ddr_bvalid,
    input                       cl_sh_ddr_bready,
 
-   input [5:0]                 cl_sh_ddr_arid,
+   input [15:0]                cl_sh_ddr_arid,
    input [63:0]                cl_sh_ddr_araddr,
    input [7:0]                 cl_sh_ddr_arlen,
    input                       cl_sh_ddr_arvalid,
    output logic                sh_cl_ddr_arready,
 
-   output logic [5:0]          sh_cl_ddr_rid,
+   output logic [15:0]         sh_cl_ddr_rid,
    output logic [511:0]        sh_cl_ddr_rdata,
    output logic [1:0]          sh_cl_ddr_rresp,
    output logic                sh_cl_ddr_rlast,
@@ -233,6 +284,105 @@ module sh_bfm #(
    inout[3:0]                 fpga_uctrl_gpio
 
 
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
+   // If the CL is created through  Xilinx’s SDAccel, then this configuration bus
+   // would be connected automatically to SDAccel generic logic (SmartConnect, APM etc)
+   //------------------------------------------------------------------------------------------
+    ,
+    output logic        sda_cl_awvalid,
+    output logic [31:0] sda_cl_awaddr, 
+    input               cl_sda_awready,
+
+   //Write data
+   output logic         sda_cl_wvalid,
+   output logic [31:0]  sda_cl_wdata,
+   output logic [3:0]   sda_cl_wstrb,
+   input                cl_sda_wready,
+
+   //Write response
+   input                cl_sda_bvalid,
+   input [1:0]          cl_sda_bresp,
+   output logic         sda_cl_bready,
+
+   //Read address
+   output logic         sda_cl_arvalid,
+   output logic [31:0]  sda_cl_araddr,
+   input                cl_sda_arready,
+
+   //Read data/response
+   input                cl_sda_rvalid,
+   input [31:0]         cl_sda_rdata,
+   input [1:0]          cl_sda_rresp,
+
+   output logic         sda_cl_rready,
+
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through AppPF BAR0
+   // For example, this AXI-L interface can connect to OpenCL Kernels
+   // This would connect automatically to the required logic 
+   // if the CL is created through SDAccel flow   
+   //------------------------------------------------------------------------------------------
+   output logic         sh_ocl_awvalid,
+   output logic [31:0]  sh_ocl_awaddr,
+   input                ocl_sh_awready,
+                                                                                                                            
+   //Write data             
+   output logic         sh_ocl_wvalid,
+   output logic [31:0]  sh_ocl_wdata,
+   output logic [3:0]   sh_ocl_wstrb,
+   input                ocl_sh_wready,
+
+   //Write response
+   input                ocl_sh_bvalid,
+   input [1:0]          ocl_sh_bresp,
+   output               sh_ocl_bready,
+
+   //Read address                                                                       
+   output logic         sh_ocl_arvalid,
+   output logic [31:0]  sh_ocl_araddr,
+   input                ocl_sh_arready,
+                                                                                                                            
+   //Read data/response
+   input                ocl_sh_rvalid,
+   input [31:0]         ocl_sh_rdata,
+   input [1:0]          ocl_sh_rresp,
+                                                                                                                            
+   output logic         sh_ocl_rready,
+
+   //------------------------------------------------------------------------------------------
+   // AXI-L maps to any inbound PCIe access through AppPF BAR1
+   // For example,
+   //------------------------------------------------------------------------------------------
+   output logic         sh_bar1_awvalid,
+   output logic [31:0]  sh_bar1_awaddr,
+   input                bar1_sh_awready,
+
+   //Write data
+   output logic         sh_bar1_wvalid,
+   output logic [31:0]  sh_bar1_wdata,
+   output logic [3:0]   sh_bar1_wstrb,
+   input                bar1_sh_wready,
+                                                                                                                     
+   //Write response      
+   input                bar1_sh_bvalid,
+   input [1:0]          bar1_sh_bresp,
+   output logic         sh_bar1_bready,
+                                                                                                                          
+   //Read address                                                                                                     
+   output logic         sh_bar1_arvalid,
+   output logic [31:0]  sh_bar1_araddr,
+   input                bar1_sh_arready,
+                                                                                                                            
+   //Read data/response      
+   input                bar1_sh_rvalid,
+   input [31:0]         bar1_sh_rdata,
+   input [1:0]          bar1_sh_rresp,
+                                                                                                                            
+   output logic [15:0]  sh_cl_status_vdip,
+   input [15:0]         cl_sh_status_vled,
+ 
+   output logic         sh_bar1_rready           
 
 `ifndef NO_CL_DDR
    ,
@@ -246,21 +396,11 @@ module sh_bfm #(
   
    );
 
-typedef struct {
-   logic [63:0] addr;
-   logic [7:0]  len;
-   logic [5:0]  id;
-   logic [1:0]  resp;
-   logic        last;
-} AXI_Command;
+`include "axi_bfm_defines.svh"
    
-typedef struct {
-   logic [511:0] data;
-   logic [63:0]  strb;
-   logic [5:0]   id;
-   logic         last;
-} AXI_Data;
+   import tb_type_defines_pkg::*;
 
+   
    AXI_Command sh_cl_wr_cmds[$];
    AXI_Data    sh_cl_wr_data[$];
    AXI_Command sh_cl_rd_cmds[$];
@@ -288,7 +428,7 @@ typedef struct {
    logic         ddr_is_ready_presync;
    logic         ddr_is_ready_sync;
 
-   logic [5:0]   cl_sh_ddr_awid_q;
+   logic [15:0]  cl_sh_ddr_awid_q;
    logic [63:0]  cl_sh_ddr_awaddr_q;
    logic [7:0]   cl_sh_ddr_awlen_q;
    logic         cl_sh_ddr_awvalid_q;
@@ -300,25 +440,25 @@ typedef struct {
    logic         cl_sh_ddr_wvalid_q;
    logic         sh_cl_ddr_wready_q;
 
-   logic [5:0]   sh_cl_ddr_bid_q;
+   logic [15:0]  sh_cl_ddr_bid_q;
    logic [1:0]   sh_cl_ddr_bresp_q;
    logic         sh_cl_ddr_bvalid_q;
    logic         cl_sh_ddr_bready_q;
    
-   logic [5:0]   cl_sh_ddr_arid_q;
+   logic [15:0]  cl_sh_ddr_arid_q;
    logic [63:0]  cl_sh_ddr_araddr_q;
    logic [7:0]   cl_sh_ddr_arlen_q;
    logic         cl_sh_ddr_arvalid_q;
    logic         sh_cl_ddr_arready_q;
 
-   logic [5:0]   sh_cl_ddr_rid_q;
+   logic [15:0]  sh_cl_ddr_rid_q;
    logic [511:0] sh_cl_ddr_rdata_q;
    logic [1:0]   sh_cl_ddr_rresp_q;
    logic         sh_cl_ddr_rlast_q;
    logic         sh_cl_ddr_rvalid_q;
    logic         cl_sh_ddr_rready_q;
 
-   logic [5:0]   sync_cl_sh_ddr_awid;
+   logic [15:0]  sync_cl_sh_ddr_awid;
    logic [63:0]  sync_cl_sh_ddr_awaddr;
    logic [7:0]   sync_cl_sh_ddr_awlen;
    logic         sync_cl_sh_ddr_awvalid;
@@ -330,18 +470,18 @@ typedef struct {
    logic         sync_cl_sh_ddr_wvalid;
    logic         sync_sh_cl_ddr_wready;
 
-   logic [5:0]   sync_sh_cl_ddr_bid;
+   logic [15:0]  sync_sh_cl_ddr_bid;
    logic [1:0]   sync_sh_cl_ddr_bresp;
    logic         sync_sh_cl_ddr_bvalid;
    logic         sync_cl_sh_ddr_bready;
 
-   logic [5:0]   sync_cl_sh_ddr_arid;
+   logic [15:0]  sync_cl_sh_ddr_arid;
    logic [63:0]  sync_cl_sh_ddr_araddr;
    logic [7:0]   sync_cl_sh_ddr_arlen;
    logic         sync_cl_sh_ddr_arvalid;
    logic         sync_sh_cl_ddr_arready;
 
-   logic [5:0]   sync_sh_cl_ddr_rid;
+   logic [15:0]  sync_sh_cl_ddr_rid;
    logic [511:0] sync_sh_cl_ddr_rdata;
    logic [1:0]   sync_sh_cl_ddr_rresp;
    logic         sync_sh_cl_ddr_rlast;
@@ -349,6 +489,34 @@ typedef struct {
    logic         sync_cl_sh_ddr_rready;
 
    bit           debug;
+
+   typedef struct {
+      logic [63:0] buffer;
+      logic [27:0] len;
+      logic [63:0] cl_addr;
+   } DMA_OP;
+
+   DMA_OP h2c_dma_list[0:3][$];
+   DMA_OP c2h_dma_list[0:3][$];
+   DMA_OP c2h_data_dma_list[0:3][$];
+   
+   logic [3:0]     h2c_dma_started;
+   logic [3:0]     c2h_dma_started;
+   logic [3:0]     c2h_dma_done;
+   logic [3:0]     h2c_dma_done;
+
+   logic [7:0] read_data_buffer[];
+  
+   real MAIN_A0_DLY  = 4ns;
+   real CORE_DLY     = 4ns;
+   real EXTRA_A1_DLY = 8ns;
+   real EXTRA_A2_DLY = 2.66ns;
+   real EXTRA_A3_DLY = 2ns;
+   real EXTRA_B0_DLY = 2ns;
+   real EXTRA_B1_DLY = 4ns;
+   real EXTRA_C0_DLY = 1.66ns;
+   real EXTRA_C1_DLY = 1.25ns;
+
 
    initial begin
       debug = 1'b0;
@@ -363,28 +531,62 @@ typedef struct {
 
    initial begin
       clk_core = 1'b0;
-      forever #2ns clk_core = ~clk_core;
+      forever #CORE_DLY clk_core = ~clk_core;
    end
-
-   assign clk_out = clk_core;
-
+   
    initial begin
-      clk_xtra = 1'b0;
-      forever #4ns clk_xtra = ~clk_xtra;
+      clk_main_a0 = 1'b0;
+      forever #MAIN_A0_DLY clk_main_a0 = ~clk_main_a0;
    end
-
+   
+   initial begin
+      clk_extra_a1 = 1'b0;
+      forever #EXTRA_A1_DLY clk_extra_a1 = ~clk_extra_a1;
+   end
+   
+   initial begin
+      clk_extra_a2 = 1'b0;
+      forever #EXTRA_A2_DLY clk_extra_a2 = ~clk_extra_a2;
+   end
+   
+   initial begin
+      clk_extra_a3 = 1'b0;
+      forever #EXTRA_A3_DLY clk_extra_a3 = ~clk_extra_a3;
+   end
+   
+   initial begin
+      clk_extra_b0 = 1'b0;
+      forever #EXTRA_B0_DLY clk_extra_b0 = ~clk_extra_b0;
+   end
+   
+   initial begin
+      clk_extra_b1 = 1'b0;
+      forever #EXTRA_B1_DLY clk_extra_b1 = ~clk_extra_b1;
+   end      
+   
+   initial begin
+      clk_extra_c0 = 1'b0;
+      forever #EXTRA_C0_DLY clk_extra_c0 = ~clk_extra_c0;
+   end
+   
+   initial begin
+      clk_extra_c1 = 1'b0;
+      forever #EXTRA_C1_DLY clk_extra_c1 = ~clk_extra_c1;
+   end
+   
    logic rst_n_i;
-   logic rst_out_n_i;
+   logic rst_main_n_i;
    logic rst_xtra_n_i;
 
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
-   always @(posedge clk_out)
-     rst_out_n <= rst_out_n_i;
+   always @(posedge clk_main_a0)
+     rst_main_n <= rst_main_n_i;
 
-   always @(posedge clk_xtra)
-     rst_xtra_n <= rst_xtra_n_i;
+   initial begin
+      kernel_rst_n = 1'b0;  // kernel reset is not used for non-SDAccel simulations.
+   end
 
    always_ff @(negedge rst_n or posedge clk_core)
      if (!rst_n)
@@ -413,6 +615,10 @@ typedef struct {
 
    initial begin
       sh_cl_flr_assert <= 1'b0;
+   end
+
+   initial begin
+      sh_cl_status_vdip <= 32'h0;
    end
 
    always_ff @(posedge clk_core or negedge sync_rst_n)
@@ -454,20 +660,20 @@ typedef struct {
 
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
-      sh_ddr_stat_addr[0] <= 8'h00;
-      sh_ddr_stat_wr[0] <= 1'b0;
-      sh_ddr_stat_rd[0] <= 1'b0;
-      sh_ddr_stat_wdata[0] <= 32'h0;
+      sh_ddr_stat_addr0  = 8'h00;
+      sh_ddr_stat_wr0    = 1'b0;
+      sh_ddr_stat_rd0    = 1'b0;
+      sh_ddr_stat_wdata0 = 32'h0;
 
-      sh_ddr_stat_addr[1] <= 8'h00;
-      sh_ddr_stat_wr[1] <= 1'b0;
-      sh_ddr_stat_rd[1] <= 1'b0;
-      sh_ddr_stat_wdata[1] <= 32'h0;
+      sh_ddr_stat_addr1  = 8'h00;
+      sh_ddr_stat_wr1    = 1'b0;
+      sh_ddr_stat_rd1    = 1'b0;
+      sh_ddr_stat_wdata1 = 32'h0;
 
-      sh_ddr_stat_addr[2] <= 8'h00;
-      sh_ddr_stat_wr[2] <= 1'b0;
-      sh_ddr_stat_rd[2] <= 1'b0;
-      sh_ddr_stat_wdata[2] <= 32'h0;
+      sh_ddr_stat_addr2  = 8'h00;
+      sh_ddr_stat_wr2    = 1'b0;
+      sh_ddr_stat_rd2    = 1'b0;
+      sh_ddr_stat_wdata2 = 32'h0;
    end
 
    //=================================================
@@ -483,14 +689,15 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_wr_cmds.size() != 0) begin
 
-         sh_cl_pcis_awaddr[0]  <= sh_cl_wr_cmds[0].addr;
-         sh_cl_pcis_awid[0]    <= sh_cl_wr_cmds[0].id;
-         sh_cl_pcis_awlen[0]   <= sh_cl_wr_cmds[0].len;
+         sh_cl_dma_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
+         sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
+         sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
+         sh_cl_dma_pcis_awsize  <= sh_cl_wr_cmds[0].size;
          
-         sh_cl_pcis_awvalid[0] <= !sh_cl_pcis_awvalid[0] ? 1'b1 :
-                                  !cl_sh_pcis_awready[0] ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
+                               !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_awready[0] && sh_cl_pcis_awvalid[0]) begin
+         if (cl_sh_dma_pcis_awready && sh_cl_dma_pcis_awvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_wr_cmds.size());
             end
@@ -499,7 +706,7 @@ typedef struct {
 
       end
       else
-         sh_cl_pcis_awvalid <= 1'b0;
+         sh_cl_dma_pcis_awvalid <= 1'b0;
    end
 
 
@@ -514,38 +721,39 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_wr_data.size() != 0) begin
 
-         sh_cl_pcis_wdata[0] <= sh_cl_wr_data[0].data;
-         sh_cl_pcis_wstrb[0] <= sh_cl_wr_data[0].strb;
-         sh_cl_pcis_wlast[0] <= sh_cl_wr_data[0].last;
+         sh_cl_dma_pcis_wdata <= sh_cl_wr_data[0].data;
+         sh_cl_dma_pcis_wstrb <= sh_cl_wr_data[0].strb;
+         sh_cl_dma_pcis_wlast <= sh_cl_wr_data[0].last;
          
-         sh_cl_pcis_wvalid[0] <= !sh_cl_pcis_wvalid[0] ? 1'b1 :
-                                 !cl_sh_pcis_wready[0] ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_wvalid <= !sh_cl_dma_pcis_wvalid ? 1'b1 :
+                              !cl_sh_dma_pcis_wready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_wready[0] && sh_cl_pcis_wvalid[0]) begin
+         if (cl_sh_dma_pcis_wready && sh_cl_dma_pcis_wvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
             end
+            h2c_dma_done[sh_cl_wr_data[0].id] = 1'b1; 
             sh_cl_wr_data.pop_front();
          end
-
+         
       end
       else
-         sh_cl_pcis_wvalid <= 1'b0;
+         sh_cl_dma_pcis_wvalid <= 1'b0;
    end
 
    //
    // cl->sh B Response Channel
    //
    always @(posedge clk_core) begin
-      sh_cl_pcis_bready[0] <= 1'b1;
+      sh_cl_dma_pcis_bready <= 1'b1;
    end
 
    always @(posedge clk_core) begin
       AXI_Command resp;
 
-      if (cl_sh_pcis_bvalid[0] & sh_cl_pcis_bready) begin
-         resp.resp     = cl_sh_pcis_bresp[0];
-         resp.id       = cl_sh_pcis_bid[0];
+      if (cl_sh_dma_pcis_bvalid & sh_cl_dma_pcis_bready) begin
+         resp.resp     = cl_sh_dma_pcis_bresp[0];
+         resp.id       = cl_sh_dma_pcis_bid[0];
 
          cl_sh_b_resps.push_back(resp);
       end
@@ -560,14 +768,15 @@ typedef struct {
    always @(posedge clk_core) begin
       if (sh_cl_rd_cmds.size() != 0) begin
 
-         sh_cl_pcis_araddr[0]  <= sh_cl_rd_cmds[0].addr;
-         sh_cl_pcis_arid[0]    <= sh_cl_rd_cmds[0].id;
-         sh_cl_pcis_arlen[0]   <= sh_cl_rd_cmds[0].len;
+         sh_cl_dma_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
+         sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
+         sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
+         sh_cl_dma_pcis_arsize  <= sh_cl_rd_cmds[0].size;
          
-         sh_cl_pcis_arvalid[0] <= !sh_cl_pcis_arvalid[0] ? 1'b1 :
-                                  !cl_sh_pcis_arready[0] ? 1'b1 : 1'b0;
+         sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
+                               !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
          
-         if (cl_sh_pcis_arready[0] && sh_cl_pcis_arvalid[0]) begin
+         if (cl_sh_dma_pcis_arready && sh_cl_dma_pcis_arvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_rd_cmds.size());
             end
@@ -576,27 +785,27 @@ typedef struct {
 
       end
       else
-         sh_cl_pcis_arvalid <= 1'b0;
+         sh_cl_dma_pcis_arvalid <= 1'b0;
    end
 
    //
    // cl->sh Read Data Channel
    //
    always @(posedge clk_core) begin
-      sh_cl_pcis_rready[0] <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
+      sh_cl_dma_pcis_rready <= (cl_sh_rd_data.size() < 16) ? 1'b1 : 1'b0;
    end
 
    always @(posedge clk_core) begin
       AXI_Data data;
 
-      if (cl_sh_pcis_rvalid[0] & sh_cl_pcis_rready) begin
-         data.data     = cl_sh_pcis_rdata[0];
-         data.id       = cl_sh_pcis_rid[0];
-         data.last     = cl_sh_pcis_rlast[0];
+      if (cl_sh_dma_pcis_rvalid & sh_cl_dma_pcis_rready) begin
+         data.data     = cl_sh_dma_pcis_rdata;
+         data.id       = cl_sh_dma_pcis_rid;
+         data.last     = cl_sh_dma_pcis_rlast;
 
          if (debug) begin
             for (int i=0; i<16; i++) begin
-               $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_pcis_rdata[0][(i*32)+:32]);
+               $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_dma_pcis_rdata[(i*32)+:32]);
             end
          end
          
@@ -691,9 +900,10 @@ typedef struct {
       AXI_Command cmd;
 
       if (cl_sh_pcim_awvalid[0] && sh_cl_pcim_awready[0]) begin
-         cmd.addr = cl_sh_pcim_awaddr[0];
-         cmd.id   = cl_sh_pcim_awid[0];
-         cmd.len  = cl_sh_pcim_awlen[0];
+         cmd.addr = cl_sh_pcim_awaddr;
+         cmd.id   = cl_sh_pcim_awid;
+         cmd.len  = cl_sh_pcim_awlen;
+         cmd.size  = cl_sh_pcim_awsize;
          cmd.last = 0;
          
          cl_sh_wr_cmds.push_back(cmd);         
@@ -717,9 +927,9 @@ typedef struct {
       AXI_Data wr_data;
       
       if (sh_cl_pcim_wready[0] && cl_sh_pcim_wvalid[0]) begin
-         wr_data.data = cl_sh_pcim_wdata[0];
-         wr_data.strb = cl_sh_pcim_wstrb[0];
-         wr_data.last = cl_sh_pcim_wlast[0];
+         wr_data.data = cl_sh_pcim_wdata;
+         wr_data.strb = cl_sh_pcim_wstrb;
+         wr_data.last = cl_sh_pcim_wlast;
 
          cl_sh_wr_data.push_back(wr_data);
 
@@ -744,8 +954,9 @@ typedef struct {
             $display("[%t] : DEBUG resp.size  %2d ", $realtime, sh_cl_b_resps.size());
          end
          if (wr_last_cnt != 0) begin
-            sh_cl_pcim_bid[0]   <= sh_cl_b_resps[0].id;
-            sh_cl_pcim_bresp[0] <= 2'b00;
+            sh_cl_pcim_bid     <= sh_cl_b_resps[0].id;
+            sh_cl_pcim_bresp   <= 2'b00;
+
             sh_cl_pcim_bvalid   <= !sh_cl_pcim_bvalid ? 1'b1 :
                                    !cl_sh_pcim_bready ? 1'b1 : 1'b0;
 
@@ -769,9 +980,10 @@ typedef struct {
       AXI_Command cmd;
       
       if (cl_sh_pcim_arvalid[0] && sh_cl_pcim_arready[0]) begin
-         cmd.addr = cl_sh_pcim_araddr[0];
-         cmd.id   = cl_sh_pcim_arid[0];
-         cmd.len  = cl_sh_pcim_arlen[0];
+         cmd.addr = cl_sh_pcim_araddr;
+         cmd.id   = cl_sh_pcim_arid;
+         cmd.len  = cl_sh_pcim_arlen;
+         cmd.size = cl_sh_pcim_arsize;
          cmd.last = 0;
          
          cl_sh_rd_cmds.push_back(cmd);
@@ -796,8 +1008,8 @@ typedef struct {
       logic [511:0] beat;
 
       if (sh_cl_rd_data.size() != 0) begin
-         sh_cl_pcim_rid[0]    <= sh_cl_rd_data[0].id;
-         sh_cl_pcim_rresp[0]  <= 2'b00;
+         sh_cl_pcim_rid    <= sh_cl_rd_data[0].id;
+         sh_cl_pcim_rresp  <= 2'b00;
          sh_cl_pcim_rvalid[0] <= !sh_cl_pcim_rvalid[0] ? 1'b1 :
                                  !cl_sh_pcim_rready[0] ? 1'b1 :
                                  !sh_cl_pcim_rlast[0]  ? 1'b1 : 1'b0;
@@ -836,7 +1048,7 @@ typedef struct {
          if (debug) begin
             $display("[%t] : DEBUG beat 0x%0128x", $realtime, beat);
          end
-         sh_cl_pcim_rdata[0] <= beat;
+         sh_cl_pcim_rdata <= beat;
 
       end
       else begin
@@ -858,11 +1070,50 @@ typedef struct {
       
    end
 
-   
+   //=================================================
+   //
+   // Interrupt handling
+   //
+   //=================================================
+   logic [15:0]  int_ack;
+   logic [15:0]  int_pend;
+
+   initial begin
+      int_ack = 16'h0000;
+      int_pend = 16'h0000;
+   end
+
+   always @(posedge clk_core) begin
+      for (int idx=0; idx<16; idx++) begin
+         if (cl_sh_irq_req[idx] == 1'b1) begin
+            int_pend |= 1'b1 << idx;
+         end
+      end
+
+      if (|int_ack) begin
+        for (int idx=0; idx<16; idx++) begin
+           if (int_ack[idx] == 1'b1) begin
+              $display("[%t] : Sending ack for interrupt %2d", $realtime, idx);
+           end
+        end
+      end
+
+      sh_cl_irq_ack <= int_ack;
+      int_ack = 16'h0000;
+   end
+
+   always @(posedge clk_core) begin
+      for (int idx=0; idx<16; idx++) begin
+         if (int_pend[idx] == 1'b1) begin
+            tb.int_handler(idx);
+         end
+      end
+   end
+
    //==========================================================
 
    // DDR Controller
-   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
+   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
      .aresetn        (sync_rst_n),
      .sync_rst_n     (intf_sync_rst_n),
@@ -930,7 +1181,7 @@ typedef struct {
      .m_axi_rready   (cl_sh_ddr_rready_q)
      );
 
-   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(6), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
+   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
      .s_axi_aclk(clk_core),
      .s_axi_aresetn(rst_n),
 
@@ -1103,25 +1354,246 @@ typedef struct {
      else
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= {ddr_is_ready_sync, ddr_is_ready_presync, ddr_is_ready};
 
-   task power_up;
+
+   axil_bfm sda_axil_bfm(
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
+                         .axil_awvalid(sda_cl_awvalid),
+                         .axil_awaddr(sda_cl_awaddr),
+                         .axil_awready(cl_sda_awready),
+                         .axil_wvalid(sda_cl_wvalid),
+                         .axil_wdata(sda_cl_wdata),
+                         .axil_wstrb(sda_cl_wstrb),
+                         .axil_wready(cl_sda_wready),
+                         .axil_bvalid(cl_sda_bvalid),
+                         .axil_bresp(cl_sda_bresp),
+                         .axil_bready(sda_cl_bready),
+                         .axil_arvalid(sda_cl_arvalid),
+                         .axil_araddr(sda_cl_araddr),
+                         .axil_arready(cl_sda_arready),
+                         .axil_rvalid(cl_sda_rvalid),
+                         .axil_rdata(cl_sda_rdata),
+                         .axil_rresp(cl_sda_rresp),
+                         .axil_rready(sda_cl_rready));
+
+   axil_bfm ocl_axil_bfm(
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
+                         .axil_awvalid(sh_ocl_awvalid),
+                         .axil_awaddr(sh_ocl_awaddr),
+                         .axil_awready(ocl_sh_awready),
+                         .axil_wvalid(sh_ocl_wvalid),
+                         .axil_wdata(sh_ocl_wdata),
+                         .axil_wstrb(sh_ocl_wstrb),
+                         .axil_wready(ocl_sh_wready),
+                         .axil_bvalid(ocl_sh_bvalid),
+                         .axil_bresp(ocl_sh_bresp),
+                         .axil_bready(sh_ocl_bready),
+                         .axil_arvalid(sh_ocl_arvalid),
+                         .axil_araddr(sh_ocl_araddr),
+                         .axil_arready(ocl_sh_arready),
+                         .axil_rvalid(ocl_sh_rvalid),
+                         .axil_rdata(ocl_sh_rdata),
+                         .axil_rresp(ocl_sh_rresp),
+                         .axil_rready(sh_ocl_rready));
+
+   axil_bfm bar1_axil_bfm(
+                         .axil_clk(clk_core),
+                         .axil_rst_n(sync_rst_n),
+                         .axil_awvalid(sh_bar1_awvalid),
+                         .axil_awaddr(sh_bar1_awaddr),
+                         .axil_awready(bar1_sh_awready),
+                         .axil_wvalid(sh_bar1_wvalid),
+                         .axil_wdata(sh_bar1_wdata),
+                         .axil_wstrb(sh_bar1_wstrb),
+                         .axil_wready(bar1_sh_wready),
+                         .axil_bvalid(bar1_sh_bvalid),
+                         .axil_bresp(bar1_sh_bresp),
+                         .axil_bready(sh_bar1_bready),
+                         .axil_arvalid(sh_bar1_arvalid),
+                         .axil_araddr(sh_bar1_araddr),
+                         .axil_arready(bar1_sh_arready),
+                         .axil_rvalid(bar1_sh_rvalid),
+                         .axil_rdata(bar1_sh_rdata),
+                         .axil_rresp(bar1_sh_rresp),
+                         .axil_rready(sh_bar1_rready));
+
+
+
+   
+   //=================================================
+   //
+   // power_up
+   //
+   //   Description: asserts and deasserts various resets
+   //   Outputs: None
+   //
+   //=================================================
+   task power_up(input ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0, 
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0, 
+                       ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
+      case (clk_recipe_a)
+         ClockRecipe::A0: begin
+            MAIN_A0_DLY  = 4ns;
+            CORE_DLY     = 4ns;
+            EXTRA_A1_DLY = 8ns;
+            EXTRA_A2_DLY = 2.66ns;
+            EXTRA_A3_DLY = 2ns;
+         end
+         ClockRecipe::A1: begin
+            MAIN_A0_DLY  = 2ns;
+            CORE_DLY     = 2ns;
+            EXTRA_A1_DLY = 4ns;
+            EXTRA_A2_DLY = 1.33ns;
+            EXTRA_A3_DLY = 1ns;
+         end
+         ClockRecipe::A2: begin
+            MAIN_A0_DLY  = 32ns;
+            CORE_DLY     = 32ns;
+            EXTRA_A1_DLY = 64ns;
+            EXTRA_A2_DLY = 4ns;
+            EXTRA_A3_DLY = 8ns;
+         end
+         default: begin
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
+         end
+      endcase 
+      case (clk_recipe_b)
+         ClockRecipe::B0: begin
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 4ns;
+         end
+         ClockRecipe::B1: begin
+            EXTRA_B0_DLY = 4ns;
+            EXTRA_B1_DLY = 8ns;
+         end
+         default: begin
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
+         end
+      endcase
+      case (clk_recipe_c)
+         ClockRecipe::C0: begin
+            EXTRA_C0_DLY = 1.66ns;
+            EXTRA_C1_DLY = 1.25ns;
+         end
+         ClockRecipe::C1: begin
+            EXTRA_C0_DLY = 3.33ns;
+            EXTRA_C1_DLY = 2.5ns;
+         end
+         default: begin
+            $display("Error - Invalid Clock Profile Selected.");
+            $finish;
+         end
+      endcase
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       rst_xtra_n_i = 1'b0;
       #5000ns;
       rst_n_i = 1'b1;
-      rst_out_n_i = 1'b1;
+      rst_main_n_i = 1'b1;
       rst_xtra_n_i = 1'b1;
       #50ns;
    endtask // power_up
-   
+  
+   //=================================================
+   //
+   // nsec_delay
+   //
+   //   Description: sets a delay in nsec
+   //   Outputs: None
+   //
+   //=================================================
+   task nsec_delay(int dly = 10000);
+      #dly;
+   endtask
+
+   //=================================================
+   //
+   // set_virtual_dip_switch
+   //
+   //   Description: writes virtual dip switches
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_virtual_dip_switch(int dip_switch);
+      sh_cl_status_vdip = dip_switch[15:0];
+   endfunction
+
+   //=================================================
+   //
+   // get_virtual_dip_switch
+   //
+   //   Description: reads virtual dip switch status
+   //   Outputs: dip_status
+   //
+   //=================================================
+   function logic[15:0] get_virtual_dip_switch();
+      return sh_cl_status_vdip;
+   endfunction
+
+   //=================================================
+   //
+   // get_virtual_led
+   //
+   //   Description: reads virtual led status
+   //   Outputs: led status
+   //
+   //=================================================
+   function logic[15:0] get_virtual_led();
+      return cl_sh_status_vled;
+   endfunction
+
+   //=================================================
+   //
+   // Kernel_reset
+   //
+   //   Description: sets kernel_reset
+   //   Outputs: None
+   //
+   //=================================================
+   function void kernel_reset(input logic d = 1);
+      kernel_rst_n = d;
+   endfunction
+
+   //=================================================
+   //
+   // power_down
+   //
+   //   Description: deasserts various resets
+   //   Outputs: None
+   //
+   //=================================================
    task power_down;
       #50ns;
       rst_n_i = 1'b0;
-      rst_out_n_i = 1'b0;
-      rst_xtra_n_i = 1'b0;
+      rst_main_n_i = 1'b0;
       #50ns;
    endtask // power_down
 
+   //=================================================
+   //
+   // issue_flr
+   //
+   //   Description: issue a FLR command
+   //   Outputs: None
+   //
+   //=================================================
+   task issue_flr();
+      sh_cl_flr_assert = 1'b1;
+      wait(cl_sh_flr_done == 1);
+      sh_cl_flr_assert = 1'b0;
+   endtask
+
+   //=================================================
+   //
+   // map_host_memory
+   //
+   //   Description: used to connect C host memory to simulation memory.
+   //   Outputs: None
+   //
+   //=================================================
    task map_host_memory(input logic [63:0] addr);
       if (debug) begin
          $display("[%t] : DEBUG mapping host memory to 0x%16x", $realtime, addr);
@@ -1129,25 +1601,128 @@ typedef struct {
       host_memory_addr = addr;
       tb.use_c_host_memory = 1'b1;      
    endtask // map_host_memory
-   
-   task poke(input logic [63:0] addr, logic [31:0] data, logic [5:0] id = 6'h0);
+  
+   //=================================================
+   //
+   // set_ack_bit
+   //
+   //   Description: used to acknowledge an interrupt and clear pending bit
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_ack_bit(input int int_num);
+      int_ack[int_num] = 1'b1;
+      int_pend[int_num] = 1'b0;
+   endfunction
+
+   //=================================================
+   //
+   // poke
+   //
+   //   Description: used to write a single beat of data at addr into one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: None
+   //
+   //=================================================
+   task poke(input logic [63:0] addr, 
+             logic [511:0] data, 
+             logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+
+      logic [63:0] strb;
+
+      case (size)
+        DataSize::UINT8  : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0001;
+        DataSize::UINT16 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0011;
+        DataSize::UINT32 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111;
+        DataSize::UINT64 : strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111_1111;
+        DataSize::UINT128: strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111;
+        DataSize::UINT256: strb = 64'b0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111_1111_1111_1111_1111;
+        DataSize::UINT512: strb = 64'b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111;
+        default: begin
+           $display("FATAL ERROR - Invalid size specified");
+           $finish;
+        end
+      endcase // case (size)
+      
+      case (intf)
+        AxiPort::PORT_DMA_PCIS: begin
+           AXI_Command axi_cmd;
+           AXI_Data    axi_data;
+
+           logic [1:0] resp;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.size = size;
+           axi_cmd.id   = id;
+    
+           sh_cl_wr_cmds.push_back(axi_cmd);
+
+           axi_data.data = data << (addr[5:0] * 8);
+           axi_data.strb = strb << addr[5:0];
+           
+           axi_data.id   = id;
+           axi_data.last = 1'b1;
+           
+           #20ns sh_cl_wr_data.push_back(axi_data);
+      
+           while (cl_sh_b_resps.size() == 0)
+             #20ns;
+      
+           resp = cl_sh_b_resps[0].resp;
+           cl_sh_b_resps.pop_front();
+        end
+        AxiPort::PORT_SDA: begin
+           sda_axil_bfm.poke(addr, data);
+        end        
+        AxiPort::PORT_OCL: begin
+           ocl_axil_bfm.poke(addr, data);
+        end
+        AxiPort::PORT_BAR1: begin
+           bar1_axil_bfm.poke(addr, data);
+        end
+        default: begin
+          $display("FATAL ERROR - Invalid CL port specified");
+          $finish;
+        end
+      endcase // case (intf)
+      
+   endtask // poke
+
+   task poke_pcis(input logic [63:0] addr, 
+                  logic [511:0] data, 
+                  logic [63:0] strb, 
+                  logic [5:0] id = 6'h0);
+      
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
-      logic [1:0] resp;
-      
+      logic [1:0]             resp;
+           
       axi_cmd.addr = addr;
       axi_cmd.len  = 0;
       axi_cmd.id   = id;
 
       sh_cl_wr_cmds.push_back(axi_cmd);
 
-      axi_data.data = data << (addr[5:0] * 8);
-      axi_data.strb = 64'h0f << addr[5:0];
-      
+      axi_data.data = data;
+      axi_data.strb = strb;
+           
       axi_data.id   = id;
       axi_data.last = 1'b1;
-
+           
       #20ns sh_cl_wr_data.push_back(axi_data);
       
       while (cl_sh_b_resps.size() == 0)
@@ -1158,98 +1733,372 @@ typedef struct {
       
    endtask // poke
 
-   task peek(input logic [63:0] addr, output logic [31:0] data, input logic [5:0] id = 6'h0);
-      AXI_Command axi_cmd;
-      int         byte_idx;
-      int         mem_arr_idx;
-      
-      axi_cmd.addr = addr;
-      axi_cmd.len  = 0;
-      axi_cmd.id   = id;
-
-      sh_cl_rd_cmds.push_back(axi_cmd);
-
-      byte_idx     = addr[5:0];
-      mem_arr_idx  = byte_idx*8;
-
-//      wait(cl_sh_rd_data.size() > 0);   // TBD: This doesn't work for XSIM
-      while (cl_sh_rd_data.size() == 0)
-        #20ns;
-      
-      data = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      cl_sh_rd_data.pop_front();
+   //=================================================
+   //
+   // peek
+   //
+   //   Description: used to read a single beat of data at addr from one of the four CL AXI ports specified by intf.
+   //        Intf
+   //         0 = PCIS
+   //         1 = SDA
+   //         2 = OCL
+   //         3 = BAR1
+   //
+   //        id - AXI bus ID
+   //
+   //        Size
+   //         0 = 1 byte, 1 = 2 bytes, 2 = 4 bytes (32 bits), 3 = 8 bytes (64 bits)
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   task peek(input logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0, 
+             DataSize::DATA_SIZE size = DataSize::UINT32, 
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+      data = 0;
+      case (intf)
+        AxiPort::PORT_DMA_PCIS : begin
+           AXI_Command axi_cmd;
+           int         byte_idx;
+           int         mem_arr_idx;
+           
+           axi_cmd.addr = addr;
+           axi_cmd.len  = 0;
+           axi_cmd.size = size;
+           axi_cmd.id   = id;
+           
+           sh_cl_rd_cmds.push_back(axi_cmd);
+           
+           byte_idx     = addr[5:0];
+           mem_arr_idx  = byte_idx*8;
+           
+           while (cl_sh_rd_data.size() == 0)
+             #20ns;
+           for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
+              data[(num_bytes*8)+:8] = cl_sh_rd_data[0].data[(mem_arr_idx+(num_bytes*8))+:8];
+           end
+           cl_sh_rd_data.pop_front();
+        end // case: 0
+        AxiPort::PORT_SDA : begin
+           sda_axil_bfm.peek(addr, data);
+        end
+        AxiPort::PORT_OCL : begin
+           ocl_axil_bfm.peek(addr, data);
+        end
+        AxiPort::PORT_BAR1 : begin
+           bar1_axil_bfm.peek(addr, data);
+        end
+      endcase // case (intf)
       
    endtask // peek
 
-`ifdef NEVER
-   
-   task poke_burst(input logic [63:0] start_addr, logic [7:0] len, logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      logic [1:0] resp;
+   task peek_pcis(input logic [63:0] addr, 
+             output logic [511:0] data, 
+             input logic [5:0] id = 6'h0);
       
-      int byte_idx;
-      int mem_arr_idx;
-
- 
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 1;
+      AXI_Command axi_cmd;
+           
+      axi_cmd.addr = addr;
+      axi_cmd.len  = 0;
+      axi_cmd.id   = id;
       
-      sh_cl_wr_cmds.push_back(cmd);
-
-      for (int n= 0; n<len;n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-
-         data.data[mem_arr_idx+:32] = dat[n];
-         data.strb[byte_idx+:4] = 'h0f;
-
-         if (n==len-1)
-           data.last = 1;
-         else
-           data.last = 0;
-      end
-
-      if (debug) begin
-         $display("[%t] DEBUG : Write data is %x strb is %x len is %x \n", $realtime, data.data, data.strb, len);
-      end
+      sh_cl_rd_cmds.push_back(axi_cmd);
       
-      #20ns sh_cl_wr_data.push_back(data);
-      
-      while (cl_sh_b_resps.size() == 0)
-        #20ns;
-      
-      resp = cl_sh_b_resps[0].resp;
-      cl_sh_b_resps.pop_front();
-      
-   endtask // poke_burst
-
-   task peek_burst(input logic [63:0] start_addr, logic [7:0] len, output logic [31:0] dat[16]);
-      AXI_Command cmd;
-      AXI_Data data;
-      int byte_idx;
-      int mem_arr_idx;
-//      int len;
-
-      cmd.addr = start_addr;
-      cmd.len  = len;
-      cmd.id   = 2;
-
-      sh_cl_rd_cmds.push_back(cmd);
-
       while (cl_sh_rd_data.size() == 0)
         #20ns;
       
-      for (int n= 0; n<len; n++) begin
-         byte_idx     = (start_addr[5:0]+(n*'h4));
-         mem_arr_idx  = byte_idx*8;
-         dat[n] = cl_sh_rd_data[0].data[mem_arr_idx+:32];
-      end
+      data = cl_sh_rd_data[0].data;
       cl_sh_rd_data.pop_front();
       
-   endtask // peek_burst
+   endtask // peek_pcis
 
-`endif
+   //=================================================
+   //
+   // dma_buffer_to_cl
+   //
+   //   Description: used to move a data buffer to the CL via the PCIS AXI interface using one of four channels.
+   //        The size of the transfer is determined by the number of bytes in the buffer.
+   //        
+   //        chan    = 0-3 channel number
+   //        buffer  = AXI bus ID
+   //        cl_addr = starting CL AXI addr
+   //
+   //
+   //   Outputs: Read Data Value
+   //
+   //=================================================
+   function void dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
+      DMA_OP dop;
+      
+      dop.buffer = src_addr;
+      dop.cl_addr = cl_addr;
+      dop.len = len;
+      
+      h2c_dma_list[chan].push_back(dop);
+      
+   endfunction // dma_buffer_to_cl
+
+   function automatic void dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
+      DMA_OP dop;
+      dop.buffer = dst_addr;
+      dop.cl_addr = cl_addr;
+      dop.len = len;
+      c2h_dma_list[chan].push_back(dop);
+   endfunction // dma_cl_to_buffer
+
+   function void start_dma_to_cl(input int chan);
+      h2c_dma_started[chan] = 1'b1;
+      h2c_dma_done[chan] = 1'b0;
+   endfunction // start_dma_to_cl
+   
+   function void start_dma_to_buffer(input int chan);
+      c2h_dma_started[chan] = 1'b1;
+      c2h_dma_done[chan] = 1'b0;
+   endfunction // start_dma_to_buffer
+
+   function bit is_dma_to_cl_done(input int chan);  // 1 = done
+      return h2c_dma_done[chan];
+   endfunction // is_dma_to_cl_done
+   
+   function bit is_dma_to_buffer_done(input int chan); // 1 = done
+      return c2h_dma_done[chan];
+   endfunction // is_dma_to_buffer_done
+   
+   //=================================================
+   //
+   // sh->cl xdma Interface
+   //
+   //=================================================
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+         h2c_dma_started <= 4'b0;
+         c2h_dma_started <= 4'b0;
+      end
+      else begin
+         AXI_Command axi_cmd;
+         AXI_Data    axi_data;
+         DMA_OP      dop;
+         logic [63:0] host_memory;
+         int num_of_data_beats;
+         int byte_cnt;
+         int num_bytes;
+         logic [63:0] aligned_addr;
+         bit last_beat;
+         logic [5:0] start_addr;
+         bit aligned;
+         
+         num_of_data_beats = 0;
+         byte_cnt = 0;
+         num_bytes = 0;
+         aligned_addr = 0;
+         last_beat = 0;
+         start_addr = 0;
+         aligned = 0;
+         
+         for (int chan = 0; chan < 4; chan++) begin
+           if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
+              dop = h2c_dma_list[chan].pop_front();                          
+         
+              aligned_addr =  {dop.cl_addr[63:6], 6'h00};
+              num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
+              byte_cnt = 0;
+              last_beat = ((dop.len + dop.cl_addr[5:0])%64 > 0);
+              start_addr = dop.cl_addr[5:0];
+              aligned = (aligned_addr == dop.cl_addr);
+
+              for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
+                if(burst_cnt == 0) begin   // if first data beat
+                  axi_cmd.addr = dop.cl_addr;
+                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  // handle the condition if addr is crossing 4k page boundry
+                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
+                    axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
+                  end
+                end
+                else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = 0;
+                end
+                else begin                                              // intermediate data beats
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  // handle the condition if addr is crossing 4k page boundry
+                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  end
+                end
+                axi_cmd.id   = chan;
+                sh_cl_wr_cmds.push_back(axi_cmd);
+
+                // loop to do multiple data beats
+                for(int j = 0; j <= axi_cmd.len; j++) begin
+                  axi_data.data = 0;
+                  axi_data.strb = 64'b0;
+                  axi_data.id   = chan;
+                  axi_data.last = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
+                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
+                  if(axi_data.last)  begin
+                    for(int i=0; i < num_bytes; i++) begin
+                      axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
+                      axi_data.strb = axi_data.strb | 1 << i;
+                      byte_cnt++;
+                    end
+                  end
+                  else begin
+                    for(int i=start_addr[5:0]; i < 64; i++) begin
+                      axi_data.data = {tb.hm_get_byte(.addr(dop.buffer + byte_cnt)), axi_data.data[511:8]};
+                      axi_data.strb = {1'b1, axi_data.strb[63:1]};
+                      byte_cnt++;
+                    end
+                  end
+                  sh_cl_wr_data.push_back(axi_data);
+                  start_addr = 0;
+                  burst_cnt++;
+                end // for(int j = 0; j <= axi_cmd.len; j++) begin
+              end // for(int burst_cnt=0; burst_cnt < num_of_data_beats; )
+           end // if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0))
+         end // for (int chan = 0; chan < 4; chan++)
+      end // else
+   end // always
+
+   //=================================================
+   //
+   // cl->sh xdma data Interface
+   //
+   //=================================================
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+        c2h_dma_done <= 1'b0;
+      end
+      else begin
+        DMA_OP dop;
+        static int byte_cnt[4];
+        
+        for (int chan = 0; chan < 4; chan++) begin
+          if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
+            if(chan == cl_sh_rd_data[0].id) begin
+              dop = c2h_data_dma_list[chan].pop_front();            
+              
+              for (int i = dop.cl_addr[5:0]; i < 64 ; i++) begin
+                tb.hm_put_byte(.addr(dop.buffer + byte_cnt[chan]), .d(cl_sh_rd_data[0].data[(i*8)+:8]));
+                if (debug) begin
+                  $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
+                                            $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
+                end
+                byte_cnt[chan]++;
+              end
+              c2h_dma_done[chan] = 1'b1;
+              cl_sh_rd_data.pop_front();
+            end
+          end
+        end
+      end
+   end
+  
+   //=================================================
+   //
+   // cl->sh xdma Interface
+   //
+   //=================================================
+
+   always @(negedge rst_n or posedge clk_core) begin
+      if (!rst_n) begin
+         h2c_dma_started <= 4'b0;
+         c2h_dma_started <= 4'b0;
+      end
+      else begin
+         AXI_Command axi_cmd;
+         AXI_Data    axi_data;
+         DMA_OP      dop;
+         DMA_OP      data_dop;
+         int num_of_data_beats;
+         bit aligned;
+         logic [63:0] aligned_addr;
+         bit last_beat;
+
+         num_of_data_beats = 0;
+         aligned = 0;
+         aligned_addr = 0;
+         last_beat = 0;
+
+         for (int chan = 0; chan < 4; chan++) begin
+           if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
+              dop = c2h_dma_list[chan].pop_front();
+              num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
+              aligned_addr =  {dop.cl_addr[63:6], 6'h00};
+              aligned = (aligned_addr == dop.cl_addr);
+              last_beat = ((dop.len + dop.cl_addr[5:0])%64 > 0);
+
+              for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
+                if(burst_cnt == 0) begin   // if first data beat
+                  axi_cmd.addr = dop.cl_addr;
+                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  // handle the condition if addr is crossing 4k page boundry
+                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
+                    axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
+                  end
+                  axi_cmd.id   = chan;
+                end
+                else if((num_of_data_beats - 1) - burst_cnt == 0) begin  // last data beat
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = 0;
+                  axi_cmd.id   = chan;
+                end
+                else begin                                              // intermediate data beats
+                  axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
+                  axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
+                  // handle the condition if addr is crossing 4k page boundry
+                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  end
+                  axi_cmd.id   = chan;
+                end
+                sh_cl_rd_cmds.push_back(axi_cmd);
+                for(int i = 0; i <= axi_cmd.len; i++) begin
+                  data_dop.buffer = dop.buffer;
+                  data_dop.cl_addr = (axi_cmd.addr + (i*64));
+                  data_dop.len = dop.len;
+                  c2h_data_dma_list[chan].push_back(data_dop);
+                  burst_cnt++;
+                end // for(int i = 0; i <= axi_cmd.len; i++)
+              end // for(int burst_cnt=0; burst_cnt < num_of_data_beats; )
+           end // if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0))
+         end // for (int chan = 0; chan < 4; chan++)
+      end // else begin
+   end // always
+
+  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+     case (ddr_idx)
+       0: begin
+          sh_ddr_stat_wr0    = 1;
+          sh_ddr_stat_addr0  = addr;
+          sh_ddr_stat_wdata0 = data;
+          sh_ddr_stat_rd0    = 0;
+          #8ns;
+          sh_ddr_stat_wr0    = 0;
+       end
+       1: begin
+          sh_ddr_stat_wr1    = 1;
+          sh_ddr_stat_addr1  = addr;
+          sh_ddr_stat_wdata1 = data;
+          sh_ddr_stat_rd1    = 0;
+          #8ns;
+          sh_ddr_stat_wr1    = 0;
+       end
+       2: begin
+          sh_ddr_stat_wr2    = 1;
+          sh_ddr_stat_addr2  = addr;
+          sh_ddr_stat_wdata2 = data;
+          sh_ddr_stat_rd2    = 0;
+          #8ns;
+          sh_ddr_stat_wr2    = 0;
+       end
+     endcase // case (ddr_idx)
+     
+  endtask
 
 endmodule // sh_bfm
