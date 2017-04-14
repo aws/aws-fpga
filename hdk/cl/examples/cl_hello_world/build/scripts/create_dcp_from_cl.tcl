@@ -73,6 +73,16 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
+#checking if HDK_SHELL_DESIGN_DIR env variable exists
+if { [info exists ::env(HDK_SHELL_DESIGN_DIR)] } {
+        set HDK_SHELL_DESIGN_DIR $::env(HDK_SHELL_DESIGN_DIR)
+        puts "Using Shell design directory $HDK_SHELL_DESIGN_DIR";
+} else {
+        puts "Error: HDK_SHELL_DESIGN_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
@@ -110,7 +120,6 @@ if {[string compare $notify_via_sns "1"] == 0} {
     puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
   }
 }
-
 
 source encrypt.tcl
 
@@ -151,22 +160,22 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DIR/design/lib/sync.v\
-  $HDK_SHELL_DIR/design/lib/flop_ccf.sv\
-  $HDK_SHELL_DIR/design/lib/ccf_ctl.v\
-  $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
-  $HDK_SHELL_DIR/design/interfaces/cl_ports.vh
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/sync.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/flop_ccf.sv\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/ccf_ctl.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh
 ]
 
 puts "AWS FPGA: Reading IP blocks";
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/axi_register_slice/axi_register_slice.xci\
-  $HDK_SHELL_DIR/design/ip/axi_register_slice_light/axi_register_slice_light.xci\
-  $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
-  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
-  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
-  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/ila_0/ila_0.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/ila_vio_counter/ila_vio_counter.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 
 puts "AWS FPGA: Reading AWS constraints";
@@ -416,13 +425,15 @@ switch $strategy {
     "DEFAULT" {
         puts "DEFAULT strategy."
         phys_opt_design  -directive Explore
-        puts "AWS FPGA: Locking design ";
-        lock_design -level routing
     }
     default {
         puts "$strategy is NOT a valid strategy."
     }
 }
+
+# Lock the design to preserve the placement and routing
+puts "AWS FPGA: Locking design ";
+lock_design -level routing
 
 # Report final timing
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
@@ -489,5 +500,4 @@ if {[string compare $notify_via_sns "1"] == 0} {
   puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling notification script to send e-mail to $env(EMAIL)";
   exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
 }
-
 

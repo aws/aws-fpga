@@ -394,7 +394,7 @@ always_ff @(posedge clk_main_a0)
    logic [15:0] vi_cnt = 0;
    
    // Tick counter and main counter
-   always @(posedge clk_extra_a1) begin
+   always @(posedge clk_main_a0) begin
 
       vo_cnt_enable_q     <= vo_cnt_enable    ;
       vo_cnt_load_q       <= vo_cnt_load      ;
@@ -419,7 +419,7 @@ always_ff @(posedge clk_main_a0)
 
       vi_cnt_ge_watermark = (vi_cnt >= vo_cnt_watermark_q);
       
-   end // always @ (posedge clk_extra_a1)
+   end // always @ (posedge clk_main_a0)
    
 
    vio_0 CL_VIO_0 (

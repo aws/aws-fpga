@@ -34,9 +34,9 @@ else
 endif
 
 export SCRIPTS_DIR = $(PWD)
-export XILINX_IP = $(HDK_SHELL_DIR)/design/ip
-export SH_LIB_DIR = $(HDK_SHELL_DIR)/design/lib
-export SH_INF_DIR = $(HDK_SHELL_DIR)/design/interfaces
+export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
+export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
+export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces
 
 SV_TEST_LIST = test_dram_dma
 C_TEST_LIST  = test_peek_poke.c

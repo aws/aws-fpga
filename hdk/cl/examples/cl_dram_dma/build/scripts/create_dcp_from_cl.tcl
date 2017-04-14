@@ -71,6 +71,16 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
+#checking if HDK_SHELL_DESIGN_DIR env variable exists
+if { [info exists ::env(HDK_SHELL_DESIGN_DIR)] } {
+        set HDK_SHELL_DESIGN_DIR $::env(HDK_SHELL_DESIGN_DIR)
+        puts "Using Shell design directory $HDK_SHELL_DESIGN_DIR";
+} else {
+        puts "Error: HDK_SHELL_DESIGN_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
@@ -147,42 +157,42 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DIR/design/lib/sync.v \
-  $HDK_SHELL_DIR/design/lib/flop_ccf.sv \
-  $HDK_SHELL_DIR/design/lib/ccf_ctl.v \
-  $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-  $HDK_SHELL_DIR/design/lib/bram_2rw.sv \
-  $HDK_SHELL_DIR/design/lib/flop_fifo.sv \
-  $HDK_SHELL_DIR/design/lib/mgt_acc_axl.sv  \
-  $HDK_SHELL_DIR/design/lib/mgt_gen_axl.sv  \
-  $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
-  $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
+  $HDK_SHELL_DESIGN_DIR/lib/sync.v \
+  $HDK_SHELL_DESIGN_DIR/lib/flop_ccf.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/ccf_ctl.v \
+  $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/mgt_acc_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/lib/mgt_gen_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/interfaces/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh 
 ]
 
 puts "AWS FPGA: Reading IP blocks";
 #Read DDR IP
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci 
+  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci 
 ]
 
 #Read IP for axi register slices
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/src_register_slice/src_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
-  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_register_slice/axi_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_register_slice_light/axi_register_slice_light.xci
+  $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci \
-  $HDK_SHELL_DIR/design/ip/ila_1/ila_1.xci \
-  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci \
-  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
+  $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/ila_1/ila_1.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/ila_vio_counter/ila_vio_counter.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 read_bd [ list \
-  $HDK_SHELL_DIR/design/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+  $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
 ]
 
 puts "AWS FPGA: Reading AWS constraints";
