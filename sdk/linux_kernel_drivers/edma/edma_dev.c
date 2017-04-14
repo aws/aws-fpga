@@ -133,26 +133,26 @@ static void edma_dev_release_resources( struct emda_buffer_control_structure* eb
 
 	BUG_ON(!ebcs);
 
-	vfree(ebcs->request);
-	ebcs->request = NULL;
-
-	for(i = 0; i < (ebcs->transient_buffer.size_in_pages); i++)
-	{
-		if(ebcs->transient_buffer.page_array[i].phys_base_addr != 0)
-			dma_free_coherent(NULL, PAGE_SIZE,
-				ebcs->transient_buffer.page_array[i].virt_buffer,
-				ebcs->transient_buffer.page_array[i].phys_base_addr);
-
-		ebcs->transient_buffer.page_array[i].virt_buffer = NULL;
-		ebcs->transient_buffer.page_array[i].phys_base_addr = 0;
+	if(ebcs->request) {
+		vfree(ebcs->request);
+		ebcs->request = NULL;
 	}
 
-	if(ebcs->transient_buffer.page_array)
+	for(i = 0; i < (ebcs->transient_buffer.size_in_pages); i++){
+		if(ebcs->transient_buffer.page_array[i].phys_base_addr != 0) {
+			dma_free_coherent(NULL, PAGE_SIZE,
+					ebcs->transient_buffer.page_array[i].virt_buffer,
+					ebcs->transient_buffer.page_array[i].phys_base_addr);
+
+			ebcs->transient_buffer.page_array[i].virt_buffer = NULL;
+			ebcs->transient_buffer.page_array[i].phys_base_addr = 0;
+		}
+	}
+
+	if(ebcs->transient_buffer.page_array) {
 		vfree(ebcs->transient_buffer.page_array);
-
-	ebcs->transient_buffer.page_array = NULL;
-
-	ebcs = NULL;
+		ebcs->transient_buffer.page_array = NULL;
+	}
 }
 
 static void edma_dev_initialize_read_ebcs(struct emda_buffer_control_structure* ebcs)
