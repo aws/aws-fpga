@@ -23,7 +23,8 @@
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
 #define PCI_VENDOR_ID_AMAZON 				(0x1d0f)
 #define PCI_DEVICE_ID_FPGA				(0xf001)
-#define XMDA_NUMBER_OF_USER_EVENTS			(16)
+#define XMDA_NUMBER_OF_USER_EVENTS			(1)
+#define XDMA_LIMIT_NUMBER_OF_QUEUES			(1)
 #define CLASS_NAME "edma"
 
 struct class* edma_class;
@@ -145,17 +146,15 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_save_state(pdev);
 
 	number_of_xdma_channels = xdma_device_open(pdev, &channel_list);
-	if(number_of_xdma_channels < 0) {
-		ret = number_of_xdma_channels;
-		goto done;
-	}
-
 	if(unlikely(number_of_xdma_channels < 0)){
 		ret = number_of_xdma_channels;
 		goto done;
 	}
 
-	dev_info(dev, "xdma opened %d channels\n", number_of_xdma_channels);
+	if(number_of_xdma_channels > XDMA_LIMIT_NUMBER_OF_QUEUES)
+		number_of_xdma_channels = XDMA_LIMIT_NUMBER_OF_QUEUES;
+
+	dev_info(dev, "DMA backend opened %d channels\n", number_of_xdma_channels);
 
 	command_queue = (command_queue_t*)kzalloc(
 			number_of_xdma_channels * sizeof(command_queue_t),
@@ -451,14 +450,15 @@ int edma_backend_stop(void *q_handle)
 					!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
 		BUG();
 
-	for(i = 0; i < edma_queue_depth; i++)
-	{
+	for(i = 0; i < edma_queue_depth; i++) {
 		memset(&(queue[i]), 0, sizeof(command_t));
 	}
 
 	command_queue->head = 0;
 	command_queue->tail = 0;
 	command_queue->next_to_recycle = 0;
+	command_queue->worker_thread = NULL;
+	command_queue->thread_status = 0;
 
 	return 0;
 }
