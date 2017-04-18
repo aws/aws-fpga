@@ -9,9 +9,6 @@ This is a Linux kernel driver only
 - Centos 7.x
 - More ditributions will be tested later.
 
-## Known Issues
-- The EDMA driver could potentially crash (via kernel panic()) in rare case many writes are issued without being followed by fsync.
-
 ## Expected performance
 - For smaller block size write performance is around 10MByte/s, read performance is around 150MByte/s
 - For a block size of 64KByte the expected performance is around 80MByte/s for write and 1GByte/s for read.
