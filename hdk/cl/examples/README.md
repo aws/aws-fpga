@@ -196,7 +196,7 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 ### 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
-Make sure you clear any FPGA you have previously loaded from your slot:
+Make sure you clear any AFI you have previously loaded in your slot:
 ```
     $ sudo fpga-clear-local-image  -S 0
 ```
