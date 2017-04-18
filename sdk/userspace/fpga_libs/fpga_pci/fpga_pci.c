@@ -398,3 +398,16 @@ int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* dat
 err:
 	return FPGA_ERR_FAIL;
 }
+
+int
+fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset, size_t len,
+	void **ptr)
+{
+	fail_on(!ptr, err, "ptr is NULL");
+
+	*ptr = fpga_pci_bar_get_mem_at_offset(handle, offset, len);
+	fail_on(!*ptr, err, "fpga_plat_get_mem_at_offset failed");
+	return 0;
+err:
+	return FPGA_ERR_FAIL;
+}
