@@ -189,3 +189,17 @@ int fpga_pci_get_resource_map(int slot_id, int pf_id,
  * @returns 0 on success, non-zero on error
  */
 int fpga_pci_rescan_slot_app_pfs(int slot_id);
+
+/**
+ * Get a bounds checked pointer to memory in the mapped region for this handle.
+ *
+ * @param[in]   handle    handle provided by fpga_pci_attach
+ * @param[in]   offset    offset into the mmap'ed region
+ * @param[in]   dword_len the length of data to write in burst, in 4-byte DWORDs
+ *                        (used for bounds checking)
+ * @param[out]  ptr       pointer to memory
+ *
+ * @return 0 on success, non-zero on error (bounds errors in particular)
+ */
+int fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset,
+	uint64_t dword_len, void **ptr);
