@@ -24,13 +24,6 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (Required: us-east-1)
 
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-
-**NOTE**: *The EC2 extension JSON file has been updated to enable support for the `create-fpga-image` command used in [Step 3](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#3-submit-the-design-checkpoint-to-aws-to-register-the-afi).*
-
 ### 1. Pick one of the examples and move to its directory
 
 There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
@@ -198,11 +191,6 @@ The FPGA Management tools are required to load an AFI onto an FPGA.  Depending o
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 ```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
-```
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-```
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
 ```
   
 ### 5. Load the AFI
