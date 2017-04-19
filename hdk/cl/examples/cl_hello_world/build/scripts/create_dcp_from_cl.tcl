@@ -107,6 +107,13 @@ set_msg_config -id {Synth 8-350}        -suppress
 set_msg_config -id {Synth 8-3848}       -suppress
 set_msg_config -id {Synth 8-3917}       -suppress
 set_msg_config -id {Timing 38-436}      -suppress
+set_msg_config -id {Synth 8-6014}       -suppress
+set_msg_config -id {Constraints 18-952} -suppress
+set_msg_config -id {DRC CKLD-2}         -suppress
+set_msg_config -id {DRC REQP-1853}      -suppress
+set_msg_config -id {Route 35-456}       -suppress
+set_msg_config -id {Route 35-455}       -suppress
+set_msg_config -id {Route 35-459}       -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
