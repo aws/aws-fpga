@@ -1,4 +1,4 @@
-#include<pthread.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -138,7 +138,7 @@ void* doRead(void *arg)
 		printf("\nRead %d bytes \n", ret, size_of_data);
 
 		if(ret != read_size)
-			exit(2);
+			printf("Read ret value was %d\n", ret);
 
 		offset += ret;
 
