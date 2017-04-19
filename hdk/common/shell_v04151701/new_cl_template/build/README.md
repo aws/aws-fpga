@@ -2,12 +2,12 @@
 
 # Table of Contents
 
-1. [Overview of AFI Build process] (#buildoverview)
-2. [Build procedure step by step] (#stepbystep)
-3. [Build strategies and parallel builds] (#strategies)
-4. [About Encrption during build process] (#buildencryption)
-5. [Advanced Notes] (#buildadvanced notes)
-6. [Build Frequently Asked Questions] (#buildfaq)
+1. [Overview of AFI Build process](#buildoverview)
+2. [Build procedure step by step](#stepbystep)
+3. [Build strategies and parallel builds](#strategies)
+4. [About Encrption during build process](#buildencryption)
+5. [Advanced Notes](#buildadvanced notes)
+6. [Build Frequently Asked Questions](#buildfaq)
 
 
 <a name="buildoverview"></a>
