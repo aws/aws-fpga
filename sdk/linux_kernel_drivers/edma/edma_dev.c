@@ -352,6 +352,8 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
+	edma_dbg("\n--> %s\n", __func__);
+
 	edma_char = container_of(inode->i_cdev, struct edma_char_queue_device, cdev);
 
 	device_private_data = &(edma_char->device_private_data[MINOR(inode->i_rdev)]);
@@ -414,6 +416,8 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 	spin_unlock(&device_private_data->edma_spin_lock);
 
+	edma_dbg("\n-->%s Done\n", __func__);
+
 	return ret;
 }
 
@@ -458,7 +462,6 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 
 	if(likely(read_ebcs->completed_buffer == NULL))
 	{
-
 #ifdef SUPPORT_M2M
 		//for m2m before completing a descriptor we need to submit one
 		ret = edma_backend_submit_s2m_request(
@@ -801,11 +804,10 @@ static loff_t edma_dev_llseek(struct file *filp, loff_t offset, int whence)
 
 static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
 {
-	int ret = -EIO;
+	int ret = 0;
 	bool ebcs_is_clean = false;
 	struct emda_buffer_control_structure* write_ebcs;
 	struct edma_queue_private_data* private_data = (struct edma_queue_private_data*)filp->private_data;
-	bool wait_for_completion = false;
 
 	(void)start;
 	(void)end;
@@ -835,16 +837,9 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 				== write_ebcs->next_to_use)
 			ebcs_is_clean = true;
 		else {
-			if(wait_for_completion){
-				ret = -EIO;
-				goto edma_dev_fsync_done;
-			}
-
 			spin_unlock(&write_ebcs->ebcs_spin_lock);
 			usleep_range(SLEEP_MINIMUM_USEC, SLEEP_MAXIMUM_USEC);
 			spin_lock(&write_ebcs->ebcs_spin_lock);
-
-			wait_for_completion = true;
 
 			if(unlikely(is_releasing(&private_data->state)))
 				goto edma_dev_fsync_done;
