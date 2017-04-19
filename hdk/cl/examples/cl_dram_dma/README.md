@@ -122,5 +122,5 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
 | Pre-generated AFI ID | afi-06d0ffc989feeea2a |
-| Pre-generated AGFI ID | agfi-0d873e8b409f8e806 
+| Pre-generated AGFI ID | agfi-0d873e8b409f8e806 |
 
