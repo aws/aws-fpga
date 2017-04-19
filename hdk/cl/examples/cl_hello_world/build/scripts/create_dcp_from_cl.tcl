@@ -123,6 +123,29 @@ if {[string compare $notify_via_sns "1"] == 0} {
 
 source encrypt.tcl
 
+##################################################
+### Tcl Procs and Params 
+##################################################
+
+if {[string match "2017.1*" [version -short]]} {
+   ####Turn off power opt in opt_design for improved QoR
+   set_param logicopt.enablePowerLopt false
+
+   ####Forcing global router ON for improved QoR 
+   set_param route.gr.minGRCongLevel 0
+   set_param route.gr.minNumNets     1
+
+   ####Disable timing relaxation in router for improved QoR
+   set_param route.ignTgtRelaxFactor true
+   set_param route.dlyCostCoef 1.141
+
+   ####Enable support of clocking from one RP to another (SH-->CL)
+   set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
+
+   ####Turn off debug flow DRCs due to false error caused by ECO changes (tck_clk.tcl)
+   set_param chipscope.enablePRFlowDRC 0
+}
+
 #This sets the Device Type
 source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 
@@ -160,10 +183,10 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sync.v\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/flop_ccf.sv\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/ccf_ctl.v\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
   $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh
 ]
 

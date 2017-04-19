@@ -38,6 +38,7 @@ export SCRIPTS_DIR = $(PWD)
 export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
 export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
 export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces
+export SH_SH_DIR   = $(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim
 
 SV_TEST_LIST = test_hello_world
 C_TEST_LIST  = test_hello_world.c

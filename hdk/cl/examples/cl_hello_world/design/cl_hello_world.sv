@@ -56,6 +56,8 @@ logic rst_main_n_sync;
   logic [31:0] araddr_q;
   logic [31:0] hello_world_q_byte_swapped;
   logic [15:0] vled_q;
+  logic [15:0] pre_cl_sh_status_vled;
+  logic [15:0] sh_cl_status_vdip_q;
   logic [31:0] hello_world_q;
 
 //-------------------------------------------------
@@ -285,6 +287,16 @@ assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[1
 //-------------------------------------------------
 // Virtual LED Register
 //-------------------------------------------------
+// Flop interface signals
+always_ff @(posedge clk_main_a0)
+   if (!rst_main_n_sync) begin                    // Reset
+      sh_cl_status_vdip_q[15:0] <= 16'h0000;
+      cl_sh_status_vled[15:0]   <= 16'h0000;
+   end
+   else begin
+      sh_cl_status_vdip_q[15:0] <= sh_cl_status_vdip[15:0];
+      cl_sh_status_vled[15:0]   <= pre_cl_sh_status_vled[15:0];
+   end
 
 // The register contains 16 read-only bits corresponding to 16 LED's.
 // For this example, the virtual LED register shadows the hello_world
@@ -301,7 +313,7 @@ always_ff @(posedge clk_main_a0)
    end
 
 // The Virtual LED outputs will be masked with the Virtual DIP switches.
-assign cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip[15:0];
+assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q[15:0];
 
 //-------------------------------------------
 // Tie-Off Global Signals
@@ -351,20 +363,20 @@ always_ff @(posedge clk_main_a0)
                    );
 
 // Debug Bridge 
-   cl_debug_bridge CL_DEBUG_BRIDGE (
+ cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(clk_main_a0),
-      .drck(drck),
-      .shift(shift),
-      .tdi(tdi),
-      .update(update),
-      .sel(sel),
-      .tdo(tdo),
-      .tms(tms),
-      .tck(tck),
-      .runtest(runtest),
-      .reset(reset),
-      .capture(capture),
-      .bscanid(bscanid)
+      .S_BSCAN_VEC_drck(drck),
+      .S_BSCAN_VEC_shift(shift),
+      .S_BSCAN_VEC_tdi(tdi),
+      .S_BSCAN_VEC_update(update),
+      .S_BSCAN_VEC_sel(sel),
+      .S_BSCAN_VEC_tdo(tdo),
+      .S_BSCAN_VEC_tms(tms),
+      .S_BSCAN_VEC_tck(tck),
+      .S_BSCAN_VEC_runtest(runtest),
+      .S_BSCAN_VEC_reset(reset),
+      .S_BSCAN_VEC_capture(capture),
+      .S_BSCAN_VEC_bscanid(bscanid)
    );
 
 //-----------------------------------------------
