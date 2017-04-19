@@ -99,7 +99,7 @@ if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Load and unload the modules just to make sure have the environment set correctly
   module unload vivado
   module unload sdx
-  module load sdx
+  module load vivado
 fi
 
 # before going too far make sure Vivado is available
@@ -133,6 +133,7 @@ info_msg "Setting up environment variables"
 unset HDK_DIR
 unset HDK_COMMON_DIR
 unset HDK_SHELL_DIR
+unset HDK_SHELL_DESIGN_DIR
 # Don't unset CL_DIR if designer has already set it.
 #unset CL_DIR
 
@@ -144,6 +145,9 @@ export HDK_COMMON_DIR=$HDK_DIR/common
 # Point to the latest version of AWS shell
 export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
 hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
+
+# Set the common shell design dir
+export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
 
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH

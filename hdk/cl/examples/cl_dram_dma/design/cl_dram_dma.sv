@@ -275,11 +275,14 @@ assign cl_sh_ddr_bus.rvalid = sh_cl_ddr_rvalid;
 assign cl_sh_ddr_bus.rdata = sh_cl_ddr_rdata;
 assign cl_sh_ddr_bus.rlast = sh_cl_ddr_rlast;
 assign cl_sh_ddr_rready = cl_sh_ddr_bus.rready;
+
+logic dma_pcis_slv_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) DMA_PCIS_SLV_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(dma_pcis_slv_sync_rst_n));
 cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
                     .SCRB_MAX_ADDR(DDR_SCRB_MAX_ADDR),
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_DMA_PCIS_SLV (
     .aclk(clk),
-    .aresetn(sync_rst_n),
+    .aresetn(dma_pcis_slv_sync_rst_n),
 
     .ddra_tst_cfg_bus(ddra_tst_cfg_bus),
     .ddrb_tst_cfg_bus(ddrb_tst_cfg_bus),
@@ -342,10 +345,12 @@ assign cl_sh_pcim_rready = cl_sh_pcim_bus.rready;
 // and the axi4 size is set fixed for 64-bytes
 //  cl_sh_pcim_arsize/awsize = 3'b6;
 
+logic pcim_mstr_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) PCIM_MSTR_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(pcim_mstr_sync_rst_n));
 cl_pcim_mstr CL_PCIM_MSTR (
 
      .aclk(clk),
-     .aresetn(sync_rst_n),
+     .aresetn(pcim_mstr_sync_rst_n),
 
      .cfg_bus(pcim_tst_cfg_bus),
 
@@ -373,10 +378,13 @@ assign ocl_sh_rvalid = sh_ocl_bus.rvalid;
 assign ocl_sh_rresp = sh_ocl_bus.rresp;
 assign ocl_sh_rdata = sh_ocl_bus.rdata[31:0];
 assign sh_ocl_bus.rready = sh_ocl_rready;
+
+logic ocl_slv_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) OCL_SLV_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(ocl_slv_sync_rst_n));
 cl_ocl_slv CL_OCL_SLV (
 
    .clk(clk),
-   .sync_rst_n(sync_rst_n),
+   .sync_rst_n(ocl_slv_sync_rst_n),
 
    .sh_cl_flr_assert_q(sh_cl_flr_assert_q),
 
@@ -441,29 +449,75 @@ lib_pipe #(.WIDTH(1+8+32), .STAGES(NUM_CFG_STGS_CL_DDR_ATG)) PIPE_DDR_STAT_ACK2 
                                                .out_bus({ddr_sh_stat_ack2, ddr_sh_stat_int2, ddr_sh_stat_rdata2})
                                                ); 
 
-//assign statements to remove VCS warnings
-logic [15:0] sh_cl_ddr_bid_temp[2:0];
-logic [1:0] sh_cl_ddr_bresp_temp[2:0];
-logic [15:0] sh_cl_ddr_rid_temp[2:0];
-logic [511:0] sh_cl_ddr_rdata_temp[2:0];
-logic [1:0] sh_cl_ddr_rresp_temp[2:0];
+//convert to 2D 
+logic[15:0] cl_sh_ddr_awid_2d[2:0];
+logic[63:0] cl_sh_ddr_awaddr_2d[2:0];
+logic[7:0] cl_sh_ddr_awlen_2d[2:0];
+logic[2:0] cl_sh_ddr_awsize_2d[2:0];
+logic cl_sh_ddr_awvalid_2d [2:0];
+logic[2:0] sh_cl_ddr_awready_2d;
 
-assign  lcl_cl_sh_ddra.bid = sh_cl_ddr_bid_temp[0];
-assign  lcl_cl_sh_ddrb.bid = sh_cl_ddr_bid_temp[1];
-assign  lcl_cl_sh_ddrd.bid = sh_cl_ddr_bid_temp[2];
-assign  lcl_cl_sh_ddra.bresp = sh_cl_ddr_bresp_temp[0];
-assign  lcl_cl_sh_ddrb.bresp = sh_cl_ddr_bresp_temp[1];
-assign  lcl_cl_sh_ddrd.bresp = sh_cl_ddr_bresp_temp[2];
-assign  lcl_cl_sh_ddra.rid = sh_cl_ddr_rid_temp[0];
-assign  lcl_cl_sh_ddrb.rid = sh_cl_ddr_rid_temp[1];
-assign  lcl_cl_sh_ddrd.rid = sh_cl_ddr_rid_temp[2];
-assign  lcl_cl_sh_ddra.rdata = sh_cl_ddr_rdata_temp[0];
-assign  lcl_cl_sh_ddrb.rdata = sh_cl_ddr_rdata_temp[1];
-assign  lcl_cl_sh_ddrd.rdata = sh_cl_ddr_rdata_temp[2];
-assign  lcl_cl_sh_ddra.rresp = sh_cl_ddr_rresp_temp[0];
-assign  lcl_cl_sh_ddrb.rresp = sh_cl_ddr_rresp_temp[1];
-assign  lcl_cl_sh_ddrd.rresp = sh_cl_ddr_rresp_temp[2];
- 
+logic[15:0] cl_sh_ddr_wid_2d[2:0];
+logic[511:0] cl_sh_ddr_wdata_2d[2:0];
+logic[63:0] cl_sh_ddr_wstrb_2d[2:0];
+logic[2:0] cl_sh_ddr_wlast_2d;
+logic[2:0] cl_sh_ddr_wvalid_2d;
+logic[2:0] sh_cl_ddr_wready_2d;
+
+logic[15:0] sh_cl_ddr_bid_2d[2:0];
+logic[1:0] sh_cl_ddr_bresp_2d[2:0];
+logic[2:0] sh_cl_ddr_bvalid_2d;
+logic[2:0] cl_sh_ddr_bready_2d;
+
+logic[15:0] cl_sh_ddr_arid_2d[2:0];
+logic[63:0] cl_sh_ddr_araddr_2d[2:0];
+logic[7:0] cl_sh_ddr_arlen_2d[2:0];
+logic[2:0] cl_sh_ddr_arsize_2d[2:0];
+logic[2:0] cl_sh_ddr_arvalid_2d;
+logic[2:0] sh_cl_ddr_arready_2d;
+
+logic[15:0] sh_cl_ddr_rid_2d[2:0];
+logic[511:0] sh_cl_ddr_rdata_2d[2:0];
+logic[1:0] sh_cl_ddr_rresp_2d[2:0];
+logic[2:0] sh_cl_ddr_rlast_2d;
+logic[2:0] sh_cl_ddr_rvalid_2d;
+logic[2:0] cl_sh_ddr_rready_2d;
+
+assign cl_sh_ddr_awid_2d = '{lcl_cl_sh_ddrd.awid, lcl_cl_sh_ddrb.awid, lcl_cl_sh_ddra.awid};
+assign cl_sh_ddr_awaddr_2d = '{lcl_cl_sh_ddrd.awaddr, lcl_cl_sh_ddrb.awaddr, lcl_cl_sh_ddra.awaddr};
+assign cl_sh_ddr_awlen_2d = '{lcl_cl_sh_ddrd.awlen, lcl_cl_sh_ddrb.awlen, lcl_cl_sh_ddra.awlen};
+assign cl_sh_ddr_awsize_2d = '{lcl_cl_sh_ddrd.awsize, lcl_cl_sh_ddrb.awsize, lcl_cl_sh_ddra.awsize};
+assign cl_sh_ddr_awvalid_2d = '{lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid};
+assign {lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready} = sh_cl_ddr_awready_2d;
+
+assign cl_sh_ddr_wid_2d = '{lcl_cl_sh_ddrd.wid, lcl_cl_sh_ddrb.wid, lcl_cl_sh_ddra.wid};
+assign cl_sh_ddr_wdata_2d = '{lcl_cl_sh_ddrd.wdata, lcl_cl_sh_ddrb.wdata, lcl_cl_sh_ddra.wdata};
+assign cl_sh_ddr_wstrb_2d = '{lcl_cl_sh_ddrd.wstrb, lcl_cl_sh_ddrb.wstrb, lcl_cl_sh_ddra.wstrb};
+assign cl_sh_ddr_wlast_2d = {lcl_cl_sh_ddrd.wlast, lcl_cl_sh_ddrb.wlast, lcl_cl_sh_ddra.wlast};
+assign cl_sh_ddr_wvalid_2d = {lcl_cl_sh_ddrd.wvalid, lcl_cl_sh_ddrb.wvalid, lcl_cl_sh_ddra.wvalid};
+assign {lcl_cl_sh_ddrd.wready, lcl_cl_sh_ddrb.wready, lcl_cl_sh_ddra.wready} = sh_cl_ddr_wready_2d;
+
+assign {lcl_cl_sh_ddrd.bid, lcl_cl_sh_ddrb.bid, lcl_cl_sh_ddra.bid} = {sh_cl_ddr_bid_2d[2], sh_cl_ddr_bid_2d[1], sh_cl_ddr_bid_2d[0]};
+assign {lcl_cl_sh_ddrd.bresp, lcl_cl_sh_ddrb.bresp, lcl_cl_sh_ddra.bresp} = {sh_cl_ddr_bresp_2d[2], sh_cl_ddr_bresp_2d[1], sh_cl_ddr_bresp_2d[0]};
+assign {lcl_cl_sh_ddrd.bvalid, lcl_cl_sh_ddrb.bvalid, lcl_cl_sh_ddra.bvalid} = sh_cl_ddr_bvalid_2d;
+assign cl_sh_ddr_bready_2d = {lcl_cl_sh_ddrd.bready, lcl_cl_sh_ddrb.bready, lcl_cl_sh_ddra.bready};
+
+assign cl_sh_ddr_arid_2d = '{lcl_cl_sh_ddrd.arid, lcl_cl_sh_ddrb.arid, lcl_cl_sh_ddra.arid};
+assign cl_sh_ddr_araddr_2d = '{lcl_cl_sh_ddrd.araddr, lcl_cl_sh_ddrb.araddr, lcl_cl_sh_ddra.araddr};
+assign cl_sh_ddr_arlen_2d = '{lcl_cl_sh_ddrd.arlen, lcl_cl_sh_ddrb.arlen, lcl_cl_sh_ddra.arlen};
+assign cl_sh_ddr_arsize_2d = '{lcl_cl_sh_ddrd.arsize, lcl_cl_sh_ddrb.arsize, lcl_cl_sh_ddra.arsize};
+assign cl_sh_ddr_arvalid_2d = {lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid};
+assign {lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready} = sh_cl_ddr_arready_2d;
+
+assign {lcl_cl_sh_ddrd.rid, lcl_cl_sh_ddrb.rid, lcl_cl_sh_ddra.rid} = {sh_cl_ddr_rid_2d[2], sh_cl_ddr_rid_2d[1], sh_cl_ddr_rid_2d[0]};
+assign {lcl_cl_sh_ddrd.rresp, lcl_cl_sh_ddrb.rresp, lcl_cl_sh_ddra.rresp} = {sh_cl_ddr_rresp_2d[2], sh_cl_ddr_rresp_2d[1], sh_cl_ddr_rresp_2d[0]};
+assign {lcl_cl_sh_ddrd.rdata, lcl_cl_sh_ddrb.rdata, lcl_cl_sh_ddra.rdata} = {sh_cl_ddr_rdata_2d[2], sh_cl_ddr_rdata_2d[1], sh_cl_ddr_rdata_2d[0]};
+assign {lcl_cl_sh_ddrd.rlast, lcl_cl_sh_ddrb.rlast, lcl_cl_sh_ddra.rlast} = sh_cl_ddr_rlast_2d;
+assign {lcl_cl_sh_ddrd.rvalid, lcl_cl_sh_ddrb.rvalid, lcl_cl_sh_ddra.rvalid} = sh_cl_ddr_rvalid_2d;
+assign cl_sh_ddr_rready_2d = {lcl_cl_sh_ddrd.rready, lcl_cl_sh_ddrb.rready, lcl_cl_sh_ddra.rready};
+
+logic sh_ddr_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) SH_DDR_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(sh_ddr_sync_rst_n));
 sh_ddr #(
          .DDR_A_PRESENT(DDR_A_PRESENT),
          .DDR_A_IO(1),
@@ -472,10 +526,10 @@ sh_ddr #(
    ) SH_DDR
    (
    .clk(clk),
-   .rst_n(sync_rst_n),
+   .rst_n(sh_ddr_sync_rst_n),
 
    .stat_clk(clk),
-   .stat_rst_n(sync_rst_n),
+   .stat_rst_n(sh_ddr_sync_rst_n),
 
 
    .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
@@ -489,7 +543,6 @@ sh_ddr #(
    .M_A_CS_N(M_A_CS_N),
    .M_A_CLK_DN(M_A_CLK_DN),
    .M_A_CLK_DP(M_A_CLK_DP),
-   .RST_DIMM_A_N(RST_DIMM_A_N),
    .M_A_PAR(M_A_PAR),
    .M_A_DQ(M_A_DQ),
    .M_A_ECC(M_A_ECC),
@@ -509,7 +562,6 @@ sh_ddr #(
    .M_B_CS_N(M_B_CS_N),
    .M_B_CLK_DN(M_B_CLK_DN),
    .M_B_CLK_DP(M_B_CLK_DP),
-   .RST_DIMM_B_N(RST_DIMM_B_N),
    .M_B_PAR(M_B_PAR),
    .M_B_DQ(M_B_DQ),
    .M_B_ECC(M_B_ECC),
@@ -528,7 +580,6 @@ sh_ddr #(
    .M_D_CS_N(M_D_CS_N),
    .M_D_CLK_DN(M_D_CLK_DN),
    .M_D_CLK_DP(M_D_CLK_DP),
-   .RST_DIMM_D_N(RST_DIMM_D_N),
    .M_D_PAR(M_D_PAR),
    .M_D_DQ(M_D_DQ),
    .M_D_ECC(M_D_ECC),
@@ -539,38 +590,38 @@ sh_ddr #(
    //------------------------------------------------------
    // DDR-4 Interface from CL (AXI-4)
    //------------------------------------------------------
-   .cl_sh_ddr_awid({lcl_cl_sh_ddrd.awid, lcl_cl_sh_ddrb.awid, lcl_cl_sh_ddra.awid}),
-   .cl_sh_ddr_awaddr({lcl_cl_sh_ddrd.awaddr, lcl_cl_sh_ddrb.awaddr, lcl_cl_sh_ddra.awaddr}),
-   .cl_sh_ddr_awlen({lcl_cl_sh_ddrd.awlen, lcl_cl_sh_ddrb.awlen, lcl_cl_sh_ddra.awlen}),
-   .cl_sh_ddr_awsize({lcl_cl_sh_ddrd.awsize, lcl_cl_sh_ddrb.awsize, lcl_cl_sh_ddra.awsize}),
-   .cl_sh_ddr_awvalid({lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid}),
-   .sh_cl_ddr_awready({lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready}),
+   .cl_sh_ddr_awid(cl_sh_ddr_awid_2d),
+   .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr_2d),
+   .cl_sh_ddr_awlen(cl_sh_ddr_awlen_2d),
+   .cl_sh_ddr_awsize(cl_sh_ddr_awsize_2d),
+   .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid_2d),
+   .sh_cl_ddr_awready(sh_cl_ddr_awready_2d),
 
-   .cl_sh_ddr_wid({lcl_cl_sh_ddrd.wid, lcl_cl_sh_ddrb.wid, lcl_cl_sh_ddra.wid}),
-   .cl_sh_ddr_wdata({lcl_cl_sh_ddrd.wdata, lcl_cl_sh_ddrb.wdata, lcl_cl_sh_ddra.wdata}),
-   .cl_sh_ddr_wstrb({lcl_cl_sh_ddrd.wstrb, lcl_cl_sh_ddrb.wstrb, lcl_cl_sh_ddra.wstrb}),
-   .cl_sh_ddr_wlast({lcl_cl_sh_ddrd.wlast, lcl_cl_sh_ddrb.wlast, lcl_cl_sh_ddra.wlast}),
-   .cl_sh_ddr_wvalid({lcl_cl_sh_ddrd.wvalid, lcl_cl_sh_ddrb.wvalid, lcl_cl_sh_ddra.wvalid}),
-   .sh_cl_ddr_wready({lcl_cl_sh_ddrd.wready, lcl_cl_sh_ddrb.wready, lcl_cl_sh_ddra.wready}),
+   .cl_sh_ddr_wid(cl_sh_ddr_wid_2d),
+   .cl_sh_ddr_wdata(cl_sh_ddr_wdata_2d),
+   .cl_sh_ddr_wstrb(cl_sh_ddr_wstrb_2d),
+   .cl_sh_ddr_wlast(cl_sh_ddr_wlast_2d),
+   .cl_sh_ddr_wvalid(cl_sh_ddr_wvalid_2d),
+   .sh_cl_ddr_wready(sh_cl_ddr_wready_2d),
 
-   .sh_cl_ddr_bid(sh_cl_ddr_bid_temp),
-   .sh_cl_ddr_bresp(sh_cl_ddr_bresp_temp),
-   .sh_cl_ddr_bvalid({lcl_cl_sh_ddrd.bvalid, lcl_cl_sh_ddrb.bvalid, lcl_cl_sh_ddra.bvalid}),
-   .cl_sh_ddr_bready({lcl_cl_sh_ddrd.bready, lcl_cl_sh_ddrb.bready, lcl_cl_sh_ddra.bready}),
+   .sh_cl_ddr_bid(sh_cl_ddr_bid_2d),
+   .sh_cl_ddr_bresp(sh_cl_ddr_bresp_2d),
+   .sh_cl_ddr_bvalid(sh_cl_ddr_bvalid_2d),
+   .cl_sh_ddr_bready(cl_sh_ddr_bready_2d),
 
-   .cl_sh_ddr_arid({lcl_cl_sh_ddrd.arid, lcl_cl_sh_ddrb.arid, lcl_cl_sh_ddra.arid}),
-   .cl_sh_ddr_araddr({lcl_cl_sh_ddrd.araddr, lcl_cl_sh_ddrb.araddr, lcl_cl_sh_ddra.araddr}),
-   .cl_sh_ddr_arlen({lcl_cl_sh_ddrd.arlen, lcl_cl_sh_ddrb.arlen, lcl_cl_sh_ddra.arlen}),
-   .cl_sh_ddr_arsize({lcl_cl_sh_ddrd.arsize, lcl_cl_sh_ddrb.arsize, lcl_cl_sh_ddra.arsize}),
-   .cl_sh_ddr_arvalid({lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid}),
-   .sh_cl_ddr_arready({lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready}),
+   .cl_sh_ddr_arid(cl_sh_ddr_arid_2d),
+   .cl_sh_ddr_araddr(cl_sh_ddr_araddr_2d),
+   .cl_sh_ddr_arlen(cl_sh_ddr_arlen_2d),
+   .cl_sh_ddr_arsize(cl_sh_ddr_arsize_2d),
+   .cl_sh_ddr_arvalid(cl_sh_ddr_arvalid_2d),
+   .sh_cl_ddr_arready(sh_cl_ddr_arready_2d),
 
-   .sh_cl_ddr_rid(sh_cl_ddr_rid_temp),
-   .sh_cl_ddr_rdata(sh_cl_ddr_rdata_temp),
-   .sh_cl_ddr_rresp(sh_cl_ddr_rresp_temp),
-   .sh_cl_ddr_rlast({lcl_cl_sh_ddrd.rlast, lcl_cl_sh_ddrb.rlast, lcl_cl_sh_ddra.rlast}),
-   .sh_cl_ddr_rvalid({lcl_cl_sh_ddrd.rvalid, lcl_cl_sh_ddrb.rvalid, lcl_cl_sh_ddra.rvalid}),
-   .cl_sh_ddr_rready({lcl_cl_sh_ddrd.rready, lcl_cl_sh_ddrb.rready, lcl_cl_sh_ddra.rready}),
+   .sh_cl_ddr_rid(sh_cl_ddr_rid_2d),
+   .sh_cl_ddr_rdata(sh_cl_ddr_rdata_2d),
+   .sh_cl_ddr_rresp(sh_cl_ddr_rresp_2d),
+   .sh_cl_ddr_rlast(sh_cl_ddr_rlast_2d),
+   .sh_cl_ddr_rvalid(sh_cl_ddr_rvalid_2d),
+   .cl_sh_ddr_rready(cl_sh_ddr_rready_2d),
 
    .sh_cl_ddr_is_ready(lcl_sh_cl_ddr_is_ready),
 
@@ -608,10 +659,12 @@ sh_ddr #(
 // Interrrupt example  
 //-----------------------------------------
 
+logic int_slv_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) INT_SLV_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(int_slv_sync_rst_n));
 cl_int_slv CL_INT_TST 
 (
   .clk                 (clk),
-  .rst_n               (sync_rst_n),
+  .rst_n               (int_slv_sync_rst_n),
 
   .cfg_bus             (int_tst_cfg_bus),
 
@@ -646,10 +699,13 @@ assign cl_sda_rvalid = sda_cl_bus.rvalid;
 assign cl_sda_rresp = sda_cl_bus.rresp;
 assign cl_sda_rdata = sda_cl_bus.rdata[31:0];
 assign sda_cl_bus.rready = sda_cl_rready;
+
+logic sda_slv_sync_rst_n;
+lib_pipe #(.WIDTH(1), .STAGES(4)) SDA_SLV_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(sda_slv_sync_rst_n));
 cl_sda_slv CL_SDA_SLV (
 
   .aclk(clk),
-  .aresetn(sync_rst_n),
+  .aresetn(sda_slv_sync_rst_n),
   
   .sda_cl_bus(sda_cl_bus)
 );
@@ -693,6 +749,7 @@ cl_vio CL_VIO (
    .clk_extra_a1(clk_extra_a1)
 
 );
+
 
 `endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 

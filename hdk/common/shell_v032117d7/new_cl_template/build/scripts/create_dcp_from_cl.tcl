@@ -397,13 +397,15 @@ switch $strategy {
     "DEFAULT" {
         puts "DEFAULT strategy."
         phys_opt_design  -directive Explore
-        puts "AWS FPGA: Locking design ";
-        lock_design -level routing
     }
     default {
         puts "$strategy is NOT a valid strategy."
     }
 }
+
+# Lock the design to preserve the placement and routing
+puts "AWS FPGA: Locking design ";
+lock_design -level routing
 
 # Report final timing
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt

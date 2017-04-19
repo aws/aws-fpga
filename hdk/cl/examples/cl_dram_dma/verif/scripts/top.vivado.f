@@ -22,6 +22,7 @@
 --sourcelibdir ${CL_ROOT}/design
 --sourcelibdir ${SH_LIB_DIR}
 --sourcelibdir ${SH_INF_DIR}
+--sourcelibdir ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 --include ${CL_ROOT}/../common/design
 --include ${CL_ROOT}/verif/sv
@@ -30,6 +31,7 @@
 --include ${HDK_COMMON_DIR}/verif/include
 --include ${CL_ROOT}/design/axi_crossbar_0
 --include ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ipshared/7e3a/hdl
+--include ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v

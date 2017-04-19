@@ -40,19 +40,20 @@ module cl_ila (
 //---------------------------- 
  cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(aclk),
-      .drck(drck),
-      .shift(shift),
-      .tdi(tdi),
-      .update(update),
-      .sel(sel),
-      .tdo(tdo),
-      .tms(tms),
-      .tck(tck),
-      .runtest(runtest),
-      .reset(reset),
-      .capture(capture),
-      .bscanid(bscanid)
- );
+      .S_BSCAN_VEC_drck(drck),
+      .S_BSCAN_VEC_shift(shift),
+      .S_BSCAN_VEC_tdi(tdi),
+      .S_BSCAN_VEC_update(update),
+      .S_BSCAN_VEC_sel(sel),
+      .S_BSCAN_VEC_tdo(tdo),
+      .S_BSCAN_VEC_tms(tms),
+      .S_BSCAN_VEC_tck(tck),
+      .S_BSCAN_VEC_runtest(runtest),
+      .S_BSCAN_VEC_reset(reset),
+      .S_BSCAN_VEC_capture(capture),
+      .S_BSCAN_VEC_bscanid(bscanid)
+   );
+
 
 //---------------------------- 
 // Debug Core ILA for dmm pcis AXI4 interface 
