@@ -530,19 +530,22 @@ vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic 
 These signals are asynchronous to the CL clocks, and the following must be done when using these signals:
 
 - vLED: In implementation a false path should be set from the vLED signals.  For example in the constraints for place and route add:
-
-   `set_false_path -from [get_cells CL/cl_sh_status_vled*]`
+   ```
+      set_false_path -from [get_cells CL/cl_sh_status_vled*]
+   ```
 
 - vDIP: The vDIP signals should be synchronized to a CL clock before being used.
 
-   `always @(posedge clk_main_a0)
-    begin
-       pre_sync_vdip <= sh_cl_status_vdip;
-       sync_vdip <= pre_sync_vdip;
-    end
+   ```
+      always @(posedge clk_main_a0)
+       begin
+          pre_sync_vdip <= sh_cl_status_vdip;
+          sync_vdip <= pre_sync_vdip;
+       end
 
 
-    my_logic = sync_vdip;`
+       my_logic = sync_vdip;`
+   ```
    
 
 ### DMA
