@@ -692,7 +692,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
          sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
          sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
-         sh_cl_dma_pcis_awsize  <= /*sh_cl_wr_cmds[0].size*/3'h6;
+         sh_cl_dma_pcis_awsize  <= sh_cl_wr_cmds[0].size;
          
          sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
                                !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
@@ -771,7 +771,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
          sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
          sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
-         sh_cl_dma_pcis_arsize  <= /*sh_cl_rd_cmds[0].size*/3'h6;
+         sh_cl_dma_pcis_arsize  <= sh_cl_rd_cmds[0].size;
          
          sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
                                !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
@@ -1914,6 +1914,7 @@ module sh_bfm #(
                   end
                 end
                 axi_cmd.id   = chan;
+                axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
 
                 // loop to do multiple data beats
@@ -2040,6 +2041,7 @@ module sh_bfm #(
                   end
                   axi_cmd.id   = chan;
                 end
+                axi_cmd.size = 6;
                 sh_cl_rd_cmds.push_back(axi_cmd);
                 for(int i = 0; i <= axi_cmd.len; i++) begin
                   data_dop.buffer = dop.buffer;
