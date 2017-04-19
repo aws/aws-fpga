@@ -21,6 +21,8 @@
 #define XDMA_WORKER_SLEEPING_STATUS_BIT			(0)
 #define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT		(1)
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
+#define XDMA_WORKER_STOP_REQUEST_BIT			(3)
+#define REQUEST_SLEEP_MSEC						(10)
 #define PCI_VENDOR_ID_AMAZON 				(0x1d0f)
 #define PCI_DEVICE_ID_FPGA				(0xf001)
 #define XMDA_NUMBER_OF_USER_EVENTS			(1)
@@ -55,7 +57,11 @@ typedef struct {
 
 //TODO: add a thread that monitors the XDMA state (check that not failed)
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
+static const struct pci_device_id edma_pci_tbl[] = {
+#else
 static DEFINE_PCI_DEVICE_TABLE(edma_pci_tbl) = {
+#endif
 	{ PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_FPGA,
 	  PCI_ANY_ID, PCI_ANY_ID, 0, 0, PCI_ANY_ID},
 	{ 0, }
@@ -71,7 +77,7 @@ static int write_worker_function(void *data)
 	command_queue_t* command_queue = (command_queue_t*)data;
 	command_t* 	queue = command_queue->queue;
 
-	while(!kthread_should_stop())
+	while(!test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))
 	{
 		if(command_queue->head != command_queue->tail)
 		{
@@ -82,7 +88,7 @@ static int write_worker_function(void *data)
 					&queue[command_queue->head].sgt,
 					true,
 					XDMA_TIMEOUT_IN_MSEC);
-			if(ret < 0) { //FIXME: for now assume that timeout - later real error
+			if(ret < 0) { 
 				pr_err(	"Thread failed during transaction with address 0x%llx and size %u\n",
 					queue[command_queue->head].target_addr,
 					sg_dma_len(queue[command_queue->head].sgt.sgl));
@@ -439,7 +445,12 @@ int edma_backend_stop(void *q_handle)
 	int i;
 
 	//Stop the kthread before reset and make sure it was stopped.
-	kthread_stop(command_queue->worker_thread);
+	set_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status);
+
+	while((wake_up_process(command_queue->worker_thread) == 0)
+			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
+					&command_queue->thread_status))
+		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
 
 	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
 			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
