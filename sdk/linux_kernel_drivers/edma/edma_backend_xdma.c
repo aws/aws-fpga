@@ -57,7 +57,11 @@ typedef struct {
 
 //TODO: add a thread that monitors the XDMA state (check that not failed)
 
-static DEFINE_PCI_DEVICE_TABLE(edma_pci_tbl) = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
+static const struct pci_device_id edma_pci_tb[] = {
+#else
+static DEFINE_PCI_DEVICE_TABLE(edma_pci_tb) = {
+#endif
 	{ PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_FPGA,
 	  PCI_ANY_ID, PCI_ANY_ID, 0, 0, PCI_ANY_ID},
 	{ 0, }
@@ -84,7 +88,7 @@ static int write_worker_function(void *data)
 					&queue[command_queue->head].sgt,
 					true,
 					XDMA_TIMEOUT_IN_MSEC);
-			if(ret < 0) { //FIXME: for now assume that timeout - later real error
+			if(ret < 0) { 
 				pr_err(	"Thread failed during transaction with address 0x%llx and size %u\n",
 					queue[command_queue->head].target_addr,
 					sg_dma_len(queue[command_queue->head].sgt.sgl));
