@@ -320,7 +320,7 @@ switch $strategy {
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers > $synthDir/${TOP}_synth.log 
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt > $synthDir/${TOP}_synth.log 
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -396,11 +396,7 @@ switch $strategy {
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        #opt_design -directive Explore
-        impl_step opt_design $top $opt_options $opt_directive $opt_preHookTcl
-        if {$psip} {
-         impl_step opt_design $top "-merge_equivalent_drivers -sweep"
-        }
+        opt_design -directive Explore
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -412,7 +408,10 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        opt_design -directive Explore
+        impl_step opt_design $top $opt_options $opt_directive $opt_preHookTcl
+        if {$psip} {
+           impl_step opt_design $top "-merge_equivalent_drivers -sweep"
+        }
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -431,12 +430,7 @@ switch $strategy {
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        #place_design -directive Explore
-        if {$psip} {
-           append place_options " -fanout_opt"
-        }
-        impl_step place_design $top $place_options $place_directive $place_preHookTcl
-
+        place_design -directive Explore
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -448,7 +442,10 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        place_design -directive ExtraNetDelay_high
+        if {$psip} {
+           append place_options " -fanout_opt"
+        }
+        impl_step place_design $top $place_options $place_directive $place_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -471,8 +468,7 @@ switch $strategy {
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        #phys_opt_design -directive Explore
-        impl_step phys_opt_design $top $phys_options $phys_directive $phys_preHookTcl
+        phys_opt_design -directive Explore
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -484,7 +480,7 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        phys_opt_design -directive Explore
+        impl_step phys_opt_design $top $phys_options $phys_directive $phys_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -504,8 +500,7 @@ switch $strategy {
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        #route_design -directive Explore
-        impl_step route_design $top $route_options $route_directive $route_preHookTcl
+        route_design -directive Explore
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -517,7 +512,7 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        route_design -directive Explore
+        impl_step route_design $top $route_options $route_directive $route_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -535,11 +530,7 @@ switch $strategy {
         puts "BASIC strategy."
     }
     "EXPLORE" {
-        #puts "EXPLORE strategy."
-        set SLACK [get_property SLACK [get_timing_paths]]
-        if {$route_phys_opt && $SLACK > -0.400 && $SLACK < 0} {
-           impl_step route_phys_opt_design $top $post_phys_options $post_phys_directive $post_phys_preHookTcl
-        }
+        #puts "EXPLORE strategy."        
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -550,7 +541,10 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        phys_opt_design  -directive Explore
+        set SLACK [get_property SLACK [get_timing_paths]]
+        if {$route_phys_opt && $SLACK > -0.400 && $SLACK < 0} {
+           impl_step route_phys_opt_design $top $post_phys_options $post_phys_directive $post_phys_preHookTcl
+        }
     }
     default {
         puts "$strategy is NOT a valid strategy."
