@@ -53,7 +53,6 @@ The following major features are included in this HDK release:
 * [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated
 * Updated the xdc timing constrains under [constraints](./hdk/common/shell_v032117d7/build/constraints) to match the new interfaces 
 * Updated [CL HELLO WORLD](./hdk/cl/examples/cl_hello_world) example to use the new cl_ports.vh
-* Updated clean_log.pl [scripts](./hdk/common/shell_v04151701/build/scripts/clean_log.pl) 
 * DCP for the latest shell v04151701. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
 
