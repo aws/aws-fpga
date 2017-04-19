@@ -53,7 +53,6 @@ The following major features are included in this HDK release:
 * [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated
 * Updated the xdc timing constrains under [constraints](./hdk/common/shell_v032117d7/build/constraints) to match the new interfaces 
 * Updated [CL HELLO WORLD](./hdk/cl/examples/cl_hello_world) example to use the new cl_ports.vh
-* Updated clean_log.pl [scripts](./hdk/common/shell_v04151701/build/scripts/clean_log.pl) 
 * DCP for the latest shell v04151701. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
 
@@ -67,7 +66,7 @@ The following major features are included in this HDK release:
 
 
 ### 3.	CL  User-defined interrupt events.  The CL can now request sending MSI-X to the instance CPU
-* * Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software (WIP)
+* Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software 
 * A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
 * [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
 * The initial release supports a single user-defined interrupt 
