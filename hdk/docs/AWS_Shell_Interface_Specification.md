@@ -544,7 +544,7 @@ These signals are asynchronous to the CL clocks, and the following must be done 
        end
 
 
-       my_logic = sync_vdip;`
+       my_logic = sync_vdip;
    ```
    
 
