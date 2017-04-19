@@ -24,3 +24,20 @@ You can setup and install the SDK with the following few steps.  Note that the f
 ```
 $ sudo yum groupinstall -y “Development Tools"
 ```
+
+## Notes for Ubuntu or other Debian based systems
+
+To install gcc with apt-get, execute:
+
+```
+$ sudo apt-get update
+$ sudo apt-get install build-essential
+```
+
+There is a known bug in the SDK install script for the fpga library (`libfpga_mgmt.so`). To get the tools running, after running `source sdk_setup.sh`, run the following commands to install the library:
+
+```
+$ cd $SDK_DIR
+$ sudo cp userspace/lib/so/libfpga_mgmt.so /usr/local/lib
+$ sudo ldconfig -v
+```
