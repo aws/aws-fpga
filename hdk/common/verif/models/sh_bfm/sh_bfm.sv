@@ -1914,6 +1914,7 @@ module sh_bfm #(
                   end
                 end
                 axi_cmd.id   = chan;
+                axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
 
                 // loop to do multiple data beats
@@ -2040,6 +2041,7 @@ module sh_bfm #(
                   end
                   axi_cmd.id   = chan;
                 end
+                axi_cmd.size = 6;
                 sh_cl_rd_cmds.push_back(axi_cmd);
                 for(int i = 0; i <= axi_cmd.len; i++) begin
                   data_dop.buffer = dop.buffer;
