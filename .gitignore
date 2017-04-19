@@ -11,6 +11,7 @@ irun.log
 irun.key
 
 fpga-local-cmd*
+static-fpga-local-cmd
 
 *_compile.log
 *_run.log
