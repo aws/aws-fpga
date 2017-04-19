@@ -2,12 +2,12 @@
 
 # Table of Contents
 
-1. [Overview of AFI Build process] (#buildoverview)
-2. [Build procedure step by step] (#stepbystep)
-3. [Build strategies and parallel builds] (#strategies)
-4. [About Encrption during build process] (#buildencryption)
-5. [Advanced Notes] (#buildadvanced notes)
-6. [Build Frequently Asked Questions] (#buildfaq)
+1. [Overview of AFI Build process](#buildoverview)
+2. [Build procedure step by step](#stepbystep)
+3. [Build strategies and parallel builds](#strategies)
+4. [About Encrption during build process](#buildencryption)
+5. [Advanced Notes](#buildadvanced notes)
+6. [Build Frequently Asked Questions](#buildfaq)
 
 
 <a name="buildoverview"></a>
@@ -139,89 +139,7 @@ You need to prepare the following information:
 **NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.
 If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](./../../../../docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
 
-To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
-For example, you can use the AWS CLI as follows:
-
-    $ aws s3 mb s3://<bucket-name>                # Create an S3 bucket (choose a unique bucket name)
-    $ aws s3 cp *.Developer_CL.tar \              # Upload the file to S3
-             s3://<bucket-name>/
-
-Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is a sample policy.
-
-**NOTE**: *The AWS Account ID has changed, please ensure you are using the correct Account ID listed here.*
-
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Bucket level permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:ListBucket"
-                ],
-                "Resource": "arn:aws:s3:::<bucket_name>"
-            },
-            {
-                "Sid": "Object read permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:GetObject"
-                ],
-                "Resource": "arn:aws:s3:::<dcp_bucket_name>/<dcp_filename>"
-            },
-            {
-                "Sid": "Folder write permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:PutObject"
-                ],
-                "Resource": "arn:aws:s3:::<log_bucket_name>/*"
-            }
-        ]
-    }
-
-You can verify that the bucket policy grants the required permissions by running the following script:
-
-    $ check_s3_bucket_policy.py \
-	--dcp-bucket <dcp-bucket-name> \
-	--dcp-key <tarball-name> \
-	--logs-bucket <logs-bucket-name> \
-	--logs-key <logs-folder>
-
-To create an AFI execute the following command:
-
-    $ aws ec2 create-fpga-image \
-        --name <afi-name> \
-        --description <afi-description> \
-        --input-storage-location Bucket=<dcp-bucket-name>,Key=<tarball-name> \
-        --logs-storage-location Bucket=<logs-bucket-name>,Key=<logs-folder> \
-	[ --client-token <value> ] \
-	[ --dry-run | --no-dry-run ]
-
-The output of this command includes two identifiers that refer to your AFI:
-- **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
-    This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is **`afi-01234567890abcdef`**.
-- **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
-    For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
-    Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
-    An example AGFI ID is **`agfi-01234567890abcdef`**.
-
-After the AFI generation is complete, AWS will put the logs into the bucket location provided by the developer and notify them
-by email.
-
-**NOTE**: *Attempting to associate the AFI to an AMI before the AFI is ready will result in an `InvalidFpgaImageID.Unavailable` error.
-Please wait until you receive a confirmation email from AWS indicating the creation process is complete.*
+[Refer to step 3 for instructions on how to submit the Design Checkpoint to AWS](./../../../../cl/examples/README.md)
 
 <a name="buildstratgies"></a>
 ## Build Strategies and Parallel Builds 
