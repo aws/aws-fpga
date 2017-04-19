@@ -124,7 +124,7 @@ int fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value);
  * @returns 0 on success, non-zero on error
  */
 int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset,
-    uint32_t* datap, uint32_t dword_len);
+    uint32_t* datap, uint64_t dword_len);
 
 /**
  * Read a value from a register.
