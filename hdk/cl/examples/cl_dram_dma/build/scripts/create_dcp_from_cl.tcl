@@ -50,7 +50,7 @@ set place 1
 set place_options    ""
 set place_directive  "Explore"
 #Prohbit sites to avoid congestion if utilization is low enough
-set place_preHookTcl "./prohibit_tr.tcl"
+set place_preHookTcl ""
 
 set phys_opt 1
 set phys_options    ""

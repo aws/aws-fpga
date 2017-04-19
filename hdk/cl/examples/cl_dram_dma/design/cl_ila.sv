@@ -53,7 +53,7 @@ module cl_ila (
       .S_BSCAN_VEC_capture(capture),
       .S_BSCAN_VEC_bscanid(bscanid)
    );
-/*
+
 
 //---------------------------- 
 // Debug Core ILA for dmm pcis AXI4 interface 
@@ -155,7 +155,7 @@ module cl_ila (
                    .probe42 (1'b0),
                    .probe43 (1'b0)
                    );
-*/
+
 
 endmodule
 
