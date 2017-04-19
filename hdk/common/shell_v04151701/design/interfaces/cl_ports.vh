@@ -44,6 +44,10 @@
    input[31:0] sh_cl_ctl0,                      //Functionality TBD
    input[31:0] sh_cl_ctl1,                      //Functionality TBD
 
+   // The Virtual DIP and Virtual LED signals are asynchronous to to the CL
+   // clocks. So the sh_cl_status_vdip needs to be synchronized in the CL.
+   // Additionally, a false path constraint should be used for the paths from
+   // the cl_sh_status_vled signals.
    input[15:0] sh_cl_status_vdip,               //Virtual DIP switches.  Controlled through FPGA management PF and tools.
    output logic[15:0] cl_sh_status_vled,        //Virtual LEDs, monitored through FPGA management PF and tools
 

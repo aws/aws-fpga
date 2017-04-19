@@ -58,6 +58,7 @@ logic rst_main_n_sync;
   logic [15:0] vled_q;
   logic [15:0] pre_cl_sh_status_vled;
   logic [15:0] sh_cl_status_vdip_q;
+  logic [15:0] sh_cl_status_vdip_q2;
   logic [31:0] hello_world_q;
 
 //-------------------------------------------------
@@ -287,15 +288,17 @@ assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[1
 //-------------------------------------------------
 // Virtual LED Register
 //-------------------------------------------------
-// Flop interface signals
+// Flop/synchronize interface signals
 always_ff @(posedge clk_main_a0)
    if (!rst_main_n_sync) begin                    // Reset
-      sh_cl_status_vdip_q[15:0] <= 16'h0000;
-      cl_sh_status_vled[15:0]   <= 16'h0000;
+      sh_cl_status_vdip_q[15:0]  <= 16'h0000;
+      sh_cl_status_vdip_q2[15:0] <= 16'h0000;
+      cl_sh_status_vled[15:0]    <= 16'h0000;
    end
    else begin
-      sh_cl_status_vdip_q[15:0] <= sh_cl_status_vdip[15:0];
-      cl_sh_status_vled[15:0]   <= pre_cl_sh_status_vled[15:0];
+      sh_cl_status_vdip_q[15:0]  <= sh_cl_status_vdip[15:0];
+      sh_cl_status_vdip_q2[15:0] <= sh_cl_status_vdip_q[15:0];
+      cl_sh_status_vled[15:0]    <= pre_cl_sh_status_vled[15:0];
    end
 
 // The register contains 16 read-only bits corresponding to 16 LED's.
@@ -313,7 +316,7 @@ always_ff @(posedge clk_main_a0)
    end
 
 // The Virtual LED outputs will be masked with the Virtual DIP switches.
-assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q[15:0];
+assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q2[15:0];
 
 //-------------------------------------------
 // Tie-Off Global Signals
