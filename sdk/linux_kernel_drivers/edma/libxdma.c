@@ -132,31 +132,6 @@ static u64 find_feature_id(const struct xdma_dev *lro)
 	return low | (high << 32);
 }
 
-static void interrupt_status(struct xdma_dev *lro)
-{
-	struct interrupt_regs *reg = (struct interrupt_regs *)
-		(lro->bar[lro->config_bar_idx] + XDMA_OFS_INT_CTRL);
-	u32 w;
-
-	dbg_irq("reg = %p\n", reg);
-	dbg_irq("&reg->user_int_enable = %p\n", &reg->user_int_enable);
-
-	w = read_register(&reg->user_int_enable);
-	dbg_irq("user_int_enable = 0x%08x\n", w);
-	w = read_register(&reg->channel_int_enable);
-	dbg_irq("channel_int_enable = 0x%08x\n", w);
-
-	w = read_register(&reg->user_int_request);
-	dbg_irq("user_int_request = 0x%08x\n", w);
-	w = read_register(&reg->channel_int_request);
-	dbg_irq("channel_int_request = 0x%08x\n", w);
-
-	w = read_register(&reg->user_int_pending);
-	dbg_irq("user_int_pending = 0x%08x\n", w);
-	w = read_register(&reg->channel_int_pending);
-	dbg_irq("channel_int_pending = 0x%08x\n", w);
-}
-
 /* channel_interrupts_enable -- Enable interrupts we are interested in */
 static void channel_interrupts_enable(struct xdma_dev *lro, u32 mask)
 {
@@ -702,12 +677,13 @@ static int engine_service(struct xdma_engine *engine)
 static void engine_service_work(struct work_struct *work)
 {
 	struct xdma_engine *engine;
+	unsigned long flags;
 
 	engine = container_of(work, struct xdma_engine, work);
 	BUG_ON(engine->magic != MAGIC_ENGINE);
 
 	/* lock the engine */
-	spin_lock(&engine->lock);
+	spin_lock_irqsave(&engine->lock, flags);
 
 	dbg_tfr("engine_service() for %s engine %p\n",
 		engine->name, engine);
@@ -721,7 +697,7 @@ static void engine_service_work(struct work_struct *work)
 		channel_interrupts_enable(engine->lro, engine->irq_bitmask);
 	}
 	/* unlock the engine */
-	spin_unlock(&engine->lock);
+	spin_unlock_irqrestore(&engine->lock, flags);
 }
 
 static irqreturn_t user_irq_service(int irq, struct xdma_irq *user_irq)
@@ -1113,7 +1089,12 @@ static void transfer_dump(struct xdma_transfer *transfer)
 	int i;
 	struct xdma_desc *desc_virt = transfer->desc_virt;
 
-	dbg_desc("Descriptor Entry (Pre-Transfer)\n");
+	dbg_desc("transfer 0x%p, state 0x%x, f 0x%x, dir %d, len %u, last %d.\n",
+		transfer, transfer->state, transfer->flags, transfer->dir,
+		transfer->xfer_len, transfer->last_in_request);
+	dbg_desc("transfer 0x%p, desc %d, bus 0x%llx, adj %d.\n",
+		transfer, transfer->desc_num, (u64)transfer->desc_bus,
+		transfer->desc_adjacent);
 	for (i = 0; i < transfer->desc_num; i += 1)
 		dump_desc(desc_virt + i);
 }
@@ -1336,6 +1317,7 @@ static int transfer_queue(struct xdma_engine *engine,
 {
 	int rc = 0;
 	struct xdma_transfer *transfer_started;
+	unsigned long flags;
 
 	BUG_ON(!engine);
 	BUG_ON(!transfer);
@@ -1343,7 +1325,7 @@ static int transfer_queue(struct xdma_engine *engine,
 	dbg_tfr("transfer_queue(transfer=0x%p).\n", transfer);
 
 	/* lock the engine state */
-	spin_lock(&engine->lock);
+	spin_lock_irqsave(&engine->lock, flags);
 	engine->prev_cpu = get_cpu();
 	put_cpu();
 
@@ -1374,7 +1356,7 @@ static int transfer_queue(struct xdma_engine *engine,
 shutdown:
 	/* unlock the engine state */
 	dbg_tfr("engine->running = %d\n", engine->running);
-	spin_unlock(&engine->lock);
+	spin_unlock_irqrestore(&engine->lock, flags);
 	return rc;
 };
 
@@ -1548,16 +1530,22 @@ static int engine_init(struct xdma_engine *engine, struct xdma_dev *lro,
 }
 
 /* transfer_destroy() - free transfer */
-static void transfer_destroy(struct xdma_dev *lro, struct xdma_transfer *transfer)
+static void transfer_destroy(struct xdma_dev *lro,
+			struct xdma_transfer *transfer, bool force)
 {
 	/* free descriptors */
 	xdma_desc_free(lro->pci_dev, transfer->desc_num, transfer->desc_virt,
 			transfer->desc_bus);
 
-	if (transfer->last_in_request &&
+
+	if ((force || transfer->last_in_request) &&
 		(transfer->flags & XFER_FLAG_NEED_UNMAP)) {
         	struct sg_table *sgt = transfer->sgt;
-		pci_unmap_sg(lro->pci_dev, sgt->sgl, sgt->nents, transfer->dir);
+		if (sgt->nents) {
+			pci_unmap_sg(lro->pci_dev, sgt->sgl, sgt->nents,
+					transfer->dir);
+			sgt->nents = 0;
+		}
 	}
 
 	/* free transfer */
@@ -1670,9 +1658,26 @@ static struct xdma_transfer *transfer_create(struct xdma_engine *engine,
 	return transfer;
 }
 
-int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
-			u64 ep_addr, struct sg_table *sgt, int dma_mapped,
-			int timeout_ms)
+static void transfer_abort(struct xdma_engine *engine,
+			struct xdma_transfer *transfer)
+{
+	struct xdma_transfer *head;
+
+	BUG_ON(!engine);
+	BUG_ON(!transfer);
+	BUG_ON(transfer->desc_num == 0);
+
+	head = list_entry(engine->transfer_list.next, struct xdma_transfer,
+			entry);
+	if (head == transfer)
+               list_del(engine->transfer_list.next);
+	else
+		pr_info("engine %s, transfer 0x%p NOT found, 0x%p.\n", 
+			engine->name, transfer, head);
+}
+
+int xdma_xfer_submit(void *channel, enum dma_data_direction dir, u64 ep_addr,
+			 struct sg_table *sgt, int dma_mapped, int timeout_ms)
 {
 	int rv = 0;
 	ssize_t done = 0;
@@ -1705,6 +1710,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 	}
 	
 	while (nents) {
+		unsigned long flags;
 		unsigned int xfer_nents = min_t(unsigned int, 
 					nents, XDMA_TRANSFER_MAX_DESC);
 		struct xdma_transfer *transfer;
@@ -1713,8 +1719,12 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 		transfer = transfer_create(engine, ep_addr, &sg, xfer_nents);
 		if (!transfer) {
 			dbg_tfr("OOM.\n");
-			rv = -ENOMEM;
-			goto unmap;
+			if (!dma_mapped) {
+				pci_unmap_sg(lro->pci_dev, sgt->sgl,
+						sgt->orig_nents, dir);
+				sgt->nents = 0;
+			}
+			return -ENOMEM;
 		}
 
 		if (!dma_mapped)
@@ -1732,47 +1742,45 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 		rv = transfer_queue(engine, transfer);
 		if (rv < 0) {
 			dbg_tfr("unable to submit %s.\n", engine->name);
-			transfer_destroy(lro, transfer);
-			rv = -ERESTARTSYS;
-			goto unmap;
+			transfer_destroy(lro, transfer, 1);
+			return -ERESTARTSYS;
 		}
 
 		rv = wait_event_interruptible_timeout(transfer->wq,
                         (transfer->state != TRANSFER_STATE_SUBMITTED),
 			msecs_to_jiffies(timeout_ms));
 
+		spin_lock_irqsave(&engine->lock, flags);
 		switch(transfer->state) {
 		case TRANSFER_STATE_COMPLETED:
+			spin_unlock_irqrestore(&engine->lock, flags);
 			dbg_tfr("transfer %p, %u completed.\n", transfer,
 				transfer->xfer_len);
 			done += transfer->xfer_len;
 			ep_addr += transfer->xfer_len;
-			transfer_destroy(lro, transfer);
+			transfer_destroy(lro, transfer, 0);
 			break;
 		case TRANSFER_STATE_FAILED:
+			spin_unlock_irqrestore(&engine->lock, flags);
 			dbg_tfr("transfer %p, %u failed.\n", transfer,
 				transfer->xfer_len);
+			transfer_destroy(lro, transfer, 1);
 			return -EIO;
 		default:
 			/* transfer can still be in-flight */
-			dbg_tfr("xfer 0x%p,%u, state 0x%x.\n",
-				 transfer, transfer->xfer_len,
-				transfer->state);
-			engine_status_read(engine, 0, 1);
-			read_interrupts(lro);
-			interrupt_status(lro);
+			dbg_tfr("xfer 0x%p,%u, state 0x%x, timed out.\n",
+				 transfer, transfer->xfer_len, transfer->state);
+			transfer_abort(engine, transfer);
+			spin_unlock_irqrestore(&engine->lock, flags);
+
+			xdma_engine_stop(engine);
+			transfer_dump(transfer);
+			transfer_destroy(lro, transfer, 1);
 			return -ERESTARTSYS;
 		}
 	} /* while (sg) */
 
 	return done;
-
-unmap:
-	if (!dma_mapped) {
-		pci_unmap_sg(lro->pci_dev, sgt->sgl, sgt->orig_nents, dir);
-		sgt->nents = 0;
-	}
-	return rv;
 }
 EXPORT_SYMBOL_GPL(xdma_xfer_submit);
 

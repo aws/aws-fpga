@@ -10,7 +10,7 @@ This is a Linux kernel driver only
 - More ditributions will be tested later.
 
 ## Known Issues
-- The EDMA driver could potentially crash (via kernel panic()) in rare case many writes are issued without being followed by fsync.
+- The EDMA driver could, on rear occasions, return a failure value on read() that results from an XMDA timeout.
 
 ## Expected performance
 - For smaller block size write performance is around 10MByte/s, read performance is around 150MByte/s
