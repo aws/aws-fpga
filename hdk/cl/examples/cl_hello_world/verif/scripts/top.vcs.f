@@ -21,6 +21,7 @@
 
 -y ${CL_ROOT}/../common/design
 -y ${CL_ROOT}/design
+-y ${CL_ROOT}/verif/sv
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
 -y ${SH_SH_DIR}
@@ -55,7 +56,7 @@ ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl/axi_register_slice_v2_1_
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl/axi_infrastructure_v1_1_vl_rfs.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/sim/axi_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
-${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/axi_clock_converter_v2_1_vl_rfs.v
+
 ${CL_ROOT}/design/cl_hello_world.sv
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f

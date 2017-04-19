@@ -26,6 +26,7 @@ compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
 	cd $(SIM_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS $(DEFINES) +lint=TFIPC-L
 	cd $(SIM_DIR) && vcs tb $(TEST) $(C_TEST_NAME) -CFLAGS "-I$(C_INC_DIR) -DINCLUDE_DPI_CALLS" -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log
+	cd $(SIM_DIR) && xelab -m64 --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --timescale 1ps/1ps --debug typical --relax --mt 8 -L axi_clock_converter_v2_1_11 -L generic_baseblocks_v2_1_0 -L axi_infrastructure_v1_1_0 -L axi_register_slice_v2_1_12 -L fifo_generator_v13_1_4 -L axi_data_fifo_v2_1_11 -L axi_crossbar_v2_1_13 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm -sv_lib dpi --snapshot tb xil_defaultlib.tb xil_defaultlib.glbl xil_defaultlib.$(TEST) 
 
 run:
 	cd $(SIM_DIR) && ./simv -l $(TEST).log $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TEST).vpd
