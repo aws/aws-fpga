@@ -22,7 +22,7 @@
 -y ${CL_ROOT}/design
 -y ${SH_LIB_DIR}
 -y ${SH_INF_DIR}
--y ${HDK_SHELL_DESIGN_DIR}/sh_ddr
+-y ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 +incdir+${CL_ROOT}/../common/design
 +incdir+${CL_ROOT}/design
@@ -30,7 +30,7 @@
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 +incdir+${HDK_COMMON_DIR}/verif/include
-+incdir+${HDK_SHELL_DESIGN_DIR}/sh_ddr
++incdir+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s00_regslice_0/sim/cl_axi_interconnect_s00_regslice_0.v

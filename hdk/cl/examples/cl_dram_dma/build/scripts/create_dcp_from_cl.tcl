@@ -250,12 +250,12 @@ read_verilog [ list \
   $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
   $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
   $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sync.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/flop_ccf.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/ccf_ctl.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/mgt_acc_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/mgt_gen_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_acc_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_gen_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
   $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh 
 ]
 
