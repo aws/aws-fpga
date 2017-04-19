@@ -527,6 +527,11 @@ vLED - There are 16 virtual LEDs that can be driven from the CL logic to the SH 
 
 vDIP - There are 16 virtual DIP switches that drive from the SH to the CL logic (sh_cl_status_vdip[15:0]).  These can be used to control logic in the CL.  The value of these signals can be written/read by S/W in the instance.  An API is also provided through AWS Management Software.
 
+These signals are asynchronous to the CL clocks, and the following must be done when using these signals:
+
+- vLED: In implementation a false path should be set from the vLED
+- vDIP: The vDIP signals should be synchronized to a CL clock before being used
+
 ### DMA
 
 There is an integrated DMA controller inside the Shell, and writes/reads data to/from the CL via the sh_cl_pcis_dma bus, and maps to the same address space exposed by the AppPF BAR4 address.
