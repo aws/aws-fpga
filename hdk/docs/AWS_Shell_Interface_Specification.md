@@ -531,7 +531,7 @@ These signals are asynchronous to the CL clocks, and the following must be done 
 
 - vLED: In implementation a false path should be set from the vLED signals.  For example in the constraints for place and route add:
    ```
-      set_false_path -from [get_cells CL/cl_sh_status_vled*]
+      set_false_path -from [get_cells CL/cl_sh_status_vled_reg*]
    ```
 
 - vDIP: The vDIP signals should be synchronized to a CL clock before being used.
@@ -544,7 +544,7 @@ These signals are asynchronous to the CL clocks, and the following must be done 
        end
 
 
-       my_logic = sync_vdip;
+       my_logic = sync_vdip[0];
    ```
    
 
