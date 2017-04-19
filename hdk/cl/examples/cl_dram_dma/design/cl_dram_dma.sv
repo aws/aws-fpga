@@ -743,13 +743,13 @@ cl_ila CL_ILA (
    .lcl_cl_sh_ddra(lcl_cl_sh_ddra)
 
 );
-/*
+
 cl_vio CL_VIO (
 
    .clk_extra_a1(clk_extra_a1)
 
 );
-*/
+
 
 `endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 
