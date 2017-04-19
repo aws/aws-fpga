@@ -99,7 +99,7 @@ if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Load and unload the modules just to make sure have the environment set correctly
   module unload vivado
   module unload sdx
-  module load sdx
+  module load vivado
 fi
 
 # before going too far make sure Vivado is available
