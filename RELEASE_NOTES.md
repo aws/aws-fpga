@@ -67,7 +67,7 @@ The following major features are included in this HDK release:
 
 
 ### 3.	CL  User-defined interrupt events.  The CL can now request sending MSI-X to the instance CPU
-* * Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma): RTL verification/simulation and software (WIP)
+* * Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma)
 * A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
 * [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
 * The initial release supports a single user-defined interrupt 
