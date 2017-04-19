@@ -24,13 +24,6 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (Required: us-east-1)
 
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-
-**NOTE**: *The EC2 extension JSON file has been updated to enable support for the `create-fpga-image` command used in [Step 3](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#3-submit-the-design-checkpoint-to-aws-to-register-the-afi).*
-
 ### 1. Pick one of the examples and move to its directory
 
 There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
@@ -199,15 +192,15 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 ```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
 ```
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-```
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-```
   
 ### 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
+Make sure you clear any AFI you have previously loaded in your slot:
+```
+    $ sudo fpga-clear-local-image  -S 0
+```
+
 You can also invoke the `fpga-describe-local-image` command to learn about which AFI, if any, is loaded onto a particular slot.
 For example, if the slot is cleared (`slot 0` in this example), you should get an output similar to the following:
 
@@ -219,6 +212,8 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 ```
+
+If the describe returns a status 'Busy', the FPGA is still performing the previous operation in the background. Please wait until the status is 'Cleared' as above.
 
 Now, let us try loading your AFI to FPGA `slot 0`:
 

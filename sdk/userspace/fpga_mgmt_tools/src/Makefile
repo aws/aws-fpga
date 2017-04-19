@@ -37,7 +37,7 @@ VTAG_XVC_SRC = virtual_jtag_pcie.c virtual_jtag_server.c
 SRC = fpga_local_cmd.c fpga_local_cmd_parse.c $(VTAG_XVC_SRC)
 OBJ = $(SRC:.c=.o)
 BIN = fpga-local-cmd
-BIN_STATIC = fpga-local-cmd-static
+BIN_STATIC = static-fpga-local-cmd
 
 all: $(BIN) $(BIN_STATIC)
 
