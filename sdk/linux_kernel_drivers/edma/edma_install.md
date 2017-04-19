@@ -88,7 +88,7 @@ The next set of steps will installing the kernel driver so it get called everyti
 ```
 
   $ echo 'edma' | sudo tee --append /etc/modules-load.d/edma.conf
-  $ cp edma-drv.ko /lib/modules/`uname -r`/
+  $ sudo cp edma-drv.ko /lib/modules/`uname -r`/
   $ sudo depmod
 ```  
 
