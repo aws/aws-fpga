@@ -32,6 +32,7 @@ set clock_recipe_a      [lindex $argv  8]
 set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set run_aws_emulation   [lindex $argv 11]
+set notify_via_sns      [lindex $argv 12]
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
@@ -50,6 +51,7 @@ puts "Clock Recipe A:         $clock_recipe_a";
 puts "Clock Recipe B:         $clock_recipe_b";
 puts "Clock Recipe C:         $clock_recipe_c";
 puts "Run AWS Emulation:      $run_aws_emulation";
+puts "Notify when done:       $notify_via_sns";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -71,17 +73,78 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
+#checking if HDK_SHELL_DESIGN_DIR env variable exists
+if { [info exists ::env(HDK_SHELL_DESIGN_DIR)] } {
+        set HDK_SHELL_DESIGN_DIR $::env(HDK_SHELL_DESIGN_DIR)
+        puts "Using Shell design directory $HDK_SHELL_DESIGN_DIR";
+} else {
+        puts "Error: HDK_SHELL_DESIGN_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
 set_msg_config -severity INFO -suppress
 set_msg_config -severity STATUS -suppress
-set_msg_config -severity WARNING -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
 
+# Suppress Warnings
+# These are to avoid warning messages that may not be real issues. A developer
+# may comment them out if they wish to see more information from warning
+# messages.
+set_msg_config -id {Constraints 18-550} -suppress
+set_msg_config -id {Constraints 18-619} -suppress
+set_msg_config -id {DRC 23-20}          -suppress
+set_msg_config -id {Physopt 32-742}     -suppress
+set_msg_config -id {Place 46-14}        -suppress
+set_msg_config -id {Synth 8-3295}       -suppress
+set_msg_config -id {Synth 8-3321}       -suppress
+set_msg_config -id {Synth 8-3331}       -suppress
+set_msg_config -id {Synth 8-3332}       -suppress
+set_msg_config -id {Synth 8-350}        -suppress
+set_msg_config -id {Synth 8-3848}       -suppress
+set_msg_config -id {Synth 8-3917}       -suppress
+set_msg_config -id {Timing 38-436}      -suppress
+
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
+# Check that an email address has been set, else unset notify_via_sns
+
+if {[string compare $notify_via_sns "1"] == 0} {
+  if {![info exists env(EMAIL)]} {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL variable empty!  Completition notification will *not* be sent!";
+    set notify_via_sns 0;
+  } else {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
+  }
+}
+
 source encrypt.tcl
+
+##################################################
+### Tcl Procs and Params 
+##################################################
+
+if {[string match "2017.1*" [version -short]]} {
+   ####Turn off power opt in opt_design for improved QoR
+   set_param logicopt.enablePowerLopt false
+
+   ####Forcing global router ON for improved QoR 
+   set_param route.gr.minGRCongLevel 0
+   set_param route.gr.minNumNets     1
+
+   ####Disable timing relaxation in router for improved QoR
+   set_param route.ignTgtRelaxFactor true
+   set_param route.dlyCostCoef 1.141
+
+   ####Enable support of clocking from one RP to another (SH-->CL)
+   set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
+
+   ####Turn off debug flow DRCs due to false error caused by ECO changes (tck_clk.tcl)
+   set_param chipscope.enablePRFlowDRC 0
+}
 
 #This sets the Device Type
 source $HDK_SHELL_DIR/build/scripts/device_type.tcl
@@ -149,6 +212,11 @@ read_ip [ list \
   $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
   $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
 ]
+
+# Additional IP's that might be needed if using the DDR
+# $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
+# $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
+# $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
 
 puts "AWS FPGA: Reading AWS constraints";
 
@@ -468,7 +536,8 @@ tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
 
-# Clean up vivado.log file
-exec perl $HDK_SHELL_DIR/build/scripts/clean_log.pl ${timestamp} ${CL_DIR}
+if {[string compare $notify_via_sns "1"] == 0} {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling notification script to send e-mail to $env(EMAIL)";
+  exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+}
 
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) finished cleaning the log file. ";

@@ -201,6 +201,11 @@ read_ip [ list \
   $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 
+# Additional IP's that might be needed if using the DDR
+# $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
+# $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
+# $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
+
 puts "AWS FPGA: Reading AWS constraints";
 
 #Read all the constraints
