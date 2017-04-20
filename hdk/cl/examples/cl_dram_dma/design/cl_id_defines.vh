@@ -27,6 +27,7 @@
 // - PCIe Subsystem/Subsystem Vendor ID Values
 //    31:16: PCIe Subsystem ID
 //    15: 0: PCIe Subsystem Vendor ID
+// - A PCIe Subsystem/Subsystem Vendor ID of 0 (zero) is not valid
 `define CL_SH_ID1       32'h1D51_FEDC
 
 
