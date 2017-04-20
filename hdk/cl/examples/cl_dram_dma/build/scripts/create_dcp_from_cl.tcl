@@ -419,6 +419,20 @@ switch $strategy {
     }
 }
 
+# Prohibit the top two URAM sites of each URAM quad.
+# These two sites cannot be used within PR designs.
+set uramSites [get_sites -filter { SITE_TYPE == "URAM288" } ]
+foreach uramSite $uramSites {
+  # Get the URAM location within a quad
+  set quadLoc [expr  [string range $uramSite [expr [string first Y $uramSite] + 1] end] % 4]
+  # The top-two sites have usage restrictions
+  if {$quadLoc == 2 || $quadLoc == 3} {
+    # Prohibit the appropriate site
+    set_property PROHIBIT true $uramSite
+    puts "Setting Placement Prohibit on $uramSite"
+  }
+}
+
 ########################
 # CL Place
 ########################

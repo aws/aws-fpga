@@ -13,12 +13,11 @@ This document helps on-premise developers (or cloud developers that prefer not t
  * SW Build 1846317 on Fri Apr 14 18:54:47 MDT 2017
  * IP Build 1846188 on Fri Apr 14 20:52:08 MDT 2017
 
- * All On-Premise customers will need a new/updated license, please email _*vivado_op@xilinx.com*_ with the following information to receive and updated license:
-    * Xilinx Website Account log-in
-    * Identify yourself as existing on-premise user vs. new on-premise user
-    * Existing users will receive a license that accompanies their existing license and enables VU9P
-    * New users will need to purchase an on-premise license of Vivado 2017.1
-    * The correct ordering number for the product is **EF-VIVADO-SDX-VU9P-OP-(NL/FL)**
+ * On-Premise customers may need a new or updated license
+    * Existing F1 On-Premise customers using the 2016.3 developer preview will not need a new license
+    * New users will need to purchase an on-premise license of Vivado 2017.1, please click on the appropriate "Buy Online From Xilinx"   
+      links here: https://www.xilinx.com/products/design-tools/acceleration-zone/ef-vivado-sdx-vu9p-op-fl-nl.html
+    * The correct ordering number for the product is EF-VIVADO-SDX-VU9P-OP-(NL/FL)
     * You can confirm you are using the correct license for this product by ensuring you have the following in Xilinx License Manager:
        * Analyzer
        * EncryptedWriter_v1
@@ -28,7 +27,6 @@ This document helps on-premise developers (or cloud developers that prefer not t
        * Simulation
        * SysGen
        * XCVU9P
-       * XCVU9P-ES2
        * XCVU9P-ES2_bitgen
        * ap_opencl
        * wtt_override

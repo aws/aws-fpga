@@ -44,6 +44,8 @@ add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -hierarchical -filter
 resize_pblock [get_pblocks pblock_CL_bot] -add {CLOCKREGION_X0Y0:CLOCKREGION_X3Y4}
 set_property PARENT pblock_CL [get_pblocks pblock_CL_bot]
 
+set_clock_groups -name cl_main_a0_tck -asynchronous -group [get_clocks -of_objects [get_pins SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst/CLKOUT0]] -group [get_clocks tck]
+
 
 
 
