@@ -28,7 +28,7 @@ Please click the "Watch" button in GitHub upper right corner to stay posted.
 <a name="fpgahdk"></a>
 ## FPGA HDK 
 
-The [HDK directory](./hdk) contains usuful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
+The [HDK directory](./hdk) contains useful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
 
 [HDK README](./hdk/README.md)
         
@@ -42,7 +42,7 @@ The [HDK directory](./hdk) contains usuful information and scripts for developer
 
 The [SDK directory](./sdk) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded to EC2 FPGA instance slots. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following resources provide further details:
 
-[SDK readme](./sdk/README.md)
+[SDK README](./sdk/README.md)
 
 [Access FPGA From Linux Applications](./hdk/docs/Programmer_View.md)
 
