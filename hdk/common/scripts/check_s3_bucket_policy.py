@@ -46,11 +46,11 @@ See $AWS_FPGA_REPO_DIR/README.md for instructions to configure your credentials.
 class PolicyStatement:
     def __init__(self, statement, principal=None):
         self.statement = statement
-        self.process_policy_statement(statement, principal)
         self.principals_re = []
         self.actions_re = []
         self.notactions_re = []
         self.resources_re = []
+        self.process_policy_statement(statement, principal)
 
     # Convert the policy pattern to a regular expression
     # Escape '.' and replace * with '.*'
