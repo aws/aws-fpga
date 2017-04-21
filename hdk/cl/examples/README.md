@@ -96,7 +96,7 @@ Create a folder for your log files
 ```             
 
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is the policy you must use, except you will need to change <bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
+Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
 
 ```
     {
