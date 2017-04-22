@@ -83,9 +83,9 @@ module test_peek_poke();
 
 `define WR_START_BIT   32'h00000001
 `define RD_START_BIT   32'h00000002
-   
+
    logic [63:0] pcim_address = 64'h0000_0000_1234_0000;
-   
+
    initial begin
 
       tb.sh.power_up();
@@ -105,11 +105,11 @@ module test_peek_poke();
       tb.poke_ocl(`CNTL_REG, 32'h0003);                  // start read & write
 
       #500ns;   // give the hardware time to run
-         
+
       ...
-           
+
       tb.power_down();
-      
+
       $finish;
    end
 
@@ -128,7 +128,7 @@ If your have Mentor Graphics' Questa simulator, then add "SIMULATOR=questa".
 
 ```
 ========================================  NOTE ============================================
-Use only the SV test APIs supplied with the developer's kit to stimulate your CL 
+Use only the SV test APIs supplied with the developer's kit to stimulate your CL
 design. They were designed specifically to mimic the behavior of the actual AWS Shell logic.
 If you choose to control CL signalling via another method, proper operation with Shell
 logic is not guaranteed.
@@ -142,7 +142,7 @@ The AWS Shell Interface specification can be found [here](https://github.com/aws
 As with the SystemVerilog (SV) testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/src sub-directory of CL design root and use the ".c" file extension.
 
 
-```
+```c
 #include <stdio.h>
 #include <stdint.h>
 
@@ -227,7 +227,7 @@ Backdoor access to host memory is provided by two functions:
    function void hm_put_byte(input longint unsigned addr, byte d);
    function byte hm_get_byte(input longint unsigned addr);
 ```
-Use these functions when you need to access data in either SV or C domain host memory. They take zero simulation time and are useful for initializing memory or checking results stored in memory. 
+Use these functions when you need to access data in either SV or C domain host memory. They take zero simulation time and are useful for initializing memory or checking results stored in memory.
 
 
 # Debugging Custom Logic using the AWS HDK
@@ -238,7 +238,7 @@ The process for dumping and viewing waves can differ depending on the simulator 
 
 1. Specify scope of logic for wave dump
 2. Re-run simulation to dump waves
-3. View waves in Vivado using .tcl 
+3. View waves in Vivado using .tcl
 
 ## Specify scope of logic for wave dump
 
@@ -648,24 +648,24 @@ The C Test API function 'void log_printf(const char *format, ...)' is used to pr
 
 | Argument | Description |
 | --- | --- |
-| *format | message to be printed | 
+| *format | message to be printed |
 
 ## _sv_printf_
 ## Description
-The C Test API function 'extern void sv_printf(char *msg)' is used to send a message buffer to the SV side of simulation. 
+The C Test API function 'extern void sv_printf(char *msg)' is used to send a message buffer to the SV side of simulation.
 ## Declaration
 #### extern void sv_printf(char *msg);
 
 | Argument | Description |
 | --- | --- |
-| *msg | Character buffer | 
+| *msg | Character buffer |
 
 ## _sv_pause_
 ## Description
-The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay to a simulation. 
+The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay to a simulation.
 ## Declaration
 #### extern void sv_pause(uint32_t x);
 
 | Argument | Description |
 | --- | --- |
-| x | Delay in micro seconds | 
+| x | Delay in micro seconds |

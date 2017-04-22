@@ -97,7 +97,7 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 1)	Launch Vivado Lab Edition (or full featured Vivado) 
 
-2)	Select “Open HW Manager” as shown in the next figure:
+2)	Select “Open HW Manager" as shown in the next figure:
   
   
 <img src="./images/Open_HW_Manager.jpg" width="600">
@@ -134,7 +134,7 @@ Upon successful connection, Vivado's Hardware panel will be populated with a deb
         $ aws s3 cp s3://<bucket-name>/<logs-folder-name>/*_debug_probes.ltx $CL_DIR   #copy to the example directory
 ```        
 
-7)	In the Hardware Device Properties window select the appropriate “Probes file” for your design by clicking the icon next to the “Probes file” entry, selecting the file, and clicking “OK”. This will refresh the hardware device and it should now show the debug cores present in your design.  Note the Probes file is written out during the design implementation, and is typically has the extension ".ltx".
+7)	In the Hardware Device Properties window select the appropriate “Probes file" for your design by clicking the icon next to the “Probes file" entry, selecting the file, and clicking “OK". This will refresh the hardware device and it should now show the debug cores present in your design.  Note the Probes file is written out during the design implementation, and is typically has the extension ".ltx".
 
 <img src="./images/select_probes_file.jpg" width="600">  
 
