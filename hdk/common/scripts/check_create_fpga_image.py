@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-# Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

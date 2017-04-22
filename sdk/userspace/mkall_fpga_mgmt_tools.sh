@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #
 # Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -17,7 +16,7 @@
 
 # Build script for the Amazon FPGA Image Management Tools and libraries.
 
-TOP=`pwd` 
+TOP=`pwd`
 
 LOGLEVEL=$1
 if [ -z "$LOGLEVEL" ]; then
@@ -26,7 +25,6 @@ else
 	CONFIG_LOGLEVEL=$LOGLEVEL
 fi
 
-#
 # gcc optimizations
 #OPT="-O3 -fno-strict-aliasing"
 
@@ -43,7 +41,7 @@ else
 fi
 
 function build_exec {
-	cd $TOP/$BUILD_DIR 
+	cd $TOP/$BUILD_DIR
 	echo "Entering $TOP/$BUILD_DIR"
 	RET=$?
 	if [ $RET -ne 0 ]; then
