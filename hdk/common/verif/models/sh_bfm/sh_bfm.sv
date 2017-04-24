@@ -692,7 +692,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_awaddr  <= sh_cl_wr_cmds[0].addr;
          sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
          sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
-         sh_cl_dma_pcis_awsize  <= sh_cl_wr_cmds[0].size;
+         sh_cl_dma_pcis_awsize  <= /*sh_cl_wr_cmds[0].size*/3'h6;
          
          sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
                                !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
@@ -771,7 +771,7 @@ module sh_bfm #(
          sh_cl_dma_pcis_araddr  <= sh_cl_rd_cmds[0].addr;
          sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
          sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
-         sh_cl_dma_pcis_arsize  <= sh_cl_rd_cmds[0].size;
+         sh_cl_dma_pcis_arsize  <= /*sh_cl_rd_cmds[0].size*/3'h6;
          
          sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
                                !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
@@ -1113,102 +1113,89 @@ module sh_bfm #(
    //==========================================================
 
    // DDR Controller
-   axi4_flop_fifo #(.IN_FIFO(1), .ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_DEPTH(3)) DDR_3_AXI4_REG_SLC (
+   axi_register_slice DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
-     .aresetn        (sync_rst_n),
-     .sync_rst_n     (intf_sync_rst_n),
+     .aresetn        (intf_sync_rst_n),
 
      .s_axi_awid     (cl_sh_ddr_awid),
      .s_axi_awaddr   (cl_sh_ddr_awaddr),
      .s_axi_awlen    (cl_sh_ddr_awlen),
-     .s_axi_awuser   (1'b0),
      .s_axi_awvalid  (cl_sh_ddr_awvalid),
      .s_axi_awready  (sh_cl_ddr_awready),
      .s_axi_wdata    (cl_sh_ddr_wdata),
      .s_axi_wstrb    (cl_sh_ddr_wstrb),
      .s_axi_wlast    (cl_sh_ddr_wlast),
      .s_axi_wvalid   (cl_sh_ddr_wvalid),
-     .s_axi_wuser    (),
      .s_axi_wready   (sh_cl_ddr_wready),
      .s_axi_bid      (sh_cl_ddr_bid),
      .s_axi_bresp    (sh_cl_ddr_bresp),
      .s_axi_bvalid   (sh_cl_ddr_bvalid),
-     .s_axi_buser    (),
      .s_axi_bready   (cl_sh_ddr_bready),
      .s_axi_arid     (cl_sh_ddr_arid),
      .s_axi_araddr   (cl_sh_ddr_araddr),
      .s_axi_arlen    (cl_sh_ddr_arlen),
-     .s_axi_aruser   (1'b0),
      .s_axi_arvalid  (cl_sh_ddr_arvalid),
      .s_axi_arready  (sh_cl_ddr_arready),
      .s_axi_rid      (sh_cl_ddr_rid),
      .s_axi_rdata    (sh_cl_ddr_rdata),
      .s_axi_rresp    (sh_cl_ddr_rresp),
      .s_axi_rlast    (sh_cl_ddr_rlast),
-     .s_axi_ruser    (),
      .s_axi_rvalid   (sh_cl_ddr_rvalid),
      .s_axi_rready   (cl_sh_ddr_rready),
   
      .m_axi_awid     (cl_sh_ddr_awid_q),   
      .m_axi_awaddr   (cl_sh_ddr_awaddr_q), 
      .m_axi_awlen    (cl_sh_ddr_awlen_q),  
-     .m_axi_awuser   (),
      .m_axi_awvalid  (cl_sh_ddr_awvalid_q),
      .m_axi_awready  (sh_cl_ddr_awready_q),
      .m_axi_wdata    (cl_sh_ddr_wdata_q),  
      .m_axi_wstrb    (cl_sh_ddr_wstrb_q),  
-     .m_axi_wuser    (),
      .m_axi_wlast    (cl_sh_ddr_wlast_q),  
      .m_axi_wvalid   (cl_sh_ddr_wvalid_q), 
      .m_axi_wready   (sh_cl_ddr_wready_q), 
      .m_axi_bid      (sh_cl_ddr_bid_q),    
      .m_axi_bresp    (sh_cl_ddr_bresp_q),  
-     .m_axi_buser    (),
      .m_axi_bvalid   (sh_cl_ddr_bvalid_q), 
      .m_axi_bready   (cl_sh_ddr_bready_q), 
      .m_axi_arid     (cl_sh_ddr_arid_q),   
      .m_axi_araddr   (cl_sh_ddr_araddr_q), 
      .m_axi_arlen    (cl_sh_ddr_arlen_q),  
-     .m_axi_aruser   (),
      .m_axi_arvalid  (cl_sh_ddr_arvalid_q),
      .m_axi_arready  (sh_cl_ddr_arready_q),
      .m_axi_rid      (sh_cl_ddr_rid_q),    
      .m_axi_rdata    (sh_cl_ddr_rdata_q),  
      .m_axi_rresp    (sh_cl_ddr_rresp_q),  
-     .m_axi_ruser    (),
      .m_axi_rlast    (sh_cl_ddr_rlast_q),  
      .m_axi_rvalid   (sh_cl_ddr_rvalid_q), 
      .m_axi_rready   (cl_sh_ddr_rready_q)
      );
 
-   axi4_ccf #(.ADDR_WIDTH(64), .DATA_WIDTH(512), .ID_WIDTH(16), .A_USER_WIDTH(1), .FIFO_ADDR_WIDTH(3)) DDR4_3_AXI_CCF (
+    axi_clock_converter_0 DDR4_3_AXI_CCF (
      .s_axi_aclk(clk_core),
      .s_axi_aresetn(rst_n),
 
      .s_axi_awid(cl_sh_ddr_awid_q),
      .s_axi_awaddr(cl_sh_ddr_awaddr_q),
      .s_axi_awlen(cl_sh_ddr_awlen_q),
-     .s_axi_awuser(1'b0),
+     .s_axi_awuser(19'b0),
      .s_axi_awvalid(cl_sh_ddr_awvalid_q),
      .s_axi_awready(sh_cl_ddr_awready_q),
 
      .s_axi_wdata(cl_sh_ddr_wdata_q),
      .s_axi_wstrb(cl_sh_ddr_wstrb_q),
      .s_axi_wlast(cl_sh_ddr_wlast_q),
-     .s_axi_wuser(),
      .s_axi_wvalid(cl_sh_ddr_wvalid_q),
      .s_axi_wready(sh_cl_ddr_wready_q),
 
      .s_axi_bid(sh_cl_ddr_bid_q),
      .s_axi_bresp(sh_cl_ddr_bresp_q),
-     .s_axi_buser(),
      .s_axi_bvalid(sh_cl_ddr_bvalid_q),
      .s_axi_bready(cl_sh_ddr_bready_q),
 
      .s_axi_arid(cl_sh_ddr_arid_q),
      .s_axi_araddr(cl_sh_ddr_araddr_q),
      .s_axi_arlen(cl_sh_ddr_arlen_q),
-     .s_axi_aruser(1'b0),
+     .s_axi_aruser(19'b0),
      .s_axi_arvalid(cl_sh_ddr_arvalid_q),
      .s_axi_arready(sh_cl_ddr_arready_q),
 
@@ -1216,7 +1203,6 @@ module sh_bfm #(
      .s_axi_rdata(sh_cl_ddr_rdata_q),
      .s_axi_rresp(sh_cl_ddr_rresp_q),
      .s_axi_rlast(sh_cl_ddr_rlast_q),
-     .s_axi_ruser(),
      .s_axi_rvalid(sh_cl_ddr_rvalid_q),
      .s_axi_rready(cl_sh_ddr_rready_q),
 
@@ -1233,13 +1219,11 @@ module sh_bfm #(
      .m_axi_wdata(sync_cl_sh_ddr_wdata),
      .m_axi_wstrb(sync_cl_sh_ddr_wstrb),
      .m_axi_wlast(sync_cl_sh_ddr_wlast),
-     .m_axi_wuser(),
      .m_axi_wvalid(sync_cl_sh_ddr_wvalid),
      .m_axi_wready(sync_sh_cl_ddr_wready),
 
      .m_axi_bid(sync_sh_cl_ddr_bid),
      .m_axi_bresp(sync_sh_cl_ddr_bresp),
-     .m_axi_buser(),
      .m_axi_bvalid(sync_sh_cl_ddr_bvalid),
      .m_axi_bready(sync_cl_sh_ddr_bready),
 
@@ -1253,7 +1237,6 @@ module sh_bfm #(
      .m_axi_rid(sync_sh_cl_ddr_rid),
      .m_axi_rdata(sync_sh_cl_ddr_rdata),
      .m_axi_rresp(sync_sh_cl_ddr_rresp),
-     .m_axi_ruser(),
      .m_axi_rlast(sync_sh_cl_ddr_rlast),
      .m_axi_rvalid(sync_sh_cl_ddr_rvalid),
      .m_axi_rready(sync_cl_sh_ddr_rready)
@@ -1931,6 +1914,7 @@ module sh_bfm #(
                   end
                 end
                 axi_cmd.id   = chan;
+                axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
 
                 // loop to do multiple data beats
@@ -2057,6 +2041,7 @@ module sh_bfm #(
                   end
                   axi_cmd.id   = chan;
                 end
+                axi_cmd.size = 6;
                 sh_cl_rd_cmds.push_back(axi_cmd);
                 for(int i = 0; i <= axi_cmd.len; i++) begin
                   data_dop.buffer = dop.buffer;

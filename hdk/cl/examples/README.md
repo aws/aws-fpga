@@ -24,13 +24,6 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (Required: us-east-1)
 
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-
-**NOTE**: *The EC2 extension JSON file has been updated to enable support for the `create-fpga-image` command used in [Step 3](https://github.com/aws/aws-fpga/tree/master/hdk/cl/examples#3-submit-the-design-checkpoint-to-aws-to-register-the-afi).*
-
 ### 1. Pick one of the examples and move to its directory
 
 There are couple of ways to start a new CL: one option is to copy one of the examples provided in the HDK and modify the design files, scripts and constrains directory.
@@ -103,7 +96,7 @@ Create a folder for your log files
 ```             
 
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is the policy you must use, except you will need to change <bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
+Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
 
 ```
     {
@@ -170,11 +163,11 @@ Once your policy passes the checks, your ready to start AFI creation.
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is **`afi-01234567890abcdef`**.
+    An example AFI ID is **`agfi-0f0e045f919413242`**.
 - **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
-    An example AGFI ID is **`agfi-01234567890abcdef`**.
+    An example AGFI ID is **`agfi-0f0e045f919413242`**.
 
 After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 
@@ -199,15 +192,15 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 ```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
 ```
-During the F1 preview, not all FPGA-specific AWS CLI commands are available to the public.
-To extend your AWS CLI installation, please execute the following:
-```
-    $ aws configure add-model --service-model file://$AWS_FPGA_REPO_DIR/sdk/aws-cli-preview/ec2_preview_model.json
-```
   
 ### 5. Load the AFI
 
 You can now use the FPGA Management tools, from within your F1 instance, to load your AFI onto an FPGA on a specific slot.
+Make sure you clear any AFI you have previously loaded in your slot:
+```
+    $ sudo fpga-clear-local-image  -S 0
+```
+
 You can also invoke the `fpga-describe-local-image` command to learn about which AFI, if any, is loaded onto a particular slot.
 For example, if the slot is cleared (`slot 0` in this example), you should get an output similar to the following:
 
@@ -220,10 +213,12 @@ For example, if the slot is cleared (`slot 0` in this example), you should get a
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 ```
 
+If the describe returns a status 'Busy', the FPGA is still performing the previous operation in the background. Please wait until the status is 'Cleared' as above.
+
 Now, let us try loading your AFI to FPGA `slot 0`:
 
 ```
-    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+    $ sudo fpga-load-local-image -S 0 -I agfi-0f0e045f919413242
 ```
 
 
@@ -234,7 +229,7 @@ Now, you can verify that the AFI was loaded properly.  The output shows the FPGA
     $ sudo fpga-describe-local-image -S 0 -R -H
 
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-    AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version>
+    AFI          0       agfi-0f0e045f919413242  loaded            0        ok               0       <shell version>
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
 ```

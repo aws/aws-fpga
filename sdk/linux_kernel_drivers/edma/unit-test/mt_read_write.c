@@ -1,4 +1,4 @@
-#include<pthread.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -86,7 +86,10 @@ void* doWrite(void *arg)
 		printf("wrote %u bytes\n", ret);
 
 		if(ret != write_size)
-			exit(1);
+		{
+			printf("write ret value was %d\n", ret);
+			ret = 0;
+		}
 
 		offset += ret;
 		written_no_fsync += ret;
@@ -129,6 +132,10 @@ void* doRead(void *arg)
 
 		read_size = can_read == 1 ? 1: rand() % can_read;
 
+		//check if we cross a 4k page
+		if((offset % PAGE_SIZE + read_size) > PAGE_SIZE)
+			read_size = PAGE_SIZE - offset % PAGE_SIZE;
+
 		ret = lseek(fd, offset, SEEK_SET);
 		if(ret < 0)
 			exit(3);
@@ -138,7 +145,10 @@ void* doRead(void *arg)
 		printf("\nRead %d bytes \n", ret, size_of_data);
 
 		if(ret != read_size)
-			exit(2);
+		{
+			printf("Read ret value was %d\n", ret);
+			ret = 0;
+		}
 
 		offset += ret;
 

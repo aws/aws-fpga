@@ -124,9 +124,6 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 -  If the above command fails, its most likely that either the virtual jtag server is not running, the IP/Port are wrong, or a firewall/security-group rule is blocking the connection. See the [FAQ](#faq) section in the end of this document.
 
-- At this point the Virtual JTAG XVC-server running on the target should acknowledge the Vivado connection by printing the following in `dmesg` log.
-`**TBD8*`
-
 
 Upon successful connection, Vivado's Hardware panel will be populated with a debug bridge instance. 
  
@@ -152,7 +149,7 @@ Vivado can now be used to debug your design: the next figure shows how a CL desi
 
 The connection Vivado and the target instance can be terminated by closing the XVC server from Vivado using the right click menu. If the target FPGA PCIe connection is lost, a new AFI is loaded or the Virtual JTAG Server application stops running, the connection to the FPGA and associated debug cores will also be lost. 
 
-**NOTE:** Xilinx Hardware Manager (Vivado Lab Edition) should not be connected to the target Virtual JTAG XVC Server when the AFI is not in READY state. If the AFI going to go through `fpga-clear-image` or `fpga-load-local-image`, Vivado should be disconnected, and the Virtual JTAG XVC Server should be terminated. (TBD - how to terminate)
+**NOTE:** Xilinx Hardware Manager (Vivado Lab Edition) should not be connected to the target Virtual JTAG XVC Server when the AFI is not in READY state. If the AFI going to go through `fpga-clear-image` or `fpga-load-local-image`, Vivado should be disconnected, and the Virtual JTAG XVC Server should be terminated by killing the process the runs the JTAG XVC Server.
   
     
 <a name="faq"></a>

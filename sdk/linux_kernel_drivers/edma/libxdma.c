@@ -452,6 +452,8 @@ struct xdma_transfer *engine_transfer_completion(struct xdma_engine *engine,
 	BUG_ON(!engine);
 	BUG_ON(!transfer);
 
+	BUG_ON(!(&transfer->wq));
+
 	/* synchronous I/O? */
 	/* awake task on transfer's wait queue */
 	wake_up_interruptible(&transfer->wq);
@@ -1737,9 +1739,8 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 			goto unmap;
 		}
 
-		rv = wait_event_interruptible_timeout(transfer->wq,
-                        (transfer->state != TRANSFER_STATE_SUBMITTED),
-			msecs_to_jiffies(timeout_ms));
+		rv = wait_event_interruptible(transfer->wq,
+                        (transfer->state != TRANSFER_STATE_SUBMITTED));
 
 		switch(transfer->state) {
 		case TRANSFER_STATE_COMPLETED:
@@ -1761,6 +1762,7 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir,
 			engine_status_read(engine, 0, 1);
 			read_interrupts(lro);
 			interrupt_status(lro);
+			transfer_destroy(lro, transfer);
 			return -ERESTARTSYS;
 		}
 	} /* while (sg) */

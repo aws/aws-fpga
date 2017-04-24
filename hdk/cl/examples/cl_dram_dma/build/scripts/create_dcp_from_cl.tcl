@@ -15,6 +15,7 @@
 
 package require tar
 
+set top top_sp
 set TOP cl_dram_dma
  
 #################################################
@@ -32,6 +33,41 @@ set clock_recipe_a      [lindex $argv  8]
 set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set run_aws_emulation   [lindex $argv 11]
+set notify_via_sns      [lindex $argv 12]
+
+##################################################
+### Implementation step options 
+##################################################
+#Set psip to 1 to enable Physical Synthesis in Placer (2017.1+ only)
+set psip 1
+
+set opt 1
+set opt_options    "-verbose"
+set opt_directive  "ExploreWithRemap"
+set opt_preHookTcl ""
+
+set place 1
+set place_options    ""
+set place_directive  "Explore"
+#Prohbit sites to avoid congestion if utilization is low enough
+
+set place_preHookTcl ""
+
+set phys_opt 1
+set phys_options    ""
+set phys_directive  "Explore"
+set phys_preHookTcl ""
+
+set route 1
+set route_options    ""
+set route_directive  "Explore"
+set route_preHookTcl ""
+
+set route_phys_opt 1
+set post_phys_options    ""
+set post_phys_directive  "Explore"
+set post_phys_preHookTcl ""
+
 
 #################################################
 ## Generate CL_routed.dcp (Done by User)
@@ -50,6 +86,7 @@ puts "Clock Recipe A:         $clock_recipe_a";
 puts "Clock Recipe B:         $clock_recipe_b";
 puts "Clock Recipe C:         $clock_recipe_c";
 puts "Run AWS Emulation:      $run_aws_emulation";
+puts "Notify when done:       $notify_via_sns";
 
 #checking if CL_DIR env variable exists
 if { [info exists ::env(CL_DIR)] } {
@@ -67,6 +104,16 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         puts "Using Shell directory $HDK_SHELL_DIR";
 } else {
         puts "Error: HDK_SHELL_DIR environment variable not defined ! ";
+        puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
+        exit 2
+}
+
+#checking if HDK_SHELL_DESIGN_DIR env variable exists
+if { [info exists ::env(HDK_SHELL_DESIGN_DIR)] } {
+        set HDK_SHELL_DESIGN_DIR $::env(HDK_SHELL_DESIGN_DIR)
+        puts "Using Shell design directory $HDK_SHELL_DESIGN_DIR";
+} else {
+        puts "Error: HDK_SHELL_DESIGN_DIR environment variable not defined ! ";
         puts "Run the hdk_setup.sh script from the root directory of aws-fpga";
         exit 2
 }
@@ -108,14 +155,68 @@ set_msg_config -id {Vivado 12-1008}       -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
-source encrypt.tcl
+# Check that an email address has been set, else unset notify_via_sns
 
+if {[string compare $notify_via_sns "1"] == 0} {
+  if {![info exists env(EMAIL)]} {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL variable empty!  Completition notification will *not* be sent!";
+    set notify_via_sns 0;
+  } else {
+    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) EMAIL address for completion notification set to $env(EMAIL).";
+  }
+}
+
+source encrypt.tcl
 #This sets the Device Type
 source $HDK_SHELL_DIR/build/scripts/device_type.tcl
+source $HDK_SHELL_DIR/build/scripts/step.tcl -notrace
+
+##################################################
+### Tcl Procs and Params 
+##################################################
+if {[string match "2017.1*" [version -short]]} {
+   ####Turn off power opt in opt_design for improved QoR
+   set_param logicopt.enablePowerLopt false
+
+   ####Forcing global router ON for improved QoR 
+   set_param route.gr.minGRCongLevel 0
+   set_param route.gr.minNumNets     1
+
+   ####Disable timing relaxation in router for improved QoR
+   set_param route.ignTgtRelaxFactor true
+   set_param route.dlyCostCoef 1.141
+
+   ####Enable support of clocking from one RP to another (SH-->CL)
+   set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1 
+}
+
+##################################################
+### Source and Output Directories 
+##################################################
+set synthDir  "../synthesis_user_sda"
+set implDir   "../implement_user_sda"
+set rptDir    "../reports_user_sda"
+
+##################################################
+### Create output Directories 
+##################################################
+if {![file exists $synthDir]} {
+   file mkdir $synthDir
+}
+
+if {![file exists $implDir]} {
+   file mkdir $implDir
+}
+
+if {![file exists $rptDir]} {
+   file mkdir $rptDir
+}
 
 create_project -in_memory -part [DEVICE_TYPE] -force
 
-set_param chipscope.enablePRFlow true
+#set_param chipscope.enablePRFlow true
+#Param needed to avoid clock name collisions
+set_param sta.enableAutoGenClkNamePersistence 0
 
 ########################################
 ## Generate clocks based on Recipe 
@@ -147,42 +248,42 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DIR/design/lib/sync.v \
-  $HDK_SHELL_DIR/design/lib/flop_ccf.sv \
-  $HDK_SHELL_DIR/design/lib/ccf_ctl.v \
-  $HDK_SHELL_DIR/design/lib/lib_pipe.sv \
-  $HDK_SHELL_DIR/design/lib/bram_2rw.sv \
-  $HDK_SHELL_DIR/design/lib/flop_fifo.sv \
-  $HDK_SHELL_DIR/design/lib/mgt_acc_axl.sv  \
-  $HDK_SHELL_DIR/design/lib/mgt_gen_axl.sv  \
-  $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
-  $HDK_SHELL_DIR/design/interfaces/cl_ports.vh 
+  $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
+  $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_acc_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_gen_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh 
 ]
 
 puts "AWS FPGA: Reading IP blocks";
 #Read DDR IP
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/ddr4_core/ddr4_core.xci 
+  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci 
 ]
 
 #Read IP for axi register slices
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/src_register_slice/src_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
-  $HDK_SHELL_DIR/design/ip/dest_register_slice/dest_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_register_slice/axi_register_slice.xci \
-  $HDK_SHELL_DIR/design/ip/axi_register_slice_light/axi_register_slice_light.xci
+  $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci \
-  $HDK_SHELL_DIR/design/ip/ila_1/ila_1.xci \
-  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci \
-  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
+  $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/ila_1/ila_1.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/ila_vio_counter/ila_vio_counter.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 read_bd [ list \
-  $HDK_SHELL_DIR/design/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+  $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
 ]
 
 puts "AWS FPGA: Reading AWS constraints";
@@ -194,38 +295,45 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_synth_user.xdc  - Developer synthesis constraints.
 read_xdc [ list \
    $CL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]
 
 #Do not propagate local clock constraints for clocks generated in the SH
-set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
+#set_property USED_IN {synthesis OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
+set_property USED_IN {synthesis implementation OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
+set_property USED_IN {synthesis implementation} [get_files cl_synth_aws.xdc]
+set_property PROCESSING_ORDER EARLY  [get_files cl_clocks_aws.xdc]
+set_property PROCESSING_ORDER LATE   [get_files cl_synth_aws.xdc]
 
 ########################
 # CL Synthesis
 ########################
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthesis.";
 
+update_compile_order -fileset sources_1
+
 switch $strategy {
     "BASIC" {
         puts "BASIC strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt > $synthDir/${TOP}_synth.log
     }
     "EXPLORE" {
         puts "EXPLORE strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers -flatten_hierarchy rebuilt > $synthDir/${TOP}_synth.log 
     }
     "TIMING" {
         puts "TIMING strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off 
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off > $synthDir/${TOP}_synth.log 
     }
     "CONGESTION" {
         puts "CONGESTION strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context -directive AlternateRoutability -no_lc -shreg_min_size 10 -control_set_opt_threshold 16 > $synthDir/${TOP}_synth.log 
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers
+        synth_design -top $TOP -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context  -keep_equivalent_registers > $synthDir/${TOP}_synth.log
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -242,6 +350,8 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth c
 
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
 close_project
+#Set param back to default value
+set_param sta.enableAutoGenClkNamePersistence 1
 
 ########################
 # CL Optimize
@@ -254,8 +364,11 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Optimizing design.";
 
 puts "AWS FPGA: Implementation step -Combining Shell and CL design checkpoints";
 
-open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+#open_checkpoint $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+#read_checkpoint -strict -cell CL $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+set_property SCOPED_TO_CELLS {CL} [get_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp]
 
 #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
 read_xdc [ list \
@@ -263,6 +376,12 @@ read_xdc [ list \
    $CL_DIR/build/constraints/cl_pnr_user.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc
 ]
+set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]
+
+link_design -top $top -part [DEVICE_TYPE] -reconfig_partitions {SH CL}
+
+puts "Writing post-link_design checkpoint $implDir/$top.post_link.dcp"
+write_checkpoint -force $implDir/$top.post_link_design.dcp > $implDir/checkpoint.log
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Sourcing aws_clock_properties.tcl to apply properties to clocks. ";
 
@@ -290,7 +409,10 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        opt_design -directive Explore
+        impl_step opt_design $top $opt_options $opt_directive $opt_preHookTcl
+        if {$psip} {
+           impl_step opt_design $top "-merge_equivalent_drivers -sweep"
+        }
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -335,7 +457,10 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        place_design -directive ExtraNetDelay_high
+        if {$psip} {
+           append place_options " -fanout_opt"
+        }
+        impl_step place_design $top $place_options $place_directive $place_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -370,7 +495,7 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        phys_opt_design -directive Explore
+        impl_step phys_opt_design $top $phys_options $phys_directive $phys_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -402,7 +527,7 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        route_design -directive Explore
+        impl_step route_design $top $route_options $route_directive $route_preHookTcl
     }
     default {
         puts "$strategy is NOT a valid strategy."
@@ -420,7 +545,7 @@ switch $strategy {
         puts "BASIC strategy."
     }
     "EXPLORE" {
-        puts "EXPLORE strategy."
+        #puts "EXPLORE strategy."        
     }
     "TIMING" {
         puts "TIMING strategy."
@@ -431,14 +556,19 @@ switch $strategy {
     }
     "DEFAULT" {
         puts "DEFAULT strategy."
-        phys_opt_design  -directive Explore
-        puts "AWS FPGA: Locking design ";
-        lock_design -level routing
+        set SLACK [get_property SLACK [get_timing_paths]]
+        if {$route_phys_opt && $SLACK > -0.400 && $SLACK < 0} {
+           impl_step route_phys_opt_design $top $post_phys_options $post_phys_directive $post_phys_preHookTcl
+        }
     }
     default {
         puts "$strategy is NOT a valid strategy."
     }
 }
+
+# Lock the design to preserve the placement and routing
+puts "AWS FPGA: Locking design ";
+lock_design -level routing
 
 # Report final timing
 report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timing_summary.rpt
@@ -500,4 +630,9 @@ cd $CL_DIR/build/checkpoints
 tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Finished creating final tar file in to_aws directory.";
+
+if {[string compare $notify_via_sns "1"] == 0} {
+  puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling notification script to send e-mail to $env(EMAIL)";
+  exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+}
 

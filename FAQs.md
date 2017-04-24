@@ -1,6 +1,6 @@
 #AWS FPGA - Frequently Asked Questions
 
-[General F1 FAQs](#general)
+[General F1 FAQs](#general) 
 
 [Getting Started FAQs](#getting-started)
 
@@ -17,7 +17,7 @@
 [Troubleshooting FAQs](#troubleshooting)
 
 
-##General
+## General
 
 **Q: What is included in the HDK?**
 
@@ -111,7 +111,7 @@ Yes. Developers are free to use any IP blocks within the Custom Logic region. Th
 
 
 
-##Getting Started
+## Getting Started
 **Q: What do I need to get started on building accelerators for FPGA instances?**
 
 Getting started requires downloading the latest HDK and SDK from the AWS FPGA GitHub repository. The HDK and SDK provide the needed code and information for building FPGA code. The HDK provides all the information needed for developing an FPGA image from source code, while the SDK provides all the runtime software for managing the Amazon FPGA Image (AFI) loaded into the F1 instance FPGA.
@@ -142,11 +142,7 @@ The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides expanded featur
 
 **Q: Where do I go for support?**
 
-We encourage you to use the forum to post questions, suggestions and receive important announcements. During the preview period, the forum is limited to the preview users only; we’ll open it once F1 moves to GA.
- 
-Please use the following direct link to enter the forum: https://forums.aws.amazon.com/forum.jspa?forumID=243. 
- 
-To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen. 
+We encourage you to use the [AWS FPGA Developer Forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to post questions, suggestions and receive important announcements. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen. 
 
 **Q: Is there any software I need on my F1 instance that will use the AFI?**
 
@@ -155,7 +151,7 @@ The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga
 Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope.
 
 
-##Marketplace
+## Marketplace
 **Q: What does publishing my AFI/AMI to AWS Marketplace enables?**
 
 Developers can sell their AFI/AMI combination through the AWS Marketplace to other AWS users. Once in Marketplace, customers can launch an F1 instance with that AFI/AMI combination directly from the marketplace with the 1-click deployment feature. Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption. The metering, billing, collections, and disbursement of payments are managed by AWS, allowing you to focus on marketing and selling your solution. Please check out [AWS Marketplace](https://aws.amazon.com/marketplace/management/tour/) for more details on how to become a seller, how to set price and collect metrics.
@@ -175,7 +171,7 @@ In other words, AFIs are not published directly on AWS marketplace, rather AFI(s
 Neither: AWS Marketplace customers that pick up an AMI with one our more AFIs associated with it will not see any source code nor bitstream. Marketplace customers actually have permission to use the AFI but not permission to see its code. The only reference to the AFI is through its unique AFI ID. The AMI would call `fpga-local-load-image` with the correct AFI ID for that Marketplace offering, which will result in **AWS loading the AFI into the FPGA** in sideband and without sending the AFI code through the customer's instance. No FPGA internal design code is exposed.
 
 
-##Instance
+## Instance
 **Q: What OS can run on the F1 instance?**
 
 Amazon Linux 2016.09 and CentOS 7.3 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows is not supported on F1.
@@ -216,7 +212,7 @@ Both. The FPGA PCIe memory address space can be mmap() to both kernel and usersp
 
 **Q: How do I change what AFI is loaded in an FPGA?**
 
-Changing the AFI loaded in an FPGA is done using the `fpga-load-local-image` API from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). This command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
+Changing the AFI loaded in an FPGA is done using the `fpga-clear-local-image` and `fpga-load-local-image` APIs from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). Note that to ensure your AFI is loaded to a consistent state, a loaded FPGA slot must be cleared with `fpga-clear-local-image` before loading another FPGA image.  The `fpga-load-local-image` command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
 
 
 
@@ -252,7 +248,7 @@ The developer can take advantage of a userspace polling-mode driver framework li
 No. The FPGAs do not have direct access to the SSDs on F1. The SSDs on F1 are high-performance, NVMe SSD devices. The developer can take advantage of a userspace polling-mode driver framework like SPDK, to implement fast and low latency copy between the NVMe SSD and the FPGA, with the data most probably stored in the x86 LastLevelCache (LLC).
 
 
-##Languages
+## Languages
 **Q: Which HDL languages are supported?**
 
 For RTL level development: Verilog and VHDL are both supported in the FPGA Developer AMI and in generating a Design Checkpoint. The Xilinx Vivado tools and simulator support mixed mode simulation of Verilog and VHDL. The AWS Shell is written in Verilog. Support for mixed mode simulation may vary if developers use other simulators. Check your simulator documentation for Verilog/VHDL/System Verilog support.
@@ -262,8 +258,6 @@ For RTL level development: Verilog and VHDL are both supported in the FPGA Devel
 **Q: Is OpenCL and/or SDAccel Supported?**
 
 Yes. OpenCL is supported through either the Xilinx SDAccel environment or any OpenCL tool capable of generating RTL supported by the Xilinx Vivado synthesis tool. There is a branch in the AWS SDK tree for SDAccel. 
-
-* Note that during the Preview period, SDAccel may not be available.
 
 
 
@@ -282,7 +276,7 @@ Support for other simulators is included through the bring-your-own license in t
 FPGA Developer AMI. AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim, and Cadence Incisive. Licenses for these simulators must be acquired by the developer and not available with AWS FPGA Developer AMI.
 
 
-##FPGA
+## FPGA
 **Q: What FPGA is used in AWS EC2 F1 instance?**
 
 The FPGA for F1 is the Xilinx Ultrascale+ VU9P device with the -2 speed grade. The HDK scripts have the compile scripts needed for the VU9P device.
@@ -338,7 +332,7 @@ Refer to [Virtual JTAG readme](./hdk/docs/Virtual_JTAG_XVC.md) for more details.
 
 
 
-##Shell
+## Shell
 **Q: Do I need to interface to the AWS Shell?**
 
 Yes. The only way to interface to PCIe and the instance CPU is using the AWS Shell. The AWS Shell is included with all F1 FPGAs. There is no option to run the F1 FPGA without a Shell. The Shell takes care of the non-differentiating heavy lifting tasks like PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
@@ -355,7 +349,7 @@ The Shell consumes about 20% of the FPGA resources, and that includes the PCIe G
 
 
 
-##Troubleshooting
+## Troubleshooting
 **Q: Why do I see error “vivado not found” while running hdk_setup.sh*?**
 
 This is an indication that Xilinx Vivado tool set are not installed. Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.

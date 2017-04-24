@@ -28,7 +28,7 @@ Please click the "Watch" button in GitHub upper right corner to stay posted.
 <a name="fpgahdk"></a>
 ## FPGA HDK 
 
-The [HDK directory](./hdk) contains usuful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
+The [HDK directory](./hdk) contains useful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
 
 [HDK README](./hdk/README.md)
         
@@ -42,18 +42,11 @@ The [HDK directory](./hdk) contains usuful information and scripts for developer
 
 The [SDK directory](./sdk) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded to EC2 FPGA instance slots. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following resources provide further details:
 
-[SDK readme](./sdk/README.md)
+[SDK README](./sdk/README.md)
 
 [Access FPGA From Linux Applications](./hdk/docs/Programmer_View.md)
 
 [AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
-
-<a name="fpgasdaccel"></a>
-## SDAccel - Coming Soon
-
-The [SDAccel directory](./sdk/SDAccel) includes the environment required to run OpenCL/SDAccel flow on EC2 instances. It includes the drivers and tools to interact with AFIs that are loaded to EC2 FPGA instance slots. 
-
-[Developing with OpenCL/SDAccel](./hdk/docs/OpenCL_SDAccel_Development.md)
 
 <a name="devAmi"></a>
 ## FPGA Developer AMI 
@@ -68,10 +61,6 @@ The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum
 * To be notified on important messages click on the “Watch Forum” button on the right side of the screen.
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
 
-During the Preview to gain access to the user forum:
-
-* Login to https://forums.aws.amazon.com/index.jspa 
-* **Note** *the first time you login, click on "Your Stuff" where you will see your forums username and userID at the end of the URL. Email your userID to f1-preview@amazon.com with "FPGA forum access" in the subject line, in order to receive forum access.*
 
  
 <a name="buildingAnExample"></a>
@@ -99,7 +88,7 @@ By following the example CLs, a developer will learn how to interface to the AWS
 <a name="buildingafiprereq"></a>
 ### Prerequisites
 * AWS FPGA HDK and SDK run in Linux environment only.
-* During the F1 Preview preiod, if you can not access GitHub repository, please request access permission from your AWS representative.
+
 * The build stage uses Xilinx's Vivado tool set. In case you build on-premises you should have an installed Vivado that has the correct license.  Please check for [supported versions of Vivado](./hdk/supported_vivado_versions.txt). [Release Notes](./RELEASE_NOTES.md) may contain additional information.
 * Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region.  Please refer to [AWS documentation for help with configuring the AWS CLI.](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)   
 

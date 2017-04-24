@@ -7,18 +7,17 @@ This document helps on-premise developers (or cloud developers that prefer not t
 
 
 <a name="requirements"></a>
-## Requirements for AWS HDK 1.1.0
- * Xilinx 2016.4 SDx
+## Requirements for AWS HDK 1.2.0
+ * Xilinx Vivado v2017.1 (64-bit)
  * License: EF-VIVADO-SDX-VU9P-OP
- * SW Build 1806307 on Thu Mar 9
- * IP Build 1759159 on Thu Jan 26
+ * SW Build 1846317 on Fri Apr 14 18:54:47 MDT 2017
+ * IP Build 1846188 on Fri Apr 14 20:52:08 MDT 2017
 
- * All On-Premise customers will need a new/updated license, please email _*vivado_op@xilinx.com*_ with the following information to receive and updated license:
-    * Xilinx Website Account log-in
-    * Identify yourself as existing 2016.3 on-premise user vs. new on-premise user
-    * Existing users will receive a license that accompanies their existing license and enables VU9P ES2
-    * New users will need to purchase an on-premise license of Vivado 2016.4 SDx
-    * The correct ordering number for the product is **EF-VIVADO-SDX-VU9P-OP-(NL/FL)**
+ * On-Premise customers may need a new or updated license
+    * Existing F1 On-Premise customers using the 2016.3 developer preview will not need a new license
+    * New users will need to purchase an on-premise license of Vivado 2017.1, please click on the appropriate "Buy Online From Xilinx"   
+      links here: https://www.xilinx.com/products/design-tools/acceleration-zone/ef-vivado-sdx-vu9p-op-fl-nl.html
+    * The correct ordering number for the product is EF-VIVADO-SDX-VU9P-OP-(NL/FL)
     * You can confirm you are using the correct license for this product by ensuring you have the following in Xilinx License Manager:
        * Analyzer
        * EncryptedWriter_v1
@@ -28,7 +27,6 @@ This document helps on-premise developers (or cloud developers that prefer not t
        * Simulation
        * SysGen
        * XCVU9P
-       * XCVU9P-ES2
        * XCVU9P-ES2_bitgen
        * ap_opencl
        * wtt_override
@@ -37,14 +35,6 @@ This document helps on-premise developers (or cloud developers that prefer not t
 <a name="download"></a>
 ## Downloading the development tool from Xilinx
 
- * URL: https://survey.xilinx.com/ss/wsb.dll/Xilinx/SDSoC_Download_Survey.htm?wsb5=xef.html&wsb7=Xilinx_SDx_2016.4_sdx_0310_1.tar.gz&wsb6=1
- * MD5 SUM Value: c18b84807b51dab7aea24f28983661af
-
-<a name="es2setup"></a>
-## Setting up local development environmnet to support VU9P ES2 FPGA
-
- * To enable the VU9P ES2 device, the following line needs to be added to your Vivado init.tcl:
-    * enable_beta_device xcvu9p\*
-  
- * More information on init.tcl can be found at https://www.xilinx.com/support/answers/53090.html
+ * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Vivado_2017.1_op_0415_1_Lin64.bin&akdm=0
+ * MD5 SUM Value: 6b2a5b9c2af6110dad8036c78ca74fb4
 
