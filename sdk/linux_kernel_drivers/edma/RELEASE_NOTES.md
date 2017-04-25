@@ -16,4 +16,6 @@ This is a Linux kernel driver only
 
 ## Expected performance
 - For smaller block size write performance is around 10MByte/s, read performance is around 150MByte/s
-- For a block size of 64KByte, the expected performance is around 80MByte/s for write and 1GByte/s for read.
+- For a block size of 4MByte, the expected performance is around 1.5GByte/s for write and 1.5GByte/s for read.
+- To increase performance for larger block sizes the module parameter of single_transaction_size should be increased. 
+-- Note that **single_transaction_size * edma_queue_depth should** should be greater than **transient_buffer_size**.
