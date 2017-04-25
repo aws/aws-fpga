@@ -71,3 +71,4 @@ if __name__ == '__main__':
         sys.exit(2)
     else:
         logger.info("All files seem compliant")
+        sys.exit(0)
