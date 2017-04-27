@@ -183,34 +183,22 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DIR/design/lib/axi4_ccf.sv\
-  $HDK_SHELL_DIR/design/lib/axi4_flop_fifo.sv\
-  $HDK_SHELL_DIR/design/lib/axil_slave.sv\
-  $HDK_SHELL_DIR/design/lib/bram_1rw.sv\
-  $HDK_SHELL_DIR/design/lib/bram_1w1r_dc.sv\
-  $HDK_SHELL_DIR/design/lib/bram_2rw.sv\
-  $HDK_SHELL_DIR/design/lib/ccf_ctl.v\
-  $HDK_SHELL_DIR/design/lib/flop_ccf.sv\
-  $HDK_SHELL_DIR/design/lib/flop_fifo_in.sv\
-  $HDK_SHELL_DIR/design/lib/flop_fifo_lu_evict.sv\
-  $HDK_SHELL_DIR/design/lib/flop_fifo.sv\
-  $HDK_SHELL_DIR/design/lib/gray.inc\
-  $HDK_SHELL_DIR/design/lib/lib_pipe.sv\
-  $HDK_SHELL_DIR/design/lib/pulse2lvl.sv\
-  $HDK_SHELL_DIR/design/lib/ram_ccf.sv\
-  $HDK_SHELL_DIR/design/lib/stat_intf_sync.sv\
-  $HDK_SHELL_DIR/design/lib/sync.v\
-  $HDK_SHELL_DIR/design/interfaces/sh_ddr.sv \
-  $HDK_SHELL_DIR/design/interfaces/cl_ports.vh
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
+  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh
 ]
 
 puts "AWS FPGA: Reading IP blocks";
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
-  $HDK_SHELL_DIR/design/ip/ila_0/ila_0.xci\
-  $HDK_SHELL_DIR/design/ip/cl_debug_bridge/cl_debug_bridge.xci\
-  $HDK_SHELL_DIR/design/ip/ila_vio_counter/ila_vio_counter.xci\
-  $HDK_SHELL_DIR/design/ip/vio_0/vio_0.xci
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/ila_0/ila_0.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/ila_vio_counter/ila_vio_counter.xci\
+  $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 
 # Additional IP's that might be needed if using the DDR
