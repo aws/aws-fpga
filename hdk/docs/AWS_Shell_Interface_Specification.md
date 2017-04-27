@@ -288,6 +288,8 @@ A read or write request on this AXI-4 bus that is not acknowledged by the CL wit
 
 If DMA is enabled this interface also has DMA traffic targeting the CL.
 
+Currently, this interface only supports a read data interleaving depth of 2. All the transactions targeting AppPF BAR4 will have the same AXI ID and all the DMA traffic targeting the CL will have the same AXI ID. So the read data interleaving depth of 2 should be good.
+
 ### AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)  -- PCIM interface
 
 This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory. The same bus is used for FPGA to FPGA communication over PCIe.
