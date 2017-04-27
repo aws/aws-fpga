@@ -48,7 +48,7 @@ struct transient_buffer_page
 requests that come from the application to the backend
 and vise-versa */
 struct transient_buffer {
-	u32 size_in_pages;
+	u32 number_of_transactions;
 	u32 head;
 	u32 tail;
 	struct transient_buffer_page* page_array;
@@ -93,7 +93,7 @@ struct emda_buffer_control_structure{
 	spinlock_t ebcs_spin_lock;
 	u32 next_to_use;
 	u32 next_to_clean;
-	u32 ebcs_size;
+	u32 ebcs_depth;
 	void *dma_queue_handle;
 	u64* completed_buffer;
 	u32 completed_size;
