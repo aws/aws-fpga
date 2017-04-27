@@ -27,11 +27,10 @@
 
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
 static uint16_t pci_device_id = 0xF001;
-/* */
 
 #define	MEM_16G		(1ULL << 34)
 
-/* use the stdout logger */
+/* Ue the stdout logger */
 const struct logger *logger = &logger_stdout;
 
 int dma_example(int slot_i);
@@ -42,13 +41,13 @@ int main(int argc, char **argv) {
     int slot_id;
     int interrupt_number;
 
-    /* setup logging to print to stdout */
+    /* Setup logging to print to stdout */
     rc = log_init("test_dram_dma");
     fail_on(rc, out, "Unable to initialize the log.");
     rc = log_attach(logger, NULL, 0);
     fail_on(rc, out, "%s", "Unable to attach to the log.");
 
-    /* initialize the fpga_plat library */
+    /* Initialize the fpga_plat library */
     rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
@@ -72,17 +71,17 @@ check_slot_config(int slot_id)
     int rc;
     struct fpga_mgmt_image_info info = {0};
 
-    /* get local image description, contains status, vendor id, and device id */
+    /* Get local image description, contains status, vendor id, and device id */
     rc = fpga_mgmt_describe_local_image(slot_id, &info, 0);
     fail_on(rc, out, "Unable to get local image information. Are you running as root?");
 
-    /* check to see if the slot is ready */
+    /* Check to see if the slot is ready */
     if (info.status != FPGA_STATUS_LOADED) {
         rc = 1;
         fail_on(rc, out, "Slot %d is not ready", slot_id);
     }
 
-    /* confirm that the AFI that we expect is in fact loaded */
+    /* Confirm that the AFI that we expect is in fact loaded */
     if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
         info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
         rc = 1;
@@ -102,8 +101,7 @@ out:
 }
 
 
-/* helper function to initialize a buffer that would be written to the FPGA later */
-
+/* Helper function to initialize a buffer that would be written to the FPGA later */
 void
 rand_string(char *str, size_t size)
 {
@@ -124,12 +122,13 @@ rand_string(char *str, size_t size)
     str[size-1] = '\0';
 }
 
-/* 
- * Write 4 identical buffers to the 4 different DRAM channels of the AFI
- * using fsync() between the writes and read to insure order
+/*
+ * Write 4 identical buffers to the 4 different DRAM channels of the AFI using fsync() between the
+ * writes and read to insure order
  */
-
-int dma_example(int slot_id) {
+int
+dma_example(int slot_id)
+{
     int fd, rc;
     char device_file_name[256];
     char *write_buffer, *read_buffer;
@@ -144,7 +143,7 @@ int dma_example(int slot_id) {
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
 
 
-    /* make sure the AFI is loaded and ready */
+    /* Make sure the AFI is loaded and ready */
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 
@@ -171,17 +170,17 @@ int dma_example(int slot_id) {
     rand_string(write_buffer, buffer_size);
 
     for (channel=0;channel < 4; channel++) {
-    	
+
 	rc = pwrite(fd, write_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
-	
+
     	fail_on((rc = (rc < 0)? 1:0), out, "call to pwrite failed.");
 
     }
 
-    /* fsync() will make sure the write made it to the target buffer 
+    /*
+     * fsync() will make sure the write made it to the target buffer
      * before read is done
      */
-
     fsync(fd);
 
     for (channel=0;channel < 4; channel++) {
@@ -204,8 +203,8 @@ int dma_example(int slot_id) {
                 printf("%c", read_buffer[i]);
             }
             printf("\n\n");
-         
-            rc = 1; 
+
+            rc = 1;
             fail_on(rc, out, "Data read from DMA did not match data written with DMA. Was there an fsync() between the read and write?");
     	}
     }
@@ -220,11 +219,13 @@ out:
     if (fd >= 0) {
         close(fd);
     }
-    /* if there is an error code, exit with status 1 */
+    /* If there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
 
-int interrupt_example(int slot_id, int interrupt_number){
+int
+interrupt_example(int slot_id, int interrupt_number)
+{
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct pollfd fds[1];
     uint32_t fd, rd,  read_data;
@@ -238,7 +239,7 @@ int interrupt_example(int slot_id, int interrupt_number){
     int poll_limit = 20;
     uint32_t interrupt_reg_offset = 0xd00;
 
-  
+
     rc = sprintf(event_file_name, "/dev/fpga%i_event%i", slot_id, interrupt_number);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format event file name.");
 
@@ -259,12 +260,15 @@ int interrupt_example(int slot_id, int interrupt_number){
     rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
     fail_on(rc, out, "Unable to write to the fpga !");
 
-    // Poll checks whether an interrupt was generated, and also clears the interrupt in the device file, so we can detect future interrupts
+    /*
+     * Poll checks whether an interrupt was generated, and also clears the interrupt in the
+     * device file, so we can detect future interrupts.
+     */
     rd = poll(fds, num_fds, poll_timeout);
     if( rd >0 && fds[0].revents & POLLIN){
-        // Check how many interrupts were generated
+        /* Check how many interrupts were generated. */
         printf("Interrupt present for Interrupt %i. It worked!\n", interrupt_number);
-        //Clear the interrupt register
+        /* Clear the interrupt register. */
         rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
         fail_on(rc, out, "Unable to write to the fpga !");
     }
@@ -275,10 +279,13 @@ int interrupt_example(int slot_id, int interrupt_number){
     }
     close(fd);
 
-    //Clear the interrupt register
-    do{
-        // In this CL, a successful interrupt is indicated by the CL setting bit <interrupt_number + 16>
-        // of the interrupt register. Here we check that bit is set and write 1 to it to clear.
+    /* Clear the interrupt register. */
+    do {
+        /*
+         * In this CL, a successful interrupt is indicated by the CL setting bit
+         * <interrupt_number + 16> of the interrupt register. Here we check that bit is set and
+         * write 1 to it to clear.
+         */
         rc = fpga_pci_peek(pci_bar_handle, interrupt_reg_offset, &read_data);
         fail_on(rc, out, "Unable to read from the fpga !");
         read_data = read_data & (1 << (interrupt_number + 16));
@@ -290,9 +297,8 @@ int interrupt_example(int slot_id, int interrupt_number){
     } while (!read_data && poll_limit > 0);
 
 out:
-    if(fd){
+    if (fd) {
         close(fd);
     }
     return rc;
 }
-

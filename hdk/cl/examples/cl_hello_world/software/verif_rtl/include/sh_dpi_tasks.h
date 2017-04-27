@@ -27,18 +27,20 @@ extern void sv_pause(uint32_t x);
 
 void test_main(uint32_t *exit_code);
 
-void host_memory_putc(uint64_t addr, uint8_t data)
+void
+host_memory_putc(uint64_t addr, uint8_t data)
 {
   *(uint8_t *)addr = data;
 }
 
-//void host_memory_getc(uint64_t addr, uint8_t *data)
-uint8_t host_memory_getc(uint64_t addr)
+uint8_t
+host_memory_getc(uint64_t addr)
 {
   return *(uint8_t *)addr;
 }
 
-void log_printf(const char *format, ...)
+void
+log_printf(const char *format, ...)
 {
   static char sv_msg_buffer[256];
   va_list args;
