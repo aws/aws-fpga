@@ -15,31 +15,50 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+function info_msg {
+  echo -e "AWS FPGA-INFO: $1"
+}
+
+function debug_msg {
+  if [[ $debug == 0 ]]; then
+    return
+  fi
+  echo -e "AWS FPGA-DEBUG: $1"
+}
+
+function warn_msg {
+  echo -e "AWS FPGA-WARNING: $1"
+}
+
+function err_msg {
+  echo -e >&2 "AWS FPGA-ERROR: $1"
+}
+
 if ! [[ $CL_DIR ]]
 then
-	echo "ERROR: Environment variable CL_DIR is not defined"
+	err_msg "Environment variable CL_DIR is not defined"
 	exit 1
 fi
 
 if ! [[ $HDK_SHELL_DIR ]]
 then
-	echo "ERROR: Environment variable HDK_SHELL_DIR is not defined"
+	err_msg "Environment variable HDK_SHELL_DIR is not defined"
 	exit 1
 fi
 
 if ! [ -d $CL_DIR/build/constraints ]
 then
-	echo "ERROR: Constraints directory is not found in $CL_DIR/build/ directory"
+	err_msg "Constraints directory is not found in $CL_DIR/build/ directory"
 	exit 1
 fi
 
 if ! [ -d $CL_DIR/build/reports ]
 then
-	echo "Creating the reports directory"
+	info_msg "Creating the reports directory"
 	mkdir $CL_DIR/build/reports
 	if ! [ -d $CL_DIR/build/reports ]
 	then	
-		echo "ERROR: Failed to create reports directory, please check directory permissions"
+		err_msg "Failed to create reports directory, please check directory permissions"
 		exit 1	
 	fi
 fi
@@ -47,11 +66,11 @@ fi
 
 if ! [ -d $CL_DIR/build/checkpoints ] 
 then
-        echo "Creating the checkpointss directory"
+        info_msg "Creating the checkpoints directory"
         mkdir $CL_DIR/build/checkpoints
         if ! [ -d $CL_DIR/build/checkpoints ]
         then
-                echo "ERROR: Failed to create checkpoints directory, please check directory permissions"
+                err_msg "Failed to create checkpoints directory, please check directory permissions"
                 exit 1
         fi
 fi
@@ -59,11 +78,11 @@ fi
 
 if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
 then
-        echo "Creating the checkpoints\/to_aws directory"
+        info_msg "Creating the checkpoints/to_aws directory"
         mkdir $CL_DIR/build/checkpoints/to_aws
         if ! [ -d $CL_DIR/build/checkpoints/to_aws ]
         then
-                echo "ERROR: Failed to create directory, please check directory permissions"
+                err_msg "Failed to create directory, please check directory permissions"
                 exit 1
         fi
 fi
@@ -71,11 +90,11 @@ fi
 
 if ! [ -d $CL_DIR/build/src_post_encryption ]
 then
-        echo "Creating the src_port_encryption directory"
+        info_msg "Creating the src_port_encryption directory"
         mkdir $CL_DIR/build/src_post_encryption
         if ! [ -d $CL_DIR/build/src_post_encryption ]
         then
-                echo "ERROR: Failed to create directory, please check directory permissions"
+                err_msg "Failed to create directory, please check directory permissions"
                 exit 1
         fi
 fi

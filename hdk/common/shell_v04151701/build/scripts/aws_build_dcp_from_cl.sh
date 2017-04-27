@@ -42,6 +42,32 @@ vivado_script="create_dcp_from_cl.tcl"
 foreground=0
 run_aws_emulation=0
 notify=0
+ignore_memory_requirement=0
+expected_memory_usage=30000000
+
+function info_msg {
+  echo -e "AWS FPGA-INFO: $1"
+}
+
+function debug_msg {
+  if [[ $debug == 0 ]]; then
+    return
+  fi
+  echo -e "AWS FPGA-DEBUG: $1"
+}
+
+function warn_msg {
+  echo -e "AWS FPGA-WARNING: $1"
+}
+
+function err_msg {
+  echo -e >&2 "AWS FPGA-ERROR: $1"
+}
+
+function get_instance_memory {
+  local mem=$(awk -F"[: ]+" '/MemTotal/ {print $2;exit}' /proc/meminfo)
+  echo "$mem"
+}
 
 # Parse command-line arguments
 while [ "$1" != "" ]; do
@@ -67,6 +93,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -notify )               notify=1
                                 ;;
+        -ignore_memory_requirement) ignore_memory_requirement=1
+                                ;;
         -h | -H | -help )       usage
                                 exit
                                 ;;
@@ -78,66 +106,79 @@ done
 
 # Check that script exists
 if ! [ -f "$vivado_script" ]; then
-  echo "ERROR: $vivado_script doesn't exist." 
+  err_msg "$vivado_script doesn't exist."
   exit 1
 fi
 
 # Check that strategy is valid
 shopt -s extglob
 if [[ $strategy != @(BASIC|DEFAULT|EXPLORE|TIMING|CONGESTION) ]]; then
-  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are BASIC, DEFAULT, EXPLORE, TIMING and CONGESTION." 
+  err_msg "$strategy isn't a valid strategy. Valid strategies are BASIC, DEFAULT, EXPLORE, TIMING and CONGESTION."
   exit 1
 fi
 
 # Check that clock_recipe_a is valid
 shopt -s extglob
 if [[ $clock_recipe_a != @(A0|A1|A2) ]]; then
-  echo "ERROR: $clock_recipe_a isn't a valid Clock Group A recipe. Valid Clock Group A recipes are A0, A1, and A2." 
+  err_msg "$clock_recipe_a isn't a valid Clock Group A recipe. Valid Clock Group A recipes are A0, A1, and A2."
   exit 1
 fi
 
 # Check that clock_recipe_b is valid
 shopt -s extglob
 if [[ $clock_recipe_b != @(B0|B1) ]]; then
-  echo "ERROR: $clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0 and B1." 
+  err_msg "$clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0 and B1."
   exit 1
 fi
 
 # Check that clock_recipe_c is valid
 shopt -s extglob
 if [[ $clock_recipe_c != @(C0|C1) ]]; then
-  echo "ERROR: $clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0 and C1." 
+  err_msg "$clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0 and C1."
   exit 1
 fi
 
-echo "AWS FPGA: Starting the design checkpoint build process"
-echo "AWS FPGA: Checking for proper environment variables and build directories"
+if [ $expected_memory_usage -gt `get_instance_memory` ]; then
+
+    output_message="YOUR INSTANCE has less memory than is necessary for certain builds. This means that your builds will take longer than expected. \nTo change to an instance type with more memory, please check our instance resize guide: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html"
+
+  if [[ $ignore_memory_requirement == 0 ]]; then
+      err_msg "$output_message"
+      err_msg "To ignore this memory requirement, source hdk_setup.sh again with -ignore_memory_requirement as an argument."
+      exit 1
+  else
+      warn_msg "$output_message"
+  fi
+fi
+
+info_msg "Starting the design checkpoint build process"
+info_msg "Checking for proper environment variables and build directories"
 
 if ! [ $HDK_SHELL_DIR ]
 then
-	echo "ERROR: HDK_SHELL_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
+	err_msg "HDK_SHELL_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
 	exit 1
 fi
 
 if ! [ $CL_DIR ]
 then
-	echo "ERROR: CL_DIR environment variable is not set. Set CL_DIR to a valid directory."
+	err_msg "CL_DIR environment variable is not set. Set CL_DIR to a valid directory."
 	exit 1
 fi
 
 if ! [ $HDK_DIR ]
 then
-	echo "ERROR: HDK_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
+	err_msg "HDK_DIR environment variable is not set, try running hdk_setup.sh script from the root directory of AWS FPGA repository."
 	exit 1
 fi
 
 if ! [ -x $HDK_SHELL_DIR/build/scripts/prepare_build_environment.sh ]
 then
-	echo "prepare_build_env.sh script is not eXecutable, trying to apply chmod +x"
+	info_msg "prepare_build_env.sh script is not eXecutable, trying to apply chmod +x"
 	chmod +x $HDK_SHELL_DIR/build/scripts/prepare_build_environment.sh
 	if ! [ -x $HDK_SHELL_DIR/build/scripts/prepare_build_environment.sh ]
 	then
-		echo "ERROR: Failed to change prepare_build_environment.sh to eXecutable, aborting!"
+		err_msg "Failed to change prepare_build_environment.sh to eXecutable, aborting!"
 		exit 1
 	fi
 fi
@@ -146,7 +187,7 @@ $HDK_SHELL_DIR/build/scripts/prepare_build_environment.sh
 
 if ! [[ $? -eq 0 ]]
 then
-	echo "ERROR: Missing environment variable or unable to create the needed build directories, aborting!"
+	err_msg "Missing environment variable or unable to create the needed build directories, aborting!"
 	exit 1
 fi
 
@@ -154,10 +195,10 @@ fi
 timestamp=$(date +"%y_%m_%d-%H%M%S")
 logname=$timestamp.vivado.log
 
-echo "AWS FPGA: Environment variables and directories are present. Checking for Vivado installation."
+info_msg "Environment variables and directories are present. Checking for Vivado installation."
 
 # Before going too far make sure Vivado is available
-vivado -version >/dev/null 2>&1 || { echo >&2 "ERROR - Please install/enable Vivado." ; return 1; }
+vivado -version >/dev/null 2>&1 || { err_msg "Please install/enable Vivado." ; return 1; }
 
 # Get the HDK Version
 hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
@@ -180,12 +221,12 @@ cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   
-  echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
-  echo "AWS FPGA: Output is being redirected to $timestamp.nohup.out"
-  echo "AWS FPGA: If you have set your EMAIL environment variable and -notify is specified, you will receive a notification when complete."
-  echo "AWS FPGA:   (See \$HDK_DIR/cl/examples/README.md for details)"
+  info_msg "Build through Vivado is running as background process, this may take few hours."
+  info_msg "Output is being redirected to $timestamp.nohup.out"
+  info_msg "If you have set your EMAIL environment variable and -notify is specified, you will receive a notification when complete."
+  info_msg "  (See \$HDK_DIR/cl/examples/README.md for details)"
 else
-  echo "AWS FPGA: Build through Vivado is running in the foreground, this may take a few hours."
-  echo "AWS FPGA: The build may be terminated if the network connection to this terminal window is lost."
+  info_msg "Build through Vivado is running in the foreground, this may take a few hours."
+  info_msg "The build may be terminated if the network connection to this terminal window is lost."
   $cmd
 fi
