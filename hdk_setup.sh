@@ -10,7 +10,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 # Script must be sourced from a bash shell or it will not work
 # When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
 # When being run $0 and $_ will be the same.
@@ -20,11 +20,14 @@ if [ $script == $0 ]; then
   echo "ERROR: You must source this script"
   exit 2
 fi
+
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
 debug=0
+ignore_memory_requirement=0
+expected_memory_usage=30000000
 
 function info_msg {
   echo -e "AWS FPGA-INFO: $1"
@@ -35,6 +38,10 @@ function debug_msg {
     return
   fi
   echo -e "AWS FPGA-DEBUG: $1"
+}
+
+function warn_msg {
+  echo -e "AWS FPGA-WARNING: $1"
 }
 
 function err_msg {
@@ -51,15 +58,20 @@ function help {
   info_msg "Sets up the environment for AWS FPGA HDK tools."
   info_msg " "
   info_msg "hdk_setup.sh script will:"
-  info_msg "  (1) check if Xilinx's vivado is installed,"
-  info_msg "  (2) set up key environment variables HDK_*, and"
+  info_msg "  (1) Check if Xilinx Vivado is installed,"
+  info_msg "  (2) Set up key environment variables HDK_*, and"
   info_msg "  (3) Download/update the HDK shell's checkpoint"
-  info_msg "  (4) prepare DRAM controller and PCIe IP modules if they are not already available in your directory."
+  info_msg "  (4) Prepare DRAM controller and PCIe IP modules if they are not already available in your directory."
   echo " "
   usage
 }
 
-# Process command line arguments
+function get_instance_memory {
+  local mem=$(awk -F"[: ]+" '/MemTotal/ {print $2;exit}' /proc/meminfo)
+  echo "$mem"
+}
+
+# Process command line args
 args=( "$@" )
 for (( i = 0; i < ${#args[@]}; i++ )); do
   arg=${args[$i]}
@@ -70,6 +82,10 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     -h|-help)
       help
       return 0
+    ;;
+    -ignore_memory_requirement)
+    info_msg "Ignoring the instance memory requirement."
+      ignore_memory_requirement=1
     ;;
     *)
       err_msg "Invalid option: $arg\n"
@@ -89,12 +105,24 @@ else
   debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
 fi
 
-debug_msg "Checking for vivado install:"
+if [ $expected_memory_usage -gt `get_instance_memory` ]; then
+
+    output_message="YOUR INSTANCE has less memory than is necessary for certain builds. This means that your builds will take longer than expected. \nTo change to an instance type with more memory, please check our instance resize guide: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html"
+
+  if [[ $ignore_memory_requirement == 0 ]]; then
+      err_msg "$output_message"
+      err_msg "To ignore this memory requirement, source hdk_setup.sh again with -ignore_memory_requirement as an argument."
+      return 2
+  else
+      warn_msg "$output_message"
+  fi
+fi
+
+debug_msg "Checking for Vivado install:"
 
 # On the FPGA Developer AMI use module load to use the correct version of Vivado
 if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Module command is installed
-  # This branch requires sdx, not Vivado
   # Load and unload the modules just to make sure have the environment set correctly
   module unload vivado
   module unload sdx
@@ -221,7 +249,7 @@ if [ -f $ddr4_model_dir/arch_defines.v ]; then
     fi
   else
     models_vivado_version=UNKNOWN
-    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN vivado version so rebuilding."
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN Vivado version so rebuilding."
   fi
 else
   # Models haven't been built
