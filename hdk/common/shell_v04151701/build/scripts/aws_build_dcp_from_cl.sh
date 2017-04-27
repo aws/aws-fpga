@@ -46,22 +46,22 @@ ignore_memory_requirement=0
 expected_memory_usage=30000000
 
 function info_msg {
-  echo -e "AWS FPGA-INFO: $1"
+  echo -e "INFO: $1"
 }
 
 function debug_msg {
   if [[ $debug == 0 ]]; then
     return
   fi
-  echo -e "AWS FPGA-DEBUG: $1"
+  echo -e "DEBUG: $1"
 }
 
 function warn_msg {
-  echo -e "AWS FPGA-WARNING: $1"
+  echo -e "WARNING: $1"
 }
 
 function err_msg {
-  echo -e >&2 "AWS FPGA-ERROR: $1"
+  echo -e >&2 "ERROR: $1"
 }
 
 function get_instance_memory {
