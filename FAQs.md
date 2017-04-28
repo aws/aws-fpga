@@ -19,7 +19,44 @@
 
 ## General
 
-**Q: What is included in the HDK?**
+**Q: How is developing a FPGA design for the cloud different from the standard practice?**
+
+AWS designed its FPGA instances to provide a developer experience with ease of use of an on-premises development environment with the following advantages:
+
+
+- Developers don’t need to purchase / design / bringup or debug the HW, all the HW is verified / maintained and  optimized for high-performance FPGA designs by AWS.
+
+- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ?qid=1488517486692&sr=0-162&ref_=brs_res_product_title) that contains the Vivado development environment, with all the needed licenses, and AWS FPGA development SDK pre-installed. By using the FPGA developer AMI developers have a choice to a wide range of servers (different CPU/memory configs) allowing developers to optimize their development flow.
+- AWS provides cloud based debug tools: [Virtual JTAG, Virtual DIP switches and Virtual LEDs](./hdk/docs/Virtual_JTAG_XVC.md).
+
+- For developers who want to develop on-premises, Xilinx provides an [on-premises license](./hdk/docs/on_premise_licensing_help.md ) that matches all the needed components needed to be licensed for F1 development on premises. 
+
+**Q: What is the extra time needed to develop on AWS FPGA instances compared with on-premises development?**
+
+There are two relevant answers to this question:
+
+- One time ramping on AWS: 
+From what we’ve seen so far, for developers that are familiar with AWS, there is no extra-time to ramp to the F1 development environment. For developers who are new to AWS, there is a 1-2 days ramp on AWS general topics such as permissions, setting up S3 storage, using AWS console, etc… For new developers to aws a good resource to start with is the [FPGA Developer Forum](https://forums.aws.amazon.com/ann.jspa?annID=4448)
+
+- On-going development flow: 
+Once developers complete their DCP, they encrypt and submit the design through an AWS API to create the Amazon FGPA Image (aka AFI, this is the binary loaded to the F1 FPGAs), this API call can take a few hours to complete. AWS is working to improve this wait time.
+
+**Q: What new skill sets will be requiered from an FPGA developer in the cloud?**
+
+- Since AWS has taken all the non-differentiating, heavy lifting of HW design, debug, implementation of DDR/PCI IPs and high-speed interfaces, AWS FPGA developers can focus on their own differentiating logic, instead of spending time on HW bringup/debug and maintenance. Therefore, we hope that on the engineering side, the question is not what new skills-sets are needed, but rather how can customers direct their engineering resources to add value with innovative solutions.
+- On the business side, AWS Marketplace (MP) provides FPGA developers the opportunity to sell HW accelerations to all of AWS users, so ramping on AWS MP services/capabilities is a skill set domain. Universities can use AWS MP to distribute their research work for free use; having access to vast amounts of free [public data-sets](https://aws.amazon.com/public-datasets/ ) can be of value when running research HW accelarations on AWS; Finally consulting and technology AWS partners can offer their services through the [AWS Partner Network](https://aws.amazon.com/ec2/instance-types/f1/partners/) to AWS users that don’t have specific FPGA development knowledge in order to develop FPGA accelerations in the cloud by themselves.
+
+**Q: How is cloud deployment of a FPGA design different compared to on-premises?**
+
+With cloud based FPGAs, developers have a few deployment advantages:
+- Low entry bar, AWS FPGAs are charged on an hourly rate instead of many thousands of dollars spent on HW/licenses and 12+ months time it takes to design/manufacture and ship a working hardware solution.
+- Scalability: users can ramp up / down the number of deployed FPGAs within seconds, and a few mouse clicks.
+- Share: FPGA developers can share their designs easily through AWS Marketplace or APN. This is important for businesses as well as academia/research use.
+- AWS FPGA instances can be combined with other AWS services to create a solution pipeline or integrate an accelaration into existing customer workflows/datasets
+- Elasticity: F1 comes in configurations answering simple or complex design needs
+ 
+ 
+**Q: What is included in the FPGA HDK?**
 
 The HDK includes the following major components::
 
@@ -32,7 +69,6 @@ The HDK includes the following major components::
 4) Reference software drivers to be used in conjunction with the Custom Logic examples.
 
 5) RTL Simulation models and RTL simulation.
-
 
 
 **Q: What is in the AWS Shell?**
@@ -71,7 +107,9 @@ Yes, on-premises tools can be used to develop the Design Checkpoint needed for c
 
 If a developer uses local tools and license, please check the [supported versions of Vivado](./hdk/supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
 
+**Q: Is there a “best practice” system template? **
 
+We prefer not to limit developers to a specific template in terms of how we advise to use AWS FPGAs. We do provide the interfaces and methods to enable innovation (DMA, MSIX, AXI, AXI-L, etc.. ) A good overview of these interfaces can be found [here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmer_View.md)
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
@@ -81,11 +119,9 @@ If the developer want to run using other methods or on a local machine, the deve
 Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
-
 **Q: Does AWS provide actual FPGA boards for on-premises development?**
 
 No. AWS supports a cloud-only development model and provides the necessary elements for doing 100% cloud development including Virtual JTAG (Vivado ChipScope), Virtual LEDs and Virtual DIP-switch. No development board is provided for on-premises development.
-
 
 
 **Q: Do I need to design for a specific power envelope?**
