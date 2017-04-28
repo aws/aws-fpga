@@ -1250,17 +1250,20 @@ if __name__ == '__main__':
     num_errors = 0
 
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawDescriptionHelpFormatter)
-
-    parser.add_argument('--dcp-bucket', action='store', required=True, help='S3 bucket where DCP is stored')
-    parser.add_argument('--dcp-key', action='store', required=True, help='DCP path in S3 bucket')
-    parser.add_argument('--logs-bucket', action='store', required=True,
-                        help='S3 bucket where AFI creation logs will be stored')
-    parser.add_argument('--logs-key', action='store', required=True, help='DCP path in S3 bucket')
+    # Required arguments
+    required_args_group = parser.add_argument_group('Required Args', 'Arguments that are required unless you specify --test in which case they are forbidden.')
+    required_args_group.add_argument('--dcp-bucket', action='store', help='S3 bucket where DCP is stored')
+    required_args_group.add_argument('--dcp-key', action='store', help='DCP path in S3 bucket')
+    required_args_group.add_argument('--logs-bucket', action='store', help='S3 bucket where AFI creation logs will be stored')
+    required_args_group.add_argument('--logs-key', action='store', help='DCP path in S3 bucket')
+    test_args_group = parser.add_argument_group('Testing Args', 'Arguments used to test the script.')
+    test_args_group.add_argument('--test', action='store_true', required=False, help='Run tests')
+    # Common to regular and test mode
+    debug_args_group = parser.add_argument_group('Debug Args')
     parser.add_argument('--debug', action='store_true', required=False, help='Enable debug messages')
-    parser.add_argument('--test', action='store_true', required=False, help='Run tests')
 
     args = parser.parse_args()
-
+    
     logging_level = logging.INFO
     if (args.debug):
         logging_level = logging.DEBUG
@@ -1281,6 +1284,23 @@ if __name__ == '__main__':
         test()
         logger.info("Tests passed")
         sys.exit(0)
+    
+    # Can't make a group of args conditionally required so check for required args here
+    failed = False
+    if not args.dcp_bucket:
+        logger.error("--dcp-bucket is required")
+        failed = True
+    if not args.dcp_key:
+        logger.error("--dcp-key is required")
+        failed = True
+    if not args.logs_bucket:
+        logger.error("--logs-bucket is required")
+        failed = True
+    if not args.logs_key:
+        logger.error("--logs-key is required")
+        failed = True
+    if failed:
+        sys.exit(1)
 
     # Validate arguments
     if re.search(r'/', args.dcp_bucket):
@@ -1382,9 +1402,8 @@ if __name__ == '__main__':
                 # Retrieve inline policies for group
                 response = iam.list_group_policies(GroupName=group_name)
                 for policy_name in response['PolicyNames']:
-                    logger.debug("{0} inline policy: {1}".format(policy_name))
-                    policy_statement = \
-                    iam.get_group_policy(GroupName=group_name, PolicyName=policy_name)['PolicyDocument']['Statement']
+                    logger.debug("Inline policy: {0}".format(policy_name))
+                    policy_statement = iam.get_group_policy(GroupName=group_name, PolicyName=policy_name)['PolicyDocument']['Statement']
                     user_policy_statements.extend(policy_statement)
 
     s3 = boto3.client('s3')

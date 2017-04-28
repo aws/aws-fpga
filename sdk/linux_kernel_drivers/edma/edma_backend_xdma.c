@@ -12,22 +12,21 @@
 #include <linux/string.h>
 
 
-#define MASTER_PF					(0)
-#define DRV_MODULE_NAME					"emda_xdma_backend"
-//FIXME: move to mutable
-#define XDMA_TIMEOUT_IN_MSEC				(3 * 1000)
-#define SLEEP_MIN_USEC					(1)
-#define SLEEP_MAX_USEC					(20)
-#define XDMA_WORKER_SLEEPING_STATUS_BIT			(0)
-#define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT		(1)
-#define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
-#define XDMA_WORKER_STOP_REQUEST_BIT			(3)
-#define REQUEST_SLEEP_MSEC						(10)
-#define PCI_VENDOR_ID_AMAZON 				(0x1d0f)
-#define PCI_DEVICE_ID_FPGA				(0xf001)
-#define XMDA_NUMBER_OF_USER_EVENTS			(1)
-#define XDMA_LIMIT_NUMBER_OF_QUEUES			(1)
-#define CLASS_NAME "edma"
+#define MASTER_PF                                               (0)
+#define DRV_MODULE_NAME                                         "emda_xdma_backend"
+#define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
+#define SLEEP_MIN_USEC                                          (1)
+#define SLEEP_MAX_USEC                                          (20)
+#define XDMA_WORKER_SLEEPING_STATUS_BIT                         (0)
+#define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT                      (1)
+#define XDMA_WORKER_STOPPED_ON_REQUEST_BIT                      (2)
+#define XDMA_WORKER_STOP_REQUEST_BIT                            (3)
+#define REQUEST_SLEEP_MSEC                                      (10)
+#define PCI_VENDOR_ID_AMAZON                                    (0x1d0f)
+#define PCI_DEVICE_ID_FPGA                                      (0xf001)
+#define XMDA_NUMBER_OF_USER_EVENTS                              (1)
+#define XDMA_LIMIT_NUMBER_OF_QUEUES                             (1)
+#define CLASS_NAME                                              "edma"
 
 struct class* edma_class;
 
