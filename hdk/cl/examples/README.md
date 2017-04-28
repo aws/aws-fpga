@@ -102,17 +102,23 @@ $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/ # Whic
 ```             
 
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below.
+
+Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket policy by using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
 
 ```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "Bucket level permissions",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::365015490807:root"
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Bucket level permissions",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::365015490807:root"
+                },
+                "Action": [
+                    "s3:ListBucket"
+                ],
+                "Resource": "arn:aws:s3:::<bucket-name>"
             },
             "Action": [
                 "s3:ListBucket"
