@@ -267,8 +267,8 @@ The following major features are included in this HDK release:
 ### Known Bugs/Issues
 
 * The PCI-M AXI interface is not supported in this release.  The interface is included in `cl_ports.vh` and required in a CL design, but not enabled for functional use in this release.
-
 * The integrated DMA function is in Beta stage.  There is a known issue with DMA READ addresses crossing 4K page boundaries.  The failure can be triggered by READ transfers that start on an address other than 4K aligned AND cross the 4K page boundary.  READ transfers that do not cross the 4K boundary OR transfers that start at the beginning of a 4K page and greater than 4K size are not susceptible to the error.  WRITE transfers are not affected by this issue Developers should use 4K aligned address boundaries on any READ transfer that can cross a 4K boundary to avoid the issue.
+* aws_dcp_verify flow (aws_dcp_verify.tcl) does not work.  The script will be fixed in a future release.  Currently the script will always give an error even if the DCP is OK.
 
 ### Supported Tools and Environment
 
