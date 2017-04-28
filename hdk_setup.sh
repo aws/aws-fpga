@@ -1,3 +1,5 @@
+# Amazon FPGA Hardware Development Kit
+#
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
@@ -26,26 +28,24 @@ script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
 debug=0
-ignore_memory_requirement=0
-expected_memory_usage=30000000
 
 function info_msg {
-  echo -e "AWS FPGA-INFO: $1"
+  echo -e "INFO: $1"
 }
 
 function debug_msg {
   if [[ $debug == 0 ]]; then
     return
   fi
-  echo -e "AWS FPGA-DEBUG: $1"
+  echo -e "DEBUG: $1"
 }
 
 function warn_msg {
-  echo -e "AWS FPGA-WARNING: $1"
+  echo -e "WARNING: $1"
 }
 
 function err_msg {
-  echo -e >&2 "AWS FPGA-ERROR: $1"
+  echo -e >&2 "ERROR: $1"
 }
 
 function usage {
@@ -66,11 +66,6 @@ function help {
   usage
 }
 
-function get_instance_memory {
-  local mem=$(awk -F"[: ]+" '/MemTotal/ {print $2;exit}' /proc/meminfo)
-  echo "$mem"
-}
-
 # Process command line args
 args=( "$@" )
 for (( i = 0; i < ${#args[@]}; i++ )); do
@@ -82,10 +77,6 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     -h|-help)
       help
       return 0
-    ;;
-    -ignore_memory_requirement)
-    info_msg "Ignoring the instance memory requirement."
-      ignore_memory_requirement=1
     ;;
     *)
       err_msg "Invalid option: $arg\n"
@@ -103,19 +94,6 @@ elif [[ $AWS_FPGA_REPO_DIR != $script_dir ]]; then
   export AWS_FPGA_REPO_DIR=$script_dir
 else
   debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
-fi
-
-if [ $expected_memory_usage -gt `get_instance_memory` ]; then
-
-    output_message="YOUR INSTANCE has less memory than is necessary for certain builds. This means that your builds will take longer than expected. \nTo change to an instance type with more memory, please check our instance resize guide: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html"
-
-  if [[ $ignore_memory_requirement == 0 ]]; then
-      err_msg "$output_message"
-      err_msg "To ignore this memory requirement, source hdk_setup.sh again with -ignore_memory_requirement as an argument."
-      return 2
-  else
-      warn_msg "$output_message"
-  fi
 fi
 
 debug_msg "Checking for Vivado install:"
