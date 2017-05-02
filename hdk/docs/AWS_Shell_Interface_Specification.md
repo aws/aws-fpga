@@ -121,6 +121,8 @@ For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfa
 
 -   AxREGION – Region identifier is not supported.
 
+-   AxSIZE - The PCIM interface does not suport narrow burst.  On the PCIM interface AxSIZE must be tied to the value 0x6. 
+
 These signals are not included on the AXI-4 interfaces of the shell.  If connecting to a fabric or component that supports these signals, these vaules should be used:
 
 | Signal       | Value      |
@@ -292,7 +294,9 @@ If DMA is enabled this interface also has DMA traffic targeting the CL.
 
 This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory. The same bus is used for FPGA to FPGA communication over PCIe.
 
-__** NOTE: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual address.** __
+__**NOTE: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual address**__.
+
+__**NOTE: The PCIM Interface does not support narrow burst. AxSIZE must be tied to 0x6**__.
 
 The following PCIe interface configuration parameters are provided from the Shell to the CL as informational:
 
