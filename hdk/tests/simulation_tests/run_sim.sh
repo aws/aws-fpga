@@ -35,5 +35,5 @@ source $WORKSPACE/hdk_setup.sh;
 test_name=${test:3}
 
 # Run the test
-cd $WORKSPACE/hdk/cl/examples/cl_dram_dma/verif/scripts;
+cd $WORKSPACE/hdk/cl/examples/$test/verif/scripts;
 make TEST=test_$test_name;
