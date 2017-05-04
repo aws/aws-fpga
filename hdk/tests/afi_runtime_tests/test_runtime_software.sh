@@ -42,13 +42,13 @@ esac
 shift # past argument or value
 done
 
-if [ "$test" = "" ]; then
+if [ ":$test" = ":" ]; then
     echo -e >&2 "ERROR: Invalid test: $test\n"
     exit 1
 fi
 
 if [ ! -d $WORKSPACE/hdk/cl/examples/$test ]; then
-    echo -e >&2 'ERROR: The test passed in does not exist!'
+    echo -e >&2 "ERROR: The test passed in($test) does not exist at $WORKSPACE/hdk/cl/examples/$test!"
     exit 1
 fi
 

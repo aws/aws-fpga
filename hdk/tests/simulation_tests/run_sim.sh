@@ -18,7 +18,7 @@ esac
 shift # past argument or value
 done
 
-if [ "$test" = "" ]; then
+if [ ":$test" = ":" ]; then
     echo -e >&2 "ERROR: Invalid test: $test\n"
     exit 1
 fi
