@@ -73,6 +73,7 @@ if [ "$non_zero_dcp" = "" ]; then
 fi
 
 echo "INFO: Checking that a dcp exists in the tar file"
+
 /usr/bin/tar tvf *.Developer_CL.tar '*.dcp'
 
 if [ $? -ne 0 ]; then
@@ -81,6 +82,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "INFO: Checking that a manifest exists in the tar file"
+
 /usr/bin/tar tvf *.Developer_CL.tar '*.manifest.txt'
 
 if [ $? -ne 0 ]; then
