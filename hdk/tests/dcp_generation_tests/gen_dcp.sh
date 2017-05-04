@@ -32,6 +32,5 @@ if [ ! -d $CL_DIR ]; then
     exit 1
 fi
 
-
 cd $HDK_DIR/cl/examples/$test/build/scripts
 ./aws_build_dcp_from_cl.sh -foreground
