@@ -6,7 +6,7 @@
 2. [Build procedure step by step](#stepbystep)
 3. [Build strategies and parallel builds](#strategies)
 4. [About Encrption during build process](#buildencryption)
-5. [Advanced Notes](#buildadvanced notes)
+5. [Advanced Notes](#buildadvanced_notes)
 6. [Build Frequently Asked Questions](#buildfaq)
 
 
@@ -152,7 +152,7 @@ If you are running on one of the EC2 compute instances with 31GiB DRAM or more, 
 
 Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
 
-<a name="buildadvanced notes"></a>
+<a name="buildadvanced_notes"></a>
 ## Advanced Notes 
 
 * The included implementation flow is a baseline flow.  It is possible to add advanced commands/constraints (e.g, rejoining) to the flow.
