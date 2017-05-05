@@ -36,7 +36,7 @@ Alternatively, by creating a new directory, setup the environment variables, and
 Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
 Each one of the examples following the recommended directory structure to match what's expected by the HDK simulation and build scripts.
 
-If you like to start your own CL, check out the [How to create your own CL](../developer_designs/README.md) readme.
+If you like to start your own CL, check out the [How to create your own CL](../../common/shell_v04151701/new_cl_template/build/README.md) readme.
 
 ### 2. Build the CL
 
@@ -46,10 +46,17 @@ If you like to start your own CL, check out the [How to create your own CL](../d
 
 Executing the `aws_build_dcp_from_cl.sh` script will perform the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA.
 The output is a tarball file comprising the DCP file, and other log/manifest files, formatted as `YY_MM_DD-hhmm.Developer_CL.tar`.
-This file would be submitted to AWS to create an AFI.
+This file would be submitted to AWS to create an AFI. By default the build script will use Clock Group A Recipe A0 wich uses a main clock of 125 MHz.
 
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
+
+In order to use a 250 MHz main clock the developer can specify the A1 Clock Group A Recipe as in the following example:
+
+    $ cd $CL_DIR/build/scripts
+    $ ./aws_build_dcp_from_cl.sh -clock_recipe_a A1
+
+Other clock recipes can be specified as well. More details on the [Clock Group Recipes Table](../../docs/clock_recipes.csv) and how to specify different recipes can be found in the following [README](../../common/shell_v04151701/new_cl_template/build/README.md).
 
 **NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` will run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
