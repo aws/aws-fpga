@@ -88,7 +88,6 @@ NUM_TIMING_VIOLATIONS=`grep -c "The design did not meet timing requirements." la
 
 if [ $NUM_TIMING_VIOLATIONS -gt 0 ]; then
     echo "WARNING: Timing violations found.  Design may not be functional."
-#	FAIL_FLAG=1
 else
     echo "INFO: No timing violations found!"
 fi
@@ -97,9 +96,7 @@ fi
 if [ $FAIL_FLAG = 1 ]; then
     echo "ERROR: One or more more checks failed!"
     exit 1
-else
-    echo "INFO: All checks passing!"
-    exit 0
 fi
 
-
+echo "INFO: All checks passing!"
+exit 0
