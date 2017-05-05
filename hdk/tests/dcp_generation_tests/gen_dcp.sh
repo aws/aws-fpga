@@ -38,7 +38,7 @@ fi
 echo "INFO: Running $HDK_DIR/cl/examples/$test/build/scripts/aws_build_dcp_from_cl.sh -foreground"
 
 cd $HDK_DIR/cl/examples/$test/build/scripts
-./aws_build_dcp_from_cl.sh -foreground
+./aws_build_dcp_from_cl.sh -foreground -clock_recipe_a A1
 
 if [ $? -ne 0 ]; then
         echo -e >&2 "ERROR: Non zero error code while generating DCP!";
