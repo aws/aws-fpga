@@ -194,7 +194,7 @@ fi
 # Use timestamp for logs and output files
 timestamp=$(date +"%y_%m_%d-%H%M%S") 
 logname=$timestamp.vivado.log
-export LAST_LOG=$logname
+ln -s -f $logname last_log
 
 info_msg "Environment variables and directories are present. Checking for Vivado installation."
 

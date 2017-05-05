@@ -42,18 +42,14 @@ fi
 cd $HDK_DIR/cl/examples/$test/build/scripts
 ./aws_build_dcp_from_cl.sh -foreground
 
-# Grab the logfile name, which is set in the environment as LAST_LOG
-if [ -z "$LAST_LOG" ]; then
-    echo -e >&2 'ERROR: Could not determine the log file to check (Is $LAST_LOG empty?)'
-    exit 1
-fi
-if [ ! -e "$LAST_LOG"]; then
-    echo -e >&2 'ERROR: Could not find the log file to check (Does $LAST_LOG exist?)'
+# Use last_log symlink to grab logname
+if [ ! -e "last_log" ]; then
+    echo -e >&2 'ERROR: Could not find the log file to check (Does last_log exist?)'
     exit 1
 fi
 
 # Check the number of warnings
-NUM_WARNINGS=`grep -c "^WARNING" ${logfile}`
+NUM_WARNINGS=`grep -c "^WARNING" last_log`
 
 echo "INFO: Saw $NUM_WARNINGS warning(s) in log file";
 
@@ -70,7 +66,7 @@ else
 fi
 
 # Check the number of critical warnings
-NUM_CRITICAL_WARNINGS=`grep -c "^CRITICAL WARNING" ${logfile}`
+NUM_CRITICAL_WARNINGS=`grep -c "^CRITICAL WARNING" last_log`
 
 echo "INFO: Saw $NUM_WARNINGS critical warning(s) in log file";
 
@@ -88,7 +84,7 @@ fi
 
 
 # Check if there are any setup/hold-time violations
-NUM_TIMING_VIOLATIONS=`grep -c "The design did not meet timing requirements." ${logfile}`
+NUM_TIMING_VIOLATIONS=`grep -c "The design did not meet timing requirements." last_log`
 
 if [ $NUM_TIMING_VIOLATIONS -gt 0 ]; then
     echo "WARNING: Timing violations found.  Design may not be functional."
