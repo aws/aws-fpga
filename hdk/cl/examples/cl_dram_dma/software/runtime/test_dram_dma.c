@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
     fail_on(rc, out, "Interrupt example failed");
 
 out:
-    return 1;
+    return rc;
 }
 
 static int
