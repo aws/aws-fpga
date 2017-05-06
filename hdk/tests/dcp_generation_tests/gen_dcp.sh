@@ -41,8 +41,11 @@ fi
 
 cd $HDK_DIR/cl/examples/$test/build/scripts
 ./aws_build_dcp_from_cl.sh -foreground
+echo "DEBUG: current working dir is $PWD"
 
 # Use last_log symlink to grab logname
+cd $HDK_DIR/cl/examples/$test/build/scripts
+echo "DEBUG: Looking for last_log in $PWD"
 if [ ! -e "last_log" ]; then
     echo -e >&2 'ERROR: Could not find the log file to check (Does last_log exist?)'
     exit 1
