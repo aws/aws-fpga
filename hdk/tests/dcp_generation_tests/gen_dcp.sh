@@ -23,9 +23,15 @@ if [ ":$test" = ":" ]; then
     exit 1
 fi
 
+#BOZO: Assume pass unless set
+FAIL_FLAG=0
+
+if [ -z "$WORKSPACE" ]; then
+    export WORKSPACE=$AWS_FPGA_REPO_DIR
+fi
+
 echo "INFO: Sourcing hdk_setup.sh"
 source $WORKSPACE/hdk_setup.sh;
-
 
 echo "INFO: Setting CL_DIR=$HDK_DIR/cl/examples/$test"
 export CL_DIR=$HDK_DIR/cl/examples/$test
@@ -39,6 +45,7 @@ echo "INFO: Running $HDK_DIR/cl/examples/$test/build/scripts/aws_build_dcp_from_
 
 cd $HDK_DIR/cl/examples/$test/build/scripts
 ./aws_build_dcp_from_cl.sh -foreground
+echo "DEBUG: current working dir is $PWD"
 
 if [ $? -ne 0 ]; then
         echo -e >&2 "ERROR: Non zero error code while generating DCP!";
@@ -90,3 +97,63 @@ if [ $? -ne 0 ]; then
         exit 1
 fi
 
+# Use last_log symlink to grab logname
+cd $HDK_DIR/cl/examples/$test/build/scripts
+echo "DEBUG: Looking for last_log in $PWD"
+if [ ! -e "last_log" ]; then
+    echo -e >&2 'ERROR: Could not find the log file to check (Does last_log exist?)'
+    exit 1
+fi
+
+# Check the number of warnings
+NUM_WARNINGS=`grep -c "^WARNING" last_log`
+
+echo "INFO: Saw $NUM_WARNINGS warning(s) in log file";
+
+# Compare number of warnings to expected number
+EXP_NUM_WARNINGS=$(<.warnings)
+
+echo "INFO: Expected $EXP_NUM_WARNINGS warning in log file"
+
+if [ $NUM_WARNINGS -eq $EXP_NUM_WARNINGS ]; then
+    echo "INFO: NUM_WARNINGS check passed!"
+else
+    echo "ERROR: NUM_WARNINGS check failed!"
+    FAIL_FLAG=1
+fi
+
+# Check the number of critical warnings
+NUM_CRITICAL_WARNINGS=`grep -c "^CRITICAL WARNING" last_log`
+
+echo "INFO: Saw $NUM_WARNINGS critical warning(s) in log file";
+
+# Compare number of warnings to expected number
+EXP_NUM_CRITICAL_WARNINGS=$(<.critical_warnings)
+
+echo "INFO: Expected $EXP_NUM_CRITICAL_WARNINGS critical warning(s) in log file"
+
+if [ $NUM_CRITICAL_WARNINGS -eq $EXP_NUM_CRITICAL_WARNINGS ]; then
+    echo "INFO: NUM_CRITICAL_WARNINGS check passed!"
+else
+    echo "ERROR: NUM_CRITICAL_WARNINGS check failed!"
+    FAIL_FLAG=1
+fi
+
+
+# Check if there are any setup/hold-time violations
+NUM_TIMING_VIOLATIONS=`grep -c "The design did not meet timing requirements." last_log`
+
+if [ $NUM_TIMING_VIOLATIONS -gt 0 ]; then
+    echo "WARNING: Timing violations found.  Design may not be functional."
+else
+    echo "INFO: No timing violations found!"
+fi
+
+# If FAIL_FLAG was sent, return non-zero error code!
+if [ $FAIL_FLAG = 1 ]; then
+    echo "ERROR: One or more more checks failed!"
+    exit 1
+fi
+
+echo "INFO: All checks passing!"
+exit 0
