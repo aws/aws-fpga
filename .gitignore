@@ -52,3 +52,9 @@ hdk/common/verif/models/.vivado_version
 vivado_pid*.str
 vivado*.jou
 vivado*.log
+
+# Pycharm projects
+.idea/
+
+# Python compiled code
+*.pyc
