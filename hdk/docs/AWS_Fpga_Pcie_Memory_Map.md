@@ -4,7 +4,7 @@ FPGAs are PCIe-attached to an AWS EC2 instance, where each FPGA Slot presents a 
 
 This document describes the actual size and attributes of each of the BARs, with some examples on how can they be mapped in a real life application.
 
-Even though all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O (MMIO) space, they need to be mapped to Linux kernel or userspace application before accessing them. Please refer to the [Software Programmer's View](./Programmers_View.md) on how the various software pieces can interact with the FPGA PCIe Memory.
+Even though all these PCIe BARs are mapped to the EC2 Instance memory-mapped I/O (MMIO) space, they need to be mapped to Linux kernel or userspace application before accessing them. Please refer to the [Software Programmer's View](./Programmer_View.md) on how the various software pieces can interact with the FPGA PCIe Memory.
 
 ## Memory map per Slot
 ```
