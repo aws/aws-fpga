@@ -127,7 +127,7 @@ fi
 # Check the number of critical warnings
 NUM_CRITICAL_WARNINGS=`grep -c "^CRITICAL WARNING" last_log`
 
-echo "INFO: Saw $NUM_WARNINGS critical warning(s) in log file";
+echo "INFO: Saw $NUM_CRITICAL_WARNINGS critical warning(s) in log file";
 
 # Compare number of warnings to expected number
 EXP_NUM_CRITICAL_WARNINGS=$(<.critical_warnings)
