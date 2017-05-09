@@ -36,7 +36,7 @@ Alternatively, by creating a new directory, setup the environment variables, and
 Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
 Each one of the examples following the recommended directory structure to match what's expected by the HDK simulation and build scripts.
 
-If you like to start your own CL, check out the [How to create your own CL](../../common/shell_v04151701/new_cl_template/build/README.md) readme.
+If you like to start your own CL, check out the [How to create your own CL](../developer_designs/Starting_Your_Own_CL.md) readme.
 
 ### 2. Build the CL
 
