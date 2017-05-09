@@ -27,5 +27,8 @@
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
 
+// Uncomment to disable Chipscope
+//`define DISABLE_CHIPSCOPE_DEBUG
+
 `endif
 
