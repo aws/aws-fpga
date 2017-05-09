@@ -36,7 +36,7 @@ EDMA driver source code is distributed with AWS FPGA HDK and SDK.
 
 ** NOTE: Usage of EDMA is not mandatory. AWS provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
 
-For a complete description of the different CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmers_View.md).
+For a complete description of the different CPU to FPGA communication options and various options available for the programmer, please review the [Programmers' View](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmer_View.md).
 
 <a name="quickExample"></a>
 # Quick Example

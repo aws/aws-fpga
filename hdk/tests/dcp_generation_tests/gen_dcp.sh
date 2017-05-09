@@ -44,7 +44,9 @@ fi
 echo "INFO: Running $HDK_DIR/cl/examples/$test/build/scripts/aws_build_dcp_from_cl.sh -foreground"
 
 cd $HDK_DIR/cl/examples/$test/build/scripts
-./aws_build_dcp_from_cl.sh -foreground
+
+./aws_build_dcp_from_cl.sh -foreground -clock_recipe_a A1
+
 echo "DEBUG: current working dir is $PWD"
 
 if [ $? -ne 0 ]; then
@@ -125,7 +127,7 @@ fi
 # Check the number of critical warnings
 NUM_CRITICAL_WARNINGS=`grep -c "^CRITICAL WARNING" last_log`
 
-echo "INFO: Saw $NUM_WARNINGS critical warning(s) in log file";
+echo "INFO: Saw $NUM_CRITICAL_WARNINGS critical warning(s) in log file";
 
 # Compare number of warnings to expected number
 EXP_NUM_CRITICAL_WARNINGS=$(<.critical_warnings)
