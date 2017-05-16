@@ -115,6 +115,9 @@ cli_attach(void)
 	ret = fpga_mgmt_init();
 	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
+	fpga_mgmt_set_cmd_timeout(f1.mbox_timeout);
+	fpga_mgmt_set_cmd_delay_msec(f1.mbox_delay_msec);
+
 out:
 	return 0;
 err:
