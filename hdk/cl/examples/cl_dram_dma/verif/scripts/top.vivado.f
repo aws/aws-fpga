@@ -47,7 +47,7 @@ ${SH_LIB_DIR}/../ip/src_register_slice/sim/src_register_slice.v
 ${SH_LIB_DIR}/../ip/axi_register_slice/sim/axi_register_slice.v
 ${SH_LIB_DIR}/../ip/axi_register_slice_light/sim/axi_register_slice_light.v
 
---define DISABLE_CHIPSCOPE_DEBUG
+--define DISABLE_VJTAG_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv
