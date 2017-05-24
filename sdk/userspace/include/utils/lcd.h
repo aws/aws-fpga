@@ -46,8 +46,8 @@ extern "C" {
 static inline int msleep(uint64_t ms)
 {
 	struct timespec sleep_time = {
-		.tv_sec = ms / MS_PER_SECOND,
-		.tv_nsec = (ms % MS_PER_SECOND) * NS_PER_MS
+		.tv_sec = (long int)(ms / MS_PER_SECOND),
+		.tv_nsec = (long int)((ms % MS_PER_SECOND) * NS_PER_MS)
 	};
 
 	return clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_time, NULL);
