@@ -40,6 +40,10 @@ enum {
 	LOGGER_FLAGS_SERIALIZE = (1u << 0),
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Logger. */
 struct logger {
 	/** Name (for debugging). */
@@ -174,3 +178,7 @@ static inline __printf(1, 2) void log_dummy(const char *fmt, ...)
 extern const struct logger logger_stdout;
 extern const struct logger logger_kmsg;
 extern const struct logger *logger_default;
+
+#ifdef __cplusplus
+}
+#endif
