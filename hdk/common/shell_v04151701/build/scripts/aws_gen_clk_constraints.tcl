@@ -65,6 +65,30 @@ switch $clock_recipe_b {
         set clk_extra_b1_period      16
         set clk_extra_b1_half_period  8
     }
+    "B2" {
+        set clk_extra_b0_period       2.222
+        set clk_extra_b0_half_period  1.111
+        set clk_extra_b1_period       4.444
+        set clk_extra_b1_half_period  2.222
+    }
+    "B3" {
+        set clk_extra_b0_period       4
+        set clk_extra_b0_half_period  2
+        set clk_extra_b1_period      16
+        set clk_extra_b1_half_period  8
+    }
+    "B4" {
+        set clk_extra_b0_period       3.333
+        set clk_extra_b0_half_period  1.667
+        set clk_extra_b1_period      13.333
+        set clk_extra_b1_half_period  6.667
+    }
+    "B5" {
+        set clk_extra_b0_period       2.5
+        set clk_extra_b0_half_period  1.25
+        set clk_extra_b1_period      10
+        set clk_extra_b1_half_period  5
+    }
     default {
         puts "$clock_recipe_b is NOT a valid clock_recipe_b."
     }
@@ -83,6 +107,18 @@ switch $clock_recipe_c {
         set clk_extra_c0_half_period  3.333
         set clk_extra_c1_period       5
         set clk_extra_c1_half_period  2.5
+    }
+    "C2" {
+        set clk_extra_c0_period      13.333
+        set clk_extra_c0_half_period  6.667
+        set clk_extra_c1_period      10
+        set clk_extra_c1_half_period  5
+    }
+    "C3" {
+        set clk_extra_c0_period       5
+        set clk_extra_c0_half_period  2.5
+        set clk_extra_c1_period       3.75
+        set clk_extra_c1_half_period  1.875
     }
     default {
         puts "$clock_recipe_c is NOT a valid clock_recipe_c."

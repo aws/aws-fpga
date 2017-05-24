@@ -23,7 +23,7 @@
 // FPGA flop init capability).  This will help with routing resources.
 `define FPGA_LESS_RST
 
-// Uncomment to disable Chipscope
-//`define DISABLE_CHIPSCOPE_DEBUG
+// Uncomment to disable Virtual JTAG
+//`define DISABLE_VJTAG_DEBUG
 
 `endif
