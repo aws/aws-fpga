@@ -21,7 +21,7 @@ set opt_preHookTcl ""
 set place 1
 set place_options    ""
 set place_directive  ""
-set place_preHookTcl "$HDK_SHELL_DIR/build/scripts/prohibit_tr.tcl $HDK_SHELL_DIR/build/scripts/apply_debug_constraints.tcl $HDK_SHELL_DIR/build/scripts/cl_xpr_xdc.tcl"
+set place_preHookTcl "$HDK_SHELL_DIR/build/scripts/prohibit_tr.tcl $CL_DIR/build/scripts/apply_debug_constraints.tcl $HDK_SHELL_DIR/build/scripts/cl_xpr_xdc.tcl"
 
 set phys_opt 0
 set phys_options    ""
