@@ -31,7 +31,7 @@
    *    EDMA Performance improvments 
    *    Expanded EC2 Instance type support
    *    CL Examples @250Mhz (Clock recipe A1)
-   *    Option to exclude chipscope from building CL examples (DISABLE_CHIPSCOPE_DEBUG)
+   *    Option to exclude Chipscope (Virtual JTAG) from building CL examples (DISABLE_VJTAG_DEBUG)
 
 # Release 1.2.0
 

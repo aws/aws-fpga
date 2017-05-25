@@ -18,7 +18,7 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1] [-clock_recipe_c C0 | C1] [-foreground] [-notify] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1 | B2 | B3 | B4 | B5] [-clock_recipe_c C0 | C1 | C2 | C3] [-foreground] [-notify] | [-h] | [-H] | [-help] |  ]"
     echo " "
     echo "By default the build is run in the background using nohup so that the"
     echo "process will not be terminated if the terminal window is closed."
@@ -123,15 +123,15 @@ fi
 
 # Check that clock_recipe_b is valid
 shopt -s extglob
-if [[ $clock_recipe_b != @(B0|B1) ]]; then
-  err_msg "$clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0 and B1."
+if [[ $clock_recipe_b != @(B0|B1|B2|B3|B4|B5) ]]; then
+  err_msg "$clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0, B1, B2, B3, B4, and B5."
   exit 1
 fi
 
 # Check that clock_recipe_c is valid
 shopt -s extglob
-if [[ $clock_recipe_c != @(C0|C1) ]]; then
-  err_msg "$clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0 and C1."
+if [[ $clock_recipe_c != @(C0|C1|C2|C3) ]]; then
+  err_msg "$clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0, C1, C2, and C3."
   exit 1
 fi
 
