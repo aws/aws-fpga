@@ -20,6 +20,10 @@
 #include <hal/fpga_common.h>
 #include <fpga_pci.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Initialize the fpga_mgmt library.
  * Calls fpga_pci_init.
@@ -158,3 +162,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value);
  * @returns 0 on success, non-zero on error
  */
 int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value);
+
+#ifdef __cplusplus
+}
+#endif
