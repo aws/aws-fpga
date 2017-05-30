@@ -720,7 +720,7 @@ cl_sda_slv CL_SDA_SLV (
 //-----------------------------------------
 
 
-`ifndef DISABLE_VJTAG_DEBUG
+`ifndef DISABLE_CHIPSCOPE_DEBUG
 
 cl_ila CL_ILA (
 
@@ -751,7 +751,7 @@ cl_vio CL_VIO (
 );
 
 
-`endif //  `ifndef DISABLE_VJTAG_DEBUG
+`endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 
 //----------------------------------------- 
 // Virtual JATG ILA Debug core example 

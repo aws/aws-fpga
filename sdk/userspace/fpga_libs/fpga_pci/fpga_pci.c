@@ -21,7 +21,6 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <errno.h>
-#include <unistd.h>
 
 #include <limits.h>
 #include <utils/lcd.h>
@@ -164,7 +163,6 @@ static int
 fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 	bool write_combining, int *handle) 
 {
-	int fd = -1;
 	log_debug("enter");
 
 	void *mem_base = NULL;
@@ -229,14 +227,12 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 
 	log_debug("Opening sysfs_name=%s", sysfs_name);
 
-	fd = open(sysfs_name, O_RDWR | O_SYNC);
+	int fd = open(sysfs_name, O_RDWR | O_SYNC);
 	fail_on(fd == -1, err, "open failed");
 
 	mem_base = mmap(0, map->resource_size[bar_id], PROT_READ | PROT_WRITE, 
 			MAP_SHARED, fd, 0);
 	fail_on(mem_base == MAP_FAILED, err, "mmap failed");
-	close(fd);
-	fd = -1;
 
 	/** Allocate a bar */
 	int tmp_handle = fpga_pci_bar_alloc();
@@ -257,9 +253,6 @@ err_unmap:
 		fail_on(ret != 0, err, "munmap failed");
 	}
 err:
-	if (fd != -1) {
-		close(fd);
-	}
 	errno = 0;
 	return FPGA_ERR_FAIL;
 }

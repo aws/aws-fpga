@@ -328,9 +328,9 @@ assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q2[15:0];
   assign cl_sh_status1[31:0] = `CL_VERSION;
 
 //-----------------------------------------------
-// Debug bridge, used if need Virtual JTAG
+// Debug bridge, used if need chipscope
 //-----------------------------------------------
-`ifndef DISABLE_VJTAG_DEBUG
+`ifndef DISABLE_CHIPSCOPE_DEBUG
 
 // Flop for timing global clock counter
 logic[63:0] sh_cl_glcount0_q;
@@ -381,7 +381,7 @@ always_ff @(posedge clk_main_a0)
    );
 
 //-----------------------------------------------
-// VIO Example - Needs Virtual JTAG
+// VIO Example - Needs Chipscope
 //-----------------------------------------------
    // Counter running at 125MHz
    
@@ -465,7 +465,7 @@ always_ff @(posedge clk_main_a0)
                    .probe10 (vo_cnt_watermark_q)
                    );
    
-`endif //  `ifndef DISABLE_VJTAG_DEBUG
+`endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
 
 endmodule
 
