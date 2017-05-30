@@ -89,7 +89,7 @@ The following command displays the current state for the given FPGA slot number.
 
 To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parameters (see FAQ for AGFI).  In synchronous mode, this command will wait for the AFI to transition to the "loaded" state, perform a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id, and display the final state for the given FPGA slot number.
 
-    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg -H
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
     
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
     AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version> 
@@ -100,7 +100,7 @@ To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parame
 
 The following command will clear the FPGA image, including internal and external memories.  In synchronous mode, this command will wait for the AFI to transition to the "cleared" state, perform a PCI device remove and recan in order to expose the default AFI Vendor and Device Id, and display the final state for the given FPGA slot number.
 
-    $ sudo fpga-clear-local-image -S 0 -H
+    $ sudo fpga-clear-local-image -S 0
     
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
     AFI          0       none                    cleared           1        ok               0       <shell version> 
