@@ -29,7 +29,7 @@ AWS provides the following set of command-line tools for Amazon FPGA Image (AFI)
 
 All of the AFI Management Tools support a `-help` option that may be used to display the full set of options.
 
-#### `sudo` or `root` Privileges
+### `sudo` or `root` Privileges
 
 The tools require sudo or root access rights since AFI loads and clears modify the underlying system hardware (also see the FAQ section "Q: How do the AFI Management Tools work?".
 
@@ -49,7 +49,7 @@ The `sdk_setup.sh` script will build the AFI Management Tools and install them i
 
 Once you have the AFI Management Tools installed on your F1 instance, you can display the FPGA slot numbers and PCIe mappings for driver attachment (e.g., PCI Domain:Bus:Device:Function).
 
-#### Getting Inventory of the Available FPGA Slots
+### Getting Inventory of the Available FPGA Slots
 
     $ sudo fpga-describe-local-image-slots -H
 
@@ -73,7 +73,7 @@ Once you have the AFI Management Tools installed on your F1 instance, you can di
 
 ** NOTE: ** *While each FPGA has more than one PCIe Physical Function, the AFI Management Tools will present the VendorId and DeviceId of the first PF only*.
 
-#### Describing the AFI Content Loaded on a Specific FPGA Slot
+### Describing the AFI Content Loaded on a Specific FPGA Slot
 
 The following command displays the current state for the given FPGA slot number.  The output shows that the FPGA in the “cleared” state right after instance create.
 
@@ -84,15 +84,39 @@ The following command displays the current state for the given FPGA slot number.
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
-#### Loading an AFI to a Specific FPGA Slot
+### Synchronous AFI Load and Clear Operations
+#### Synchronously Loading an AFI to a Specific FPGA Slot
 
-To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parameters (see FAQ for AGFI).
+To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parameters (see FAQ for AGFI).  In synchronous mode, this command will wait for the AFI to transition to the "loaded" state, perform a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id, and display the final state for the given FPGA slot number.
 
-    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg -H
+    
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       agfi-0123456789abcdefg  loaded            0        ok               0       <shell version> 
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
+    
+#### Synchronously Clearing the FPGA Image on Specific Slot
 
-#### Describing the AFI content loaded on a specific FPGA slot after load
+The following command will clear the FPGA image, including internal and external memories.  In synchronous mode, this command will wait for the AFI to transition to the "cleared" state, perform a PCI device remove and recan in order to expose the default AFI Vendor and Device Id, and display the final state for the given FPGA slot number.
 
-Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
+    $ sudo fpga-clear-local-image -S 0 -H
+    
+    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+    AFI          0       none                    cleared           1        ok               0       <shell version> 
+    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+    AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
+
+### Asynchronous AFI Load and Clear Operations
+#### Asynchronously Loading an AFI to a Specific FPGA Slot
+
+To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parameters (see FAQ for AGFI). The "-A" is used for asynchronous AFI load operations.
+
+    $ sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdefg -A
+
+#### Describing the AFI content loaded on a specific FPGA slot after an asynchronous AFI load
+
+Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  **_The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id._**
 
     $ sudo fpga-describe-local-image -S 0 -R -H 
     
@@ -101,15 +125,15 @@ Displays the current state for the given FPGA slot number.  The output shows the
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
 
-#### Clearing the FPGA Image on Specific Slot
+#### Asynchronously Clearing the FPGA Image on Specific Slot
 
-The following command will clear the FPGA image, including internal and external memories.
+The following command will clear the FPGA image, including internal and external memories. The "-A" is used for asynchronous AFI clear operations.
 
-    $ sudo fpga-clear-local-image -S 0
+    $ sudo fpga-clear-local-image -S 0 -A
 
-#### Describing the AFI content loaded on a specific FPGA slot after clear
+#### Describing the AFI content loaded on a specific FPGA slot after an asynchronous AFI clear
 
-The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.  The "-R" option performs a PCI device remove and recan in order to expose the default AFI Vendor and Device Id.
+The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.  **_The "-R" option performs a PCI device remove and recan in order to expose the default AFI Vendor and Device Id._**
 
     $ sudo fpga-describe-local-image -S 0 -R -H
     
@@ -118,13 +142,13 @@ The following command displays the current state for the given FPGA slot number.
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0x1042      0000:00:0f.0
 
-#### Looking at Metrics
+### Looking at Metrics
 
 The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA image hardware metrics including FPGA PCI and DDR ECC metrics.
 
 Additionally, the `fpga-describe-local-image` **`clear-metrics`** option may be used to display and clear FPGA image hardware metrics (clear on read).
 
-##### Supported Metrics
+#### Supported Metrics
 
 The following FPGA image hardware metrics are provided. PCIe related counters contain the `pcis` or `pcim` prefix which indicates a PCIe slave access (the instance CPU or other FPGAs accessing this FPGA) or PCIe master access (the FPGA is mastering an outbound transaction toward the instance memory or other FPGAs).
 
