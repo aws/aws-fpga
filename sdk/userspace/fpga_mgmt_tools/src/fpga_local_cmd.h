@@ -71,54 +71,29 @@ enum {
 	"Error: Please prefix the command with 'sudo' or login as root"
 
 /**
- * Default synchronous API timeout:
- * e.g. load + describe multi-AFI command sequences.
- *  timeout * delay_msec 
+ * Default timeout:
+ *   CLI_TIMEOUT_DFLT * CLI_DELAY_MSEC_DFLT
  */
-#define CLI_SYNC_TIMEOUT_DFLT		300	
-#define CLI_SYNC_DELAY_MSEC_DFLT	200	
-
-/**
- * Request timeout: timeout * delay_msec
- */
-#define CLI_REQUEST_TIMEOUT_DFLT   	25
-#define CLI_REQUEST_DELAY_MSEC_DFLT	200	
+#define CLI_TIMEOUT_DFLT   	25
+#define CLI_DELAY_MSEC_DFLT	200	
 
 /**
  * ec2_fpga_cmd:
  */
 struct ec2_fpga_cmd {
-	/** See CLI_CMD_XYZ */
+	uint32_t slot_dev_index;
 	uint32_t opcode;
-	/** The AFI slot */
 	uint32_t afi_slot;
-	/** The AFI ID */
 	char	 afi_id[AFI_ID_STR_MAX];
-	/** 
-	 * Synchronous API timeout (e.g. load + describe AFI command sequence): 
-	 *  timeout * delay_msec 
-	 */
-	uint32_t sync_timeout;
-	uint32_t sync_delay_msec;
-	/** Request timeout for AFI commands: timeout * delay_msec */
-	uint32_t request_timeout;
-	uint32_t request_delay_msec;
-	/** Indicates if the parser itself fully completed the command */
+	uint32_t mbox_timeout;
+	uint32_t mbox_delay_msec;
 	bool	 parser_completed;	
-	/** Asynchronous operations */
-	bool	 async;
-	/** Show headers option */
 	bool	 show_headers;
-	/** Metrics options */
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;
-	/** Rescan option */
 	bool	 rescan;
-	/** Show mailbox device option */
 	bool     show_mbox_device;
-	/** Virtual DIP switch */
 	uint16_t v_dip_switch;
-	/** Virtual JTAG TCP port */
 	char*    tcp_port;
 };
 

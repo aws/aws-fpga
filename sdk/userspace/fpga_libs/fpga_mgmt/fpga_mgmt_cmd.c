@@ -385,12 +385,12 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 	fail_on_quiet(!is_response, err, "Command is not a response");
 	return 0;
 
+id_err:
+	return -EAGAIN;
 op_err:
 	if (rsp->hdr.op == AFI_CMD_ERROR) {
 		return fpga_mgmt_handle_afi_cmd_error_rsp(rsp, len);
 	}
-id_err:
-	return -EAGAIN;
 err:
 	return FPGA_ERR_FAIL;
 }
@@ -411,20 +411,18 @@ fpga_mgmt_send_cmd(int slot_id,
 	 *  -also make a minimal attempt to drain stale responses
 	 *   (if any).
 	 */
-	uint32_t retries = 0;
-	bool done = false;
-	while (!done) {
+	uint32_t id_retries = 0;
+	ret = -EAGAIN;
+	while (ret == -EAGAIN) {
 		ret = fpga_hal_mbox_read(handle, (void *)rsp, len);
 		fail_on(ret = (ret) ? (-ETIMEDOUT) : 0, err_code, "Error: operation timed out");
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
-		if (ret == 0) {
-			done = true;
-		} else {
-			fail_on(ret != -EAGAIN, err_code, CLI_INTERNAL_ERR_STR);
-			fail_on(retries >= AFI_MAX_RETRIES, err, CLI_INTERNAL_ERR_STR);
-			retries++;
-		}
+		fail_on(ret, err_code, CLI_INTERNAL_ERR_STR);
+
+		fail_on(id_retries >= AFI_MAX_ID_RETRIES, err,
+				CLI_INTERNAL_ERR_STR);
+		id_retries++;
 	}
 	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
