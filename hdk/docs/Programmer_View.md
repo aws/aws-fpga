@@ -10,13 +10,13 @@ There are two parts required to work with AWS FPGA: Management and Runtime, and 
 
   **\[A\]** As linux shell commands called [FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md).
   
-  **\[B\]** As a C-library called [FPGA Management Lib](../../sdk/userspace/lib/) to be compiled with the developer's C/C++ application.
+  **\[B\]** As a C-library called [FPGA Management Lib](../../sdk/userspace/fpga_libs/fpga_mgmt/) to be compiled with the developer's C/C++ application.
   
   **\[C\]** Pre-integrated with [OpenCL runtime library](../../sdk/SDAccel)
   
 2. **Runtime code**: required for reading/writing from/to the Custom Logic, handling interrupts, and using the DMA. This is provided by:
   
-  **\[D\]** [FPGA PCIe Lib](../../sdk/runtime/lib/) is a C-library used to access the FPGA memory space behind the AppPF PCIe BARs, from Linux application space like reading/writing to register space or passing messages. This library can be compiled and linked with the developer's C/C++ application.
+  **\[D\]** [FPGA PCIe Lib](../../sdk/userspace/fpga_libs/fpga_pci/) is a C-library used to access the FPGA memory space behind the AppPF PCIe BARs, from Linux application space like reading/writing to register space or passing messages. This library can be compiled and linked with the developer's C/C++ application.
   
   **\[E\]** A [DMA Interface](../../sdk/linux_kernel_drivers/edma/edma_README.md) using standard POSIX API like open()/read()/write() to be used in any C/C++ application for data transfer using DMA. This DMA interface requires installing the [AWS EDMA kernel driver](../../sdk/linux_kernel_drivers/edma/edma_install.md) - marked as item **\[G\]**.
   

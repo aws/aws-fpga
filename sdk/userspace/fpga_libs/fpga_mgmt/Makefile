@@ -26,7 +26,7 @@ CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-pro
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-FPGAMGMTLIB_SO = $(LIB_SO_PATH)/libfpga_mgmt.so
+FPGAMGMTLIB_SO = $(LIB_SO_PATH)/libfpga_mgmt.so.1.0.0
 FPGAMGMTLIB = $(LIB_PATH)/libfpga_mgmt.a
 
 LDLIBS = -lrt -lpthread
@@ -43,7 +43,8 @@ $(FPGAMGMTLIB): $(OBJ)
 
 $(FPGAMGMTLIB_SO): $(OBJ)
 	mkdir -p $(LIB_SO_PATH)
-	$(CC) -o $(FPGAMGMTLIB_SO) -shared $(OBJ) -Wl,-soname,libfpga_mgmt.so -Wl,--whole-archive $(FPGAAUXLIBS) -Wl,--no-whole-archive $(LDLIBS)
+	$(CC) -o $(FPGAMGMTLIB_SO) -shared $(OBJ) -Wl,-soname,libfpga_mgmt.so.1 -Wl,--whole-archive $(FPGAAUXLIBS) -Wl,--no-whole-archive $(LDLIBS)
+	ln -sf libfpga_mgmt.so.1.0.0 $(LIB_SO_PATH)/libfpga_mgmt.so
 
 clean:
 	rm -f *.o $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)

@@ -5,7 +5,7 @@
 1. [Overview of AFI Build process](#buildoverview)
 2. [Build procedure step by step](#stepbystep)
 3. [Build strategies and parallel builds](#strategies)
-4. [About Encrption during build process](#buildencryption)
+4. [About Encryption during build process](#buildencryption)
 5. [Advanced Notes](#buildadvanced_notes)
 6. [Build Frequently Asked Questions](#buildfaq)
 
@@ -61,7 +61,7 @@ The build script performs:
   
 <a name="strategies"></a>  
 #### Build Strategies   
-In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than anothers. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy, or run a few strategies in parallel using the FPGA Developer AMI. The strategies are described in more detail below.
+In order to help developers close timing goals and successfully build their designs efficiently, the build script provides the means to synthesize with different strategies. The different strategies alter the directives used by the synthesis tool. For example, some directives might specify additional optimizations to close timing, while others may specify less effort to minimize synthesis time for designs that can more easily close timing and area goals. Since every design is different, some strategies may provide better results than another build strategies. If a developer has trouble successfully building their design with one strategy it is encouraged that they try a different strategy, or run a few strategies in parallel using the FPGA Developer AMI. The strategies are described in more detail below.
 
 Build script usage:
 
@@ -96,7 +96,7 @@ Options:
 Strategy descriptions:
 
 * BASIC
-  * This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance betwwen runtime and Quality of Results (QOR).
+  * This is the basic flow in Vivado and contains the mandatory steps to be able to build a design. It is designed to provide a good balance between runtime and Quality of Results (QOR).
 
 * EXPLORE
   * This is a high-effort flow which is designed to give improved QOR results at the expense of runtime.
