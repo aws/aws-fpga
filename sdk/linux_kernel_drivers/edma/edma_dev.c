@@ -83,7 +83,7 @@ MODULE_PARM_DESC(transient_buffer_size, "Transient buffer size. (default=32MB)")
 
 static int single_transaction_size = 8 * PAGE_SIZE;
 module_param(single_transaction_size, int, 0);
-MODULE_PARM_DESC(transient_buffer_size, "The size of a single transaction over the DMA. (default=32KB)");
+MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over the DMA. (default=32KB)");
 
 extern int edma_queue_depth;
 
