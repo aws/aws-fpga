@@ -141,7 +141,7 @@ if [ $expected_memory_usage -gt `get_instance_memory` ]; then
 
   if [[ $ignore_memory_requirement == 0 ]]; then
       err_msg "$output_message"
-      err_msg "To ignore this memory requirement, source hdk_setup.sh again with -ignore_memory_requirement as an argument."
+      err_msg "To ignore this memory requirement, run this script again with -ignore_memory_requirement as an argument."
       exit 1
   else
       warn_msg "$output_message"
