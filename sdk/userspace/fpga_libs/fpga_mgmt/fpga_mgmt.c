@@ -263,7 +263,8 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_LOADED) {
 			/** Sanity check the afi_id */
-			ret = strncmp(afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id)); 
+			ret = (strncmp(afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id))) ? 
+				FPGA_ERR_FAIL : 0; 
 			fail_on(ret, out, "AFI ID mismatch: requested afi_id=%s, loaded afi_id=%s",
 					afi_id, tmp_info.ids.afi_id);
 			done = true;
