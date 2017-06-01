@@ -26,12 +26,17 @@
          *     1 DDR controller implemented in the SH (always available)
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+# Release 1.2.2
+   *    Expanded [clock recipes](./hdk/docs/clock_recipes.csv) 
+   *    Reduced DCP build times by 13% (34 mins) for cl_dram_dma example by adding an option to disable virtual jtag
+   *    Included encryption of .sv files for CL examples
+
 # Release 1.2.1
    *    Updated CL example build scripts with Prohibit URAM sites 
    *    EDMA Performance improvments 
    *    Expanded EC2 Instance type support
    *    CL Examples @250Mhz (Clock recipe A1)
-   *    Option to exclude chipscope from building CL examples (DISABLE_CHIPSCOPE_DEBUG)
+   *    Option to exclude Chipscope (Virtual JTAG) from building CL examples (DISABLE_VJTAG_DEBUG)
 
 # Release 1.2.0
 

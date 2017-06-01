@@ -204,7 +204,7 @@ We encourage you to use the [AWS FPGA Developer Forum](https://forums.aws.amazon
 
 The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_mgmt_tools). This software manages loading and clearing AFIs for the instance FPGAs. It also allows developers to retrieve FPGAs status from within the instance. Users will need to load the F1 AMI with the drivers and runtime libraries needed for their FPGA application.
 
-Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope.
+Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope (Virtual JTAG).
 
 
 ## Marketplace
@@ -235,7 +235,7 @@ There are two types of interfaces from the instance host CPU to the FPGAs:
 
 The first is the FPGA Image Management Tools. These APIs are detailed in the [SDK portion](./sdk/userspace/fpga_mgmt_tools) of the GitHub repository. FPGA Image Management Tools include APIs to load, clear, and get status of the FPGA. 
 
-The second type of interface is direct address access to the Application PCIe Physical Functions (PF) of the FPGA. There is no API for this access. Rather, there is direct access to resources in the Custom Logic (CL) region or Shell that can be accessed by software written on the instance. For example, the ChipScope software uses address space in a PF to provide FPGA debug support. Developers can create any API to the resources in their CL. See the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details on the address space mapping as seen from the instance.
+The second type of interface is direct address access to the Application PCIe Physical Functions (PF) of the FPGA. There is no API for this access. Rather, there is direct access to resources in the Custom Logic (CL) region or Shell that can be accessed by software written on the instance. For example, the ChipScope software (Virtual JTAG) uses address space in a PF to provide FPGA debug support. Developers can create any API to the resources in their CL. See the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details on the address space mapping as seen from the instance.
 
 
 
@@ -379,7 +379,7 @@ Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common 
 
 **Q: What resources within the FPGA does the AWS Shell consume?**
 
-The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, DRAM controller interface, ChipScope and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
+The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
 
 
 

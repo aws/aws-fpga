@@ -92,7 +92,7 @@ To load the AFI, use the FPGA slot number and Amazon Global FPGA Image ID parame
 
 #### Describing the AFI content loaded on a specific FPGA slot after load
 
-Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
+Displays the current state for the given FPGA slot number.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  **_The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id._**
 
     $ sudo fpga-describe-local-image -S 0 -R -H 
     
@@ -109,7 +109,7 @@ The following command will clear the FPGA image, including internal and external
 
 #### Describing the AFI content loaded on a specific FPGA slot after clear
 
-The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.  The "-R" option performs a PCI device remove and recan in order to expose the default AFI Vendor and Device Id.
+The following command displays the current state for the given FPGA slot number. It shows that the FPGA is in the “cleared” state after the FPGA image "clear" operation.  **_The "-R" option performs a PCI device remove and recan in order to expose the default AFI Vendor and Device Id._**
 
     $ sudo fpga-describe-local-image -S 0 -R -H
     
