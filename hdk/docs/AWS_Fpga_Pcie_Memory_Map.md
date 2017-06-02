@@ -1,6 +1,7 @@
 # AWS FPGA PCIe Memory Map
 
-FPGAs are PCIe-attached to an AWS EC2 instance, where each FPGA Slot presents a single FPGA with two PCIe Physical Functions (PFs), each with multiple PCIe Base Address Registers (BARs) as defined in [AWS Shell Specification](./AWS_Shell_Interface_Spec.md).
+FPGAs are PCIe-attached to an AWS EC2 instance, where each FPGA Slot presents a single FPGA with two PCIe Physical Functions (PFs), each with multiple PCIe Base Address Registers (BARs) as defined in [AWS Shell Specification](./AWS_Shell_Interface_Specification.md).
+ 
 
 This document describes the actual size and attributes of each of the BARs, with some examples on how can they be mapped in a real life application.
 
