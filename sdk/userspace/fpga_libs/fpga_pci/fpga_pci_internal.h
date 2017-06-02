@@ -30,5 +30,3 @@
 #define F1_MBOX_DEV2APP_DEV(dev)		((dev) - 1)
 #define F1_CHECK_APP_PF_DELAY_MSEC		1000
 #define F1_CHECK_APP_PF_MAX_RETRIES	3
-
-#define CLI_INTERNAL_ERR_STR "Error: Internal error "

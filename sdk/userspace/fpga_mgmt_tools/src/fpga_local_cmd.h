@@ -49,23 +49,6 @@ enum {
 		}							\
 	} while (0)
 
-/** 
- * This should be used for sanitized first level internal errors
- * to be displayed to the user.
- * We're only providing the line number and not the routine name
- * because we're abstracting the mailbox interface and all that
- * goes along with it.
- */
-#define CLI_INTERNAL_ERR_STR "Error: Internal error "
-#define fail_on_internal(CONDITION, LABEL, ...)	\
-	do {										\
-		if (CONDITION) {						\
-			printf(__VA_ARGS__);				\
-			printf("(line %u)\n", __LINE__);	\
-			goto LABEL;							\
-		}										\
-	} while (0)
-
 /** Common string for sudo/root access */
 #define CLI_ROOT_ACCESS_ERR_STR \
 	"Error: Please prefix the command with 'sudo' or login as root"

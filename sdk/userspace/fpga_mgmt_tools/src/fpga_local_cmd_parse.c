@@ -477,14 +477,14 @@ parse_args_load_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 's': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_sync_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the sync-timeout");
+			fail_on(ret != 0, err, "Could not configure the sync-timeout");
 			break;
 		}
 		case 'A': {
@@ -555,14 +555,14 @@ parse_args_clear_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 's': {
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_sync_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the sync-timeout");
+			fail_on(ret != 0, err, "Could not configure the sync-timeout");
 			break;
 		}
 		case 'A': {
@@ -642,7 +642,7 @@ parse_args_describe_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 'R': {
@@ -705,7 +705,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 'H': {
@@ -1028,7 +1028,7 @@ struct parse_args_str2func {
 int 
 parse_args(int argc, char *argv[])
 {
-	fail_on_quiet(argc < 2, err, "Error: opcode string must be specified");
+	fail_on(argc < 2, err, "Error: opcode string must be specified");
 	fail_on_user(!argv[0] || !argv[1], err, 
 			"Error: program name or opcode string is NULL");
 

@@ -60,7 +60,8 @@ const struct logger *logger = &logger_stdout;
 static int 
 cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 {
-	fail_on_quiet(slot_id >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
+	fail_on(slot_id >= FPGA_SLOT_MAX, err, "slot_id(%d) >= %d", 
+		slot_id, FPGA_SLOT_MAX);
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");         
@@ -123,14 +124,14 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
 		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot);
-		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
+		fail_on(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
 	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
-	fail_on_quiet(ret != 0, err, "fpga_pci_get_slot_spec failed");
+	fail_on(ret != 0, err, "fpga_pci_get_slot_spec failed");
 	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
-	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+	fail_on(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	if (f1.get_hw_metrics) {
 		if (f1.show_headers) {
@@ -258,7 +259,7 @@ cli_attach(void)
 	}
 
 	ret = fpga_mgmt_init();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "fpga_mgmt_init failed");
 
 	fpga_mgmt_set_cmd_timeout(f1.request_timeout);
 	fpga_mgmt_set_cmd_delay_msec(f1.request_delay_msec);
@@ -291,16 +292,17 @@ static int command_load(void)
 
 	if (f1.async) {
 		ret = fpga_mgmt_load_local_image(f1.afi_slot, f1.afi_id);
+		fail_on(ret != 0, err, "fpga_mgmt_load_local_image failed");
 	} else {
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
 		ret = fpga_mgmt_load_local_image_sync(f1.afi_slot, f1.afi_id,
 				f1.sync_timeout, f1.sync_delay_msec, &info);
-		fail_on_internal(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
+		fail_on(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
 
 		ret = cli_show_image_info(&info);
-		fail_on_internal(ret, err, "cli_show_image_info failed");
+		fail_on(ret != 0, err, "cli_show_image_info failed");
 	}
 err:
 	return ret;
@@ -316,16 +318,17 @@ command_clear(void)
 
 	if (f1.async) {
 		ret = fpga_mgmt_clear_local_image(f1.afi_slot);
+		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image failed");
 	} else {
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
 		ret = fpga_mgmt_clear_local_image_sync(f1.afi_slot, 
 				f1.sync_timeout, f1.sync_delay_msec, &info);
-		fail_on_internal(ret != 0, err, "fpga_mgmt_clear_local_image_sync failed");
+		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image_sync failed");
 
 		ret = cli_show_image_info(&info);
-		fail_on_internal(ret, err, "cli_show_image_info failed");
+		fail_on(ret != 0, err, "cli_show_image_info failed");
 	}
 err:
 	return ret;
@@ -355,10 +358,10 @@ command_describe(void)
 	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
 
 	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
-	fail_on(ret, err, "Unable to describe local image");
+	fail_on(ret != 0, err, "fpga_mgmt_describe_local_image failed");
 
 	ret = cli_show_image_info(&info);
-	fail_on_internal(ret, err, "cli_show_image_info failed");
+	fail_on(ret != 0, err, "cli_show_image_info failed");
 
 	return 0;
 err:
@@ -388,7 +391,7 @@ command_describe_slots(void)
 
 		/** Display the application PFs for this slot */
 		ret = cli_show_slot_app_pfs(i, &spec_array[i]);
-		fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+		fail_on(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	}
 	return 0;
@@ -519,7 +522,7 @@ static const command_func_t command_table[CLI_CMD_END] = {
 static int
 cli_main(void)
 {
-	fail_on_quiet(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
+	fail_on(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
 	fail_on_user(command_table[f1.opcode] == NULL, err, "Action not defined for "
 	             "opcode %u", f1.opcode);
 
@@ -588,22 +591,22 @@ int
 main(int argc, char *argv[])
 {
 	int ret = cli_create();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "cli_create failed");
 
 	ret = log_init("fpga-local-cmd");
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "log_init failed");
 
 	ret = log_attach(logger, NULL, 0);
 	fail_on_user(ret != 0, err, "%s", CLI_ROOT_ACCESS_ERR_STR);
 		
 	ret = parse_args(argc, argv);
-	fail_on_quiet(ret != 0, err, "parse args failed");
+	fail_on(ret != 0, err, "parse_args failed");
 
 	ret = cli_attach();
-	fail_on_quiet(ret != 0, err, "cli_attach failed");
+	fail_on(ret != 0, err, "cli_attach failed");
 
 	ret = cli_main();
-	fail_on_quiet(ret != 0, err, "cli_main failed");
+	fail_on(ret != 0, err, "cli_main failed");
 err:
 	/** 
 	 * f1.parser_completed may be set by parse_args when it internally 

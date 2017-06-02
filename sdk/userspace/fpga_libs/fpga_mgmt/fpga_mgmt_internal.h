@@ -29,8 +29,6 @@
 /** Max retries for draining presumed stale AFI commands */
 #define AFI_MAX_RETRIES		1
 
-#define CLI_INTERNAL_ERR_STR "Error: Internal error "
-
 /** F1 Mailbox PF defines */
 #define F1_MBOX_VENDOR_ID		0x1d0f
 #define F1_MBOX_DEVICE_ID		0x1041
