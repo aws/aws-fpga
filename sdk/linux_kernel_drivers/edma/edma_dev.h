@@ -44,9 +44,11 @@ struct transient_buffer_page
 	dma_addr_t phys_base_addr;
 };
 
-/* Transient buffer is used to store write and read
-requests that come from the application to the backend
-and vise-versa */
+/*
+ * Transient buffer is used to store write and read
+ * requests that come from the application to the backend
+ * and vise-versa.
+ */
 struct transient_buffer {
 	u32 number_of_transactions;
 	u32 head;
@@ -57,11 +59,10 @@ struct transient_buffer {
 struct request{
 	u32 size;
 	u32 offset;
-	//TODO:add timestamp
+	/* TODO: add timestamp */
 	u8* virt_data;
 	dma_addr_t phys_data;
 }____cacheline_aligned;
-
 
 struct edma_queue_stats {
 	u64 write_requests;
@@ -79,14 +80,13 @@ struct edma_queue_stats {
 	struct u64_stats_sync syncp;
 }____cacheline_aligned;
 
-
 struct edma_event_stats {
 	u64 opened_times;
 	struct u64_stats_sync syncp;
 }____cacheline_aligned;
 
 /* EBCS is the structure used to manage the transient buffer */
-struct emda_buffer_control_structure{
+struct emda_buffer_control_structure {
 
 	struct transient_buffer transient_buffer;
 	struct request* request;
@@ -99,9 +99,7 @@ struct emda_buffer_control_structure{
 	u32 completed_size;
 }____cacheline_aligned;
 
-
-struct edma_queue_private_data
-{
+struct edma_queue_private_data {
 	struct emda_buffer_control_structure read_ebcs;
 	struct emda_buffer_control_structure write_ebcs;
 	struct edma_queue_stats stats;
@@ -110,13 +108,11 @@ struct edma_queue_private_data
 	struct edma_device *dma_device;
 } ____cacheline_aligned;
 
-struct edma_event_private_data
-{
+struct edma_event_private_data {
 	wait_queue_head_t event_wq;
 	struct edma_event_stats stats;
 	bool event_happend;
 	spinlock_t event_lock;
 }____cacheline_aligned;
-
 
 #endif

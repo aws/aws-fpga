@@ -34,8 +34,7 @@
 static char *	pcie_find_first(void);
 static int	pcie_find_all(char *[], int);
 
-//static uint64_t   g_bar0;
-//static uintptr_t  g_base;
+
 static __thread uint64_t    t_bar0;
 static __thread uintptr_t   t_base;
 
@@ -46,7 +45,7 @@ static char *pcie_ids[MAX_SLOT] = {
 static void
 pcie_report(char *name)
 {
-    //printf("using [%s]\n", name);
+    // TODO: print a PCIe report
 }
 
 static char *
@@ -69,7 +68,7 @@ pcie_open_config(char *id)
 
     int fd = open(buffer, O_RDWR);
     if (fd < 0) {
-        //perror(buffer);
+        // TODO: pass the buffer to perror()
         return -1;
     }
     return fd;
@@ -132,7 +131,7 @@ pcie_find_all(char *ids[], int max)
             }
         }
     }
-    closedir(d); 
+    closedir(d);
     return count;
 }
 
@@ -158,7 +157,7 @@ pcie_find_first(void)
             return de.d_name;
         }
     }
-    closedir(d); 
+    closedir(d);
     return NULL;
 }
 
@@ -173,7 +172,7 @@ pcie_mmap(char *id, bool verify)
     if (fd < 0) {
         return false;
     }
-    
+
     lseek(fd, 0x10, SEEK_SET);
     read(fd, &t_bar0, sizeof(t_bar0));
     if (t_bar0 == 0) {
@@ -195,7 +194,7 @@ pcie_mmap(char *id, bool verify)
         perror("/dev/mem");
         return false;
     }
-    
+
     t_base = (uintptr_t) mmap(0, MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, t_bar0);
     if (t_base == (uintptr_t) MAP_FAILED) {
         perror("mmap");
@@ -249,25 +248,19 @@ pcie_connect(int *argcP, char ***argvP)
 
         int slot;
         switch (arg[1]) {
-        case 's':       // locate by domain:bus:device.func
+        case 's':       // Locate by domain:bus:device.func
             id = opt;
             verify = false;
             goto try_mmap;
 
-        case 'S':       // locate by slot number
+        case 'S':       // Locate by slot number
             slot = strtol(opt, NULL, 0);
             id = pcie_lookup(slot);
             goto try_mmap;
-
-//      case 'T': {
-//          int t = strtol(opt, NULL, 0);
-//          timeout_set(t);
-//          break;
-//      }
         }
     }
 
-    // no arguments given
+    // No arguments given
     id = pcie_find_first();
 
 try_mmap:
