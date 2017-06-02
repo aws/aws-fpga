@@ -81,7 +81,7 @@ enum {
 /**
  * Request timeout: timeout * delay_msec
  */
-#define CLI_REQUEST_TIMEOUT_DFLT   	25
+#define CLI_REQUEST_TIMEOUT_DFLT   	50
 #define CLI_REQUEST_DELAY_MSEC_DFLT	200	
 
 /**

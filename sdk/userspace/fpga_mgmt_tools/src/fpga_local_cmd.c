@@ -247,7 +247,7 @@ err:
 static int
 cli_attach(void)
 {
-	int ret;
+	int ret = FPGA_ERR_FAIL;
 
 	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
 		/** 
@@ -266,7 +266,7 @@ cli_attach(void)
 out:
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
 }
 
 /**
@@ -362,7 +362,7 @@ command_describe(void)
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
 }
 
 /**
@@ -393,7 +393,7 @@ command_describe_slots(void)
 	}
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
 }
 
 /**

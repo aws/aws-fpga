@@ -600,9 +600,17 @@ fpga_pci_remove_app_pf(struct fpga_pci_resource_map *app_map)
     ret = fpga_pci_write_one2file(sysfs_name);
     fail_on_quiet(ret != 0, err, "cli_write_one2file failed");
     
+#if 0 
 	/** Check that the app_pf does not exist */
+	/** 
+	 * NOTE:
+	 * A concurrent (remove)+rescan action on another FPGA slot will make this 
+	 * FPGA's app_pf visible again, so we should not error out here if we see
+	 * that the app_pf is still present.  
+	 */
 	ret = fpga_pci_check_app_pf_sysfs(sysfs_name, false); /** exists==false */
     fail_on_quiet(ret != 0, err, "fpga_pci_check_app_pf_sysfs failed");
+#endif
     
 	errno = 0;
     return 0;

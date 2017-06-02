@@ -415,7 +415,7 @@ fpga_mgmt_send_cmd(int slot_id,
 	bool done = false;
 	while (!done) {
 		ret = fpga_hal_mbox_read(handle, (void *)rsp, len);
-		fail_on(ret = (ret) ? ETIMEDOUT : 0, err_code, "Error: operation timed out");
+		fail_on(ret = (ret) ? -ETIMEDOUT : 0, err_code, "Error: operation timed out");
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
 		if (ret == 0) {
@@ -426,7 +426,6 @@ fpga_mgmt_send_cmd(int slot_id,
 			retries++;
 		}
 	}
-	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	return 0;
 err:
