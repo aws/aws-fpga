@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -78,35 +76,35 @@ done
 
 # Check that script exists
 if ! [ -f "$vivado_script" ]; then
-  echo "ERROR: $vivado_script doesn't exist." 
+  echo "ERROR: $vivado_script doesn't exist."
   exit 1
 fi
 
 # Check that strategy is valid
 shopt -s extglob
 if [[ $strategy != @(BASIC|DEFAULT|EXPLORE|TIMING|CONGESTION) ]]; then
-  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are BASIC, DEFAULT, EXPLORE, TIMING and CONGESTION." 
+  echo "ERROR: $strategy isn't a valid strategy. Valid strategies are BASIC, DEFAULT, EXPLORE, TIMING and CONGESTION."
   exit 1
 fi
 
 # Check that clock_recipe_a is valid
 shopt -s extglob
 if [[ $clock_recipe_a != @(A0|A1|A2) ]]; then
-  echo "ERROR: $clock_recipe_a isn't a valid Clock Group A recipe. Valid Clock Group A recipes are A0, A1, and A2." 
+  echo "ERROR: $clock_recipe_a isn't a valid Clock Group A recipe. Valid Clock Group A recipes are A0, A1, and A2."
   exit 1
 fi
 
 # Check that clock_recipe_b is valid
 shopt -s extglob
 if [[ $clock_recipe_b != @(B0|B1) ]]; then
-  echo "ERROR: $clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0 and B1." 
+  echo "ERROR: $clock_recipe_b isn't a valid Clock Group B recipe. Valid Clock Group B recipes are B0 and B1."
   exit 1
 fi
 
 # Check that clock_recipe_c is valid
 shopt -s extglob
 if [[ $clock_recipe_c != @(C0|C1) ]]; then
-  echo "ERROR: $clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0 and C1." 
+  echo "ERROR: $clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0 and C1."
   exit 1
 fi
 
@@ -179,7 +177,7 @@ subsystem_vendor_id="0x${id1_version:4:4}";
 cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $run_aws_emulation $notify"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
-  
+
   echo "AWS FPGA: Build through Vivado is running as background process, this may take few hours."
   echo "AWS FPGA: Output is being redirected to $timestamp.nohup.out"
   echo "AWS FPGA: If you have set your EMAIL environment variable and -notify is specified, you will receive a notification when complete."

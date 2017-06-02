@@ -85,7 +85,7 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
   esac
 done
 
-# Make sure that AWS_FPGA_REPO_DIR is set to the location of this script.
+# Make sure that AWS_FPGA_REPO_DIR is set to the location of this script
 if [[ ":$AWS_FPGA_REPO_DIR" == ':' ]]; then
   debug_msg "AWS_FPGA_REPO_DIR not set so setting to $script_dir"
   export AWS_FPGA_REPO_DIR=$script_dir
@@ -100,22 +100,21 @@ debug_msg "Checking for Vivado install:"
 
 # On the FPGA Developer AMI use module load to use the correct version of Vivado
 if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
-  # Module command is installed.
+  # Module command is installed
   # Load and unload the modules just to make sure have the environment set correctly
   module unload vivado
   module unload sdx
   module load vivado
 fi
 
-# before going too far make sure Vivado is available
+# Before going too far make sure Vivado is available
 if ! vivado -version > /dev/null 2>&1; then
     err_msg "Please install/enable Vivado."
     err_msg "  If you are using the FPGA Developer AMI then please request support."
     return 1
 fi
 
-#Searching for Vivado version and comparing it with the list of supported versions
-
+# Search for Vivado version and comparing it with the list of supported versions
 export VIVADO_VER=`vivado -version | grep Vivado | head -1`
 
 info_msg "Using $VIVADO_VER"
@@ -139,7 +138,8 @@ unset HDK_DIR
 unset HDK_COMMON_DIR
 unset HDK_SHELL_DIR
 unset HDK_SHELL_DESIGN_DIR
-# Don't unset CL_DIR if designer has already set it.
+
+# Don't unset CL_DIR if designer has already set it
 #unset CL_DIR
 
 export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
@@ -157,7 +157,7 @@ export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
 
-# The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
+# The CL_DIR is where the actual Custom Logic design resides; the developer is expected to override this
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
 debug_msg "Done setting environment variables.";
@@ -169,10 +169,12 @@ hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
 s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+
 # Download the sha256
 if [ ! -e $hdk_shell_dir ]; then
 	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
 fi
+
 # Use curl instead of AWS CLI so that credentials aren't required.
 curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
 if grep -q '<?xml version' $hdk_shell.sha256; then
@@ -182,7 +184,8 @@ if grep -q '<?xml version' $hdk_shell.sha256; then
 fi
 exp_sha256=$(cat $hdk_shell.sha256)
 debug_msg "  latest   version=$exp_sha256"
-# If shell already downloaded check its sha256
+
+# If shell already downloaded, check its sha256
 if [ -e $hdk_shell ]; then
   act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
   debug_msg "  existing version=$act_sha256"
@@ -196,9 +199,10 @@ else
 fi
 if [ ! -e $hdk_shell ]; then
   info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
-  # Use curl instead of AWS CLI so that credentials aren't required.
+  # Use curl instead of AWS CLI so that credentials aren't required
   curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
 fi
+
 # Check sha256
 act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
 if [[ $act_sha256 != $exp_sha256 ]]; then
@@ -214,8 +218,7 @@ info_msg "HDK shell is up-to-date"
 models_dir=$HDK_COMMON_DIR/verif/models
 ddr4_model_dir=$models_dir/ddr4_model
 if [ -f $ddr4_model_dir/arch_defines.v ]; then
-  # Models already built
-  # Check to make sure they were built with this version of vivado
+  # Models already built, check to make sure they were built with this version of vivado
   if [[ -f $models_dir/.vivado_version ]]; then
     models_vivado_version=$(cat $models_dir/.vivado_version)
     info_msg "DDR4 model files in $ddr4_model_dir/ were built with $models_vivado_version"

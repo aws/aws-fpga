@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #
 # Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -25,7 +24,7 @@ RET=$?
 if [ $RET != 0 ]; then
     echo "Error: gcc is not installed."
     echo "    You can install gcc and other useful development tools by using: sudo yum groupinstall \"Development tools\""
-    exit $RET 
+    exit $RET
 fi
 
 SDK_USERSPACE_DIR=$SDK_DIR/userspace

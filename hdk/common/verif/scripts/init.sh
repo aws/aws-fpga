@@ -1,6 +1,4 @@
 #!/bin/sh
-
-# Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -61,18 +59,14 @@ if [ ! -d $ddr4_model_dir ]; then mkdir -p $ddr4_model_dir; fi
 if [ ! -d $ddr4_rdimm_model_dir ]; then mkdir -p $ddr4_rdimm_model_dir; fi
 echo "Copying files to $ddr4_model_dir"
 cp $ddr4_imports_dir/arch_defines.v              $ddr4_model_dir/
-cp $ddr4_imports_dir/arch_package.sv              $ddr4_model_dir/
+cp $ddr4_imports_dir/arch_package.sv             $ddr4_model_dir/
 cp $ddr4_imports_dir/ddr4_model.sv               $ddr4_model_dir/
 cp $ddr4_imports_dir/ddr4_sdram_model_wrapper.sv $ddr4_model_dir/
-#cp $ddr4_imports_dir/dimm_interface.sv           $ddr4_model_dir/
-#cp $ddr4_imports_dir/dimm_subtest.vh             $ddr4_model_dir/
-#cp $ddr4_imports_dir/dimm.vh                     $ddr4_model_dir/
 cp $ddr4_imports_dir/interface.sv                $ddr4_model_dir/
 cp $ddr4_imports_dir/MemoryArray.sv              $ddr4_model_dir/
 cp $ddr4_imports_dir/proj_package.sv             $ddr4_model_dir/
 cp $ddr4_imports_dir/StateTableCore.sv           $ddr4_model_dir/
 cp $ddr4_imports_dir/StateTable.sv               $ddr4_model_dir/
-#cp $ddr4_imports_dir/subtest.vh                  $ddr4_model_dir/
 cp $ddr4_imports_dir/timing_tasks.sv             $ddr4_model_dir/
 
 echo "Copying files to $ddr4_rdimm_model_dir"

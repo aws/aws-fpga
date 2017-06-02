@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-
-# Amazon FPGA Hardware Development Kit
-#
+# 
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
@@ -378,7 +376,7 @@ class S3PolicyChecker:
                     "Resource": "{dcp_bucket_resource}"
                 }}'''.format(aws_account=aws_account, dcp_bucket_resource=self.dcp_bucket_resource)
             logger.error('''AWS can't list the DCP bucket.
-            
+
     Add the following statement to the bucket policy for:
     {dcp_bucket}
             '''.format(dcp_bucket=self.dcp_bucket) + statement_str)
@@ -399,7 +397,7 @@ class S3PolicyChecker:
                 }}
     '''.format(aws_account=aws_account, dcp_resouce=self.dcp_resource)
             logger.error('''AWS can't read the DCP.
-            
+
     Add the following statement to the bucket policy for:
     {dcp_bucket}
             '''.format(dcp_bucket=self.dcp_bucket) + statement_str)
@@ -420,7 +418,7 @@ class S3PolicyChecker:
                 }}
     '''.format(user_account_arn=self.user_account_arn, dcp_bucket_resource=self.dcp_bucket_resource)
             logger.error('''User can't list the DCP bucket
-            
+
     Add the following statement to the bucket policy for:
     {dcp_bucket}
             '''.format(dcp_bucket=self.dcp_bucket) + statement_str)
@@ -441,7 +439,7 @@ class S3PolicyChecker:
                 }}
     '''.format(user_account_arn=self.user_account_arn, dcp_resource=self.dcp_resource)
             logger.error('''User can't write the DCP
-            
+
     Add the following statement to the bucket policy for:
     {dcp_bucket}
             '''.format(dcp_bucket=self.dcp_bucket) + statement_str)
@@ -462,7 +460,7 @@ class S3PolicyChecker:
                 }}
     '''.format(aws_account=aws_account, logs_bucket=self.logs_bucket)
             logger.error('''AWS can't list the the logs bucket
-            
+
     Add the following statement to the bucket policy for:
     {logs_bucket}
             '''.format(logs_bucket=self.logs_bucket) + statement_str)
@@ -483,7 +481,7 @@ class S3PolicyChecker:
                 }}
     '''.format(aws_account=aws_account, logs_resource=self.logs_resource)
             logger.error('''AWS can't write the logs
-            
+
     Add the following statement to the bucket policy for:
     {logs_bucket}
             '''.format(logs_bucket=self.logs_bucket) + statement_str)
@@ -507,7 +505,7 @@ class S3PolicyChecker:
                 }}
     '''.format(user_account_arn=self.user_account_arn, logs_resource=self.logs_resource)
             logger.error('''User can't get logs
-            
+
     Add the following statement to the bucket policy for:
     {logs_bucket}
             '''.format(logs_bucket=self.logs_bucket) + statement_str)
@@ -518,9 +516,9 @@ class S3PolicyChecker:
 
         if self.num_errors:
             logger.error('''You need to provide AWS (Account ID: {aws_account}) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-    
+
     **NOTE**: *The AWS Account ID has changed, please ensure you are using the correct Account ID listed here.*
-    
+
     See $HDK_DIR/cl/examples/README.md'''.format(aws_account=aws_account))
 
         if len(extra_dcp_statements):

@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -59,12 +57,12 @@ then
 	if ! [ -d $CL_DIR/build/reports ]
 	then	
 		err_msg "Failed to create reports directory, please check directory permissions"
-		exit 1	
+		exit 1
 	fi
 fi
 
 
-if ! [ -d $CL_DIR/build/checkpoints ] 
+if ! [ -d $CL_DIR/build/checkpoints ]
 then
         info_msg "Creating the checkpoints directory"
         mkdir $CL_DIR/build/checkpoints

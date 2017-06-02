@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -218,7 +216,6 @@ subsystem_vendor_id="0x${id1_version:4:4}";
 cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $notify"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
-  
   info_msg "Build through Vivado is running as background process, this may take few hours."
   info_msg "Output is being redirected to $timestamp.nohup.out"
   info_msg "If you have set your EMAIL environment variable and -notify is specified, you will receive a notification when complete."
