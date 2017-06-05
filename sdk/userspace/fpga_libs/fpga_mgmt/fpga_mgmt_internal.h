@@ -26,7 +26,7 @@
 /** Mask to get the length portion, @see afi_cmd_hdr#len_flags */
 #define AFI_CMD_HDR_LEN_MASK    ((1 << AFI_CMD_HDR_FLAGS_SHIFT) - 1)
 
-/** Max retries for draining presumed stale AFI commands */
+/** Max retries for draining presumed stale AFI CMD responses */
 #define AFI_MAX_RETRIES		1
 
 /** F1 Mailbox PF defines */

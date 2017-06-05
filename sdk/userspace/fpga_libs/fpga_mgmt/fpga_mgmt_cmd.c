@@ -370,7 +370,7 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 			cmd->hdr.op, rsp->hdr.op);
 
 	/** Id */
-	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, "cmd_id(%u) != rsp_id(%u)",
+	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, "cmd_id(0x%08x) != rsp_id(0x%08x)",
 			cmd->hdr.id, rsp->hdr.id);
 
 	/** Received len too small */

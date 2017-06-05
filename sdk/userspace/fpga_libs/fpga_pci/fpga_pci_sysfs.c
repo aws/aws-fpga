@@ -31,7 +31,7 @@
 static int fpga_pci_rescan(void);
 static int fpga_pci_check_app_pf(struct fpga_pci_resource_map *app_map, 
 		bool exists);
-static int fpga_pci_check_app_pf_sysfs(char *sysfs_name, bool exists);
+static int fpga_pci_check_app_pf_sysfs(char *dir_name, bool exists);
 
 /**
  * Return the ID from the given sysfs file (e.g. Vendor ID, Device ID).
@@ -285,61 +285,43 @@ fpga_pci_mbox2app(struct fpga_pci_resource_map *mbox_map,
 		struct fpga_pci_resource_map *app_map,
 		char *app_dir_name, size_t app_dir_name_size)
 {
-	uint16_t vendor_id = 0;
-	uint16_t device_id = 0;
-
 	fail_on(!mbox_map || !app_map || !app_dir_name || !app_dir_name_size, 
 		err, "Invalid input parameters");
 
-	/** Fill in the app map */
-	*app_map = *mbox_map;
-	app_map->dev = F1_MBOX_DEV2APP_DEV(mbox_map->dev);
-	
-	/** Construct the app dir name based on the app_map */
+	/** Construct the app dir name based on the mbox_map */
 	int ret = snprintf(app_dir_name, app_dir_name_size, PCI_DEV_FMT, 
-			app_map->domain, app_map->bus, 
-			app_map->dev, app_map->func);
+			mbox_map->domain, mbox_map->bus, 
+			F1_MBOX_DEV2APP_DEV(mbox_map->dev), mbox_map->func);
 
 	fail_on(ret < 0, err, "Error building the app_dir_name");
 	fail_on((size_t) ret >= app_dir_name_size, err, "app_dir_name too long");
-
-	/** Setup the sysfs_name for the app_pf */
-	char sysfs_name[NAME_MAX + 1];
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/%s", app_dir_name);
-
-	fail_on(ret < 0, err, "Error building the sysfs path for app_pf");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for app_pf");
 
 	/** 
 	 * Check that the app_pf exists.  If not found, make a minimal attempt to 
 	 * recover it.
 	 */
-	ret = fpga_pci_check_app_pf_sysfs(sysfs_name, true); /** exists==true*/
+	ret = fpga_pci_check_app_pf_sysfs(app_dir_name, true); /** exists==true*/
     fail_on(ret != 0, err, "fpga_pci_check_app_pf_sysfs failed");
 
-	/** Setup and read the PCI Vendor ID */
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/%s/vendor", app_dir_name);
-
-	fail_on(ret < 0, err, "Error building the sysfs path for vendor");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for vendor");
-
-	ret = fpga_pci_get_id(sysfs_name, &vendor_id);
-	fail_on(ret != 0, err, "Error retrieving vendor_id");
-
-	/** Setup and read the PCI Device ID */
-	ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/%s/device", app_dir_name);
-
-	fail_on(ret < 0, err, "Error building the sysfs path for device");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for device");
-
-	ret = fpga_pci_get_id(sysfs_name, &device_id);
-	fail_on(ret != 0, err, "Error retrieving device_id");
-
-	app_map->vendor_id = vendor_id;
-	app_map->device_id = device_id;
+	/**
+	 * Fill in the app_map for the given app_dir_name.  If the app_dir_name is 
+	 * not yet ready (e.g. sysfs files are in the process of being recreated 
+	 * due to a remove/rescan) make a minimal retry attempt.
+	 */
+	bool done = false;
+	uint32_t retries = 0;
+	while (!done) {
+		ret = fpga_pci_get_resource_map_ids(app_dir_name, app_map); 
+        if (ret == 0) {
+            done = true;
+        } else { 
+            fail_on(retries >= F1_CHECK_APP_PF_MAX_RETRIES, err,
+                    "fpga_pci_get_resource_map_ids failed for app_dir_nae=%s", 
+					app_dir_name);
+            msleep(F1_CHECK_APP_PF_DELAY_MSEC);
+            retries++;
+        }
+	}
 
 	return 0;
 err:
@@ -481,24 +463,33 @@ out:
 }
 
 /**
- * Check that the application PF exists or not based on the app_map and 
+ * Check that the application PF exists or not based on the dir_name and 
  * exists flag.  If the application PF is supposed to exist but was not
  * found, perform a minimal attempt at recovery be performing a PCI rescan.
  *  
- * @param[in]	sysfs_name	the application PF sysfs name
+ * @param[in]	dir_name	the application PF device directory name 
  * @param[in]	exists		flag to check existence or non-existence		
  *  
  * @returns
  *  0   on success, non-zero on error
  */         
 static int
-fpga_pci_check_app_pf_sysfs(char *sysfs_name, bool exists)
+fpga_pci_check_app_pf_sysfs(char *dir_name, bool exists)
 {
-	fail_on(!sysfs_name, err, "syfs_name is NULL");
+	fail_on(!dir_name, err, "dir_name is NULL");
+
+    /** Setup the path to the app_pf */
+    char sysfs_name[NAME_MAX + 1];
+    int ret = snprintf(sysfs_name, sizeof(sysfs_name),
+            "/sys/bus/pci/devices/%s", dir_name);
+
+    fail_on(ret < 0, err,
+            "Error building the sysfs path for app_pf");
+    fail_on((size_t) ret >= sizeof(sysfs_name), err,
+            "sysfs path too long for app_pf");
 
 	bool done = false;
 	uint32_t retries = 0;
-	int ret;
     while (!done) {
         /** Check for file existence */
         struct stat file_stat;
@@ -547,17 +538,7 @@ fpga_pci_check_app_pf(struct fpga_pci_resource_map *app_map, bool exists)
     fail_on(ret < 0, err, "Error building the dir_name");
     fail_on((size_t) ret >= sizeof(dir_name), err, "dir_name too long");
 
-    /** Setup the path to the app_pf */
-    char sysfs_name[NAME_MAX + 1];
-    ret = snprintf(sysfs_name, sizeof(sysfs_name),
-            "/sys/bus/pci/devices/%s", dir_name);
-
-    fail_on(ret < 0, err,
-            "Error building the sysfs path for app_pf");
-    fail_on((size_t) ret >= sizeof(sysfs_name), err,
-            "sysfs path too long for app_pf");
-
-	ret = fpga_pci_check_app_pf_sysfs(sysfs_name, exists);
+	ret = fpga_pci_check_app_pf_sysfs(dir_name, exists);
 	fail_on(ret != 0, err, "fpga_check_app_pf_sysfs failed");
 
 	return 0;
@@ -608,7 +589,7 @@ fpga_pci_remove_app_pf(struct fpga_pci_resource_map *app_map)
 	 * FPGA's app_pf visible again, so we should not error out here if we see
 	 * that the app_pf is still present.  
 	 */
-	ret = fpga_pci_check_app_pf_sysfs(sysfs_name, false); /** exists==false */
+	ret = fpga_pci_check_app_pf_sysfs(dir_name, false); /** exists==false */
     fail_on(ret != 0, err, "fpga_pci_check_app_pf_sysfs failed");
 #endif
     
