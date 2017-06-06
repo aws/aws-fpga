@@ -46,10 +46,23 @@ In this example the Virtual LED Register is used to drive the Virtual LED signal
 While running on F1, the developer can use the FPGA tools `fpga-get-virtual-led` to read the LED values on the CL-to-Shell interface.  While `fpga-set-virtual-dip-switch` tool is used to set the DIP switch values on the Shell-to-CL interface.
 
   
-### Unused interfaces
+### VHDL Wrapper Information
 
-The Hello World example does not use most of AWS Shell interface, hence the unused signals are tied off.
-At the end of `cl_hello_world.sv` file, there is a specific `include` command for an interface-specific `.inc` file, to handle the tie-off\'s for every unused interface.
+Clock/Reset/General Information
+    
+Only supporting clk_main_a0 (250 MHz clock) at this time.
+    
+MISC Interfaces are not added in wrappers (Interrupts).  Inter-FPGA functionality is not enabled with these wrappers.
+    
+cl_hello_world_defines.sv - Comment out AXI Interfaces not used (AXIL_OCL, AXIL_USR, AXIL_SDA, DMA_PCIS, DDR4_SH, DDR4_CL, PCIM).
+    
+The `define for DDR4_A_ID/ DDR4_B_ID/ DDR4_D_ID  and `define AXIL_USR_NOPASS/ AXIL_SDA_NOPASS/AXIL_OCL_NOPASS  are used for IPI flow which are not used with the Verilog/VHDL wrappers.
+    
+PCIM hasn't been fully tested in  VHDL flow.  Use at your own risk but provide feedback if used.
+    
+cl_hello_world.sv - This module uses  `define that are configured in cl_hello_world_defines.sv and ensure to tie off signals to the SH when necessary for seamless usage of the different flows (VHDL Flow this file shouldn't be modified)
+    
+cl_vhdl_wrapper.vhd - VHDL Wrapper Flow Can use generate statements to connect signals from top level ports when AXI Interfaces are used.  Not required to use these generates statements but makes code more cleaner.
 
 
 <a name="metadata"></a>

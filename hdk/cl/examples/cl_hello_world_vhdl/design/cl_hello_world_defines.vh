@@ -23,7 +23,29 @@
 // FPGA flop init capability).  This will help with routing resources.
 `define FPGA_LESS_RST
 
-// Uncomment to disable Chipscope
-//`define DISABLE_CHIPSCOPE_DEBUG
+
+
+//IPI AXI Interfaces
+//Comment out interfaces not used
+`define AXIL_OCL
+
+//`define AXIL_USR       
+ 
+
+//`define AXIL_SDA        
+
+
+//`define DMA_PCIS        
+
+//`define DDR4_SH
+//`define DDR4_SH_ID
+
+//`define DDR4_CL
+//`define DDR4_A_ID
+//`define DDR4_B_ID
+//`define DDR4_D_ID
+
+//`define PCIM
+
 
 `endif
