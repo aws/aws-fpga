@@ -178,6 +178,7 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 	int status;
 	int ret;
 
+	/** Allow timeout adjustments that are greater than the defaults */
 	uint32_t timeout_tmp = (timeout > FPGA_MGMT_SYNC_TIMEOUT) ?
 		timeout : FPGA_MGMT_SYNC_TIMEOUT;
 	uint32_t delay_msec_tmp = (delay_msec > FPGA_MGMT_SYNC_DELAY_MSEC) ?
@@ -185,9 +186,11 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
 
+	/** Clear the FPGA image (async completion) */
 	ret = fpga_mgmt_clear_local_image(slot_id);
 	fail_on(ret, out, "fpga_mgmt_clear_local_image failed");
 
+	/** Wait until the status is "cleared" or timeout */
 	while (!done) {
 		ret = fpga_mgmt_describe_local_image(slot_id, &tmp_info, 0); /** flags==0 */
 
@@ -203,6 +206,10 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		}
 	}
 
+	/** 
+	 * Perform a PCI device remove and recan in order to expose the default AFI 
+	 * Vendor and Device Id.
+	 */
 	ret = fpga_pci_rescan_slot_app_pfs(slot_id);
 	fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
 
@@ -247,6 +254,7 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 	int status;
 	int ret;
 
+	/** Allow timeout adjustments that are greater than the defaults */
 	uint32_t timeout_tmp = (timeout > FPGA_MGMT_SYNC_TIMEOUT) ?
 		timeout : FPGA_MGMT_SYNC_TIMEOUT;
 	uint32_t delay_msec_tmp = (delay_msec > FPGA_MGMT_SYNC_DELAY_MSEC) ?
@@ -254,9 +262,11 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
 
+	/** Load the FPGA image (async completion) */
 	ret = fpga_mgmt_load_local_image(slot_id, afi_id);
 	fail_on(ret, out, "fpga_mgmt_load_local_image failed");
 
+	/** Wait until the status is "loaded" or timeout */
 	while (!done) {
 		ret = fpga_mgmt_describe_local_image(slot_id, &tmp_info, 0); /** flags==0 */
 
@@ -277,6 +287,10 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 		}
 	}
 
+	/** 
+	 * Perform a PCI device remove and recan in order to expose the unique AFI 
+	 * Vendor and Device Id.
+	 */
 	ret = fpga_pci_rescan_slot_app_pfs(slot_id);
 	fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
 

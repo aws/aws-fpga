@@ -131,12 +131,13 @@ err:
 }
 
 /**
- * Return the PCI resource size using the PCI directory name and resource
+ * Return PCI resource info using the PCI directory name and resource
  * number.
  *
  * @param[in]		dir_name		the PCI device directory name
  * @param[in]		resource_num	the resource number
  * @param[in,out]   resource_size	the returned resource size
+ * @param[in,out]   burstable		the returned resource burstable flag 
  *
  * @returns
  *  0	on success
@@ -188,6 +189,16 @@ err:
 	return FPGA_ERR_FAIL;
 }
 
+/**
+ * Return the PCI resources for the given sysfs directory name.
+ *
+ * @param[in]		dir_name	the PCI device directory name
+ * @param[in,out]	map			the PCI resource map 
+ *
+ * @returns
+ *  0	on success
+ * -1	on failure
+ */
 static int
 fpga_pci_get_resources(char *dir_name, struct fpga_pci_resource_map *map)
 {
@@ -251,7 +262,7 @@ fpga_pci_get_resource_map_ids(char *dir_name, struct fpga_pci_resource_map *map)
 	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for device");
 
 	ret = fpga_pci_get_id(sysfs_name, &device_id);
-	fail_on(ret != 0, err, "Error retrieving device_id");
+	fail_on_quiet(ret != 0, err, "Error retrieving device_id");
 
 	/** Fill in the DBDF */
 	ret = fpga_pci_get_dbdf(dir_name, map);

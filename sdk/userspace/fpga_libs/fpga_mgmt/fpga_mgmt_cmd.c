@@ -362,15 +362,17 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 
 	/** Version */
 	fail_on(cmd->hdr.version != rsp->hdr.version, err,
-			"cmd_ver(%u) != rsp_ver(%u)",
-			cmd->hdr.version, rsp->hdr.version);
+			"cmd_ver(%u) != rsp_ver(%u), cmd_id=0x%08x",
+			cmd->hdr.version, rsp->hdr.version, cmd->hdr.id);
 
 	/** Opcode */
-	fail_on(cmd->hdr.op != rsp->hdr.op, op_err, "cmd_op(%u) != rsp_op(%u)",
-			cmd->hdr.op, rsp->hdr.op);
+	fail_on(cmd->hdr.op != rsp->hdr.op, op_err, 
+			"cmd_op(%u) != rsp_op(%u), cmd_id=0x%08x",
+			cmd->hdr.op, rsp->hdr.op, cmd->hdr.id);
 
 	/** Id */
-	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, "cmd_id(0x%08x) != rsp_id(0x%08x)",
+	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, 
+			"cmd_id(0x%08x) != rsp_id(0x%08x)",
 			cmd->hdr.id, rsp->hdr.id);
 
 	/** Received len too small */
