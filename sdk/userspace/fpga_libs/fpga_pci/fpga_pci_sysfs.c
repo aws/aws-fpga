@@ -327,7 +327,7 @@ fpga_pci_mbox2app(struct fpga_pci_resource_map *mbox_map,
             done = true;
         } else { 
             fail_on(retries >= F1_CHECK_APP_PF_MAX_RETRIES, err,
-                    "fpga_pci_get_resource_map_ids failed for app_dir_nae=%s", 
+                    "fpga_pci_get_resource_map_ids failed for app_dir_name=%s", 
 					app_dir_name);
             msleep(F1_CHECK_APP_PF_DELAY_MSEC);
             retries++;
