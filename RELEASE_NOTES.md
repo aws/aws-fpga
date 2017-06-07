@@ -26,7 +26,7 @@
          *     1 DDR controller implemented in the SH (always available)
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
-# Release 1.2.1
+# Release 1.2.2
    *    Expanded [clock recipes](./hdk/docs/clock_recipes.csv) 
    *    Virtual JTAG documentation updates
    *    Included encryption of .sv files for CL examples
