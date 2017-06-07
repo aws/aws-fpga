@@ -55,7 +55,7 @@ fpga_pci_get_id(char *path, uint16_t *id)
 
 	uint32_t tmp_id;
 	ret = fscanf(fp, "%x", &tmp_id);
-	fail_on(ret < 0, err_close, "Error parsing %s", path);
+	fail_on_quiet(ret < 0, err_close, "Error parsing %s", path);
 
 	*id = tmp_id;
 
