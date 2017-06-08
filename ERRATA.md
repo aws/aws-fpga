@@ -22,7 +22,7 @@ Any items in this release marked as WIP (Work-in-progress) or NA (Not avaiable y
     *    WSTRB(write strobe) must reflect appropriate valid bytes for AXI write beats
     *    Only Increment burst type is supported
     *    AXI lock, memory type, protection type, Quality of service and Region identifier are not supported
-*    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) must follow the AMBA AXI4 protocol.  
+*    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) must follow the AMBA AXI4 protocol specification.  
     *    Prior to running on F1 instance, it is highly recommended that developers run logic simulations with the ARM or Xilinx AXI4 protocol checker  
 
 
