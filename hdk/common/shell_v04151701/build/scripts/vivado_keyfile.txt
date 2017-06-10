@@ -6,16 +6,15 @@
 `pragma protect end_commonblock
 `pragma protect begin_toolblock
 `pragma protect rights_digest_method="sha256"
-`pragma protect key_keyowner="Xilinx", key_method="rsa", key_keyname="xilinx_2015_12", key_public_key
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvMWecpwh9W0XzrDNLbLM
-Xhvjvidr+4e+pCwMymwssVLrhCC5MjHRDo4IUnYIHdOZtMSFu0VxyUaQdxEiv8kT
-bSDMg50jSRQvZs0QvTs6OvSyYEKHL+v/dcs9XO4MZZHCaosAon1VK2D+R+vA7g/s
-daCyvFP+uFcfGcFVVwtfTG+OPziFL4B9IfczjTzZFAjKzeFh6FEwdFd5xOWnwp0h
-IXXVrqaTlN9hhw9ktWwQ+WLBghG729blIyqR7w1NnxzESTDSScNXUHmYY2m2Vtf+
-e/szJL1PjANcFwGtBhbQHmYav7NdibGMGp9z9PQggEF/sUlvknA5SFMhvLISnIx9
-0QIDAQAB
+`pragma protect key_keyowner = "Xilinx", key_keyname= "xilinx_2016_05", key_method = "rsa", key_public_key
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZhNmo1lcKpLYPA4vXVI
+shhj9wquP/jqwNK2XQFYkOoko3u7cVusEV500SZDkSc5oW7XJ6xG7dtlrQuh5jyV
+NaKryVeFowXf2LTRteboQ1HsrCRICdpR+qyU9JBg8lRS7LhaqJq0r1EeFJ6W8xof
+io9ggEvdWvPGGpZu0hv/fykuRWevDCC5ITcx2GeHeHEKpEsqqBGMUOEyv+MRRdzp
+pakAIldB2MRGf2CJqC2Lptcdxry0PQDQHmCsrQi7VxDGdPQp9iq+e6r+wXSqJb7r
+yzFcHXII4N4IlaZsBomALCVnsBxLyx1ilKWXsdwOSH0IH1EjTLIqxSx2pJBfkFRr
+xQIDAQAB
 `pragma protect control xilinx_configuration_visible = "false"
 `pragma protect control xilinx_enable_modification = "false"
 `pragma protect control xilinx_enable_probing = "false"
-`pragma protect control decryption=(xilinx_activity==simulation) ? "false" : "true"
 `pragma protect end_toolblock=""
