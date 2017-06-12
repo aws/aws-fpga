@@ -176,6 +176,29 @@ The output of this command includes two identifiers that refer to your AFI:
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-0f0e045f919413242`**.
 
+The [describe-fpga-images](../../docs/describe_fpga_images.md) API allows you to check the AFI state during the background AFI generation process.  You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
+```
+    $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a
+```
+
+The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`: 
+```
+    {
+        "FpgaImages": [
+            {
+			    ...
+                "State": {
+                    "Code": "available"
+                },
+			    ...
+                "FpgaImageId": "afi-06d0ffc989feeea2a",
+			    ...
+            }
+        ]
+    }
+
+```
+
 After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 
  
