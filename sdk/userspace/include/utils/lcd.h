@@ -31,6 +31,10 @@
 /** PCI device format string */
 #define PCI_DEV_FMT "%04x:%02x:%02x.%d"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Sleep for some milliseconds.
  *
@@ -42,9 +46,13 @@
 static inline int msleep(uint64_t ms)
 {
 	struct timespec sleep_time = {
-		.tv_sec = ms / MS_PER_SECOND,
-		.tv_nsec = (ms % MS_PER_SECOND) * NS_PER_MS
+		.tv_sec = (time_t)(ms / MS_PER_SECOND),
+		.tv_nsec = (long)((ms % MS_PER_SECOND) * NS_PER_MS)
 	};
 
 	return clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep_time, NULL);
 }
+
+#ifdef __cplusplus
+}
+#endif

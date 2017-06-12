@@ -23,6 +23,10 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Set up epoll.
  *
@@ -200,3 +204,7 @@ int string_to_uint(unsigned int *num, const char *str);
  * @returns	How many files are open in a given process, -1 on error.
  */
 int number_of_open_files(pid_t pid);
+
+#ifdef __cplusplus
+}
+#endif
