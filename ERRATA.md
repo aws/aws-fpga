@@ -43,7 +43,6 @@ Any items in this release marked as WIP (Work-in-progress) or NA (Not avaiable y
 
 * The integrated DMA function is in Beta stage.  Known issues: 
     * DMA READ addresses crossing 4K page boundaries.  The failure can be triggered by READ transfers that start on an address other than 4K aligned AND cross the 4K page boundary.  READ transfers that do not cross the 4K boundary OR transfers that start at the beginning of a 4K page and greater than 4K size are not susceptible to the error.  WRITE transfers are not affected by this issue Developers should use 4K aligned address boundaries on any READ transfer that can cross a 4K boundary to avoid the issue. 
-    * Supported DMA transaction sizes are limited 16KB or less.  Greater than 16KB are not supported.
-    * DMA timeouts can be detected by checking metrics using this command:  `sudo fpga-describe-local-image -S 0 -M`
+    * Integrated DMA with large transfer sizes (16KB or greater) can cause timeouts between the Shell and CL if the Shell can’t respond with all data before the timeout.  Transfer sizes of 8KB or less are supported with the integrated DMA engine for this revision of the Shell.  Shell-CL interface timeouts can be detected by checking metrics using this command:  `sudo fpga-describe-local-image -S 0 -M`
 
 
