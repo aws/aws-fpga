@@ -95,37 +95,7 @@ err:
 /**
  * Display the FPGA image information.
  *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-cli_attach(void)
-{
-	int ret;
-
-	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
-		/** 
-		 * ec2-afi-describe-slots does not use the Mbox logic, local
-		 * information only 
-		 */
-		goto out;
-	}
-
-	ret = fpga_mgmt_init();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-	fpga_mgmt_set_cmd_timeout(f1.mbox_timeout);
-	fpga_mgmt_set_cmd_delay_msec(f1.mbox_delay_msec);
-
-out:
-	return 0;
-err:
-	return FPGA_ERR_FAIL;
-}
-
-/**
- * Detach CLI processing.
+ * @param[in]   info the fpga info 
  *
  * @returns
  *  0	on success, non-zero on failure
@@ -315,6 +285,9 @@ cli_detach(void)
 
 /**
  * Generate the load local image command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
  */
 static int command_load(void)
 {
@@ -340,6 +313,9 @@ err:
 
 /**
  * Generate the clear local image command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
  */
 static int 
 command_clear(void)
@@ -366,10 +342,6 @@ err:
 
 /**
  * Generate the describe local image command and handle the response.
- *
- * @param[in]	cmd		cmd buffer 
- * @param[in]	rsp		rsp buffer 
- * @param[in]	len		rsp len
  *
  * @returns
  *  0	on success, non-zero on failure
