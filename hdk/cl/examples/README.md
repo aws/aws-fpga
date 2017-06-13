@@ -170,7 +170,7 @@ Once your policy passes the checks, your ready to start AFI creation.
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is **`agfi-0f0e045f919413242`**.
+    An example AFI ID is **`afi-06d0ffc989feeea2a`**.
 - **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.

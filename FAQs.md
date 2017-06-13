@@ -112,7 +112,7 @@ The developer can create multiple AFIs at no extra cost, up to a defined limited
 
 The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
-Use `aws ec2 describe-fpga-images` API to get information about submitted DCPs using the AFI ID provided by `create-fpga-image`, or list available AFIs for your account.  See [describe fpga images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
+Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
