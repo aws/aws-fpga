@@ -112,7 +112,7 @@ The developer can create multiple AFIs at no extra cost, up to a defined limited
 
 The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
-
+Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
@@ -128,7 +128,7 @@ Yes, on-premises tools can be used to develop the Design Checkpoint needed for c
 If a developer uses local tools and license, please check the [supported versions of Vivado](./hdk/supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
   
 
-**Q: Is there a “best practice” system template? **
+**Q: Is there a “best practice” system template?**
 
 AWS prefers not to limit developers to a specific template in terms of how we advise to use AWS FPGAs. A good overview of these interfaces can be found [here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmer_View.md)
   
@@ -384,7 +384,7 @@ The Shell consumes about 20% of the FPGA resources, and that includes the PCIe G
 
 
 ## Troubleshooting
-**Q: Why do I see error “vivado not found” while running hdk_setup.sh*?**
+**Q: Why do I see error “vivado not found” while running hdk_setup.sh?**
 
 This is an indication that Xilinx Vivado tool set are not installed. Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.
 
