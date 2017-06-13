@@ -131,9 +131,6 @@ The following response shows the AFI information provided by `describe-fpga-imag
 
     # Get AFIs with multiple wildcards
     $ aws ec2 describe-fpga-images --filters "Name=name,Values=*_world_*"
-
-    # Get AFIs with multiple wildcards
-    $ aws ec2 describe-fpga-images --filters "Name=name,Values=*_world_*"
 ```
 
 
