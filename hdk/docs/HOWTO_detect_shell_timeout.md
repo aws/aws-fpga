@@ -1,11 +1,11 @@
 
 # How to detect a shell timeout has occured
 
-* Shell-CL interface timeouts can be detected by checking for non-zero counter metrics using this command:  
+* Shell-CL interface timeouts can be detected by checking for non-zero timeout counters.  These metrics can be read using this command:  
 ```
 $sudo fpga-describe-local-image -S 0 -M
-AFI          0       none                    cleared           1        ok               0       0x04151701
-AFIDEVICE    0       0x1d0f      0x1042      0000:00:1d.0
+AFI          0       agfi-0f0e045f919413242  loaded            0        ok               0       0x04151701
+AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 sdacl-slave-timeout=0
 virtual-jtag-slave-timeout=0
 ocl-slave-timeout=0
@@ -45,9 +45,10 @@ DDR1
    write-count=0
    read-count=0
 DDR2
-   write-count=0
-   read-count=0
+   write-count=29797854199
+   read-count=4
 DDR3
    write-count=0
    read-count=0
 ```
+* For detailed infomation on metrics, see [Amazon FPGA Image Management Tools README](../../sdk//userspace/fpga_mgmt_tools/README.md)
