@@ -30,6 +30,7 @@ See [Errata](./ERRATA.md) for additional documentation of unsupported features a
 # Release 1.2.2
    *    Expanded [clock recipes](./hdk/docs/clock_recipes.csv) 
    *    Virtual JTAG documentation updates
+   *    Reduced DCP build times by 13% (34 mins) for cl_dram_dma example by adding an option to disable virtual jtag
    *    Included encryption of .sv files for CL examples
 
 # Release 1.2.1
