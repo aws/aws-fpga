@@ -476,6 +476,10 @@ report_timing_summary -file $CL_DIR/build/reports/${timestamp}.SH_CL_final_timin
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing final DCP to to_aws directory.";
 
 write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+
+# Generate debug probes file
+write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
+
 close_project
 
 # ################################################
