@@ -1872,14 +1872,16 @@ module sh_bfm #(
          bit last_beat;
          logic [5:0] start_addr;
          bit aligned;
+         bit last_data_beat;
          
          num_of_data_beats = 0;
-         byte_cnt = 0;
-         num_bytes = 0;
-         aligned_addr = 0;
-         last_beat = 0;
-         start_addr = 0;
-         aligned = 0;
+         last_data_beat    = 0;
+         byte_cnt          = 0;
+         num_bytes         = 0;
+         aligned_addr      = 0;
+         last_beat         = 0;
+         start_addr        = 0;
+         aligned           = 0;
          
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
@@ -1922,9 +1924,10 @@ module sh_bfm #(
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
-                  axi_data.last = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
+                  last_data_beat = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
                   num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
-                  if(axi_data.last)  begin
+                  axi_data.last = (j == axi_cmd.len) ? 1 : 0;
+                  if(last_data_beat)  begin
                     for(int i=0; i < num_bytes; i++) begin
                       axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
                       axi_data.strb = axi_data.strb | 1 << i;
