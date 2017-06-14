@@ -1,9 +1,23 @@
 
+# AXI Timeouts
+ 
+* The Shell provides a timeout mechanism which terminates any outstanding AXI transactions after 2.5 uS. There is a separate timeout per interface. Upon the first timeout, metrics registers are updated with the offending address and a counter is incremented. Upon further timeouts the counter is incremented. These metrics registers can be read via the fpga-describe-local-image found in [Amazon FPGA Image Management Tools README](../../sdk//userspace/fpga_mgmt_tools/README.md)
+ 
+* Timeouts can occur for three reasons:
+  1. The CL doesn’t respond to the address (reserved address space)
+  2. The CL has a protocol violation on AXI which hangs the bus
+  3. The address is going to F1 card’s DDR memory and the CL design’s latency is exceeding timeout value.
+
+* Best practice is to ensure addresses to reserved address space are fully decoded in your CL design.  
+* DMA accesses to DDR will accumulate which can sometimes lead to timeouts.  
+* CL designs which have multiple masters to DDR will also incur arbitration delays.
+* If you suspect a timeout, debug by reading the metrics registers. The saved offending address should help narrow whether this is to DDR or registers/RAMs inside the FPGA. If it’s inside the FPGA the developer should investigate protocol violations.
+
 # How to detect a shell timeout has occured
 
 * Shell-CL interface timeouts can be detected by checking for non-zero timeout counters.  These metrics can be read using this command:  
 ```
-$sudo fpga-describe-local-image -S 0 -M
+$sudo fpga-describe-local-image -S 0 --metrics
 AFI          0       agfi-0f0e045f919413242  loaded            0        ok               0       0x04151701
 AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 sdacl-slave-timeout=0
