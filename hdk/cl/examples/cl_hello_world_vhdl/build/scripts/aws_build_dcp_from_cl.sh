@@ -1,0 +1,1 @@
+../../../../../common/shell_stable/build/scripts/aws_build_dcp_from_cl.sh
