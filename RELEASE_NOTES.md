@@ -27,6 +27,12 @@ See [Errata](./ERRATA.md) for additional documentation of unsupported features a
          *     1 DDR controller implemented in the SH (always available)
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+# Release 1.2.3
+   *    New [Errata](./ERRATA.md) 
+   *    Added debug probes (.ltx) generation to build scripts
+   *    Fixed a bug with the simulation model that fixed the AXI behavior of wlast on unaligned address
+   *    Added [timeout debug documentation](./hdk/docs/HOWTO_detect_shell_timeout.md)
+   
 # Release 1.2.2
    *    Expanded [clock recipes](./hdk/docs/clock_recipes.csv) 
    *    Virtual JTAG documentation updates
