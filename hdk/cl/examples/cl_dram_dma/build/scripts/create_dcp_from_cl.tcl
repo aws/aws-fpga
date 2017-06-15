@@ -347,6 +347,10 @@ if { $failval==0 } {
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth checkpoint.";
 
 write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+
+# Generate debug probes file
+write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
+
 close_project
 #Set param back to default value
 set_param sta.enableAutoGenClkNamePersistence 1
