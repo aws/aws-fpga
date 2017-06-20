@@ -2095,20 +2095,20 @@ static u32 get_engine_id(struct engine_regs *regs)
 static void remove_engines(struct xdma_dev *lro)
 {
 	struct xdma_engine *engine;
-	int i;
+	int channel;
 
 	BUG_ON(!lro);
 
 	/* iterate over channels */
-	for (i = 0; i < XDMA_CHANNEL_NUM_MAX; i++) {
-		engine = &lro->engine_h2c[i];
+	for (channel = 0; channel < XDMA_CHANNEL_NUM_MAX; channel++) {
+		engine = &lro->engine_h2c[channel];
 		if (engine->magic == MAGIC_ENGINE) {
 			dbg_sg("Remove %s, %d", engine->name, channel);
 			engine_destroy(lro, engine);
 			dbg_sg("%s, %d removed", engine->name, channel);
 		}
 
-		engine = &lro->engine_c2h[i];
+		engine = &lro->engine_c2h[channel];
 		if (engine->magic == MAGIC_ENGINE) {
 			dbg_sg("Remove %s, %d", engine->name, channel);
 			engine_destroy(lro, engine);
