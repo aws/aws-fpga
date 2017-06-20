@@ -173,6 +173,7 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		struct fpga_mgmt_image_info *info) 
 {
 	struct fpga_mgmt_image_info tmp_info;
+	struct fpga_pci_resource_map app_map;
 	uint32_t retries = 0;
 	bool done = false;
 	int status;
@@ -185,6 +186,13 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		delay_msec : FPGA_MGMT_SYNC_DELAY_MSEC;
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
+
+	/** 
+	 * Get the current PCI resource map for the app_pf that will be used after 
+	 * the clear has completed.
+	 */
+	ret = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &app_map);
+	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
 	/** Clear the FPGA image (async completion) */
 	ret = fpga_mgmt_clear_local_image(slot_id);
@@ -206,12 +214,27 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		}
 	}
 
-	/** 
-	 * Perform a PCI device remove and recan in order to expose the default AFI 
-	 * Vendor and Device Id.
+	/**
+	 * Do not perform a remove/rescan of the APP PF if the PCI IDs have not changed.
 	 */
-	ret = fpga_pci_rescan_slot_app_pfs(slot_id);
-	fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
+	struct afi_device_ids *afi_device_ids = &tmp_info.ids.afi_device_ids;
+	if (!((afi_device_ids->vendor_id == app_map.vendor_id) &&
+			(afi_device_ids->device_id == app_map.device_id) &&
+			(afi_device_ids->svid == app_map.subsystem_vendor_id) &&
+			(afi_device_ids->ssid == app_map.subsystem_device_id))) {
+		/** 
+		 * Perform a PCI device remove and recan in order to expose the default AFI 
+		 * Vendor and Device Id.
+		 */
+		log_info("remove+rescan required, expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+				afi_device_ids->vendor_id, afi_device_ids->device_id, 
+				afi_device_ids->svid, afi_device_ids->ssid,
+				app_map.vendor_id, app_map.device_id, 
+				app_map.subsystem_vendor_id, app_map.subsystem_device_id);
+
+		ret = fpga_pci_rescan_slot_app_pfs(slot_id);
+		fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
+	}
 
 	if (info) {
 		*info = tmp_info;
@@ -249,6 +272,7 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 		struct fpga_mgmt_image_info *info) 
 {
 	struct fpga_mgmt_image_info tmp_info;
+	struct fpga_pci_resource_map app_map;
 	uint32_t retries = 0;
 	bool done = false;
 	int status;
@@ -261,6 +285,13 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 		delay_msec : FPGA_MGMT_SYNC_DELAY_MSEC;
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
+	
+	/** 
+	 * Get the current PCI resource map for the app_pf that will be used after 
+	 * the load has completed.
+	 */
+	ret = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &app_map);
+	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
 	/** Load the FPGA image (async completion) */
 	ret = fpga_mgmt_load_local_image(slot_id, afi_id);
@@ -287,12 +318,27 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 		}
 	}
 
-	/** 
-	 * Perform a PCI device remove and recan in order to expose the unique AFI 
-	 * Vendor and Device Id.
+	/**
+	 * Do not perform a remove/rescan of the APP PF if the PCI IDs have not changed.
 	 */
-	ret = fpga_pci_rescan_slot_app_pfs(slot_id);
-	fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
+	struct afi_device_ids *afi_device_ids = &tmp_info.ids.afi_device_ids;
+	if (!((afi_device_ids->vendor_id == app_map.vendor_id) &&
+			(afi_device_ids->device_id == app_map.device_id) &&
+			(afi_device_ids->svid == app_map.subsystem_vendor_id) &&
+			(afi_device_ids->ssid == app_map.subsystem_device_id))) {
+		/** 
+		 * Perform a PCI device remove and recan in order to expose the unique AFI 
+		 * Vendor and Device Id.
+		 */
+		log_info("remove+rescan required, expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+				afi_device_ids->vendor_id, afi_device_ids->device_id, 
+				afi_device_ids->svid, afi_device_ids->ssid,
+				app_map.vendor_id, app_map.device_id, 
+				app_map.subsystem_vendor_id, app_map.subsystem_device_id);
+
+		ret = fpga_pci_rescan_slot_app_pfs(slot_id);
+		fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
+	}
 
 	if (info) {
 		*info = tmp_info;

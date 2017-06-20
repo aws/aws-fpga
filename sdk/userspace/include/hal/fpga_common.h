@@ -165,8 +165,8 @@ struct fpga_pci_resource_map {
 	/** These can be used for sanity checking prior to the attach */
 	uint16_t vendor_id;
 	uint16_t device_id;
-	uint16_t subsystem_id;
-	uint16_t vendor_subsystem_id;
+	uint16_t subsystem_device_id;
+	uint16_t subsystem_vendor_id;
 	
 	/** e.g. PCI Domain:Bus:Device.Function */
 	uint16_t  domain;
