@@ -497,6 +497,8 @@ module sh_bfm #(
    } DMA_OP;
 
    DMA_OP h2c_dma_list[0:3][$];
+   int    h2c_dma_wr_cmd_cnt[0:3];
+   
    DMA_OP c2h_dma_list[0:3][$];
    DMA_OP c2h_data_dma_list[0:3][$];
    
@@ -682,6 +684,12 @@ module sh_bfm #(
    //
    //=================================================
 
+   // initial various counts for DMA operations
+   initial begin
+      for(int i=0; i<4; i++)
+        h2c_dma_wr_cmd_cnt[i] = 0;
+   end
+   
    //
    // sh->cl Address Write Channel
    //
@@ -732,7 +740,11 @@ module sh_bfm #(
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
             end
-            h2c_dma_done[sh_cl_wr_data[0].id] = 1'b1; 
+
+            if (sh_cl_dma_pcis_wlast)
+              h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id]--;
+            
+            h2c_dma_done[sh_cl_wr_data[0].id] =  (h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id] == 0); 
             sh_cl_wr_data.pop_front();
          end
          
@@ -1918,7 +1930,8 @@ module sh_bfm #(
                 axi_cmd.id   = chan;
                 axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
-
+                h2c_dma_wr_cmd_cnt[chan]++;
+                 
                 // loop to do multiple data beats
                 for(int j = 0; j <= axi_cmd.len; j++) begin
                   axi_data.data = 0;
@@ -1978,9 +1991,13 @@ module sh_bfm #(
                 end
                 byte_cnt[chan]++;
               end
-              c2h_dma_done[chan] = 1'b1;
+              c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
+
+              if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
+                byte_cnt[chan] = 0;
+               
               cl_sh_rd_data.pop_front();
-            end
+            end // if (chan == cl_sh_rd_data[0].id)
           end
         end
       end
