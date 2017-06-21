@@ -13,7 +13,7 @@
 
 
 #define MASTER_PF                                               (0)
-#define DRV_MODULE_NAME                                         "emda_xdma_backend"
+#define DRV_MODULE_NAME                                         "edma_xdma_backend"
 #define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
 #define SLEEP_MIN_USEC                                          (1)
 #define SLEEP_MAX_USEC                                          (20)
