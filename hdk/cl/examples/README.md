@@ -170,11 +170,34 @@ Once your policy passes the checks, your ready to start AFI creation.
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is **`agfi-0f0e045f919413242`**.
+    An example AFI ID is **`afi-06d0ffc989feeea2a`**.
 - **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-0f0e045f919413242`**.
+
+The [describe-fpga-images](../../docs/describe_fpga_images.md) API allows you to check the AFI state during the background AFI generation process.  You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
+```
+    $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a
+```
+
+The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`: 
+```
+    {
+        "FpgaImages": [
+            {
+			    ...
+                "State": {
+                    "Code": "available"
+                },
+			    ...
+                "FpgaImageId": "afi-06d0ffc989feeea2a",
+			    ...
+            }
+        ]
+    }
+
+```
 
 After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 
