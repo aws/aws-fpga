@@ -28,7 +28,7 @@ See [Errata](./ERRATA.md) for additional documentation of unsupported features a
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 # Release 1.2.4
-   *    AWS SDK API `aws ec2 describe-fpga-images` released. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
+   *    AWS SDK API `aws ec2 describe-fpga-images` released. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.  Requires Developer AMI 1.2.4 or awscli upgrade: `pip install --upgrade --user awscli`
    *    Fix cl_dram_dam debug probes (.ltx) generation in build scripts
    *    Fixed bugs with DMA in the simulation model and testbench
 
