@@ -66,7 +66,7 @@ To be notified via e-mail when the build completes:
 
 ```
     $ export EMAIL=your.email@example.com
-    $ ./$HDK_COMMON_DIR/scripts/notify_via_sns.py
+    $ $HDK_COMMON_DIR/scripts/notify_via_sns.py
 
 ```
 
