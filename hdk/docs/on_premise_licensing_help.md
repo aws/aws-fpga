@@ -10,8 +10,8 @@ This document helps on-premise developers (or cloud developers that prefer not t
 ## Requirements for AWS HDK 1.2.x
  * Xilinx Vivado v2017.1_sdx (64-bit)
  * License: EF-VIVADO-SDX-VU9P-OP
- * SW Build 1914770 on Wed Jun 21 23:23:34 MDT 2017
- * IP Build 1908669 on Thu Jun 22 00:50:19 MDT 2017
+ * SW Build 1915620 on Thu Jun 22 17:54:59 MDT 2017
+ * IP Build 1908669 on Thu Jun 22 19:20:41 MDT 2017
 
  * On-Premise customers may need a new or updated license
     * Existing F1 On-Premise customers will not need a new license
@@ -35,6 +35,6 @@ This document helps on-premise developers (or cloud developers that prefer not t
 <a name="download"></a>
 ## Downloading the development tool from Xilinx
 
- * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_Lin_2017.1_sdx_0622_1.tar.gz&akdm=0
- * MD5 SUM Value: c0ffa81763fdd7f5eb4eeefd73a30e52
+ * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.1_sdx_0623_1_Lin64.bin&akdm=0
+ * MD5 SUM Value: 62f9e5023002da0d3ca1c9726cbf5fee
 
