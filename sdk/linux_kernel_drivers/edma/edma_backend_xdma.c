@@ -349,10 +349,10 @@ int edma_backend_get_completed_m2s_request(u64** buffer, u32* size, void *q_hand
 			&& (queue[command_queue->next_to_recycle].completed == 1)) {
 
 		completed_buffer = (void*)(sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl));
-		completed_size = queue[command_queue->next_to_recycle].sgt.sgl->length;
+		completed_size = sg_dma_len(queue[command_queue->next_to_recycle].sgt.sgl);
 		queue[command_queue->next_to_recycle].completed = 0;
 
-		queue[command_queue->next_to_recycle].sgt.sgl->length = 0;
+		sg_dma_len(queue[command_queue->next_to_recycle].sgt.sgl) = 0;
 		sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl) = 0;
 
 		command_queue->next_to_recycle =
