@@ -76,6 +76,14 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
 
 
+//reset synchronizers
+(* dont_touch = "true" *) logic slr0_sync_aresetn;
+(* dont_touch = "true" *) logic slr1_sync_aresetn;
+(* dont_touch = "true" *) logic slr2_sync_aresetn;
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR0_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr0_sync_aresetn));
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR1_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr1_sync_aresetn));
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR2_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr2_sync_aresetn));
+
 //---------------------------- 
 // flop the dma_pcis interface input of CL 
 //---------------------------- 
@@ -83,7 +91,7 @@ scrb_bus_t ddrd_scrb_bus_q();
    // AXI4 Register Slice for dma_pcis interface
    axi_register_slice PCI_AXL_REG_SLC (
        .aclk          (aclk),
-       .aresetn       (aresetn),
+       .aresetn       (slr0_sync_aresetn),
        .s_axi_awid    (sh_cl_dma_pcis_bus.awid),
        .s_axi_awaddr  (sh_cl_dma_pcis_bus.awaddr),
        .s_axi_awlen   (sh_cl_dma_pcis_bus.awlen),                                            
@@ -145,9 +153,9 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
 // axi interconnect for DDR address decodes 
 //---------------------------- 
- cl_axi_interconnect AXI_CROSSBAR 
+(* dont_touch = "true" *) cl_axi_interconnect AXI_CROSSBAR 
        (.ACLK(aclk),
-        .ARESETN(aresetn),
+        .ARESETN(slr1_sync_aresetn),
 
         .M00_AXI_araddr(lcl_cl_sh_ddra_q.araddr),
         .M00_AXI_arburst(),
@@ -357,7 +365,7 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
    axi_register_slice DDR_C_TST_AXI4_REG_SLC (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
                                                                                                                                   
        .s_axi_awid     (cl_sh_ddr_q.awid),
        .s_axi_awaddr   ({cl_sh_ddr_q.awaddr[63:36], 2'b0, cl_sh_ddr_q.awaddr[33:0]}),
@@ -444,7 +452,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_C (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr1_sync_aresetn),
 
          .cfg_addr(ddrc_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrc_tst_cfg_bus_q.wdata),
@@ -542,7 +550,7 @@ scrb_bus_t ddrd_scrb_bus_q();
 
    axi_register_slice DDR_C_TST_AXI4_REG_SLC_1 (
      .aclk           (aclk),
-     .aresetn        (aresetn),
+     .aresetn        (slr1_sync_aresetn),
                                                                                                                                 
      .s_axi_awid     ({10'b0, cl_sh_ddr_q3.awid[5:0]}),
      .s_axi_awaddr   ({cl_sh_ddr_q3.awaddr}),
@@ -609,7 +617,7 @@ scrb_bus_t ddrd_scrb_bus_q();
    //back to back register slices for SLR crossing
    src_register_slice DDR_A_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddra_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddra_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddra_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddra_q.awlen),
@@ -691,7 +699,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_A_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr2_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddra_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddra_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddra_q2.awlen),
@@ -800,7 +808,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_A (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr2_sync_aresetn),
 
          .cfg_addr(ddra_tst_cfg_bus_q.addr),
          .cfg_wdata(ddra_tst_cfg_bus_q.wdata),
@@ -902,7 +910,7 @@ scrb_bus_t ddrd_scrb_bus_q();
   //back to back register slices for SLR crossing
    src_register_slice DDR_B_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrb_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddrb_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddrb_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddrb_q.awlen),
@@ -984,7 +992,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_B_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrb_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddrb_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddrb_q2.awlen),
@@ -1093,7 +1101,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_B (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr1_sync_aresetn),
 
          .cfg_addr(ddrb_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrb_tst_cfg_bus_q.wdata),
@@ -1196,7 +1204,7 @@ scrb_bus_t ddrd_scrb_bus_q();
   //back to back register slices for SLR crossing
    src_register_slice DDR_D_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrd_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddrd_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddrd_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddrd_q.awlen),
@@ -1278,7 +1286,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_D_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr0_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrd_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddrd_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddrd_q2.awlen),
@@ -1387,7 +1395,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_D (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr0_sync_aresetn),
 
          .cfg_addr(ddrd_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrd_tst_cfg_bus_q.wdata),
