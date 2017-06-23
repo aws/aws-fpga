@@ -1053,6 +1053,9 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 		goto edma_queue_device_done;
 	}
 
+	// Setup the linkage to device private data
+	dev_set_drvdata(edmaCharDevice, &edma_queues->device_private_data[minor_index]);
+
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;
 
