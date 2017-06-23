@@ -1,6 +1,8 @@
 
 # AWS EC2 FPGA HDK+SDK Errata
 
+## Release 1.2.1
+
 Any items in this release marked as WIP (Work-in-progress) or NA (Not avaiable yet) are not currently supported by the 1.2.0 release.
 
 ## Integrated DMA in Beta Release. AWS Shell now includes DMA capabilities on behalf of the CL
@@ -22,9 +24,6 @@ Any items in this release marked as WIP (Work-in-progress) or NA (Not avaiable y
     *    WSTRB(write strobe) must reflect appropriate valid bytes for AXI write beats
     *    Only Increment burst type is supported
     *    AXI lock, memory type, protection type, Quality of service and Region identifier are not supported
-*    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) must follow the AMBA AXI4 protocol specification.  
-    *    Prior to running on F1 instance, it is highly recommended that developers run logic simulations with the ARM or Xilinx AXI4 protocol checker  
-
 
 ## Unsupported Features (Planned for future releases)
 
@@ -38,11 +37,8 @@ Any items in this release marked as WIP (Work-in-progress) or NA (Not avaiable y
 
 ## Known Bugs/Issues
 
-* The PCI-M AXI interface is not supported in this release.  
-    * The interface is included in cl_ports.vh and required in a CL design, but not enabled for functional use
+* The PCI-M AXI interface is not supported in this release.  The interface is included in cl_ports.vh and required in a CL design, but not enabled for functional use in this release.
 
-* The integrated DMA function is in Beta stage.  Known issues: 
-    * DMA READ addresses crossing 4K page boundaries.  The failure can be triggered by READ transfers that start on an address other than 4K aligned AND cross the 4K page boundary.  READ transfers that do not cross the 4K boundary OR transfers that start at the beginning of a 4K page and greater than 4K size are not susceptible to the error.  WRITE transfers are not affected by this issue Developers should use 4K aligned address boundaries on any READ transfer that can cross a 4K boundary to avoid the issue. 
-    * Integrated DMA with large transfer sizes (16KB or greater) can cause timeouts between the Shell and CL if the Shell can’t respond with all data before the timeout.  Transfer sizes of 8KB or less are supported with the integrated DMA engine for this revision of the Shell.  Shell-CL interface timeouts can be detected by checking metrics using this command:  `sudo fpga-describe-local-image -S 0 -M`
+* The integrated DMA function is in Beta stage.  There is a known issue with DMA READ addresses crossing 4K page boundaries.  The failure can be triggered by READ transfers that start on an address other than 4K aligned AND cross the 4K page boundary.  READ transfers that do not cross the 4K boundary OR transfers that start at the beginning of a 4K page and greater than 4K size are not susceptible to the error.  WRITE transfers are not affected by this issue Developers should use 4K aligned address boundaries on any READ transfer that can cross a 4K boundary to avoid the issue. Additionally CL designs synthesized to 125Mhz or greater should limit DMA transaction sizes to 16KB or less. 
 
-
+* aws_dcp_verify flow (aws_dcp_verify.tcl) does not work.  The script will be fixed in a future release.  Currently the script will always give an error even if the DCP is OK.
