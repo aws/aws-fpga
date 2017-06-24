@@ -2103,16 +2103,16 @@ static void remove_engines(struct xdma_dev *lro)
 	for (channel = 0; channel < XDMA_CHANNEL_NUM_MAX; channel++) {
 		engine = &lro->engine_h2c[channel];
 		if (engine->magic == MAGIC_ENGINE) {
-			dbg_sg("Remove %s, %d", engine->name, channel);
+			dbg_sg("Remove %s, %d", engine->name, engine->channel);
 			engine_destroy(lro, engine);
-			dbg_sg("%s, %d removed", engine->name, channel);
+			dbg_sg("%s, %d removed", engine->name, engine->channel);
 		}
 
 		engine = &lro->engine_c2h[channel];
 		if (engine->magic == MAGIC_ENGINE) {
-			dbg_sg("Remove %s, %d", engine->name, channel);
+			dbg_sg("Remove %s, %d", engine->name, engine->channel);
 			engine_destroy(lro, engine);
-			dbg_sg("%s, %d removed", engine->name, channel);
+			dbg_sg("%s, %d removed", engine->name, engine->channel);
 		}
 	}
 }
