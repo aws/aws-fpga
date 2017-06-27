@@ -180,6 +180,14 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
 ##################################################
+### Tcl Procs and Params 
+##################################################
+
+if {[string match "2017.1" [version -short]]} {
+  set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
+}
+
+##################################################
 ### CL XPR OOC Synthesis
 ##################################################
 if {${cl.synth}} {
@@ -291,6 +299,10 @@ if {$implement} {
    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
 
    write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+
+   # Generate debug probes file
+   write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
+
    close_project
 }
 
