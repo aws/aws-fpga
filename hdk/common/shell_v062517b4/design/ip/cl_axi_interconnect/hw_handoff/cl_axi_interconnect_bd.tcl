@@ -220,6 +220,38 @@ CONFIG.SUPPORTS_NARROW_BURST {1} \
 CONFIG.WUSER_BITS_PER_BYTE {0} \
 CONFIG.WUSER_WIDTH {0} \
  ] $S00_AXI
+  set S01_AXI [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S01_AXI ]
+  set_property -dict [ list \
+CONFIG.ADDR_WIDTH {64} \
+CONFIG.ARUSER_WIDTH {0} \
+CONFIG.AWUSER_WIDTH {0} \
+CONFIG.BUSER_WIDTH {0} \
+CONFIG.CLK_DOMAIN {cl_axi_interconnect_ACLK} \
+CONFIG.DATA_WIDTH {512} \
+CONFIG.FREQ_HZ {250000000} \
+CONFIG.HAS_BRESP {1} \
+CONFIG.HAS_BURST {1} \
+CONFIG.HAS_CACHE {1} \
+CONFIG.HAS_LOCK {1} \
+CONFIG.HAS_PROT {1} \
+CONFIG.HAS_QOS {1} \
+CONFIG.HAS_REGION {1} \
+CONFIG.HAS_RRESP {1} \
+CONFIG.HAS_WSTRB {1} \
+CONFIG.ID_WIDTH {6} \
+CONFIG.MAX_BURST_LENGTH {256} \
+CONFIG.NUM_READ_OUTSTANDING {32} \
+CONFIG.NUM_READ_THREADS {16} \
+CONFIG.NUM_WRITE_OUTSTANDING {32} \
+CONFIG.NUM_WRITE_THREADS {16} \
+CONFIG.PROTOCOL {AXI4} \
+CONFIG.READ_WRITE_MODE {READ_WRITE} \
+CONFIG.RUSER_BITS_PER_BYTE {0} \
+CONFIG.RUSER_WIDTH {0} \
+CONFIG.SUPPORTS_NARROW_BURST {1} \
+CONFIG.WUSER_BITS_PER_BYTE {0} \
+CONFIG.WUSER_WIDTH {0} \
+ ] $S01_AXI
 
   # Create ports
   set ACLK [ create_bd_port -dir I -type clk ACLK ]
@@ -231,31 +263,39 @@ CONFIG.FREQ_HZ {250000000} \
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
   set_property -dict [ list \
+CONFIG.ENABLE_ADVANCED_OPTIONS {1} \
 CONFIG.M00_HAS_REGSLICE {4} \
 CONFIG.M01_HAS_REGSLICE {4} \
 CONFIG.M02_HAS_REGSLICE {4} \
 CONFIG.M03_HAS_REGSLICE {4} \
 CONFIG.NUM_MI {4} \
-CONFIG.NUM_SI {1} \
+CONFIG.NUM_SI {2} \
 CONFIG.S00_HAS_REGSLICE {4} \
+CONFIG.S01_HAS_REGSLICE {4} \
+CONFIG.XBAR_DATA_WIDTH {512} \
  ] $axi_interconnect_0
 
   # Create interface connections
   connect_bd_intf_net -intf_net S00_AXI_1 [get_bd_intf_ports S00_AXI] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
+  connect_bd_intf_net -intf_net S01_AXI_1 [get_bd_intf_ports S01_AXI] [get_bd_intf_pins axi_interconnect_0/S01_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M00_AXI [get_bd_intf_ports M00_AXI] [get_bd_intf_pins axi_interconnect_0/M00_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M01_AXI [get_bd_intf_ports M01_AXI] [get_bd_intf_pins axi_interconnect_0/M01_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M02_AXI [get_bd_intf_ports M02_AXI] [get_bd_intf_pins axi_interconnect_0/M02_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_0_M03_AXI [get_bd_intf_ports M03_AXI] [get_bd_intf_pins axi_interconnect_0/M03_AXI]
 
   # Create port connections
-  connect_bd_net -net ACLK_1 [get_bd_ports ACLK] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/M03_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK]
-  connect_bd_net -net ARESETN_1 [get_bd_ports ARESETN] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/M03_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN]
+  connect_bd_net -net ACLK_1 [get_bd_ports ACLK] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/M03_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_0/S01_ACLK]
+  connect_bd_net -net ARESETN_1 [get_bd_ports ARESETN] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/M03_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_0/S01_ARESETN]
 
   # Create address segments
   create_bd_addr_seg -range 0x000400000000 -offset 0x00000000 [get_bd_addr_spaces S00_AXI] [get_bd_addr_segs M00_AXI/Reg] SEG_M00_AXI_Reg
+  create_bd_addr_seg -range 0x000400000000 -offset 0x00000000 [get_bd_addr_spaces S01_AXI] [get_bd_addr_segs M00_AXI/Reg] SEG_M00_AXI_Reg
   create_bd_addr_seg -range 0x000400000000 -offset 0x000400000000 [get_bd_addr_spaces S00_AXI] [get_bd_addr_segs M01_AXI/Reg] SEG_M01_AXI_Reg
+  create_bd_addr_seg -range 0x000400000000 -offset 0x000400000000 [get_bd_addr_spaces S01_AXI] [get_bd_addr_segs M01_AXI/Reg] SEG_M01_AXI_Reg
   create_bd_addr_seg -range 0x000400000000 -offset 0x000800000000 [get_bd_addr_spaces S00_AXI] [get_bd_addr_segs M02_AXI/Reg] SEG_M02_AXI_Reg
+  create_bd_addr_seg -range 0x000400000000 -offset 0x000800000000 [get_bd_addr_spaces S01_AXI] [get_bd_addr_segs M02_AXI/Reg] SEG_M02_AXI_Reg
   create_bd_addr_seg -range 0x000400000000 -offset 0x000C00000000 [get_bd_addr_spaces S00_AXI] [get_bd_addr_segs M03_AXI/Reg] SEG_M03_AXI_Reg
+  create_bd_addr_seg -range 0x000400000000 -offset 0x000C00000000 [get_bd_addr_spaces S01_AXI] [get_bd_addr_segs M03_AXI/Reg] SEG_M03_AXI_Reg
 
 
   # Restore current instance
