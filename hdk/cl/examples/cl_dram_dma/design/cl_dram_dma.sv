@@ -30,8 +30,6 @@ module cl_dram_dma #(parameter NUM_DDR=4)
 // developers to remve the specific interfaces
 // that the CL will use
 
-`include "unused_hmc_template.inc"
-`include "unused_aurora_template.inc"
 `include "unused_sh_bar1_template.inc"
 
 // Defining local parameters that will instantiate the

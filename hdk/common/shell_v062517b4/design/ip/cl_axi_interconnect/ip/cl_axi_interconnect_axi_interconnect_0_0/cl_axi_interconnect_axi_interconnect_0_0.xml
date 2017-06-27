@@ -53,12 +53,12 @@
     <spirit:parameter>
       <spirit:name>NUM_SI</spirit:name>
       <spirit:displayName>Number of Slave Interfaces</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.NUM_SI" spirit:order="2" spirit:minimum="1" spirit:maximum="16" spirit:rangeType="long">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.NUM_SI" spirit:order="2" spirit:minimum="1" spirit:maximum="16" spirit:rangeType="long">2</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>NUM_MI</spirit:name>
       <spirit:displayName>Number of Master Interfaces</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.NUM_MI" spirit:order="3" spirit:minimum="1" spirit:maximum="64" spirit:rangeType="long">4</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.NUM_MI" spirit:order="3" spirit:minimum="1" spirit:maximum="16" spirit:rangeType="long">4</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>STRATEGY</spirit:name>
@@ -68,7 +68,7 @@
     <spirit:parameter>
       <spirit:name>ENABLE_ADVANCED_OPTIONS</spirit:name>
       <spirit:displayName>Enable Advanced Configuration Options</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS" spirit:choiceRef="choice_pairs_4873554b" spirit:order="5">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS" spirit:choiceRef="choice_pairs_4873554b" spirit:order="5">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>ENABLE_PROTOCOL_CHECKERS</spirit:name>
@@ -78,7 +78,7 @@
     <spirit:parameter>
       <spirit:name>XBAR_DATA_WIDTH</spirit:name>
       <spirit:displayName>Data Width of the AXI Crossbar</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.XBAR_DATA_WIDTH" spirit:choiceRef="choice_list_40181835" spirit:order="7">32</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.XBAR_DATA_WIDTH" spirit:choiceRef="choice_list_40181835" spirit:order="7">512</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>PCHK_WAITS</spirit:name>
@@ -748,7 +748,7 @@
     <spirit:parameter>
       <spirit:name>S01_HAS_REGSLICE</spirit:name>
       <spirit:displayName>Enable Register Slice on interface S01_AXI</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.S01_HAS_REGSLICE" spirit:choiceRef="choice_pairs_b6c9535e" spirit:order="1635413">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.S01_HAS_REGSLICE" spirit:choiceRef="choice_pairs_b6c9535e" spirit:order="1635413">4</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>S02_HAS_REGSLICE</spirit:name>
@@ -1630,6 +1630,7 @@
       <xilinx:displayName>AXI Interconnect</xilinx:displayName>
       <xilinx:coreRevision>13</xilinx:coreRevision>
       <xilinx:configElementInfos>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_HAS_REGSLICE" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_HAS_REGSLICE" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_HAS_REGSLICE" xilinx:valueSource="user"/>
@@ -1637,6 +1638,8 @@
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_MI" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_SI" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S00_HAS_REGSLICE" xilinx:valueSource="user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S01_HAS_REGSLICE" xilinx:valueSource="user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.XBAR_DATA_WIDTH" xilinx:valueSource="user"/>
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
