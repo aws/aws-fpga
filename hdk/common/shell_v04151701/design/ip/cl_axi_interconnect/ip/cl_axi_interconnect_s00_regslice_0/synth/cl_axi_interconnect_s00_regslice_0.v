@@ -50,10 +50,10 @@
 // IP VLNV: xilinx.com:ip:axi_register_slice:2.1
 // IP Revision: 12
 
-(* X_CORE_INFO = "axi_register_slice_v2_1_12_axi_register_slice,Vivado 2017.1" *)
+(* X_CORE_INFO = "axi_register_slice_v2_1_12_axi_register_slice,Vivado 2017.1_sdxop" *)
 (* CHECK_LICENSE_TYPE = "cl_axi_interconnect_s00_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{}" *)
-(* CORE_GENERATION_INFO = "cl_axi_interconnect_s00_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{x_ipProduct=Vivado 2017.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_register_slice,x_ipVersion=2.1,x_ipCoreRevision=12,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_AXI_PROTOCOL=0,C_AXI_ID_WIDTH=6,C_AXI_ADDR_WIDTH=64,C_AXI_DATA_WIDTH=512,C_AXI_SUPPORTS_USER_SIGNALS=0,C_AXI_AWUSER_WIDTH=1,C_AXI_ARUSER_WIDTH=1,C_AXI_WUSER_WIDTH=1,C_AXI_RUSER_WIDTH=1,C_AXI_BUSER_WIDTH=1,C_REG_CONFIG_AW=7,C_\
-REG_CONFIG_W=1,C_REG_CONFIG_B=7,C_REG_CONFIG_AR=7,C_REG_CONFIG_R=1}" *)
+(* CORE_GENERATION_INFO = "cl_axi_interconnect_s00_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{x_ipProduct=Vivado 2017.1_sdxop,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_register_slice,x_ipVersion=2.1,x_ipCoreRevision=12,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_AXI_PROTOCOL=0,C_AXI_ID_WIDTH=6,C_AXI_ADDR_WIDTH=64,C_AXI_DATA_WIDTH=512,C_AXI_SUPPORTS_USER_SIGNALS=0,C_AXI_AWUSER_WIDTH=1,C_AXI_ARUSER_WIDTH=1,C_AXI_WUSER_WIDTH=1,C_AXI_RUSER_WIDTH=1,C_AXI_BUSER_WIDTH=1,C_REG_CONFIG_A\
+W=7,C_REG_CONFIG_W=1,C_REG_CONFIG_B=7,C_REG_CONFIG_AR=7,C_REG_CONFIG_R=1}" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module cl_axi_interconnect_s00_regslice_0 (
   aclk,

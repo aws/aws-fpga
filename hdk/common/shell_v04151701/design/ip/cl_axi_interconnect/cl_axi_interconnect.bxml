@@ -2,9 +2,9 @@
 <Root MajorVersion="0" MinorVersion="33">
   <CompositeFile CompositeFileTopName="cl_axi_interconnect" CanBeSetAsTop="true" CanDisplayChildGraph="true">
     <Description>Composite Fileset</Description>
-    <Generation Name="SYNTHESIS" State="GENERATED" Timestamp="1491860212"/>
-    <Generation Name="IMPLEMENTATION" State="GENERATED" Timestamp="1491860212"/>
-    <Generation Name="SIMULATION" State="GENERATED" Timestamp="1491860212"/>
+    <Generation Name="SYNTHESIS" State="GENERATED" Timestamp="1497990864"/>
+    <Generation Name="IMPLEMENTATION" State="GENERATED" Timestamp="1497990864"/>
+    <Generation Name="SIMULATION" State="GENERATED" Timestamp="1497990864"/>
     <FileCollection Name="SOURCES" Type="SOURCES">
       <File Name="ip/cl_axi_interconnect_axi_interconnect_0_0/cl_axi_interconnect_axi_interconnect_0_0.xci" Type="IP">
         <Instance HierarchyPath="axi_interconnect_0"/>
@@ -48,6 +48,14 @@
       </File>
       <File Name="ip/cl_axi_interconnect_m00_regslice_0/cl_axi_interconnect_m00_regslice_0.xci" Type="IP">
         <Instance HierarchyPath="axi_interconnect_0/m00_couplers/m00_regslice"/>
+        <Properties IsEditable="false" IsVisible="true" Timestamp="0" IsTrackable="true" IsStatusTracked="true"/>
+        <Library Name="xil_defaultlib"/>
+        <UsedIn Val="SYNTHESIS"/>
+        <UsedIn Val="IMPLEMENTATION"/>
+        <UsedIn Val="SIMULATION"/>
+      </File>
+      <File Name="ip/cl_axi_interconnect_s01_regslice_0/cl_axi_interconnect_s01_regslice_0.xci" Type="IP">
+        <Instance HierarchyPath="axi_interconnect_0/s01_couplers/s01_regslice"/>
         <Properties IsEditable="false" IsVisible="true" Timestamp="0" IsTrackable="true" IsStatusTracked="true"/>
         <Library Name="xil_defaultlib"/>
         <UsedIn Val="SYNTHESIS"/>
