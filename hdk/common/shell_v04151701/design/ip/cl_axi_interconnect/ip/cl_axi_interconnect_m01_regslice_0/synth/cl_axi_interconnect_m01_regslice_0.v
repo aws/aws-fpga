@@ -50,10 +50,10 @@
 // IP VLNV: xilinx.com:ip:axi_register_slice:2.1
 // IP Revision: 12
 
-(* X_CORE_INFO = "axi_register_slice_v2_1_12_axi_register_slice,Vivado 2017.1" *)
+(* X_CORE_INFO = "axi_register_slice_v2_1_12_axi_register_slice,Vivado 2017.1_sdxop" *)
 (* CHECK_LICENSE_TYPE = "cl_axi_interconnect_m01_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{}" *)
-(* CORE_GENERATION_INFO = "cl_axi_interconnect_m01_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{x_ipProduct=Vivado 2017.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_register_slice,x_ipVersion=2.1,x_ipCoreRevision=12,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_AXI_PROTOCOL=0,C_AXI_ID_WIDTH=6,C_AXI_ADDR_WIDTH=64,C_AXI_DATA_WIDTH=512,C_AXI_SUPPORTS_USER_SIGNALS=0,C_AXI_AWUSER_WIDTH=1,C_AXI_ARUSER_WIDTH=1,C_AXI_WUSER_WIDTH=1,C_AXI_RUSER_WIDTH=1,C_AXI_BUSER_WIDTH=1,C_REG_CONFIG_AW=7,C_\
-REG_CONFIG_W=1,C_REG_CONFIG_B=7,C_REG_CONFIG_AR=7,C_REG_CONFIG_R=1}" *)
+(* CORE_GENERATION_INFO = "cl_axi_interconnect_m01_regslice_0,axi_register_slice_v2_1_12_axi_register_slice,{x_ipProduct=Vivado 2017.1_sdxop,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=axi_register_slice,x_ipVersion=2.1,x_ipCoreRevision=12,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_AXI_PROTOCOL=0,C_AXI_ID_WIDTH=7,C_AXI_ADDR_WIDTH=64,C_AXI_DATA_WIDTH=512,C_AXI_SUPPORTS_USER_SIGNALS=0,C_AXI_AWUSER_WIDTH=1,C_AXI_ARUSER_WIDTH=1,C_AXI_WUSER_WIDTH=1,C_AXI_RUSER_WIDTH=1,C_AXI_BUSER_WIDTH=1,C_REG_CONFIG_A\
+W=7,C_REG_CONFIG_W=1,C_REG_CONFIG_B=7,C_REG_CONFIG_AR=7,C_REG_CONFIG_R=1}" *)
 (* DowngradeIPIdentifiedWarnings = "yes" *)
 module cl_axi_interconnect_m01_regslice_0 (
   aclk,
@@ -143,7 +143,7 @@ input wire aclk;
 (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 RST RST" *)
 input wire aresetn;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI AWID" *)
-input wire [5 : 0] s_axi_awid;
+input wire [6 : 0] s_axi_awid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI AWADDR" *)
 input wire [63 : 0] s_axi_awaddr;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI AWLEN" *)
@@ -177,7 +177,7 @@ input wire s_axi_wvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI WREADY" *)
 output wire s_axi_wready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI BID" *)
-output wire [5 : 0] s_axi_bid;
+output wire [6 : 0] s_axi_bid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI BRESP" *)
 output wire [1 : 0] s_axi_bresp;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI BVALID" *)
@@ -185,7 +185,7 @@ output wire s_axi_bvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI BREADY" *)
 input wire s_axi_bready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI ARID" *)
-input wire [5 : 0] s_axi_arid;
+input wire [6 : 0] s_axi_arid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI ARADDR" *)
 input wire [63 : 0] s_axi_araddr;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI ARLEN" *)
@@ -209,7 +209,7 @@ input wire s_axi_arvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI ARREADY" *)
 output wire s_axi_arready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI RID" *)
-output wire [5 : 0] s_axi_rid;
+output wire [6 : 0] s_axi_rid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI RDATA" *)
 output wire [511 : 0] s_axi_rdata;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI RRESP" *)
@@ -221,7 +221,7 @@ output wire s_axi_rvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 S_AXI RREADY" *)
 input wire s_axi_rready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI AWID" *)
-output wire [5 : 0] m_axi_awid;
+output wire [6 : 0] m_axi_awid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI AWADDR" *)
 output wire [63 : 0] m_axi_awaddr;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI AWLEN" *)
@@ -255,7 +255,7 @@ output wire m_axi_wvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI WREADY" *)
 input wire m_axi_wready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI BID" *)
-input wire [5 : 0] m_axi_bid;
+input wire [6 : 0] m_axi_bid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI BRESP" *)
 input wire [1 : 0] m_axi_bresp;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI BVALID" *)
@@ -263,7 +263,7 @@ input wire m_axi_bvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI BREADY" *)
 output wire m_axi_bready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI ARID" *)
-output wire [5 : 0] m_axi_arid;
+output wire [6 : 0] m_axi_arid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI ARADDR" *)
 output wire [63 : 0] m_axi_araddr;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI ARLEN" *)
@@ -287,7 +287,7 @@ output wire m_axi_arvalid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI ARREADY" *)
 input wire m_axi_arready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI RID" *)
-input wire [5 : 0] m_axi_rid;
+input wire [6 : 0] m_axi_rid;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI RDATA" *)
 input wire [511 : 0] m_axi_rdata;
 (* X_INTERFACE_INFO = "xilinx.com:interface:aximm:1.0 M_AXI RRESP" *)
@@ -302,7 +302,7 @@ output wire m_axi_rready;
   axi_register_slice_v2_1_12_axi_register_slice #(
     .C_FAMILY("virtexuplus"),
     .C_AXI_PROTOCOL(0),
-    .C_AXI_ID_WIDTH(6),
+    .C_AXI_ID_WIDTH(7),
     .C_AXI_ADDR_WIDTH(64),
     .C_AXI_DATA_WIDTH(512),
     .C_AXI_SUPPORTS_USER_SIGNALS(0),
@@ -332,7 +332,7 @@ output wire m_axi_rready;
     .s_axi_awuser(1'H0),
     .s_axi_awvalid(s_axi_awvalid),
     .s_axi_awready(s_axi_awready),
-    .s_axi_wid(6'H00),
+    .s_axi_wid(7'H00),
     .s_axi_wdata(s_axi_wdata),
     .s_axi_wstrb(s_axi_wstrb),
     .s_axi_wlast(s_axi_wlast),
