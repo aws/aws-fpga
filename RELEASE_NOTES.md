@@ -27,7 +27,7 @@
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Release 1.3.0 (Preview)
-   *    PFPGA initiated read/write over PCI (PCI-M)
+   *    FPGA initiated read/write over PCI (PCI-M)
    *    Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
    *    Expanded DMA support
    *    Improved URAM utilization
@@ -36,7 +36,7 @@
    *    SDAccel support - More details will be communicated on AWS forum
 
 
-**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-loca-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional annnoucements.
+**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-local-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional annnoucements.
 
 ## Release 1.3.0 New Features Details
 
