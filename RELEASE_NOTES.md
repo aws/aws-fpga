@@ -79,6 +79,7 @@ The following major features are included in this HDK release:
 ### 9.	Support for Vivado 2017.1 SDX Build 
 
 * The FPGA Development AMI includes Vivado 2017.1 SDX
+    * Get the 1.3.0+ AMI by selecting the version from the [marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ#). 
 * Older Vivado versions will not be supported
 
 ### 10.	SDK changes 
