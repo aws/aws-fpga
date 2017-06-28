@@ -102,9 +102,8 @@ debug_msg "Checking for Vivado install:"
 if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Module command is installed.
   # Load and unload the modules just to make sure have the environment set correctly
-  module unload vivado
-  module unload sdx
-  module load vivado
+  module purge
+  module load sdx
 fi
 
 # before going too far make sure Vivado is available
