@@ -1,4 +1,5 @@
-current_instance CL/CL_DEBUG_BRIDGE/inst/xsdbm/inst/BSCANID_VEC.u_xsdbm_id_vec/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_RD/U_RD_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_rdfifo_inst
+set bridge [get_debug_cores -filter {NAME=~CL/*CL_DEBUG_BRIDGE*}]
+current_instance $bridge/inst/BSCANID.u_xsdbm_id/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_RD/U_RD_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_rdfifo_inst
 
 set wr_clock          [get_clocks -of_objects [get_ports -scoped_to_current_instance clk]]
 set rd_clock          [get_clocks -of_objects [get_ports -scoped_to_current_instance tck]]
@@ -19,7 +20,7 @@ set_bus_skew -from [get_cells inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fif
 
 current_instance
 
-current_instance CL/CL_DEBUG_BRIDGE/inst/xsdbm/inst/BSCANID_VEC.u_xsdbm_id_vec/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_WR/U_WR_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_wrfifo_inst
+current_instance $bridge/inst/BSCANID.u_xsdbm_id/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_WR/U_WR_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_wrfifo_inst
 
 set wr_clock          [get_clocks -of_objects [get_ports -scoped_to_current_instance tck]]
 set rd_clock          [get_clocks -of_objects [get_ports -scoped_to_current_instance clk]]
