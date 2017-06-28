@@ -166,7 +166,8 @@ switch $strategy {
         source $HDK_SHELL_DIR/build/scripts/strategy_DEFAULT.tcl
     }
     default {
-        puts "$strategy is NOT a valid strategy."
+        puts "$strategy is NOT a valid strategy. Defaulting to strategy DEFAULT."
+        source $HDK_SHELL_DIR/build/scripts/strategy_DEFAULT.tcl
     }
 }
 
