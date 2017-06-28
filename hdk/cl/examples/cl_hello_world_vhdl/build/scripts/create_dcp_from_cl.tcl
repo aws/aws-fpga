@@ -19,7 +19,7 @@ package require tar
 set TOP top_sp
 
 ## Replace with the name of your module
-set CL_MODULE cl_hello_world 
+set CL_MODULE cl_hello_world
 
 #################################################
 ## Command-line Arguments
@@ -92,15 +92,14 @@ if { [info exists ::env(HDK_SHELL_DESIGN_DIR)] } {
 }
 
 ##################################################
-### Output Directories used by step.tcl
+### Output Directories used by step_user.tcl
 ##################################################
 set implDir   $CL_DIR/build/checkpoints
 set rptDir    $CL_DIR/build/reports
+set cacheDir  $HDK_SHELL_DESIGN_DIR/cache/ddr4_phy
 
 puts "All reports and intermediate results will be time stamped with $timestamp";
 
-set_msg_config -severity INFO -suppress
-set_msg_config -severity STATUS -suppress
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
 
@@ -167,7 +166,8 @@ switch $strategy {
         source $HDK_SHELL_DIR/build/scripts/strategy_DEFAULT.tcl
     }
     default {
-        puts "$strategy is NOT a valid strategy."
+        puts "$strategy is NOT a valid strategy. Defaulting to strategy DEFAULT."
+        source $HDK_SHELL_DIR/build/scripts/strategy_DEFAULT.tcl
     }
 }
 
@@ -178,15 +178,7 @@ source encrypt.tcl
 source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 
 #Procedure for running various implementation steps (impl_step)
-source $HDK_SHELL_DIR/build/scripts/step.tcl -notrace
-
-##################################################
-### Tcl Procs and Params 
-##################################################
-
-if {[string match "2017.1" [version -short]]} {
-  set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
-}
+source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
 ##################################################
 ### CL XPR OOC Synthesis
@@ -204,6 +196,9 @@ if {$implement} {
    # Link Design
    ########################
    if {$link} {
+      ####Create in-memory prjoect and setup IP cache location
+      create_project -part [DEVICE_TYPE] -in_memory
+      set_property IP_REPO_PATHS $cacheDir [current_project]
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Combining Shell and CL design checkpoints";
       add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
       add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
@@ -211,13 +206,15 @@ if {$implement} {
 
       #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
       read_xdc [ list \
-         $CL_DIR/build/constraints/cl_pnr_user.xdc \
+         $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
+         $CL_DIR/build/constraints/cl_pnr_user.xdc
       ]
       set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]
 
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running link_design";
       link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {SH CL}
 
+      puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - PLATFORM.IMPL==[get_property PLATFORM.IMPL [current_design]]";
       ##################################################
       # Apply Clock Properties for Clock Table Recipes
       ##################################################
@@ -236,11 +233,17 @@ if {$implement} {
    ########################
    if {$opt} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running optimization";
-      impl_step opt_design $TOP $opt_options $opt_directive $opt_preHookTcl
+      impl_step opt_design $TOP $opt_options $opt_directive $opt_preHookTcl $opt_postHookTcl
       if {$psip} {
          impl_step opt_design $TOP "-merge_equivalent_drivers -sweep"
       }
    }
+
+# Constraints for TCK<->Main Clock
+#set_clock_groups -name tck_clk_main_a0 -asynchronous -group [get_clocks -of_objects [get_pins static_sh/SH_DEBUG_BRIDGE/inst/bsip/inst/USE_SOFTBSCAN.U_TAP_TCKBUFG/O]] -group [get_clocks -of_objects [get_pins SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst/CLKOUT0]]
+#set_clock_groups -name tck_drck -asynchronous -group [get_clocks -of_objects [get_pins static_sh/SH_DEBUG_BRIDGE/inst/bsip/inst/USE_SOFTBSCAN.U_TAP_TCKBUFG/O]] -group [get_clocks drck]
+#set_clock_groups -name tck_userclk -asynchronous -group [get_clocks -of_objects [get_pins static_sh/SH_DEBUG_BRIDGE/inst/bsip/inst/USE_SOFTBSCAN.U_TAP_TCKBUFG/O]] -group [get_clocks -of_objects [get_pins static_sh/pcie_inst/inst/gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_userclk/O]]
+
 
    ########################
    # CL Place
@@ -250,7 +253,7 @@ if {$implement} {
       if {$psip} {
          append place_options " -fanout_opt"
       }
-      impl_step place_design $TOP $place_options $place_directive $place_preHookTcl
+      impl_step place_design $TOP $place_options $place_directive $place_preHookTcl $place_postHookTcl
    }
 
    ##############################
@@ -258,7 +261,7 @@ if {$implement} {
    ##############################
    if {$phys_opt} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running post-place optimization";
-      impl_step phys_opt_design $TOP $phys_options $phys_directive $phys_preHookTcl
+      impl_step phys_opt_design $TOP $phys_options $phys_directive $phys_preHookTcl $phys_postHookTcl
    }
 
    ########################
@@ -266,7 +269,7 @@ if {$implement} {
    ########################
    if {$route} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Routing design";
-      impl_step route_design $TOP $route_options $route_directive $route_preHookTcl
+      impl_step route_design $TOP $route_options $route_directive $route_preHookTcl $route_postHookTcl
    }
 
    ##############################
@@ -276,7 +279,7 @@ if {$implement} {
    #Post-route phys_opt will not be run if slack is positive or greater than -200ps.
    if {$route_phys_opt && $SLACK > -0.400 && $SLACK < 0} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running post-route optimization";
-      impl_step route_phys_opt_design $TOP $post_phys_options $post_phys_directive $post_phys_preHookTcl
+      impl_step route_phys_opt_design $TOP $post_phys_options $post_phys_directive $post_phys_preHookTcl $post_phys_postHookTcl
    }
 
    ##############################
