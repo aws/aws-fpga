@@ -3,11 +3,9 @@
 
 ## Release 1.3.0 
 
-### Preview Only (temporary) Restrictions (as of 6/27) - Features not currently supported:
-* CL examples: simulation and runtime
-* Chipscope
-* create-fpga-image
-* F1 Runtime
+### Preview Only (temporary) Restrictions - Features not currently supported in preview of v1.3.0:
+* create-fpga-image does not support creating AFIs for this Shell version yet
+* fpga-load-local-image does not support loading for this Shell version yet
 
 ### Implementation Restrictions
 *    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
