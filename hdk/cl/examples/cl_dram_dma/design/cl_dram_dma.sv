@@ -735,7 +735,7 @@ cl_ila CL_ILA (
    .runtest(runtest),
    .reset(reset),
    .capture(capture),
-   .bscanid(bscanid),
+   .bscanid_en(bscanid_en),
  
    .sh_cl_dma_pcis_q(sh_cl_dma_pcis_q),
    .lcl_cl_sh_ddra(lcl_cl_sh_ddra)

@@ -28,7 +28,7 @@ module cl_ila (
    input runtest,
    input reset,
    input capture,
-   output logic[31:0] bscanid,
+   output logic bscanid_en,
 
    axi_bus_t sh_cl_dma_pcis_q,
    axi_bus_t lcl_cl_sh_ddra

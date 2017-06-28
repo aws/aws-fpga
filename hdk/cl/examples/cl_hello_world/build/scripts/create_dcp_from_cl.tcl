@@ -180,14 +180,6 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
 ##################################################
-### Tcl Procs and Params 
-##################################################
-
-if {[string match "2017.1" [version -short]]} {
-  set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
-}
-
-##################################################
 ### CL XPR OOC Synthesis
 ##################################################
 if {${cl.synth}} {
