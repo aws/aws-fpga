@@ -36,7 +36,7 @@
    *    SDAccel support - More details will be communicated on AWS forum
 
 
-**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-loca-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional annnoucements.
+**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-local-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional annnoucements.
 
 ## Release 1.3.0 New Features Details
 
@@ -80,6 +80,11 @@ The following major features are included in this HDK release:
 
 * The FPGA Development AMI includes Vivado 2017.1 SDX
 * Older Vivado versions will not be supported
+
+### 10.	SDK changes 
+
+* Synchronous (default) mode for fpga-load-local-image and fpga-clear-local-image.  For example, in synchronous mode (default) fpga-load-local-image will wait for the AFI to transition to the "loaded" state, perform a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id, and display the final state for the given FPGA slot number.  Asynchronous operation is preserved with the "-A" option to both fpga-load-local-image and fpga-clear-local-image.
+* The corresponding fpga_mgmt_load_local_image_sync and fpga_mgmt_clear_local_image_sync are provided by the fpga_mgmt library for use in C/C++ programs.
 
 ## Supported Tools and Environment
 
