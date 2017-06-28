@@ -98,15 +98,6 @@ fi
 
 debug_msg "Checking for Vivado install:"
 
-# On the FPGA Developer AMI use module load to use the correct version of Vivado
-if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
-  # Module command is installed.
-  # Load and unload the modules just to make sure have the environment set correctly
-  module unload vivado
-  module unload sdx
-  module load vivado
-fi
-
 # before going too far make sure Vivado is available
 if ! vivado -version > /dev/null 2>&1; then
     err_msg "Please install/enable Vivado."
