@@ -27,60 +27,59 @@
          *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Release 1.3.0 (Preview)
-   *    Expanded [clock recipes](./hdk/docs/clock_recipes.csv) 
-   *    Virtual JTAG documentation updates
-   *    Included encryption of .sv files for CL examples
+   *    PFPGA initiated read/write over PCI (PCI-M)
+   *    Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
+   *    Expanded DMA support
+   *    Improved URAM utilization
+   *    Improved AXI Interface checking
+   *    New customer examples/workflows:  IP Integrator, VHDL and GUI
+   *    SDAccel support - More details will be communicated on AWS forum
 
-**On July 7th, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-loca-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.
+
+**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-loca-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional annnoucements.
 
 ## Release 1.3.0 New Features Details
 
 The following major features are included in this HDK release: 
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
-
+* The floorplan has been enhanced to enable more optimal CL designs through better timing closure and reduced congestion at the CL to Shell interface.
 * [New Shell Stable: v062517b4](./hdk/common/shell_v062517b4)
-* 
 * [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated.  See cl_ports.vh for the updated port list
 * DCP for the latest shell v062517b4. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
-
 ### 2.	Integrated DMA 
+* DMA functionality has been enhanced to allow DMA transactions of any size.
+* Multi-queue in each direction is now supported
 * The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
 * DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software 
 * A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided.
 * [EDMA Installation Readme](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
-* The initial release supports a single queue in each direction
-* DMA support is in Beta stage with a known issue for DMA READ transactions that cross 4K address boundaries.  See [Kernel_Drivers_README](./sdk/linux_kernel_drivers/README.md) for more information on restrictions for this release
-
-
+* See [Kernel_Drivers_README](./sdk/linux_kernel_drivers/README.md) for more information on restrictions for this release
 
 
 ### 3.	PCI-M
-
+* The PCI-M interface is fully supported for CL generated transactions to the Shell. 
 
 ### 4.	URAM 
-
+* Restrictions on URAM have been relieved to enable 100% of the URAM with a CL to be utilized.
 
 ### 5.	IPI
+* WIP
   
 ### 6.	Build Flow improvments
+* WIP
 
+### 7.	VHDL
+* WIP
 
-### 7.	Redesigned shell
-
-### 8.	VHDL
+### 8.	AXI Interface Checking
+* Protocol checks have been added to the CL-Shell interface to detect and report CL errors for enhanced CL debugging.
 
 ### 9.	Support for Vivado 2017.1 SDX Build 
 
-* The FPGA Development AMI includes Vivado 2017.1
+* The FPGA Development AMI includes Vivado 2017.1 SDX
 * Older Vivado versions will not be supported
-
-### 10.	SDAccel Preview
-
-* Updated documentation in /sdk/SDAccel (NA)
-* OpenCL runtime HAL for supporting SDAccel and OpenCL ICD in /sdk/userspace (NA)
-* SDAccel build post-processing to register SDAccel xcl.bin as AFI. (NA) 
 
 ## Supported Tools and Environment
 
