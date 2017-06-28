@@ -81,6 +81,11 @@ The following major features are included in this HDK release:
 * The FPGA Development AMI includes Vivado 2017.1 SDX
 * Older Vivado versions will not be supported
 
+### 10.	SDK changes 
+
+* Synchronous (default) mode for fpga-load-local-image and fpga-clear-local-image.  For example, in synchronous mode (default) fpga-load-local-image will wait for the AFI to transition to the "loaded" state, perform a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id, and display the final state for the given FPGA slot number.  Asynchronous operation is preserved with the "-A" option to both fpga-load-local-image and fpga-clear-local-image.
+* The corresponding fpga_mgmt_load_local_image_sync and fpga_mgmt_clear_local_image_sync are provided by the fpga_mgmt library for use in C/C++ programs.
+
 ## Supported Tools and Environment
 
 * The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms
