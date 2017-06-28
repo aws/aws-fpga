@@ -4,6 +4,7 @@ set CL_MODULE $CL_MODULE
 
 create_project -in_memory -part [DEVICE_TYPE] -force
 
+
 ########################################
 ## Generate clocks based on Recipe 
 ########################################
@@ -34,46 +35,36 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog [ list \
-  $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
-  $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
-  $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_acc_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_gen_axl.sv  \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv\
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v\
   $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
-  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh 
+  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh
 ]
 
 puts "AWS FPGA: Reading IP blocks";
-
-#Read DDR IP
-read_ip [ list \
-  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci 
-]
 
 #Read IP for axi register slices
 read_ip [ list \
   $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
   $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
-  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
+  $HDK_SHELL_DESIGN_DIR/ip/ila_0/ila_0.xci\
   $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci \
-  $HDK_SHELL_DESIGN_DIR/ip/ila_1/ila_1.xci \
   $HDK_SHELL_DESIGN_DIR/ip/ila_vio_counter/ila_vio_counter.xci \
   $HDK_SHELL_DESIGN_DIR/ip/vio_0/vio_0.xci
 ]
 
 # Additional IP's that might be needed if using the DDR
-read_bd [ list \
-  $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
-]
+#read_bd [ list \
+# $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci \
+# $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+#]
 
 puts "AWS FPGA: Reading AWS constraints";
 
@@ -83,7 +74,7 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_ddr.xdc         - AWS provided DDR pin constraints.      ***DO NOT MODIFY***
 #  cl_synth_user.xdc  - Developer synthesis constraints.
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $CL_DIR/build/constraints/cl_clocks_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
