@@ -22,10 +22,10 @@ set dbg_bridge [get_debug_cores -filter {NAME=~CL/*CL_DEBUG_BRIDGE*}]
 if {[llength $dbg_bridge]} {
    puts "AWS FPGA: Found debug_bridge instance $dbg_bridge in CL. Processing debug constraints"
    if {[llength [get_cells -quiet $dbg_bridge/inst/BSCANID.u_xsdbm_id/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_RD/U_RD_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_rdfifo_inst]]} {
-      read_xdc  ../constraints/cl_debug_bridge.xdc
+      read_xdc  $HDK_SHELL_DIR/build/constraints/cl_debug_bridge.xdc
    }
    if {[llength [get_cells -quiet CL/CL_DEBUG_BRIDGE/inst/xsdbm/inst]]} {
-      read_xdc -cell CL/CL_DEBUG_BRIDGE/inst/xsdbm/inst  ../constraints/xsdbm_timing_exception.xdc
+      read_xdc -cell CL/CL_DEBUG_BRIDGE/inst/xsdbm/inst  $HDK_SHELL_DIR/build/constraints/xsdbm_timing_exception.xdc
    }
    
    set dbg_cores [get_debug_cores -filter {NAME=~CL/*}]
