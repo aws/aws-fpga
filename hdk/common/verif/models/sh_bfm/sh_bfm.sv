@@ -54,28 +54,6 @@ module sh_bfm #(
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
-   //-------------------------------   
-   // HMC
-   //-------------------------------   
-   ,
-   output logic               hmc_iic_scl_i,
-   input                      hmc_iic_scl_o,
-   input                      hmc_iic_scl_t,
-   output logic               hmc_iic_sda_i,
-   input                      hmc_iic_sda_o,
-   input                      hmc_iic_sda_t,
-
-   output logic [7:0]         sh_hmc_stat_addr,
-   output logic               sh_hmc_stat_wr,
-   output logic               sh_hmc_stat_rd,
-   output logic [31:0]        sh_hmc_stat_wdata,
-
-   input                      hmc_sh_stat_ack,
-   input [31:0]               hmc_sh_stat_rdata,
-
-   input [7:0]                hmc_sh_stat_int
-
-    
    ,
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
@@ -171,19 +149,11 @@ module sh_bfm #(
     
    ,
    input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-   output logic [7:0]         sh_aurora_stat_addr,
-   output logic               sh_aurora_stat_wr,
-   output logic               sh_aurora_stat_rd,
-   output logic [31:0]        sh_aurora_stat_wdata,
-
-   input                      aurora_sh_stat_ack,
-   input [31:0]               aurora_sh_stat_rdata,
-   input [7:0]                aurora_sh_stat_int
 
    //--------------------------------------------------------------
    // DDR[3] (M_C_) interface 
    //--------------------------------------------------------------
-   ,
+
    // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
    input                       CLK_300M_DIMM2_DP,
    input                       CLK_300M_DIMM2_DN,
@@ -637,28 +607,6 @@ module sh_bfm #(
    end
 
    assign ddr_user_rst_n = ~ddr_user_rst;
-
-   // TODO: Connect up HMC I2C interface once supported
-   initial begin
-      hmc_iic_scl_i <= 1'b0;
-      hmc_iic_sda_i <= 1'b0;
-   end
-
-   // TODO: Connect up HMC stats interface once supported
-   initial begin
-      sh_hmc_stat_addr <= 8'h00;
-      sh_hmc_stat_wr <= 1'b0;
-      sh_hmc_stat_rd <= 1'b0;
-      sh_hmc_stat_wdata <= 32'h0;
-   end
-
-   // TODO: Connect up Aurora stats interface once supported
-   initial begin
-      sh_aurora_stat_addr <= 8'h00;
-      sh_aurora_stat_wr <= 1'b0;
-      sh_aurora_stat_rd <= 1'b0;
-      sh_aurora_stat_wdata <= 32'h0;
-   end
 
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
