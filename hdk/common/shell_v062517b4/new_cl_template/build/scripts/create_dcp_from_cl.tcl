@@ -206,7 +206,6 @@ if {$implement} {
 
       #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
       read_xdc [ list \
-         $HDK_SHELL_DIR/build/constraints/cl_pnr_aws.xdc \
          $CL_DIR/build/constraints/cl_pnr_user.xdc
       ]
       set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]

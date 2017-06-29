@@ -83,6 +83,7 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_synth_user.xdc  - Developer synthesis constraints.
 read_xdc [ list \
    $CL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
 ]
