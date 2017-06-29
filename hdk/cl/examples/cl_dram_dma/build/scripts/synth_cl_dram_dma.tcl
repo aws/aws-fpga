@@ -83,7 +83,7 @@ puts "AWS FPGA: Reading AWS constraints";
 #  cl_ddr.xdc         - AWS provided DDR pin constraints.      ***DO NOT MODIFY***
 #  cl_synth_user.xdc  - Developer synthesis constraints.
 read_xdc [ list \
-   $HDK_SHELL_DIR/build/constraints/cl_clocks_aws.xdc \
+   $CL_DIR/build/constraints/cl_clocks_aws.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
    $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
    $CL_DIR/build/constraints/cl_synth_user.xdc
