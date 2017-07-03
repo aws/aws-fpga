@@ -51,14 +51,21 @@ read_verilog [ list \
 
 puts "AWS FPGA: Reading IP blocks";
 
+#Read DDR IP
+read_ip [ list \
+  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci 
+]
+
 #Read IP for axi register slices
 read_ip [ list \
   $HDK_SHELL_DESIGN_DIR/ip/src_register_slice/src_register_slice.xci \
-  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
+  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
 ]
+
+
 
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
@@ -70,8 +77,7 @@ read_ip [ list \
 
 # Additional IP's that might be needed if using the DDR
 read_bd [ list \
- $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci \
- $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+  $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
 ]
 
 puts "AWS FPGA: Reading AWS constraints";
@@ -99,7 +105,7 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthes
 
 update_compile_order -fileset sources_1
 puts "\nRunning synth_design for $CL_MODULE $CL_DIR/build/scripts \[[clock format [clock seconds] -format {%a %b %d %H:%M:%S %Y}]\]"
-synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive
+eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive]
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
