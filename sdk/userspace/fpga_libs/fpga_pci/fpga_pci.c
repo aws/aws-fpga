@@ -418,3 +418,25 @@ fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset, size_t len,
 err:
 	return FPGA_ERR_FAIL;
 }
+
+int
+fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
+	uint64_t dword_len)
+{
+	uint64_t i;
+	log_debug("handle=%d, offset=0x%" PRIx64, handle, offset);
+
+	/** get the pointer to the beginning of the range */
+	uint32_t *reg_ptr = (uint32_t *)fpga_pci_bar_get_mem_at_offset(handle,
+			offset, sizeof(uint32_t)*dword_len);
+	fail_on(!reg_ptr, err, "fpga_plat_get_mem_at_offset failed");
+
+	/** memset */
+	for (i = 0; i < dword_len; ++i) {
+		reg_ptr[i] = value;
+	}
+
+	return 0;
+err:
+	return FPGA_ERR_FAIL;
+}
