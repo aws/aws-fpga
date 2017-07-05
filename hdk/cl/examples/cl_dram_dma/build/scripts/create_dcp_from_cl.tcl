@@ -180,6 +180,14 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 #Procedure for running various implementation steps (impl_step)
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
+########################################
+## Generate clocks based on Recipe 
+########################################
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
+
+source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
+
 ##################################################
 ### CL XPR OOC Synthesis
 ##################################################
