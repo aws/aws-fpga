@@ -126,6 +126,7 @@ if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   else
     err_msg "The modulefile to set the environment variables for Vivado does not exist!"
     err_msg "  Please source the hdk_setup script on the correct AMI from the marketplace"
+    return 1
   fi
 
 fi
