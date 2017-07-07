@@ -18,34 +18,34 @@
 #include <stdint.h>
 
 // Vivado does not support svGetScopeFromName
-#ifdef INCLUDE_DPI_CALLS
+//#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
 #include "svdpi.h"
 #endif
-#endif
+//#endif
 
 #include "sh_dpi_tasks.h"
 
-#define HELLO_WORLD_REG_ADDR UINT64_C(0x00)
+#define HELLO_WORLD_REG_ADDR UINT64_C(0x500)
 
 void test_main(uint32_t *exit_code) {
 
 // Vivado does not support svGetScopeFromName
-#ifdef INCLUDE_DPI_CALLS
+//#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
   svScope scope;
 #endif
-#endif
+//#endif
 
   uint32_t rdata;
 
 // Vivado does not support svGetScopeFromName
-#ifdef INCLUDE_DPI_CALLS
+//#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
   scope = svGetScopeFromName("tb");
   svSetScope(scope);
 #endif
-#endif
+//#endif
 
   log_printf("Writing 0xDEAD_BEEF to address 0x%x", HELLO_WORLD_REG_ADDR);
   cl_poke(HELLO_WORLD_REG_ADDR, 0xDEADBEEF);
