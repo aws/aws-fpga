@@ -61,6 +61,15 @@ if [ ! -d $HDK_DIR/cl/examples/$test/build/checkpoints/to_aws ]; then
     exit 1
 fi
 
+cd $HDK_DIR/cl/examples/$test/build/checkpoints
+
+echo "INFO: Checking that a non zero size ltx file exists in the folder"
+non_zero_ltx=$(find . -name '*.ltx' -type f ! -size 0)
+if [ "$non_zero_ltx" = "" ]; then
+    echo -e >&2 "ERROR: LTX file not found or is of 0 byte size\n"
+    exit 1
+fi
+
 cd $HDK_DIR/cl/examples/$test/build/checkpoints/to_aws
 
 echo "INFO: Checking that a non zero size manifest file exists in the folder"
