@@ -64,7 +64,6 @@ int main()
 	write_buf = (char*)malloc(sizeof(char) * SIZE_OF_DATA);
 	read_buf = (char*)malloc(sizeof(char) * SIZE_OF_DATA);
 
-
 	rand_string(write_buf, SIZE_OF_DATA);
 
 	if((fd = open("/dev/edma0_queue_0",O_RDWR)) == -1){
@@ -82,7 +81,7 @@ int main()
 #ifdef WRITE_PERF
 		ret = write(fd, write_buf, SIZE_OF_DATA);
 #else
-		ret = read(fd, write_buf, SIZE_OF_DATA);
+		ret = read(fd, read_buf, SIZE_OF_DATA);
 #endif
 		clock_gettime(CLOCK_REALTIME, &after);
 

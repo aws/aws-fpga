@@ -225,7 +225,7 @@ fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 	uint32_t tmp_len = 
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
 
-	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
+	fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
 			len, tmp_len);
 
 	/* We've already validated the header; copy the response into the out
@@ -260,10 +260,10 @@ fpga_mgmt_mbox_attach(int slot_id)
 	};
 
 	ret = fpga_hal_mbox_init(&mbox);
-	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "fpga_hal_mbox_init failed");
 
 	ret = fpga_hal_mbox_attach(handle, true); /**< clear_state=true */
-	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "fpga_hal_mbox_attach failed");
 
 	return 0;
 err:
@@ -278,13 +278,13 @@ fpga_mgmt_mbox_detach(int slot_id)
 
 		int ret = fpga_hal_mbox_detach(handle, true); /**< clear_state=true */
 		if (ret != 0) {
-			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
+			log_error("fpga_hal_mbox_detach failed");
 			/** Continue with plat detach */
 		}
 
 		ret = fpga_pci_detach(handle);
 		if (ret != 0) {
-			log_error("%s (line %u)", CLI_INTERNAL_ERR_STR, __LINE__);
+			log_error("fpga_pci_detach failed");
 			/* Continue with detach */
 		}
 		fpga_mgmt_state.slots[slot_id].handle = PCI_BAR_HANDLE_INIT;
@@ -319,7 +319,7 @@ fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
 	uint32_t tmp_len =
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_err_rsp);
 
-	fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
+	fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
 			len, tmp_len);
 
 	/** Handle invalid API version error */
@@ -327,7 +327,7 @@ fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
 		union afi_err_info *err_info = (void *)err_rsp->error_info;
 
 		tmp_len += sizeof(err_info->afi_cmd_version);
-		fail_on_quiet(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
+		fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
 				len, tmp_len);
 
 		log_error("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n",
@@ -357,40 +357,42 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 	uint32_t is_response = stored_flags & AFI_CMD_HDR_IS_RSP;
 	uint32_t payload_len = afi_cmd_hdr_get_len(rsp);
 
-	fail_on_quiet(!cmd, err, "cmd == NULL");
-	fail_on_quiet(!rsp, err, "rsp == NULL");
+	fail_on(!cmd, err, "cmd == NULL");
+	fail_on(!rsp, err, "rsp == NULL");
 
 	/** Version */
-	fail_on_quiet(cmd->hdr.version != rsp->hdr.version, err,
-			"cmd_ver(%u) != rsp_ver(%u)",
-			cmd->hdr.version, rsp->hdr.version);
+	fail_on(cmd->hdr.version != rsp->hdr.version, err,
+			"cmd_ver(%u) != rsp_ver(%u), cmd_id=0x%08x",
+			cmd->hdr.version, rsp->hdr.version, cmd->hdr.id);
 
 	/** Opcode */
-	fail_on_quiet(cmd->hdr.op != rsp->hdr.op, op_err, "cmd_op(%u) != rsp_op(%u)",
-			cmd->hdr.op, rsp->hdr.op);
+	fail_on(cmd->hdr.op != rsp->hdr.op, op_err, 
+			"cmd_op(%u) != rsp_op(%u), cmd_id=0x%08x",
+			cmd->hdr.op, rsp->hdr.op, cmd->hdr.id);
 
 	/** Id */
-	fail_on_quiet(cmd->hdr.id != rsp->hdr.id, id_err, "cmd_id(%u) != rsp_id(%u)",
+	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, 
+			"cmd_id(0x%08x) != rsp_id(0x%08x)",
 			cmd->hdr.id, rsp->hdr.id);
 
 	/** Received len too small */
-	fail_on_quiet(len < sizeof(struct afi_cmd_hdr), err,
+	fail_on(len < sizeof(struct afi_cmd_hdr), err,
 			"Received length %u too small", len);
 
 	/** Payload len too big */
-	fail_on_quiet(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN,
+	fail_on(payload_len + sizeof(struct afi_cmd_hdr) > AFI_CMD_DATA_LEN,
 			err, "Payload length %u too big", payload_len);
 
 	/** Not a response */
-	fail_on_quiet(!is_response, err, "Command is not a response");
+	fail_on(!is_response, err, "Command is not a response");
 	return 0;
 
-id_err:
-	return -EAGAIN;
 op_err:
 	if (rsp->hdr.op == AFI_CMD_ERROR) {
 		return fpga_mgmt_handle_afi_cmd_error_rsp(rsp, len);
 	}
+id_err:
+	return -EAGAIN;
 err:
 	return FPGA_ERR_FAIL;
 }
@@ -404,27 +406,30 @@ fpga_mgmt_send_cmd(int slot_id,
 	/** Write the AFI cmd to the mailbox */
 	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
 	ret = fpga_hal_mbox_write(handle, (void *)cmd, *len);
-	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "fpga_hal_mbox_write failed");
 
 	/**
 	 * Read the AFI rsp from the mailbox.
 	 *  -also make a minimal attempt to drain stale responses
 	 *   (if any).
 	 */
-	uint32_t id_retries = 0;
-	ret = -EAGAIN;
-	while (ret == -EAGAIN) {
+	uint32_t retries = 0;
+	bool done = false;
+	while (!done) {
 		ret = fpga_hal_mbox_read(handle, (void *)rsp, len);
-		fail_on(ret = (ret) ? ETIMEDOUT : 0, err_code, "Error: operation timed out");
+		fail_on(ret = (ret) ? -ETIMEDOUT : 0, err_code, "Error: operation timed out");
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
-		fail_on(ret, err_code, CLI_INTERNAL_ERR_STR);
-
-		fail_on(id_retries >= AFI_MAX_ID_RETRIES, err,
-				CLI_INTERNAL_ERR_STR);
-		id_retries++;
+		if (ret == 0) {
+			done = true;
+		} else {
+			fail_on(ret != -EAGAIN, err_code, 
+				"fpga_mgmt_afi_validate_header failed");
+			fail_on(retries >= AFI_MAX_RETRIES, err, "retries=%u, exceeded",
+				retries);
+			retries++;
+		}
 	}
-	fail_on(ret != 0, err, CLI_INTERNAL_ERR_STR);
 
 	return 0;
 err:
@@ -442,10 +447,10 @@ fpga_mgmt_process_cmd(int slot_id,
 	fail_slot_id(slot_id, err, ret);
 
 	ret = fpga_mgmt_mbox_attach(slot_id);
-	fail_on_quiet(ret, err, "fpga_mgmt_mbox_attach failed");
+	fail_on(ret, err, "fpga_mgmt_mbox_attach failed");
 
 	ret = fpga_mgmt_send_cmd(slot_id, cmd, rsp, len);
-	fail_on_quiet(ret, err_detach, "fpga_mgmt_send_cmd failed");
+	fail_on(ret, err_detach, "fpga_mgmt_send_cmd failed");
 
 	return 0;
 err_detach:

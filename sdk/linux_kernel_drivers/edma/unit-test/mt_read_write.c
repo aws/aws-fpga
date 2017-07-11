@@ -132,6 +132,10 @@ void* doRead(void *arg)
 
 		read_size = can_read == 1 ? 1: rand() % can_read;
 
+		//check if we cross a 4k page
+		if((offset % PAGE_SIZE + read_size) > PAGE_SIZE)
+			read_size = PAGE_SIZE - offset % PAGE_SIZE;
+
 		ret = lseek(fd, offset, SEEK_SET);
 		if(ret < 0)
 			exit(3);

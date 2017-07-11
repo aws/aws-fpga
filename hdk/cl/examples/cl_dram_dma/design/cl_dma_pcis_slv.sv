@@ -76,6 +76,14 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
 
 
+//reset synchronizers
+(* dont_touch = "true" *) logic slr0_sync_aresetn;
+(* dont_touch = "true" *) logic slr1_sync_aresetn;
+(* dont_touch = "true" *) logic slr2_sync_aresetn;
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR0_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr0_sync_aresetn));
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR1_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr1_sync_aresetn));
+lib_pipe #(.WIDTH(1), .STAGES(4)) SLR2_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in_bus(aresetn), .out_bus(slr2_sync_aresetn));
+
 //---------------------------- 
 // flop the dma_pcis interface input of CL 
 //---------------------------- 
@@ -83,7 +91,7 @@ scrb_bus_t ddrd_scrb_bus_q();
    // AXI4 Register Slice for dma_pcis interface
    axi_register_slice PCI_AXL_REG_SLC (
        .aclk          (aclk),
-       .aresetn       (aresetn),
+       .aresetn       (slr0_sync_aresetn),
        .s_axi_awid    (sh_cl_dma_pcis_bus.awid),
        .s_axi_awaddr  (sh_cl_dma_pcis_bus.awaddr),
        .s_axi_awlen   (sh_cl_dma_pcis_bus.awlen),                                            
@@ -145,14 +153,14 @@ scrb_bus_t ddrd_scrb_bus_q();
 //---------------------------- 
 // axi interconnect for DDR address decodes 
 //---------------------------- 
- cl_axi_interconnect AXI_CROSSBAR 
+(* dont_touch = "true" *) cl_axi_interconnect AXI_CROSSBAR 
        (.ACLK(aclk),
-        .ARESETN(aresetn),
+        .ARESETN(slr1_sync_aresetn),
 
         .M00_AXI_araddr(lcl_cl_sh_ddra_q.araddr),
         .M00_AXI_arburst(),
         .M00_AXI_arcache(),
-        .M00_AXI_arid(lcl_cl_sh_ddra_q.arid[5:0]),
+        .M00_AXI_arid(lcl_cl_sh_ddra_q.arid[6:0]),
         .M00_AXI_arlen(lcl_cl_sh_ddra_q.arlen),
         .M00_AXI_arlock(),
         .M00_AXI_arprot(),
@@ -164,7 +172,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M00_AXI_awaddr(lcl_cl_sh_ddra_q.awaddr),
         .M00_AXI_awburst(),
         .M00_AXI_awcache(),
-        .M00_AXI_awid(lcl_cl_sh_ddra_q.awid[5:0]),
+        .M00_AXI_awid(lcl_cl_sh_ddra_q.awid[6:0]),
         .M00_AXI_awlen(lcl_cl_sh_ddra_q.awlen),
         .M00_AXI_awlock(),
         .M00_AXI_awprot(),
@@ -173,12 +181,12 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M00_AXI_awregion(),
         .M00_AXI_awsize(lcl_cl_sh_ddra_q.awsize),
         .M00_AXI_awvalid(lcl_cl_sh_ddra_q.awvalid),
-        .M00_AXI_bid(lcl_cl_sh_ddra_q.bid[5:0]),
+        .M00_AXI_bid(lcl_cl_sh_ddra_q.bid[6:0]),
         .M00_AXI_bready(lcl_cl_sh_ddra_q.bready),
         .M00_AXI_bresp(lcl_cl_sh_ddra_q.bresp),
         .M00_AXI_bvalid(lcl_cl_sh_ddra_q.bvalid),
         .M00_AXI_rdata(lcl_cl_sh_ddra_q.rdata),
-        .M00_AXI_rid(lcl_cl_sh_ddra_q.rid[5:0]),
+        .M00_AXI_rid(lcl_cl_sh_ddra_q.rid[6:0]),
         .M00_AXI_rlast(lcl_cl_sh_ddra_q.rlast),
         .M00_AXI_rready(lcl_cl_sh_ddra_q.rready),
         .M00_AXI_rresp(lcl_cl_sh_ddra_q.rresp),
@@ -192,7 +200,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M01_AXI_araddr(lcl_cl_sh_ddrb_q.araddr),
         .M01_AXI_arburst(),
         .M01_AXI_arcache(),
-        .M01_AXI_arid(lcl_cl_sh_ddrb_q.arid[5:0]),
+        .M01_AXI_arid(lcl_cl_sh_ddrb_q.arid[6:0]),
         .M01_AXI_arlen(lcl_cl_sh_ddrb_q.arlen),
         .M01_AXI_arlock(),
         .M01_AXI_arprot(),
@@ -204,7 +212,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M01_AXI_awaddr(lcl_cl_sh_ddrb_q.awaddr),
         .M01_AXI_awburst(),
         .M01_AXI_awcache(),
-        .M01_AXI_awid(lcl_cl_sh_ddrb_q.awid[5:0]),
+        .M01_AXI_awid(lcl_cl_sh_ddrb_q.awid[6:0]),
         .M01_AXI_awlen(lcl_cl_sh_ddrb_q.awlen),
         .M01_AXI_awlock(),
         .M01_AXI_awprot(),
@@ -213,12 +221,12 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M01_AXI_awregion(),
         .M01_AXI_awsize(lcl_cl_sh_ddrb_q.awsize),
         .M01_AXI_awvalid(lcl_cl_sh_ddrb_q.awvalid),
-        .M01_AXI_bid(lcl_cl_sh_ddrb_q.bid[5:0]),
+        .M01_AXI_bid(lcl_cl_sh_ddrb_q.bid[6:0]),
         .M01_AXI_bready(lcl_cl_sh_ddrb_q.bready),
         .M01_AXI_bresp(lcl_cl_sh_ddrb_q.bresp),
         .M01_AXI_bvalid(lcl_cl_sh_ddrb_q.bvalid),
         .M01_AXI_rdata(lcl_cl_sh_ddrb_q.rdata),
-        .M01_AXI_rid(lcl_cl_sh_ddrb_q.rid[5:0]),
+        .M01_AXI_rid(lcl_cl_sh_ddrb_q.rid[6:0]),
         .M01_AXI_rlast(lcl_cl_sh_ddrb_q.rlast),
         .M01_AXI_rready(lcl_cl_sh_ddrb_q.rready),
         .M01_AXI_rresp(lcl_cl_sh_ddrb_q.rresp),
@@ -233,7 +241,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M02_AXI_araddr(cl_sh_ddr_q.araddr),
         .M02_AXI_arburst(),
         .M02_AXI_arcache(),
-        .M02_AXI_arid(cl_sh_ddr_q.arid[5:0]),
+        .M02_AXI_arid(cl_sh_ddr_q.arid[6:0]),
         .M02_AXI_arlen(cl_sh_ddr_q.arlen),
         .M02_AXI_arlock(),
         .M02_AXI_arprot(),
@@ -245,7 +253,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M02_AXI_awaddr(cl_sh_ddr_q.awaddr),
         .M02_AXI_awburst(),
         .M02_AXI_awcache(),
-        .M02_AXI_awid(cl_sh_ddr_q.awid[5:0]),
+        .M02_AXI_awid(cl_sh_ddr_q.awid[6:0]),
         .M02_AXI_awlen(cl_sh_ddr_q.awlen),
         .M02_AXI_awlock(),
         .M02_AXI_awprot(),
@@ -254,12 +262,12 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M02_AXI_awregion(),
         .M02_AXI_awsize(cl_sh_ddr_q.awsize),
         .M02_AXI_awvalid(cl_sh_ddr_q.awvalid),
-        .M02_AXI_bid(cl_sh_ddr_q.bid[5:0]),
+        .M02_AXI_bid(cl_sh_ddr_q.bid[6:0]),
         .M02_AXI_bready(cl_sh_ddr_q.bready),
         .M02_AXI_bresp(cl_sh_ddr_q.bresp),
         .M02_AXI_bvalid(cl_sh_ddr_q.bvalid),
         .M02_AXI_rdata(cl_sh_ddr_q.rdata),
-        .M02_AXI_rid(cl_sh_ddr_q.rid[5:0]),
+        .M02_AXI_rid(cl_sh_ddr_q.rid[6:0]),
         .M02_AXI_rlast(cl_sh_ddr_q.rlast),
         .M02_AXI_rready(cl_sh_ddr_q.rready),
         .M02_AXI_rresp(cl_sh_ddr_q.rresp),
@@ -273,7 +281,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M03_AXI_araddr(lcl_cl_sh_ddrd_q.araddr),
         .M03_AXI_arburst(),
         .M03_AXI_arcache(),
-        .M03_AXI_arid(lcl_cl_sh_ddrd_q.arid[5:0]),
+        .M03_AXI_arid(lcl_cl_sh_ddrd_q.arid[6:0]),
         .M03_AXI_arlen(lcl_cl_sh_ddrd_q.arlen),
         .M03_AXI_arlock(),
         .M03_AXI_arprot(),
@@ -285,7 +293,7 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M03_AXI_awaddr(lcl_cl_sh_ddrd_q.awaddr),
         .M03_AXI_awburst(),
         .M03_AXI_awcache(),
-        .M03_AXI_awid(lcl_cl_sh_ddrd_q.awid[5:0]),
+        .M03_AXI_awid(lcl_cl_sh_ddrd_q.awid[6:0]),
         .M03_AXI_awlen(lcl_cl_sh_ddrd_q.awlen),
         .M03_AXI_awlock(),
         .M03_AXI_awprot(),
@@ -294,12 +302,12 @@ scrb_bus_t ddrd_scrb_bus_q();
         .M03_AXI_awregion(),
         .M03_AXI_awsize(lcl_cl_sh_ddrd_q.awsize),
         .M03_AXI_awvalid(lcl_cl_sh_ddrd_q.awvalid),
-        .M03_AXI_bid(lcl_cl_sh_ddrd_q.bid[5:0]),
+        .M03_AXI_bid(lcl_cl_sh_ddrd_q.bid[6:0]),
         .M03_AXI_bready(lcl_cl_sh_ddrd_q.bready),
         .M03_AXI_bresp(lcl_cl_sh_ddrd_q.bresp),
         .M03_AXI_bvalid(lcl_cl_sh_ddrd_q.bvalid),
         .M03_AXI_rdata(lcl_cl_sh_ddrd_q.rdata),
-        .M03_AXI_rid(lcl_cl_sh_ddrd_q.rid[5:0]),
+        .M03_AXI_rid(lcl_cl_sh_ddrd_q.rid[6:0]),
         .M03_AXI_rlast(lcl_cl_sh_ddrd_q.rlast),
         .M03_AXI_rready(lcl_cl_sh_ddrd_q.rready),
         .M03_AXI_rresp(lcl_cl_sh_ddrd_q.rresp),
@@ -350,14 +358,54 @@ scrb_bus_t ddrd_scrb_bus_q();
         .S00_AXI_wlast(sh_cl_dma_pcis_q.wlast),
         .S00_AXI_wready(sh_cl_dma_pcis_q.wready),
         .S00_AXI_wstrb(sh_cl_dma_pcis_q.wstrb),
-        .S00_AXI_wvalid(sh_cl_dma_pcis_q.wvalid));
+        .S00_AXI_wvalid(sh_cl_dma_pcis_q.wvalid),
+
+        .S01_AXI_araddr(64'h0),
+        .S01_AXI_arburst(2'b1),
+        .S01_AXI_arcache(4'b11),
+        .S01_AXI_arid(6'h0),
+        .S01_AXI_arlen(8'h0),
+        .S01_AXI_arlock(1'b0),
+        .S01_AXI_arprot(3'b10),
+        .S01_AXI_arqos(4'b0),
+        .S01_AXI_arready(),
+        .S01_AXI_arregion(4'b0),
+        .S01_AXI_arsize(3'h0),
+        .S01_AXI_arvalid(1'b0),
+        .S01_AXI_awaddr(64'h0),
+        .S01_AXI_awburst(2'b1),
+        .S01_AXI_awcache(4'b11),
+        .S01_AXI_awid(6'h0),
+        .S01_AXI_awlen(8'h0),
+        .S01_AXI_awlock(1'b0),
+        .S01_AXI_awprot(3'b10),
+        .S01_AXI_awqos(4'b0),
+        .S01_AXI_awready(),
+        .S01_AXI_awregion(4'b0),
+        .S01_AXI_awsize(3'h0),
+        .S01_AXI_awvalid(1'b0),
+        .S01_AXI_bid(),
+        .S01_AXI_bready(1'b0),
+        .S01_AXI_bresp(),
+        .S01_AXI_bvalid(),
+        .S01_AXI_rdata(),
+        .S01_AXI_rid(),
+        .S01_AXI_rlast(),
+        .S01_AXI_rready(1'b0),
+        .S01_AXI_rresp(),
+        .S01_AXI_rvalid(),
+        .S01_AXI_wdata(512'h0),
+        .S01_AXI_wlast(1'b0),
+        .S01_AXI_wready(),
+        .S01_AXI_wstrb(64'h0),
+        .S01_AXI_wvalid(1'b0));
 
 //---------------------------- 
 // flop the output of interconnect for DDRC 
 //---------------------------- 
    axi_register_slice DDR_C_TST_AXI4_REG_SLC (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
                                                                                                                                   
        .s_axi_awid     (cl_sh_ddr_q.awid),
        .s_axi_awaddr   ({cl_sh_ddr_q.awaddr[63:36], 2'b0, cl_sh_ddr_q.awaddr[33:0]}),
@@ -444,7 +492,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_C (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr1_sync_aresetn),
 
          .cfg_addr(ddrc_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrc_tst_cfg_bus_q.wdata),
@@ -542,7 +590,7 @@ scrb_bus_t ddrd_scrb_bus_q();
 
    axi_register_slice DDR_C_TST_AXI4_REG_SLC_1 (
      .aclk           (aclk),
-     .aresetn        (aresetn),
+     .aresetn        (slr1_sync_aresetn),
                                                                                                                                 
      .s_axi_awid     ({10'b0, cl_sh_ddr_q3.awid[5:0]}),
      .s_axi_awaddr   ({cl_sh_ddr_q3.awaddr}),
@@ -609,7 +657,7 @@ scrb_bus_t ddrd_scrb_bus_q();
    //back to back register slices for SLR crossing
    src_register_slice DDR_A_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddra_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddra_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddra_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddra_q.awlen),
@@ -691,7 +739,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_A_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr2_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddra_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddra_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddra_q2.awlen),
@@ -800,7 +848,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_A (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr2_sync_aresetn),
 
          .cfg_addr(ddra_tst_cfg_bus_q.addr),
          .cfg_wdata(ddra_tst_cfg_bus_q.wdata),
@@ -902,7 +950,7 @@ scrb_bus_t ddrd_scrb_bus_q();
   //back to back register slices for SLR crossing
    src_register_slice DDR_B_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrb_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddrb_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddrb_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddrb_q.awlen),
@@ -984,7 +1032,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_B_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrb_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddrb_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddrb_q2.awlen),
@@ -1093,7 +1141,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_B (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr1_sync_aresetn),
 
          .cfg_addr(ddrb_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrb_tst_cfg_bus_q.wdata),
@@ -1196,7 +1244,7 @@ scrb_bus_t ddrd_scrb_bus_q();
   //back to back register slices for SLR crossing
    src_register_slice DDR_D_TST_AXI4_REG_SLC_1 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr1_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrd_q.awid),
        .s_axi_awaddr   ({lcl_cl_sh_ddrd_q.awaddr[63:36], 2'b0, lcl_cl_sh_ddrd_q.awaddr[33:0]}),
        .s_axi_awlen    (lcl_cl_sh_ddrd_q.awlen),
@@ -1278,7 +1326,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        );
    dest_register_slice DDR_D_TST_AXI4_REG_SLC_2 (
        .aclk           (aclk),
-       .aresetn        (aresetn),
+       .aresetn        (slr0_sync_aresetn),
        .s_axi_awid     (lcl_cl_sh_ddrd_q2.awid),
        .s_axi_awaddr   (lcl_cl_sh_ddrd_q2.awaddr),
        .s_axi_awlen    (lcl_cl_sh_ddrd_q2.awlen),
@@ -1387,7 +1435,7 @@ scrb_bus_t ddrd_scrb_bus_q();
                     .NO_SCRB_INST(NO_SCRB_INST)) CL_TST_DDR_D (
    
          .clk(aclk),
-         .rst_n(aresetn),
+         .rst_n(slr0_sync_aresetn),
 
          .cfg_addr(ddrd_tst_cfg_bus_q.addr),
          .cfg_wdata(ddrd_tst_cfg_bus_q.wdata),

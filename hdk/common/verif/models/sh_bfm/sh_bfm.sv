@@ -54,28 +54,6 @@ module sh_bfm #(
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
-   //-------------------------------   
-   // HMC
-   //-------------------------------   
-   ,
-   output logic               hmc_iic_scl_i,
-   input                      hmc_iic_scl_o,
-   input                      hmc_iic_scl_t,
-   output logic               hmc_iic_sda_i,
-   input                      hmc_iic_sda_o,
-   input                      hmc_iic_sda_t,
-
-   output logic [7:0]         sh_hmc_stat_addr,
-   output logic               sh_hmc_stat_wr,
-   output logic               sh_hmc_stat_rd,
-   output logic [31:0]        sh_hmc_stat_wdata,
-
-   input                      hmc_sh_stat_ack,
-   input [31:0]               hmc_sh_stat_rdata,
-
-   input [7:0]                hmc_sh_stat_int
-
-    
    ,
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
@@ -171,19 +149,11 @@ module sh_bfm #(
     
    ,
    input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-   output logic [7:0]         sh_aurora_stat_addr,
-   output logic               sh_aurora_stat_wr,
-   output logic               sh_aurora_stat_rd,
-   output logic [31:0]        sh_aurora_stat_wdata,
-
-   input                      aurora_sh_stat_ack,
-   input [31:0]               aurora_sh_stat_rdata,
-   input [7:0]                aurora_sh_stat_int
 
    //--------------------------------------------------------------
    // DDR[3] (M_C_) interface 
    //--------------------------------------------------------------
-   ,
+
    // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
    input                       CLK_300M_DIMM2_DP,
    input                       CLK_300M_DIMM2_DN,
@@ -497,6 +467,8 @@ module sh_bfm #(
    } DMA_OP;
 
    DMA_OP h2c_dma_list[0:3][$];
+   int    h2c_dma_wr_cmd_cnt[0:3];
+   
    DMA_OP c2h_dma_list[0:3][$];
    DMA_OP c2h_data_dma_list[0:3][$];
    
@@ -636,28 +608,6 @@ module sh_bfm #(
 
    assign ddr_user_rst_n = ~ddr_user_rst;
 
-   // TODO: Connect up HMC I2C interface once supported
-   initial begin
-      hmc_iic_scl_i <= 1'b0;
-      hmc_iic_sda_i <= 1'b0;
-   end
-
-   // TODO: Connect up HMC stats interface once supported
-   initial begin
-      sh_hmc_stat_addr <= 8'h00;
-      sh_hmc_stat_wr <= 1'b0;
-      sh_hmc_stat_rd <= 1'b0;
-      sh_hmc_stat_wdata <= 32'h0;
-   end
-
-   // TODO: Connect up Aurora stats interface once supported
-   initial begin
-      sh_aurora_stat_addr <= 8'h00;
-      sh_aurora_stat_wr <= 1'b0;
-      sh_aurora_stat_rd <= 1'b0;
-      sh_aurora_stat_wdata <= 32'h0;
-   end
-
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
       sh_ddr_stat_addr0  = 8'h00;
@@ -682,6 +632,12 @@ module sh_bfm #(
    //
    //=================================================
 
+   // initial various counts for DMA operations
+   initial begin
+      for(int i=0; i<4; i++)
+        h2c_dma_wr_cmd_cnt[i] = 0;
+   end
+   
    //
    // sh->cl Address Write Channel
    //
@@ -732,7 +688,11 @@ module sh_bfm #(
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
             end
-            h2c_dma_done[sh_cl_wr_data[0].id] = 1'b1; 
+
+            if (sh_cl_dma_pcis_wlast)
+              h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id]--;
+            
+            h2c_dma_done[sh_cl_wr_data[0].id] =  (h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id] == 0); 
             sh_cl_wr_data.pop_front();
          end
          
@@ -1872,15 +1832,17 @@ module sh_bfm #(
          bit last_beat;
          logic [5:0] start_addr;
          bit aligned;
+         bit last_data_beat;
          
          num_of_data_beats = 0;
-         byte_cnt = 0;
-         num_bytes = 0;
-         aligned_addr = 0;
-         last_beat = 0;
-         start_addr = 0;
-         aligned = 0;
-         
+         last_data_beat    = 0;
+         byte_cnt          = 0;
+         num_bytes         = 0;
+         aligned_addr      = 0;
+         last_beat         = 0;
+         start_addr        = 0;
+         aligned           = 0;
+              
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
@@ -1895,7 +1857,8 @@ module sh_bfm #(
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  axi_cmd.len  = (num_of_data_beats==1) ? 0 :
+                                  aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
                   if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
@@ -1916,15 +1879,25 @@ module sh_bfm #(
                 axi_cmd.id   = chan;
                 axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
-
+                h2c_dma_wr_cmd_cnt[chan]++;
+                 
                 // loop to do multiple data beats
                 for(int j = 0; j <= axi_cmd.len; j++) begin
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
-                  axi_data.last = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
-                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
-                  if(axi_data.last)  begin
+                  last_data_beat = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
+                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64; 
+                  axi_data.last = (j == axi_cmd.len) ? 1 : 0;
+                  if(num_of_data_beats == 1) begin
+                    num_bytes = (dop.len)%64;
+                    for(int i=start_addr[5:0]; i < (num_bytes+start_addr[5:0]); i++) begin
+                      axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
+                      axi_data.strb = axi_data.strb | 1 << i;
+                      byte_cnt++;
+                    end
+                  end
+                  else if(last_data_beat)  begin
                     for(int i=0; i < num_bytes; i++) begin
                       axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
                       axi_data.strb = axi_data.strb | 1 << i;
@@ -1975,9 +1948,13 @@ module sh_bfm #(
                 end
                 byte_cnt[chan]++;
               end
-              c2h_dma_done[chan] = 1'b1;
+              c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
+
+              if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
+                byte_cnt[chan] = 0;
+               
               cl_sh_rd_data.pop_front();
-            end
+            end // if (chan == cl_sh_rd_data[0].id)
           end
         end
       end
@@ -2020,7 +1997,8 @@ module sh_bfm #(
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  axi_cmd.len  = (num_of_data_beats==1) ? 0 :
+                                  aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
                   if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;

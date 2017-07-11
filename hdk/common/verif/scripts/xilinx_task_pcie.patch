@@ -1,0 +1,751 @@
+diff -ruN new_xilinx_task_pcie_x16/dsport/pcie_4_0_rp.v xilinx_task_pcie_x16/dsport/pcie_4_0_rp.v
+--- new_xilinx_task_pcie_x16/dsport/pcie_4_0_rp.v	2016-10-25 15:54:13.136504517 -0700
++++ xilinx_task_pcie_x16/dsport/pcie_4_0_rp.v	2016-10-21 16:46:13.670248254 -0700
+@@ -299,10 +299,10 @@
+    ,output wire           conf_req_ready
+    ,output wire [31:0]    conf_resp_rdata
+    ,output wire           conf_resp_valid
+-   ,output wire           conf_mcap_design_switch
+-   ,output wire           conf_mcap_eos
+-   ,output wire           conf_mcap_in_use_by_pcie
+-   ,input  wire           conf_mcap_request_by_conf
++//   ,output wire           conf_mcap_design_switch
++//   ,output wire           conf_mcap_eos
++//   ,output wire           conf_mcap_in_use_by_pcie
++//   ,input  wire           conf_mcap_request_by_conf
+ 
+ /*
+    ,output wire [255:0]   dbg_data0_out
+@@ -1611,10 +1611,10 @@
+    ,.conf_req_ready(conf_req_ready)
+    ,.conf_resp_rdata(conf_resp_rdata[31:0])
+    ,.conf_resp_valid(conf_resp_valid)
+-   ,.conf_mcap_design_switch(conf_mcap_design_switch)
+-   ,.conf_mcap_eos(conf_mcap_eos)
+-   ,.conf_mcap_in_use_by_pcie(conf_mcap_in_use_by_pcie)
+-   ,.conf_mcap_request_by_conf(conf_mcap_request_by_conf)
++//   ,.conf_mcap_design_switch(conf_mcap_design_switch)
++//   ,.conf_mcap_eos(conf_mcap_eos)
++//   ,.conf_mcap_in_use_by_pcie(conf_mcap_in_use_by_pcie)
++//   ,.conf_mcap_request_by_conf(conf_mcap_request_by_conf)
+ /*
+    ,.dbg_data0_out(dbg_data0_out)
+    ,.dbg_ctrl0_out(dbg_ctrl0_out)
+diff -ruN new_xilinx_task_pcie_x16/dsport/pci_exp_usrapp_cfg.v xilinx_task_pcie_x16/dsport/pci_exp_usrapp_cfg.v
+--- new_xilinx_task_pcie_x16/dsport/pci_exp_usrapp_cfg.v	2016-10-25 15:54:13.166501869 -0700
++++ xilinx_task_pcie_x16/dsport/pci_exp_usrapp_cfg.v	2016-10-21 16:46:13.667248512 -0700
+@@ -150,30 +150,6 @@
+   cfg_ext_write_byte_enable,
+   cfg_ext_read_data,
+   cfg_ext_read_data_valid,
+-  cfg_interrupt_msi_enable,
+-  cfg_interrupt_msi_vf_enable,
+-  cfg_interrupt_msi_mmenable,
+-  cfg_interrupt_msi_mask_update,
+-  cfg_interrupt_msi_data,
+-  cfg_interrupt_msi_select,
+-  cfg_interrupt_msi_int,
+-  cfg_interrupt_msi_pending_status,
+-  cfg_interrupt_msi_sent,
+-  cfg_interrupt_msi_fail,
+-  cfg_interrupt_msi_attr,
+-  cfg_interrupt_msi_tph_present,
+-  cfg_interrupt_msi_tph_type,
+-  cfg_interrupt_msi_tph_st_tag,
+-  cfg_interrupt_msi_function_number,
+-  cfg_interrupt_msix_enable,
+-  cfg_interrupt_msix_mask,
+-  cfg_interrupt_msix_vf_enable,
+-  cfg_interrupt_msix_vf_mask,
+-  cfg_interrupt_msix_data,
+-  cfg_interrupt_msix_address,
+-  cfg_interrupt_msix_int,
+-  cfg_interrupt_msix_sent,
+-  cfg_interrupt_msix_fail,
+ 
+   cfg_hot_reset_out,
+   cfg_config_space_enable,
+@@ -290,31 +266,6 @@
+   output reg                      [1:0]     cfg_interrupt_pending;
+   input                                 cfg_interrupt_sent;
+ 
+-  input                       [3:0]     cfg_interrupt_msi_enable;
+-  input                       [7:0]     cfg_interrupt_msi_vf_enable;
+-  input                      [11:0]     cfg_interrupt_msi_mmenable;
+-  input                                 cfg_interrupt_msi_mask_update;
+-  input                      [31:0]     cfg_interrupt_msi_data;
+-  output reg                      [3:0]     cfg_interrupt_msi_select;
+-  output reg                     [31:0]     cfg_interrupt_msi_int;
+-  output reg                     [63:0]     cfg_interrupt_msi_pending_status;
+-  input                                 cfg_interrupt_msi_sent;
+-  input                                 cfg_interrupt_msi_fail;
+-  output reg                      [2:0]     cfg_interrupt_msi_attr;
+-  output reg                                cfg_interrupt_msi_tph_present;
+-  output reg                      [1:0]     cfg_interrupt_msi_tph_type;
+-  output reg                      [7:0]     cfg_interrupt_msi_tph_st_tag;
+-  output reg                      [2:0]     cfg_interrupt_msi_function_number;
+-  input                       [1:0]     cfg_interrupt_msix_enable;
+-  input                       [1:0]     cfg_interrupt_msix_mask;
+-  input                       [5:0]     cfg_interrupt_msix_vf_enable;
+-  input                       [5:0]     cfg_interrupt_msix_vf_mask;
+-  output reg                     [31:0]     cfg_interrupt_msix_data;
+-  output reg                     [63:0]     cfg_interrupt_msix_address;
+-  output reg                                cfg_interrupt_msix_int;
+-  input                                 cfg_interrupt_msix_sent;
+-  input                                 cfg_interrupt_msix_fail;
+-
+ 
+   input                                 cfg_hot_reset_out;
+   output reg                                cfg_config_space_enable;
+@@ -371,27 +322,15 @@
+   cfg_interrupt_int                <= 0 ;//[3:0]  
+   cfg_interrupt_pending            <= 0 ;//[1:0]      
+ 
+-  cfg_interrupt_msi_select         <= 0 ;//[3:0]        
+-  cfg_interrupt_msi_int            <= 0 ;//[31:0]  
+-  cfg_interrupt_msi_pending_status <= 0 ;//[63:0]             
+-  cfg_interrupt_msi_select         <= 0 ;//[3:0]        
+-  cfg_interrupt_msi_attr           <= 0 ;//[2:0] 
+-  cfg_interrupt_msi_tph_present    <= 0 ;//        
+-  cfg_interrupt_msi_tph_type       <= 0 ;//[1:0]       
+-  cfg_interrupt_msi_tph_st_tag     <= 0 ;//[8:0]        
+-  cfg_interrupt_msi_function_number<= 0 ;//[2:0]            
+-  cfg_interrupt_msix_data          <= 0 ;//[31:0]    
+-  cfg_interrupt_msix_address       <= 0 ;//[63:0]    
+-  cfg_interrupt_msix_int           <= 0 ;// 
+ 
+   cfg_config_space_enable          <= 1'b1 ;//    
+   cfg_req_pm_transition_l23_ready  <= 0 ;//         
+   // RP Only                                                   //                             
+   cfg_hot_reset_in                 <= 0 ;//        
+ 
+-  cfg_ds_bus_number                <= board.RP.tx_usrapp.RP_BUS_DEV_FNS[15:8]; //[7:0]
+-  cfg_ds_device_number             <= board.RP.tx_usrapp.RP_BUS_DEV_FNS[7:3];  //[4:0]
+-  cfg_ds_function_number           <= board.RP.tx_usrapp.RP_BUS_DEV_FNS[2:0];  //[2:0]
++  cfg_ds_bus_number                <= tb.RP.tx_usrapp.RP_BUS_DEV_FNS[15:8]; //[7:0]
++  cfg_ds_device_number             <= tb.RP.tx_usrapp.RP_BUS_DEV_FNS[7:3];  //[4:0]
++  cfg_ds_function_number           <= tb.RP.tx_usrapp.RP_BUS_DEV_FNS[2:0];  //[2:0]
+ end
+ /********************************************************************************************************************
+ Task : TSK_READ_CFG_DW                
+@@ -420,18 +359,18 @@
+   cfg_mgmt_read  <= #(Tcq) 1'b1;
+ 
+   $display("[%t] : Reading Cfg Addr [0x%h]", $realtime, addr_);
+-  $fdisplay(board.RP.com_usrapp.tx_file_ptr,
+-            "\n[%t] : Local Configuration Read Access :", 
+-            $realtime);
++//  $fdisplay(tb.RP.com_usrapp.tx_file_ptr,
++//            "\n[%t] : Local Configuration Read Access :", 
++//            $realtime);
+                  
+   @(posedge user_clk); 
+   #(Tcq);
+   wait ( cfg_mgmt_read_write_done == 1'b1)
+   #(Tcq);
+ 
+-  $fdisplay(board.RP.com_usrapp.tx_file_ptr,
+-            "\t\t\tCfg Addr [0x%h] -> Data [0x%h]\n", 
+-            {addr_,2'b00}, cfg_mgmt_read_data);
++//  $fdisplay(tb.RP.com_usrapp.tx_file_ptr,
++//            "\t\t\tCfg Addr [0x%h] -> Data [0x%h]\n", 
++//            {addr_,2'b00}, cfg_mgmt_read_data);
+   cfg_mgmt_read <= #(Tcq) 1'b0;
+          
+ end
+@@ -468,9 +407,9 @@
+   cfg_mgmt_read        <= #(Tcq) 1'b0;
+ 
+   $display("[%t] : Writing Cfg Addr [0x%h]", $realtime, addr_);
+-  $fdisplay(board.RP.com_usrapp.tx_file_ptr,
+-            "\n[%t] : Local Configuration Write Access :",
+-            $realtime);
++//  $fdisplay(tb.RP.com_usrapp.tx_file_ptr,
++//            "\n[%t] : Local Configuration Write Access :",
++//            $realtime);
+ 
+   @(posedge user_clk);
+   #(Tcq);
+diff -ruN new_xilinx_task_pcie_x16/dsport/xilinx_pcie_uscale_rp.v xilinx_task_pcie_x16/dsport/xilinx_pcie_uscale_rp.v
+--- new_xilinx_task_pcie_x16/dsport/xilinx_pcie_uscale_rp.v	2016-10-25 15:54:13.146503635 -0700
++++ xilinx_task_pcie_x16/dsport/xilinx_pcie_uscale_rp.v	2016-10-21 16:46:13.673247996 -0700
+@@ -62,12 +62,10 @@
+ `timescale 1ps / 1ps
+ 
+ module xilinx_pcie4_uscale_rp # (
+-  parameter        C_DATA_WIDTH                   = 512,//512,    // RX/TX interface data width
++  parameter        C_DATA_WIDTH                   = 512,    // RX/TX interface data width
+   parameter        EXT_PIPE_SIM                   = "FALSE",  // This Parameter has effect on selecting Enable External PIPE Interface in GUI.
+-
+-  parameter        PL_LINK_CAP_MAX_LINK_SPEED     = 4,//4,   // 1- GEN1, 2 - GEN2, 4 - GEN3, 8 - GEN4
+-  parameter  [4:0] PL_LINK_CAP_MAX_LINK_WIDTH     = 16,//16,   // 1- X1, 2 - X2, 4 - X4, 8 - X8, 16 - X16
+-
++  parameter        PL_LINK_CAP_MAX_LINK_SPEED     = 4,   // 1- GEN1, 2 - GEN2, 4 - GEN3, 8 - GEN4
++  parameter  [4:0] PL_LINK_CAP_MAX_LINK_WIDTH     = 16,   // 1- X1, 2 - X2, 4 - X4, 8 - X8, 16 - X16
+   parameter  [2:0] PF0_DEV_CAP_MAX_PAYLOAD_SIZE   = 3'h0,
+   parameter        PL_DISABLE_EI_INFER_IN_L0      = "TRUE",
+   parameter        PL_DISABLE_UPCONFIG_CAPABLE    = "FALSE",
+@@ -82,10 +80,8 @@
+   parameter        AXI4_RQ_TUSER_WIDTH = 137,
+   parameter        AXI4_RC_TUSER_WIDTH = 161,
+   parameter        AXISTEN_IF_ENABLE_CLIENT_TAG   = "TRUE",
+-  parameter        AXISTEN_IF_RQ_PARITY_CHECK     = 0,
+-  parameter        AXISTEN_IF_CC_PARITY_CHECK     = 0,
+-  parameter        AXISTEN_IF_RC_PARITY_CHECK     = 0,
+-  parameter        AXISTEN_IF_CQ_PARITY_CHECK     = 0,
++  parameter        AXISTEN_IF_RQ_PARITY_CHECK     = "FALSE",
++  parameter        AXISTEN_IF_CC_PARITY_CHECK     = "FALSE",
+   parameter        AXISTEN_IF_MC_RX_STRADDLE      = "FALSE",
+   parameter        AXISTEN_IF_ENABLE_RX_MSG_INTFC = "FALSE",
+   parameter [17:0] AXISTEN_IF_ENABLE_MSG_ROUTE    = 18'h2FFFF,
+@@ -115,23 +111,23 @@
+   input  wire [83:0]  pipe_rx_14_sigs,
+   input  wire [83:0]  pipe_rx_15_sigs,
+                       
+-  output wire [25:0]  common_commands_out,
+-  output wire [83:0]  pipe_tx_0_sigs,
+-  output wire [83:0]  pipe_tx_1_sigs,
+-  output wire [83:0]  pipe_tx_2_sigs,
+-  output wire [83:0]  pipe_tx_3_sigs,
+-  output wire [83:0]  pipe_tx_4_sigs,
+-  output wire [83:0]  pipe_tx_5_sigs,
+-  output wire [83:0]  pipe_tx_6_sigs,
+-  output wire [83:0]  pipe_tx_7_sigs,
+-  output  wire [83:0]  pipe_tx_8_sigs,
+-  output  wire [83:0]  pipe_tx_9_sigs,
+-  output  wire [83:0]  pipe_tx_10_sigs,
+-  output  wire [83:0]  pipe_tx_11_sigs,
+-  output  wire [83:0]  pipe_tx_12_sigs,
+-  output  wire [83:0]  pipe_tx_13_sigs,
+-  output  wire [83:0]  pipe_tx_14_sigs,
+-  output  wire [83:0]  pipe_tx_15_sigs,
++  output wire [16:0]  common_commands_out,
++  output wire [69:0]  pipe_tx_0_sigs,
++  output wire [69:0]  pipe_tx_1_sigs,
++  output wire [69:0]  pipe_tx_2_sigs,
++  output wire [69:0]  pipe_tx_3_sigs,
++  output wire [69:0]  pipe_tx_4_sigs,
++  output wire [69:0]  pipe_tx_5_sigs,
++  output wire [69:0]  pipe_tx_6_sigs,
++  output wire [69:0]  pipe_tx_7_sigs,
++  output  wire [69:0]  pipe_tx_8_sigs,
++  output  wire [69:0]  pipe_tx_9_sigs,
++  output  wire [69:0]  pipe_tx_10_sigs,
++  output  wire [69:0]  pipe_tx_11_sigs,
++  output  wire [69:0]  pipe_tx_12_sigs,
++  output  wire [69:0]  pipe_tx_13_sigs,
++  output  wire [69:0]  pipe_tx_14_sigs,
++  output  wire [69:0]  pipe_tx_15_sigs,
+     // synthesis translate_on   
+   input                                           sys_clk_p,
+   input                                           sys_clk_n,
+@@ -139,7 +135,7 @@
+ );
+ 
+   localparam         TCQ = 1;
+-  localparam         EP_DEV_ID = 16'h1042;
++  localparam         EP_DEV_ID = 16'h1040;
+ 
+   //----------------------------------------------------------------------------------------------------------------//
+   // 3. AXI Interface                                                                                               //
+@@ -153,7 +149,7 @@
+   wire                 [C_DATA_WIDTH-1:0]    s_axis_rq_tdata;
+   wire             [AXI4_RQ_TUSER_WIDTH-1:0] s_axis_rq_tuser;
+   wire                   [KEEP_WIDTH-1:0]    s_axis_rq_tkeep;
+-  wire                                       s_axis_rq_tready;
++  wire                              [3:0]    s_axis_rq_tready;
+   wire                                       s_axis_rq_tvalid;
+ 
+   wire                 [C_DATA_WIDTH-1:0]    m_axis_rc_tdata;
+@@ -175,7 +171,7 @@
+   wire                                       s_axis_cc_tlast;
+   wire                   [KEEP_WIDTH-1:0]    s_axis_cc_tkeep;
+   wire                                       s_axis_cc_tvalid;
+-  wire                                       s_axis_cc_tready;
++  wire                              [3:0]    s_axis_cc_tready;
+ 
+   wire                              [3:0]    pcie_tfc_nph_av;
+   wire                              [3:0]    pcie_tfc_npd_av;
+@@ -291,32 +287,6 @@
+   wire                              [1:0]    cfg_interrupt_pending;
+   wire                                       cfg_interrupt_sent;
+ 
+-  wire                              [3:0]    cfg_interrupt_msi_enable;
+-  wire                              [7:0]    cfg_interrupt_msi_vf_enable;
+-  wire                             [11:0]    cfg_interrupt_msi_mmenable;
+-  wire                                       cfg_interrupt_msi_mask_update;
+-  wire                             [31:0]    cfg_interrupt_msi_data;
+-  wire                              [3:0]    cfg_interrupt_msi_select;
+-  wire                             [31:0]    cfg_interrupt_msi_int;
+-  wire                             [63:0]    cfg_interrupt_msi_pending_status;
+-  wire                                       cfg_interrupt_msi_sent;
+-  wire                                       cfg_interrupt_msi_fail;
+-  wire                              [2:0]    cfg_interrupt_msi_attr;
+-  wire                                       cfg_interrupt_msi_tph_present;
+-  wire                              [1:0]    cfg_interrupt_msi_tph_type;
+-  wire                              [7:0]    cfg_interrupt_msi_tph_st_tag;
+-  wire                              [2:0]    cfg_interrupt_msi_function_number;
+-  wire                                       cfg_interrupt_msi_pending_status_data_enable;
+-  wire                              [3:0]    cfg_interrupt_msi_pending_status_function_num;
+-  wire                              [1:0]    cfg_interrupt_msix_enable;
+-  wire                              [1:0]    cfg_interrupt_msix_mask;
+-  wire                              [5:0]    cfg_interrupt_msix_vf_enable;
+-  wire                              [5:0]    cfg_interrupt_msix_vf_mask;
+-  wire                             [31:0]    cfg_interrupt_msix_data;
+-  wire                             [63:0]    cfg_interrupt_msix_address;
+-  wire                                       cfg_interrupt_msix_int;
+-  wire                                       cfg_interrupt_msix_sent;
+-  wire                                       cfg_interrupt_msix_fail;
+ 
+ 
+ // EP only
+@@ -362,23 +332,23 @@
+    wire  [83:0]  pipe_rx_14_sigs_i;
+    wire  [83:0]  pipe_rx_15_sigs_i;  
+    
+-   wire  [25:0]  common_commands_out_i;
+-   wire  [83:0]  pipe_tx_0_sigs_i;
+-   wire  [83:0]  pipe_tx_1_sigs_i;
+-   wire  [83:0]  pipe_tx_2_sigs_i;
+-   wire  [83:0]  pipe_tx_3_sigs_i;
+-   wire  [83:0]  pipe_tx_4_sigs_i;
+-   wire  [83:0]  pipe_tx_5_sigs_i;
+-   wire  [83:0]  pipe_tx_6_sigs_i;
+-   wire  [83:0]  pipe_tx_7_sigs_i;
+-   wire  [83:0]  pipe_tx_8_sigs_i;
+-   wire  [83:0]  pipe_tx_9_sigs_i;
+-   wire  [83:0]  pipe_tx_10_sigs_i;
+-   wire  [83:0]  pipe_tx_11_sigs_i;
+-   wire  [83:0]  pipe_tx_12_sigs_i;
+-   wire  [83:0]  pipe_tx_13_sigs_i;
+-   wire  [83:0]  pipe_tx_14_sigs_i;
+-   wire  [83:0]  pipe_tx_15_sigs_i;
++   wire  [16:0]  common_commands_out_i;
++   wire  [69:0]  pipe_tx_0_sigs_i;
++   wire  [69:0]  pipe_tx_1_sigs_i;
++   wire  [69:0]  pipe_tx_2_sigs_i;
++   wire  [69:0]  pipe_tx_3_sigs_i;
++   wire  [69:0]  pipe_tx_4_sigs_i;
++   wire  [69:0]  pipe_tx_5_sigs_i;
++   wire  [69:0]  pipe_tx_6_sigs_i;
++   wire  [69:0]  pipe_tx_7_sigs_i;
++   wire  [69:0]  pipe_tx_8_sigs_i;
++   wire  [69:0]  pipe_tx_9_sigs_i;
++   wire  [69:0]  pipe_tx_10_sigs_i;
++   wire  [69:0]  pipe_tx_11_sigs_i;
++   wire  [69:0]  pipe_tx_12_sigs_i;
++   wire  [69:0]  pipe_tx_13_sigs_i;
++   wire  [69:0]  pipe_tx_14_sigs_i;
++   wire  [69:0]  pipe_tx_15_sigs_i;
+ 
+ // synthesis translate_off
+ generate if (EXT_PIPE_SIM == "TRUE") 
+@@ -444,13 +414,20 @@
+  end
+ endgenerate
+ 
+-  wire [15:0]  cfg_vend_id        = 16'h10EE; //16'h1d0f;   
+-
+-  wire [15:0]  cfg_dev_id         = 16'h903F; //16'h1042;   
+-  wire [15:0]  cfg_subsys_id      = 16'h0007; //16'h0007;                                
+-  wire [7:0]   cfg_rev_id         = 8'h00;    //8'h00; 
+-  wire [15:0]  cfg_subsys_vend_id = 16'h10EE; //16'h10EE;
+-
++  wire [15:0]  cfg_vend_id        = 16'h1d0f;   
++  wire [15:0]  cfg_dev_id         = 16'h1040;   
++  wire [15:0]  cfg_subsys_id      = 16'h0007;                                
++  wire [7:0]   cfg_rev_id         = 8'h00; 
++  wire [15:0]  cfg_subsys_vend_id = 16'h1d0f;
++
++  wire  [63:0] cfg_interrupt_msi_pending_status;
++  wire  [3:0]  cfg_interrupt_msi_select;
++  wire  [31:0] cfg_interrupt_msi_int;
++  wire  [2:0]  cfg_interrupt_msi_attr;
++  wire         cfg_interrupt_msi_tph_present;
++  wire  [1:0]  cfg_interrupt_msi_tph_type;
++  wire  [7:0]  cfg_interrupt_msi_tph_st_tag;
++  wire  [2:0]  cfg_interrupt_msi_function_number;
+ 
+   //--------------------------------------------------------------------------------------------------------------------//
+   // Instantiate Root Port wrapper
+@@ -479,7 +456,7 @@
+     .cfg_mgmt_function_number                       (8'b0),
+ 
+     .cfg_vf_flr_func_num                            (8'b0),
+-    .conf_mcap_request_by_conf                      (1'b0),
++//    .conf_mcap_request_by_conf                      (1'b0),
+     .conf_req_type                                  (2'b0),
+     .conf_req_reg_num                               (4'b0),
+     .conf_req_data                                  (32'b0),
+@@ -715,13 +692,12 @@
+ 
+   );
+ 
++/*
+   pci_exp_usrapp_rx # (
+     .AXISTEN_IF_CC_ALIGNMENT_MODE     ( AXISTEN_IF_CC_ALIGNMENT_MODE ),
+     .AXISTEN_IF_CQ_ALIGNMENT_MODE     ( AXISTEN_IF_CQ_ALIGNMENT_MODE ),
+     .AXISTEN_IF_RC_ALIGNMENT_MODE     ( AXISTEN_IF_RC_ALIGNMENT_MODE ), 
+     .AXISTEN_IF_RQ_ALIGNMENT_MODE     ( AXISTEN_IF_RQ_ALIGNMENT_MODE ),
+-    .AXISTEN_IF_RC_PARITY_CHECK       ( AXISTEN_IF_RC_PARITY_CHECK   ),
+-    .AXISTEN_IF_CQ_PARITY_CHECK       ( AXISTEN_IF_CQ_PARITY_CHECK   ),
+     .C_DATA_WIDTH                     ( C_DATA_WIDTH                 )
+   ) rx_usrapp (
+     .m_axis_cq_tdata(m_axis_cq_tdata),
+@@ -746,14 +722,12 @@
+ 
+   // Tx User Application Interface
+   pci_exp_usrapp_tx # (
+-    .C_DATA_WIDTH                     ( C_DATA_WIDTH),
+-    .DEV_CAP_MAX_PAYLOAD_SUPPORTED    ( PF0_DEV_CAP_MAX_PAYLOAD_SIZE ),
++    .C_DATA_WIDTH                    ( C_DATA_WIDTH),
++    .DEV_CAP_MAX_PAYLOAD_SUPPORTED   (PF0_DEV_CAP_MAX_PAYLOAD_SIZE ),
+     .AXISTEN_IF_CC_ALIGNMENT_MODE     ( AXISTEN_IF_CC_ALIGNMENT_MODE ),
+     .AXISTEN_IF_CQ_ALIGNMENT_MODE     ( AXISTEN_IF_CQ_ALIGNMENT_MODE ),
+     .AXISTEN_IF_RC_ALIGNMENT_MODE     ( AXISTEN_IF_RC_ALIGNMENT_MODE ),
+     .AXISTEN_IF_RQ_ALIGNMENT_MODE     ( AXISTEN_IF_RQ_ALIGNMENT_MODE ),
+-    .AXISTEN_IF_RQ_PARITY_CHECK       ( AXISTEN_IF_RQ_PARITY_CHECK   ),
+-    .AXISTEN_IF_CC_PARITY_CHECK       ( AXISTEN_IF_CC_PARITY_CHECK   ),
+     .EP_DEV_ID                        ( EP_DEV_ID                    )
+   ) tx_usrapp (
+   .s_axis_rq_tlast    (s_axis_rq_tlast),
+@@ -781,6 +755,7 @@
+ 
+ 
+   );
++*/
+ 
+   // Cfg UsrApp
+ 
+@@ -876,31 +851,7 @@
+  .cfg_ext_read_data                         (cfg_ext_read_data),
+  .cfg_ext_read_data_valid                   (cfg_ext_read_data_valid),
+ 
+- .cfg_interrupt_msi_enable                  (cfg_interrupt_msi_enable),
+- .cfg_interrupt_msi_vf_enable               (cfg_interrupt_msi_vf_enable),
+- .cfg_interrupt_msi_mmenable                (cfg_interrupt_msi_mmenable),
+- .cfg_interrupt_msi_mask_update             (cfg_interrupt_msi_mask_update),
+- .cfg_interrupt_msi_data                    (cfg_interrupt_msi_data),
+- .cfg_interrupt_msi_select                  (cfg_interrupt_msi_select),
+- .cfg_interrupt_msi_int                     (cfg_interrupt_msi_int),
+- .cfg_interrupt_msi_pending_status          (cfg_interrupt_msi_pending_status),
+- .cfg_interrupt_msi_sent                    (cfg_interrupt_msi_sent),
+- .cfg_interrupt_msi_fail                    (cfg_interrupt_msi_fail),
+- .cfg_interrupt_msi_attr                    (cfg_interrupt_msi_attr),
+- .cfg_interrupt_msi_tph_present             (cfg_interrupt_msi_tph_present),
+- .cfg_interrupt_msi_tph_type                (cfg_interrupt_msi_tph_type),
+- .cfg_interrupt_msi_tph_st_tag              (cfg_interrupt_msi_tph_st_tag),
+- .cfg_interrupt_msi_function_number         (cfg_interrupt_msi_function_number),
+-
+- .cfg_interrupt_msix_enable                 (cfg_interrupt_msix_enable),
+- .cfg_interrupt_msix_mask                   (cfg_interrupt_msix_mask),
+- .cfg_interrupt_msix_vf_enable              (cfg_interrupt_msix_vf_enable),
+- .cfg_interrupt_msix_vf_mask                (cfg_interrupt_msix_vf_mask),
+- .cfg_interrupt_msix_data                   (cfg_interrupt_msix_data),
+- .cfg_interrupt_msix_address                (cfg_interrupt_msix_address),
+- .cfg_interrupt_msix_int                    (cfg_interrupt_msix_int),
+- .cfg_interrupt_msix_sent                   (cfg_interrupt_msix_sent),
+- .cfg_interrupt_msix_fail                   (cfg_interrupt_msix_fail),
++
+ 
+  .cfg_hot_reset_out                         (cfg_hot_reset_out),
+  .cfg_config_space_enable                   (cfg_config_space_enable),
+@@ -922,13 +873,58 @@
+   );
+ 
+ 
++assign  cfg_interrupt_msi_pending_status = 64'b0;
++assign  cfg_interrupt_msi_select = 4'b0;
++assign  cfg_interrupt_msi_int = 32'b0;
++assign  cfg_interrupt_msi_attr = 3'b0;
++assign  cfg_interrupt_msi_tph_present = 1'b0;
++assign  cfg_interrupt_msi_tph_type = 2'b0;
++assign  cfg_interrupt_msi_tph_st_tag = 8'h00;
++assign  cfg_interrupt_msi_function_number = 3'b0;
+ 
+ 
+   // Common UsrApp
+-
++/*
+   pci_exp_usrapp_com com_usrapp   ();
++*/
++
+ 
++   simp_pcie_usrapp #(
++                      .C_DATA_WIDTH(512)
++                     ) tx_usrapp (.clk                (user_clk),
++                                  .rst                (user_reset),
++                                  .user_lnk_up        (user_lnk_up),
++
++                                  .s_axis_rq_tlast  (s_axis_rq_tlast),
++                                  .s_axis_rq_tdata  (s_axis_rq_tdata),
++                                  .s_axis_rq_tuser  (s_axis_rq_tuser),
++                                  .s_axis_rq_tkeep  (s_axis_rq_tkeep),
++                                  .s_axis_rq_tready (s_axis_rq_tready[0]),
++                                  .s_axis_rq_tvalid (s_axis_rq_tvalid),
++
++                                  .s_axis_cc_tdata  (s_axis_cc_tdata),
++                                  .s_axis_cc_tuser  (s_axis_cc_tuser),
++                                  .s_axis_cc_tlast  (s_axis_cc_tlast),
++                                  .s_axis_cc_tkeep  (s_axis_cc_tkeep),
++                                  .s_axis_cc_tvalid (s_axis_cc_tvalid),
++                                  .s_axis_cc_tready (s_axis_cc_tready[0]),
++
++                                  .m_axis_cq_tdata  (m_axis_cq_tdata),
++                                  .m_axis_cq_tlast  (m_axis_cq_tlast),
++                                  .m_axis_cq_tvalid (m_axis_cq_tvalid),
++                                  .m_axis_cq_tuser  (m_axis_cq_tuser),
++                                  .m_axis_cq_tkeep  (m_axis_cq_tkeep),
++                                  .m_axis_cq_tready (m_axis_cq_tready),
++
++                                  .m_axis_rc_tdata  (m_axis_rc_tdata),
++                                  .m_axis_rc_tlast  (m_axis_rc_tlast),
++                                  .m_axis_rc_tvalid (m_axis_rc_tvalid),
++                                  .m_axis_rc_tuser  (m_axis_rc_tuser),
++                                  .m_axis_rc_tkeep  (m_axis_rc_tkeep),
++                                  .m_axis_rc_tready (m_axis_rc_tready)
++                                 );
+ 
++   assign pcie_cq_np_req = 1'b1;
+ 
+ 
+ 
+diff -ruN new_xilinx_task_pcie_x16/functional/board_common.vh xilinx_task_pcie_x16/functional/board_common.vh
+--- new_xilinx_task_pcie_x16/functional/board_common.vh	2016-10-25 15:54:13.138504340 -0700
++++ xilinx_task_pcie_x16/functional/board_common.vh	2016-10-21 16:46:13.686246880 -0700
+@@ -64,7 +64,7 @@
+ `define IO_TRUE                      1
+ `define IO_FALSE                     0
+ 
+-`define TX_TASKS                     board.RP.tx_usrapp
++`define TX_TASKS                     tb.RP.tx_usrapp
+ 
+ // Endpoint Sys clock clock frequency 100 MHz -> half clock -> 5000 pS
+ `define SYS_CLK_COR_HALF_CLK_PERIOD         5000
+diff -ruN new_xilinx_task_pcie_x16/functional/board.v xilinx_task_pcie_x16/functional/board.v
+--- new_xilinx_task_pcie_x16/functional/board.v	2016-10-25 15:54:13.169501602 -0700
++++ xilinx_task_pcie_x16/functional/board.v	2016-10-21 16:46:13.684247052 -0700
+@@ -87,7 +87,7 @@
+                                           (REF_CLK_FREQ == 2) ? 2000 : 0;
+ 
+   localparam   [2:0] PF0_DEV_CAP_MAX_PAYLOAD_SIZE = 3'b000;
+-//  Comment below line to support post synth/impl simulation support
++
+   defparam board.EP.pcie4_uscale_plus_0_i.inst.PL_SIM_FAST_LINK_TRAINING=2'h3;
+ 
+   localparam EXT_PIPE_SIM = "TRUE";
+@@ -105,26 +105,27 @@
+   wire               ep_sys_clk_n;
+   wire               rp_sys_clk_p;
+   wire               rp_sys_clk_n;
++  wire               ep_sys_clk;
++  wire               rp_sys_clk;
+ 
+   // Xilinx Pipe Interface
+-  wire  [25:0]  common_commands_out;
+-  wire  [83:0]  xil_tx0_sigs_ep;
+-  wire  [83:0]  xil_tx1_sigs_ep;
+-  wire  [83:0]  xil_tx2_sigs_ep;
+-  wire  [83:0]  xil_tx3_sigs_ep;
+-  wire  [83:0]  xil_tx4_sigs_ep;
+-  wire  [83:0]  xil_tx5_sigs_ep;
+-  wire  [83:0]  xil_tx6_sigs_ep;
+-  wire  [83:0]  xil_tx7_sigs_ep;
+-  wire  [83:0]  xil_tx8_sigs_ep;
+-  wire  [83:0]  xil_tx9_sigs_ep;
+-  wire  [83:0]  xil_tx10_sigs_ep;
+-  wire  [83:0]  xil_tx11_sigs_ep;
+-  wire  [83:0]  xil_tx12_sigs_ep;
+-  wire  [83:0]  xil_tx13_sigs_ep;
+-  wire  [83:0]  xil_tx14_sigs_ep;
+-  wire  [83:0]  xil_tx15_sigs_ep;
+-
++  wire  [16:0]  common_commands_out;
++  wire  [69:0]  xil_tx0_sigs_ep;
++  wire  [69:0]  xil_tx1_sigs_ep;
++  wire  [69:0]  xil_tx2_sigs_ep;
++  wire  [69:0]  xil_tx3_sigs_ep;
++  wire  [69:0]  xil_tx4_sigs_ep;
++  wire  [69:0]  xil_tx5_sigs_ep;
++  wire  [69:0]  xil_tx6_sigs_ep;
++  wire  [69:0]  xil_tx7_sigs_ep;
++  wire  [69:0]  xil_tx8_sigs_ep;
++  wire  [69:0]  xil_tx9_sigs_ep;
++  wire  [69:0]  xil_tx10_sigs_ep;
++  wire  [69:0]  xil_tx11_sigs_ep;
++  wire  [69:0]  xil_tx12_sigs_ep;
++  wire  [69:0]  xil_tx13_sigs_ep;
++  wire  [69:0]  xil_tx14_sigs_ep;
++  wire  [69:0]  xil_tx15_sigs_ep;
+   wire  [83:0]  xil_rx0_sigs_ep;
+   wire  [83:0]  xil_rx1_sigs_ep;
+   wire  [83:0]  xil_rx2_sigs_ep;
+@@ -141,40 +142,23 @@
+   wire  [83:0]  xil_rx13_sigs_ep;
+   wire  [83:0]  xil_rx14_sigs_ep;
+   wire  [83:0]  xil_rx15_sigs_ep;
+-
+-  wire  [83:0]  xil_rx0_sigs_rp;
+-  wire  [83:0]  xil_rx1_sigs_rp;
+-  wire  [83:0]  xil_rx2_sigs_rp;
+-  wire  [83:0]  xil_rx3_sigs_rp;
+-  wire  [83:0]  xil_rx4_sigs_rp;
+-  wire  [83:0]  xil_rx5_sigs_rp;
+-  wire  [83:0]  xil_rx6_sigs_rp;
+-  wire  [83:0]  xil_rx7_sigs_rp;
+-  wire  [83:0]  xil_rx8_sigs_rp;
+-  wire  [83:0]  xil_rx9_sigs_rp;
+-  wire  [83:0]  xil_rx10_sigs_rp;
+-  wire  [83:0]  xil_rx11_sigs_rp;
+-  wire  [83:0]  xil_rx12_sigs_rp;
+-  wire  [83:0]  xil_rx13_sigs_rp;
+-  wire  [83:0]  xil_rx14_sigs_rp;
+-  wire  [83:0]  xil_rx15_sigs_rp;
+-
+-  wire  [83:0]  xil_tx0_sigs_rp;
+-  wire  [83:0]  xil_tx1_sigs_rp;
+-  wire  [83:0]  xil_tx2_sigs_rp;
+-  wire  [83:0]  xil_tx3_sigs_rp;
+-  wire  [83:0]  xil_tx4_sigs_rp;
+-  wire  [83:0]  xil_tx5_sigs_rp;
+-  wire  [83:0]  xil_tx6_sigs_rp;
+-  wire  [83:0]  xil_tx7_sigs_rp;
+-  wire  [83:0]  xil_tx8_sigs_rp;
+-  wire  [83:0]  xil_tx9_sigs_rp;
+-  wire  [83:0]  xil_tx10_sigs_rp;
+-  wire  [83:0]  xil_tx11_sigs_rp;
+-  wire  [83:0]  xil_tx12_sigs_rp;
+-  wire  [83:0]  xil_tx13_sigs_rp;
+-  wire  [83:0]  xil_tx14_sigs_rp;
+-  wire  [83:0]  xil_tx15_sigs_rp;
++   
++  wire  [69:0]  xil_tx0_sigs_rp;
++  wire  [69:0]  xil_tx1_sigs_rp;
++  wire  [69:0]  xil_tx2_sigs_rp;
++  wire  [69:0]  xil_tx3_sigs_rp;
++  wire  [69:0]  xil_tx4_sigs_rp;
++  wire  [69:0]  xil_tx5_sigs_rp;
++  wire  [69:0]  xil_tx6_sigs_rp;
++  wire  [69:0]  xil_tx7_sigs_rp;
++  wire  [69:0]  xil_tx8_sigs_rp;
++  wire  [69:0]  xil_tx9_sigs_rp;
++  wire  [69:0]  xil_tx10_sigs_rp;
++  wire  [69:0]  xil_tx11_sigs_rp;
++  wire  [69:0]  xil_tx12_sigs_rp;
++  wire  [69:0]  xil_tx13_sigs_rp;
++  wire  [69:0]  xil_tx14_sigs_rp;
++  wire  [69:0]  xil_tx15_sigs_rp;
+ 
+   sys_clk_gen_ds # (
+     .halfcycle(REF_CLK_HALF_CYCLE),
+@@ -233,12 +217,12 @@
+     .pipe_rx_7_sigs     (xil_rx7_sigs_ep),   
+     .pipe_rx_8_sigs     (xil_rx8_sigs_ep),    
+     .pipe_rx_9_sigs     (xil_rx9_sigs_ep),
+-    .pipe_rx_10_sigs    (xil_rx10_sigs_ep),
+-    .pipe_rx_11_sigs    (xil_rx11_sigs_ep),
+-    .pipe_rx_12_sigs    (xil_rx12_sigs_ep),
+-    .pipe_rx_13_sigs    (xil_rx13_sigs_ep),
+-    .pipe_rx_14_sigs    (xil_rx14_sigs_ep),
+-    .pipe_rx_15_sigs    (xil_rx15_sigs_ep),   
++    .pipe_rx_10_sigs     (xil_rx10_sigs_ep),
++    .pipe_rx_11_sigs     (xil_rx11_sigs_ep),
++    .pipe_rx_12_sigs     (xil_rx12_sigs_ep),
++    .pipe_rx_13_sigs     (xil_rx13_sigs_ep),
++    .pipe_rx_14_sigs     (xil_rx14_sigs_ep),
++    .pipe_rx_15_sigs     (xil_rx15_sigs_ep),   
+     .common_commands_out(common_commands_out), //[0] - pipe_clk out     
+     .pipe_tx_0_sigs     (xil_tx0_sigs_ep),
+     .pipe_tx_1_sigs     (xil_tx1_sigs_ep),
+@@ -256,15 +240,10 @@
+     .pipe_tx_13_sigs     (xil_tx13_sigs_ep),
+     .pipe_tx_14_sigs     (xil_tx14_sigs_ep),
+     .pipe_tx_15_sigs     (xil_tx15_sigs_ep)
++
+   );
+ 
+-  //------------------------------------------------------------------------------//
+-  // Simulation Root Port Model
+-  // (Comment out this module to interface EndPoint with BFM)
+-  
+-  //------------------------------------------------------------------------------//
+-  // PCI-Express Model Root Port Instance
+-  //------------------------------------------------------------------------------//
++
+ 
+   xilinx_pcie4_uscale_rp RP (
+ 
+@@ -273,21 +252,18 @@
+     .sys_clk_p(rp_sys_clk_p),
+     .sys_rst_n(sys_rst_n),
+ 
+-
+-    //
+     // Xilinx Pipe Interface
+-    //
+-    .common_commands_in  ({25'b0,common_commands_out[0]} ), // pipe_clk from EP
+-    .pipe_rx_0_sigs      ({45'b0,xil_tx0_sigs_ep[38:0]}),
+-    .pipe_rx_1_sigs      ({45'b0,xil_tx1_sigs_ep[38:0]}),
+-    .pipe_rx_2_sigs      ({45'b0,xil_tx2_sigs_ep[38:0]}),
+-    .pipe_rx_3_sigs      ({45'b0,xil_tx3_sigs_ep[38:0]}),
+-    .pipe_rx_4_sigs      ({45'b0,xil_tx4_sigs_ep[38:0]}),
+-    .pipe_rx_5_sigs      ({45'b0,xil_tx5_sigs_ep[38:0]}),
+-    .pipe_rx_6_sigs      ({45'b0,xil_tx6_sigs_ep[38:0]}),
+-    .pipe_rx_7_sigs      ({45'b0,xil_tx7_sigs_ep[38:0]}),
+-    .pipe_rx_8_sigs      ({45'b0,xil_tx8_sigs_ep[38:0]}),
+-    .pipe_rx_9_sigs      ({45'b0,xil_tx9_sigs_ep[38:0]}),
++    .common_commands_in ({25'b0,common_commands_out[0]} ), // pipe_clk from EP
++    .pipe_rx_0_sigs     ({45'b0,xil_tx0_sigs_ep[38:0]}),
++    .pipe_rx_1_sigs     ({45'b0,xil_tx1_sigs_ep[38:0]}),
++    .pipe_rx_2_sigs     ({45'b0,xil_tx2_sigs_ep[38:0]}),
++    .pipe_rx_3_sigs     ({45'b0,xil_tx3_sigs_ep[38:0]}),
++    .pipe_rx_4_sigs     ({45'b0,xil_tx4_sigs_ep[38:0]}),
++    .pipe_rx_5_sigs     ({45'b0,xil_tx5_sigs_ep[38:0]}),
++    .pipe_rx_6_sigs     ({45'b0,xil_tx6_sigs_ep[38:0]}),
++    .pipe_rx_7_sigs     ({45'b0,xil_tx7_sigs_ep[38:0]}),
++    .pipe_rx_8_sigs     ({45'b0,xil_tx8_sigs_ep[38:0]}),
++    .pipe_rx_9_sigs     ({45'b0,xil_tx9_sigs_ep[38:0]}),
+     .pipe_rx_10_sigs     ({45'b0,xil_tx10_sigs_ep[38:0]}),
+     .pipe_rx_11_sigs     ({45'b0,xil_tx11_sigs_ep[38:0]}),
+     .pipe_rx_12_sigs     ({45'b0,xil_tx12_sigs_ep[38:0]}),
+@@ -305,24 +281,24 @@
+     .pipe_tx_7_sigs     (xil_tx7_sigs_rp),
+     .pipe_tx_8_sigs     (xil_tx8_sigs_rp),
+     .pipe_tx_9_sigs     (xil_tx9_sigs_rp),
+-    .pipe_tx_10_sigs    (xil_tx10_sigs_rp),
+-    .pipe_tx_11_sigs    (xil_tx11_sigs_rp),
+-    .pipe_tx_12_sigs    (xil_tx12_sigs_rp),
+-    .pipe_tx_13_sigs    (xil_tx13_sigs_rp),
+-    .pipe_tx_14_sigs    (xil_tx14_sigs_rp),
+-    .pipe_tx_15_sigs    (xil_tx15_sigs_rp)
++    .pipe_tx_10_sigs     (xil_tx10_sigs_rp),
++    .pipe_tx_11_sigs     (xil_tx11_sigs_rp),
++    .pipe_tx_12_sigs     (xil_tx12_sigs_rp),
++    .pipe_tx_13_sigs     (xil_tx13_sigs_rp),
++    .pipe_tx_14_sigs     (xil_tx14_sigs_rp),
++    .pipe_tx_15_sigs     (xil_tx15_sigs_rp)
+   );
+   
+-     assign xil_rx0_sigs_ep   = {45'b0,xil_tx0_sigs_rp[38:0]};
+-     assign xil_rx1_sigs_ep   = {45'b0,xil_tx1_sigs_rp[38:0]};
+-     assign xil_rx2_sigs_ep   = {45'b0,xil_tx2_sigs_rp[38:0]};
+-     assign xil_rx3_sigs_ep   = {45'b0,xil_tx3_sigs_rp[38:0]};
+-     assign xil_rx4_sigs_ep   = {45'b0,xil_tx4_sigs_rp[38:0]};
+-     assign xil_rx5_sigs_ep   = {45'b0,xil_tx5_sigs_rp[38:0]};
+-     assign xil_rx6_sigs_ep   = {45'b0,xil_tx6_sigs_rp[38:0]};
+-     assign xil_rx7_sigs_ep   = {45'b0,xil_tx7_sigs_rp[38:0]};
+-     assign xil_rx8_sigs_ep   = {45'b0,xil_tx8_sigs_rp[38:0]};
+-     assign xil_rx9_sigs_ep   = {45'b0,xil_tx9_sigs_rp[38:0]};
++     assign xil_rx0_sigs_ep  = {45'b0,xil_tx0_sigs_rp[38:0]};
++     assign xil_rx1_sigs_ep  = {45'b0,xil_tx1_sigs_rp[38:0]};
++     assign xil_rx2_sigs_ep  = {45'b0,xil_tx2_sigs_rp[38:0]};
++     assign xil_rx3_sigs_ep  = {45'b0,xil_tx3_sigs_rp[38:0]};
++     assign xil_rx4_sigs_ep  = {45'b0,xil_tx4_sigs_rp[38:0]};
++     assign xil_rx5_sigs_ep  = {45'b0,xil_tx5_sigs_rp[38:0]};
++     assign xil_rx6_sigs_ep  = {45'b0,xil_tx6_sigs_rp[38:0]};
++     assign xil_rx7_sigs_ep  = {45'b0,xil_tx7_sigs_rp[38:0]};
++     assign xil_rx8_sigs_ep  = {45'b0,xil_tx8_sigs_rp[38:0]};
++     assign xil_rx9_sigs_ep  = {45'b0,xil_tx9_sigs_rp[38:0]};
+      assign xil_rx10_sigs_ep  = {45'b0,xil_tx10_sigs_rp[38:0]};
+      assign xil_rx11_sigs_ep  = {45'b0,xil_tx11_sigs_rp[38:0]};
+      assign xil_rx12_sigs_ep  = {45'b0,xil_tx12_sigs_rp[38:0]};

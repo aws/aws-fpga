@@ -55,13 +55,13 @@ const struct logger *logger = &logger_stdout;
  * @param[in]   afi_slot	the fpga slot
  *
  * @returns
- *  0	on success 
- * -1	on failure
+ *  0	on success, non-zero on failure
  */
 static int 
 cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 {
-	fail_on_quiet(slot_id >= FPGA_SLOT_MAX, err, CLI_INTERNAL_ERR_STR);
+	fail_on(slot_id >= FPGA_SLOT_MAX, err, "slot_id(%d) >= %d", 
+		slot_id, FPGA_SLOT_MAX);
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");         
@@ -93,191 +93,52 @@ err:
 }
 
 /**
- * Attach for CLI processing.
+ * Display the FPGA image information.
+ *
+ * @param[in]   info the fpga info 
  *
  * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-cli_attach(void)
-{
-	int ret;
-
-	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
-		/** 
-		 * ec2-afi-describe-slots does not use the Mbox logic, local
-		 * information only 
-		 */
-		goto out;
-	}
-
-	ret = fpga_mgmt_init();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
-
-out:
-	return 0;
-err:
-	return FPGA_ERR_FAIL;
-}
-
-/**
- * Detach CLI processing.
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-cli_detach(void)
-{
-	fpga_mgmt_close();
-	return 0;
-}
-
-static int command_get_virtual_led(void)
-{
-uint16_t	status;
-int		ret;
-int		i;
-        if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot,&status)) {
-                printf("Error trying to get virtual LED state\n");
-                return ret;
-        }
-
-        printf("FPGA slot id %u have the following Virtual LED:\n",f1.afi_slot);
-        for(i=0;i<16;i++) {
-                if (status & 0x8000)
-                        printf("1");
-                else
-                        printf("0");
-                status = status << 1;
-                if ((i%4 == 3) && (i!=15))
-                        printf("-");
-	}
-	printf("\n");
-	return 0;
-}
-
-static int command_get_virtual_dip(void)
-{
-uint16_t        status;
-int             ret;
-int             i;
-        if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot,&status)) {
-                printf("Error: can not get virtual DIP Switch state\n");
-                return ret;
-        }
-
-        printf("FPGA slot id %u has the following Virtual DIP Switches:\n",f1.afi_slot);
-        for(i=0;i<16;i++) {
-                if (status & 0x8000)
-                        printf("1");
-                else
-                        printf("0");
-                status = status << 1;
-		if ((i%4 == 3) && (i!=15))
-			printf("-");
-        }
-        printf("\n");
-	return 0;
-}
-
-static int command_set_virtual_dip(void)
-{
-int             ret;
-	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot,f1.v_dip_switch)) {
-		printf("Error trying to set virtual DIP Switch \n");
-	}
-	return ret;
-}
-
-static int command_start_virtual_jtag(void)
-{
-        printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",f1.afi_slot,f1.tcp_port);
-        printf("Press CTRL-C to stop the service.\n");
-
-        return xvcserver_start(f1.afi_slot,f1.tcp_port);
-}
-
-/**
- * Generate the load local image command.
- */
-static int command_load(void)
-{
-	int ret;
-	ret = fpga_mgmt_load_local_image(f1.afi_slot, f1.afi_id);
-	return ret;
-}
-
-/**
- * Generate the clear local image command.
+ *  0	on success, non-zero on failure
  */
 static int 
-command_clear(void)
+cli_show_image_info(struct fpga_mgmt_image_info *info)
 {
-	return fpga_mgmt_clear_local_image(f1.afi_slot);
-}
+	assert(info);
 
-/**
- * Generate the describe local image command and handle the response.
- *
- * @param[in]	cmd		cmd buffer 
- * @param[in]	rsp		rsp buffer 
- * @param[in]	len		rsp len
- *
- * @returns
- *  0	on success 
- * -1	on failure
- */
-static int
-command_describe(void)
-{
-	int ret;
-	uint32_t i, flags;
-	struct fpga_mgmt_image_info info;
 	struct fpga_slot_spec slot_spec;
-
-	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
-
-	flags = 0;
-	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
-	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
-
-	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
-	fail_on(ret, err, "Unable to describe local image");
-
+	int ret = FPGA_ERR_FAIL;
+	uint32_t i;
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion\n");
 	}
 
-	char *afi_id = (!info.ids.afi_id[0]) ? "none" : info.ids.afi_id;
+	char *afi_id = (!info->ids.afi_id[0]) ? "none" : info->ids.afi_id;
 	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
 	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n", 
-			FPGA_STATUS2STR(info.status), info.status, 
-			FPGA_ERR2STR(info.status_q), info.status_q, 
-			info.sh_version);
+			FPGA_STATUS2STR(info->status), info->status, 
+			FPGA_ERR2STR(info->status_q), info->status_q, 
+			info->sh_version);
 
 	if (f1.rescan) {
 		/** Rescan the application PFs for this slot */
 		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot);
-		fail_on_quiet(ret != 0, err, "cli_rescan_slot_app_pfs failed");
+		fail_on(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
 	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
-	fail_on_quiet(ret != 0, err, "fpga_pci_get_slot_spec failed");
+	fail_on(ret != 0, err, "fpga_pci_get_slot_spec failed");
 	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
-	fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+	fail_on(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	if (f1.get_hw_metrics) {
 		if (f1.show_headers) {
 			printf("Metrics\n");
 		}
 
-		struct fpga_metrics_common *fmc = &info.metrics;
+		struct fpga_metrics_common *fmc = &info->metrics;
 		printf("sdacl-slave-timeout=%u\n", 
 				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
 
@@ -375,7 +236,138 @@ command_describe(void)
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
+}
+
+/**
+ * Attach for CLI processing.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+cli_attach(void)
+{
+	int ret = FPGA_ERR_FAIL;
+
+	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
+		/** 
+		 * ec2-afi-describe-slots does not use the Mbox logic, local
+		 * information only 
+		 */
+		goto out;
+	}
+
+	ret = fpga_mgmt_init();
+	fail_on(ret != 0, err, "fpga_mgmt_init failed");
+
+	fpga_mgmt_set_cmd_timeout(f1.request_timeout);
+	fpga_mgmt_set_cmd_delay_msec(f1.request_delay_msec);
+
+out:
+	return 0;
+err:
+	return ret;
+}
+
+/**
+ * Detach CLI processing.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+cli_detach(void)
+{
+	fpga_mgmt_close();
+	return 0;
+}
+
+/**
+ * Generate the load local image command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int command_load(void)
+{
+	int ret;
+
+	if (f1.async) {
+		ret = fpga_mgmt_load_local_image(f1.afi_slot, f1.afi_id);
+		fail_on(ret != 0, err, "fpga_mgmt_load_local_image failed");
+	} else {
+		struct fpga_mgmt_image_info info;
+		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
+
+		ret = fpga_mgmt_load_local_image_sync(f1.afi_slot, f1.afi_id,
+				f1.sync_timeout, f1.sync_delay_msec, &info);
+		fail_on(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
+
+		ret = cli_show_image_info(&info);
+		fail_on(ret != 0, err, "cli_show_image_info failed");
+	}
+err:
+	return ret;
+}
+
+/**
+ * Generate the clear local image command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int 
+command_clear(void)
+{
+	int ret;
+
+	if (f1.async) {
+		ret = fpga_mgmt_clear_local_image(f1.afi_slot);
+		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image failed");
+	} else {
+		struct fpga_mgmt_image_info info;
+		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
+
+		ret = fpga_mgmt_clear_local_image_sync(f1.afi_slot, 
+				f1.sync_timeout, f1.sync_delay_msec, &info);
+		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image_sync failed");
+
+		ret = cli_show_image_info(&info);
+		fail_on(ret != 0, err, "cli_show_image_info failed");
+	}
+err:
+	return ret;
+}
+
+/**
+ * Generate the describe local image command and handle the response.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+command_describe(void)
+{
+	int ret;
+	uint32_t flags;
+	struct fpga_mgmt_image_info info;
+
+	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
+
+	flags = 0;
+	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
+
+	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
+	fail_on(ret != 0, err, "fpga_mgmt_describe_local_image failed");
+
+	ret = cli_show_image_info(&info);
+	fail_on(ret != 0, err, "cli_show_image_info failed");
+
+	return 0;
+err:
+	return ret;
 }
 
 /**
@@ -383,8 +375,7 @@ err:
  *  -this response uses local (not mbox) information only.
  *
  * @returns
- *  0	on success 
- * -1	on failure
+ *  0	on success, non-zero on failure
  */
 static int
 command_describe_slots(void)
@@ -402,12 +393,113 @@ command_describe_slots(void)
 
 		/** Display the application PFs for this slot */
 		ret = cli_show_slot_app_pfs(i, &spec_array[i]);
-		fail_on_quiet(ret != 0, err, "cli_show_slot_app_pfs failed");
+		fail_on(ret != 0, err, "cli_show_slot_app_pfs failed");
 
 	}
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
+}
+
+/**
+ * Generate the start virtual jtag command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int 
+command_start_virtual_jtag(void)
+{
+	printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",
+			f1.afi_slot, f1.tcp_port);
+	printf("Press CTRL-C to stop the service.\n");
+
+	return xvcserver_start(f1.afi_slot, f1.tcp_port);
+}
+
+/**
+ * Display the virtual status from the get virtual led or dip command.
+ *
+ * @param[in]   status  the virtual led or dip status to display. 
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+cli_show_virtual_led_dip_status(uint16_t status)
+{
+	int i;
+	for(i = 0; i < 16; i++) {
+		if (status & 0x8000) {
+			printf("1");
+		} else {
+			printf("0");
+		}
+		status = status << 1;
+		if ((i % 4 == 3) && (i != 15)) {
+			printf("-");
+		}
+	}
+	printf("\n");
+	return 0;
+}
+
+/**
+ * Generate the get virtual led command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int 
+command_get_virtual_led(void)
+{
+	uint16_t status;
+	int	ret;
+
+	if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot, &status)) {
+		printf("Error trying to get virtual LED state\n");
+		return ret;
+	}
+
+	printf("FPGA slot id %u have the following Virtual LED:\n", f1.afi_slot);
+	return cli_show_virtual_led_dip_status(status);
+}
+
+/**
+ * Generate the get virtual dip command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int 
+command_get_virtual_dip(void)
+{
+	uint16_t status;
+	int ret;
+
+	if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot, &status)) {
+		printf("Error: can not get virtual DIP Switch state\n");
+		return ret;
+	}
+
+	printf("FPGA slot id %u has the following Virtual DIP Switches:\n", f1.afi_slot);
+	return cli_show_virtual_led_dip_status(status);
+}
+
+/**
+ * Generate the set virtual dip command.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int 
+command_set_virtual_dip(void)
+{
+	int ret;
+	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot, f1.v_dip_switch)) {
+		printf("Error trying to set virtual DIP Switch \n");
+	}
+	return ret;
 }
 
 typedef int (*command_func_t)(void);
@@ -427,13 +519,12 @@ static const command_func_t command_table[CLI_CMD_END] = {
  * Main CLI cmd/rsp processing engine. 
  *
  * @returns
- *  0	on success 
- * -1	on failure
+ *  0	on success, non-zero on failure
  */
 static int
 cli_main(void)
 {
-	fail_on_quiet(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
+	fail_on(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
 	fail_on_user(command_table[f1.opcode] == NULL, err, "Action not defined for "
 	             "opcode %u", f1.opcode);
 
@@ -446,8 +537,7 @@ err:
  * Setup the f1 structure with initial values.
  *
  * @returns
- *  0	on success 
- * !0	failure
+ *  0	on success, non-zero on failure
  */
 static int 
 cli_init_f1(void)
@@ -455,8 +545,10 @@ cli_init_f1(void)
 	memset(&f1, 0, sizeof(f1));
 	f1.opcode = -1;
 	f1.afi_slot = -1;
-	f1.mbox_timeout = CLI_TIMEOUT_DFLT;
-	f1.mbox_delay_msec = CLI_DELAY_MSEC_DFLT;
+	f1.request_timeout = CLI_REQUEST_TIMEOUT_DFLT;
+	f1.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
+	f1.sync_timeout = CLI_SYNC_TIMEOUT_DFLT;
+	f1.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
 	f1.show_mbox_device = false;
 
 	srand((unsigned)time(NULL));
@@ -468,8 +560,7 @@ cli_init_f1(void)
  * CLI create method.
  *
  * @returns
- *  0	on success 
- * !0	failure
+ *  0	on success, non-zero on failure
  */
 static int 
 cli_create(void)
@@ -481,8 +572,7 @@ cli_create(void)
  * CLI destroy method.
  *
  * @returns
- *  0	on success 
- * !0	failure
+ *  0	on success, non-zero on failure
  */
 static int 
 cli_destroy(void)
@@ -497,29 +587,28 @@ cli_destroy(void)
  * @param[in]   argv	argument vector
  *
  * @returns
- *  0	on success 
- * !0	failure
+ *  0	on success, non-zero on failure
  */
 int 
 main(int argc, char *argv[])
 {
 	int ret = cli_create();
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "cli_create failed");
 
 	ret = log_init("fpga-local-cmd");
-	fail_on_internal(ret != 0, err, CLI_INTERNAL_ERR_STR);
+	fail_on(ret != 0, err, "log_init failed");
 
 	ret = log_attach(logger, NULL, 0);
 	fail_on_user(ret != 0, err, "%s", CLI_ROOT_ACCESS_ERR_STR);
 		
 	ret = parse_args(argc, argv);
-	fail_on_quiet(ret != 0, err, "parse args failed");
+	fail_on(ret != 0, err, "parse_args failed");
 
 	ret = cli_attach();
-	fail_on_quiet(ret != 0, err, "cli_attach failed");
+	fail_on(ret != 0, err, "cli_attach failed");
 
 	ret = cli_main();
-	fail_on_quiet(ret != 0, err, "cli_main failed");
+	fail_on(ret != 0, err, "cli_main failed");
 err:
 	/** 
 	 * f1.parser_completed may be set by parse_args when it internally 

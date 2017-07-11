@@ -1,26 +1,28 @@
-# Amazon FGPA Hardware Development Kit
-# 
+# Amazon FPGA Hardware Development Kit
+#
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# 
+#
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
 # located at
-# 
+#
 #    http://aws.amazon.com/asl/
-# 
+#
 # or in the "license" file accompanying this file. This file is distributed on
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 # Script must be sourced from a bash shell or it will not work
 # When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
 # When being run $0 and $_ will be the same.
+
 script=${BASH_SOURCE[0]}
 if [ $script == $0 ]; then
   echo "ERROR: You must source this script"
   exit 2
 fi
+
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
@@ -28,18 +30,22 @@ script_dir=$(dirname $full_script)
 debug=0
 
 function info_msg {
-  echo -e "AWS FPGA-INFO: $1"
+  echo -e "INFO: $1"
 }
 
 function debug_msg {
   if [[ $debug == 0 ]]; then
     return
   fi
-  echo -e "AWS FPGA-DEBUG: $1"
+  echo -e "DEBUG: $1"
+}
+
+function warn_msg {
+  echo -e "WARNING: $1"
 }
 
 function err_msg {
-  echo -e >&2 "AWS FPGA-ERROR: $1"
+  echo -e >&2 "ERROR: $1"
 }
 
 function usage {
@@ -52,10 +58,10 @@ function help {
   info_msg "Sets up the environment for AWS FPGA HDK tools."
   info_msg " "
   info_msg "hdk_setup.sh script will:"
-  info_msg "  (1) check if Xilinx's vivado is installed,"
-  info_msg "  (2) set up key environment variables HDK_*, and"
+  info_msg "  (1) Check if Xilinx Vivado is installed,"
+  info_msg "  (2) Set up key environment variables HDK_*, and"
   info_msg "  (3) Download/update the HDK shell's checkpoint"
-  info_msg "  (4) prepare DRAM controller and PCIe IP modules if they are not already available in your directory."
+  info_msg "  (4) Prepare DRAM controller and PCIe IP modules if they are not already available in your directory."
   echo " "
   usage
 }
@@ -90,17 +96,7 @@ else
   debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
 fi
 
-debug_msg "Checking for vivado install:"
-
-# On the FPGA Developer AMI use module load to use the correct version of vivado
-if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
-  # Module command is installed.
-  # This branch requires sdx, not vivado
-  # Load and unload the modules just to make sure have the environment set correctly
-  module unload vivado
-  module unload sdx
-  module load vivado
-fi
+debug_msg "Checking for Vivado install:"
 
 # before going too far make sure Vivado is available
 if ! vivado -version > /dev/null 2>&1; then
@@ -219,7 +215,7 @@ if [ -f $ddr4_model_dir/arch_defines.v ]; then
     fi
   else
     models_vivado_version=UNKNOWN
-    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN vivado version so rebuilding."
+    info_msg "DDR4 model files in $ddr4_model_dir/ were built with UNKNOWN Vivado version so rebuilding."
   fi
 else
   # Models haven't been built

@@ -57,10 +57,6 @@
 #define MAX_NUMBER_OF_USER_INTERRUPTS 	(16)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
-
-#define QUEUE_CHAR_SANITY_STRING (0xbaddad)
-#define INTERRUPT_CHAR_SANITY_STRING (0xdeadbeef)
-
 extern struct class* edma_class;
 
 //This is a bi-directional DMA queue
@@ -81,9 +77,13 @@ struct edma_char_event_device{
 };
 
 
-static int transient_buffer_size = 4 * 1024 * 1024;
+static int transient_buffer_size = 32 * 1024 * 1024;
 module_param(transient_buffer_size, int, 0);
-MODULE_PARM_DESC(transient_buffer_size, "Transient buffer size. (default=4MB)");
+MODULE_PARM_DESC(transient_buffer_size, "Transient buffer size. (default=32MB)");
+
+static int single_transaction_size = 8 * PAGE_SIZE;
+module_param(single_transaction_size, int, 0);
+MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over the DMA. (default=32KB)");
 
 extern int edma_queue_depth;
 
@@ -127,7 +127,7 @@ static inline int wait_is_fsync_running(struct edma_queue_private_data* private_
  * This function will only be called after we make sure that read,write and fsync
  * are are no longer working with the queue we are releasing
  */
-static void edma_dev_release_resources( struct emda_buffer_control_structure* ebcs)
+static void edma_dev_release_resources( struct edma_buffer_control_structure* ebcs)
 {
 	int i;
 
@@ -138,9 +138,9 @@ static void edma_dev_release_resources( struct emda_buffer_control_structure* eb
 		ebcs->request = NULL;
 	}
 
-	for(i = 0; i < (ebcs->transient_buffer.size_in_pages); i++){
+	for(i = 0; i < (ebcs->transient_buffer.number_of_transactions); i++){
 		if(ebcs->transient_buffer.page_array[i].phys_base_addr != 0) {
-			dma_free_coherent(NULL, PAGE_SIZE,
+			dma_free_coherent(NULL, single_transaction_size,
 					ebcs->transient_buffer.page_array[i].virt_buffer,
 					ebcs->transient_buffer.page_array[i].phys_base_addr);
 
@@ -155,23 +155,23 @@ static void edma_dev_release_resources( struct emda_buffer_control_structure* eb
 	}
 }
 
-static void edma_dev_initialize_read_ebcs(struct emda_buffer_control_structure* ebcs)
+static void edma_dev_initialize_read_ebcs(struct edma_buffer_control_structure* ebcs)
 {
 	int i;
 
 	//if we have not enough memory for the read ebcs
-	BUG_ON((ebcs->transient_buffer.size_in_pages < ebcs->ebcs_size));
+	BUG_ON((ebcs->transient_buffer.number_of_transactions < ebcs->ebcs_depth));
 
-	for(i = 0; i < ebcs->ebcs_size; i++)
+	for(i = 0; i < ebcs->ebcs_depth; i++)
 	{
 		ebcs->request[i].phys_data = ebcs->transient_buffer.page_array[i].phys_base_addr;
 		ebcs->request[i].virt_data = (u8 *)(ebcs->transient_buffer.page_array[i].virt_buffer);
-		ebcs->request[i].size = PAGE_SIZE;
+		ebcs->request[i].size = single_transaction_size;
 		ebcs->request[i].offset = 0;
 
 #ifndef SUPPORT_M2M
 		//last one - don't submit
-		if(unlikely(i == ebcs->ebcs_size - 1))
+		if(unlikely(i == ebcs->ebcs_depth - 1))
 			break;
 
 		edma_backend_submit_s2m_request((u64*)(ebcs->request[i].phys_data), ebcs->request[i].size, ebcs->dma_queue_handle, 0);
@@ -179,33 +179,33 @@ static void edma_dev_initialize_read_ebcs(struct emda_buffer_control_structure* 
 	}
 
 #ifndef SUPPORT_M2M
-	ebcs->next_to_use = ebcs->ebcs_size - 1;
+	ebcs->next_to_use = ebcs->ebcs_depth - 1;
 #endif
 }
 
-static inline int edma_dev_allocate_resources( struct emda_buffer_control_structure* ebcs)
+static inline int edma_dev_allocate_resources( struct edma_buffer_control_structure* ebcs)
 {
 	int ret = 0;
 	int i;
-	u32 transient_buffer_rounded_to_page_size = 0;
+	u32 transient_buffer_rounded_to_transaction_size = 0;
 
 	BUG_ON(!ebcs);
 
 	//round transient_buffer_size to be a multiplication product of page_size
-	transient_buffer_rounded_to_page_size =  CEIL(transient_buffer_size, PAGE_SIZE);
+	transient_buffer_rounded_to_transaction_size =  CEIL(transient_buffer_size, single_transaction_size);
 
 	//allocate the page_array
-	ebcs->transient_buffer.page_array = vzalloc(sizeof(struct transient_buffer_page) * transient_buffer_rounded_to_page_size );
+	ebcs->transient_buffer.page_array = vzalloc(sizeof(struct transient_buffer_page) * transient_buffer_rounded_to_transaction_size );
 	if(unlikely(!ebcs->transient_buffer.page_array)) {
 		ret = -ENOMEM;
 		goto edma_dev_allocate_resources_done;
 	}
 
-	for(i = 0; i < transient_buffer_rounded_to_page_size; i++)
+	for(i = 0; i < transient_buffer_rounded_to_transaction_size; i++)
 	{
 		ebcs->transient_buffer.page_array[i].virt_buffer = dma_alloc_coherent(
 				NULL,
-				PAGE_SIZE, &(ebcs->transient_buffer.page_array[i].phys_base_addr),
+				single_transaction_size, &(ebcs->transient_buffer.page_array[i].phys_base_addr),
 				GFP_KERNEL | __GFP_ZERO);
 
 		if(unlikely(!(ebcs->transient_buffer.page_array[i].virt_buffer))) {
@@ -214,17 +214,17 @@ static inline int edma_dev_allocate_resources( struct emda_buffer_control_struct
 		}
 	}
 
-	ebcs->ebcs_size = edma_queue_depth;
+	ebcs->ebcs_depth = edma_queue_depth;
 	ebcs->request =
 			(struct request*) vzalloc(
 					sizeof(struct request)
-					* ebcs->ebcs_size);
+					* ebcs->ebcs_depth);
 	if(unlikely(!ebcs->request)) {
 		ret = -ENOMEM;
 		goto edma_dev_allocate_resources_dma_fail;
 	}
 
-	ebcs->transient_buffer.size_in_pages = transient_buffer_rounded_to_page_size;
+	ebcs->transient_buffer.number_of_transactions = transient_buffer_rounded_to_transaction_size;
 	ebcs->transient_buffer.head = 0;
 	ebcs->transient_buffer.tail = 0;
 	ebcs->next_to_clean = 0;
@@ -237,9 +237,9 @@ static inline int edma_dev_allocate_resources( struct emda_buffer_control_struct
 	goto edma_dev_allocate_resources_done;
 
 edma_dev_allocate_resources_dma_fail:
-	for(i = 0; i < transient_buffer_rounded_to_page_size; i++)
+	for(i = 0; i < transient_buffer_rounded_to_transaction_size; i++)
 	{
-		dma_free_coherent(NULL, PAGE_SIZE,
+		dma_free_coherent(NULL, single_transaction_size,
 				ebcs->transient_buffer.page_array[i].virt_buffer,
 				ebcs->transient_buffer.page_array[i].phys_base_addr);
 		ebcs->transient_buffer.page_array[i].virt_buffer = NULL;
@@ -255,7 +255,7 @@ edma_dev_allocate_resources_done:
 }
 
 
-static inline void recycle_completed_descriptors(struct emda_buffer_control_structure* write_ebcs,
+static inline void recycle_completed_descriptors(struct edma_buffer_control_structure* write_ebcs,
 		struct edma_queue_private_data *private_data)
 {
 	u64* buffer_to_clean = NULL;
@@ -278,7 +278,7 @@ static inline void recycle_completed_descriptors(struct emda_buffer_control_stru
 
 		write_ebcs->transient_buffer.tail =
 				EDMA_RING_IDX_NEXT(write_ebcs->transient_buffer.tail,
-						write_ebcs->transient_buffer.size_in_pages);
+						write_ebcs->transient_buffer.number_of_transactions);
 
 		request_to_clean->phys_data = 0;
 		request_to_clean->virt_data = NULL;
@@ -289,7 +289,7 @@ static inline void recycle_completed_descriptors(struct emda_buffer_control_stru
 		write_ebcs->next_to_clean =
 				EDMA_RING_IDX_NEXT(
 						write_ebcs->next_to_clean,
-						write_ebcs->ebcs_size);
+						write_ebcs->ebcs_depth);
 
 		edma_backend_get_completed_m2s_request(&buffer_to_clean, &buffer_size, write_ebcs->dma_queue_handle);
 	}
@@ -430,7 +430,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 	int ret = 0;
 	size_t data_copied_from_current_transaction = 0;
 	size_t total_data_copied = 0;
-	struct emda_buffer_control_structure* read_ebcs = NULL;
+	struct edma_buffer_control_structure* read_ebcs = NULL;
 	struct request* request_to_clean = NULL;
 	struct request* request_to_submit = NULL;
 	size_t copy_size;
@@ -531,6 +531,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 		//Make sure that user reads the entire buffer, otherwise - don't clean it.
 		if(data_copied_from_current_transaction + request_to_clean->offset < read_ebcs->completed_size) {
 			request_to_clean->offset += data_copied_from_current_transaction;
+			copy_size = min_t(size_t, (read_ebcs->completed_size - request_to_clean->offset), len - total_data_copied);
 		} else {
 			read_ebcs->completed_buffer = NULL;
 			read_ebcs->completed_size = 0;
@@ -539,13 +540,13 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 			//read the data from the buffer, clean the request.
 			read_ebcs->next_to_clean = EDMA_RING_IDX_NEXT(
 					read_ebcs->next_to_clean,
-					read_ebcs->ebcs_size);
+					read_ebcs->ebcs_depth);
 
 			request_to_clean = read_ebcs->request + read_ebcs->next_to_clean;
 
 #ifdef SUPPORT_M2M
 			if(total_data_copied < len) {
-				copy_size = len - total_data_copied;
+				copy_size = min_t(size_t, len - total_data_copied, single_transaction_size);
 				ret = edma_backend_submit_s2m_request(
 						(u64*)request_to_clean->phys_data,
 						copy_size, read_ebcs->dma_queue_handle, *off);
@@ -587,7 +588,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 			//after submitting the request use the next one
 			read_ebcs->next_to_use = EDMA_RING_IDX_NEXT(
 					read_ebcs->next_to_use,
-					read_ebcs->ebcs_size);
+					read_ebcs->ebcs_depth);
 
 			request_to_submit = read_ebcs->request + read_ebcs->next_to_use;
 
@@ -607,9 +608,6 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 #endif
 
 		}
-
-		copy_size = min_t(size_t, (read_ebcs->completed_size - request_to_clean->offset), len - total_data_copied);
-
 	}
 
 	//There is a possibility that data_left_to_read is not 0 and that's OK.
@@ -630,11 +628,11 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 		loff_t * off)
 {
 	int ret = 0;
-	struct emda_buffer_control_structure* write_ebcs;
+	struct edma_buffer_control_structure* write_ebcs;
 	struct request* request;
 	size_t data_copied = 0;
 	size_t data_to_copy = len;
-	int number_of_pages = CEIL(len,PAGE_SIZE);
+	int number_of_transactions = CEIL(len,single_transaction_size);
 	struct edma_queue_private_data* private_data = (struct edma_queue_private_data*)filp->private_data;
 	int i;
 
@@ -662,12 +660,12 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 	u64_stats_update_end(&private_data->stats.syncp);
 
 	//request for each page
-	for (i = 0; i < number_of_pages; i++)
+	for (i = 0; i < number_of_transactions; i++)
 	{
-		size_t copy_to_rquest_size = min_t(size_t, data_to_copy, PAGE_SIZE);
+		size_t copy_to_rquest_size = min_t(size_t, data_to_copy, single_transaction_size);
 
 		//no requests available.
-		if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,write_ebcs->ebcs_size)
+		if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,write_ebcs->ebcs_depth)
 					== write_ebcs->next_to_clean) {
 			u64_stats_update_begin(&private_data->stats.syncp);
 			private_data->stats.no_space_left_error++;
@@ -683,14 +681,14 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 				goto edma_dev_write_done;
 
 			if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,
-					write_ebcs->ebcs_size)
+					write_ebcs->ebcs_depth)
 					== write_ebcs->next_to_clean) {
 				//if we have no requests left - try to recycle completed descriptors
 				recycle_completed_descriptors(write_ebcs, private_data);
 
 				//if still no requests left - we are done.
 				if(EDMA_RING_IDX_NEXT(write_ebcs->next_to_use,
-						write_ebcs->ebcs_size)
+						write_ebcs->ebcs_depth)
 						== write_ebcs->next_to_clean) {
 					break;
 				}
@@ -701,7 +699,7 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 		request = write_ebcs->request + write_ebcs->next_to_use;
 		request->phys_data = write_ebcs->transient_buffer.page_array[write_ebcs->transient_buffer.head].phys_base_addr;
 		request->virt_data = (u8*)(write_ebcs->transient_buffer.page_array[write_ebcs->transient_buffer.head].virt_buffer);
-		request->size = PAGE_SIZE;
+		request->size = single_transaction_size;
 
 		ret = copy_from_user(request->virt_data, buff + data_copied, copy_to_rquest_size);
 		if(unlikely(ret)){
@@ -749,11 +747,11 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 
 		//move the next_to_use by one since we used it
 		write_ebcs->next_to_use = EDMA_RING_IDX_NEXT(
-				write_ebcs->next_to_use, write_ebcs->ebcs_size);
+				write_ebcs->next_to_use, write_ebcs->ebcs_depth);
 
 		//move head pointer now that we used the head
 		write_ebcs->transient_buffer.head = EDMA_RING_IDX_NEXT(
-				write_ebcs->transient_buffer.head, write_ebcs->transient_buffer.size_in_pages);
+				write_ebcs->transient_buffer.head, write_ebcs->transient_buffer.number_of_transactions);
 	}
 
 	edma_backend_m2s_dma_action(write_ebcs->dma_queue_handle);
@@ -806,7 +804,7 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 {
 	int ret = 0;
 	bool ebcs_is_clean = false;
-	struct emda_buffer_control_structure* write_ebcs;
+	struct edma_buffer_control_structure* write_ebcs;
 	struct edma_queue_private_data* private_data = (struct edma_queue_private_data*)filp->private_data;
 
 	(void)start;
@@ -1054,6 +1052,9 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 		pr_err("failed to create write /sys endpoint - continuing without\n");
 		goto edma_queue_device_done;
 	}
+
+	// Setup the linkage to device private data
+	dev_set_drvdata(edmaCharDevice, &edma_queues->device_private_data[minor_index]);
 
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;

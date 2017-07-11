@@ -1,6 +1,6 @@
 # AWS EC2 FPGA SDK Userspace Software
 
-The [Programmer's View](../../hdk/docs/Programmers_View.md) describes all the runtime software components that would be used in an FPGA-enabled EC2 instance like F1. It supports linux operating systems only.
+The [Programmer's View](../../hdk/docs/Programmer_View.md) describes all the runtime software components that would be used in an FPGA-enabled EC2 instance like F1. It supports linux operating systems only.
 
 This directory contains the source and build files for the needed components:
 

@@ -48,7 +48,7 @@ struct transient_buffer_page
 requests that come from the application to the backend
 and vise-versa */
 struct transient_buffer {
-	u32 size_in_pages;
+	u32 number_of_transactions;
 	u32 head;
 	u32 tail;
 	struct transient_buffer_page* page_array;
@@ -86,14 +86,14 @@ struct edma_event_stats {
 }____cacheline_aligned;
 
 /* EBCS is the structure used to manage the transient buffer */
-struct emda_buffer_control_structure{
+struct edma_buffer_control_structure{
 
 	struct transient_buffer transient_buffer;
 	struct request* request;
 	spinlock_t ebcs_spin_lock;
 	u32 next_to_use;
 	u32 next_to_clean;
-	u32 ebcs_size;
+	u32 ebcs_depth;
 	void *dma_queue_handle;
 	u64* completed_buffer;
 	u32 completed_size;
@@ -102,8 +102,8 @@ struct emda_buffer_control_structure{
 
 struct edma_queue_private_data
 {
-	struct emda_buffer_control_structure read_ebcs;
-	struct emda_buffer_control_structure write_ebcs;
+	struct edma_buffer_control_structure read_ebcs;
+	struct edma_buffer_control_structure write_ebcs;
 	struct edma_queue_stats stats;
 	spinlock_t edma_spin_lock;
 	unsigned long state;

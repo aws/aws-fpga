@@ -129,10 +129,7 @@ Upon successful connection, Vivado's Hardware panel will be populated with a deb
  
 5)	Select the debug bridge instance from the Vivado Hardware panel
 
-6)      You will need a "Probes file" in the next step.  Once you run the EC2 API create-fpga-image and the process of creating the AFI is complete, a "Probes file" is generated that has a ".ltx" extension.   
-```
-        $ aws s3 cp s3://<bucket-name>/<logs-folder-name>/*_debug_probes.ltx $CL_DIR   #copy to the example directory
-```        
+6)      You will need a "Probes file" in the next step.  A "Probes file" with an ".ltx" extension is generated during the build process and written to the checkpoints directory.   
 
 7)	In the Hardware Device Properties window select the appropriate “Probes file” for your design by clicking the icon next to the “Probes file” entry, selecting the file, and clicking “OK”. This will refresh the hardware device and it should now show the debug cores present in your design.  Note the Probes file is written out during the design implementation, and is typically has the extension ".ltx".
 
@@ -206,4 +203,4 @@ This could mean there is already a server running with thtat TCP port.  Either f
 
 Xilinc Virtual Cable (XVC) is a protocol for transferring JTAG commands over TCP/IP network connection between a debug tool (like Vivado Lab Edition Hardware Manager) and a debug target.
 
-The full specification for XVC version 1.0 is available [here](https://github.com/Xilinx/XilinxVirtualCable/blob/master/README_XVC_v1_0.txt).  
+The full specification for XVC version 1.0 is available [here](https://github.com/Xilinx/XilinxVirtualCable/blob/master/README.md).  

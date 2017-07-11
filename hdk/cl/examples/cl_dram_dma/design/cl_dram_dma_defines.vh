@@ -27,5 +27,8 @@
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
 
+// Uncomment to disable Virtual JTAG
+//`define DISABLE_VJTAG_DEBUG
+
 `endif
 

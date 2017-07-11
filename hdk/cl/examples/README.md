@@ -36,7 +36,7 @@ Alternatively, by creating a new directory, setup the environment variables, and
 Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
 Each one of the examples following the recommended directory structure to match what's expected by the HDK simulation and build scripts.
 
-If you like to start your own CL, check out the [How to create your own CL](../developer_designs/README.md) readme.
+If you like to start your own CL, check out the [How to create your own CL](../developer_designs/Starting_Your_Own_CL.md) readme.
 
 ### 2. Build the CL
 
@@ -46,10 +46,17 @@ If you like to start your own CL, check out the [How to create your own CL](../d
 
 Executing the `aws_build_dcp_from_cl.sh` script will perform the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA.
 The output is a tarball file comprising the DCP file, and other log/manifest files, formatted as `YY_MM_DD-hhmm.Developer_CL.tar`.
-This file would be submitted to AWS to create an AFI.
+This file would be submitted to AWS to create an AFI. By default the build script will use Clock Group A Recipe A0 wich uses a main clock of 125 MHz.
 
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
+
+In order to use a 250 MHz main clock the developer can specify the A1 Clock Group A Recipe as in the following example:
+
+    $ cd $CL_DIR/build/scripts
+    $ ./aws_build_dcp_from_cl.sh -clock_recipe_a A1
+
+Other clock recipes can be specified as well. More details on the [Clock Group Recipes Table](../../docs/clock_recipes.csv) and how to specify different recipes can be found in the following [README](../../common/shell_v04151701/new_cl_template/build/README.md).
 
 **NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` will run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
@@ -59,7 +66,7 @@ To be notified via e-mail when the build completes:
 
 ```
     $ export EMAIL=your.email@example.com
-    $ ./$HDK_COMMON_DIR/scripts/notify_via_sns.py
+    $ $HDK_COMMON_DIR/scripts/notify_via_sns.py
 
 ```
 
@@ -96,7 +103,7 @@ Create a folder for your log files
 ```             
 
 Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is the policy you must use, except you will need to change <bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>.  Edit your S3 bucket permissions and bucket policy using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
+Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket policy by using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
 
 ```
     {
@@ -163,11 +170,34 @@ Once your policy passes the checks, your ready to start AFI creation.
 The output of this command includes two identifiers that refer to your AFI:
 - **FPGA Image Identifier** or **AFI ID**: this is the main ID used to manage your AFI through the AWS EC2 CLI commands and AWS SDK APIs.
     This ID is regional, i.e., if an AFI is copied across multiple regions, it will have a different unique AFI ID in each region.
-    An example AFI ID is **`agfi-0f0e045f919413242`**.
+    An example AFI ID is **`afi-06d0ffc989feeea2a`**.
 - **Glogal FPGA Image Identifier** or **AGFI ID**: this is a global ID that is used to refer to an AFI from within an F1 instance.
     For example, to load or clear an AFI from an FPGA slot, you use the AGFI ID.
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-0f0e045f919413242`**.
+
+The [describe-fpga-images](../../docs/describe_fpga_images.md) API allows you to check the AFI state during the background AFI generation process.  You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
+```
+    $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a
+```
+
+The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`: 
+```
+    {
+        "FpgaImages": [
+            {
+			    ...
+                "State": {
+                    "Code": "available"
+                },
+			    ...
+                "FpgaImageId": "afi-06d0ffc989feeea2a",
+			    ...
+            }
+        ]
+    }
+
+```
 
 After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 

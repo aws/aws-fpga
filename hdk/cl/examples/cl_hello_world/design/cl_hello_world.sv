@@ -44,8 +44,6 @@ logic rst_main_n_sync;
 `include "unused_cl_sda_template.inc"
 `include "unused_sh_bar1_template.inc"
 `include "unused_apppf_irq_template.inc"
-`include "unused_hmc_template.inc"
-`include "unused_aurora_template.inc"
 
 //-------------------------------------------------
 // Wires
@@ -328,9 +326,9 @@ assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q2[15:0];
   assign cl_sh_status1[31:0] = `CL_VERSION;
 
 //-----------------------------------------------
-// Debug bridge, used if need chipscope
+// Debug bridge, used if need Virtual JTAG
 //-----------------------------------------------
-`ifndef DISABLE_CHIPSCOPE_DEBUG
+`ifndef DISABLE_VJTAG_DEBUG
 
 // Flop for timing global clock counter
 logic[63:0] sh_cl_glcount0_q;
@@ -366,22 +364,22 @@ always_ff @(posedge clk_main_a0)
 // Debug Bridge 
  cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(clk_main_a0),
-      .S_BSCAN_VEC_drck(drck),
-      .S_BSCAN_VEC_shift(shift),
-      .S_BSCAN_VEC_tdi(tdi),
-      .S_BSCAN_VEC_update(update),
-      .S_BSCAN_VEC_sel(sel),
-      .S_BSCAN_VEC_tdo(tdo),
-      .S_BSCAN_VEC_tms(tms),
-      .S_BSCAN_VEC_tck(tck),
-      .S_BSCAN_VEC_runtest(runtest),
-      .S_BSCAN_VEC_reset(reset),
-      .S_BSCAN_VEC_capture(capture),
-      .S_BSCAN_VEC_bscanid(bscanid)
+      .S_BSCAN_drck(drck),
+      .S_BSCAN_shift(shift),
+      .S_BSCAN_tdi(tdi),
+      .S_BSCAN_update(update),
+      .S_BSCAN_sel(sel),
+      .S_BSCAN_tdo(tdo),
+      .S_BSCAN_tms(tms),
+      .S_BSCAN_tck(tck),
+      .S_BSCAN_runtest(runtest),
+      .S_BSCAN_reset(reset),
+      .S_BSCAN_capture(capture),
+      .S_BSCAN_bscanid_en(bscanid_en)
    );
 
 //-----------------------------------------------
-// VIO Example - Needs Chipscope
+// VIO Example - Needs Virtual JTAG
 //-----------------------------------------------
    // Counter running at 125MHz
    
@@ -465,7 +463,7 @@ always_ff @(posedge clk_main_a0)
                    .probe10 (vo_cnt_watermark_q)
                    );
    
-`endif //  `ifndef DISABLE_CHIPSCOPE_DEBUG
+`endif //  `ifndef DISABLE_VJTAG_DEBUG
 
 endmodule
 

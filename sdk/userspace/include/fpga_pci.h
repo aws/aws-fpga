@@ -19,6 +19,10 @@
 
 #include <hal/fpga_common.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * FPGA_PCI_BARS_MAX:
  *  -compile time tunable via mkall_fpga_mgmt_tools.sh, with the below default.
@@ -203,3 +207,21 @@ int fpga_pci_rescan_slot_app_pfs(int slot_id);
  */
 int fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset,
 	uint64_t dword_len, void **ptr);
+
+/**
+ * Initialze a segment of memory to an initial value. This has the best
+ * performance when the BAR is attached with write combining enabled.
+ *
+ * @param[in]  handle  handle provided by fpga_pci_attach
+ * @param[in]  offset  memory location offset to write
+ * @param[in]  value   value to write into memory
+ * @param[in]  dword_len  the length of data to write in burst, in 4-byte DWORDs
+ *
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
+	uint64_t dword_len);
+
+#ifdef __cplusplus
+}
+#endif

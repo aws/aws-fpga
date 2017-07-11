@@ -12,22 +12,21 @@
 #include <linux/string.h>
 
 
-#define MASTER_PF					(0)
-#define DRV_MODULE_NAME					"emda_xdma_backend"
-//FIXME: move to mutable
-#define XDMA_TIMEOUT_IN_MSEC				(3 * 1000)
-#define SLEEP_MIN_USEC					(1)
-#define SLEEP_MAX_USEC					(20)
-#define XDMA_WORKER_SLEEPING_STATUS_BIT			(0)
-#define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT		(1)
-#define XDMA_WORKER_STOPPED_ON_REQUEST_BIT		(2)
-#define XDMA_WORKER_STOP_REQUEST_BIT			(3)
-#define REQUEST_SLEEP_MSEC						(10)
-#define PCI_VENDOR_ID_AMAZON 				(0x1d0f)
-#define PCI_DEVICE_ID_FPGA				(0xf001)
-#define XMDA_NUMBER_OF_USER_EVENTS			(1)
-#define XDMA_LIMIT_NUMBER_OF_QUEUES			(1)
-#define CLASS_NAME "edma"
+#define MASTER_PF                                               (0)
+#define DRV_MODULE_NAME                                         "edma_xdma_backend"
+#define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
+#define SLEEP_MIN_USEC                                          (1)
+#define SLEEP_MAX_USEC                                          (20)
+#define XDMA_WORKER_SLEEPING_STATUS_BIT                         (0)
+#define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT                      (1)
+#define XDMA_WORKER_STOPPED_ON_REQUEST_BIT                      (2)
+#define XDMA_WORKER_STOP_REQUEST_BIT                            (3)
+#define REQUEST_SLEEP_MSEC                                      (10)
+#define PCI_VENDOR_ID_AMAZON                                    (0x1d0f)
+#define PCI_DEVICE_ID_FPGA                                      (0xf001)
+#define XMDA_NUMBER_OF_USER_EVENTS                              (1)
+#define XDMA_LIMIT_NUMBER_OF_QUEUES                             (1)
+#define CLASS_NAME                                              "edma"
 
 struct class* edma_class;
 
@@ -350,10 +349,10 @@ int edma_backend_get_completed_m2s_request(u64** buffer, u32* size, void *q_hand
 			&& (queue[command_queue->next_to_recycle].completed == 1)) {
 
 		completed_buffer = (void*)(sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl));
-		completed_size = queue[command_queue->next_to_recycle].sgt.sgl->length;
+		completed_size = sg_dma_len(queue[command_queue->next_to_recycle].sgt.sgl);
 		queue[command_queue->next_to_recycle].completed = 0;
 
-		queue[command_queue->next_to_recycle].sgt.sgl->length = 0;
+		sg_dma_len(queue[command_queue->next_to_recycle].sgt.sgl) = 0;
 		sg_dma_address(queue[command_queue->next_to_recycle].sgt.sgl) = 0;
 
 		command_queue->next_to_recycle =

@@ -35,6 +35,7 @@
 
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s00_regslice_0/sim/cl_axi_interconnect_s00_regslice_0.v
+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s01_regslice_0/sim/cl_axi_interconnect_s01_regslice_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m00_regslice_0/sim/cl_axi_interconnect_m00_regslice_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m01_regslice_0/sim/cl_axi_interconnect_m01_regslice_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_m02_regslice_0/sim/cl_axi_interconnect_m02_regslice_0.v
@@ -49,7 +50,7 @@ ${SH_LIB_DIR}/../ip/axi_register_slice_light/sim/axi_register_slice_light.v
 ${SH_LIB_DIR}/bram_2rw.sv
 ${SH_LIB_DIR}/flop_fifo.sv
 
-+define+DISABLE_CHIPSCOPE_DEBUG
++define+DISABLE_VJTAG_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/cl_tst_scrb.sv

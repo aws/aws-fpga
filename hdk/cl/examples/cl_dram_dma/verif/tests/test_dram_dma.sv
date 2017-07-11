@@ -117,12 +117,6 @@ module test_dram_dma();
 
        $display("[%t] : starting C2H DMA channels ", $realtime);
 
-       //Start transfers of data from CL DDR
-       tb.start_que_to_buffer(.chan(0));   
-       tb.start_que_to_buffer(.chan(1));   
-       tb.start_que_to_buffer(.chan(2));   
-       tb.start_que_to_buffer(.chan(3));   
-
        // read the data from cl and put it in the host memory 
        host_memory_buffer_address = 64'h0_0001_0800;
        tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0002), .len(len0) );  // move DDR0 to buffer
@@ -136,6 +130,12 @@ module test_dram_dma();
        host_memory_buffer_address = 64'h0_0004_3800;                                                                                        
        tb.que_cl_to_buffer(.chan(3), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_3000_0000), .len(len3) );  // move DDR3 to buffer
        
+       //Start transfers of data from CL DDR
+       tb.start_que_to_buffer(.chan(0));   
+       tb.start_que_to_buffer(.chan(1));   
+       tb.start_que_to_buffer(.chan(2));   
+       tb.start_que_to_buffer(.chan(3));   
+
        // wait for dma transfers to complete
        timeout_count = 0;       
        do begin
@@ -152,7 +152,8 @@ module test_dram_dma();
           error_count++;
        end
 
-
+       #1us;
+       
        // DDR 0
        // Compare the data in host memory with the expected data
        $display("[%t] : DMA buffer from DDR 0", $realtime);
