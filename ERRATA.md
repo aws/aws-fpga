@@ -1,12 +1,16 @@
 
 # AWS EC2 FPGA HDK+SDK Errata
 
+
+## Preview 1.3.0 - Features that are not supported in preview.  These features will see additional updates.
+* create-fpga-image 
+* fpga-load-local-image 
+* Improvements to URAM utilization 
+* IP Integrator flow
+* SDAccel
+
+
 ## Release 1.3.0 
-
-### Preview Only (temporary) Restrictions - Features not currently supported in preview of v1.3.0:
-* create-fpga-image does not support creating AFIs for this Shell version yet
-* fpga-load-local-image does not support loading for this Shell version yet
-
 ### Implementation Restrictions
 *    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
     *    All PCIe transactions must adhere to the PCIe Exress base spec
