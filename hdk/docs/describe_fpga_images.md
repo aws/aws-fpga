@@ -84,12 +84,12 @@ The following response shows the AFI information provided by `describe-fpga-imag
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a afi-0f0927bc2649e6259
 ```
 
-* Get AFIs owned by caller AWS account.  Exludes public AFIs and AFIs with load permissions.
+* Get AFIs owned by caller AWS account.  Excludes public AFIs and AFIs with load permissions.
 ```
     $ aws ec2 describe-fpga-images --owners self
 ```
 
-* Get public AFIs owned by Amazon (this is the command use to retrive the example response)
+* Get public AFIs owned by Amazon (this is the command use to retrieve the example response)
 ```
     $ aws ec2 describe-fpga-images --owners amazon
 ```
