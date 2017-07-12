@@ -180,6 +180,14 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 #Procedure for running various implementation steps (impl_step)
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
+########################################
+## Generate clocks based on Recipe 
+########################################
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
+
+source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
+
 ##################################################
 ### CL XPR OOC Synthesis
 ##################################################
@@ -285,6 +293,10 @@ if {$implement} {
    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
 
    write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+
+   # Generate debug probes file
+   write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
+
    close_project
 }
 
