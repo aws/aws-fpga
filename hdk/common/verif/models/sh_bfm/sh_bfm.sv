@@ -1445,7 +1445,7 @@ module sh_bfm #(
          ClockRecipe::A2: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
-            EXTRA_A1_DLY = 64ns;
+            EXTRA_A1_DLY = 32ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
