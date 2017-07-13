@@ -29,6 +29,20 @@ script_dir=$(dirname $full_script)
 
 debug=0
 
+# This function checks if an environment module exists
+# Returns 0 if it exists, and returns 1 if it doesn't
+function does_module_exist() {
+
+    output=`/usr/bin/ls /usr/local/Modules/$MODULE_VERSION/modulefiles | grep $1`
+
+    if [[ $output == "$1" ]]; then
+        return 0;
+    else
+        return 1;
+    fi
+}
+
+
 function info_msg {
   echo -e "INFO: $1"
 }
@@ -102,9 +116,21 @@ debug_msg "Checking for Vivado install:"
 if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
   # Module command is installed.
   # Load and unload the modules just to make sure have the environment set correctly
-  module unload vivado
-  module unload sdx
-  module load vivado
+
+    # We want to make sure sdx exists before calling the unload function
+    if does_module_exist sdx; then
+        module unload sdx
+    fi
+
+    if does_module_exist vivado; then
+        # First unload and then load it back.
+        module unload vivado
+        module load vivado
+    else
+        err_msg "The modulefile to set the environment variables for Vivado does not exist!"
+        err_msg "  Please source the hdk_setup script on the correct AMI from the marketplace"
+        return 1
+    fi
 fi
 
 # before going too far make sure Vivado is available

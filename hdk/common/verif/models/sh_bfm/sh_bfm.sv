@@ -1445,7 +1445,7 @@ module sh_bfm #(
          ClockRecipe::A2: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
-            EXTRA_A1_DLY = 64ns;
+            EXTRA_A1_DLY = 32ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
@@ -1894,7 +1894,7 @@ module sh_bfm #(
          last_beat         = 0;
          start_addr        = 0;
          aligned           = 0;
-         
+              
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
@@ -1909,7 +1909,8 @@ module sh_bfm #(
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  axi_cmd.len  = (num_of_data_beats==1) ? 0 :
+                                  aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
                   if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
@@ -1938,9 +1939,17 @@ module sh_bfm #(
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
                   last_data_beat = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
-                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
+                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64; 
                   axi_data.last = (j == axi_cmd.len) ? 1 : 0;
-                  if(last_data_beat)  begin
+                  if(num_of_data_beats == 1) begin
+                    num_bytes = (dop.len)%64;
+                    for(int i=start_addr[5:0]; i < (num_bytes+start_addr[5:0]); i++) begin
+                      axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
+                      axi_data.strb = axi_data.strb | 1 << i;
+                      byte_cnt++;
+                    end
+                  end
+                  else if(last_data_beat)  begin
                     for(int i=0; i < num_bytes; i++) begin
                       axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
                       axi_data.strb = axi_data.strb | 1 << i;
@@ -2040,7 +2049,8 @@ module sh_bfm #(
               for(int burst_cnt=0; burst_cnt < num_of_data_beats; ) begin
                 if(burst_cnt == 0) begin   // if first data beat
                   axi_cmd.addr = dop.cl_addr;
-                  axi_cmd.len  = aligned ? (num_of_data_beats - 1 - last_beat) : 0;
+                  axi_cmd.len  = (num_of_data_beats==1) ? 0 :
+                                  aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
                   if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
