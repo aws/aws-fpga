@@ -2093,7 +2093,8 @@ module sh_bfm #(
           sh_ddr_stat_addr0  = addr;
           sh_ddr_stat_wdata0 = data;
           sh_ddr_stat_rd0    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr0    = 0;
        end
        1: begin
@@ -2101,7 +2102,8 @@ module sh_bfm #(
           sh_ddr_stat_addr1  = addr;
           sh_ddr_stat_wdata1 = data;
           sh_ddr_stat_rd1    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr1    = 0;
        end
        2: begin
@@ -2109,7 +2111,8 @@ module sh_bfm #(
           sh_ddr_stat_addr2  = addr;
           sh_ddr_stat_wdata2 = data;
           sh_ddr_stat_rd2    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr2    = 0;
        end
      endcase // case (ddr_idx)

@@ -36,7 +36,7 @@ module test_dram_dma();
                    .clk_recipe_b(ClockRecipe::B0), 
                    .clk_recipe_c(ClockRecipe::C0));
 
-       tb.nsec_delay(500);
+       tb.nsec_delay(1000);
        tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
        tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
        tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
@@ -108,9 +108,9 @@ module test_dram_dma();
           status[3] = tb.is_dma_to_cl_done(.chan(3));
           #10ns;
           timeout_count++;
-       end while ((status != 4'hf) && (timeout_count < 500));
+       end while ((status != 4'hf) && (timeout_count < 2000));
        
-       if (timeout_count >= 500) begin
+       if (timeout_count >= 2000) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
@@ -145,9 +145,9 @@ module test_dram_dma();
           status[3] = tb.is_dma_to_buffer_done(.chan(3));
           #10ns;
           timeout_count++;          
-       end while ((status != 4'hf) && (timeout_count < 500));
+       end while ((status != 4'hf) && (timeout_count < 1000));
        
-       if (timeout_count >= 500) begin
+       if (timeout_count >= 1000) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
