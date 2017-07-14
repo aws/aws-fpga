@@ -915,8 +915,13 @@ module sh_bfm #(
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
-         cmd.size  = cl_sh_pcim_awsize;
+         cmd.size = cl_sh_pcim_awsize;
          cmd.last = 0;
+         
+         if(cl_sh_pcim_awsize != 6) begin
+          $display("FATAL ERROR: AwSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_wr_cmds.push_back(cmd);         
          sh_cl_b_resps.push_back(cmd);
@@ -997,6 +1002,11 @@ module sh_bfm #(
          cmd.len  = cl_sh_pcim_arlen;
          cmd.size = cl_sh_pcim_arsize;
          cmd.last = 0;
+
+         if(cl_sh_pcim_arsize != 6) begin
+          $display("FATAL ERROR: ArSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_rd_cmds.push_back(cmd);
          sh_cl_rd_data.push_back(cmd);
