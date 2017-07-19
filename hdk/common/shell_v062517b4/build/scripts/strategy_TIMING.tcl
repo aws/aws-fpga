@@ -1,6 +1,7 @@
+
 source $HDK_SHELL_DIR/build/scripts/params.tcl
 
-set synth_options "-no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off -max_uram_cascade_height 1"
+set synth_options "-no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off"
 set synth_directive "default"
 
 #Set psip to 1 to enable Physical Synthesis in Placer (2017.1+ only)
@@ -35,7 +36,7 @@ set route_postHookTcl ""
 
 set route_phys_opt 1
 set post_phys_options     ""
-set post_phys_directive   "AgressiveExplore"
+set post_phys_directive   "AggressiveExplore"
 set post_phys_preHookTcl  ""
 set post_phys_postHookTcl ""
 

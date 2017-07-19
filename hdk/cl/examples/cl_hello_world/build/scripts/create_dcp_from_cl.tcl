@@ -35,7 +35,8 @@ set subsystem_vendor_id [lindex $argv  7]
 set clock_recipe_a      [lindex $argv  8]
 set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
-set notify_via_sns      [lindex $argv 11]
+set uram_option         [lindex $argv 11]
+set notify_via_sns      [lindex $argv 12]
 
 ##################################################
 ## Flow control variables 
@@ -59,6 +60,7 @@ puts "PCI Subsystem Vendor ID $subsystem_vendor_id";
 puts "Clock Recipe A:         $clock_recipe_a";
 puts "Clock Recipe B:         $clock_recipe_b";
 puts "Clock Recipe C:         $clock_recipe_c";
+puts "URAM option:            $uram_option";
 puts "Notify when done:       $notify_via_sns";
 
 #checking if CL_DIR env variable exists

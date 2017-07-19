@@ -18,7 +18,7 @@
 # Usage help
 function usage
 {
-    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1 | B2 | B3 | B4 | B5] [-clock_recipe_c C0 | C1 | C2 | C3] [-foreground] [-notify] | [-h] | [-H] | [-help] |  ]"
+    echo "usage: aws_build_dcp_from_cl.sh [ [-script <vivado_script>] | [-strategy BASIC | DEFAULT | EXPLORE | TIMING | CONGESTION] [-clock_recipe_a A0 | A1 | A2] [-clock_recipe_b B0 | B1 | B2 | B3 | B4 | B5] [-clock_recipe_c C0 | C1 | C2 | C3] [-uram_option 2 | 3 | 4] [-foreground] [-notify] | [-h] | [-H] | [-help] |  ]"
     echo " "
     echo "By default the build is run in the background using nohup so that the"
     echo "process will not be terminated if the terminal window is closed."
@@ -43,6 +43,7 @@ foreground=0
 notify=0
 ignore_memory_requirement=0
 expected_memory_usage=30000000
+uram_option=2
 
 function info_msg {
   echo -e "INFO: $1"
@@ -85,6 +86,9 @@ while [ "$1" != "" ]; do
                                 ;;
         -clock_recipe_c )       shift
                                 clock_recipe_c=$1
+                                ;;
+        -uram_option )          shift
+                                uram_option=$1
                                 ;;
         -foreground )           foreground=1
                                 ;;
@@ -132,6 +136,13 @@ fi
 shopt -s extglob
 if [[ $clock_recipe_c != @(C0|C1|C2|C3) ]]; then
   err_msg "$clock_recipe_c isn't a valid Clock Group C recipe. Valid Clock Group C recipes are C0, C1, C2, and C3."
+  exit 1
+fi
+
+# Check that uram_option is valid
+shopt -s extglob
+if [[ $uram_option != @(2|3|4) ]]; then
+  err_msg "$uram_option isn't a valid URAM option. Valid URAM options are 2 (50%), 3 (75%), and 4 (100%)."
   exit 1
 fi
 
@@ -215,7 +226,7 @@ subsystem_id="0x${id1_version:0:4}";
 subsystem_vendor_id="0x${id1_version:4:4}";
 
 # Run vivado
-cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $notify"
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $uram_option $notify"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   
