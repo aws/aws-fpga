@@ -84,6 +84,34 @@ read_xdc [ list \
 set_property USED_IN {synthesis implementation OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
 set_property PROCESSING_ORDER EARLY  [get_files cl_clocks_aws.xdc]
 
+##################################################
+### URAM options 
+##################################################
+switch $uram_option {
+    "2" {
+        set synth_uram_option "-max_uram_cascade_height 2"
+        set uramHeight 2
+    }
+    "3" {
+        set synth_uram_option "-max_uram_cascade_height 3"
+        set_param physynth.ultraRAMOptOutput false
+        set_param synth.elaboration.rodinMoreOptions  {rt::set_parameter disableOregPackingUram true}
+        set uramHeight 3
+    }
+    "4" {
+        set synth_uram_option "-max_uram_cascade_height 1"
+        set_param physynth.ultraRAMOptOutput false
+        set_param synth.elaboration.rodinMoreOptions  {rt::set_parameter disableOregPackingUram true}
+        set uramHeight 4
+    }
+    default {
+        set synth_uram_option "-max_uram_cascade_height 1"
+        set_param physynth.ultraRAMOptOutput false
+        set_param synth.elaboration.rodinMoreOptions  {rt::set_parameter disableOregPackingUram true}
+        set uramHeight 4
+    }
+}
+
 ########################
 # CL Synthesis
 ########################
@@ -91,7 +119,7 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthes
 
 update_compile_order -fileset sources_1
 puts "\nRunning synth_design for $CL_MODULE $CL_DIR/build/scripts \[[clock format [clock seconds] -format {%a %b %d %H:%M:%S %Y}]\]"
-eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive]
+eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options $synth_uram_option -directive $synth_directive]
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {

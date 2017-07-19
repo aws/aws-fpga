@@ -1,4 +1,4 @@
-set uramHeight 4
+global uramHeight
 
 ###Check oreg_b usage for uramHeight==3 and uramHeight==4
 set clean 1
