@@ -22,11 +22,11 @@
          *    Maximum read request size set by the Shell
          *    AXI4 error handling 
     *    DDR interface between SH and CL
-         *     CL to SH 512-bit AXI4 interface
-         *     1 DDR controller implemented in the SH (always available)
-         *     3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
+         *    CL to SH 512-bit AXI4 interface
+         *    1 DDR controller implemented in the SH (always available)
+         *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
-## Release 1.3.0 (Preview)
+## Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features during preview)
    *    FPGA initiated read/write over PCI (PCI-M)
    *    Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
    *    Expanded DMA support

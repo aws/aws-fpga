@@ -1,20 +1,23 @@
-# Hello World CL Example
+# Hello World CL VHDL Example
 
 ## Table of Contents
 
 1. [Overview](#overview)
 2. [Functional Description](#description)
-3. [Hello World Example Metadata](#metadata)
+3. [Hello World VHDL Example Metadata](#metadata)
 
 
 <a name="overview"></a>
 ## Overview
 
+The purpose of this example is to provide an environment for VHDL users which uses the hello_world example.
+This hello_world_vhdl example is based upon the main hello_world example except for a VHDL wrapper is provided for VHDL users.
+This design can be modified to include or exclude certain interfaces for VHDL logic and mean't to be modified for VHDL designs/users.
+Unused interfaces interfaces between AWS Shell and the CL are automatically tied off based upon `define in cl_hello_world_defines.vh.
+
 This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (C). These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
 
 This example demonstrate a basic use-case of the Virtual LED and Virtual DIP switches.
-
-All of the unused interfaces between AWS Shell and the CL are tied to fixed values, and it is recommended that the developer use similar values for every unused interface in the developer's CL.
 
 Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
@@ -28,6 +31,8 @@ The cl_hello_world example demonstrates basic Shell-to-CL connectivity, memory-m
 2. Virtual LED Register (offset 0x504)
 
 Please refer to the [FPGA PCIe memory space overview](../../../docs/AWS_Fpga_Pcie_Memory_Map.md)
+
+The Hello World logic is incorporated into a verilog module and called out in the VHDL wrapper.  However, the debug logic is written in the VHDL wrapper.
 
 The Hello World Register is a 32-bit read/write register. However, in order to demonstrate that the register is being accessed correctly, the read data returned for the register will be byte swapped.
 
@@ -50,23 +55,23 @@ While running on F1, the developer can use the FPGA tools `fpga-get-virtual-led`
 
 Clock/Reset/General Information
     
-Only supporting clk_main_a0 (250 MHz clock) at this time.
+Only supporting clk_main_a0 at this time.
     
-MISC Interfaces are not added in wrappers (Interrupts).  Inter-FPGA functionality is not enabled with these wrappers.
-    
-cl_hello_world_defines.sv - Comment out AXI Interfaces not used (AXIL_OCL, AXIL_USR, AXIL_SDA, DMA_PCIS, DDR4_SH, DDR4_CL, PCIM).
-    
-The `define for DDR4_A_ID/ DDR4_B_ID/ DDR4_D_ID  and `define AXIL_USR_NOPASS/ AXIL_SDA_NOPASS/AXIL_OCL_NOPASS  are used for IPI flow which are not used with the Verilog/VHDL wrappers.
-    
-PCIM hasn't been fully tested in  VHDL flow.  Use at your own risk but provide feedback if used.
-    
+MISC Interfaces are not added in wrappers (Interrupts).
+        
+PCIM hasn't been fully tested in the VHDL flow.  Use at your own risk but provide feedback if used.
+
+Below is the hiearchy of the design.
+
 cl_hello_world.sv - This module uses  `define that are configured in cl_hello_world_defines.sv and ensure to tie off signals to the SH when necessary for seamless usage of the different flows (VHDL Flow this file shouldn't be modified)
-    
-cl_vhdl_wrapper.vhd - VHDL Wrapper Flow Can use generate statements to connect signals from top level ports when AXI Interfaces are used.  Not required to use these generates statements but makes code more cleaner.
+cl_hello_world_defines.sv - Comment out AXI Interfaces that are not used (AXIL_OCL, AXIL_USR, AXIL_SDA, DMA_PCIS, DDR4_SH, DDR4_CL, PCIM).
+	-cl_vhdl_wrapper.vhd - VHDL users are encouraged to modify this wrapper based upon design requirements. VHDL Wrapper flow Can use generate statements to connect signals from top level ports when AXI Interfaces are used.  Not required to use these generates statements but makes code more cleaner.
+			       This file currently connects the hello_world module for OCL AXI interface and VLED and VDIP logic and contains debug logic.
+		-hello_world.sv - Logic for hello world design (verilog)
 
-
+   
 <a name="metadata"></a>
-## Hello World Example Metadata
+## Hello World VHDL Example Metadata
 
 The following table displays information about the CL that is required to register it as an AFI with AWS.
 Alternatively, you can directly use a pre-generated AFI for this CL.

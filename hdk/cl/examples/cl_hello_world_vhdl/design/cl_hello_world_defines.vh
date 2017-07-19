@@ -38,12 +38,9 @@
 //`define DMA_PCIS        
 
 //`define DDR4_SH
-//`define DDR4_SH_ID
 
 //`define DDR4_CL
-//`define DDR4_A_ID
-//`define DDR4_B_ID
-//`define DDR4_D_ID
+
 
 //`define PCIM
 
