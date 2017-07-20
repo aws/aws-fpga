@@ -1,7 +1,7 @@
-
 source $HDK_SHELL_DIR/build/scripts/params.tcl
+source $HDK_SHELL_DIR/build/scripts/uram_options.tcl
 
-set synth_options "-keep_equivalent_registers -flatten_hierarchy rebuilt"
+set synth_options "-keep_equivalent_registers -flatten_hierarchy rebuilt $synth_uram_option"
 set synth_directive "default"
 
 #Set psip to 1 to enable Physical Synthesis in Placer (2017.1+ only)
