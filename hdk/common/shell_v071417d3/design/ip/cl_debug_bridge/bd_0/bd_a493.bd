@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<bd:repository xmlns:bd="http://www.xilinx.com/bd" bd:BoundaryCRC="0x1F6A4C708E54A361" bd:bdsource="SBD" bd:device="xcvu9p-flgb2104-2-i" bd:isScoped="true" bd:isValidated="true" bd:synthFlowMode="None" bd:tool_version="2017.1_sdxop" bd:top="bd_a493" bd:version="1.00.a">
+
+  <spirit:component xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">
+    <spirit:vendor>xilinx.com</spirit:vendor>
+    <spirit:library>BlockDiagram</spirit:library>
+    <spirit:name>bd_a493</spirit:name>
+    <spirit:version>1.00.a</spirit:version>
+    <spirit:parameters>
+      <spirit:parameter>
+        <spirit:name>isTop</spirit:name>
+        <spirit:value spirit:format="bool" spirit:resolve="immediate">true</spirit:value>
+      </spirit:parameter>
+    </spirit:parameters>
+    <spirit:busInterfaces>
+      <spirit:busInterface>
+        <spirit:name>S_BSCAN</spirit:name>
+        <spirit:slave/>
+        <spirit:busType spirit:library="interface" spirit:name="bscan" spirit:vendor="xilinx.com" spirit:version="1.0"/>
+        <spirit:abstractionType spirit:library="interface" spirit:name="bscan_rtl" spirit:vendor="xilinx.com" spirit:version="1.0"/>
+      </spirit:busInterface>
+      <spirit:busInterface>
+        <spirit:name>CLK.CLK</spirit:name>
+        <spirit:displayName>Clk</spirit:displayName>
+        <spirit:description>Clock</spirit:description>
+        <spirit:busType spirit:library="signal" spirit:name="clock" spirit:vendor="xilinx.com" spirit:version="1.0"/>
+        <spirit:abstractionType spirit:library="signal" spirit:name="clock_rtl" spirit:vendor="xilinx.com" spirit:version="1.0"/>
+        <spirit:slave/>
+        <spirit:portMaps>
+          <spirit:portMap>
+            <spirit:logicalPort>
+              <spirit:name>CLK</spirit:name>
+            </spirit:logicalPort>
+            <spirit:physicalPort>
+              <spirit:name>clk</spirit:name>
+            </spirit:physicalPort>
+          </spirit:portMap>
+        </spirit:portMaps>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>FREQ_HZ</spirit:name>
+            <spirit:value>100000000</spirit:value>
+            <spirit:vendorExtensions>
+              <bd:configElementInfos>
+                <bd:configElementInfo bd:valueSource="default"/>
+              </bd:configElementInfos>
+            </spirit:vendorExtensions>
+          </spirit:parameter>
+          <spirit:parameter>
+            <spirit:name>PHASE</spirit:name>
+            <spirit:value>0.000</spirit:value>
+            <spirit:vendorExtensions>
+              <bd:configElementInfos>
+                <bd:configElementInfo bd:valueSource="default"/>
+              </bd:configElementInfos>
+            </spirit:vendorExtensions>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:busInterface>
+    </spirit:busInterfaces>
+    <spirit:model>
+      <spirit:views>
+        <spirit:view>
+          <spirit:name>BlockDiagram</spirit:name>
+          <spirit:envIdentifier>:vivado.xilinx.com:</spirit:envIdentifier>
+          <spirit:hierarchyRef spirit:library="BlockDiagram" spirit:name="bd_a493_imp" spirit:vendor="xilinx.com" spirit:version="1.00.a"/>
+        </spirit:view>
+      </spirit:views>
+      <spirit:ports>
+        <spirit:port>
+          <spirit:name>clk</spirit:name>
+          <spirit:wire>
+            <spirit:direction>in</spirit:direction>
+          </spirit:wire>
+        </spirit:port>
+      </spirit:ports>
+    </spirit:model>
+  </spirit:component>
+
+  <spirit:design xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009">
+    <spirit:vendor>xilinx.com</spirit:vendor>
+    <spirit:library>BlockDiagram</spirit:library>
+    <spirit:name>bd_a493_imp</spirit:name>
+    <spirit:version>1.00.a</spirit:version>
+    <spirit:componentInstances>
+      <spirit:componentInstance>
+        <spirit:instanceName>xsdbm</spirit:instanceName>
+        <spirit:componentRef spirit:library="ip" spirit:name="xsdbm" spirit:vendor="xilinx.com" spirit:version="3.0"/>
+        <spirit:configurableElementValues>
+          <spirit:configurableElementValue spirit:referenceId="bd:xciName">bd_a493_xsdbm_0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_EN_BSCANID_VEC">false</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_TWO_PRIM_MODE">false</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_USE_EXT_BSCAN">true</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_USE_STARTUP_CLK">false</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_ENABLE_CLK_DIVIDER">false</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_USER_SCAN_CHAIN">1</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_CORE_TYPE">1</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_EN_INT_SIM">1</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_DCLK_HAS_RESET">0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_USE_BUFR">0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_XSDB_NUM_SLAVES">0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_CORE_MINOR_ALPHA_VER">97</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_CORE_MINOR_VER">0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_CORE_MAJOR_VER">1</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_BUILD_REVISION">0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_MINOR_VERSION">1</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_MAJOR_VERSION">14</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_FIFO_STYLE">SUBCORE</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_CLK_INPUT_FREQ_HZ">300000000</spirit:configurableElementValue>
+        </spirit:configurableElementValues>
+      </spirit:componentInstance>
+      <spirit:componentInstance>
+        <spirit:instanceName>lut_buffer</spirit:instanceName>
+        <spirit:componentRef spirit:library="ip" spirit:name="lut_buffer" spirit:vendor="xilinx.com" spirit:version="2.0"/>
+        <spirit:configurableElementValues>
+          <spirit:configurableElementValue spirit:referenceId="bd:xciName">bd_a493_lut_buffer_0</spirit:configurableElementValue>
+          <spirit:configurableElementValue spirit:referenceId="C_EN_BSCANID_VEC">false</spirit:configurableElementValue>
+        </spirit:configurableElementValues>
+      </spirit:componentInstance>
+    </spirit:componentInstances>
+    <spirit:interconnections>
+      <spirit:interconnection>
+        <spirit:name>lut_buffer_m_bscan</spirit:name>
+        <spirit:activeInterface spirit:busRef="m_bscan" spirit:componentRef="lut_buffer"/>
+        <spirit:activeInterface spirit:busRef="s_bscan" spirit:componentRef="xsdbm"/>
+      </spirit:interconnection>
+    </spirit:interconnections>
+    <spirit:adHocConnections>
+      <spirit:adHocConnection>
+        <spirit:name>clk_1</spirit:name>
+        <spirit:externalPortReference spirit:portRef="clk"/>
+        <spirit:internalPortReference spirit:componentRef="xsdbm" spirit:portRef="clk"/>
+      </spirit:adHocConnection>
+    </spirit:adHocConnections>
+    <spirit:hierConnections>
+      <spirit:hierConnection spirit:interfaceRef="S_BSCAN/S_BSCAN_1">
+        <spirit:activeInterface spirit:busRef="s_bscan" spirit:componentRef="lut_buffer"/>
+      </spirit:hierConnection>
+    </spirit:hierConnections>
+  </spirit:design>
+
+</bd:repository>
