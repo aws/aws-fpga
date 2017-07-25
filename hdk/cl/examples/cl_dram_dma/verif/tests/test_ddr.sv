@@ -32,7 +32,7 @@ module test_ddr();
       tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
-      // de-select the ATG hardware
+      // select the ATG hardware
        
       tb.poke_ocl(.addr(64'h130), .data(1));
       tb.poke_ocl(.addr(64'h230), .data(1));
