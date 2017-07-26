@@ -170,12 +170,23 @@ int dma_example(int slot_id) {
 
     rand_string(write_buffer, buffer_size);
 
-    for (channel=0;channel < 4; channel++) {
-    	
-	rc = pwrite(fd, write_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
-	
-    	fail_on((rc = (rc < 0)? 1:0), out, "call to pwrite failed.");
-
+    for (channel=0; channel < 4; channel++) {
+        size_t write_offset = 0;
+        while (write_offset < buffer_size) {
+            if (write_offset != 0) {
+                printf("Partial write by driver, trying again with remainder of buffer (%lu bytes)\n",
+                    buffer_size - write_offset);
+            }
+            rc = pwrite(fd,
+                write_buffer + write_offset,
+                buffer_size - write_offset,
+                0x10000000 + channel*MEM_16G + write_offset);
+            if (rc < 0) {
+                fail_on((rc = (rc < 0)? errno:0), out, "call to pwrite failed.");
+            }
+            write_offset += rc;
+        }
+        rc = 0;
     }
 
     /* fsync() will make sure the write made it to the target buffer 
@@ -184,9 +195,23 @@ int dma_example(int slot_id) {
 
     fsync(fd);
 
-    for (channel=0;channel < 4; channel++) {
-    	rc = pread(fd, read_buffer, buffer_size, 0x10000000 + channel*MEM_16G);
-    	fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
+    for (channel=0; channel < 4; channel++) {
+        size_t read_offset = 0;
+        while (read_offset < buffer_size) {
+            if (read_offset != 0) {
+                printf("Partial read by driver, trying again with remainder of buffer (%lu bytes)\n",
+                    buffer_size - read_offset);
+            }
+            rc = pread(fd,
+                read_buffer + read_offset,
+                buffer_size - read_offset,
+                0x10000000 + channel*MEM_16G + read_offset);
+            if (rc < 0) {
+                fail_on((rc = (rc < 0)? errno:0), out, "call to pread failed.");
+            }
+            read_offset += rc;
+        }
+        rc = 0;
 
     	if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
         	printf("DRAM DMA read the same string as it wrote on channel %d (it worked correctly!)\n", channel);
