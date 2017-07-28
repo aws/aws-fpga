@@ -40,8 +40,9 @@ This section covers using a precanned IP Integrator example designs with Vivado.
 
 Current examples are the following. Select the link below for information on the design and how to create the particular example design.
 
-hello_world
-cl_ipi_cdma_test
+[cl_hello_world_hlx](../cl/examples/cl_hello_world_hlx/README.md)
+[cl_dram_dma_hlx](../cl/examples/cl_dram_dma_hlx/README.md)
+[cl_ipi_cdma_test_hlx](../cl/examples/cl_ipi_cdma_test_hlx/README.md)
 
 <a name="rtlex"></a>
 # RTL Examples Prepackage
@@ -52,8 +53,8 @@ This section covers using a precanned RTL example design with Vivado.  The examp
 
 Current examples are the following. Select the link below for information on the design and how to create the particular example design.
 
-cl_hello_world
-cl_dram_dma
+[cl_hello_world_hlx](../cl/examples/cl_hello_world_hlx/README.md)
+[cl_dram_dma_hlx](../cl/examples/cl_dram_dma_hlx/README.md)
 
 
 <a name="rtlexistut_world"></a>

@@ -44,11 +44,7 @@ When vivado in invoked, this script will always be sourced and features of this 
 # AWS IP Overview
 To configure the AWS IP, double click on the AWS IP in the canvas.
 
-Add Image
-
 When the Re-customize IP GUI appears, four catagories appear for IP configuration.
-
-Add Image
 
 ## Enable IP Interfaces
 
