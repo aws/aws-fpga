@@ -28,7 +28,7 @@
 * Aurora and Reliabile Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
-* All AXI-4 interfaces (PCIM, DDR4) do not support AxSIZE other than 0b110 (64B)
+* PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)
 
 ## Known Bugs/Issues
 
