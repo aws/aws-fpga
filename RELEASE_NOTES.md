@@ -26,7 +26,7 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
-## Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features during preview)
+## Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    FPGA initiated read/write over PCI (PCI-M)
    *    Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
    *    Expanded DMA support
@@ -44,12 +44,12 @@ The following major features are included in this HDK release:
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 * The floorplan has been enhanced to enable more optimal CL designs through better timing closure and reduced congestion at the CL to Shell interface.
-* [New Shell Stable: v062517b4](./hdk/common/shell_v062517b4)
+* [New Shell Stable: v071417d3](./hdk/common/shell_v071417d3)
 * [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated.  See cl_ports.vh for the updated port list
-* DCP for the latest shell v062517b4. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
+* DCP for the latest shell v071417d3. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
 ### 2.	Integrated DMA 
-* DMA functionality has been enhanced to allow DMA transactions of any size.
+* DMA functionality has been enhanced to allow DMA transactions of up to 1MB.
 * Multi-queue in each direction is now supported
 * The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
 * DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software 
@@ -62,19 +62,22 @@ The following major features are included in this HDK release:
 * The PCI-M interface is fully supported for CL generated transactions to the Shell. 
 
 ### 4.	URAM 
-* Restrictions on URAM have been relieved to enable 100% of the URAM with a CL to be utilized.
+* Restrictions on URAM have been updated to enable 100% of the URAM with a CL to be utilized.  See documnetation on enabling URAM utilization: [URAM_options](.hdk/docs/URAM_Options.md)
 
 ### 5.	IPI
-* WIP
+* IPI developer flow is supported
   
 ### 6.	Build Flow improvments
-* WIP
+* See [Build_Scripts](./hdk/common/shell_v071417d3/build/scripts)
 
 ### 7.	VHDL
-* WIP
+* CL designs in VHDL are fully supported.  
+See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_world_vhdl/README.md)
 
 ### 8.	AXI Interface Checking
 * Protocol checks have been added to the CL-Shell interface to detect and report CL errors for enhanced CL debugging.
+* Transaction timeout values on the CL-Shell interface have been increased to allow for longer CL response times.
+* See [Shell_Interface_Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
 
 ### 9.	Support for Vivado 2017.1 SDX Build 
 
