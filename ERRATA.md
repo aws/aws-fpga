@@ -2,14 +2,6 @@
 # AWS EC2 FPGA HDK+SDK Errata
 
 
-## Preview 1.3.0 - Features that are not supported in preview.  These features will see additional updates.
-* create-fpga-image 
-* fpga-load-local-image 
-* Improvements to URAM utilization 
-* IP Integrator flow
-* SDAccel
-
-
 ## Release 1.3.0 
 ### Implementation Restrictions
 *    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
@@ -21,6 +13,8 @@
     *    WSTRB(write strobe) must reflect appropriate valid bytes for AXI write beats
     *    Only Increment burst type is supported
     *    AXI lock, memory type, protection type, Quality of service and Region identifier are not supported
+    *    Transactions from the Shell to CL must complete within the timeout period to avoid transaction termination by the Shell
+    *    DMA transactions from the Shell to CL must complete within the timeout period to avoid transaction termination and invalid data returned for the DMA transaction
 
 ## Unsupported Features (Planned for future releases)
 * FPGA to FPGA communication over PCIe for F1.16xl
