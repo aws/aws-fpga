@@ -5,9 +5,11 @@
 *.bin
 */build/checkpoints
 */build/checkpoints/*.dcp
+*/build/constraints/cl_clocks_aws.xdc
 */build/reports/*.rpt
 */build/reports/*.txt
 */build/scripts/.Xil
+*/build/scripts/last_log
 */build/scripts/fsm_encoding.os
 */build/scripts/hd_visual
 */build/scripts/*.nohup.out

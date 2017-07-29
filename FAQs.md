@@ -58,9 +58,7 @@ Once developers complete their DCP, they submit the design through an AWS EC2 AP
 
 As AWS has taken all the non-differentiating, heavy lifting of hardware design, debug and implementation of PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring. Therefore AWS FPGA developers can focus on their own differentiating logic, instead of spending time on hardware bringup/debug and maintenance.
 
-On the business side, AWS Marketplace (MP) provides FPGA developers the opportunity to sell hardware accelerations to all of AWS users: Ramping on AWS MP services, capabilities and commercial opportunities are recommend knowledge for developers interested in offering their AFIs. 
-
-Education and research institutes can use AWS MP to distribute their research work ; having access to vast amounts of free [public data-sets](https://aws.amazon.com/public-datasets/ ) can be of value when running research hardware accelarations on AWS.
+On the business side, AWS Marketplace (MP) provides FPGA developers the opportunity to sell hardware accelerations to all of AWS users: Ramping on AWS MP services, capabilities and commercial opportunities are recommended knowledge for developers interested in selling their AFIs on AWS MP. Education and research institutes can use AWS MP to distribute their research work ; having access to vast amounts of free [public data-sets](https://aws.amazon.com/public-datasets/ ) can be of value when running research hardware accelarations on AWS.
 
 Finally, AWS consulting and technology partners can offer their services through the [AWS Partner Network](https://aws.amazon.com/ec2/instance-types/f1/partners/) to AWS users that don’t have specific FPGA development knowledge, in order to develop FPGA accelerations in the cloud by themselves.
   
@@ -75,7 +73,7 @@ With AWS, FPGAs developers have a few advantages:
   
 - Share: FPGA developers can share their designs easily through AWS Marketplace or APN. This is important for businesses as well as education and research use.
   
-- AWS FPGA instances can be combined with other AWS services to create a solution pipeline or integrate an accelaration into existing customer workflows/datasets
+- AWS FPGA instances can be combined with other AWS services to create a solution pipeline or integrate an acceleration into existing customer workflows/datasets
  
  
 **Q: What is included in the FPGA HDK?**
@@ -95,17 +93,16 @@ The HDK includes the following main components:
 
 **Q: What is in the AWS Shell?**
 
-The AWS Shell is the part of the FPGA that is provided and managed by AWS: it implements the non-differentiated development and heavy lifting tasks like setting up the PCIe interface, image download, security, monitoring, metrics and debug hooks.
+The AWS Shell is the part of the FPGA that is provided and managed by AWS: it implements the non-differentiated development and heavy lifting tasks like setting up the PCIe interface, FPGA image download, security, health monitoring, metrics and debug hooks.
 
-Every FPGA deployed in AWS cloud includes an AWS shell, and the developer Custom Logic (CL) interfaces with the available AWS Shell interfaces.
+Every FPGA deployed in AWS cloud includes an AWS Shell, and the developer Custom Logic (CL) interfaces with the available AWS Shell interfaces.
   
 
 **Q: What is an Amazon FPGA Image (AFI)?**
 
-It is the compiled FPGA code that is loaded into an FPGA in AWS for performing the Custom Logic (CL) function created by the developer. AFIs are maintained by AWS according and associated with the AWS account that created them. The AFI includes the CustomLogic (CL) and AWS FPGA Shell. An AFI ID is used to reference a particular AFI from an F1 instance.
+It is the compiled FPGA code that is loaded into an FPGA in AWS for performing the Custom Logic (CL) function created by the developer. AFIs are maintained by AWS according and associated with the AWS account that created them. The AFI includes the CL and AWS FPGA Shell. An AFI ID is used to reference a particular AFI from an F1 instance.
 
 The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed. 
-
 
 
 **Q: What is the process for creating an AFI?**
@@ -116,9 +113,9 @@ Use the AWS CLI `describe-fpga-images` API to get information about the created 
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
-No. There is no mechanism for loading a bitstream directly onto the FPGAs of an F1 instance. All Custom Logic are loaded onto the FPGA by calling `$ fpga-local-load-image` tool provides by [AWS FPGA SDK](https://github.com/aws/aws-fpga/sdk). 
+No. There is no mechanism for loading a bitstream directly onto the FPGAs of an F1 instance. All Custom Logic is loaded onto the FPGA by calling `$ fpga-local-load-image` tool at [AWS FPGA SDK](https://github.com/aws/aws-fpga/sdk). 
 
-Developers create an AFI by creating a Vivado Design Checkpoint (DCP) and submitting that DCP to AWS using `aws ec2 create-fpga-image` API. AWS creates the final AFI and bitstream from that DCP and returns an AFI ID for referencing that AFI.
+Developers create an AFI by creating a Vivado Design Checkpoint (DCP) and submitting that DCP to AWS using `aws ec2 create-fpga-image` API. AWS creates the AFI and bitstream from that DCP and returns a unique AFI ID referencing that AFI.
   
 
 **Q: Can I generate my bitstream on my own desktop/server (not on AWS cloud)?**
@@ -135,13 +132,12 @@ AWS prefers not to limit developers to a specific template in terms of how we ad
   
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If the developer uses the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included. 
+If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included at no additional cost. 
 
-If the developer want to run using other methods or on a local machine, the developer is responsible for obtaining any necessary licenses. 
-Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premises.  For more help, please refer to [On-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
+If you want to run using other methods or on a local machine, you will need to obtain any necessary licenses, specifically you will need to have setup the approproate Xilinx Vivado license. For more details, please refer to [On-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
-**Q: Does AWS provide actual FPGA boards for on-premises development?**
+**Q: Does AWS provide physical FPGA boards for on-premises development?**
 
 No. AWS supports a cloud-only development model and provides the necessary elements for doing 100% cloud development including Virtual JTAG (Vivado ChipScope), Virtual LEDs and Virtual DIP-switch. No development board is provided for on-premises development.
   
@@ -198,11 +194,11 @@ The [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/p
 
 **Q: Where do I go to for support?**
 
-We encourage you to use the [AWS FPGA Developer Forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to post questions, suggestions and receive important announcements. To be notified on important messages and new posts, click the “Watch Forum” button on the right side of the screen. 
+For F1 related development support issues, we encourage you to use the [AWS FPGA Developer Forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to post questions, suggestions and receive important announcements. To be notified on important messages and new posts, click the “Watch Forum” button on the right side of the screen. For general instance or AWS support issues, please use the avaliable [AWS support](https://aws.amazon.com/premiumsupport/) options avaliable for AWS users.
 
 **Q: Is there any software I need on my F1 instance that will use the AFI?**
 
-The required AWS software is the [FPGA Management Tool set](./sdk/userspace/fpga_mgmt_tools). This software manages loading and clearing AFIs for the instance FPGAs. It also allows developers to retrieve FPGAs status from within the instance. Users will need to load the F1 AMI with the drivers and runtime libraries needed for their FPGA application.
+To be able to manage and monitor the F1 FPGAs it is required to install the [FPGA Management Tool set](./sdk/userspace/fpga_mgmt_tools). This software manages loading and clearing AFIs for the instance FPGAs, it also allows developers to retrieve FPGAs status from within the instance. Developers will need to include in their F1 AMI all the drivers and runtime libraries needed for their specific FPGA application.
 
 Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope (Virtual JTAG).
 
@@ -210,7 +206,7 @@ Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instan
 ## Marketplace
 **Q: What does publishing my AFI/AMI to AWS Marketplace enables?**
 
-Developers can share or sell their AFI/AMI combination through the AWS Marketplace to other AWS users. Once in Marketplace, AWS users can launch an F1 instance with that AFI/AMI combination with the 1-click deployment feature. Marketplace Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption. The metering, billing, collections, and disbursement of payments are managed by AWS, allowing developers to focus on marketing and selling their solution. Please check out [AWS Marketplace Tour](https://aws.amazon.com/marketplace/management/tour/) for more details on how to become a seller, how to set pricing and collect metrics.
+FPGA Developers can share or sell their AFI/AMI using the AWS Marketplace to other AWS users. Once in Marketplace, AWS users can launch an F1 instance with that AFI/AMI combination with the 1-click deployment feature. Marketplace Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption. The metering, billing, collections, and disbursement of payments are managed by AWS, allowing developers to focus on marketing their solution. Please check out [AWS Marketplace Tour](https://aws.amazon.com/marketplace/management/tour/) for more details on how to become an AWS Marketplace seller, how to set pricing and collect metrics.
 
 
 **Q: How can I publish my AFI to AWS Marketplace?**
@@ -220,7 +216,7 @@ First, you need to [register as a Marketplace Seller](https://aws.amazon.com/mar
 
 **Q: Do AWS Marketplace customers see FPGA source code or a bitstream?**
 
-Neither, no FPGA internal design code is exposed. AWS Marketplace customers that pick up an AMI with one our more AFIs associated with it will not see any source code nor bitstream. Marketplace customers actually have permission to use the AFI but no permission to see its code. The only reference to the AFI is through its unique AFI ID. The AMI would call `fpga-local-load-image` with the correct AFI ID for that Marketplace offering, which will result in **AWS loading the AFI into the FPGA** in a sideband channel and without sending the AFI code through the customer's instance. 
+Neither, no FPGA internal design code is exposed. AWS Marketplace customers that pick up an AMI with one or more AFIs associated with it will not see any source code nor bitstream. Marketplace customers actually have permission to use the AFI but no permission to see its code. The only reference to the AFI is through its unique AFI ID. The AMI would call `fpga-local-load-image` with the correct AFI ID for that Marketplace offering, which will result in **AWS loading the AFI into the FPGA** in a sideband channel and without sending the AFI code through the customer's instance. 
 
 
 ## Instance
@@ -253,11 +249,11 @@ Both. The FPGA PCIe memory address space can be mmap() to both kernel and usersp
 
 **Q: How do I change what AFI is loaded in an FPGA?**
 
-Changing the AFI loaded in an FPGA is done using the `fpga-clear-local-image` and `fpga-load-local-image` APIs from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). Note that to ensure your AFI is loaded to a consistent state, a loaded FPGA slot must be cleared with `fpga-clear-local-image` before loading another FPGA image.  The `fpga-load-local-image` command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of Xilinx FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A users may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
+Changing the AFI loaded in an FPGA is done using the `fpga-clear-local-image` and `fpga-load-local-image` APIs from the [FPGA Image Management tools](./sdk/userspace/fpga_mgmt_tools). Note that to ensure your AFI is loaded to a consistent state, a loaded FPGA slot must be cleared with `fpga-clear-local-image` before loading another FPGA image.  The `fpga-load-local-image` command takes the AFI ID and requests it to be programmed into the identified FPGA. The AWS infrastructure manages the actual FPGA image and programming of the FPGA using Partial Reconfiguration capabilities of the FPGA. The AFI image is not stored in the F1 instance nor AMI. The AFI image can’t be read or modified by the instance as there isn't a direct access to programming the FPGA from the instance. A user may call `fpga-load-local-image` at any time during the life of an instance, and may call `fpga-load-local-image` any number of times.
 
 
 
-**Q: I can not see the new AFI after `fpga-load-local-image` call returned ?**
+**Q: I can not see the new AFI after `fpga-load-local-image` call returned?**
 
 The `fpga-load-local-image` call will initiate the loading of the AFI, however a successful return of `fpga-load-local-image` is just an indication that the loading process has started. The developer should poll on the status of the AFI via `fpga-describe-local-image` until the status would show **`loaded`**.
 
@@ -346,7 +342,7 @@ The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the 
 
 **Q: What memory is attached to the FPGA?**
 
-Each FPGA on F1 has 4 x DDR4-2133 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory local to each FPGA on F1.
+Each FPGA on F1 has 4 x DDR4 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory avaliable localy to each F1 FPGA.
 
 
 **Q: What FPGA debug capabilities are supported?**

@@ -4,6 +4,7 @@
 
 1. [AWS EC2 FPGA Hardware and Software Development Kits](#devkit)
     - [FPGA Hardware Development Kit (HDK)](#fpgahdk)
+    - [Vivado HLx Environment](#fpgahlx)    
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
@@ -36,6 +37,19 @@ The [HDK directory](./hdk) contains useful information and scripts for developer
         
 [FPGA PCIe Address Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
 
+<a name="fpgahlx"></a>
+## Vivado HLx 
+
+The Vivado HLx allows users to use Vivado in project mode to create designs or import designs using RTL or IP Integrator flows.
+The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
+
+[HLx Setup README](./hdk/docs/AWS_IP_Vivado_Setup.md)
+
+[HLx Flows](./hdk/docs/AWS_Vivado_Flows.md)
+
+[HLx Tutorials/Examples](./hdk/docs/AWS_Tutorials_Examples.md)
+
+[HLx FAQ](./hdk/docs/AWS_Vivado_FAQ.md)
         
 <a name="fpgasdk"></a>
 ## FPGA SDK

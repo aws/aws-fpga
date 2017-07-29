@@ -351,42 +351,6 @@ module fpga(
 
    logic               sh_bar1_rready;
 
-
-   //------------------------------------------------------
-   // HMC Stat Interface from CL
-   //------------------------------------------------------
-   
-   logic [7:0]          sh_hmc_stat_addr;
-   logic                sh_hmc_stat_wr;
-   logic                sh_hmc_stat_rd;
-   logic [31:0]         sh_hmc_stat_wdata;   
-   logic                hmc_sh_stat_ack;
-   logic [31:0]         hmc_sh_stat_rdata;
-   logic [7:0]          hmc_sh_stat_int;
-   
-   //------------------------------------------------------
-   // HMC Stat Interface from CL
-   //------------------------------------------------------
-   
-   logic                hmc_iic_scl_i;
-   logic                hmc_iic_scl_o;
-   logic                hmc_iic_scl_t;
-   logic                hmc_iic_sda_i;
-   logic                hmc_iic_sda_o;
-   logic                hmc_iic_sda_t;
-                              
-   //------------------------------------------------------
-   // Aurora Stat Interface from CL
-   //------------------------------------------------------
-   
-   logic [7:0]          sh_aurora_stat_addr;
-   logic                sh_aurora_stat_wr; 
-   logic                sh_aurora_stat_rd; 
-   logic [31:0]         sh_aurora_stat_wdata; 
-   logic                aurora_sh_stat_ack;
-   logic [31:0]         aurora_sh_stat_rdata;
-   logic [7:0]          aurora_sh_stat_int;
-
    logic [15:0]         cl_sh_irq_req;
    logic [15:0]         sh_cl_irq_ack;
 
@@ -428,20 +392,20 @@ module fpga(
              //-------------------------------   
              // HMC
              //-------------------------------   
-             .hmc_iic_scl_i(hmc_iic_scl_i),
-             .hmc_iic_scl_o(hmc_iic_scl_o),
-             .hmc_iic_scl_t(hmc_iic_scl_t),
-             .hmc_iic_sda_i(hmc_iic_sda_i),
-             .hmc_iic_sda_o(hmc_iic_sda_o),
-             .hmc_iic_sda_t(hmc_iic_sda_t),
-             
-             .sh_hmc_stat_addr(sh_hmc_stat_addr),
-             .sh_hmc_stat_wr(sh_hmc_stat_wr),
-             .sh_hmc_stat_rd(sh_hmc_stat_rd),
-             .sh_hmc_stat_wdata(sh_hmc_stat_wdata),
-             .hmc_sh_stat_ack(hmc_sh_stat_ack),
-             .hmc_sh_stat_rdata(hmc_sh_stat_rdata),
-             .hmc_sh_stat_int(hmc_sh_stat_int),  
+      //     .hmc_iic_scl_i(hmc_iic_scl_i),
+      //     .hmc_iic_scl_o(hmc_iic_scl_o),
+      //     .hmc_iic_scl_t(hmc_iic_scl_t),
+      //     .hmc_iic_sda_i(hmc_iic_sda_i),
+      //     .hmc_iic_sda_o(hmc_iic_sda_o),
+      //     .hmc_iic_sda_t(hmc_iic_sda_t),
+      //     
+      //     .sh_hmc_stat_addr(sh_hmc_stat_addr),
+      //     .sh_hmc_stat_wr(sh_hmc_stat_wr),
+      //     .sh_hmc_stat_rd(sh_hmc_stat_rd),
+      //     .sh_hmc_stat_wdata(sh_hmc_stat_wdata),
+      //     .hmc_sh_stat_ack(hmc_sh_stat_ack),
+      //     .hmc_sh_stat_rdata(hmc_sh_stat_rdata),
+      //     .hmc_sh_stat_int(hmc_sh_stat_int),  
              
              //-------------------------------------
              // PCIe Interface from CL (AXI-4) (CL is PCI-master)
@@ -531,14 +495,6 @@ module fpga(
              .sh_cl_msix_int_ack(),
     
              .cl_sh_aurora_channel_up(),
-             .sh_aurora_stat_addr(sh_aurora_stat_addr),
-             .sh_aurora_stat_wr(sh_aurora_stat_wr),
-             .sh_aurora_stat_rd(sh_aurora_stat_rd),
-             .sh_aurora_stat_wdata(sh_aurora_stat_wdata),
-             
-             .aurora_sh_stat_ack(aurora_sh_stat_ack),
-             .aurora_sh_stat_rdata(aurora_sh_stat_rdata),
-             .aurora_sh_stat_int(aurora_sh_stat_int),
 
              //--------------------------------------------------------------
              // DDR[3] (M_C_) interface 
@@ -1009,9 +965,10 @@ module fpga(
               .sh_cl_ddr_is_ready(sh_cl_ddr_is_ready),
 
               .cl_sh_apppf_irq_req(cl_sh_irq_req),
-              .sh_cl_apppf_irq_ack(sh_cl_irq_ack),
+              .sh_cl_apppf_irq_ack(sh_cl_irq_ack)
 
 `ifdef ENABLE_CS_DEBUG
+              ,
               //Debug (chipscope)
               .drck(drck),
               .shift(shift),
@@ -1024,33 +981,8 @@ module fpga(
               .runtest(runtest),
               .reset(reset),
               .capture(capture),
-              .bscanid(bscanid),
+              .bscanid(bscanid)
 `endif
-   
-              .hmc_iic_scl_i(hmc_iic_scl_i),
-              .hmc_iic_scl_o(hmc_iic_scl_o),
-              .hmc_iic_scl_t(hmc_iic_scl_t),
-              .hmc_iic_sda_i(hmc_iic_sda_i),
-              .hmc_iic_sda_o(hmc_iic_sda_o),
-              .hmc_iic_sda_t(hmc_iic_sda_t),
-              
-              .sh_hmc_stat_addr(sh_hmc_stat_addr),
-              .sh_hmc_stat_wr(sh_hmc_stat_wr),
-              .sh_hmc_stat_rd(sh_hmc_stat_rd),
-              .sh_hmc_stat_wdata(sh_hmc_stat_wdata),
-              
-              .hmc_sh_stat_ack(hmc_sh_stat_ack),
-              .hmc_sh_stat_rdata(hmc_sh_stat_rdata),
-
-              .hmc_sh_stat_int(hmc_sh_stat_int),
-
-              .sh_aurora_stat_addr   (sh_aurora_stat_addr),
-              .sh_aurora_stat_wr     (sh_aurora_stat_wr), 
-              .sh_aurora_stat_rd     (sh_aurora_stat_rd), 
-              .sh_aurora_stat_wdata  (sh_aurora_stat_wdata), 
-              .aurora_sh_stat_ack    (aurora_sh_stat_ack),
-              .aurora_sh_stat_rdata  (aurora_sh_stat_rdata),
-              .aurora_sh_stat_int    (aurora_sh_stat_int)
               
               );
 
