@@ -115,8 +115,8 @@ int fpga_mgmt_get_status(int slot_id, int *status, int *status_q);
 const char *fpga_mgmt_get_status_name(int status);
 
 /**
- * Clears the specified FPGA image slot, including FPGA internal and external
- * memories that are used by the slot.
+ * Asynchronously clears the specified FPGA image slot, including FPGA 
+ * internal and external memories that are used by the slot.
  *
  * @param[in]  slot_id  the logical slot index
  * @returns 0 on success, non-zero on error
@@ -124,13 +124,45 @@ const char *fpga_mgmt_get_status_name(int status);
 int fpga_mgmt_clear_local_image(int slot_id);
 
 /**
- * Loads the specified FPGA image to the specified slot number.
+ * Synchronously clears the specified FPGA image slot, including FPGA 
+ * internal and external memories that are used by the slot.
+ * A user-specified timeout may be specified as: 
+ *		timeout (retries) * delay_msec (polling period)
+ *
+ * @param[in]  slot_id	the logical slot index
+ * @param[in]  timeout	the timeout retries
+ * @param[in]  delay_msec the delay msec between timeout retries
+ * @param[in/out]  info	struct to populate with the slot description (or NULL)
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_mgmt_clear_local_image_sync(int slot_id, 
+		uint32_t timeout, uint32_t delay_msec,
+		struct fpga_mgmt_image_info *info);
+
+/**
+ * Asynchronously loads the specified FPGA image to the specified slot number.
  *
  * @param[in]  slot_id  the logical slot index
  * @param[in]  afi_id   The Amazon FGPA Image id to be loaded
  * @returns 0 on success, non-zero on error
  */
 int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
+
+/**
+ * Synchronously loads the specified FPGA image slot to the specified slot 
+ * number.
+ * A user-specified timeout may be specified as: 
+ *		timeout (retries) * delay_msec (polling period)
+ *
+ * @param[in]  slot_id	the logical slot index
+ * @param[in]  timeout	the timeout retries
+ * @param[in]  delay_msec the delay msec between timeout retries
+ * @param[in/out]  info	struct to populate with the slot description (or NULL)
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id, 
+		uint32_t timeout, uint32_t delay_msec,
+		struct fpga_mgmt_image_info *info);
 
 /**
  * Gets the status of the 16 virtual LEDs. Their statuses are returned as a

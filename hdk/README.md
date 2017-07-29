@@ -16,6 +16,7 @@ Useful resources:
     - [Start Custom Logic (CL) Design](#startcl)
     - [Simulate Custom Logic (CL) RTL Design](#simcl)
     - [Build Custom Logic (CL) Design to send to AWS](#buildcl)
+3. [Vivado HLx Setup/Environment](#vivadohlx)    
 
 <a name="overview"></a>
 ## Overview 
@@ -84,3 +85,16 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 You can follow the [build scripts readme](./common/shell_v04151701/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
+<a name="vivadohlx"></a>
+## Vivado HLx Overview
+
+The Vivado HLx allows users to use Vivado in project mode to create designs or importing designs using RTL or IP Integrator flows.
+The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
+
+[HLx Setup README](./docs/AWS_IP_Vivado_Setup.md)
+
+[HLx Flows](./docs/AWS_Vivado_Flows.md)
+
+[HLx Tutorials/Examples](./docs/AWS_Tutorials_Examples.md)
+
+[HLx FAQ](./docs/AWS_Vivado_FAQ.md)

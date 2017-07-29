@@ -1,0 +1,40 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+##################################################################
+## Makefile For Questa compiles and simulations
+## Step to run :
+## 1. make create_libs QUESTA=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all QUESTA=1  -> Runs the test
+##################################################################
+
+compile: $(COMPLIB_DIR)
+	mkdir -p $(SIM_DIR)
+	cd ${SIM_DIR} && ln -s -f ../questa_complib/modelsim.ini 
+	cd $(SIM_DIR) && vlog $(C_TEST_NAME) -ccflags "-I$(C_INC_DIR)"
+	cd $(SIM_DIR) && vcom -work work -64 -93 -f $(SCRIPTS_DIR)/top_vhdl.$(SIMULATOR).f	
+	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
+
+run:
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_12 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_13 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_11 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_11 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -do "run -all; quit -f" tb glbl $(TEST)
+
+$(COMPLIB_DIR):
+	cd $(SIM_ROOT)/.. && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT)/.. && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT)/.. && rm -rf create_libs.tcl 
+
+

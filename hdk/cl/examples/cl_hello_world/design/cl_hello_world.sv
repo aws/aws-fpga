@@ -44,8 +44,6 @@ logic rst_main_n_sync;
 `include "unused_cl_sda_template.inc"
 `include "unused_sh_bar1_template.inc"
 `include "unused_apppf_irq_template.inc"
-`include "unused_hmc_template.inc"
-`include "unused_aurora_template.inc"
 
 //-------------------------------------------------
 // Wires
@@ -366,18 +364,18 @@ always_ff @(posedge clk_main_a0)
 // Debug Bridge 
  cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(clk_main_a0),
-      .S_BSCAN_VEC_drck(drck),
-      .S_BSCAN_VEC_shift(shift),
-      .S_BSCAN_VEC_tdi(tdi),
-      .S_BSCAN_VEC_update(update),
-      .S_BSCAN_VEC_sel(sel),
-      .S_BSCAN_VEC_tdo(tdo),
-      .S_BSCAN_VEC_tms(tms),
-      .S_BSCAN_VEC_tck(tck),
-      .S_BSCAN_VEC_runtest(runtest),
-      .S_BSCAN_VEC_reset(reset),
-      .S_BSCAN_VEC_capture(capture),
-      .S_BSCAN_VEC_bscanid(bscanid)
+      .S_BSCAN_drck(drck),
+      .S_BSCAN_shift(shift),
+      .S_BSCAN_tdi(tdi),
+      .S_BSCAN_update(update),
+      .S_BSCAN_sel(sel),
+      .S_BSCAN_tdo(tdo),
+      .S_BSCAN_tms(tms),
+      .S_BSCAN_tck(tck),
+      .S_BSCAN_runtest(runtest),
+      .S_BSCAN_reset(reset),
+      .S_BSCAN_capture(capture),
+      .S_BSCAN_bscanid_en(bscanid_en)
    );
 
 //-----------------------------------------------

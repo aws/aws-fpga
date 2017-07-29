@@ -54,28 +54,6 @@ module sh_bfm #(
    output logic                sh_cl_flr_assert,
    input                       cl_sh_flr_done
 
-   //-------------------------------   
-   // HMC
-   //-------------------------------   
-   ,
-   output logic               hmc_iic_scl_i,
-   input                      hmc_iic_scl_o,
-   input                      hmc_iic_scl_t,
-   output logic               hmc_iic_sda_i,
-   input                      hmc_iic_sda_o,
-   input                      hmc_iic_sda_t,
-
-   output logic [7:0]         sh_hmc_stat_addr,
-   output logic               sh_hmc_stat_wr,
-   output logic               sh_hmc_stat_rd,
-   output logic [31:0]        sh_hmc_stat_wdata,
-
-   input                      hmc_sh_stat_ack,
-   input [31:0]               hmc_sh_stat_rdata,
-
-   input [7:0]                hmc_sh_stat_int
-
-    
    ,
    //-------------------------------------
    // PCIe Interface from CL (AXI-4) (CL is PCI-master)
@@ -171,19 +149,11 @@ module sh_bfm #(
     
    ,
    input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-   output logic [7:0]         sh_aurora_stat_addr,
-   output logic               sh_aurora_stat_wr,
-   output logic               sh_aurora_stat_rd,
-   output logic [31:0]        sh_aurora_stat_wdata,
-
-   input                      aurora_sh_stat_ack,
-   input [31:0]               aurora_sh_stat_rdata,
-   input [7:0]                aurora_sh_stat_int
 
    //--------------------------------------------------------------
    // DDR[3] (M_C_) interface 
    //--------------------------------------------------------------
-   ,
+
    // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
    input                       CLK_300M_DIMM2_DP,
    input                       CLK_300M_DIMM2_DN,
@@ -638,28 +608,6 @@ module sh_bfm #(
 
    assign ddr_user_rst_n = ~ddr_user_rst;
 
-   // TODO: Connect up HMC I2C interface once supported
-   initial begin
-      hmc_iic_scl_i <= 1'b0;
-      hmc_iic_sda_i <= 1'b0;
-   end
-
-   // TODO: Connect up HMC stats interface once supported
-   initial begin
-      sh_hmc_stat_addr <= 8'h00;
-      sh_hmc_stat_wr <= 1'b0;
-      sh_hmc_stat_rd <= 1'b0;
-      sh_hmc_stat_wdata <= 32'h0;
-   end
-
-   // TODO: Connect up Aurora stats interface once supported
-   initial begin
-      sh_aurora_stat_addr <= 8'h00;
-      sh_aurora_stat_wr <= 1'b0;
-      sh_aurora_stat_rd <= 1'b0;
-      sh_aurora_stat_wdata <= 32'h0;
-   end
-
    // TODO: Connect up DDR stats interfaces if needed
    initial begin
       sh_ddr_stat_addr0  = 8'h00;
@@ -915,8 +863,13 @@ module sh_bfm #(
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
-         cmd.size  = cl_sh_pcim_awsize;
+         cmd.size = cl_sh_pcim_awsize;
          cmd.last = 0;
+         
+         if(cl_sh_pcim_awsize != 6) begin
+          $display("FATAL ERROR: AwSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_wr_cmds.push_back(cmd);         
          sh_cl_b_resps.push_back(cmd);
@@ -997,6 +950,11 @@ module sh_bfm #(
          cmd.len  = cl_sh_pcim_arlen;
          cmd.size = cl_sh_pcim_arsize;
          cmd.last = 0;
+
+         if(cl_sh_pcim_arsize != 6) begin
+          $display("FATAL ERROR: ArSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_rd_cmds.push_back(cmd);
          sh_cl_rd_data.push_back(cmd);
@@ -2093,7 +2051,8 @@ module sh_bfm #(
           sh_ddr_stat_addr0  = addr;
           sh_ddr_stat_wdata0 = data;
           sh_ddr_stat_rd0    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr0    = 0;
        end
        1: begin
@@ -2101,7 +2060,8 @@ module sh_bfm #(
           sh_ddr_stat_addr1  = addr;
           sh_ddr_stat_wdata1 = data;
           sh_ddr_stat_rd1    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr1    = 0;
        end
        2: begin
@@ -2109,7 +2069,8 @@ module sh_bfm #(
           sh_ddr_stat_addr2  = addr;
           sh_ddr_stat_wdata2 = data;
           sh_ddr_stat_rd2    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr2    = 0;
        end
      endcase // case (ddr_idx)

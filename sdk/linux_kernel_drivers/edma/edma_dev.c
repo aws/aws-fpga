@@ -127,7 +127,7 @@ static inline int wait_is_fsync_running(struct edma_queue_private_data* private_
  * This function will only be called after we make sure that read,write and fsync
  * are are no longer working with the queue we are releasing
  */
-static void edma_dev_release_resources( struct emda_buffer_control_structure* ebcs)
+static void edma_dev_release_resources( struct edma_buffer_control_structure* ebcs)
 {
 	int i;
 
@@ -155,7 +155,7 @@ static void edma_dev_release_resources( struct emda_buffer_control_structure* eb
 	}
 }
 
-static void edma_dev_initialize_read_ebcs(struct emda_buffer_control_structure* ebcs)
+static void edma_dev_initialize_read_ebcs(struct edma_buffer_control_structure* ebcs)
 {
 	int i;
 
@@ -183,7 +183,7 @@ static void edma_dev_initialize_read_ebcs(struct emda_buffer_control_structure* 
 #endif
 }
 
-static inline int edma_dev_allocate_resources( struct emda_buffer_control_structure* ebcs)
+static inline int edma_dev_allocate_resources( struct edma_buffer_control_structure* ebcs)
 {
 	int ret = 0;
 	int i;
@@ -255,7 +255,7 @@ edma_dev_allocate_resources_done:
 }
 
 
-static inline void recycle_completed_descriptors(struct emda_buffer_control_structure* write_ebcs,
+static inline void recycle_completed_descriptors(struct edma_buffer_control_structure* write_ebcs,
 		struct edma_queue_private_data *private_data)
 {
 	u64* buffer_to_clean = NULL;
@@ -430,7 +430,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 	int ret = 0;
 	size_t data_copied_from_current_transaction = 0;
 	size_t total_data_copied = 0;
-	struct emda_buffer_control_structure* read_ebcs = NULL;
+	struct edma_buffer_control_structure* read_ebcs = NULL;
 	struct request* request_to_clean = NULL;
 	struct request* request_to_submit = NULL;
 	size_t copy_size;
@@ -628,7 +628,7 @@ static ssize_t edma_dev_write(struct file *filp, const char *buff, size_t len,
 		loff_t * off)
 {
 	int ret = 0;
-	struct emda_buffer_control_structure* write_ebcs;
+	struct edma_buffer_control_structure* write_ebcs;
 	struct request* request;
 	size_t data_copied = 0;
 	size_t data_to_copy = len;
@@ -804,7 +804,7 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 {
 	int ret = 0;
 	bool ebcs_is_clean = false;
-	struct emda_buffer_control_structure* write_ebcs;
+	struct edma_buffer_control_structure* write_ebcs;
 	struct edma_queue_private_data* private_data = (struct edma_queue_private_data*)filp->private_data;
 
 	(void)start;
@@ -1052,6 +1052,9 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 		pr_err("failed to create write /sys endpoint - continuing without\n");
 		goto edma_queue_device_done;
 	}
+
+	// Setup the linkage to device private data
+	dev_set_drvdata(edmaCharDevice, edma_queues->device_private_data);
 
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;

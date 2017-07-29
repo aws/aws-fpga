@@ -127,12 +127,26 @@ static const char *load_afi_usage[] = {
 	"      Use fpga-describe-local-image to return the FPGA image status, and",
 	"      fpga-describe-local-image-slots to return the available FPGA image",
 	"      slots for the instance.",
+	"      NOTE: By default, this command automatically rescans the AFIDEVICE",
+	"      to update the per-AFI PCI VendorId and DeviceId that may be",
+	"      dynamically modified during each FPGA image load.",
+	"      The rescan operation removes the AFIDEVICE from the sysfs PCI", 
+	"      subsystem and then rescans the PCI subsystem in order for",
+	"      the modified AFI PCI IDs to be refreshed.",
+	"      It is the developer's responsibility to remove any", 
+	"      driver previously installed on the older PCIe VendorId",
+	"      and DeviceId before the FPGA image is loaded.",
 	"  GENERAL OPTIONS",
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
 	"      -I, --fpga-image-id",
 	"          The ID of the FPGA image. agfi-<number>",
+	"      -A, --async",
+	"          The default mode of operation is synchronous FPGA image load",
+	"          with automatic rescan.  The --async option may be specfied",
+	"          for asynchronous FPGA image load completion, which may be",
+	"          polled for completion using fpga-describe-local-image.",
 	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
@@ -141,6 +155,10 @@ static const char *load_afi_usage[] = {
 	"          Display version number of this program.",
 	"      --request-timeout TIMEOUT",
 	"          Specify a request timeout TIMEOUT (in seconds).",
+	"      --sync-timeout TIMEOUT",
+	"          Specify a timeout TIMEOUT (in seconds) for the sequence",
+	"          of operations that are performed in the synchronous (blocking)",
+	"          mode",
 };
 
 static const char *clear_afi_usage[] = {
@@ -155,10 +173,24 @@ static const char *clear_afi_usage[] = {
 	"      Use fpga-describe-local-image to return the FPGA image status, and",
 	"      fpga-describe-local-image-slots to return the available FPGA image",
 	"      slots for the instance.",
+	"      NOTE: By default, this command automatically rescans the AFIDEVICE",
+	"      to update the default AFI PCI VendorId and DeviceId that are",
+	"      dynamically modified during each FPGA image clear.",
+	"      The rescan operation removes the AFIDEVICE from the sysfs PCI", 
+	"      subsystem and then rescans the PCI subsystem in order for",
+	"      the modified AFI PCI IDs to be refreshed.",
+	"      It is the developer's responsibility to remove any", 
+	"      driver previously installed on the older PCIe VendorId",
+	"      and DeviceId before the FPGA image is cleared.",
 	"  GENERAL OPTIONS",
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image.",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -A, --async",
+	"          The default mode of operation is synchronous FPGA image clear",
+	"          with automatic rescan.  The --async option may be specfied",
+	"          for asynchronous FPGA image clear completion, which may be",
+	"          polled for completion using fpga-describe-local-image.",
 	"      -h, --help",
 	"          Display this help.",
 	"      -H, --headers",
@@ -167,6 +199,10 @@ static const char *clear_afi_usage[] = {
 	"          Display version number of this program.",
 	"      --request-timeout TIMEOUT",
 	"          Specify a request timeout TIMEOUT (in seconds).",
+	"      --sync-timeout TIMEOUT",
+	"          Specify a timeout TIMEOUT (in seconds) for the sequence",
+	"          of operations that are performed in the synchronous (blocking)",
+	"          mode",
 };
 
 static const char *start_virtual_jtag_usage[] = {
@@ -333,25 +369,64 @@ static int
 config_request_timeout(uint32_t timeout)
 {
 	size_t timeout_tmp = 
-			CLI_TIMEOUT_DFLT * CLI_DELAY_MSEC_DFLT / MSEC_PER_SEC;
+			CLI_REQUEST_TIMEOUT_DFLT * CLI_REQUEST_DELAY_MSEC_DFLT / MSEC_PER_SEC;
 	size_t timeout_max = 
-			((size_t)(uint32_t)-1) * CLI_DELAY_MSEC_DFLT / MSEC_PER_SEC;
+			((size_t)(uint32_t)-1) * CLI_REQUEST_DELAY_MSEC_DFLT / MSEC_PER_SEC;
 
 	/** Check min and max values */
 	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err, 
 			"Error: The timeout must be between %zu and %zu seconds",
 			timeout_tmp, timeout_max);
 
-	timeout_tmp = ((size_t)timeout) * MSEC_PER_SEC / CLI_DELAY_MSEC_DFLT;
+	timeout_tmp = ((size_t)timeout) * MSEC_PER_SEC / CLI_REQUEST_DELAY_MSEC_DFLT;
 	if (timeout_tmp > (uint32_t)-1) {
-		/** Sanity check: Max out at ((1 << 32) - 1) * CLI_DELAY_MSEC_DFLT */
+		/** Sanity check: Max out at ((1 << 32) - 1) * CLI_REQUEST_DELAY_MSEC_DFLT */
 		timeout_tmp = (uint32_t)-1;
 	}
 
-	f1.mbox_timeout = timeout_tmp;
+	f1.request_timeout = timeout_tmp;
+	f1.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
 
-	log_debug("Setting timeout to %u secs, mbox_timeout=%u, mbox_delay_msec=%u", 
-			timeout, f1.mbox_timeout, f1.mbox_delay_msec);
+	log_debug("Setting timeout to %u secs, request_timeout=%u, request_delay_msec=%u", 
+			timeout, f1.request_timeout, f1.request_delay_msec);
+	return 0;
+err:
+	return -EINVAL;
+}
+
+/**
+ * Configure the synchronous operation timeout
+ *
+ * @param[in]   timeout		timeout in seconds
+ *
+ * @returns
+ *  0   on success 
+ * -1   on failure
+ */
+static int
+config_sync_timeout(uint32_t timeout)
+{
+	size_t timeout_tmp = 
+			CLI_SYNC_TIMEOUT_DFLT * CLI_SYNC_DELAY_MSEC_DFLT / MSEC_PER_SEC;
+	size_t timeout_max = 
+			((size_t)(uint32_t)-1) * CLI_SYNC_DELAY_MSEC_DFLT / MSEC_PER_SEC;
+
+	/** Check min and max values */
+	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err, 
+			"Error: The timeout must be between %zu and %zu seconds",
+			timeout_tmp, timeout_max);
+
+	timeout_tmp = ((size_t)timeout) * MSEC_PER_SEC / CLI_SYNC_DELAY_MSEC_DFLT;
+	if (timeout_tmp > (uint32_t)-1) {
+		/** Sanity check: Max out at ((1 << 32) - 1) * CLI_SYNC_DELAY_MSEC_DFLT */
+		timeout_tmp = (uint32_t)-1;
+	}
+
+	f1.sync_timeout = timeout_tmp;
+	f1.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
+
+	log_debug("Setting timeout to %u secs, sync_timeout=%u, sync_delay_msec=%u", 
+			timeout, f1.sync_timeout, f1.sync_delay_msec);
 	return 0;
 err:
 	return -EINVAL;
@@ -372,6 +447,8 @@ parse_args_load_afi(int argc, char *argv[])
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"fpga-image-id",		required_argument,	0,	'I'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
+		{"sync-timeout",		required_argument,	0,	's'	},
+		{"async",				no_argument,		0,	'A'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -379,7 +456,7 @@ parse_args_load_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:H?hV",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:AH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -400,7 +477,18 @@ parse_args_load_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
+			break;
+		}
+		case 's': {
+			uint32_t value32;
+			string_to_uint(&value32, optarg);
+			int ret = config_sync_timeout(value32);
+			fail_on(ret != 0, err, "Could not configure the sync-timeout");
+			break;
+		}
+		case 'A': {
+			f1.async = true;
 			break;
 		}
 		case 'H': {
@@ -445,6 +533,8 @@ parse_args_clear_afi(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
+		{"sync-timeout",		required_argument,	0,	's'	},
+		{"async",				no_argument,		0,	'A'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
@@ -452,7 +542,7 @@ parse_args_clear_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:r:H?hV",
+	while ((opt = getopt_long(argc, argv, "S:r:s:AH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -465,7 +555,18 @@ parse_args_clear_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
+			break;
+		}
+		case 's': {
+			uint32_t value32;
+			string_to_uint(&value32, optarg);
+			int ret = config_sync_timeout(value32);
+			fail_on(ret != 0, err, "Could not configure the sync-timeout");
+			break;
+		}
+		case 'A': {
+			f1.async = true;
 			break;
 		}
 		case 'H': {
@@ -541,7 +642,7 @@ parse_args_describe_afi(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 'R': {
@@ -604,7 +705,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			uint32_t value32;
 			string_to_uint(&value32, optarg);
 			int ret = config_request_timeout(value32);
-			fail_on_quiet(ret != 0, err, "Could not configure the request-timeout");
+			fail_on(ret != 0, err, "Could not configure the request-timeout");
 			break;
 		}
 		case 'H': {
@@ -927,7 +1028,7 @@ struct parse_args_str2func {
 int 
 parse_args(int argc, char *argv[])
 {
-	fail_on_quiet(argc < 2, err, "Error: opcode string must be specified");
+	fail_on(argc < 2, err, "Error: opcode string must be specified");
 	fail_on_user(!argv[0] || !argv[1], err, 
 			"Error: program name or opcode string is NULL");
 

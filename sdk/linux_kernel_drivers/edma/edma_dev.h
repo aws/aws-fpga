@@ -86,7 +86,7 @@ struct edma_event_stats {
 }____cacheline_aligned;
 
 /* EBCS is the structure used to manage the transient buffer */
-struct emda_buffer_control_structure{
+struct edma_buffer_control_structure{
 
 	struct transient_buffer transient_buffer;
 	struct request* request;
@@ -102,8 +102,8 @@ struct emda_buffer_control_structure{
 
 struct edma_queue_private_data
 {
-	struct emda_buffer_control_structure read_ebcs;
-	struct emda_buffer_control_structure write_ebcs;
+	struct edma_buffer_control_structure read_ebcs;
+	struct edma_buffer_control_structure write_ebcs;
 	struct edma_queue_stats stats;
 	spinlock_t edma_spin_lock;
 	unsigned long state;

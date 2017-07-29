@@ -112,27 +112,6 @@ fi
 
 debug_msg "Checking for Vivado install:"
 
-# On the FPGA Developer AMI use module load to use the correct version of Vivado
-if [ -e /usr/local/Modules/$MODULE_VERSION/bin/modulecmd ]; then
-  # Module command is installed.
-  # Load and unload the modules just to make sure have the environment set correctly
-
-    # We want to make sure sdx exists before calling the unload function
-    if does_module_exist sdx; then
-        module unload sdx
-    fi
-
-    if does_module_exist vivado; then
-        # First unload and then load it back.
-        module unload vivado
-        module load vivado
-    else
-        err_msg "The modulefile to set the environment variables for Vivado does not exist!"
-        err_msg "  Please source the hdk_setup script on the correct AMI from the marketplace"
-        return 1
-    fi
-fi
-
 # before going too far make sure Vivado is available
 if ! vivado -version > /dev/null 2>&1; then
     err_msg "Please install/enable Vivado."

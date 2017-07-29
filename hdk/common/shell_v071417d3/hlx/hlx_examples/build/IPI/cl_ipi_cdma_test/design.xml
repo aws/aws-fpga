@@ -1,0 +1,10 @@
+<ExampleDesign>
+<Vendor>xilinx.com</Vendor>
+<Library>design</Library>
+<Name>cl_ipi_cdma_test</Name>
+<Version>1.0</Version>
+<Design>init.tcl</Design>
+<DisplayName>cl_ipi_cdma_test (IPI)</DisplayName>
+<Description>cl_ipi_cdma_test (IPI)</Description>
+<Image>cl_ipi_cdma_test.png</Image>
+</ExampleDesign>
