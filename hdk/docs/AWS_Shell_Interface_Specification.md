@@ -347,7 +347,10 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 -   Illegal AXI-Size (only full width 512-bit transfers, size=0b110 are supported)
 
--   Timeout.  Once a transaction starts, the entire transaction (address, data, and response) must complete in 8us or it will timeout.
+-   Timeout.  Each channel must complete in 8 us or it will timeout:
+      1. Once AW is asserted, the write data must be supplied in 8us
+      2. Once RVALID is asserted, RREADY must be asserted, and all data transferred within 8us
+      3. Once BVALID is asserted, BREADY must be asserted within 8us
 
 __** NOTE: If a timeout occurs, the PCIM bus will no longer be functional.  This can be cleared by clearing the AFI.  Refer to [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) ** __
 
@@ -572,5 +575,7 @@ There are two global counter outputs that increment every 4ns.  These can be use
 Transacitons on the DMA_PCIS interface must complete in 8us or the SH will timeout the transactions.  Each "issued" transaction has an independent timeout counter of 8us.  For example if 4 transactions are issued "simultaneously" (i.e. back-to-back cycles), then all 4 must completed within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The SH supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.  
 
 Once a transaction is issued, it must fully completed within 8us (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads. 
+
+If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  After the moderation time, the CL may be accessed with the normal timeout value of 8us.
 
 
