@@ -15,12 +15,12 @@
 * After the first transaction timeout, transactions will timeout for a period of time (moderation time).  This time is 4ms.
 
 # AXI Master Timeouts (PCIM)
-AXI Master transactions also have an 8us timeout.  Timeout occur when the CL does not respond to some channel within 8us:
+* AXI Master transactions also have an 8us timeout.  Timeout occur when the CL does not respond to some channel within 8us:
    1. Does not complete Write Data
    2. Does not assert BREADY when BVALID is asserted
    3. Does not assert RREADY when RVALID is asserted
 
-Best practice is to have store and forward buffers for any slow masters (write), and to not issue read requests if the CL is not able to buffer the returned read data.
+* Best practice is to have store and forward buffers for any slow masters (write), and to not issue read requests if the CL is not able to buffer the returned read data.
 
 # How to detect a shell timeout has occured
 
