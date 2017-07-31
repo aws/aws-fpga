@@ -39,6 +39,8 @@ file mkdir "$FAAS_CL_DIR/build/checkpoints/to_aws"
 write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/SH_CL_routed.dcp
 
+# Generate debug probes file
+write_debug_probes -force -no_partial_ltxfile -file $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.debug_probes.ltx
 
 
 ##################################################

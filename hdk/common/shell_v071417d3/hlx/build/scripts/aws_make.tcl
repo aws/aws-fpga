@@ -230,7 +230,16 @@ proc [set _THISNAMESPACE]::make_rtl {{args ""}} {
 		if {[get_files */tb.sv -quiet] == ""} {
 
 			source $::aws::make_faas::_nsvars::script_dir/add_hdk_rtl_ip.tcl
-			
+
+add_files -fileset sim_1 [ list \
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/sync.v\
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/flop_ccf.sv\
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/ccf_ctl.v\
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/mgt_acc_axl.sv  \
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/mgt_gen_axl.sv  \
+  $::env(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim/sh_ddr.sv
+]
+
 			source $::aws::make_faas::_nsvars::script_dir/add_simulation.tcl
 
 			}			
