@@ -63,7 +63,7 @@ With F1, each FPGA is divided into two partitions:
 
 -   Custom Logic (CL) – Custom acceleration logic created by an FPGA Developer.
 
-At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto EC2 F1 Intances.
+At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto EC2 F1 Instances.
 
 This document specifies the hardware interface and functional behavior between the SH and the CL; specifically the Shell design for xvu9p architecture used in EC2 F1 instance.
   
