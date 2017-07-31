@@ -162,7 +162,7 @@ These parameters are used to control which DDR controllers are impemented in the
               .clk(clk),
               ...
  ```   
- **WARNING** If the CL does not instantiate the sh_ddr block, it will result in implementation errros.
+ **WARNING** If the CL does not instantiate the sh_ddr block, it will result in implementation errors.
 
 **NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
