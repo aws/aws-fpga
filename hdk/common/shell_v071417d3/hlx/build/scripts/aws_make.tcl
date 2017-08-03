@@ -197,6 +197,35 @@ proc [set _THISNAMESPACE]::make_rtl {{args ""}} {
 	
 	update_public_faas_variables_to_parent_app
 	::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial {*}$args
+
+	# Suppress Warnings - for RTL flow to match AWS env, future enable or disable in flow instead of hardcode
+	# These are to avoid warning messages that may not be real issues. A developer
+	# may comment them out if they wish to see more information from warning
+	# messages.
+	set_msg_config -id {Common 17-55}        -suppress
+	set_msg_config -id {Vivado 12-4739}      -suppress
+	set_msg_config -id {Constraints 18-4866} -suppress
+	set_msg_config -id {IP_Flow 19-2162}     -suppress
+	set_msg_config -id {Route 35-328}        -suppress
+	set_msg_config -id {Vivado 12-1008}      -suppress
+	set_msg_config -id {Vivado 12-508}       -suppress
+	set_msg_config -id {filemgmt 56-12}      -suppress
+	set_msg_config -id {DRC CKLD-1}          -suppress
+	set_msg_config -id {DRC CKLD-2}          -suppress
+	set_msg_config -id {IP_Flow 19-2248}     -suppress
+	set_msg_config -id {Vivado 12-1580}      -suppress
+	set_msg_config -id {Constraints 18-550}  -suppress
+	set_msg_config -id {Synth 8-3295}        -suppress
+	set_msg_config -id {Synth 8-3321}        -suppress
+	set_msg_config -id {Synth 8-3331}        -suppress
+	set_msg_config -id {Synth 8-3332}        -suppress
+	set_msg_config -id {Synth 8-6014}        -suppress
+	set_msg_config -id {Timing 38-436}       -suppress
+	set_msg_config -id {DRC REQP-1853}       -suppress
+	set_msg_config -id {Synth 8-350}         -suppress
+	set_msg_config -id {Synth 8-3848}        -suppress
+	set_msg_config -id {Synth 8-3917}        -suppress
+	
 	if {[info exist ::env(FAAS_CL_DIR)]} {
 		if {[file exist $::env(FAAS_CL_DIR)/build/constraints/cl_clocks_aws.xdc] eq 0} {
 			file mkdir $::env(FAAS_CL_DIR)/build/constraints
