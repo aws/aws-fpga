@@ -10,11 +10,11 @@
 
 4. [IP Integrator Example Tutorial with AXI GPIO/AXI BRAM](#ipitut)
 
-5. [IP Integrator Design Modular Reference Tutorial-hello\\_world](#ipimodtut)
+5. [IP Integrator Design Modular Reference Tutorial-hello_world](#ipimodtut)
 
-6. [Adding Existing RTL Tutorial-cl\\_hello\\_world](#rtlexistut_world)
+6. [Adding Existing RTL Tutorial-cl_hello_world](#rtlexistut_world)
 
-7. [Adding Existing RTL Tutorial-cl\\_dram\\_dma](#rtlexistut_dram)
+7. [Adding Existing RTL Tutorial-cl_dram_dma](#rtlexistut_dram)
 
 8. [Starting from Scratch RTL Design](#rtlscrtut)
 
@@ -37,11 +37,11 @@ This section covers using a automated IP Integrator example designs with Vivado.
 
 Current examples include the following. Select the link below for information on the design and how to create the particular example design.
 
-[hello\\_world](../cl/examples/hello\_world\_hlx/README.md)
+[hello_world](../cl/examples/hello\_world\_hlx/README.md)
 
-[cl\\_ipi\\_cdma\\_test](../cl/examples/cl\_ipi\_cdma\_test\_hlx/README.md)
+[cl_ipi_cdma_test](../cl/examples/cl\_ipi\_cdma\_test\_hlx/README.md)
 
-[cl\\_hello\\_world\\_ref](../cl/examples/cl\_hello\_world\_ref\_hlx/README.md)
+[cl_hello_world_ref](../cl/examples/cl\_hello\_world\_ref\_hlx/README.md)
 
 
 <a name="rtlex"></a>
@@ -53,9 +53,9 @@ This section covers using a automated RTL example design with Vivado.  The examp
 
 Current examples include the following. Select the link below for information on the design and how to create the particular example design.
 
-[cl\\_hello\\_world](../cl/examples/cl\_hello\_world\_hlx/README.md)
+[cl_hello_world](../cl/examples/cl\_hello\_world\_hlx/README.md)
 
-[cl\\_dram\\_dma](../cl/examples/cl\_dram\_dma\_hlx/README.md)
+[cl_dram_dma](../cl/examples/cl\_dram\_dma\_hlx/README.md)
 
 
 <a name="ipitut"></a>
