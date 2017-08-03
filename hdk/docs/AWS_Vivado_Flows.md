@@ -35,7 +35,6 @@ See what examples are possible, type into TCL console.
 
 aws::make\_ipi -examples
 
-## Execute example where synth/impl not run.
 Type into TCL console based upon example needed.
 
 aws::make\_ipi -examples <example requested>
@@ -68,7 +67,6 @@ See what examples are possible, type into TCL console.
 
 aws::make\_rtl -examples
 
-## Execute example where synth/impl not run.
 Type into TCL console based upon example needed.
 
 aws::make\_rtl -examples <example requested>
