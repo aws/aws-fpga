@@ -4311,7 +4311,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9054a600</spirit:value>
+            <spirit:value>47768c9e</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -13944,13 +13944,13 @@
   </spirit:model>
   <spirit:choices>
     <spirit:choice>
+      <spirit:name>choice_list_26b6e00a</spirit:name>
+      <spirit:enumeration>0x071417d3</spirit:enumeration>
+    </spirit:choice>
+    <spirit:choice>
       <spirit:name>choice_list_74b5137e</spirit:name>
       <spirit:enumeration>ACTIVE_HIGH</spirit:enumeration>
       <spirit:enumeration>ACTIVE_LOW</spirit:enumeration>
-    </spirit:choice>
-    <spirit:choice>
-      <spirit:name>choice_list_f30b8285</spirit:name>
-      <spirit:enumeration>0x071417d3</spirit:enumeration>
     </spirit:choice>
   </spirit:choices>
   <spirit:fileSets>
@@ -14421,7 +14421,7 @@
     <spirit:parameter>
       <spirit:name>SHELL_VERSION</spirit:name>
       <spirit:displayName>Shell Version (constant)</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.SHELL_VERSION" spirit:choiceRef="choice_list_f30b8285" spirit:order="31" spirit:bitStringLength="32">0x071417d3</spirit:value>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.SHELL_VERSION" spirit:choiceRef="choice_list_26b6e00a" spirit:order="31" spirit:bitStringLength="32">0x071417d3</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -14446,18 +14446,18 @@
       <xilinx:displayName>AWS</xilinx:displayName>
       <xilinx:vendorURL>http://www.xilinx.com</xilinx:vendorURL>
       <xilinx:coreRevision>0</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-07-14T17:06:51Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2017-07-31T22:02:03Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2017.1_sdx</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="1043eae4"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="b960cc28"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="b27b7458"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="fa31fe27"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="861b9533"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="a445d5ed"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="09a50a2e"/>
       <xilinx:checksum xilinx:scope="cpus" xilinx:value="116b6c06"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="6cdd579a"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="9b67b750"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

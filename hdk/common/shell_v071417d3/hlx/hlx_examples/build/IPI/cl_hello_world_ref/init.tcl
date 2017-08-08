@@ -47,13 +47,20 @@ if {[info exist inline_examples] eq 0} {
 	}
 }
 
+set DESIGN_DIR [file join $currentDir design]
 set SYNTH_CONST [file join $currentDir constraints cl_synth_user.xdc]
 set IMPL_CONST [file join $currentDir constraints cl_pnr_user.xdc]
 
-set VERIF [file join $currentDir verif test_cl.sv]
+set PWD_DIR $::env(PWD)
+
+set CL_COMMON_DIR "${PWD_DIR}/../common/design"
+set CL_VERIF_DIR "${PWD_DIR}/../cl_hello_world/verif/tests"
 
 import_files -fileset constrs_1 -force $SYNTH_CONST
 import_files -fileset constrs_1 -force $IMPL_CONST
+
+read_verilog [glob ${CL_COMMON_DIR}/*.vh]
+read_verilog [glob ${DESIGN_DIR}/*.v]
 
 set_property PROCESSING_ORDER LATE [get_files */cl_pnr_user.xdc]
 set_property USED_IN {implementation} [get_files */cl_pnr_user.xdc]
@@ -61,8 +68,11 @@ set_property USED_IN {implementation} [get_files */cl_pnr_user.xdc]
 set_property is_enabled false [get_files */cl_pnr_user.xdc]
 set ::env(PNR_USER) [get_files */cl_pnr_user.xdc]			
 
-import_files -fileset sim_1 -norecurse $VERIF
+import_files -fileset sim_1 -norecurse $CL_VERIF_DIR/test_hello_world.sv
 update_compile_order -fileset sim_1
+
+set_property verilog_define {CL_NAME=cl_top TEST_NAME=test_hello_world} [get_filesets sim_1]
+
 
 set DELAYEDEXAMPLE [file join $currentDir [file tail $currentDir].tcl]
 set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE"
