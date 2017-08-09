@@ -18,18 +18,17 @@ This document helps developers who choose to develop on-premises with specifying
     * New users will need to obtain an on-premises license of Vivado, please follow instruction at: https://www.xilinx.com/products/design-tools/acceleration-zone/ef-vivado-sdx-vu9p-op-fl-nl.html
     * The correct ordering number for the product is EF-VIVADO-SDX-VU9P-OP-(NL/FL)
     * You can confirm you are using the correct license for this product by ensuring you have the following in Xilinx License Manager:
-       * Analyzer
-       * EncryptedWriter_v1
        * EncryptedWriter_v2
+       * Synthesis
+       * Implementation
+       * XCVU9P
+       * XCVU9P_bitgen
+       * ap_opencl
+       * Analyzer
        * HLS
        * PartialReconfiguration
        * Simulation
        * SysGen
-       * XCVU9P
-       * XCVU9P-ES2_bitgen
-       * ap_opencl
-       * wtt_override
-       * xcvu9p_bitgen
 
 <a name="download"></a>
 ## Downloading the development tool from Xilinx
