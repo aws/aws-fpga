@@ -1,17 +1,36 @@
 #!/usr/bin/env bash
 
+
+function remove_edma_driver_func {
+    echo "INFO: Removing the edma driver"
+    sudo rmmod edma-drv
+    sudo rm -f /lib/modules/`uname -r`/edma-drv.ko
+    sudo rm -f /etc/modules-load.d/edma.conf
+}
+
+function edma_driver_install_steps_func {
+    echo "INFO: Running edma driver install steps"
+    echo 'edma' | sudo tee -a /etc/modules-load.d/edma.conf
+    pushd $WORKSPACE/sdk/linux_kernel_drivers/edma;
+    make clean
+    make
+    sudo cp edma-drv.ko /lib/modules/`uname -r`/
+    sudo depmod
+    sudo modprobe edma-drv
+    popd
+}
+
 # Function to install the edma drivers
 function install_edma_driver_func {
     echo "INFO: Installing the edma drivers"
 
-    cd $WORKSPACE/sdk/linux_kernel_drivers/edma;
-    make
-    sudo cp edma-drv.ko /lib/modules/`uname -r`/
-    sudo depmod
-
     # Check if the file exists
     if [ ! -f /etc/modules-load.d/edma.conf ]; then
-        echo 'edma' | sudo tee -a /etc/modules-load.d/edma.conf
+        edma_driver_install_steps_func
+    else
+        echo "INFO: Edma driver is already installed."
+        remove_edma_driver_func
+        edma_driver_install_steps_func
     fi
 
     if [ $? -ne 0 ]; then
@@ -52,15 +71,11 @@ if [ ! -d $WORKSPACE/hdk/cl/examples/$test ]; then
     exit 1
 fi
 
-if [ "$install_edma_driver" -eq "1" ]; then
-    install_edma_driver_func
-fi
-
-cd $WORKSPACE;
+pushd $WORKSPACE;
 
 source $WORKSPACE/sdk_setup.sh;
 
-cd $WORKSPACE/hdk/cl/examples/$test;
+pushd $WORKSPACE/hdk/cl/examples/$test;
 
 test_afi=$(cat README.md | grep 'Pre-generated AGFI ID' | cut -d "|" -f 3)
 
@@ -98,9 +113,15 @@ if [ "${describe_output}" = "" ]; then
         exit 1
 fi
 
+if [ "$install_edma_driver" -eq "1" ]; then
+    set -x
+    install_edma_driver_func
+    set +x
+fi
+
 echo "INFO: Building runtime software"
 
-cd $WORKSPACE/hdk/cl/examples/$test/software/runtime;
+pushd $WORKSPACE/hdk/cl/examples/$test/software/runtime;
 
 sudo make -f Makefile SDK_DIR=$WORKSPACE/sdk
 
