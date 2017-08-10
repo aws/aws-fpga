@@ -157,9 +157,15 @@ debug_msg "Done setting environment variables.";
 info_msg "Using HDK shell version $hdk_shell_version"
 debug_msg "Checking HDK shell's checkpoint version"
 hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
+hdk_ltx_dir=$HDK_SHELL_DIR/debug_probes/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
 s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+s3_hdk_ltx_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/debug_probes/from_aws
+declare -a s3_hdk_ltx_files=("cl_hello_world.debug_probes.ltx"
+                             "cl_dram_dma.debug_probes.ltx"
+                             )
+
 # Download the sha256
 if [ ! -e $hdk_shell_dir ]; then
 	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
@@ -167,7 +173,7 @@ fi
 # Use curl instead of AWS CLI so that credentials aren't required.
 curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
 if grep -q '<?xml version' $hdk_shell.sha256; then
-  err_msg "Failed to downlonad HDK shell's checkpoint version from $s3_hdk_shell.sha256"
+  err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256"
   cat hdk_shell.sha256
   return 2
 fi
@@ -200,6 +206,18 @@ if [[ $act_sha256 != $exp_sha256 ]]; then
   return 2
 fi
 info_msg "HDK shell is up-to-date"
+
+info_msg "Fetching the debug probes(ltx files)"
+if [ ! -e $hdk_ltx_dir ]; then
+	mkdir -p $hdk_ltx_dir || { err_msg "Failed to create $hdk_ltx_dir"; return 2; }
+fi
+# Downloading the ltx files
+for ltx_file in "${s3_hdk_ltx_files[@]}"
+do
+	s3_ltx_file=$s3_hdk_ltx_dir/$ltx_file
+	hdk_ltx_file=$hdk_ltx_dir/$ltx_file
+    curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file || { warn_msg "Failed to download debug probe files. Try the following command to fetch debug probe files for the examples: curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file"; }
+done
 
 # Create DDR and PCIe IP models and patch PCIe
 models_dir=$HDK_COMMON_DIR/verif/models
