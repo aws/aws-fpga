@@ -1,0 +1,10 @@
+<ExampleDesign>
+<Vendor>xilinx.com</Vendor>
+<Library>design</Library>
+<Name>cl_hello_world_ref</Name>
+<Version>1.0</Version>
+<Design>init.tcl</Design>
+<DisplayName>cl_hello_world_ref (IPI)</DisplayName>
+<Description>cl_hello_world_ref (IPI)</Description>
+<Image>cl_hello_world_ref.png</Image>
+</ExampleDesign>

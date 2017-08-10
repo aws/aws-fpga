@@ -21,6 +21,14 @@
 # IP Integrator Tcl commands easier.
 ################################################################
 
+################################################################
+# This is a generated script based on design: cl
+#
+# Though there are limitations about the generated script,
+# the main purpose of this utility is to make learning
+# IP Integrator Tcl commands easier.
+################################################################
+
 namespace eval _tcl {
 proc get_script_folder {} {
    set script_path [file normalize [info script]]
@@ -50,6 +58,13 @@ if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
 
 # To test this script, run the following commands from Vivado Tcl console:
 # source cl_script.tcl
+
+
+# The design that will be created by this Tcl script contains the following 
+# module references:
+# hello_world
+
+# Please add the sources of those modules before sourcing this Tcl script.
 
 # If there is no project opened, this script will create a
 # project, but make sure you do not have an existing project
@@ -172,38 +187,11 @@ proc create_root_design { parentCell } {
 
   # Create ports
 
-  # Create instance: axi_bram_ctrl_0, and set properties
-  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.0 axi_bram_ctrl_0 ]
-  set_property -dict [ list \
-CONFIG.DATA_WIDTH {512} \
-CONFIG.ECC_TYPE {0} \
- ] $axi_bram_ctrl_0
-
-  # Create instance: axi_bram_ctrl_0_bram, and set properties
-  set axi_bram_ctrl_0_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 axi_bram_ctrl_0_bram ]
-  set_property -dict [ list \
-CONFIG.Memory_Type {True_Dual_Port_RAM} \
- ] $axi_bram_ctrl_0_bram
-
-  # Create instance: axi_gpio_0, and set properties
-  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
-  set_property -dict [ list \
-CONFIG.C_ALL_OUTPUTS {1} \
-CONFIG.C_GPIO_WIDTH {16} \
- ] $axi_gpio_0
-
-  # Create instance: axi_smc, and set properties
-  set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
-  set_property -dict [ list \
-CONFIG.NUM_SI {1} \
- ] $axi_smc
-
   # Create instance: f1_inst, and set properties
   set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 f1_inst ]
   set_property -dict [ list \
 CONFIG.AUX_PRESENT {1} \
-CONFIG.BAR1_PRESENT {1} \
-CONFIG.PCIS_PRESENT {1} \
+CONFIG.OCL_PRESENT {1} \
  ] $f1_inst
 
   # Create instance: f1_inst_axi_periph, and set properties
@@ -212,23 +200,58 @@ CONFIG.PCIS_PRESENT {1} \
 CONFIG.NUM_MI {1} \
  ] $f1_inst_axi_periph
 
+  # Create instance: hello_world_0, and set properties
+  set block_name hello_world
+  set block_cell_name hello_world_0
+  if { [catch {set hello_world_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_msg_id "BD_TCL-105" "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $hello_world_0 eq "" } {
+     catch {common::send_msg_id "BD_TCL-106" "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  set_property -dict [ list \
+CONFIG.NUM_READ_OUTSTANDING {1} \
+CONFIG.NUM_WRITE_OUTSTANDING {1} \
+ ] [get_bd_intf_pins /hello_world_0/s_axi]
+
+  # Create instance: system_ila_0, and set properties
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.0 system_ila_0 ]
+  set_property -dict [ list \
+CONFIG.C_MON_TYPE {INTERFACE} \
+CONFIG.C_NUM_MONITOR_SLOTS {1} \
+CONFIG.C_SLOT_0_APC_EN {0} \
+CONFIG.C_SLOT_0_AXI_AR_SEL_DATA {1} \
+CONFIG.C_SLOT_0_AXI_AR_SEL_TRIG {1} \
+CONFIG.C_SLOT_0_AXI_AW_SEL_DATA {1} \
+CONFIG.C_SLOT_0_AXI_AW_SEL_TRIG {1} \
+CONFIG.C_SLOT_0_AXI_B_SEL_DATA {1} \
+CONFIG.C_SLOT_0_AXI_B_SEL_TRIG {1} \
+CONFIG.C_SLOT_0_AXI_R_SEL_DATA {1} \
+CONFIG.C_SLOT_0_AXI_R_SEL_TRIG {1} \
+CONFIG.C_SLOT_0_AXI_W_SEL_DATA {1} \
+CONFIG.C_SLOT_0_AXI_W_SEL_TRIG {1} \
+CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:aximm_rtl:1.0} \
+ ] $system_ila_0
+
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTA [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTA] [get_bd_intf_pins axi_bram_ctrl_0_bram/BRAM_PORTA]
-  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTB [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTB] [get_bd_intf_pins axi_bram_ctrl_0_bram/BRAM_PORTB]
-  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_bram_ctrl_0/S_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
-  connect_bd_intf_net -intf_net f1_inst_M_AXI_BAR1 [get_bd_intf_pins f1_inst/M_AXI_BAR1] [get_bd_intf_pins f1_inst_axi_periph/S00_AXI]
-  connect_bd_intf_net -intf_net f1_inst_M_AXI_PCIS [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins f1_inst/M_AXI_PCIS]
+  connect_bd_intf_net -intf_net f1_inst_M_AXI_OCL [get_bd_intf_pins f1_inst/M_AXI_OCL] [get_bd_intf_pins f1_inst_axi_periph/S00_AXI]
+connect_bd_intf_net -intf_net [get_bd_intf_nets f1_inst_M_AXI_OCL] [get_bd_intf_pins f1_inst/M_AXI_OCL] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
+  set_property -dict [ list \
+HDL_ATTRIBUTE.DEBUG {true} \
+ ] [get_bd_intf_nets f1_inst_M_AXI_OCL]
   connect_bd_intf_net -intf_net f1_inst_S_SH [get_bd_intf_ports S_SH] [get_bd_intf_pins f1_inst/S_SH]
-  connect_bd_intf_net -intf_net f1_inst_axi_periph_M00_AXI [get_bd_intf_pins axi_gpio_0/S_AXI] [get_bd_intf_pins f1_inst_axi_periph/M00_AXI]
+  connect_bd_intf_net -intf_net f1_inst_axi_periph_M00_AXI [get_bd_intf_pins f1_inst_axi_periph/M00_AXI] [get_bd_intf_pins hello_world_0/s_axi]
 
   # Create port connections
-  connect_bd_net -net axi_gpio_0_gpio_io_o [get_bd_pins axi_gpio_0/gpio_io_o] [get_bd_pins f1_inst/status_vled]
-  connect_bd_net -net f1_inst_clk_main_a0_out [get_bd_pins axi_bram_ctrl_0/s_axi_aclk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins axi_smc/aclk] [get_bd_pins f1_inst/clk_main_a0_out] [get_bd_pins f1_inst_axi_periph/ACLK] [get_bd_pins f1_inst_axi_periph/M00_ACLK] [get_bd_pins f1_inst_axi_periph/S00_ACLK]
-  connect_bd_net -net f1_inst_rst_main_n_out [get_bd_pins axi_bram_ctrl_0/s_axi_aresetn] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins axi_smc/aresetn] [get_bd_pins f1_inst/rst_main_n_out] [get_bd_pins f1_inst_axi_periph/ARESETN] [get_bd_pins f1_inst_axi_periph/M00_ARESETN] [get_bd_pins f1_inst_axi_periph/S00_ARESETN]
+  connect_bd_net -net f1_inst_clk_main_a0_out [get_bd_pins f1_inst/clk_main_a0_out] [get_bd_pins f1_inst_axi_periph/ACLK] [get_bd_pins f1_inst_axi_periph/M00_ACLK] [get_bd_pins f1_inst_axi_periph/S00_ACLK] [get_bd_pins hello_world_0/s_axi_aclk] [get_bd_pins system_ila_0/clk]
+  connect_bd_net -net f1_inst_rst_main_n_out [get_bd_pins f1_inst/rst_main_n_out] [get_bd_pins f1_inst_axi_periph/ARESETN] [get_bd_pins f1_inst_axi_periph/M00_ARESETN] [get_bd_pins f1_inst_axi_periph/S00_ARESETN] [get_bd_pins hello_world_0/s_axi_aresetn] [get_bd_pins system_ila_0/resetn]
+  connect_bd_net -net f1_inst_status_vdip [get_bd_pins f1_inst/status_vdip] [get_bd_pins hello_world_0/vdip]
+  connect_bd_net -net hello_world_0_vled [get_bd_pins f1_inst/status_vled] [get_bd_pins hello_world_0/vled]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00002000 -offset 0xC0000000 [get_bd_addr_spaces f1_inst/M_AXI_PCIS] [get_bd_addr_segs axi_bram_ctrl_0/S_AXI/Mem0] SEG_axi_bram_ctrl_0_Mem0
-  create_bd_addr_seg -range 0x00001000 -offset 0x00000000 [get_bd_addr_spaces f1_inst/M_AXI_BAR1] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] SEG_axi_gpio_0_Reg
+  create_bd_addr_seg -range 0x02000000 -offset 0x00000000 [get_bd_addr_spaces f1_inst/M_AXI_OCL] [get_bd_addr_segs hello_world_0/s_axi/reg0] SEG_hello_world_0_reg0
 
 
   # Restore current instance

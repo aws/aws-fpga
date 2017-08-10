@@ -9,35 +9,45 @@
 <a name="overview"></a>
 ## Overview
 
-For more information about the hello_world example, read the following information[Hello World CL Example](./../cl_hello_world/README.md)
+For more information about the hello\_world example, read the following information [Hello World CL Example](./../cl_hello_world/README.md)
 
+At this time On-Premise flow is recommended with this environment.
+
+Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
 
 <a name="hlx"></a>
 ## HLx Flow for CL Example
 
-### Add in the following system variables for clock recipes and IDs for cl_hello_world example.
+### Add in the following system variables for clock recipes and IDs for cl\_hello\_world example.
 
-export CLOCK_A_RECIPE=0
+export CLOCK\_A\_RECIPE=0
 
-export CLOCK_B_RECIPE=0
+export CLOCK\_B\_RECIPE=0
 
-export CLOCK_C_RECIPE=0
+export CLOCK\_C\_RECIPE=0
 
-export device_id=0xF000
+export device\_id=0xF000
 
-export vendor_id=0x0001
+export vendor\_id=0x1D0F
 
-export subsystem_id=0x1D51
+export subsystem\_id=0x1D51
 
-export subsystem_vendor_id=0xFEDD
+export subsystem\_vendor\_id=0xFEDD
 
 ### Creating Example Design
 
-Invoke vivado in the cl/examples/cl_hello_world_hlx directory.
+Change directories to the cl/examples/cl\_hello\_world\_hlx directory.
 
-In the TCL console type in the following to create the cl_hello_world example.  The example will be generated in cl/examples/cl_hello_world_hlx/example_projects.  The vivado project is examples_projects/cl_hello_world.xpr.
+Invoke vivado by typing vivado in the console.
 
-aws::make_rtl -examples cl_hello_world
+In the TCL console type in the following to create the cl\_hello\_world example.  The example will be generated in cl/examples/cl\_hello\_world\_hlx/example\_projects.  The vivado project is examples\_projects/cl\_hello\_world.xpr.
+
+aws::make\_rtl -examples cl\_hello\_world
+
+Note when closing and opening the project in the future, the following command must be run or error could show up in simulation/implementation.
+
+aws::make\_rtl
+
 
 ### Simulation
 
@@ -51,9 +61,21 @@ run -all
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 
-The completed .tar file is located in <project>.runs/faas_1/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
+The completed .tar file is located in example\_projects/cl\_hello\_world.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
+
+### CL Example Software
+
+The runtime software must be complied for the AFI to run on F1.
+
+Use the software in cl/examples/cl\_hello\_world
+
+    $ cd cl/cl_hello_world/software/runtime/
+    $ make all
+    $ sudo ./test_hello_world
+
+
 
