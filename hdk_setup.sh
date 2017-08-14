@@ -157,7 +157,7 @@ debug_msg "Done setting environment variables.";
 info_msg "Using HDK shell version $hdk_shell_version"
 debug_msg "Checking HDK shell's checkpoint version"
 hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
-hdk_ltx_dir=$HDK_SHELL_DIR/debug_probes/from_aws
+hdk_ltx_dir=$HDK_SHELL_DIR/build/debug_probes/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
 s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
