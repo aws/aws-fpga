@@ -62,7 +62,7 @@ The following major features are included in this HDK release:
 * The PCI-M interface is fully supported for CL generated transactions to the Shell. 
 
 ### 4.	URAM 
-* Restrictions on URAM have been updated to enable 100% of the URAM with a CL to be utilized.  See documnetation on enabling URAM utilization: [URAM_options](.hdk/docs/URAM_Options.md)
+* Restrictions on URAM have been updated to enable 100% of the URAM with a CL to be utilized.  See documnetation on enabling URAM utilization: [URAM_options](./hdk/docs/URAM_Options.md)
 
 ### 5.	IPI
 * IPI developer flow is supported
