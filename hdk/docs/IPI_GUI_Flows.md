@@ -17,11 +17,11 @@
 
 This document covers top level steps (cheat sheet) for using a particular flow
 
-For step by step instructions refer to the [Vivado Tutorials/Examples](./AWS_Vivado_Example_Tutorials.md) documentation.
+For step by step instructions refer to the [Vivado Tutorials/Examples](./IPI_GUI_Examples.md) documentation.
 
 At this time On-Premise flow is recommended with this environment.
 
-Make sure the [HLx Setup Instructions](./AWS_IP_Vivado_Setup.md) are followed and executed.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed and executed.
 
 <a name="ipiprojex"></a>
 # IP Integrator Project with Example Design

@@ -25,7 +25,7 @@
 
 This document covers examples provided through the HLx environment and step by step tutorials with certain flows.
 
-Make sure the [HLx Setup Instructions](./AWS_IP_Vivado_Setup.md) are followed and executed.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed and executed.
 
 
 <a name="ipiex"></a>

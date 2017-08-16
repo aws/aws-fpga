@@ -91,10 +91,10 @@ This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted befor
 The Vivado HLx allows users to use Vivado in project mode to create designs or importing designs using RTL or IP Integrator flows.
 The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
 
-[HLx Setup README](./docs/AWS_IP_Vivado_Setup.md)
+[HLx Setup README](./docs/IPI_GUI_Vivado_Setup.md)
 
-[HLx Flows](./docs/AWS_Vivado_Flows.md)
+[HLx Flows](./docs/IPI_GUI_Flows.md)
 
-[HLx Tutorials/Examples](./docs/AWS_Tutorials_Examples.md)
+[HLx Tutorials/Examples](./docs/IPI_GUI_Examples.md)
 
-[HLx FAQ](./docs/AWS_Vivado_FAQ.md)
+[HLx FAQ](./docs/IPI_GUI_Vivado_FAQ.md)

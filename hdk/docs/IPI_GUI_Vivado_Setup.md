@@ -15,7 +15,7 @@
 
 This document covers how to clone github, source hdk and how to installed the HLx environment.  In addition, information about the AWS IP and general information about Vivado projects (IP Integrator/RTL) are discussed.
 
-After setup, the [Vivado HLx AWS Tutorials and Examples](./AWS_Tutorials_Examples.md) documentation is for new designs, example designs, and tutorials.
+After setup, the [Vivado HLx AWS Tutorials and Examples](./IPI_GUI_Examples.md) documentation is for new designs, example designs, and tutorials.
 
 <a name="hdksdkinst"></a>
 Follow the sections of Xilinx Vivado Tools, License Requirements and HDK Installation and Environment Setup.
@@ -142,9 +142,9 @@ The blue box is where the Design Runs are located with similar functionality as 
 
 # AWS IP Overview
 
-To configure the AWS IP, double click on the AWS IP in the Block Diagram (BD) after the IP Integrator Block Diagram is created.  This is discussed in the [Vivado HLx AWS Tutorials and Examples](./AWS_Tutorials_Examples.md).
+To configure the AWS IP, double click on the AWS IP in the Block Diagram (BD) after the IP Integrator Block Diagram is created.  This is discussed in the [Vivado HLx AWS Tutorials and Examples](./IPI_GUI_Examples.md).
 
-When the Re-customize IP GUI appears, four catagories appear for IP configuration.
+When the Re-customize IP GUI appears, four categories appear for IP configuration.
 
 ## Enable IP Interfaces
 
@@ -207,7 +207,7 @@ Number of pipeline stages - Range is between 1-4 pipeline stages for the stats i
 # Vivado Flows Overview
 
 The HLx environment supports IP Integrator, RTL, HLS flows in Vivado and this section will discuss these
-flows from a top level. Refer to [Vivado HLx AWS Tutorials and Examples](./AWS_Tutorials_Examples.md) for more details.
+flows from a top level. Refer to [Vivado HLx AWS Tutorials and Examples](./IPI_GUI_Examples.md) for more details.
 
 
 ## RTL
