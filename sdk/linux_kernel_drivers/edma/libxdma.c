@@ -24,7 +24,7 @@
 #define DRV_MODULE_NAME		"edma"
 #ifdef __LIBXDMA_MOD__
 #define DRV_MODULE_DESC		"Xilinx XDMA Base Driver"
-#define DRV_MODULE_VERSION	"1.0"
+#define DRV_MODULE_VERSION	"1.0.29"
 #define DRV_MODULE_RELDATE	"Feb. 2017"
 
 static char version[] =
@@ -836,9 +836,9 @@ static irqreturn_t xdma_channel_irq(int irq, void *dev_id)
 			XDMA_OFS_INT_CTRL);
 
 	/* Disable the interrupt for this engine */
-	//channel_interrupts_disable(lro, engine->irq_bitmask);
-	engine->interrupt_enable_mask_value = read_register(&engine->regs->interrupt_enable_mask);
-	write_register(engine->interrupt_enable_mask_value, &engine->regs->interrupt_enable_mask_w1c);
+	write_register(engine->interrupt_enable_mask_value,
+			 &engine->regs->interrupt_enable_mask_w1c);
+
 	/* Dummy read to flush the above write */
 	read_register(&irq_regs->channel_int_pending);
 	/* Schedule the bottom half */
@@ -1525,6 +1525,8 @@ static int engine_init(struct xdma_engine *engine, struct xdma_dev *lro,
 	/* Apply engine configurations */
 	write_register(reg_value, &engine->regs->interrupt_enable_mask);
 
+	engine->interrupt_enable_mask_value = reg_value;
+
 	/* all engine setup completed successfully */
 	return 0;
 }
@@ -2198,6 +2200,89 @@ fail:
 	return rc;
 }
 
+static void pci_check_extended_tag(struct xdma_dev *xdev, struct pci_dev *pdev)
+{
+	u16 cap;
+	u32 v;
+	void *__iomem reg;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+	pcie_capability_read_word(pdev, PCI_EXP_DEVCTL, &cap);
+#else
+	int pos;
+
+	pos = pci_pcie_cap(pdev);
+	if (pos > 0)
+		pci_read_config_word(pdev, pos + PCI_EXP_DEVCTL, &cap);
+	else {
+		pr_info("%s, unable to access pcie cap.\n",
+			dev_name(&pdev->dev));
+		return;
+	}
+#endif
+
+	if ((cap & PCI_EXP_DEVCTL_EXT_TAG))
+		return;
+
+	/* extended tag not enabled */
+	if (xdev->config_bar_idx < 0) {
+		pr_info("pdev 0x%p, xdev 0x%p, config bar UNKNOWN.\n",
+			pdev, xdev);
+		return;
+	}
+
+	reg = xdev->bar[xdev->config_bar_idx] + XDMA_OFS_CONFIG + 0x4C;
+	v =  read_register(reg);
+	v = (v & 0xFF) | (((u32)32) << 8);
+	write_register(v, reg);
+}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+static void pci_enable_relaxed_ordering(struct pci_dev *pdev)
+{
+	pcie_capability_set_word(pdev, PCI_EXP_DEVCTL,
+				PCI_EXP_DEVCTL_RELAX_EN);
+}
+#else
+static void pci_enable_relaxed_ordering(struct pci_dev *pdev)
+{
+	u16 v;
+	int pos;
+
+	pos = pci_pcie_cap(pdev);
+	if (pos > 0) {
+		pci_read_config_word(pdev, pos + PCI_EXP_DEVCTL, &v);
+		v |= PCI_EXP_DEVCTL_RELAX_EN;
+		pci_write_config_word(pdev, pos + PCI_EXP_DEVCTL, v);
+	}
+}
+#endif
+
+static void pci_keep_intx_enabled(struct pci_dev *pdev)
+{
+	u16 pcmd, pcmd_new;
+
+	pci_read_config_word(pdev, PCI_COMMAND, &pcmd);
+	pcmd_new = pcmd & ~PCI_COMMAND_INTX_DISABLE;
+	if (pcmd_new != pcmd) {
+		pr_info("%s: clear INTX_DISABLE, 0x%x -> 0x%x.\n",
+			dev_name(&pdev->dev), pcmd, pcmd_new);
+		pci_write_config_word(pdev, PCI_COMMAND, pcmd_new);
+	}
+}
+
+static void pci_clear_intr_status(struct pci_dev *pdev)
+{
+	u16 v;
+
+	pci_read_config_word(pdev, PCI_STATUS, &v);
+	if (v & PCI_STATUS_INTERRUPT) {
+		pr_info("%s: PCI STATUS Interrupt pending 0x%x.\n",
+			dev_name(&pdev->dev), v);
+		pci_write_config_word(pdev, PCI_STATUS, PCI_STATUS_INTERRUPT);
+	}
+}
+
 int xdma_device_open(struct pci_dev *pdev, xdma_channel_tuple **tuple_p)
 {
 	int i, j;
@@ -2221,6 +2306,10 @@ int xdma_device_open(struct pci_dev *pdev, xdma_channel_tuple **tuple_p)
 		goto err_enable;
 	}
 
+	pci_clear_intr_status(pdev);
+
+	pci_enable_relaxed_ordering(pdev);
+
 	/* enable bus master capability */
 	dbg_init("pci_set_master()\n");
 	pci_set_master(pdev);
@@ -2237,9 +2326,18 @@ int xdma_device_open(struct pci_dev *pdev, xdma_channel_tuple **tuple_p)
 	if (rc)
 		goto err_map;
 
+	pci_check_extended_tag(lro, pdev);
+
 	rc = set_dma_mask(pdev);
 	if (rc)
 		goto err_mask;
+
+	/* clear out all irq enable masks */
+	channel_interrupts_disable(lro, ~0);
+	user_interrupts_disable(lro, ~0);
+	read_interrupts(lro);
+
+	pci_keep_intx_enabled(pdev);
 
 	rc = irq_setup(lro, pdev);
 	if (rc)

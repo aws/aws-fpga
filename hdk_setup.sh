@@ -29,6 +29,20 @@ script_dir=$(dirname $full_script)
 
 debug=0
 
+# This function checks if an environment module exists
+# Returns 0 if it exists, and returns 1 if it doesn't
+function does_module_exist() {
+
+    output=`/usr/bin/ls /usr/local/Modules/$MODULE_VERSION/modulefiles | grep $1`
+
+    if [[ $output == "$1" ]]; then
+        return 0;
+    else
+        return 1;
+    fi
+}
+
+
 function info_msg {
   echo -e "INFO: $1"
 }

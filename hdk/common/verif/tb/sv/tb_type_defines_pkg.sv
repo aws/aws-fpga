@@ -18,7 +18,7 @@ package tb_type_defines_pkg;
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
 // Recipe A0 (Default)       125        62.5            187.5           250
 // Recipe A1	             250       125	            375             500
-// Recipe A2                  15.625     7.8125         125              62.5
+// Recipe A2                  15.625     15.625         125              62.5
 								
 //                      clk_extra_b0 clk_extra_b1		
 // Recipe B0 (Default)       250       125		

@@ -863,8 +863,13 @@ module sh_bfm #(
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
-         cmd.size  = cl_sh_pcim_awsize;
+         cmd.size = cl_sh_pcim_awsize;
          cmd.last = 0;
+         
+         if(cl_sh_pcim_awsize != 6) begin
+          $display("FATAL ERROR: AwSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_wr_cmds.push_back(cmd);         
          sh_cl_b_resps.push_back(cmd);
@@ -945,6 +950,11 @@ module sh_bfm #(
          cmd.len  = cl_sh_pcim_arlen;
          cmd.size = cl_sh_pcim_arsize;
          cmd.last = 0;
+
+         if(cl_sh_pcim_arsize != 6) begin
+          $display("FATAL ERROR: ArSize other than 6 are not supported");
+          $finish;
+         end
          
          cl_sh_rd_cmds.push_back(cmd);
          sh_cl_rd_data.push_back(cmd);
@@ -1393,7 +1403,7 @@ module sh_bfm #(
          ClockRecipe::A2: begin
             MAIN_A0_DLY  = 32ns;
             CORE_DLY     = 32ns;
-            EXTRA_A1_DLY = 64ns;
+            EXTRA_A1_DLY = 32ns;
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
@@ -2041,7 +2051,8 @@ module sh_bfm #(
           sh_ddr_stat_addr0  = addr;
           sh_ddr_stat_wdata0 = data;
           sh_ddr_stat_rd0    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr0    = 0;
        end
        1: begin
@@ -2049,7 +2060,8 @@ module sh_bfm #(
           sh_ddr_stat_addr1  = addr;
           sh_ddr_stat_wdata1 = data;
           sh_ddr_stat_rd1    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr1    = 0;
        end
        2: begin
@@ -2057,7 +2069,8 @@ module sh_bfm #(
           sh_ddr_stat_addr2  = addr;
           sh_ddr_stat_wdata2 = data;
           sh_ddr_stat_rd2    = 0;
-          #8ns;
+          #CORE_DLY;
+          #CORE_DLY;
           sh_ddr_stat_wr2    = 0;
        end
      endcase // case (ddr_idx)

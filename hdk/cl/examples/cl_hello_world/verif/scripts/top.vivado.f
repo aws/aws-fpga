@@ -21,6 +21,7 @@
 
 -sourcelibdir ${CL_ROOT}/../common/design
 -sourcelibdir ${CL_ROOT}/design
+-sourcelibdir ${CL_ROOT}/verif/sv
 -sourcelibdir ${SH_LIB_DIR}
 -sourcelibdir ${SH_INF_DIR}
 -sourcelibdir ${SH_SH_DIR}
