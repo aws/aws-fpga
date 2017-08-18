@@ -5,7 +5,7 @@ AWS FPGA HDK is the official kit provided by AWS to facilitate RTL development (
 
 Useful resources:
 * Check out the [release notes](../RELEASE_NOTES.md) for information about the latest bug fixes, updates, and features added to the HDK.
-* [FAQ](../aws-fpga/FAQs.md)
+* [FAQ](../FAQs.md)
 
 ## Table of Contents
 1. [Overview](#overview)
