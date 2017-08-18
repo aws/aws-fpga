@@ -156,12 +156,7 @@ debug_msg "Done setting environment variables.";
 # Download correct shell DCP
 info_msg "Using HDK shell version $hdk_shell_version"
 debug_msg "Checking HDK shell's checkpoint version"
-#hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
-hdk_ltx_dir=$HDK_SHELL_DIR/build/debug_probes/from_aws
-hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
-#s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-s3_hdk_ltx_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/debug_probes/from_aws
 declare -a s3_hdk_ltx_files=("cl_hello_world.debug_probes.ltx"
                              "cl_dram_dma.debug_probes.ltx"
                              )
@@ -181,40 +176,41 @@ do
     sub_dir="debug_probes"
   fi
   hdk_shell_dir=$HDK_SHELL_DIR/build/$sub_dir/from_aws
+  hdk_file=$hdk_shell_dir/$shell_file
   s3_shell_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/$sub_dir/from_aws
   # Download the sha256
   if [ ! -e $hdk_shell_dir ]; then
   	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
   fi
   # Use curl instead of AWS CLI so that credentials aren't required.
-  curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_shell_dir/$shell_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_shell_dir/$shell_file.sha256"; return 2; }
-  if grep -q '<?xml version' $hdk_shell_dir/$shell_file.sha256; then
+  curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }
+  if grep -q '<?xml version' $hdk_file.sha256; then
     err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256"
-    cat $hdk_shell_dir/$shell_file.sha256
+    cat $hdk_file.sha256
     return 2
   fi
-  exp_sha256=$(cat $hdk_shell_dir/$shell_file.sha256)
+  exp_sha256=$(cat $hdk_file.sha256)
   debug_msg "  $shell_file latest   version=$exp_sha256"
   # If shell file already downloaded check its sha256
-  if [ -e $hdk_shell_dir/$shell_file ]; then
-    act_sha256=$( sha256sum $hdk_shell_dir/$shell_file | awk '{ print $1 }' )
+  if [ -e $hdk_file ]; then
+    act_sha256=$( sha256sum $hdk_file | awk '{ print $1 }' )
     debug_msg "  $shell_file existing version=$act_sha256"
     if [[ $act_sha256 != $exp_sha256 ]]; then
       info_msg "HDK shell's $shell_file version is incorrect"
-      info_msg "  Saving old file to $hdk_shell_dir/$shell_file.back"
-      mv $hdk_shell_dir/$shell_file $hdk_shell_dir/$shell_file.back
+      info_msg "  Saving old file to $hdk_file.back"
+      mv $hdk_file $hdk_file.back
     fi
   else
     info_msg "HDK shell's $shell_file hasn't been downloaded yet."
   fi
-  if [ ! -e $hdk_shell_dir/$shell_file ]; then
+  if [ ! -e $hdk_file ]; then
     info_msg "Downloading latest HDK shell $shell_file from $s3_shell_dir/$shell_file"
     # Use curl instead of AWS CLI so that credentials aren't required.
-    curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file -o $hdk_shell_dir/$shell_file || { err_msg "HDK shell checkpoint download failed"; return 2; }
+    curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file -o $hdk_file || { err_msg "HDK shell checkpoint download failed"; return 2; }
   fi
 
   # Check sha256
-  act_sha256=$( sha256sum $hdk_shell_dir/$shell_file | awk '{ print $1 }' )
+  act_sha256=$( sha256sum $hdk_file | awk '{ print $1 }' )
   if [[ $act_sha256 != $exp_sha256 ]]; then
     err_msg "Incorrect HDK shell checkpoint version:"
     err_msg "  expected version=$exp_sha256"
