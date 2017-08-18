@@ -156,67 +156,73 @@ debug_msg "Done setting environment variables.";
 # Download correct shell DCP
 info_msg "Using HDK shell version $hdk_shell_version"
 debug_msg "Checking HDK shell's checkpoint version"
-hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
+#hdk_shell_dir=$HDK_SHELL_DIR/build/checkpoints/from_aws
 hdk_ltx_dir=$HDK_SHELL_DIR/build/debug_probes/from_aws
 hdk_shell=$hdk_shell_dir/SH_CL_BB_routed.dcp
 hdk_shell_s3_bucket=aws-fpga-hdk-resources
-s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+#s3_hdk_shell=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 s3_hdk_ltx_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/debug_probes/from_aws
 declare -a s3_hdk_ltx_files=("cl_hello_world.debug_probes.ltx"
                              "cl_dram_dma.debug_probes.ltx"
                              )
 
-# Download the sha256
-if [ ! -e $hdk_shell_dir ]; then
-	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
-fi
-# Use curl instead of AWS CLI so that credentials aren't required.
-curl -s https://s3.amazonaws.com/$s3_hdk_shell.sha256 -o $hdk_shell.sha256 || { err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256 -o $hdk_shell.sha256"; return 2; }
-if grep -q '<?xml version' $hdk_shell.sha256; then
-  err_msg "Failed to download HDK shell's checkpoint version from $s3_hdk_shell.sha256"
-  cat hdk_shell.sha256
-  return 2
-fi
-exp_sha256=$(cat $hdk_shell.sha256)
-debug_msg "  latest   version=$exp_sha256"
-# If shell already downloaded check its sha256
-if [ -e $hdk_shell ]; then
-  act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
-  debug_msg "  existing version=$act_sha256"
-  if [[ $act_sha256 != $exp_sha256 ]]; then
-    info_msg "HDK shell's checkpoint version is incorrect"
-    info_msg "  Saving old checkpoint to $hdk_shell.back"
-    mv $hdk_shell $hdk_shell.back
-  fi
-else
-  info_msg "HDK shell's checkpoint hasn't been downloaded yet."
-fi
-if [ ! -e $hdk_shell ]; then
-  info_msg "Downloading latest HDK shell checkpoint from $s3_hdk_shell"
-  # Use curl instead of AWS CLI so that credentials aren't required.
-  curl -s https://s3.amazonaws.com/$s3_hdk_shell -o $hdk_shell || { err_msg "HDK shell checkpoint download failed"; return 2; }
-fi
-# Check sha256
-act_sha256=$( sha256sum $hdk_shell | awk '{ print $1 }' )
-if [[ $act_sha256 != $exp_sha256 ]]; then
-  err_msg "Incorrect HDK shell checkpoint version:"
-  err_msg "  expected version=$exp_sha256"
-  err_msg "  actual   version=$act_sha256"
-  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
-  return 2
-fi
-info_msg "HDK shell is up-to-date"
-
-info_msg "Fetching the debug probes(ltx files)"
-if [ ! -e $hdk_ltx_dir ]; then
-	mkdir -p $hdk_ltx_dir || { err_msg "Failed to create $hdk_ltx_dir"; return 2; }
-fi
-# Downloading the ltx files
-for ltx_file in "${s3_hdk_ltx_files[@]}"
+# Shell files to be downloaded
+declare -a s3_hdk_files=("SH_CL_BB_routed.dcp"
+                         "cl_hello_world.debug_probes.ltx"
+                         "cl_dram_dma.debug_probes.ltx"
+                        )
+# Downloading the shell files
+for shell_file in "${s3_hdk_files[@]}"
 do
-	s3_ltx_file=$s3_hdk_ltx_dir/$ltx_file
-	hdk_ltx_file=$hdk_ltx_dir/$ltx_file
-    curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file || { warn_msg "Failed to download debug probe files. Try the following command to fetch debug probe files for the examples: curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file"; }
+  # Determine if shell or debug probe
+  if [ $shell_file == "SH_CL_BB_routed.dcp" ]; then
+    sub_dir="checkpoints"
+  else
+    sub_dir="debug_probes"
+  fi
+  hdk_shell_dir=$HDK_SHELL_DIR/build/$sub_dir/from_aws
+  s3_shell_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/$sub_dir/from_aws
+  # Download the sha256
+  if [ ! -e $hdk_shell_dir ]; then
+  	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
+  fi
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_shell_dir/$shell_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_shell_dir/$shell_file.sha256"; return 2; }
+  if grep -q '<?xml version' $hdk_shell_dir/$shell_file.sha256; then
+    err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256"
+    cat $hdk_shell_dir/$shell_file.sha256
+    return 2
+  fi
+  exp_sha256=$(cat $hdk_shell_dir/$shell_file.sha256)
+  debug_msg "  $shell_file latest   version=$exp_sha256"
+  # If shell file already downloaded check its sha256
+  if [ -e $hdk_shell_dir/$shell_file ]; then
+    act_sha256=$( sha256sum $hdk_shell_dir/$shell_file | awk '{ print $1 }' )
+    debug_msg "  $shell_file existing version=$act_sha256"
+    if [[ $act_sha256 != $exp_sha256 ]]; then
+      info_msg "HDK shell's $shell_file version is incorrect"
+      info_msg "  Saving old file to $hdk_shell_dir/$shell_file.back"
+      mv $hdk_shell_dir/$shell_file $hdk_shell_dir/$shell_file.back
+    fi
+  else
+    info_msg "HDK shell's $shell_file hasn't been downloaded yet."
+  fi
+  if [ ! -e $hdk_shell_dir/$shell_file ]; then
+    info_msg "Downloading latest HDK shell $shell_file from $s3_shell_dir/$shell_file"
+    # Use curl instead of AWS CLI so that credentials aren't required.
+    curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file -o $hdk_shell_dir/$shell_file || { err_msg "HDK shell checkpoint download failed"; return 2; }
+  fi
+
+  # Check sha256
+  act_sha256=$( sha256sum $hdk_shell_dir/$shell_file | awk '{ print $1 }' )
+  if [[ $act_sha256 != $exp_sha256 ]]; then
+    err_msg "Incorrect HDK shell checkpoint version:"
+    err_msg "  expected version=$exp_sha256"
+    err_msg "  actual   version=$act_sha256"
+    err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
+    return 2
+  fi
+  info_msg "HDK shell is up-to-date"
 done
 
 # Create DDR and PCIe IP models and patch PCIe
