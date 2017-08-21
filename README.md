@@ -45,7 +45,7 @@ The below documentation covers the setup, tutorials of RTL/IP Integrator flows a
 
 [HLx Setup README](./hdk/docs/IPI_GUI_Vivado_Setup.md)
 
-[HLx Flows](./hdk/docs/IPI_GUI_Vivado_Flows.md)
+[HLx Flows](./hdk/docs/IPI_GUI_Flows.md)
 
 [HLx Tutorials/Examples](./hdk/docs/IPI_GUI_Examples.md)
 
