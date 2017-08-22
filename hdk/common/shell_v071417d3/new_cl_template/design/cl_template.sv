@@ -45,8 +45,8 @@ module cl_template #(parameter NUM_PCIE=1, parameter NUM_DDR=4, parameter NUM_HM
 logic pre_sync_rst_n;
 logic sync_rst_n;
    
-always_ff @(negedge rst_n or posedge clk)
-   if (!rst_n)
+always_ff @(negedge rst_main_n or posedge clk)
+   if (!rst_main_n)
    begin
       pre_sync_rst_n <= 0;
       sync_rst_n <= 0;

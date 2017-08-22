@@ -172,49 +172,63 @@ proc create_root_design { parentCell } {
 
   # Create ports
 
-  # Create instance: aws_0, and set properties
-  set aws_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 aws_0 ]
+  # Create instance: axi_bram_ctrl_0, and set properties
+  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.0 axi_bram_ctrl_0 ]
   set_property -dict [ list \
-CONFIG.AUX_PRESENT {1} \
-CONFIG.BAR1_PRESENT {1} \
-CONFIG.CLOCK_A0_FREQ {250000000} \
-CONFIG.CLOCK_A1_FREQ {125000000} \
-CONFIG.CLOCK_A2_FREQ {375000000} \
-CONFIG.CLOCK_A3_FREQ {500000000} \
-CONFIG.CLOCK_A_RECIPE {1} \
-CONFIG.NUM_A_CLOCKS {1} \
-CONFIG.VENDOR_ID {0x0001} \
- ] $aws_0
+CONFIG.DATA_WIDTH {512} \
+CONFIG.ECC_TYPE {0} \
+ ] $axi_bram_ctrl_0
 
-  # Create instance: aws_0_axi_periph, and set properties
-  set aws_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 aws_0_axi_periph ]
+  # Create instance: axi_bram_ctrl_0_bram, and set properties
+  set axi_bram_ctrl_0_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 axi_bram_ctrl_0_bram ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
- ] $aws_0_axi_periph
+CONFIG.Memory_Type {True_Dual_Port_RAM} \
+ ] $axi_bram_ctrl_0_bram
 
   # Create instance: axi_gpio_0, and set properties
   set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
   set_property -dict [ list \
-CONFIG.C_ALL_INPUTS {1} \
-CONFIG.C_ALL_OUTPUTS_2 {1} \
-CONFIG.C_GPIO2_WIDTH {16} \
+CONFIG.C_ALL_OUTPUTS {1} \
 CONFIG.C_GPIO_WIDTH {16} \
-CONFIG.C_IS_DUAL {1} \
  ] $axi_gpio_0
 
+  # Create instance: axi_smc, and set properties
+  set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
+  set_property -dict [ list \
+CONFIG.NUM_SI {1} \
+ ] $axi_smc
+
+  # Create instance: f1_inst, and set properties
+  set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 f1_inst ]
+  set_property -dict [ list \
+CONFIG.AUX_PRESENT {1} \
+CONFIG.BAR1_PRESENT {1} \
+CONFIG.PCIS_PRESENT {1} \
+ ] $f1_inst
+
+  # Create instance: f1_inst_axi_periph, and set properties
+  set f1_inst_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 f1_inst_axi_periph ]
+  set_property -dict [ list \
+CONFIG.NUM_MI {1} \
+ ] $f1_inst_axi_periph
+
   # Create interface connections
-  connect_bd_intf_net -intf_net S_SH_1 [get_bd_intf_ports S_SH] [get_bd_intf_pins aws_0/S_SH]
-  connect_bd_intf_net -intf_net aws_0_M_AXI_BAR1 [get_bd_intf_pins aws_0/M_AXI_BAR1] [get_bd_intf_pins aws_0_axi_periph/S00_AXI]
-  connect_bd_intf_net -intf_net aws_0_axi_periph_M00_AXI [get_bd_intf_pins aws_0_axi_periph/M00_AXI] [get_bd_intf_pins axi_gpio_0/S_AXI]
+  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTA [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTA] [get_bd_intf_pins axi_bram_ctrl_0_bram/BRAM_PORTA]
+  connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTB [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTB] [get_bd_intf_pins axi_bram_ctrl_0_bram/BRAM_PORTB]
+  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_bram_ctrl_0/S_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
+  connect_bd_intf_net -intf_net f1_inst_M_AXI_BAR1 [get_bd_intf_pins f1_inst/M_AXI_BAR1] [get_bd_intf_pins f1_inst_axi_periph/S00_AXI]
+  connect_bd_intf_net -intf_net f1_inst_M_AXI_PCIS [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins f1_inst/M_AXI_PCIS]
+  connect_bd_intf_net -intf_net f1_inst_S_SH [get_bd_intf_ports S_SH] [get_bd_intf_pins f1_inst/S_SH]
+  connect_bd_intf_net -intf_net f1_inst_axi_periph_M00_AXI [get_bd_intf_pins axi_gpio_0/S_AXI] [get_bd_intf_pins f1_inst_axi_periph/M00_AXI]
 
   # Create port connections
-  connect_bd_net -net aws_0_clk_main_a0_out [get_bd_pins aws_0/clk_main_a0_out] [get_bd_pins aws_0_axi_periph/ACLK] [get_bd_pins aws_0_axi_periph/M00_ACLK] [get_bd_pins aws_0_axi_periph/S00_ACLK] [get_bd_pins axi_gpio_0/s_axi_aclk]
-  connect_bd_net -net aws_0_rst_main_n_out1 [get_bd_pins aws_0/rst_main_n_out] [get_bd_pins aws_0_axi_periph/ARESETN] [get_bd_pins aws_0_axi_periph/M00_ARESETN] [get_bd_pins aws_0_axi_periph/S00_ARESETN] [get_bd_pins axi_gpio_0/s_axi_aresetn]
-  connect_bd_net -net aws_0_status_vdip [get_bd_pins aws_0/status_vdip] [get_bd_pins axi_gpio_0/gpio_io_i]
-  connect_bd_net -net axi_gpio_0_gpio2_io_o [get_bd_pins aws_0/status_vled] [get_bd_pins axi_gpio_0/gpio2_io_o]
+  connect_bd_net -net axi_gpio_0_gpio_io_o [get_bd_pins axi_gpio_0/gpio_io_o] [get_bd_pins f1_inst/status_vled]
+  connect_bd_net -net f1_inst_clk_main_a0_out [get_bd_pins axi_bram_ctrl_0/s_axi_aclk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins axi_smc/aclk] [get_bd_pins f1_inst/clk_main_a0_out] [get_bd_pins f1_inst_axi_periph/ACLK] [get_bd_pins f1_inst_axi_periph/M00_ACLK] [get_bd_pins f1_inst_axi_periph/S00_ACLK]
+  connect_bd_net -net f1_inst_rst_main_n_out [get_bd_pins axi_bram_ctrl_0/s_axi_aresetn] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins axi_smc/aresetn] [get_bd_pins f1_inst/rst_main_n_out] [get_bd_pins f1_inst_axi_periph/ARESETN] [get_bd_pins f1_inst_axi_periph/M00_ARESETN] [get_bd_pins f1_inst_axi_periph/S00_ARESETN]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00001000 -offset 0x00000000 [get_bd_addr_spaces aws_0/M_AXI_BAR1] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] SEG_axi_gpio_0_Reg
+  create_bd_addr_seg -range 0x00002000 -offset 0xC0000000 [get_bd_addr_spaces f1_inst/M_AXI_PCIS] [get_bd_addr_segs axi_bram_ctrl_0/S_AXI/Mem0] SEG_axi_bram_ctrl_0_Mem0
+  create_bd_addr_seg -range 0x00001000 -offset 0x00000000 [get_bd_addr_spaces f1_inst/M_AXI_BAR1] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] SEG_axi_gpio_0_Reg
 
 
   # Restore current instance

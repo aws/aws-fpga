@@ -47,6 +47,23 @@ if {[info exist inline_examples] eq 0} {
 	}
 }
 
+set SYNTH_CONST [file join $currentDir constraints cl_synth_user.xdc]
+set IMPL_CONST [file join $currentDir constraints cl_pnr_user.xdc]
+
+set VERIF [file join $currentDir verif test_cl.sv]
+
+import_files -fileset constrs_1 -force $SYNTH_CONST
+import_files -fileset constrs_1 -force $IMPL_CONST
+
+set_property PROCESSING_ORDER LATE [get_files */cl_pnr_user.xdc]
+set_property USED_IN {implementation} [get_files */cl_pnr_user.xdc]
+
+set_property is_enabled false [get_files */cl_pnr_user.xdc]
+set ::env(PNR_USER) [get_files */cl_pnr_user.xdc]			
+
+import_files -fileset sim_1 -norecurse $VERIF
+update_compile_order -fileset sim_1
+
 set DELAYEDEXAMPLE [file join $currentDir [file tail $currentDir].tcl]
 set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE"
 

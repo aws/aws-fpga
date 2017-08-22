@@ -46,8 +46,24 @@ if {$_this_flow_option eq 1} {
 	
 	set AWS_RTL_XDC_EXISTS [get_files */cl_synth_aws.xdc -quiet]
 	
+	set BD_PATH_EXISTS [get_files */cl.bd -quiet]
+
+	if {$BD_PATH_EXISTS != ""} {
+		set BD_CHECK_MODE [get_property synth_checkpoint_mode [get_files */cl.bd]]
+		if {$BD_CHECK_MODE == "None"} {
+		set BD_MODE "None"
+		} else {
+		set BD_MODE ""
+		}
+	} else {
+		set BD_MODE ""	
+	}
+	
+	
+	
+	
 	#RTL Flow or IPI Flow
-	if {$AWS_RTL_XDC_EXISTS != ""} {
+	if {$AWS_RTL_XDC_EXISTS != "" || $BD_MODE  == "None" } {
 	add_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp
 	set_property SCOPED_TO_CELLS {CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp]
 	} else {
@@ -62,9 +78,27 @@ if {$_this_flow_option eq 1} {
 	set_property PROCESSING_ORDER LATE [get_files $PNR_USR_LOC]
 	set_property USED_IN {implementation} [get_files $PNR_USR_LOC]	
 
+
 	link_design -top $top -part [get_parts -of_objects [current_project]] -reconfig_partitions {SH CL}
 	source ${FAAS_CL_DIR}/build/constraints/aws_gen_clk_constraints.tcl
 
+	switch  $::env(URAM_CASCADE) {
+	    "2" {
+	        set uramHeight 2
+	    }
+	    "3" {
+	        set uramHeight 3
+	    }
+	    "4" {
+	        set uramHeight 4
+	    }
+	    default {
+	        set uramHeight 4
+	    }
+	}
+
+	source $::env(HDK_SHELL_DIR)/build/scripts/check_uram.tcl
+	
 	write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_link_design.dcp
 
 

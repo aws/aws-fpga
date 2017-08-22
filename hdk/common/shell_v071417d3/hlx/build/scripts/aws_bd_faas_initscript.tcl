@@ -18,10 +18,7 @@
 
 set abfi_script_dir [file dirname [info script]]
 
-set_param synth.elaboration.rodinMoreOptions {rt::set_parameter disableOregPackingUram true}
-
 set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1
-set_param physynth.ultraRAMOptOutput false
 
 
 
@@ -31,7 +28,24 @@ set_property STEPS.PLACE_DESIGN.ARGS.DIRECTIVE Explore [get_runs [current_run -i
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED true [get_runs [current_run -implementation]]
 #set_property STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE Explore [get_runs [current_run -implementation]]
 
-set_property -name "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" -value "-mode out_of_context" -objects [get_runs [current_run -synthesis]]
+	if {[get_property "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" [get_runs [current_run -synthesis]]] == ""} {
+		set_property -name "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" -value "-mode out_of_context -max_uram_cascade_height 1" -objects [get_runs [current_run -synthesis]]		
+		set SYNTH_URAM_CMD [get_property "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" [get_runs [current_run -synthesis]]]
+		set SYNTH_URAM_ID [lsearch -all $SYNTH_URAM_CMD *max_uram_cascade_height*]
+		set ::env(URAM_CASCADE) [lindex $SYNTH_URAM_CMD [expr ${SYNTH_URAM_ID}+1]]
+		
+	} else {
+		set SYNTH_URAM_CMD [get_property "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" [get_runs [current_run -synthesis]]]
+		set SYNTH_URAM_ID [lsearch -all $SYNTH_URAM_CMD *max_uram_cascade_height*]
+		set ::env(URAM_CASCADE) [lindex $SYNTH_URAM_CMD [expr ${SYNTH_URAM_ID}+1]]		
+	}		
+
+	if {$::env(URAM_CASCADE) != 2} {
+ 	set_param synth.elaboration.rodinMoreOptions {rt::set_parameter disableOregPackingUram true}
+  	set_param physynth.ultraRAMOptOutput false
+	}
+
+
 set_property -name "STEPS.SYNTH_DESIGN.TCL.PRE" \
 	-value [file normalize [file join $abfi_script_dir subscripts synth_design_pre.tcl]] \
 	-objects [get_runs [current_run -synthesis]]

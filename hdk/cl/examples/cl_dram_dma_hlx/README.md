@@ -9,36 +9,45 @@
 <a name="overview"></a>
 ## Overview
 
-For more information about the cl_dram_dma example, read the following information[CL DRAM DMA CL Example](./../cl_dram_dma/README.md)
+For more information about the cl\_dram\_dma example, read the following information [CL DRAM DMA CL Example](./../cl_dram_dma/README.md)
 
+At this time On-Premise flow is recommended with this environment.
+
+Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
 
 <a name="hlx"></a>
 ## HLx Flow for CL Example
 
-### Add in the following system variables for clock recipes and IDs for cl_dram_dma example.
+### Add in the following system variables for clock recipes and IDs for cl\_dram\_dma example.
 
-export CLOCK_A_RECIPE=0
+export CLOCK\_A\_RECIPE=0
 
-export CLOCK_B_RECIPE=0
+export CLOCK\_B\_RECIPE=0
 
-export CLOCK_C_RECIPE=0
+export CLOCK\_C\_RECIPE=0
 
-export device_id=0xF001
+export device\_id=0xF001
 
-export vendor_id=0x1D0F
+export vendor\_id=0x1D0F
 
-export subsystem_id=0x1D51
+export subsystem\_id=0x1D51
 
-export subsystem_vendor_id=0xFEDC 
+export subsystem\_vendor\_id=0xFEDC 
 
 
 ### Creating Example Design
 
-Invoke vivado in the cl/examples/cl_dram_dma_hlx directory.
+Change directories to the cl/examples/cl\_dram\_dma\_hlx directory.
 
-In the TCL console type in the following to create the cl_dram_dma example.  The example will be generated in cl/examples/cl_dram_dma_hlx/example_projects.  The vivado project is examples_projects/cl_dram_dma.xpr.
+Invoke vivado by typing vivado in the console.
 
-aws::make_rtl -examples cl_dram_dma
+In the TCL console type in the following to create the cl\_dram\_dma example.  The example will be generated in cl/examples/cl\_dram\_dma\_hlx/example_projects.  The vivado project is examples\_projects/cl\_dram\_dma.xpr.
+
+aws::make\_rtl -examples cl\_dram\_dma
+
+Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
+
+aws::make\_rtl
 
 ### Simulation
 Click on Simulation->Run Simulation->Run Behavioral Simulation
@@ -51,20 +60,31 @@ run -all
 
 ### Changing Simulation Sources for Tests
 
-cl_dram_dma has several simulation sources that can be used for simulation (test_ddr, test_dram_dma, test_int, test_peek_poke, test_peek_poke_pcis_axsize).  
+cl\_dram\_dma has several simulation sources that can be used for simulation (test\_ddr, test\_dram\_dma, test\_int, test\_peek\_poke, test\_peek\_poke\_pcis\_axsize).  
 
-By default the test_dram_dma is used in the project.  To switch tests, right click on SIMULATION in the Project Manager and select Simulation Settings…
+By default the test\_dram\_dma is used in the project.  To switch tests, right click on SIMULATION in the Project Manager and select Simulation Settings…
 
 For Verilog options select the … box and change the following name.  Below is an example.
 
-TEST_NAME=test_ddr
+TEST\_NAME=test\_ddr
 
 Click OK, Click Apply, Click OK to back into the Vivado project.
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 
-The completed .tar file is located in <project>.runs/faas_1/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
+The completed .tar file is located in example\_projects/cl\_dram\_dma.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
+
+### CL Example Software
+
+The runtime software must be complied for the AFI to run on F1.  Note the EDMA driver must be installed before running on F1.
+
+Use the software in cl/examples/cl\_dram\_dma
+
+    $ cd cl/cl_dram_dma/software/runtime/
+    $ make all
+    $ sudo ./test_dram_dma
+

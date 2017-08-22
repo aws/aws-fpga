@@ -43,13 +43,13 @@ The [HDK directory](./hdk) contains useful information and scripts for developer
 The Vivado HLx allows users to use Vivado in project mode to create designs or import designs using RTL or IP Integrator flows.
 The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
 
-[HLx Setup README](./hdk/docs/AWS_IP_Vivado_Setup.md)
+[HLx Setup README](./hdk/docs/IPI_GUI_Vivado_Setup.md)
 
-[HLx Flows](./hdk/docs/AWS_Vivado_Flows.md)
+[HLx Flows](./hdk/docs/IPI_GUI_Flows.md)
 
-[HLx Tutorials/Examples](./hdk/docs/AWS_Tutorials_Examples.md)
+[HLx Tutorials/Examples](./hdk/docs/IPI_GUI_Examples.md)
 
-[HLx FAQ](./hdk/docs/AWS_Vivado_FAQ.md)
+[HLx FAQ](./hdk/docs/IPI_GUI_Vivado_FAQ.md)
         
 <a name="fpgasdk"></a>
 ## FPGA SDK

@@ -24,15 +24,6 @@ set IS_DEFINE [get_property verilog_define [get_filesets sim_1]]
 	}
 
 add_files -fileset sim_1 [ list \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/sync.v\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/flop_ccf.sv\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/ccf_ctl.v\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/mgt_acc_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/mgt_gen_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/sim/sh_ddr.sv
-]
-
-add_files -fileset sim_1 [ list \
  ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/sim/axi_register_slice.v\
  ${HDK_SHELL_DIR}/verif/models/ddr4_model/ddr4_sdram_model_wrapper.sv\
  ${HDK_SHELL_DIR}/verif/models/sh_bfm/axi_bfm_defines.svh\
