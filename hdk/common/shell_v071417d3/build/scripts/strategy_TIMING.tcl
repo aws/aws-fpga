@@ -1,7 +1,7 @@
 source $HDK_SHELL_DIR/build/scripts/params.tcl
 source $HDK_SHELL_DIR/build/scripts/uram_options.tcl
 
-set synth_options "-no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing off $synth_uram_option"
+set synth_options "-no_lc -shreg_min_size 5 -fsm_extraction one_hot -resource_sharing auto $synth_uram_option"
 set synth_directive "default"
 
 #Set psip to 1 to enable Physical Synthesis in Placer (2017.1+ only)
