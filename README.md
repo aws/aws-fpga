@@ -4,7 +4,7 @@
 
 1. [AWS EC2 FPGA Hardware and Software Development Kits](#devkit)
     - [FPGA Hardware Development Kit (HDK)](#fpgahdk)
-    - [Vivado HLx Environment](#fpgahlx)    
+    - [Vivado IP Integrator](#ipi)    
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
@@ -37,7 +37,7 @@ The [HDK directory](./hdk) contains useful information and scripts for developer
         
 [FPGA PCIe Address Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
 
-<a name="fpgahlx"></a>
+<a name="ipi"></a>
 ## Vivado IP Integrator
 
 Developers have the option of working in a GUI mode using Vivado IP Integator (IPI).   With IPI you can create complex F1 customer designs on a graphical interface design canvas.   The HDK development kit provides AWS IP which will help you quickly develop your customer design and enable you to quickly drop in IP blocks.
