@@ -16,7 +16,7 @@ Useful resources:
     - [Start Custom Logic (CL) Design](#startcl)
     - [Simulate Custom Logic (CL) RTL Design](#simcl)
     - [Build Custom Logic (CL) Design to send to AWS](#buildcl)
-3. [Vivado HLx Setup/Environment](#vivadohlx)    
+3. [Vivado IP Integrator](#ipi)    
 
 <a name="overview"></a>
 ## Overview 
@@ -85,7 +85,7 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 You can follow the [build scripts readme](./common/shell_v04151701/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
-<a name="vivadohlx"></a>
+<a name="ipi"></a>
 ## Vivado IP Integrator
 
 Developers have the option of working in a GUI mode using Vivado IP Integator (IPI).   With IPI you can create complex F1 customer designs on a graphical interface design canvas.   The HDK development kit provides AWS IP which will help you quickly develop your customer design and enable you to quickly drop in IP blocks.
