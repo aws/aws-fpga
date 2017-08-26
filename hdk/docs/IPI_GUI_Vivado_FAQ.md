@@ -1,4 +1,4 @@
-# Vivado AWS HLx - Frequently Asked Questions
+# IP Integrator - Frequently Asked Questions
 
 ## Table of Content
 
@@ -11,11 +11,8 @@
 [Synthesis/Implementation](#impl)
 
 
-
 <a name="ip"></a>
 # AWS IP
-
-**Q: **
 
 <a name="proj"></a>
 # Vivado Project Flows
@@ -82,13 +79,13 @@ VHDL/Verilog only (System Verilog not supported)
 # Simulation
 
 
-**Q: What simulators and simulation flows are supported with this release?**
+**Q: What simulators and simulation flows are supported?**
 
-Currently only Vivado Simulator is supported at this time.
+When using the Vivado GUI, the Vivado Simulator is supported.  We plan to support linking in 3rd party vendor simulator support.
 
-System Verilog testbench .sv/BFM flow supported. 
+Customer example System Verilog testbench (.sv/BFM) is supported
 
-No DPI simulation (C simulation is not supported)
+When using the Vivado GUI, DPI simulation (C simulation is not supported) is not supported at this time 
 
 **Q: With IP Integrator flow with AWS IP configured with no DDR4 in the CL, why does errors show up with Vivado Simulator?**
 
