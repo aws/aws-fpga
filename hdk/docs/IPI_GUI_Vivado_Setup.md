@@ -1,36 +1,28 @@
-# HLx Setup/Vivado Overview/AWS IP Readme
+# IP Integrator Setup
 
 ## Table of Content
 
 1. [Overview](#overview)
-2. [HDK Install](#hdksdkinst)
-3. [HLx Install](#hlxinst)
-4. [Vivado Overview](#vivado) 
-5. [AWS IP Overview](#ipover)
-6. [Vivado Flows Overview](#projover)
+2. [Install](#hlxinst)
+3. [Vivado Overview](#vivado) 
+4. [AWS IP Overview](#ipover)
+5. [Vivado Flows Overview](#projover)
 
 
 <a name="overview"></a>
 # Overview  
 
-This document covers how to clone github, source hdk and how to installed the HLx environment.  In addition, information about the AWS IP and general information about Vivado projects (IP Integrator/RTL) are discussed.
+This document assumes you have cloned the developer kit and sourced the hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator. 
 
-After setup, the [Vivado HLx AWS Tutorials and Examples](./IPI_GUI_Examples.md) documentation is for new designs, example designs, and tutorials.
+Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
-<a name="hdksdkinst"></a>
-Follow the sections of Xilinx Vivado Tools, License Requirements and HDK Installation and Environment Setup.
-
-This will setup the license, clone the github, and setup the HDK environment.
-
-At this time on-premise flow is highly recommended with the HLx flow.
 
 <a name="hlxinst"></a>
-
-# HLx Install
+# Install
 
 Open the following file in a text editor ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl
 
-If the file doesn't exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
+If either of these files do not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
 
 touch Vivado_init.tcl
 
@@ -38,24 +30,27 @@ Get the absolute path of the $HDK\_SHELL\_DIR with the following command.
 
 echo $HDK\_SHELL\_DIR
 
+If your $HDK\_SHELL\_DIR is empty or does not list <path>/$HDK\_SHELL\_DIR/<shell dir>, then you may need to source the [hdk_setup](../README.md).
+
 In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHELL\_DIR path.
 
 source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
 
-Everytime when vivado is invoked, this script will always be sourced and features of this script are available.
+Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded.
 
 <a name="vivado"></a>
-
 # Vivado Overview
 
-This section is a basic overview of the Vivado GUI and features that are discussed in the tutorials and examples in the HLx environment.  The GUI environment enables users at all experience levels to quickly set project options and strategies to meet their design requirements and enables interactive reports and design views to help quickly close any issues with timing or area.     
+This section is a basic overview of the Vivado GUI.  The GUI environment enables users at all experience levels to quickly set project options and strategies to meet their design requirements,  enables interactive reports and design views to help quickly close any issues with timing or area.   
+
+vivado 
 
 IP Integrator is a design entry tool in the Vivado HLx Design Suite.  It lets developers connect IPs at a block level and generates a "what you see is what you get" Register Transfer Language (RTL) file, either in VHDL or Verilog format.  The IP Integrator flow enhances the standard RTL flow and gives the developer access to designer assistance features which include:
 
 
 - Simplified connectivity of IPs through interface based connections
 
-- Block automation that adds helper IPs like Interconnects, DMAs, or other support blocks based upon an IP’s configuration
+- Block automation that adds helper IPs like Interconnects, DMAs, or other support blocks based upon an IPâ€™s configuration
 
 - Connectivity automation to route interfaces, clocks and resets between blocks
 
@@ -64,13 +59,11 @@ IP Integrator is a design entry tool in the Vivado HLx Design Suite.  It lets de
 - Advanced hardware debug capabilities that enable the developer to debug at a transaction level
 
 
-
 For more detailed information and methodology design guidelines refer to the following documentation:
 
 - <a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug892-vivado-design-flows-overview.pdf">ug892-vivado-design-flows-overview.pdf</a>
 - <a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug994-vivado-ip-subsystems.pdf">ug994-vivado-ip-subsystems.pdf</a>
 - <a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug949-vivado-design-methodology.pdf">ug949-vivado-design-methodology.pdf</a>
-
 
 
 The below screenshot is from the Vivado GUI which is discussed in the sections below.
@@ -104,12 +97,12 @@ The Flow Navigator is in the green box.
 
 PROJECT MANAGER section allows to Add Sources like RTL/IP/XDC sources, Language Templates for common RTL constructs/XDCs/DEBUG, and IP Catalog to add IPs to the project.  This portion of the flow targets the RTL flow.
 
-When invoking IP Catalog, the user can search for a particular IP or look through the different categories of IP and it’s the responsibility of the user to add and connect the IP into the user RTL.  
+When invoking IP Catalog, the user can search for a particular IP or look through the different categories of IP and itâ€™s the responsibility of the user to add and connect the IP into the user RTL.  
 
 
 ### IP INTEGRATOR
 
-This section allows the user to open and modify the Block Design and the Generate Block Design after the design is validated.  The framework of the Block Design with the AWS IP and board are already created with the HLx flow so Create Block Design isn’t necessary.
+This section allows the user to open and modify the Block Design and the Generate Block Design after the design is validated.  The framework of the Block Design with the AWS IP and board are already created with the HLx flow so Create Block Design isnâ€™t necessary.
 
 Double clicking on any IP in the BD brings up the Re-customize IP Dialog Box where IP settings can be reviewed or modified.  When connecting designs, Connection Automation is available to automatically connect interfaces.
 
@@ -237,10 +230,10 @@ Users can add developed/generated HLS IPs in either RTL/IP Integrator flows usin
 
 Timing analysis and setting timing constraints/floorplans is discussed in the timing closure documentation.
 
-The following top level clocks from the Shell (MMCM in the Shell to the CL) are generated dynamically based upon clock recipe’s used with the AWS flow.
-The user can’t modify these constraints as they are dynamically created before synthesis.
+The following top level clocks from the Shell (MMCM in the Shell to the CL) are generated dynamically based upon clock recipeâ€™s used with the AWS flow.
+The user canâ€™t modify these constraints as they are dynamically created before synthesis.
 
-cl\_clocks\_aws.xdc – Top level clock constraints for the CL.
+cl\_clocks\_aws.xdc â€“ Top level clock constraints for the CL.
 
 The following .xdc file is only available with the RTL flow provided by the AWS env for synthesis.  This file should be disabled in the vivado project
 if DDR4 memories are not in the CL design(critical warnings could show up).
@@ -249,9 +242,9 @@ cl\_synth\_aws.xdc - Timing constraints between sh_ddr module and DDR4 IP.
 
 The following .xdc files are available to the user.
 
-cl\_synth\_user.xdc – Timing constraints in the CL(I.E creating new clock structures with clock generator/using clocks in different Shell MMCM).
+cl\_synth\_user.xdc â€“ Timing constraints in the CL(I.E creating new clock structures with clock generator/using clocks in different Shell MMCM).
 
-cl\_pnr\_user.xdc – Timing constraints between the CL/SH.  Floorplanning is done in this xdc if necessary.
+cl\_pnr\_user.xdc â€“ Timing constraints between the CL/SH.  Floorplanning is done in this xdc if necessary.
 
 
 
@@ -263,7 +256,7 @@ By default, synthesis is using Default directive and -max\_uram\_cascade\_height
 
 By default, all implementation steps are using the Explore directive.
 
-If needing to change implementation settings, only change the tool directives in the Design Run Settings tab by right clicking on Impl_1->Change Run Settings… .
+If needing to change implementation settings, only change the tool directives in the Design Run Settings tab by right clicking on Impl_1->Change Run Settingsâ€¦ .
 Change only directives for opt_design ,place_design, phys_opt_design, and route_design.  Do not change Strategy options as this overrides certain options in the HLx environment at this time.
 
 
