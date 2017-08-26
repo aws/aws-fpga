@@ -86,15 +86,15 @@ You can follow the [build scripts readme](./common/shell_v04151701/new_cl_templa
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
 <a name="vivadohlx"></a>
-## Vivado HLx Overview
+## Vivado IP Integrator
 
-The Vivado HLx allows users to use Vivado in project mode to create designs or importing designs using RTL or IP Integrator flows.
-The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
+Developers have the option of working in a GUI mode using Vivado IP Integator (IPI).   With IPI you can create complex F1 customer designs on a graphical interface design canvas.   The HDK development kit provides AWS IP which will help you quickly develop your customer design and enable you to quickly drop in IP blocks.
+The below documentation covers the setup, tutorials of the IP Integrator flows and FAQ.  Developers are recommended to read all documents before starting any design.
 
-[HLx Setup README](./docs/IPI_GUI_Vivado_Setup.md)
+[IPI Setup](./hdk/docs/IPI_GUI_Vivado_Setup.md)
 
-[HLx Flows](./docs/IPI_GUI_Flows.md)
+[IPI Developer Flow](./hdk/docs/IPI_GUI_Flows.md)
 
-[HLx Tutorials/Examples](./docs/IPI_GUI_Examples.md)
+[IPI Tutorials/Examples](./hdk/docs/IPI_GUI_Examples.md)
 
-[HLx FAQ](./docs/IPI_GUI_Vivado_FAQ.md)
+[IPI FAQ](./hdk/docs/IPI_GUI_Vivado_FAQ.md)
