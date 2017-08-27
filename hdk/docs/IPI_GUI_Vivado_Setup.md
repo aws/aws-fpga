@@ -5,7 +5,9 @@
 1. [Overview](#overview)
 2. [Install](#hlxinst)
 3. [Vivado Overview](#vivado) 
-5. [Vivado Flows Overview](#projover)
+4. [Vivado Flows Overview](#projover)
+5. [Summary](#summary)
+
 
 
 <a name="overview"></a>
@@ -194,3 +196,12 @@ If needing to change implementation settings, only change the tool directives in
 Change only directives for opt_design ,place_design, phys_opt_design, and route_design.  Do not change Strategy options as this overrides certain options in the HLx environment at this time.
 
 Refer to [IPI Tutorials and Examples](./IPI_GUI_Examples.md) to get started.
+
+
+<a name="summary"></a>
+# Summary  
+
+Now that you are familar with building an [customer examples](../cl/examples/README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
+
+
+
