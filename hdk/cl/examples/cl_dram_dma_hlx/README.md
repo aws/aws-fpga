@@ -1,19 +1,15 @@
-# CL DRAM DMA CL Example HLx
+# CL DRAM DMA Example
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HLx Flow for CL Example](#hlx)
+2. [IPI Flow](#hlx)
 
 
 <a name="overview"></a>
 ## Overview
 
 For more information about the cl\_dram\_dma example, read the following information [CL DRAM DMA CL Example](./../cl_dram_dma/README.md)
-
-At this time On-Premise flow is recommended with this environment.
-
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
 
 <a name="hlx"></a>
 ## HLx Flow for CL Example
@@ -62,9 +58,9 @@ run -all
 
 cl\_dram\_dma has several simulation sources that can be used for simulation (test\_ddr, test\_dram\_dma, test\_int, test\_peek\_poke, test\_peek\_poke\_pcis\_axsize).  
 
-By default the test\_dram\_dma is used in the project.  To switch tests, right click on SIMULATION in the Project Manager and select Simulation Settings…
+By default the test\_dram\_dma is used in the project.  To switch tests, right click on SIMULATION in the Project Manager and select Simulation Settingsâ€¦
 
-For Verilog options select the … box and change the following name.  Below is an example.
+For Verilog options select the â€¦ box and change the following name.  Below is an example.
 
 TEST\_NAME=test\_ddr
 
@@ -72,7 +68,7 @@ Click OK, Click Apply, Click OK to back into the Vivado project.
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 

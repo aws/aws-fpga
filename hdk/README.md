@@ -16,7 +16,7 @@ Useful resources:
     - [Start Custom Logic (CL) Design](#startcl)
     - [Simulate Custom Logic (CL) RTL Design](#simcl)
     - [Build Custom Logic (CL) Design to send to AWS](#buildcl)
-3. [Vivado HLx Setup/Environment](#vivadohlx)    
+3. [Vivado IP Integrator (IPI) and GUI Workflow](#ipi)    
 
 <a name="overview"></a>
 ## Overview 
@@ -85,16 +85,21 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 You can follow the [build scripts readme](./common/shell_v04151701/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
-<a name="vivadohlx"></a>
-## Vivado HLx Overview
+<a name="ipi"></a>
+## Vivado IP Integrator (IPI) and GUI Workflow
 
-The Vivado HLx allows users to use Vivado in project mode to create designs or importing designs using RTL or IP Integrator flows.
-The below documentation covers the setup, tutorials of RTL/IP Integrator flows and FAQ.  Users are recommended to read all documents before starting any design.
+Developers have the option of working in a GUI mode using Vivado IP Integator (IPI).   With IPI you can create complex F1 customer designs on a graphical interface design canvas.   The HDK development kit provides AWS IP which will help you quickly develop your customer design and enable you to quickly drop in IP blocks.
 
-[HLx Setup README](./docs/IPI_GUI_Vivado_Setup.md)
+The IP Integrator flow isolates the Customer Logic (CL) from the shell, allowing the developer to focus on differentiation within the F1 image.  Generating a logic diagram is simplified with designer automation that connects RTL, IP, and peripherals like DDR and PCIe in a correct by construction flow.  The “what you see is what you get” tool generates the equivalent code by instantiating the underlying IP and RTL and gives access via the Vivado project to the entire FPGA hardware design flow.  A video walk through of this flow for a simple diagram is available at https://www.xilinx.com/video/hardware/using-vivado-ip-integrator-and-amazon-f1.html.  This flow is a good starting point for developers who want to quickly add IP blocks with high performance access to multiple external memories.
+ 
+The IP Integrator RTL flow enables the developer a single graphical environment to add sources and IP, simulate, synthesize the RTL, and then stitch together the Customer Logic (CL) with the shell’s design check point (DCP).  Developers can easily instantiate logic analyzers or other debug logic, investigate timing and resource reports, and quickly link from implementation messages to the design view and source code when applicable.  This flow is a good starting point for experts in RTL design or developers who have a minimal amount of interconnection between RTL modules.
 
-[HLx Flows](./docs/IPI_GUI_Flows.md)
+The below documentation covers the setup, tutorials of the IP Integrator flows and FAQ.  Developers are recommended to read all documents before starting any design.  
 
-[HLx Tutorials/Examples](./docs/IPI_GUI_Examples.md)
+[IPI Setup](./docs/IPI_GUI_Vivado_Setup.md)
 
-[HLx FAQ](./docs/IPI_GUI_Vivado_FAQ.md)
+[IPI Tutorials/Examples](./docs/IPI_GUI_Examples.md)
+
+[IPI Developer Flow](./docs/IPI_GUI_Flows.md)
+
+[IPI FAQ](./docs/IPI_GUI_Vivado_FAQ.md)
