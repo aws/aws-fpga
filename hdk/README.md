@@ -96,10 +96,10 @@ The IP Integrator RTL flow enables the developer a single graphical environment 
 
 The below documentation covers the setup, tutorials of the IP Integrator flows and FAQ.  Developers are recommended to read all documents before starting any design.  
 
-[IPI Setup](./hdk/docs/IPI_GUI_Vivado_Setup.md)
+[IPI Setup](./docs/IPI_GUI_Vivado_Setup.md)
 
-[IPI Tutorials/Examples](./hdk/docs/IPI_GUI_Examples.md)
+[IPI Tutorials/Examples](./docs/IPI_GUI_Examples.md)
 
-[IPI Developer Flow](./hdk/docs/IPI_GUI_Flows.md)
+[IPI Developer Flow](./docs/IPI_GUI_Flows.md)
 
-[IPI FAQ](./hdk/docs/IPI_GUI_Vivado_FAQ.md)
+[IPI FAQ](./docs/IPI_GUI_Vivado_FAQ.md)
