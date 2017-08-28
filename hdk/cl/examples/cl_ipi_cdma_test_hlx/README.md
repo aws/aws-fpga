@@ -1,15 +1,15 @@
-# cl\_ipi\_cdma\_test HLx
+# cl\_ipi\_cdma\_test
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HLx Flow for CL Example](#hlx)
+2. [IPI Flow](#hlx)
 
 
 <a name="overview"></a>
 ## Overview
 
-The design does the following which simulation and software shows the following behavior.
+Here is an overview of the cl\_ipi\_cmda\_test design:
  
 AXIL\_SDA AXI GPIO input connected to DDR4\_A/B/D and SH calibration done signal, processor polls register
  
@@ -25,12 +25,8 @@ AXIL\_OCL AXI GPIO output written 16-bits for VLED (16-bit patter of 0xAAAA)
 
 Read from VLED from Verilog task or linux command to read VLED to verify pattern
 
-At this time On-Premise flow is recommended with this environment.
-
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
-
 <a name="hlx"></a>
-## HLx Flow for CL Example
+## IPI Flow
 
 
 ### Creating Example Design
@@ -66,7 +62,7 @@ run -all
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 

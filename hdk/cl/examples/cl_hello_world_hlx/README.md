@@ -1,9 +1,9 @@
-# Hello World CL Example HLx
+# Hello World Example
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HLx Flow for CL Example](#hlx)
+2. [IPI Flow](#hlx)
 
 
 <a name="overview"></a>
@@ -11,12 +11,8 @@
 
 For more information about the hello\_world example, read the following information [Hello World CL Example](./../cl_hello_world/README.md)
 
-At this time On-Premise flow is recommended with this environment.
-
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
-
 <a name="hlx"></a>
-## HLx Flow for CL Example
+## IPI Flow
 
 ### Add in the following system variables for clock recipes and IDs for cl\_hello\_world example.
 
@@ -61,7 +57,7 @@ run -all
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 

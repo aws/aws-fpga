@@ -235,18 +235,6 @@ do
   info_msg "HDK shell is up-to-date"
 done
 
-info_msg "Fetching the debug probes(ltx files)"
-if [ ! -e $hdk_ltx_dir ]; then
-	mkdir -p $hdk_ltx_dir || { err_msg "Failed to create $hdk_ltx_dir"; return 2; }
-fi
-# Downloading the ltx files
-for ltx_file in "${s3_hdk_ltx_files[@]}"
-do
-	s3_ltx_file=$s3_hdk_ltx_dir/$ltx_file
-	hdk_ltx_file=$hdk_ltx_dir/$ltx_file
-    curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file || { warn_msg "Failed to download debug probe files. Try the following command to fetch debug probe files for the examples: curl -s https://s3.amazonaws.com/$s3_ltx_file -o $hdk_ltx_file"; }
-done
-
 # Create DDR and PCIe IP models and patch PCIe
 models_dir=$HDK_COMMON_DIR/verif/models
 ddr4_model_dir=$models_dir/ddr4_model
