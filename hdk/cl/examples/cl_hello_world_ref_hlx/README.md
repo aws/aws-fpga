@@ -1,9 +1,9 @@
-# cl\_hello\_world\_ref HLx
+# cl\_hello\_world\_ref
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [HLx Flow for CL Example](#hlx)
+2. [IPI Flow](#hlx)
 
 
 <a name="overview"></a>
@@ -17,14 +17,8 @@ The cl\_hello\_world\_ref example demonstrates basic Shell-to-CL connectivity, m
 
 The logic for the original cl\_hello\_world example from github is contained in one RTL module (hello\_world.v).  In hello\_world.v, the top level ports are for AXI4Lite interface, clock/reset and ports for VLED and VDIP which allows for IP packaging of the design and reuse with other flows/AXI4Lite Master interfaces.  Note VIO logic is not included with this example from the original cl\_hello\_world example.
 
-At this time On-Premise flow is recommended with this environment.
-
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
-
-
 <a name="hlx"></a>
-## HLx Flow for CL Example
-
+## IPI Flow
 
 ### Creating Example Design
 Change directories to the cl/examples/cl\_hello\_world\_ref\_hlx directory.
@@ -58,7 +52,7 @@ run -all
 
 ### Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 
