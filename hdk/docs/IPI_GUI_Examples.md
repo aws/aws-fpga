@@ -515,7 +515,7 @@ Use the software in cl/examples/cl\_hello\_world
 
 This example shows how to add existing RTL, simulation RTL, and constraints into a Vivado project.  This example uses cl\_dram\_dma from the github examples directory.
 
-Make sure the HLx Setup Instructions are followed before continuing.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed before continuing.
 
 ## Create Directory Structure\Vivado Project and System Variables 
 
@@ -685,7 +685,7 @@ Use the software in cl/examples/cl\_dram\_dma
 
 This example shows how to add existing RTL, simulation RTL, and constraints into a Vivado project based upon template files provided from github.
 
-Make sure the HLx Setup Instructions are followed before continuing.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed before continuing.
 
 ## Create Directory Structure\Vivado Project and System Variables 
 
