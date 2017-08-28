@@ -17,11 +17,6 @@
 
 This document covers top level steps (cheat sheet) for using a particular flow
 
-For step by step instructions refer to the [Vivado Tutorials/Examples](./IPI_GUI_Examples.md) documentation.
-
-At this time On-Premise flow is recommended with this environment.
-
-Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed and executed.
 
 <a name="ipiprojex"></a>
 # IP Integrator Project with Example Design
@@ -41,7 +36,7 @@ aws::make\_ipi -examples <example requested>
 
 ## Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 
@@ -73,7 +68,7 @@ aws::make\_rtl -examples <example requested>
 
 ## Implementing the Design/Tar file
 
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+In the Design Runs tab, right click on impl\_1 and select Launch Runsâ€¦ . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
 
 This will run both synthesis and implementation.
 
