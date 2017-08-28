@@ -28,7 +28,7 @@ AWS designed its FPGA instances to provide a developer experience with ease of u
 
 - AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA developer AMI developers have a choice to a wide range of instance (different CPU and Memory configutation) allowing developers to optimize their development flow.
 
-- AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premise development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
+- AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premises development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
 
 - For developers who want to develop on-premises, Xilinx provides an [on-premises license](./hdk/docs/on_premise_licensing_help.md ) that matches all the needed components needed to be licensed for F1 development on premises. 
 
