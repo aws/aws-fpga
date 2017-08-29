@@ -12,7 +12,7 @@ Developers' ten to simulate their designs to validate the RTL design and functio
 
 One easy way is to have a pre-installed environment is to use the [AWS FPGA Developer AMI available on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes with pre-installed Vivado tools and license.
 
-For developers who like to work on-premise or different AMI in the cloud, AWS recommend to follow the [required license for on-premise document](./on_premise_licensing_help.md).
+For developers who like to work on-premises or different AMI in the cloud, AWS recommend to follow the [required license for on-premise document](./on_premise_licensing_help.md).
 
 Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vivado version](../supported_vivado_versions.txt) for the exact version of Vivado tools, and the required license components.
 
