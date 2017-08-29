@@ -77,18 +77,6 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    logger.info("Checking bucket permissions for the dcp and logs.")
-    cmd = "{0} {1}/common/scripts/check_s3_bucket_policy.py --dcp-bucket {2} --dcp-key {3} --logs-bucket {4} --logs-key {5}".format(
-        sys.executable, os.environ['HDK_DIR'], args.dcp_bucket, args.dcp_key, args.logs_bucket, args.logs_key)
-    if args.debug:
-        cmd += ' --debug'
-    logger.debug(cmd)
-    rc = os.system(cmd)
-    if rc:
-        logger.error("S3 bucket permissions must be updated")
-        sys.exit(2)
-    logger.info("S3 bucket permissions are correct")
-
     # Check that input dcp tarball has been uploaded to S3
     if not s3_exists(args.dcp_bucket, args.dcp_key):
         logger.error("DCP tarball hasn't been uploaded to S3: s3://{0}/{1}".format(args.dcp_bucket, args.dcp_key))
