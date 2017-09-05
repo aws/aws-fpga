@@ -22,7 +22,9 @@ When using the developer AMI:  ```AWS_FPGA_REPO_DIR=/home/centos/src/project_dat
 
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
-    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (Required: us-east-1)
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and default region
+
+Use the aws-cli [region](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) command line argument to override the profile default region.  Supported regions include: us-east-1, us-west-2 and eu-west-1
 
 ### 1. Pick one of the examples and move to its directory
 
@@ -84,13 +86,14 @@ You need to prepare the following information:
 2. Generic description of the logic design *(Optional)*.
 3. Location of the tarball file object in S3.
 4. Location of an S3 directory where AWS would write back logs of the AFI creation.
+5. AWS region where the AFI will be created.  Use [copy-fpga-image](../../docs/copy-fpga-images.md) API if you need to load an AFI on a different region.
 
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
 
 Create a bucket and folder for your tarball, then copy to S3
 ```
-    $ aws s3 mb s3://<bucket-name> --region us-east-1  # Create an S3 bucket (choose a unique bucket name)
+    $ aws s3 mb s3://<bucket-name> --region <region>   # Create an S3 bucket (choose a unique bucket name)
     $ aws s3 mb s3://<bucket-name>/<dcp-folder-name>   # Create folder for your tarball files
     $ aws s3 cp $CL_DIR/build/checkpoints/to_aws/*.Developer_CL.tar \       # Upload the file to S3
              s3://<bucket-name>/<dcp-folder-name>/
@@ -102,63 +105,10 @@ Create a folder for your log files
     $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/  #Which creates the folder on S3
 ```             
 
-Now you need to provide AWS (Account ID: 365015490807) the appropriate [read/write permissions](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-walkthroughs-managing-access-example2.html) to your S3 buckets.
-Below is the policy you must use, except you will need to change `<bucket-name>, <dcp-folder-name>, <tar-file-name> and <logs-folder-name>`.  Edit your S3 bucket policy by using the AWS console.  Select the S3 bucket and select the permissions tab.  Then select bucket policy and add the policy listed below. 
-
-```
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Bucket level permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:ListBucket"
-                ],
-                "Resource": "arn:aws:s3:::<bucket-name>"
-            },
-            {
-                "Sid": "Object read permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:GetObject"
-                ],
-                "Resource": "arn:aws:s3:::<bucket-name>/<dcp-folder-name>/<tar-file-name>"
-            },
-            {
-                "Sid": "Folder write permissions",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::365015490807:root"
-                },
-                "Action": [
-                    "s3:PutObject"
-                ],
-                "Resource": "arn:aws:s3:::<bucket-name>/<logs-folder-name>/*"
-            }
-        ]
-    }
-```
-
-You can verify that the bucket policy grants the required permissions by running the following script:
-
-```
-    $ check_s3_bucket_policy.py \
-	--dcp-bucket <bucket-name> \
-	--dcp-key <dcp-folder-name>/<tar-file-name> \
-	--logs-bucket <bucket-name> \
-	--logs-key <logs-folder-name>
-
-```
-Once your policy passes the checks, your ready to start AFI creation. 
+Start AFI creation. 
 ```
     $ aws ec2 create-fpga-image \
+        --region <region> \
         --name <afi-name> \
         --description <afi-description> \
         --input-storage-location Bucket=<dcp-bucket-name>,Key=<path-to-tarball> \
@@ -201,9 +151,10 @@ The AFI can only be loaded to an instance once the AFI generation completes and 
 
 After the AFI generation is complete, AWS will put the logs into the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided by the developer. The presence of these logs is an indication that the creation process is complete. Please look for either a “State” file indicating the state of the AFI (e.g., available or failed), or the Vivado logs detailing errors encountered during the creation process.  For help with AFI creation issues, see [create-fpga-image error codes](../../docs/create_fpga_image_error_codes.md)
 
- 
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
 Please wait until you confirm the AFI is created successfully.*
+
+The [copy-fpga-image](../../docs/copy-fpga-images.md) API allows you copy AFIs to other regions and avoid the time consuming `create-fpga-image` process. Copy will also preserve the source Global AFI ID and minimize region-specific changes to your instance code or scripts.
 
 ## Step by step guide how to load and test a registered AFI from within an F1 instance
 
@@ -220,7 +171,7 @@ The FPGA Management tools are required to load an AFI onto an FPGA.  Depending o
 ```
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 ```
-    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and region (us-east-1)
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and instance region (us-east-1, us-west-2 or eu-west-1)
 ```
   
 ### 5. Load the AFI

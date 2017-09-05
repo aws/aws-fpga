@@ -28,7 +28,7 @@ AWS designed its FPGA instances to provide a developer experience with ease of u
 
 - AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA developer AMI developers have a choice to a wide range of instance (different CPU and Memory configutation) allowing developers to optimize their development flow.
 
-- AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premise development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
+- AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premises development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
 
 - For developers who want to develop on-premises, Xilinx provides an [on-premises license](./hdk/docs/on_premise_licensing_help.md ) that matches all the needed components needed to be licensed for F1 development on premises. 
 
@@ -104,12 +104,21 @@ It is the compiled FPGA code that is loaded into an FPGA in AWS for performing t
 
 The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed. 
 
+**Q: What regions are supported?**
+
+AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and ue-west-1 (Ireland).
 
 **Q: What is the process for creating an AFI?**
 
 The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
 Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
+
+**Q: Can I load an AFI on every region AWS FPGA is supported?**
+
+Yes, but you must first copy the AFI using the [copy-fpga-image](./hdk/docs/copy_fpga_image.md) API.  You should generate AFIs in one region and use copy to make them available in other regions.  Copy preserves the Global AFI ID used to load an AFI on a EC2 instance.
+
+Use [describe-fpga-images](./hdk/docs/describe_fpga_images.md) with the [--region command line option](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) to list AFIs available in a specific region.  Use `FpgaImageGlobalId` attribute and `fpga-image-global-id` filter to match AFI copies accross regions.
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 

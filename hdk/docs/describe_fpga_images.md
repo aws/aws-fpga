@@ -159,6 +159,19 @@ The following response shows the AFI information provided by `describe-fpga-imag
     $ aws ec2 describe-fpga-images --filters "Name=name,Values=cl_dram_dma_0415" "Name=name,Values=cl_hellow_world_04151701"
 ```
 
+## Control command output
+
+* Use the stadard aws-cli `query` and `output` parameters to change the response format and displayed fields:
+```
+    $ aws ec2 describe-fpga-images --query 'FpgaImages[*].[FpgaImageGlobalId,UpdateTime,ShellVersion,State.Code,Name]' --output text --owners amazon
+    agfi-02948a33d1a0e9665	2017-07-26T19:18:41.000Z	0x071417d3	available	dram_dma_1.3.0
+    agfi-088bffb3ab91ca2d1	2017-07-26T19:09:24.000Z	0x071417d3	available	hello_world_1.3.0
+    agfi-0f0e045f919413242	2017-04-19T17:15:26.000Z	0x04151701	available	cl_hellow_world_04151701
+    agfi-0d873e8b409f8e806	2017-04-17T15:58:54.000Z	0x04151701	available	cl_dram_dma_0415
+```
+
+Find details on all available formatting options in [Controlling Command Output from the AWS Command Line Interface](http://docs.aws.amazon.com/cli/latest/userguide/controlling-output.html).
+
 ## Common Error Messages
 
 

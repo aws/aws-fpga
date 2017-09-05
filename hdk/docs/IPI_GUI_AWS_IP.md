@@ -1,4 +1,4 @@
-# AWS IP for IP Integrator Overview
+# AWS FPGA IP for IP Integrator Overview
 
 ## Table of Content
 
@@ -6,7 +6,7 @@
 
 <a name="ipover"></a>
 
-# AWS IP Overview
+# AWS FPGA IP Overview
 
 To configure the AWS IP, double click on the AWS IP in the Block Diagram (BD) after the IP Integrator Block Diagram is created.  This is discussed in the [Vivado HLx AWS Tutorials and Examples](./IPI_GUI_Examples.md).
 
