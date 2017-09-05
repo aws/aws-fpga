@@ -1,6 +1,6 @@
-# SDAccel Private Preview
+# Preview OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
 
-This directory includes unsupported source code and binary files.  SDAccel preview and development is hosted in a private Github Repo and support is provided through a dedicated/private SDAccel AWS forum.  To request access to SDAccel preview please email to f1-preview@amazon.com with the following information:
+This directory includes unsupported source code and binary files.  The preview is hosted in a private Github Repo and support is provided through a dedicated/private AWS forum.  To request access to the preview please email to f1-preview@amazon.com with the following information:
 
 * Name
 * Organization or Company Name
