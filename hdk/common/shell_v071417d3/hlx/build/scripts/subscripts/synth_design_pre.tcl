@@ -13,15 +13,36 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+proc fileSearch {searchString fileName} {  
+  package require fileutil
+  set pattern {grep}
+  if [llength [fileutil::grep $searchString $fileName]] {
+    return 1
+  }
+}
+
 #Temp for testing should be in main script
 #open_bd_design [get_files -quiet cl.bd]
 if {[info exist FAAS_CL_DIR] eq 0} {
 	if {[info exist ::env(FAAS_CL_DIR)]} {
 		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
 	} else {
-		send_msg_id "synth_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_ipi_faas_setup' at the Vivado TCL command prompt"
+#		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+		# CATCH if unsure if the ::env(BD_LOCATION) is not set
+#		send_msg_id "synth_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please re-run the proc 'aws::make_ipi' or 'aws::make_rtl' as appropriate for your project at the Vivado TCL command prompt"
+
+
+		set file_path [get_property parent.project_path [current_project]]
+
+		if {[fileSearch cl.bd ${file_path}] == 1} {
+			common::send_msg_id "synth_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please re-run the following proc at the Vivado TCL command prompt:\naws::make_ipi"
+		} else {
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+#			common::send_msg_id "synth_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please re-run the following proc at the Vivado TCL command prompt:\naws::make_rtl"
+		}
 	}
 }
+
 
 
 #TODO

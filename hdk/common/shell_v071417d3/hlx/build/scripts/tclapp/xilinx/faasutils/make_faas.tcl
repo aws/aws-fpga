@@ -31,7 +31,7 @@
 
 
 
-set _make_faas_version 0.910
+set _make_faas_version 0.911
 #NYI indicates Not Yet Implemented
 #0.850-	initial files
 #0.904- set_params for 2017.1*
@@ -39,7 +39,8 @@ set _make_faas_version 0.910
 #0.907- fixed some issues with examples, moved the namespace
 #0.908- directory structure - NYI
 #0.909- Move DRC for RTL (-bypass) mode
-#0.910- add -selftest option (tcl testbench) - NYI
+#0.911- Moved bd_location env, messaging cleanup
+#0.912- add -selftest option (tcl testbench) - NYI
 #0.962- export sim? -NYI
 
 
@@ -226,7 +227,7 @@ proc [set _THISNAMESPACE]::[set _THISTOPSPACE]::make_faas {{args ""}} {
 
 # Local Proc Variables
 	set arg_error 1
-	set debugMode 1
+	set debugMode 0
 	set help 0
 	set usage 0
 	set resource 0
@@ -461,15 +462,6 @@ while {[llength $args]} {
 		}
 
 
-#		set example_list [glob -types d -tails -directory $_nsvars::script_dir/$_examples_board\_examples/sed/IPI *]
-#		set example_list "$example_list [glob -types d -tails -directory $_nsvars::script_dir/$_examples_board\_examples/sed/IPI *]"
-## need to determine where an example came from
-##		if {[file isdirectory $_nsvars::examples_directory/$_examples_board\_examples/sed/IPI]} {
-##			set example_list "$example_list [glob -types d -tails -directory $_nsvars::examples_directory/$_examples_board\_examples/sed/IPI *]"
-##		}
-#		if {[file isdirectory $public::bd_faas_examples_directory/$_examples_board\_examples]} {
-#			set example_list "$example_list [glob -types d -tails -directory $public::bd_faas_examples_directory/$_examples_board\_examples *]"
-#		}
 		if {[string match [string tolower $examples] "list"]} {
 			puts "Available examples for $_faas_board:"
 			set spacespaceN "\n  "
@@ -482,13 +474,6 @@ while {[llength $args]} {
 			regsub -all {[~!@#$%^&*()-+]} $examples_Name {} examples_Name
 			regsub -all {[`=\|"';:/?.>,<]} $examples_Name {} examples_Name
 			
-#			if {$_nsvars::examples_directory eq ""} {
-#				set _nsvars::examples_directory [pwd]
-#			}
-#			file mkdir [file join $_nsvars::examples_directory $_examples_board\_examples]
-#			file mkdir [file join $_nsvars::examples_directory $_examples_board\_examples sed]
-#			file mkdir [file join $_nsvars::examples_directory $_examples_board\_examples sed IPI]
-#			set example_directory [file join $_nsvars::examples_directory $_examples_board\_examples sed IPI $examples_Name]
 
 			if {$user::examples_directory eq ""} {
 				set user::examples_directory [pwd]
@@ -541,22 +526,14 @@ while {[llength $args]} {
 				} else {
 					set example_found [ expr ( [lsearch $example_find $examples] + 1 ) ]
 					if {$example_found <= [llength $example_find]} {
-						source [lindex $example_find $example_found]
+						if {$debugMode eq 1} { 
+							source [lindex $example_find $example_found] 
+						} else {
+							source [lindex $example_find $example_found] -notrace
+						}
 						set partial_examples 1
 					}
 
-##					set check_dirs $_nsvars::examples_directory
-#					set check_dirs $public::bd_faas_examples_directory
-#					lappend check_dirs $_nsvars::script_dir
-#					foreach {check_dir} $check_dirs {
-#						set theFileToExample $check_dir/$_examples_board\_examples/sed/IPI/$examples/init.tcl
-#						#dputs $debugMode "$check_dir - $theFileToExample"
-#						if {[file exist $theFileToExample]} {
-#							source $theFileToExample
-#							set partial_examples 1
-#						}
-##					source $_nsvars::script_dir/$_examples_board\_examples/sed/IPI/$examples/init.tcl
-#					}
 					if {$output_directory ne ""} {
 						set output_directory [get_property DIRECTORY [current_project]]
 					}
@@ -711,7 +688,7 @@ while {[llength $args]} {
 			generate_target all [get_files  $_full_loc_bd]
 
 		}
-		set ::env(BD_LOCATION) [get_files cl.bd]
+#		set ::env(BD_LOCATION) [get_files cl.bd]
 
 		# Test for multiple IPs (not at end of script)
 		open_bd_design [get_files -quiet cl.bd]
@@ -749,12 +726,6 @@ while {[llength $args]} {
 				return $errorCode
 			}
 		}
-
-#HACK! for 2017.1
-#if {[get_files -quiet -filter {FILE_TYPE==IP} *cl_debug_bridge.xci] eq ""} {
-#	import_files -norecurse $_nsvars::script_dir/DONOTINCLUDE_INAPP/hdk_lite/common/shell_v04151701/design/ip/cl_debug_bridge/cl_debug_bridge.xci
-#}
-
 	}	
 
 
@@ -831,18 +802,14 @@ while {[llength $args]} {
 	}
 
 	# Environment Variables - current location
-#	if { [info exists ::env(HDK_DIR)] eq 0 } {
-#		set ::env(HDK_DIR) [file join $_nsvars::script_dir DONOTINCLUDE_INAPP hdk_lite]
-#	}
-#	if { [file isdirectory $::env(HDK_DIR)] eq 0 } {
-#		set ::env(HDK_DIR) [file normalize [file join $public::bd_faas_root .. .. .. .. DONOTINCLUDE_INAPP hdk_lite]]
-#	}
+	if {[get_files -quiet cl.bd] ne ""} {
+		set ::env(BD_LOCATION) [get_files cl.bd]
+	}
 	set ::env(FAAS_CL_DIR) $_faas_runs_dir
 	set ::env(FAAS_SCRIPT_DIR) $_nsvars::script_dir
 	file mkdir [file join $::env(FAAS_CL_DIR) build checkpoints]
 
-	# Stop if only doing a partial example
-	puts "INFO: \[$_procName 10-1\] Finished setting up project [current_project] for enhanced FaaS flow with IP Integrator.  Please update your block diagram and rerun the $_procName"
+	puts "INFO: \[$_procName 10-1\] Finished setting up project [current_project] for enhanced FaaS flow with Vivado HLx."
 
 
 	########################################################################

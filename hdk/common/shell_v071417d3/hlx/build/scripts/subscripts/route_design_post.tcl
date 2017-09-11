@@ -21,7 +21,8 @@ if {[info exist FAAS_CL_DIR] eq 0} {
 	if {[info exist ::env(FAAS_CL_DIR)]} {
 		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
 	} else {
-		send_msg_id "route_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+#		send_msg_id "route_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
 	}
 }
 
@@ -200,7 +201,10 @@ tar::create to_aws/${timestamp}.Developer_CL.tar [glob to_aws/${timestamp}*]
 
 cd ${CURRENT_PATH}
 
-send_msg_id {make_faas 3-1870} WARNING "Bitstream Generation Not Supported for AWS flow, creating TAR file instead. \n\nSUCCESS!  TAR file generated at $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar"
+send_msg_id {make_faas 3-1870} WARNING "Bitstream Generation Not Supported for AWS flow, creating TAR file instead."
+puts "\n********************************************************************************"
+send_msg_id {make_faas 10-4} INFO "SUCCESS!  TAR file generated at $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.Developer_CL.tar"
+puts "********************************************************************************\n"
 
 
 

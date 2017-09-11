@@ -39,10 +39,6 @@ In the TCL console type in the following to create the cl\_ipi\_cdma\_test examp
 
 aws::make\_ipi -examples cl\_ipi\_cdma\_test
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_ipi
-
 Once the Block Diagram is open, review the different IP blocks especially the settings in the AWS IP.
 
 ### Simulation
