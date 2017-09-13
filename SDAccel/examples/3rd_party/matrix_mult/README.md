@@ -29,4 +29,4 @@ make TARGETS=hw DEVICES=$AWS_PLATFORM all
 ./main
 ```
 
-* For more information on running this example on an F1 instance, see [this](../../../README.md#step-by-step-guide-how-to-load-and-test-a-registered-afi-from-within-an-f1-instance).
+* For more information on running this example on an F1 instance, see [this](../../../README.md#run-the-fpga-accelerated-application-on-f1).
