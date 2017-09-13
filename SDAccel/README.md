@@ -142,7 +142,7 @@ The [create_sdaccel_afi.sh](./tools/create_sdaccel_afi.sh) script is provided to
 ```
     $ $SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=<input_xilinx_fpga_binary_xclbin_filename> 
 		-o=<output_aws_fpga_binary_awsxclbin_filename_root> \
-		-s3_bucket=<bucket-name> -s3_dcp_key=<dcp-folder-name> -s3_log <logs-folder-name>
+		-s3_bucket=<bucket-name> -s3_dcp_key=<dcp-folder-name> -s3_logs_key=<logs-folder-name>
 ```
 
 **Save the \*.awsxclbin, you will need to copy it to your F1 instance along with your executable host application.**
