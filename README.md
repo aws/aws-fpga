@@ -112,14 +112,13 @@ Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in
 
 To get started using SDAccel start with the [SDAccel README](SDAccel/README.md)
 
-The guides below provide you with the following concepts and work flows:
+The guides below provide you with the following concepts:
 * [Gain an understanding of the SDAccel **Design** Flow](#design)
 * [A complete **Methodology** for using the SDAccel Development Environment effectively](#methodology)
 * [**Recommendations** for Acceleration](#acceleration_recommendations)
 
 In addition, you can review the following useful documents:
 * [Run a sample design on **GUI**][GUI_README]
-* [Frequently Asked Questions (**FAQ**)][FAQ]
 * [On Premise development][OnPremiseDev]
 
 <a name="buildingafiprereq"></a>
