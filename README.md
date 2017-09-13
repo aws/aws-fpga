@@ -8,7 +8,8 @@
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [Building an example AFI](#buildingAnExample)
+2. [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
+3. [Building an example AFI](#buildingAnExample)
     - [Prerequisites](#buildingafiprereq)
     - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
@@ -80,8 +81,6 @@ The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum
 * To be notified on important messages click on the “Watch Forum” button on the right side of the screen.
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again. 
 
-
- 
 <a name="buildingAnExample"></a>
 # Building a Custom Logic AFI for AWS FPGA Instances
 
@@ -103,6 +102,25 @@ In summary:
 - The AFI can be used in an EC2 F1 instance by using the files in #4, #5 and #6.
 
 By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
+
+<a name="sdaccel"></a>
+# OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
+
+The OpenCL development enviroment allows customers to use OpenCL with Amazon EC2 F1 FPGA Instances to accelerate their C/C++ applications. Software developers with little to no FPGA experience, will find a familiar development experience and now can use the cloud-scale availability of FPGAs to supercharge their applications. 
+
+Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs. 
+
+To get started using SDAccel start with the [SDAccel README](SDAccel/README.md)
+
+The guides below provide you with the following concepts and work flows:
+* [Gain an understanding of the SDAccel **Design** Flow](#design)
+* [A complete **Methodology** for using the SDAccel Development Environment effectively](#methodology)
+* [**Recommendations** for Acceleration](#acceleration_recommendations)
+
+In addition, you can review the following useful documents:
+* [Run a sample design on **GUI**][GUI_README]
+* [Frequently Asked Questions (**FAQ**)][FAQ]
+* [On Premise development][OnPremiseDev]
 
 <a name="buildingafiprereq"></a>
 ### Prerequisites
