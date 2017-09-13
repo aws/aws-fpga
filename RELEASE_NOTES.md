@@ -26,6 +26,9 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    SDAccel general availability 
+
 ## Release 1.3.1 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    EDMA Driver release 1.0.29 - MSI-X fixes
    *    Improved IPI documentation
