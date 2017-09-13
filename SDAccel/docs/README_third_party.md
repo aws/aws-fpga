@@ -26,21 +26,18 @@ common/src/AOCLUtils/options.cpp
   * The second is the [fft(1D)](https://www.altera.com/support/support-resources/design-examples/design-software/opencl/fft-1d.html) example.
 
 ## Changes to the host code.
- * The host code *main.cpp* has dependencies found in *common/inc/AOCLUtils/{inc,src}*.
- * The *main.cpp* file and its dependencies need the following changes to work with SDAccel.
 
-#### The changes needed for the *vector_addition* host code can be found [here](../examples/3rd_party/vector_addition) in the file named vector_addition_main.cpp.diff.
-
-#### The changes needed for the *fft1d* host code can be found [here](../examples/3rd_party/fft1d) in the file named fft1d_main.cpp.diff.
-
-#### All the modified dependency files can be found in the [SDAccel/examples/3rd_party/common](../examples/3rd_party/common) directory.
+ * The changes needed for the *vector_addition* host code can be found [here](../examples/3rd_party/vector_addition) in the file named vector_addition_main.cpp.diff.
+ * The changes needed for the *fft1d* host code can be found [here](../examples/3rd_party/fft1d) in the file named fft1d_main.cpp.diff.
+ * All the modified dependency files can be found in the [SDAccel/examples/3rd_party/common](../examples/3rd_party/common) directory.
 
 ## Changes to the kernel code.
+
 * The kernel code, found in the &lt;example_name>/device directory, will most likely need modifications.
 * The vector addition kernel does not need changes.
 * The FFT (1D) example needs several changes due to the differences between the third party and Xilinx implementations.
 * The changes needed for the fft1d.cl file are found [here](../examples/3rd_party/fft1d) in the file named fft1d_fft1d.cl.diff.
-* See table below regarding [implementation differences between third party and Xilinx](#xilinx-and-third party-implementation-differences).
+* See table below regarding [implementation differences between third party and Xilinx](#xilinx-and-third-party-implementation-differences).
 
 * The &lt;example_name>/device/twid_radix4_8.cl file will get many warnings about casting from double to float.
 * The shell commands below will cast the double constant values to float.
