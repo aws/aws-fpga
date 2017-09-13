@@ -6,10 +6,10 @@
     - [FPGA Hardware Development Kit Workflow(HDK)](#fpgahdk)
     - [GUI Workflow with Vivado IP Integrator (IPI)](#ipi)    
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
+    - [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
     - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
-2. [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
-3. [Building an example AFI](#buildingAnExample)
+2. [Building an example AFI](#buildingAnExample)
     - [Prerequisites](#buildingafiprereq)
     - [Using an AFI on EC2 FPGA Instances](#usingAfi)
 
@@ -68,6 +68,15 @@ The [SDK directory](./sdk) includes the runtime environment required to run on E
 
 [AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
 
+<a name="sdaccel"></a>
+## OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
+
+The OpenCL development enviroment allows customers to use OpenCL with Amazon EC2 F1 FPGA Instances to accelerate their C/C++ applications. Software developers with little to no FPGA experience, will find a familiar development experience and now can use the cloud-scale availability of FPGAs to supercharge their applications. 
+
+Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs. 
+
+This developer kit has 50+ examples to help you get started on FPGA acceleration.  To get started, review the [SDAccel README](SDAccel/README.md)
+
 <a name="devAmi"></a>
 ## FPGA Developer AMI 
 
@@ -103,14 +112,6 @@ In summary:
 
 By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
 
-<a name="sdaccel"></a>
-# OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
-
-The OpenCL development enviroment allows customers to use OpenCL with Amazon EC2 F1 FPGA Instances to accelerate their C/C++ applications. Software developers with little to no FPGA experience, will find a familiar development experience and now can use the cloud-scale availability of FPGAs to supercharge their applications. 
-
-Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs. 
-
-This developer kit has 50+ examples to help you get started on FPGA acceleration.  To get started, review the [SDAccel README](SDAccel/README.md)
 
 <a name="buildingafiprereq"></a>
 ### Prerequisites
