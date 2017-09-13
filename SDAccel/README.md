@@ -122,7 +122,7 @@ The instructions below describe how to build the Xilinx FPGA Binary and host app
     $ make TARGETS=hw DEVICES=$AWS_PLATFORM all   
 ```
 
-Now that you have built your Xilinx FPGA binary, see [SDAccel Power Analysis Guide](./docs/SDaccel_Power_Analysis.md) for more details on how to analyze power for your binary.
+Now that you have built your Xilinx FPGA binary, see [SDAccel Power Analysis Guide](./docs/SDAccel_Power_Analysis.md) for more details on how to analyze power for your binary.
 
 <a name="createafi"></a>
 # 2. Create an Amazon FPGA Image (AFI) 
