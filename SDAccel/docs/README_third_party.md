@@ -83,7 +83,7 @@ make TARGETS=hw DEVICES=$AWS_PLATFORM all
 ./main
 ```
 
-* For more information on running this example on an F1 instance, see [this](../README.md#run-the-fpga-accelerated-application-on-f1).
+* For more information on running this example on an F1 instance, see [this](../README.md#runonf1).
 
 
 ## Xilinx and third party Implementation Differences
