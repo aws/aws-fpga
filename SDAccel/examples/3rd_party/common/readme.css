@@ -1,0 +1,261 @@
+/*
+Copyright (C) 2013-2017 Altera Corporation, San Jose, California, USA. All rights reserved.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+This agreement shall be governed in all respects by the laws of the State of California and
+by the laws of the United States of America.
+*/
+
+body {
+  margin: 0 1em 1em 1em;
+  font-family: sans-serif;
+}
+ul {
+  list-style-type: square;
+}
+pre, code, kbd, samp, tt {
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+}
+
+h1 {
+  font-size: 200%;
+  color: #fff;
+  background-color: #0067a6;
+  margin: 0 -0.5em;
+  padding: 0.25em 0.5em;
+}
+h1 .preheading {
+  font-size: 40%;
+  font-weight: normal;
+}
+h2 {
+  font-size: 125%;
+  background-color: #bae5ff;
+  margin: 1.5em -0.8em 0 -0.8em;
+  padding: 0.2em 0.8em;
+}
+h3 {
+  margin-top: 1.5em;
+  font-size: 100%;
+  border-bottom: 1px dotted #000;
+}
+
+table {
+  border: 2px solid #0067a6;
+  border-collapse: collapse;
+}
+th {
+  border-bottom: 1px solid #0067a6;
+  border-left: 1px dotted #0067a6;
+  border-right: 1px dotted #0067a6;
+  background-color: #bae5ff;
+  padding: 0.3em;
+  font-size: 90%;
+}
+td {
+  padding: 0.3em;
+  border: 1px dotted #0067a6;
+}
+
+table.reqs {
+  margin: 0 auto;
+}
+table.reqs td {
+  white-space: nowrap;
+  text-align: center;
+}
+table.reqs td:first-child,
+table.reqs tr:first-child th:first-child {
+  text-align: left;
+}
+table.reqs td.req {
+  background-color: #b3ef71;
+  font-size: 150%;
+  padding: 0 0.3em;
+}
+table.reqs td.req .either {
+  font-size: 50%;
+}
+table.reqs td.unsupported {
+  white-space: normal;
+  background-color: #ccc;
+  max-width: 20em;
+}
+table.reqs a.note {
+  text-decoration: none;
+}
+ol.req-notes > li {
+  margin-bottom: 0.75em;
+}
+
+table.history {
+  margin: 0 auto;
+}
+table.history td {
+  text-align: center;
+  vertical-align: top;
+}
+table.history .changes {
+  text-align: left;
+}
+table.history tbody tr:first-child td {
+  background-color: #b3ef71;
+}
+table.history ul {
+  margin: 0;
+  padding-left: 1em;
+}
+
+table.pkg-contents {
+  margin: 0 auto;
+}
+table.pkg-contents th,
+table.pkg-contents td {
+  text-align: left;
+  vertical-align: top;
+}
+table.pkg-contents td.path {
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+}
+table.pkg-contents tr.highlight td {
+  background-color: #ffc;
+  font-weight: bold;
+  color: #000;
+}
+table.pkg-contents td p:first-child {
+  margin-top: 0;
+}
+table.pkg-contents td p:last-child {
+  margin-bottom: 0;
+}
+
+table.parameters {
+  margin-left: 3em;
+  margin-right: 3em;
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+}
+table.parameters th,
+table.parameters td {
+  font-family: sans-serif;
+  text-align: center;
+  vertical-align: top;
+}
+table.parameters .name,
+table.parameters .desc {
+  text-align: left;
+}
+table.parameters .name {
+  white-space: nowrap;
+}
+table.parameters td.name,
+table.parameters td.default {
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+}
+table.parameters ul {
+  margin-top: 0;
+}
+table.parameters td ul:last-child {
+  margin-bottom: 0;
+}
+
+table.indent {
+  margin-left: 3em;
+}
+
+.doc .title {
+  background-color: #eee;
+  padding: 0.35em;
+  margin-bottom: 0.5em;
+}
+.doc .title a {
+  font-weight: bold;
+}
+.doc .desc {
+  margin-left: 2em;
+  margin-right: 2em;
+}
+
+.left {
+  text-align: left;
+}
+.center {
+  text-align: center;
+}
+.right {
+  text-align: right;
+}
+
+.mono {
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+}
+.highlight {
+  font-weight: bold;
+  color: #0067a6;
+}
+.nowrap {
+  white-space: nowrap;
+}
+
+.command {
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+  margin: 0 3em;
+  background-color: #ffc;
+  border: 1px solid #aaa;
+  padding: 0.5em 1em;
+}
+.console-output,
+.code-block {
+  display: block;
+  font-family: monospace, sans-serif;
+  font-size: 1em;
+  margin: 0 3em;
+  background-color: #fff;
+  border: 1px solid #aaa !important;
+  padding: 1.8em 1em 0.5em 1em !important;
+  position: relative;
+}
+.console-output .heading,
+.code-block .heading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  font-size: 80%;
+  text-transform: uppercase;
+  background-color: #e8e8e8;
+  padding: 0.3125em 0;
+  border-bottom: 1px dotted #888;
+}
+.console-output .heading span,
+.code-block .heading span {
+  padding: 0 1.25em;
+}
+.not-released {
+  font-weight: bold;
+  color: red;
+}
+.license,
+.trademark {
+  font-size: 80%;
+}

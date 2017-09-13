@@ -1,0 +1,4 @@
+[submodule "SDAccel/examples/xilinx"]
+	path = SDAccel/examples/xilinx
+	url = https://github.com/Xilinx/SDAccel_Examples.git
+	branch = 2017.1
