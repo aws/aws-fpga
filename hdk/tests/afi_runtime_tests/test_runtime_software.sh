@@ -88,8 +88,27 @@ if [ $? -ne 0 ]; then
         exit 1
 fi
 
-echo "INFO: Sleeping 60 seconds"
-sleep 60
+echo "INFO: Sleeping 300 seconds"
+sleep 300
+
+echo "INFO: Loading AFI for MSI-X workaround"
+
+sudo fpga-load-local-image -S 0 -I agfi-09c2a21805a8b9257
+
+echo "INFO: Sleeping 300 seconds"
+sleep 300
+
+echo "INFO: Clearing the FPGA again.";
+
+sudo fpga-clear-local-image -S 0
+
+if [ $? -ne 0 ]; then
+        echo -e >&2 "ERROR: Clearing FPGA failed!";
+        exit 1
+fi
+
+echo "INFO: Sleeping 300 seconds"
+sleep 300
 
 echo "INFO: Loading AFI: $test_afi"
 sudo fpga-load-local-image -S 0 -I $test_afi
@@ -99,9 +118,8 @@ if [ $? -ne 0 ]; then
         exit 1
 fi
 
-echo "INFO: Sleeping 60 seconds"
-sleep 60
-
+echo "INFO: Sleeping 300 seconds"
+sleep 300
 
 echo "INFO: Checking AFI Load status"
 describe_output=$(sudo fpga-describe-local-image -S 0 -R -H 2>&1 | grep ok)
