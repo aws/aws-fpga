@@ -110,16 +110,7 @@ The OpenCL development enviroment allows customers to use OpenCL with Amazon EC2
 
 Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs. 
 
-To get started using SDAccel start with the [SDAccel README](SDAccel/README.md)
-
-The guides below provide you with the following concepts:
-* [Gain an understanding of the SDAccel **Design** Flow](#design)
-* [A complete **Methodology** for using the SDAccel Development Environment effectively](#methodology)
-* [**Recommendations** for Acceleration](#acceleration_recommendations)
-
-In addition, you can review the following useful documents:
-* [Run a sample design on **GUI**][GUI_README]
-* [On Premise development][OnPremiseDev]
+This developer kit has 50+ examples to help you get started on FPGA acceleration.  To get started, review the [SDAccel README](SDAccel/README.md)
 
 <a name="buildingafiprereq"></a>
 ### Prerequisites
