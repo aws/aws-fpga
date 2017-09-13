@@ -149,9 +149,9 @@ void matrix_mult( // Input and output matrices
         // loop and analyzing the regions that are loaded:
         //  A_local[local_y][0..BLOCK_SIZE-1] and
         //  B_local[local_x][0..BLOCK_SIZE-1]
+	__attribute__((opencl_unroll_hint()))
         for (int k = 0; k < BLOCK_SIZE; ++k)
         {
-            #pragma HLS unroll
             running_sum += A_local[local_y][k] * B_local[local_x][k];
         }
 

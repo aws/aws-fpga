@@ -1,0 +1,22 @@
+--- third_party/vector_add/host/src/main.cpp       2017-05-09 22:47:50.000000000 +0000
++++ sdaccel/vector_add/host/src/main.cpp  2017-09-12 18:55:22.172000000 +0000
+@@ -70,0 +71,2 @@
++std::string hwtype = "hw";
++
+@@ -85,0 +88,3 @@
++  if(options.has("hw")) {
++    hwtype = options.get<std::string>("hw");
++  }
+@@ -123 +128 @@
+-  platform = findPlatform("Intel");
++  platform = findPlatform("Xilinx");
+@@ -125 +130 @@
+-    printf("ERROR: Unable to find Intel FPGA OpenCL platform.\n");
++    printf("ERROR: Unable to find Xilinx FPGA OpenCL platform.\n");
+@@ -143,2 +148,4 @@
+-  std::string binary_file = getBoardBinaryFile("vector_add", device[0]);
+-  printf("Using AOCX: %s\n", binary_file.c_str());
++  std::string fname = "xclbin/vector_add."+ hwtype + "." + VERSION_STR;
++  printf("Looking for %s.\n",fname.c_str());
++  std::string binary_file = getBoardBinaryFile(fname.c_str(), device[0]);
++  printf("Using XCLBIN: %s\n", binary_file.c_str());

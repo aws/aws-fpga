@@ -1,0 +1,79 @@
+--- third_party/fft1d/device/fft1d.cl      2017-05-09 22:47:43.000000000 +0000
++++ sdaccel/fft1d/device/fft1d.cl 2017-09-12 19:21:02.120000000 +0000
+@@ -49 +49 @@
+-#pragma OPENCL EXTENSION cl_intel_channels : enable
++//#pragma OPENCL EXTENSION cl_intel_channels : enable
+@@ -64 +64,9 @@
+-channel float2 chanin[8] __attribute__((depth(CONT_FACTOR*8)));
++
++pipe float2 chanin0 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin1 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin2 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin3 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin4 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin5 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin6 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
++pipe float2 chanin7 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
+@@ -68 +76 @@
+-  #pragma unroll
++  __attribute__((opencl_unroll_hint()))
+@@ -137,2 +145,2 @@
+-__attribute__((reqd_work_group_size(CONT_FACTOR * POINTS, 1, 1)))
+-kernel void fetch (global float2 * restrict src) {
++kernel __attribute__((reqd_work_group_size(CONT_FACTOR * POINTS, 1, 1)))
++void fetch (global float2 * restrict src) {
+@@ -145 +153 @@
+-  local float2 buf[BUF_SIZE];
++  local float2 buf[BUF_SIZE] __attribute__((xcl_array_partition(block,8,1)));
+@@ -156,2 +164,2 @@
+-  #pragma unroll
+-  for (uint k = 0; k < POINTS; k++) {
++  __attribute__((opencl_unroll_hint()))
++  for (uint k = 0; k < POINTS; k+=2) {
+@@ -160 +167,0 @@
+-
+@@ -163,4 +170,4 @@
+-  #pragma unroll
+-  for (uint k = 0; k < POINTS; k++) {
+-    uint buf_addr = bit_reversed(k,3) * CONT_FACTOR * POINTS + lid;
+-    write_channel_intel (chanin[k], buf[buf_addr]);
++  uint buf_addr[8];
++  __attribute__((opencl_unroll_hint()))
++  for(uint k=0;k<8;k++) {
++    buf_addr[k] = bit_reversed(k,3) * CONT_FACTOR * POINTS + lid;
+@@ -167,0 +175,12 @@
++  // bit_reversed reverses the bit locations of the value given.
++  // The second parameter is the width of the number (in bits) to reverse.
++  // Only the non-symmetric numbers are changed.  E.g. 001,011,100,110 -> 100,110,100,110
++    write_pipe (chanin0, &buf[buf_addr[0]]);
++    write_pipe (chanin1, &buf[buf_addr[1]]);
++    write_pipe (chanin2, &buf[buf_addr[2]]);
++    write_pipe (chanin3, &buf[buf_addr[3]]);
++    write_pipe (chanin4, &buf[buf_addr[4]]);
++    write_pipe (chanin5, &buf[buf_addr[5]]);
++    write_pipe (chanin6, &buf[buf_addr[6]]);
++    write_pipe (chanin7, &buf[buf_addr[7]]);
++
+@@ -180,2 +199,2 @@
+-__attribute((task))
+-kernel void fft1d(global float2 * restrict dest,
++kernel __attribute((reqd_work_group_size(1, 1, 1))) //task))
++void fft1d(global float2 * restrict dest,
+@@ -218,8 +237,9 @@
+-      data.i0 = read_channel_intel(chanin[0]);
+-      data.i1 = read_channel_intel(chanin[1]);
+-      data.i2 = read_channel_intel(chanin[2]);
+-      data.i3 = read_channel_intel(chanin[3]);
+-      data.i4 = read_channel_intel(chanin[4]);
+-      data.i5 = read_channel_intel(chanin[5]);
+-      data.i6 = read_channel_intel(chanin[6]);
+-      data.i7 = read_channel_intel(chanin[7]);
++
++      read_pipe(chanin0,&data.i0);
++      read_pipe(chanin1,&data.i1);
++      read_pipe(chanin2,&data.i2);
++      read_pipe(chanin3,&data.i3);
++      read_pipe(chanin4,&data.i4);
++      read_pipe(chanin5,&data.i5);
++      read_pipe(chanin6,&data.i6);
++      read_pipe(chanin7,&data.i7);

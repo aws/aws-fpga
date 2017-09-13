@@ -1,0 +1,30 @@
+--- third_party/fft1d/host/src/main.cpp    2017-05-09 22:47:43.000000000 +0000
++++ sdaccel/fft1d/host/src/main.cpp       2017-09-12 16:18:56.072000000 +0000
+@@ -61,0 +62 @@
++std::string hwtype = "hw";
+@@ -94,3 +94,0 @@
+-  if(!init()) {
+-    return false;
+-  }
+@@ -104,0 +103,3 @@
++  if(options.has("hw")) {
++    hwtype = options.get<std::string>("hw");
++  }
+@@ -110,0 +112,4 @@
++  if(!init()) {
++    return false;
++  }
++
+@@ -163 +168 @@
+-  d_outData = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_BANK_2_ALTERA, sizeof(float2) * N * iterations, NULL, &status);
++  d_outData = clCreateBuffer(context, CL_MEM_READ_WRITE , sizeof(float2) * N * iterations, NULL, &status);
+@@ -336 +341 @@
+-  platform = findPlatform("Intel");
++  platform = findPlatform("Xilinx");
+@@ -363,2 +368,4 @@
+-  std::string binary_file = getBoardBinaryFile("fft1d", device);
+-  printf("Using AOCX: %s\n\n", binary_file.c_str());
++  std::string fname = "xclbin/fft1d."+ hwtype + "." + VERSION_STR;
++  printf("Looking for %s.\n",fname.c_str());
++  std::string binary_file = getBoardBinaryFile(fname.c_str(), device);
++  printf("Using XCLBIN: %s\n\n", binary_file.c_str());
