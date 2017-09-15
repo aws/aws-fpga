@@ -984,16 +984,18 @@ static ssize_t print_queue_stats(struct device* dev, struct device_attribute* at
 	device_private_data = (struct edma_queue_private_data *)dev_get_drvdata(dev);
 
 	if(!device_private_data)
-		char_count = sprintf(buf, "No Statistics available. The device is not in use.");
+		char_count = scnprintf(buf, PAGE_SIZE, 
+			"No Statistics available. The device is not in use.");
 
 	else
-		char_count = sprintf(buf,
+		char_count = scnprintf(buf, PAGE_SIZE,
 				"read_requests_submitted - %llu\n"
 				"read_requests_completed - %llu\n"
 				"write_requests_submitted - %llu\n"
 				"write_requests_completed - %llu\n"
 				"fsync_count - %llu\n"
 				"no_space_left_error - %llu\n"
+				"dma_submit_error - %llu\n"
 				"fsync_busy_count - %llu\n"
 				"read_timeouts_error - %llu\n"
 				"opened_times - %llu\n",
@@ -1003,6 +1005,7 @@ static ssize_t print_queue_stats(struct device* dev, struct device_attribute* at
 				device_private_data[MINOR(dev->devt)].stats.write_completed_bytes,
 				device_private_data[MINOR(dev->devt)].stats.fsync_count,
 				device_private_data[MINOR(dev->devt)].stats.no_space_left_error,
+				device_private_data[MINOR(dev->devt)].stats.dma_submit_error,
 				device_private_data[MINOR(dev->devt)].stats.fsync_busy_count,
 				device_private_data[MINOR(dev->devt)].stats.read_timeouts_error,
 				device_private_data[MINOR(dev->devt)].stats.opened_times);
