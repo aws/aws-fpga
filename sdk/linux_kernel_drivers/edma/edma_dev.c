@@ -380,6 +380,13 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 		set_bit(EDMA_STATE_QUEUE_RELEASING_BIT, &device_private_data->state);
 
+		// Now that we signaled to the other threads that we want to release
+		// we can unlock the spin locks
+		// the code in the read/write/fsync function should always check the 
+		// EDMA_STATE_QUEUE_RELEASING_BIT often to stop quickly
+		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
+		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
+
 		if(test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
 				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
@@ -396,8 +403,6 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
 						&device_private_data->state));
 
-		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
-		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
 
 		// First, set the DEV_RELEASING flag so all other tasks are notified
 		// disable hardware interrupts (note - we could still have interrupts inflight or interrupt routine in execution
