@@ -1062,6 +1062,8 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;
 
+	spin_lock_init(&edma_queues->device_private_data[minor_index].edma_spin_lock);
+
 edma_queue_device_done:
 	return edmaCharDevice;
 }
