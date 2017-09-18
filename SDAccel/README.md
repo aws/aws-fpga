@@ -41,8 +41,8 @@ This quick start guide will use a simple "Hello World" SDAccel example to get yo
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses on an F1 instance
   * You may use this F1 instance to [Build your Host Application and Xilinx FPGA Binary](#createapp), however, it may be more cost efficient to either: 
-     * Launch a second [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a cheaper EC2 instance, with a minimum of 30GiB RAM), **OR** 
-     * Follow the [On-Premises Instructions](../../hdk/docs/on_premise_licensing_help.md) to install and license SDAccel on your own local machine.
+     * Launch a second [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a lower cost EC2 instance, with a minimum of 30GiB RAM), **OR** 
+     * Follow the [On-Premises Instructions](../../hdk/docs/on_premise_licensing_help.md) to install and obtain a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html) <!-- #TBF Is there a better guide (syntax/links to for explicitly making this update? -->
 * [Setup AWS CLI and S3 Bucket](docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
 
