@@ -438,8 +438,13 @@ struct xdma_transfer *engine_service_transfer_list(struct xdma_engine *engine,
 		struct xdma_transfer *transfer, u32 *pdesc_completed)
 {
 	BUG_ON(!engine);
-	BUG_ON(!transfer);
 	BUG_ON(!pdesc_completed);
+
+	if (!transfer) {
+		pr_info("%s xfer empty, pdesc completed %u.\n",
+			engine->name, *pdesc_completed);
+		return NULL;
+	}
 
 	/*
 	 * iterate over all the transfers completed by the engine,
@@ -507,8 +512,13 @@ struct xdma_transfer *engine_service_final_transfer(struct xdma_engine *engine,
 {
 	u32 err_flags;
 	BUG_ON(!engine);
-	BUG_ON(!transfer);
 	BUG_ON(!pdesc_completed);
+
+	if (!transfer) {
+		pr_info("%s xfer empty, pdesc completed %u.\n",
+			engine->name, *pdesc_completed);
+		return NULL;
+	}
 
 	err_flags = XDMA_STAT_MAGIC_STOPPED;
 	err_flags |= XDMA_STAT_ALIGN_MISMATCH;
