@@ -10,11 +10,11 @@
 
 4. [IP Integrator Example with AXI GPIO/AXI BRAM](#ipitut)
 
-5. [IP Integrator Design Modular Reference Tutorial-hello_world](#ipimodtut)
+5. [IP Integrator Design Modular Reference Tutorial-hello\\_world](#ipimodtut)
 
-6. [Adding Existing RTL Tutorial-cl_hello_world](#rtlexistut_world)
+6. [Adding Existing RTL Tutorial-cl\\_hello\\_world](#rtlexistut_world)
 
-7. [Adding Existing RTL Tutorial-cl_dram_dma](#rtlexistut_dram)
+7. [Adding Existing RTL Tutorial-cl\\_dram\\_dma](#rtlexistut_dram)
 
 8. [Starting from Scratch RTL Design](#rtlscrtut)
 
@@ -25,22 +25,22 @@
 
 This document is an overview of the IP Integrator examples provided through the HLx environment.
 
-Prior to starting you should have completed [Vivado Setup Instructions](./IPI_GUI_Vivado_Setup.md) to help you setup and get familar with Vivado GUI and IP Integrator.
+Prior to starting you should have completed [Vivado Setup Instructions](./IPI_GUI_Vivado_Setup.md) to help setup and get familar with the Vivado GUI and IP Integrator.
 
-All of the examples have been integrated into an automated flow that genereates the Vivado project for you.
+All of the examples have been integrated into an automated flow that automatically generates the Vivado project.
 
 <a name="ipiex"></a>
 # IP Integrator Examples
 
-This section covers a simple IP Integrator example designs that can help you get familar with the automated project generation flow and IP integrator.
+This section covers IP Integrator example designs that can help you get familar with the automated project generation flow and IP Integrator.
 
 Current examples include the following:
 
-[hello_world](../cl/examples/hello\_world\_hlx/README.md)
+[hello\\_world](../cl/examples/hello\_world\_hlx/README.md)
 
-[cl_ipi_cdma_test](../cl/examples/cl\_ipi\_cdma\_test\_hlx/README.md)
+[cl\\_ipi\\_cdma\\_test](../cl/examples/cl\_ipi\_cdma\_test\_hlx/README.md)
 
-[cl_hello_world_ref](../cl/examples/cl\_hello\_world\_ref\_hlx/README.md)
+[cl\\_hello\\_world\\_ref](../cl/examples/cl\_hello\_world\_ref\_hlx/README.md)
 
 Select the above link for detailed information on the design and how to get started with using that design.
 
@@ -52,9 +52,9 @@ This section covers using an automated RTL example design with Vivado.  The exam
 
 Current examples include the following:
 
-[cl_hello_world](../cl/examples/cl\_hello\_world\_hlx/README.md)
+[cl\\_hello\\_world](../cl/examples/cl\_hello\_world\_hlx/README.md)
 
-[cl_dram_dma](../cl/examples/cl\_dram\_dma\_hlx/README.md)
+[cl\\_dram\\_dma](../cl/examples/cl\_dram\_dma\_hlx/README.md)
 
 Select the above link for detailed information on the design and how to get started with using that design.
 
@@ -88,10 +88,6 @@ Type in the following TCL command which changes the project settings for AWS and
 
 aws::make\_ipi
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_ipi
-
 
 ## Configuring the Block Diagram
 
@@ -112,7 +108,7 @@ In the Re-customize IP Dialog Box, under the GPIO section select All Outputs and
 
 ### Adding/Configuring AXI BRAM
 
-Right click in the canvas, and select Add IP...  Search for AXI BRAM and double click on AXI BRAM.
+Right click in the canvas, and select Add IP...  Search for AXI BRAM and double click on AXI BRAM Controller.
 
 In the canvas for axi\_bram\_ctrl\_0, double click on the block to configure the IP.
 
@@ -121,7 +117,7 @@ Set the Data Width to 512 and click OK.  This is to match the 512-bit data width
 ### Connecting the Design
 Select Run Connection Automation at the top of the Block Diagram in the green highlighted section.
 
-Select axi\_bram\_ctrl\_0/BRAM\_PORTA and then BRAM\_PORTB and select Auto.  For axi\_bram\_ctrl\_0, make sure Master is set to /f1\_inst/M\_AXI\_PCIS and the rest of the options are Auto.
+Select axi\_bram\_ctrl\_0/BRAM\_PORTA and then BRAM\_PORTB and select Auto.  For axi\_bram\_ctrl\_0/S\_AXI, make sure Master is set to /f1\_inst/M\_AXI\_PCIS and the rest of the options are Auto.
 
 Select axi\_gpio\_0/S\_AXI.  Make sure Master is set to /f1\_inst/M\_AXI\_BAR1 and the rest of the options are Auto.
 
@@ -129,7 +125,7 @@ The axi\_gpio\_0/GPIO will be manually configured after Run Connection Automatio
 
 Select OK.
 
-Expand axi\_gpio\_0/GPIO by select the +.  Connect gpio\_io\_o[15:0] on the f1\_inst block and make a connection to status\_vled[15:0].
+Expand axi\_gpio\_0/GPIO by select the +.  Connect gpio\_io\_o[15:0] on the f1\_inst block and make a connection to status\_vled[15:0] and Run Connection Automation.
 
 ### Address Editor Tab
 Select the Address Editor tab on top of the block diagram.
@@ -197,7 +193,7 @@ The completed .tar file is located in <project>.runs/faas\_1/build/checkpoints/t
 
 ## CL Example Software
 
-The runtime software must be complied for the AFI to run on F1.
+The runtime software must be compiled for the AFI to run on F1.
 
 Copy the software directory to any directory and compile with the following commands.
 
@@ -237,9 +233,6 @@ Type in the following command which changes the project settings for AWS and cre
 
 aws::make\_ipi
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_ipi
 
 ## Adding existing RTL sources (hello\_world.v)
 
@@ -390,9 +383,6 @@ To setup the project for RTL mode, type in the following command.
 
 aws::make\_rtl
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_rtl
 
 ## Adding existing RTL sources (cl\_hello\_world)
 
@@ -549,10 +539,6 @@ Type in the following to create a generic project.
 create\_project -name cl\_dram\_dma
 
 To setup the project for RTL mode, type in the following command.
-
-aws::make\_rtl
-
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
 
 aws::make\_rtl
 
@@ -721,9 +707,6 @@ create\_project -name cl\_template
 
 aws::make\_rtl
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_rtl
 
 ## Adding existing RTL template sources
 

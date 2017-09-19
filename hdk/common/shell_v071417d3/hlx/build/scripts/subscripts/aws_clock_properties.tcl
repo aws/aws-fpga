@@ -17,8 +17,13 @@
 open_bd_design [get_files -quiet cl.bd]
 
 if {[info exist FAAS_CL_DIR] eq 0} {
-	set FAAS_CL_DIR $::env(FAAS_CL_DIR)
+	if {[info exist ::env(FAAS_CL_DIR)]} {
+		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
+	} else {
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+	}
 }
+
 
 set const_dir $FAAS_CL_DIR
 

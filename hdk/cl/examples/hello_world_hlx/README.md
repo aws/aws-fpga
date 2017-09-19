@@ -31,10 +31,6 @@ In the TCL console type in the following to create the hello\_world\_hlx example
 
 aws::make\_ipi -examples hello\_world
 
-Note when closing and re-opening the project in the future, the following TCL command must be run when the project first opens or an error will show up in simulation/implementation flow.
-
-aws::make\_ipi
-
 Once the Block diagram is open, review the different IP blocks especially the settings in the AWS IP.
 
 ### Simulation

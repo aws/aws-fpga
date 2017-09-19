@@ -48,7 +48,7 @@ if {[info exist inline_examples] eq 0} {
 }
 
 set DELAYEDEXAMPLE [file join $currentDir [file tail $currentDir].tcl]
-set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE"
+set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE -notrace"
 
 # if parent is not magic_button, exec DELAYEDEXAMPLE (SED flow)
 if {[info exist _nsvars::script_dir] eq 0} {

@@ -46,9 +46,11 @@ set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED true [get_runs [current_run -imple
 	}
 
 
-set_property -name "STEPS.SYNTH_DESIGN.TCL.PRE" \
-	-value [file normalize [file join $abfi_script_dir subscripts synth_design_pre.tcl]] \
-	-objects [get_runs [current_run -synthesis]]
+set_property -name "STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS" -value "-mode out_of_context -max_uram_cascade_height 1" -objects [get_runs [current_run -synthesis]]
+# HANDLED IN launch_runs_pre.tcl
+#set_property -name "STEPS.SYNTH_DESIGN.TCL.PRE" \
+#	-value [file normalize [file join $abfi_script_dir subscripts synth_design_pre.tcl]] \
+#	-objects [get_runs [current_run -synthesis]]
 set_property -name "STEPS.SYNTH_DESIGN.TCL.POST" \
 	-value [file normalize [file join $abfi_script_dir subscripts synth_design_post.tcl]] \
 	-objects [get_runs [current_run -synthesis]]

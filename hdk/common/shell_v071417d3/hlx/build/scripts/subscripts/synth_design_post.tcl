@@ -13,6 +13,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 set script_dir $::env(FAAS_SCRIPT_DIR)
 set sdp_script_dir [file dirname [info script]]
 
@@ -22,7 +23,8 @@ if {[info exist FAAS_CL_DIR] eq 0} {
 	if {[info exist ::env(FAAS_CL_DIR)]} {
 		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
 	} else {
-		send_msg_id "synth_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+#		send_msg_id "synth_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
 	}
 }
 
