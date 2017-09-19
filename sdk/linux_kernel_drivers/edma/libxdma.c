@@ -1780,8 +1780,8 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir, u64 ep_addr,
 			return -EIO;
 		default:
 			/* transfer can still be in-flight */
-			pr_info("xfer 0x%p,%u, state 0x%x, timed out.\n",
-				 transfer, transfer->xfer_len, transfer->state);
+			pr_info("xfer 0x%p,%u, state 0x%x, rv=%d, timed out.\n",
+				 transfer, transfer->xfer_len, transfer->state, rv);
 			transfer_abort(engine, transfer);
 			spin_unlock_irqrestore(&engine->lock, flags);
 
