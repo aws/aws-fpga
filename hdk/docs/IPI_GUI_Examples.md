@@ -1,4 +1,4 @@
-# Vivado IP Integrator Quickstart Examples
+# GUI Workflow with Vivado IP Integrator Quickstart Examples
 
 ## Table of Content
 
@@ -48,7 +48,7 @@ Select the above link for detailed information on the design and how to get star
 <a name="rtlex"></a>
 # CL Examples using IP Integrator
 
-This section covers using an automated RTL example design with Vivado.  The examples are based on the HDK cl/examples directory (ex: cl\_hello\_world and cl\_dram\_dma).
+The following CL examples cover using an automated RTL example design with Vivado.  The examples are based on the HDK cl/examples directory (ex: cl\_hello\_world and cl\_dram\_dma).
 
 Current examples include the following:
 
@@ -62,7 +62,7 @@ Select the above link for detailed information on the design and how to get star
 <a name="ipitut"></a>
 # IP Integrator Example Tutorial with AXI GPIO and AXI BRAM (hello\_world)
 
-This tutorial will configure the AWS IP with the BAR1 Interface (AXI4-Lite Master Interface) and the PCIS Interface (AXI4 Master). 
+The IPI example turtorial will cover how to configure the AWS IP with the BAR1 Interface (AXI4-Lite Master Interface) and the PCIS Interface (AXI4 Master). 
 
 The AXI GPIO IP is added to the design to control the VLED.  Also, the AXI BRAM is added to the design for the PCIS Interface (AXI4 Master).
 
@@ -505,7 +505,7 @@ Use the software in cl/examples/cl\_hello\_world
 
 This example shows how to add existing RTL, simulation RTL, and constraints into a Vivado project.  This example uses cl\_dram\_dma from the github examples directory.
 
-Make sure the HLx Setup Instructions are followed before continuing.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed before continuing.
 
 ## Create Directory Structure\Vivado Project and System Variables 
 
@@ -671,7 +671,7 @@ Use the software in cl/examples/cl\_dram\_dma
 
 This example shows how to add existing RTL, simulation RTL, and constraints into a Vivado project based upon template files provided from github.
 
-Make sure the HLx Setup Instructions are followed before continuing.
+Make sure the [HLx Setup Instructions](./IPI_GUI_Vivado_Setup.md) are followed before continuing.
 
 ## Create Directory Structure\Vivado Project and System Variables 
 

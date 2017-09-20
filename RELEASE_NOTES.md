@@ -26,6 +26,9 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    SDAccel general availability 
+
 ## Release 1.3.1 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    EDMA Driver release 1.0.29 - MSI-X fixes
    *    Improved IPI documentation
@@ -103,7 +106,7 @@ See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_wo
 * First installation of AWS FPGA SDK requires having gcc installed in the instance server. If that's not available, try `sudo yum update && sudo yum group install "Development Tools"`
 * The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running.  Tools and licenses are provided with AWS FPGA Developer AMI at no additional cost
 * This release is tested and validated with Xilinx 2017.1 SDX (Vivado)
-* Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premise.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
+* Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premises.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
 * Vivado XSIM RTL simulator supported by the HDK
 * MentorGraphic's Questa RTL simulator supported by the HDK (but requires a purchase of separate license from MentorGraphics)
 * Synopsys' VCS RTL simulator supported by the HDK (but requires a purchase of separate license from Synopsys)

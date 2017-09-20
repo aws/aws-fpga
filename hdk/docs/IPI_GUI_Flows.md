@@ -1,4 +1,4 @@
-# AWS Vivado Flows
+# AWS GUI Flows with Vivado IPI
 
 ## Table of Content
 

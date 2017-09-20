@@ -17,10 +17,10 @@
 <a name="proj"></a>
 # Vivado Project Flows
 
-
 **Q: Why does a critical warning appear for DDR4?**
 
-The DDR4 IP currently doesn't have a board associated with the XCI that is used with the HLx flow that locks the IP.  The critical warning can safely be ignored as the IP will not change.
+The DDR4 IP currently doesn't have a board associated with the XCI that is used with the HLx flow.  
+The critical warning can safely be ignored as the IP will not change.
 
 **Q: Why is cl\_pnr\_user.xdc file disabled in the project?**
 
@@ -105,7 +105,7 @@ This is a known issue and should be fixed in the next release. For now type in r
 
 **Q: With IP Integrator Flow, why does the DDR4 IPs and Reg Slice IP need to be disabled with DDR4 in the CL enabled ?**
 
-This is a known issue and should be fixed in the next release. At this time the AWS IP and DDR4 IPs in the HDK area conflict when simulation sources that are generated.
+This is a known issue and should be fixed in a future release. At this time the AWS IP and DDR4 IPs in the HDK area conflict when simulation sources that are generated.
 
 Disabling the HDK area IPs allows for DDR4 sources to come directly from the AWS IP only.  If sources coming from both IPs, missing .mem files will appear in the simulator
 causing errors.
@@ -114,7 +114,7 @@ causing errors.
 <a name="impl"></a>
 # Synthesis/Implementation
 
-**Q: What are the advantages of using OOC(Out of Context) runs instead of global runs for IPs?**
+**Q: What are the advantages of using Out of Context(OOC) runs instead of global runs for IPs?**
 
 Global synthesis for IPs will require synthesis to be run every time a design synthesis run is kicked off.  However, with RTL flow at this time IPs only support global mode at this time.  
 
@@ -123,9 +123,9 @@ OOC builds the synthesized one time where the dcp and cache is saved.  When exec
 
 **Q: Why do critical warnings show up in synthesis with the AWS IP when no DDR4 memories enabled in the CL?**
 
-This is a known issue and should be fixed in the next release. These critical warnings can safely be ignored.
+This is a known issue and should be fixed in a future release. These critical warnings can safely be ignored.
 
 **Q: How to change synthesis/implementation options?**
 
-Currently right now synthesis is using default directives and implementation tools using Explore as directives.  At this time in all cases don't use strategies for synthesis and implementation only change directives.   
+Currently synthesis is using default directives and implementation tools using Explore as directives.  At this time in all cases don't use strategies for synthesis and implementation only change directives.   
 
