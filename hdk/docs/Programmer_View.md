@@ -12,7 +12,7 @@ There are two parts required to work with AWS FPGA: Management and Runtime, and 
   
   **\[B\]** As a C-library called [FPGA Management Lib](../../sdk/userspace/fpga_libs/fpga_mgmt/) to be compiled with the developer's C/C++ application.
   
-  **\[C\]** Pre-integrated with [OpenCL runtime library](../../sdk/SDAccel)
+  **\[C\]** Pre-integrated with [OpenCL runtime library](../../SDAccel)
   
 2. **Runtime code**: required for reading/writing from/to the Custom Logic, handling interrupts, and using the DMA. This is provided by:
   

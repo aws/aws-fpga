@@ -1,13 +1,6 @@
-# SDAccel Private Preview
 
-This directory includes unsupported source code and binary files.  SDAccel preview and development is hosted in a private Github Repo and support is provided through a dedicated/private SDAccel AWS forum.  To request access to SDAccel preview please email to f1-preview@amazon.com with the following information:
+## OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
 
-* Name
-* Organization or Company Name
-* Email Address
-* GitHub Username
-* AWS Forum ID
-* AWS 12-digit Account number
-
-In addition, it will be helpful if you can provide us, without disclosing confidential information, with your intended use-case and FPGA programming background
+Today (9/13/17), We are very excited to announce the general availability of the OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications. Software developers with little to no FPGA experience, will find a familiar development experience and now can use the cloud-scale availability of FPGAs to supercharge their applications.
+The AWS FPGA Developer Kit has 50+ examples to help you get started on FPGA acceleration using SDAccel. To get started, review the Developer Kit README: https://github.com/aws/aws-fpga/blob/master/SDAccel/README.md
 
