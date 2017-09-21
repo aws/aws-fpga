@@ -17,7 +17,8 @@ if {[info exist FAAS_CL_DIR] eq 0} {
 	if {[info exist ::env(FAAS_CL_DIR)]} {
 		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
 	} else {
-		send_msg_id "place_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+#		send_msg_id "place_design_post 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
 	}
 }
 set timestamp $::env(timestamp)

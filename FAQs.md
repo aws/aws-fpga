@@ -302,7 +302,7 @@ For RTL level development: Verilog and VHDL are both supported in the FPGA Devel
 
 **Q: Is OpenCL and/or SDAccel Supported?**
 
-Yes. OpenCL is supported through either the Xilinx SDAccel environment or any OpenCL tool capable of generating RTL supported by the Xilinx Vivado synthesis tool. There is a branch in the AWS SDK tree for SDAccel. 
+Yes. Please review the [SDAccel README to get started](SDAccel/README.md)
 
 
 

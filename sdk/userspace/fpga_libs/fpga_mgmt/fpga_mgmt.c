@@ -205,12 +205,19 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_CLEARED) {
 			done = true;
-		} else {
+		} else if (status == FPGA_STATUS_BUSY) {
 			fail_on(ret = (retries >= timeout_tmp) ? -ETIMEDOUT : 0, out, 
 					"fpga_mgmt_describe_local_image timed out, status=%s(%d), retries=%u",
 					FPGA_STATUS2STR(status), status, retries);
 			retries++;
 			msleep(delay_msec_tmp);
+		} else {
+			/** 
+			 * Catch error status cases here.
+			 *  -the caller can then display the error status and cause upon return.
+			 */
+			ret = tmp_info.status_q;
+			goto out;
 		}
 	}
 
@@ -309,12 +316,19 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 			fail_on(ret, out, "AFI ID mismatch: requested afi_id=%s, loaded afi_id=%s",
 					afi_id, tmp_info.ids.afi_id);
 			done = true;
-		} else {
+		} else if (status == FPGA_STATUS_BUSY) {
 			fail_on(ret = (retries >= timeout_tmp) ? -ETIMEDOUT : 0, out, 
 					"fpga_mgmt_describe_local_image timed out, status=%s(%d), retries=%u",
 					FPGA_STATUS2STR(status), status, retries);
 			retries++;
 			msleep(delay_msec_tmp);
+		} else {
+			/** 
+			 * Catch error status cases here.
+			 *  -the caller can then display the error status and cause upon return.
+			 */
+			ret = tmp_info.status_q;
+			goto out;
 		}
 	}
 

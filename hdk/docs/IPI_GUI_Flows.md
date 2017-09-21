@@ -42,14 +42,6 @@ This will run both synthesis and implementation.
 
 The completed .tar file is located in <project>.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
 
-
-## Opening Existing Vivado Project
-Type into TCL console any time reopening the project.
-
-When opening an existing Vivado project (IPI flow), the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_ipi
-
 <a name="rtlprojex"></a>
 # RTL Project with Example Design
 
@@ -74,14 +66,6 @@ This will run both synthesis and implementation.
 
 The completed .tar file is located in <project>.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
 
-
-## Opening Existing Vivado Project
-Type into TCL console any time reopening the project.
-
-When opening an existing Vivado project (RTL flow), the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_rtl
-
 <a name="rtlnew"></a>
 # RTL Project - New RTL Design
 
@@ -93,13 +77,6 @@ start vivado
 aws::make\_rtl
 
 Add RTL sources, sim sources, constraints.
-
-## Opening Existing Vivado Project
-Type into TCL console any time reopening the project.
-
-When opening an existing Vivado project (RTL flow), the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_rtl
 
 
 

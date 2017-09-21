@@ -380,6 +380,13 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 
 		set_bit(EDMA_STATE_QUEUE_RELEASING_BIT, &device_private_data->state);
 
+		// Now that we signaled to the other threads that we want to release
+		// we can unlock the spin locks
+		// the code in the read/write/fsync function should always check the 
+		// EDMA_STATE_QUEUE_RELEASING_BIT often to stop quickly
+		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
+		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
+
 		if(test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
 				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
@@ -396,8 +403,6 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
 						&device_private_data->state));
 
-		spin_unlock(&device_private_data->read_ebcs.ebcs_spin_lock);
-		spin_unlock(&device_private_data->write_ebcs.ebcs_spin_lock);
 
 		// First, set the DEV_RELEASING flag so all other tasks are notified
 		// disable hardware interrupts (note - we could still have interrupts inflight or interrupt routine in execution
@@ -984,16 +989,18 @@ static ssize_t print_queue_stats(struct device* dev, struct device_attribute* at
 	device_private_data = (struct edma_queue_private_data *)dev_get_drvdata(dev);
 
 	if(!device_private_data)
-		char_count = sprintf(buf, "No Statistics available. The device is not in use.");
+		char_count = scnprintf(buf, PAGE_SIZE, 
+			"No Statistics available. The device is not in use.");
 
 	else
-		char_count = sprintf(buf,
+		char_count = scnprintf(buf, PAGE_SIZE,
 				"read_requests_submitted - %llu\n"
 				"read_requests_completed - %llu\n"
 				"write_requests_submitted - %llu\n"
 				"write_requests_completed - %llu\n"
 				"fsync_count - %llu\n"
 				"no_space_left_error - %llu\n"
+				"dma_submit_error - %llu\n"
 				"fsync_busy_count - %llu\n"
 				"read_timeouts_error - %llu\n"
 				"opened_times - %llu\n",
@@ -1003,6 +1010,7 @@ static ssize_t print_queue_stats(struct device* dev, struct device_attribute* at
 				device_private_data[MINOR(dev->devt)].stats.write_completed_bytes,
 				device_private_data[MINOR(dev->devt)].stats.fsync_count,
 				device_private_data[MINOR(dev->devt)].stats.no_space_left_error,
+				device_private_data[MINOR(dev->devt)].stats.dma_submit_error,
 				device_private_data[MINOR(dev->devt)].stats.fsync_busy_count,
 				device_private_data[MINOR(dev->devt)].stats.read_timeouts_error,
 				device_private_data[MINOR(dev->devt)].stats.opened_times);
@@ -1058,6 +1066,8 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;
+
+	spin_lock_init(&edma_queues->device_private_data[minor_index].edma_spin_lock);
 
 edma_queue_device_done:
 	return edmaCharDevice;

@@ -15,6 +15,7 @@
 
 #link_faas_dcps_call
 
+
 puts "CURRENT_PART [get_parts -of_objects [current_project]]"
 
 set _this_flow_option 2
@@ -28,7 +29,8 @@ if {$_this_flow_option eq 1} {
 		if {[info exist ::env(FAAS_CL_DIR)]} {
 			set FAAS_CL_DIR $::env(FAAS_CL_DIR)
 		} else {
-			send_msg_id "opt_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
+			::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+#			send_msg_id "opt_design_pre 0-1" ERROR "FAAS_CL_DIR environment varaiable not set, please run the proc 'aws::make_faas_setup' at the Vivado TCL command prompt"
 		}
 	}
 	set top top_sp
@@ -45,7 +47,7 @@ if {$_this_flow_option eq 1} {
 
 	
 	set AWS_RTL_XDC_EXISTS [get_files */cl_synth_aws.xdc -quiet]
-	
+
 	set BD_PATH_EXISTS [get_files */cl.bd -quiet]
 
 	if {$BD_PATH_EXISTS != ""} {
@@ -58,9 +60,6 @@ if {$_this_flow_option eq 1} {
 	} else {
 		set BD_MODE ""	
 	}
-	
-	
-	
 	
 	#RTL Flow or IPI Flow
 	if {$AWS_RTL_XDC_EXISTS != "" || $BD_MODE  == "None" } {
@@ -77,7 +76,6 @@ if {$_this_flow_option eq 1} {
 	read_xdc ${PNR_USR_LOC}
 	set_property PROCESSING_ORDER LATE [get_files $PNR_USR_LOC]
 	set_property USED_IN {implementation} [get_files $PNR_USR_LOC]	
-
 
 	link_design -top $top -part [get_parts -of_objects [current_project]] -reconfig_partitions {SH CL}
 	source ${FAAS_CL_DIR}/build/constraints/aws_gen_clk_constraints.tcl

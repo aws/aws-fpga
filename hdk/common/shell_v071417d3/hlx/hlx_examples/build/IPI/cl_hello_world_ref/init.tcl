@@ -75,7 +75,7 @@ set_property verilog_define {CL_NAME=cl_top TEST_NAME=test_hello_world} [get_fil
 
 
 set DELAYEDEXAMPLE [file join $currentDir [file tail $currentDir].tcl]
-set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE"
+set DELAYEDEXAMPLE "source $DELAYEDEXAMPLE -notrace"
 
 # if parent is not magic_button, exec DELAYEDEXAMPLE (SED flow)
 if {[info exist _nsvars::script_dir] eq 0} {
