@@ -490,7 +490,6 @@ module sh_bfm #(
    real EXTRA_C0_DLY = 1.66ns;
    real EXTRA_C1_DLY = 1.25ns;
 
-   `ifdef ENABLE_PROTOCOL_CHK   
    logic [97 - 1:0]    pcis_pc_status;
    logic               pcis_pc_asserted;
    logic [97 - 1:0]    pcim_pc_status;
@@ -501,7 +500,6 @@ module sh_bfm #(
    logic               sda_pc_asserted;
    logic [97 - 1:0]    bar1_pc_status;
    logic               bar1_pc_asserted;
-`endif
 
    //----------------------------------------------------------------
    // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*) 
