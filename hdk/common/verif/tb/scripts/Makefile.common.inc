@@ -23,8 +23,14 @@ ifeq ($(VCS), 1)
   export COMPLIB_DIR = $(CL_ROOT)/verif/sim/vcs_complib
   include Makefile.vcs
 else
+ifeq ($(IES), 1)
+  export SIMULATOR = ies
+  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/ies_complib
+  include Makefile.ies
+else
   export SIMULATOR = vivado
   include Makefile.vivado
+endif
 endif
 endif
 
