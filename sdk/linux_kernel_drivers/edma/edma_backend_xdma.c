@@ -17,7 +17,7 @@
 #define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
 #define SLEEP_MIN_USEC                                          (1)
 #define SLEEP_MAX_USEC                                          (20)
-#define XDMA_WORKER_SLEEPING_STATUS_BIT                         (0)
+#define XDMA_WORKER_RESERVED_BIT	                        (0)
 #define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT                      (1)
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT                      (2)
 #define XDMA_WORKER_STOP_REQUEST_BIT                            (3)
@@ -74,50 +74,58 @@ extern int edma_queue_depth;
 static int write_worker_function(void *data)
 {
 	command_queue_t* command_queue = (command_queue_t*)data;
-	command_t* 	queue = command_queue->queue;
+	command_t*  queue = command_queue->queue;
+	int ret;
 
-	while(!test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))
-	{
-		if(command_queue->head != command_queue->tail)
-		{
-			int ret = xdma_xfer_submit(
-					command_queue->channel_handle,
-					DMA_TO_DEVICE,
-					queue[command_queue->head].target_addr,
-					&queue[command_queue->head].sgt,
-					true,
-					XDMA_TIMEOUT_IN_MSEC);
-			if(ret < 0) { 
-				pr_err(	"Thread failed during transaction with address 0x%llx and size %u\n",
-					queue[command_queue->head].target_addr,
-					sg_dma_len(queue[command_queue->head].sgt.sgl));
-				test_and_set_bit(
-						XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT,
-						&command_queue->thread_status);
-				do_exit(-1);
-			}
+	while (true) {
+		/* From sched.h:
+		 *  set_current_state() includes a barrier so that the write of current->state
+		 *  is correctly serialised wrt the caller's subsequent test of whether to
+		 *  actually sleep.
+		 *
+		 * We are using the below pattern to avoid missed wakeups.
+		 */
+		set_current_state(TASK_INTERRUPTIBLE);
 
-			queue[command_queue->head].completed = 1;
-
-			command_queue->head =
-					EDMA_RING_IDX_NEXT(
-							command_queue->head,edma_queue_depth);
-
-			//are there still requests in the queue?
-			if(command_queue->head != command_queue->tail)
-				continue;
+		if (unlikely(test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))) {
+			/* We were asked to exit */
+			break;
+		} else if (unlikely(command_queue->head == command_queue->tail)) {
+			/* Queue is empty, sleep until wake_up_process is called */
+			schedule();
+			continue;
 		}
 
-		set_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+		/* Set running state, process the queue head */
+		__set_current_state(TASK_RUNNING);
 
-		set_current_state(TASK_INTERRUPTIBLE);
-		schedule();
+		ret = xdma_xfer_submit(
+			command_queue->channel_handle,
+			DMA_TO_DEVICE,
+			queue[command_queue->head].target_addr,
+			&queue[command_queue->head].sgt,
+			true,
+			XDMA_TIMEOUT_IN_MSEC);
 
-		clear_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+		if(ret < 0) {
+			pr_err("Thread failed during transaction with address 0x%llx and size %u\n",
+				queue[command_queue->head].target_addr,
+				sg_dma_len(queue[command_queue->head].sgt.sgl));
+			test_and_set_bit(
+				XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT,
+				&command_queue->thread_status);
+			do_exit(-1);
+		}
+
+		queue[command_queue->head].completed = 1;
+
+		command_queue->head =
+			EDMA_RING_IDX_NEXT(
+				command_queue->head,edma_queue_depth);
 	}
 
 	set_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT,
-			&command_queue->thread_status);
+		&command_queue->thread_status);
 
 	return 0;
 }
@@ -319,16 +327,8 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 
 	smp_wmb();
 
-	/*
-	 * detection of a race-condition - the going_to_sleep bit is set but
-	 * thread is not asleep so it will miss the wakeup
-	 *
-	 */
-
-	while((wake_up_process(command_queue->worker_thread) == 0)
-			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
-					&command_queue->thread_status))
-		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
+	//See the comment in the write_worker_function regarding missed wakeups 
+	wake_up_process(command_queue->worker_thread);
 
 	edma_dbg("<< %s\n", __func__);
 
@@ -446,10 +446,8 @@ int edma_backend_stop(void *q_handle)
 	//Stop the kthread before reset and make sure it was stopped.
 	set_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status);
 
-	while((wake_up_process(command_queue->worker_thread) == 0)
-			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
-					&command_queue->thread_status))
-		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
+	//See the comment in the write_worker_function regarding missed wakeups 
+	wake_up_process(command_queue->worker_thread);
 
 	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
 			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))

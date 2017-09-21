@@ -438,8 +438,13 @@ struct xdma_transfer *engine_service_transfer_list(struct xdma_engine *engine,
 		struct xdma_transfer *transfer, u32 *pdesc_completed)
 {
 	BUG_ON(!engine);
-	BUG_ON(!transfer);
 	BUG_ON(!pdesc_completed);
+
+	if (!transfer) {
+		pr_info("%s xfer empty, pdesc completed %u.\n",
+			engine->name, *pdesc_completed);
+		return NULL;
+	}
 
 	/*
 	 * iterate over all the transfers completed by the engine,
@@ -507,8 +512,13 @@ struct xdma_transfer *engine_service_final_transfer(struct xdma_engine *engine,
 {
 	u32 err_flags;
 	BUG_ON(!engine);
-	BUG_ON(!transfer);
 	BUG_ON(!pdesc_completed);
+
+	if (!transfer) {
+		pr_info("%s xfer empty, pdesc completed %u.\n",
+			engine->name, *pdesc_completed);
+		return NULL;
+	}
 
 	err_flags = XDMA_STAT_MAGIC_STOPPED;
 	err_flags |= XDMA_STAT_ALIGN_MISMATCH;
@@ -1770,8 +1780,8 @@ int xdma_xfer_submit(void *channel, enum dma_data_direction dir, u64 ep_addr,
 			return -EIO;
 		default:
 			/* transfer can still be in-flight */
-			pr_info("xfer 0x%p,%u, state 0x%x, timed out.\n",
-				 transfer, transfer->xfer_len, transfer->state);
+			pr_info("xfer 0x%p,%u, state 0x%x, rv=%d, timed out.\n",
+				 transfer, transfer->xfer_len, transfer->state, rv);
 			transfer_abort(engine, transfer);
 			spin_unlock_irqrestore(&engine->lock, flags);
 
