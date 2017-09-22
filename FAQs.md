@@ -120,6 +120,20 @@ Yes, but you must first copy the AFI using the [copy-fpga-image](./hdk/docs/copy
 
 Use [describe-fpga-images](./hdk/docs/describe_fpga_images.md) with the [--region command line option](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) to list AFIs available in a specific region.  Use `FpgaImageGlobalId` attribute and `fpga-image-global-id` filter to match AFI copies accross regions.
 
+**Q: Can I share an AFI with other AWS accounts?**
+
+Yes, sharing allows accounts other than the owner account to load and use an AFI.  Use [modify-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to update `loadPermission` attribute to grant/remove AFI load permission.  AWS AFIs support two load permission types:
+* `UserId`: share AFI with specific AWS accounts using account IDs.
+* `UserGroups`: only supports `all` group to make an AFI public or private.
+
+Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to revoke all load permissions.
+
+**Q: Can I delete an AFI?**
+
+Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
+
+Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to resrict access to this API.
+
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
 No. There is no mechanism for loading a bitstream directly onto the FPGAs of an F1 instance. All Custom Logic is loaded onto the FPGA by calling `$ fpga-local-load-image` tool at [AWS FPGA SDK](https://github.com/aws/aws-fpga/sdk). 

@@ -86,7 +86,7 @@ You need to prepare the following information:
 2. Generic description of the logic design *(Optional)*.
 3. Location of the tarball file object in S3.
 4. Location of an S3 directory where AWS would write back logs of the AFI creation.
-5. AWS region where the AFI will be created.  Use [copy-fpga-image](../../docs/copy-fpga-images.md) API if you need to load an AFI on a different region.
+5. AWS region where the AFI will be created.  Use [copy-fpga-image](../../docs/copy_fpga_image.md) API to copy an AFI to a different region.
 
 To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
 For example, you can use the AWS CLI as follows:
@@ -154,7 +154,7 @@ After the AFI generation is complete, AWS will put the logs into the bucket loca
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
 Please wait until you confirm the AFI is created successfully.*
 
-The [copy-fpga-image](../../docs/copy-fpga-images.md) API allows you copy AFIs to other regions and avoid the time consuming `create-fpga-image` process. Copy will also preserve the source Global AFI ID and minimize region-specific changes to your instance code or scripts.
+The [copy-fpga-image](../../docs/copy_fpga_image.md) API allows you to copy the AFI to other regions and avoid the time consuming `create-fpga-image` process. Copy will also preserve the source Global AFI ID and minimize region-specific changes to your instance code or scripts.
 
 ## Step by step guide how to load and test a registered AFI from within an F1 instance
 
