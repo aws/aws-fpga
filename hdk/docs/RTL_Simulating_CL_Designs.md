@@ -258,6 +258,18 @@ Note that dumping all signals of a design will increase simulation time and will
 
 For more information on the syntax for `add_wave` and other tcl functions, see the [Vivado Design Suite Tcl Command Reference Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2013_1/ug835-vivado-tcl-commands.pdf)
 
+## Protocol Checkers
+
+Xilinx Protocol Checkers are instantiated on all AXI4 and AXIL interfaces in Shell BFM. By default all the tests run with protocol checkers enabled. If there is a protocol error in any one of the AXI interfaces, then the protocol checker will fire an error as below.
+
+tb.card.fpga.sh.axl_pc_bar1_slv_inst.REP : BIT(         56) :   ERROR : Invalid state x
+tb.card.fpga.sh.axl_pc_sda_slv_inst.REP : BIT(         35) :   ERROR : Invalid state x
+tb.card.fpga.sh.axi_pc_mstr_inst_pcim.REP : BIT(         33) :   ERROR : Invalid state x
+tb.card.fpga.sh.axi_pc_mstr_inst_pcis.REP : BIT(         35) :   ERROR : Invalid state x
+tb.card.fpga.sh.axl_pc_ocl_slv_inst.REP : BIT(         35) :   ERROR : Invalid state x
+
+Please refer to hdk/common/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v for mapping between bit positins and the protocol errors.
+
 ## Re-run simulation to dump waves
 
 Once `waves.tcl` has been modified, re-run the simulatio with `make` as shown at the top of this document.
