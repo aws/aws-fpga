@@ -28,10 +28,10 @@ module sh_bfm #(
    // Main input clock
    //--------------------
 
-   input [31:0]                cl_sh_status0,
-   input [31:0]                cl_sh_status1,
-   input [31:0]                cl_sh_id0,
-   input [31:0]                cl_sh_id1,
+   input logic [31:0]                cl_sh_status0,
+   input logic [31:0]                cl_sh_status1,
+   input logic [31:0]                cl_sh_id0,
+   input logic [31:0]                cl_sh_id1,
 
    output logic [31:0]         sh_cl_ctl0,
    output logic [31:0]         sh_cl_ctl1,
@@ -936,31 +936,6 @@ module sh_bfm #(
     .pc_axi_rready(sh_bar1_rready)
   );
    
-`ifdef ENABLE_PROTOCOL_ERR
-//Inject some errors on CL_SH DMA_PCIS interface to show protocol checker operation.
-  initial begin
-    $display("Force 'X' on cl_sh_dma_pcis_bvalid \n");
-     
-    force cl_sh_dma_pcis_bvalid = 1'bX;
-
-    $display("Force 'X' on sh_cl_pcim_bvalid \n");
-     
-    force sh_cl_pcim_bvalid = 1'bX;
-
-    $display("Force 'X' on sh_bar1_arvalid \n");
-     
-    force sh_bar1_arvalid = 1'bX;
-
-    $display("Force 'X' on sh_ocl_bready \n");
-     
-    force sh_ocl_bready = 1'bX;
-
-    $display("Force 'X' on cl_sda_bvalid \n");
-     
-    force cl_sda_bvalid = 1'bX;
-  end   
-`endif
-
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled
