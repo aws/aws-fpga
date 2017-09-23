@@ -28,10 +28,10 @@ module sh_bfm #(
    // Main input clock
    //--------------------
 
-   input [31:0]                cl_sh_status0,
-   input [31:0]                cl_sh_status1,
-   input [31:0]                cl_sh_id0,
-   input [31:0]                cl_sh_id1,
+   input logic [31:0]                cl_sh_status0,
+   input logic [31:0]                cl_sh_status1,
+   input logic [31:0]                cl_sh_id0,
+   input logic [31:0]                cl_sh_id1,
 
    output logic [31:0]         sh_cl_ctl0,
    output logic [31:0]         sh_cl_ctl1,
@@ -136,7 +136,8 @@ module sh_bfm #(
    input [15:0]         cl_sh_irq_req,
    output logic [15:0]  sh_cl_irq_ack,
 `endif   
-   
+
+    
 `ifndef VU190   
    //-----------------------------------------
    // CL MSIX
@@ -489,7 +490,452 @@ module sh_bfm #(
    real EXTRA_C0_DLY = 1.66ns;
    real EXTRA_C1_DLY = 1.25ns;
 
+   logic [97 - 1:0]    pcis_pc_status;
+   logic               pcis_pc_asserted;
+   logic [97 - 1:0]    pcim_pc_status;
+   logic               pcim_pc_asserted;
+   logic [97 - 1:0]    ocl_pc_status;
+   logic               ocl_pc_asserted;
+   logic [97 - 1:0]    sda_pc_status;
+   logic               sda_pc_asserted;
+   logic [97 - 1:0]    bar1_pc_status;
+   logic               bar1_pc_asserted;
 
+   //----------------------------------------------------------------
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*) 
+   //----------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(0),
+    .C_AXI_ID_WIDTH(6),
+    .C_AXI_DATA_WIDTH(512),
+    .C_AXI_ADDR_WIDTH(64),
+    .C_AXI_AWUSER_WIDTH(1),
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(128),
+    .C_PC_MAXWBURSTS(128),
+    .C_PC_EXMON_WIDTH(0),
+
+    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
+    .C_PC_AW_MAXWAITS(3),
+    .C_PC_AR_MAXWAITS(3),
+    .C_PC_W_MAXWAITS(3),
+    .C_PC_R_MAXWAITS(3),
+    .C_PC_B_MAXWAITS(3),
+
+    .C_PC_MESSAGE_LEVEL(2),
+    .C_PC_SUPPORTS_NARROW_BURST(1),
+    .C_PC_MAX_BURST_LENGTH(256),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axi_pc_mstr_inst_pcis (
+    .pc_status           (pcis_pc_status),
+    .pc_asserted         (pcis_pc_asserted),
+    .system_resetn       (rst_main_n),
+    .aclk                (clk_main_a0),
+    .aresetn             (rst_main_n),
+
+    .pc_axi_awid         (sh_cl_dma_pcis_awid),
+    .pc_axi_awaddr       (sh_cl_dma_pcis_awaddr),
+    .pc_axi_awlen        (sh_cl_dma_pcis_awlen),
+    .pc_axi_awsize       (sh_cl_dma_pcis_awsize),
+    .pc_axi_awburst      (2'b01),
+    .pc_axi_awlock       (1'b0),
+    .pc_axi_awcache      (4'b0000),
+    .pc_axi_awprot       (3'b000),
+    .pc_axi_awqos        (4'b0000),
+    .pc_axi_awregion     (4'b0000),
+    .pc_axi_awuser       (1'h0),
+    .pc_axi_awvalid      (sh_cl_dma_pcis_awvalid),
+    .pc_axi_awready      (cl_sh_dma_pcis_awready),
+
+    .pc_axi_wid          (6'h00), // AXI3 only
+    .pc_axi_wlast        (sh_cl_dma_pcis_wlast),
+    .pc_axi_wdata        (sh_cl_dma_pcis_wdata),
+    .pc_axi_wstrb        (sh_cl_dma_pcis_wstrb),
+    .pc_axi_wuser        (1'h0),
+    .pc_axi_wvalid       (sh_cl_dma_pcis_wvalid),
+    .pc_axi_wready       (cl_sh_dma_pcis_wready),
+
+    .pc_axi_bid          (cl_sh_dma_pcis_bid),
+    .pc_axi_bresp        (cl_sh_dma_pcis_bresp),
+    .pc_axi_buser        (1'h0),
+    .pc_axi_bvalid       (cl_sh_dma_pcis_bvalid),
+    .pc_axi_bready       (cl_sh_dma_pcis_bready),
+
+    .pc_axi_arid         (sh_cl_dma_pcis_arid),
+    .pc_axi_araddr       (sh_cl_dma_pcis_araddr),
+    .pc_axi_arlen        (sh_cl_dma_pcis_arlen),
+    .pc_axi_arsize       (sh_cl_dma_pcis_arsize),
+    .pc_axi_arburst      (2'b00),
+    .pc_axi_arlock       (1'b0),
+    .pc_axi_arcache      (4'b0000),
+    .pc_axi_arprot       (3'b000),
+    .pc_axi_arqos        (4'b0000),
+    .pc_axi_arregion     (4'b0000),
+    .pc_axi_aruser       (1'h0),
+    .pc_axi_arvalid      (sh_cl_dma_pcis_arvalid),
+    .pc_axi_arready      (cl_sh_dma_pcis_arready),
+
+    .pc_axi_rid          (cl_sh_dma_pcis_rid),
+    .pc_axi_rlast        (cl_sh_dma_pcis_rlast),
+    .pc_axi_rdata        (cl_sh_dma_pcis_rdata),
+    .pc_axi_rresp        (cl_sh_dma_pcis_rresp),
+    .pc_axi_ruser        (1'h0),
+    .pc_axi_rvalid       (cl_sh_dma_pcis_rvalid),
+    .pc_axi_rready       (cl_sh_dma_pcis_rready)
+  );
+
+  //----------------------------------------------------------------
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_PCIM*) 
+   //----------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(0),
+    .C_AXI_ID_WIDTH(6),
+    .C_AXI_DATA_WIDTH(512),
+    .C_AXI_ADDR_WIDTH(64),
+    .C_AXI_AWUSER_WIDTH(1),
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(128),
+    .C_PC_MAXWBURSTS(128),
+    .C_PC_EXMON_WIDTH(0),
+
+    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
+    .C_PC_AW_MAXWAITS(3),
+    .C_PC_AR_MAXWAITS(3),
+    .C_PC_W_MAXWAITS(3),
+    .C_PC_R_MAXWAITS(3),
+    .C_PC_B_MAXWAITS(3),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(1),
+    .C_PC_MAX_BURST_LENGTH(256),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axi_pc_mstr_inst_pcim (
+    .pc_status           (pcim_pc_status),
+    .pc_asserted         (pcim_pc_asserted),
+    .system_resetn       (rst_main_n),
+    .aclk                (clk_main_a0),
+    .aresetn             (rst_main_n),
+
+    .pc_axi_awid         (cl_sh_pcim_awid),
+    .pc_axi_awaddr       (cl_sh_pcim_awaddr),
+    .pc_axi_awlen        (cl_sh_pcim_awlen),
+    .pc_axi_awsize       (cl_sh_pcim_awsize),
+    .pc_axi_awburst      (2'b01),
+    .pc_axi_awlock       (1'b0),
+    .pc_axi_awcache      (4'b0000),
+    .pc_axi_awprot       (3'b000),
+    .pc_axi_awqos        (4'b0000),
+    .pc_axi_awregion     (4'b0000),
+    .pc_axi_awuser       (1'H0),
+    .pc_axi_awvalid      (cl_sh_pcim_awvalid),
+    .pc_axi_awready      (sh_cl_pcim_awready),
+
+    .pc_axi_wid          (6'H00), // AXI3 only
+    .pc_axi_wlast        (cl_sh_pcim_wlast),
+    .pc_axi_wdata        (cl_sh_pcim_wdata),
+    .pc_axi_wstrb        (cl_sh_pcim_wstrb),
+    .pc_axi_wuser        (1'H0),
+    .pc_axi_wvalid       (cl_sh_pcim_wvalid),
+    .pc_axi_wready       (sh_cl_pcim_wready),
+
+    .pc_axi_bid          (sh_cl_pcim_bid),
+    .pc_axi_bresp        (sh_cl_pcim_bresp),
+    .pc_axi_buser        (1'H0),
+    .pc_axi_bvalid       (sh_cl_pcim_bvalid),
+    .pc_axi_bready       (cl_sh_pcim_bready),
+
+    .pc_axi_arid         (cl_sh_pcim_arid),
+    .pc_axi_araddr       (cl_sh_pcim_araddr),
+    .pc_axi_arlen        (cl_sh_pcim_arlen),
+    .pc_axi_arsize       (cl_sh_pcim_arsize),
+    .pc_axi_arburst      (2'b00),
+    .pc_axi_arlock       (1'b0),
+    .pc_axi_arcache      (4'b0000),
+    .pc_axi_arprot       (3'b000),
+    .pc_axi_arqos        (4'b0000),
+    .pc_axi_arregion     (4'b0000),
+    .pc_axi_aruser       (1'H0),
+    .pc_axi_arvalid      (cl_sh_pcim_arvalid),
+    .pc_axi_arready      (sh_cl_pcim_arready),
+
+    .pc_axi_rid          (sh_cl_pcim_rid),
+    .pc_axi_rlast        (sh_cl_pcim_rlast),
+    .pc_axi_rdata        (sh_cl_pcim_rdata),
+    .pc_axi_rresp        (cl_sh_pcim_rresp),
+    .pc_axi_ruser        (1'H0),
+    .pc_axi_rvalid       (sh_cl_pcim_rvalid),
+    .pc_axi_rready       (cl_sh_pcim_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for OCL AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
+    .C_PC_AW_MAXWAITS(3),
+    .C_PC_AR_MAXWAITS(3),
+    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(3),
+    .C_PC_B_MAXWAITS(3),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_ocl_slv_inst (
+    .pc_status(ocl_pc_status),
+    .pc_asserted(ocl_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sh_ocl_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sh_ocl_awvalid),
+    .pc_axi_awready(ocl_sh_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sh_ocl_wdata),
+    .pc_axi_wstrb(sh_ocl_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sh_ocl_wvalid),
+    .pc_axi_wready(ocl_sh_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(ocl_sh_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(ocl_sh_bvalid),
+    .pc_axi_bready(sh_ocl_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sh_ocl_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sh_ocl_arvalid),
+    .pc_axi_arready(ocl_sh_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(ocl_sh_rdata),
+    .pc_axi_rresp(ocl_sh_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(ocl_sh_rvalid),
+    .pc_axi_rready(sh_ocl_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for SDA AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
+    .C_PC_AW_MAXWAITS(3),
+    .C_PC_AR_MAXWAITS(3),
+    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(3),
+    .C_PC_B_MAXWAITS(3),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_sda_slv_inst (
+    .pc_status(sda_pc_status),
+    .pc_asserted(sda_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sda_cl_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sda_cl_awvalid),
+    .pc_axi_awready(cl_sda_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sda_cl_wdata),
+    .pc_axi_wstrb(sda_cl_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sda_cl_wvalid),
+    .pc_axi_wready(cl_sda_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(cl_sda_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(cl_sda_bvalid),
+    .pc_axi_bready(cl_sda_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sda_cl_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sda_cl_arvalid),
+    .pc_axi_arready(cl_sda_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(cl_sda_rdata),
+    .pc_axi_rresp(cl_sda_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(cl_sda_rvalid),
+    .pc_axi_rready(sda_cl_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for BAR1 AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
+    .C_PC_AW_MAXWAITS(3),
+    .C_PC_AR_MAXWAITS(3),
+    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(3),
+    .C_PC_B_MAXWAITS(3),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_bar1_slv_inst (
+    .pc_status(bar1_pc_status),
+    .pc_asserted(bar1_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sh_bar1_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sh_bar1_awvalid),
+    .pc_axi_awready(bar1_sh_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sh_bar1_wdata),
+    .pc_axi_wstrb(sh_bar1_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sh_bar1_wvalid),
+    .pc_axi_wready(bar1_sh_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(bar1_sh_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(bar1_sh_bvalid),
+    .pc_axi_bready(sh_bar1_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sh_bar1_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sh_bar1_arvalid),
+    .pc_axi_arready(bar1_sh_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(bar1_sh_rdata),
+    .pc_axi_rresp(bar1_sh_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(bar1_sh_rvalid),
+    .pc_axi_rready(sh_bar1_rready)
+  );
+   
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled

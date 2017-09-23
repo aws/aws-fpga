@@ -430,6 +430,7 @@ end
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0); 
        logic [63:0] tmp;
+
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
       data = {32'h0, tmp[31:0]};
    endtask
