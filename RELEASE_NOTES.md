@@ -26,6 +26,9 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    New FPGA Image APIs for deleteing and reading/editing attributes 
+
 ## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    SDAccel general availability 
 
