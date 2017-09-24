@@ -104,15 +104,18 @@ It is the compiled FPGA code that is loaded into an FPGA in AWS for performing t
 
 The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed. 
 
+
 **Q: What regions are supported?**
 
 AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and ue-west-1 (Ireland).
+
 
 **Q: What is the process for creating an AFI?**
 
 The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
 Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
+
 
 **Q: Can I load an AFI on every region AWS FPGA is supported?**
 
@@ -225,6 +228,19 @@ To be able to manage and monitor the F1 FPGAs it is required to install the [FPG
 
 Typically, you will not need the HDK nor any Xilinx Vivado tools on an F1 instance that is using prebuilt AFIs; unless, you want to do in-field debug using Vivado's ChipScope (Virtual JTAG).
 
+**Q: How do I update the AWS CLI to use the latest EC2 commands to manage my AFI's?**
+
+On the FPGA Developer AMI, you can update your AWS CLI for all users using the command:
+```
+sudo pip install awscli --upgrade 
+```
+
+If You want to upgrade the AWS CLI for just your user, you can run the following:
+```
+pip install awscli --upgrade --user
+```
+The AWS CLI [documentation page](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) shows steps to update the AWS CLI.
+We recommend using the latest available version to be able to use the expanding list of commands that we add.
 
 ## Marketplace
 **Q: What does publishing my AFI/AMI to AWS Marketplace enables?**
@@ -418,4 +434,18 @@ elapsed = 00:08:59 . Memory (MB): peak = 4032.184 ; gain = 3031.297 ; free physi
 /opt/Xilinx/Vivado/2016.3/bin/loader: line 164:  8160 Killed                  "$RDI_PROG" "$@"
 Parent process (pid 8160) has died. This helper process will now exit
 
+**Q: Why am I getting an error: `A valid license was not found for feature 'XYZ' and/or device 'XYZ'` from Xilinx Vivado while trying to build by dcp/running my examples?**
 
+*For On Premise runs:* 
+
+You would need a valid [on premise license](./hdk/docs/on_premise_licensing_help.md) provided by Xilinx.
+
+*For runs using the FPGA Developer AMI:*
+
+**NOTE:** 
+>    * The license included on FPGA Developer AMI Versions 1.3.0_a and earlier expires on October 31 2017.
+>    * If you see the above error, please update to FPGA Developer AMI Version 1.3.3 or later.
+>    * All FPGA Developer AMI Versions 1.3.0_a and earlier will be deprecated once Version 1.3.3 is released.
+
+* If you are using the FPGA Developer AMI Version 1.3.3 or later, please check if the environment variable `XILINXD_LICENSE_FILE` is set to `/opt/Xilinx/license/XilinxAWS.lic`
+* If you still face the above error, please contact us on the forums and we'd be happy to help further.
