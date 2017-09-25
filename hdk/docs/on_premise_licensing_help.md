@@ -1,7 +1,7 @@
 
 # Enabling on-premises development with Xilinx tools
 
-**NOTE: If you are developing on AWS cloud and using AWS FPGA Developer AMI provided on AWS Marketplace, you can skip this document.**
+**NOTE: If you are developing on the AWS cloud and using AWS FPGA Developer AMI provided on AWS Marketplace, you can skip this document.**
 
 This document helps developers who choose to develop on-premises with specifying and licensing AWS-compatible Xilinx tools for use with the AWS FPGA HDK.
 
@@ -15,7 +15,7 @@ This document helps developers who choose to develop on-premises with specifying
 
  * On-Premises customers may need a new or updated license
     * Existing F1 on-premises customers will not need a new license
-    * New users will need to obtain an on-premises license of Vivado, please follow instruction at: https://www.xilinx.com/products/design-tools/acceleration-zone/ef-vivado-sdx-vu9p-op-fl-nl.html
+    * New users will need to obtain an on-premises license of Vivado, please follow the instructions at: https://www.xilinx.com/products/design-tools/acceleration-zone/ef-vivado-sdx-vu9p-op-fl-nl.html
     * The correct ordering number for the product is EF-VIVADO-SDX-VU9P-OP-(NL/FL)
     * You can confirm you are using the correct license for this product by ensuring you have the following in Xilinx License Manager:
        * EncryptedWriter_v2
