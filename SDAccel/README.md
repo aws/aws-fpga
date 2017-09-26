@@ -59,7 +59,7 @@ This quick start guide will use a simple "Hello World" SDAccel example to get yo
   * Installing  the required libraries and drivers
 
    ```
-       $ git clone https://github.com/aws/aws-fpga-preview.git $AWS_FPGA_REPO_DIR  
+       $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR  
        $ cd $AWS_FPGA_REPO_DIR                                         
        $ source sdaccel_setup.sh
    ```
