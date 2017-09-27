@@ -108,9 +108,9 @@ module test_dram_dma();
           status[3] = tb.is_dma_to_cl_done(.chan(3));
           #10ns;
           timeout_count++;
-       end while ((status != 4'hf) && (timeout_count < 2000));
+       end while ((status != 4'hf) && (timeout_count < 4000));
        
-       if (timeout_count >= 2000) begin
+       if (timeout_count >= 4000) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
@@ -220,7 +220,7 @@ module test_dram_dma();
        end
        $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
-       if (fail ||  || (tb.chk_prot_err_stat())) begin
+       if (fail || (tb.chk_prot_err_stat())) begin
          $display("[%t] : *** TEST FAILED ***", $realtime);
        end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
