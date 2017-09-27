@@ -501,6 +501,14 @@ module sh_bfm #(
    logic [97 - 1:0]    bar1_pc_status;
    logic               bar1_pc_asserted;
 
+   logic prot_rst;
+   
+   initial begin
+      prot_rst = 1'b0;
+      #30000ns
+      prot_rst = 1'b1;
+   end
+   
    //----------------------------------------------------------------
    // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*) 
    //----------------------------------------------------------------
@@ -533,9 +541,9 @@ module sh_bfm #(
   ) axi_pc_mstr_inst_pcis (
     .pc_status           (pcis_pc_status),
     .pc_asserted         (pcis_pc_asserted),
-    .system_resetn       (rst_main_n),
+    .system_resetn       (prot_rst),
     .aclk                (clk_main_a0),
-    .aresetn             (rst_main_n),
+    .aresetn             (prot_rst),
 
     .pc_axi_awid         (sh_cl_dma_pcis_awid),
     .pc_axi_awaddr       (sh_cl_dma_pcis_awaddr),
@@ -620,9 +628,9 @@ module sh_bfm #(
   ) axi_pc_mstr_inst_pcim (
     .pc_status           (pcim_pc_status),
     .pc_asserted         (pcim_pc_asserted),
-    .system_resetn       (rst_main_n),
+    .system_resetn       (prot_rst),
     .aclk                (clk_main_a0),
-    .aresetn             (rst_main_n),
+    .aresetn             (prot_rst),
 
     .pc_axi_awid         (cl_sh_pcim_awid),
     .pc_axi_awaddr       (cl_sh_pcim_awaddr),
@@ -947,6 +955,8 @@ module sh_bfm #(
 */
    end
 
+   
+   
    initial begin
       clk_core = 1'b0;
       forever #CORE_DLY clk_core = ~clk_core;
@@ -995,7 +1005,7 @@ module sh_bfm #(
    logic rst_n_i;
    logic rst_main_n_i;
    logic rst_xtra_n_i;
-
+   
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
@@ -1895,7 +1905,25 @@ module sh_bfm #(
       rst_xtra_n_i = 1'b1;
       #50ns;
    endtask // power_up
-  
+
+   //=================================================
+   //
+   // chk_prot_err_stat
+   //
+   //   Description: Checks if there is a protocol checker violation
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_prot_err_stat();
+      $display("[%t] : Checking protocol checker error status...", $realtime);
+      if ((pcis_pc_asserted) || (pcim_pc_asserted) || (ocl_pc_asserted) || (sda_pc_asserted) || (bar1_pc_asserted)) begin
+         $display("[%t] : *** Protocol Checker Violations Detected. Refer to log file for more details ***", $realtime);
+         return 1'b1;
+      end
+      else
+         return 1'b0;
+   endfunction // chk_prot_err_stat
+   
    //=================================================
    //
    // nsec_delay

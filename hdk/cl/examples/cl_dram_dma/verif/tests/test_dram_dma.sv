@@ -220,7 +220,7 @@ module test_dram_dma();
        end
        $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
-       if (fail) begin
+       if (fail ||  || (tb.chk_prot_err_stat())) begin
          $display("[%t] : *** TEST FAILED ***", $realtime);
        end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
