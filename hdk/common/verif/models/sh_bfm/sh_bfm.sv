@@ -24,347 +24,42 @@ module sh_bfm #(
                   )
 
    (
-   //--------------------
-   // Main input clock
-   //--------------------
 
-   input logic [31:0]                cl_sh_status0,
-   input logic [31:0]                cl_sh_status1,
-   input logic [31:0]                cl_sh_id0,
-   input logic [31:0]                cl_sh_id1,
-
-   output logic [31:0]         sh_cl_ctl0,
-   output logic [31:0]         sh_cl_ctl1,
-   output logic [1:0]          sh_cl_pwr_state,
-
-   output logic                clk_main_a0,
-   output logic                clk_extra_a1,
-   output logic                clk_extra_a2,
-   output logic                clk_extra_a3,
-   
-   output logic                clk_extra_b0,
-   output logic                clk_extra_b1,
-   
-   output logic                clk_extra_c0,
-   output logic                clk_extra_c1,
-    
-   output logic                rst_main_n,
-   output logic                kernel_rst_n,
-    
-   output logic                sh_cl_flr_assert,
-   input                       cl_sh_flr_done
-
-   ,
-   //-------------------------------------
-   // PCIe Interface from CL (AXI-4) (CL is PCI-master)
-   //-------------------------------------
-   input [15:0]                 cl_sh_pcim_awid  ,
-   input [63:0]                 cl_sh_pcim_awaddr,
-   input [7:0]                  cl_sh_pcim_awlen ,
-   input [2:0]                  cl_sh_pcim_awsize ,
-   input [18:0]                 cl_sh_pcim_awuser, //DW length of transfer
-   input [NUM_PCIE-1:0]         cl_sh_pcim_awvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_awready,
-
-   input [511:0]                cl_sh_pcim_wdata,
-   input [63:0]                 cl_sh_pcim_wstrb,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_wlast,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_wvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_wready,
-
-   output logic [15:0]          sh_cl_pcim_bid,
-   output logic [1:0]           sh_cl_pcim_bresp,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_bvalid,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_bready,
-                               
-   input [15:0]                 cl_sh_pcim_arid,
-   input [63:0]                 cl_sh_pcim_araddr,
-   input [7:0]                  cl_sh_pcim_arlen ,
-   input [2:0]                  cl_sh_pcim_arsize ,
-   input [18:0]                 cl_sh_pcim_aruser, //DW length of transfer
-   input [NUM_PCIE-1:0]         cl_sh_pcim_arvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_arready,
-
-   output logic [15:0]          sh_cl_pcim_rid,
-   output logic [511:0]         sh_cl_pcim_rdata,
-   output logic [1:0]           sh_cl_pcim_rresp,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rlast,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rvalid,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_rready,
-
-   output logic[1:0]            cfg_max_payload ,       //Max payload size - 00:128B, 01:256B, 10:512B
-   output logic[2:0]            cfg_max_read_req,      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
-                                                                  // 100b-2048B, 101b:4096B
-
-
-   //-------------------------------------
-   // PCIe Interface to CL (AXI-4) (CL is PCI-slave)
-   //-------------------------------------
-   output logic [63:0]               sh_cl_dma_pcis_awaddr,
-   output logic [5:0]                sh_cl_dma_pcis_awid  ,
-   output logic [7:0]                sh_cl_dma_pcis_awlen ,
-   output logic [2:0]                sh_cl_dma_pcis_awsize,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_awvalid,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_awready,
-
-   output logic [511:0]              sh_cl_dma_pcis_wdata,
-   output logic [63:0]               sh_cl_dma_pcis_wstrb,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wlast,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_wready,
-
-   input [1:0]                       cl_sh_dma_pcis_bresp,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_bvalid,
-   input [5:0]                       cl_sh_dma_pcis_bid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_bready,
-
-   output logic [63:0]               sh_cl_dma_pcis_araddr,
-   output logic [5:0]                sh_cl_dma_pcis_arid,
-   output logic [7:0]                sh_cl_dma_pcis_arlen,
-   output logic [2:0]                sh_cl_dma_pcis_arsize,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_arvalid,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_arready,
-                                     
-   input [5:0]                       cl_sh_dma_pcis_rid,
-   input [511:0]                     cl_sh_dma_pcis_rdata,
-   input [1:0]                       cl_sh_dma_pcis_rresp,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rlast,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_rready,
-
-`ifndef NO_XDMA
-   input [15:0]         cl_sh_irq_req,
-   output logic [15:0]  sh_cl_irq_ack,
-`endif   
-
-    
-`ifndef VU190   
-   //-----------------------------------------
-   // CL MSIX
-   //-----------------------------------------
-    input                     cl_sh_msix_int,
-    input [7:0]               cl_sh_msix_vec,
-    output logic              sh_cl_msix_int_sent,
-    output logic              sh_cl_msix_int_ack
-`endif
-    
-   ,
-   input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-
-   //--------------------------------------------------------------
-   // DDR[3] (M_C_) interface 
-   //--------------------------------------------------------------
-
-   // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
-   input                       CLK_300M_DIMM2_DP,
-   input                       CLK_300M_DIMM2_DN,
-   output logic                M_C_ACT_N,
-   output logic [16:0]         M_C_MA,
-   output logic [1:0]          M_C_BA,
-   output logic [1:0]          M_C_BG,
-   output logic [0:0]          M_C_CKE,
-   output logic [0:0]          M_C_ODT,
-   output logic [0:0]          M_C_CS_N,
-   output logic [0:0]          M_C_CLK_DN,
-   output logic [0:0]          M_C_CLK_DP,
-   output logic                RST_DIMM_C_N,
-   output logic                M_C_PAR,
-   inout [63:0]                M_C_DQ,
-   inout [7:0]                 M_C_ECC,
-   inout [17:0]                M_C_DQS_DP,
-   inout [17:0]                M_C_DQS_DN,
-
-
-
-   //----------------------------------------------
-   // DDR stats
-   //----------------------------------------------
-   output logic[7:0]           sh_ddr_stat_addr[2:0],
-   output logic[2:0]           sh_ddr_stat_wr,
-   output logic[2:0]           sh_ddr_stat_rd,
-   output logic[31:0]          sh_ddr_stat_wdata[2:0],
-
-   input [2:0]                 ddr_sh_stat_ack,
-   input [31:0]                ddr_sh_stat_rdata[2:0],
-   input [7:0]                 ddr_sh_stat_int[2:0],
-
-   //-----------------------------------------------------------------------------
-   // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
-   // to the sh_ddr.sv for the DDR interfaces to function.
-   //-----------------------------------------------------------------------------
-   output logic [7:0]          sh_ddr_stat_addr0,
-   output logic                sh_ddr_stat_wr0, 
-   output logic                sh_ddr_stat_rd0, 
-   output logic [31:0]         sh_ddr_stat_wdata0,
-   input                       ddr_sh_stat_ack0,
-   input [31:0]                ddr_sh_stat_rdata0,
-   input [7:0]                 ddr_sh_stat_int0,
-
-   output logic [7:0]          sh_ddr_stat_addr1,
-   output logic                sh_ddr_stat_wr1, 
-   output logic                sh_ddr_stat_rd1, 
-   output logic [31:0]         sh_ddr_stat_wdata1,
-   input                       ddr_sh_stat_ack1,
-   input [31:0]                ddr_sh_stat_rdata1,
-   input [7:0]                 ddr_sh_stat_int1,
-
-   output logic [7:0]          sh_ddr_stat_addr2,
-   output logic                sh_ddr_stat_wr2, 
-   output logic                sh_ddr_stat_rd2, 
-   output logic [31:0]         sh_ddr_stat_wdata2,
-   input                       ddr_sh_stat_ack2,
-   input [31:0]                ddr_sh_stat_rdata2,
-   input [7:0]                 ddr_sh_stat_int2,
-    
-   input [15:0]                cl_sh_ddr_awid,
-   input [63:0]                cl_sh_ddr_awaddr,
-   input [7:0]                 cl_sh_ddr_awlen,
-   input                       cl_sh_ddr_awvalid,
-   output logic                sh_cl_ddr_awready,
-
-   input [15:0]                cl_sh_ddr_wid,
-   input [511:0]               cl_sh_ddr_wdata,
-   input [63:0]                cl_sh_ddr_wstrb,
-   input                       cl_sh_ddr_wlast,
-   input                       cl_sh_ddr_wvalid,
-   output logic                sh_cl_ddr_wready,
-
-   output logic [15:0]         sh_cl_ddr_bid,
-   output logic [1:0]          sh_cl_ddr_bresp,
-   output logic                sh_cl_ddr_bvalid,
-   input                       cl_sh_ddr_bready,
-
-   input [15:0]                cl_sh_ddr_arid,
-   input [63:0]                cl_sh_ddr_araddr,
-   input [7:0]                 cl_sh_ddr_arlen,
-   input                       cl_sh_ddr_arvalid,
-   output logic                sh_cl_ddr_arready,
-
-   output logic [15:0]         sh_cl_ddr_rid,
-   output logic [511:0]        sh_cl_ddr_rdata,
-   output logic [1:0]          sh_cl_ddr_rresp,
-   output logic                sh_cl_ddr_rlast,
-   output logic                sh_cl_ddr_rvalid,
-   input                       cl_sh_ddr_rready,
-
-   output logic                sh_cl_ddr_is_ready,
-
-   inout                       SYSMON_SCL,
-   inout                       SYSMON_SDA,
-
-   inout[3:0]                 fpga_uctrl_gpio
-
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
-   // If the CL is created through  Xilinx’s SDAccel, then this configuration bus
-   // would be connected automatically to SDAccel generic logic (SmartConnect, APM etc)
-   //------------------------------------------------------------------------------------------
-    ,
-    output logic        sda_cl_awvalid,
-    output logic [31:0] sda_cl_awaddr, 
-    input               cl_sda_awready,
-
-   //Write data
-   output logic         sda_cl_wvalid,
-   output logic [31:0]  sda_cl_wdata,
-   output logic [3:0]   sda_cl_wstrb,
-   input                cl_sda_wready,
-
-   //Write response
-   input                cl_sda_bvalid,
-   input [1:0]          cl_sda_bresp,
-   output logic         sda_cl_bready,
-
-   //Read address
-   output logic         sda_cl_arvalid,
-   output logic [31:0]  sda_cl_araddr,
-   input                cl_sda_arready,
-
-   //Read data/response
-   input                cl_sda_rvalid,
-   input [31:0]         cl_sda_rdata,
-   input [1:0]          cl_sda_rresp,
-
-   output logic         sda_cl_rready,
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through AppPF BAR0
-   // For example, this AXI-L interface can connect to OpenCL Kernels
-   // This would connect automatically to the required logic 
-   // if the CL is created through SDAccel flow   
-   //------------------------------------------------------------------------------------------
-   output logic         sh_ocl_awvalid,
-   output logic [31:0]  sh_ocl_awaddr,
-   input                ocl_sh_awready,
-                                                                                                                            
-   //Write data             
-   output logic         sh_ocl_wvalid,
-   output logic [31:0]  sh_ocl_wdata,
-   output logic [3:0]   sh_ocl_wstrb,
-   input                ocl_sh_wready,
-
-   //Write response
-   input                ocl_sh_bvalid,
-   input [1:0]          ocl_sh_bresp,
-   output               sh_ocl_bready,
-
-   //Read address                                                                       
-   output logic         sh_ocl_arvalid,
-   output logic [31:0]  sh_ocl_araddr,
-   input                ocl_sh_arready,
-                                                                                                                            
-   //Read data/response
-   input                ocl_sh_rvalid,
-   input [31:0]         ocl_sh_rdata,
-   input [1:0]          ocl_sh_rresp,
-                                                                                                                            
-   output logic         sh_ocl_rready,
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through AppPF BAR1
-   // For example,
-   //------------------------------------------------------------------------------------------
-   output logic         sh_bar1_awvalid,
-   output logic [31:0]  sh_bar1_awaddr,
-   input                bar1_sh_awready,
-
-   //Write data
-   output logic         sh_bar1_wvalid,
-   output logic [31:0]  sh_bar1_wdata,
-   output logic [3:0]   sh_bar1_wstrb,
-   input                bar1_sh_wready,
-                                                                                                                     
-   //Write response      
-   input                bar1_sh_bvalid,
-   input [1:0]          bar1_sh_bresp,
-   output logic         sh_bar1_bready,
-                                                                                                                          
-   //Read address                                                                                                     
-   output logic         sh_bar1_arvalid,
-   output logic [31:0]  sh_bar1_araddr,
-   input                bar1_sh_arready,
-                                                                                                                            
-   //Read data/response      
-   input                bar1_sh_rvalid,
-   input [31:0]         bar1_sh_rdata,
-   input [1:0]          bar1_sh_rresp,
-                                                                                                                            
-   output logic [15:0]  sh_cl_status_vdip,
-   input [15:0]         cl_sh_status_vled,
- 
-   output logic         sh_bar1_rready           
+    //---------------------------------------------------------------------------------------
+    //DDR C interface is in shell. 
+    // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
+   input              CLK_300M_DIMM2_DP,
+   input              CLK_300M_DIMM2_DN,
+   output             M_C_ACT_N,
+   output [16:0]      M_C_MA,
+   output [1:0]       M_C_BA,
+   output [1:0]       M_C_BG,
+   output [0:0]       M_C_CKE,
+   output [0:0]       M_C_ODT,
+   output [0:0]       M_C_CS_N,
+   output [0:0]       M_C_CLK_DN,
+   output [0:0]       M_C_CLK_DP,
+   output             M_C_PAR,
+   inout  [63:0]      M_C_DQ,
+   inout  [7:0]       M_C_ECC,
+   inout  [17:0]      M_C_DQS_DP,
+   inout  [17:0]      M_C_DQS_DN,
+   output             RST_DIMM_C_N,
 
 `ifndef NO_CL_DDR
-   ,
-   output logic        sh_RST_DIMM_A_N,
-   output logic        sh_RST_DIMM_B_N,
-   output logic        sh_RST_DIMM_D_N
+   `ifndef VU190
+     output logic        sh_RST_DIMM_A_N,
+     output logic        sh_RST_DIMM_B_N,
+     output logic        sh_RST_DIMM_D_N,
+   `endif
 `endif  
-                               
-
     
-  
+   //---------------------------------------------------------------------------------------
+   //cl_ports_sh_bfm.vh is generated from cl_ports.vh in $(HDK_SHELL_DESIGN_DIR)/interfaces.
+   //This is to ensure that there is no integration issues.
+   //---------------------------------------------------------------------------------------
+    `include "cl_ports_sh_bfm.vh"
+
    );
 
 `include "axi_bfm_defines.svh"
@@ -675,7 +370,7 @@ module sh_bfm #(
     .pc_axi_rid          (sh_cl_pcim_rid),
     .pc_axi_rlast        (sh_cl_pcim_rlast),
     .pc_axi_rdata        (sh_cl_pcim_rdata),
-    .pc_axi_rresp        (cl_sh_pcim_rresp),
+    .pc_axi_rresp        (sh_cl_pcim_rresp),
     .pc_axi_ruser        (1'H0),
     .pc_axi_rvalid       (sh_cl_pcim_rvalid),
     .pc_axi_rready       (cl_sh_pcim_rready)
@@ -828,7 +523,7 @@ module sh_bfm #(
     .pc_axi_bresp(cl_sda_bresp),
     .pc_axi_buser(1'H0),
     .pc_axi_bvalid(cl_sda_bvalid),
-    .pc_axi_bready(cl_sda_bready),
+    .pc_axi_bready(sda_cl_bready),
 
     .pc_axi_arid(1'h0),
     .pc_axi_araddr(sda_cl_araddr),
@@ -1163,8 +858,8 @@ module sh_bfm #(
       AXI_Command resp;
 
       if (cl_sh_dma_pcis_bvalid & sh_cl_dma_pcis_bready) begin
-         resp.resp     = cl_sh_dma_pcis_bresp[0];
-         resp.id       = cl_sh_dma_pcis_bid[0];
+         resp.resp     = cl_sh_dma_pcis_bresp;
+         resp.id       = cl_sh_dma_pcis_bid;
 
          cl_sh_b_resps.push_back(resp);
       end
@@ -1312,7 +1007,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Command cmd;
 
-      if (cl_sh_pcim_awvalid[0] && sh_cl_pcim_awready[0]) begin
+      if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
@@ -1330,9 +1025,9 @@ module sh_bfm #(
       end
 
       if (cl_sh_wr_cmds.size() < 4)
-        sh_cl_pcim_awready[0] <= 1'b1;
+        sh_cl_pcim_awready <= 1'b1;
       else
-        sh_cl_pcim_awready[0] <= 1'b0;
+        sh_cl_pcim_awready <= 1'b0;
         
    end
 
@@ -1344,7 +1039,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Data wr_data;
       
-      if (sh_cl_pcim_wready[0] && cl_sh_pcim_wvalid[0]) begin
+      if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
          wr_data.strb = cl_sh_pcim_wstrb;
          wr_data.last = cl_sh_pcim_wlast;
@@ -1356,9 +1051,9 @@ module sh_bfm #(
          
       end
       if (cl_sh_wr_data.size() > 64)
-        sh_cl_pcim_wready[0] <= 1'b0;
+        sh_cl_pcim_wready <= 1'b0;
       else
-        sh_cl_pcim_wready[0] <= 1'b1;
+        sh_cl_pcim_wready <= 1'b1;
         
    end
 
@@ -1397,7 +1092,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Command cmd;
       
-      if (cl_sh_pcim_arvalid[0] && sh_cl_pcim_arready[0]) begin
+      if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
          cmd.id   = cl_sh_pcim_arid;
          cmd.len  = cl_sh_pcim_arlen;
@@ -1414,9 +1109,9 @@ module sh_bfm #(
       end
 
       if (cl_sh_rd_cmds.size() < 4)
-        sh_cl_pcim_arready[0] <= 1'b1;
+        sh_cl_pcim_arready <= 1'b1;
       else
-        sh_cl_pcim_arready[0] <= 1'b0;
+        sh_cl_pcim_arready <= 1'b0;
    end
 
    //
@@ -1433,11 +1128,11 @@ module sh_bfm #(
       if (sh_cl_rd_data.size() != 0) begin
          sh_cl_pcim_rid    <= sh_cl_rd_data[0].id;
          sh_cl_pcim_rresp  <= 2'b00;
-         sh_cl_pcim_rvalid[0] <= !sh_cl_pcim_rvalid[0] ? 1'b1 :
-                                 !cl_sh_pcim_rready[0] ? 1'b1 :
-                                 !sh_cl_pcim_rlast[0]  ? 1'b1 : 1'b0;
+         sh_cl_pcim_rvalid <= !sh_cl_pcim_rvalid ? 1'b1 :
+                                 !cl_sh_pcim_rready ? 1'b1 :
+                                 !sh_cl_pcim_rlast  ? 1'b1 : 1'b0;
 
-         sh_cl_pcim_rlast[0] <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
+         sh_cl_pcim_rlast <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
                                 (sh_cl_rd_data[0].len == 1) && sh_cl_pcim_rvalid && cl_sh_pcim_rready ? 1'b1 : 1'b0;
          
          if (first_rd_beat == 1'b1) begin
@@ -1475,12 +1170,12 @@ module sh_bfm #(
 
       end
       else begin
-         sh_cl_pcim_rvalid[0] <= 1'b0;
-         sh_cl_pcim_rlast[0]  <= 1'b0;         
+         sh_cl_pcim_rvalid <= 1'b0;
+         sh_cl_pcim_rlast  <= 1'b0;         
          first_rd_beat = 1'b1;
       end
 
-      if (cl_sh_pcim_rready[0] && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
+      if (cl_sh_pcim_rready && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
          if (sh_cl_rd_data[0].len == 0) begin
             sh_cl_rd_data.pop_front();
             cl_sh_rd_cmds.pop_front();
@@ -1508,7 +1203,7 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       for (int idx=0; idx<16; idx++) begin
-         if (cl_sh_irq_req[idx] == 1'b1) begin
+         if (cl_sh_apppf_irq_req[idx] == 1'b1) begin
             int_pend |= 1'b1 << idx;
          end
       end
@@ -1521,7 +1216,7 @@ module sh_bfm #(
         end
       end
 
-      sh_cl_irq_ack <= int_ack;
+      sh_cl_apppf_irq_ack <= int_ack;
       int_ack = 16'h0000;
    end
 
