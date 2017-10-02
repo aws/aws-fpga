@@ -493,7 +493,7 @@ end
    //   Outputs: None
    //
    //=================================================
-   function logic chk_prot_err_stat();
-      return tb.card.fpga.sh.chk_prot_err_stat();
+   function logic chk_prot_err_stat(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(chk_prot_err_stat());
    endfunction
 `endif

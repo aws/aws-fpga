@@ -501,17 +501,17 @@ module sh_bfm #(
    logic [97 - 1:0]    bar1_pc_status;
    logic               bar1_pc_asserted;
 
-   logic prot_rst;
+   int   prot_err_count;
+   int   prot_x_count;
+   int   counter;
    
-   initial begin
-      prot_rst = 1'b0;
-      #30000ns
-      prot_rst = 1'b1;
-   end
-   
-   //----------------------------------------------------------------
-   // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*) 
-   //----------------------------------------------------------------
+   //-------------------------------------------------------------------------------------------------------------
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*).
+   // Protocol checker checks for protocol violations on the interface where protocol checker
+   // is instantiated. This will help the CL designers in catiching protocol violations before
+   // testing with real system. Refer to hdk/common/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v
+   // for more details about each PC_STATUS bit.
+   //------------------------------------------------------------------------------------------------------------
   axi_protocol_checker_v1_1_12_top #(
     .C_AXI_PROTOCOL(0),
     .C_AXI_ID_WIDTH(6),
@@ -522,16 +522,15 @@ module sh_bfm #(
     .C_AXI_WUSER_WIDTH(1),
     .C_AXI_RUSER_WIDTH(1),
     .C_AXI_BUSER_WIDTH(1),
-    .C_PC_MAXRBURSTS(128),
-    .C_PC_MAXWBURSTS(128),
+    .C_PC_MAXRBURSTS(32),
+    .C_PC_MAXWBURSTS(32),
     .C_PC_EXMON_WIDTH(0),
 
-    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
-    .C_PC_AW_MAXWAITS(3),
-    .C_PC_AR_MAXWAITS(3),
-    .C_PC_W_MAXWAITS(3),
-    .C_PC_R_MAXWAITS(3),
-    .C_PC_B_MAXWAITS(3),
+    .C_PC_AW_MAXWAITS(10),
+    .C_PC_AR_MAXWAITS(10),
+    .C_PC_W_MAXWAITS(10),
+    .C_PC_R_MAXWAITS(10),
+    .C_PC_B_MAXWAITS(10),
 
     .C_PC_MESSAGE_LEVEL(2),
     .C_PC_SUPPORTS_NARROW_BURST(1),
@@ -541,9 +540,9 @@ module sh_bfm #(
   ) axi_pc_mstr_inst_pcis (
     .pc_status           (pcis_pc_status),
     .pc_asserted         (pcis_pc_asserted),
-    .system_resetn       (prot_rst),
+    .system_resetn       (rst_main_n),
     .aclk                (clk_main_a0),
-    .aresetn             (prot_rst),
+    .aresetn             (rst_main_n),
 
     .pc_axi_awid         (sh_cl_dma_pcis_awid),
     .pc_axi_awaddr       (sh_cl_dma_pcis_awaddr),
@@ -571,7 +570,7 @@ module sh_bfm #(
     .pc_axi_bresp        (cl_sh_dma_pcis_bresp),
     .pc_axi_buser        (1'h0),
     .pc_axi_bvalid       (cl_sh_dma_pcis_bvalid),
-    .pc_axi_bready       (cl_sh_dma_pcis_bready),
+    .pc_axi_bready       (sh_cl_dma_pcis_bready),
 
     .pc_axi_arid         (sh_cl_dma_pcis_arid),
     .pc_axi_araddr       (sh_cl_dma_pcis_araddr),
@@ -593,7 +592,7 @@ module sh_bfm #(
     .pc_axi_rresp        (cl_sh_dma_pcis_rresp),
     .pc_axi_ruser        (1'h0),
     .pc_axi_rvalid       (cl_sh_dma_pcis_rvalid),
-    .pc_axi_rready       (cl_sh_dma_pcis_rready)
+    .pc_axi_rready       (sh_cl_dma_pcis_rready)
   );
 
   //----------------------------------------------------------------
@@ -609,16 +608,15 @@ module sh_bfm #(
     .C_AXI_WUSER_WIDTH(1),
     .C_AXI_RUSER_WIDTH(1),
     .C_AXI_BUSER_WIDTH(1),
-    .C_PC_MAXRBURSTS(128),
-    .C_PC_MAXWBURSTS(128),
+    .C_PC_MAXRBURSTS(32),
+    .C_PC_MAXWBURSTS(32),
     .C_PC_EXMON_WIDTH(0),
 
-    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
-    .C_PC_AW_MAXWAITS(3),
-    .C_PC_AR_MAXWAITS(3),
-    .C_PC_W_MAXWAITS(3),
-    .C_PC_R_MAXWAITS(3),
-    .C_PC_B_MAXWAITS(3),
+    .C_PC_AW_MAXWAITS(10),
+    .C_PC_AR_MAXWAITS(10),
+    .C_PC_W_MAXWAITS(10),
+    .C_PC_R_MAXWAITS(10),
+    .C_PC_B_MAXWAITS(10),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(1),
@@ -628,9 +626,9 @@ module sh_bfm #(
   ) axi_pc_mstr_inst_pcim (
     .pc_status           (pcim_pc_status),
     .pc_asserted         (pcim_pc_asserted),
-    .system_resetn       (prot_rst),
+    .system_resetn       (rst_main_n),
     .aclk                (clk_main_a0),
-    .aresetn             (prot_rst),
+    .aresetn             (rst_main_n),
 
     .pc_axi_awid         (cl_sh_pcim_awid),
     .pc_axi_awaddr       (cl_sh_pcim_awaddr),
@@ -700,12 +698,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
-    .C_PC_AW_MAXWAITS(3),
-    .C_PC_AR_MAXWAITS(3),
-    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(3),
-    .C_PC_B_MAXWAITS(3),
+    .C_PC_AW_MAXWAITS(10),
+    .C_PC_AR_MAXWAITS(10),
+    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(10),
+    .C_PC_B_MAXWAITS(10),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -787,12 +784,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
-    .C_PC_AW_MAXWAITS(3),
-    .C_PC_AR_MAXWAITS(3),
-    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(3),
-    .C_PC_B_MAXWAITS(3),
+    .C_PC_AW_MAXWAITS(10),
+    .C_PC_AR_MAXWAITS(10),
+    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(10),
+    .C_PC_B_MAXWAITS(10),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -874,12 +870,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    // BOZO: Increase MAXWAITS to suitable value to try to catch "out-of-order" cases?
-    .C_PC_AW_MAXWAITS(3),
-    .C_PC_AR_MAXWAITS(3),
-    .C_PC_W_MAXWAITS(3),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(3),
-    .C_PC_B_MAXWAITS(3),
+    .C_PC_AW_MAXWAITS(10),
+    .C_PC_AR_MAXWAITS(10),
+    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(10),
+    .C_PC_B_MAXWAITS(10),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -1200,8 +1195,10 @@ module sh_bfm #(
          end
 
       end
-      else
+      else begin
+         sh_cl_dma_pcis_arid    <= 1'b0;
          sh_cl_dma_pcis_arvalid <= 1'b0;
+      end
    end
 
    //
@@ -1906,6 +1903,14 @@ module sh_bfm #(
       #50ns;
    endtask // power_up
 
+   always @* begin
+      if ((pcis_pc_asserted === 'b1) || ((pcim_pc_asserted === 'b1) || (ocl_pc_asserted === 'b1) || (sda_pc_asserted === 'b1) || (bar1_pc_asserted === 'b1))) begin
+         prot_err_count++;
+      end else if ((pcis_pc_asserted === 'hx) || (pcim_pc_asserted === 'hx) || (ocl_pc_asserted === 'hx) || (sda_pc_asserted === 'hx) || (bar1_pc_asserted === 'hx)) begin
+         prot_x_count++;
+      end
+   end
+
    //=================================================
    //
    // chk_prot_err_stat
@@ -1916,10 +1921,16 @@ module sh_bfm #(
    //=================================================
    function logic chk_prot_err_stat();
       $display("[%t] : Checking protocol checker error status...", $realtime);
-      if ((pcis_pc_asserted) || (pcim_pc_asserted) || (ocl_pc_asserted) || (sda_pc_asserted) || (bar1_pc_asserted)) begin
-         $display("[%t] : *** Protocol Checker Violations Detected. Refer to log file for more details ***", $realtime);
-         return 1'b1;
-      end
+      if ((prot_err_count > 0) || (prot_x_count > 0)) begin
+         if (prot_err_count > 0) begin
+            $display("[%t] : *** Protocol Checker Violations Detected. Refer to log file for details about each specific error ***", $realtime);
+            return 1'b1;
+         end
+         if (prot_x_count > 0) begin
+            $display("[%t] : *** 'X' propagation detected in protocol checker status bits. Please dump waves and look at pc_status bits for more information***", $realtime);
+            return 1'b1;
+         end
+      end // if ((prot_err_count > 0) || (prot_x_count > 0))
       else
          return 1'b0;
    endfunction // chk_prot_err_stat
