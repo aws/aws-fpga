@@ -129,7 +129,7 @@ class SimulationTestCases(unittest.TestCase):
 
     # cl_test_gl_cntr sv
 
-    def test_cl_gl_cntr__hello_world__sv(self):
+    def test_cl_hello_world__gl_cntr__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
         test_name = 'test_gl_cntr'
