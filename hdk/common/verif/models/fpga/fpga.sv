@@ -352,7 +352,7 @@ module fpga(
    logic               sh_bar1_rready;
 
    logic [15:0]        cl_sh_irq_req;
-   logic [15:0]        sh_cl_irq_ack;
+   logic [15:0]        sh_cl_apppf_irq_ack;
 
    sh_bfm sh(
 
@@ -482,19 +482,16 @@ module fpga(
              .cl_sh_dma_pcis_rlast(cl_sh_dma_pcis_rlast),
              .cl_sh_dma_pcis_rvalid(cl_sh_dma_pcis_rvalid),
              .sh_cl_dma_pcis_rready(sh_cl_dma_pcis_rready),
-             
-             .cl_sh_irq_req(cl_sh_irq_req),
-             .sh_cl_irq_ack(sh_cl_irq_ack),
 
              //-----------------------------------------
-             // CL MSIX
+             // CL INTERRUPTS
              //-----------------------------------------
-             .cl_sh_msix_int(),
-             .cl_sh_msix_vec(),
-             .sh_cl_msix_int_sent(),
-             .sh_cl_msix_int_ack(),
-    
+             .cl_sh_apppf_irq_req(cl_sh_apppf_irq_req),
+             .sh_cl_apppf_irq_ack(sh_cl_apppf_irq_ack),
+
+    `ifdef AURORA
              .cl_sh_aurora_channel_up(),
+    `endif
 
              //--------------------------------------------------------------
              // DDR[3] (M_C_) interface 
@@ -661,11 +658,11 @@ module fpga(
              .bar1_sh_rresp(bar1_sh_rresp),
              
              .sh_bar1_rready(sh_bar1_rready),
-             
-             .sh_RST_DIMM_A_N(),
-             .sh_RST_DIMM_B_N(),
-             .sh_RST_DIMM_D_N()
-
+`ifndef NO_CL_DDR             
+             .sh_RST_DIMM_A_N(RST_DIMM_A_N),
+             .sh_RST_DIMM_B_N(RST_DIMM_B_N),
+             .sh_RST_DIMM_D_N(RST_DIMM_D_N)
+`endif
              );
 
 `ifndef CL_NAME
@@ -964,8 +961,8 @@ module fpga(
    
               .sh_cl_ddr_is_ready(sh_cl_ddr_is_ready),
 
-              .cl_sh_apppf_irq_req(cl_sh_irq_req),
-              .sh_cl_apppf_irq_ack(sh_cl_irq_ack)
+              .cl_sh_apppf_irq_req(cl_sh_apppf_irq_req),
+              .sh_cl_apppf_irq_ack(sh_cl_apppf_irq_ack)
 
 `ifdef ENABLE_CS_DEBUG
               ,

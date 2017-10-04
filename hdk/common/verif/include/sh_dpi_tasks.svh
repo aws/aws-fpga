@@ -484,5 +484,16 @@ end
    task poke_stat(input int slot_id = 0,
                   input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
       `SLOT_MACRO_TASK(poke_stat(.addr(addr), .ddr_idx(ddr_idx), .data(data)))
-   endtask
+   endtask // poke_stat
+   //=================================================
+   //
+   //   chk_prot_err_stat
+   //
+   //   Description: Check for protocol checker violations
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_prot_err_stat(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(chk_prot_err_stat());
+   endfunction
 `endif
