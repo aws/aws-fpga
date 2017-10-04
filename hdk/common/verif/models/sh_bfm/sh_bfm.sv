@@ -199,6 +199,8 @@ module sh_bfm #(
    int   prot_err_count;
    int   prot_x_count;
    int   counter;
+
+   logic [63:0] glcount0, glcount1;
    
    //-------------------------------------------------------------------------------------------------------------
    // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*).
@@ -723,7 +725,7 @@ module sh_bfm #(
           pre_sync3_rst_n <= pre_sync2_rst_n;
           sync_rst_n      <= pre_sync3_rst_n;
        end
-
+  
    assign sh_cl_pwr_state = 2'b00;
 
    initial begin
@@ -744,6 +746,32 @@ module sh_bfm #(
        intf_sync_rst_n <= 0;
      else
        intf_sync_rst_n <= ~(sh_cl_flr_assert);
+
+   always_ff @(negedge rst_n or posedge clk_core)
+     if (!rst_n)
+       begin
+          glcount0 <= 0;
+       end
+     else 
+       begin
+          glcount0 <= glcount0+1;
+       end
+
+   always_ff @(negedge rst_n or negedge clk_core)
+     if (!rst_n)
+       begin
+          glcount1 <= 0;
+       end
+     else 
+       begin
+          glcount1 <= glcount1+1;
+       end
+   
+   always_ff @(posedge clk_main_a0)
+     begin
+       sh_cl_glcount0 <= glcount0;
+       sh_cl_glcount1 <= glcount1;
+     end
 
    initial begin
       for (int i=0; i<NUM_PCIE; i++) begin
@@ -1678,6 +1706,30 @@ module sh_bfm #(
       return cl_sh_status_vled;
    endfunction
 
+   //=================================================
+   //
+   // get_global_couter_0
+   //
+   //   Description: reads global counter 0 value;
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic[63:0] get_global_counter_0();
+      return sh_cl_glcount0;
+   endfunction // get_global_counter_0
+
+   //=================================================
+   //
+   // get_global_couter_1
+   //
+   //   Description: reads global counter 1 value;
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic[63:0] get_global_counter_1();
+      return sh_cl_glcount1;
+   endfunction // get_global_counter_0
+   
    //=================================================
    //
    // Kernel_reset
