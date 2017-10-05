@@ -112,7 +112,7 @@ AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia
 
 **Q: What is the process for creating an AFI?**
 
-The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification]((./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
+The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
 
 Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
 
@@ -153,7 +153,7 @@ If a developer uses local tools and license, please check the [supported version
 
 **Q: Is there a “best practice” system template?**
 
-AWS prefers not to limit developers to a specific template in terms of how we advise to use AWS FPGAs. A good overview of these interfaces can be found [here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/Programmer_View.md)
+AWS prefers not to limit developers to a specific template in terms of how we advise to use AWS FPGAs. A good overview of these interfaces can be found [here](./hdk/docs/Programmer_View.md)
   
   
 **Q: Do I need to get a Xilinx license to generate an AFI?**
@@ -374,7 +374,7 @@ Details on the Shell Interface to the FPGA Link IP blocks are provided in the [S
 
 **Q: What clock speed does the FPGA utilize?**
  
-The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the Shell to the Custom Logic (CL) region, please refer to the [Shell Interface Specification](./hdk/docs/AWS_Shell_interface_Specification.md) and the [available clock recipe](./hdk/docs/clock_recipes.csv) for the available clocks and frequency options.
+The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the Shell to the Custom Logic (CL) region, please refer to the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) and the [available clock recipe](./hdk/docs/clock_recipes.csv) for the available clocks and frequency options.
 
 *Note: All the AXI interfaces between Shell and CL are synchronous to `clk_main_a0`, which has a default of 125Mhz using `A0` clock recipe.
 

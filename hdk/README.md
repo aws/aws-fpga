@@ -82,7 +82,7 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 
 ### Build and submit the Custom Logic to AWS for generating an AFI <a name="buildcl"></a>
 
-You can follow the [build scripts readme](./common/shell_v04151701/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
+You can follow the [build scripts readme](./common/shell_v071417d3/new_cl_template/build/README.md) for step-by-step instructions on how to setup the scripts and run the build process.
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
 <a name="ipi"></a>

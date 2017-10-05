@@ -69,7 +69,7 @@ The next example shows how an application can register to two events (aka user-d
 
 **Q: How can I toggle an interrupt event from within the CL?**
 
-Toggling of user interrupt event by toggling the `cl_sh_apppf_int_req` interface to an MSI-X, which gets translated to an event in Linux userspace that an application can poll() on. Follow https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md) for the hardware interface details.
+Toggling of user interrupt event by toggling the `cl_sh_apppf_int_req` interface to an MSI-X, which gets translated to an event in Linux userspace that an application can poll() on. Follow [AWS Shell Interface Spec](../hdk/docs/AWS_Shell_Interface_Specification.md) for the hardware interface details.
 
 
 
