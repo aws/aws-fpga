@@ -1583,6 +1583,27 @@ module sh_bfm #(
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
+         ClockRecipe::A3: begin
+            MAIN_A0_DLY  = 32ns;
+            CORE_DLY     = 32ns;
+            EXTRA_A1_DLY = 32ns;
+            EXTRA_A2_DLY = 4ns;
+            EXTRA_A3_DLY = 8ns;
+         end
+         ClockRecipe::A4: begin
+            MAIN_A0_DLY  = 2.22ns;
+            CORE_DLY     = 2.22ns;
+            EXTRA_A1_DLY = 4.44ns;
+            EXTRA_A2_DLY = 1.48ns;
+            EXTRA_A3_DLY = 1.11ns;
+         end
+         ClockRecipe::A5: begin
+            MAIN_A0_DLY  = 2.5ns;
+            CORE_DLY     = 2.5ns;
+            EXTRA_A1_DLY = 5ns;
+            EXTRA_A2_DLY = 1.66ns;
+            EXTRA_A3_DLY = 1.25ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1597,6 +1618,26 @@ module sh_bfm #(
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
          end
+         ClockRecipe::B2: begin
+            EXTRA_B0_DLY = 1.11ns;
+            EXTRA_B1_DLY = 2.22ns;
+         end
+         ClockRecipe::B3: begin
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 8ns;
+         end
+         ClockRecipe::B4: begin
+            EXTRA_B0_DLY = 1.66ns;
+            EXTRA_B1_DLY = 6.66ns;
+         end
+         ClockRecipe::B5: begin
+            EXTRA_B0_DLY = 1.25ns;
+            EXTRA_B1_DLY = 5ns;
+         end
+         ClockRecipe::B6: begin
+            EXTRA_B0_DLY = 1.4ns;
+            EXTRA_B1_DLY = 11.4ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1610,6 +1651,14 @@ module sh_bfm #(
          ClockRecipe::C1: begin
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
+         end
+         ClockRecipe::C2: begin
+            EXTRA_C0_DLY = 6.66ns;
+            EXTRA_C1_DLY = 5ns;
+         end
+         ClockRecipe::C3: begin
+            EXTRA_C0_DLY = 2.5ns;
+            EXTRA_C1_DLY = 1.8ns;
          end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
