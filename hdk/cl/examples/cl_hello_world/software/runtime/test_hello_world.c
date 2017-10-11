@@ -29,8 +29,24 @@ const struct logger *logger = &logger_stdout;
 #endif
 
 MAIN {
+
+// Vivado does not support svGetScopeFromName
+//#ifdef INCLUDE_DPI_CALLS
+#ifndef VIVADO_SIM
+  svScope scope;
+#endif
+//#endif
+
     int rc;
     int slot_id;
+
+// Vivado does not support svGetScopeFromName
+//#ifdef INCLUDE_DPI_CALLS
+#ifndef VIVADO_SIM
+  scope = svGetScopeFromName("tb");
+  svSetScope(scope);
+#endif
+//#endif
 
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
@@ -45,7 +61,7 @@ MAIN {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    log_printf("===== Starting with peek_poke_example =====\n");	
+    log_printf("===== Starting with peek_poke_example =====\n");
     rc = peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0);
     fail_on(rc, out, "peek-poke example failed");
 
@@ -86,6 +102,7 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
 
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
 
+    
     /* attach to the fpga, with a pci_bar_handle out param
      * To attach to multiple slots or BARs, call this function multiple times,
      * saving the pci_bar_handle to specify which address space to interact with in
@@ -94,17 +111,21 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
      */
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
-
+    
     /* write a value into the mapped address space */
     uint32_t value = 0xefbeadde;
     uint32_t expected = 0xdeadbeef;
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
+
+    printf("rc value %d \n", rc);
+
     fail_on(rc, out, "Unable to write to the fpga !");
 
     /* read it back and print it out; you should expect the byte order to be
      * reversed (That's what this CL does) */
     rc = fpga_pci_peek(pci_bar_handle, HELLO_WORLD_REG_ADDR, &value);
     fail_on(rc, out, "Unable to read read from the fpga !");
+    log_printf("=====  Entering peek_poke_example =====\n");
     log_printf("register: 0x%x\n", value);
     if(value == expected) {
         log_printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
