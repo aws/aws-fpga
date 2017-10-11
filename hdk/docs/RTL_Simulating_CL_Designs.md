@@ -133,7 +133,7 @@ design. They were designed specifically to mimic the behavior of the actual AWS 
 If you choose to control CL signalling via another method, proper operation with Shell
 logic is not guaranteed.
 
-The AWS Shell Interface specification can be found [here](https://github.com/aws/aws-fpga/hdk/docs/AWS_Shell_Interface_Specification.md)
+The AWS Shell Interface specification can be found [here](AWS_Shell_Interface_Specification.md)
 ============================================================================================
 ```
 

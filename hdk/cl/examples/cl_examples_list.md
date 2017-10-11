@@ -21,4 +21,4 @@
 | [fpga_mgmt lib](../../../sdk/userspace/include/fpga_mgmt.h)	|   	Used  	|  Used 	|   	Used  	|
 | [edma kernel driver](../../../sdk/linux_kernel_drivers/edma/README.md)	|   	Not used  	|  Used 	|   	Not used  	|
 | read()/write() using bulk transfer	|   	Not used  	|  Used 	|   	Not used  	|
-| [poll() for user events](../../../sdk/linux_kernel_drivers/edma/user_defined_interrupts.md) 	|   	Not used  	|  Used 	|   	Not used  	|
+| [poll() for user events](../../../sdk/linux_kernel_drivers/edma/user_defined_interrupts_README.md) 	|   	Not used  	|  Used 	|   	Not used  	|

@@ -1,10 +1,10 @@
 # Virtual JTAG for Real-time FPGA Debug
 
-## Table of Content
+## Table of Contents
 
-1. [Overview](#overview)  
+1. [Overview](#overview)
 
-2. [Embedding Debug Cores in CL/AFI](#embeddingDebugCores)  
+2. [Embedding Debug Cores in CL/AFI](#embeddingDebugCores)
 
 3. [Enabling Debug on FPGA-enabled EC2 Instance, using XVC](#startVJtag)
 
@@ -15,25 +15,27 @@
 6. [Frequently Asked Questions](#faq)
 
 
-
-
-
 <a name="overview"></a>
-# Overview 
+# Overview
 
-EC2 FPGA platforms supports Virtual JTAG capability, by emulating JTAG over PCIe
+EC2 FPGA platforms support Virtual JTAG capability by emulating JTAG over PCIe.
 
-To take advantage of this capability, [AWS FPGA Management Tools](./../../sdk/userspace/fpga_mgmt_tools/README.md) enables running an in-target service (in Linux userspace), implementing Xilinx Virtual Cable (XVC) protocol, which allows (local or remote) Vivado to connect to a target FPGA for debug leveraging standard Xilinx standard debug cores like [Integrated Logic Analyzer - ILA](https://www.xilinx.com/products/intellectual-property/ila.html), [Virtual Input/Output - VIO](https://www.xilinx.com/products/intellectual-property/vio.html), and others. 
+To take advantage of this capability [AWS FPGA Management Tools](./../../sdk/userspace/fpga_mgmt_tools/README.md)
+enables running an in-target service (in Linux userspace) implementing Xilinx Virtual Cable (XVC) protocol
+which allows (local or remote) Vivado to connect to a target FPGA for debug leveraging standard 
+Xilinx standard debug cores like
+[Integrated Logic Analyzer - ILA](https://www.xilinx.com/products/intellectual-property/ila.html),
+[Virtual Input/Output - VIO](https://www.xilinx.com/products/intellectual-property/vio.html), and others.
 
 Traditionally, a physical JTAG connection is used to debug FPGAs.  AWS has developed a virtual JTAG, leveraging Xilinx XVC, for a debug flow that enables debug in the cloud.
 
-There are three main components which enable XVC debug an AWS FPGA enabled instances like F1, shown in the following figure:  
+There are three main components which enable XVC debug on AWS FPGA enabled instances like F1, shown in the following figure:
 
 - **[A]** [Debug cores](#embeddingDebugCores)  CL Debug Bridge, Xilinx ILA, VIO, etc., inside the FPGA CustomLogic (CL) portion. It is the developer's responsibility to instance these cores in the CL design. Refer to the [CL Hello World Example](../cl/examples/cl_hello_world/) for an example.
 
 - **[B]** [Virtual-JTAG service](#startVJtag) acting as XVC Server, running on target F1 instance (or any other EC2 instance with Xilinx FPGA).  
 
--	**[C]** [(Local or Remote) Vivado](#connectToTarget) application for interactive debug.
+- **[C]** Vivado [Local](#connectToTargetLocally) or [Remote](#connectToTargetRemotely) application for interactive debug.
 
 
 <img src="./images/Virtual_JTAG_XVC_Server.jpg" width="600">  
@@ -42,11 +44,17 @@ There are three main components which enable XVC debug an AWS FPGA enabled insta
 <a name="embeddingDebugCores"></a>
 # Embedding Debug Cores in CL 
 
-The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_latest/TBD) provided by AWS as part of the HDK, and any required standard Xilinx debug IP components like ILAs and VIOs. 
+The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_stable/design/ip/cl_debug_bridge/sim/cl_debug_bridge.v)
+provided by AWS as part of the HDK, and any required standard Xilinx debug IP components like ILAs and VIOs. 
 
 The following list describes the steps to successfully setup debug in a CL:  
 
-**Step 1 (Required):**	Instance the CL Debug Bridge.  The CL Debug Bridge must be instantiated at the top-level of the CL, and the nets connecting to the CL Debug Bridge must have the same as the port names of the CL Debug Bridge, except the clock. The clock to the CL Debug Bridge should be one of the various input CL clocks (clk_main_a0 and all the clk_xtra\_\*). When the net names are correct, these nets will connect automatically to the top level of the CL. The below code snippet shows the instance for the CL Debug Bridge.
+**Step 1 (Required):**	Instance the CL Debug Bridge.
+The CL Debug Bridge must be instantiated at the top-level of the CL.
+The nets connecting to the CL Debug Bridge must have the same names as the port names of the CL Debug Bridge, except the clock.
+The clock to the CL Debug Bridge should be one of the various input CL clocks (clk_main_a0 and all the clk_xtra\_\*).
+When the net names are correct, these nets will connect automatically to the top level of the CL.
+The following code snippet shows the instance for the CL Debug Bridge.
 
 ```
 cl_debug_bridge CL_DEBUG_BRIDGE (

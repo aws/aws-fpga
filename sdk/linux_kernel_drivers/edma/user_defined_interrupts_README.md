@@ -2,7 +2,7 @@
 
 AWS FPGA provides options for Custom Logic (CL) to generate user-defined interrupt events, sent to the instance via MSI-X message.
 
-At the hardware level, these interrupt event are defined in [AWS Shell Interface Specification](https://github.com/aws/aws-fpga/master/blob/hdl/docs/AWS_Shell_Interface_Specification.md)
+At the hardware level, these interrupt event are defined in [AWS Shell Interface Specification](../../../hdk/docs/AWS_Shell_Interface_Specification.md)
 
 
 
@@ -132,10 +132,3 @@ EDMA implementation keeps a state per interrupt event that indicates it has been
 **Q: Which MSI-X entries are used for the user-defined interrupts?**
 
 The EDMA Linux kernel driver maps the CL user-defined interrupts to MSI-X entries 16 to 31, which is mapped to /dev/fpgaX/event0 through 15.  This is handled by the EDMA driver and user intervention is not required.
-
-
-
-**Q: What if I want to build an in-kernel interrupt service routine for some of the user-defined interrupts?** 
-
-A reference in-kernel driver interrupt handler is provided for user modification in [EDMA source directory](./src/example_kernel_interrupt.c).
-

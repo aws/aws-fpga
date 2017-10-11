@@ -47,7 +47,11 @@ The DRAM space is 64GiB, and is mapped to the sh_cl_dma_pcis AXI4 bus.
 sh\_cl\_dma\_pcis exposes a address windows of 128GiB matching AppPF BAR4.
 
 
-This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half). An [axi_crossbar_0](../../../common/shell_v032117d7/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v) will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB), DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB), DDR_D(base_addr=0xC_0000_0000, range=16GB).
+This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half).
+An [axi_crossbar_0](../../../common/shell_stable/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v)
+will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB),
+DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB),
+DDR_D(base_addr=0xC_0000_0000, range=16GB).
 
 
 ### ocl\_ AXI-Lite
