@@ -1584,11 +1584,11 @@ module sh_bfm #(
             EXTRA_A3_DLY = 8ns;
          end
          ClockRecipe::A3: begin
-            MAIN_A0_DLY  = 32ns;
-            CORE_DLY     = 32ns;
-            EXTRA_A1_DLY = 32ns;
-            EXTRA_A2_DLY = 4ns;
-            EXTRA_A3_DLY = 8ns;
+            MAIN_A0_DLY  = 8ns;
+            CORE_DLY     = 8ns;
+            EXTRA_A1_DLY = 16ns;
+            EXTRA_A2_DLY = 2ns;
+            EXTRA_A3_DLY = 4ns;
          end
          ClockRecipe::A4: begin
             MAIN_A0_DLY  = 2.22ns;
@@ -1636,7 +1636,7 @@ module sh_bfm #(
          end
          ClockRecipe::B6: begin
             EXTRA_B0_DLY = 1.4ns;
-            EXTRA_B1_DLY = 11.4ns;
+            EXTRA_B1_DLY = 5.7ns;
          end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
@@ -1658,7 +1658,7 @@ module sh_bfm #(
          end
          ClockRecipe::C3: begin
             EXTRA_C0_DLY = 2.5ns;
-            EXTRA_C1_DLY = 1.8ns;
+            EXTRA_C1_DLY = 1.87ns;
          end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
