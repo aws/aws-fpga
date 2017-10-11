@@ -153,7 +153,7 @@ The two standard Linux/POSIX APIs for write are listed below:
 
 ***ssize_t write(int fd, void\* buf, size_t count)*** 
 
-***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explaination](#seek))
+***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explanation](#seek))
 
 The file-descriptor (fd) must have been opened successfully before calling `write()/pwrite()`.
 

@@ -207,7 +207,7 @@ bd_uram_inst: bd_uram
                 -- Decrement the number of data inside the uram
                 cpt_nb_data_uram <= std_logic_vector(unsigned(cpt_nb_data_uram) - 1);
                 -- If this data is the last one, come back to state_idle
-                if cpt_nb_data_uram = addr_uram_b then -- Here, not there is no "addr_uram_b - 1" because cpt_nb_data_uram starts at 1
+                if cpt_nb_data_uram = addr_uram_b then -- Here, note there is no "addr_uram_b - 1" because cpt_nb_data_uram starts at 1
                   current_state <= state_idle;
                 -- Else, this data is not the last one, so read the data at the next address and start the pull up
                 else

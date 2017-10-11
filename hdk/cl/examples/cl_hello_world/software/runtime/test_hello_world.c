@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <string.h>
 
 #ifdef SV_TEST
    #include "fpga_pci_sv.h"
@@ -53,34 +55,67 @@ int check_afi_ready(int slot_id);
 /*
  * An example to attach to an arbitrary slot, pf, and bar with register access.
  */
-int peek_poke_example(int slot_id, int pf_id, int bar_id);
+int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id);
 
+void usage(char* program_name) {
+    cosim_printf("usage: %s [--slot <slot-id>][<poke-value>]\n", program_name);
+}
+
+uint32_t byte_swap(uint32_t value) {
+    uint32_t swapped_value = 0;
+    int b;
+    for (b = 0; b < 4; b++) {
+        swapped_value |= ((value >> (b * 8)) & 0xff) << (8 * (3-b));
+    }
+    return swapped_value;
+}
 #endif
 
 #ifdef SV_TEST
 void test_main(uint32_t *exit_code) {
 #else
-int main(int argc, char **argv) {  
+int main(int argc, char **argv) {
 #endif
     //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
     #ifdef SCOPE
       svScope scope;
       scope = svGetScopeFromName("tb");
       svSetScope(scope);
-    #endif 
+    #endif
 
+    uint32_t value = 0xefbeadde;
+    int slot_id = 0;
     int rc;
-    int slot_id;
+    
+    // Process command line args
+    {
+        int i;
+        int value_set = 0;
+        for (i = 1; i < argc; i++) {
+            if (!strcmp(argv[i], "--slot")) {
+                i++;
+                if (i >= argc) {
+                    cosim_printf("error: missing slot-id\n");
+                    usage(argv[0]);
+                    return 1;
+                }
+                sscanf(argv[i], "%d", &slot_id);
+            } else if (!value_set) {
+                sscanf(argv[i], "%x", &value);
+                value_set = 1;
+            } else {
+                cosim_printf("error: Invalid arg: %s", argv[i]);
+                usage(argv[0]);
+                return 1;
+            }
+        }
+    }
 
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
     fail_on(rc, out, "Unable to initialize the fpga_pci library");
 
-    /* This demo works with single FPGA slot, we pick slot #0 as it works for both f1.2xl and f1.16xl */
-
-    slot_id = 0;
-
-#ifndef SV_TEST 
+#ifndef SV_TEST
     rc = check_afi_ready(slot_id);
 #endif
 
@@ -89,14 +124,13 @@ int main(int argc, char **argv) {
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
     cosim_printf("===== Starting with peek_poke_example =====\n");
-    rc = peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0);
+    rc = peek_poke_example(value, slot_id, FPGA_APP_PF, APP_PF_BAR0);
     fail_on(rc, out, "peek-poke example failed");
 
-
-    cosim_printf("Developers are encourged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
+    cosim_printf("Developers are encouraged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
     cosim_printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
     cosim_printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
-     
+
     cosim_printf(
         "# fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
         "# fpga-get-virtual-led  -S 0\n"
@@ -108,9 +142,9 @@ int main(int argc, char **argv) {
         "0000-0000-0000-0000\n"
     );
 
-#ifndef SV_TEST  
+#ifndef SV_TEST
     return rc;
-   
+    
 out:
     return 1;
 #else
@@ -137,14 +171,14 @@ out:
      fail_on(rc, out, "AFI in Slot %d is not in READY state !", slot_id);
    }
 
-   printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
+   cosim_printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
           info.spec.map[FPGA_APP_PF].vendor_id,
           info.spec.map[FPGA_APP_PF].device_id);
 
    /* confirm that the AFI that we expect is in fact loaded */
    if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
        info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
-     printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
+     cosim_printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
             "was just loaded, it might need a rescan. Rescanning now.\n");
 
      rc = fpga_pci_rescan_slot_app_pfs(slot_id);
@@ -153,7 +187,7 @@ out:
      rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
      fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
 
-     printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
+     cosim_printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
             info.spec.map[FPGA_APP_PF].vendor_id,
             info.spec.map[FPGA_APP_PF].device_id);
 
@@ -177,7 +211,7 @@ out:
 /*
  * An example to attach to an arbitrary slot, pf, and bar with register access.
  */
-int peek_poke_example(int slot_id, int pf_id, int bar_id) {
+int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
     int rc;
     /* pci_bar_handle_t is a handler for an address space exposed by one PCI BAR on one of the PCI PFs of the FPGA */
 
@@ -194,8 +228,8 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
     
     /* write a value into the mapped address space */
-    uint32_t value = 0xefbeadde;
-    uint32_t expected = 0xdeadbeef;
+    uint32_t expected = byte_swap(value);
+    cosim_printf("Writing 0x%08x to HELLO_WORLD register (0x%016lx)\n", value, HELLO_WORLD_REG_ADDR);
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
 
     fail_on(rc, out, "Unable to write to the fpga !");
@@ -224,5 +258,3 @@ out:
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
-
-

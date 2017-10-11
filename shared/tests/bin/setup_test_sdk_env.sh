@@ -13,28 +13,24 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-#VPATH = src:include:$(HDK_DIR)/common/software/src:$(HDK_DIR)/common/software/include
+# Script must be sourced from a bash shell or it will not work
+# When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
+# When being run $0 and $_ will be the same.
 
-INCLUDES = -I$(SDK_DIR)/userspace/include
+script=${BASH_SOURCE[0]}
+if [ $script == $0 ]; then
+  echo "ERROR: You must source this script"
+  exit 2
+fi
 
-CC = gcc
-CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
+full_script=$(readlink -f $script)
+script_name=$(basename $full_script)
+script_dir=$(dirname $full_script)
 
-LDLIBS = -lfpga_mgmt -lrt -lpthread
+if ! source $script_dir/setup_test_env.sh; then
+    return 1
+fi
 
-SRC = test_hello_world_vhdl.c
-OBJ = $(SRC:.c=.o)
-BIN = test_hello_world_vhdl
-
-all: $(BIN) check_env
-
-$(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-clean:
-	rm -f *.o $(BIN)
-
-check_env:
-ifndef SDK_DIR
-    $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
-endif
+if ! source $WORKSPACE/sdk_setup.sh; then
+    return 1
+fi
