@@ -20,16 +20,14 @@ cl_sh_id1[31:0],output,,
 sh_cl_ctl0[31:0],input,,Functionality TBD
 sh_cl_ctl1[31:0],input,,Functionality TBD
 sh_cl_status_vdip[15:0],input,,Virtual DIP switches.  Controlled through FPGA management PF and tools.
-cl_sh_status_vled[15:0],output,,Virtual LEDs, monitored through FPGA management PF and tools
+cl_sh_status_vled[15:0],output,,Virtual LEDs monitored through FPGA management PF and tools
 sh_cl_pwr_state[1:0],input,,Power state  2'b00: Normal 2'b11: Critical
 PCIe Master interface from CL,,,
 cl_sh_pcim_awid[15:0],output,,
 cl_sh_pcim_awaddr[63:0],output,,
 cl_sh_pcim_awlen[7:0],output,,
 cl_sh_pcim_awsize[2:0],output,,
-cl_sh_pcim_awuser[18:0],output,, 10:0 Length in DW of the transaction
-                                 14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable, i.e. not masked)
-                                 18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable, i.e. not masked)
+cl_sh_pcim_awuser[18:0],output,, 10:0 Length in DW of the transaction 14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable, i.e. not masked) 18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable, i.e. not masked)
 cl_sh_pcim_awvalid,output,,
 sh_cl_pcim_awready,input,,
 cl_sh_pcim_wdata[511:0],output,,
@@ -55,8 +53,7 @@ sh_cl_pcim_rlast,input,,
 sh_cl_pcim_rvalid,input,,
 cl_sh_pcim_rready,output,,
 cfg_max_payload[1:0],input,,Max payload size - 00:128B, 01:256B, 10:512B
-cfg_max_read_req[2:0],input,,Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
-                             100b-2048B, 101b:4096B
+cfg_max_read_req[2:0],input,,Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B 100b-2048B, 101b:4096B
 DDR-4 Interface,,,x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in SH)
 DDR4 x72 RDIMM 2100 Interface A,,,
 CLK_300M_DIMM0_DP,input,,
