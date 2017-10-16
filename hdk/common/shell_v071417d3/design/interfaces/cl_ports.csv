@@ -1,13 +1,13 @@
 Signal Name,Input/Output/Inout,Synchronous To,Description
 Clocks and Resets,,,
 clk_main_a0,input,,Main clock.  This is the clock for all of the interfaces to the SH
-clk_extra_a1,input,,Extra clock A1 (phase aligned to "A" clock group)
-clk_extra_a2,input,,Extra clock A2 (phase aligned to "A" clock group)
-clk_extra_a3,input,,Extra clock A3 (phase aligned to "A" clock group)
-clk_extra_b0,input,,Extra clock B0 (phase aligned to "B" clock group)
-clk_extra_b1,input,,Extra clock B1 (phase aligned to "B" clock group)
-clk_extra_c0,input,,Extra clock C0 (phase aligned to "B" clock group)
-clk_extra_c1,input,,Extra clock C1 (phase aligned to "B" clock group)
+clk_extra_a1,input,,Extra clock A1 (phase aligned to \"A\" clock group)
+clk_extra_a2,input,,Extra clock A2 (phase aligned to \"A\" clock group)
+clk_extra_a3,input,,Extra clock A3 (phase aligned to \"A\" clock group)
+clk_extra_b0,input,,Extra clock B0 (phase aligned to \"B\" clock group)
+clk_extra_b1,input,,Extra clock B1 (phase aligned to \"B\" clock group)
+clk_extra_c0,input,,Extra clock C0 (phase aligned to \"B\" clock group)
+clk_extra_c1,input,,Extra clock C1 (phase aligned to \"B\" clock group)
 kernel_rst_n,input,,Kernel reset (for SDA platform)
 rst_main_n,input,,Reset sync to main clock.
 Miscellaneous,,,
