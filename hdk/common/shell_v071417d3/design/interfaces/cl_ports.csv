@@ -39,7 +39,7 @@ sh_cl_pcim_bid[15:0],input,,
 sh_cl_pcim_bresp[1:0],input,,
 sh_cl_pcim_bvalid,input,,
 cl_sh_pcim_bready,output,,
-cl_sh_pcim_arid[15:0],output,,Note max 32 outstanding txns are supported, width is larger to allow bits for AXI fabrics
+cl_sh_pcim_arid[15:0],output,,Note max 32 outstanding txns are supported width is larger to allow bits for AXI fabrics
 cl_sh_pcim_araddr[63:0],output,,
 cl_sh_pcim_arlen[7:0],output,,
 cl_sh_pcim_arsize[2:0],output,,
@@ -53,7 +53,7 @@ sh_cl_pcim_rlast,input,,
 sh_cl_pcim_rvalid,input,,
 cl_sh_pcim_rready,output,,
 cfg_max_payload[1:0],input,,Max payload size - 00:128B, 01:256B, 10:512B
-cfg_max_read_req[2:0],input,,Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B 100b-2048B, 101b:4096B
+cfg_max_read_req[2:0],input,,Max read requst size - 000b:128B  001b:256B  010b:512B  011b:1024B 100b-2048B  101b:4096B
 DDR-4 Interface,,,x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in SH)
 DDR4 x72 RDIMM 2100 Interface A,,,
 CLK_300M_DIMM0_DP,input,,
@@ -132,7 +132,7 @@ ddr_sh_stat_ack2,output,,
 ddr_sh_stat_rdata2[31:0],output,,
 ddr_sh_stat_int2[7:0],output,,
 
-AXI4 Interface for DDR_C This is the DDR controller that is instantiated in the SH.  CL is the AXI-4 master, and the DDR_C controller in the SH is the slave.,,,
+AXI4 Interface for DDR_C This is the DDR controller that is instantiated in the SH.  CL is the AXI-4 master and the DDR_C controller in the SH is the slave.,,,
 cl_sh_ddr_awid[15:0],output,,
 cl_sh_ddr_awaddr[63:0],output,,
 cl_sh_ddr_awlen[7:0],output,,
@@ -193,7 +193,7 @@ cl_sh_dma_pcis_rresp[1:0],output,,
 cl_sh_dma_pcis_rlast,output,,
 cl_sh_dma_pcis_rvalid,output,,
 sh_cl_dma_pcis_rready,input,,
-AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use if the CL is created through  Xilinx’s SDAccel, then this configuration bus would be connected automatically to SDAccel generic logic (SmartConnect, APM etc),,,
+AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use if the CL is created through  Xilinx’s SDAccel  then this configuration bus would be connected automatically to SDAccel generic logic (SmartConnect, APM etc),,,
 sda_cl_awvalid,input,,
 sda_cl_awaddr[31:0],input,,
 cl_sda_awready,output,,
