@@ -52,7 +52,7 @@ sh_cl_pcim_rresp[1:0],input,,
 sh_cl_pcim_rlast,input,,
 sh_cl_pcim_rvalid,input,,
 cl_sh_pcim_rready,output,,
-cfg_max_payload[1:0],input,,Max payload size - 00:128B, 01:256B, 10:512B
+cfg_max_payload[1:0],input,,Max payload size - 00:128B  01:256B  10:512B
 cfg_max_read_req[2:0],input,,Max read requst size - 000b:128B  001b:256B  010b:512B  011b:1024B 100b-2048B  101b:4096B
 DDR-4 Interface,,,x3 DDR is instantiated in CL.  This is the physical interface (fourth DDR is in SH)
 DDR4 x72 RDIMM 2100 Interface A,,,
