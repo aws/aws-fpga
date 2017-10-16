@@ -27,7 +27,7 @@ cl_sh_pcim_awid[15:0],output,,
 cl_sh_pcim_awaddr[63:0],output,,
 cl_sh_pcim_awlen[7:0],output,,
 cl_sh_pcim_awsize[2:0],output,,
-cl_sh_pcim_awuser[18:0],output,, 10:0 Length in DW of the transaction 14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable, i.e. not masked) 18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable, i.e. not masked)
+cl_sh_pcim_awuser[18:0],output,, 10:0 Length in DW of the transaction 14:11 are the byte-enable for the first DW (bit value 1 mean byte is enable i.e. not masked) 18:15 are the byte-enable for the last DW (bit value 1 mean byte is enable i.e. not masked)
 cl_sh_pcim_awvalid,output,,
 sh_cl_pcim_awready,input,,
 cl_sh_pcim_wdata[511:0],output,,
