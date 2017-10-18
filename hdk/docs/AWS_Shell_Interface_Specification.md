@@ -459,7 +459,7 @@ There are two sets of signals to generate interrupts:
 -   cl_sh_apppf_irq_req\[15:0\] (from CL to SH)
 -   sh_cl_apppf_irq_ack\[15:0\] (from SH to CL)
 
-The CL asserts (active high) cl_sh_apppf_irq_req\[x\], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
+This interface uses single clock pulses for the req/ack.  The CL asserts (active high) cl_sh_apppf_irq_req\[x\] for a single clock to assert the interrupt request to the SH.  The SH will respond with a single clock pulse on sh_cl_apppf_irq_ack[x] to acknowledge the interrupt.  Once the CL asserts a request on a particular bit[x], it should not assert a request for the same bit[x] until it has recieved the ack for bit[x] from the SH.  The CL may assert requests on other bits[y] (y!=x).
 
 <a name="ddr"></a>
 ## DDR4 DRAM Interface
