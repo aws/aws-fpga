@@ -30,7 +30,7 @@ logic [15:0] vled_value;
    initial begin
 
       tb.power_up();
-      
+
       tb.set_virtual_dip_switch(.dip(0));
 
       vdip_value = tb.get_virtual_dip_switch();

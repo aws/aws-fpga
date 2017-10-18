@@ -19,6 +19,7 @@ export C_TEST ?= test_null
 
 export CL_ROOT = $(PWD)/../..
 
+export C_COMMON_DIR = $(HDK_COMMON_DIR)/software/include
 export C_INC_DIR  = $(CL_ROOT)/software/include
 export C_SRC_DIR  = $(CL_ROOT)/software/src
 

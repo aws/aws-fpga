@@ -23,6 +23,7 @@ extern void sv_map_host_memory(uint8_t *memory);
 
 extern void cl_peek(uint64_t addr, uint32_t *data);
 extern void cl_poke(uint64_t addr, uint32_t  data);
+extern void sv_int_ack(uint32_t int_num);
 extern void sv_pause(uint32_t x);
 
 void test_main(uint32_t *exit_code);
@@ -48,6 +49,19 @@ void log_printf(const char *format, ...)
   sv_printf(sv_msg_buffer);
 
   va_end(args);
+}
+
+void int_handler(uint32_t int_num)
+{
+// Vivado does not support svGetScopeFromName
+#ifndef VIVADO_SIM
+  svScope scope;
+  scope = svGetScopeFromName("tb");
+  svSetScope(scope);
+#endif
+
+  log_printf("Received interrupt %2d", int_num);
+  sv_int_ack(int_num);
 }
 
 #define LOW_32b(a)  ((uint32_t)((uint64_t)(a) & 0xffffffff))
