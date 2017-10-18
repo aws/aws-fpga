@@ -116,7 +116,6 @@ int fpga_pci_detach(pci_bar_handle_t handle)
  */
 int fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value)
 {
-  //uint32_t rc;
 
   sv_fpga_pci_poke(handle, offset, value);
 
@@ -134,16 +133,6 @@ int fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value)
 extern int sv_fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value);
 
 /**
- * Write a value to a register.
- *
- * @param[in]  handle  handle provided by fpga_pci_attach
- * @param[in]  offset  memory location offset for register to write
- * @param[in]  value   64-bit value to write to the register
- * @returns 0 on success, non-zero on error
- */
-//extern int fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value);
-
-/**
  * Read a value from a register.
  *
  * @param[in]  handle  handle provided by fpga_pci_attach
@@ -153,7 +142,6 @@ extern int sv_fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t v
  */
 int fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value)
 {
-  uint32_t rc;
 
   sv_fpga_pci_peek(handle, offset, value);
 
@@ -169,16 +157,6 @@ int fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value)
  * @returns 0 on success, non-zero on error
  */
 extern int sv_fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value);
-
-/**
- * Read a value from a register.
- *
- * @param[in]  handle  handle provided by fpga_pci_attach
- * @param[in]  offset  memory location offset for register to read
- * @param[out] value   64-bit value read from the register
- * @returns 0 on success, non-zero on error
- */
-//extern int fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value);
 
 #ifdef __cplusplus
 }
