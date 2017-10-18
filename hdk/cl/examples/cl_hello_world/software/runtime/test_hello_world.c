@@ -31,22 +31,18 @@ const struct logger *logger = &logger_stdout;
 MAIN {
 
 // Vivado does not support svGetScopeFromName
-//#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
-  svScope scope;
+    svScope scope;
 #endif
-//#endif
 
     int rc;
     int slot_id;
 
 // Vivado does not support svGetScopeFromName
-//#ifdef INCLUDE_DPI_CALLS
 #ifndef VIVADO_SIM
   scope = svGetScopeFromName("tb");
   svSetScope(scope);
 #endif
-//#endif
 
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
@@ -116,8 +112,6 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     uint32_t value = 0xefbeadde;
     uint32_t expected = 0xdeadbeef;
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
-
-    printf("rc value %d \n", rc);
 
     fail_on(rc, out, "Unable to write to the fpga !");
 
