@@ -40,7 +40,6 @@
    void test_main(uint32_t *exit_code)
 #endif
    
-
 #ifndef SV_TEST
    extern int check_afi_ready(int slot_id);
    extern void sv_printf(char *msg);

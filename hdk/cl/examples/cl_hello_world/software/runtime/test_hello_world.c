@@ -19,6 +19,7 @@
 /* a set of register offsets; this CL has only one */
 /* these register addresses should match the addresses in */
 /* /aws-fpga/hdk/cl/examples/common/cl_common_defines.vh */
+/* SV_TEST macro should be set if SW/HW co-simulation should be enabled */
 
 #define HELLO_WORLD_REG_ADDR UINT64_C(0x500)
 #define VLED_REG_ADDR	UINT64_C(0x504)
@@ -28,21 +29,18 @@
 const struct logger *logger = &logger_stdout;
 #endif
 
+//The MAIN will be different between Simulation and software, so a macro is defined. The macro definition can be found in the header file.
 MAIN {
 
-// Vivado does not support svGetScopeFromName
-#ifndef VIVADO_SIM
-    svScope scope;
-#endif
+    //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
+    #ifdef SCOPE
+      svScope scope;
+      scope = svGetScopeFromName("tb");
+      svSetScope(scope);
+    #endif 
 
     int rc;
     int slot_id;
-
-// Vivado does not support svGetScopeFromName
-#ifndef VIVADO_SIM
-  scope = svGetScopeFromName("tb");
-  svSetScope(scope);
-#endif
 
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
