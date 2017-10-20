@@ -99,16 +99,15 @@ New shell versions will require updated CL implementation and regenerating the A
 <a name="external_interfaces_implemented_in_cl"></a>
 ## External Interfaces implemented in CL
 
-The F1 FPGA platform includes the following external interfaces available to the
-CL:
+The F1 FPGA platform includes the following external interfaces:
 
 -   One x16 PCI Express 3.0 Interface.
 
 -   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
 
-Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
+One of the four DRAM interface controllers is implemented in the Shell, and three are implemented in the CL. This allows for optimized resource utilization of the FPGA (allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
 
-There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. A design block (sh_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
+There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. The sh_ddr design block, sh_ddr.sv, instantiates the three DRAM interfaces in the CL (A, B, D).
 
 For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.  **WARNING** if the stats interface is not hooked up, the DDR controllers will not function.
 
@@ -132,7 +131,7 @@ These parameters are used to control which DDR controllers are impemented in the
 
 <a name="cl_shell_axi_interfaces"></a>
 ## CL/Shell Interfaces
-The following diagram and table summarize the various interfaces between the Shell and CL as defined in `cl_ports.vh`.
+The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v071417d3/design/interfaces/cl_ports.vh).
 
 ![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
@@ -200,7 +199,7 @@ Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more deta
 <a name="management_pf"></a>
 ## Management PF (MgmtPF)
 
-The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
+The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as AWS OpenCL Runtime ICD/HDL, and does not support any interface with the CL code. 
 
 The Management PF exposes:
 
