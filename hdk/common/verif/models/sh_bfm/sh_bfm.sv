@@ -273,7 +273,7 @@ module sh_bfm #(
     .pc_axi_araddr       (sh_cl_dma_pcis_araddr),
     .pc_axi_arlen        (sh_cl_dma_pcis_arlen),
     .pc_axi_arsize       (sh_cl_dma_pcis_arsize),
-    .pc_axi_arburst      (2'b00),
+    .pc_axi_arburst      (2'b01),
     .pc_axi_arlock       (1'b0),
     .pc_axi_arcache      (4'b0000),
     .pc_axi_arprot       (3'b000),
@@ -359,7 +359,7 @@ module sh_bfm #(
     .pc_axi_araddr       (cl_sh_pcim_araddr),
     .pc_axi_arlen        (cl_sh_pcim_arlen),
     .pc_axi_arsize       (cl_sh_pcim_arsize),
-    .pc_axi_arburst      (2'b00),
+    .pc_axi_arburst      (2'b01),
     .pc_axi_arlock       (1'b0),
     .pc_axi_arcache      (4'b0000),
     .pc_axi_arprot       (3'b000),
@@ -2102,7 +2102,7 @@ module sh_bfm #(
                   axi_cmd.len  = (num_of_data_beats==1) ? 0 :
                                   aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
-                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
+                  if(dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095) begin 
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
                 end
@@ -2114,8 +2114,8 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
-                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
-                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
                 end
                 axi_cmd.id   = chan;
@@ -2256,9 +2256,10 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
-                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
-                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
+                  
                   axi_cmd.id   = chan;
                 end
                 axi_cmd.size = 6;
