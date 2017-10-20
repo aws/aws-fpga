@@ -34,7 +34,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    output [2:0]                      scrb_dbg_state,
    output [63:0]                     scrb_dbg_addr,
 
-   input logic [5:0]                 slv_awid,
+   input logic [6:0]                 slv_awid,
    input logic [63:0]                slv_awaddr,
    input logic [7:0]                 slv_awlen,
    input logic [2:0]                 slv_awsize,
@@ -42,20 +42,20 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    input logic [10:0]                slv_awuser,
    output                            slv_awready,
 
-   input logic [5:0]                 slv_wid,
+   input logic [6:0]                 slv_wid,
    input logic [DATA_WIDTH-1:0]      slv_wdata,
    input logic [(DATA_WIDTH/8)-1:0]  slv_wstrb,
    input logic                       slv_wlast,
    input logic                       slv_wvalid,
    output                            slv_wready,
 
-   output [5:0]                      slv_bid,
+   output [6:0]                      slv_bid,
    output [1:0]                      slv_bresp,
    output                            slv_bvalid,
    output [10:0]                     slv_buser, //This is specific to HMC, other interfaces should tie to '0'
    input logic                       slv_bready,
 
-   input logic [5:0]                 slv_arid,
+   input logic [6:0]                 slv_arid,
    input logic [63:0]                slv_araddr,
    input logic [7:0]                 slv_arlen,
    input logic [2:0]                 slv_arsize,
@@ -63,7 +63,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    input logic [10:0]                slv_aruser,
    output                            slv_arready,
 
-   output [5:0]                      slv_rid,
+   output [6:0]                      slv_rid,
    output [DATA_WIDTH-1:0]           slv_rdata,
    output [1:0]                      slv_rresp,
    output                            slv_rlast,
@@ -322,7 +322,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
 
 assign awid    = scrb_enable ? scrb_awid    : 
                  atg_enable  ? atg_awid     :
-                 {3'b0, slv_awid}    ;
+                 {2'b0, slv_awid}    ;
 assign awaddr  = scrb_enable ? scrb_awaddr  : 
                  atg_enable  ? atg_awaddr   :
                  slv_awaddr;
@@ -344,7 +344,7 @@ assign slv_awready = ~atg_enable & ~scrb_enable & awready;
 
 assign wid     = scrb_enable ? scrb_wid    : 
                  atg_enable  ? atg_wid     :
-                 {3'b0, slv_wid}   ;
+                 {2'b0, slv_wid}   ;
 assign wdata   = scrb_enable ? scrb_wdata  : 
                  atg_enable  ? atg_wdata   :
                  slv_wdata;
@@ -369,7 +369,7 @@ assign scrb_bid    = bid[5:0]   ;
 assign scrb_bresp  = bresp ;
 assign scrb_bvalid = scrb_enable & bvalid;
 assign scrb_buser  = buser ;
-assign slv_bid    = bid[5:0]   ;
+assign slv_bid    = bid[6:0]   ;
 assign slv_bresp  = bresp ;
 assign slv_bvalid = ~scrb_enable & ~atg_enable & bvalid;
 assign slv_buser  = buser[10:0] ;
@@ -379,7 +379,7 @@ assign bready = scrb_enable ? scrb_bready :
 
 assign arid    = scrb_enable ? {3'b0, scrb_arid}    : 
                  atg_enable  ? atg_arid             :
-                 {3'b0, slv_arid};
+                 {2'b0, slv_arid};
 assign araddr  = scrb_enable ? scrb_araddr  : 
                  atg_enable  ? atg_araddr   :
                  slv_araddr;
@@ -411,7 +411,7 @@ assign scrb_rresp   = rresp ;
 assign scrb_rlast   = rlast ;
 assign scrb_rvalid  = scrb_enable & rvalid;
 assign scrb_ruser   = ruser ;
-assign slv_rid     = rid[5:0]   ;
+assign slv_rid     = rid[6:0]   ;
 assign slv_rdata   = rdata ;
 assign slv_rresp   = rresp ;
 assign slv_rlast   = rlast ;
