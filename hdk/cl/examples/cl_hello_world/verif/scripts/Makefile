@@ -19,9 +19,9 @@ export C_TEST ?= test_null
 
 export CL_ROOT = $(PWD)/../..
 
-export FPGA_INC_DIR = $(HDK_COMMON_DIR)/software/include
-export C_INC_DIR  = $(CL_ROOT)/software/runtime/include
-export C_SRC_DIR  = $(CL_ROOT)/software/runtime
+export C_COMMON_DIR = $(HDK_COMMON_DIR)/software/include
+export C_INC_DIR  = $(CL_ROOT)/software/verif_rtl/include
+export C_SRC_DIR  = $(CL_ROOT)/software/verif_rtl/src
 
 export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
 export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c

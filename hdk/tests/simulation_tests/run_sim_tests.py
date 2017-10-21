@@ -127,6 +127,16 @@ class SimulationTestCases(unittest.TestCase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    # cl_test_gl_cntr sv
+
+    def test_cl_hello_world__gl_cntr__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
+        test_name = 'test_gl_cntr'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
     # cl_hello_world vhdl
 
     def test_cl_hello_world__hello_world__vhdl(self):

@@ -505,5 +505,30 @@ end
    //=================================================
    function logic chk_prot_err_stat(input int slot_id = 0);
      `SLOT_MACRO_FUNC(chk_prot_err_stat());
-   endfunction
+   endfunction // chk_prot_err_stat
+
+   //=================================================
+   //
+   //   get_global_counter_0
+   //
+   //   Description: Get global counter 0 value.
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic [63:0] get_global_counter_0(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(get_global_counter_0());
+   endfunction // get_global_counter_0
+
+   //=================================================
+   //
+   //   get_global_counter_1
+   //
+   //   Description: Get global counter 1 value.
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic [63:0] get_global_counter_1(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(get_global_counter_1());
+   endfunction // get_global_counter_1
+   
 `endif

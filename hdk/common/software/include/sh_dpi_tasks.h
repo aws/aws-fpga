@@ -17,7 +17,7 @@
 #define SH_DPI_TASKS
 
 #include <stdarg.h>
-
+#include "svdpi.h"
 extern void sv_printf(char *msg);
 extern void sv_map_host_memory(uint8_t *memory);
 

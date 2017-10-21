@@ -405,3 +405,7 @@ elapsed = 00:08:59 . Memory (MB): peak = 4032.184 ; gain = 3031.297 ; free physi
 Parent process (pid 8160) has died. This helper process will now exit
 
 
+**Q: Why does Vivado in GUI mode show up blank ? or Why does Vivado in GUI mode show up as an empty window?**
+
+We've seen this issue when running RDP in 32 bit color mode where Vivado shows up as a blank window.
+Please modify RDP options to choose any color depth less than 32 bit and try re-connecting. 

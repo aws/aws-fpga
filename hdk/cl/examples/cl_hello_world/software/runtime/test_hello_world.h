@@ -33,23 +33,9 @@
 #endif
 
 #ifndef SV_TEST
-   #define MAIN \
-   int main(int argc, char **argv)
-#else
-   #define MAIN \
-   void test_main(uint32_t *exit_code)
-#endif
-   
-#ifndef SV_TEST
-   extern int check_afi_ready(int slot_id);
    extern void sv_printf(char *msg);
    extern void sv_map_host_memory(uint8_t *memory);
    extern void sv_pause(uint32_t x);
-#else
-   int check_afi_ready(int slot_id)
-   {
-     return 0;
-   }
 #endif
 
 void log_printf(const char *format, ...) 
