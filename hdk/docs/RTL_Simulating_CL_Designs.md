@@ -140,7 +140,9 @@ The AWS Shell Interface specification can be found [here](https://github.com/aws
 
 As with the SystemVerilog (SV) testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/runtime sub-directory of CL design root and use the ".c" file extension. HW/SW simulation support is added to simulate the software tests. SV_TEST should be used for any simulation specific code in the software test. SCOPE macro is specific to VCS simulator. Below are the 'C' header and source files for cl_hello_world example.
 
-# test_hello_world.h
+
+```
+test_hello_world.h
 
 #ifndef TEST_HELLO_WORLD_H
 #define TEST_HELLO_WORLD_H
@@ -187,8 +189,10 @@ void log_printf(const char *format, ...)
 #define HIGH_32b(a) ((uint32_t)(((uint64_t)(a)) >> 32L))
 
 #endif
+```
 
-# test_hello_world.c
+```
+test_hello_world.c
 
 #include "test_hello_world.h"
 /* Constants determined by the CL */
