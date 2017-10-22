@@ -194,7 +194,12 @@ Here are the steps:
      * Copy the compiled host executable (exe) to new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
      * Copy any data files required for execution to the new instance
-     * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
+     * Clone the github repository to the new F1 instance and install runtime drivers
+   ```
+       $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR  
+       $ cd $AWS_FPGA_REPO_DIR                                         
+       $ source sdaccel_setup.sh
+   ```
 
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
 <!--
