@@ -21,6 +21,7 @@
 #
 
 import argparse
+import aws_fpga_test_utils
 import git
 from HTMLParser import HTMLParser
 import io
@@ -33,13 +34,7 @@ import re
 import sys
 import urllib2
 
-logger = logging.getLogger(__name__)
-logger_console_handler = logging.StreamHandler()
-logger_formatter = logging.Formatter('%(levelname)s:%(asctime)s: %(message)s')
-logger_console_handler.setFormatter(logger_formatter)
-logger.addHandler(logger_console_handler)
-logger_console_handler.setLevel(logging.INFO)
-logger.setLevel(logging.INFO)
+logger = aws_fpga_test_utils.configure_logger(__name__)
 
 class HtmlAnchorParser(HTMLParser):
     '''
@@ -113,7 +108,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
-        logger_console_handler.setLevel(logging.DEBUG)
+        #logger_console_handler.setLevel(logging.DEBUG)
+        logger.debug("test")
+        sys.exit(1)
 
     # Make sure running at root of repo
     repo = git.Repo(dirname(__file__), search_parent_directories=True)

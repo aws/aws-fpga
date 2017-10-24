@@ -162,6 +162,11 @@ export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
 
+# Update PYTHONPATH with libraries used for unit testing
+python_lib=$AWS_FPGA_REPO_DIR/shared/lib
+export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
+PYTHONPATH=$python_lib:$PYTHONPATH
+
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 

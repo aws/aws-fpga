@@ -19,6 +19,12 @@ implemented correctly.
 The release process will automatically run all unit tests on all pull requests and all
 the unit tests must pass before the pull request can be merged.
 
+### Prerequisities
+
+#### GitPython
+
+```sudo yum install GitPython```
+
 ### Running Tests
 
 Run tests in a module:

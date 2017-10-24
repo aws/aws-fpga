@@ -6,9 +6,12 @@ Call using ```pytest test_md_links.py```
 See TESTING.md for details.
 '''
 
+import aws_fpga_test_utils
 import os
 from os.path import dirname, realpath
 import pytest
+
+logger = aws_fpga_test_utils.configure_logger(__name__)
 
 class TestAwsFpgaAll:
     '''
