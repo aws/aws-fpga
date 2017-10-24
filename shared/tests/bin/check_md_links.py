@@ -109,16 +109,16 @@ def contains_link(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messagte")
+    parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
         logger_console_handler.setLevel(logging.DEBUG)
 
     # Make sure running at root of repo
-    repo_dir = realpath(dirname(os.path.realpath(__file__)) + '../../../..')
-    repo = git.Repo(repo_dir)
+    repo = git.Repo(dirname(__file__), search_parent_directories=True)
     assert not repo.bare
+    repo_dir = repo.git.rev_parse("--show-toplevel")
     
     num_links  = 0 # total number of links we've found in .md files
     num_broken = 0 # total number of links which are broken
