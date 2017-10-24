@@ -20,6 +20,7 @@
 #  5) return non-zero if there are broken links.
 #
 
+import argparse
 import git
 from HTMLParser import HTMLParser
 import io
@@ -97,7 +98,23 @@ def check_link(url):
         return False
     return True
 
+def contains_link(path):
+    parent_dir = dirname(path)
+    if parent_dir == path:
+        return False
+    if os.path.islink(path):
+        logger.debug("Found link: {}".format(path))
+        return True
+    return contains_link(parent_dir)
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messagte")
+    args = parser.parse_args()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+        logger_console_handler.setLevel(logging.DEBUG)
+
     # Make sure running at root of repo
     repo_dir = realpath(dirname(os.path.realpath(__file__)) + '../../../..')
     repo = git.Repo(repo_dir)
@@ -154,6 +171,11 @@ if __name__ == '__main__':
                     # Link points to a different file
                     md_file_dir = dirname(md_file)
                     link_path = os.path.join(md_file_dir, link_only)
+                    # github doesn't resolve paths that contain symbolic links
+                    if contains_link(link_path):
+                        logger.error("Broken link in {}: {}".format(md_file, link))
+                        logger.error("  Link contains a symbolic link.")
+                        num_broken += 1
                     link_path = os.path.relpath(link_path)
                     if not os.path.exists(link_path):
                         logger.error("Broken link in {}: {}".format(md_file, link))
