@@ -108,7 +108,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
-        #logger_console_handler.setLevel(logging.DEBUG)
         logger.debug("test")
         sys.exit(1)
 
