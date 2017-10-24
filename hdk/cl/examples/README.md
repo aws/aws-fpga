@@ -58,7 +58,7 @@ In order to use a 250 MHz main clock the developer can specify the A1 Clock Grou
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh -clock_recipe_a A1
 
-Other clock recipes can be specified as well. More details on the [Clock Group Recipes Table](../../docs/clock_recipes.csv) and how to specify different recipes can be found in the following [README](../../common/shell_stable/new_cl_template/build/README.md).
+Other clock recipes can be specified as well. More details on the [Clock Group Recipes Table](../../docs/clock_recipes.csv) and how to specify different recipes can be found in the following [README](../../common/shell_v071417d3/new_cl_template/build/README.md).
 
 **NOTE**: *The DCP generation can take up to several hours to complete, hence the `aws_build_dcp_from_cl.sh` will run the main build process (`vivado`) in within a  `nohup` context: This will allow the build to continue running even if the SSH session is terminated half way through the run*
 
