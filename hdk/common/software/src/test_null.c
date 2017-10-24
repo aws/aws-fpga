@@ -13,33 +13,23 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEST_HELLO_WORLD_H
-#define TEST_HELLO_WORLD_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
-#include <stdarg.h>
 
-#ifdef SV_TEST
-   #ifndef VIVADO_SIM
-      #include "svdpi.h"
-   #endif
-   #include "fpga_pci_sv.h"
-#else
-   #include <fpga_pci.h>
-   #include <fpga_mgmt.h>
-   #include <utils/lcd.h>
+// Vivado does not support svGetScopeFromName
+#ifdef INCLUDE_DPI_CALLS
+#ifndef VIVADO_SIM
+#include "svdpi.h"
+#endif
 #endif
 
-#ifndef SV_TEST
-   extern void sv_printf(char *msg);
-   extern void sv_map_host_memory(uint8_t *memory);
-   extern void sv_pause(uint32_t x);
-#endif
+#include "sh_dpi_tasks.h"
 
+void test_main(uint32_t *exit_code) {
 
-#define LOW_32b(a)  ((uint32_t)((uint64_t)(a) & 0xffffffff))
-#define HIGH_32b(a) ((uint32_t)(((uint64_t)(a)) >> 32L))
+  // NULL Test
 
-#endif
+  *exit_code = 0;
+}
