@@ -1,10 +1,14 @@
 '''
 Pytest module:
 
-Call using ```pytest test_all```
+Call using ```pytest test_md_links.py```
+
+See TESTING.md for details.
 '''
+
 import os
 from os.path import dirname, realpath
+import pytest
 
 class TestAwsFpgaAll:
     '''
@@ -21,6 +25,6 @@ class TestAwsFpgaAll:
         return
     
     def test_md_links(self):
-        rc = os.system(self.test_dir + "/check_md_links.py")
+        rc = os.system(self.test_dir + "/bin/check_md_links.py")
         assert rc == 0
         

@@ -40,7 +40,7 @@ pytest *test-dir*
 ## Shared Testing
 
 ```
-pytest shared/test/bin/test_all.py
+pytest shared/tests
 ```
 
 ### Markdown Broken Links Checking
@@ -51,6 +51,11 @@ that the links point to valid URLs.
 
 ```
 shared/test/bin/check_md_files.py
+```
+
+This script can also be run as part of pytest using:
+```
+pytest shared/tests/test_md_links.py
 ```
 
 ## HDK Testing
