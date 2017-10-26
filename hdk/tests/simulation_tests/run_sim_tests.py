@@ -107,6 +107,14 @@ class SimulationTestCases(unittest.TestCase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    def test_cl_dram_dma__ddr_peek_poke__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_ddr_peek_poke'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
     # cl_dram_dma c
     @unittest.skip("Skip till the test is fixed. Fix is planned.")
     def test_cl_dram_dma__dram_dma__c(self):
