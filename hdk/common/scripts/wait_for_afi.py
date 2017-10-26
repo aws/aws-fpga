@@ -35,7 +35,6 @@ except ImportError as e:
 logger = aws_fpga_utils.get_logger(__file__)
 
 SLEEP_SECONDS = 60
-# SLA is 6 hours
 DEFAULT_MAX_DURATION_HOURS = 6
 
 description = '''
