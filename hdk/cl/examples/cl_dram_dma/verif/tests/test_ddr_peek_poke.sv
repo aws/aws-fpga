@@ -12,7 +12,9 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+// 
+// Description: This test is to catch the memory aliasing issues in DDR memory models.
+// The test walks through the DDR address range and tests the contents.
 
 module test_ddr_peek_poke();
 
