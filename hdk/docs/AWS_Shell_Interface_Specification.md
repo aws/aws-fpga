@@ -96,17 +96,61 @@ New shell versions will require updated CL implementation and regenerating the A
 <a name="ShellInterfaces"></a>
 # Shell Interfaces
 
+<a name="external_interfaces_implemented_in_cl"></a>
+## External Interfaces implemented in CL
 
-The F1 FPGA platform includes the following interfaces available to the
-CL:
+The F1 FPGA platform includes the following external interfaces:
 
 -   One x16 PCI Express 3.0 Interface.
 
 -   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
 
+One of the four DRAM interface controllers is implemented in the Shell, and three are implemented in the CL. This allows for optimized resource utilization of the FPGA (allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
+
+There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. The sh_ddr design block, sh_ddr.sv, instantiates the three DRAM interfaces in the CL (A, B, D).
+
+For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.  **WARNING** if the stats interface is not hooked up, the DDR controllers will not function.
+
+All CL's **must** instantiate sh_ddr.sv, regardless of the number of DDR's that should be implemented.  There are three parameters (all default to '1') that define which DDR controllers are implemented:
+  - DDR_A_PRESENT
+  - DDR_B_PRESENT
+  - DDR_D_PRESENT
+  
+These parameters are used to control which DDR controllers are impemented in the CL design.  An example instantiation (includes DDR_A and DDR_B, excludes DDR_D):
+ ```   
+    sh_ddr #(.DDR_A_PRESENT(1),
+           .DDR_B_PRESENT(1),
+           .DDR_D_PRESENT(0))
+           SH_DDR (
+              .clk(clk),
+              ...
+ ```   
+ **WARNING** If the CL does not instantiate the sh_ddr block, it will result in implementation errors.
+
+**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
 <a name="cl_shell_axi_interfaces"></a>
-## CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
+## CL/Shell Interfaces
+The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v071417d3/design/interfaces/cl_ports.vh).
+
+![alt tag](./images/AWS_Shell_CL_overview.jpg)
+
+
+| Interface       | Description      |
+|:-------------|:-----------|
+| Clocks and Resets  | There are multiple clocks and resets provided by the Shell to the CL. Refer to the [Clocks and Resets](#clocks-and-reset) section for more information. |
+| PCIS  | The PCIe Slave (PCIS) Interface is an AXI-4 interface used for Inbound PCIe transactions. Refer to the [PCIS Interface](#pcis_interface) section for more information. |
+| PCIM | The PCIe Master (PCIM) Interface is an AXI-4 interface used for Outbound PCIe transactions. Refer to the [PCIM Interface](#pcim_interface) section for more information.     |
+| SDA |  The SDA Interface is an AXI-Lite interface associated with MgmtPF and BAR4. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
+| OCL | The OCL Interface is an AXI-Lite interface associated with AppPF and BAR0. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
+| BAR1| The BAR1 Interface is an AXI-Lite interface associated with AppPF and BAR1. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
+| Interrupts | There are 16 user interrupts available. Refer to the [Interrupts](#interrupts) section for more information. |
+| Miscellaneous | There are various generic signals, such as ID's, status, counters, etc., between the Shell and CL that are described in the [Miscellaneous Signals](#miscellaneous-signals) section.     |
+| DDR Stats | There are three statistics interfaces (one for each CL DDR controller) that must be connected between the Shell and the DRAM interface controller modules. These signals are required to be connected, but the CL developer should not otherwise use them since they are specific to Shell management functions. |
+
+
+
+### CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
 
 All interfaces except the inter-FPGA links use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can access lower speed control interfaces that use the AXI-Lite protocol. 
 
@@ -137,34 +181,7 @@ These signals are not included on the AXI-4 interfaces of the shell.  If connect
 
 
 
-![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
-<a name="external_memory_interfaces_implemented_in_cl"></a>
-## External Memory Interfaces implemented in CL
-
-Some of the DRAM interface controllers are implemented in the CL rather than the Shell for optimized resource utilization of the FPGA (Allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
-
-There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. A design block (sh_ddr.sv) instantiates the three DRAM interfaces in the CL (A, B, D).
-
-For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. There are also statistics interfaces that must be connected from Shell to the DRAM interface controller modules.  **WARNING** if the stats interface is not hooked up, the DDR controllers will not function.
-
-All CL's **must** instantiate sh_ddr.sv, regardless of the number of DDR's that should be implemented.  There are three parameters (all default to '1') that define which DDR controllers are implemented:
-  - DDR_A_PRESENT
-  - DDR_B_PRESENT
-  - DDR_D_PRESENT
-  
-These parameters are used to control which DDR controllers are impemented in the CL design.  An example instantiation (includes DDR_A and DDR_B, excludes DDR_D):
- ```   
-    sh_ddr #(.DDR_A_PRESENT(1),
-           .DDR_B_PRESENT(1),
-           .DDR_D_PRESENT(0))
-           SH_DDR (
-              .clk(clk),
-              ...
- ```   
- **WARNING** If the CL does not instantiate the sh_ddr block, it will result in implementation errors.
-
-**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
 <a name="pciPresentation"></a>
 # FPGA PCIe Representation to EC2 Instance
@@ -182,7 +199,7 @@ Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more deta
 <a name="management_pf"></a>
 ## Management PF (MgmtPF)
 
-The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as [AWS OpenCL Runtime ICD/HDL](./TBD), and does not support any interface with the CL code. 
+The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as AWS OpenCL Runtime ICD/HDL, and does not support any interface with the CL code. 
 
 The Management PF exposes:
 
@@ -269,8 +286,8 @@ The shell provides an active_low reset signal synchronous to clk_main_a0: rst_ma
 
 The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can access it through two AXI-4 interfaces:
   
-  
-### AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) -- DMA_PCIS interface 
+<a name="pcis_interface"></a>  
+### DMA_PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) 
 
 This AXI-4 bus is used for:
 * PCIe transactions mastered by the instance and targeting AppPF BAR4
@@ -287,7 +304,8 @@ The AXI ID can be used to determine the source of the transaction:
 - 0x02 : XDMA Channel 2
 - 0x03 : XDMA Channel 3
 
-### AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)  -- PCIM interface
+<a name="pcim_interface"></a>
+### PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)
 
 This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory.
 
@@ -459,7 +477,7 @@ There are two sets of signals to generate interrupts:
 -   cl_sh_apppf_irq_req\[15:0\] (from CL to SH)
 -   sh_cl_apppf_irq_ack\[15:0\] (from SH to CL)
 
-The CL asserts (active high) cl_sh_apppf_irq_req\[x\], and holds it asserted until the SH responds with sh_cl_apppf_irq_ack[x].
+This interface uses single clock pulses for the req/ack.  The CL asserts (active high) cl_sh_apppf_irq_req\[x\] for a single clock to assert the interrupt request to the SH.  The SH will respond with a single clock pulse on sh_cl_apppf_irq_ack[x] to acknowledge the interrupt.  Once the CL asserts a request on a particular bit[x], it should not assert a request for the same bit[x] until it has recieved the ack for bit[x] from the SH.  The CL may assert requests on other bits[y] (y!=x).
 
 <a name="ddr"></a>
 ## DDR4 DRAM Interface
