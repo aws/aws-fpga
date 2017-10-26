@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import sys
+import traceback
 try:
     import aws_fpga_utils
 except ImportError as e:

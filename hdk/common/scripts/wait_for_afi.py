@@ -17,6 +17,8 @@
 
 import argparse
 import boto3
+import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 import re
@@ -32,6 +34,10 @@ except ImportError as e:
 
 logger = aws_fpga_utils.get_logger(__file__)
 
+SLEEP_SECONDS = 60
+# SLA is 6 hours
+DEFAULT_MAX_DURATION_HOURS = 6
+
 description = '''
 Waits for AFI generation to complete.
 
@@ -42,6 +48,7 @@ If --notify is used then --email is required.
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--afi', action='store', required=True, help="AFI ID (not Global AFI ID)")
+    parser.add_argument('--max-minutes', action='store', required=False, default=(DEFAULT_MAX_DURATION_HOURS * 60), help="Maximum minutes to wait. Default={}".format(DEFAULT_MAX_DURATION_HOURS * 60))
     parser.add_argument('--notify', action='store_true', default=False, required=False, help="Notify SNS topic when AFI generation completes.")
     parser.add_argument('--sns-topic', action='store', required=False, default='CREATE_AFI', help="SNS topic name to create/use for notification. Defaults to CREATE_AFI)")
     parser.add_argument('--email', action='store', required=False, default=None, help="Email address to subscribe to the SNS topic.")
@@ -50,6 +57,10 @@ if __name__ == '__main__':
     
     if args.debug:
         logger.setLevel(logging.DEBUG)
+    
+    start_time = datetime.utcnow()
+    
+    max_duration = timedelta(minutes=args.max_minutes)
     
     logger.info("Waiting for {} generation to complete.".format(args.afi))
     
@@ -76,8 +87,13 @@ if __name__ == '__main__':
             else:
                 afi_message = afi_info['State']['Message']
                 logger.error("AFI generation failed. State={} Message={}".format(afi_state, afi_message))
-            break
-        time.sleep(60)
+            create_fpga_image_complete = True
+        else:
+            current_time = datetime.utcnow()
+            if (current_time - start_time) > max_duration:
+                logger.error("Timed out waiting for AFI generation to complete.")
+                sys.exit(1)
+            time.sleep(SLEEP_SECONDS)
     passed = afi_state == 'available'
     
     if args.notify:

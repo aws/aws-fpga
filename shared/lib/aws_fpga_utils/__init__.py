@@ -16,8 +16,11 @@
 # limitations under the License.
 
 import boto3
+import datetime
+from datetime import datetime, timedelta
 import logging
 import re
+import time
 
 def get_logger(name):
     logger = logging.getLogger(name)
@@ -31,6 +34,8 @@ def get_logger(name):
 logger = get_logger(__file__)
 
 def create_sns_subscription(topic_name, email, wait_for_confirmation=True):
+    WAIT_FOR_CONFIRMATION_DELAY = 10
+    MAX_WAIT_FOR_CONFIRMATION_DELAY = timedelta(minutes=10)
     sns_client = boto3.client('sns')
     # Create the topic if it doesn't exist
     # If it already exists just returns the ARN of the existing topic.
@@ -60,9 +65,10 @@ def create_sns_subscription(topic_name, email, wait_for_confirmation=True):
         arn_re = re.compile(r'^arn:aws:sns:')
         subscription_confirmed = arn_re.match(subscription_arn)
         if not subscription_confirmed:
-            logger.info("Waiting for subscription confirmation before continuing.")
+            logger.info("Waiting for subscription confirmation before continuing. Check your email.")
+        start_time = datetime.utcnow()
         while not subscription_confirmed:
-            time.sleep(10)
+            time.sleep(WAIT_FOR_CONFIRMATION_DELAY)
             subscription_found = False
             list_resp = sns_client.list_subscriptions_by_topic(TopicArn=topic_arn)
             for subscription in list_resp['Subscriptions']:
@@ -71,9 +77,14 @@ def create_sns_subscription(topic_name, email, wait_for_confirmation=True):
                     subscription_arn = subscription['SubscriptionArn']
             if not subscription_found:
                 logger.error("Subscription not found")
-                sys.exit(1)
+                raise RuntimeError("Subscription not found")
             subscription_confirmed = arn_re.match(subscription_arn)
             if subscription_confirmed:
                 logger.info("Subscription confirmed")
+            else:
+                current_time = datetime.utcnow()
+                if (current_time - start_time) > MAX_WAIT_FOR_CONFIRMATION_DELAY:
+                    logger.error("Timed out waiting for SNS subscription confirmation.")
+                    raise RuntimeError("Timed out waiting for SNS subscription confirmation.")
     
     return topic_arn
