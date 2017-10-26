@@ -77,7 +77,7 @@ To be notified via e-mail when the build completes:
 4. Once your build is complete, an e-mail will be sent to you stating "Your build is done."
 
 
-### 3. Submit the Design Checkpoint to AWS to Register the AFI
+### 3. Submit the Design Checkpoint to AWS to Create the AFI
 
 To submit the DCP, create an S3 bucket for submitting the design and upload the tarball file into that bucket.
 You need to prepare the following information:
@@ -99,11 +99,11 @@ Create a bucket and folder for your tarball, then copy to S3
              s3://<bucket-name>/<dcp-folder-name>/
 ```
 Create a folder for your log files        
-```    
+```
     $ aws s3 mb s3://<bucket-name>/<logs-folder-name>  # Create a folder to keep your logs
     $ touch LOGS_FILES_GO_HERE.txt                     # Create a temp file
     $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/  #Which creates the folder on S3
-```             
+```
 
 Start AFI creation. 
 ```
@@ -126,10 +126,14 @@ The output of this command includes two identifiers that refer to your AFI:
     Since the AGFI IDs is global (by design), it allows you to copy a combination of AFI/AMI to multiple regions, and they will work without requiring any extra setup.
     An example AGFI ID is **`agfi-0f0e045f919413242`**.
 
-The [describe-fpga-images](../../docs/describe_fpga_images.md) API allows you to check the AFI state during the background AFI generation process.  You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
+The [describe-fpga-images](../../docs/describe_fpga_images.md) API allows you to check the AFI state during the background AFI generation process.
+You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
 ```
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a
 ```
+
+You can use the [wait_for_afi.py](../../docs/wait_for_afi.md) script to wait for the AFI creation to complete and then optionally
+send an email with the results.
 
 The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`: 
 ```
