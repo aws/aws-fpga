@@ -15,21 +15,21 @@
 
 
 ##################################################################
-## Makefile For VCS compiles and simulations
+## Makefile For IES compiles and simulations
 ## Step to run :
-## 1. make create_libs VCS=1  -> To generate xilinx compile 
+## 1. make create_libs IES=1  -> To generate xilinx compile 
 ##    libraries. This is a one time step
-## 2. make all VCS=1  -> Runs the test
+## 2. make all IES=1  -> Runs the test
 ##################################################################
 
 compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
-	cd ${SIM_DIR} && ln -s -f ../vcs_complib/synopsys_sim.setup 
-	cd $(SIM_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS $(DEFINES) +lint=TFIPC-L
-	cd $(SIM_DIR) && vcs tb $(TEST) $(C_FILES) -CFLAGS "-I$(C_SDK_USR_INC_DIR)" -CFLAGS "-I$(C_SDK_USR_UTILS_DIR) -std=gnu99" -CFLAGS "-I$(C_COMMON_DIR)" -CFLAGS "-DSV_TEST" -CFLAGS "-DSCOPE" -CFLAGS "-I$(C_INC_DIR)" -debug_all -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log
+	cd $(SIM_DIR) && ln -s -f ../ies_complib/cds.lib
+	cd $(SIM_DIR) && ln -s -f ../ies_complib/hdl.var
+	cd $(SIM_DIR) && irun -64bit -elaborate +libext+.v+.sv -disable_sem2009 -l compile.ies.log -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR) -I$(C_INC_DIR) -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f -top tb -top glbl -top $(TEST) +define+SV_TEST +define+SCOPE +define+IES_SIM $(DEFINES) $(TEST_NAME) $(C_FILES) -timescale 1ps/1ps
 
 run:
-	cd $(SIM_DIR) && ./simv -l $(TEST).log $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TEST).vpd
+	cd $(SIM_DIR) && irun -R -access +rwc -timescale 1ps/1ps -l $(TEST).log $(PLUSARGS) +vpdfile+$(TEST).vpd
 
 $(COMPLIB_DIR):
 	cd $(SIM_ROOT)/.. && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
