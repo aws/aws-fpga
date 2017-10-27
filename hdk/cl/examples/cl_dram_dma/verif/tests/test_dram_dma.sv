@@ -68,7 +68,7 @@ module test_dram_dma();
        end
        
        host_memory_buffer_address = 64'h0_0000_3000;
-       tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_1000_0000), .len(len1) );  // move buffer to DDR 0
+       tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) );  // move buffer to DDR 0
 
        for (int i = 0 ; i < len1 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hBB));
@@ -122,7 +122,7 @@ module test_dram_dma();
        tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0002), .len(len0) );  // move DDR0 to buffer
                                                                                                                                             
        host_memory_buffer_address = 64'h0_0002_1800;                                                                                        
-       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_1000_0000), .len(len1) );  // move DDR1 to buffer
+       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) );  // move DDR1 to buffer
                                                                                                                                             
        host_memory_buffer_address = 64'h0_0003_2800;                                                                                        
        tb.que_cl_to_buffer(.chan(2), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0005), .len(len2) );  // move DDR2 to buffer

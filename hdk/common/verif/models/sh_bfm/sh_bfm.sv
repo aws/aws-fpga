@@ -156,6 +156,8 @@ module sh_bfm #(
 
    bit           debug;
 
+   logic         chk_clk_freq;
+   
    typedef struct {
       logic [63:0] buffer;
       logic [27:0] len;
@@ -185,6 +187,26 @@ module sh_bfm #(
    real EXTRA_C0_DLY = 1.66ns;
    real EXTRA_C1_DLY = 1.25ns;
 
+   real main_rising_edge  ;
+   real core_rising_edge     ;
+   real extra_a1_rising_edge ;
+   real extra_a2_rising_edge ;
+   real extra_a3_rising_edge ;
+   real extra_b0_rising_edge ;
+   real extra_b1_rising_edge ;
+   real extra_c0_rising_edge ;
+   real extra_c1_rising_edge ;
+
+   real main_clk_period  ;
+   real core_clk_period     ;
+   real extra_a1_clk_period ;
+   real extra_a2_clk_period ;
+   real extra_a3_clk_period ;
+   real extra_b0_clk_period ;
+   real extra_b1_clk_period ;
+   real extra_c0_clk_period ;
+   real extra_c1_clk_period ;
+   
    logic [97 - 1:0]    pcis_pc_status;
    logic               pcis_pc_asserted;
    logic [97 - 1:0]    pcim_pc_status;
@@ -1548,8 +1570,118 @@ module sh_bfm #(
                          .axil_rready(sh_bar1_rready));
 
 
+   always @(posedge clk_core)
+    begin
+       if (chk_clk_freq) begin 
+         core_rising_edge = $time;
+         @(posedge clk_core)
+            core_clk_period = $time - core_rising_edge;
+         if (core_clk_period !== CORE_DLY) begin
+            $display("Error - core clk frequency check failed. Expected %x Actual %x", core_clk_period, CORE_DLY);
+         end
+       end
+    end
+
+   always @(posedge clk_main_a0)
+    begin
+       if (chk_clk_freq) begin 
+          main_rising_edge = $time;
+          @(posedge clk_main_a0)
+             main_clk_period = $time - main_rising_edge;
+          if (main_clk_period !== MAIN_A0_DLY) begin
+            $display("Error - main a0 clk frequency check failed. Expected %x Actual %x", main_clk_period, MAIN_A0_DLY);
+         end
+       end
+    end
+
+   always @(posedge clk_extra_a1)
+   begin
+      if (chk_clk_freq) begin  
+         extra_a1_rising_edge = $time;
+         @(posedge clk_extra_a1)
+            extra_a1_clk_period = $time - extra_a1_rising_edge;
+         if (extra_a1_clk_period !== EXTRA_A1_DLY) begin
+            $display("Error - extra a1 clk frequency check failed. Expected %x Actual %x", extra_a1_clk_period, EXTRA_A1_DLY);
+         end
+       end 
+    end
+
+   always @(posedge clk_extra_a2)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a2_rising_edge = $time;
+          @(posedge clk_extra_a2)
+             extra_a2_clk_period = $time - extra_a2_rising_edge;
+          if (extra_a2_clk_period !== EXTRA_A2_DLY) begin
+             $display("Error - extra a2 clk frequency check failed. Expected %x Actual %x", extra_a2_clk_period, EXTRA_A2_DLY);
+          end
+       end
+    end
+
+   always @(posedge clk_extra_a3)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a3_rising_edge = $time;
+          @(posedge clk_extra_a3)
+             extra_a3_clk_period = $time - extra_a3_rising_edge;
+          if (extra_a3_clk_period !== EXTRA_A3_DLY) begin
+             $display("Error - extra a3 clk frequency check failed. Expected %x Actual %x", extra_a3_clk_period, EXTRA_A3_DLY);
+          end
+       end
+    end
+   
+   always @(posedge clk_extra_b0)
+    begin
+      if (chk_clk_freq) begin  
+        extra_b0_rising_edge = $time;
+        @(posedge clk_extra_b0)
+           extra_b0_clk_period = $time - extra_b0_rising_edge;
+        if (extra_b0_clk_period !== EXTRA_B0_DLY) begin
+           $display("Error - extra b0 clk frequency check failed. Expected %x Actual %x", extra_b0_clk_period, EXTRA_B0_DLY);
+        end
+      end
+    end
+
+   always @(posedge clk_extra_b1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_b1_rising_edge = $time;
+          @(posedge clk_extra_b1)
+             extra_b1_clk_period = $time - extra_b1_rising_edge;
+          if (extra_b1_clk_period !== EXTRA_B1_DLY) begin
+             $display("Error - extra b1 clk frequency check failed. Expected %x Actual %x", extra_b1_clk_period, EXTRA_B1_DLY);
+          end
+       end
+    end
+
+   always @(posedge clk_extra_c0)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c0_rising_edge = $time;
+          @(posedge clk_extra_c0)
+             extra_c0_clk_period = $time - extra_c0_rising_edge;
+          if (extra_c0_clk_period !== EXTRA_C0_DLY) begin
+             $display("Error - extra c0 clk frequency check failed. Expected %x Actual %x", extra_c0_clk_period, EXTRA_C0_DLY);
+          end
+       end
+    end
+
+   always @(posedge clk_extra_c1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c1_rising_edge = $time;
+          @(posedge clk_extra_c1)
+             extra_c1_clk_period = $time - extra_c1_rising_edge;
+          if (extra_c1_clk_period !== EXTRA_C1_DLY) begin
+             $display("Error - extra c1 clk frequency check failed. Expected %x Actual %x", extra_c1_clk_period, EXTRA_C1_DLY);
+          end
+       end
+    end
 
    
+   // function void chk_clk_freq(input int slot_id = 0);
+   //   `SLOT_MACRO_FUNC(chk_prot_err_stat());
+   // endfunction // chk_prot_err_stat
    //=================================================
    //
    // power_up
@@ -2325,35 +2457,35 @@ module sh_bfm #(
       end // else begin
    end // always
 
-  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
-     case (ddr_idx)
-       0: begin
-          sh_ddr_stat_wr0    = 1;
-          sh_ddr_stat_addr0  = addr;
-          sh_ddr_stat_wdata0 = data;
-          sh_ddr_stat_rd0    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr0    = 0;
-       end
-       1: begin
-          sh_ddr_stat_wr1    = 1;
-          sh_ddr_stat_addr1  = addr;
-          sh_ddr_stat_wdata1 = data;
-          sh_ddr_stat_rd1    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr1    = 0;
-       end
-       2: begin
-          sh_ddr_stat_wr2    = 1;
-          sh_ddr_stat_addr2  = addr;
-          sh_ddr_stat_wdata2 = data;
-          sh_ddr_stat_rd2    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr2    = 0;
-       end
+   task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+      case (ddr_idx)
+         0: begin
+            sh_ddr_stat_wr0    = 1;
+            sh_ddr_stat_addr0  = addr;
+            sh_ddr_stat_wdata0 = data;
+            sh_ddr_stat_rd0    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr0    = 0;
+         end
+         1: begin
+            sh_ddr_stat_wr1    = 1;
+            sh_ddr_stat_addr1  = addr;
+            sh_ddr_stat_wdata1 = data;
+            sh_ddr_stat_rd1    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr1    = 0;
+         end
+         2: begin
+            sh_ddr_stat_wr2    = 1;
+            sh_ddr_stat_addr2  = addr;
+            sh_ddr_stat_wdata2 = data;
+            sh_ddr_stat_rd2    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr2    = 0;
+         end
      endcase // case (ddr_idx)
      
   endtask
