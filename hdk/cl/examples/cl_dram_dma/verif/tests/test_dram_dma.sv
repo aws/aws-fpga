@@ -26,7 +26,8 @@ module test_dram_dma();
     int            len1 = 128;
     int            len2 = 6000;
     int            len3 = 300;
-
+    logic          ddr_ready;
+   
     initial begin
 
        logic [63:0] host_memory_buffer_address;
@@ -48,12 +49,20 @@ module test_dram_dma();
        tb.poke_ocl(.addr(64'h330), .data(0));
        tb.poke_ocl(.addr(64'h430), .data(0));
 
+       // issuing flr
+       //tb.issue_flr();
+
+       // timeout_count = 0;       
+       // do begin
+       //    ddr_ready = tb.is_ddr_ready();
+       //    $display("DDR ready is %x \n", ddr_ready);
+       //    timeout_count++;
+       // end // UNMATCHED !!
+       // while ((ddr_ready !== 1'b1) || (timeout_count < 10000));
+
        // allow memory to initialize
        tb.nsec_delay(25000);
-
-       // issuing flr
-       tb.issue_flr();
-
+       
        $display("[%t] : Initializing buffers", $realtime);
 
        host_memory_buffer_address = 64'h0;

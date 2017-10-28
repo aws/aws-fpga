@@ -1679,9 +1679,6 @@ module sh_bfm #(
     end
 
    
-   // function void chk_clk_freq(input int slot_id = 0);
-   //   `SLOT_MACRO_FUNC(chk_prot_err_stat());
-   // endfunction // chk_prot_err_stat
    //=================================================
    //
    // power_up
@@ -1815,6 +1812,19 @@ module sh_bfm #(
       end
    end
 
+   //=================================================
+   //
+   // set_chk_clk_freq
+   //
+   //   Description: Starts checking clock frequency
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_chk_clk_freq(input logic chk_freq = 1'b1);
+      $display("[%t] : Start checking clock frequency...", $realtime);
+      chk_clk_freq = chk_freq;
+   endfunction // set_chk_clk_freq
+   
    //=================================================
    //
    // chk_prot_err_stat
@@ -2231,6 +2241,10 @@ module sh_bfm #(
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
       return c2h_dma_done[chan];
    endfunction // is_dma_to_buffer_done
+
+   function bit is_ddr_ready();  // 1 = done
+      return ddr_is_ready;
+   endfunction // is_ddr_ready
    
    //=================================================
    //
