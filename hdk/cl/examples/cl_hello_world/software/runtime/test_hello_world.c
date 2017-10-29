@@ -16,7 +16,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
-#include <macros.h>
+
+#include "macros.h"
 
 #ifdef SV_TEST
    #ifndef VIVADO_SIM
