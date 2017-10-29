@@ -94,8 +94,13 @@ static const struct pci_device_id pci_ids[] = {
 
 	{ PCI_DEVICE(0x10ee, 0x2808), },
 
+#ifdef INTERNAL_TESTING
+	/* 
+	 * AWS: Within the F1 instance {0x1d0f, 0x1042} is reserved and represents the FPGA 
+	 * in the CLEARED state
+	 */
 	{ PCI_DEVICE(0x1d0f, 0x1042), 0},
-
+#endif
 	{ PCI_DEVICE(0x1d0f, 0xF000), 0},
 	{ PCI_DEVICE(0x1d0f, 0xF001), 0},
 	{0,}
