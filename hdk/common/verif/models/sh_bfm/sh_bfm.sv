@@ -156,7 +156,7 @@ module sh_bfm #(
 
    bit           debug;
 
-   logic         chk_clk_freq;
+   logic         chk_clk_freq = 1'b0;
    
    typedef struct {
       logic [63:0] buffer;
@@ -219,6 +219,7 @@ module sh_bfm #(
    logic               bar1_pc_asserted;
 
    int   prot_err_count;
+   int   clk_err_count;
    int   prot_x_count;
    int   counter;
 
@@ -1569,110 +1570,128 @@ module sh_bfm #(
                          .axil_rresp(bar1_sh_rresp),
                          .axil_rready(sh_bar1_rready));
 
-
+   
+   // Check core clock frequency when chk_clk_freq is set 
    always @(posedge clk_core)
     begin
        if (chk_clk_freq) begin 
          core_rising_edge = $time;
          @(posedge clk_core)
             core_clk_period = $time - core_rising_edge;
-         if (core_clk_period !== CORE_DLY) begin
+         if (core_clk_period != CORE_DLY * 2) begin
+            clk_err_count++;
             $display("Error - core clk frequency check failed. Expected %x Actual %x", core_clk_period, CORE_DLY);
          end
        end
     end
 
+   // Check main clock frequency when chk_clk_freq is set 
    always @(posedge clk_main_a0)
     begin
        if (chk_clk_freq) begin 
           main_rising_edge = $time;
           @(posedge clk_main_a0)
              main_clk_period = $time - main_rising_edge;
-          if (main_clk_period !== MAIN_A0_DLY) begin
+          if (main_clk_period != MAIN_A0_DLY * 2) begin
+            clk_err_count++;
             $display("Error - main a0 clk frequency check failed. Expected %x Actual %x", main_clk_period, MAIN_A0_DLY);
          end
        end
     end
 
+   // Check extra a1 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_a1)
    begin
       if (chk_clk_freq) begin  
          extra_a1_rising_edge = $time;
          @(posedge clk_extra_a1)
             extra_a1_clk_period = $time - extra_a1_rising_edge;
-         if (extra_a1_clk_period !== EXTRA_A1_DLY) begin
+         if (extra_a1_clk_period != EXTRA_A1_DLY * 2) begin
+            clk_err_count++;
             $display("Error - extra a1 clk frequency check failed. Expected %x Actual %x", extra_a1_clk_period, EXTRA_A1_DLY);
          end
        end 
     end
 
+   // Check extra a2 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_a2)
     begin
        if (chk_clk_freq) begin 
           extra_a2_rising_edge = $time;
           @(posedge clk_extra_a2)
              extra_a2_clk_period = $time - extra_a2_rising_edge;
-          if (extra_a2_clk_period !== EXTRA_A2_DLY) begin
+          if (extra_a2_clk_period != EXTRA_A2_DLY * 2) begin
+             clk_err_count++;
              $display("Error - extra a2 clk frequency check failed. Expected %x Actual %x", extra_a2_clk_period, EXTRA_A2_DLY);
           end
        end
     end
 
+   // Check extra a3 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_a3)
     begin
        if (chk_clk_freq) begin 
           extra_a3_rising_edge = $time;
           @(posedge clk_extra_a3)
              extra_a3_clk_period = $time - extra_a3_rising_edge;
-          if (extra_a3_clk_period !== EXTRA_A3_DLY) begin
+          if (extra_a3_clk_period != EXTRA_A3_DLY * 2) begin
+             clk_err_count++;
              $display("Error - extra a3 clk frequency check failed. Expected %x Actual %x", extra_a3_clk_period, EXTRA_A3_DLY);
           end
        end
     end
    
+   // Check extra b0 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_b0)
     begin
       if (chk_clk_freq) begin  
         extra_b0_rising_edge = $time;
         @(posedge clk_extra_b0)
            extra_b0_clk_period = $time - extra_b0_rising_edge;
-        if (extra_b0_clk_period !== EXTRA_B0_DLY) begin
+        if (extra_b0_clk_period != EXTRA_B0_DLY * 2) begin
+           clk_err_count++;
            $display("Error - extra b0 clk frequency check failed. Expected %x Actual %x", extra_b0_clk_period, EXTRA_B0_DLY);
         end
       end
     end
 
+   // Check extra b1 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_b1)
     begin
        if (chk_clk_freq) begin 
           extra_b1_rising_edge = $time;
           @(posedge clk_extra_b1)
              extra_b1_clk_period = $time - extra_b1_rising_edge;
-          if (extra_b1_clk_period !== EXTRA_B1_DLY) begin
+          if (extra_b1_clk_period != EXTRA_B1_DLY * 2) begin
+             clk_err_count++;
              $display("Error - extra b1 clk frequency check failed. Expected %x Actual %x", extra_b1_clk_period, EXTRA_B1_DLY);
           end
        end
     end
 
+   // Check extra c0 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_c0)
     begin
        if (chk_clk_freq) begin 
           extra_c0_rising_edge = $time;
           @(posedge clk_extra_c0)
              extra_c0_clk_period = $time - extra_c0_rising_edge;
-          if (extra_c0_clk_period !== EXTRA_C0_DLY) begin
+          if (extra_c0_clk_period != EXTRA_C0_DLY * 2) begin
+             clk_err_count++;
              $display("Error - extra c0 clk frequency check failed. Expected %x Actual %x", extra_c0_clk_period, EXTRA_C0_DLY);
           end
        end
     end
 
+   // Check extra c1 clock frequency when chk_clk_freq is set 
    always @(posedge clk_extra_c1)
     begin
        if (chk_clk_freq) begin 
           extra_c1_rising_edge = $time;
           @(posedge clk_extra_c1)
              extra_c1_clk_period = $time - extra_c1_rising_edge;
-          if (extra_c1_clk_period !== EXTRA_C1_DLY) begin
+          if (extra_c1_clk_period != (EXTRA_C1_DLY * 2)) begin
+             clk_err_count++;
              $display("Error - extra c1 clk frequency check failed. Expected %x Actual %x", extra_c1_clk_period, EXTRA_C1_DLY);
           end
        end
@@ -1820,7 +1839,7 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   function void set_chk_clk_freq(input logic chk_freq = 1'b1);
+   function void set_chk_clk_freq(logic chk_freq = 1'b1);
       $display("[%t] : Start checking clock frequency...", $realtime);
       chk_clk_freq = chk_freq;
    endfunction // set_chk_clk_freq
@@ -1848,6 +1867,25 @@ module sh_bfm #(
       else
          return 1'b0;
    endfunction // chk_prot_err_stat
+
+   //=================================================
+   //
+   // chk_clk_err_cnt
+   //
+   //   Description: Checks if there are clock errors
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_clk_err_cnt();
+      $display("[%t] : Checking clock error status...", $realtime);
+      if (clk_err_count > 0) begin
+         $display("[%t] : *** Clock Frequency Errors Detected. Refer to log file for details about each specific error ***", $realtime);
+         return 1'b1;
+      end
+      else begin
+         return 1'b0;
+      end
+   endfunction
    
    //=================================================
    //
@@ -1858,7 +1896,7 @@ module sh_bfm #(
    //
    //=================================================
    task nsec_delay(int dly = 10000);
-      #dly;
+      # (dly * 1ns);
    endtask
 
    //=================================================

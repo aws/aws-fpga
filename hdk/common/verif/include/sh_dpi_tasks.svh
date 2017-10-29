@@ -497,7 +497,7 @@ end
    //   Outputs: None
    //
    //=================================================
-   function void set_chk_clk_freq(input int slot_id = 0, input logic chk_freq = 1'b1);
+   function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);
      `SLOT_MACRO_TASK(set_chk_clk_freq(chk_freq))
    endfunction // chk_clk_freq
    
@@ -513,6 +513,18 @@ end
      `SLOT_MACRO_FUNC(chk_prot_err_stat());
    endfunction // chk_prot_err_stat
 
+   //=================================================
+   //
+   //   chk_clk_err_cnt
+   //
+   //   Description: Check for protocol checker violations
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_clk_err_cnt(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(chk_clk_err_cnt());
+   endfunction // chk_clk_err_cnt
+   
    //=================================================
    //
    //   get_global_counter_0
