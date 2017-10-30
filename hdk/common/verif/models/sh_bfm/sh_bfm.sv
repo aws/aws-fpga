@@ -223,11 +223,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(32),
     .C_PC_EXMON_WIDTH(0),
 
-    .C_PC_AW_MAXWAITS(10),
-    .C_PC_AR_MAXWAITS(10),
-    .C_PC_W_MAXWAITS(10),
-    .C_PC_R_MAXWAITS(10),
-    .C_PC_B_MAXWAITS(10),
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
 
     .C_PC_MESSAGE_LEVEL(2),
     .C_PC_SUPPORTS_NARROW_BURST(1),
@@ -309,11 +309,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(32),
     .C_PC_EXMON_WIDTH(0),
 
-    .C_PC_AW_MAXWAITS(10),
-    .C_PC_AR_MAXWAITS(10),
-    .C_PC_W_MAXWAITS(10),
-    .C_PC_R_MAXWAITS(10),
-    .C_PC_B_MAXWAITS(10),
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(1),
@@ -395,11 +395,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    .C_PC_AW_MAXWAITS(10),
-    .C_PC_AR_MAXWAITS(10),
-    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(10),
-    .C_PC_B_MAXWAITS(10),
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -481,11 +481,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    .C_PC_AW_MAXWAITS(10),
-    .C_PC_AR_MAXWAITS(10),
-    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(10),
-    .C_PC_B_MAXWAITS(10),
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -567,11 +567,11 @@ module sh_bfm #(
     .C_PC_MAXWBURSTS(8),
     .C_PC_EXMON_WIDTH(0),
 
-    .C_PC_AW_MAXWAITS(10),
-    .C_PC_AR_MAXWAITS(10),
-    .C_PC_W_MAXWAITS(10),    // These three are don't care because "ready" signals on master behave properly (or are tied)
-    .C_PC_R_MAXWAITS(10),
-    .C_PC_B_MAXWAITS(10),
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
 
     .C_PC_MESSAGE_LEVEL(0),
     .C_PC_SUPPORTS_NARROW_BURST(0),
@@ -1667,7 +1667,7 @@ module sh_bfm #(
    //
    //=================================================
    task nsec_delay(int dly = 10000);
-      #dly;
+      #(dly * 1ns);
    endtask
 
    //=================================================

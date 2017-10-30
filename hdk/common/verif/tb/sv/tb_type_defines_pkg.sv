@@ -12,7 +12,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+`define MAXWAITS 100000
 package tb_type_defines_pkg;
 
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
@@ -27,7 +27,6 @@ package tb_type_defines_pkg;
 //                      clk_extra_c0 clk_extra_c1		
 // Recipe C0 (Default)       300       400		
 // Recipe C1                 150       200		
- 
   virtual class ClockRecipe;
      typedef enum integer {A0=0, A1=1, A2=2} A_RECIPE;
      typedef enum integer {B0=0, B1=1} B_RECIPE;

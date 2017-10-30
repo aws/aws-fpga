@@ -49,7 +49,7 @@ module test_dram_dma();
        tb.poke_ocl(.addr(64'h430), .data(0));
 
        // allow memory to initialize
-       tb.nsec_delay(27000000);
+       tb.nsec_delay(27000);
 
        // issuing flr
        tb.issue_flr();
