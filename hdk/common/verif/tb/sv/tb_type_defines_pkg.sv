@@ -12,7 +12,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+`define MAXWAITS 100000
 package tb_type_defines_pkg;
 
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
