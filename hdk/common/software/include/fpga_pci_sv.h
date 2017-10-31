@@ -14,7 +14,7 @@
  */
 
 #include <stdint.h>
-#include <fpga_common.h>
+#include <hal/fpga_common.h>
 
 /**
  * FPGA_PCI_BARS_MAX:

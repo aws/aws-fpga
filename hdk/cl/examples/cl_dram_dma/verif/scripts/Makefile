@@ -20,6 +20,8 @@ export C_TEST ?= test_null
 export CL_ROOT = $(PWD)/../..
 
 export C_COMMON_DIR = $(HDK_COMMON_DIR)/software/include
+export C_SDK_USR_INC_DIR = $(SDK_DIR)/userspace/include
+export C_SDK_USR_UTILS_DIR = $(SDK_DIR)/userspace/utils
 export C_INC_DIR  = $(CL_ROOT)/software/include
 export C_SRC_DIR  = $(CL_ROOT)/software/src
 

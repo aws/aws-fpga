@@ -17,8 +17,6 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "macros.h"
-
 #ifdef SV_TEST
    #ifndef VIVADO_SIM
       #include "svdpi.h"
@@ -27,8 +25,9 @@
 #else
    #include <fpga_pci.h>
    #include <fpga_mgmt.h>
-   #include <utils/lcd.h>
 #endif
+
+#include <sh_dpi_tasks.c>
 
 #ifndef SV_TEST
    extern void sv_printf(char *msg);
