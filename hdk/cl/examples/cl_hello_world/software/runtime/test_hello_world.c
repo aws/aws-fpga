@@ -18,9 +18,6 @@
 #include <stdarg.h>
 
 #ifdef SV_TEST
-   #ifndef VIVADO_SIM
-      #include "svdpi.h"
-   #endif
    #include "fpga_pci_sv.h"
 #else
    #include <fpga_pci.h>
@@ -28,16 +25,6 @@
 #endif
 
 #include <sh_dpi_tasks.c>
-
-#ifndef SV_TEST
-   extern void sv_printf(char *msg);
-   extern void sv_map_host_memory(uint8_t *memory);
-   extern void sv_pause(uint32_t x);
-#endif
-
-
-#define LOW_32b(a)  ((uint32_t)((uint64_t)(a) & 0xffffffff))
-#define HIGH_32b(a) ((uint32_t)(((uint64_t)(a)) >> 32L))
 
 /* Constants determined by the CL */
 /* a set of register offsets; this CL has only one */
