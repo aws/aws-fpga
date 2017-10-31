@@ -13,6 +13,9 @@
  * permissions and limitations under the License.
  */
 
+/*
+ * This file is a SV wrapper header file for fpga_pci.h. 
+ */
 #include <stdint.h>
 #include <hal/fpga_common.h>
 
