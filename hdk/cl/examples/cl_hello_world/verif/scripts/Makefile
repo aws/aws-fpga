@@ -18,12 +18,21 @@ export TEST ?= test_null
 export C_TEST ?= test_null
 
 export CL_ROOT = $(PWD)/../..
+export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
 
-export C_INC_DIR  = $(CL_ROOT)/software/verif_rtl/include
-export C_SRC_DIR  = $(CL_ROOT)/software/verif_rtl/src
+export C_COMMON_DIR = $(HDK_COMMON_DIR)/software/include
+export C_SDK_USR_INC_DIR = $(SDK_DIR)/userspace/include
+export C_SDK_USR_UTILS_DIR = $(SDK_DIR)/userspace/utils
+export C_INC_DIR  = $(CL_ROOT)/software/runtime
+export C_SRC_DIR  = $(CL_ROOT)/software/runtime
 
 export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
-export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+
+ifeq ($(C_TEST),test_null)
+  export C_TEST_NAME = $(HDK_COMMON_DIR)/software/src/$(C_TEST).c
+else
+  export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+endif
 
 export SIM_ROOT = $(CL_ROOT)/verif/sim
 
@@ -43,7 +52,11 @@ export SH_SH_DIR   = $(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim
 SV_TEST_LIST = test_hello_world
 C_TEST_LIST  = test_hello_world.c
 
-all:	make_sim_dir compile run
+ifeq ($(XCHK), 1)
+  all:	make_sim_dir compile_chk run
+else
+  all:	make_sim_dir compile run
+endif
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.common.inc
 

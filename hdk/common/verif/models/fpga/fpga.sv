@@ -351,7 +351,7 @@ module fpga(
 
    logic               sh_bar1_rready;
 
-   logic [15:0]        cl_sh_irq_req;
+   logic [15:0]        cl_sh_apppf_irq_req;
    logic [15:0]        sh_cl_apppf_irq_ack;
 
    sh_bfm sh(
