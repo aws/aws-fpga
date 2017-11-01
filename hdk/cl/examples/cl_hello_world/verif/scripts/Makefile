@@ -26,7 +26,12 @@ export C_INC_DIR  = $(CL_ROOT)/software/runtime
 export C_SRC_DIR  = $(CL_ROOT)/software/runtime
 
 export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
-export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+
+ifeq ($(C_TEST),test_null)
+  export C_TEST_NAME = $(HDK_COMMON_DIR)/software/src/$(C_TEST).c
+else
+  export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+endif
 
 export SIM_ROOT = $(CL_ROOT)/verif/sim
 

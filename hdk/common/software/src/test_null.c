@@ -12,9 +12,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-// This file is needed for HW tests when running regular simulations.
-// When not running HW/SW co-simulation, the HW tests are looking for a dummy test_main 
-// definition which can be found in this fileis defined here.
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +25,7 @@
 #endif
 #endif
 
-#include "sh_dpi_tasks.h"
+#include "sh_dpi_tasks.c"
 
 void test_main(uint32_t *exit_code) {
 
