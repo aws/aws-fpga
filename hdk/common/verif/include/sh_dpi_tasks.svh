@@ -29,7 +29,9 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task cl_poke;
    export "DPI-C" task sv_int_ack;
    export "DPI-C" task sv_pause;
-
+   export "DPI-C" task sv_fpga_pci_peek;
+   export "DPI-C" task sv_fpga_pci_poke;
+   
    static int h2c_desc_index = 0;
    static int c2h_desc_index = 0;
    
@@ -57,6 +59,14 @@ import tb_type_defines_pkg::*;
       repeat (x) #1us;
    endtask
 
+   task sv_fpga_pci_peek(input int handle, input longint unsigned offset, output int unsigned value);
+      tb.card.fpga.sh.peek(.addr(offset), .data(value), .intf(AxiPort::PORT_OCL));
+   endtask
+   
+   task sv_fpga_pci_poke(input int handle, input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
+   endtask 
+   
    function void hm_put_byte(input longint unsigned addr, byte d);
       if (tb.use_c_host_memory)
          host_memory_putc(addr, d);

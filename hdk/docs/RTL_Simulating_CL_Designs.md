@@ -52,9 +52,8 @@ One fast way to write your own test is to start with an example test from one of
     |-- build
     |-- design
     |-- software
-    |   |--verif_rtl
-    |       |-- include              # C header files for simulations
-    |       `-- src                  # C source files for simulation
+    |   |--runtime
+    |       `-- src                  # C source files and header files for simulation
     `-- verif
         |-- scripts              # Makefiles and filelists
         |-- sim                  # sim results directory
@@ -139,76 +138,94 @@ The AWS Shell Interface specification can be found [here](https://github.com/aws
 
 ## C Tests
 
-As with the SystemVerilog (SV) testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/src sub-directory of CL design root and use the ".c" file extension.
+As with the SystemVerilog (SV) testing, one fast way to write your own test is to start with an example test from one of the examples designs and customize it for your design. All C tests must be placed in the software/runtime sub-directory of CL design root and use the ".c" file extension. HW/SW simulation support is added to simulate the software tests. SV_TEST should be used for any simulation specific code in the software test. SCOPE macro is specific to VCS simulator. Below are the 'C' header and source files for cl_hello_world example.
 
+
+
+## Header files to be included for HW/SW co-simulation
 
 ```
-#include <stdio.h>
-#include <stdint.h>
+test_hello_world.c
 
-#include "sh_dpi_tasks.h"
+For HW/SW simulation the below header files need to be included. 
+SV_TEST macro should be defined in HW makefile to enable HW simulation of test_hello_world.c
 
-#define WR_INSTR_INDEX UINT64_C(0x1c)
-#define WR_ADDR_LOW    UINT64_C(0x20)
-#define WR_ADDR_HIGH   UINT64_C(0x24)
-#define WR_DATA        UINT64_C(0x28)
-#define WR_SIZE        UINT64_C(0x2c)
+fpga_pci_sv.h is the SV wrapper for C functions.
 
-#define RD_INSTR_INDEX UINT64_C(0x3c)
-#define RD_ADDR_LOW    UINT64_C(0x40)
-#define RD_ADDR_HIGH   UINT64_C(0x44)
-#define RD_DATA        UINT64_C(0x48)
-#define RD_SIZE        UINT64_C(0x4c)
+sh_dpi_tasks.c is the C file which has common functions to be used between C and SV.
 
-#define CNTL_REG       UINT64_C(0x08)
+#ifdef SV_TEST
+   #include "fpga_pci_sv.h"
+#else
+   #include <fpga_pci.h>
+   #include <fpga_mgmt.h>
+#endif
 
-#define WR_START_BIT   0x00000001
-#define RD_START_BIT   0x00000002
+#include <sh_dpi_tasks.c>
 
+```
+
+## Code changes to enable HW/SW co-simulation
+Logger will not work for HW simulation, so use the SV_TEST macro to exclude that. pci_vendor_id and pci_device_id are not used for HW simulation as well, so should be excluded.
+
+```
+#ifndef SV_TEST
+const struct logger *logger = &logger_stdout;
+/*
+ * pci_vendor_id and pci_device_id values below are Amazon's and avaliable to use for a given FPGA slot. 
+ * Users may replace these with their own if allocated to them by PCI SIG
+ */
+static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
+static uint16_t pci_device_id = 0xF000; /* PCI Device ID preassigned by Amazon for F1 applications */
+
+/*
+ * check if the corresponding AFI for hello_world is loaded
+ */
+#endif
+```
+
+test_main should be used for HW simulation as shown below.
+
+```
+#ifdef SV_TEST
 void test_main(uint32_t *exit_code) {
-  long long addr;
-  uint8_t *buffer;
-  int j;
+#else
+int main(int argc, char **argv) {  
+#endif
+```
+Also SCOPE should be defined for HW simulation with VCS and QUESTA simulators.
 
-  buffer = (uint8_t *)malloc(1024);
-
-  sv_map_host_memory(buffer);
-
-  log_printf("test_main is running...");
-
-  cl_poke(WR_INSTR_INDEX, 0);
-  cl_poke(WR_ADDR_LOW,   LOW_32b(buffer));
-  cl_poke(WR_ADDR_HIGH, HIGH_32b(buffer));
-  cl_poke(WR_DATA, 0);
-  cl_poke(WR_SIZE, 2);
-
-  cl_poke(RD_INSTR_INDEX, 0);
-  cl_poke(RD_ADDR_LOW,   LOW_32b(buffer));
-  cl_poke(RD_ADDR_HIGH, HIGH_32b(buffer));
-  cl_poke(RD_DATA, 0);
-  cl_poke(RD_SIZE, 2);
-
-  cl_poke(CNTL_REG, WR_START_BIT | RD_START_BIT);      // start read & write
-
-  sv_pause(2);                                            // wait 2us
-
-  // for fun print out the incrementing pattern
-  // written by the CL
-  for (j=0; j<64; j++)
-    printf("buffer[%d] = %0x\n", j, buffer[j]);
-
-  log_printf("test_main is done.");
-
-  *exit_code = 0;
-}
+```
+    //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
+    #ifdef SCOPE
+      svScope scope;
+      scope = svGetScopeFromName("tb");
+      svSetScope(scope);
+    #endif 
+    
 ```
 
+Checking for AFI ready is not required for HW/simulation as in simulation the hardware is directly accessed.
+
+```
+#ifndef SV_TEST 
+    rc = check_afi_ready(slot_id);
+#endif
+```
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
     $ cd verif/scripts
     $ make C_TEST={your_test_name} # compile and run using XSIM (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
+    
+    $ cd verif/scripts
+    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
+    $ cd ../sim/{your_test_name} # to view the test log files
 
+    $ cd verif/scripts
+    $ make C_TEST={your_test_name} QUESTA=1 # compile and run using QUESTA (NOTE: Do Not include .c)
+    $ cd ../sim/{your_test_name} # to view the test log files
+    
 ## Accessing Host Memory During Simulation
 Your design may share data between host memory and logic within the CL. To verify your CL is accessing host memory, the test bench includes two types of host memory: SV and C domain host memory. If you are are only using SV to verify your CL, then use SV domain host memory. An associative array represents host memory, where the address is the key to locate a 32-bit data value.
 
