@@ -52,8 +52,7 @@ One fast way to write your own test is to start with an example test from one of
     |-- build
     |-- design
     |-- software
-    |   |--runtime
-    |       `-- src                  # C source files and header files for simulation
+    |   |--runtime               # C source files and header files for simulation
     `-- verif
         |-- scripts              # Makefiles and filelists
         |-- sim                  # sim results directory
@@ -145,7 +144,7 @@ As with the SystemVerilog (SV) testing, one fast way to write your own test is t
 ## Header files to be included for HW/SW co-simulation
 
 ```
-test_hello_world.c
+[test_hello_world.c](../cl/examples/cl_hello_world/software/runtime/test_hello_world.c)
 
 For HW/SW simulation the below header files need to be included. 
 SV_TEST macro should be defined in HW makefile to enable HW simulation of test_hello_world.c
