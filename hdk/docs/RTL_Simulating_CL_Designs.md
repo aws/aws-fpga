@@ -143,9 +143,9 @@ As with the SystemVerilog (SV) testing, one fast way to write your own test is t
 
 ## Header files to be included for HW/SW co-simulation
 
-```
 [test_hello_world.c](../cl/examples/cl_hello_world/software/runtime/test_hello_world.c)
 
+```
 For HW/SW simulation the below header files need to be included. 
 SV_TEST macro should be defined in HW makefile to enable HW simulation of test_hello_world.c
 
@@ -160,7 +160,7 @@ sh_dpi_tasks.c is the C file which has common functions to be used between C and
    #include <fpga_mgmt.h>
 #endif
 
-#include <sh_dpi_tasks.c>
+#include <sh_dpi_tasks.h>
 
 ```
 
@@ -181,6 +181,13 @@ static uint16_t pci_device_id = 0xF000; /* PCI Device ID preassigned by Amazon f
  * check if the corresponding AFI for hello_world is loaded
  */
 #endif
+```
+
+Use cosim_printf function instead of printf
+
+```
+cosim_printf("===== Starting with peek_poke_example =====\n");
+    
 ```
 
 test_main should be used for HW simulation as shown below.
@@ -211,6 +218,22 @@ Checking for AFI ready is not required for HW/simulation as in simulation the ha
     rc = check_afi_ready(slot_id);
 #endif
 ```
+Test exit should be codes as below for HW/SW co-simulation.
+
+```
+#ifndef SV_TEST  
+    return rc;
+   
+out:
+    return 1;
+#else
+
+out:
+   *exit_code = 0;
+#endif
+
+```
+
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
     $ cd verif/scripts

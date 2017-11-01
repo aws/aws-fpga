@@ -24,7 +24,7 @@
    #include <fpga_mgmt.h>
 #endif
 
-#include <sh_dpi_tasks.c>
+#include <utils/sh_dpi_tasks.h>
 
 /* Constants determined by the CL */
 /* a set of register offsets; this CL has only one */

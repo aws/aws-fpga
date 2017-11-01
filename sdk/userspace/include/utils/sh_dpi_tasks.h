@@ -16,6 +16,11 @@
 #ifndef SH_DPI_TASKS
 #define SH_DPI_TASKS
 
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdarg.h>
+
 #ifdef SV_TEST
    #ifndef VIVADO_SIM
       #include "svdpi.h"

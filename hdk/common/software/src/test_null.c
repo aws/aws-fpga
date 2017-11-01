@@ -25,7 +25,7 @@
 #endif
 #endif
 
-#include "sh_dpi_tasks.c"
+#include <utils/sh_dpi_tasks.h>
 
 void test_main(uint32_t *exit_code) {
 
