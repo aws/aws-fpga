@@ -156,6 +156,8 @@ module sh_bfm #(
 
    bit           debug;
 
+   logic         chk_clk_freq = 1'b0;
+   
    typedef struct {
       logic [63:0] buffer;
       logic [27:0] len;
@@ -185,6 +187,26 @@ module sh_bfm #(
    real EXTRA_C0_DLY = 1.66ns;
    real EXTRA_C1_DLY = 1.25ns;
 
+   real main_rising_edge  ;
+   real core_rising_edge     ;
+   real extra_a1_rising_edge ;
+   real extra_a2_rising_edge ;
+   real extra_a3_rising_edge ;
+   real extra_b0_rising_edge ;
+   real extra_b1_rising_edge ;
+   real extra_c0_rising_edge ;
+   real extra_c1_rising_edge ;
+
+   real main_clk_period  ;
+   real core_clk_period     ;
+   real extra_a1_clk_period ;
+   real extra_a2_clk_period ;
+   real extra_a3_clk_period ;
+   real extra_b0_clk_period ;
+   real extra_b1_clk_period ;
+   real extra_c0_clk_period ;
+   real extra_c1_clk_period ;
+   
    logic [97 - 1:0]    pcis_pc_status;
    logic               pcis_pc_asserted;
    logic [97 - 1:0]    pcim_pc_status;
@@ -197,6 +219,7 @@ module sh_bfm #(
    logic               bar1_pc_asserted;
 
    int   prot_err_count;
+   int   clk_err_count;
    int   prot_x_count;
    int   counter;
 
@@ -1547,7 +1570,132 @@ module sh_bfm #(
                          .axil_rresp(bar1_sh_rresp),
                          .axil_rready(sh_bar1_rready));
 
+   
+   // Check core clock frequency when chk_clk_freq is set 
+   always @(posedge clk_core)
+    begin
+       if (chk_clk_freq) begin 
+         core_rising_edge = $time;
+         @(posedge clk_core)
+            core_clk_period = $time - core_rising_edge;
+         if (core_clk_period != CORE_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - core clk frequency check failed. Expected %x Actual %x", core_clk_period, CORE_DLY);
+         end
+       end
+    end
 
+   // Check main clock frequency when chk_clk_freq is set 
+   always @(posedge clk_main_a0)
+    begin
+       if (chk_clk_freq) begin 
+          main_rising_edge = $time;
+          @(posedge clk_main_a0)
+             main_clk_period = $time - main_rising_edge;
+          if (main_clk_period != MAIN_A0_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - main a0 clk frequency check failed. Expected %x Actual %x", main_clk_period, MAIN_A0_DLY);
+         end
+       end
+    end
+
+   // Check extra a1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a1)
+   begin
+      if (chk_clk_freq) begin  
+         extra_a1_rising_edge = $time;
+         @(posedge clk_extra_a1)
+            extra_a1_clk_period = $time - extra_a1_rising_edge;
+         if (extra_a1_clk_period != EXTRA_A1_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - extra a1 clk frequency check failed. Expected %x Actual %x", extra_a1_clk_period, EXTRA_A1_DLY);
+         end
+       end 
+    end
+
+   // Check extra a2 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a2)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a2_rising_edge = $time;
+          @(posedge clk_extra_a2)
+             extra_a2_clk_period = $time - extra_a2_rising_edge;
+          if (extra_a2_clk_period != EXTRA_A2_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra a2 clk frequency check failed. Expected %x Actual %x", extra_a2_clk_period, EXTRA_A2_DLY);
+          end
+       end
+    end
+
+   // Check extra a3 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a3)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a3_rising_edge = $time;
+          @(posedge clk_extra_a3)
+             extra_a3_clk_period = $time - extra_a3_rising_edge;
+          if (extra_a3_clk_period != EXTRA_A3_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra a3 clk frequency check failed. Expected %x Actual %x", extra_a3_clk_period, EXTRA_A3_DLY);
+          end
+       end
+    end
+   
+   // Check extra b0 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_b0)
+    begin
+      if (chk_clk_freq) begin  
+        extra_b0_rising_edge = $time;
+        @(posedge clk_extra_b0)
+           extra_b0_clk_period = $time - extra_b0_rising_edge;
+        if (extra_b0_clk_period != EXTRA_B0_DLY * 2) begin
+           clk_err_count++;
+           $display("Error - extra b0 clk frequency check failed. Expected %x Actual %x", extra_b0_clk_period, EXTRA_B0_DLY);
+        end
+      end
+    end
+
+   // Check extra b1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_b1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_b1_rising_edge = $time;
+          @(posedge clk_extra_b1)
+             extra_b1_clk_period = $time - extra_b1_rising_edge;
+          if (extra_b1_clk_period != EXTRA_B1_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra b1 clk frequency check failed. Expected %x Actual %x", extra_b1_clk_period, EXTRA_B1_DLY);
+          end
+       end
+    end
+
+   // Check extra c0 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_c0)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c0_rising_edge = $time;
+          @(posedge clk_extra_c0)
+             extra_c0_clk_period = $time - extra_c0_rising_edge;
+          if (extra_c0_clk_period != EXTRA_C0_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra c0 clk frequency check failed. Expected %x Actual %x", extra_c0_clk_period, EXTRA_C0_DLY);
+          end
+       end
+    end
+
+   // Check extra c1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_c1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c1_rising_edge = $time;
+          @(posedge clk_extra_c1)
+             extra_c1_clk_period = $time - extra_c1_rising_edge;
+          if (extra_c1_clk_period != (EXTRA_C1_DLY * 2)) begin
+             clk_err_count++;
+             $display("Error - extra c1 clk frequency check failed. Expected %x Actual %x", extra_c1_clk_period, EXTRA_C1_DLY);
+          end
+       end
+    end
 
    
    //=================================================
@@ -1583,6 +1731,27 @@ module sh_bfm #(
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
+         ClockRecipe::A3: begin
+            MAIN_A0_DLY  = 8ns;
+            CORE_DLY     = 8ns;
+            EXTRA_A1_DLY = 16ns;
+            EXTRA_A2_DLY = 2ns;
+            EXTRA_A3_DLY = 4ns;
+         end
+         ClockRecipe::A4: begin
+            MAIN_A0_DLY  = 2.22ns;
+            CORE_DLY     = 2.22ns;
+            EXTRA_A1_DLY = 4.44ns;
+            EXTRA_A2_DLY = 1.48ns;
+            EXTRA_A3_DLY = 1.11ns;
+         end
+         ClockRecipe::A5: begin
+            MAIN_A0_DLY  = 2.5ns;
+            CORE_DLY     = 2.5ns;
+            EXTRA_A1_DLY = 5ns;
+            EXTRA_A2_DLY = 1.66ns;
+            EXTRA_A3_DLY = 1.25ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1597,6 +1766,26 @@ module sh_bfm #(
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
          end
+         ClockRecipe::B2: begin
+            EXTRA_B0_DLY = 1.11ns;
+            EXTRA_B1_DLY = 2.22ns;
+         end
+         ClockRecipe::B3: begin
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 8ns;
+         end
+         ClockRecipe::B4: begin
+            EXTRA_B0_DLY = 1.66ns;
+            EXTRA_B1_DLY = 6.66ns;
+         end
+         ClockRecipe::B5: begin
+            EXTRA_B0_DLY = 1.25ns;
+            EXTRA_B1_DLY = 5ns;
+         end
+         ClockRecipe::B6: begin
+            EXTRA_B0_DLY = 1.4ns;
+            EXTRA_B1_DLY = 5.7ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1610,6 +1799,14 @@ module sh_bfm #(
          ClockRecipe::C1: begin
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
+         end
+         ClockRecipe::C2: begin
+            EXTRA_C0_DLY = 6.66ns;
+            EXTRA_C1_DLY = 5ns;
+         end
+         ClockRecipe::C3: begin
+            EXTRA_C0_DLY = 2.5ns;
+            EXTRA_C1_DLY = 1.87ns;
          end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
@@ -1636,6 +1833,19 @@ module sh_bfm #(
 
    //=================================================
    //
+   // set_chk_clk_freq
+   //
+   //   Description: Starts checking clock frequency
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_chk_clk_freq(logic chk_freq = 1'b1);
+      $display("[%t] : Start checking clock frequency...", $realtime);
+      chk_clk_freq = chk_freq;
+   endfunction // set_chk_clk_freq
+   
+   //=================================================
+   //
    // chk_prot_err_stat
    //
    //   Description: Checks if there is a protocol checker violation
@@ -1657,6 +1867,25 @@ module sh_bfm #(
       else
          return 1'b0;
    endfunction // chk_prot_err_stat
+
+   //=================================================
+   //
+   // chk_clk_err_cnt
+   //
+   //   Description: Checks if there are clock errors
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_clk_err_cnt();
+      $display("[%t] : Checking clock error status...", $realtime);
+      if (clk_err_count > 0) begin
+         $display("[%t] : *** Clock Frequency Errors Detected. Refer to log file for details about each specific error ***", $realtime);
+         return 1'b1;
+      end
+      else begin
+         return 1'b0;
+      end
+   endfunction
    
    //=================================================
    //
@@ -1667,7 +1896,7 @@ module sh_bfm #(
    //
    //=================================================
    task nsec_delay(int dly = 10000);
-      #(dly * 1ns);
+      # (dly * 1ns);
    endtask
 
    //=================================================
@@ -2050,6 +2279,10 @@ module sh_bfm #(
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
       return c2h_dma_done[chan];
    endfunction // is_dma_to_buffer_done
+
+   function bit is_ddr_ready();  // 1 = done
+      return ddr_is_ready;
+   endfunction // is_ddr_ready
    
    //=================================================
    //
@@ -2277,35 +2510,35 @@ module sh_bfm #(
       end // else begin
    end // always
 
-  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
-     case (ddr_idx)
-       0: begin
-          sh_ddr_stat_wr0    = 1;
-          sh_ddr_stat_addr0  = addr;
-          sh_ddr_stat_wdata0 = data;
-          sh_ddr_stat_rd0    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr0    = 0;
-       end
-       1: begin
-          sh_ddr_stat_wr1    = 1;
-          sh_ddr_stat_addr1  = addr;
-          sh_ddr_stat_wdata1 = data;
-          sh_ddr_stat_rd1    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr1    = 0;
-       end
-       2: begin
-          sh_ddr_stat_wr2    = 1;
-          sh_ddr_stat_addr2  = addr;
-          sh_ddr_stat_wdata2 = data;
-          sh_ddr_stat_rd2    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr2    = 0;
-       end
+   task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+      case (ddr_idx)
+         0: begin
+            sh_ddr_stat_wr0    = 1;
+            sh_ddr_stat_addr0  = addr;
+            sh_ddr_stat_wdata0 = data;
+            sh_ddr_stat_rd0    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr0    = 0;
+         end
+         1: begin
+            sh_ddr_stat_wr1    = 1;
+            sh_ddr_stat_addr1  = addr;
+            sh_ddr_stat_wdata1 = data;
+            sh_ddr_stat_rd1    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr1    = 0;
+         end
+         2: begin
+            sh_ddr_stat_wr2    = 1;
+            sh_ddr_stat_addr2  = addr;
+            sh_ddr_stat_wdata2 = data;
+            sh_ddr_stat_rd2    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr2    = 0;
+         end
      endcase // case (ddr_idx)
      
   endtask

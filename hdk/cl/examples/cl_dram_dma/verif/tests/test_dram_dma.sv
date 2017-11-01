@@ -26,7 +26,8 @@ module test_dram_dma();
     int            len1 = 128;
     int            len2 = 6000;
     int            len3 = 300;
-
+    logic          ddr_ready;
+   
     initial begin
 
        logic [63:0] host_memory_buffer_address;
@@ -50,10 +51,7 @@ module test_dram_dma();
 
        // allow memory to initialize
        tb.nsec_delay(27000);
-
-       // issuing flr
-       tb.issue_flr();
-
+       
        $display("[%t] : Initializing buffers", $realtime);
 
        host_memory_buffer_address = 64'h0;
@@ -68,6 +66,7 @@ module test_dram_dma();
        end
        
        host_memory_buffer_address = 64'h0_0000_3000;
+
        tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) );  // move buffer to DDR 1
 
        for (int i = 0 ; i < len1 ; i++) begin
