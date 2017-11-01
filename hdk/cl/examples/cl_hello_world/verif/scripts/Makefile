@@ -18,6 +18,7 @@ export TEST ?= test_null
 export C_TEST ?= test_null
 
 export CL_ROOT = $(PWD)/../..
+export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
 
 export C_COMMON_DIR = $(HDK_COMMON_DIR)/software/include
 export C_SDK_USR_INC_DIR = $(SDK_DIR)/userspace/include
