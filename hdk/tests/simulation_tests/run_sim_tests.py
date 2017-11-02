@@ -83,6 +83,14 @@ class SimulationTestCases(unittest.TestCase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    def test_cl_dram_dma__clk_recipe__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_clk_recipe'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
     def test_cl_dram_dma__int__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -103,6 +111,14 @@ class SimulationTestCases(unittest.TestCase):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_pcis_axsize'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__ddr_peek_poke__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_ddr_peek_poke'
         test_type = 'sv'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)

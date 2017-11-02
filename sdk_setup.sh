@@ -17,6 +17,11 @@
 
 export SDK_DIR=${SDK_DIR:=$(pwd)/sdk}
 
+# Update PYTHONPATH with libraries used for unit testing
+python_lib=$AWS_FPGA_REPO_DIR/shared/lib
+export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
+PYTHONPATH=$python_lib:$PYTHONPATH
+
 echo "Done setting environment variables."
 
 # 
