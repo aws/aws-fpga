@@ -50,8 +50,7 @@ A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, the
 A:
 1. Raw xclbin (.xcp file) from xocc is not usable
 1. Directly using the .xcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary
-1. See [Instructions on how to create AFI and subsequent execution process](../README.md#create-an-amazon-fpga-image-afi-for-your-kernel)
-
+1. See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
 
 # Additional Resources
 

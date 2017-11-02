@@ -15,7 +15,7 @@ The VLED is set based upon writing 0xAAAA into the AXI GPIO (0x0) slave register
 
 The PCIS Interfaces writes ASCII data into the AXI BRAM memory space and reads back from these address to print out “Hello World!” in simulation or on F1.
 
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
+Make sure the [HLx Setup Instructions](../../../docs/IPI_GUI_Vivado_Setup.md) are followed and executed.
 
 <a name="hlx"></a>
 ## CL Example

@@ -122,7 +122,8 @@ Use [describe-fpga-images](./hdk/docs/describe_fpga_images.md) with the [--regio
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
-No. There is no mechanism for loading a bitstream directly onto the FPGAs of an F1 instance. All Custom Logic is loaded onto the FPGA by calling `$ fpga-local-load-image` tool at [AWS FPGA SDK](https://github.com/aws/aws-fpga/sdk). 
+No. There is no mechanism for loading a bitstream directly onto the FPGAs of an F1 instance.
+All Custom Logic is loaded onto the FPGA by calling the `fpga-local-load-image` tool found in [AWS FPGA SDK](./sdk).
 
 Developers create an AFI by creating a Vivado Design Checkpoint (DCP) and submitting that DCP to AWS using `aws ec2 create-fpga-image` API. AWS creates the AFI and bitstream from that DCP and returns a unique AFI ID referencing that AFI.
   
@@ -194,7 +195,7 @@ Yes, examples are in the [examples directory](./hdk/cl/examples):
 
 The [cl_hello_world example](./hdk/cl/examples/cl_hello_world) is an RTL/Verilog simple example to build and test the Custom Logic development process, it does not use any of the external interfaces of the FPGA except the PCIe to "peek" and "poke" registers in the memory space of the CL inside the FPGA.
 
-The [cl_dram_dma example](.hdk/cl/examples/cl_dram_dma) provides expanded features that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
+The [cl_dram_dma example](./hdk/cl/examples/cl_dram_dma) provides expanded features that demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality.
 
 
 **Q: How do I get access to AWS FPGA Developer AMI?**
@@ -344,7 +345,7 @@ Details on the Shell Interface to the FPGA Link IP blocks are provided in the [S
 
 **Q: What clock speed does the FPGA utilize?**
  
-The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the Shell to the Custom Logic (CL) region, please refer to the [Shell Interface Specification](./hdk/docs/AWS_Shell_interface_Specification.md) and the [available clock recipe](./hdk/docs/clock_recipes.csv) for the available clocks and frequency options.
+The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the Shell to the Custom Logic (CL) region, please refer to the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) and the [available clock recipe](./hdk/docs/clock_recipes.csv) for the available clocks and frequency options.
 
 *Note: All the AXI interfaces between Shell and CL are synchronous to `clk_main_a0`, which has a default of 125Mhz using `A0` clock recipe.
 

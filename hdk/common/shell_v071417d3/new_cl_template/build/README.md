@@ -136,7 +136,7 @@ You need to prepare the following information:
 6. Version of the AWS Shell.
 
 **NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.
-If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](./../../../../docs/AWS_Shell_Interface_Specification.md#pcie-ids).*
+If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](./../../../../docs/AWS_Shell_Interface_Specification.md#misc).*
 
 [Refer to step 3 for instructions on how to submit the Design Checkpoint to AWS](./../../../../cl/examples/README.md)
 
