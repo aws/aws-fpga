@@ -53,10 +53,6 @@
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
 #define NUM_POLLS_PER_SCHED		(100)
-#define MAX_NUMBER_OF_EDMA_DEVICE 	(16)
-#define MAX_NUMBER_OF_EDMA_QUEUES 	(4)
-//TODO: move to a mutable and unite across
-#define MAX_NUMBER_OF_USER_INTERRUPTS 	(16)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
 extern struct class* edma_class;

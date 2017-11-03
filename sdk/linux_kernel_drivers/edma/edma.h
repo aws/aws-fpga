@@ -13,6 +13,10 @@
 #define edma_dbg(...)
 #endif
 
+#define MAX_NUMBER_OF_EDMA_DEVICE      (16)
+#define MAX_NUMBER_OF_EDMA_QUEUES      (4)
+#define MAX_NUMBER_OF_USER_INTERRUPTS  (16)
+
 struct edma_queue_handle {
 	void* tx;
 	void* rx;

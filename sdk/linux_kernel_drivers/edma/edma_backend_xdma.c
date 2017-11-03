@@ -28,6 +28,7 @@
 #define XDMA_LIMIT_NUMBER_OF_QUEUES                             (4)
 #define CLASS_NAME                                              "edma"
 
+
 struct class* edma_class;
 
 
@@ -39,7 +40,8 @@ typedef struct {
 }command_t;
 
 typedef struct {
-	void* channel_handle;
+	void*		xdev;
+	int		channel_num;
 	command_t* 	queue;
 	u32		head;
 	u32		tail;
@@ -49,7 +51,8 @@ typedef struct {
 }command_queue_t;
 
 typedef struct {
-	void* channel_handle;
+	void* xdev;
+	int   channel_num;
 	void* buffer;
 	u32 size;
 } c2h_handle_t;
@@ -100,11 +103,12 @@ static int write_worker_function(void *data)
 		__set_current_state(TASK_RUNNING);
 
 		ret = xdma_xfer_submit(
-			command_queue->channel_handle,
-			DMA_TO_DEVICE,
+			command_queue->xdev,
+			command_queue->channel_num,
+			true, /* write==true */
 			queue[command_queue->head].target_addr,
 			&queue[command_queue->head].sgt,
-			true,
+			true, /* dma_mapped==true */
 			XDMA_TIMEOUT_IN_MSEC);
 
 		if(ret < 0) {
@@ -134,9 +138,12 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
 	int ret = 0;
 	struct device *dev = &pdev->dev;
-	xdma_channel_tuple* channel_list = NULL;
+	void* xdev= NULL;
 	int i;
 	struct backend_device* backend_device = NULL;
+	int user_max = MAX_NUMBER_OF_USER_INTERRUPTS;
+	int h2c_channel_max = XDMA_LIMIT_NUMBER_OF_QUEUES;
+	int c2h_channel_max = XDMA_LIMIT_NUMBER_OF_QUEUES;
 	int number_of_xdma_channels = 0;
 	command_queue_t* command_queue = NULL;
 	c2h_handle_t* c2h_handles = NULL;
@@ -158,15 +165,23 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_master(pdev);
 	pci_save_state(pdev);
 
-	number_of_xdma_channels = xdma_device_open(pdev, &channel_list);
-	if(unlikely(number_of_xdma_channels < 0)){
-		ret = number_of_xdma_channels;
+	xdev = xdma_device_open(DRV_MODULE_NAME, pdev, &user_max, &h2c_channel_max, &c2h_channel_max);
+	if(unlikely(xdev == NULL)){
+		ret = -EINVAL;
 		goto done;
 	}
 
-	if(number_of_xdma_channels > XDMA_LIMIT_NUMBER_OF_QUEUES)
-		number_of_xdma_channels = XDMA_LIMIT_NUMBER_OF_QUEUES;
+        BUG_ON(user_max > MAX_NUMBER_OF_USER_INTERRUPTS);
+        BUG_ON(h2c_channel_max > XDMA_LIMIT_NUMBER_OF_QUEUES);
+        BUG_ON(c2h_channel_max > XDMA_LIMIT_NUMBER_OF_QUEUES);
+        BUG_ON(h2c_channel_max != c2h_channel_max);
 
+	if(unlikely(!h2c_channel_max || !c2h_channel_max)){
+		ret = -ENODEV;
+		goto done;
+	}
+
+	number_of_xdma_channels = h2c_channel_max;
 	dev_info(dev, "DMA backend opened %d channels\n", number_of_xdma_channels);
 
 	command_queue = (command_queue_t*)kzalloc(
@@ -186,8 +201,7 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	backend_device->queues = (struct edma_queue_handle*)kzalloc(
-			number_of_xdma_channels
-					* sizeof(struct edma_queue_handle),
+			number_of_xdma_channels * sizeof(struct edma_queue_handle),
 			GFP_KERNEL);
 	if(!backend_device->queues) {
 		ret = -ENOMEM;
@@ -209,14 +223,17 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	for( i = 0; i < number_of_xdma_channels; i++)
 	{
-		command_queue[i].channel_handle = channel_list[i].h2c;
+		command_queue[i].xdev = xdev;
+		command_queue[i].channel_num = i;
 		command_queue[i].queue = (command_t*)kzalloc(
 				edma_queue_depth * sizeof(command_t), GFP_KERNEL);
 
-		c2h_handles[i].channel_handle = channel_list[i].c2h;
+		c2h_handles[i].xdev = xdev;
+		c2h_handles[i].channel_num = i;
 
 		backend_device->queues[i].rx = &(c2h_handles[i]);
 		backend_device->queues[i].tx = &(command_queue[i]);
+		backend_device->backend_device_handle = xdev;
 
 		smp_wmb();
 	}
@@ -282,7 +299,7 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 int edma_backend_register_isr(struct pci_dev *pdev, u32 event_number,
 		irq_handler_t handler, const char* name, void* drv)
 {
-	return xdma_user_isr_register(pdev,BIT(event_number), handler, name, drv);
+	return xdma_user_isr_register(drv,BIT(event_number), handler, pdev);
 }
 
 
@@ -315,7 +332,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 	sg_dma_len(sgl) = size;
 
 	sgt->sgl = sgl;
-	sgt->nents = 1;
+	sgt->nents = sgt->orig_nents = 1;
 
 	command_queue->queue[command_queue->tail].target_addr = target_addr;
 
@@ -386,9 +403,13 @@ int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 t
 	sg_dma_len(&sg) = size;
 
 	sg_table.sgl = &sg;
-	sg_table.nents = 1;
+	sg_table.nents = sg_table.orig_nents = 1;
 
-	size_read = xdma_xfer_submit(c2h_handle->channel_handle, DMA_FROM_DEVICE, target_addr, &sg_table, true, XDMA_TIMEOUT_IN_MSEC);
+	size_read = xdma_xfer_submit(c2h_handle->xdev, c2h_handle->channel_num, 
+				false, /* write==false */
+				target_addr, &sg_table, 
+				true, /* dma_mapped==true */
+				XDMA_TIMEOUT_IN_MSEC);
 	if (size_read < 0) {
 		ret = size_read;
 		if (ret != -ENOMEM && ret != -EIO)
