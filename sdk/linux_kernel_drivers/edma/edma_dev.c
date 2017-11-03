@@ -83,7 +83,9 @@ static int single_transaction_size = 8 * PAGE_SIZE;
 module_param(single_transaction_size, int, 0);
 MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over the DMA. (default=32KB)");
 
-extern int edma_queue_depth;
+int edma_queue_depth = 1024;
+module_param(edma_queue_depth, int, 0);
+MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=1024)");
 
 //TODO: add a callback for the backend to notify fatal error - reset
 

@@ -40,10 +40,6 @@ MODULE_DESCRIPTION("Amazon EDMA driver");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(DRV_MODULE_VERSION);
 
-int edma_queue_depth = 512;
-module_param(edma_queue_depth, int, 0);
-MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=512)");
-
 static int __init edma_init(void)
 {
 
