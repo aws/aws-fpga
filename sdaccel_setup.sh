@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #
 # Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -14,36 +12,38 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
+
+# Script must be sourced from a bash shell or it will not work
+# When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
+# When being run $0 and $_ will be the same.
 script=${BASH_SOURCE[0]}
 if [ $script == $0 ]; then
   echo "ERROR: You must source this script"
   exit 2
 fi
+
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
+current_dir=$(pwd)
 
-# Make sure that AWS_FPGA_REPO_DIR is set to the location of this script.
-if [[ ":$AWS_FPGA_REPO_DIR" == ':' ]]; then
-  debug_msg "AWS_FPGA_REPO_DIR not set so setting to $script_dir"
-  export AWS_FPGA_REPO_DIR=$script_dir
-elif [[ $AWS_FPGA_REPO_DIR != $script_dir ]]; then
-  info_msg "Changing AWS_FPGA_REPO_DIR from $AWS_FPGA_REPO_DIR to $script_dir"
-  export AWS_FPGA_REPO_DIR=$script_dir
-else
-  debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
-fi
+source $script_dir/shared/bin/message_functions.sh
+
+source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
 
 # Source sdk_setup.sh
-source sdk_setup.sh
+info_msg "source sdk_setup.sh"
+if ! source $AWS_FPGA_REPO_DIR/sdk_setup.sh; then
+    return 1
+fi
 
 if [ -z "$SDK_DIR" ]; then
-    echo "Error: SDK_DIR environment variable is not set.  Please use 'source sdk_setup.sh' from the aws-fpga directory."
-    exit 1
+    err_msg "SDK_DIR environment variable is not set.  Please use 'source sdk_setup.sh' from the aws-fpga directory."
+    return 1
 fi
 
 # Setup Location of SDACCEL_DIR 
-export SDACCEL_DIR=$(pwd)/SDAccel
+export SDACCEL_DIR=$AWS_FPGA_REPO_DIR/SDAccel
 
 # Update Xilinx SDAccel Examples from GitHub 
 echo "Updating Xilinx SDAccel Examples" 
@@ -51,25 +51,6 @@ git submodule update --init -- SDAccel/examples/xilinx
 
 debug=0
 DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
-
-function info_msg {
-  echo -e "AWS FPGA-SDK-INFO: $1"
-}
-
-function debug_msg {
-  if [[ $debug == 0 ]]; then
-    return
-  fi
-  echo -e "AWS FPGA-SDK-DEBUG: $1"
-}
-
-function err_msg {
-  echo -e >&2 "AWS FPGA-SDK-ERROR: $1"
-}
-
-function warn_msg {
-  echo -e "AWS FPGA-SDK-WARNING: $1"
-}
 
 function usage {
   echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-h|-help]"
@@ -93,14 +74,14 @@ function help {
 function check_set_xilinx_sdx {
   if [[ ":$XILINX_SDX" == ':' ]]; then
     debug_msg "XILINX_SDX is not set"
-    which sdx 
+    which sdx
     RET=$?
     if [ $RET != 0 ]; then
       debug_msg "sdx not found in path."
       err_msg "XILINX_SDX variable not set and sdx not in the path" 
       err_msg "Please set XILINX_SDX variable to point to your location of your Xilinx installation or add location of sdx exectuable to your PATH variable"
-      exit $RET
-    else 
+      return $RET
+    else
       export XILINX_SDX=`which sdx | sed 's:/bin/sdx::'`
       info_msg "Setting XILINX_SDX to $XILINX_SDX"
     fi
@@ -127,7 +108,7 @@ function check_internet {
   if [ $RET != 0 ]; then
       err_msg "curl cannot connect to the internet using please check your internet connection or proxy settings" 
       err_msg "To check your connection run:   curl --silent --head -m 30 http://www.amazon.com "  
-      exit $RET
+      return $RET
   else 
       info_msg "Internet Access OK"
   fi  
@@ -144,7 +125,7 @@ function check_icd {
     if [ $RET != 0 ]; then
       err_msg "/etc/OpenCL/vendors/xilinx.icd does not exist and cannot be created, sudo permissions needed to update it." 
       err_msg "Run the following with sudo permissions: sudo sh -c \"echo libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd\" "  
-      exit $RET
+      return $RET
     else
       echo "Done with ICD installation"
     fi
@@ -173,17 +154,24 @@ done
 
 
 # Check XILINX_SDX is set 
-check_set_xilinx_sdx
+if ! check_set_xilinx_sdx; then
+    return 1
+fi
 
 # Check if internet connection is available
-check_internet
+if ! check_internet; then
+    return 1
+fi
 
 # Check ICD is installed
-check_icd
+if ! check_icd; then
+    return 1
+fi
 
 # Check correct packages are installed 
-check_install_packages
-
+if ! check_install_packages; then
+    return 1
+fi
 
 # Download correct DSA
 #TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
@@ -238,8 +226,18 @@ fi
 info_msg "SDK DSA is up-to-date"
 
 # Start of runtime xdma driver install 
-info_msg "Installing SDAccel runtime..."
 cd $SDACCEL_DIR
-make ec2=1 debug=1
-sudo make ec2=1 debug=1 INSTALL_ROOT=/opt/Xilinx/SDx/2017.1.rte SDK_DIR=$SDK_DIR DSA=$DSA XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR install
-cd $script_dir
+info_msg "Building SDAccel runtime"
+if ! make ec2=1 debug=1 ; then
+    err_msg "Build of SDAccel runtime FAILED"
+    return 1
+fi
+info_msg "Installing SDAccel runtime"
+if ! sudo make ec2=1 debug=1 INSTALL_ROOT=/opt/Xilinx/SDx/2017.1.rte SDK_DIR=$SDK_DIR DSA=$DSA XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR install ; then
+    err_msg "Install of SDAccel runtime FAILED"
+    return 1
+fi
+info_msg "SDAccel runtime installed"
+
+cd $current_dir
+info_msg "$script_name PASSED"

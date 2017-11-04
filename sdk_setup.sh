@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #
 # Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,7 +13,25 @@
 # permissions and limitations under the License.
 #
 
-export SDK_DIR=${SDK_DIR:=$(pwd)/sdk}
+# Script must be sourced from a bash shell or it will not work
+# When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
+# When being run $0 and $_ will be the same.
+script=${BASH_SOURCE[0]}
+if [ $script == $0 ]; then
+  echo "ERROR: You must source this script"
+  exit 2
+fi
+
+full_script=$(readlink -f $script)
+script_name=$(basename $full_script)
+script_dir=$(dirname $full_script)
+current_dir=$(pwd)
+
+source $script_dir/shared/bin/message_functions.sh
+
+source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
+
+export SDK_DIR=${SDK_DIR:=$script_dir/sdk}
 
 # Update PYTHONPATH with libraries used for unit testing
 python_lib=$AWS_FPGA_REPO_DIR/shared/lib
@@ -28,11 +44,11 @@ echo "Done setting environment variables."
 # Execute sdk_install.sh inside a subshell so the user's current
 # shell does not exit on errors from the install.
 # 
-bash $SDK_DIR/sdk_install.sh
-RET=$?
-
-if [ $RET != 0 ]; then
-    echo "Error: AWS SDK install was unsuccessful, sdk_install.sh returned $RET" 
-else
-    echo "Done with AWS SDK setup."
+cd $script_dir
+if ! bash $SDK_DIR/sdk_install.sh; then
+    echo "Error: AWS SDK install was unsuccessful, sdk_install.sh returned $?"
+    return 1
 fi
+
+cd $current_dir
+info_msg "$script_name PASSED"
