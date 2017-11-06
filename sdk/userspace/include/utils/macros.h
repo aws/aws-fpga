@@ -74,17 +74,3 @@ __extension__({                  \
 		*(a) = *(b); \
 		*(b) = _tmp; \
 	} while (0)
-
-#define cosim_printf(format, ...) \
-        do { \                                       
-                static char sv_msg_buffer[256]; \
-                va_list args; \      
-                va_start(args, format); \
-                vsprintf(sv_msg_buffer, format, args); \
-                #ifdef SV_TEST \
-                    sv_printf(sv_msg_buffer); \
-                #else \
-                    printf(format, __VA_ARGS__); \
-                #endif \
-                va_end(args); \
-             }
