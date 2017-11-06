@@ -45,13 +45,13 @@ module_param(poll_mode, uint, 0644);
 MODULE_PARM_DESC(poll_mode, "Set 1 for hw polling, default is 0 (interrupts)");
 
 static unsigned int interrupt_mode;
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 module_param(interrupt_mode, uint, 0644);
 MODULE_PARM_DESC(interrupt_mode, "0 - MSI-x , 1 - MSI, 2 - Legacy");
 #endif
 
 static unsigned int enable_credit_mp;
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 module_param(enable_credit_mp, uint, 0644);
 MODULE_PARM_DESC(enable_credit_mp, "Set 1 to enable creidt feature, default is 0 (no credit control)");
 #endif
@@ -284,7 +284,7 @@ void enable_perf(struct xdma_engine *engine)
 }
 EXPORT_SYMBOL_GPL(enable_perf);
 
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 void get_perf_stats(struct xdma_engine *engine)
 {
 	u32 hi;
@@ -814,7 +814,7 @@ transfer_del:
 	return transfer;
 }
 
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 static void engine_service_perf(struct xdma_engine *engine, u32 desc_completed)
 {
 	BUG_ON(!engine);
@@ -1105,7 +1105,7 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 			(int)desc_count,
 			(int)desc_count - engine->desc_dequeued);
 
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 		engine_service_perf(engine, desc_count);
 #endif
 	}
@@ -3130,7 +3130,7 @@ unmap_sgl:
 }
 EXPORT_SYMBOL_GPL(xdma_xfer_submit);
 
-#if defined(INTERNAL_TESTING)
+#ifdef INTERNAL_TESTING
 int xdma_performance_submit(struct xdma_dev *xdev, struct xdma_engine *engine)
 {
 	u8 *buffer_virt;
