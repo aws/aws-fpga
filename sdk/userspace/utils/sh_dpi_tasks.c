@@ -29,12 +29,18 @@ void cosim_printf(const char *format, ...)
 void int_handler(uint32_t int_num)
 {
 // Vivado does not support svGetScopeFromName
-#ifndef VIVADO_SIM
-  svScope scope;
-  scope = svGetScopeFromName("tb");
-  svSetScope(scope);
+#ifdef SV_TEST
+  #ifndef VIVADO_SIM
+    svScope scope;
+    scope = svGetScopeFromName("tb");
+    svSetScope(scope);
+  #endif
 #endif
 
   cosim_printf("Received interrupt %2d", int_num);
+
+#ifdef SV_TEST
   sv_int_ack(int_num);
+#endif
+
 }

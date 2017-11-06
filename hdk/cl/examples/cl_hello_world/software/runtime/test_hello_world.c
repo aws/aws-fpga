@@ -49,6 +49,12 @@ static uint16_t pci_device_id = 0xF000; /* PCI Device ID preassigned by Amazon f
 /*
  * check if the corresponding AFI for hello_world is loaded
  */
+int check_afi_ready(int slot_id);
+/*
+ * An example to attach to an arbitrary slot, pf, and bar with register access.
+ */
+int peek_poke_example(int slot_id, int pf_id, int bar_id);
+
 #endif
 
 #ifdef SV_TEST
