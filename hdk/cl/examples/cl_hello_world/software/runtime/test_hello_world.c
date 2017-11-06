@@ -22,6 +22,7 @@
 #else
    #include <fpga_pci.h>
    #include <fpga_mgmt.h>
+   #include <utils/lcd.h>
 #endif
 
 #include <utils/sh_dpi_tasks.h>

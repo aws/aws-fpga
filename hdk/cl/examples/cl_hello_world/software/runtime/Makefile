@@ -26,7 +26,7 @@ LDLIBS = -lfpga_mgmt -lrt -lpthread
 
 SRC = test_hello_world.c 
 OBJ = $(SRC:.c=.o)
-BIN = test_hello_world
+BIN = sh_dpi_tasks test_hello_world
 
 all: $(BIN) check_env
 
