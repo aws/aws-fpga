@@ -299,18 +299,31 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 int edma_backend_register_isr(struct pci_dev *pdev, u32 event_number,
 		irq_handler_t handler, const char* name, void* drv)
 {
-	return xdma_user_isr_register(drv,BIT(event_number), handler, pdev);
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_register(backend_device->backend_device_handle, 
+			BIT(event_number), handler, drv);
 }
 
 
 int edma_backend_enable_isr(struct pci_dev *pdev, u32 event_number)
 {
-	return xdma_user_isr_enable(pdev,BIT(event_number));
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_enable(backend_device->backend_device_handle, BIT(event_number));
 }
 
 int edma_backend_disable_isr(struct pci_dev *pdev, u32 event_number)
 {
-	return xdma_user_isr_disable(pdev,BIT(event_number));
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_disable(backend_device->backend_device_handle, BIT(event_number));
 }
 
 
