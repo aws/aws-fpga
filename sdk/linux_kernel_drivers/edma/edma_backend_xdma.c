@@ -233,12 +233,12 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 		backend_device->queues[i].rx = &(c2h_handles[i]);
 		backend_device->queues[i].tx = &(command_queue[i]);
-		backend_device->backend_device_handle = xdev;
 
 		smp_wmb();
 	}
 
 	backend_device->pdev = pdev;
+	backend_device->backend_device_handle = xdev;
 	backend_device->number_of_queues = number_of_xdma_channels;
 
 	//TODO: consider moving number of events to an API
