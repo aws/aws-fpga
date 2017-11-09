@@ -718,7 +718,7 @@ module sh_bfm #(
    end
    
    logic rst_n_i;
-   logic rst_main_n_i;
+   logic rst_main_n_i = 0;
    logic rst_xtra_n_i;
    
    always @(posedge clk_core)

@@ -657,8 +657,9 @@ module fpga(
              .bar1_sh_rdata(bar1_sh_rdata),
              .bar1_sh_rresp(bar1_sh_rresp),
              
-             .sh_bar1_rready(sh_bar1_rready),
-`ifndef NO_CL_DDR             
+             .sh_bar1_rready(sh_bar1_rready)
+`ifndef NO_CL_DDR
+             ,
              .sh_RST_DIMM_A_N(RST_DIMM_A_N),
              .sh_RST_DIMM_B_N(RST_DIMM_B_N),
              .sh_RST_DIMM_D_N(RST_DIMM_D_N)
@@ -849,7 +850,7 @@ module fpga(
               .bar1_sh_rresp(bar1_sh_rresp),
               
               .sh_bar1_rready(sh_bar1_rready),
-              
+`ifndef NO_CL_DDR              
               .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),
               .CLK_300M_DIMM0_DN(CLK_300M_DIMM0_DN),
               .M_A_ACT_N(M_A_ACT_N),
@@ -899,8 +900,8 @@ module fpga(
               .M_D_DQ(M_D_DQ),
               .M_D_ECC(M_D_ECC),
               .M_D_DQS_DP(M_D_DQS_DP),
-              .M_D_DQS_DN(M_D_DQS_DN), 
-
+              .M_D_DQS_DN(M_D_DQS_DN),
+`endif //  `ifndef NO_CL_DDR
               .sh_ddr_stat_addr0(sh_ddr_stat_addr[0]),
               .sh_ddr_stat_wr0(sh_ddr_stat_wr[0]),
               .sh_ddr_stat_rd0(sh_ddr_stat_rd[0]),
