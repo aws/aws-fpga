@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2017 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
@@ -15,6 +27,11 @@
 #include "libxdma_api.h"
 #include "xdma_cdev.h"
 #include "cdev_sgdma.h"
+
+/* Module Parameters */
+unsigned int sgdma_timeout = 10;
+module_param(sgdma_timeout, uint, 0644);
+MODULE_PARM_DESC(sgdma_timeout, "timeout in seconds for sgdma, default is 10 sec.");
 
 /*
  * character device file operations for SG DMA engine
@@ -129,7 +146,7 @@ static inline void xdma_io_cb_release(struct xdma_io_cb *cb)
 	memset(cb, 0, sizeof(*cb));
 }
 
-static void char_sgdma_unmap_user_buf(struct xdma_io_cb *cb)
+static void char_sgdma_unmap_user_buf(struct xdma_io_cb *cb, bool write)
 {
 	int i;
 
@@ -139,9 +156,11 @@ static void char_sgdma_unmap_user_buf(struct xdma_io_cb *cb)
 		return;
 
 	for (i = 0; i < cb->pages_nr; i++) {
-		if (cb->pages[i])
+		if (cb->pages[i]) {
+			if (!write)
+				set_page_dirty_lock(cb->pages[i]);
 			put_page(cb->pages[i]);
-		else
+		} else
 			break;
 	}
 
@@ -215,7 +234,7 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 
 		flush_dcache_page(cb->pages[i]);
 		sg_set_page(sg, cb->pages[i], nbytes, offset);
-//pr_err("sg %d,0x%p, off %u, len %u, page 0x%p.\n", i, sg, offset, nbytes, cb->pages[i]);
+
 		buf += nbytes;
 		len -= nbytes;
 	}
@@ -225,7 +244,7 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 	return 0;
 
 err_out:
-	char_sgdma_unmap_user_buf(cb);
+	char_sgdma_unmap_user_buf(cb, write);
 
 	return rv;
 }
@@ -271,12 +290,12 @@ static ssize_t char_sgdma_read_write(struct file *file, char __user *buf,
 		return rv;
 
 	res = xdma_xfer_submit(xdev, engine->channel, write, *pos, &cb.sgt,
-				0, 10000);	
+				0, sgdma_timeout * 1000);	
 	//pr_err("xfer_submit return=%lld.\n", (s64)res);
 
 	//interrupt_status(xdev);
 
-	char_sgdma_unmap_user_buf(&cb);
+	char_sgdma_unmap_user_buf(&cb, write);
 
 	return res;
 }
@@ -301,9 +320,13 @@ static ssize_t char_sgdma_read(struct file *file, char __user *buf,
 
 	engine = xcdev->engine;
 
-	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) 
+	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
+		rv = xdma_cyclic_transfer_setup(engine);
+		if (rv < 0 && rv != -EBUSY)
+			return rv;
 		/* 600 sec. timeout */
 		return xdma_engine_read_cyclic(engine, buf, count, 600000);
+	}
 
         return char_sgdma_read_write(file, (char *)buf, count, pos, 0);
 }
@@ -413,6 +436,33 @@ static int ioctl_do_perf_get(struct xdma_engine *engine, unsigned long arg)
         return 0;
 }
 
+static int ioctl_do_addrmode_set(struct xdma_engine *engine, unsigned long arg) 
+{
+	return engine_addrmode_set(engine, arg);
+}
+
+static int ioctl_do_addrmode_get(struct xdma_engine *engine, unsigned long arg) 
+{
+	int rv;
+	unsigned long src;
+
+	BUG_ON(!engine);
+	src = !!engine->non_incr_addr;
+
+	dbg_perf("IOCTL_XDMA_ADDRMODE_GET\n");
+	rv = put_user(src, (int __user *)arg);
+
+	return rv;
+}
+
+static int ioctl_do_align_get(struct xdma_engine *engine, unsigned long arg) 
+{
+	BUG_ON(!engine);
+
+	dbg_perf("IOCTL_XDMA_ALIGN_GET\n");
+	return put_user(engine->addr_align, (int __user *)arg);
+}
+
 static long char_sgdma_ioctl(struct file *file, unsigned int cmd,
                 unsigned long arg)
 {
@@ -433,15 +483,21 @@ static long char_sgdma_ioctl(struct file *file, unsigned int cmd,
         case IOCTL_XDMA_PERF_START:
                 rv = ioctl_do_perf_start(engine, arg);
                 break;
-
         case IOCTL_XDMA_PERF_STOP:
                 rv = ioctl_do_perf_stop(engine, arg);
                 break;
-
         case IOCTL_XDMA_PERF_GET:
                 rv = ioctl_do_perf_get(engine, arg);
                 break;
-
+	case IOCTL_XDMA_ADDRMODE_SET:
+		rv = ioctl_do_addrmode_set(engine, arg);
+		break;
+	case IOCTL_XDMA_ADDRMODE_GET:
+		rv = ioctl_do_addrmode_get(engine, arg);
+		break;
+	case IOCTL_XDMA_ALIGN_GET:
+		rv = ioctl_do_align_get(engine, arg);
+		break;
         default:
                 dbg_perf("Unsupported operation\n");
                 rv = -EINVAL;
@@ -461,8 +517,12 @@ static int char_sgdma_open(struct inode *inode, struct file *file)
 	xcdev = (struct xdma_cdev *)file->private_data;
 	engine = xcdev->engine;
 
-	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) 
-		return xdma_cyclic_transfer_setup(engine);
+	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
+		if (engine->device_open == 1)
+			return -EBUSY;
+		else
+			engine->device_open = 1;
+	}
 
 	return 0;
 }
@@ -479,8 +539,11 @@ static int char_sgdma_close(struct inode *inode, struct file *file)
 
 	engine = xcdev->engine;
 
-	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) 
-		return xdma_cyclic_transfer_teardown(engine);
+	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
+		engine->device_open = 0;
+		if (engine->cyclic_req)
+			return xdma_cyclic_transfer_teardown(engine);
+	}
 
 	return 0;
 }

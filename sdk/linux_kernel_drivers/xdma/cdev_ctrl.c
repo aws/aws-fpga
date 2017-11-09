@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2017 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
@@ -124,7 +136,7 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return rv;	
 	xdev = xcdev->xdev;
 
-//	pr_info("cmd 0x%x, xdev 0x%p, pdev 0x%p.\n", cmd, xdev, xdev->pdev);
+	pr_info("cmd 0x%x, xdev 0x%p, pdev 0x%p.\n", cmd, xdev, xdev->pdev);
 
 	if (_IOC_TYPE(cmd) != XDMA_IOC_MAGIC) {
 		pr_err("cmd %u, bad magic 0x%x/0x%x.\n",
@@ -181,7 +193,7 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 }
 
 /* maps the PCIe BAR into user space for memory-like access using mmap() */
-static int bridge_mmap(struct file *file, struct vm_area_struct *vma)
+int bridge_mmap(struct file *file, struct vm_area_struct *vma)
 {
 	struct xdma_dev *xdev;
 	struct xdma_cdev *xcdev = (struct xdma_cdev *)file->private_data;
