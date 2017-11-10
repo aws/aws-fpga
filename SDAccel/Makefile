@@ -36,6 +36,14 @@ endif
 
 INSTALL_ROOT = /opt/Xilinx/SDx/2017.1
 DSA = xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
+OPENCLLIB := 
+OPENCLFILE =  $(INSTALL_ROOT)/runtime/platforms/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
+
+ifeq ($(wildcard $(OPENCLFILE)),)
+  OPENCLLIB := ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so
+else
+  OPENCLLIB := $(OPENCLFILE)
+endif
 
 all:
 	make -C ${SDACCEL_DIR}/userspace/src debug=$(debug) ec2=$(ec2)
@@ -56,7 +64,8 @@ install:
 	install -m 755 ${SDACCEL_DIR}/tools/awssak/xbsak $(INSTALL_ROOT)/runtime/bin
 	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_ROOT)/runtime/bin
 	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_ROOT)/runtime/bin
-	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so $(INSTALL_ROOT)/runtime/lib/x86_64
+	#install -m 755 ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so $(INSTALL_ROOT)/runtime/lib/x86_64
+	install -m 755 ${OPENCLLIB} $(INSTALL_ROOT)/runtime/lib/x86_64
 	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
 	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_ROOT)/setup.sh for bash"
 	@echo "export XILINX_OPENCL=$(INSTALL_ROOT)" > $(INSTALL_ROOT)/setup.sh
