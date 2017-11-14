@@ -61,26 +61,8 @@ class TestSims(AwsFpgaTestBase):
 
         command_line = [self.RUN_SIM_SCRIPT, '--test-name', test_name, '--test-dir', test_dir, '--test-type', test_type]
 
-        logger.debug("Calling: " + subprocess.list2cmdline(command_line))
-
-        output = None
-        try:
-            output = subprocess.check_output(
-                command_line,
-                cwd=os.path.dirname(self.RUN_SIM_SCRIPT),
-                stderr=subprocess.STDOUT
-            )
-            logger.info(output)
-
-        except subprocess.CalledProcessError as e:
-            # This exception is thrown if the rc is non-zero
-            logger.exception("rc={}\nOutput:\n".format(e.returncode, e.output))
-            raise e
-        except OSError as o:
-            if output:
-                logger.info("Simulation output:\n" + output)
-            logger.exception(o.strerror)
-            raise e
+        (rc, stdout_lines, stderr_lines) = self.run_cmd(" ".join(command_line))
+        assert rc == 0, "Sim failed"
     
     # cl_dram_dma sv
 

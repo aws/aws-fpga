@@ -58,7 +58,7 @@ int check_afi_ready(int slot_id);
 int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id);
 
 void usage(char* program_name) {
-    cosim_printf("usage: %s [--slot <slot-id>][<poke-value>]\n", program_name);
+    printf("usage: %s [--slot <slot-id>][<poke-value>]\n", program_name);
 }
 
 uint32_t byte_swap(uint32_t value) {
@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
     int slot_id = 0;
     int rc;
     
+#ifndef SV_TEST
     // Process command line args
     {
         int i;
@@ -95,7 +96,7 @@ int main(int argc, char **argv) {
             if (!strcmp(argv[i], "--slot")) {
                 i++;
                 if (i >= argc) {
-                    cosim_printf("error: missing slot-id\n");
+                    printf("error: missing slot-id\n");
                     usage(argv[0]);
                     return 1;
                 }
@@ -104,12 +105,13 @@ int main(int argc, char **argv) {
                 sscanf(argv[i], "%x", &value);
                 value_set = 1;
             } else {
-                cosim_printf("error: Invalid arg: %s", argv[i]);
+                printf("error: Invalid arg: %s", argv[i]);
                 usage(argv[0]);
                 return 1;
             }
         }
     }
+#endif
 
     /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
     rc = fpga_pci_init();
@@ -123,15 +125,15 @@ int main(int argc, char **argv) {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    cosim_printf("===== Starting with peek_poke_example =====\n");
+    printf("===== Starting with peek_poke_example =====\n");
     rc = peek_poke_example(value, slot_id, FPGA_APP_PF, APP_PF_BAR0);
     fail_on(rc, out, "peek-poke example failed");
 
-    cosim_printf("Developers are encouraged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
-    cosim_printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
-    cosim_printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
+    printf("Developers are encouraged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
+    printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
+    printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
 
-    cosim_printf(
+    printf(
         "# fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
         "# fpga-get-virtual-led  -S 0\n"
         "FPGA slot id 0 have the following Virtual LED:\n"
@@ -171,14 +173,14 @@ out:
      fail_on(rc, out, "AFI in Slot %d is not in READY state !", slot_id);
    }
 
-   cosim_printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
+   printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
           info.spec.map[FPGA_APP_PF].vendor_id,
           info.spec.map[FPGA_APP_PF].device_id);
 
    /* confirm that the AFI that we expect is in fact loaded */
    if (info.spec.map[FPGA_APP_PF].vendor_id != pci_vendor_id ||
        info.spec.map[FPGA_APP_PF].device_id != pci_device_id) {
-     cosim_printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
+     printf("AFI does not show expected PCI vendor id and device ID. If the AFI "
             "was just loaded, it might need a rescan. Rescanning now.\n");
 
      rc = fpga_pci_rescan_slot_app_pfs(slot_id);
@@ -187,7 +189,7 @@ out:
      rc = fpga_mgmt_describe_local_image(slot_id, &info,0);
      fail_on(rc, out, "Unable to get AFI information from slot %d",slot_id);
 
-     cosim_printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
+     printf("AFI PCI  Vendor ID: 0x%x, Device ID 0x%x\n",
             info.spec.map[FPGA_APP_PF].vendor_id,
             info.spec.map[FPGA_APP_PF].device_id);
 
@@ -229,7 +231,7 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
     
     /* write a value into the mapped address space */
     uint32_t expected = byte_swap(value);
-    cosim_printf("Writing 0x%08x to HELLO_WORLD register (0x%016lx)\n", value, HELLO_WORLD_REG_ADDR);
+    printf("Writing 0x%08x to HELLO_WORLD register (0x%016lx)\n", value, HELLO_WORLD_REG_ADDR);
     rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
 
     fail_on(rc, out, "Unable to write to the fpga !");
@@ -238,20 +240,20 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
      * reversed (That's what this CL does) */
     rc = fpga_pci_peek(pci_bar_handle, HELLO_WORLD_REG_ADDR, &value);
     fail_on(rc, out, "Unable to read read from the fpga !");
-    cosim_printf("=====  Entering peek_poke_example =====\n");
-    cosim_printf("register: 0x%x\n", value);
+    printf("=====  Entering peek_poke_example =====\n");
+    printf("register: 0x%x\n", value);
     if(value == expected) {
-        cosim_printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
+        printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
     }
     else{
-        cosim_printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
+        printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
     }
 out:
     /* clean up */
     if (pci_bar_handle >= 0) {
         rc = fpga_pci_detach(pci_bar_handle);
         if (rc) {
-            cosim_printf("Failure while detaching from the fpga.\n");
+            printf("Failure while detaching from the fpga.\n");
         }
     }
 

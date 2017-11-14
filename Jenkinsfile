@@ -26,6 +26,7 @@ boolean test_sims = params.get('test_sims')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_fdf = params.get('test_fdf')
 boolean test_sdaccel_scripts = params.get('test_sdaccel_scripts')
+boolean test_sdaccel_builds = params.get('test_sdaccel_builds')
 
 def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world']
 def fdf_cl_names = ['cl_dram_dma', 'cl_hello_world', 'cl_hello_world_vhdl',

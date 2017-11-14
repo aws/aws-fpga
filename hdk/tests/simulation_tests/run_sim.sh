@@ -31,12 +31,6 @@ case $key in
 esac
 done
 
-pushd $WORKSPACE
-
-source $WORKSPACE/hdk_setup.sh;
-
-popd
-
 # Run the test
 pushd $test_dir
 

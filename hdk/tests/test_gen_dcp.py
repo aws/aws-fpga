@@ -118,7 +118,8 @@ class TestGenDcp(AwsFpgaTestBase):
         # Compare number of warnings to expected number
         exp_num_warnings = int(open('.warnings', 'r').readline().rstrip())
         logger.info("Expected {} warnings in log file".format(exp_num_warnings))
-        assert num_warnings == exp_num_warnings, "Unexpected number of warnings, exp={}, act={}\n{}\n{}".format(exp_num_warnings, num_warnings, stdout_lines, stderr_lines)
+        assert num_warnings == exp_num_warnings, "Unexpected number of warnings, exp={}, act={}\n{}\n{}".format(
+            exp_num_warnings, num_warnings, "\n".join(stdout_lines), "\n".join(stderr_lines))
         
         # Check the number of critical warnings
         (rc, stdout_lines, stderr_lines) = self.run_cmd("grep \"^CRITICAL WARNING\" last_log", check=False)
@@ -131,7 +132,8 @@ class TestGenDcp(AwsFpgaTestBase):
         # Compare number of warnings to expected number
         exp_num_warnings = int(open('.critical_warnings', 'r').readline().rstrip())
         logger.info("Expected {} critical warnings in log file".format(exp_num_warnings))
-        assert num_warnings == exp_num_warnings, "Unexpected number of critical warnings, exp={}, act={}".format(exp_num_warnings, num_warnings, stdout_lines)
+        assert num_warnings == exp_num_warnings, "Unexpected number of critical warnings, exp={}, act={}".format(
+            exp_num_warnings, num_warnings, "\n".join(stdout_lines))
         
         # Check if there are any setup/hold-time violations
         (rc, stdout_lines, stderr_lines) = self.run_cmd("grep \"The design did not meet timing requirements.\" last_log", check=False)
@@ -139,7 +141,8 @@ class TestGenDcp(AwsFpgaTestBase):
             NUM_TIMING_VIOLATIONS = len(stdout_lines) -1
         else:
             NUM_TIMING_VIOLATIONS = 0
-        assert NUM_TIMING_VIOLATIONS == 0, "{} timing violations found.  Design may not be functional:\n{}".format(NUM_TIMING_VIOLATIONS, stdout_lines)
+        assert NUM_TIMING_VIOLATIONS == 0, "{} timing violations found.  Design may not be functional:\n{}".format(
+            NUM_TIMING_VIOLATIONS, "\n".join(stdout_lines))
         return tarball
         
     def base_test(self, cl, clock_recipe_a='A1', extra_args='', option_tag='default'):

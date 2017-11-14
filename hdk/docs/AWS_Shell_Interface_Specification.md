@@ -22,8 +22,6 @@
 
    2a. [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
 
-   2b. [External Memory Interfaces implemented in CL](#external_memory_interfaces_implemented_in_cl)
-
 3. [EC2 Instance view of FPGA PCIe](#pciPresentation)
    
    3a. [Management PF](#management_pf)
