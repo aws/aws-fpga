@@ -52,7 +52,7 @@ int fpga_mgmt_process_cmd(int slot_id,
 void fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len,
 	uint32_t flags);
 void fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len,
-	const char *afi_id);
+	const char *afi_id, uint32_t flags);
 void fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len);
 
 int
