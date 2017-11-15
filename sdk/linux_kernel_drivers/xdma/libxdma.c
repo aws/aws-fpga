@@ -792,7 +792,7 @@ struct xdma_transfer *engine_service_final_transfer(struct xdma_engine *engine,
 		}
 
 		if (engine->status & XDMA_STAT_BUSY)
-			pr_info("engine %s is unexpectedly busy - ignoring\n",
+			pr_debug("engine %s is unexpectedly busy - ignoring\n",
 				engine->name);
 
 		/* the engine stopped on current transfer? */
@@ -3126,9 +3126,10 @@ ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
 			rv = -ERESTARTSYS;
 			break;
 		}
-		spin_unlock(&engine->desc_lock);
 
 		transfer_destroy(xdev, xfer);
+		spin_unlock(&engine->desc_lock);
+
 		if (rv < 0)
 			goto unmap_sgl;
 	} /* while (sg) */
