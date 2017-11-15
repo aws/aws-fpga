@@ -53,10 +53,6 @@
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
 #define NUM_POLLS_PER_SCHED		(100)
-#define MAX_NUMBER_OF_EDMA_DEVICE 	(16)
-#define MAX_NUMBER_OF_EDMA_QUEUES 	(4)
-//TODO: move to a mutable and unite across
-#define MAX_NUMBER_OF_USER_INTERRUPTS 	(16)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
 extern struct class* edma_class;
@@ -87,7 +83,9 @@ static int single_transaction_size = 8 * PAGE_SIZE;
 module_param(single_transaction_size, int, 0);
 MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over the DMA. (default=32KB)");
 
-extern int edma_queue_depth;
+int edma_queue_depth = 1024;
+module_param(edma_queue_depth, int, 0);
+MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=1024)");
 
 //TODO: add a callback for the backend to notify fatal error - reset
 
