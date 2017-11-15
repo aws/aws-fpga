@@ -102,7 +102,8 @@ The following diagram and table summarize the various interfaces between the She
 | Interface       | Description      |
 |:-------------|:-----------|
 | Clocks and Resets  | There are multiple clocks and resets provided by the Shell to the CL. Refer to the [Clocks and Resets](#clocks-and-reset) section for more information. |
-| PCIS  | The PCIe Slave (PCIS) Interface is an AXI-4 interface used for Inbound PCIe transactions. Refer to the [PCIS Interface](#pcis_interface) section for more information. |
+| DDR4  | The master interface to the DDR4 Controllers utilizes an AXI-4 interface. Refer to the [DDR4 AXI Interface](#ddr4axi) section for more information. |
+| DMA_PCIS  | The PCIe Slave (PCIS) Interface is an AXI-4 interface used for Inbound PCIe transactions. Refer to the [PCIS Interface](#pcis_interface) section for more information. |
 | PCIM | The PCIe Master (PCIM) Interface is an AXI-4 interface used for Outbound PCIe transactions. Refer to the [PCIM Interface](#pcim_interface) section for more information.     |
 | SDA |  The SDA Interface is an AXI-Lite interface associated with MgmtPF and BAR4. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
 | OCL | The OCL Interface is an AXI-Lite interface associated with AppPF and BAR0. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
@@ -204,19 +205,6 @@ These parameters are used to control which DDR controllers are impemented in the
               ...
  ```   
 
-Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. **WARNING** If the stats interfaces are not connected, the DDR controllers will not function. However, the CL developer should not otherwise use them since they are specific to Shell management functions.
-If the DDR controllers are not used by the CL, then the interfaces can be left unconnected.
-
-**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
-
-Each DRAM interface is accessed via an AXI-4 interface:
-
--   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR.
-
-There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
-
-The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  ECC error status can be read using AWS Management Software APIs.
-  
 ### DRAM Content Preservation between AFI Loads (Future)
 
 In future Shell versions a DRAM content preservation feature will be implemented. This feature allows the DDR state to be preserved when dynamically changing CL logic. The current Shell version will not guarantee preservation of DRAM contents if the CL logic is re-loaded.
@@ -297,7 +285,25 @@ Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which i
 ### Reset
 
 The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
-  
+
+<a name="ddr4axi"></a>
+## DDR4 AXI
+
+Each of the four DDR4 Controllers has an AXI-4 interface with a 512 bit data bus. The AXI-4 interfaces for the three DDR4 Controllers instantiated in the CL (`sh_ddr.sv`) are connected inside of the CL. However, for the DDR-4 controller that is instantiated in the Shell, DDRC, there is an AXI-4 interface between the Shell and CL.  
+
+Each DRAM interface is accessed via an AXI-4 interface:
+
+-   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR.
+
+There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
+
+The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  ECC error status can be read using AWS Management Software APIs.
+
+Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. **WARNING** If the stats interfaces are not connected, the DDR controllers will not function. However, the CL developer should not otherwise use them since they are specific to Shell management functions.
+If the DDR controllers are not used by the CL, then the interfaces should be left unconnected.
+
+**NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
+
 <a name="pcis_interface"></a>  
 ## DMA_PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) 
 
