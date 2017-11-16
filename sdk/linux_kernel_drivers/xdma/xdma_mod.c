@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2017 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
@@ -80,8 +92,8 @@ static const struct pci_device_id pci_ids[] = {
 
 	{ PCI_DEVICE(0x10ee, 0x6828), },
 	{ PCI_DEVICE(0x10ee, 0x6830), },
-	{ PCI_DEVICE(0x10ee, 0x6930), },
 	{ PCI_DEVICE(0x10ee, 0x6928), },
+	{ PCI_DEVICE(0x10ee, 0x6930), },
 	{ PCI_DEVICE(0x10ee, 0x6A28), },
 	{ PCI_DEVICE(0x10ee, 0x6A30), },
 	{ PCI_DEVICE(0x10ee, 0x6D30), },
@@ -95,14 +107,8 @@ static const struct pci_device_id pci_ids[] = {
 	{ PCI_DEVICE(0x10ee, 0x2808), },
 
 #ifdef INTERNAL_TESTING
-	/* 
-	 * AWS: Within the F1 instance {0x1d0f, 0x1042} is reserved and represents the FPGA 
-	 * in the CLEARED state
-	 */
 	{ PCI_DEVICE(0x1d0f, 0x1042), 0},
 #endif
-	{ PCI_DEVICE(0x1d0f, 0xF000), 0},
-	{ PCI_DEVICE(0x1d0f, 0xF001), 0},
 	{0,}
 };
 MODULE_DEVICE_TABLE(pci, pci_ids);
@@ -265,7 +271,24 @@ static void xdma_error_resume(struct pci_dev *pdev)
 	pci_cleanup_aer_uncorrect_error_status(pdev);
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,13,0)
+static void xdma_reset_prepare(struct pci_dev *pdev)
+{
+	struct xdma_pci_dev *xpdev = dev_get_drvdata(&pdev->dev);
+
+	pr_info("dev 0x%p,0x%p.\n", pdev, xpdev);
+	xdma_device_offline(pdev, xpdev->xdev);
+}
+
+static void xdma_reset_done(struct pci_dev *pdev)
+{
+	struct xdma_pci_dev *xpdev = dev_get_drvdata(&pdev->dev);
+
+	pr_info("dev 0x%p,0x%p.\n", pdev, xpdev);
+	xdma_device_online(pdev, xpdev->xdev);
+}
+
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
 static void xdma_reset_notify(struct pci_dev *pdev, bool prepare)
 {
 	struct xdma_pci_dev *xpdev = dev_get_drvdata(&pdev->dev);
@@ -283,7 +306,10 @@ static const struct pci_error_handlers xdma_err_handler = {
 	.error_detected	= xdma_error_detected,
 	.slot_reset	= xdma_slot_reset,
 	.resume		= xdma_error_resume,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,13,0)
+	.reset_prepare	= xdma_reset_prepare,
+	.reset_done	= xdma_reset_done,
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
 	.reset_notify	= xdma_reset_notify,
 #endif
 };
@@ -299,8 +325,15 @@ static struct pci_driver pci_driver = {
 static int __init xdma_mod_init(void)
 {
 	int rv;
+	extern unsigned int desc_blen_max;
+	extern unsigned int sgdma_timeout;
 
 	pr_info("%s", version);
+
+	if (desc_blen_max > XDMA_DESC_BLEN_MAX)
+		desc_blen_max = XDMA_DESC_BLEN_MAX;
+	pr_info("desc_blen_max: 0x%x/%u, sgdma_timeout: %u sec.\n",
+		desc_blen_max, desc_blen_max, sgdma_timeout);
 
 	rv = xdma_cdev_init();
 	if (rv < 0)
