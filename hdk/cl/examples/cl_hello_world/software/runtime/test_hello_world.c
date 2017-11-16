@@ -203,7 +203,6 @@ out:
    }
     
    return rc;
-
  out:
    return 1;
  }
@@ -226,7 +225,9 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
      * other API calls.
      * This function accepts the slot_id, physical function, and bar number
      */
+#ifndef SV_TEST
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
+#endif
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
     
     /* write a value into the mapped address space */
