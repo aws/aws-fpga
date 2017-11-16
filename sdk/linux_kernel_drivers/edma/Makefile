@@ -23,4 +23,4 @@ all:
 unit-test:
 	make -C ./unit-test all
 clean:
-	make -C /lib/modules/$(KERNEL_VERSION)/build M=$(PWD) clean                                                                              
+	make -C /lib/modules/$(KERNEL_VERSION)/build M=$(PWD) clean

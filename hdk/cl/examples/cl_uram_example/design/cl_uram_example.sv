@@ -265,7 +265,7 @@ always_ff @(posedge clk_main_a0)
    if (!rst_main_n_sync) begin                    // Reset
       data_in[31:0] <= 32'h0000_0000;
    end
-   else if (wready & (wr_addr == `URAM_REG_ADDR)) begin  
+   else if (wready & (wr_addr == `URAM_REG_ADDR)) begin
       data_in[31:0] <= wdata[31:0];
    end
    else begin                                // Hold Value

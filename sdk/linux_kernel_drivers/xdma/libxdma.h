@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2017 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 #ifndef XDMA_LIB_H
@@ -419,6 +431,7 @@ struct xdma_engine {
 	/* Engine state, configuration and flags */
 	enum shutdown_state shutdown;	/* engine shutdown mode */
 	enum dma_data_direction dir;
+	int device_open;	/* flag if engine node open, ST mode only */
 	int running;		/* flag if the driver started engine */
 	int non_incr_addr;	/* flag if non-incremental addressing used */
 	int streaming;
@@ -594,5 +607,6 @@ int xdma_cyclic_transfer_setup(struct xdma_engine *engine);
 int xdma_cyclic_transfer_teardown(struct xdma_engine *engine);
 ssize_t xdma_engine_read_cyclic(struct xdma_engine *, char __user *, size_t,
 			 int);
+int engine_addrmode_set(struct xdma_engine *engine, unsigned long arg);
 
 #endif /* XDMA_LIB_H */
