@@ -58,15 +58,15 @@ def top_parallel_stages = [:]
 
 // Task to Label map
 def task_label = [
-    'create-afi':        'create-afi',
+    'create-afi':        't2-l-50',
     'simulation':        'c4xl',
-    'dcp_gen':           'c4-8xl',
+    'dcp_gen':           'c4-4xl',
     'runtime':           'f1-2xl',
     'runtime-all-slots': 'f1-16xl',
     'source_scripts':    'c4xl',
     'md_links':          'c4xl',
-    'find_tests':        't2-l-1',
-    'sdaccel_builds':    'c5-9xl-8'
+    'find_tests':        't2-l-50',
+    'sdaccel_builds':    'c4-4xl'
 ]
 
 // Get serializable entry set
@@ -143,7 +143,7 @@ if (test_sims) {
                         } catch (exc) {
                             echo "${node_name} failed: archiving results"
                             archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
-                            raise exc
+                            throw exc
                         } finally {
                             junit healthScaleFactor: 10.0, testResults: report_file
                         }
@@ -231,7 +231,7 @@ if (test_fdf) {
                             } catch (exc) {
                                 echo "${cl_name_with_options} DCP generation failed: archiving results"
                                 archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
-                                raise exc
+                                throw exc
                             } finally {
                                 junit healthScaleFactor: 10.0, testResults: report_file
                             }
@@ -267,7 +267,7 @@ if (test_fdf) {
                                 unstash name: dcp_stash_name
                             } catch (exc) {
                                 echo "unstash ${dcp_stash_name} failed"
-                                raise exc
+                                throw exc
                             }
                             try {
                                 // There is a Xilinx bug that causes the following error during hdk_setup.sh if multiple
@@ -283,7 +283,7 @@ if (test_fdf) {
                             } catch (exc) {
                                 echo "${cl_name_with_options} AFI generation failed: archiving results"
                                 archiveArtifacts artifacts: "${build_dir}/to_aws/**", fingerprint: true
-                                raise exc
+                                throw exc
                             } finally {
                                 junit healthScaleFactor: 10.0, testResults: report_file
                             }
@@ -291,7 +291,7 @@ if (test_fdf) {
                                 stash name: afi_stash_name, includes: "${afi_stash_dir}/**"
                             } catch (exc) {
                                 echo "stash ${afi_stash_name} failed"
-                                raise exc
+                                throw exc
                             }
                         }
                         node(task_label.get('runtime')) {
@@ -312,7 +312,7 @@ if (test_fdf) {
                                 unstash name: afi_stash_name
                             } catch (exc) {
                                 echo "unstash ${afi_stash_name} failed"
-                                raise exc
+                                throw exc
                             }
                             try {
                                 sh """
@@ -359,10 +359,25 @@ if (test_sdaccel_scripts) {
 if (test_sdaccel_builds) {
     top_parallel_stages['Run SDAccel Tests'] = {
         def sdaccel_build_stages = [:]
+        String sdaccel_examples_list = 'sdaccel_examples_list.json'
+
         stage ('Find SDACCel tests') {
+
             String report_file = 'test_find_sdaccel_examples.xml'
+
             node(task_label.get('find_tests')) {
+
                 checkout scm
+
+                try {
+                    sh """
+                        rm -rf ${sdaccel_examples_list}
+                    """
+                } catch(error) {
+                    // Ignore any errors
+                    echo "Failed to clean ${sdaccel_examples_list}"
+                }
+
                 try {
                     sh """
                         set -e
@@ -371,28 +386,36 @@ if (test_sdaccel_builds) {
                     """
                 } catch (exc) {
                     echo "Could not find tests. Please check the repository."
-                    raise exc
+                    throw exc
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
                 }
 
-                def list_map = readJSON file:'sdaccel_examples_list.json'
+                //def list_map = readJSON file: sdaccel_examples_list
+                // Just run the hello world example for now
+                def list_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
 
                 for ( def e in entrySet(list_map) ) {
 
                     String build_name = e.key
                     String example_path = e.value
-                    String stage_name = "SDAccel Build ${build_name}"
+                    String sw_emu_stage_name = "SDAccel SW_EMU ${build_name}"
+                    String hw_emu_stage_name = "SDAccel HW_EMU ${build_name}"
+                    String hw_stage_name     = "SDAccel HW ${build_name}"
+                    String create_afi_stage_name = "SDAccel AFI ${build_name}"
+
+                    String sw_emu_report_file = "sdaccel_sw_emu_${build_name}.xml"
+                    String hw_emu_report_file = "sdaccel_hw_emu_${build_name}.xml"
+                    String hw_report_file     = "sdaccel_hw_${build_name}.xml"
+
+                    String xclbin_stash_name  = "xclbin_${build_name}_stash"
+
 
                     sdaccel_build_stages[build_name] = {
 
-                        stage(stage_name) {
-                            timeout (time: 7, unit: 'HOURS') {
+                        stage(sw_emu_stage_name) {
+                            timeout (time: 1, unit: 'HOURS') {
                                 node(task_label.get('sdaccel_builds')) {
-
-                                    String sw_emu_report_file = "sdaccel_sw_emu_${build_name}.xml"
-                                    String hw_emu_report_file = "sdaccel_hw_emu_${build_name}.xml"
-                                    String hw_report_file = "sdaccel_hw_${build_name}.xml"
 
                                     checkout scm
 
@@ -406,10 +429,17 @@ if (test_sdaccel_builds) {
                                         """
                                     } catch (error) {
                                         echo "${stage_name} SW EMU Build generation failed"
+                                        throw error
                                     } finally {
-                                        junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
+                                        junit healthScaleFactor: 0.0, testResults: sw_emu_report_file
                                     }
+                                }
+                            }
+                        }
 
+                        stage(hw_emu_stage_name) {
+                            timeout (time: 1, unit: 'HOURS') {
+                                node(task_label.get('sdaccel_builds')) {
                                     try {
                                         sh """
                                             set -e
@@ -420,9 +450,15 @@ if (test_sdaccel_builds) {
                                     } catch (error) {
                                         echo "${stage_name} HW EMU Build generation failed"
                                     } finally {
-                                        junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
+                                        junit healthScaleFactor: 0.0, testResults: hw_emu_report_file
                                     }
+                                }
+                            }
+                        }
 
+                        stage(hw_stage_name) {
+                            timeout (time: 7, unit: 'HOURS') {
+                                node(task_label.get('sdaccel_builds')) {
                                     try {
                                         sh """
                                             set -e
@@ -432,14 +468,14 @@ if (test_sdaccel_builds) {
                                         """
                                     } catch (error) {
                                         echo "${stage_name} HW Build generation failed"
-                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                        raise error
+                                        throw error
                                     } finally {
-                                        junit healthScaleFactor: 10.0, testResults: hw_report_file
+                                        junit healthScaleFactor: 0.0, testResults: hw_report_file
                                     }
                                 }
                             }
                         }
+
                     } // sdaccel_build_stages[ e.key ]
                 } // for ( e in list_map )
 
