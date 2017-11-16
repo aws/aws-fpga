@@ -58,14 +58,14 @@ def top_parallel_stages = [:]
 
 // Task to Label map
 def task_label = [
-    'create-afi':        'create-afi',
+    'create-afi':        't2-l-50',
     'simulation':        'c4xl',
     'dcp_gen':           'c4-8xl',
     'runtime':           'f1-2xl',
     'runtime-all-slots': 'f1-16xl',
     'source_scripts':    'c4xl',
     'md_links':          'c4xl',
-    'find_tests':        'create-afi',
+    'find_tests':        't2-l-50',
     'sdaccel_builds':    'c5-9xl-8'
 ]
 
