@@ -22,8 +22,6 @@
 
    2a. [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
 
-   2b. [External Memory Interfaces implemented in CL](#external_memory_interfaces_implemented_in_cl)
-
 3. [EC2 Instance view of FPGA PCIe](#pciPresentation)
    
    3a. [Management PF](#management_pf)
@@ -199,11 +197,10 @@ Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more deta
 <a name="management_pf"></a>
 ## Management PF (MgmtPF)
 
-
-The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance. 
-This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands, 
-and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as AWS OpenCL Runtime ICD/HDL, 
-and does not support any interface with the CL code. 
+The Management PF details are provided for reference to help understanding the PCIe mapping from an F1 instance.
+This interface is strictly used by the [AWS FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md) linux shell commands,
+and [FPGA Management Library](../../sdk/userspace/include/) for integration with C/C++ applications, as well as AWS OpenCL Runtime ICD/HDL,
+and does not support any interface with the CL code.
 
 The Management PF exposes:
 

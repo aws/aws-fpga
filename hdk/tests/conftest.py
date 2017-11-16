@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+
 # Amazon FPGA Hardware Development Kit
 #
 # Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -13,28 +15,8 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-#VPATH = src:include:$(HDK_DIR)/common/software/src:$(HDK_DIR)/common/software/include
+'''
+pytest configuration
+'''
 
-INCLUDES = -I$(SDK_DIR)/userspace/include
-
-CC = gcc
-CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
-
-LDLIBS = -lfpga_mgmt -lrt -lpthread
-
-SRC = test_hello_world_vhdl.c
-OBJ = $(SRC:.c=.o)
-BIN = test_hello_world_vhdl
-
-all: $(BIN) check_env
-
-$(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-clean:
-	rm -f *.o $(BIN)
-
-check_env:
-ifndef SDK_DIR
-    $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
-endif
+import pytest

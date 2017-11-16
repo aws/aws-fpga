@@ -10,11 +10,13 @@
 <a name="overview"></a>
 ## Overview
 
-This simple *URAM* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (CL). These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
+This simple *URAM* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (CL).
+These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
 
-This example demonstrate a basic use-case of the URAMs and the different implementations available.
+This example demonstrates a basic use-case of the URAMs and the different implementations available.
 
-All of the unused interfaces between AWS Shell and the CL are tied to fixed values, and it is recommended that the developer use similar values for every unused interface in the developer's CL.
+All of the unused interfaces between the AWS Shell and the CL are tied to fixed values.
+It is recommended that the developer use similar values for every unused interface in the developer's CL.
 
 Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
@@ -54,30 +56,31 @@ URAM Options | Max Cascade Height | URAMs Limitations
 
 ### Hardware - HDK Flow
 You can run this design like the other examples designs by:
-- soucing hdk\_setup.sh
-- cd into hdk/cl/examples/cl\_uram\_example
-- $ export CL\_DIR=$(pwd)
-- cd into $CL\_DIR/build/scripts
+- `source hdk\_setup.sh`
+- `cd hdk/cl/examples/cl_uram_example`
+- `export CL_DIR=$(pwd)`
+- `cd $CL\_DIR/build/scripts`
 - Running the .tar file generation using:
-	- Option 2:
-		- $ ./aws\_build\_dcp\_from\_cl.sh -uram\_option 2
-	- Option 3:
-		- $ ./aws\_build\_dcp\_from\_cl.sh -uram\_option 3
-	- Option 4 (default option):
-		- $ ./aws\_build\_dcp\_from\_cl.sh -uram\_option 4
+  - Option 2:
+    - `./aws_build_dcp_from_cl.sh -uram_option 2`
+  - Option 3:
+    - `./aws_build_dcp_from_cl.sh -uram_option 3`
+  - Option 4 (default option):
+    - `./aws_build_dcp_from_cl.sh -uram_option 4`
 
 ### Software
 You can generate the software by:
-- sourcing sdk_setup.sh
-- cd into hdk/cl/examples/cl_uram_example/software/runtime
-- Build the SW using the Makefile
-	- $ make
+```
+source sdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/software/runtime
+make
+```
 
 __How to use it?__
 
 This software allows you to read from and write into the URAMs.
 Do not forget to run it in sudo mode:
-- sudo ./uram_example
+- `sudo ./uram_example`
 
 You have 3 commands available:
 - find: Command which allows you to find a 32 bits hexadecimal data inside the URAM
@@ -86,5 +89,3 @@ You have 3 commands available:
 
 (e.g. add DEADBEEF)
 (Please note that you do not need the "0x" in front of the 32 bits hexadecimal value)
-
-

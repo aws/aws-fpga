@@ -15,31 +15,25 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''
-Pytest module:
-
-Call using ```pytest test_md_links.py```
-
-See TESTING.md for details.
-'''
-
+import logging
 import os
 from os.path import dirname, realpath
 import pytest
+import subprocess
 import sys
 import traceback
 try:
+    import aws_fpga_utils
     import aws_fpga_test_utils
     from aws_fpga_test_utils.AwsFpgaTestBase import AwsFpgaTestBase
-    import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh or shared/tests/bin/setup_test_env*.sh".format(sys.exc_info()[1])
+    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
 
-class TestMdLinks(AwsFpgaTestBase):
+class TestSdaccelScripts(AwsFpgaTestBase):
     '''
     Pytest test class.
     
@@ -52,9 +46,11 @@ class TestMdLinks(AwsFpgaTestBase):
         Do any setup required for tests.
         '''
         AwsFpgaTestBase.setup_class(self, __file__)
+        
+        AwsFpgaTestBase.assert_sdaccel_setup()
         return
     
-    def test_md_links(self):
-        rc = os.system(self.test_dir + "/bin/check_md_links.py --exclude SDAccel/examples/xilinx")
-        assert rc == 0
+    @pytest.mark.skip(reason="Not implemented")
+    def test_sdaccel_setup(self):
+        assert False
         

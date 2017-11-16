@@ -1,5 +1,19 @@
 #!/usr/bin/env python2.7
 
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+
 # This script looks for broken hyperlinks in all markdown files (*.md) in the repository. 
 # It returns 0 if it didn't find any broken or non-zero if it found broken links.
 #
@@ -21,7 +35,6 @@
 #
 
 import argparse
-import aws_fpga_test_utils
 import git
 from HTMLParser import HTMLParser
 import io
@@ -33,8 +46,15 @@ from os.path import dirname, realpath
 import re
 import sys
 import urllib2
+try:
+    import aws_fpga_test_utils
+    import aws_fpga_utils
+except ImportError as e:
+    traceback.print_tb(sys.exc_info()[2])
+    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    sys.exit(1)
 
-logger = aws_fpga_test_utils.configure_logger(__name__)
+logger = aws_fpga_utils.get_logger(__name__)
 
 class HtmlAnchorParser(HTMLParser):
     '''
@@ -78,6 +98,7 @@ def check_link(url):
     
     @returns True if the link is valid, False otherwise.
     '''
+    logger.debug("Checking {}".format(url))
     if re.match(r'https://forums\.aws\.amazon\.com/', url):
         return True
     try:
@@ -90,6 +111,7 @@ def check_link(url):
         if website.code != 200:
             return False
     except Exception, e:
+        logger.exception("")
         return False
     return True
 
@@ -104,17 +126,15 @@ def contains_link(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--exclude', action='store', nargs='*', default=[], help="Paths to ignore")
     parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
-        logger.debug("test")
-        sys.exit(1)
 
     # Make sure running at root of repo
-    repo = git.Repo(dirname(__file__), search_parent_directories=True)
-    assert not repo.bare
-    repo_dir = repo.git.rev_parse("--show-toplevel")
+    repo_dir = aws_fpga_test_utils.get_git_repo_root(dirname(__file__))
+    os.chdir(repo_dir)
     
     num_links  = 0 # total number of links we've found in .md files
     num_broken = 0 # total number of links which are broken
@@ -127,7 +147,16 @@ if __name__ == '__main__':
         for name in files:
             if name.lower().endswith('.md'):
                 path = os.path.join(root, name)
-                md_files.append(os.path.relpath(path))
+                path = os.path.relpath(path)
+                exclude = False
+                for exclude_path in args.exclude:
+                    if re.match(exclude_path, path):
+                        exclude = True
+                        break
+                if exclude:
+                    logger.warning("Ignoring {}".format(path))
+                    continue
+                md_files.append(path)
     logger.debug ("Found {} .md files".format(len(md_files)))
     
     # Render the markdown files to xhtml5 and parse the HTML for links and anchors

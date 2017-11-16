@@ -37,10 +37,25 @@ const struct logger *logger = &logger_stdout;
 int dma_example(int slot_i);
 int interrupt_example(int slot_id, int interrupt_number);
 
+void usage(const char* program_name) {
+    printf("usage: %s [--slot <slot>]\n", program_name);
+}
+
 int main(int argc, char **argv) {
     int rc;
-    int slot_id;
+    int slot_id = 0;
     int interrupt_number;
+
+    switch (argc) {
+    case 1:
+        break;
+    case 3:
+        sscanf(argv[2], "%x", &slot_id);
+        break;
+    default:
+        usage(argv[0]);
+        return 1;
+    }
 
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
@@ -51,8 +66,6 @@ int main(int argc, char **argv) {
     /* initialize the fpga_plat library */
     rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
-
-    slot_id = 0;
 
     rc = dma_example(slot_id);
     fail_on(rc, out, "DMA example failed");
@@ -142,7 +155,7 @@ int dma_example(int slot_id) {
 
     rc = sprintf(device_file_name, "/dev/edma%i_queue_0", slot_id);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format device file name.");
-
+    printf("device_file_name=%s\n", device_file_name);
 
     /* make sure the AFI is loaded and ready */
     rc = check_slot_config(slot_id);
