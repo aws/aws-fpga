@@ -50,7 +50,6 @@ echo "Updating Xilinx SDAccel Examples"
 git submodule update --init -- SDAccel/examples/xilinx
 
 debug=0
-DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
 
 function usage {
   echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-h|-help]"
@@ -173,9 +172,12 @@ if ! check_install_packages; then
     return 1
 fi
 
+
 # Download correct DSA
+#-------------------4 DDR--------------------
 #TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
 #TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
+DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
 dsa_dir=$SDACCEL_DIR/aws_platform/$DSA/hw/
 sdk_dsa=$dsa_dir/$DSA.dsa
 sdk_dsa_s3_bucket=aws-fpga-hdk-resources
@@ -224,6 +226,115 @@ if [[ $act_sha256 != $exp_sha256 ]]; then
   return 2
 fi
 info_msg "SDK DSA is up-to-date"
+#-------------------4 DDR--------------------
+
+#-------------------1 DDR--------------------
+#TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
+#TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
+DSA=xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0
+dsa_dir=$SDACCEL_DIR/aws_platform/$DSA/hw/
+sdk_dsa=$dsa_dir/$DSA.dsa
+sdk_dsa_s3_bucket=aws-fpga-hdk-resources
+s3_sdk_dsa=$sdk_dsa_s3_bucket/SDAccel/dsa_v11517_shell_v071417d3/$DSA/$DSA.dsa
+
+# set a variable to point to the platfom for build and emulation runs
+export AWS_PLATFORM=$SDACCEL_DIR/aws_platform/$DSA/$DSA.xpfm
+
+# Download the sha256
+if [ ! -e $dsa_dir ]; then
+	mkdir -p $dsa_dir || { err_msg "Failed to create $dsa_dir"; return 2; }
+fi
+# Use curl instead of AWS CLI so that credentials aren't required.
+curl -s https://s3.amazonaws.com/$s3_sdk_dsa.sha256 -o $sdk_dsa.sha256 || { err_msg "Failed to download DSA checkpoint version from $s3_sdk_dsa.sha256 -o $sdk_dsa.sha256"; return 2; }
+if grep -q '<?xml version' $sdk_dsa.sha256; then
+  err_msg "Failed to downlonad SDK DSA checkpoint version from $s3_sdk_dsa.sha256"
+  cat sdk_dsa.sha256
+  return 2
+fi
+exp_sha256=$(cat $sdk_dsa.sha256)
+debug_msg "  latest   version=$exp_sha256"
+# If DSA already downloaded check its sha256
+if [ -e $sdk_dsa ]; then
+  act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+  debug_msg "  existing version=$act_sha256"
+  if [[ $act_sha256 != $exp_sha256 ]]; then
+    info_msg "SDK dsa checkpoint version is incorrect"
+    info_msg "  Saving old checkpoint to $sdk_dsa.back"
+    mv $sdk_dsa $sdk_dsa.back
+  fi
+else
+  info_msg "SDK dsa hasn't been downloaded yet."
+fi
+if [ ! -e $sdk_dsa ]; then
+  info_msg "Downloading latest SDK dsa checkpoint from $s3_sdk_dsa"
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_sdk_dsa -o $sdk_dsa || { err_msg "SDK dsa checkpoint download failed"; return 2; }
+fi
+# Check sha256
+act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+if [[ $act_sha256 != $exp_sha256 ]]; then
+  err_msg "Incorrect SDK dsa checkpoint version:"
+  err_msg "  expected version=$exp_sha256"
+  err_msg "  actual   version=$act_sha256"
+  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
+  return 2
+fi
+info_msg "SDK DSA is up-to-date"
+#-------------------1 DDR--------------------
+
+#-------------------4 DDR RTL Kernel Debug--------------------
+#TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
+#TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
+DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0
+dsa_dir=$SDACCEL_DIR/aws_platform/$DSA/hw/
+sdk_dsa=$dsa_dir/$DSA.dsa
+sdk_dsa_s3_bucket=aws-fpga-hdk-resources
+s3_sdk_dsa=$sdk_dsa_s3_bucket/SDAccel/dsa_v11517_shell_v071417d3/$DSA/$DSA.dsa
+
+# set a variable to point to the platfom for build and emulation runs
+export AWS_PLATFORM=$SDACCEL_DIR/aws_platform/$DSA/$DSA.xpfm
+
+# Download the sha256
+if [ ! -e $dsa_dir ]; then
+	mkdir -p $dsa_dir || { err_msg "Failed to create $dsa_dir"; return 2; }
+fi
+# Use curl instead of AWS CLI so that credentials aren't required.
+curl -s https://s3.amazonaws.com/$s3_sdk_dsa.sha256 -o $sdk_dsa.sha256 || { err_msg "Failed to download DSA checkpoint version from $s3_sdk_dsa.sha256 -o $sdk_dsa.sha256"; return 2; }
+if grep -q '<?xml version' $sdk_dsa.sha256; then
+  err_msg "Failed to downlonad SDK DSA checkpoint version from $s3_sdk_dsa.sha256"
+  cat sdk_dsa.sha256
+  return 2
+fi
+exp_sha256=$(cat $sdk_dsa.sha256)
+debug_msg "  latest   version=$exp_sha256"
+# If DSA already downloaded check its sha256
+if [ -e $sdk_dsa ]; then
+  act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+  debug_msg "  existing version=$act_sha256"
+  if [[ $act_sha256 != $exp_sha256 ]]; then
+    info_msg "SDK dsa checkpoint version is incorrect"
+    info_msg "  Saving old checkpoint to $sdk_dsa.back"
+    mv $sdk_dsa $sdk_dsa.back
+  fi
+else
+  info_msg "SDK dsa hasn't been downloaded yet."
+fi
+if [ ! -e $sdk_dsa ]; then
+  info_msg "Downloading latest SDK dsa checkpoint from $s3_sdk_dsa"
+  # Use curl instead of AWS CLI so that credentials aren't required.
+  curl -s https://s3.amazonaws.com/$s3_sdk_dsa -o $sdk_dsa || { err_msg "SDK dsa checkpoint download failed"; return 2; }
+fi
+# Check sha256
+act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+if [[ $act_sha256 != $exp_sha256 ]]; then
+  err_msg "Incorrect SDK dsa checkpoint version:"
+  err_msg "  expected version=$exp_sha256"
+  err_msg "  actual   version=$act_sha256"
+  err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
+  return 2
+fi
+info_msg "SDK DSA is up-to-date"
+#-------------------4 DDR RTL Kernel Debug--------------------
 
 # Start of runtime xdma driver install 
 cd $SDACCEL_DIR
