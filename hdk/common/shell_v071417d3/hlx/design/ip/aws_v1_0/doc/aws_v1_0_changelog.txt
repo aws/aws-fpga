@@ -1,3 +1,7 @@
+2017.4:
+ * Version 1.0 (Rev. 1)
+ * Changed frequency of clk_extra_c0 from 300 to 500 MHz when recipe C0 is selected.
+
 2017.1:
  * Version 1.0
  * Native Vivado Release

@@ -4399,7 +4399,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d57a08ac</spirit:value>
+            <spirit:value>7dde6f22</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4421,7 +4421,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2a3c31c4</spirit:value>
+            <spirit:value>5207de60</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -16329,14 +16329,14 @@
       <xilinx:displayName>AWS</xilinx:displayName>
       <xilinx:vendorURL>http://www.xilinx.com</xilinx:vendorURL>
       <xilinx:coreRevision>0</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-11-14T21:57:18Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2017-11-15T21:58:49Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2017.1_sdx</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="1043eae4"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="b960cc28"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="dcd15a8a"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="850d6fb8"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="23edff88"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="d0c5a948"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d2b7b8ff"/>
       <xilinx:checksum xilinx:scope="cpus" xilinx:value="116b6c06"/>
