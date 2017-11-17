@@ -225,7 +225,7 @@ if [[ $act_sha256 != $exp_sha256 ]]; then
   err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
   return 2
 fi
-info_msg "SDK DSA is up-to-date"
+info_msg "AWS Platform: 4DDR is up-to-date"
 #-------------------4 DDR--------------------
 
 #-------------------1 DDR--------------------
@@ -279,7 +279,7 @@ if [[ $act_sha256 != $exp_sha256 ]]; then
   err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
   return 2
 fi
-info_msg "SDK DSA is up-to-date"
+info_msg "AWS Platform: 1DDR is up-to-date"
 #-------------------1 DDR--------------------
 
 #-------------------4 DDR RTL Kernel Debug--------------------
@@ -333,8 +333,9 @@ if [[ $act_sha256 != $exp_sha256 ]]; then
   err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
   return 2
 fi
-info_msg "SDK DSA is up-to-date"
+info_msg "AWS Platform: 4DDR RTL Kernel is up-to-date"
 #-------------------4 DDR RTL Kernel Debug--------------------
+
 
 # Start of runtime xdma driver install 
 cd $SDACCEL_DIR
@@ -350,5 +351,8 @@ if ! sudo make ec2=1 debug=1 INSTALL_ROOT=/opt/Xilinx/SDx/2017.1.rte SDK_DIR=$SD
 fi
 info_msg "SDAccel runtime installed"
 
+DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
+export AWS_PLATFORM=$SDACCEL_DIR/aws_platform/$DSA/$DSA.xpfm
+info_msg "The default AWS Platform has been set to: 4DDR - $AWS_PLATFORM"
 cd $current_dir
 info_msg "$script_name PASSED"
