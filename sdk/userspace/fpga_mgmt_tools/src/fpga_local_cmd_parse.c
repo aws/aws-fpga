@@ -158,7 +158,10 @@ static const char *load_afi_usage[] = {
 	"      --sync-timeout TIMEOUT",
 	"          Specify a timeout TIMEOUT (in seconds) for the sequence",
 	"          of operations that are performed in the synchronous (blocking)",
-	"          mode",
+	"          mode.",
+	"      -F, --force-shell-reload",
+	"          Reload the FPGA shell on AFI load, even if the next AFI",
+	"          doesn't require it.",
 };
 
 static const char *clear_afi_usage[] = {
@@ -452,11 +455,12 @@ parse_args_load_afi(int argc, char *argv[])
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
+		{"force-shell-reload",				no_argument,		0,	'F'	},
 		{0,						0,					0,	0	},
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:s:AH?hV",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:AH?hVF",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -493,6 +497,10 @@ parse_args_load_afi(int argc, char *argv[])
 		}
 		case 'H': {
 			f1.show_headers = true;
+			break;
+		}
+		case 'F': {
+			f1.force_shell_reload = true;
 			break;
 		}
 		case 'V': {

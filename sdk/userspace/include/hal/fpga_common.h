@@ -27,6 +27,17 @@
 #define FPGA_DDR_IFS_MAX		4
 
 /**
+ * FPGA Mixed Mode Clock Manager (MMCM) config.
+ *
+ * MMCM Groups A, B, C are 0, 1, 2 respectively
+ */
+#define FPGA_MMCM_GROUP_MAX         3
+#define FPGA_MMCM_OUT_CLKS_MAX      7
+#define CLOCK_COUNT_A		4
+#define CLOCK_COUNT_B		2
+#define CLOCK_COUNT_C		2
+
+/**
  * Common FPGA command flags.
  */
 enum {
@@ -36,9 +47,11 @@ enum {
 	FPGA_CMD_GET_HW_METRICS = 1 << 1,
 	/** return FPGA image hardware metrics (clear on read */ 
 	FPGA_CMD_CLEAR_HW_METRICS = 1 << 2,
+	FPGA_CMD_FORCE_SHELL_RELOAD = 1 << 3,
 
 	FPGA_CMD_ALL_FLAGS = FPGA_CMD_GET_HW_METRICS | 
-		FPGA_CMD_CLEAR_HW_METRICS,
+		FPGA_CMD_CLEAR_HW_METRICS|
+		FPGA_CMD_FORCE_SHELL_RELOAD,
 };
 
 /** 
@@ -212,6 +225,12 @@ struct fpga_ddr_if_metrics_common {
 	uint64_t    read_count;
 } __attribute__((packed));
 
+/** FPGA clock metrics common */
+struct fpga_clocks_common {
+    uint64_t    frequency[FPGA_MMCM_OUT_CLKS_MAX];
+} __attribute__((packed));
+
+
 /** FPGA metrics */
 struct fpga_metrics_common {
 	/** See FPGA_INT_STATUS_XYZ below */
@@ -247,6 +266,9 @@ struct fpga_metrics_common {
 
 	/** FPGA DDR interface metrics */
 	struct fpga_ddr_if_metrics_common ddr_ifs[FPGA_DDR_IFS_MAX];
+
+	/** FPGA clock metrics */
+	struct fpga_clocks_common clocks[FPGA_MMCM_GROUP_MAX];
 } __attribute__((packed));
 
 /** Common int_status */

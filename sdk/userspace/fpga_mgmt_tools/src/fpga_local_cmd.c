@@ -108,6 +108,7 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 	struct fpga_slot_spec slot_spec;
 	int ret = FPGA_ERR_FAIL;
 	uint32_t i;
+	uint64_t frequency;
 
 	if (f1.show_headers) {
 		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion\n");
@@ -232,6 +233,23 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 			printf("   write-count=%" PRIu64 "\n", ddr_if->write_count); 
 			printf("   read-count=%" PRIu64 "\n", ddr_if->read_count); 
 		}
+
+		printf("Clock Group A Frequency (Mhz)\n");
+		for (i = 0; i < CLOCK_COUNT_A; i++) {
+			frequency = fmc->clocks[0].frequency[i] / 1000000;
+			printf("%" PRIu64 "  ", frequency); 
+		}
+		printf("\nClock Group B Frequency (Mhz)\n");
+		for (i = 0; i < CLOCK_COUNT_B; i++) {
+			frequency = fmc->clocks[1].frequency[i] / 1000000;
+			printf("%" PRIu64 "  ", frequency); 
+		}
+		printf("\nClock Group C Frequency (Mhz)\n");
+		for (i = 0; i < CLOCK_COUNT_C; i++) {
+			frequency = fmc->clocks[2].frequency[i] / 1000000;
+			printf("%" PRIu64 "  ", frequency); 
+		}
+		printf("\n");
 	}
 
 	return 0;
@@ -293,14 +311,17 @@ static int command_load(void)
 {
 	int ret;
 
+	uint32_t flags = (f1.force_shell_reload) ? FPGA_CMD_FORCE_SHELL_RELOAD : 0;
+
+
 	if (f1.async) {
-		ret = fpga_mgmt_load_local_image(f1.afi_slot, f1.afi_id);
+		ret = fpga_mgmt_load_local_image_flags(f1.afi_slot, f1.afi_id, flags);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image failed");
 	} else {
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-		ret = fpga_mgmt_load_local_image_sync(f1.afi_slot, f1.afi_id,
+		ret = fpga_mgmt_load_local_image_sync_flags(f1.afi_slot, f1.afi_id, flags,
 				f1.sync_timeout, f1.sync_delay_msec, &info);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
 

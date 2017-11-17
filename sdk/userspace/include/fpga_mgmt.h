@@ -139,15 +139,30 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		uint32_t timeout, uint32_t delay_msec,
 		struct fpga_mgmt_image_info *info);
 
+
+/**
+ * Wrapper for fpga_mgmt_load_local_image_flags, with flags set to 0 as a default
+ */
+int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
+
 /**
  * Asynchronously loads the specified FPGA image to the specified slot number.
  *
  * @param[in]  slot_id  the logical slot index
  * @param[in]  afi_id   The Amazon FGPA Image id to be loaded
+ * @param[in]  flags   flags to select various options from Common FPGA
+ *                     command flags
  * @returns 0 on success, non-zero on error
  */
-int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
+int fpga_mgmt_load_local_image_flags(int slot_id, char *afi_id, uint32_t flags);
 
+/**
+ * Wrapper for fpga_mgmt_laod_local_image_sync_flags, with flags set to 0 as a
+ * default.
+*/
+int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
+		uint32_t timeout, uint32_t delay_msec,
+		struct fpga_mgmt_image_info *info);
 /**
  * Synchronously loads the specified FPGA image slot to the specified slot 
  * number.
@@ -160,7 +175,7 @@ int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
  * @param[in/out]  info	struct to populate with the slot description (or NULL)
  * @returns 0 on success, non-zero on error
  */
-int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id, 
+int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t flags,
 		uint32_t timeout, uint32_t delay_msec,
 		struct fpga_mgmt_image_info *info);
 
