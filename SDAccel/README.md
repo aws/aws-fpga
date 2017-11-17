@@ -42,7 +42,7 @@ This quick start guide will use a simple "Hello World" SDAccel example to get yo
 * Launch an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses on an F1 instance
   * You may use this F1 instance to [Build your Host Application and Xilinx FPGA Binary](#createapp), however, it may be more cost efficient to either: 
      * Launch a second [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a lower cost EC2 instance, with a minimum of 30GiB RAM), **OR** 
-     * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to install and obtain a license from Xilinx.
+     * Follow the [On-Premises Instructions](./docs/On_Premises_Development_Steps.md) to install and obtain a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html) <!-- #TBF Is there a better guide (syntax/links to for explicitly making this update? -->
 * [Setup AWS CLI and S3 Bucket](docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
 
@@ -195,6 +195,12 @@ Here are the steps:
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
+   * Clone the github repository to the new F1 instance and install runtime drivers
+```
+   $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
+   $ cd $AWS_FPGA_REPO_DIR 
+   $ source sdaccel_setup.sh
+```
 
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
 <!--

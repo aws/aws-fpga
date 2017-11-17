@@ -1,30 +1,33 @@
-# On-Premise Development and F1 Deployment Guide
+# On-Premises Development and F1 Deployment Guide
 
 The SDAccel flow for F1 supports the following development models:
 - Cloud based development on AWS EC2 cloud instances
-- On-premise development on your own local workstations
+- On-premises development on your own local workstations
 
 In both cases, the final binaries are deployed on an AWS F1 instance and the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is required for running on F1
 
-This guide provides step-by-step instructions for getting started with the on-premise flow and covers the following:
+This guide provides step-by-step instructions for getting started with the on-premises flow and covers the following:
 1. Installing and licensing SDAccel in your own environment
-2. Building your application on-premise with SDAccel
+2. Building your application on-premises with SDAccel
 3. Executing your application on F1
 
 ## Prerequisites
 Before going through the steps described in this document, the user should have completed at least once the steps described in the [AWS SDAccel README] in the cloud.  After completing the README steps, you will be familiar with the developer environment and will be ready to setup your own environment. 
 
 ## Requirements
-The supported Operating Systems for SDaccel On-premise development are:
-- Red Hat Enterprise Workstation/Server 7.2 and 7.3 (64-bit)
-- Red Hat Enterprise Workstation 6.7 and 6.8 (64-bit)
-- CentOS 6.8, CentOS 7.3 (64-bit)
-- Ubuntu Linux 16.04.1 LTS (64-bit)
+* The supported Operating Systems for SDaccel On-premises development are:
+   * Red Hat Enterprise Workstation/Server 7.2 and 7.3 (64-bit)		 
+   * Red Hat Enterprise Workstation 6.7 and 6.8 (64-bit)		 
+   * CentOS 6.8, CentOS 7.3 (64-bit)		 
+   * Ubuntu Linux 16.04.1 LTS (64-bit)		 
+* gcc5.x or later is required to compile your OpenCL host code in order to use C++14 features (cl2.hpp). 
+   * It is recommended that you use the Xilinx xcpp g++ wrapper to compile your host code.
+   * xcpp simply uses system g++ if it is gcc5.x or later, otherwise it uses the g++ provided by SDAccel.
 
 # 1. Installing and licensing SDAccel in your own environment
 
 ## Downloading the SDAccel Development Environment
-In order to develop any SDAccel application on-premise, you will need to install the same version of SDAccel as deployed on AWS F1. The SDAccel installer can be found here:
+In order to develop any SDAccel application on-premises, you will need to install the same version of SDAccel as deployed on AWS F1. The SDAccel installer can be found here:
 
 https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.1_sdx_0715_1_Lin64.bin&akdm=0
 
@@ -49,7 +52,7 @@ Execute the following commands on your local machine to clone the Github reposit
 **Note**: Sourcing sdaccel_setup.sh may show some errors as it also tries to install runtime drivers which requires sudo access. These errors are nonintrusive, and you can ignore these messages. 
 
 
-# 2. Building your design on-premise with SDAccel
+# 2. Building your design on-premises with SDAccel
 
 These steps will show you how to:
 - Confirm you are able to run SDAccel on your local machine
@@ -105,7 +108,7 @@ These binary files are ready to be uploaded to F1.
 # 3. Uploading and executing on F1
 
 In this section we will cover the following steps:
- - Upload your application built on-premise to the AWS cloud 
+ - Upload your application built on-premises to the AWS cloud 
  - Execute your application on F1
 
 ## Uploading the application to AWS
