@@ -197,7 +197,7 @@ Links pointing to **2017.1** version of the user guides
 [UG949 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
 
 [AWS SDAccel Readme]: ../README.md
-[OnPremiseDev]: ./On_Premise_Development_Steps.md
+[OnPremiseDev]: ./On_Premises_Development_Steps.md
 [Power_Analysis]: ./SDAccel_Power_Analysis.md
 [GUI_README]: ./README_GUI.md
 [FAQ]:../FAQ.md
