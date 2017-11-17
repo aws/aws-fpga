@@ -40,18 +40,20 @@
    4a. [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
    
    4b. [Clocks and Resets](#ClocksNReset)
+   
+   4c. [DDR4 AXI](#ddr4axi)
 
-   4c. [PCIS Interface](#pcis_interface)
+   4d. [PCIS Interface](#pcis_interface)
  
       *  [DMA_PCIS Interface Timeout Details](#pcis_timeout_details)
  
-   4d. [PCIM Interface](#pcim_interface)
+   4e. [PCIM Interface](#pcim_interface)
 
-   4e. [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
+   4f. [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
 
-   4f. [Interrupts](#interrupts)
+   4g. [Interrupts](#interrupts)
   
-   4g. [Miscellanous Interfaces(vLED, vDIP..)](#misc)
+   4h. [Miscellanous Interfaces(vLED, vDIP..)](#misc)
 
 <a name="overview"></a>
 # Overview
@@ -187,7 +189,7 @@ One of the four DRAM interface controllers is implemented in the Shell, and thre
 
 There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. The sh_ddr design block, sh_ddr.sv, instantiates the three DRAM interfaces in the CL (A, B, D).
 
-For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. 
+For DRAM interface controllers that are implemented in the CL, the AXI-4 interfaces do not connect into the Shell, but connect locally inside the CL to the AWS provided blocks. Refer to the [DDR4 AXI section](#ddr4axi) for more information about these interfaces.
 
 **NOTE:** Even if no DDR4 controllers are desired in the CL, the `sh_ddr.sv` block **must** be instantiated in the CL (parameters are used to remove DDR controllers).  **WARNING** If the CL does not instantiate the `sh_ddr.sv` block, it will result in implementation errors. Additionally, if the DDR C controller that's instantiated in the Shell is not desired, then the `cl_sh_ddr_rready` can be tied-off to `1'b0`.
 
