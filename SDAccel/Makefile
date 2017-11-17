@@ -34,10 +34,10 @@ else
 $(info XILINX_SDX = $(XILINX_SDX))
 endif
 
-INSTALL_ROOT = /opt/Xilinx/SDx/2017.1
+INSTALL_ROOT = /opt/Xilinx/SDx/2017.1.rte
 DSA = xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
 OPENCLLIB := 
-OPENCLFILE =  $(INSTALL_ROOT)/runtime/platforms/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
+OPENCLFILE =  $(XILINX_SDX)/runtime/platforms/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
 
 ifeq ($(wildcard $(OPENCLFILE)),)
   OPENCLLIB := ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so
