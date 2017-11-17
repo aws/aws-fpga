@@ -424,6 +424,7 @@ int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t d
     fail_on(rc, out, "Unable to write to AXI Master CCR register!");
 
     /* Poll for done */
+    poll_limit = 20;
     do{
         // Read the CCR until the done bit is set
         rc = fpga_pci_peek(pci_bar_handle, ccr_offset, &read_data);
