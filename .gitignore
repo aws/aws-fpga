@@ -56,7 +56,10 @@ hdk/common/verif/models/sh_bfm/cl_ports_sh_bfm.vh
 # SDAccel generated files
 SDAccel/**/*.d
 SDAccel/**/*.o.cmd
-SDAccel/aws_platform/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0/hw/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.dsa*
+SDAccel/aws_platform/xilinx_aws-*/hw/xilinx_aws-vu9p-*.dsa*
+SDAccel/tools/*.d
+SDAccel/tools/*.o
+SDAccel/tools/xbsak
 
 # SDK generated files
 sdk/linux_kernel_drivers/edma/.*.o.cmd
@@ -85,6 +88,7 @@ vivado*.log
 # Eclipse projects
 .project
 .pydevproject
+.settings
 
 # Python compiled code
 *.pyc

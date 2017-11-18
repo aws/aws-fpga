@@ -99,6 +99,7 @@ class TestLoadAfi(AwsFpgaTestBase):
     
     def base_precompiled_test(self, cl, install_edma_driver, slots_to_test=[], option_tag='default'):
         (agfi, afi) = self.get_agfi_from_readme(cl)
+        self.assert_afi_public(afi)
         self.base_test(cl, agfi, afi, install_edma_driver, slots_to_test, option_tag)
     
     def base_fdf_test(self, cl, install_edma_driver, slots_to_test=[], option_tag='default'):
@@ -137,11 +138,14 @@ class TestLoadAfi(AwsFpgaTestBase):
         test_obj_name = cl[3:]
         
         if cl == 'cl_dram_dma':
-            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && sudo ./test_{} --slot {}".format(self.WORKSPACE, cl, test_obj_name, slot))
+            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && sudo ./test_{} --slot {}".format(
+                self.WORKSPACE, cl, test_obj_name, slot), echo=True)
             assert rc == 0, "Runtime example failed."
+            logger.info("stdout:\n{}\nstderr:\n{}".format("\n".join(stdout_lines), "\n".join(stderr_lines)))
         
         elif re.match(r'cl_hello_world', cl):
-            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && sudo ./test_{} --slot {}".format(self.WORKSPACE, cl, test_obj_name, slot))
+            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && sudo ./test_{} --slot {}".format(
+                self.WORKSPACE, cl, test_obj_name, slot), echo=True)
             assert rc == 0, "Runtime example failed."
             exp_vdip_switch = '0000-0000-0000-0000'
             act_vdip_switch = self.fpga_get_virtual_dip_switch(slot)
@@ -163,7 +167,7 @@ class TestLoadAfi(AwsFpgaTestBase):
                 reg_value = 1 << b
                 logger.info("Testing with reg_value=0x{:016x}".format(reg_value))
                 (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && sudo ./test_{} --slot {} 0x{:x}".format(
-                    self.WORKSPACE, cl, test_obj_name, slot, reg_value))
+                    self.WORKSPACE, cl, test_obj_name, slot, reg_value), echo=True)
                 assert rc == 0, "Runtime example failed."
                 
                 exp_reg_value = self.byte_swap(reg_value)

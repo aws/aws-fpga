@@ -127,6 +127,8 @@ class AwsFpgaTestBase(object):
         if check and p.returncode:
             logger.error("Cmd failed with rc={}\ncmd: {}\nstdout:\n{}\nstderr:\n{}".format(
                 p.returncode, cmd, stdout_data, stderr_data))
+        elif echo:
+            logger.info("rc={}\nstdout:\n{}\nstderr:\n{}\n".format(p.returncode, cmd, stdout_data, stderr_data))
         return (p.returncode, stdout_lines, stderr_lines)
 
     @staticmethod
@@ -188,6 +190,22 @@ class AwsFpgaTestBase(object):
         afi_state = AwsFpgaTestBase.ec2_client().describe_fpga_images(FpgaImageIds=[afi])['FpgaImages'][0]['State']['Code']
         logger.info("{} state={}".format(afi, afi_state))
         assert afi_state == 'available'
+
+    @staticmethod
+    def assert_afi_public(afi):
+        # Check the status of the afi
+        logger.info("Checking that {} is public".format(afi))
+        loadPermissions = AwsFpgaTestBase.ec2_client().describe_fpga_image_attribute(FpgaImageId=afi, Attribute='loadPermission')['FpgaImageAttribute']['LoadPermissions']
+        logger.info("{} loadPermissions:".format(afi))
+        for loadPermission in loadPermissions:
+            if 'UserId' in loadPermission:
+                logger.info("  UserId={}".format(loadPermission['UserId']))
+            else:
+                logger.info("  Group={}".format(loadPermission['Group']))
+        is_public = AwsFpgaTestBase.ec2_client().describe_fpga_images(FpgaImageIds=[afi])['FpgaImages'][0]['Public']
+        logger.info("  Public={}".format(is_public))
+        assert is_public, "{} is not public. To make public:\n{}".format(afi,
+            "aws ec2 modify-fpga-image-attribute --fpga-image-id {} --load-permission \'Add=[{{Group=all}}]\'".format(afi))
 
     @staticmethod
     def fpga_clear_local_image(slot):

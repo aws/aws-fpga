@@ -424,6 +424,7 @@ int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t d
     fail_on(rc, out, "Unable to write to AXI Master CCR register!");
 
     /* Poll for done */
+    poll_limit = 20;
     do{
         // Read the CCR until the done bit is set
         rc = fpga_pci_peek(pci_bar_handle, ccr_offset, &read_data);
@@ -438,10 +439,12 @@ int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t d
     rc = fpga_pci_peek(pci_bar_handle, crdr_offset, &read_data);
     fail_on(rc, out, "Unable to read AXI Master CRDR from the fpga !");
     if(read_data == ddr_data) {
+        rc = 0;
         printf("Resulting value at address 0x%x%x matched expected value 0x%x. It worked!\n", ddr_hi_addr, ddr_lo_addr, ddr_data);
     }
     else{
-        printf("Resulting value, 0x%x did not match expected value 0x%x at address 0x%x%x. Something didn't work.\n", read_data, ddr_data, ddr_hi_addr, ddr_lo_addr);
+        rc = 1;
+        fail_on(rc, out, "Resulting value, 0x%x did not match expected value 0x%x at address 0x%x%x. Something didn't work.\n", read_data, ddr_data, ddr_hi_addr, ddr_lo_addr);
     }
 
 out:
