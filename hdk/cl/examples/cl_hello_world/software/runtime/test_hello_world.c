@@ -61,6 +61,10 @@ void usage(char* program_name) {
     printf("usage: %s [--slot <slot-id>][<poke-value>]\n", program_name);
 }
 
+uint32_t byte_swap(uint32_t value);
+ 
+#endif
+
 uint32_t byte_swap(uint32_t value) {
     uint32_t swapped_value = 0;
     int b;
@@ -69,7 +73,6 @@ uint32_t byte_swap(uint32_t value) {
     }
     return swapped_value;
 }
-#endif
 
 #ifdef SV_TEST
 void test_main(uint32_t *exit_code) {
