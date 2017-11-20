@@ -9,13 +9,6 @@ To allow copies, the source AFI must meet the following requirements:
 * AFI must be owned by caller.  Access to an AFI does not grant sufficient permissions to copy it.
 * AFI must be in `available` state.  Copy is not allowed if source AFI is in `pending`, `failed` or `unavailable` states.
 
-## Load preview AWS cli model
-
-`copy-fpga-image` is currently a preview API available after loading the preview json model included in the SDK:
-```
-   $ aws configure add-model --service-name ec2 --service-model file://./sdk/aws-cli-preview/ec2_copy-fpga-image.json
-```
-
 ## Example usage
 
 * Show command manual page:

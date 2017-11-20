@@ -1,5 +1,7 @@
 # CL_DRAM_DMA CustomLogic Example
 
+## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../README.md) first!!
+
 ## Table of Content
 
 1. [Overview](#overview)

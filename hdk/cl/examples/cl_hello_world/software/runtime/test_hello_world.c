@@ -137,12 +137,12 @@ int main(int argc, char **argv) {
     printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
 
     printf(
-        "# fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
-        "# fpga-get-virtual-led  -S 0\n"
+        "# sudo fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
+        "# sudo fpga-get-virtual-led  -S 0\n"
         "FPGA slot id 0 have the following Virtual LED:\n"
         "1010-1101-1101-1110\n"
-        "# fpga-set-virtual-dip-switch -S 0 -D 0000000000000000\n"
-        "# fpga-get-virtual-led  -S 0\n"
+        "# sudo fpga-set-virtual-dip-switch -S 0 -D 0000000000000000\n"
+        "# sudo fpga-get-virtual-led  -S 0\n"
         "FPGA slot id 0 have the following Virtual LED:\n"
         "0000-0000-0000-0000\n"
     );
