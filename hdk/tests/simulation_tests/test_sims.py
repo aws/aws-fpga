@@ -40,12 +40,12 @@ class TestSims(AwsFpgaTestBase):
     NOTE: Cannot have an __init__ method.
     '''
     
-    @staticmethod
-    def setup_class(self):
+    @classmethod
+    def setup_class(cls):
         '''
         Do any setup required for tests.
         '''
-        AwsFpgaTestBase.setup_class(self, __file__)
+        AwsFpgaTestBase.setup_class(cls, __file__)
         
         AwsFpgaTestBase.assert_hdk_setup()
         
