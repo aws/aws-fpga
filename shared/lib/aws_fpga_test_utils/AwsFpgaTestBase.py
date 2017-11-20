@@ -128,7 +128,7 @@ class AwsFpgaTestBase(object):
             logger.error("Cmd failed with rc={}\ncmd: {}\nstdout:\n{}\nstderr:\n{}".format(
                 p.returncode, cmd, stdout_data, stderr_data))
         elif echo:
-            logger.info("rc={}\nstdout:\n{}\nstderr:\n{}\n".format(p.returncode, cmd, stdout_data, stderr_data))
+            logger.info("rc={}\nstdout:\n{}\nstderr:\n{}\n".format(p.returncode, stdout_data, stderr_data))
         return (p.returncode, stdout_lines, stderr_lines)
 
     @staticmethod
@@ -206,6 +206,16 @@ class AwsFpgaTestBase(object):
         logger.info("  Public={}".format(is_public))
         assert is_public, "{} is not public. To make public:\n{}".format(afi,
             "aws ec2 modify-fpga-image-attribute --fpga-image-id {} --load-permission \'Add=[{{Group=all}}]\'".format(afi))
+
+    @staticmethod
+    def get_agfi_from_readme(cl):
+        cl_dir = "{}/hdk/cl/examples/{}".format(AwsFpgaTestBase.WORKSPACE, cl)
+        assert os.path.exists(cl_dir)
+        agfi = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AGFI ID\' | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
+        afi  = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AFI ID\'  | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
+        logger.info("AGFI from README: {}".format(agfi))
+        logger.info("AFI  from README: {}".format(afi))
+        return (agfi, afi)
 
     @staticmethod
     def fpga_clear_local_image(slot):

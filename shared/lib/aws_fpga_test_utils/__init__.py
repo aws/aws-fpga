@@ -40,7 +40,7 @@ def get_git_repo_root(path=None):
 
 def remove_edma_driver():
     logger.info("Removing the edma driver")
-    assert os.system('sudo rmmod edma-drv') == 0
+    os.system('sudo rmmod edma-drv')
     assert os.system('sudo rm -f /lib/modules/`uname -r`/edma-drv.ko') == 0
     assert os.system('sudo rm -f /etc/modules-load.d/edma.conf') == 0
 

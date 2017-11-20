@@ -8,8 +8,9 @@ properties([parameters([
     booleanParam(name: 'test_markdown_links',   defaultValue: true),
     booleanParam(name: 'test_hdk_scripts',      defaultValue: true),
     booleanParam(name: 'test_sims',             defaultValue: true),
-    booleanParam(name: 'test_runtime_software', defaultValue: true),
-    booleanParam(name: 'test_fdf',              defaultValue: true),
+    booleanParam(name: 'test_edma',             defaultValue: true, description: 'Run EDMA unit and perf tests'),
+    booleanParam(name: 'test_runtime_software', defaultValue: true, description: 'Test precompiled AFIs'),
+    booleanParam(name: 'test_fdf',              defaultValue: true, description: 'Test full developer flow on cl_hello_world and cl_dram_dma'),
     booleanParam(name: 'test_sdaccel_scripts',  defaultValue: true),
     booleanParam(name: 'test_sdaccel_builds',   defaultValue: false),
     booleanParam(name: 'debug_dcp_gen',         defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
@@ -23,6 +24,7 @@ properties([parameters([
 boolean test_markdown_links = params.get('test_markdown_links')
 boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_sims = params.get('test_sims')
+boolean test_edma = params.get('test_edma')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_fdf = params.get('test_fdf')
 boolean test_sdaccel_scripts = params.get('test_sdaccel_scripts')
@@ -155,26 +157,61 @@ if (test_sims) {
     }
 }
 
+if (test_edma) {
+    top_parallel_stages['Test EDMA Driver'] = {
+        stage('Test EDMA Driver') {
+            node(task_label.get('runtime')) {
+                echo "Test EDMA Driver"
+                checkout scm
+                String report_file = "test_edma.xml"
+                try {
+                    sh """
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        pytest -v sdk/tests/test_edma.py --junit-xml $WORKSPACE/${report_file}
+                    """
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                }
+            }
+        }
+    }
+}
+
 if (test_runtime_software) {
     top_parallel_stages['Test Runtime Software'] = {
         stage('Test Runtime Software') {
             def nodes = [:]
-            for (x in runtime_sw_cl_names) {
-                String cl_name = x
-                String node_name = "Test Runtime Software ${cl_name}"
-                String test = "hdk/tests/test_load_afi.py::TestLoadAfi::test_precompiled_${cl_name}"
-                String report_file = "test_runtime_software_${cl_name}.xml"
-                nodes[node_name] = {
-                    node(task_label.get('runtime')) {
-                        checkout scm
-                        try {
-                            sh """
-                                set -e
-                                source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                                pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
-                            """
-                        } finally {
-                            junit healthScaleFactor: 10.0, testResults: report_file
+            def node_types = ['runtime', 'runtime-all-slots']
+            for (n in node_types) {
+                node_type = n
+                for (x in runtime_sw_cl_names) {
+                    String cl_name = x
+                    String node_name
+                    switch (node_type) {
+                        case "runtime":
+                            node_name = "Test Runtime Software f1.2xl ${cl_name}"
+                            break;
+                        case "runtime-all-slots":
+                            node_name = "Test Runtime Software f1.16xl ${cl_name}"
+                            break;
+                    }
+                    String node_label = task_label.get(node_type)
+                    nodes[node_name] = {
+                        node(node_label) {
+                            String test = "hdk/tests/test_load_afi.py::TestLoadAfi::test_precompiled_${cl_name}"
+                            String report_file = "test_runtime_software_${cl_name}.xml"
+                            checkout scm
+                            
+                            try {
+                                sh """
+                                    set -e
+                                    source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                                    pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                """
+                            } finally {
+                                junit healthScaleFactor: 10.0, testResults: report_file
+                            }
                         }
                     }
                 }

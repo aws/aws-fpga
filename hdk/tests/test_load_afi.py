@@ -62,15 +62,6 @@ class TestLoadAfi(AwsFpgaTestBase):
         
         assert AwsFpgaTestBase.running_on_f1_instance(), 'This test must be run on an F1 instance.'
         return
-
-    def get_agfi_from_readme(self, cl):
-        cl_dir = "{}/hdk/cl/examples/{}".format(self.WORKSPACE, cl)
-        assert os.path.exists(cl_dir)
-        agfi = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AGFI ID\' | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
-        afi  = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AFI ID\'  | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
-        logger.info("AGFI from README: {}".format(agfi))
-        logger.info("AFI  from README: {}".format(afi))
-        return (agfi, afi)
     
     def get_agfi(self, cl, option_tag):
         '''
