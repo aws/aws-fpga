@@ -15,7 +15,7 @@ The VLED is set based upon writing 0xAAAA into the AXI GPIO (0x0) slave register
 
 The PCIS Interfaces writes ASCII data into the AXI BRAM memory space and reads back from these address to print out “Hello World!” in simulation or on F1.
 
-Make sure the [HLx Setup Instructions](../../../docs/AWS_IP_Vivado_Setup.md) are followed and executed.
+Make sure the [HLx Setup Instructions](../../../../hdk/docs/IPI_GUI_Vivado_Setup.md) are followed and executed.
 
 <a name="hlx"></a>
 ## CL Example
@@ -30,10 +30,6 @@ Invoke vivado by typing `vivado`, once the GUI has loaded click Tcl Console.
 In the TCL console type in the following to create the hello\_world\_hlx example.  The example will be generated in cl/examples/hello\_world\_hlx/example\_projects.  The vivado project is examples\_projects/hello\_world.xpr.
 
 aws::make\_ipi -examples hello\_world
-
-Note when closing and re-opening the project in the future, the following TCL command must be run when the project first opens or an error will show up in simulation/implementation flow.
-
-aws::make\_ipi
 
 Once the Block diagram is open, review the different IP blocks especially the settings in the AWS IP.
 

@@ -81,6 +81,7 @@ namespace awsbwhal {
     static std::mutex deviceListMutex;
     static std::vector<int> deviceList;
 
+
     static int findDMADevice(unsigned short domain, unsigned char bus, unsigned char dev, unsigned char func)
     {
         int i;
@@ -111,6 +112,16 @@ namespace awsbwhal {
         return -1;
     }
 
+    int AwsXcl::setDDRCount(const axlf* buffer) 
+    {
+	const char*  str = (const char*) buffer->m_header.m_platformVBNV;
+	if(strstr(str, "1ddr-xpr")) {
+	    m4DDR = false;
+	} else 
+	    m4DDR = true;
+	return 0;
+    }
+
     int AwsXcl::xclLoadAxlf(const axlf *buffer)
     {
         if ( mLogStream.is_open()) {
@@ -118,7 +129,11 @@ namespace awsbwhal {
         }
 
         if ( !mLocked)
-            return -EPERM;
+	    return -EPERM;
+
+	//set 1 or 4 ddr.
+	if(setDDRCount(buffer))
+	    return -EINVAL;
 
 #ifdef INTERNAL_TESTING
         const unsigned cmd = AWSMGMT_IOCICAPDOWNLOAD_AXLF;
@@ -378,6 +393,11 @@ namespace awsbwhal {
             size = DDR_BUFFER_ALIGNMENT;
 
         uint64_t result = MemoryManager::mNull;
+
+	if(!is4DDR()) {
+	    return mDDRMemoryManager[0]->alloc(size);
+	}
+	
         for (auto i : mDDRMemoryManager) {
             result = i->alloc(size);
             if (result != MemoryManager::mNull)
@@ -398,6 +418,11 @@ namespace awsbwhal {
 
         if (size == 0)
             size = DDR_BUFFER_ALIGNMENT;
+
+	if(!is4DDR() && flags > 0) {
+            std::cout << "Trying to allocate past the 1 bank on the 1 DDR device " << std::endl;
+            return MemoryManager::mNull;
+	}
 
         if (flags >= mDDRMemoryManager.size()) {
             return MemoryManager::mNull;
@@ -579,7 +604,8 @@ namespace awsbwhal {
                                                   maxDMASize(0xfa0000),
                                                   mLocked(false),
                                                   mOffsets{0x0, 0x0, 0x0, 0x0},
-                                                  mOclRegionProfilingNumberSlots(XPAR_AXI_PERF_MON_2_NUMBER_SLOTS)
+                                                  mOclRegionProfilingNumberSlots(XPAR_AXI_PERF_MON_2_NUMBER_SLOTS),
+						  m4DDR(true)
     {
         int slot_id = mBoardNumber;
         mDataMover = new DataMover(mDMADeviceNodeNumber, 4 /* 1 channel each dir */);

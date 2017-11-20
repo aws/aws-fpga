@@ -26,7 +26,8 @@ module test_dram_dma();
     int            len1 = 128;
     int            len2 = 6000;
     int            len3 = 300;
-
+    logic          ddr_ready;
+   
     initial begin
 
        logic [63:0] host_memory_buffer_address;
@@ -49,11 +50,8 @@ module test_dram_dma();
        tb.poke_ocl(.addr(64'h430), .data(0));
 
        // allow memory to initialize
-       tb.nsec_delay(25000);
-
-       // issuing flr
-       tb.issue_flr();
-
+       tb.nsec_delay(27000);
+       
        $display("[%t] : Initializing buffers", $realtime);
 
        host_memory_buffer_address = 64'h0;
@@ -68,7 +66,8 @@ module test_dram_dma();
        end
        
        host_memory_buffer_address = 64'h0_0000_3000;
-       tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_1000_0000), .len(len1) );  // move buffer to DDR 0
+
+       tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) );  // move buffer to DDR 1
 
        for (int i = 0 ; i < len1 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hBB));
@@ -76,7 +75,7 @@ module test_dram_dma();
        end
 
        host_memory_buffer_address = 64'h0_0000_6000;
-       tb.que_buffer_to_cl(.chan(2), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0005), .len(len2) );  // move buffer to DDR 0
+       tb.que_buffer_to_cl(.chan(2), .src_addr(host_memory_buffer_address), .cl_addr(64'h0008_0000_0005), .len(len2) );  // move buffer to DDR 2
 
        for (int i = 0 ; i < len2 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hCC));
@@ -84,7 +83,7 @@ module test_dram_dma();
        end
 
        host_memory_buffer_address = 64'h0_0000_9000;
-       tb.que_buffer_to_cl(.chan(3), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_3000_0000), .len(len3) );  // move buffer to DDR 0
+       tb.que_buffer_to_cl(.chan(3), .src_addr(host_memory_buffer_address), .cl_addr(64'h000C_0000_0000), .len(len3) );  // move buffer to DDR 3
 
        for (int i = 0 ; i < len3 ; i++) begin
           tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hDD));
@@ -108,9 +107,9 @@ module test_dram_dma();
           status[3] = tb.is_dma_to_cl_done(.chan(3));
           #10ns;
           timeout_count++;
-       end while ((status != 4'hf) && (timeout_count < 2000));
+       end while ((status != 4'hf) && (timeout_count < 4000));
        
-       if (timeout_count >= 2000) begin
+       if (timeout_count >= 4000) begin
           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
           error_count++;
        end
@@ -122,13 +121,13 @@ module test_dram_dma();
        tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0002), .len(len0) );  // move DDR0 to buffer
                                                                                                                                             
        host_memory_buffer_address = 64'h0_0002_1800;                                                                                        
-       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_1000_0000), .len(len1) );  // move DDR1 to buffer
+       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) );  // move DDR1 to buffer
                                                                                                                                             
        host_memory_buffer_address = 64'h0_0003_2800;                                                                                        
-       tb.que_cl_to_buffer(.chan(2), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_2000_0005), .len(len2) );  // move DDR2 to buffer
+       tb.que_cl_to_buffer(.chan(2), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0008_0000_0005), .len(len2) );  // move DDR2 to buffer
                                                                                                                                             
        host_memory_buffer_address = 64'h0_0004_3800;                                                                                        
-       tb.que_cl_to_buffer(.chan(3), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_3000_0000), .len(len3) );  // move DDR3 to buffer
+       tb.que_cl_to_buffer(.chan(3), .dst_addr(host_memory_buffer_address), .cl_addr(64'h000C_0000_0000), .len(len3) );  // move DDR3 to buffer
        
        //Start transfers of data from CL DDR
        tb.start_que_to_buffer(.chan(0));   
@@ -220,7 +219,7 @@ module test_dram_dma();
        end
        $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
-       if (fail) begin
+       if (fail || (tb.chk_prot_err_stat())) begin
          $display("[%t] : *** TEST FAILED ***", $realtime);
        end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);

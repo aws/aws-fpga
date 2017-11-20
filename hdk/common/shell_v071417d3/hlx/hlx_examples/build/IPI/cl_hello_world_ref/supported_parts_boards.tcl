@@ -33,19 +33,15 @@ proc getSupportedParts {} {
 
 proc getSupportedBoards {} {
 	if {[setSupportedBoards] eq "" && [info exist _nsvars::script_dir] eq 1} {
-		puts "setting repo: [ file join $_nsvars::script_dir boards ]"
 		set_param board.repoPaths [ file join $_nsvars::script_dir boards ]
-		puts "found [setSupportedBoards]"
 	}
 	if {[setSupportedBoards] eq "" && [info exist public::bd_faas_design_directory] eq 1} {
-		puts "setting repo: [ file join public::bd_faas_design_directory boards ]"
 		set_param board.repoPaths [ file join $_nsvars::script_dir boards ]
-		puts "found [setSupportedBoards]"
 	}
 	return [setSupportedBoards]
 }
 
 proc setSupportedBoards {} {
-	set fullBoard [get_board_parts "*f1_cl*"]
+	set fullBoard [get_board_parts -quiet "*f1_cl*"]
 	return [get_board_parts -filter " NAME == $fullBoard " -latest_file_version -quiet]
 }

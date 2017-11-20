@@ -43,7 +43,7 @@ module test_peek_poke_pcis_axsize();
 
       tb.power_up();
 
-      tb.nsec_delay(500);
+      tb.nsec_delay(2000);
       tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
@@ -80,12 +80,12 @@ module test_peek_poke_pcis_axsize();
       // Report pass/fail status
       //---------------------------
       $display("[%t] : Checking total error count...", $realtime);
-      if (error_count > 0) begin
+      if (error_count > 0)begin
          fail = 1;
       end
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
-      if (fail) begin
+      if (fail || (tb.chk_prot_err_stat())) begin
          $display("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
@@ -96,8 +96,9 @@ module test_peek_poke_pcis_axsize();
 
    task compare_data(logic [511:0] act_data, exp_data);
        if(act_data !== exp_data) begin
-          disp_err($psprintf("Error: Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
-                             act_data, exp_data));
+          $display($time,,,"***ERROR*** : Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
+                             act_data, exp_data);
+          error_count ++;
        end
        else begin
           $display("Data Matched. Actual Data:%0h <==> Expected Data: %0h", act_data, exp_data);

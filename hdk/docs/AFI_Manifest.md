@@ -1,6 +1,6 @@
 # AWS AFI Manifest File Specification
 
-An AFI submission to AWS through  [`aws ec2 create-fpga-image` API](./TBD), includes a pointer to an S3 bucket with a tar file: The tar file includes the encrypted and compiled fpga image(a.k.a. Design Checkpoint or DCP) and a mandatory `manifest.txt` file.
+An AFI submission to AWS using  `aws ec2 create-fpga-image` includes a pointer to an S3 bucket with a tar file: The tar file includes the encrypted and compiled fpga image(a.k.a. Design Checkpoint or DCP) and a mandatory `manifest.txt` file.
 
 This document provides the specification for the `manifest.txt` file.  Note that an AFI built through the scripts provided by AWS will generate the manifest file automatically.
 

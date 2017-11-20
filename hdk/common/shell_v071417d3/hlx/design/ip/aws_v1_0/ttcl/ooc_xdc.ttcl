@@ -16,7 +16,7 @@
 <: set CLOCK_A2_MULT [lindex [list 2 2 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_A3_MULT [lindex [list 1 1 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_B1_MULT [lindex [list 2 2 2 4 4 4] $CLOCK_B_RECIPE] :> 
-<: set CLOCK_C1_MULT [lindex [list 3 3 3 3] $CLOCK_C_RECIPE] :> 
+<: set CLOCK_C1_MULT [lindex [list 5 3 3 3] $CLOCK_C_RECIPE] :> 
 <: set CLOCK_A1_DIV [lindex [list 1 1 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_A2_DIV [lindex [list 3 3 8] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_A3_DIV [lindex [list 2 2 4] $CLOCK_A_RECIPE] :> 

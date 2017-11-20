@@ -29,7 +29,7 @@ This document further describes the above and links to documentation or concepts
 
 ## SDAccel Design Flow
 The figure below shows:
-1. The [design flow](#design) overview on the left hand side. This overview explains the flow using the `xocc` option names. An example of this flow using the SDAccel GUI is shown [here](#working_with_examples)
+1. The [design flow](#design) overview on the left hand side. This overview explains the flow using the `xocc` option names. An example is documented using the [SDAccel GUI](./README_GUI.md).
 1. The [methodology flow](#methodology) on the right hand side.
 
 
@@ -197,7 +197,7 @@ Links pointing to **2017.1** version of the user guides
 [UG949 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
 
 [AWS SDAccel Readme]: ../README.md
-[OnPremiseDev]: ./On_Premise_Development_Steps.md
+[OnPremiseDev]: ./On_Premises_Development_Steps.md
 [Power_Analysis]: ./SDAccel_Power_Analysis.md
 [GUI_README]: ./README_GUI.md
 [FAQ]:../FAQ.md

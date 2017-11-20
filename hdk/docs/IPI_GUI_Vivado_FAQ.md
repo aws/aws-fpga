@@ -17,26 +17,10 @@
 <a name="proj"></a>
 # Vivado Project Flows
 
-**Q: Why does the 'FAAS\_CL\_DIR environment varaiable not set' project error show up and how to fix it?**
-
-The error `
-FAAS\_CL\_DIR environment varaiable not set, please run the proc 'aws::make_ipi_faas_setup' at the Vivado TCL command prompt
-` occurs when opening the project without using aws::make\_ipi (IPI flow) or aws::make\_rtl (RTL flow). When opening the project use either of the following TCL commands based upon the flow.  This will fix the issue.
-
-`aws::make\_rtl`
-
-`aws::make\_ipi`
-
 **Q: Why does a critical warning appear for DDR4?**
 
 The DDR4 IP currently doesn't have a board associated with the XCI that is used with the HLx flow.  
 The critical warning can safely be ignored as the IP will not change.
-
-**Q: Why does synth\_1 and impl\_1 report Out-of-date?**
-
-cl\_clocks\_aws.xdc is dynamically created before synthesis which makes the sources out of date.  The status can be safely ignored. However, right clicking on impl\_1 and then synth\_1 and select. Force Up-To-Date to get the correct status.
-
-cl\_clocks\_aws.xdc is dynamically created before synthesis which makes the sources out of date. The status can be safely ignored. However, right clicking on impl\_1 and then synth\_1 and select. Force Up-To-Date to get the correct status.
 
 **Q: Why is cl\_pnr\_user.xdc file disabled in the project?**
 
@@ -80,11 +64,40 @@ VHDL/Verilog only (System Verilog not supported)
 
 **Q: What simulators and simulation flows are supported?**
 
-When using the Vivado GUI, the Vivado Simulator is supported.  We plan to support linking in 3rd party vendor simulator support.
+When using the Vivado GUI, the Vivado Simulator is supported and is the default simulator.  
+
+We plan to support other linking in 3rd party vendor simulator support.  However, Questa simulator is supported (see next question/answer)
 
 Customer example System Verilog testbench (.sv/BFM) is supported
 
-When using the Vivado GUI, DPI simulation (C simulation is not supported) is not supported at this time 
+When using the Vivado GUI, DPI simulation (C simulation is not supported) is not supported at this time.
+
+**Q: How to use Questa simulator with GUI flow?**
+
+For Questa, libraries need to be compiled and the following changes are needed to the Vivado GUI project.  Note the user must install Questa and handle the licenses (not described in this document).
+
+Invoke vivado (no project needs to be open).  In the TCL console run the following compile to compile libraries.
+
+compile_simlib -simulator questa -directory path/simlib/2017.1\_sdx 
+
+Open any Vivado project where simulation needs to be changed to Questa.
+
+Right click on SIMULATION in the Project Manager and select Simulation Settings.
+
+Change Target simulator to Questa Advanced Simulator. Click Yes to change the simulator to 'Questa Advanced Simulator'.
+
+Change the Compiled library location to the path that was used for compiling libraries.
+
+For Verilog options select the ... box and add the following Defines.
+
+`QUESTA_SIM`
+
+In the Compilation tab, for questa.compile.vlog.more_options add in the following value.
+
+`-timescale 1ps/1ps`
+
+Click OK, Click Apply, Click OK to back into the Vivado project.
+
 
 **Q: With IP Integrator flow with AWS IP configured with no DDR4 in the CL, why does errors show up with Vivado Simulator?**
 

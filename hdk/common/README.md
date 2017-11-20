@@ -13,7 +13,7 @@ The shell_stable soft link points to the shell version contained in this directo
 
 ## /shell_v#\#\#\#\#\#\#\# #
 
-Each shell release constains files specific to that release. These files are stored in a shell directory with the version included in the directory name. For example, the [shell_v04151701](shell_v04151701) directory contains files specific to Shell Version 0x04151701.
+Each shell release contains files specific to that release. These files are stored in a shell directory with the version included in the directory name. For example, the [shell_v071417d3](shell_v071417d3) directory contains files specific to Shell Version 0x071417d3.
 
 ## /software
 

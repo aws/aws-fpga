@@ -90,7 +90,7 @@ struct edma_buffer_control_structure{
 
 	struct transient_buffer transient_buffer;
 	struct request* request;
-	spinlock_t ebcs_spin_lock;
+	struct mutex ebcs_mutex;
 	u32 next_to_use;
 	u32 next_to_clean;
 	u32 ebcs_depth;
@@ -105,7 +105,7 @@ struct edma_queue_private_data
 	struct edma_buffer_control_structure read_ebcs;
 	struct edma_buffer_control_structure write_ebcs;
 	struct edma_queue_stats stats;
-	spinlock_t edma_spin_lock;
+	struct mutex edma_mutex;
 	unsigned long state;
 	struct edma_device *dma_device;
 } ____cacheline_aligned;

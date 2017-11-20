@@ -23,7 +23,7 @@
 #include "svdpi.h"
 #endif
 
-#include "sh_dpi_tasks.h"
+#include "sh_dpi_tasks.c"
 
 void test_main(uint32_t *exit_code) {
 

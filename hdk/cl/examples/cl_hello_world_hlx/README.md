@@ -40,11 +40,6 @@ In the TCL console type in the following to create the cl\_hello\_world example.
 
 aws::make\_rtl -examples cl\_hello\_world
 
-Note when closing and opening the project in the future, the following command must be run or error could show up in simulation/implementation.
-
-aws::make\_rtl
-
-
 ### Simulation
 
 Click on Simulation->Run Simulation->Run Behavioral Simulation

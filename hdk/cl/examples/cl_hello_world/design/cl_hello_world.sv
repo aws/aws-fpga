@@ -315,15 +315,11 @@ always_ff @(posedge clk_main_a0)
 assign pre_cl_sh_status_vled[15:0] = vled_q[15:0] & sh_cl_status_vdip_q2[15:0];
 
 //-------------------------------------------
-// Tie-Off Global Signals
+// Tie-Off Unused Global Signals
 //-------------------------------------------
-`ifndef CL_VERSION
-   `define CL_VERSION 32'hee_ee_ee_00
-`endif  
-
-
-  assign cl_sh_status0[31:0] =  32'h0000_0FF0;
-  assign cl_sh_status1[31:0] = `CL_VERSION;
+// The functionality for these signals is TBD so they can can be tied-off.
+  assign cl_sh_status0[31:0] = 32'h0;
+  assign cl_sh_status1[31:0] = 32'h0;
 
 //-----------------------------------------------
 // Debug bridge, used if need Virtual JTAG

@@ -74,6 +74,8 @@ axi_bus_t lcl_cl_sh_ddrd();
 axi_bus_t sh_cl_dma_pcis_bus();
 axi_bus_t sh_cl_dma_pcis_q();
 
+axi_bus_t cl_axi_mstr_bus();
+
 axi_bus_t cl_sh_pcim_bus();
 axi_bus_t cl_sh_ddr_bus();
 
@@ -85,6 +87,7 @@ cfg_bus_t ddra_tst_cfg_bus();
 cfg_bus_t ddrb_tst_cfg_bus();
 cfg_bus_t ddrc_tst_cfg_bus();
 cfg_bus_t ddrd_tst_cfg_bus();
+cfg_bus_t axi_mstr_cfg_bus();
 cfg_bus_t int_tst_cfg_bus();
 
 scrb_bus_t ddra_scrb_bus();
@@ -167,19 +170,9 @@ assign ddrc_scrb_bus.enable = sh_cl_ctl0_q[3];
 assign dbg_scrb_en = sh_cl_ctl0_q[31];
 assign dbg_scrb_mem_sel[2:0] = sh_cl_ctl0_q[30:28];
 
-`ifndef CL_VERSION
-   `define CL_VERSION 32'hee_ee_ee_00
-`endif  
-
-always_ff @(posedge clk)
-    cl_sh_status0 <= dbg_scrb_en ? {1'b0, ddrc_scrb_bus.state, 
-                                    1'b0, ddrd_scrb_bus.state, 
-                                    1'b0, ddrb_scrb_bus.state, 
-                                    1'b0, ddra_scrb_bus.state,
-                                    4'b0, 4'hf, all_ddr_scrb_done, all_ddr_is_ready} :
-                        {20'ha111_1, 4'hf, all_ddr_scrb_done, all_ddr_is_ready};
-assign cl_sh_status1 = `CL_VERSION;
-
+// The functionality for these signals is TBD so they can can be tied-off.
+assign cl_sh_status0 = 32'h0;
+assign cl_sh_status1 = 32'h0;
 
 always_ff @(posedge clk)
     cl_sh_id0 <= dbg_scrb_en ? (dbg_scrb_mem_sel == 3'd3 ? ddrc_scrb_bus.addr[31:0] :
@@ -293,6 +286,7 @@ cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
     .ddrd_scrb_bus(ddrd_scrb_bus),
 
     .sh_cl_dma_pcis_bus(sh_cl_dma_pcis_bus),
+    .cl_axi_mstr_bus(cl_axi_mstr_bus),
 
     .lcl_cl_sh_ddra(lcl_cl_sh_ddra),
     .lcl_cl_sh_ddrb(lcl_cl_sh_ddrb),
@@ -305,6 +299,20 @@ cl_dma_pcis_slv #(.SCRB_BURST_LEN_MINUS1(DDR_SCRB_BURST_LEN_MINUS1),
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////// DMA PCIS SLAVE module ///////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+///////////////// Secondary AXI Master module /////////////////////////
+///////////////////////////////////////////////////////////////////////
+cl_dram_dma_axi_mstr  CL_DRAM_DMA_AXI_MSTR (
+    .aclk(clk),
+    .aresetn(dma_pcis_slv_sync_rst_n),
+    .cl_axi_mstr_bus(cl_axi_mstr_bus),
+    .axi_mstr_cfg_bus(axi_mstr_cfg_bus)
+  );
+
+///////////////////////////////////////////////////////////////////////
+///////////////// Secondary AXI Master module /////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
@@ -393,6 +401,7 @@ cl_ocl_slv CL_OCL_SLV (
    .ddrb_tst_cfg_bus(ddrb_tst_cfg_bus),
    .ddrc_tst_cfg_bus(ddrc_tst_cfg_bus),
    .ddrd_tst_cfg_bus(ddrd_tst_cfg_bus),
+   .axi_mstr_cfg_bus(axi_mstr_cfg_bus),
    .int_tst_cfg_bus(int_tst_cfg_bus)
 
 );
@@ -518,7 +527,6 @@ assign cl_sh_ddr_rready_2d = {lcl_cl_sh_ddrd.rready, lcl_cl_sh_ddrb.rready, lcl_
 lib_pipe #(.WIDTH(1), .STAGES(4)) SH_DDR_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(sh_ddr_sync_rst_n));
 sh_ddr #(
          .DDR_A_PRESENT(DDR_A_PRESENT),
-         .DDR_A_IO(1),
          .DDR_B_PRESENT(DDR_B_PRESENT),
          .DDR_D_PRESENT(DDR_D_PRESENT)
    ) SH_DDR

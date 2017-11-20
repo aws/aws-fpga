@@ -1,39 +1,54 @@
 #!/usr/bin/env bash
 
+# Exit on any error
+set -e
+
 # Process command line args
 while [[ $# -gt 1 ]]
 do
 key="$1"
 
 case $key in
-    -t|--test)
-    test="$2"
-    shift # past argument
-    ;;
+    --test-name)
+        test_name="$2"
+        shift
+        shift
+        ;;
+    --test-dir)
+        test_dir="$2"
+        shift
+        shift
+        ;;
+    --test-type)
+        test_type="$2"
+        shift
+        shift
+        ;;
     *)
-    echo -e >&2 "ERROR: Invalid option: $1\n"
-    exit 1
-    ;;
+        echo -e >&2 "ERROR: Invalid option: $1\n"
+        exit 1
+        ;;
 esac
-shift # past argument or value
 done
 
-if [ ":$test" = ":" ]; then
-    echo -e >&2 "ERROR: Invalid test: $test\n"
-    exit 1
-fi
-
-if [ ! -d $WORKSPACE/hdk/cl/examples/$test/verif/scripts ]; then
-    echo -e >&2 'ERROR: The test passed in does not exist!'
-    exit 1
-fi
-
-source $WORKSPACE/hdk_setup.sh;
-
-# Example test = cl_hello_world
-# makefile makes test_hello_world, so removing cl_ from the string
-test_name=${test:3}
-
 # Run the test
-cd $WORKSPACE/hdk/cl/examples/$test/verif/scripts;
-make TEST=test_$test_name;
+pushd $test_dir
+
+case "$test_type" in
+    sv)
+        make TEST="$test_name"
+        ;;
+    vhdl)
+        make TEST="$test_name"
+        ;;
+    c)
+        make C_TEST="$test_name"
+        ;;
+    *)
+        echo -e >&2 "ERROR: Invalid option: $1\n"
+        exit 1
+        ;;
+esac
+
+# Exit out of the test dir
+popd

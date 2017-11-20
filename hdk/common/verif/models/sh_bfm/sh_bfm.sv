@@ -24,346 +24,42 @@ module sh_bfm #(
                   )
 
    (
-   //--------------------
-   // Main input clock
-   //--------------------
 
-   input [31:0]                cl_sh_status0,
-   input [31:0]                cl_sh_status1,
-   input [31:0]                cl_sh_id0,
-   input [31:0]                cl_sh_id1,
-
-   output logic [31:0]         sh_cl_ctl0,
-   output logic [31:0]         sh_cl_ctl1,
-   output logic [1:0]          sh_cl_pwr_state,
-
-   output logic                clk_main_a0,
-   output logic                clk_extra_a1,
-   output logic                clk_extra_a2,
-   output logic                clk_extra_a3,
-   
-   output logic                clk_extra_b0,
-   output logic                clk_extra_b1,
-   
-   output logic                clk_extra_c0,
-   output logic                clk_extra_c1,
-    
-   output logic                rst_main_n,
-   output logic                kernel_rst_n,
-    
-   output logic                sh_cl_flr_assert,
-   input                       cl_sh_flr_done
-
-   ,
-   //-------------------------------------
-   // PCIe Interface from CL (AXI-4) (CL is PCI-master)
-   //-------------------------------------
-   input [15:0]                 cl_sh_pcim_awid  ,
-   input [63:0]                 cl_sh_pcim_awaddr,
-   input [7:0]                  cl_sh_pcim_awlen ,
-   input [2:0]                  cl_sh_pcim_awsize ,
-   input [18:0]                 cl_sh_pcim_awuser, //DW length of transfer
-   input [NUM_PCIE-1:0]         cl_sh_pcim_awvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_awready,
-
-   input [511:0]                cl_sh_pcim_wdata,
-   input [63:0]                 cl_sh_pcim_wstrb,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_wlast,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_wvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_wready,
-
-   output logic [15:0]          sh_cl_pcim_bid,
-   output logic [1:0]           sh_cl_pcim_bresp,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_bvalid,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_bready,
-                               
-   input [15:0]                 cl_sh_pcim_arid,
-   input [63:0]                 cl_sh_pcim_araddr,
-   input [7:0]                  cl_sh_pcim_arlen ,
-   input [2:0]                  cl_sh_pcim_arsize ,
-   input [18:0]                 cl_sh_pcim_aruser, //DW length of transfer
-   input [NUM_PCIE-1:0]         cl_sh_pcim_arvalid,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_arready,
-
-   output logic [15:0]          sh_cl_pcim_rid,
-   output logic [511:0]         sh_cl_pcim_rdata,
-   output logic [1:0]           sh_cl_pcim_rresp,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rlast,
-   output logic [NUM_PCIE-1:0]  sh_cl_pcim_rvalid,
-   input [NUM_PCIE-1:0]         cl_sh_pcim_rready,
-
-   output logic[1:0]            cfg_max_payload ,       //Max payload size - 00:128B, 01:256B, 10:512B
-   output logic[2:0]            cfg_max_read_req,      //Max read requst size - 000b:128B, 001b:256B, 010b:512B, 011b:1024B
-                                                                  // 100b-2048B, 101b:4096B
-
-
-   //-------------------------------------
-   // PCIe Interface to CL (AXI-4) (CL is PCI-slave)
-   //-------------------------------------
-   output logic [63:0]               sh_cl_dma_pcis_awaddr,
-   output logic [5:0]                sh_cl_dma_pcis_awid  ,
-   output logic [7:0]                sh_cl_dma_pcis_awlen ,
-   output logic [2:0]                sh_cl_dma_pcis_awsize,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_awvalid,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_awready,
-
-   output logic [511:0]              sh_cl_dma_pcis_wdata,
-   output logic [63:0]               sh_cl_dma_pcis_wstrb,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_wlast,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_wready,
-
-   input [1:0]                       cl_sh_dma_pcis_bresp,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_bvalid,
-   input [5:0]                       cl_sh_dma_pcis_bid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_bready,
-
-   output logic [63:0]               sh_cl_dma_pcis_araddr,
-   output logic [5:0]                sh_cl_dma_pcis_arid,
-   output logic [7:0]                sh_cl_dma_pcis_arlen,
-   output logic [2:0]                sh_cl_dma_pcis_arsize,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_arvalid,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_arready,
-                                     
-   input [5:0]                       cl_sh_dma_pcis_rid,
-   input [511:0]                     cl_sh_dma_pcis_rdata,
-   input [1:0]                       cl_sh_dma_pcis_rresp,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rlast,
-   input [NUM_PCIE-1:0]              cl_sh_dma_pcis_rvalid,
-   output logic [NUM_PCIE-1:0]       sh_cl_dma_pcis_rready,
-
-`ifndef NO_XDMA
-   input [15:0]         cl_sh_irq_req,
-   output logic [15:0]  sh_cl_irq_ack,
-`endif   
-   
-`ifndef VU190   
-   //-----------------------------------------
-   // CL MSIX
-   //-----------------------------------------
-    input                     cl_sh_msix_int,
-    input [7:0]               cl_sh_msix_vec,
-    output logic              sh_cl_msix_int_sent,
-    output logic              sh_cl_msix_int_ack
-`endif
-    
-   ,
-   input [NUM_GTY-1:0]        cl_sh_aurora_channel_up,
-
-   //--------------------------------------------------------------
-   // DDR[3] (M_C_) interface 
-   //--------------------------------------------------------------
-
-   // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
-   input                       CLK_300M_DIMM2_DP,
-   input                       CLK_300M_DIMM2_DN,
-   output logic                M_C_ACT_N,
-   output logic [16:0]         M_C_MA,
-   output logic [1:0]          M_C_BA,
-   output logic [1:0]          M_C_BG,
-   output logic [0:0]          M_C_CKE,
-   output logic [0:0]          M_C_ODT,
-   output logic [0:0]          M_C_CS_N,
-   output logic [0:0]          M_C_CLK_DN,
-   output logic [0:0]          M_C_CLK_DP,
-   output logic                RST_DIMM_C_N,
-   output logic                M_C_PAR,
-   inout [63:0]                M_C_DQ,
-   inout [7:0]                 M_C_ECC,
-   inout [17:0]                M_C_DQS_DP,
-   inout [17:0]                M_C_DQS_DN,
-
-
-
-   //----------------------------------------------
-   // DDR stats
-   //----------------------------------------------
-   output logic[7:0]           sh_ddr_stat_addr[2:0],
-   output logic[2:0]           sh_ddr_stat_wr,
-   output logic[2:0]           sh_ddr_stat_rd,
-   output logic[31:0]          sh_ddr_stat_wdata[2:0],
-
-   input [2:0]                 ddr_sh_stat_ack,
-   input [31:0]                ddr_sh_stat_rdata[2:0],
-   input [7:0]                 ddr_sh_stat_int[2:0],
-
-   //-----------------------------------------------------------------------------
-   // DDR Stats interfaces for DDR controllers in the CL.  This must be hooked up
-   // to the sh_ddr.sv for the DDR interfaces to function.
-   //-----------------------------------------------------------------------------
-   output logic [7:0]          sh_ddr_stat_addr0,
-   output logic                sh_ddr_stat_wr0, 
-   output logic                sh_ddr_stat_rd0, 
-   output logic [31:0]         sh_ddr_stat_wdata0,
-   input                       ddr_sh_stat_ack0,
-   input [31:0]                ddr_sh_stat_rdata0,
-   input [7:0]                 ddr_sh_stat_int0,
-
-   output logic [7:0]          sh_ddr_stat_addr1,
-   output logic                sh_ddr_stat_wr1, 
-   output logic                sh_ddr_stat_rd1, 
-   output logic [31:0]         sh_ddr_stat_wdata1,
-   input                       ddr_sh_stat_ack1,
-   input [31:0]                ddr_sh_stat_rdata1,
-   input [7:0]                 ddr_sh_stat_int1,
-
-   output logic [7:0]          sh_ddr_stat_addr2,
-   output logic                sh_ddr_stat_wr2, 
-   output logic                sh_ddr_stat_rd2, 
-   output logic [31:0]         sh_ddr_stat_wdata2,
-   input                       ddr_sh_stat_ack2,
-   input [31:0]                ddr_sh_stat_rdata2,
-   input [7:0]                 ddr_sh_stat_int2,
-    
-   input [15:0]                cl_sh_ddr_awid,
-   input [63:0]                cl_sh_ddr_awaddr,
-   input [7:0]                 cl_sh_ddr_awlen,
-   input                       cl_sh_ddr_awvalid,
-   output logic                sh_cl_ddr_awready,
-
-   input [15:0]                cl_sh_ddr_wid,
-   input [511:0]               cl_sh_ddr_wdata,
-   input [63:0]                cl_sh_ddr_wstrb,
-   input                       cl_sh_ddr_wlast,
-   input                       cl_sh_ddr_wvalid,
-   output logic                sh_cl_ddr_wready,
-
-   output logic [15:0]         sh_cl_ddr_bid,
-   output logic [1:0]          sh_cl_ddr_bresp,
-   output logic                sh_cl_ddr_bvalid,
-   input                       cl_sh_ddr_bready,
-
-   input [15:0]                cl_sh_ddr_arid,
-   input [63:0]                cl_sh_ddr_araddr,
-   input [7:0]                 cl_sh_ddr_arlen,
-   input                       cl_sh_ddr_arvalid,
-   output logic                sh_cl_ddr_arready,
-
-   output logic [15:0]         sh_cl_ddr_rid,
-   output logic [511:0]        sh_cl_ddr_rdata,
-   output logic [1:0]          sh_cl_ddr_rresp,
-   output logic                sh_cl_ddr_rlast,
-   output logic                sh_cl_ddr_rvalid,
-   input                       cl_sh_ddr_rready,
-
-   output logic                sh_cl_ddr_is_ready,
-
-   inout                       SYSMON_SCL,
-   inout                       SYSMON_SDA,
-
-   inout[3:0]                 fpga_uctrl_gpio
-
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through ManagementPF BAR4 for developer's use
-   // If the CL is created through  Xilinx’s SDAccel, then this configuration bus
-   // would be connected automatically to SDAccel generic logic (SmartConnect, APM etc)
-   //------------------------------------------------------------------------------------------
-    ,
-    output logic        sda_cl_awvalid,
-    output logic [31:0] sda_cl_awaddr, 
-    input               cl_sda_awready,
-
-   //Write data
-   output logic         sda_cl_wvalid,
-   output logic [31:0]  sda_cl_wdata,
-   output logic [3:0]   sda_cl_wstrb,
-   input                cl_sda_wready,
-
-   //Write response
-   input                cl_sda_bvalid,
-   input [1:0]          cl_sda_bresp,
-   output logic         sda_cl_bready,
-
-   //Read address
-   output logic         sda_cl_arvalid,
-   output logic [31:0]  sda_cl_araddr,
-   input                cl_sda_arready,
-
-   //Read data/response
-   input                cl_sda_rvalid,
-   input [31:0]         cl_sda_rdata,
-   input [1:0]          cl_sda_rresp,
-
-   output logic         sda_cl_rready,
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through AppPF BAR0
-   // For example, this AXI-L interface can connect to OpenCL Kernels
-   // This would connect automatically to the required logic 
-   // if the CL is created through SDAccel flow   
-   //------------------------------------------------------------------------------------------
-   output logic         sh_ocl_awvalid,
-   output logic [31:0]  sh_ocl_awaddr,
-   input                ocl_sh_awready,
-                                                                                                                            
-   //Write data             
-   output logic         sh_ocl_wvalid,
-   output logic [31:0]  sh_ocl_wdata,
-   output logic [3:0]   sh_ocl_wstrb,
-   input                ocl_sh_wready,
-
-   //Write response
-   input                ocl_sh_bvalid,
-   input [1:0]          ocl_sh_bresp,
-   output               sh_ocl_bready,
-
-   //Read address                                                                       
-   output logic         sh_ocl_arvalid,
-   output logic [31:0]  sh_ocl_araddr,
-   input                ocl_sh_arready,
-                                                                                                                            
-   //Read data/response
-   input                ocl_sh_rvalid,
-   input [31:0]         ocl_sh_rdata,
-   input [1:0]          ocl_sh_rresp,
-                                                                                                                            
-   output logic         sh_ocl_rready,
-
-   //------------------------------------------------------------------------------------------
-   // AXI-L maps to any inbound PCIe access through AppPF BAR1
-   // For example,
-   //------------------------------------------------------------------------------------------
-   output logic         sh_bar1_awvalid,
-   output logic [31:0]  sh_bar1_awaddr,
-   input                bar1_sh_awready,
-
-   //Write data
-   output logic         sh_bar1_wvalid,
-   output logic [31:0]  sh_bar1_wdata,
-   output logic [3:0]   sh_bar1_wstrb,
-   input                bar1_sh_wready,
-                                                                                                                     
-   //Write response      
-   input                bar1_sh_bvalid,
-   input [1:0]          bar1_sh_bresp,
-   output logic         sh_bar1_bready,
-                                                                                                                          
-   //Read address                                                                                                     
-   output logic         sh_bar1_arvalid,
-   output logic [31:0]  sh_bar1_araddr,
-   input                bar1_sh_arready,
-                                                                                                                            
-   //Read data/response      
-   input                bar1_sh_rvalid,
-   input [31:0]         bar1_sh_rdata,
-   input [1:0]          bar1_sh_rresp,
-                                                                                                                            
-   output logic [15:0]  sh_cl_status_vdip,
-   input [15:0]         cl_sh_status_vled,
- 
-   output logic         sh_bar1_rready           
+    //---------------------------------------------------------------------------------------
+    //DDR C interface is in shell. 
+    // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
+   input              CLK_300M_DIMM2_DP,
+   input              CLK_300M_DIMM2_DN,
+   output             M_C_ACT_N,
+   output [16:0]      M_C_MA,
+   output [1:0]       M_C_BA,
+   output [1:0]       M_C_BG,
+   output [0:0]       M_C_CKE,
+   output [0:0]       M_C_ODT,
+   output [0:0]       M_C_CS_N,
+   output [0:0]       M_C_CLK_DN,
+   output [0:0]       M_C_CLK_DP,
+   output             M_C_PAR,
+   inout  [63:0]      M_C_DQ,
+   inout  [7:0]       M_C_ECC,
+   inout  [17:0]      M_C_DQS_DP,
+   inout  [17:0]      M_C_DQS_DN,
+   output             RST_DIMM_C_N,
 
 `ifndef NO_CL_DDR
-   ,
-   output logic        sh_RST_DIMM_A_N,
-   output logic        sh_RST_DIMM_B_N,
-   output logic        sh_RST_DIMM_D_N
+   `ifndef VU190
+     output logic        sh_RST_DIMM_A_N,
+     output logic        sh_RST_DIMM_B_N,
+     output logic        sh_RST_DIMM_D_N,
+   `endif
 `endif  
-                               
-
     
-  
+   //---------------------------------------------------------------------------------------
+   //cl_ports_sh_bfm.vh is generated from cl_ports.vh in $(HDK_SHELL_DESIGN_DIR)/interfaces.
+   //This is to ensure that there is no integration issues.
+   //---------------------------------------------------------------------------------------
+    `include "cl_ports_sh_bfm.vh"
+
    );
 
 `include "axi_bfm_defines.svh"
@@ -460,6 +156,8 @@ module sh_bfm #(
 
    bit           debug;
 
+   logic         chk_clk_freq = 1'b0;
+   
    typedef struct {
       logic [63:0] buffer;
       logic [27:0] len;
@@ -489,7 +187,478 @@ module sh_bfm #(
    real EXTRA_C0_DLY = 1.66ns;
    real EXTRA_C1_DLY = 1.25ns;
 
+   real main_rising_edge  ;
+   real core_rising_edge     ;
+   real extra_a1_rising_edge ;
+   real extra_a2_rising_edge ;
+   real extra_a3_rising_edge ;
+   real extra_b0_rising_edge ;
+   real extra_b1_rising_edge ;
+   real extra_c0_rising_edge ;
+   real extra_c1_rising_edge ;
 
+   real main_clk_period  ;
+   real core_clk_period     ;
+   real extra_a1_clk_period ;
+   real extra_a2_clk_period ;
+   real extra_a3_clk_period ;
+   real extra_b0_clk_period ;
+   real extra_b1_clk_period ;
+   real extra_c0_clk_period ;
+   real extra_c1_clk_period ;
+   
+   logic [97 - 1:0]    pcis_pc_status;
+   logic               pcis_pc_asserted;
+   logic [97 - 1:0]    pcim_pc_status;
+   logic               pcim_pc_asserted;
+   logic [97 - 1:0]    ocl_pc_status;
+   logic               ocl_pc_asserted;
+   logic [97 - 1:0]    sda_pc_status;
+   logic               sda_pc_asserted;
+   logic [97 - 1:0]    bar1_pc_status;
+   logic               bar1_pc_asserted;
+
+   int   prot_err_count;
+   int   clk_err_count;
+   int   prot_x_count;
+   int   counter;
+
+   logic [63:0] glcount0, glcount1;
+   
+   //-------------------------------------------------------------------------------------------------------------
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*).
+   // Protocol checker checks for protocol violations on the interface where protocol checker
+   // is instantiated. This will help the CL designers in catiching protocol violations before
+   // testing with real system. Refer to hdk/common/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v
+   // for more details about each PC_STATUS bit.
+   //------------------------------------------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(0),
+    .C_AXI_ID_WIDTH(6),
+    .C_AXI_DATA_WIDTH(512),
+    .C_AXI_ADDR_WIDTH(64),
+    .C_AXI_AWUSER_WIDTH(1),
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(32),
+    .C_PC_MAXWBURSTS(32),
+    .C_PC_EXMON_WIDTH(0),
+
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
+
+    .C_PC_MESSAGE_LEVEL(2),
+    .C_PC_SUPPORTS_NARROW_BURST(1),
+    .C_PC_MAX_BURST_LENGTH(256),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axi_pc_mstr_inst_pcis (
+    .pc_status           (pcis_pc_status),
+    .pc_asserted         (pcis_pc_asserted),
+    .system_resetn       (rst_main_n),
+    .aclk                (clk_main_a0),
+    .aresetn             (rst_main_n),
+
+    .pc_axi_awid         (sh_cl_dma_pcis_awid),
+    .pc_axi_awaddr       (sh_cl_dma_pcis_awaddr),
+    .pc_axi_awlen        (sh_cl_dma_pcis_awlen),
+    .pc_axi_awsize       (sh_cl_dma_pcis_awsize),
+    .pc_axi_awburst      (2'b01),
+    .pc_axi_awlock       (1'b0),
+    .pc_axi_awcache      (4'b0000),
+    .pc_axi_awprot       (3'b000),
+    .pc_axi_awqos        (4'b0000),
+    .pc_axi_awregion     (4'b0000),
+    .pc_axi_awuser       (1'h0),
+    .pc_axi_awvalid      (sh_cl_dma_pcis_awvalid),
+    .pc_axi_awready      (cl_sh_dma_pcis_awready),
+
+    .pc_axi_wid          (6'h00), // AXI3 only
+    .pc_axi_wlast        (sh_cl_dma_pcis_wlast),
+    .pc_axi_wdata        (sh_cl_dma_pcis_wdata),
+    .pc_axi_wstrb        (sh_cl_dma_pcis_wstrb),
+    .pc_axi_wuser        (1'h0),
+    .pc_axi_wvalid       (sh_cl_dma_pcis_wvalid),
+    .pc_axi_wready       (cl_sh_dma_pcis_wready),
+
+    .pc_axi_bid          (cl_sh_dma_pcis_bid),
+    .pc_axi_bresp        (cl_sh_dma_pcis_bresp),
+    .pc_axi_buser        (1'h0),
+    .pc_axi_bvalid       (cl_sh_dma_pcis_bvalid),
+    .pc_axi_bready       (sh_cl_dma_pcis_bready),
+
+    .pc_axi_arid         (sh_cl_dma_pcis_arid),
+    .pc_axi_araddr       (sh_cl_dma_pcis_araddr),
+    .pc_axi_arlen        (sh_cl_dma_pcis_arlen),
+    .pc_axi_arsize       (sh_cl_dma_pcis_arsize),
+    .pc_axi_arburst      (2'b01),
+    .pc_axi_arlock       (1'b0),
+    .pc_axi_arcache      (4'b0000),
+    .pc_axi_arprot       (3'b000),
+    .pc_axi_arqos        (4'b0000),
+    .pc_axi_arregion     (4'b0000),
+    .pc_axi_aruser       (1'h0),
+    .pc_axi_arvalid      (sh_cl_dma_pcis_arvalid),
+    .pc_axi_arready      (cl_sh_dma_pcis_arready),
+
+    .pc_axi_rid          (cl_sh_dma_pcis_rid),
+    .pc_axi_rlast        (cl_sh_dma_pcis_rlast),
+    .pc_axi_rdata        (cl_sh_dma_pcis_rdata),
+    .pc_axi_rresp        (cl_sh_dma_pcis_rresp),
+    .pc_axi_ruser        (1'h0),
+    .pc_axi_rvalid       (cl_sh_dma_pcis_rvalid),
+    .pc_axi_rready       (sh_cl_dma_pcis_rready)
+  );
+
+  //----------------------------------------------------------------
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_PCIM*) 
+   //----------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(0),
+    .C_AXI_ID_WIDTH(6),
+    .C_AXI_DATA_WIDTH(512),
+    .C_AXI_ADDR_WIDTH(64),
+    .C_AXI_AWUSER_WIDTH(1),
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(32),
+    .C_PC_MAXWBURSTS(32),
+    .C_PC_EXMON_WIDTH(0),
+
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(1),
+    .C_PC_MAX_BURST_LENGTH(256),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axi_pc_mstr_inst_pcim (
+    .pc_status           (pcim_pc_status),
+    .pc_asserted         (pcim_pc_asserted),
+    .system_resetn       (rst_main_n),
+    .aclk                (clk_main_a0),
+    .aresetn             (rst_main_n),
+
+    .pc_axi_awid         (cl_sh_pcim_awid),
+    .pc_axi_awaddr       (cl_sh_pcim_awaddr),
+    .pc_axi_awlen        (cl_sh_pcim_awlen),
+    .pc_axi_awsize       (cl_sh_pcim_awsize),
+    .pc_axi_awburst      (2'b01),
+    .pc_axi_awlock       (1'b0),
+    .pc_axi_awcache      (4'b0000),
+    .pc_axi_awprot       (3'b000),
+    .pc_axi_awqos        (4'b0000),
+    .pc_axi_awregion     (4'b0000),
+    .pc_axi_awuser       (1'H0),
+    .pc_axi_awvalid      (cl_sh_pcim_awvalid),
+    .pc_axi_awready      (sh_cl_pcim_awready),
+
+    .pc_axi_wid          (6'H00), // AXI3 only
+    .pc_axi_wlast        (cl_sh_pcim_wlast),
+    .pc_axi_wdata        (cl_sh_pcim_wdata),
+    .pc_axi_wstrb        (cl_sh_pcim_wstrb),
+    .pc_axi_wuser        (1'H0),
+    .pc_axi_wvalid       (cl_sh_pcim_wvalid),
+    .pc_axi_wready       (sh_cl_pcim_wready),
+
+    .pc_axi_bid          (sh_cl_pcim_bid),
+    .pc_axi_bresp        (sh_cl_pcim_bresp),
+    .pc_axi_buser        (1'H0),
+    .pc_axi_bvalid       (sh_cl_pcim_bvalid),
+    .pc_axi_bready       (cl_sh_pcim_bready),
+
+    .pc_axi_arid         (cl_sh_pcim_arid),
+    .pc_axi_araddr       (cl_sh_pcim_araddr),
+    .pc_axi_arlen        (cl_sh_pcim_arlen),
+    .pc_axi_arsize       (cl_sh_pcim_arsize),
+    .pc_axi_arburst      (2'b01),
+    .pc_axi_arlock       (1'b0),
+    .pc_axi_arcache      (4'b0000),
+    .pc_axi_arprot       (3'b000),
+    .pc_axi_arqos        (4'b0000),
+    .pc_axi_arregion     (4'b0000),
+    .pc_axi_aruser       (1'H0),
+    .pc_axi_arvalid      (cl_sh_pcim_arvalid),
+    .pc_axi_arready      (sh_cl_pcim_arready),
+
+    .pc_axi_rid          (sh_cl_pcim_rid),
+    .pc_axi_rlast        (sh_cl_pcim_rlast),
+    .pc_axi_rdata        (sh_cl_pcim_rdata),
+    .pc_axi_rresp        (sh_cl_pcim_rresp),
+    .pc_axi_ruser        (1'H0),
+    .pc_axi_rvalid       (sh_cl_pcim_rvalid),
+    .pc_axi_rready       (cl_sh_pcim_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for OCL AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_ocl_slv_inst (
+    .pc_status(ocl_pc_status),
+    .pc_asserted(ocl_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sh_ocl_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sh_ocl_awvalid),
+    .pc_axi_awready(ocl_sh_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sh_ocl_wdata),
+    .pc_axi_wstrb(sh_ocl_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sh_ocl_wvalid),
+    .pc_axi_wready(ocl_sh_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(ocl_sh_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(ocl_sh_bvalid),
+    .pc_axi_bready(sh_ocl_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sh_ocl_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sh_ocl_arvalid),
+    .pc_axi_arready(ocl_sh_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(ocl_sh_rdata),
+    .pc_axi_rresp(ocl_sh_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(ocl_sh_rvalid),
+    .pc_axi_rready(sh_ocl_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for SDA AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_sda_slv_inst (
+    .pc_status(sda_pc_status),
+    .pc_asserted(sda_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sda_cl_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sda_cl_awvalid),
+    .pc_axi_awready(cl_sda_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sda_cl_wdata),
+    .pc_axi_wstrb(sda_cl_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sda_cl_wvalid),
+    .pc_axi_wready(cl_sda_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(cl_sda_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(cl_sda_bvalid),
+    .pc_axi_bready(sda_cl_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sda_cl_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sda_cl_arvalid),
+    .pc_axi_arready(cl_sda_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(cl_sda_rdata),
+    .pc_axi_rresp(cl_sda_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(cl_sda_rvalid),
+    .pc_axi_rready(sda_cl_rready)
+  );
+
+   //-------------------------------------------------------------------------
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for BAR1 AXL interface) 
+   //-------------------------------------------------------------------------
+  axi_protocol_checker_v1_1_12_top #(
+    .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
+    .C_AXI_ID_WIDTH(1),
+    .C_AXI_DATA_WIDTH(32),
+    .C_AXI_ADDR_WIDTH(32),
+    .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
+    .C_AXI_ARUSER_WIDTH(1),
+    .C_AXI_WUSER_WIDTH(1),
+    .C_AXI_RUSER_WIDTH(1),
+    .C_AXI_BUSER_WIDTH(1),
+    .C_PC_MAXRBURSTS(8),    // Technicaly, up to 8, but must be in-order - no use of IDs
+    .C_PC_MAXWBURSTS(8),
+    .C_PC_EXMON_WIDTH(0),
+
+    .C_PC_AW_MAXWAITS(`MAXWAITS),
+    .C_PC_AR_MAXWAITS(`MAXWAITS),
+    .C_PC_W_MAXWAITS(`MAXWAITS),    // These three are don't care because "ready" signals on master behave properly (or are tied)
+    .C_PC_R_MAXWAITS(`MAXWAITS),
+    .C_PC_B_MAXWAITS(`MAXWAITS),
+
+    .C_PC_MESSAGE_LEVEL(0),
+    .C_PC_SUPPORTS_NARROW_BURST(0),
+    .C_PC_MAX_BURST_LENGTH(1),
+    .C_PC_HAS_SYSTEM_RESET(1),
+    .C_PC_STATUS_WIDTH(97)
+  ) axl_pc_bar1_slv_inst (
+    .pc_status(bar1_pc_status),
+    .pc_asserted(bar1_pc_asserted),
+    .system_resetn(rst_main_n),
+    .aclk(clk_main_a0),
+    .aresetn(rst_main_n),
+
+    .pc_axi_awid(1'h0),
+    .pc_axi_awaddr(sh_bar1_awaddr),
+    .pc_axi_awlen(8'd0),
+    .pc_axi_awsize(3'd0),
+    .pc_axi_awburst(2'b01),
+    .pc_axi_awlock(1'b0),
+    .pc_axi_awcache(4'b0000),
+    .pc_axi_awprot(3'b000),
+    .pc_axi_awqos(4'b0000),
+    .pc_axi_awregion(4'b0000),
+    .pc_axi_awuser(1'H0),
+    .pc_axi_awvalid(sh_bar1_awvalid),
+    .pc_axi_awready(bar1_sh_awready),
+
+    .pc_axi_wid(6'H00), // AXI3 only
+    .pc_axi_wlast(1'd1),
+    .pc_axi_wdata(sh_bar1_wdata),
+    .pc_axi_wstrb(sh_bar1_wstrb),
+    .pc_axi_wuser(1'H0),
+    .pc_axi_wvalid(sh_bar1_wvalid),
+    .pc_axi_wready(bar1_sh_wready),
+
+    .pc_axi_bid(1'h0),
+    .pc_axi_bresp(bar1_sh_bresp),
+    .pc_axi_buser(1'H0),
+    .pc_axi_bvalid(bar1_sh_bvalid),
+    .pc_axi_bready(sh_bar1_bready),
+
+    .pc_axi_arid(1'h0),
+    .pc_axi_araddr(sh_bar1_araddr),
+    .pc_axi_arlen(8'd0),
+    .pc_axi_arsize(3'd0),
+    .pc_axi_arburst(2'b01),
+    .pc_axi_arlock(1'b0),
+    .pc_axi_arcache(4'b0000),
+    .pc_axi_arprot(3'b000),
+    .pc_axi_arqos(4'b0000),
+    .pc_axi_arregion(4'b0000),
+    .pc_axi_aruser(1'H0),
+    .pc_axi_arvalid(sh_bar1_arvalid),
+    .pc_axi_arready(bar1_sh_arready),
+
+    .pc_axi_rid(1'h0),
+    .pc_axi_rlast(1'd1),
+    .pc_axi_rdata(bar1_sh_rdata),
+    .pc_axi_rresp(bar1_sh_rresp),
+    .pc_axi_ruser(1'H0),
+    .pc_axi_rvalid(bar1_sh_rvalid),
+    .pc_axi_rready(sh_bar1_rready)
+  );
+   
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled
@@ -501,6 +670,8 @@ module sh_bfm #(
 */
    end
 
+   
+   
    initial begin
       clk_core = 1'b0;
       forever #CORE_DLY clk_core = ~clk_core;
@@ -547,9 +718,9 @@ module sh_bfm #(
    end
    
    logic rst_n_i;
-   logic rst_main_n_i;
+   logic rst_main_n_i = 0;
    logic rst_xtra_n_i;
-
+   
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
@@ -577,7 +748,7 @@ module sh_bfm #(
           pre_sync3_rst_n <= pre_sync2_rst_n;
           sync_rst_n      <= pre_sync3_rst_n;
        end
-
+  
    assign sh_cl_pwr_state = 2'b00;
 
    initial begin
@@ -598,6 +769,32 @@ module sh_bfm #(
        intf_sync_rst_n <= 0;
      else
        intf_sync_rst_n <= ~(sh_cl_flr_assert);
+
+   always_ff @(negedge rst_n or posedge clk_core)
+     if (!rst_n)
+       begin
+          glcount0 <= 0;
+       end
+     else 
+       begin
+          glcount0 <= glcount0+1;
+       end
+
+   always_ff @(negedge rst_n or negedge clk_core)
+     if (!rst_n)
+       begin
+          glcount1 <= 0;
+       end
+     else 
+       begin
+          glcount1 <= glcount1+1;
+       end
+   
+   always_ff @(posedge clk_main_a0)
+     begin
+       sh_cl_glcount0 <= glcount0;
+       sh_cl_glcount1 <= glcount1;
+     end
 
    initial begin
       for (int i=0; i<NUM_PCIE; i++) begin
@@ -712,8 +909,8 @@ module sh_bfm #(
       AXI_Command resp;
 
       if (cl_sh_dma_pcis_bvalid & sh_cl_dma_pcis_bready) begin
-         resp.resp     = cl_sh_dma_pcis_bresp[0];
-         resp.id       = cl_sh_dma_pcis_bid[0];
+         resp.resp     = cl_sh_dma_pcis_bresp;
+         resp.id       = cl_sh_dma_pcis_bid;
 
          cl_sh_b_resps.push_back(resp);
       end
@@ -744,8 +941,10 @@ module sh_bfm #(
          end
 
       end
-      else
+      else begin
+         sh_cl_dma_pcis_arid    <= 1'b0;
          sh_cl_dma_pcis_arvalid <= 1'b0;
+      end
    end
 
    //
@@ -859,7 +1058,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Command cmd;
 
-      if (cl_sh_pcim_awvalid[0] && sh_cl_pcim_awready[0]) begin
+      if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
@@ -877,9 +1076,9 @@ module sh_bfm #(
       end
 
       if (cl_sh_wr_cmds.size() < 4)
-        sh_cl_pcim_awready[0] <= 1'b1;
+        sh_cl_pcim_awready <= 1'b1;
       else
-        sh_cl_pcim_awready[0] <= 1'b0;
+        sh_cl_pcim_awready <= 1'b0;
         
    end
 
@@ -891,7 +1090,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Data wr_data;
       
-      if (sh_cl_pcim_wready[0] && cl_sh_pcim_wvalid[0]) begin
+      if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
          wr_data.strb = cl_sh_pcim_wstrb;
          wr_data.last = cl_sh_pcim_wlast;
@@ -903,9 +1102,9 @@ module sh_bfm #(
          
       end
       if (cl_sh_wr_data.size() > 64)
-        sh_cl_pcim_wready[0] <= 1'b0;
+        sh_cl_pcim_wready <= 1'b0;
       else
-        sh_cl_pcim_wready[0] <= 1'b1;
+        sh_cl_pcim_wready <= 1'b1;
         
    end
 
@@ -944,7 +1143,7 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Command cmd;
       
-      if (cl_sh_pcim_arvalid[0] && sh_cl_pcim_arready[0]) begin
+      if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
          cmd.id   = cl_sh_pcim_arid;
          cmd.len  = cl_sh_pcim_arlen;
@@ -961,9 +1160,9 @@ module sh_bfm #(
       end
 
       if (cl_sh_rd_cmds.size() < 4)
-        sh_cl_pcim_arready[0] <= 1'b1;
+        sh_cl_pcim_arready <= 1'b1;
       else
-        sh_cl_pcim_arready[0] <= 1'b0;
+        sh_cl_pcim_arready <= 1'b0;
    end
 
    //
@@ -980,11 +1179,11 @@ module sh_bfm #(
       if (sh_cl_rd_data.size() != 0) begin
          sh_cl_pcim_rid    <= sh_cl_rd_data[0].id;
          sh_cl_pcim_rresp  <= 2'b00;
-         sh_cl_pcim_rvalid[0] <= !sh_cl_pcim_rvalid[0] ? 1'b1 :
-                                 !cl_sh_pcim_rready[0] ? 1'b1 :
-                                 !sh_cl_pcim_rlast[0]  ? 1'b1 : 1'b0;
+         sh_cl_pcim_rvalid <= !sh_cl_pcim_rvalid ? 1'b1 :
+                                 !cl_sh_pcim_rready ? 1'b1 :
+                                 !sh_cl_pcim_rlast  ? 1'b1 : 1'b0;
 
-         sh_cl_pcim_rlast[0] <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
+         sh_cl_pcim_rlast <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
                                 (sh_cl_rd_data[0].len == 1) && sh_cl_pcim_rvalid && cl_sh_pcim_rready ? 1'b1 : 1'b0;
          
          if (first_rd_beat == 1'b1) begin
@@ -1022,12 +1221,12 @@ module sh_bfm #(
 
       end
       else begin
-         sh_cl_pcim_rvalid[0] <= 1'b0;
-         sh_cl_pcim_rlast[0]  <= 1'b0;         
+         sh_cl_pcim_rvalid <= 1'b0;
+         sh_cl_pcim_rlast  <= 1'b0;         
          first_rd_beat = 1'b1;
       end
 
-      if (cl_sh_pcim_rready[0] && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
+      if (cl_sh_pcim_rready && sh_cl_pcim_rvalid && (sh_cl_rd_data.size() != 0)) begin
          if (sh_cl_rd_data[0].len == 0) begin
             sh_cl_rd_data.pop_front();
             cl_sh_rd_cmds.pop_front();
@@ -1055,7 +1254,7 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       for (int idx=0; idx<16; idx++) begin
-         if (cl_sh_irq_req[idx] == 1'b1) begin
+         if (cl_sh_apppf_irq_req[idx] == 1'b1) begin
             int_pend |= 1'b1 << idx;
          end
       end
@@ -1068,7 +1267,7 @@ module sh_bfm #(
         end
       end
 
-      sh_cl_irq_ack <= int_ack;
+      sh_cl_apppf_irq_ack <= int_ack;
       int_ack = 16'h0000;
    end
 
@@ -1371,7 +1570,132 @@ module sh_bfm #(
                          .axil_rresp(bar1_sh_rresp),
                          .axil_rready(sh_bar1_rready));
 
+   
+   // Check core clock frequency when chk_clk_freq is set 
+   always @(posedge clk_core)
+    begin
+       if (chk_clk_freq) begin 
+         core_rising_edge = $time;
+         @(posedge clk_core)
+            core_clk_period = $time - core_rising_edge;
+         if (core_clk_period != CORE_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - core clk frequency check failed. Expected %x Actual %x", core_clk_period, CORE_DLY);
+         end
+       end
+    end
 
+   // Check main clock frequency when chk_clk_freq is set 
+   always @(posedge clk_main_a0)
+    begin
+       if (chk_clk_freq) begin 
+          main_rising_edge = $time;
+          @(posedge clk_main_a0)
+             main_clk_period = $time - main_rising_edge;
+          if (main_clk_period != MAIN_A0_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - main a0 clk frequency check failed. Expected %x Actual %x", main_clk_period, MAIN_A0_DLY);
+         end
+       end
+    end
+
+   // Check extra a1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a1)
+   begin
+      if (chk_clk_freq) begin  
+         extra_a1_rising_edge = $time;
+         @(posedge clk_extra_a1)
+            extra_a1_clk_period = $time - extra_a1_rising_edge;
+         if (extra_a1_clk_period != EXTRA_A1_DLY * 2) begin
+            clk_err_count++;
+            $display("Error - extra a1 clk frequency check failed. Expected %x Actual %x", extra_a1_clk_period, EXTRA_A1_DLY);
+         end
+       end 
+    end
+
+   // Check extra a2 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a2)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a2_rising_edge = $time;
+          @(posedge clk_extra_a2)
+             extra_a2_clk_period = $time - extra_a2_rising_edge;
+          if (extra_a2_clk_period != EXTRA_A2_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra a2 clk frequency check failed. Expected %x Actual %x", extra_a2_clk_period, EXTRA_A2_DLY);
+          end
+       end
+    end
+
+   // Check extra a3 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_a3)
+    begin
+       if (chk_clk_freq) begin 
+          extra_a3_rising_edge = $time;
+          @(posedge clk_extra_a3)
+             extra_a3_clk_period = $time - extra_a3_rising_edge;
+          if (extra_a3_clk_period != EXTRA_A3_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra a3 clk frequency check failed. Expected %x Actual %x", extra_a3_clk_period, EXTRA_A3_DLY);
+          end
+       end
+    end
+   
+   // Check extra b0 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_b0)
+    begin
+      if (chk_clk_freq) begin  
+        extra_b0_rising_edge = $time;
+        @(posedge clk_extra_b0)
+           extra_b0_clk_period = $time - extra_b0_rising_edge;
+        if (extra_b0_clk_period != EXTRA_B0_DLY * 2) begin
+           clk_err_count++;
+           $display("Error - extra b0 clk frequency check failed. Expected %x Actual %x", extra_b0_clk_period, EXTRA_B0_DLY);
+        end
+      end
+    end
+
+   // Check extra b1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_b1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_b1_rising_edge = $time;
+          @(posedge clk_extra_b1)
+             extra_b1_clk_period = $time - extra_b1_rising_edge;
+          if (extra_b1_clk_period != EXTRA_B1_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra b1 clk frequency check failed. Expected %x Actual %x", extra_b1_clk_period, EXTRA_B1_DLY);
+          end
+       end
+    end
+
+   // Check extra c0 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_c0)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c0_rising_edge = $time;
+          @(posedge clk_extra_c0)
+             extra_c0_clk_period = $time - extra_c0_rising_edge;
+          if (extra_c0_clk_period != EXTRA_C0_DLY * 2) begin
+             clk_err_count++;
+             $display("Error - extra c0 clk frequency check failed. Expected %x Actual %x", extra_c0_clk_period, EXTRA_C0_DLY);
+          end
+       end
+    end
+
+   // Check extra c1 clock frequency when chk_clk_freq is set 
+   always @(posedge clk_extra_c1)
+    begin
+       if (chk_clk_freq) begin 
+          extra_c1_rising_edge = $time;
+          @(posedge clk_extra_c1)
+             extra_c1_clk_period = $time - extra_c1_rising_edge;
+          if (extra_c1_clk_period != (EXTRA_C1_DLY * 2)) begin
+             clk_err_count++;
+             $display("Error - extra c1 clk frequency check failed. Expected %x Actual %x", extra_c1_clk_period, EXTRA_C1_DLY);
+          end
+       end
+    end
 
    
    //=================================================
@@ -1407,6 +1731,27 @@ module sh_bfm #(
             EXTRA_A2_DLY = 4ns;
             EXTRA_A3_DLY = 8ns;
          end
+         ClockRecipe::A3: begin
+            MAIN_A0_DLY  = 8ns;
+            CORE_DLY     = 8ns;
+            EXTRA_A1_DLY = 16ns;
+            EXTRA_A2_DLY = 2ns;
+            EXTRA_A3_DLY = 4ns;
+         end
+         ClockRecipe::A4: begin
+            MAIN_A0_DLY  = 2.22ns;
+            CORE_DLY     = 2.22ns;
+            EXTRA_A1_DLY = 4.44ns;
+            EXTRA_A2_DLY = 1.48ns;
+            EXTRA_A3_DLY = 1.11ns;
+         end
+         ClockRecipe::A5: begin
+            MAIN_A0_DLY  = 2.5ns;
+            CORE_DLY     = 2.5ns;
+            EXTRA_A1_DLY = 5ns;
+            EXTRA_A2_DLY = 1.66ns;
+            EXTRA_A3_DLY = 1.25ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1420,6 +1765,26 @@ module sh_bfm #(
          ClockRecipe::B1: begin
             EXTRA_B0_DLY = 4ns;
             EXTRA_B1_DLY = 8ns;
+         end
+         ClockRecipe::B2: begin
+            EXTRA_B0_DLY = 1.11ns;
+            EXTRA_B1_DLY = 2.22ns;
+         end
+         ClockRecipe::B3: begin
+            EXTRA_B0_DLY = 2ns;
+            EXTRA_B1_DLY = 8ns;
+         end
+         ClockRecipe::B4: begin
+            EXTRA_B0_DLY = 1.66ns;
+            EXTRA_B1_DLY = 6.66ns;
+         end
+         ClockRecipe::B5: begin
+            EXTRA_B0_DLY = 1.25ns;
+            EXTRA_B1_DLY = 5ns;
+         end
+         ClockRecipe::B6: begin
+            EXTRA_B0_DLY = 1.4ns;
+            EXTRA_B1_DLY = 5.7ns;
          end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
@@ -1435,6 +1800,14 @@ module sh_bfm #(
             EXTRA_C0_DLY = 3.33ns;
             EXTRA_C1_DLY = 2.5ns;
          end
+         ClockRecipe::C2: begin
+            EXTRA_C0_DLY = 6.66ns;
+            EXTRA_C1_DLY = 5ns;
+         end
+         ClockRecipe::C3: begin
+            EXTRA_C0_DLY = 2.5ns;
+            EXTRA_C1_DLY = 1.87ns;
+         end
          default: begin
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
@@ -1449,7 +1822,71 @@ module sh_bfm #(
       rst_xtra_n_i = 1'b1;
       #50ns;
    endtask // power_up
-  
+
+   always @* begin
+      if ((pcis_pc_asserted === 'b1) || ((pcim_pc_asserted === 'b1) || (ocl_pc_asserted === 'b1) || (sda_pc_asserted === 'b1) || (bar1_pc_asserted === 'b1))) begin
+         prot_err_count++;
+      end else if ((pcis_pc_asserted === 'hx) || (pcim_pc_asserted === 'hx) || (ocl_pc_asserted === 'hx) || (sda_pc_asserted === 'hx) || (bar1_pc_asserted === 'hx)) begin
+         prot_x_count++;
+      end
+   end
+
+   //=================================================
+   //
+   // set_chk_clk_freq
+   //
+   //   Description: Starts checking clock frequency
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_chk_clk_freq(logic chk_freq = 1'b1);
+      $display("[%t] : Start checking clock frequency...", $realtime);
+      chk_clk_freq = chk_freq;
+   endfunction // set_chk_clk_freq
+   
+   //=================================================
+   //
+   // chk_prot_err_stat
+   //
+   //   Description: Checks if there is a protocol checker violation
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_prot_err_stat();
+      $display("[%t] : Checking protocol checker error status...", $realtime);
+      if ((prot_err_count > 0) || (prot_x_count > 0)) begin
+         if (prot_err_count > 0) begin
+            $display("[%t] : *** Protocol Checker Violations Detected. Refer to log file for details about each specific error ***", $realtime);
+            return 1'b1;
+         end
+         if (prot_x_count > 0) begin
+            $display("[%t] : *** 'X' propagation detected in protocol checker status bits. Please dump waves and look at pc_status bits for more information***", $realtime);
+            return 1'b1;
+         end
+      end // if ((prot_err_count > 0) || (prot_x_count > 0))
+      else
+         return 1'b0;
+   endfunction // chk_prot_err_stat
+
+   //=================================================
+   //
+   // chk_clk_err_cnt
+   //
+   //   Description: Checks if there are clock errors
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_clk_err_cnt();
+      $display("[%t] : Checking clock error status...", $realtime);
+      if (clk_err_count > 0) begin
+         $display("[%t] : *** Clock Frequency Errors Detected. Refer to log file for details about each specific error ***", $realtime);
+         return 1'b1;
+      end
+      else begin
+         return 1'b0;
+      end
+   endfunction
+   
    //=================================================
    //
    // nsec_delay
@@ -1459,7 +1896,7 @@ module sh_bfm #(
    //
    //=================================================
    task nsec_delay(int dly = 10000);
-      #dly;
+      # (dly * 1ns);
    endtask
 
    //=================================================
@@ -1498,6 +1935,30 @@ module sh_bfm #(
       return cl_sh_status_vled;
    endfunction
 
+   //=================================================
+   //
+   // get_global_couter_0
+   //
+   //   Description: reads global counter 0 value;
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic[63:0] get_global_counter_0();
+      return sh_cl_glcount0;
+   endfunction // get_global_counter_0
+
+   //=================================================
+   //
+   // get_global_couter_1
+   //
+   //   Description: reads global counter 1 value;
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic[63:0] get_global_counter_1();
+      return sh_cl_glcount1;
+   endfunction // get_global_counter_0
+   
    //=================================================
    //
    // Kernel_reset
@@ -1818,6 +2279,10 @@ module sh_bfm #(
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
       return c2h_dma_done[chan];
    endfunction // is_dma_to_buffer_done
+
+   function bit is_ddr_ready();  // 1 = done
+      return ddr_is_ready;
+   endfunction // is_ddr_ready
    
    //=================================================
    //
@@ -1870,7 +2335,7 @@ module sh_bfm #(
                   axi_cmd.len  = (num_of_data_beats==1) ? 0 :
                                   aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
-                  if(aligned  && (dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095)) begin 
+                  if(dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095) begin 
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
                 end
@@ -1882,8 +2347,8 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
-                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
-                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
                 end
                 axi_cmd.id   = chan;
@@ -2024,9 +2489,10 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
-                  if( (aligned_addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
-                    axi_cmd.len = ((4096 - aligned_addr[11:0])/64) - 1;
+                  if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
+                    axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
+                  
                   axi_cmd.id   = chan;
                 end
                 axi_cmd.size = 6;
@@ -2044,35 +2510,35 @@ module sh_bfm #(
       end // else begin
    end // always
 
-  task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
-     case (ddr_idx)
-       0: begin
-          sh_ddr_stat_wr0    = 1;
-          sh_ddr_stat_addr0  = addr;
-          sh_ddr_stat_wdata0 = data;
-          sh_ddr_stat_rd0    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr0    = 0;
-       end
-       1: begin
-          sh_ddr_stat_wr1    = 1;
-          sh_ddr_stat_addr1  = addr;
-          sh_ddr_stat_wdata1 = data;
-          sh_ddr_stat_rd1    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr1    = 0;
-       end
-       2: begin
-          sh_ddr_stat_wr2    = 1;
-          sh_ddr_stat_addr2  = addr;
-          sh_ddr_stat_wdata2 = data;
-          sh_ddr_stat_rd2    = 0;
-          #CORE_DLY;
-          #CORE_DLY;
-          sh_ddr_stat_wr2    = 0;
-       end
+   task poke_stat(input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
+      case (ddr_idx)
+         0: begin
+            sh_ddr_stat_wr0    = 1;
+            sh_ddr_stat_addr0  = addr;
+            sh_ddr_stat_wdata0 = data;
+            sh_ddr_stat_rd0    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr0    = 0;
+         end
+         1: begin
+            sh_ddr_stat_wr1    = 1;
+            sh_ddr_stat_addr1  = addr;
+            sh_ddr_stat_wdata1 = data;
+            sh_ddr_stat_rd1    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr1    = 0;
+         end
+         2: begin
+            sh_ddr_stat_wr2    = 1;
+            sh_ddr_stat_addr2  = addr;
+            sh_ddr_stat_wdata2 = data;
+            sh_ddr_stat_rd2    = 0;
+            #CORE_DLY;
+            #CORE_DLY;
+            sh_ddr_stat_wr2    = 0;
+         end
      endcase // case (ddr_idx)
      
   endtask

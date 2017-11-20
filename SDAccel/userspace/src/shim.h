@@ -142,6 +142,7 @@ namespace awsbwhal {
             return mTag;
         }
         bool isGood() const;
+	bool is4DDR() {return m4DDR;}; 
 
         ~AwsXcl();
         AwsXcl(unsigned index, const char *logfileName, xclVerbosityLevel verbosity);
@@ -192,6 +193,7 @@ namespace awsbwhal {
         bool bulkErase();
         bool sectorErase(unsigned Addr);
         bool writeEnable();
+	int setDDRCount(const axlf* buffer);
 #if 0
 	bool dataTransfer(bool read);
 #endif
@@ -257,6 +259,7 @@ namespace awsbwhal {
         ELARecordList mRecordList;
         std::vector<MemoryManager *> mDDRMemoryManager;
         xclDeviceInfo2 mDeviceInfo;
+	bool m4DDR;
 
     public:
         static const unsigned TAG;

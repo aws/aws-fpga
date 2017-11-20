@@ -127,7 +127,8 @@ afi_get_next_id(void)
  * @param[in,out]	len		cmd len
  */
 void 
-fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id)
+fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id,
+	uint32_t flags)
 {
 	assert(cmd);
 	assert(len);
@@ -145,7 +146,7 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id)
 	strncpy(req->ids.afi_id, afi_id, sizeof(req->ids.afi_id)); 
 	req->ids.afi_id[sizeof(req->ids.afi_id) - 1] = 0; 
 
-	req->fpga_cmd_flags = 0;
+	req->fpga_cmd_flags = flags;
 
 	*len = sizeof(struct afi_cmd_hdr) + payload_len;
 }

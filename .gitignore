@@ -41,6 +41,35 @@ nohup.out
 # Shell DCP files are stored in S3 and downloaded by hdk_setup.sh
 hdk/common/shell_*/build/checkpoints/from_aws/SH_CL_BB_routed.dcp*
 
+# HDK generated files
+hdk/cl/examples/*/build/create-afi/
+hdk/cl/examples/*/build/scripts/.srcs/
+hdk/cl/examples/*/software/runtime/sh_dpi_tasks
+hdk/cl/examples/cl_hello_world/software/runtime/test_hello_world
+hdk/cl/examples/cl_hello_world_vhdl/software/runtime/test_hello_world_vhdl
+hdk/cl/examples/cl_hello_world_vhdl/software/runtime/test_hello_world_vhdl
+hdk/cl/examples/cl_uram_example/software/runtime/test_uram_example
+hdk/cl_uram_example/software/runtime/test_uram_example
+hdk/common/shell_*/build/debug_probes/
+hdk/common/verif/models/sh_bfm/cl_ports_sh_bfm.vh
+
+# SDAccel generated files
+SDAccel/**/*.d
+SDAccel/**/*.o.cmd
+SDAccel/aws_platform/xilinx_aws-*/hw/xilinx_aws-vu9p-*.dsa*
+SDAccel/tools/*.d
+SDAccel/tools/*.o
+SDAccel/tools/xbsak
+
+# SDK generated files
+sdk/linux_kernel_drivers/edma/.*.o.cmd
+sdk/linux_kernel_drivers/edma/.*.ko.cmd
+sdk/linux_kernel_drivers/edma/.tmp_versions
+sdk/linux_kernel_drivers/xdma/.*.o.cmd
+sdk/linux_kernel_drivers/xdma/.*.ko.cmd
+sdk/linux_kernel_drivers/xdma/.tmp_versions
+sdk/userspace/lib/
+
 # Generated checkpoints
 checkpoints
 
@@ -56,5 +85,13 @@ vivado*.log
 # Pycharm projects
 .idea/
 
+# Eclipse projects
+.project
+.pydevproject
+.settings
+
 # Python compiled code
 *.pyc
+
+# pytest artifacts
+.cache/

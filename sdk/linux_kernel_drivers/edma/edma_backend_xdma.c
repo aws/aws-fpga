@@ -17,7 +17,7 @@
 #define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
 #define SLEEP_MIN_USEC                                          (1)
 #define SLEEP_MAX_USEC                                          (20)
-#define XDMA_WORKER_SLEEPING_STATUS_BIT                         (0)
+#define XDMA_WORKER_RESERVED_BIT	                        (0)
 #define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT                      (1)
 #define XDMA_WORKER_STOPPED_ON_REQUEST_BIT                      (2)
 #define XDMA_WORKER_STOP_REQUEST_BIT                            (3)
@@ -25,8 +25,9 @@
 #define PCI_VENDOR_ID_AMAZON                                    (0x1d0f)
 #define PCI_DEVICE_ID_FPGA                                      (0xf001)
 #define XMDA_NUMBER_OF_USER_EVENTS                              (1)
-#define XDMA_LIMIT_NUMBER_OF_QUEUES                             (1)
+#define XDMA_LIMIT_NUMBER_OF_QUEUES                             (4)
 #define CLASS_NAME                                              "edma"
+
 
 struct class* edma_class;
 
@@ -39,7 +40,8 @@ typedef struct {
 }command_t;
 
 typedef struct {
-	void* channel_handle;
+	void*		xdev;
+	int		channel_num;
 	command_t* 	queue;
 	u32		head;
 	u32		tail;
@@ -49,7 +51,8 @@ typedef struct {
 }command_queue_t;
 
 typedef struct {
-	void* channel_handle;
+	void* xdev;
+	int   channel_num;
 	void* buffer;
 	u32 size;
 } c2h_handle_t;
@@ -74,50 +77,59 @@ extern int edma_queue_depth;
 static int write_worker_function(void *data)
 {
 	command_queue_t* command_queue = (command_queue_t*)data;
-	command_t* 	queue = command_queue->queue;
+	command_t*  queue = command_queue->queue;
+	int ret;
 
-	while(!test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))
-	{
-		if(command_queue->head != command_queue->tail)
-		{
-			int ret = xdma_xfer_submit(
-					command_queue->channel_handle,
-					DMA_TO_DEVICE,
-					queue[command_queue->head].target_addr,
-					&queue[command_queue->head].sgt,
-					true,
-					XDMA_TIMEOUT_IN_MSEC);
-			if(ret < 0) { 
-				pr_err(	"Thread failed during transaction with address 0x%llx and size %u\n",
-					queue[command_queue->head].target_addr,
-					sg_dma_len(queue[command_queue->head].sgt.sgl));
-				test_and_set_bit(
-						XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT,
-						&command_queue->thread_status);
-				do_exit(-1);
-			}
+	while (true) {
+		/* From sched.h:
+		 *  set_current_state() includes a barrier so that the write of current->state
+		 *  is correctly serialised wrt the caller's subsequent test of whether to
+		 *  actually sleep.
+		 *
+		 * We are using the below pattern to avoid missed wakeups.
+		 */
+		set_current_state(TASK_INTERRUPTIBLE);
 
-			queue[command_queue->head].completed = 1;
-
-			command_queue->head =
-					EDMA_RING_IDX_NEXT(
-							command_queue->head,edma_queue_depth);
-
-			//are there still requests in the queue?
-			if(command_queue->head != command_queue->tail)
-				continue;
+		if (unlikely(test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))) {
+			/* We were asked to exit */
+			break;
+		} else if (unlikely(command_queue->head == command_queue->tail)) {
+			/* Queue is empty, sleep until wake_up_process is called */
+			schedule();
+			continue;
 		}
 
-		set_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+		/* Set running state, process the queue head */
+		__set_current_state(TASK_RUNNING);
 
-		set_current_state(TASK_INTERRUPTIBLE);
-		schedule();
+		ret = xdma_xfer_submit(
+			command_queue->xdev,
+			command_queue->channel_num,
+			true, /* write==true */
+			queue[command_queue->head].target_addr,
+			&queue[command_queue->head].sgt,
+			true, /* dma_mapped==true */
+			XDMA_TIMEOUT_IN_MSEC);
 
-		clear_bit(XDMA_WORKER_SLEEPING_STATUS_BIT, &command_queue->thread_status);
+		if(ret < 0) {
+			pr_err("Thread failed during transaction with address 0x%llx and size %u\n",
+				queue[command_queue->head].target_addr,
+				sg_dma_len(queue[command_queue->head].sgt.sgl));
+			test_and_set_bit(
+				XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT,
+				&command_queue->thread_status);
+			do_exit(-1);
+		}
+
+		queue[command_queue->head].completed = 1;
+
+		command_queue->head =
+			EDMA_RING_IDX_NEXT(
+				command_queue->head,edma_queue_depth);
 	}
 
 	set_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT,
-			&command_queue->thread_status);
+		&command_queue->thread_status);
 
 	return 0;
 }
@@ -126,9 +138,12 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
 	int ret = 0;
 	struct device *dev = &pdev->dev;
-	xdma_channel_tuple* channel_list = NULL;
+	void* xdev= NULL;
 	int i;
 	struct backend_device* backend_device = NULL;
+	int user_max = MAX_NUMBER_OF_USER_INTERRUPTS;
+	int h2c_channel_max = XDMA_LIMIT_NUMBER_OF_QUEUES;
+	int c2h_channel_max = XDMA_LIMIT_NUMBER_OF_QUEUES;
 	int number_of_xdma_channels = 0;
 	command_queue_t* command_queue = NULL;
 	c2h_handle_t* c2h_handles = NULL;
@@ -150,15 +165,23 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_master(pdev);
 	pci_save_state(pdev);
 
-	number_of_xdma_channels = xdma_device_open(pdev, &channel_list);
-	if(unlikely(number_of_xdma_channels < 0)){
-		ret = number_of_xdma_channels;
+	xdev = xdma_device_open(DRV_MODULE_NAME, pdev, &user_max, &h2c_channel_max, &c2h_channel_max);
+	if(unlikely(xdev == NULL)){
+		ret = -EINVAL;
 		goto done;
 	}
 
-	if(number_of_xdma_channels > XDMA_LIMIT_NUMBER_OF_QUEUES)
-		number_of_xdma_channels = XDMA_LIMIT_NUMBER_OF_QUEUES;
+        BUG_ON(user_max > MAX_NUMBER_OF_USER_INTERRUPTS);
+        BUG_ON(h2c_channel_max > XDMA_LIMIT_NUMBER_OF_QUEUES);
+        BUG_ON(c2h_channel_max > XDMA_LIMIT_NUMBER_OF_QUEUES);
+        BUG_ON(h2c_channel_max != c2h_channel_max);
 
+	if(unlikely(!h2c_channel_max || !c2h_channel_max)){
+		ret = -ENODEV;
+		goto done;
+	}
+
+	number_of_xdma_channels = h2c_channel_max;
 	dev_info(dev, "DMA backend opened %d channels\n", number_of_xdma_channels);
 
 	command_queue = (command_queue_t*)kzalloc(
@@ -178,8 +201,7 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	backend_device->queues = (struct edma_queue_handle*)kzalloc(
-			number_of_xdma_channels
-					* sizeof(struct edma_queue_handle),
+			number_of_xdma_channels * sizeof(struct edma_queue_handle),
 			GFP_KERNEL);
 	if(!backend_device->queues) {
 		ret = -ENOMEM;
@@ -201,11 +223,13 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	for( i = 0; i < number_of_xdma_channels; i++)
 	{
-		command_queue[i].channel_handle = channel_list[i].h2c;
+		command_queue[i].xdev = xdev;
+		command_queue[i].channel_num = i;
 		command_queue[i].queue = (command_t*)kzalloc(
 				edma_queue_depth * sizeof(command_t), GFP_KERNEL);
 
-		c2h_handles[i].channel_handle = channel_list[i].c2h;
+		c2h_handles[i].xdev = xdev;
+		c2h_handles[i].channel_num = i;
 
 		backend_device->queues[i].rx = &(c2h_handles[i]);
 		backend_device->queues[i].tx = &(command_queue[i]);
@@ -214,6 +238,7 @@ static int edma_xdma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	backend_device->pdev = pdev;
+	backend_device->backend_device_handle = xdev;
 	backend_device->number_of_queues = number_of_xdma_channels;
 
 	//TODO: consider moving number of events to an API
@@ -274,18 +299,31 @@ static void edma_xdma_remove(struct pci_dev *pdev)
 int edma_backend_register_isr(struct pci_dev *pdev, u32 event_number,
 		irq_handler_t handler, const char* name, void* drv)
 {
-	return xdma_user_isr_register(pdev,BIT(event_number), handler, name, drv);
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_register(backend_device->backend_device_handle, 
+			BIT(event_number), handler, drv);
 }
 
 
 int edma_backend_enable_isr(struct pci_dev *pdev, u32 event_number)
 {
-	return xdma_user_isr_enable(pdev,BIT(event_number));
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_enable(backend_device->backend_device_handle, BIT(event_number));
 }
 
 int edma_backend_disable_isr(struct pci_dev *pdev, u32 event_number)
 {
-	return xdma_user_isr_disable(pdev,BIT(event_number));
+	struct backend_device* backend_device;
+
+	backend_device = (struct backend_device *)dev_get_drvdata(&pdev->dev);
+
+	return xdma_user_isr_disable(backend_device->backend_device_handle, BIT(event_number));
 }
 
 
@@ -307,7 +345,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 	sg_dma_len(sgl) = size;
 
 	sgt->sgl = sgl;
-	sgt->nents = 1;
+	sgt->nents = sgt->orig_nents = 1;
 
 	command_queue->queue[command_queue->tail].target_addr = target_addr;
 
@@ -319,16 +357,8 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 
 	smp_wmb();
 
-	/*
-	 * detection of a race-condition - the going_to_sleep bit is set but
-	 * thread is not asleep so it will miss the wakeup
-	 *
-	 */
-
-	while((wake_up_process(command_queue->worker_thread) == 0)
-			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
-					&command_queue->thread_status))
-		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
+	//See the comment in the write_worker_function regarding missed wakeups 
+	wake_up_process(command_queue->worker_thread);
 
 	edma_dbg("<< %s\n", __func__);
 
@@ -386,9 +416,13 @@ int edma_backend_submit_s2m_request(u64* buffer, u32 size, void *q_handle, u64 t
 	sg_dma_len(&sg) = size;
 
 	sg_table.sgl = &sg;
-	sg_table.nents = 1;
+	sg_table.nents = sg_table.orig_nents = 1;
 
-	size_read = xdma_xfer_submit(c2h_handle->channel_handle, DMA_FROM_DEVICE, target_addr, &sg_table, true, XDMA_TIMEOUT_IN_MSEC);
+	size_read = xdma_xfer_submit(c2h_handle->xdev, c2h_handle->channel_num, 
+				false, /* write==false */
+				target_addr, &sg_table, 
+				true, /* dma_mapped==true */
+				XDMA_TIMEOUT_IN_MSEC);
 	if (size_read < 0) {
 		ret = size_read;
 		if (ret != -ENOMEM && ret != -EIO)
@@ -446,10 +480,8 @@ int edma_backend_stop(void *q_handle)
 	//Stop the kthread before reset and make sure it was stopped.
 	set_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status);
 
-	while((wake_up_process(command_queue->worker_thread) == 0)
-			&& test_bit(XDMA_WORKER_SLEEPING_STATUS_BIT,
-					&command_queue->thread_status))
-		usleep_range(SLEEP_MIN_USEC,SLEEP_MAX_USEC);
+	//See the comment in the write_worker_function regarding missed wakeups 
+	wake_up_process(command_queue->worker_thread);
 
 	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
 			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
