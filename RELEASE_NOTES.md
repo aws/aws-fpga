@@ -26,6 +26,21 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.4 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    EDMA/XDMA Driver improvements
+   *    Additional SDAccel Platforms
+         *    1DDR for faster build times and smaller expanded shell
+	 *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
+   *    IP Integrator GUI (HLx) improvments 
+   *    CL\_DRAM\_DMA fixes and improvements 
+   	*     Dual master support
+   *    Simulation enviroment fixes and improvements
+   	*     AXI/AXIL Protocol checkers
+	*     Shell model improvements
+	*     SW co-simulation support on cl\_hello\_world
+	*     DDR Model patch
+   *    Updated SH\_DDR module in preperation for upcoming feature release	
+   
 ## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    New FPGA Image APIs for deleteing and reading/editing attributes 
 
