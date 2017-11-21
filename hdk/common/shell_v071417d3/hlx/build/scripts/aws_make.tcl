@@ -76,6 +76,7 @@ namespace eval ${_THISNAMESPACE} {
 }
 
 
+
 #proc [set _THISNAMESPACE]::make_faas {{args ""}} {
 #	# Summary: 
 #	# Argument Usage:
@@ -102,12 +103,9 @@ proc [set _THISNAMESPACE]::update_public_faas_variables_to_parent_app {{args ""}
   # Return Value:
   # Categories:
 	
-#	set _local_vars [info vars aws::make_faas::public::*]
 	set _local_vars [info vars ::aws::make_faas::public::*]
-	puts "Local: $_local_vars"
 	set _local_space "public"
 	foreach {_local_var} $_local_vars {
-		puts "copying:\n\t[set _local_var]"
 		set _localized [lindex [split $_local_var :] end]
 		set ::tclapp::xilinx::faasutils::make_faas::[set _local_space]::[set _localized] [set [set _local_var]]
 	}
@@ -277,4 +275,12 @@ add_files -fileset sim_1 [ list \
 	return
 }
 
+source [file dirname [info script]]/aws_proc_overrides.tcl
+if {[info exist ::env(OS)] eq 0} {
+	#info_msg "OS Environment variable not set, assuming Linux"
+	set ::env(OS) "linux"
+}
+if {[string match "*windows*" [string tolower $::env(OS)]]} {
+	source [file dirname [info script]]/hdk_setup.tcl
+}
 

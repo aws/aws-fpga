@@ -26,6 +26,9 @@ fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
+current_dir=$(pwd)
+
+source $script_dir/shared/bin/message_functions.sh
 
 debug=0
 
@@ -40,26 +43,6 @@ function does_module_exist() {
     else
         return 1;
     fi
-}
-
-
-function info_msg {
-  echo -e "INFO: $1"
-}
-
-function debug_msg {
-  if [[ $debug == 0 ]]; then
-    return
-  fi
-  echo -e "DEBUG: $1"
-}
-
-function warn_msg {
-  echo -e "WARNING: $1"
-}
-
-function err_msg {
-  echo -e >&2 "ERROR: $1"
 }
 
 function usage {
@@ -99,16 +82,7 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
   esac
 done
 
-# Make sure that AWS_FPGA_REPO_DIR is set to the location of this script.
-if [[ ":$AWS_FPGA_REPO_DIR" == ':' ]]; then
-  debug_msg "AWS_FPGA_REPO_DIR not set so setting to $script_dir"
-  export AWS_FPGA_REPO_DIR=$script_dir
-elif [[ $AWS_FPGA_REPO_DIR != $script_dir ]]; then
-  info_msg "Changing AWS_FPGA_REPO_DIR from $AWS_FPGA_REPO_DIR to $script_dir"
-  export AWS_FPGA_REPO_DIR=$script_dir
-else
-  debug_msg "AWS_FPGA_REPO_DIR=$AWS_FPGA_REPO_DIR"
-fi
+source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
 
 debug_msg "Checking for Vivado install:"
 
@@ -161,6 +135,11 @@ export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
 
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
+
+# Update PYTHONPATH with libraries used for unit testing
+python_lib=$AWS_FPGA_REPO_DIR/shared/lib
+export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
+PYTHONPATH=$python_lib:$PYTHONPATH
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
@@ -284,4 +263,6 @@ else
     unset CL_DIR
   fi
 fi
+
+cd $current_dir
 info_msg "AWS HDK setup PASSED.";

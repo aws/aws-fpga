@@ -30,7 +30,7 @@ logic [15:0] vled_value;
    initial begin
 
       tb.power_up();
-      
+
       tb.set_virtual_dip_switch(.dip(0));
 
       vdip_value = tb.get_virtual_dip_switch();
@@ -44,17 +44,17 @@ logic [15:0] vled_value;
       $display ("Reading 0x%x from address 0x%x", rdata, `HELLO_WORLD_REG_ADDR);
 
       if (rdata == 32'hEFBE_ADDE) // Check for byte swap in register read
-        $display ("Test PASSED");
+        $display ("TEST PASSED");
       else
-        $display ("Test FAILED");
+        $display ("TEST FAILED");
 
       tb.peek_ocl(.addr(`VLED_REG_ADDR), .data(rdata));         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
       if (rdata == 32'h0000_BEEF) // Check for LED register read
-        $display ("Test PASSED");
+        $display ("TEST PASSED");
       else
-        $display ("Test FAILED");
+        $display ("TEST FAILED");
 
       vled_value = tb.get_virtual_led();
 

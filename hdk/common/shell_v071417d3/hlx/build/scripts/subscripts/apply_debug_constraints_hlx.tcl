@@ -23,6 +23,14 @@ if { [info exists ::env(HDK_SHELL_DIR)] } {
         exit 2
 }
 
+if {[info exist FAAS_CL_DIR] eq 0} {
+	if {[info exist ::env(FAAS_CL_DIR)]} {
+		set FAAS_CL_DIR $::env(FAAS_CL_DIR)
+	} else {
+		::tclapp::xilinx::faasutils::make_faas -force -bypass_drcs -partial
+	}
+}
+
 
 set dbg_bridge [get_debug_cores -filter {NAME=~CL/*CL_DEBUG_BRIDGE* || NAME=~CL/dbg_hub_1}]
 if {[llength $dbg_bridge]} {

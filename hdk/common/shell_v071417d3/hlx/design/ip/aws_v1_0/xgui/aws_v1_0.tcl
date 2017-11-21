@@ -7,6 +7,7 @@ proc init_gui { IPINST } {
   set clock_group [ipgui::add_group $IPINST -parent $Page_0 -name {Clock Signals} -layout vertical] 
   set id_group    [ipgui::add_group $IPINST -parent $Page_0 -name {CL Partition ID} -layout vertical] 
   set advanced    [ipgui::add_group $IPINST -parent $Page_0 -name {Advanced} -layout vertical] 
+  set MODE                [ipgui::add_param $IPINST -name "MODE"                  -parent ${interfaces_group} -widget comboBox     ]
   set DDR_A_PRESENT       [ipgui::add_param $IPINST -name "DDR_A_PRESENT"         -parent ${interfaces_group} -widget checkBox     ]
   set DDR_B_PRESENT       [ipgui::add_param $IPINST -name "DDR_B_PRESENT"         -parent ${interfaces_group} -widget checkBox     ]
   set DDR_C_PRESENT       [ipgui::add_param $IPINST -name "DDR_C_PRESENT"         -parent ${interfaces_group} -widget checkBox     ]
@@ -44,8 +45,9 @@ proc init_gui { IPINST } {
   set SUBSYSTEM_VENDOR_ID [ipgui::add_param $IPINST -name "SUBSYSTEM_VENDOR_ID"   -parent ${id_group}                 ]
   set SUBSYSTEM_ID        [ipgui::add_param $IPINST -name "SUBSYSTEM_ID"          -parent ${id_group}                        ]
   set SHELL_VERSION       [ipgui::add_param $IPINST -name "SHELL_VERSION"         -parent ${id_group}                             ]
-  set NUM_STAGES_SCALAR   [ipgui::add_param $IPINST -name "NUM_STAGES_SCALAR"     -parent ${advanced} -widget comboBox    ]
+  set NUM_STAGES_STATS   [ipgui::add_param $IPINST -name "NUM_STAGES_STATS"     -parent ${advanced} -widget comboBox    ]
   
+  set_property tooltip "0 = AWS HLS flow; 1 = Unified Memory-only; 2 = Unified Non-memory" $MODE      
 #  set_property tooltip "" $DDR_A_PRESENT      
 #  set_property tooltip "" $DDR_B_PRESENT      
 #  set_property tooltip "" $DDR_C_PRESENT      
@@ -75,31 +77,58 @@ proc init_gui { IPINST } {
   set_property tooltip "Constant driven onto cl_sh_id1[15:0]" $SUBSYSTEM_VENDOR_ID
   set_property tooltip "Constant driven onto cl_sh_id1[31:16]" $SUBSYSTEM_ID       
   set_property tooltip "Version of the connected AWS Shell" $SHELL_VERSION       
-  set_property tooltip "Pipelining of DDR statistics signals between DDR A/B/D and Shell" $NUM_STAGES_SCALAR  
+  set_property tooltip "Pipelining of DDR statistics signals between DDR A/B/D and Shell" $NUM_STAGES_STATS  
 }
 
-proc update_PARAM_VALUE.NUM_STAGES_SCALAR { PARAM_VALUE.NUM_STAGES_SCALAR } {
-	# Procedure called to update VENDOR_ID when any of the dependent parameters in the arguments change
+proc update_gui_for_PARAM_VALUE.NUM_A_CLOCKS { IPINST PARAM_VALUE.NUM_A_CLOCKS } {
+  set NUM_A_CLOCKS [get_property value ${PARAM_VALUE.NUM_A_CLOCKS}]
+  if {$NUM_A_CLOCKS>1} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_A1_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_A1_FREQ -of $IPINST ]
+  }
+  if {$NUM_A_CLOCKS>2} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_A2_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_A2_FREQ -of $IPINST ]
+  }
+  if {$NUM_A_CLOCKS>3} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_A3_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_A3_FREQ -of $IPINST ]
+  }
 }
 
-proc update_PARAM_VALUE.VENDOR_ID { PARAM_VALUE.VENDOR_ID } {
-	# Procedure called to update VENDOR_ID when any of the dependent parameters in the arguments change
+proc update_gui_for_PARAM_VALUE.NUM_B_CLOCKS { IPINST PARAM_VALUE.NUM_B_CLOCKS } {
+  set NUM_B_CLOCKS [get_property value ${PARAM_VALUE.NUM_B_CLOCKS}]
+  if {$NUM_B_CLOCKS>0} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_B_RECIPE -of $IPINST ]
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_B0_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_B_RECIPE -of $IPINST ]
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_B0_FREQ -of $IPINST ]
+  }
+  if {$NUM_B_CLOCKS>1} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_B1_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_B1_FREQ -of $IPINST ]
+  }
 }
 
-proc update_PARAM_VALUE.DEVICE_ID { PARAM_VALUE.DEVICE_ID } {
-	# Procedure called to update DEVICE_ID when any of the dependent parameters in the arguments change
-}
-
-proc update_PARAM_VALUE.SUBSYSTEM_VENDOR_ID { PARAM_VALUE.SUBSYSTEM_VENDOR_ID } {
-	# Procedure called to update SUBSYSTEM_VENDOR_ID when any of the dependent parameters in the arguments change
-}
-
-proc update_PARAM_VALUE.SUBSYSTEM_ID { PARAM_VALUE.SUBSYSTEM_ID } {
-	# Procedure called to update  when any of the dependent parameters in the arguments change
-}
-
-proc update_PARAM_VALUE.SHELL_VERSION { PARAM_VALUE.SHELL_VERSION } {
-	# Procedure called to update  when any of the dependent parameters in the arguments change
+proc update_gui_for_PARAM_VALUE.NUM_C_CLOCKS { IPINST PARAM_VALUE.NUM_C_CLOCKS } {
+  set NUM_C_CLOCKS [get_property value ${PARAM_VALUE.NUM_C_CLOCKS}]
+  if {$NUM_C_CLOCKS>0} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_C_RECIPE -of $IPINST ]
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_C0_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_C_RECIPE -of $IPINST ]
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_C0_FREQ -of $IPINST ]
+  }
+  if {$NUM_C_CLOCKS>1} {
+    set_property visible true  [ ipgui::get_guiparamspec CLOCK_C1_FREQ -of $IPINST ]
+  } else {
+    set_property visible false [ ipgui::get_guiparamspec CLOCK_C1_FREQ -of $IPINST ]
+  }
 }
 
 proc update_PARAM_VALUE.CLOCK_A_RECIPE { PARAM_VALUE.CLOCK_A_RECIPE } {
@@ -171,7 +200,7 @@ proc update_PARAM_VALUE.CLOCK_B1_FREQ { PARAM_VALUE.CLOCK_B1_FREQ PARAM_VALUE.CL
 }
 
 proc update_PARAM_VALUE.CLOCK_C0_FREQ { PARAM_VALUE.CLOCK_C0_FREQ PARAM_VALUE.CLOCK_C_RECIPE } {
-  set clock_freq [list 300000000 150000000 75000000 200000000]
+  set clock_freq [list 500000000 150000000 75000000 200000000]
   set CLOCK_C_RECIPE [get_property value ${PARAM_VALUE.CLOCK_C_RECIPE}]
   set_property value [lindex $clock_freq $CLOCK_C_RECIPE] ${PARAM_VALUE.CLOCK_C0_FREQ}
   set_property enabled false ${PARAM_VALUE.CLOCK_C0_FREQ}
@@ -214,36 +243,261 @@ proc update_MODELPARAM_VALUE.C_CLOCK_C_RECIPE { MODELPARAM_VALUE.C_CLOCK_C_RECIP
 	set_property value [get_property value ${PARAM_VALUE.CLOCK_C_RECIPE}] ${MODELPARAM_VALUE.C_CLOCK_C_RECIPE}
 }
 
-proc update_PARAM_VALUE.DDR_A_PRESENT { PARAM_VALUE.DDR_A_PRESENT } {
+proc update_gui_for_PARAM_VALUE.DDR_A_PRESENT { IPINST PARAM_VALUE.DDR_A_PRESENT PARAM_VALUE.DDR_B_PRESENT PARAM_VALUE.DDR_D_PRESENT } {
+  set DDR_A_PRESENT [get_property value ${PARAM_VALUE.DDR_A_PRESENT}]
+  set DDR_B_PRESENT [get_property value ${PARAM_VALUE.DDR_B_PRESENT}]
+  set DDR_D_PRESENT [get_property value ${PARAM_VALUE.DDR_D_PRESENT}]
+  if {($DDR_A_PRESENT==0) && ($DDR_B_PRESENT==0) && ($DDR_D_PRESENT==0)} {
+    set_property visible false  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible false  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  } else {
+    set_property visible true  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible true  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  }
+}
+
+proc update_gui_for_PARAM_VALUE.DDR_B_PRESENT { IPINST PARAM_VALUE.DDR_A_PRESENT PARAM_VALUE.DDR_B_PRESENT PARAM_VALUE.DDR_D_PRESENT } {
+  set DDR_A_PRESENT [get_property value ${PARAM_VALUE.DDR_A_PRESENT}]
+  set DDR_B_PRESENT [get_property value ${PARAM_VALUE.DDR_B_PRESENT}]
+  set DDR_D_PRESENT [get_property value ${PARAM_VALUE.DDR_D_PRESENT}]
+  if {($DDR_A_PRESENT==0) && ($DDR_B_PRESENT==0) && ($DDR_D_PRESENT==0)} {
+    set_property visible false  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible false  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  } else {
+    set_property visible true  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible true  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  }
+}
+
+proc update_gui_for_PARAM_VALUE.DDR_D_PRESENT { IPINST PARAM_VALUE.DDR_A_PRESENT PARAM_VALUE.DDR_B_PRESENT PARAM_VALUE.DDR_D_PRESENT } {
+  set DDR_A_PRESENT [get_property value ${PARAM_VALUE.DDR_A_PRESENT}]
+  set DDR_B_PRESENT [get_property value ${PARAM_VALUE.DDR_B_PRESENT}]
+  set DDR_D_PRESENT [get_property value ${PARAM_VALUE.DDR_D_PRESENT}]
+  if {($DDR_A_PRESENT==0) && ($DDR_B_PRESENT==0) && ($DDR_D_PRESENT==0)} {
+    set_property visible false  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible false  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  } else {
+    set_property visible true  [ ipgui::get_guiparamspec NUM_STAGES_STATS -of $IPINST ]
+    set_property visible true  [ ipgui::get_groupspec Advanced -of $IPINST ]
+  }
+}
+
+proc update_PARAM_VALUE.NUM_STAGES_STATS { PARAM_VALUE.NUM_STAGES_STATS PARAM_VALUE.DDR_A_PRESENT PARAM_VALUE.DDR_B_PRESENT PARAM_VALUE.DDR_D_PRESENT } {
+  set DDR_A_PRESENT [get_property value ${PARAM_VALUE.DDR_A_PRESENT}]
+  set DDR_B_PRESENT [get_property value ${PARAM_VALUE.DDR_B_PRESENT}]
+  set DDR_D_PRESENT [get_property value ${PARAM_VALUE.DDR_D_PRESENT}]
+  if {($DDR_A_PRESENT==0) && ($DDR_B_PRESENT==0) && ($DDR_D_PRESENT==0)} {
+    set_property range 1,1 ${PARAM_VALUE.NUM_STAGES_STATS}
+    set_property enabled false ${PARAM_VALUE.NUM_STAGES_STATS}
+  } else {
+    set_property range 1,4 ${PARAM_VALUE.NUM_STAGES_STATS}
+    set_property enabled true ${PARAM_VALUE.NUM_STAGES_STATS}
+  }
+}
+
+proc update_PARAM_VALUE.MODE { PARAM_VALUE.MODE } {
+	# Procedure called to update MODE when any of the dependent parameters in the arguments change
+}
+
+proc update_PARAM_VALUE.DDR_A_PRESENT { PARAM_VALUE.DDR_A_PRESENT PARAM_VALUE.MODE } {
 	# Procedure called to update DDR_A_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==1)} {
+    set_property range 0,1 ${PARAM_VALUE.DDR_A_PRESENT}
+    set_property enabled true ${PARAM_VALUE.DDR_A_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.DDR_A_PRESENT}
+    set_property enabled false ${PARAM_VALUE.DDR_A_PRESENT}
+  }
 }
 
-proc update_PARAM_VALUE.DDR_B_PRESENT { PARAM_VALUE.DDR_B_PRESENT } {
+proc update_PARAM_VALUE.DDR_B_PRESENT { PARAM_VALUE.DDR_B_PRESENT PARAM_VALUE.MODE } {
 	# Procedure called to update DDR_B_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==1)} {
+    set_property range 0,1 ${PARAM_VALUE.DDR_B_PRESENT}
+    set_property enabled true ${PARAM_VALUE.DDR_B_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.DDR_B_PRESENT}
+    set_property enabled false ${PARAM_VALUE.DDR_B_PRESENT}
+  }
 }
 
-proc update_PARAM_VALUE.DDR_C_PRESENT { PARAM_VALUE.DDR_C_PRESENT } {
+proc update_PARAM_VALUE.DDR_C_PRESENT { PARAM_VALUE.DDR_C_PRESENT PARAM_VALUE.MODE } {
 	# Procedure called to update DDR_B_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==1)} {
+    set_property range 0,1 ${PARAM_VALUE.DDR_C_PRESENT}
+    set_property enabled true ${PARAM_VALUE.DDR_C_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.DDR_C_PRESENT}
+    set_property enabled false ${PARAM_VALUE.DDR_C_PRESENT}
+  }
 }
 
-proc update_PARAM_VALUE.DDR_D_PRESENT { PARAM_VALUE.DDR_D_PRESENT } {
+proc update_PARAM_VALUE.DDR_D_PRESENT { PARAM_VALUE.DDR_D_PRESENT PARAM_VALUE.MODE } {
 	# Procedure called to update DDR_D_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==1)} {
+    set_property range 0,1 ${PARAM_VALUE.DDR_D_PRESENT}
+    set_property enabled true ${PARAM_VALUE.DDR_D_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.DDR_D_PRESENT}
+    set_property enabled false ${PARAM_VALUE.DDR_D_PRESENT}
+  }
 }
 
-proc update_PARAM_VALUE.NUM_A_CLOCKS { PARAM_VALUE.NUM_A_CLOCKS } {
+proc update_PARAM_VALUE.NUM_A_CLOCKS { PARAM_VALUE.NUM_A_CLOCKS PARAM_VALUE.MODE } {
 	# Procedure called to update NUM_A_CLOCKS when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 1,4 ${PARAM_VALUE.NUM_A_CLOCKS}
+    set_property enabled true ${PARAM_VALUE.NUM_A_CLOCKS}
+  } else {
+    set_property range 1,1 ${PARAM_VALUE.NUM_A_CLOCKS}
+    set_property enabled false ${PARAM_VALUE.NUM_A_CLOCKS}
+  }
 }
 
-proc update_PARAM_VALUE.NUM_B_CLOCKS { PARAM_VALUE.NUM_B_CLOCKS } {
+proc update_PARAM_VALUE.NUM_B_CLOCKS { PARAM_VALUE.NUM_B_CLOCKS PARAM_VALUE.MODE } {
 	# Procedure called to update NUM_B_CLOCKS when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,2 ${PARAM_VALUE.NUM_B_CLOCKS}
+    set_property enabled true ${PARAM_VALUE.NUM_B_CLOCKS}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.NUM_B_CLOCKS}
+    set_property enabled false ${PARAM_VALUE.NUM_B_CLOCKS}
+  }
 }
 
-proc update_PARAM_VALUE.NUM_C_CLOCKS { PARAM_VALUE.NUM_C_CLOCKS } {
+proc update_PARAM_VALUE.NUM_C_CLOCKS { PARAM_VALUE.NUM_C_CLOCKS PARAM_VALUE.MODE } {
 	# Procedure called to update NUM_C_CLOCKS when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,2 ${PARAM_VALUE.NUM_C_CLOCKS}
+    set_property enabled true ${PARAM_VALUE.NUM_C_CLOCKS}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.NUM_C_CLOCKS}
+    set_property enabled false ${PARAM_VALUE.NUM_C_CLOCKS}
+  }
 }
 
-proc update_PARAM_VALUE.PCIM_PRESENT { PARAM_VALUE.PCIM_PRESENT } {
+proc update_PARAM_VALUE.PCIS_PRESENT { PARAM_VALUE.PCIS_PRESENT PARAM_VALUE.MODE } {
 	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.PCIS_PRESENT}
+    set_property enabled true ${PARAM_VALUE.PCIS_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.PCIS_PRESENT}
+    set_property enabled false ${PARAM_VALUE.PCIS_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.PCIM_PRESENT { PARAM_VALUE.PCIM_PRESENT PARAM_VALUE.MODE } {
+	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.PCIM_PRESENT}
+    set_property enabled true ${PARAM_VALUE.PCIM_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.PCIM_PRESENT}
+    set_property enabled false ${PARAM_VALUE.PCIM_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.SDA_PRESENT { PARAM_VALUE.SDA_PRESENT PARAM_VALUE.MODE } {
+	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.SDA_PRESENT}
+    set_property enabled true ${PARAM_VALUE.SDA_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.SDA_PRESENT}
+    set_property enabled false ${PARAM_VALUE.SDA_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.OCL_PRESENT { PARAM_VALUE.OCL_PRESENT PARAM_VALUE.MODE } {
+	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.OCL_PRESENT}
+    set_property enabled true ${PARAM_VALUE.OCL_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.OCL_PRESENT}
+    set_property enabled false ${PARAM_VALUE.OCL_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.BAR1_PRESENT { PARAM_VALUE.BAR1_PRESENT PARAM_VALUE.MODE } {
+	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.BAR1_PRESENT}
+    set_property enabled true ${PARAM_VALUE.BAR1_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.BAR1_PRESENT}
+    set_property enabled false ${PARAM_VALUE.BAR1_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.AUX_PRESENT { PARAM_VALUE.AUX_PRESENT PARAM_VALUE.MODE } {
+	# Procedure called to update PCIM_PRESENT when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property range 0,1 ${PARAM_VALUE.AUX_PRESENT}
+    set_property enabled true ${PARAM_VALUE.AUX_PRESENT}
+  } else {
+    set_property range 0,0 ${PARAM_VALUE.AUX_PRESENT}
+    set_property enabled false ${PARAM_VALUE.AUX_PRESENT}
+  }
+}
+
+proc update_PARAM_VALUE.VENDOR_ID { PARAM_VALUE.VENDOR_ID PARAM_VALUE.MODE } {
+	# Procedure called to update VENDOR_ID when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property enabled true ${PARAM_VALUE.VENDOR_ID}
+  } else {
+    set_property enabled false ${PARAM_VALUE.VENDOR_ID}
+  }
+}
+
+proc update_PARAM_VALUE.DEVICE_ID { PARAM_VALUE.DEVICE_ID PARAM_VALUE.MODE } {
+	# Procedure called to update DEVICE_ID when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property enabled true ${PARAM_VALUE.DEVICE_ID}
+  } else {
+    set_property enabled false ${PARAM_VALUE.DEVICE_ID}
+  }
+}
+
+proc update_PARAM_VALUE.SUBSYSTEM_VENDOR_ID { PARAM_VALUE.SUBSYSTEM_VENDOR_ID PARAM_VALUE.MODE } {
+	# Procedure called to update SUBSYSTEM_VENDOR_ID when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property enabled true ${PARAM_VALUE.SUBSYSTEM_VENDOR_ID}
+  } else {
+    set_property enabled false ${PARAM_VALUE.SUBSYSTEM_VENDOR_ID}
+  }
+}
+
+proc update_PARAM_VALUE.SUBSYSTEM_ID { PARAM_VALUE.SUBSYSTEM_ID PARAM_VALUE.MODE } {
+	# Procedure called to update  when any of the dependent parameters in the arguments change
+  set MODE [get_property value ${PARAM_VALUE.MODE}]
+  if {($MODE==0) || ($MODE==2)} {
+    set_property enabled true ${PARAM_VALUE.SUBSYSTEM_ID}
+  } else {
+    set_property enabled false ${PARAM_VALUE.SUBSYSTEM_ID}
+  }
+}
+
+proc update_MODELPARAM_VALUE.C_MODE { MODELPARAM_VALUE.C_MODE PARAM_VALUE.MODE } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.MODE}] ${MODELPARAM_VALUE.C_MODE}
 }
 
 proc update_MODELPARAM_VALUE.C_DDR_A_PRESENT { MODELPARAM_VALUE.C_DDR_A_PRESENT PARAM_VALUE.DDR_A_PRESENT } {
@@ -297,7 +551,6 @@ proc update_MODELPARAM_VALUE.C_SUBSYSTEM_ID { MODELPARAM_VALUE.C_SUBSYSTEM_ID PA
 	set_property value [get_property value ${PARAM_VALUE.SUBSYSTEM_ID}] ${MODELPARAM_VALUE.C_SUBSYSTEM_ID}
 }
 
-proc update_MODELPARAM_VALUE.C_NUM_STAGES_SCALAR { MODELPARAM_VALUE.C_NUM_STAGES_SCALAR PARAM_VALUE.NUM_STAGES_SCALAR } {
-	set_property value [get_property value ${PARAM_VALUE.NUM_STAGES_SCALAR}] ${MODELPARAM_VALUE.C_NUM_STAGES_SCALAR}
+proc update_MODELPARAM_VALUE.C_NUM_STAGES_STATS { MODELPARAM_VALUE.C_NUM_STAGES_STATS PARAM_VALUE.NUM_STAGES_STATS } {
+	set_property value [get_property value ${PARAM_VALUE.NUM_STAGES_STATS}] ${MODELPARAM_VALUE.C_NUM_STAGES_STATS}
 }
-

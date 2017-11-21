@@ -22,9 +22,9 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt -lrt -lpthread
 
-SRC = test_hello_world.c
+SRC = test_hello_world_vhdl.c
 OBJ = $(SRC:.c=.o)
-BIN = test_hello_world
+BIN = test_hello_world_vhdl
 
 all: $(BIN) check_env
 

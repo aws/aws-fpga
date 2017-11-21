@@ -22,9 +22,9 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt -lrt -lpthread
 
-SRC = uram_example.c
+SRC = test_uram_example.c
 OBJ = $(SRC:.c=.o)
-BIN = uram_example
+BIN = test_uram_example
 
 all: $(BIN) check_env
 

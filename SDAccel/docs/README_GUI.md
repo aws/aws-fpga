@@ -161,6 +161,6 @@ Then Click on **Build** icon (similar to Emulation flow).
 This process can take few hours to complete. Upon completion, you no longer need the GUI. Exit from GUI and follow the process to create AFI and executing on the FPGA. 
 
 
-[Instructions on how to create AFI and subsequent execution process](../README.md#create-an-amazon-fpga-image-afi-for-your-kernel)
+[Instructions on how to create AFI and subsequent execution process](../README.md#createafi)
 
 [SDAccel_Guide]: ./SDAccel_Guide_AWS_F1.md

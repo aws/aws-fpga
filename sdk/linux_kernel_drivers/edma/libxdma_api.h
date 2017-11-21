@@ -1,18 +1,25 @@
+/*******************************************************************************
+ *
+ * Xilinx XDMA IP Core Linux Driver
+ *
+ * Copyright(c) Sidebranch.
+ * Copyright(c) Xilinx, Inc.
+ *
+ * Karen Xie <karen.xie@xilinx.com>
+ * Leon Woestenberg <leon@sidebranch.com>
+ *
+ ******************************************************************************/
+
 #ifndef __XDMA_BASE_API_H__
 #define __XDMA_BASE_API_H__
 
 #include <linux/types.h>
-#include <linux/dma-direction.h>
 #include <linux/scatterlist.h>
 #include <linux/interrupt.h>
+
 /*
  * functions exported by the xdma driver
  */
-
-typedef struct {
-	void* h2c;
-	void* c2h;
-} xdma_channel_tuple;
 
 typedef struct {
 	u64 write_submitted;
@@ -39,13 +46,17 @@ typedef struct {
  *		user interrupt will not enabled until xdma_user_isr_enable()
  *		is called
  * @pdev: ptr to pci_dev
- * @channel_list: a list of pointers to the xdma channels 
- *		each channle is a tupple of C2H and H2C
+ * @mod_name: the module name to be used for request_irq
+ * @user_max: max # of user/event (interrupts) to be configured
+ * @channel_max: max # of c2h and h2c channels to be configured
+ * NOTE: if the user/channel provisioned is less than the max specified,
+ *	 libxdma will update the user_max/channel_max
  * returns
- *	< 0, error in initialization
- *	>=0, # of xdma channels (i.e., the size of the channel_list)  
+ *	a opaque handle (for libxdma to identify the device)
+ *	NULL, in case of error  
  */
-int xdma_device_open(struct pci_dev *pdev, xdma_channel_tuple **tuples);
+void *xdma_device_open(const char *mod_name, struct pci_dev *pdev,
+		 int *user_max, int *h2c_channel_max, int *c2h_channel_max);
 
 /* 
  * xdma_device_close - prepare fpga for removal: disable all interrupts (users
@@ -54,8 +65,7 @@ int xdma_device_open(struct pci_dev *pdev, xdma_channel_tuple **tuples);
  * @pdev: ptr to struct pci_dev
  * @tuples: from xdma_device_open()
  */
-void xdma_device_close(struct pci_dev *pdev, xdma_channel_tuple *tuples);
-
+void xdma_device_close(struct pci_dev *pdev, void *dev_handle);
 
 /* 
  * xdma_device_restart - restart the fpga
@@ -65,7 +75,7 @@ void xdma_device_close(struct pci_dev *pdev, xdma_channel_tuple *tuples);
  * return < 0 in case of error
  * TODO: exact error code will be defined later
  */
-int xdma_device_restart(struct pci_dev *pdev);
+int xdma_device_restart(struct pci_dev *pdev, void *dev_handle);
 
 /*
  * xdma_user_isr_register - register a user ISR handler
@@ -86,8 +96,8 @@ int xdma_device_restart(struct pci_dev *pdev);
  * return < 0 in case of error
  * TODO: exact error code will be defined later
  */
-int xdma_user_isr_register(struct pci_dev *pdev, unsigned int mask,
-		irq_handler_t handler, const char *name, void *dev);
+int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
+			 irq_handler_t handler, void *dev);
 
 /*
  * xdma_user_isr_enable/disable - enable or disable user interrupt
@@ -96,13 +106,15 @@ int xdma_user_isr_register(struct pci_dev *pdev, unsigned int mask,
  * return < 0 in case of error
  * TODO: exact error code will be defined later
  */
-int xdma_user_isr_enable(struct pci_dev *pdev, unsigned int mask);
-int xdma_user_isr_disable(struct pci_dev *pdev, unsigned int mask);
+int xdma_user_isr_enable(void *dev_hndl, unsigned int mask);
+int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
 
 /*
  * xdma_xfer_submit - submit data for dma operation (for both read and write)
  *	This is a blocking call
- * @channel: ptr to channel (obtained via xdma_device_open)
+ * @channel: channle number (< channel_max)
+ *	== channel_max means libxdma can pick any channel available:q
+
  * @dir: DMA_FROM/TO_DEVICE
  * @offset: offset into the DDR/BRAM memory to read from or write to
  * @sg_tbl: the scatter-gather list of data buffers
@@ -111,8 +123,8 @@ int xdma_user_isr_disable(struct pci_dev *pdev, unsigned int mask);
  *	 < 0 in case of error
  * TODO: exact error code will be defined later
  */
-int xdma_xfer_submit(void *channel, enum dma_data_direction dir, u64 offset,
-		 struct sg_table *sgt, int dma_mapped, int timeout_ms);
+ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
+			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
 			
 
 /////////////////////missing API////////////////////

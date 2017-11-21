@@ -250,7 +250,12 @@ out:
 	return ret;
 }
 
-int fpga_mgmt_load_local_image(int slot_id, char *afi_id) 
+int fpga_mgmt_load_local_image(int slot_id, char *afi_id)
+{
+	return fpga_mgmt_load_local_image_flags(slot_id, afi_id, 0);
+}
+
+int fpga_mgmt_load_local_image_flags(int slot_id, char *afi_id, uint32_t flags)
 {
 	int ret;
 	uint32_t len;
@@ -263,7 +268,7 @@ int fpga_mgmt_load_local_image(int slot_id, char *afi_id)
 	memset(&rsp, 0, sizeof(union afi_cmd));
 
 	/* initialize the command structure */
-	fpga_mgmt_cmd_init_load(&cmd, &len, afi_id);
+	fpga_mgmt_cmd_init_load(&cmd, &len, afi_id, flags);
 
 	/* send the command and wait for the response */
 	ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
@@ -274,7 +279,15 @@ out:
 	return ret;
 }
 
-int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id, 
+int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
+		uint32_t timeout, uint32_t delay_msec,
+		struct fpga_mgmt_image_info *info) 
+{
+	return fpga_mgmt_load_local_image_sync_flags(slot_id, afi_id, 0,
+		timeout, delay_msec, info);
+}
+
+int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t flags,
 		uint32_t timeout, uint32_t delay_msec,
 		struct fpga_mgmt_image_info *info) 
 {
@@ -301,7 +314,7 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
 	/** Load the FPGA image (async completion) */
-	ret = fpga_mgmt_load_local_image(slot_id, afi_id);
+	ret = fpga_mgmt_load_local_image_flags(slot_id, afi_id, flags);
 	fail_on(ret, out, "fpga_mgmt_load_local_image failed");
 
 	/** Wait until the status is "loaded" or timeout */

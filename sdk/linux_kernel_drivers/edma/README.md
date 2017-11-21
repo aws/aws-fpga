@@ -130,7 +130,7 @@ The EDMA can be used in any user-space program, using simple device operations f
 
 EDMA data movement commands (like `read()` and `write()`) use a buffer pointers `void*` to the instance CPU memory, while using file offset `off_t` to present the write-to/read-from address in the FPGA.
 
-**NOTE: ** In EC2 F1 instances, the file offset represents the write-to/read-from address in the FPGA relative to AppPF BAR4 128GB address space. The DMA cannot access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](../../../hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).  
+**NOTE: ** In EC2 F1 instances, the file offset represents the write-to/read-from address in the FPGA relative to AppPF BAR4 128GB address space. The DMA cannot access any other PCIe BAR space. Refer to [FPGA PCIe Memory Address Map](../../../hdk/docs/AWS_Fpga_Pcie_Memory_Map.md).
 
 
 <a name="openclose"></a>
@@ -153,7 +153,7 @@ The two standard Linux/POSIX APIs for write are listed below:
 
 ***ssize_t write(int fd, void\* buf, size_t count)*** 
 
-***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explaination](#seek))
+***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explanation](#seek))
 
 The file-descriptor (fd) must have been opened successfully before calling `write()/pwrite()`.
 
@@ -292,7 +292,7 @@ $
 
 **Q: How do I get the Source code of the EDMA driver and compile it?**
 
-Amazon EDMA driver is included [AWS FPGA HDK/SDK](http://github.com/aws/aws-fpga/blob/master/sdk/linux_device_driver/edma), and may be included pre-installed in some Amazon Linux distribution.
+Amazon EDMA driver is included [AWS FPGA HDK/SDK](.), and may be included pre-installed in some Amazon Linux distribution.
 
 Follow the [installation guide](./edma_install.md) for more details.
 

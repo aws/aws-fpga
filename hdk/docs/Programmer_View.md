@@ -18,7 +18,7 @@ There are two parts required to work with AWS FPGA: Management and Runtime, and 
   
   **\[D\]** [FPGA PCIe Lib](../../sdk/userspace/fpga_libs/fpga_pci/) is a C-library used to access the FPGA memory space behind the AppPF PCIe BARs, from Linux application space like reading/writing to register space or passing messages. This library can be compiled and linked with the developer's C/C++ application.
   
-  **\[E\]** A [DMA Interface](../../sdk/linux_kernel_drivers/edma/edma_README.md) using standard POSIX API like open()/read()/write() to be used in any C/C++ application for data transfer using DMA. This DMA interface requires installing the [AWS EDMA kernel driver](../../sdk/linux_kernel_drivers/edma/edma_install.md) - marked as item **\[G\]**.
+  **\[E\]** A [DMA Interface](../../sdk/linux_kernel_drivers/edma/README.md) using standard POSIX API like open()/read()/write() to be used in any C/C++ application for data transfer using DMA. This DMA interface requires installing the [AWS EDMA kernel driver](../../sdk/linux_kernel_drivers/edma/edma_install.md) - marked as item **\[G\]**.
   
   **\[F\]** A [Userspace Interrupt/Event notification](../../sdk/linux_kernel_drivers/edma/user_defined_interrupts_README.md) using standard POSIX API like open() and poll(), to be used in any C/C++ application. This Interrupt/Event interface requires installing the [AWS EDMA kernel driver](../../sdk/linux_kernel_drivers/edma/edma_install.md) - marked as item **\[G\]**.
   

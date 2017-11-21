@@ -29,7 +29,9 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task cl_poke;
    export "DPI-C" task sv_int_ack;
    export "DPI-C" task sv_pause;
-
+   export "DPI-C" task sv_fpga_pci_peek;
+   export "DPI-C" task sv_fpga_pci_poke;
+   
    static int h2c_desc_index = 0;
    static int c2h_desc_index = 0;
    
@@ -57,6 +59,14 @@ import tb_type_defines_pkg::*;
       repeat (x) #1us;
    endtask
 
+   task sv_fpga_pci_peek(input int handle, input longint unsigned offset, output int unsigned value);
+      tb.card.fpga.sh.peek(.addr(offset), .data(value), .intf(AxiPort::PORT_OCL));
+   endtask
+   
+   task sv_fpga_pci_poke(input int handle, input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
+   endtask 
+   
    function void hm_put_byte(input longint unsigned addr, byte d);
       if (tb.use_c_host_memory)
          host_memory_putc(addr, d);
@@ -430,7 +440,8 @@ end
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0); 
        logic [63:0] tmp;
-       `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
+
+       `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
       data = {32'h0, tmp[31:0]};
    endtask
 
@@ -468,7 +479,7 @@ end
              output logic [63:0] data, 
              input logic [5:0] id = 6'h0); 
       logic [63:0] tmp;
-      `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
+      `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
       data = {32'h0, tmp[31:0]};
    endtask
 
@@ -480,8 +491,72 @@ end
       `SLOT_MACRO_FUNC(is_dma_to_buffer_done(chan))
    endfunction // is_dma_to_buffer_done
 
+   function bit is_ddr_ready(input int slot_id = 0);
+      `SLOT_MACRO_TASK(is_ddr_ready())
+   endfunction // is_dma_to_buffer_done
+   
    task poke_stat(input int slot_id = 0,
                   input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
       `SLOT_MACRO_TASK(poke_stat(.addr(addr), .ddr_idx(ddr_idx), .data(data)))
-   endtask
+   endtask // poke_stat
+   //=================================================
+   //
+   //   set_chk_clk_freq
+   //
+   //   Description: starts clock frequency checks
+   //   Outputs: None
+   //
+   //=================================================
+   function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);
+     `SLOT_MACRO_TASK(set_chk_clk_freq(chk_freq))
+   endfunction // chk_clk_freq
+   
+   //=================================================
+   //
+   //   chk_prot_err_stat
+   //
+   //   Description: Check for protocol checker violations
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_prot_err_stat(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(chk_prot_err_stat());
+   endfunction // chk_prot_err_stat
+
+   //=================================================
+   //
+   //   chk_clk_err_cnt
+   //
+   //   Description: Check for protocol checker violations
+   //   Outputs: None
+   //
+   //=================================================
+   function logic chk_clk_err_cnt(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(chk_clk_err_cnt());
+   endfunction // chk_clk_err_cnt
+   
+   //=================================================
+   //
+   //   get_global_counter_0
+   //
+   //   Description: Get global counter 0 value.
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic [63:0] get_global_counter_0(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(get_global_counter_0());
+   endfunction // get_global_counter_0
+
+   //=================================================
+   //
+   //   get_global_counter_1
+   //
+   //   Description: Get global counter 1 value.
+   //   Outputs: 64 bit counter
+   //
+   //=================================================
+   function logic [63:0] get_global_counter_1(input int slot_id = 0);
+     `SLOT_MACRO_FUNC(get_global_counter_1());
+   endfunction // get_global_counter_1
+   
 `endif

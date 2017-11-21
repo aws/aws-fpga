@@ -1,13 +1,13 @@
 
 # Elastic DMA (EDMA) Installation and Frequently Asked Questions
 
-EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined interrupts for AWS FPGAs. Please see [EDMA README](./README.md) for details.
+EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined interrupts for AWS FPGAs. Please see [EDMA README](README.md) for details.
 
 # Table of Contents
 
 1. [Q: How do I know if the EDMA driver is available and installed?](#howIKnow)
 2. [Q: How do I get the source code of the `edma` driver and compile it?](#howToCompile)
-3. [Q: How can I make sure the installed driver will be preserved following a kernel update?](#howToUpgradeKernel) 
+3. [Q: How can I make sure the installed driver will be preserved following a kernel update?](#howToUpdateKernel) 
 4. [Q: What PCIe Vendor-ID and Device-ID does EDMA driver support](#howToDIDnVID)
 
 
@@ -30,7 +30,7 @@ The developer can operate these DMA queues and interrupts directly from Linux us
 <a name="howToCompile"></a>
 **Q: How do I get the source code of the `edma` driver and compile it?** 
 
-Amazon `edma` driver is included in [AWS FPGA SDK](https://github.com/aws/aws-fpga/master/blob/sdk/kernel_drivers/edma) for integration with other Linux distributions, please follow the next set of steps:
+Amazon `edma` driver is included in [AWS FPGA SDK](.) for integration with other Linux distributions, please follow the next set of steps:
 
 __**Step 1**__: Make sure you have `gcc` and `linux kernel source code` installed in your machine:
 

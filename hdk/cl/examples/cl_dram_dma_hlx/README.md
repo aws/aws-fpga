@@ -41,10 +41,6 @@ In the TCL console type in the following to create the cl\_dram\_dma example.  T
 
 aws::make\_rtl -examples cl\_dram\_dma
 
-Note when closing and opening the project in the future, the following TCL command must be run when the project first opens or an error could show up in simulation/implementation flow.
-
-aws::make\_rtl
-
 ### Simulation
 Click on Simulation->Run Simulation->Run Behavioral Simulation
 

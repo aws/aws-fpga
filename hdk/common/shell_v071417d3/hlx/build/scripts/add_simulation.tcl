@@ -25,11 +25,12 @@ set IS_DEFINE [get_property verilog_define [get_filesets sim_1]]
 
 add_files -fileset sim_1 [ list \
  ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/sim/axi_register_slice.v\
- ${HDK_SHELL_DIR}/verif/models/ddr4_model/ddr4_sdram_model_wrapper.sv\
+ ${HDK_SHELL_DIR}/verif/include/sh_dpi_tasks.svh\
+ ${HDK_SHELL_DIR}/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v\
+ $::aws::make_faas::_nsvars::script_dir/../../verif/cl_ports_sh_bfm.vh\
  ${HDK_SHELL_DIR}/verif/models/sh_bfm/axi_bfm_defines.svh\
  ${HDK_SHELL_DIR}/verif/tb/sv/tb_type_defines_pkg.sv\
  ${HDK_SHELL_DIR}/verif/models/sh_bfm/sh_bfm.sv\
- ${HDK_SHELL_DIR}/verif/include/sh_dpi_tasks.svh\
  ${HDK_SHELL_DIR}/verif/models/sh_bfm/axil_bfm.sv\
  ${HDK_SHELL_DIR}/verif/models/fpga/fpga.sv\
  ${HDK_SHELL_DIR}/verif/models/fpga/card.sv\
@@ -45,8 +46,16 @@ add_files -fileset sim_1 [ list \
  ${HDK_SHELL_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rank.sv\
  ${HDK_SHELL_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rcd_model.sv\
  ${HDK_SHELL_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rdimm_wrapper.sv\
+ ${HDK_SHELL_DIR}/verif/models/ddr4_model/ddr4_sdram_model_wrapper.sv\
 ]
 
+set_property include_dirs ${HDK_SHELL_DIR}/verif/models/ddr4_model [get_filesets sim_1]
+
+set define_var [get_property verilog_define [get_filesets sim_1]]
+set new_var [join [list $define_var "MAXWAITS=100000"]]
+
+
+set_property verilog_define $new_var [get_filesets sim_1]
 
 set_property top tb [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]

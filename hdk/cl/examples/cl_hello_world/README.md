@@ -1,5 +1,8 @@
 # Hello World CL Example
 
+
+## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../README.md) first!!
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -10,13 +13,12 @@
 <a name="overview"></a>
 ## Overview
 
-This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (C). These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
+This simple *hello_world* example builds a Custom Logic (CL) that will enable the instance to "peek" and "poke" registers in the Custom Logic (CL).
+These registers will be in the memory space behind AppPF BAR0, which is the ocl\_cl\_ AXI-lite bus on the Shell to CL interface.
 
 This example demonstrate a basic use-case of the Virtual LED and Virtual DIP switches.
 
 All of the unused interfaces between AWS Shell and the CL are tied to fixed values, and it is recommended that the developer use similar values for every unused interface in the developer's CL.
-
-Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
 
 
 <a name="description"></a>
@@ -66,6 +68,6 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDD |
-| Pre-generated AFI ID | afi-01a7ea9bafe3ef8cc |
-| Pre-generated AGFI ID | agfi-088bffb3ab91ca2d1 |
+| Pre-generated AFI ID | afi-0853bcceeda387d03 |
+| Pre-generated AGFI ID | agfi-0f4478c5ca0b1dbaf |
 

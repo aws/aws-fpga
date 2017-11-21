@@ -33,6 +33,9 @@
 +incdir+${CL_ROOT}/design/axi_crossbar_0 
 +incdir+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
+-f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
+${TEST_NAME}
+
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s00_regslice_0/sim/cl_axi_interconnect_s00_regslice_0.v
 ${SH_LIB_DIR}/../ip/cl_axi_interconnect/ip/cl_axi_interconnect_s01_regslice_0/sim/cl_axi_interconnect_s01_regslice_0.v
@@ -67,8 +70,6 @@ ${CL_ROOT}/design/cl_vio.sv
 ${CL_ROOT}/design/cl_int_slv.sv
 ${CL_ROOT}/design/cl_ocl_slv.sv
 ${CL_ROOT}/design/cl_sda_slv.sv
+${CL_ROOT}/design/cl_dram_dma_axi_mstr.sv
 ${CL_ROOT}/design/cl_dram_dma.sv
 
--f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
-
-${TEST_NAME}

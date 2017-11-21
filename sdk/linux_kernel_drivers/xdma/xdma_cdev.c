@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2017 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
@@ -88,10 +100,13 @@ static int config_kobject(struct xdma_cdev *xcdev, enum cdev_type type)
 	switch (type) {
 	case CHAR_XDMA_H2C:
 	case CHAR_XDMA_C2H:
+	case CHAR_BYPASS_H2C:
+	case CHAR_BYPASS_C2H:
 		BUG_ON(!engine);
 		rv = kobject_set_name(&xcdev->cdev.kobj, devnode_names[type],
 			xdev->idx, engine->channel);
 		break;
+	case CHAR_BYPASS:
 	case CHAR_USER:
 	case CHAR_CTRL:
 	case CHAR_XVC:
@@ -286,6 +301,18 @@ static int create_xcdev(struct xdma_pci_dev *xpdev, struct xdma_cdev *xcdev,
 		minor = 10 + bar;
 		cdev_event_init(xcdev);
 		break;
+	case CHAR_BYPASS_H2C:
+		minor = 64 + engine->channel;
+		cdev_bypass_init(xcdev);
+		break;
+	case CHAR_BYPASS_C2H:
+		minor = 68 + engine->channel;
+		cdev_bypass_init(xcdev);
+		break;
+	case CHAR_BYPASS:
+		minor = 100;
+		cdev_bypass_init(xcdev);
+		break;
 	default:
 		pr_info("type 0x%x NOT supported.\n", type);
 		return -EINVAL;
@@ -354,6 +381,16 @@ void xpdev_destroy_interfaces(struct xdma_pci_dev *xpdev)
 		destroy_xcdev(&xpdev->xvc_cdev);
 	}
 
+	if (xpdev_flag_test(xpdev, XDF_CDEV_BYPASS)) {
+		/* iterate over channels */
+		for (i = 0; i < xpdev->h2c_channel_max; i++)
+			/* remove DMA Bypass character device */
+			destroy_xcdev(&xpdev->bypass_h2c_cdev[i]);
+		for (i = 0; i < xpdev->c2h_channel_max; i++)
+			destroy_xcdev(&xpdev->bypass_c2h_cdev[i]);
+		destroy_xcdev(&xpdev->bypass_cdev_base);
+	}
+
 	if (xpdev->major)
 		unregister_chrdev_region(MKDEV(xpdev->major, XDMA_MINOR_BASE), XDMA_MINOR_COUNT);
 }
@@ -416,6 +453,46 @@ int xpdev_create_interfaces(struct xdma_pci_dev *xpdev)
 	xpdev_flag_set(xpdev, XDF_CDEV_SG);
 
 	/* ??? Bypass */
+	/* Initialize Bypass Character Device */
+	if (xdev->bypass_bar_idx > 0){
+		for (i = 0; i < xpdev->h2c_channel_max; i++) {
+			engine = &xdev->engine_h2c[i];
+
+			if (engine->magic != MAGIC_ENGINE)
+				continue;
+
+			rv = create_xcdev(xpdev, &xpdev->bypass_h2c_cdev[i], i,
+					engine, CHAR_BYPASS_H2C);
+			if (rv < 0) {
+				pr_err("create h2c %d bypass I/F failed, %d.\n",
+					i, rv);
+				goto fail;
+			}
+		}
+
+		for (i = 0; i < xpdev->c2h_channel_max; i++) {
+			engine = &xdev->engine_c2h[i];
+
+			if (engine->magic != MAGIC_ENGINE)
+				continue;
+
+			rv = create_xcdev(xpdev, &xpdev->bypass_c2h_cdev[i], i,
+					engine, CHAR_BYPASS_C2H);
+			if (rv < 0) {
+				pr_err("create c2h %d bypass I/F failed, %d.\n",
+					i, rv);
+				goto fail;
+			}
+		}
+
+		rv = create_xcdev(xpdev, &xpdev->bypass_cdev_base,
+				xdev->bypass_bar_idx, NULL, CHAR_BYPASS);
+		if (rv < 0) {
+			pr_err("create bypass failed %d.\n", rv);
+			goto fail;
+		}
+		xpdev_flag_set(xpdev, XDF_CDEV_BYPASS);
+	}
 
 	/* initialize user character device */
 	if (xdev->user_bar_idx >= 0) {
