@@ -33,12 +33,12 @@
 	 *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
    *    IP Integrator GUI (HLx) improvments 
    *    CL\_DRAM\_DMA fixes and improvements 
-   	*     Dual master support
+   	 *    Dual master support
    *    Simulation enviroment fixes and improvements
-   	*     AXI/AXIL Protocol checkers
-	*     Shell model improvements
-	*     SW co-simulation support on cl\_hello\_world
-	*     DDR Model patch
+         *    AXI/AXIL Protocol checkers
+         *    Shell model improvements
+         *    SW co-simulation support on cl\_hello\_world
+         *    DDR Model patch
    *    Updated SH\_DDR module in preperation for upcoming feature release	
    
 ## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
