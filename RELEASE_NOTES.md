@@ -30,10 +30,10 @@
    *    EDMA/XDMA Driver improvements
    *    Additional SDAccel Platforms
          *    1DDR for faster build times and smaller expanded shell
-	 *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
+         *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
    *    IP Integrator GUI (HLx) improvments 
-   *    CL\_DRAM\_DMA fixes and improvements 
-   	 *    Dual master support
+   *    CL\_DRAM\_DMA fixes and improvements
+         *    Dual master support
    *    Simulation enviroment fixes and improvements
          *    AXI/AXIL Protocol checkers
          *    Shell model improvements
