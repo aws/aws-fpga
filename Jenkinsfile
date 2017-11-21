@@ -11,7 +11,7 @@ properties([parameters([
     booleanParam(name: 'test_runtime_software', defaultValue: true),
     booleanParam(name: 'test_fdf',              defaultValue: true),
     booleanParam(name: 'test_sdaccel_scripts',  defaultValue: true),
-    booleanParam(name: 'test_sdaccel_builds',   defaultValue: false),
+    booleanParam(name: 'test_sdaccel_builds',   defaultValue: true),
     booleanParam(name: 'debug_dcp_gen',         defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',        defaultValue: false, description: 'Debug the FDF for cl_uram_example.')
 
