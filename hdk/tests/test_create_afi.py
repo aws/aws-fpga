@@ -50,12 +50,12 @@ class TestCreateAfi(AwsFpgaTestBase):
     Create AFI from DCP.
     '''
     
-    @staticmethod
-    def setup_class(self):
+    @classmethod
+    def setup_class(cls):
         '''
         Do any setup required for tests.
         '''
-        AwsFpgaTestBase.setup_class(self, __file__)
+        AwsFpgaTestBase.setup_class(cls, __file__)
         return
     
     def get_dcp_tarball(self, cl):
