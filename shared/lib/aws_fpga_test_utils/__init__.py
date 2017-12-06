@@ -14,9 +14,11 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 
+import csv
 import git
 import logging
 import os
+from os.path import basename, dirname, realpath
 import re
 import subprocess
 import sys
@@ -117,3 +119,54 @@ def get_num_fpga_slots(instance_type):
     elif re.match(r'f1\.16xlarge', instance_type):
         return 8
     return 0
+
+def read_clock_recipes():
+    '''
+    @returns a struct liek the following:
+    CLOCK_RECIPES = {
+        'A': {
+            'clock_names': ['clk_main_a0, clk_extra_a1, ...],
+            'recipes': {
+                'A0': {
+                    'clk_main_a0': '125',
+                    'clk_extra_a1': '62.5',
+                    ...
+                },
+                ...
+            }
+        },
+        ...
+    }
+    '''
+    git_repo_dir = get_git_repo_root(dirname(__file__))
+    clock_recipes_csv = os.path.join(git_repo_dir, 'hdk/docs/clock_recipes.csv')
+    with open(clock_recipes_csv, 'r') as csvfile:
+        CLOCK_RECIPES = {}
+        csvreader = csv.reader(csvfile)
+        for row in csvreader:
+            if not row or row[0] == '':
+                continue
+            matches = re.match(r'Clock Group (\S)', row[0])
+            assert matches, "Invalid format in {}. Expected 'Clock Group \S'\n{}".format(clock_recipes_csv, row[0])
+            clock_group = matches.group(1)
+            logger.debug(row[0])
+            CLOCK_RECIPES[clock_group] = {}
+            CLOCK_RECIPES[clock_group]['clock_names'] = []
+            CLOCK_RECIPES[clock_group]['recipes'] = {}
+            row = csvreader.next()
+            assert row[0] == 'Recipe Number', "Invalid format in {}. Expected 'Recipe Number'\n{}".format(clock_recipes_csv, row[0])
+            for clock_name in row[1:]:
+                if clock_name == '':
+                    break;
+                CLOCK_RECIPES[clock_group]['clock_names'].append(clock_name)
+            logger.debug("  Clock names:\n  {}".format("\n  ".join(CLOCK_RECIPES[clock_group]['clock_names'])))
+            while True:
+                row = csvreader.next()
+                if not row or row[0] == '':
+                    break
+                recipe_number = row[0]
+                CLOCK_RECIPES[clock_group]['recipes'][recipe_number] = {}
+                for i in range(len(CLOCK_RECIPES[clock_group]['clock_names'])):
+                    clock_name = CLOCK_RECIPES[clock_group]['clock_names'][i]
+                    CLOCK_RECIPES[clock_group]['recipes'][recipe_number][clock_name] = row[i + 1]
+    return CLOCK_RECIPES

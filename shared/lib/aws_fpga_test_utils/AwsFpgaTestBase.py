@@ -49,14 +49,26 @@ class AwsFpgaTestBase(object):
     Load AFI created by test_create_afi.py
     '''
 
+    DCP_BUILD_STRATEGIES = [
+        'BASIC',
+        'DEFAULT',
+        'EXPLORE',
+        'TIMING',
+        'CONGESTION']
+
+    DCP_CLOCK_RECIPES = aws_fpga_test_utils.read_clock_recipes()
+
+    DCP_URAM_OPTIONS = ['2', '3', '4']
+
+    git_repo_dir = get_git_repo_root(dirname(__file__))
+    WORKSPACE = git_repo_dir
+
     @classmethod
     def setup_class(cls, derived_cls, filename_of_test_class):
         AwsFpgaTestBase.s3_bucket = 'aws-fpga-jenkins-testing'
         AwsFpgaTestBase.__ec2_client = None
         AwsFpgaTestBase.__s3_client = None
         AwsFpgaTestBase.test_dir = dirname(realpath(filename_of_test_class))
-        AwsFpgaTestBase.git_repo_dir = get_git_repo_root(dirname(filename_of_test_class))
-        AwsFpgaTestBase.WORKSPACE = AwsFpgaTestBase.git_repo_dir
 
         # SDAccel locations
         # Need to move to either a config file somewhere or a subclass
@@ -67,6 +79,9 @@ class AwsFpgaTestBase(object):
             assert os.environ['WORKSPACE'] == AwsFpgaTestBase.git_repo_dir, "WORKSPACE incorrect"
         else:
             os.environ['WORKSPACE'] = AwsFpgaTestBase.WORKSPACE
+        if 'BUILD_TAG' not in os.environ:
+            os.environ['BUILD_TAG'] = 'test'
+            logger.info('Set BUILD_TAG to {}'.format(os.environ['BUILD_TAG']))
         AwsFpgaTestBase.instance_type = aws_fpga_test_utils.get_instance_type()
         AwsFpgaTestBase.num_slots = aws_fpga_test_utils.get_num_fpga_slots(AwsFpgaTestBase.instance_type)
         return
