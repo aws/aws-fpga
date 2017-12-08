@@ -17,13 +17,13 @@
 '''
 Pytest module:
 
-Call using ```pytest test_run_sdaccel_examples.py```
+Call using ```pytest test_build_sdaccel_examples.py```
 
 See TESTING.md for details.
 '''
 
 import os
-from os.path import dirname, realpath
+from os.path import dirname, realpath, basename
 import json
 try:
     import aws_fpga_utils
@@ -36,13 +36,15 @@ except ImportError as e:
 
 logger = aws_fpga_utils.get_logger(__name__)
 
-class TestRunSDAccelExamples(AwsFpgaTestBase):
+class TestBuildSDAccelExample(AwsFpgaTestBase):
     '''
     Pytest test class.
 
     NOTE: Cannot have an __init__ method.
 
     '''
+    ADD_EXAMPLEPATH = True
+
     @classmethod
     def setup_class(cls):
         '''
@@ -50,26 +52,44 @@ class TestRunSDAccelExamples(AwsFpgaTestBase):
         '''
 
         AwsFpgaTestBase.setup_class(cls, __file__)
-        AwsFpgaTestBase.assert_hdk_setup()
+
+        AwsFpgaTestBase.assert_sdk_setup()
         AwsFpgaTestBase.assert_sdaccel_setup()
 
         return
 
     def test_sw_emu(self, examplePath):
-        self.runner(examplePath=examplePath, target="sw_emu", check=True)
+        target = "sw_emu"
+        self.base_test(examplePath=examplePath, target=target, check=True)
 
     def test_hw_emu(self, examplePath):
-        self.runner(examplePath=examplePath, target="hw_emu", check=True)
+        target = "hw_emu"
+        self.base_test(examplePath=examplePath, target=target, check=True)
 
     def test_hw_build(self, examplePath):
-        self.runner(examplePath=examplePath, target="hw", check=False)
+        target = "hw"
+        self.base_test(examplePath=examplePath, target=target, check=False)
 
-    def runner(self, examplePath, target, clean=True, check=True):
+    def check_build(self, examplePath, target):
 
-        full_example_path = self.WORKSPACE + "/" + examplePath
-        assert os.path.exists(full_example_path), logger.error("SDAccel Example path={} does not exist".format(examplePath))
+        xclbin_path = self.get_sdaccel_xclbin_dir(examplePath)
 
-        logger.info("SDAccel Example path={}".format(examplePath))
+        logger.info("Checking if SDAccel Example xclbin path={} exists".format(xclbin_path))
+        assert os.path.exists(xclbin_path), "SDAccel Example xclbinpath={} does not exist".format(xclbin_path)
+
+        logger.info("Checking that a non zero size xclbin file exists in {}".format(xclbin_path))
+        xclbin = self.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*.xclbin".format(target)))
+        logger.info("xclbin: {}".format(xclbin))
+
+        return xclbin
+
+    def base_test(self, examplePath, target, clean=True, check=True):
+
+        full_example_path = self.get_sdaccel_example_fullpath(examplePath=examplePath)
+        logger.info("SDAccel Example path={}".format(full_example_path))
+
+        assert os.path.exists(full_example_path), "SDAccel Example path={} does not exist".format(full_example_path)
+
         os.chdir(full_example_path)
 
         if clean:
@@ -82,5 +102,13 @@ class TestRunSDAccelExamples(AwsFpgaTestBase):
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd("make {0} TARGETS={1} DEVICES={2} all".format(check_string, target, os.environ['AWS_PLATFORM']))
         assert rc == 0, "SDAccel build failed with rc={}".format(rc)
+
+        # Check for non zero xclbin
+        xclbin = self.check_build(examplePath=examplePath, target=target)
+
+        xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target), basename(xclbin))
+
+        logger.info("Uploading xclbin to {}".format(os.path.join(self.s3_bucket, xclbin_key)))
+        self.s3_client().upload_file(xclbin, self.s3_bucket, xclbin_key)
 
         return

@@ -13,7 +13,7 @@ properties([parameters([
     booleanParam(name: 'test_dcp_recipes',      defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
     booleanParam(name: 'test_fdf',              defaultValue: true, description: 'Test full developer flow on cl_hello_world and cl_dram_dma'),
     booleanParam(name: 'test_sdaccel_scripts',  defaultValue: true),
-    booleanParam(name: 'test_sdaccel_builds',   defaultValue: false),
+    booleanParam(name: 'test_sdaccel_builds',   defaultValue: true),
     booleanParam(name: 'debug_dcp_gen',         defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',        defaultValue: false, description: 'Debug the FDF for cl_uram_example.')
 
@@ -221,7 +221,7 @@ if (test_runtime_software) {
                             String test = "hdk/tests/test_load_afi.py::TestLoadAfi::test_precompiled_${cl_name}"
                             String report_file = "test_runtime_software_${cl_name}.xml"
                             checkout scm
-                            
+
                             try {
                                 sh """
                                     set -e
@@ -456,7 +456,7 @@ if (test_sdaccel_builds) {
         def sdaccel_build_stages = [:]
         String sdaccel_examples_list = 'sdaccel_examples_list.json'
 
-        stage ('Find SDACCel tests') {
+        stage ('Find SDAccel tests') {
 
             String report_file = 'test_find_sdaccel_examples.xml'
 
@@ -494,82 +494,120 @@ if (test_sdaccel_builds) {
 
                     String build_name = e.key
                     String example_path = e.value
-                    String sw_emu_stage_name = "SDAccel SW_EMU ${build_name}"
-                    String hw_emu_stage_name = "SDAccel HW_EMU ${build_name}"
-                    String hw_stage_name     = "SDAccel HW ${build_name}"
-                    String create_afi_stage_name = "SDAccel AFI ${build_name}"
 
-                    String sw_emu_report_file = "sdaccel_sw_emu_${build_name}.xml"
-                    String hw_emu_report_file = "sdaccel_hw_emu_${build_name}.xml"
-                    String hw_report_file     = "sdaccel_hw_${build_name}.xml"
+                    String sw_emu_stage_name      = "SDAccel SW_EMU ${build_name}"
+                    String hw_emu_stage_name      = "SDAccel HW_EMU ${build_name}"
+                    String hw_stage_name          = "SDAccel HW ${build_name}"
+                    String create_afi_stage_name  = "SDAccel AFI ${build_name}"
+                    String run_example_stage_name = "SDAccel RUN ${build_name}"
 
-                    String xclbin_stash_name  = "xclbin_${build_name}_stash"
-
+                    String sw_emu_report_file      = "sdaccel_sw_emu_${build_name}.xml"
+                    String hw_emu_report_file      = "sdaccel_hw_emu_${build_name}.xml"
+                    String hw_report_file          = "sdaccel_hw_${build_name}.xml"
+                    String create_afi_report_file  = "sdaccel_create_afi_${build_name}.xml"
+                    String run_example_report_file = "sdaccel_run_${build_name}.xml"
 
                     sdaccel_build_stages[build_name] = {
 
                         stage(sw_emu_stage_name) {
-                            timeout (time: 1, unit: 'HOURS') {
-                                node(task_label.get('sdaccel_builds')) {
+                            node(task_label.get('sdaccel_builds')) {
 
-                                    checkout scm
+                                checkout scm
 
-                                    try {
-                                        sh """
-                                            set -e
-                                            source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                            pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_examples.py::TestRunSDAccelExamples::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file}
+                                try {
+                                    sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600
 
-                                        """
-                                    } catch (error) {
-                                        echo "${stage_name} SW EMU Build generation failed"
-                                        throw error
-                                    } finally {
-                                        junit healthScaleFactor: 0.0, testResults: sw_emu_report_file
-                                    }
+                                    """
+                                } catch (error) {
+                                    echo "${sw_emu_stage_name} SW EMU Build generation failed"
+                                    throw error
+                                } finally {
+                                    junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
                                 }
                             }
                         }
 
                         stage(hw_emu_stage_name) {
-                            timeout (time: 1, unit: 'HOURS') {
-                                node(task_label.get('sdaccel_builds')) {
-                                    try {
-                                        sh """
-                                            set -e
-                                            source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                            pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_examples.py::TestRunSDAccelExamples::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file}
-                                        """
-                                    } catch (error) {
-                                        echo "${stage_name} HW EMU Build generation failed"
-                                    } finally {
-                                        junit healthScaleFactor: 0.0, testResults: hw_emu_report_file
-                                    }
+                            node(task_label.get('sdaccel_builds')) {
+
+                                checkout scm
+
+                                try {
+                                    sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600
+                                    """
+                                } catch (error) {
+                                    echo "${hw_emu_stage_name} HW EMU Build generation failed"
+                                    throw error
+                                } finally {
+                                    junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
                                 }
                             }
                         }
 
                         stage(hw_stage_name) {
-                            timeout (time: 7, unit: 'HOURS') {
-                                node(task_label.get('sdaccel_builds')) {
-                                    try {
-                                        sh """
-                                            set -e
-                                            source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                            pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_examples.py::TestRunSDAccelExamples::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file}
-                                        """
-                                    } catch (error) {
-                                        echo "${stage_name} HW Build generation failed"
-                                        throw error
-                                    } finally {
-                                        junit healthScaleFactor: 0.0, testResults: hw_report_file
-                                    }
+                            node(task_label.get('sdaccel_builds')) {
+
+                                checkout scm
+
+                                try {
+                                    sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200
+                                    """
+                                } catch (error) {
+                                    echo "${hw_stage_name} HW Build generation failed"
+                                    throw error
+                                } finally {
+                                    junit healthScaleFactor: 10.0, testResults: hw_report_file
                                 }
                             }
                         }
+
+                        stage(create_afi_stage_name) {
+                            node(task_label.get('create-afi')) {
+
+                                checkout scm
+                                try {
+                                    sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                        pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=3600
+                                    """
+                                } catch (error) {
+                                    echo "${create_afi_stage_name} Create AFI failed"
+                                    throw error
+                                } finally {
+                                    junit healthScaleFactor: 10.0, testResults: create_afi_report_file
+                                }
+                            }
+                        }
+
+                        stage(run_example_stage_name) {
+                            node(task_label.get('runtime')) {
+
+                                checkout scm
+                                try {
+                                    sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
+                                        pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600
+                                    """
+                                } catch (error) {
+                                    echo "${run_example_stage_name} Runtime example failed"
+                                    throw error
+                                } finally {
+                                    junit healthScaleFactor: 10.0, testResults: run_example_report_file
+                                }
+                            }
+                        }
+
 
                     } // sdaccel_build_stages[ e.key ]
                 } // for ( e in list_map )

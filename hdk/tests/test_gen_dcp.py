@@ -45,9 +45,9 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestGenDcp(AwsFpgaTestBase):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
-    
+
     Test all example CLs with different strategies and clock recipes.
     '''
 
@@ -57,7 +57,6 @@ class TestGenDcp(AwsFpgaTestBase):
         Do any setup required for tests.
         '''
         AwsFpgaTestBase.setup_class(cls, __file__)
-
         AwsFpgaTestBase.assert_hdk_setup()
 
         cls.set_allowed_warnings()
@@ -151,6 +150,7 @@ class TestGenDcp(AwsFpgaTestBase):
         assert os.path.exists(to_aws_dir), "The checkpoints/to_aws directory does not exist: {}".format(to_aws_dir)
 
         logger.info("Checking that a non zero size ltx file exists in {}".format(checkpoints_dir))
+
         ltx_file = self.assert_non_zero_file(os.path.join(checkpoints_dir, '*.ltx'))
         logger.info("ltx file: {}".format(ltx_file))
 
@@ -175,8 +175,8 @@ class TestGenDcp(AwsFpgaTestBase):
         assert rc == 0, "Did not find manifest in {}".format(tarball)
 
         # Use last_log symlink to grab logname
-        os.chdir(scripts_dir)
         logger.debug("Looking for last_log in {}".format(scripts_dir))
+
         assert os.path.exists("last_log"), "Could not find the log file: {}/last_log".format(scripts_dir)
 
         # Check the number of warnings
@@ -190,7 +190,6 @@ class TestGenDcp(AwsFpgaTestBase):
         filtered_warnings = self.filter_warnings(cl, option_tag, warnings)
         num_warnings = len(filtered_warnings)
         logger.info("Saw {} filtered warnings in log file:\n{}".format(num_warnings, "\n".join(filtered_warnings)))
-
         # Check the number of critical warnings
         (rc, stdout_lines, stderr_lines) = self.run_cmd("grep \"^CRITICAL WARNING\" last_log", check=False)
         if rc == 0:
@@ -204,7 +203,6 @@ class TestGenDcp(AwsFpgaTestBase):
         logger.info("Saw {} filtered critical warnings in log file:\n{}".format(num_critical_warnings, "\n".join(filtered_critical_warnings)))
 
         assert not (num_warnings or num_critical_warnings), "Unexpected warnings"
-
         # Check if there are any setup/hold-time violations
         (rc, stdout_lines, stderr_lines) = self.run_cmd("grep \"The design did not meet timing requirements.\" last_log", check=False)
         if rc == 0:
@@ -240,7 +238,6 @@ class TestGenDcp(AwsFpgaTestBase):
         assert clock_recipe_b in self.DCP_CLOCK_RECIPES['B']['recipes']
         assert clock_recipe_c in self.DCP_CLOCK_RECIPES['C']['recipes']
         assert uram_option in self.DCP_URAM_OPTIONS
-
         cl_dir = self.get_cl_dir(cl)
         logger.info("Setting CL_DIR={}".format(cl_dir))
         os.environ['CL_DIR'] = cl_dir
@@ -258,6 +255,7 @@ class TestGenDcp(AwsFpgaTestBase):
         os.system("rm -f {}/*.log".format(scripts_dir))
 
         logger.info("Scripts dir is {}".format(scripts_dir))
+        cwd = os.getcwd()
         os.chdir(scripts_dir)
 
         option_tag = "{}_{}_{}_{}_{}".format(clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option, build_strategy)

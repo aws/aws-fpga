@@ -27,35 +27,10 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
-if ! pip2.7 list --format columns | grep pytest; then
-    if ! sudo pip2.7 install pytest; then
-        echo "error: Install of pytest failed"
-        return 1
-    fi
-fi
-if ! pip2.7 list --format columns | grep pytest-timeout; then
-    if ! sudo pip install pytest-timeout; then
-        echo "error: Install of pytest-timeout failed"
-        return 1
-    fi
-fi
-if ! pip2.7 list --format columns | grep GitPython; then
-    if ! sudo pip install GitPython; then
-        echo "error: Install of GitPython failed"
-        return 1
-    fi
-fi
-if ! pip2.7 list --format columns | grep boto3; then
-    if ! sudo pip install boto3; then
-        echo "error: Install of boto3 failed"
-        return 1
-    fi
+if ! source $script_dir/setup_test_env.sh; then
+    return 1
 fi
 
-if [ ":$WORKSPACE" == ":" ]; then
-    export WORKSPACE=$(git rev-parse --show-toplevel)
+if ! source $WORKSPACE/sdaccel_setup.sh; then
+    return 1
 fi
-
-export PYTHONPATH=$WORKSPACE/shared/lib:$PYTHONPATH
-
-export AWS_DEFAULT_REGION=us-east-1

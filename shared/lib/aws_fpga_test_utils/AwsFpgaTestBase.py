@@ -24,11 +24,13 @@ See TESTING.md for details.
 import boto3
 import os
 from os.path import basename, dirname, realpath
+import glob
 import pytest
 import re
 import subprocess
 import sys
 import traceback
+import json
 try:
     import aws_fpga_test_utils
     from aws_fpga_test_utils import get_git_repo_root
@@ -63,6 +65,8 @@ class AwsFpgaTestBase(object):
     git_repo_dir = get_git_repo_root(dirname(__file__))
     WORKSPACE = git_repo_dir
 
+    ADD_EXAMPLEPATH = False
+
     @classmethod
     def setup_class(cls, derived_cls, filename_of_test_class):
         AwsFpgaTestBase.s3_bucket = 'aws-fpga-jenkins-testing'
@@ -72,7 +76,8 @@ class AwsFpgaTestBase(object):
 
         # SDAccel locations
         # Need to move to either a config file somewhere or a subclass
-        AwsFpgaTestBase.xilinx_sdaccel_examples_dir = AwsFpgaTestBase.git_repo_dir + "/SDAccel/examples/xilinx"
+        AwsFpgaTestBase.xilinx_sdaccel_examples_prefix_path = "SDAccel/examples/xilinx"
+        AwsFpgaTestBase.xilinx_sdaccel_examples_dir = AwsFpgaTestBase.git_repo_dir + "/" + AwsFpgaTestBase.xilinx_sdaccel_examples_prefix_path
         AwsFpgaTestBase.xilinx_sdaccel_examples_list_file = AwsFpgaTestBase.WORKSPACE + "/sdaccel_examples_list.json"
 
         if 'WORKSPACE' in os.environ:
@@ -114,8 +119,6 @@ class AwsFpgaTestBase(object):
     def assert_sdaccel_setup():
         assert 'AWS_FPGA_REPO_DIR' in os.environ, "AWS_FPGA_REPO_DIR not set. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
         assert os.environ['AWS_FPGA_REPO_DIR'] == AwsFpgaTestBase.git_repo_dir, "AWS_FPGA_REPO_DIR not set to the repo dir. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
-        assert 'HDK_DIR' in os.environ, "HDK_DIR not set. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
-        assert os.environ['HDK_DIR'] == os.path.join(AwsFpgaTestBase.git_repo_dir, 'hdk'), "HDK_DIR incorrect. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
         assert 'SDK_DIR' in os.environ, "SDK_DIR not set. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
         assert os.environ['SDK_DIR'] == os.path.join(AwsFpgaTestBase.git_repo_dir, 'sdk'), "SDK_DIR incorrect. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
         assert 'SDACCEL_DIR' in os.environ, "SDACCEL_DIR not set. source {}/sdaccel_setup.sh".format(AwsFpgaTestBase.git_repo_dir)
@@ -199,6 +202,114 @@ class AwsFpgaTestBase(object):
         return "jenkins/{}/{}/{}/create-afi/afi_ids.txt".format(os.environ['BUILD_TAG'], cl, option_tag)
 
     @staticmethod
+    def get_sdaccel_xclbin_dir(examplePath):
+        return os.path.join(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath=examplePath), 'xclbin')
+
+    @staticmethod
+    def get_sdaccel_example_s3_root_tag(examplePath, target):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        '''
+        assert target != ''
+        assert examplePath != ''
+        example_relative_path = os.path.relpath(examplePath, AwsFpgaTestBase.xilinx_sdaccel_examples_prefix_path)
+        return "jenkins/{}/SDAccel/{}/{}".format(os.environ['BUILD_TAG'], example_relative_path, target)
+
+    @staticmethod
+    def get_sdaccel_example_s3_xclbin_tag(examplePath, target):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        '''
+        assert target != ''
+        assert examplePath != ''
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+
+        return "{}/xclbin".format(root_tag)
+
+    @staticmethod
+    def get_sdaccel_example_s3_dcp_tag(examplePath, target):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        '''
+        assert target != ''
+        assert examplePath != ''
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+
+        return "{}/dcp".format(root_tag)
+
+    @staticmethod
+    def get_sdaccel_example_s3_afi_tag(examplePath, target):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        '''
+        assert target != ''
+        assert examplePath != ''
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+
+        return "{}/create-afi/afi-ids.txt".format(root_tag)
+
+    @staticmethod
+    def get_sdaccel_example_run_cmd(examplePath):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        '''
+        description = AwsFpgaTestBase.get_sdaccel_example_description(examplePath)
+        run_cmd = description.get("em_cmd", None)
+
+        assert run_cmd is not None, "Could not find run_cmd(em_cmd) in the example description here {}".format(examplePath)
+
+        return run_cmd
+
+    @staticmethod
+    def get_sdaccel_example_description(examplePath):
+        '''
+        @param examplePath: Path of the Xilinx SDAccel example
+        '''
+
+        example_description = AwsFpgaTestBase.assert_non_zero_file(os.path.join(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath), "description.json"))
+
+        with open(example_description) as json_data:
+            description = json.load(json_data)
+            return description
+
+    @staticmethod
+    def get_sdaccel_example_fullpath(examplePath):
+        return "{}/{}/".format(AwsFpgaTestBase.WORKSPACE, examplePath)
+
+    @staticmethod
+    def fetch_sdaccel_xclbin_folder_from_s3(examplePath):
+        cwd = os.getcwd()
+
+        os.chdir(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath))
+        rc = os.system("aws s3 cp s3://{}/{} {} --recursive".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw"), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath)))
+        assert rc == 0, "Error while copying from s3://{}/{} to {}".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw"), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath))
+        xclbin_path = AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath)
+
+        logger.debug(xclbin_path)
+        assert os.path.exists(xclbin_path), "SDAccel Example xclbin path={} does not exist".format(xclbin_path)
+
+        os.chdir(cwd)
+        return xclbin_path
+
+    @staticmethod
+    def get_sdaccel_xclbin_file(examplePath):
+        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath)
+        logger.info("Checking that a non zero size xclbin file exists in {}".format(xclbin_path))
+        xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*.xclbin".format("hw")))
+        return xclbin
+
+    @staticmethod
+    def get_sdaccel_aws_xclbin_file(examplePath):
+        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath)
+        logger.info("Checking that a non zero size xclbin file exists in {}".format(xclbin_path))
+        aws_xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*.awsxclbin".format("hw")))
+        return aws_xclbin
+
+    @staticmethod
     def assert_afi_available(afi):
         # Check the status of the afi
         logger.info("Checking the status of {}".format(afi))
@@ -260,7 +371,7 @@ class AwsFpgaTestBase(object):
         assert rc == 0, "Failed to get virtual LEDs from slot {}.".format(slot)
         value = stdout_lines[1]
         if remove_dashes:
-            value= re.sub('-', '', value)
+            value = re.sub('-', '', value)
         return value
 
     @staticmethod
@@ -269,12 +380,23 @@ class AwsFpgaTestBase(object):
         assert rc == 0, "Failed to get virtual DIP switches from slot {}.".format(slot)
         value = stdout_lines[1]
         if remove_dashes:
-            value= re.sub('-', '', value)
+            value = re.sub('-', '', value)
         return value
 
     @staticmethod
     def fpga_set_virtual_dip_switch(value, slot):
-        value= re.sub('-', '', value)
+        value = re.sub('-', '', value)
         (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-set-virtual-dip-switch -S {} -D {}".format(slot, value))
         assert rc == 0, "Failed to set virtual DIP switches in slot {} to {}.".format(slot, value)
 
+    @staticmethod
+    def assert_non_zero_file(filter):
+
+        filenames = glob.glob(filter)
+
+        assert len(filenames) > 0, "No {} file found in {}".format(filter, os.getcwd())
+        assert len(filenames) == 1, "More than 1 {} file found: {}\n{}".format(filter, len(filenames), filenames)
+
+        filename = filenames[0]
+        assert os.stat(filename).st_size != 0, "{} is 0 size".format(filename)
+        return filename
