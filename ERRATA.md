@@ -2,10 +2,10 @@
 # AWS EC2 FPGA HDK+SDK Errata
 
 
-## Release 1.3.0 
+## Release 1.3.X
 ### Implementation Restrictions
 *    PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
-    *    All PCIe transactions must adhere to the PCIe Exress base spec
+    *    All PCIe transactions must adhere to the PCIe Express base spec
     *    4Kbyte Address boundary for all transactions(PCIe restriction)
     *    Multiple outstanding outbound PCIe Read transactions with same ID not supported
     *    PCIE extended tag not supported, so read-request is limited to 32 outstanding
@@ -19,7 +19,7 @@
 ## Unsupported Features (Planned for future releases)
 * FPGA to FPGA communication over PCIe for F1.16xl
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
-* Aurora and Reliabile Aurora modules for the FPGA-to-FPGA 
+* Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence RTL simulations tools
 * PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)

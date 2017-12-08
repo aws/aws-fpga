@@ -31,18 +31,18 @@
    *    Additional SDAccel Platforms
          *    1DDR for faster build times and smaller expanded shell
          *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
-   *    IP Integrator GUI (HLx) improvments 
+   *    IP Integrator GUI (HLx) improvements 
    *    CL\_DRAM\_DMA fixes and improvements
          *    Dual master support
-   *    Simulation enviroment fixes and improvements
+   *    Simulation environment fixes and improvements
          *    AXI/AXIL Protocol checkers
          *    Shell model improvements
          *    SW co-simulation support on cl\_hello\_world
          *    DDR Model patch
-   *    Updated SH\_DDR module in preperation for upcoming feature release	
+   *    Updated SH\_DDR module in preparation for upcoming feature release	
    
 ## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    New FPGA Image APIs for deleteing and reading/editing attributes 
+   *    New FPGA Image APIs for deleting and reading/editing attributes 
 
 ## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    SDAccel general availability 
