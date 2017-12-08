@@ -461,7 +461,7 @@ The SV Test API function 'task peek_pcis' reads 512 bits of data from the CL via
 ## Description
 The SV Test API task 'poke_pcis' writes 512 bits of data to the CL via the AXI PCIE interface.
 ## Declaration
-#### task poke_pcis(input int slot_id = 0, logic [63:0] addr, logic [511:0] data, logic [5:0] id = 6'h0);
+#### task poke_pcis(input int slot_id = 0, logic [63:0] addr, logic [511:0] data, logic [5:0] id = 6'h0, logic [63:0] strb);
 
 | Argument | Description |
 | --- | --- |
