@@ -239,7 +239,7 @@ err:
 }
 
 
-static int
+int 
 fpga_mgmt_mbox_attach(int slot_id)
 {
 	/* slot_id not validated on internal function */
@@ -271,7 +271,7 @@ err:
 	return FPGA_ERR_FAIL;
 }
 
-static int
+int 
 fpga_mgmt_mbox_detach(int slot_id)
 {
 	if (fpga_mgmt_state.slots[slot_id].handle != PCI_BAR_HANDLE_INIT) {
@@ -294,7 +294,8 @@ fpga_mgmt_mbox_detach(int slot_id)
 	return 0;
 }
 
-int fpga_mgmt_detach_all(void)
+int 
+fpga_mgmt_detach_all(void)
 {
 	int ret = 0;
 	for (unsigned int i = 0; i < sizeof_array(fpga_mgmt_state.slots); ++i) {
@@ -443,24 +444,22 @@ int
 fpga_mgmt_process_cmd(int slot_id,
 	const union afi_cmd *cmd, union afi_cmd *rsp, uint32_t *len)
 {
-	int ret, ret2;
+	bool attached = false;
+	int ret;
 
 	fail_slot_id(slot_id, err, ret);
 
 	ret = fpga_mgmt_mbox_attach(slot_id);
 	fail_on(ret, err, "fpga_mgmt_mbox_attach failed");
 
+	attached = true;
+
 	ret = fpga_mgmt_send_cmd(slot_id, cmd, rsp, len);
-	fail_on(ret, err_detach, "fpga_mgmt_send_cmd failed");
-
-	return 0;
-err_detach:
-	ret2 = fpga_mgmt_mbox_detach(slot_id);
+	fail_on(ret, err, "fpga_mgmt_send_cmd failed");
 err:
-	if (ret) {
-		return ret;
-	} else {
-		return ret2;
-	}
-}
+	if (attached) {
+		fpga_mgmt_mbox_detach(slot_id);
+	}	
 
+	return ret;
+}

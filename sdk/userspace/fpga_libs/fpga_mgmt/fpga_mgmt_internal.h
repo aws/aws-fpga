@@ -59,6 +59,8 @@ int
 fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 	struct afi_cmd_metrics_rsp **metrics);
 
+int fpga_mgmt_mbox_attach(int slot_id);
+int fpga_mgmt_mbox_detach(int slot_id);
 int fpga_mgmt_detach_all(void);
 
 #define fail_slot_id(slot_id, label, ret) do {               \

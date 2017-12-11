@@ -55,6 +55,33 @@ void fpga_mgmt_set_cmd_delay_msec(uint32_t value)
 	fpga_mgmt_state.delay_msec = value;
 }
 
+static 
+int fpga_mgmt_get_sh_version(int slot_id, uint32_t *sh_version)
+{
+	pci_bar_handle_t handle = PCI_BAR_HANDLE_INIT;
+	int ret = -EINVAL;
+
+	fail_on(!sh_version, err, "sh_version is NULL");
+	fail_slot_id(slot_id, err, ret);
+
+	ret = fpga_mgmt_mbox_attach(slot_id);
+	fail_on(ret, err, "fpga_mgmt_mbox_attach failed");
+
+	handle = fpga_mgmt_state.slots[slot_id].handle;
+
+	struct fpga_hal_mbox_versions ver;
+	ret = fpga_hal_mbox_get_versions(handle, &ver);
+	fail_on(ret, err, "fpga_hal_mbox_get_versions failed");
+
+	*sh_version = ver.sh_version;
+err:
+	if (handle != PCI_BAR_HANDLE_INIT) {
+		fpga_mgmt_mbox_detach(slot_id);
+	}
+	
+	return ret;
+}
+
 int fpga_mgmt_describe_local_image(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
@@ -93,11 +120,10 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	info->ids = metrics->ids;
 	strncpy(info->ids.afi_id, afi_id, sizeof(info->ids.afi_id));
 
-	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
-	struct fpga_hal_mbox_versions ver;
-	ret = fpga_hal_mbox_get_versions(handle, &ver);
-	fail_on(ret, out, "fpga_hal_mbox_get_versions failed");
-	info->sh_version = ver.sh_version;
+	uint32_t sh_version;
+	ret = fpga_mgmt_get_sh_version(slot_id, &sh_version);
+	fail_on(ret, out, "fpga_mgmt_get_sh_version failed");
+	info->sh_version = sh_version;
 
 	ret = fpga_pci_get_slot_spec(slot_id, &info->spec);
 	fail_on(ret, out, "fpga_pci_get_slot_spec failed");
@@ -174,6 +200,8 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 {
 	struct fpga_mgmt_image_info tmp_info;
 	struct fpga_pci_resource_map app_map;
+	uint32_t prev_sh_version = 0;
+	uint32_t sh_version = 0;
 	uint32_t retries = 0;
 	bool done = false;
 	int status;
@@ -188,9 +216,12 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 	memset(&tmp_info, 0, sizeof(tmp_info));
 
 	/** 
-	 * Get the current PCI resource map for the app_pf that will be used after 
-	 * the clear has completed.
+	 * Get the current SH version and PCI resource map for the app_pf 
+	 * that will be used after the clear has completed.
 	 */
+	ret = fpga_mgmt_get_sh_version(slot_id, &prev_sh_version);
+	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
+
 	ret = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &app_map);
 	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
@@ -222,10 +253,15 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 	}
 
 	/**
-	 * Do not perform a remove/rescan of the APP PF if the PCI IDs have not changed.
+	 * Do not perform a remove/rescan of the APP PF if the SH version and PCI IDs
+	 * have not changed.
 	 */
 	struct afi_device_ids *afi_device_ids = &tmp_info.ids.afi_device_ids;
-	if (!((afi_device_ids->vendor_id == app_map.vendor_id) &&
+	ret = fpga_mgmt_get_sh_version(slot_id, &sh_version);
+	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
+
+	if ((sh_version != prev_sh_version) ||
+		!((afi_device_ids->vendor_id == app_map.vendor_id) &&
 			(afi_device_ids->device_id == app_map.device_id) &&
 			(afi_device_ids->svid == app_map.subsystem_vendor_id) &&
 			(afi_device_ids->ssid == app_map.subsystem_device_id))) {
@@ -233,7 +269,10 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		 * Perform a PCI device remove and recan in order to expose the default AFI 
 		 * Vendor and Device Id.
 		 */
-		log_info("remove+rescan required, expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+		log_info("remove+rescan required, sh_version=0x%08x, prev_sh_version=0x%08x, "
+				"expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, "
+				"sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+				sh_version, prev_sh_version,
 				afi_device_ids->vendor_id, afi_device_ids->device_id, 
 				afi_device_ids->svid, afi_device_ids->ssid,
 				app_map.vendor_id, app_map.device_id, 
@@ -293,6 +332,8 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 {
 	struct fpga_mgmt_image_info tmp_info;
 	struct fpga_pci_resource_map app_map;
+	uint32_t prev_sh_version = 0;
+	uint32_t sh_version = 0;
 	uint32_t retries = 0;
 	bool done = false;
 	int status;
@@ -307,9 +348,12 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 	memset(&tmp_info, 0, sizeof(tmp_info));
 	
 	/** 
-	 * Get the current PCI resource map for the app_pf that will be used after 
-	 * the load has completed.
+	 * Get the current SH version and PCI resource map for the app_pf 
+	 * that will be used after the load has completed.
 	 */
+	ret = fpga_mgmt_get_sh_version(slot_id, &prev_sh_version);
+	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
+
 	ret = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &app_map);
 	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
@@ -346,10 +390,15 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 	}
 
 	/**
-	 * Do not perform a remove/rescan of the APP PF if the PCI IDs have not changed.
+	 * Do not perform a remove/rescan of the APP PF if the SH version and PCI IDs
+	 * have not changed.
 	 */
 	struct afi_device_ids *afi_device_ids = &tmp_info.ids.afi_device_ids;
-	if (!((afi_device_ids->vendor_id == app_map.vendor_id) &&
+	ret = fpga_mgmt_get_sh_version(slot_id, &sh_version);
+	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
+
+	if ((sh_version != prev_sh_version) ||
+		!((afi_device_ids->vendor_id == app_map.vendor_id) &&
 			(afi_device_ids->device_id == app_map.device_id) &&
 			(afi_device_ids->svid == app_map.subsystem_vendor_id) &&
 			(afi_device_ids->ssid == app_map.subsystem_device_id))) {
@@ -357,7 +406,10 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 		 * Perform a PCI device remove and recan in order to expose the unique AFI 
 		 * Vendor and Device Id.
 		 */
-		log_info("remove+rescan required, expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+		log_info("remove+rescan required, sh_version=0x%08x, prev_sh_version=0x%08x, "
+				"expected_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}, "
+				"sysfs_ids={0x%04x, 0x%04x, 0x%04x, 0x%04x}",
+				sh_version, prev_sh_version,
 				afi_device_ids->vendor_id, afi_device_ids->device_id, 
 				afi_device_ids->svid, afi_device_ids->ssid,
 				app_map.vendor_id, app_map.device_id, 
