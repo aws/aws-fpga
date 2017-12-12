@@ -13,6 +13,8 @@ $(basename "$0") -- a script to compile and run performance (i.e. latency and ba
 data_size=(0x100 0x1000 0x5000)
 number_of_repetitions=(0x10 0x100 0x200)
 
+rm -f $result_filename
+
 for ((i=0;i<${#data_size[@]};i++))
 do
 	for ((j=0;j<${#number_of_repetitions[@]};j++))

@@ -52,6 +52,8 @@
 #define EVENT_DEVICE_NAME "fpga"
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
+#define FSYNC_TIMEOUT_SEC 		(3)
+#define RELEASE_SLEEP_MSEC 		((FSYNC_TIMEOUT_SEC + 1) * 1000)
 #define NUM_POLLS_PER_SCHED		(100)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
@@ -64,6 +66,7 @@ struct edma_char_queue_device{
 	struct pci_dev *pdev;
 	struct edma_queue_private_data *device_private_data;
 	u32 major;
+	u32 fpga_number;
 };
 
 struct edma_char_event_device{
@@ -88,6 +91,9 @@ module_param(edma_queue_depth, int, 0);
 MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=1024)");
 
 //TODO: add a callback for the backend to notify fatal error - reset
+
+static DECLARE_BITMAP(edma_fpga_alloc_bitmap, MAX_NUMBER_OF_EDMA_DEVICE);
+static DEFINE_SPINLOCK(edma_fpga_alloc_lock);
 
 static inline bool is_releasing(void* state)
 {
@@ -393,7 +399,7 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 						&device_private_data->state)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
 						&device_private_data->state))
-			msleep(SLEEP_MAXIMUM_USEC);
+			msleep(RELEASE_SLEEP_MSEC);
 
 		//if still running - panic
 		BUG_ON( test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
@@ -480,7 +486,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 				u64_stats_update_end(&private_data->stats.syncp);
 			}
 
-			pr_err("Read failed\n (%d)\n", ret);
+			pr_err("%s: read failed (%d)\n", __func__, ret);
 			goto edma_dev_read_done;
 		}
 
@@ -561,7 +567,7 @@ static ssize_t edma_dev_read(struct file *filp, char *buffer, size_t len,
 					private_data->stats.read_timeouts_error++;
 					u64_stats_update_end(&private_data->stats.syncp);
 
-					pr_err("Read failed\n (%d)\n", ret);
+					pr_err("%s: read failed (%d)\n", __func__, ret);
 					goto edma_dev_read_done;
 				}
 
@@ -812,6 +818,7 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 	struct edma_buffer_control_structure* write_ebcs;
 	struct edma_queue_private_data* private_data = (struct edma_queue_private_data*)filp->private_data;
 	u32 sched_limit = 1;
+	unsigned long timeout;
 
 	(void)start;
 	(void)end;
@@ -833,6 +840,8 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 
 	set_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT, &private_data->state);
 
+        timeout = jiffies + (FSYNC_TIMEOUT_SEC * HZ);
+
 	while(!ebcs_is_clean)
 	{
 		recycle_completed_descriptors(write_ebcs, private_data);
@@ -841,6 +850,12 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 				== write_ebcs->next_to_use)
 			ebcs_is_clean = true;
 		else {
+			if (time_after(jiffies, timeout)) {
+				pr_err("%s: timeout occurred\n", __func__);
+				ret = -EIO;
+				goto edma_dev_fsync_done;
+			}
+
 			mutex_unlock(&write_ebcs->ebcs_mutex);
 
 			if ((sched_limit % NUM_POLLS_PER_SCHED) == 0) {
@@ -875,10 +890,6 @@ static struct file_operations queue_fops = {
 		.llseek = edma_dev_llseek,
 #endif
 		.owner = THIS_MODULE
-#if 0
-		.readv = edma_dev_readv,
-		.writev = edma_dev_writev
-#endif
 };
 
 irqreturn_t edma_dev_irq_handler(int irq, void *dev)
@@ -1072,6 +1083,7 @@ static struct device* edma_add_queue_device(struct class* edma_class, void* rx_h
 
 	edma_queues->device_private_data[minor_index].write_ebcs.dma_queue_handle = tx_handle;
 	edma_queues->device_private_data[minor_index].read_ebcs.dma_queue_handle = rx_handle;
+	edma_queues->fpga_number = fpga_number;
 
 	mutex_init(&edma_queues->device_private_data[minor_index].edma_mutex);
 
@@ -1107,15 +1119,50 @@ edma_event_device_done:
 		return edmaCharDevice;
 }
 
+static int edma_alloc_fpga_num(void)
+{
+	u32 fpga_num;
+
+	spin_lock(&edma_fpga_alloc_lock);
+	fpga_num = find_first_zero_bit(edma_fpga_alloc_bitmap, MAX_NUMBER_OF_EDMA_DEVICE);
+
+	if (fpga_num == MAX_NUMBER_OF_EDMA_DEVICE) {
+		fpga_num = -ENODEV;
+		goto out;
+	}
+	set_bit(fpga_num, edma_fpga_alloc_bitmap);
+
+out:
+	spin_unlock(&edma_fpga_alloc_lock);
+
+	pr_debug("%s: fpga_num=%d\n", __func__, fpga_num);
+	return fpga_num;
+}
+
+static void edma_free_fpga_num(int fpga_num)
+{
+	pr_debug("%s: fpga_num=%d\n", __func__, fpga_num);
+
+	spin_lock(&edma_fpga_alloc_lock);
+	clear_bit(fpga_num, edma_fpga_alloc_bitmap);
+	spin_unlock(&edma_fpga_alloc_lock);
+}
+
 
 int edma_dev_init(struct backend_device* backend_device)
 {
-	int ret;
+	int ret = 0;
 	struct edma_char_queue_device* edma_queues = NULL;
 	struct edma_char_event_device* edma_events = NULL;
 	struct device** edmaEventDevices;
-	static u32 fpga_number = 0;
+	int fpga_number;
 	int i;
+
+	fpga_number = edma_alloc_fpga_num();
+	if (fpga_number < 0) {
+		ret = -ENODEV;
+		goto edma_dev_init_done;	
+	}
 
 	edma_queues = (struct edma_char_queue_device*)kzalloc(sizeof(struct edma_char_queue_device), GFP_KERNEL);
 	if(edma_queues == NULL) {
@@ -1205,9 +1252,12 @@ int edma_dev_init(struct backend_device* backend_device)
 		edmaEventDevices[i] = edma_add_user_event(edma_class, edma_events, fpga_number, i);
 	}
 
-	fpga_number++;
-
 edma_dev_init_done:
+
+	if ((ret != 0) && (fpga_number >= 0)) {
+		edma_free_fpga_num(fpga_number);
+	}
+	
 	return ret;
 }
 
@@ -1219,6 +1269,7 @@ int edma_dev_cleanup(struct backend_device* backend_device)
 	struct device** edmaEventDevices = NULL;
 	u32 queue_Major = 0;
 	u32 events_Major = 0;
+	int fpga_number;
 
 	edmaEventDevices = (struct device**)backend_device->event_handles;
 
@@ -1231,7 +1282,6 @@ int edma_dev_cleanup(struct backend_device* backend_device)
 			queue_Major = MAJOR (dev->devt);
 			device_remove_file(dev, &dev_attr_stats);
 			device_destroy(edma_class, dev->devt);
-
 		}
 	}
 
@@ -1257,11 +1307,15 @@ int edma_dev_cleanup(struct backend_device* backend_device)
 	if(edma_events)
 		kfree(edma_events);
 
-	if(edma_queues->device_private_data)
-		kfree(edma_queues->device_private_data);
+	if(edma_queues) {
+		fpga_number = edma_queues->fpga_number;
 
-	if(edma_queues)
+		if(edma_queues->device_private_data) {
+			kfree(edma_queues->device_private_data);
+		}
 		kfree(edma_queues);
+		edma_free_fpga_num(fpga_number);
+	}
 
 	return 0;
 }

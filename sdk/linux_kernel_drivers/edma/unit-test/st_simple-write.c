@@ -67,7 +67,7 @@ int main()
     }
     printf("\n");
 
-    fsync(fd);
+    ret = fsync(fd);
 
     ret = lseek(fd, 0x010000000, SEEK_SET);
 

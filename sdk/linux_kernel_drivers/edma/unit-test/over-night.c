@@ -72,7 +72,7 @@ int main()
 
 			ret = write(fd, write_buf, data_size);
 
-			fsync(fd);
+			ret = fsync(fd);
 
 			ret = lseek(fd, 0x010000000, SEEK_SET);
 

@@ -212,13 +212,18 @@ void* doFsync(void *arg)
 	int fd = *((int*)arg);
 	int sleep_time = rand() % 200;
 	bool read_lock = false;
+	int ret;
 
 	while(!read_lock)
 	{
 
 		pthread_mutex_lock(&lock);
 		read_lock = read_done;
-		fsync(fd);
+		ret = fsync(fd);
+		if (ret != 0) {
+			printf("\n---> %s\nFsyncing %lld failed, exiting\n", __func__, written_no_fsync);
+			break;
+		}
 		printf("\n---> %s\nFsyncing %lld can read was %lld and now it is", __func__, written_no_fsync, can_read);
 		can_read += written_no_fsync;
 		printf("%lld\n", can_read);

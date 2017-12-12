@@ -17,10 +17,6 @@
 #define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
 #define SLEEP_MIN_USEC                                          (1)
 #define SLEEP_MAX_USEC                                          (20)
-#define XDMA_WORKER_RESERVED_BIT	                        (0)
-#define XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT                      (1)
-#define XDMA_WORKER_STOPPED_ON_REQUEST_BIT                      (2)
-#define XDMA_WORKER_STOP_REQUEST_BIT                            (3)
 #define REQUEST_SLEEP_MSEC                                      (10)
 #define PCI_VENDOR_ID_AMAZON                                    (0x1d0f)
 #define PCI_DEVICE_ID_FPGA                                      (0xf001)
@@ -78,6 +74,7 @@ static int write_worker_function(void *data)
 {
 	command_queue_t* command_queue = (command_queue_t*)data;
 	command_t*  queue = command_queue->queue;
+	bool stopped_on_timeout = false;
 	int ret;
 
 	while (true) {
@@ -90,11 +87,17 @@ static int write_worker_function(void *data)
 		 */
 		set_current_state(TASK_INTERRUPTIBLE);
 
-		if (unlikely(test_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status))) {
+		if (unlikely(kthread_should_stop())) {
 			/* We were asked to exit */
 			break;
-		} else if (unlikely(command_queue->head == command_queue->tail)) {
-			/* Queue is empty, sleep until wake_up_process is called */
+		} else if (unlikely((command_queue->head == command_queue->tail) ||
+					stopped_on_timeout)) {
+			/* 
+			 * Two conditions:
+			 *  1.) Queue is empty, sleep until wake_up_process is called.
+			 *  2.) If we stopped due to a previous timeout, continue waiting 
+			 * 	until we are asked to exit via kthread_stop.
+			 */
 			schedule();
 			continue;
 		}
@@ -112,13 +115,13 @@ static int write_worker_function(void *data)
 			XDMA_TIMEOUT_IN_MSEC);
 
 		if(ret < 0) {
-			pr_err("Thread failed during transaction with address 0x%llx and size %u\n",
+			pr_err("%s: IO failed with address 0x%llx and size %u\n", __func__,
 				queue[command_queue->head].target_addr,
 				sg_dma_len(queue[command_queue->head].sgt.sgl));
-			test_and_set_bit(
-				XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT,
-				&command_queue->thread_status);
-			do_exit(-1);
+
+			/* We'll wait in this state until we are asked to exit */
+			stopped_on_timeout = true;
+			continue;
 		}
 
 		queue[command_queue->head].completed = 1;
@@ -128,9 +131,7 @@ static int write_worker_function(void *data)
 				command_queue->head,edma_queue_depth);
 	}
 
-	set_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT,
-		&command_queue->thread_status);
-
+	pr_debug("%s: exiting\n", __func__);
 	return 0;
 }
 
@@ -335,8 +336,7 @@ int edma_backend_submit_m2s_request(u64* buffer, u32 size, void *q_handle, u64 t
 
 	edma_dbg(">> %s\n", __func__);
 
-	if( EDMA_RING_IDX_NEXT(command_queue->tail, edma_queue_depth) == command_queue->next_to_recycle)
-		BUG();
+	BUG_ON(EDMA_RING_IDX_NEXT(command_queue->tail, edma_queue_depth) == command_queue->next_to_recycle);
 
 	sg_init_table(sgl, 1);
 
@@ -477,20 +477,13 @@ int edma_backend_stop(void *q_handle)
 	command_t* queue = command_queue->queue;
 	int i;
 
-	//Stop the kthread before reset and make sure it was stopped.
-	set_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status);
+	if (command_queue->worker_thread) {
+		pr_debug("%s: kthread_stop...\n", __func__);
 
-	//See the comment in the write_worker_function regarding missed wakeups 
-	wake_up_process(command_queue->worker_thread);
+		kthread_stop(command_queue->worker_thread);
 
-	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
-			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
-		msleep(XDMA_TIMEOUT_IN_MSEC);
-
-	//if still not stopped - panic
-	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
-					!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
-		BUG();
+		pr_debug("%s: kthread_stop...done\n", __func__);
+	}
 
 	for(i = 0; i < edma_queue_depth; i++) {
 		memset(&(queue[i]), 0, sizeof(command_t));
