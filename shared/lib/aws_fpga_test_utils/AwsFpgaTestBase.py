@@ -168,6 +168,13 @@ class AwsFpgaTestBase(object):
         return AwsFpgaTestBase.run_cmd(cmd, echo, check)
 
     @staticmethod
+    def get_shell_version():
+        shell_link = os.path.join(AwsFpgaTestBase.WORKSPACE, 'hdk/common/shell_stable')
+        link = basename(os.readlink(shell_link))
+        shell_version = re.sub('^shell_v', '0x', link)
+        return shell_version
+
+    @staticmethod
     def get_cl_dir(cl):
         return "{}/hdk/cl/examples/{}".format(AwsFpgaTestBase.WORKSPACE, cl)
 
@@ -338,7 +345,7 @@ class AwsFpgaTestBase(object):
         cl_dir = "{}/hdk/cl/examples/{}".format(AwsFpgaTestBase.WORKSPACE, cl)
         assert os.path.exists(cl_dir)
         agfi = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AGFI ID\' | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
-        afi  = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AFI ID\'  | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
+        afi = subprocess.check_output("cat {}/README.md | grep \'Pre-generated AFI ID\'  | cut -d \"|\" -f 3".format(cl_dir), shell=True).lstrip().rstrip()
         logger.info("AGFI from README: {}".format(agfi))
         logger.info("AFI  from README: {}".format(afi))
         return (agfi, afi)

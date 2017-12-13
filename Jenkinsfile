@@ -7,6 +7,7 @@ properties([parameters([
     string(name: 'branch', defaultValue: ''),
     booleanParam(name: 'test_markdown_links',   defaultValue: true),
     booleanParam(name: 'test_hdk_scripts',      defaultValue: true),
+    booleanParam(name: 'test_fpga_tools',       defaultValue: true, description: 'Test fpga-* commands on F1'),
     booleanParam(name: 'test_sims',             defaultValue: true),
     booleanParam(name: 'test_edma',             defaultValue: true, description: 'Run EDMA unit and perf tests'),
     booleanParam(name: 'test_runtime_software', defaultValue: true, description: 'Test precompiled AFIs'),
@@ -24,6 +25,7 @@ properties([parameters([
 //=============================================================================
 boolean test_markdown_links = params.get('test_markdown_links')
 boolean test_hdk_scripts = params.get('test_hdk_scripts')
+boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
 boolean test_runtime_software = params.get('test_runtime_software')
@@ -133,6 +135,43 @@ if (test_hdk_scripts) {
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_env.sh
                         pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
+                    """
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                }
+            }
+        }
+    }
+}
+
+if (test_fpga_tools) {
+    top_parallel_stages['Test FPGA Tools 1 Slot'] = {
+        stage('Test FPGA Tools 1 Slot') {
+            String report_file = 'test_fpga_tools.xml'
+            node(task_label.get('runtime')) {
+                checkout scm
+                try {
+                    sh """
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
+                    """
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                }
+            }
+        }
+    }
+    top_parallel_stages['Test FPGA Tools All Slots'] = {
+        stage('Test FPGA Tools All Slots') {
+            String report_file = 'test_fpga_tools_all_slots.xml'
+            node(task_label.get('runtime-all-slots')) {
+                checkout scm
+                try {
+                    sh """
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
