@@ -52,8 +52,7 @@
 #define EVENT_DEVICE_NAME "fpga"
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
-#define FSYNC_TIMEOUT_SEC 		(3)
-#define RELEASE_SLEEP_MSEC 		((FSYNC_TIMEOUT_SEC + 1) * 1000)
+#define RELEASE_SLEEP_MSEC 		((fsync_timeout_sec + 1) * 1000)
 #define NUM_POLLS_PER_SCHED		(100)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
@@ -78,17 +77,21 @@ struct edma_char_event_device{
 };
 
 
-static int transient_buffer_size = 32 * 1024 * 1024;
-module_param(transient_buffer_size, int, 0);
+static unsigned int transient_buffer_size = 32 * 1024 * 1024;
+module_param(transient_buffer_size, uint, 0);
 MODULE_PARM_DESC(transient_buffer_size, "Transient buffer size. (default=32MB)");
 
-static int single_transaction_size = 8 * PAGE_SIZE;
-module_param(single_transaction_size, int, 0);
+static unsigned int single_transaction_size = 8 * PAGE_SIZE;
+module_param(single_transaction_size, uint, 0);
 MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over the DMA. (default=32KB)");
 
-int edma_queue_depth = 1024;
-module_param(edma_queue_depth, int, 0);
+unsigned int edma_queue_depth = 1024;
+module_param(edma_queue_depth, uint, 0);
 MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=1024)");
+
+static unsigned int fsync_timeout_sec = 9;
+module_param(fsync_timeout_sec, uint, 0);
+MODULE_PARM_DESC(fsync_timeout_sec, "fsync timeout sec. (default=9)");
 
 //TODO: add a callback for the backend to notify fatal error - reset
 
@@ -840,7 +843,7 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 
 	set_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT, &private_data->state);
 
-        timeout = jiffies + (FSYNC_TIMEOUT_SEC * HZ);
+        timeout = jiffies + (fsync_timeout_sec * HZ);
 
 	while(!ebcs_is_clean)
 	{
@@ -851,7 +854,8 @@ static int edma_dev_fsync(struct file *filp, loff_t start, loff_t end, int datas
 			ebcs_is_clean = true;
 		else {
 			if (time_after(jiffies, timeout)) {
-				pr_err("%s: timeout occurred\n", __func__);
+				pr_err("%s: timeout occurred, fsync_timeout_sec=%u\n", 
+					__func__, fsync_timeout_sec);
 				ret = -EIO;
 				goto edma_dev_fsync_done;
 			}

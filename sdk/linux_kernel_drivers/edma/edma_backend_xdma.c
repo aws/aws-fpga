@@ -68,7 +68,7 @@ MODULE_DEVICE_TABLE(pci, edma_pci_tbl);
 
 static frontend_callback frontend_init_callback;
 static frontend_callback frontend_cleanup_callback;
-extern int edma_queue_depth;
+extern unsigned int edma_queue_depth;
 
 static int write_worker_function(void *data)
 {
