@@ -5,19 +5,19 @@
 //=============================================================================
 properties([parameters([
     string(name: 'branch', defaultValue: ''),
-    booleanParam(name: 'test_markdown_links',   defaultValue: true),
-    booleanParam(name: 'test_hdk_scripts',      defaultValue: true),
-    booleanParam(name: 'test_fpga_tools',       defaultValue: true, description: 'Test fpga-* commands on F1'),
-    booleanParam(name: 'test_sims',             defaultValue: true),
-    booleanParam(name: 'test_edma',             defaultValue: true, description: 'Run EDMA unit and perf tests'),
-    booleanParam(name: 'test_runtime_software', defaultValue: true, description: 'Test precompiled AFIs'),
-    booleanParam(name: 'test_dcp_recipes',      defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
-    booleanParam(name: 'test_fdf',              defaultValue: true, description: 'Test full developer flow on cl_hello_world and cl_dram_dma'),
-    booleanParam(name: 'test_sdaccel_scripts',  defaultValue: true),
-    booleanParam(name: 'test_sdaccel_builds',   defaultValue: true),
-    booleanParam(name: 'debug_dcp_gen',         defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
-    booleanParam(name: 'debug_fdf_uram',        defaultValue: false, description: 'Debug the FDF for cl_uram_example.')
-
+    booleanParam(name: 'test_markdown_links',                 defaultValue: true,  description: 'Test markdown files and check for broken links'),
+    booleanParam(name: 'test_fpga_tools',                     defaultValue: true,  description: 'Test fpga-* commands on F1'),
+    booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
+    booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
+    booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
+    booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
+    booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
+    booleanParam(name: 'test_hdk_fdf',                        defaultValue: true,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
+    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: true,  description: 'Test SDAccel setup scripts'),
+    booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
+    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
+    booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
+    booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.')
 ])])
 
 //=============================================================================
@@ -30,9 +30,10 @@ boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_dcp_recipes = params.get('test_dcp_recipes')
-boolean test_fdf = params.get('test_fdf')
+boolean test_hdk_fdf = params.get('test_hdk_fdf')
 boolean test_sdaccel_scripts = params.get('test_sdaccel_scripts')
-boolean test_sdaccel_builds = params.get('test_sdaccel_builds')
+boolean test_all_sdaccel_examples_fdf = params.get('test_all_sdaccel_examples_fdf')
+boolean test_helloworld_sdaccel_example_fdf = params.get('test_helloworld_sdaccel_example_fdf')
 
 def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world']
 def dcp_recipe_cl_names = ['cl_dram_dma', 'cl_hello_world']
@@ -316,11 +317,11 @@ if (test_dcp_recipes) {
     }
 }
 
-if (test_fdf) {
+if (test_hdk_fdf) {
     // Top level stage for FDF
     // Each CL will have its own parallel FDF stage under this one.
-    top_parallel_stages['FDF'] = {
-        stage('FDF') {
+    top_parallel_stages['HDK_FDF'] = {
+        stage('HDK FDF') {
             def fdf_stages = [:]
             for (x in fdf_test_names) {
                 String fdf_test_name = x
@@ -490,7 +491,7 @@ if (test_sdaccel_scripts) {
     }
 }
 
-if (test_sdaccel_builds) {
+if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
     top_parallel_stages['Run SDAccel Tests'] = {
         def sdaccel_build_stages = [:]
         String sdaccel_examples_list = 'sdaccel_examples_list.json'
@@ -525,20 +526,24 @@ if (test_sdaccel_builds) {
                     junit healthScaleFactor: 10.0, testResults: report_file
                 }
 
-                //def list_map = readJSON file: sdaccel_examples_list
-                // Just run the hello world example for now
-                def list_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
+                // Only run the hello world test by default
+                def example_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
 
-                for ( def e in entrySet(list_map) ) {
+                // Run all examples when parameter set
+                if (test_all_sdaccel_examples_fdf) {
+                    example_map = readJSON file: sdaccel_examples_list
+                }
+
+                for ( def e in entrySet(example_map) ) {
 
                     String build_name = e.key
                     String example_path = e.value
 
-                    String sw_emu_stage_name      = "SDAccel SW_EMU ${build_name}"
-                    String hw_emu_stage_name      = "SDAccel HW_EMU ${build_name}"
-                    String hw_stage_name          = "SDAccel HW ${build_name}"
-                    String create_afi_stage_name  = "SDAccel AFI ${build_name}"
-                    String run_example_stage_name = "SDAccel RUN ${build_name}"
+                    String sw_emu_stage_name      = "SDAccel SW_EMU ${build_name} FDF"
+                    String hw_emu_stage_name      = "SDAccel HW_EMU ${build_name} FDF"
+                    String hw_stage_name          = "SDAccel HW ${build_name} FDF"
+                    String create_afi_stage_name  = "SDAccel AFI ${build_name} FDF"
+                    String run_example_stage_name = "SDAccel RUN ${build_name} FDF"
 
                     String sw_emu_report_file      = "sdaccel_sw_emu_${build_name}.xml"
                     String hw_emu_report_file      = "sdaccel_hw_emu_${build_name}.xml"
@@ -562,6 +567,7 @@ if (test_sdaccel_builds) {
                                     """
                                 } catch (error) {
                                     echo "${sw_emu_stage_name} SW EMU Build generation failed"
+                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
@@ -582,6 +588,7 @@ if (test_sdaccel_builds) {
                                     """
                                 } catch (error) {
                                     echo "${hw_emu_stage_name} HW EMU Build generation failed"
+                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
@@ -602,6 +609,7 @@ if (test_sdaccel_builds) {
                                     """
                                 } catch (error) {
                                     echo "${hw_stage_name} HW Build generation failed"
+                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: hw_report_file
@@ -621,6 +629,7 @@ if (test_sdaccel_builds) {
                                     """
                                 } catch (error) {
                                     echo "${create_afi_stage_name} Create AFI failed"
+                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: create_afi_report_file
@@ -640,6 +649,7 @@ if (test_sdaccel_builds) {
                                     """
                                 } catch (error) {
                                     echo "${run_example_stage_name} Runtime example failed"
+                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: run_example_report_file
