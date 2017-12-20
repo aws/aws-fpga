@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import argparse
 import boto3
 import datetime
@@ -29,7 +30,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__file__)
