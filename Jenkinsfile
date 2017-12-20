@@ -97,6 +97,17 @@ def task_label = [
 @NonCPS def entrySet(m) {m.collect {k, v -> [key: k, value: v]}}
 
 
+// Check if we are running on github.com/aws/aws-fpga
+def is_public_repo() {
+    return (scm.getUserRemoteConfigs()[0].getUrl() ==~ /^(\S+)?aws-fpga[\/]?$/)
+}
+
+// Wait for input if we are running on a public repo to avoid malicious PRS
+if (is_public_repo())
+{
+    input "Running on a public repository, do you want to proceed with running the tests?"
+}
+
 //=============================================================================
 // Shared Tests
 //=============================================================================
