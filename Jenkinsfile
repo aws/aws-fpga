@@ -257,7 +257,7 @@ if (test_runtime_software) {
                 node_type = n
                 for (x in runtime_sw_cl_names) {
                     String cl_name = x
-                    String node_name
+                    String node_name = "Undefined"
                     switch (node_type) {
                         case "runtime":
                             node_name = "Test Runtime Software f1.2xl ${cl_name}"
@@ -336,7 +336,7 @@ if (test_hdk_fdf) {
             def fdf_stages = [:]
             for (x in fdf_test_names) {
                 String fdf_test_name = x
-                String cl_name
+                String cl_name = ""
                 if (fdf_test_name.startsWith("cl_hello_world[")) {
                     cl_name = "cl_hello_world"
                 } else if (fdf_test_name.startsWith("cl_dram_dma[")) {
@@ -349,11 +349,14 @@ if (test_hdk_fdf) {
                 String fdf_stage_name = "FDF ${fdf_test_name}"
                 fdf_stages[fdf_stage_name] = {
                     stage(fdf_stage_name) {
+                        echo "Generate DCP for ${fdf_test_name}"
                         String build_dir = "hdk/cl/examples/${cl_name}/build"
-                        String dcp_stash_name = "dcp_tarball_${fdf_test_name}"
+                        String dcp_stash_name = "dcp_tarball_${fdf_test_name}".replaceAll(/[\[\]]/, "_")
                         String dcp_stash_dir = "${build_dir}/checkpoints/to_aws"
-                        String afi_stash_name = "afi_${fdf_test_name}"
+                        String afi_stash_name = "afi_${fdf_test_name}".replaceAll(/[\[\]]/, "_")
                         String afi_stash_dir = "${build_dir}/create-afi"
+                        echo "dcp_stash_name=${dcp_stash_name}"
+                        echo "afi_stash_name=$afi_stash_name}"
                         node(task_label.get('dcp_gen')) {
                             String test = "hdk/tests/test_gen_dcp.py::TestGenDcp::test_${fdf_test_name}"
                             String report_file = "test_dcp_${fdf_test_name}.xml"
@@ -367,7 +370,6 @@ if (test_hdk_fdf) {
                                 // Ignore any errors
                                 echo "Failed to clean ${dcp_stash_dir}"
                             }
-                            echo "Generate DCP for ${fdf_test_name}"
                             try {
                                 sh """
                                   set -e
@@ -384,7 +386,7 @@ if (test_hdk_fdf) {
                             try {
                                 stash name: dcp_stash_name, includes: "${dcp_stash_dir}/**"
                             } catch (exc) {
-                                echo "stash ${dcp_stash_name} failed"
+                                echo "stash ${dcp_stash_name} failed:\n${exc}"
                             }
                         }
                         node(task_label.get('create-afi')) {
@@ -412,7 +414,7 @@ if (test_hdk_fdf) {
                             try {
                                 unstash name: dcp_stash_name
                             } catch (exc) {
-                                echo "unstash ${dcp_stash_name} failed"
+                                echo "unstash ${dcp_stash_name} failed:\n${exc}"
                                 //throw exc
                             }
                             try {
@@ -436,7 +438,7 @@ if (test_hdk_fdf) {
                             try {
                                 stash name: afi_stash_name, includes: "${afi_stash_dir}/**"
                             } catch (exc) {
-                                echo "stash ${afi_stash_name} failed"
+                                echo "stash ${afi_stash_name} failed:\n${exc}"
                                 //throw exc
                             }
                         }
@@ -457,7 +459,7 @@ if (test_hdk_fdf) {
                             try {
                                 unstash name: afi_stash_name
                             } catch (exc) {
-                                echo "unstash ${afi_stash_name} failed"
+                                echo "unstash ${afi_stash_name} failed:\n${exc}"
                                 //throw exc
                             }
                             try {
