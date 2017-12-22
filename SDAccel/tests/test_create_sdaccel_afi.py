@@ -1,5 +1,4 @@
 #!/usr/bin/env python2.7
-from __builtin__ import str
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -24,6 +23,8 @@ Call using ```pytest test_create_sdaccel_afi.py```
 See TESTING.md for details.
 '''
 
+from __future__ import print_function
+from __builtin__ import str
 import boto3
 import os
 from os.path import basename, dirname, realpath
@@ -38,7 +39,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source shared/bin/setup_test_env.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source shared/bin/setup_test_env.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
@@ -93,16 +94,16 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         logger.info("Checking that a non zero size aws_xclbin file exists in {}".format(aws_xclbin_path))
         aws_xclbin = self.assert_non_zero_file(os.path.join(aws_xclbin_path, "*.{}.*.awsxclbin".format(target)))
-        logger.info("Uploading aws_xclbin file: {}".format(aws_xclbin) )
+        logger.info("Uploading aws_xclbin file: {}".format(aws_xclbin))
 
         aws_xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target), basename(aws_xclbin))
         self.s3_client().upload_file(aws_xclbin, self.s3_bucket, aws_xclbin_key)
 
-        create_afi_response_file = self.assert_non_zero_file( os.path.join(full_example_path, "*afi_id.txt"))
+        create_afi_response_file = self.assert_non_zero_file(os.path.join(full_example_path, "*afi_id.txt"))
 
         create_afi_response_file_key = self.get_sdaccel_example_s3_afi_tag(examplePath=examplePath, target=target)
 
-        logger.info("Uploading create_afi output file: {}".format(create_afi_response_file) )
+        logger.info("Uploading create_afi output file: {}".format(create_afi_response_file))
         self.s3_client().upload_file(create_afi_response_file, self.s3_bucket, create_afi_response_file_key)
 
         create_afi_response = json.load(open(create_afi_response_file))

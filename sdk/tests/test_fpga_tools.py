@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import logging
 import os
 from os.path import dirname, realpath
@@ -30,7 +31,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)

@@ -14,7 +14,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 
-# This script looks for broken hyperlinks in all markdown files (*.md) in the repository. 
+# This script looks for broken hyperlinks in all markdown files (*.md) in the repository.
 # It returns 0 if it didn't find any broken or non-zero if it found broken links.
 #
 # Specifics:
@@ -34,6 +34,7 @@
 #  5) return non-zero if there are broken links.
 #
 
+from __future__ import print_function
 import argparse
 import git
 from HTMLParser import HTMLParser
@@ -51,7 +52,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
@@ -72,17 +73,17 @@ class HtmlAnchorParser(HTMLParser):
         self.anchors = {}
         self.links = []
         return
-    
+
     def handle_starttag(self, tag, attrs):
-        #logger.info("started {}".format(tag))
+        # logger.info("started {}".format(tag))
         if tag == 'a':
             for attr in attrs:
                 if attr[0] == 'href':
-                    #logger.info('link: {}'.format(attr[1]))
+                    # logger.info('link: {}'.format(attr[1]))
                     self.links.append(attr[1])
         for attr in attrs:
             if attr[0] in ['id', 'name']:
-                #logger.info("{} attr: {}".format(tag, attr))
+                # logger.info("{} attr: {}".format(tag, attr))
                 self.anchors[attr[1]] = 1
         return
 
@@ -104,10 +105,10 @@ def check_link(url):
     try:
         if not urllib2.urlparse.urlparse(url).netloc:
             return False
-        
+
         website = urllib2.urlopen(url)
         html = website.read()
-        
+
         if website.code != 200:
             return False
     except Exception, e:
@@ -135,10 +136,10 @@ if __name__ == '__main__':
     # Make sure running at root of repo
     repo_dir = aws_fpga_test_utils.get_git_repo_root(dirname(__file__))
     os.chdir(repo_dir)
-    
-    num_links  = 0 # total number of links we've found in .md files
-    num_broken = 0 # total number of links which are broken
-    
+
+    num_links = 0  # total number of links we've found in .md files
+    num_broken = 0  # total number of links which are broken
+
     # Get a list of markdown files
     logger.debug("Getting list of .md files")
     md_files = []
@@ -158,7 +159,7 @@ if __name__ == '__main__':
                     continue
                 md_files.append(path)
     logger.debug ("Found {} .md files".format(len(md_files)))
-    
+
     # Render the markdown files to xhtml5 and parse the HTML for links and anchors
     md_info = {}
     for md_file in md_files:
@@ -171,7 +172,7 @@ if __name__ == '__main__':
         md_info[md_file]['anchors'] = html_parser.anchors
         md_info[md_file]['links'] = html_parser.links
         num_links += len(html_parser.links)
-    
+
     # Check links
     for md_file in md_files:
         logger.debug("Checking {}".format(md_file))
@@ -220,10 +221,10 @@ if __name__ == '__main__':
                         logger.error("Broken link in {}: {}".format(md_file, link))
                         logger.error("    Anchor missing in {}".format(link_path))
                         num_broken += 1
-    
+
     logger.info("NUM doc files (.md)   : {}".format(len(md_files)))
     logger.info("NUM links in doc files: {}".format(num_links))
     logger.info("NUM brokenlinks       : {}".format(num_broken))
-    
+
     # if no broken links, return code is 0. Else it's the number of broken links.
     sys.exit(num_broken)

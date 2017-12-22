@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import argparse
 import logging
 import sys
@@ -29,7 +30,7 @@ It lists out all files that don't comply and exits with an error code 2.
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--dir', action='store', required=False, default=os.path.abspath(__file__) + "/../../../" ,help='Directory to check for the headers')
+    parser.add_argument('--dir', action='store', required=False, default=os.path.abspath(__file__) + "/../../../" , help='Directory to check for the headers')
     parser.add_argument('--debug', action='store_true', required=False, help='Enable debug messages')
 
     args = parser.parse_args()

@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import logging
 import os
 from os.path import dirname, realpath
@@ -28,7 +29,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
@@ -39,29 +40,29 @@ class TestEdma(AwsFpgaTestBase):
     
     NOTE: Cannot have an __init__ method.
     '''
-    
+
     @classmethod
     def setup_class(cls):
         '''
         Do any setup required for tests.
         '''
         AwsFpgaTestBase.setup_class(cls, __file__)
-        
+
         AwsFpgaTestBase.assert_sdk_setup()
-        
+
         assert AwsFpgaTestBase.running_on_f1_instance(), 'This test must be run on an F1 instance.'
         return
-    
+
     def test_unittest(self):
         (agfi, afi) = self.get_agfi_from_readme('cl_dram_dma')
         self.fpga_load_local_image(agfi, 0)
         aws_fpga_test_utils.install_edma_driver()
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_unit_test.sh".format(self.WORKSPACE), echo=True)
-        assert rc==0
-    
+        assert rc == 0
+
     def test_perftest(self):
         (agfi, afi) = self.get_agfi_from_readme('cl_dram_dma')
         self.fpga_load_local_image(agfi, 0)
         aws_fpga_test_utils.install_edma_driver()
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_perf_test.sh".format(self.WORKSPACE), echo=True)
-        assert rc==0
+        assert rc == 0

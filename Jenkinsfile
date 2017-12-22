@@ -122,7 +122,7 @@ if (test_markdown_links) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -146,7 +146,7 @@ if (test_hdk_scripts) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -166,7 +166,7 @@ if (test_fpga_tools) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -183,7 +183,7 @@ if (test_fpga_tools) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -210,7 +210,7 @@ if (test_sims) {
                             sh """
                                 set -e
                                 source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file}
+                                python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file}
                             """
                         } catch (exc) {
                             echo "${node_name} failed: archiving results"
@@ -238,7 +238,7 @@ if (test_edma) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        pytest -v sdk/tests/test_edma.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v sdk/tests/test_edma.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -277,7 +277,7 @@ if (test_runtime_software) {
                                 sh """
                                     set -e
                                     source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                                    pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                 """
                             } finally {
                                 junit healthScaleFactor: 10.0, testResults: report_file
@@ -310,7 +310,7 @@ if (test_dcp_recipes) {
                                 sh """
                                   set -e
                                   source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                  pytest -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file}
+                                  python2.7 -m pytest -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file}
                                   """
                             } catch(exc) {
                                 echo "${test_name} DCP generation failed: archiving results"
@@ -374,7 +374,7 @@ if (test_hdk_fdf) {
                                 sh """
                                   set -e
                                   source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                  pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                  python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                   """
                             } catch (exc) {
                                 echo "${fdf_test_name} DCP generation failed: archiving results"
@@ -426,7 +426,7 @@ if (test_hdk_fdf) {
                                 sh """
                                     set -e
                                     source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                                    pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                 """
                             } catch (exc) {
                                 echo "${fdf_test_name} AFI generation failed: archiving results"
@@ -466,7 +466,7 @@ if (test_hdk_fdf) {
                                 sh """
                                     set -e
                                     source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                                    pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                 """
                             } finally {
                                 junit healthScaleFactor: 10.0, testResults: report_file
@@ -494,7 +494,7 @@ if (test_sdaccel_scripts) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
@@ -530,7 +530,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } catch (exc) {
                     echo "Could not find tests. Please check the repository."
@@ -575,7 +575,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600
 
                                     """
                                 } catch (error) {
@@ -597,7 +597,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600
                                     """
                                 } catch (error) {
                                     echo "${hw_emu_stage_name} HW EMU Build generation failed"
@@ -618,7 +618,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200
                                     """
                                 } catch (error) {
                                     echo "${hw_stage_name} HW Build generation failed"
@@ -638,7 +638,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=3600
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=3600
                                     """
                                 } catch (error) {
                                     echo "${create_afi_stage_name} Create AFI failed"
@@ -658,7 +658,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
-                                        pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600
                                     """
                                 } catch (error) {
                                     echo "${run_example_stage_name} Runtime example failed"

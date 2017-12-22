@@ -14,6 +14,7 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 
+from __future__ import print_function
 import csv
 import git
 import logging
@@ -28,7 +29,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__file__)
@@ -80,7 +81,7 @@ class FpgaLocalImage:
         self.deviceId = None
         self.dbdf = None
         return
-    
+
     def describe_local_image(self, slot):
         '''
 Example output:
