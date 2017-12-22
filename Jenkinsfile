@@ -580,7 +580,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     """
                                 } catch (error) {
                                     echo "${sw_emu_stage_name} SW EMU Build generation failed"
-                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
+                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
@@ -601,7 +601,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     """
                                 } catch (error) {
                                     echo "${hw_emu_stage_name} HW EMU Build generation failed"
-                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
+                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
@@ -622,7 +622,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     """
                                 } catch (error) {
                                     echo "${hw_stage_name} HW Build generation failed"
-                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
+                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: hw_report_file
@@ -642,7 +642,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     """
                                 } catch (error) {
                                     echo "${create_afi_stage_name} Create AFI failed"
-                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
+                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: create_afi_report_file
@@ -662,7 +662,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     """
                                 } catch (error) {
                                     echo "${run_example_stage_name} Runtime example failed"
-                                    archiveArtifacts artifacts: "${WORKSPACE}/${example_path}/**", fingerprint: true
+                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
                                     junit healthScaleFactor: 10.0, testResults: run_example_report_file
