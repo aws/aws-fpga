@@ -43,7 +43,7 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestMdLinks(AwsFpgaTestBase):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
     '''
 

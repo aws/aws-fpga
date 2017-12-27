@@ -65,11 +65,11 @@ logger = aws_fpga_utils.get_logger(__name__)
 class HtmlAnchorParser(HTMLParser):
     '''
     Class for parsing html to extract links and anchors.
-    
+
     It handles the start of each tag it finds and parses the tag type and its atrributes.
     A link is an "a" tag with an "href" attribute.
     An anchor is any tag with an 'id' or 'name' attribute.
-    
+
     It saves the links in an array and it saves the anchors in a dict so that it is easy
     and efficient to check to see if an anchor exists.
     '''
@@ -95,13 +95,13 @@ class HtmlAnchorParser(HTMLParser):
 def check_link(url):
     '''
     Checks a link whose URL starts with 'http'.
-    
+
     Ignores links that start with:
     * https://forums.aws.amazon.com
     because you have to be signed in to the forum for the link to be valid.
-    
+
     Uses urllib2 to parse the URL and check that it is valid.
-    
+
     @returns True if the link is valid, False otherwise.
     '''
     logger.debug("Checking {}".format(url))

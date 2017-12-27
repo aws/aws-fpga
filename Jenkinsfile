@@ -125,7 +125,12 @@ if (test_markdown_links) {
                         python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -149,7 +154,12 @@ if (test_hdk_scripts) {
                         python2.7 -m pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -169,7 +179,12 @@ if (test_fpga_tools) {
                         python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -186,7 +201,12 @@ if (test_fpga_tools) {
                         python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -217,7 +237,12 @@ if (test_sims) {
                             archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
                             throw exc
                         } finally {
-                            junit healthScaleFactor: 10.0, testResults: report_file
+                            if (fileExists(report_file)) {
+                                junit healthScaleFactor: 10.0, testResults: report_file
+                            }
+                            else {
+                                echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                            }
                         }
                     }
                 }
@@ -241,7 +266,12 @@ if (test_edma) {
                         python2.7 -m pytest -v sdk/tests/test_edma.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -280,7 +310,12 @@ if (test_runtime_software) {
                                     python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                 """
                             } finally {
-                                junit healthScaleFactor: 10.0, testResults: report_file
+                                if (fileExists(report_file)) {
+                                    junit healthScaleFactor: 10.0, testResults: report_file
+                                }
+                                else {
+                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                }
                             }
                         }
                     }
@@ -317,7 +352,12 @@ if (test_dcp_recipes) {
                                 archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
                                 throw exc
                             } finally {
-                                junit healthScaleFactor: 10.0, testResults: report_file
+                                if (fileExists(report_file)) {
+                                    junit healthScaleFactor: 10.0, testResults: report_file
+                                }
+                                else {
+                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                }
                             }
                         }
                     }
@@ -381,7 +421,12 @@ if (test_hdk_fdf) {
                                 archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
                                 throw exc
                             } finally {
-                                junit healthScaleFactor: 10.0, testResults: report_file
+                                if (fileExists(report_file)) {
+                                    junit healthScaleFactor: 10.0, testResults: report_file
+                                }
+                                else {
+                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                }
                             }
                             try {
                                 stash name: dcp_stash_name, includes: "${dcp_stash_dir}/**"
@@ -433,7 +478,12 @@ if (test_hdk_fdf) {
                                 archiveArtifacts artifacts: "${build_dir}/to_aws/**", fingerprint: true
                                 throw exc
                             } finally {
-                                junit healthScaleFactor: 10.0, testResults: report_file
+                                if (fileExists(report_file)) {
+                                    junit healthScaleFactor: 10.0, testResults: report_file
+                                }
+                                else {
+                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                }
                             }
                             try {
                                 stash name: afi_stash_name, includes: "${afi_stash_dir}/**"
@@ -469,7 +519,12 @@ if (test_hdk_fdf) {
                                     python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                 """
                             } finally {
-                                junit healthScaleFactor: 10.0, testResults: report_file
+                                if (fileExists(report_file)) {
+                                    junit healthScaleFactor: 10.0, testResults: report_file
+                                }
+                                else {
+                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                }
                             }
                         }
                     }
@@ -497,7 +552,12 @@ if (test_sdaccel_scripts) {
                         python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
             }
         }
@@ -536,7 +596,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                     echo "Could not find tests. Please check the repository."
                     throw exc
                 } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file
+                    }
+                    else {
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                    }
                 }
 
                 // Only run the hello world test by default
@@ -583,7 +648,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
-                                    junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
+                                    if (fileExists(sw_emu_report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${sw_emu_report_file}"
+                                    }
                                 }
                             }
                         }
@@ -604,7 +674,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
-                                    junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
+                                    if (fileExists(hw_emu_report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${hw_emu_report_file}"
+                                    }
                                 }
                             }
                         }
@@ -625,7 +700,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
-                                    junit healthScaleFactor: 10.0, testResults: hw_report_file
+                                    if (fileExists(hw_report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: hw_report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${hw_report_file}"
+                                    }
                                 }
                             }
                         }
@@ -645,7 +725,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
-                                    junit healthScaleFactor: 10.0, testResults: create_afi_report_file
+                                    if (fileExists(create_afi_report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: create_afi_report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${create_afi_report_file}"
+                                    }
                                 }
                             }
                         }
@@ -665,7 +750,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
-                                    junit healthScaleFactor: 10.0, testResults: run_example_report_file
+                                    if (fileExists(run_example_report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: run_example_report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${run_example_report_file}"
+                                    }
                                 }
                             }
                         }
