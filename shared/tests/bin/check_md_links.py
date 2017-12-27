@@ -46,7 +46,12 @@ import os.path
 from os.path import dirname, realpath
 import re
 import sys
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen, urlparse
 try:
     import aws_fpga_test_utils
     import aws_fpga_utils
@@ -103,10 +108,10 @@ def check_link(url):
     if re.match(r'https://forums\.aws\.amazon\.com/', url):
         return True
     try:
-        if not urllib2.urlparse.urlparse(url).netloc:
+        if not urlparse.urlparse(url).netloc:
             return False
 
-        website = urllib2.urlopen(url)
+        website = urlopen(url)
         html = website.read()
 
         if website.code != 200:
@@ -128,6 +133,7 @@ def contains_link(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--exclude', action='store', nargs='*', default=[], help="Paths to ignore")
+    parser.add_argument('--ignore-url', action='store', nargs='*', default=[], help="URLs to ignore")
     parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
     if args.debug:
@@ -139,6 +145,11 @@ if __name__ == '__main__':
 
     num_links = 0  # total number of links we've found in .md files
     num_broken = 0  # total number of links which are broken
+
+    if args.exclude:
+        logger.info("Ignoring {} paths:\n  {}".format(len(args.exclude), "  \n".join(args.exclude)))
+    if args.ignore_url:
+        logger.info("Ignoring {} urls:\n  {}".format(len(args.ignore_url), "  \n".join(args.ignore_url)))
 
     # Get a list of markdown files
     logger.debug("Getting list of .md files")
@@ -177,7 +188,15 @@ if __name__ == '__main__':
     for md_file in md_files:
         logger.debug("Checking {}".format(md_file))
         for link in md_info[md_file]['links']:
-            if re.match(r'http', link):
+            if re.match('http', link):
+                ignore = False
+                for url in args.ignore_url:
+                    if url == link:
+                        ignore = True
+                        logger.warning("In {} ignoring {}".format(md_file, link))
+                        break
+                if ignore:
+                    continue
                 # Check using urllib2
                 if not check_link(link):
                     logger.error("Broken link in {}: {}".format(md_file, link))

@@ -24,7 +24,12 @@ import re
 import subprocess
 import sys
 import traceback
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen
 try:
     import aws_fpga_utils
 except ImportError as e:
@@ -107,17 +112,17 @@ def fpga_describe_local_image(slot):
     return fpgaLocalImage
 
 def get_instance_id():
-    instance_id = urllib2.urlopen('http://169.254.169.254/latest/meta-data/instance-id').read()
+    instance_id = urlopen('http://169.254.169.254/latest/meta-data/instance-id').read()
     return instance_id
 
 def get_instance_type():
-    instance_type = urllib2.urlopen('http://169.254.169.254/latest/meta-data/instance-type').read()
+    instance_type = urlopen('http://169.254.169.254/latest/meta-data/instance-type').read()
     return instance_type
 
 def get_num_fpga_slots(instance_type):
-    if re.match(r'f1\.2xlarge', instance_type):
+    if re.match('f1\.2xlarge', instance_type):
         return 1
-    elif re.match(r'f1\.16xlarge', instance_type):
+    elif re.match('f1\.16xlarge', instance_type):
         return 8
     return 0
 
@@ -147,14 +152,14 @@ def read_clock_recipes():
         for row in csvreader:
             if not row or row[0] == '':
                 continue
-            matches = re.match(r'Clock Group (\S)', row[0])
+            matches = re.match('Clock Group (\S)', row[0])
             assert matches, "Invalid format in {}. Expected 'Clock Group \S'\n{}".format(clock_recipes_csv, row[0])
             clock_group = matches.group(1)
             logger.debug(row[0])
             CLOCK_RECIPES[clock_group] = {}
             CLOCK_RECIPES[clock_group]['clock_names'] = []
             CLOCK_RECIPES[clock_group]['recipes'] = {}
-            row = csvreader.next()
+            row = next(csvreader)
             assert row[0] == 'Recipe Number', "Invalid format in {}. Expected 'Recipe Number'\n{}".format(clock_recipes_csv, row[0])
             for clock_name in row[1:]:
                 if clock_name == '':
@@ -162,7 +167,7 @@ def read_clock_recipes():
                 CLOCK_RECIPES[clock_group]['clock_names'].append(clock_name)
             logger.debug("  Clock names:\n  {}".format("\n  ".join(CLOCK_RECIPES[clock_group]['clock_names'])))
             while True:
-                row = csvreader.next()
+                row = next(csvreader)
                 if not row or row[0] == '':
                     break
                 recipe_number = row[0]

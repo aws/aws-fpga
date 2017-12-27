@@ -56,5 +56,9 @@ class TestMdLinks(AwsFpgaTestBase):
         return
 
     def test_md_links(self):
-        rc = os.system(self.test_dir + "/bin/check_md_links.py --exclude SDAccel/examples/xilinx")
+        cmd = self.test_dir + "/bin/check_md_links.py"
+        cmd += " --exclude SDAccel/examples/xilinx"
+        # This is a valid link but sometimes it 404s
+        cmd += " --ignore-url https://docs.pytest.org/en/latest/"
+        (rc, stdout, stderr) = self.run_cmd(cmd, echo=True)
         assert rc == 0
