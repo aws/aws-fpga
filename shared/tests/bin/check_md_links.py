@@ -133,7 +133,7 @@ def contains_link(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--exclude', action='store', nargs='*', default=[], help="Paths to ignore")
-    parser.add_argument('--ignore-url', action='store', nargs='*', default=[], help="URLs to ignore")
+    parser.add_argument('--ignore-url', action='store', nargs='*', default=[], help="URLs to ignore. Will ignore all URLs starting with this prefix.")
     parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
     if args.debug:
@@ -191,7 +191,7 @@ if __name__ == '__main__':
             if re.match('http', link):
                 ignore = False
                 for url in args.ignore_url:
-                    if url == link:
+                    if link.startswith(url):
                         ignore = True
                         logger.warning("In {} ignoring {}".format(md_file, link))
                         break
