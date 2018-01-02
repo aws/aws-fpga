@@ -14,7 +14,8 @@
 
 #define MASTER_PF                                               (0)
 #define DRV_MODULE_NAME                                         "edma_xdma_backend"
-#define XDMA_TIMEOUT_IN_MSEC                                    (3 * 1000)
+#define XDMA_TIMEOUT_IN_MSEC                                    (5)
+#define XDMA_MAX_TIMEOUT_IN_MSEC                                (3 * 1000)
 #define SLEEP_MIN_USEC                                          (1)
 #define SLEEP_MAX_USEC                                          (20)
 #define XDMA_WORKER_RESERVED_BIT	                        (0)
@@ -475,7 +476,7 @@ int edma_backend_stop(void *q_handle)
 {
 	command_queue_t* command_queue = (command_queue_t*)q_handle;
 	command_t* queue = command_queue->queue;
-	int i;
+	int i, timeout = 0;
 
 	//Stop the kthread before reset and make sure it was stopped.
 	set_bit(XDMA_WORKER_STOP_REQUEST_BIT, &command_queue->thread_status);
@@ -483,9 +484,16 @@ int edma_backend_stop(void *q_handle)
 	//See the comment in the write_worker_function regarding missed wakeups 
 	wake_up_process(command_queue->worker_thread);
 
-	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
-			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status))
-		msleep(XDMA_TIMEOUT_IN_MSEC);
+
+	while(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
+			!test_bit(XDMA_WORKER_STOPPED_ON_TIMEOUT_BIT, &command_queue->thread_status)){
+
+                msleep(XDMA_TIMEOUT_IN_MSEC);
+                //Wait for XDMA_MAX_TIMEOUT_IN_MSEC at most
+                if(timeout > XDMA_MAX_TIMEOUT_IN_MSEC)
+                    break;
+                timeout += XDMA_TIMEOUT_IN_MSEC;
+        }
 
 	//if still not stopped - panic
 	if(!test_bit(XDMA_WORKER_STOPPED_ON_REQUEST_BIT, &command_queue->thread_status) &&
