@@ -718,7 +718,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=3600
+                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800
                                     """
                                 } catch (error) {
                                     echo "${create_afi_stage_name} Create AFI failed"
