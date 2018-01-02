@@ -1019,7 +1019,7 @@ module sh_bfm #(
                   
                   if (cl_sh_wr_data[0].strb[index]) begin
                      c = cl_sh_wr_data[0].data >> (index * 8);
-                     word = {c, word[31:8]};
+                     word[8*j+:8] = c;
                   end
                end // for (int j=0; j<4; j++)
 
