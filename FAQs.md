@@ -26,7 +26,7 @@ AWS designed its FPGA instances to provide a developer experience with ease of u
 
 - Developers don’t need to purchase / design / bringup or debug the physical hardware where the FPGA is hosted, nor the platform/server hardware: all the hardware is verified, monitored, and maintained by AWS.
 
-- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA developer AMI developers have a choice to a wide range of instance (different CPU and Memory configutation) allowing developers to optimize their development flow.
+- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA developer AMI developers have a choice to a wide range of instance (different CPU and Memory configuration) allowing developers to optimize their development flow.
 
 - AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premises development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
 
@@ -58,7 +58,7 @@ Once developers complete their DCP, they submit the design through an AWS EC2 AP
 
 As AWS has taken all the non-differentiating, heavy lifting of hardware design, debug and implementation of PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring. Therefore AWS FPGA developers can focus on their own differentiating logic, instead of spending time on hardware bringup/debug and maintenance.
 
-On the business side, AWS Marketplace (MP) provides FPGA developers the opportunity to sell hardware accelerations to all of AWS users: Ramping on AWS MP services, capabilities and commercial opportunities are recommended knowledge for developers interested in selling their AFIs on AWS MP. Education and research institutes can use AWS MP to distribute their research work ; having access to vast amounts of free [public data-sets](https://aws.amazon.com/public-datasets/ ) can be of value when running research hardware accelarations on AWS.
+On the business side, AWS Marketplace (MP) provides FPGA developers the opportunity to sell hardware accelerations to all of AWS users: Ramping on AWS MP services, capabilities and commercial opportunities are recommended knowledge for developers interested in selling their AFIs on AWS MP. Education and research institutes can use AWS MP to distribute their research work ; having access to vast amounts of free [public data-sets](https://aws.amazon.com/public-datasets/ ) can be of value when running research hardware accelerations on AWS.
 
 Finally, AWS consulting and technology partners can offer their services through the [AWS Partner Network](https://aws.amazon.com/ec2/instance-types/f1/partners/) to AWS users that don’t have specific FPGA development knowledge, in order to develop FPGA accelerations in the cloud by themselves.
   
@@ -107,7 +107,8 @@ The developer can create multiple AFIs at no extra cost, up to a defined limited
 
 **Q: What regions are supported?**
 
-AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and ue-west-1 (Ireland).
+AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and eu-west-1 (Ireland).
+
 
 
 **Q: What is the process for creating an AFI?**
@@ -121,7 +122,21 @@ Use the AWS CLI `describe-fpga-images` API to get information about the created 
 
 Yes, but you must first copy the AFI using the [copy-fpga-image](./hdk/docs/copy_fpga_image.md) API.  You should generate AFIs in one region and use copy to make them available in other regions.  Copy preserves the Global AFI ID used to load an AFI on a EC2 instance.
 
-Use [describe-fpga-images](./hdk/docs/describe_fpga_images.md) with the [--region command line option](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) to list AFIs available in a specific region.  Use `FpgaImageGlobalId` attribute and `fpga-image-global-id` filter to match AFI copies accross regions.
+Use [describe-fpga-images](./hdk/docs/describe_fpga_images.md) with the [--region command line option](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) to list AFIs available in a specific region.  Use `FpgaImageGlobalId` attribute and `fpga-image-global-id` filter to match AFI copies across regions.
+
+**Q: Can I share an AFI with other AWS accounts?**
+
+Yes, sharing allows accounts other than the owner account to load and use an AFI.  Use [modify-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to update `loadPermission` attribute to grant/remove AFI load permission.  AWS AFIs support two load permission types:
+* `UserId`: share AFI with specific AWS accounts using account IDs.
+* `UserGroups`: only supports `all` group to make an AFI public or private.
+
+Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to revoke all load permissions.
+
+**Q: Can I delete an AFI?**
+
+Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
+
+Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to restrict access to this API.
 
 **Q: Can I share an AFI with other AWS accounts?**
 
@@ -160,7 +175,7 @@ AWS prefers not to limit developers to a specific template in terms of how we ad
 
 If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included at no additional cost. 
 
-If you want to run using other methods or on a local machine, you will need to obtain any necessary licenses, specifically you will need to have setup the approproate Xilinx Vivado license. For more details, please refer to [On-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
+If you want to run using other methods or on a local machine, you will need to obtain any necessary licenses, specifically you will need to have setup the appropriate Xilinx Vivado license. For more details, please refer to [On-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
 
 
 **Q: Does AWS provide physical FPGA boards for on-premises development?**
@@ -381,7 +396,7 @@ The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the 
 
 **Q: What memory is attached to the FPGA?**
 
-Each FPGA on F1 has 4 x DDR4 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory avaliable localy to each F1 FPGA.
+Each FPGA on F1 has 4 x DDR4 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory available localy to each F1 FPGA.
 
 
 **Q: What FPGA debug capabilities are supported?**
