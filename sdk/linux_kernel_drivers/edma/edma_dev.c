@@ -52,7 +52,8 @@
 #define EVENT_DEVICE_NAME "fpga"
 #define SLEEP_MINIMUM_USEC 		(1 * 100)
 #define SLEEP_MAXIMUM_USEC 		(4 * 100)
-#define RELEASE_SLEEP_MSEC 		((fsync_timeout_sec + 1) * 1000)
+#define RELEASE_SLEEP_MSEC 		(5)
+#define RELEASE_TIMEOUT_MSEC 		(((fsync_timeout_sec) + 1) * 1000)
 #define NUM_POLLS_PER_SCHED		(100)
 #define CEIL(a, b)	(((a) + (b-1)) / (b))
 
@@ -358,6 +359,7 @@ edma_open_done:
 static int edma_dev_release(struct inode *inode, struct file *file)
 {
 	int ret = 0;
+	int timeout = 0;
 	struct edma_char_queue_device* edma_char;
 	struct edma_queue_private_data *device_private_data;
 
@@ -390,21 +392,28 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 		set_bit(EDMA_STATE_QUEUE_RELEASING_BIT, &device_private_data->state);
 
 		// Now that we signaled to the other threads that we want to release
-		// we can unlock the spin locks
+		// we can unlock the locks
 		// the code in the read/write/fsync function should always check the 
 		// EDMA_STATE_QUEUE_RELEASING_BIT often to stop quickly
 		mutex_unlock(&device_private_data->read_ebcs.ebcs_mutex);
 		mutex_unlock(&device_private_data->write_ebcs.ebcs_mutex);
 
-		if(test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
+		while (test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
 				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
 						&device_private_data->state)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
-						&device_private_data->state))
+						&device_private_data->state)) {
 			msleep(RELEASE_SLEEP_MSEC);
+			if (timeout > RELEASE_TIMEOUT_MSEC) {
+				pr_err("%s: DMA still in-progress, timeout=%u\n", 
+						__func__, timeout);
+				break;
+			}
+			timeout += RELEASE_SLEEP_MSEC;
+		}
 
-		//if still running - panic
+		// if still running - panic
 		BUG_ON( test_bit(EDMA_STATE_READ_IN_PROGRESS_BIT,
 				&device_private_data->state)
 				|| test_bit(EDMA_STATE_WRITE_IN_PROGRESS_BIT,
@@ -412,14 +421,7 @@ static int edma_dev_release(struct inode *inode, struct file *file)
 				|| test_bit(EDMA_STATE_FSYNC_IN_PROGRESS_BIT,
 						&device_private_data->state));
 
-
-		// First, set the DEV_RELEASING flag so all other tasks are notified
-		// disable hardware interrupts (note - we could still have interrupts inflight or interrupt routine in execution
-		// wait_on interrupt_routine test_bit(INT_RUNNING) - wait for X seconds
-		// disassociate MSIX with an interrupt routine
-
-		// once we reached here, we know that we can release
-
+		// Once we reach this point, we know that we can release
 		edma_backend_stop(device_private_data->write_ebcs.dma_queue_handle);
 
 		edma_dev_release_resources(&device_private_data->write_ebcs);
