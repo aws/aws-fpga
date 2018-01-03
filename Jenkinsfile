@@ -725,11 +725,18 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                     throw error
                                 } finally {
+
                                     if (fileExists(create_afi_report_file)) {
                                         junit healthScaleFactor: 10.0, testResults: create_afi_report_file
                                     }
                                     else {
                                         echo "Pytest wasn't run for stage. Report file not generated: ${create_afi_report_file}"
+                                    }
+
+                                    String to_aws_dir = "${example_path}/to_aws"
+
+                                    if (fileExists(to_aws_dir)) {
+                                        sh "rm -rf ${to_aws_dir}"
                                     }
                                 }
                             }
