@@ -250,6 +250,11 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 			printf("%" PRIu64 "  ", frequency); 
 		}
 		printf("\n");
+
+		printf("Power consumption (Vccint):\n");
+		printf("   Last measured: %" PRIu64 " watts\n",fmc->power);
+		printf("   Average: %" PRIu64 " watts\n",fmc->power_mean);
+		printf("   Max measured: %" PRIu64 " watts\n",fmc->power_max);
 	}
 
 	return 0;
@@ -310,18 +315,27 @@ cli_detach(void)
 static int command_load(void)
 {
 	int ret;
+	union fpga_mgmt_load_local_image_options opt;
 
 	uint32_t flags = (f1.force_shell_reload) ? FPGA_CMD_FORCE_SHELL_RELOAD : 0;
 
+ 	fpga_mgmt_init_load_local_image_options(&opt);
+        opt.slot_id = f1.afi_slot;
+        opt.afi_id = f1.afi_id;
+        opt.flags = flags;
+	opt.clock_mains[0] = f1.clock_a0_freq;
+	opt.clock_mains[1] = f1.clock_b0_freq;
+	opt.clock_mains[2] = f1.clock_c0_freq;
+
 
 	if (f1.async) {
-		ret = fpga_mgmt_load_local_image_flags(f1.afi_slot, f1.afi_id, flags);
+		ret = fpga_mgmt_load_local_image_with_options(&opt);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image failed");
 	} else {
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-		ret = fpga_mgmt_load_local_image_sync_flags(f1.afi_slot, f1.afi_id, flags,
+		ret = fpga_mgmt_load_local_image_sync_with_options(&opt,
 				f1.sync_timeout, f1.sync_delay_msec, &info);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
 

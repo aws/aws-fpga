@@ -294,23 +294,39 @@ int fpga_mgmt_load_local_image(int slot_id, char *afi_id)
 	return fpga_mgmt_load_local_image_flags(slot_id, afi_id, 0);
 }
 
+int fpga_mgmt_init_load_local_image_options(union fpga_mgmt_load_local_image_options *opt){
+	memset(opt, 0, sizeof(union fpga_mgmt_load_local_image_options));
+	return 0;
+}
+
 int fpga_mgmt_load_local_image_flags(int slot_id, char *afi_id, uint32_t flags)
 {
+	union fpga_mgmt_load_local_image_options opt;
+
+	fpga_mgmt_init_load_local_image_options(&opt);
+	opt.slot_id = slot_id;
+	opt.afi_id = afi_id;
+	opt.flags = flags;
+
+	return fpga_mgmt_load_local_image_with_options(&opt);
+}
+
+int fpga_mgmt_load_local_image_with_options(union fpga_mgmt_load_local_image_options *opt){
 	int ret;
 	uint32_t len;
 	union afi_cmd cmd;
 	union afi_cmd rsp;
 
-	fail_slot_id(slot_id, out, ret);
+	fail_slot_id(opt->slot_id, out, ret);
 
 	memset(&cmd, 0, sizeof(union afi_cmd));
 	memset(&rsp, 0, sizeof(union afi_cmd));
 
 	/* initialize the command structure */
-	fpga_mgmt_cmd_init_load(&cmd, &len, afi_id, flags);
+	fpga_mgmt_cmd_init_load(&cmd, &len, opt);
 
 	/* send the command and wait for the response */
-	ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
+	ret = fpga_mgmt_process_cmd(opt->slot_id, &cmd, &rsp, &len);
 	fail_on(ret, out, "fpga_mgmt_process_cmd failed");
 
 	/* the load command does not have an interesting response payload */
@@ -327,6 +343,20 @@ int fpga_mgmt_load_local_image_sync(int slot_id, char *afi_id,
 }
 
 int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t flags,
+		uint32_t timeout, uint32_t delay_msec,
+		struct fpga_mgmt_image_info *info) 
+{
+	union fpga_mgmt_load_local_image_options opt;
+
+	fpga_mgmt_init_load_local_image_options(&opt);
+	opt.slot_id = slot_id;
+	opt.afi_id = afi_id;
+	opt.flags = flags;
+
+	return fpga_mgmt_load_local_image_sync_with_options(&opt, timeout, delay_msec, info);
+
+}
+int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_image_options *opt,
 		uint32_t timeout, uint32_t delay_msec,
 		struct fpga_mgmt_image_info *info) 
 {
@@ -351,27 +381,27 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 	 * Get the current SH version and PCI resource map for the app_pf 
 	 * that will be used after the load has completed.
 	 */
-	ret = fpga_mgmt_get_sh_version(slot_id, &prev_sh_version);
+	ret = fpga_mgmt_get_sh_version(opt->slot_id, &prev_sh_version);
 	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
 
-	ret = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &app_map);
+	ret = fpga_pci_get_resource_map(opt->slot_id, FPGA_APP_PF, &app_map);
 	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 
 	/** Load the FPGA image (async completion) */
-	ret = fpga_mgmt_load_local_image_flags(slot_id, afi_id, flags);
+	ret = fpga_mgmt_load_local_image_with_options(opt);
 	fail_on(ret, out, "fpga_mgmt_load_local_image failed");
 
 	/** Wait until the status is "loaded" or timeout */
 	while (!done) {
-		ret = fpga_mgmt_describe_local_image(slot_id, &tmp_info, 0); /** flags==0 */
+		ret = fpga_mgmt_describe_local_image(opt->slot_id, &tmp_info, 0); /** flags==0 */
 
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_LOADED) {
 			/** Sanity check the afi_id */
-			ret = (strncmp(afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id))) ? 
+			ret = (strncmp(opt->afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id))) ? 
 				FPGA_ERR_FAIL : 0; 
 			fail_on(ret, out, "AFI ID mismatch: requested afi_id=%s, loaded afi_id=%s",
-					afi_id, tmp_info.ids.afi_id);
+					opt->afi_id, tmp_info.ids.afi_id);
 			done = true;
 		} else if (status == FPGA_STATUS_BUSY) {
 			fail_on(ret = (retries >= timeout_tmp) ? -ETIMEDOUT : 0, out, 
@@ -394,7 +424,7 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 	 * have not changed.
 	 */
 	struct afi_device_ids *afi_device_ids = &tmp_info.ids.afi_device_ids;
-	ret = fpga_mgmt_get_sh_version(slot_id, &sh_version);
+	ret = fpga_mgmt_get_sh_version(opt->slot_id, &sh_version);
 	fail_on(ret != 0, out, "fpga_mgmt_get_sh_version failed");
 
 	if ((sh_version != prev_sh_version) ||
@@ -415,7 +445,7 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 				app_map.vendor_id, app_map.device_id, 
 				app_map.subsystem_vendor_id, app_map.subsystem_device_id);
 
-		ret = fpga_pci_rescan_slot_app_pfs(slot_id);
+		ret = fpga_pci_rescan_slot_app_pfs(opt->slot_id);
 		fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
 	}
 
