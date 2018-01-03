@@ -2425,6 +2425,8 @@ module sh_bfm #(
               end
               c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
 
+              if ((c2h_dma_done[chan]) && (cl_sh_rd_data[0].last == 1)) c2h_dma_started[chan] = 0;
+               
               if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
                 byte_cnt[chan] = 0;
                
