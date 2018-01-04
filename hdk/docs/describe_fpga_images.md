@@ -126,6 +126,15 @@ The following response shows the AFI information provided by `describe-fpga-imag
 [`describe-tags`](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html)
 and [`delete-tags`](https://docs.aws.amazon.com/cli/latest/reference/ec2/delete-tags.html)):
 ```
+    # Create a tag with key="key_1" and value="value_1"
+    $ aws ec2 create-tags --resources afi-06d0ffc989feeea2a --tags Key=key_1,Value=value_1
+
+    # Get all AFIs with tags
+    $ aws ec2 describe-tags --filters "Name=resource-type,Values=fpga-image"
+
+    # Get the tags for a specific AFI ID
+    $ aws ec2 describe-tags --filters "Name=resource-id,Values=afi-06d0ffc989feeea2a"
+
     # Get AFIs with a tag key "key_1"
     $ aws ec2 describe-fpga-images --filters "Name=tag-key,Values=key_1"
 
