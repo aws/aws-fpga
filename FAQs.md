@@ -185,7 +185,7 @@ No. AWS supports a cloud-only development model and provides the necessary eleme
 
 **Q: Do I need to design for a specific power envelope?**
 
-Yes, the design scripts provided in the HDK include checks for power consumption that exceeds the allocated power for the Custom Logic (CL) region. Developers do not need to include design considerations for DRAM, Shell, or Thermal. AWS includes the design considerations for those as part of providing the power envelop for the CL region.
+Yes, the Xilinx UltraScale+ FPGA devices used on the F1 instances have a maximum power limit that must be maintained.  If a loaded AFI consumes maximum power, the F1 instance will automatically gate the input clocks provided to the AFI in order to prevent errors within the FPGA. Developers are provided warnings when power (Vccint) is greater than 85 watts.  Above that level, the CL is in danger of being clock gated.  [Additional details on AFI power](hdk/docs/afi_power.md)
 
 
 **Q: What IP blocks are provided in the HDK?**
