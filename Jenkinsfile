@@ -10,6 +10,7 @@ properties([parameters([
     booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
     booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
+    booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
     booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
     booleanParam(name: 'test_hdk_fdf',                        defaultValue: true,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
@@ -28,6 +29,7 @@ boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
+boolean test_xdma = params.get('test_xdma')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_dcp_recipes = params.get('test_dcp_recipes')
 boolean test_hdk_fdf = params.get('test_hdk_fdf')
@@ -258,20 +260,55 @@ if (test_edma) {
             node(task_label.get('runtime')) {
                 echo "Test EDMA Driver"
                 checkout scm
+                String test = "sdk/tests/test_edma.py"
                 String report_file = "test_edma.xml"
                 try {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v sdk/tests/test_edma.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                     """
+                } catch (exc) {
+                    echo "${test} failed."
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                    input message: "EDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exc
                 } finally {
                     if (fileExists(report_file)) {
                         junit healthScaleFactor: 10.0, testResults: report_file
+                        archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
                     }
                     else {
                         echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
                     }
+                }
+            }
+        }
+    }
+}
+
+if (test_xdma) {
+    top_parallel_stages['Test XDMA Driver'] = {
+        stage('Test XDMA Driver') {
+            node(task_label.get('runtime')) {
+                echo "Test XDMA Driver"
+                checkout scm
+                String test = "sdk/tests/test_xdma.py"
+                String report_file = "test_xdma.xml"
+                try {
+                    sh """
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                    """
+                } catch (exc) {
+                    echo "${test} failed."
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                    input message: "XDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exc
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
+                    archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
                 }
             }
         }

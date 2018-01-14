@@ -15,30 +15,37 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-import logging
+'''
+Pytest module:
+
+Call using ```pytest test_drivers.py```
+
+See TESTING.md for details.
+'''
+
 import os
-from os.path import dirname, realpath
+from os.path import basename, dirname, realpath
 import pytest
-import subprocess
 import sys
 import traceback
 try:
+    import aws_fpga_utils
     import aws_fpga_test_utils
     from aws_fpga_test_utils.AwsFpgaTestBase import AwsFpgaTestBase
-    import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print("error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1]))
+    print "error: {}\nMake sure to source sdk_setup.sh".format(sys.exc_info()[1])
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
 
-class TestEdma(AwsFpgaTestBase):
+class TestXdma(AwsFpgaTestBase):
     '''
     Pytest test class.
 
     NOTE: Cannot have an __init__ method.
+
+    Test all example CLs with different strategies and clock recipes.
     '''
 
     @classmethod
@@ -54,6 +61,9 @@ class TestEdma(AwsFpgaTestBase):
 
         (cls.cl_dram_dma_agfi, cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_dram_dma')
 
+        for slot in range(AwsFpgaTestBase.num_slots):
+            AwsFpgaTestBase.load_msix_workaround(slot)
+
         cls.get_fio_dma_tools()
         return
 
@@ -65,31 +75,17 @@ class TestEdma(AwsFpgaTestBase):
         aws_fpga_test_utils.remove_edma_driver()
         aws_fpga_test_utils.remove_xdma_driver()
 
-
-    def test_unittest(self):
-        self.load_msix_workaround(slot=0)
-        self.fpga_load_local_image(self.cl_dram_dma_agfi, 0)
-        aws_fpga_test_utils.install_edma_driver()
-        assert aws_fpga_test_utils.edma_driver_installed() == True
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_unit_test.sh".format(self.WORKSPACE), echo=True)
-        assert rc == 0
-
-    def test_perftest(self):
-        self.load_msix_workaround(slot=0)
-        self.fpga_load_local_image(self.cl_dram_dma_agfi, 0)
-        aws_fpga_test_utils.install_edma_driver()
-        assert aws_fpga_test_utils.edma_driver_installed() == True
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_perf_test.sh".format(self.WORKSPACE), echo=True)
-        assert rc == 0
+    def test_install(self):
+        aws_fpga_test_utils.install_xdma_driver()
+        assert aws_fpga_test_utils.xdma_driver_installed() == True
 
     def test_fio_perf(self):
-        # Build the driver so the fio script can install it.
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma && make".format(self.WORKSPACE), echo=True)
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/xdma && make".format(self.WORKSPACE), echo=True)
         assert rc == 0
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/tests/fio_dma_tools && sudo ./edma_perf.sh 1 0 {} {} {}".format(
-            self.WORKSPACE, self.msix_agfi, self.cl_dram_dma_agfi, self.WORKSPACE), check=False, echo=True)
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/tests/fio_dma_tools && sudo ./xdma_perf.sh 1 0 {} {} {}".format(
+            self.WORKSPACE, self.msix_agfi, self.cl_dram_dma_agfi, self.WORKSPACE), echo=True, check=False)
         if rc != 0:
-            logger.error("FIO EDMA test failed")
+            logger.error("FIO xdmam_perf test failed")
             # Create some diagnostic information
             # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
             self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)

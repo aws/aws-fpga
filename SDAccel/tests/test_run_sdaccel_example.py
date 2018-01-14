@@ -66,6 +66,9 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
 
         return
 
+    def teardown_method(self, test_method):
+        aws_fpga_test_utils.remove_xdma_driver()
+
     def test_run_sdaccel_example(self, examplePath):
 
         os.chdir(self.get_sdaccel_example_fullpath(examplePath))

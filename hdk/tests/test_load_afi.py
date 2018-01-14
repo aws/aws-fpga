@@ -46,9 +46,9 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestLoadAfi(AwsFpgaTestBase):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
-    
+
     Load AFI created by test_create_afi.py
     '''
 
@@ -63,6 +63,9 @@ class TestLoadAfi(AwsFpgaTestBase):
 
         assert AwsFpgaTestBase.running_on_f1_instance(), 'This test must be run on an F1 instance. Instance type={}'.format(aws_fpga_test_utils.get_instance_type())
         return
+
+    def teardown_method(self, test_method):
+        aws_fpga_test_utils.remove_edma_driver()
 
     def get_agfi(self, cl, option_tag):
         '''
@@ -117,16 +120,7 @@ class TestLoadAfi(AwsFpgaTestBase):
     def load_agfi(self, cl, agfi, afi, slot):
         self.assert_afi_available(afi)
 
-        self.fpga_clear_local_image(slot)
-
-        msix_agfi = 'agfi-09c2a21805a8b9257'
-        logger.info("Loading MSI-X workaround into slot {}".format(slot))
-        self.fpga_load_local_image(msix_agfi, slot)
-
-        logger.info("Checking slot {} AFI Load status".format(slot))
-        assert self.check_fpga_afi_loaded(msix_agfi, slot), "{} not loaded in slot {}".format(msix_agfi, slot)
-
-        self.fpga_clear_local_image(slot)
+        self.load_msix_workaround(slot)
 
         self.fpga_load_local_image(agfi, slot)
 
@@ -269,6 +263,10 @@ class TestLoadAfi(AwsFpgaTestBase):
         assert rc == 0, "Runtime software build failed."
 
         if install_edma_driver:
+            # Uninstall drivers just in case a previous test left them installed
+            aws_fpga_test_utils.remove_edma_driver()
+            aws_fpga_test_utils.remove_xdma_driver()
+
             # Load the AFI onto all available FPGAs
             # This is required for the EDMA driver to correctly installfor all slots
             # We do this because otherwise installation on slots 1-7 doesn't seem to work.

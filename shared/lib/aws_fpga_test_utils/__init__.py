@@ -20,6 +20,7 @@ import git
 import logging
 import os
 from os.path import basename, dirname, realpath
+import platform
 import re
 import subprocess
 import sys
@@ -46,31 +47,83 @@ def get_git_repo_root(path=None):
     repo_dir = repo.git.rev_parse("--show-toplevel")
     return repo_dir
 
+def edma_driver_installed():
+    if find_files_in_path('/lib/modules', 'edma-drv.ko'):
+        return True
+    if os.path.exists('/etc/modules-load.d/edma.conf'):
+        return True
+    if os.system('/usr/sbin/lsmod | grep edma_drv') == 0:
+        return True
+    return False
+
 def remove_edma_driver():
     logger.info("Removing the edma driver")
-    os.system('sudo rmmod edma-drv')
-    assert os.system('sudo rm -f /lib/modules/`uname -r`/edma-drv.ko') == 0
+    # This fails if the driver isn't installed
+    edma_driver_ko_list = find_files_in_path('/lib/modules', 'edma-drv.ko')
+    for edma_ko in edma_driver_ko_list:
+        logger.info("Removing {}".format(edma_ko1))
+        assert os.system("sudo rm -f {}".format(edma_ko)) == 0
+
     assert os.system('sudo rm -f /etc/modules-load.d/edma.conf') == 0
+    os.system('sudo rmmod edma-drv')
 
 def edma_driver_install_steps():
     logger.info("Running edma driver install steps")
-    assert os.system('echo \'edma\' | sudo tee -a /etc/modules-load.d/edma.conf') == 0
+    # Check if the file exists
+    if edma_driver_installed():
+        logger.info("edma driver is already installed.")
+        remove_edma_driver()
+
     assert os.system('cd $WORKSPACE/sdk/linux_kernel_drivers/edma && \
         make clean && \
         make && \
-        sudo cp edma-drv.ko /lib/modules/`uname -r`/ && \
-        sudo depmod && \
-        sudo modprobe edma-drv') == 0
+        sudo insmod edma-drv.ko') == 0
 
 # Function to install the edma drivers
 def install_edma_driver():
     logger.info("Installing the edma drivers")
 
     # Check if the file exists
-    if os.path.exists('/etc/modules-load.d/edma.conf'):
+    if edma_driver_installed():
         logger.info("Edma driver is already installed.")
         remove_edma_driver()
     edma_driver_install_steps()
+
+def xdma_driver_installed():
+    if find_files_in_path('/lib/modules', 'xdma.ko'):
+        return True
+    if os.path.exists('/etc/modules-load.d/xdma.conf'):
+        return True
+    if os.system('/usr/sbin/lsmod | grep xdma') == 0:
+        return True
+    if os.path.exists('/etc/udev/rules.d/10-xdma.rules'):
+        return True
+    return False
+
+def remove_xdma_driver():
+    logger.info("Removing the xdma driver.")
+    # This fails if the driver isn't installed
+    os.system('sudo rmmod xdma')
+
+    xdma_driver_ko_list = find_files_in_path('/lib/modules', 'xdma.ko')
+    for xdma_ko in xdma_driver_ko_list:
+        logger.info("Removing {}".format(xdma_ko))
+        assert os.system("sudo rm -f {}".format(xdma_ko)) == 0
+
+    assert os.system('sudo rm -f /etc/modules-load.d/xdma.conf') == 0
+    assert os.system('sudo rm -f /etc/udev/rules.d/10-xdma.rules') == 0
+
+def install_xdma_driver():
+    logger.info("Installing the xdma driver")
+
+    # Check if the file exists
+    if xdma_driver_installed():
+        logger.info("xdma driver is already installed.")
+        remove_xdma_driver()
+    assert os.system('cd $WORKSPACE/sdk/linux_kernel_drivers/xdma && \
+        make clean && \
+        make && \
+        sudo insmod xdma.ko poll_mode=1') == 0
 
 class FpgaLocalImage:
     def __init__(self):
@@ -176,3 +229,14 @@ def read_clock_recipes():
                     clock_name = CLOCK_RECIPES[clock_group]['clock_names'][i]
                     CLOCK_RECIPES[clock_group]['recipes'][recipe_number][clock_name] = row[i + 1]
     return CLOCK_RECIPES
+
+def find_files_in_path(root_folder='/lib/modules', filename='xdma.ko'):
+    found_file_list=[]
+
+    for root, dirs, files in os.walk(root_folder):
+        for file in files:
+            if file == filename:
+                 found_file_list.append(os.path.join(root, filename))
+
+    return found_file_list
+

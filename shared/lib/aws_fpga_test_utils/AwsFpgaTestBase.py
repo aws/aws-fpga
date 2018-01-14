@@ -68,6 +68,8 @@ class AwsFpgaTestBase(object):
 
     ADD_EXAMPLEPATH = False
 
+    msix_agfi = 'agfi-09c2a21805a8b9257'
+
     @classmethod
     def setup_class(cls, derived_cls, filename_of_test_class):
         AwsFpgaTestBase.s3_bucket = 'aws-fpga-jenkins-testing'
@@ -134,6 +136,20 @@ class AwsFpgaTestBase(object):
         '''
         instance_type = aws_fpga_test_utils.get_instance_type()
         return re.match(r'f1\.', instance_type)
+
+
+    @staticmethod
+    def load_msix_workaround(slot=0):
+
+        AwsFpgaTestBase.fpga_clear_local_image(slot)
+
+        logger.info("Loading MSI-X workaround into slot {}".format(slot))
+        AwsFpgaTestBase.fpga_load_local_image(AwsFpgaTestBase.msix_agfi, slot)
+
+        logger.info("Checking slot {} AFI Load status".format(slot))
+        assert AwsFpgaTestBase.check_fpga_afi_loaded(AwsFpgaTestBase.msix_agfi, slot), "{} not loaded in slot {}".format(AwsFpgaTestBase.msix_agfi, slot)
+
+        AwsFpgaTestBase.fpga_clear_local_image(slot)
 
     @staticmethod
     def run_cmd(cmd, echo=False, check=True):
@@ -408,3 +424,18 @@ class AwsFpgaTestBase(object):
         filename = filenames[0]
         assert os.stat(filename).st_size != 0, "{} is 0 size".format(filename)
         return filename
+
+    @staticmethod
+    def get_fio_dma_tools():
+        '''Retrieve fio_dma_tools from S3'''
+        local_path = os.path.join(AwsFpgaTestBase.WORKSPACE, 'sdk/tests/fio_dma_tools/')
+        # If already exists then delete it so that get the latest
+        if os.path.exists(local_path):
+            AwsFpgaTestBase.run_cmd("rm -rf {}".format(local_path), echo=True)
+        logger.info("Downloading fio_dma_tools")
+        s3_path = 's3://' + AwsFpgaTestBase.s3_bucket + '/fio_dma_tools_compiled'
+        # For some reason S3 client doesn't have a native --recursive option so using the CLI
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("aws s3 cp {} {} --recursive".format(s3_path, local_path), echo=True)
+        assert rc == 0
+        assert os.path.exists("{}/scripts/fio".format(local_path))
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("chmod +x {0}/*.sh {0}/scripts/fio".format(local_path))
