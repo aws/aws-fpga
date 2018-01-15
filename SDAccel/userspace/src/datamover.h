@@ -1,6 +1,3 @@
-#ifndef _XDMA_DATA_MOVER_H_
-#define _XDMA_DATA_MOVER_H_
-
 /**
  * Copyright (C) 2016-2017 Xilinx, Inc
  * Author: Sonal Santan
@@ -18,6 +15,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+#ifndef _XDMA_DATA_MOVER_H_
+#define _XDMA_DATA_MOVER_H_
 
 #include <fstream>
 #include <list>
