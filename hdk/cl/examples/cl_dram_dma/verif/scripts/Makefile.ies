@@ -26,12 +26,18 @@ compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
 	cd $(SIM_DIR) && ln -s -f ../ies_complib/cds.lib
 	cd $(SIM_DIR) && ln -s -f ../ies_complib/hdl.var
-	cd $(SIM_DIR) && irun -64bit -elaborate +libext+.v+.sv -disable_sem2009 -l compile.ies.log -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR) -I$(C_INC_DIR) -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f -top tb -top glbl -top $(TEST) +define+SV_TEST +define+SCOPE +define+IES_SIM $(DEFINES) $(TEST_NAME) $(C_FILES) -timescale 1ps/1ps
+	cd $(SIM_DIR) && gcc -fPIC -g -shared -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR) -I$(C_INC_DIR) -DSV_TEST -DSCOPE -o libdpi.so $(C_FILES) -I/`ncroot`/tools/include
+	cd $(SIM_DIR) && irun -64bit -elaborate +libext+.v+.sv -disable_sem2009 -l compile.ies.log -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR) +define+SV_TEST +define+SCOPE +define+IES_SIM -I$(C_INC_DIR) -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f -top tb -top glbl -top $(TEST) $(DEFINES) $(TEST_NAME)  -timescale 1ps/1ps
 
 run:
+
+ifeq ($(TEST),test_null)
+	cd $(SIM_DIR) && irun -R -access +rwc -timescale 1ps/1ps -l $(C_TEST).log $(PLUSARGS) +vpdfile+$(TEST).vpd
+else
 	cd $(SIM_DIR) && irun -R -access +rwc -timescale 1ps/1ps -l $(TEST).log $(PLUSARGS) +vpdfile+$(TEST).vpd
+endif
 
 $(COMPLIB_DIR):
-	cd $(SIM_ROOT)/.. && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
-	cd $(SIM_ROOT)/.. && vivado -mode batch -source create_libs.tcl
-	cd $(SIM_ROOT)/.. && rm -rf create_libs.tcl
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT) && rm -rf create_libs.tcl
