@@ -34,7 +34,3 @@ fi
 if ! source $WORKSPACE/sdaccel_setup.sh; then
     return 1
 fi
-
-if ! source $XILINX_SDX/settings64.sh; then
-    return 1
-fi

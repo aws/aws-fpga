@@ -62,7 +62,6 @@ mv tmp twid_radix4_8.cl
 * To run in software emulation mode, use the following commands.
  ```
 make clean
-source $XILINX_SDX/settings64.sh
 make TARGETS=sw_emu DEVICES=$AWS_PLATFORM all
 ./main -hw=sw_emu
 ```
@@ -70,7 +69,6 @@ make TARGETS=sw_emu DEVICES=$AWS_PLATFORM all
 * To run in hardware emulation mode, use the following commands.
  ```
 make clean
-source $XILINX_SDX/settings64.sh
 make TARGETS=hw_emu DEVICES=$AWS_PLATFORM all
 ./main -hw=hw_emu
 ```
@@ -78,7 +76,6 @@ make TARGETS=hw_emu DEVICES=$AWS_PLATFORM all
 * To run on an F1 instance, use the following commands.
  ```
 make clean
-source $XILINX_SDX/settings64.sh
 make TARGETS=hw DEVICES=$AWS_PLATFORM all
 ./main
 ```
