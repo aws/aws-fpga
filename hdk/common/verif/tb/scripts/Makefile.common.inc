@@ -15,17 +15,17 @@
 
 ifeq ($(QUESTA), 1)
   export SIMULATOR = questa
-  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/questa_complib
+  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/questa/questa_complib
   include Makefile.questa
 else
 ifeq ($(VCS), 1)
   export SIMULATOR = vcs
-  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/vcs_complib
+  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/vcs/vcs_complib
   include Makefile.vcs
 else
 ifeq ($(IES), 1)
   export SIMULATOR = ies
-  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/ies_complib
+  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/ies/ies_complib
   include Makefile.ies
 else
   export SIMULATOR = vivado

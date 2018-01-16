@@ -94,6 +94,8 @@ enum {
 
 	FPGA_ERR_SHELL_MISMATCH = 16,
 
+	FPGA_ERR_POWER_VIOLATION = 17,
+
 	FPGA_ERR_END
 };
 
@@ -107,6 +109,7 @@ enum {
 	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
 	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
 	((error) == FPGA_ERR_SHELL_MISMATCH) ?			    "afi-shell-version-mismatch" : \
+	((error) == FPGA_ERR_POWER_VIOLATION) ?			    "afi-power-violation" : \
 														"internal-error"
 
 
@@ -269,6 +272,11 @@ struct fpga_metrics_common {
 
 	/** FPGA clock metrics */
 	struct fpga_clocks_common clocks[FPGA_MMCM_GROUP_MAX];
+
+	/** Power data from the microcontroller */
+	uint64_t power_mean;
+	uint64_t power_max;
+	uint64_t power;
 } __attribute__((packed));
 
 /** Common int_status */

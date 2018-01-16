@@ -22,6 +22,7 @@ Call using ```pytest test_find_sdaccel_examples.py```
 See TESTING.md for details.
 '''
 
+from __future__ import print_function
 import os
 from os.path import dirname, realpath
 import json
@@ -31,7 +32,7 @@ try:
     from aws_fpga_test_utils.AwsFpgaTestBase import AwsFpgaTestBase
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source shared/bin/setup_test_env.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source shared/bin/setup_test_env.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)

@@ -30,5 +30,10 @@ compile_chk:
 	cd $(SIM_DIR) && xelab -m64 -d ENABLE_PROTOCOL_CHK --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --timescale 1ps/1ps --debug typical --relax --mt 8 -L axi_protocol_checker_v1_1_12 -L axi_clock_converter_v2_1_11 -L generic_baseblocks_v2_1_0 -L axi_infrastructure_v1_1_0 -L axi_register_slice_v2_1_12 -L fifo_generator_v13_1_4 -L axi_data_fifo_v2_1_11 -L axi_crossbar_v2_1_13 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm -sv_lib dpi --snapshot tb xil_defaultlib.tb xil_defaultlib.glbl xil_defaultlib.$(TEST)
 
 run:
-	cd $(SIM_DIR) && xsim -R -log test.log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
+
+ifeq ($(TEST),test_null)
+	cd $(SIM_DIR) && xsim -R -log $(C_TEST).log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
+else
+	cd $(SIM_DIR) && xsim -R -log $(TEST).log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
+endif
 

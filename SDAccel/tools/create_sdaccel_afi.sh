@@ -1,49 +1,33 @@
 #!/bin/bash
 
+# Amazon FPGA Hardware Development Kit
 #
-# Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License"). You may
-# not use this file except in compliance with the License. A copy of the
-# License is located at
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
 #
-#     http://aws.amazon.com/apache2.0/
+#    http://aws.amazon.com/asl/
 #
-# or in the "license" file accompanying this file. This file is distributed
-# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-# express or implied. See the License for the specific language governing
-# permissions and limitations under the License.
-#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e
+
 script=${BASH_SOURCE[0]}
-#if [ $script == $0 ]; then
-#  echo "ERROR: You must source this script"
-#  exit 2
-#fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
-script_dir=$(dirname $full_script)
+
+source $AWS_FPGA_REPO_DIR/shared/bin/message_functions.sh
 
 debug=0
 
-function info_msg {
-  echo -e "AWS FPGA-SDK-INFO: $1"
-}
-
-function debug_msg {
-  if [[ $debug == 0 ]]; then
-    return
-  fi
-  echo -e "AWS FPGA-SDK-DEBUG: $1"
-}
-
-function err_msg {
-  echo -e >&2 "AWS FPGA-SDK-ERROR: $1"
-}
-
 function usage {
-  echo -e "USAGE: $script_name [-d|-debug] [-h|-help] [-s3_bucket=<bucket_name>] [-s3_dcp_key=<S3_folder_of_dcp>] [-s3_logs_key=<S3_folder_of_logs>] [-xclbin=<xclbin_filename>] [-o=<awsxclbin_filename>] [-awsprofile=<aws_profile_name>]"
+   info_msg "USAGE: $script_name [-d|-debug] [-h|-help] [-s3_bucket=<bucket_name>] [-s3_dcp_key=<S3_folder_of_dcp>] [-s3_logs_key=<S3_folder_of_logs>] [-xclbin=<xclbin_filename>] [-o=<awsxclbin_filename>] [-awsprofile=<aws_profile_name>]"
 }
-#FIXME -o
 
 function help {
   info_msg "$script_name"
@@ -54,7 +38,6 @@ function help {
   info_msg "  (*) Read the README on Github and understand the SDAccel workflow (SDAccel/README.md)"
   info_msg "  (*) Generated an XCLBIN using the SDAccel Build flow"
   info_msg "  (*) Ready to create an AFI and test on F1.  Your kernel has been validated using SW/HW Emulation."
-  info_msg "  (*) Prepared your S3 Bucket for AFI Creation.  See Github README for more details"
   info_msg "create_sdaccel_afi.sh will:"
   info_msg "  (1) Split your XCLBIN into two parts:  DCP (.bit) and Metadata (.xml)"
   info_msg "  (2) Generates a Manifest file for AFI creation that sets the clocks based on your achieved target freq from your build"
@@ -65,13 +48,11 @@ function help {
   usage
 }
 
-
-
 if [ "$1" == "" ]
 then
-  echo "ERROR: invalid usage"
-  usage
-  exit 1
+    err_msg "Invalid usage"
+    usage
+    exit 1
 fi
 
 while [ "$1" != "" ]; do
@@ -79,7 +60,7 @@ while [ "$1" != "" ]; do
     VALUE=`echo $1 | awk -F= '{print $2}'`
     case $PARAM in
         -h | --help)
-            usage
+            help
             exit
             ;;
         -xclbin)
@@ -101,7 +82,7 @@ while [ "$1" != "" ]; do
             s3_dcps=$VALUE
             ;;
         *)
-            echo "ERROR: unknown parameter \"$PARAM\""
+            err_msg "Unknown parameter \"$PARAM\""
             usage
             exit 1
             ;;
@@ -112,17 +93,18 @@ done
 
 if [[ -e "$xclbin" ]]
 then
-    echo "Found xclbin '$xclbin'"
+    info_msg "Found xclbin '$xclbin'"
 else
-    echo "Error: File '$xclbin' is not found"
+    err_msg "File '$xclbin' not found"
     exit 1
 fi
 
 stripped_xclbin=$(basename $xclbin)
 ext_xclbin=${stripped_xclbin##*.}
 stripped_xclbin=${stripped_xclbin%.*}
-echo $stripped_xclbin
- 
+
+info_msg "$stripped_xclbin"
+
 if [ "$awsxclbin" == "" ]
 then
     awsxclbin=$stripped_xclbin
@@ -131,45 +113,31 @@ fi
 
 if [ "$awsxclbin" != "$stripped_xclbin" ]
 then
-    echo "WARNING!!!"
-    echo "Warning: $awsxclbin does not match $stripped_xclbin"
-    echo "Warning: For github examples, -o <xclbin_filename> must be equal to $stripped_xclbin"
-    echo "WARNING!!!"
+    warn_msg "$awsxclbin does not match $stripped_xclbin"
+    warn_msg "For github examples, -o <xclbin_filename> must be equal to $stripped_xclbin"
 fi
 
 if [[ -e "$awsxclbin" ]]
 then
-    echo "Error: File '$awsxclbin' already exists"
+    err_msg "File '$awsxclbin' already exists"
     exit 1
 fi
 
-if [ "$s3_bucket" == "" ]
+if [ ":$s3_bucket" == ":" ]
 then
-  echo "ERROR: invalid s3_bucket"
-  usage
-  exit 1
+    err_msg "Invalid s3_bucket"
+    usage
+    exit 1
 fi
 
-if [ "$s3_logs" == "" ]
-then
-  echo "ERROR: invalid s3_logs key"
-  usage
-  exit 1
-fi
-
+# s3 logs is not required
+# s3 dcp key is required
 if [ "$s3_dcps" == "" ]
 then
-  echo "ERROR: invalid s3_dcps key"
-  usage
-  exit 1
+    err_msg "Invalid s3_dcps key"
+    usage
+    exit 1
 fi
-
-#echo $xclbin
-#echo $awsxclbin
-#echo $aws_profile_name
-#echo $s3_bucket
-#echo $s3_logs
-#echo $s3_dcps
 
 timestamp=$(date +"%y_%m_%d-%H%M%S")
 
@@ -184,24 +152,25 @@ timestamp=$(date +"%y_%m_%d-%H%M%S")
 #STEP 1
 #Strip XCLBIN to get DCP for ingestion
 $XILINX_SDX/runtime/bin/xclbinsplit -o ${timestamp} $xclbin
+
 if [[ -e "${timestamp}-primary.bit" ]]
 then
-    echo "Split DCP from xclbin: ${timestamp}-primary.bit"
+    info_msg "Split DCP from xclbin: ${timestamp}-primary.bit"
 else
-    echo "Error: File ${timestamp}-primary.bit is not found"
+    err_msg "File ${timestamp}-primary.bit not found"
     exit 1
 fi
 if [[ -e "${timestamp}-xclbin.xml" ]]
 then
-    echo "Split Metadata from xclbin: ${timestamp}-primary.bit"
+    info_msg "Split Metadata from xclbin: ${timestamp}-primary.bit"
 else
-    echo "Error: File ${timestamp}-xclbin.xml is not found"
+    err_msg "File ${timestamp}-xclbin.xml not found"
     exit 1
 fi
 
 if [[ -d "to_aws" ]]
 then
-    echo "Error: Directory to_aws already exists"
+    err_msg "Directory to_aws already exists"
     exit 1
 fi
 
@@ -211,40 +180,34 @@ cp ${timestamp}-primary.bit to_aws/${timestamp}_SH_CL_routed.dcp
 #STEP 2
 #Create Manifest file
 strategy=DEFAULT
-hdk_version=1.3.2
-#FIXME hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
-shell_version=0x071417d3
-#FIXME shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
+hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
+shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
 device_id=0xF000
 vendor_id=0x1D0F
-#FIXME id0_version=$(grep 'CL_SH_ID0' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
-#FIXME device_id="0x${id0_version:0:4}";
-#FIXME vendor_id="0x${id0_version:4:4}";
 subsystem_id=0x1D51
 subsystem_vendor_id=0xFEDD
-#FIXME id1_version=$(grep 'CL_SH_ID1' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
-#FIXME subsystem_id="0x${id1_version:0:4}";
-#FIXME subsystem_vendor_id="0x${id1_version:4:4}";
-
 clock_main_a0=$(echo 'cat //project/platform/device/systemClocks/clock/@frequency' | xmllint --shell "${timestamp}-xclbin.xml" | grep -v ">" | cut -f 2 -d "=" | tr -d MHz\" | xargs printf "%.0f");
 clock_extra_b0=$(echo 'cat //project/platform/device/core/kernelClocks/clock[2]/@frequency' | xmllint --shell "${timestamp}-xclbin.xml" | grep -v ">" | cut -f 2 -d "=" | tr -d MHz\" | xargs printf "%.0f");
 clock_extra_c0=$(echo 'cat //project/platform/device/core/kernelClocks/clock[1]/@frequency' | xmllint --shell "${timestamp}-xclbin.xml" | grep -v ">" | cut -f 2 -d "=" | tr -d MHz\" | xargs printf "%.0f");
-
-#echo "$clock_main_a0"
-#echo "$clock_extra_b0"
-#echo "$clock_extra_c0"
-
 board_id=$(echo 'cat //project/platform/@boardid' | xmllint --shell "${timestamp}-xclbin.xml" | grep -v ">" | cut -f 2 -d "=" | tr -d \");
+
+#id0_version=$(grep 'CL_SH_ID0' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+#device_id="0x${id0_version:0:4}";
+#vendor_id="0x${id0_version:4:4}";
+#id1_version=$(grep 'CL_SH_ID1' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+#subsystem_id="0x${id1_version:0:4}";
+#subsystem_vendor_id="0x${id1_version:4:4}";
+
 if [[ "$board_id" != "aws-vu9p-f1" ]]
-then 
-    echo "Error: Platform $board_id used to create xclbin is not correct, you should be using aws-vu9p-f1"
+then
+    err_msg "Platform $board_id used to create xclbin is not correct, you should be using aws-vu9p-f1"
     exit
 fi
 
-
+#Write Manifest File here
 hash=$( sha256sum  to_aws/${timestamp}_SH_CL_routed.dcp | awk '{ print $1 }' )
-FILENAME="${timestamp}_manifest.txt"
-exec 3<>$FILENAME
+manifest_file="${timestamp}_manifest.txt"
+exec 3<>$manifest_file
 echo "manifest_format_version=1" >&3
 echo "pci_vendor_id=$vendor_id" >&3
 echo "pci_device_id=$device_id" >&3
@@ -261,14 +224,14 @@ echo "clock_extra_c0=$clock_extra_c0" >&3
 exec 3>&-
 exec 3>&-
 
-if [[ -e "$FILENAME" ]]
+if [[ -e "$manifest_file" ]]
 then
-    echo "Generated manifest file '$FILENAME'"
+    info_msg "Generated manifest file '$manifest_file'"
 else
-    echo "Error: File '$FILENAME' is not found"
+    err_msg "File '$manifest_file' not found"
     exit 1
 fi
-cp $FILENAME to_aws/$FILENAME
+cp $manifest_file to_aws/$manifest_file
 
 
 #STEP 3
@@ -278,14 +241,20 @@ tar -cf ${timestamp}_Developer_SDAccel_Kernel.tar to_aws/${timestamp}_SH_CL_rout
 
 #STEP 4
 #Call create-fpga-image
-if [ "$aws_profile_name" == "" ]
+profile_text=""
+if [ "$aws_profile_name" != "" ]
 then
-  aws s3 cp ${timestamp}_Developer_SDAccel_Kernel.tar s3://${s3_bucket}/${s3_dcps}/
-  aws ec2 create-fpga-image --name ${xclbin} --description ${xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar --logs-storage-location Bucket=${s3_bucket},Key=${s3_logs} > ${timestamp}_afi_id.txt
-else
-  aws s3 --profile ${aws_profile_name} cp ${timestamp}_Developer_SDAccel_Kernel.tar s3://${s3_bucket}/${s3_dcps}/
-  aws ec2 --profile ${aws_profile_name} create-fpga-image --name ${xclbin} --description ${xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar --logs-storage-location Bucket=${s3_bucket},Key=${s3_logs} > ${timestamp}_afi_id.txt
+    profile_text="--profile ${aws_profile_name}"
 fi
+
+log_storage_text=""
+if [ "${s3_logs}" != "" ]
+then
+    log_storage_text="--logs-storage-location Bucket=${s3_bucket},Key=${s3_logs}"
+fi
+
+aws s3 ${profile_text} cp ${timestamp}_Developer_SDAccel_Kernel.tar s3://${s3_bucket}/${s3_dcps}/
+aws ec2 ${profile_text} create-fpga-image --name ${xclbin} --description ${xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar ${log_storage_text} > ${timestamp}_afi_id.txt
 
 
 #STEP 5
@@ -296,4 +265,6 @@ echo ${timestamp}_agfi_id.txt
 
 #STEP 6
 #Create .awsxclbin
+
+info_msg "Calling $XILINX_SDX/runtime/bin/xclbincat -b ${timestamp}_agfi_id.txt -m ${timestamp}-xclbin.xml -n header.bin -o ${awsxclbin}.awsxclbin"
 $XILINX_SDX/runtime/bin/xclbincat -b ${timestamp}_agfi_id.txt -m ${timestamp}-xclbin.xml -n header.bin -o ${awsxclbin}.awsxclbin

@@ -21,7 +21,7 @@
 * FPGA to FPGA over the 400Gbps Ring for F1.16xl
 * Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
-* Cadence RTL simulations tools
+* Cadence Xcelium simulations tools
 * PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)
 
 ## Known Bugs/Issues

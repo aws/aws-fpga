@@ -211,7 +211,8 @@ int dma_example(int slot_id) {
      * before read is done
      */
 
-    fsync(fd);
+    rc = fsync(fd);
+    fail_on((rc = (rc < 0)? errno:0), out, "call to fsync failed.");
 
     for (channel=0; channel < 4; channel++) {
         size_t read_offset = 0;
