@@ -110,6 +110,7 @@ The developer can create multiple AFIs at no extra cost, up to a defined limited
 AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and eu-west-1 (Ireland).
 
 
+
 **Q: What is the process for creating an AFI?**
 
 The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md). Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
@@ -136,6 +137,20 @@ Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to rev
 Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
 
 Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to restrict access to this API.
+
+**Q: Can I share an AFI with other AWS accounts?**
+
+Yes, sharing allows accounts other than the owner account to load and use an AFI.  Use [modify-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to update `loadPermission` attribute to grant/remove AFI load permission.  AWS AFIs support two load permission types:
+* `UserId`: share AFI with specific AWS accounts using account IDs.
+* `UserGroups`: only supports `all` group to make an AFI public or private.
+
+Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to revoke all load permissions.
+
+**Q: Can I delete an AFI?**
+
+Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
+
+Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to resrict access to this API.
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 
@@ -170,7 +185,7 @@ No. AWS supports a cloud-only development model and provides the necessary eleme
 
 **Q: Do I need to design for a specific power envelope?**
 
-Yes, the design scripts provided in the HDK include checks for power consumption that exceeds the allocated power for the Custom Logic (CL) region. Developers do not need to include design considerations for DRAM, Shell, or Thermal. AWS includes the design considerations for those as part of providing the power envelop for the CL region.
+Yes, the Xilinx UltraScale+ FPGA devices used on the F1 instances have a maximum power limit that must be maintained.  If a loaded AFI consumes maximum power, the F1 instance will automatically gate the input clocks provided to the AFI in order to prevent errors within the FPGA. Developers are provided warnings when power (Vccint) is greater than 85 watts.  Above that level, the CL is in danger of being clock gated.  [Additional details on AFI power](hdk/docs/afi_power.md)
 
 
 **Q: What IP blocks are provided in the HDK?**

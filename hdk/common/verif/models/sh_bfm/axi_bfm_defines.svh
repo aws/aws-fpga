@@ -13,8 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-`ifndef AXI_BFM_DEFINES
-`define AXI_BFM_DEFINES
+
 
 typedef struct {
    logic [63:0] addr;
@@ -32,4 +31,3 @@ typedef struct {
    logic         last;
 } AXI_Data;
 
-`endif

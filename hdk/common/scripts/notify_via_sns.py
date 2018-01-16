@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import argparse
 import boto3
 import logging
@@ -26,7 +27,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__file__)
@@ -44,10 +45,10 @@ if __name__ == '__main__':
     parser.add_argument('--email', action='store', required=False, default=None, help="Email address to subscribe to the SNS topic. If not specified must set EMAIL environment variable.")
     parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
-    
+
     if args.debug:
         logger.setLevel(logging.DEBUG)
-        
+
     if args.email:
         email = args.email
     else:
@@ -55,14 +56,14 @@ if __name__ == '__main__':
             logger.error('Set email address via --email or the EMAIL environment variable.')
             sys.exit(1)
         email = os.environ['EMAIL']
-        
+
     topic_name = args.sns_topic
-    
+
     topic_arn = aws_fpga_utils.create_sns_subscription(topic_name, email)
-    
+
     sns_client = boto3.client('sns')
     pub_resp = sns_client.publish(TopicArn=topic_arn,
                            Message='Your FPGA CL build is complete.',
                            Subject='Your FPGA CL build is complete.')
-    
+
     sys.exit(0)

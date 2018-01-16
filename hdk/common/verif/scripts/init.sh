@@ -81,7 +81,7 @@ cp $ddr4_imports_dir/ddr4_db_delay_model.sv      $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_db_dly_dir.sv          $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_dimm.sv                $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_dir_detect.sv          $ddr4_rdimm_model_dir/
-cp $ddr4_imports_dir/ddr4_rank.sv                $ddr4_rdimm_model_dir/
+#cp $ddr4_imports_dir/ddr4_rank.sv                $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_rcd_model.sv           $ddr4_rdimm_model_dir/
 cp $ddr4_imports_dir/ddr4_rdimm_wrapper.sv       $ddr4_rdimm_model_dir/
 

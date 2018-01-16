@@ -222,6 +222,17 @@ The following FPGA image hardware metrics are provided. PCIe related counters co
 * `DDR-A write-count` or `DDR-A read-count` (64-bit) (same for `DDR-B`, `DDR-C` or `DDR-D`)
    * Counting the number of bus-beats (512-bit or 64Bytes) on the DRAM controller interface.
 
+* `Clock Group A Frequency ` (32-bit) (same for `Clock Group B` or `Clock Group C`)
+   * The programmed frequency of each output clock, in Mhz rounded down. Programmed frequency in hz is available via the SDK. 
+
+* `Power consumption (Vccint) - Last measured` (32-bit)
+   * The measured power value of the Vccint power supply to the AFI in watts, updated every minute. Used to determine how close the AFI is to the maximum power draw.
+
+* `Power consumption (Vccint) - Average` (32-bit)
+   * The average measured power value of the Vccint power supply to the AFI in watts over the lifetime of the current AFI load. Updated every minute. Used to determine how close the AFI is to the maximum power draw.
+
+* `Power consumption (Vccint) - Max measured` (32-bit)
+   * The maximum sampled power value of the Vccint power supply to the AFI in watts, sampled frequently but updated every minute. The maximum is computed over the time the current AFI has been loaded, except that samples up to a minute after the AFI is first loaded are ignored. Max measured therefore does not include short term, on load power usage. Used to determine how close the AFI is to the maximum power draw.
 
 ## FAQ
 
@@ -264,6 +275,9 @@ into the given `fpga-image-slot`.
 * **Q: Can the AFI Management Tools work concurrently from multiple processes on the same FPGA?**
    * Without synchronization between processes, the tools should only be executed as one worker process per FPGA (highest level of concurrency), or one worker process across all FPGAs (least level of concurrency).
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results. 
+   
+* **Q: What is an afi-power-violation?**
+   * The F1 system can only reliably provide a certain amount of power to the FPGA. If an AFI consumes more than this amount of power, the F1 system will disable the input clocks to the AFI. For more information on preventing, detecting, and recovering from this state, see [F1 power guide](../../../hdk/docs/afi_power.md)
 
 * **Q: How can I reset the AFI?**
    * The AFI may be reset (reloaded) via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import argparse
 import boto3
 import datetime
@@ -29,7 +30,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__file__)
@@ -53,16 +54,16 @@ if __name__ == '__main__':
     parser.add_argument('--email', action='store', required=False, default=None, help="Email address to subscribe to the SNS topic.")
     parser.add_argument('--debug', action='store_true', default=False, help="Enable debug messages")
     args = parser.parse_args()
-    
+
     if args.debug:
         logger.setLevel(logging.DEBUG)
-    
+
     start_time = datetime.utcnow()
-    
+
     max_duration = timedelta(minutes=args.max_minutes)
-    
+
     logger.info("Waiting for {} generation to complete.".format(args.afi))
-    
+
     if args.notify:
         if not args.email:
             logger.error("--email required with --notify.")
@@ -70,9 +71,9 @@ if __name__ == '__main__':
         email = args.email
         topic_name = args.sns_topic
         logger.info("Will subscribe {} to SNS topic {} and notify the topic when complete".format(email, topic_name))
-        
+
         topic_arn = aws_fpga_utils.create_sns_subscription(topic_name, email)
-        
+
     # Wait for create-fpga-image to complete
     ec2_client = boto3.client('ec2')
     create_fpga_image_complete = False
@@ -94,7 +95,7 @@ if __name__ == '__main__':
                 sys.exit(1)
             time.sleep(SLEEP_SECONDS)
     passed = afi_state == 'available'
-    
+
     if args.notify:
         if passed:
             subject = "create-fpga-image of {} passed".format(args.afi)
