@@ -75,6 +75,10 @@ struct ec2_fpga_cmd {
 	uint32_t opcode;
 	/** The AFI slot */
 	uint32_t afi_slot;
+	/** Requested clock frequencies for each clock group */
+	uint32_t clock_a0_freq;
+	uint32_t clock_b0_freq;
+	uint32_t clock_c0_freq;
 	/** The AFI ID */
 	char	 afi_id[AFI_ID_STR_MAX];
 	/** 

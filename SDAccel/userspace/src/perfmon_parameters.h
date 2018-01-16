@@ -1,6 +1,36 @@
+/**
+ * Copyright (C) 2016-2017 Xilinx, Inc
+ * Author: Sonal Santan
+ * XDMA HAL multi-threading safe, multi-channel DMA read/write support
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may
+ * not use this file except in compliance with the License. A copy of the
+ * License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+
 /*
  * Performance Monitoring Internal Parameters
- * NOTE: partially taken from file xaxipmon_hw.h in v5.0 of APM driver
+ *  Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may
+ * not use this file except in compliance with the License. A copy of the
+ * License is located at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
  */
 
 #ifndef _PERFMON_PARAMETERS_H
@@ -99,7 +129,7 @@
 #define XAPM_SINC8_OFFSET               0x0284  /**< Sampled Incrementer 8 Register */
 #define XAPM_SMC9_OFFSET                0x0290  /**< Sampled Metric Counter 9 Register */
 #define XAPM_SINC9_OFFSET               0x0294  /**< Sampled Incrementer 9 Register */
-                                        
+
 #define XAPM_MC10_OFFSET                0x01A0  /**< Metric Counter 10 Register */
 #define XAPM_MC11_OFFSET                0x01B0  /**< Metric Counter 11 Register */
 #define XAPM_MC12_OFFSET                0x0500  /**< Metric Counter 12 Register */
@@ -138,7 +168,7 @@
 #define XAPM_MC45_OFFSET                0x0990  /**< Metric Counter 45 Register */
 #define XAPM_MC46_OFFSET                0x09A0  /**< Metric Counter 46 Register */
 #define XAPM_MC47_OFFSET                0x09B0  /**< Metric Counter 47 Register */
-                                        
+
 #define XAPM_SMC10_OFFSET               0x02A0  /**< Sampled Metric Counter 10 Register */
 #define XAPM_SMC11_OFFSET               0x02B0  /**< Sampled Metric Counter 11 Register */
 #define XAPM_SMC12_OFFSET               0x0600  /**< Sampled Metric Counter 12 Register */
@@ -194,7 +224,7 @@
 #define XAPM_SMC61_OFFSET               0x0A58  /**< Sampled Metric Counter 61 Register */
 #define XAPM_SMC62_OFFSET               0x0AB4  /**< Sampled Metric Counter 62 Register */
 #define XAPM_SMC63_OFFSET               0x0AB8  /**< Sampled Metric Counter 63 Register */
-                                        
+
 #define XAPM_CTL_OFFSET                 0x0300  /**< Control Register */
 #define XAPM_ID_OFFSET                  0x0304  /**< Latency ID Register */
 #define XAPM_IDMASK_OFFSET              0x0308  /**< ID Mask Register */

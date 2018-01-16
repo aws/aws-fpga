@@ -23,6 +23,7 @@ Call using ```pytest test_md_links.py```
 See TESTING.md for details.
 '''
 
+from __future__ import print_function
 import os
 from os.path import dirname, realpath
 import pytest
@@ -34,7 +35,7 @@ try:
     import aws_fpga_utils
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh or shared/tests/bin/setup_test_env*.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh or shared/tests/bin/setup_test_env*.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
@@ -42,19 +43,22 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestMdLinks(AwsFpgaTestBase):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
     '''
-    
-    @staticmethod
-    def setup_class(self):
+
+    @classmethod
+    def setup_class(cls):
         '''
         Do any setup required for tests.
         '''
-        AwsFpgaTestBase.setup_class(self, __file__)
+        AwsFpgaTestBase.setup_class(cls, __file__)
         return
-    
+
     def test_md_links(self):
-        rc = os.system(self.test_dir + "/bin/check_md_links.py --exclude SDAccel/examples/xilinx")
+        cmd = self.test_dir + "/bin/check_md_links.py"
+        cmd += " --exclude SDAccel/examples/xilinx"
+        # This is a valid link but sometimes it 404s
+        cmd += " --ignore-url https://docs.pytest.org/en/latest/"
+        (rc, stdout, stderr) = self.run_cmd(cmd, echo=True)
         assert rc == 0
-        

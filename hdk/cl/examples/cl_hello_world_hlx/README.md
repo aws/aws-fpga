@@ -50,6 +50,28 @@ Type in the following in the TCL console.
 
 run -all
 
+### DPI Simulation with test\_hello\_world.c
+
+Right click on SIMULATION in the Project Manager and select Simulation Settings.
+
+For Verilog options select the ... box and modify TEST\_NAME to test_null to disable sv stimulus.
+
+`TEST_NAME = test_null`
+
+In the TCL console in Vivado project, copy and paste the following command to set the path for the creation of the .so with test\_hello\_world.c script
+
+If using 3rd party simulators, modify the command to match the simulator and the path to dpi.tcl instead of dpi_xsim.tcl (see IP Integrator - Frequently Asked Questions documentation in using 3rd party simulators).
+
+`set_property -name {xsim.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../hlx_examples/build/RTL/cl_hello_world/verif/scripts/dpi_xsim.tcl -objects [get_filesets sim_1]`
+
+Right click on SIMULATION in the Project Manager and select Simulation Settings.
+
+In the Elaboration tab, for xsim.elaborate.xelab.more_options add in the following value.  Settings can be different based upon the simulator.
+
+`-sv_lib dpi`
+
+Certain 3rd party simulators might need the explicit include path to the design directory for provided RTL example designs like cl\_hello\_world and cl\_dram\_dma.  For Verilog options select the ... box and click the + button under Verilog Include Files Search Paths.  Select the path to the cl/cl\_example/design directory.
+
 ### Implementing the Design/Tar file
 
 In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.

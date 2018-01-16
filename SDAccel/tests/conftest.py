@@ -23,10 +23,11 @@ import pytest
 
 def pytest_addoption(parser):
     parser.addoption("--examplePath", action="store", required=False, type=str,
-        help="Path to the Xilinx Example to test")
+        help="Path to the Xilinx Example to test", default="SDAccel/examples/xilinx/getting_started/host/helloworld_ocl")
 
 def pytest_generate_tests(metafunc):
-    if metafunc.module.__name__ == 'test_run_sdaccel_examples' :
+
+    if metafunc.cls.ADD_EXAMPLEPATH:
         print("Configuring parameters of {}::{}".format(metafunc.module.__name__, metafunc.function.__name__))
         print("examplePath = " + metafunc.config.getoption('examplePath'))
         metafunc.parametrize("examplePath", [metafunc.config.getoption('examplePath')])

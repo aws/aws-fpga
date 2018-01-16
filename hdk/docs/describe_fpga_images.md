@@ -69,46 +69,46 @@ The following response shows the AFI information provided by `describe-fpga-imag
 
 ## Example usage
 
-* Get all AFIs accessible to caller AWS account
+* Get all AFIs accessible to caller AWS account:
 ```
     $ aws ec2 describe-fpga-images
 ```
 
-* Get AFI using specific AFI ID.  Information is provided only if caller has access to AFI.
+* Get AFI using a specific AFI ID:
 ```
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a
 ```
 
-* Get multiple AFIs by AFI IDs
+* Get multiple AFIs by AFI IDs:
 ```
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeea2a afi-0f0927bc2649e6259
 ```
 
-* Get AFIs owned by caller AWS account.  Excludes public AFIs and AFIs with load permissions.
+* Get AFIs owned by caller AWS account (i.e., exclude public AFIs and AFIs with load permissions):
 ```
     $ aws ec2 describe-fpga-images --owners self
 ```
 
-* Get public AFIs owned by Amazon (this is the command use to retrieve the example response)
+* Get public AFIs owned by Amazon (this is the command used to retrieve the example response):
 ```
     $ aws ec2 describe-fpga-images --owners amazon
 ```
 
-* Get AFIs owned by AWS marketplace.
+* Get AFIs owned by [AWS Marketplace](https://aws.amazon.com/marketplace):
 ```
     $ aws ec2 describe-fpga-images --owners aws-marketplace
 ```
 
-* Get AFIs using explicit AWS account ID.
+* Get AFIs using explicit AWS account ID:
 ```
     $ aws ec2 describe-fpga-images --owners 095707098027
 ```
 
 ### Use filters parameter
 
-* Get AFIs using various filters
+* Get AFIs using various filters:
 ```
-    # Get AFI by name
+    # Get AFIs by name
     $ aws ec2 describe-fpga-images --filters "Name=name,Values=cl_dram_dma_0415"
 
     # Get AFIs in 'available' state
@@ -117,11 +117,35 @@ The following response shows the AFI information provided by `describe-fpga-imag
     # Get AFIs with shell version 0x04151701
     $ aws ec2 describe-fpga-images --filters "Name=shell-version,Values=0x04151701"
 
-    # Get AFI created at a specific time
+    # Get AFIs created at a specific time
     $ aws ec2 describe-fpga-images --filters "Name=create-time,Values=2017-04-17T15:58:54.000Z"
 ```
 
-* Get AFIs using wildcard filters (wildcards only usable in `filters` parameter)
+* Get AFIs using EC2 tagging filters (manage EC2 tags using
+[`create-tags`](https://docs.aws.amazon.com/cli/latest/reference/ec2/create-tags.html),
+[`describe-tags`](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html)
+and [`delete-tags`](https://docs.aws.amazon.com/cli/latest/reference/ec2/delete-tags.html)):
+```
+    # Create a tag with key="key_1" and value="value_1"
+    $ aws ec2 create-tags --resources afi-06d0ffc989feeea2a --tags Key=key_1,Value=value_1
+
+    # Get all AFIs with tags
+    $ aws ec2 describe-tags --filters "Name=resource-type,Values=fpga-image"
+
+    # Get the tags for a specific AFI ID
+    $ aws ec2 describe-tags --filters "Name=resource-id,Values=afi-06d0ffc989feeea2a"
+
+    # Get AFIs with a tag key "key_1"
+    $ aws ec2 describe-fpga-images --filters "Name=tag-key,Values=key_1"
+
+    # Get AFIs with a tag value "value_1"
+    $ aws ec2 describe-fpga-images --filters "Name=tag-value,Values=value"
+
+    # Get AFIs with a tag key/value pair "key_1/value_1"
+    $ aws ec2 describe-fpga-images --filters "Name=tag:key_1,Values=value_1"
+```
+
+* Get AFIs using wildcard filters (wildcards only usable in `filters` parameter):
 ```
     # Get AFIs created on 2017-04-17
     $ aws ec2 describe-fpga-images --filters "Name=create-time,Values=2017-04-17*"
@@ -136,12 +160,12 @@ The following response shows the AFI information provided by `describe-fpga-imag
 
 ### Combine filters to find groups of AFIs
 
-* Get all failed AFIs owned by caller AWS account
+* Get all failed AFIs owned by caller AWS account:
 ```
     $ aws ec2 describe-fpga-images --owners self --filters "Name=state,Values=failed"
 ```
 
-* Multiple filter values are evaluated as `OR` conditions
+* Multiple filter values are evaluated as `OR` conditions:
 ```
     # Get both example AFIs by name
     $ aws ec2 describe-fpga-images --filters "Name=name,Values=cl_dram_dma_0415,cl_hellow_world_04151701"
@@ -150,7 +174,7 @@ The following response shows the AFI information provided by `describe-fpga-imag
     $ aws ec2 describe-fpga-images --filters "Name=create-time,Values=2017-04-17*,2017-04-19*"
 ```
 
-* Multiple filters are evaluated as `AND` conditions
+* Multiple filters are evaluated as `AND` conditions:
 ```
     # Get AFIs by name AND created on 2017-04-17
     $ aws ec2 describe-fpga-images --filters "Name=name,Values=cl_dram_dma_0415,cl_hellow_world_04151701" "Name=create-time,Values=2017-04-17*"
@@ -175,28 +199,28 @@ Find details on all available formatting options in [Controlling Command Output 
 ## Common Error Messages
 
 
-* Invalid owner ID or filter alias
+* Invalid owner ID or filter alias:
 ```
     $ aws ec2 describe-fpga-images --owners 12345
 
     An error occurred (InvalidUserID.Malformed) when calling the DescribeFpgaImages operation: User ID '12345' is invalid
 ```
 
-* Invalid AFI ID
+* Invalid AFI ID:
 ```
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-06d0ffc989feeeXXX
 
     An error occurred (InvalidFpgaImageID.Malformed) when calling the DescribeFpgaImages operation: Image ID 'afi-06d0ffc989feeeXXX' is invalid
 ```
 
-* AFI ID not found
+* AFI ID not found:
 ```
     $ aws ec2 describe-fpga-images --fpga-image-ids afi-03d027a3318440a77
 
     An error occurred (InvalidFpgaImageID.NotFound) when calling the DescribeFpgaImages operation: Image ID 'afi-03d027a3318440a77' not found
 ```
 
-* Invalid filter name
+* Invalid filter name:
 ```
     $ aws ec2 describe-fpga-images --filters "Name=bad-filter,Values=value"
 

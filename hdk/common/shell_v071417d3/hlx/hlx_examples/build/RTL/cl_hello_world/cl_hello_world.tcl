@@ -65,7 +65,10 @@ set_property is_enabled false [get_files */cl_pnr_user.xdc]
 set ::env(PNR_USER) [get_files */cl_pnr_user.xdc]			
 
 
+add_files -fileset sim_1 -norecurse ${CL_VERIF_DIR}/test_null.sv
+add_files -fileset sim_1 -norecurse ${CL_VERIF_DIR}/test_gl_cntr.sv
 add_files -fileset sim_1 -norecurse ${CL_VERIF_DIR}/test_hello_world.sv
+
 update_compile_order -fileset sim_1
 
 set_property verilog_define {CL_NAME=cl_hello_world TEST_NAME=test_hello_world} [get_filesets sim_1]

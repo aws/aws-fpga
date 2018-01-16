@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2015-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -23,8 +23,16 @@
 
 #include <hal/fpga_common.h>
 
-#define AFI_CMD_API_VERSION	2
 #define AFI_CMD_DATA_LEN	512 
+
+
+#define AFI_CMD_API_MAJOR_VERSION      0x2
+#define AFI_CMD_API_MINOR_VERSION      0x1
+#define AFI_CMD_API_VERSION    (AFI_CMD_API_MINOR_VERSION << 16) | AFI_CMD_API_MAJOR_VERSION
+
+
+#define MINOR_VERSION(X)       ((X >> 16) & 0xFFFF)
+#define MAJOR_VERSION(X)       (X & 0xFFFF)
 
 /** 
  * AFI Protocol:
@@ -96,6 +104,7 @@ struct afi_cmd_load_req {
 	struct fpga_meta_ids	ids;
 	uint32_t				fpga_cmd_flags; /**< e.g. see FPGA_CMD_ALL_FLAGS */
 	struct fpga_common_cfg  cfg;
+	struct fpga_clocks_common clock_frequencies[FPGA_MMCM_GROUP_MAX];
 } __attribute__((packed));
 
 /**< Metrics AFI request */

@@ -127,9 +127,9 @@ afi_get_next_id(void)
  * @param[in,out]	len		cmd len
  */
 void 
-fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id,
-	uint32_t flags)
+fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, union fpga_mgmt_load_local_image_options *opt)
 {
+	int i;
 	assert(cmd);
 	assert(len);
 	struct afi_cmd_load_req *req = (void *)cmd->body;
@@ -143,10 +143,13 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, const char *afi_id,
 	afi_cmd_hdr_set_flags(cmd, 0);
 
 	/** Fill in cmd body */
-	strncpy(req->ids.afi_id, afi_id, sizeof(req->ids.afi_id)); 
+	strncpy(req->ids.afi_id, opt->afi_id, sizeof(req->ids.afi_id)); 
 	req->ids.afi_id[sizeof(req->ids.afi_id) - 1] = 0; 
 
-	req->fpga_cmd_flags = flags;
+	req->fpga_cmd_flags = opt->flags;
+	for (i = 0; i<FPGA_MMCM_GROUP_MAX; i++){
+		req->clock_frequencies[i].frequency[0] = 1000000 * opt->clock_mains[i];
+	}
 
 	*len = sizeof(struct afi_cmd_hdr) + payload_len;
 }
@@ -239,7 +242,7 @@ err:
 }
 
 
-static int
+int 
 fpga_mgmt_mbox_attach(int slot_id)
 {
 	/* slot_id not validated on internal function */
@@ -271,7 +274,7 @@ err:
 	return FPGA_ERR_FAIL;
 }
 
-static int
+int 
 fpga_mgmt_mbox_detach(int slot_id)
 {
 	if (fpga_mgmt_state.slots[slot_id].handle != PCI_BAR_HANDLE_INIT) {
@@ -294,7 +297,8 @@ fpga_mgmt_mbox_detach(int slot_id)
 	return 0;
 }
 
-int fpga_mgmt_detach_all(void)
+int 
+fpga_mgmt_detach_all(void)
 {
 	int ret = 0;
 	for (unsigned int i = 0; i < sizeof_array(fpga_mgmt_state.slots); ++i) {
@@ -330,9 +334,9 @@ fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
 		tmp_len += sizeof(err_info->afi_cmd_version);
 		fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
 				len, tmp_len);
-
 		log_error("Error: Please upgrade from aws-fpga github to AFI CMD API Version: v%u\n",
 				err_info->afi_cmd_version);
+
 	}
 
 	return err_rsp->error;
@@ -362,7 +366,7 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 	fail_on(!rsp, err, "rsp == NULL");
 
 	/** Version */
-	fail_on(cmd->hdr.version != rsp->hdr.version, err,
+	fail_on(MAJOR_VERSION(cmd->hdr.version) != MAJOR_VERSION(rsp->hdr.version), err,
 			"cmd_ver(%u) != rsp_ver(%u), cmd_id=0x%08x",
 			cmd->hdr.version, rsp->hdr.version, cmd->hdr.id);
 
@@ -443,24 +447,22 @@ int
 fpga_mgmt_process_cmd(int slot_id,
 	const union afi_cmd *cmd, union afi_cmd *rsp, uint32_t *len)
 {
-	int ret, ret2;
+	bool attached = false;
+	int ret;
 
 	fail_slot_id(slot_id, err, ret);
 
 	ret = fpga_mgmt_mbox_attach(slot_id);
 	fail_on(ret, err, "fpga_mgmt_mbox_attach failed");
 
+	attached = true;
+
 	ret = fpga_mgmt_send_cmd(slot_id, cmd, rsp, len);
-	fail_on(ret, err_detach, "fpga_mgmt_send_cmd failed");
-
-	return 0;
-err_detach:
-	ret2 = fpga_mgmt_mbox_detach(slot_id);
+	fail_on(ret, err, "fpga_mgmt_send_cmd failed");
 err:
-	if (ret) {
-		return ret;
-	} else {
-		return ret2;
-	}
-}
+	if (attached) {
+		fpga_mgmt_mbox_detach(slot_id);
+	}	
 
+	return ret;
+}

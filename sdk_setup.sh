@@ -31,19 +31,12 @@ source $script_dir/shared/bin/message_functions.sh
 
 source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
 
-export SDK_DIR=${SDK_DIR:=$script_dir/sdk}
+source $script_dir/shared/bin/set_common_env_vars.sh
 
-# Update PYTHONPATH with libraries used for unit testing
-python_lib=$AWS_FPGA_REPO_DIR/shared/lib
-export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
-PYTHONPATH=$python_lib:$PYTHONPATH
-
-echo "Done setting environment variables."
-
-# 
+#
 # Execute sdk_install.sh inside a subshell so the user's current
 # shell does not exit on errors from the install.
-# 
+#
 cd $script_dir
 if ! bash $SDK_DIR/sdk_install.sh; then
     echo "Error: AWS SDK install was unsuccessful, sdk_install.sh returned $?"

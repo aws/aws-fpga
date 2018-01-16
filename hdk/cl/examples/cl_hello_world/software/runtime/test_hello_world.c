@@ -247,9 +247,11 @@ int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id) {
     printf("=====  Entering peek_poke_example =====\n");
     printf("register: 0x%x\n", value);
     if(value == expected) {
+        printf("TEST PASSED");
         printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
     }
     else{
+        printf("TEST FAILED");
         printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
     }
 out:

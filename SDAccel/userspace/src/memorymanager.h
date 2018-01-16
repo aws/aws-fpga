@@ -1,6 +1,3 @@
-#ifndef _XDMA_MEMORY_MANAGER_H_
-#define _XDMA_MEMORY_MANAGER_H_
-
 /**
  * Copyright (C) 2015-2017 Xilinx, Inc
  * Author: Sonal Santan
@@ -20,6 +17,8 @@
  * under the License.
  */
 
+#ifndef _XDMA_MEMORY_MANAGER_H_
+#define _XDMA_MEMORY_MANAGER_H_
 
 #include <mutex>
 #include <list>
