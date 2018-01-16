@@ -6,6 +6,7 @@
 properties([parameters([
     string(name: 'branch', defaultValue: ''),
     booleanParam(name: 'test_markdown_links',                 defaultValue: true,  description: 'Test markdown files and check for broken links'),
+    booleanParam(name: 'test_src_headers',                    defaultValue: true,  description: 'Check copyright heaers of source files'),
     booleanParam(name: 'test_fpga_tools',                     defaultValue: true,  description: 'Test fpga-* commands on F1'),
     booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
@@ -25,6 +26,7 @@ properties([parameters([
 // Configuration
 //=============================================================================
 boolean test_markdown_links = params.get('test_markdown_links')
+boolean test_src_headers = params.get('test_src_headers')
 boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
@@ -114,24 +116,47 @@ if (is_public_repo())
 // Shared Tests
 //=============================================================================
 
-if (test_markdown_links) {
-    top_parallel_stages['Test Markdown Links'] = {
-        stage('Test Markdown Links') {
-            String report_file = 'test_md_links.xml'
-            node(task_label.get('md_links')) {
-                checkout scm
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
-                    """
-                } finally {
-                    if (fileExists(report_file)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file
+
+if (test_markdown_links || test_src_headers) {
+    top_parallel_stages['Short Tests'] = {
+        node(task_label.get('md_links')) {
+            checkout scm
+            if (test_markdown_links) {
+                stage('Test Markdown Links') {
+                    String report_file = 'test_md_links.xml'
+                    try {
+                        sh """
+                            set -e
+                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                            python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
+                        """
+                    } finally {
+                        if (fileExists(report_file)) {
+                            junit healthScaleFactor: 10.0, testResults: report_file
+                        }
+                        else {
+                            echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                        }
                     }
-                    else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                }
+            }
+            if (test_src_headers) {
+                stage('Test Source Headers') {
+                    String report_file = 'test_check_src_headers.xml'
+                    checkout scm
+                    try {
+                        sh """
+                            set -e
+                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                            python2.7 -m pytest -v $WORKSPACE/shared/tests/test_check_src_headers.py --junit-xml $WORKSPACE/${report_file}
+                        """
+                    } finally {
+                        if (fileExists(report_file)) {
+                            junit healthScaleFactor: 10.0, testResults: report_file
+                        }
+                        else {
+                            echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                        }
                     }
                 }
             }
