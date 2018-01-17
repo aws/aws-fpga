@@ -34,7 +34,7 @@ else
   export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
 endif
 
-export SIM_ROOT = $(CL_ROOT)/verif/sim
+export SIM_ROOT = $(CL_ROOT)/verif/sim/$(SIMULATOR)
 
 ifeq ($(C_TEST),test_null)
   export SIM_DIR = $(SIM_ROOT)/$(TEST)

@@ -165,6 +165,7 @@ After the AFI generation is complete, AWS will put the logs into the bucket loca
 **NOTE**: *Attempting to load the AFI immediately on an instance will result in an `Invalid AFI ID` error.
 Please wait until you confirm the AFI is created successfully.*
 
+**NOTE**: *Attempting to load the AFI in a region different from where the AFI was created will result in an `Invalid AFI ID` error.  AFIs need to be copied to regions.*
 The [copy-fpga-image](../../docs/copy_fpga_image.md) API allows you to copy the AFI to other regions and avoid the time consuming `create-fpga-image` process. Copy will also preserve the source Global AFI ID and minimize region-specific changes to your instance code or scripts.
 
 ## Step by step guide how to load and test a registered AFI from within an F1 instance

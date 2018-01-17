@@ -83,6 +83,9 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
 done
 
 source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
+source $script_dir/shared/bin/set_common_env_vars.sh
+
+hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
 
 debug_msg "Checking for Vivado install:"
 
@@ -110,36 +113,6 @@ else
 fi
 
 debug_msg "Vivado check succeeded"
-
-info_msg "Setting up environment variables"
-
-# Clear environment variables
-unset HDK_DIR
-unset HDK_COMMON_DIR
-unset HDK_SHELL_DIR
-unset HDK_SHELL_DESIGN_DIR
-# Don't unset CL_DIR if designer has already set it.
-#unset CL_DIR
-
-export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
-
-# The next variable should not be modified and should always point to the /common directory under HDK_DIR
-export HDK_COMMON_DIR=$HDK_DIR/common
-
-# Point to the latest version of AWS shell
-export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
-hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
-
-# Set the common shell design dir
-export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
-
-export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
-PATH=$AWS_FPGA_REPO_DIR/hdk/common/scripts:$PATH
-
-# Update PYTHONPATH with libraries used for unit testing
-python_lib=$AWS_FPGA_REPO_DIR/shared/lib
-export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
-PYTHONPATH=$python_lib:$PYTHONPATH
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs
@@ -173,7 +146,7 @@ do
   s3_shell_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/$sub_dir/from_aws
   # Download the sha256
   if [ ! -e $hdk_shell_dir ]; then
-  	mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
+      mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
   fi
   # Use curl instead of AWS CLI so that credentials aren't required.
   curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }

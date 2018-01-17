@@ -162,6 +162,15 @@ static const char *load_afi_usage[] = {
 	"      -F, --force-shell-reload",
 	"          Reload the FPGA shell on AFI load, even if the next AFI",
 	"          doesn't require it.",
+	"      -a, --clock-a0-freq",
+	"          Request the clock a0 frequency be set to this value in Mhz or less,",
+	"          setting other frequencies in clock group a much slower.",
+	"      -b, --clock-b0-freq",
+	"          Request the clock b0 frequency be set to this value in Mhz or less,",
+	"          setting other frequencies in clock group b much slower.",
+	"      -c, --clock-c0-freq",
+	"          Request the clock c0 frequency be set to this value in Mhz or less,",
+	"          setting other frequencies in clock group c much slower.",
 };
 
 static const char *clear_afi_usage[] = {
@@ -449,6 +458,9 @@ parse_args_load_afi(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"fpga-image-id",		required_argument,	0,	'I'	},
+		{"clock-a0-freq",		required_argument,	0,	'a'	},
+		{"clock-b0-freq",		required_argument,	0,	'b'	},
+		{"clock-c0-freq",		required_argument,	0,	'c'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"sync-timeout",		required_argument,	0,	's'	},
 		{"async",				no_argument,		0,	'A'	},
@@ -460,7 +472,7 @@ parse_args_load_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:s:AH?hVF",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVF",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -475,6 +487,21 @@ parse_args_load_afi(int argc, char *argv[])
 
 			strncpy(f1.afi_id, optarg, sizeof(f1.afi_id)); 
 			f1.afi_id[sizeof(f1.afi_id) - 1] = 0; 
+			break;
+		}
+		case 'a': {
+			string_to_uint(&f1.clock_a0_freq, optarg);
+			fail_on_user(f1.clock_a0_freq == 0, err, "Requested frequency must be positive");
+			break;
+		}
+		case 'b': {
+			string_to_uint(&f1.clock_b0_freq, optarg);
+			fail_on_user(f1.clock_b0_freq == 0, err, "Requested frequency must be positive");
+			break;
+		}
+		case 'c': {
+			string_to_uint(&f1.clock_c0_freq, optarg);
+			fail_on_user(f1.clock_c0_freq == 0, err, "Requested frequency must be positive");
 			break;
 		}
 		case 'r': {

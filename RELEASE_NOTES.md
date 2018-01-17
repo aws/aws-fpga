@@ -26,6 +26,14 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
+   *    [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB)
+   *    [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
+   *    Improved IPI 3rd party simulator support
+   *    Simulation model fixes
+   *    SDAccel improvements - Removal of settings64 script from SDAccel setup and switching between DSAs	
+
 ## Release 1.3.4 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    EDMA/XDMA Driver improvements
    *    Additional SDAccel Platforms

@@ -15,6 +15,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import logging
 import os
 from os.path import dirname, realpath
@@ -28,7 +29,7 @@ try:
     from aws_fpga_test_utils.AwsFpgaTestBase import AwsFpgaTestBase
 except ImportError as e:
     traceback.print_tb(sys.exc_info()[2])
-    print "error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1])
+    print("error: {}\nMake sure to source hdk_setup.sh".format(sys.exc_info()[1]))
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
@@ -39,18 +40,18 @@ class TestSims(AwsFpgaTestBase):
     
     NOTE: Cannot have an __init__ method.
     '''
-    
-    @staticmethod
-    def setup_class(self):
+
+    @classmethod
+    def setup_class(cls):
         '''
         Do any setup required for tests.
         '''
-        AwsFpgaTestBase.setup_class(self, __file__)
-        
+        AwsFpgaTestBase.setup_class(cls, __file__)
+
         AwsFpgaTestBase.assert_hdk_setup()
-        
-        self.RUN_SIM_SCRIPT = dirname(realpath(__file__)) + "/run_sim.sh"
-        assert os.path.exists(self.RUN_SIM_SCRIPT)
+
+        cls.RUN_SIM_SCRIPT = dirname(realpath(__file__)) + "/run_sim.sh"
+        assert os.path.exists(cls.RUN_SIM_SCRIPT)
         return
 
     def run_sim(self, test_dir="", test_name="", test_type=""):
@@ -63,7 +64,7 @@ class TestSims(AwsFpgaTestBase):
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd(" ".join(command_line))
         assert rc == 0, "Sim failed"
-    
+
     # cl_dram_dma sv
 
     def test_cl_dram_dma__dram_dma__sv(self):
