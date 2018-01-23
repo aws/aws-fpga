@@ -82,6 +82,7 @@ class TestEdma(AwsFpgaTestBase):
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_perf_test.sh".format(self.WORKSPACE), echo=True)
         assert rc == 0
 
+    @pytest.mark.skip(reason="Flaky. We Re-start tests after shell updates.")
     def test_fio_perf(self):
         # Build the driver so the fio script can install it.
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma && make".format(self.WORKSPACE), echo=True)
