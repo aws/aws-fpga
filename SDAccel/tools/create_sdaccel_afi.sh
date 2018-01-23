@@ -21,7 +21,7 @@ script=${BASH_SOURCE[0]}
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 
-source $AWS_FPGA_REPO_DIR/shared/bin/message_functions.sh
+source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
 
 debug=0
 
