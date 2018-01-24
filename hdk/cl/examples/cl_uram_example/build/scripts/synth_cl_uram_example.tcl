@@ -77,7 +77,7 @@ save_bd_design
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
-read_verilog [ list \
+read_verilog -sv [ list \
   $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v\
   $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv\
   $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v\
