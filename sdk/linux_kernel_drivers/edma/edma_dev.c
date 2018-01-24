@@ -88,7 +88,7 @@ MODULE_PARM_DESC(single_transaction_size, "The size of a single transaction over
 
 unsigned int edma_queue_depth = 1024;
 module_param(edma_queue_depth, uint, 0);
-MODULE_PARM_DESC(ebcs_queue_depth, "EDMA queue depth. (default=1024)");
+MODULE_PARM_DESC(edma_queue_depth, "EDMA queue depth. (default=1024)");
 
 static unsigned int fsync_timeout_sec = 9;
 module_param(fsync_timeout_sec, uint, 0);
