@@ -62,7 +62,7 @@ def remove_edma_driver():
     # This fails if the driver isn't installed
     edma_driver_ko_list = find_files_in_path('/lib/modules', 'edma-drv.ko')
     for edma_ko in edma_driver_ko_list:
-        logger.info("Removing {}".format(edma_ko1))
+        logger.info("Removing {}".format(edma_ko))
         assert os.system("sudo rm -f {}".format(edma_ko)) == 0
 
     assert os.system('sudo rm -f /etc/modules-load.d/edma.conf') == 0

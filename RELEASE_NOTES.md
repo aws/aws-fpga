@@ -26,6 +26,13 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.6 (See [ERRATA](./ERRATA.md) for unsupported features)
+   *    Simulation model bug fix for transfer size of 64 bytes
+   *    Xilinx 2017.1 Patch AR70350 - fixes report_power hangs.  Patch is automatically applied during setup scripts using MYVIVADO environment variable
+   *    Updated synthesis scripts with -sv option when calling read_verilog
+   *    Added documentation on us-gov-west-1 (GovCloud US)
+   *    Minor EDMA driver fixes and improvements
+
 ## Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
    *    [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
    *    [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB)

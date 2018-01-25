@@ -95,3 +95,6 @@ vivado*.log
 
 # pytest artifacts
 .cache/
+
+# Patches
+patches/*

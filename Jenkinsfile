@@ -81,8 +81,11 @@ if (debug_fdf_uram) {
 // Globals
 //=============================================================================
 
-// Map that contains top level stages
-def top_parallel_stages = [:]
+// Map that contains stages of tests
+
+def initial_tests = [:]
+def secondary_tests = [:]
+def multi_stage_tests = [:]
 
 // Task to Label map
 def task_label = [
@@ -118,7 +121,7 @@ if (is_public_repo())
 
 
 if (test_markdown_links || test_src_headers) {
-    top_parallel_stages['Short Tests'] = {
+    initial_tests['Documentation Tests'] = {
         node(task_label.get('md_links')) {
             checkout scm
             if (test_markdown_links) {
@@ -169,7 +172,7 @@ if (test_markdown_links || test_src_headers) {
 //=============================================================================
 
 if (test_hdk_scripts) {
-    top_parallel_stages['Test HDK Scripts'] = {
+    initial_tests['Test HDK Scripts'] = {
         stage('Test HDK Scripts') {
             String report_file = 'test_hdk_scripts.xml'
             node(task_label.get('source_scripts')) {
@@ -194,7 +197,7 @@ if (test_hdk_scripts) {
 }
 
 if (test_fpga_tools) {
-    top_parallel_stages['Test FPGA Tools 1 Slot'] = {
+    initial_tests['Test FPGA Tools 1 Slot'] = {
         stage('Test FPGA Tools 1 Slot') {
             String report_file = 'test_fpga_tools.xml'
             node(task_label.get('runtime')) {
@@ -216,7 +219,7 @@ if (test_fpga_tools) {
             }
         }
     }
-    top_parallel_stages['Test FPGA Tools All Slots'] = {
+    initial_tests['Test FPGA Tools All Slots'] = {
         stage('Test FPGA Tools All Slots') {
             String report_file = 'test_fpga_tools_all_slots.xml'
             node(task_label.get('runtime-all-slots')) {
@@ -241,7 +244,7 @@ if (test_fpga_tools) {
 }
 
 if (test_sims) {
-    top_parallel_stages['Run Sims'] = {
+    multi_stage_tests['Run Sims'] = {
         stage('Run Sims') {
             def cl_names = ['cl_dram_dma', 'cl_hello_world']
             def sim_nodes = [:]
@@ -280,7 +283,7 @@ if (test_sims) {
 }
 
 if (test_edma) {
-    top_parallel_stages['Test EDMA Driver'] = {
+    secondary_tests['Test EDMA Driver'] = {
         stage('Test EDMA Driver') {
             node(task_label.get('runtime')) {
                 echo "Test EDMA Driver"
@@ -301,7 +304,7 @@ if (test_edma) {
                 } finally {
                     if (fileExists(report_file)) {
                         junit healthScaleFactor: 10.0, testResults: report_file
-                        archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
+                        // archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
                     }
                     else {
                         echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
@@ -313,7 +316,7 @@ if (test_edma) {
 }
 
 if (test_xdma) {
-    top_parallel_stages['Test XDMA Driver'] = {
+    secondary_tests['Test XDMA Driver'] = {
         stage('Test XDMA Driver') {
             node(task_label.get('runtime')) {
                 echo "Test XDMA Driver"
@@ -333,7 +336,7 @@ if (test_xdma) {
                     throw exc
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
-                    archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
+                    //archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
                 }
             }
         }
@@ -341,7 +344,7 @@ if (test_xdma) {
 }
 
 if (test_runtime_software) {
-    top_parallel_stages['Test Runtime Software'] = {
+    multi_stage_tests['Test Runtime Software'] = {
         stage('Test Runtime Software') {
             def nodes = [:]
             def node_types = ['runtime', 'runtime-all-slots']
@@ -389,7 +392,7 @@ if (test_runtime_software) {
 }
 
 if (test_dcp_recipes) {
-    top_parallel_stages['Test DCP Recipes'] = {
+    multi_stage_tests['Test DCP Recipes'] = {
         stage('Test DCP Recipes') {
             def nodes = [:]
             for (cl in dcp_recipe_cl_names) {
@@ -433,7 +436,7 @@ if (test_dcp_recipes) {
 if (test_hdk_fdf) {
     // Top level stage for FDF
     // Each CL will have its own parallel FDF stage under this one.
-    top_parallel_stages['HDK_FDF'] = {
+    multi_stage_tests['HDK_FDF'] = {
         stage('HDK FDF') {
             def fdf_stages = [:]
             for (x in fdf_test_names) {
@@ -602,7 +605,7 @@ if (test_hdk_fdf) {
 //=============================================================================
 
 if (test_sdaccel_scripts) {
-    top_parallel_stages['Test SDAccel Scripts'] = {
+    initial_tests['Test SDAccel Scripts'] = {
         stage('Test SDAccel Scripts') {
             String report_file = 'test_sdaccel_scripts.xml'
             node(task_label.get('source_scripts')) {
@@ -627,7 +630,7 @@ if (test_sdaccel_scripts) {
 }
 
 if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
-    top_parallel_stages['Run SDAccel Tests'] = {
+    multi_stage_tests['Run SDAccel Tests'] = {
         def sdaccel_build_stages = [:]
         String sdaccel_examples_list = 'sdaccel_examples_list.json'
 
@@ -843,4 +846,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 // SDK Tests
 //=============================================================================
 
-parallel top_parallel_stages
+
+// Run the tests here
+parallel initial_tests
+parallel secondary_tests
+parallel multi_stage_tests

@@ -35,8 +35,8 @@
 #include "edma_dev.h"
 #include "edma_backend.h"
 
-MODULE_AUTHOR("Alex Levin <levinale@amazon.com>");
-MODULE_DESCRIPTION("Amazon EDMA driver");
+MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
+MODULE_DESCRIPTION("Elastic Direct Memory Access");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(DRV_MODULE_VERSION);
 

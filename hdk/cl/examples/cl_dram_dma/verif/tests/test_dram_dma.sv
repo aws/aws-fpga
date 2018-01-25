@@ -22,7 +22,7 @@ module test_dram_dma();
    int timeout_count;
    int fail;
    logic [3:0] status;
-   int         len0 = 128;
+   int         len0 = 64;
    int         len1 = 128;
    int         len2 = 6000;
    int         len3 = 300;

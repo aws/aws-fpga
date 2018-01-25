@@ -28,8 +28,6 @@ script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 current_dir=$(pwd)
 
-source $script_dir/shared/bin/message_functions.sh
-
 debug=0
 
 # This function checks if an environment module exists
@@ -82,7 +80,7 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
   esac
 done
 
-source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
+source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
 
 hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
@@ -238,4 +236,8 @@ else
 fi
 
 cd $current_dir
+
+# Install any patches as required
+setup_patches
+
 info_msg "AWS HDK setup PASSED.";

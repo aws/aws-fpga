@@ -79,6 +79,7 @@ class TestXdma(AwsFpgaTestBase):
         aws_fpga_test_utils.install_xdma_driver()
         assert aws_fpga_test_utils.xdma_driver_installed() == True
 
+    @pytest.mark.skip(reason="Flaky. We Re-start tests after shell updates.")
     def test_fio_perf(self):
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/xdma && make".format(self.WORKSPACE), echo=True)
         assert rc == 0

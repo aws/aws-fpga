@@ -107,7 +107,7 @@ The developer can create multiple AFIs at no extra cost, up to a defined limited
 
 **Q: What regions are supported?**
 
-AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon) and eu-west-1 (Ireland).
+AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) and us-gov-west-1 (GovCloud US).
 
 
 
@@ -205,6 +205,10 @@ Yes. Developers are free to use any IP blocks within the Custom Logic region. Th
 
 
 ## Getting Started
+**Q: What AWS knowledge do I need to learn before I can develop accelerators and run on AWS F1 instances?**
+
+[AWS Getting Started Resource Center](https://aws.amazon.com/getting-started/) has lots of resources to help developers get started.  For F1 development, launching linux virtual machines (EC2) and storing and retrieving files from S3 are required skills.  
+
 **Q: What do I need to get started on building accelerators for FPGA instances?**
 
 Getting started requires downloading the latest HDK and SDK from the AWS FPGA GitHub repository. The HDK and SDK provide the needed code and information for building FPGA code. The HDK provides all the information needed for developing an FPGA image from source code, while the SDK provides all the runtime software for managing the Amazon FPGA Image (AFI) loaded into the F1 instance FPGA.

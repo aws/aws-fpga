@@ -48,7 +48,7 @@ read_verilog -sv [glob $ENC_SRC_DIR/*.?v]
 puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
-read_verilog [ list \
+read_verilog -sv [ list \
   $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
   $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
   $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \

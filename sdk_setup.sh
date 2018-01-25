@@ -27,10 +27,7 @@ script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 current_dir=$(pwd)
 
-source $script_dir/shared/bin/message_functions.sh
-
-source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
-
+source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
 
 #
