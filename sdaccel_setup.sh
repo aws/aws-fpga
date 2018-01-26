@@ -27,10 +27,7 @@ script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 current_dir=$(pwd)
 
-source $script_dir/shared/bin/message_functions.sh
-
-source $script_dir/shared/bin/set_AWS_FPGA_REPO_DIR.sh
-
+source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
 
 # Source sdk_setup.sh
@@ -280,6 +277,10 @@ export AWS_PLATFORM=$AWS_PLATFORM_4DDR
 info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
 info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
 info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
+
+# Install patches as required.
+
+setup_patches
 
 cd $current_dir
 

@@ -2273,10 +2273,13 @@ module sh_bfm #(
    endfunction // start_dma_to_buffer
 
    function bit is_dma_to_cl_done(input int chan);  // 1 = done
+      //$display("In function is_dma_to_cl_done h2c_dma_done is %x \n", h2c_dma_done[chan]);
+      
       return h2c_dma_done[chan];
    endfunction // is_dma_to_cl_done
    
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
+      //$display("In function is_dma_to_buffer_done c2h_dma_done is %x \n", c2h_dma_done[chan]);
       return c2h_dma_done[chan];
    endfunction // is_dma_to_buffer_done
 
@@ -2365,7 +2368,7 @@ module sh_bfm #(
                   num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64; 
                   axi_data.last = (j == axi_cmd.len) ? 1 : 0;
                   if(num_of_data_beats == 1) begin
-                    num_bytes = (dop.len)%64;
+                    num_bytes = (dop.len == 64) ? 64 : (dop.len)%64;
                     for(int i=start_addr[5:0]; i < (num_bytes+start_addr[5:0]); i++) begin
                       axi_data.data = axi_data.data | tb.hm_get_byte(.addr(dop.buffer + byte_cnt)) << 8*i;
                       axi_data.strb = axi_data.strb | 1 << i;

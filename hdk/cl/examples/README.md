@@ -24,7 +24,7 @@ To install the AWS CLI, please follow the instructions here: (http://docs.aws.am
 
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and default region
 
-Use the aws-cli [region](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) command line argument to override the profile default region.  Supported regions include: us-east-1, us-west-2 and eu-west-1
+Use the aws-cli [region](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) command line argument to override the profile default region.  Supported regions include: us-east-1, us-west-2, eu-west-1 and us-gov-west-1.
 
 ### 1. Pick one of the examples and move to its directory
 
@@ -183,7 +183,7 @@ The FPGA Management tools are required to load an AFI onto an FPGA.  Depending o
 ```
 To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 ```
-    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and instance region (us-east-1, us-west-2 or eu-west-1)
+    $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and instance region (us-east-1, us-west-2, eu-west-1 or us-gov-west-1)
 ```
   
 ### 5. Load the AFI
