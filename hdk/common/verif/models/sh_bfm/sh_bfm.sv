@@ -982,7 +982,7 @@ module sh_bfm #(
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
    int          wr_last_cnt = 0;
-   logic [63:0] wr_addr;
+   logic [63:0] wr_addr, wr_addr_t;
    
    always @(posedge clk_core) begin
 
@@ -1000,14 +1000,15 @@ module sh_bfm #(
                logic [31:0] word;
 
                if (!tb.use_c_host_memory)
-                 if (tb.sv_host_memory.exists(wr_addr))
-                   word = tb.sv_host_memory[wr_addr];
+                 if (tb.sv_host_memory.exists({wr_addr[63:2], 2'b00}))
+                   word = tb.sv_host_memory[{wr_addr[63:2], 2'b00}];
                  else
                    word = 32'hffff_ffff;   // return a default value
                else begin
+                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
-                     t = tb.host_memory_getc(wr_addr + k);
+                     t = tb.host_memory_getc(wr_addr_t + k);
                      word = {t, word[31:8]};
                   end                  
                end
@@ -1024,13 +1025,15 @@ module sh_bfm #(
                end // for (int j=0; j<4; j++)
 
                if (!tb.use_c_host_memory)
-                 tb.sv_host_memory[wr_addr] = word;
+               begin
+                 tb.sv_host_memory[{wr_addr[63:2], 2'b00}] = word;
+               end
                else begin
+                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
                      t = word[7:0];                     
-
-                     tb.host_memory_putc(wr_addr + k, t);
+                     tb.host_memory_putc(wr_addr_t + k, t);
                      word = word >> 8;
                   end                  
                end
@@ -1170,7 +1173,7 @@ module sh_bfm #(
    //
 
    logic first_rd_beat;
-   logic [63:0] rd_addr;
+   logic [63:0] rd_addr, rd_addr_t;
    
    always @(posedge clk_core) begin
       AXI_Command rd_cmd;
@@ -1191,6 +1194,7 @@ module sh_bfm #(
             first_rd_beat = 1'b0;
          end
          
+         beat = {512{1'b1}}; 
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
 
@@ -1199,14 +1203,15 @@ module sh_bfm #(
             end
             
             if (!tb.use_c_host_memory)
-              if (tb.sv_host_memory.exists(rd_addr))
-                c = tb.sv_host_memory[rd_addr];
+              if (tb.sv_host_memory.exists({rd_addr[63:2], 2'b00}))
+                c = tb.sv_host_memory[{rd_addr[63:2], 2'b00}];
               else
                 c = 32'hffffffff;
             else begin
+               rd_addr_t = {rd_addr[63:2], 2'b00};
                for(int k=0; k<4; k++) begin
                   byte t;
-                  t = tb.host_memory_getc(rd_addr + k);
+                  t = tb.host_memory_getc(rd_addr_t + k);
                   c = {t, c[31:8]};
                end
             end
