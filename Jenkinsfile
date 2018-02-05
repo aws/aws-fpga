@@ -104,9 +104,9 @@ def task_label = [
 @NonCPS def entrySet(m) {m.collect {k, v -> [key: k, value: v]}}
 
 
-// Check if we are running on github.com/aws/aws-fpga
 def is_public_repo() {
-    return (scm.getUserRemoteConfigs()[0].getUrl() ==~ /^(\S+)?aws-fpga[\/]?$/)
+    echo "Change URL: ${env.CHANGE_URL}"
+    return (env.CHANGE_URL =~ /^(\S+)?aws-fpga\/pull\/(\d+)$/)
 }
 
 // Wait for input if we are running on a public repo to avoid malicious PRS
@@ -114,7 +114,10 @@ if (is_public_repo())
 {
     input "Running on a public repository, do you want to proceed with running the tests?"
 }
-
+else
+{
+    echo "Running on a private repository"
+}
 //=============================================================================
 // Shared Tests
 //=============================================================================
@@ -197,7 +200,7 @@ if (test_hdk_scripts) {
 }
 
 if (test_fpga_tools) {
-    initial_tests['Test FPGA Tools 1 Slot'] = {
+    secondary_tests['Test FPGA Tools 1 Slot'] = {
         stage('Test FPGA Tools 1 Slot') {
             String report_file = 'test_fpga_tools.xml'
             node(task_label.get('runtime')) {
@@ -208,7 +211,13 @@ if (test_fpga_tools) {
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
                         python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
-                } finally {
+                }
+                catch (exception) {
+                    echo "Test FPGA Tools 1 Slot failed"
+                    input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exception
+                }
+                finally {
                     if (fileExists(report_file)) {
                         junit healthScaleFactor: 10.0, testResults: report_file
                     }
@@ -219,7 +228,7 @@ if (test_fpga_tools) {
             }
         }
     }
-    initial_tests['Test FPGA Tools All Slots'] = {
+    secondary_tests['Test FPGA Tools All Slots'] = {
         stage('Test FPGA Tools All Slots') {
             String report_file = 'test_fpga_tools_all_slots.xml'
             node(task_label.get('runtime-all-slots')) {
@@ -230,7 +239,13 @@ if (test_fpga_tools) {
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
                         python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
                     """
-                } finally {
+                }
+                catch (exception) {
+                    echo "Test FPGA Tools All Slots failed"
+                    input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exception
+                }
+                finally {
                     if (fileExists(report_file)) {
                         junit healthScaleFactor: 10.0, testResults: report_file
                     }
@@ -820,6 +835,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                 } catch (error) {
                                     echo "${run_example_stage_name} Runtime example failed"
                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                    input message: "SDAccel Runtime test failed. Click Proceed or Abort when you are done debugging on the instance."
                                     throw error
                                 } finally {
                                     if (fileExists(run_example_report_file)) {
