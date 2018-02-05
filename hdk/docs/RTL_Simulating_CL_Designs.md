@@ -234,8 +234,32 @@ out:
 
 ```
 
+[test_dram_dma_hwsw_cosim.c](../cl/examples/cl_dram_dma/software/runtime/test_dram_dma_hwsw_cosim.c)
+
+```
+For HW/SW simulation the below header files need to be included. 
+SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
+
+For test_dram_dma test the below two functions are used for DMA transfers from host and to host.
+
+//This function on the SV side sets up the string buffer and does Host to cl transfer.
+sv_fpga_start_buffer_to_cl(slot_id, channel, buffer_size, write_buffer, (0x10000000 + channel*MEM_16G));
+
+//This function on the SV side sets up the string buffer and does CL to Host transfer.
+sv_fpga_start_cl_to_buffer(slot_id, channel, buffer_size, (0x10000000 + channel*MEM_16G));
+
+//This function updates the buffer on 'C' side.
+int send_rdbuf_to_c(char* rd_buf)
+
+For HW/SW simulation the below header files need to be included. 
+SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
+
+```
+
+
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
+```
     $ cd verif/scripts
     $ make C_TEST={your_test_name} # compile and run using XSIM (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
@@ -247,7 +271,7 @@ Once your test is written, you are ready to run a simulation. The *scripts/* dir
     $ cd verif/scripts
     $ make C_TEST={your_test_name} QUESTA=1 # compile and run using QUESTA (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
-    
+```    
 ## Accessing Host Memory During Simulation
 Your design may share data between host memory and logic within the CL. To verify your CL is accessing host memory, the test bench includes two types of host memory: SV and C domain host memory. If you are are only using SV to verify your CL, then use SV domain host memory. An associative array represents host memory, where the address is the key to locate a 32-bit data value.
 
@@ -257,7 +281,7 @@ Your design may share data between host memory and logic within the CL. To verif
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
 
-<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory">
+<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory"/>
 
 
 Backdoor access to host memory is provided by two functions:

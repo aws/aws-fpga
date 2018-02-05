@@ -124,11 +124,11 @@ class TestSims(AwsFpgaTestBase):
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
     # cl_dram_dma c
-    @pytest.mark.skip(reason="Skip till the test is fixed. Fix is planned.")
-    def test_cl_dram_dma__dram_dma__c(self):
+
+    def test_cl_dram_dma__dram_dma_hwsw_cosim__c(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma'
+        test_name = 'test_dram_dma_hwsw_cosim'
         test_type = 'c'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)

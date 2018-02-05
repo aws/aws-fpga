@@ -35,8 +35,20 @@ extern void cl_peek(uint64_t addr, uint32_t *data);
 extern void cl_poke(uint64_t addr, uint32_t  data);
 extern void sv_int_ack(uint32_t int_num);
 extern void sv_pause(uint32_t x);
+extern void sv_fpga_start_buffer_to_cl(uint32_t slot_id, uint32_t chan, uint32_t buf_size, const char *wr_buffer, uint64_t cl_addr);
+extern void sv_fpga_start_cl_to_buffer(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t cl_addr);
+extern void init_ddr(void);
 
+
+#ifdef INT_MAIN
+int test_main(uint32_t *exit_code);
+#else
 void test_main(uint32_t *exit_code);
+#endif
+
+#ifdef SV_TEST
+int send_rdbuf_to_c(char* rd_buf);
+#endif
 
 void host_memory_putc(uint64_t addr, uint8_t data);
 
@@ -44,7 +56,6 @@ uint8_t host_memory_getc(uint64_t addr);
 
 
 void cosim_printf(const char *format, ...);
-
 
 void int_handler(uint32_t int_num);
 

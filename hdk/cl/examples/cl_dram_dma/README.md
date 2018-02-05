@@ -114,7 +114,38 @@ flr_reset is ignored in this design
 DMA accesses rely on the edma driver- see the [edma driver readme](../../../../sdk/linux_kernel_drivers/edma/README.md)
 
 The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
-  
+
+There are two example tests in cl_dram_dma example.
+
+# test_dram_dma.c
+
+This test runs a regular software test with data transfer with all 4 DMA channels enabled.
+
+## Compile and run instructions
+cd $CL_DIR/software/runtime
+
+make all
+
+sudo ./test_dram_dma
+
+# test_dram_dma_hwsw_cosim.c
+
+This test runs a software test with HW/SW co-simulation enabled with all 4 DMA channels enabled.
+
+## Compile and run instructions
+
+cd $CL_DIR/software/runtime
+
+make TEST=test_dram_dma_hwsw_cosim
+
+sudo ./test_dram_dma_hwsw_cosim
+
+The test can be simulated with XSIM as follows.
+
+cd $CL_DIR/verif/scripts
+
+make C_TEST=test_dram_dma_hwsw_cosim
+
 <a name="metadata"></a>
 ## DRAM DMA Example Metadata
 The following table displays information about the CL that is required to register it as an AFI with AWS.
