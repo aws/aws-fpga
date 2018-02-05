@@ -159,6 +159,24 @@ add_files -fileset sim_1 [ list \
 ]
 			
 			source $::aws::make_faas::_nsvars::script_dir/add_simulation.tcl
+			
+set_property -name {xsim.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi_xsim.tcl -objects [get_filesets sim_1]
+set_property -name {xsim.elaborate.xelab.more_options} -value {-sv_lib dpi} -objects [get_filesets sim_1]
+
+set_property -name {questa.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {questa.compile.vlog.more_options} -value {-timescale 1ps/1ps +define+QUESTA_SIM} -objects [get_filesets sim_1]
+set_property -name {questa.simulate.vsim.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
+
+
+set_property -name {ies.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {ies.compile.ncvlog.more_options} -value {+define+SV_TEST +define+SCOPE +define+IES_SIM} -objects [get_filesets sim_1]
+set_property -name {ies.elaborate.ncelab.more_options} -value {+libext+.v+.sv -disable_sem2009 -timescale 1ps/1ps} -objects [get_filesets sim_1]
+set_property -name {ies.simulate.ncsim.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
+        
+
+set_property -name {vcs.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {vcs.compile.vlogan.more_options} -value {-ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k +define+VCS_SIM} -objects [get_filesets sim_1]
+set_property -name {vcs.simulate.vcs.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
 
 			}		
 	}
@@ -268,6 +286,25 @@ add_files -fileset sim_1 [ list \
 ]
 
 			source $::aws::make_faas::_nsvars::script_dir/add_simulation.tcl
+
+set_property -name {xsim.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi_xsim.tcl -objects [get_filesets sim_1]
+set_property -name {xsim.elaborate.xelab.more_options} -value {-sv_lib dpi} -objects [get_filesets sim_1]
+
+set_property -name {questa.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {questa.compile.vlog.more_options} -value {-timescale 1ps/1ps +define+QUESTA_SIM} -objects [get_filesets sim_1]
+set_property -name {questa.simulate.vsim.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
+
+
+set_property -name {ies.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {ies.compile.ncvlog.more_options} -value {+define+SV_TEST +define+SCOPE +define+IES_SIM} -objects [get_filesets sim_1]
+set_property -name {ies.elaborate.ncelab.more_options} -value {+libext+.v+.sv -disable_sem2009 -timescale 1ps/1ps} -objects [get_filesets sim_1]
+set_property -name {ies.simulate.ncsim.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
+        
+
+set_property -name {vcs.compile.tcl.pre} -value $::aws::make_faas::_nsvars::script_dir/../../verif/scripts/dpi.tcl -objects [get_filesets sim_1]
+set_property -name {vcs.compile.vlogan.more_options} -value {-ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k +define+VCS_SIM} -objects [get_filesets sim_1]
+set_property -name {vcs.simulate.vcs.more_options} -value {-sv_lib libdpi} -objects [get_filesets sim_1]
+
 
 			}			
 	}

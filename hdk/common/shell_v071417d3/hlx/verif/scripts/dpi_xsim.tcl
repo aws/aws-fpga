@@ -17,7 +17,7 @@ set HDK_COMMON_DIR $::env(HDK_COMMON_DIR)
 set AWS_FPGA_REPO_DIR $::env(AWS_FPGA_REPO_DIR)
 
 
-exec xsc ${HDK_COMMON_DIR}/software/src/test_null.c  --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/include --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/utils --additional_option -I${HDK_COMMON_DIR}/software/include --additional_option -DVIVADO_SIM
+exec xsc ${AWS_FPGA_REPO_DIR}/hdk/cl/examples/cl_hello_world/software/verif_rtl/src/test_hello_world.c   --additional_option -I${AWS_FPGA_REPO_DIR}/hdk/cl/examples/cl_hello_world/software/verif_rtl/include --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/include --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/utils --additional_option -I${HDK_COMMON_DIR}/software/include --additional_option -DVIVADO_SIM
 
 #exec xsc ${AWS_FPGA_REPO_DIR}/hdk/cl/examples/cl_hello_world/software/verif_rtl/src/test_hello_world.c  --additional_option -I${AWS_FPGA_REPO_DIR}/hdk/cl/examples/cl_hello_world/software/verif_rtl/include --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/include --additional_option -I${AWS_FPGA_REPO_DIR}/sdk/userspace/utils --additional_option -I${HDK_COMMON_DIR}/software/include --additional_option -DVIVADO_SIM
 

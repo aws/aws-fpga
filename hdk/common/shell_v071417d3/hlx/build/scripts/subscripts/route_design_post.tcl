@@ -88,7 +88,7 @@ if {[string match "*windows*" [string tolower $::env(OS)]]} {
 	if {[info exist SCRIPT_DIR] eq 0} {
 		set SCRIPT_DIR [set tclapp::xilinx::faasutils::make_faas::_nsvars::script_dir]
 	}
-	set sha256sum [file normalize [file join $SCRIPT_DIR .. .. .. DONOTINCLUDE_INAPP sha256sum.exe]]
+	set sha256sum [file normalize [file join $SCRIPT_DIR .. .. .. sha256sum.exe]]
 	if {[file exists $sha256sum] eq 0} {
 		puts "Please add sha256sum to your install app tree at $SCRIPT_DIR or hardcode in [file join [file dirname $argv0] $argv0]"
 		set hash "MISSING HASH!  HASH NOT RUN, INVALID MANIFEST"

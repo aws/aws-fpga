@@ -30,6 +30,22 @@ export subsystem\_id=0x1D51
 
 export subsystem\_vendor\_id=0xFEDD
 
+### For Windows, add in the following variables in the TCL console for clock recipes and IDs for cl\_hello\_world example.
+
+set ::env(CLOCK\_A\_RECIPE) "0"
+
+set ::env(CLOCK\_B\_RECIPE) "0"
+
+set ::env(CLOCK\_C\_RECIPE) "0"
+
+set ::env(device\_id) "0xF000"
+
+set ::env(vendor\_id) "0x1D0F"
+
+set ::env(subsystem\_id) "0x1D51"
+
+set ::env(subsystem\_vendor\_id) "0xFEDD"
+
 ### Creating Example Design
 
 Change directories to the cl/examples/cl\_hello\_world\_hlx directory.

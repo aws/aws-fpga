@@ -34,15 +34,20 @@ set script_folder [_tcl::get_script_folder]
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2017.1
+set scripts_vivado_version_1 2017.1
+set scripts_vivado_version_4 2017.4
+
 set current_vivado_version [version -short]
 
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
+if { [string first $scripts_vivado_version_1 $current_vivado_version] == 0 || [string first $scripts_vivado_version_4 $current_vivado_version] == 0  } {
+   puts "Supported Version of Tools"
+} else {
    puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
+   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version_1 or $scripts_vivado_version_4> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version_1 or $scripts_vivado_version_4> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
 
    return 1
 }
+
 
 ################################################################
 # START
@@ -165,7 +170,11 @@ proc create_root_design { parentCell } {
   # Set parent object as current
   current_bd_instance $parentObj
 
-
+  # Set supported version of tools
+  set scripts_vivado_version_1 2017.1
+  set scripts_vivado_version_4 2017.4
+  set current_vivado_version [version -short]
+  
   # Create interface ports
   set S_SH [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aws_f1_sh1_rtl:1.0 S_SH ]
 
@@ -244,7 +253,11 @@ CONFIG.S01_HAS_REGSLICE {4} \
  ] $axi_mem_intercon
 
   # Create instance: system_ila_0, and set properties
+if { [string first $scripts_vivado_version_4 $current_vivado_version] == 0} {
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
+} else {
   set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.0 system_ila_0 ]
+}
 
   # Create instance: xlconcat_0, and set properties
   set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_0 ]

@@ -27,6 +27,8 @@ module cl_dram_dma_axi_mstr (
     axi_bus_t.slave  cl_axi_mstr_bus,  // AXI Master Bus
     cfg_bus_t.master axi_mstr_cfg_bus  // Config Bus for Register Access
 );
+
+ `include "cl_dram_dma_defines.vh"
  
 // -----------------------------------------------------------------------------
 // Parameters

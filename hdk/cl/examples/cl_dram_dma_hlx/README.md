@@ -30,6 +30,21 @@ export subsystem\_id=0x1D51
 
 export subsystem\_vendor\_id=0xFEDC 
 
+### For Windows, add in the following variables in the TCL console for clock recipes and IDs for cl\_dram\_dma example.
+
+set ::env(CLOCK\_A\_RECIPE) "0"
+
+set ::env(CLOCK\_B\_RECIPE) "0"
+
+set ::env(CLOCK\_C\_RECIPE) "0"
+
+set ::env(device\_id) "0xF001"
+
+set ::env(vendor\_id) "0x1D0F"
+
+set ::env(subsystem\_id) "0x1D51"
+
+set ::env(subsystem\_vendor\_id) "0xFEDC"
 
 ### Creating Example Design
 
