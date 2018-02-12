@@ -245,8 +245,8 @@ info_msg "AWS Platform: 4DDR is up-to-date"
 #TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
 #TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
 
-setup_dsa xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_1DDR
-info_msg "AWS Platform: 1DDR is up-to-date"
+#setup_dsa xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_1DDR
+#info_msg "AWS Platform: 1DDR is up-to-date"
 #-------------------1 DDR--------------------
 
 #-------------------4 DDR RTL Kernel Debug--------------------
@@ -275,7 +275,7 @@ info_msg "SDAccel runtime installed"
 export AWS_PLATFORM=$AWS_PLATFORM_4DDR
 
 info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
-info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
+#info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
 info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
 
 # Install patches as required.
