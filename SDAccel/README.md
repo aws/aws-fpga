@@ -7,8 +7,10 @@ There are three simple steps for accelerating your application on an AWS F1 inst
 
 This quick start guide will use a simple "Hello World" SDAccel example to get you started.  
 
+It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR), therefore, software and hardware emulation should be used during development.
+<!---
 It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR) and ~1hr (1DDR), therefore, software and hardware emulation should be used during development.
-
+-->
 
 # Table of Content
 
@@ -67,11 +69,13 @@ It is highly recommended you read the documentation and utilize software and har
     * Select a platform:
       * AWS_PLATFORM_4DDR - Default AWS F1 platform with 4 DDRs and profiling support. Optimized for multi DDR use cases. This platform should be used for all production applications which require more than 1 DDR bank.
       * AWS_PLATFORM_4DDR_DEBUG - This platform is a debug variant of the 4DDR platform and should be used for hardware debugging of kernels. This version consists of an additional debug feature which allows advanced users to insert ILA’s in the kernels for debugging purposes. All other features are identical to the AWS_PLATFORM_4DDR platform.  
+<!---
       * AWS_PLATFORM_1DDR - This platform consist of 1 DDR that is located in the shell region. This allow maximum space for kernels. This also allows much faster compile times for all the use cases which require only 1 DDR bank.  This platform does not support APM and hence no profiling data can be obtained.
 
    ```
        $ export AWS_PLATFORM=$AWS_PLATFORM_1DDR 
    ```
+-->   
 <a name="createapp"></a>
 # 1. Build the host application, Xilinx FPGA binary and verify you are ready for FPGA acceleration
 
