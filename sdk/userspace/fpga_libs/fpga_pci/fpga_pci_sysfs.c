@@ -372,7 +372,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	DIR *dirp = opendir(path);
 	fail_on(!dirp, err, "opendir failed for path=%s", path);
 
-	struct dirent entry, *result;
+	struct dirent *entry;
 	int slot_dev_index = 0;
 	struct fpga_slot_spec search_spec;
 	struct fpga_pci_resource_map search_map, app_map;
@@ -390,16 +390,15 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	 *  the PCI device number (DBDF).
 	 */
 	while (true) {
-		memset(&entry, 0, sizeof(struct dirent));
-		readdir_r(dirp, &entry, &result);
-		if (result == NULL) {
+		entry = readdir(dirp);
+		if (entry == NULL) {
 			/** No more directories */
 			break;
 		}
 
 		/** Handle the current directory entry */
 		memset(&search_map, 0, sizeof(struct fpga_pci_resource_map));
-		int ret = fpga_pci_get_resource_map_ids(entry.d_name, &search_map);
+		int ret = fpga_pci_get_resource_map_ids(entry->d_name, &search_map);
 		if (ret != 0) {
 			continue;
 		}
@@ -407,7 +406,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 		if (search_map.vendor_id == F1_MBOX_VENDOR_ID && 
 			search_map.device_id == F1_MBOX_DEVICE_ID) {
 			/* mbox resources */
-			ret = fpga_pci_get_resources(entry.d_name, &search_map);
+			ret = fpga_pci_get_resources(entry->d_name, &search_map);
 			fail_on(ret != 0, err, "Error retrieving resource information");
 
 			/* app resources */
