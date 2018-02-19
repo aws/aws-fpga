@@ -24,6 +24,8 @@ import pytest
 def pytest_addoption(parser):
     parser.addoption("--examplePath", action="store", required=False, type=str,
         help="Path to the Xilinx Example to test", default="SDAccel/examples/xilinx/getting_started/host/helloworld_ocl")
+    parser.addoption("--rteName ", action="store", required=False, type=str,
+        help="RTE Name", default="4ddr")
 
 def pytest_generate_tests(metafunc):
 
@@ -31,3 +33,7 @@ def pytest_generate_tests(metafunc):
         print("Configuring parameters of {}::{}".format(metafunc.module.__name__, metafunc.function.__name__))
         print("examplePath = " + metafunc.config.getoption('examplePath'))
         metafunc.parametrize("examplePath", [metafunc.config.getoption('examplePath')])
+    if metafunc.cls.ADD_RTENAME:
+        print("Configuring parameters of {}::{}".format(metafunc.module.__name__, metafunc.function.__name__))
+        print("rteName = " + metafunc.config.getoption('rteName'))
+        metafunc.parametrize("rteName", [metafunc.config.getoption('rteName')])
