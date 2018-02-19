@@ -53,6 +53,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
     '''
 
     ADD_EXAMPLEPATH = True
+    ADD_RTENAME = True
 
     @classmethod
     def setup_class(cls):
