@@ -80,7 +80,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
 
         self.get_sdaccel_aws_xclbin_file(examplePath)
 
-        run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/2017.1.rte/setup.sh && {} \"".format(em_run_cmd)
+        run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/2017.1.rte.4ddr/setup.sh && {} \"".format(em_run_cmd)
 
         logger.info("Running cmd={}".format(run_cmd))
         (rc, stdout_lines, stderr_lines) = self.run_cmd(run_cmd)
