@@ -222,7 +222,7 @@ Here are the steps:
 * Source the Runtime Environment & Execute your Host Application
 ```
     $ sudo sh
-    # source /opt/Xilinx/SDx/2017.1.rte/setup.sh   # Other runtime env settings needed by the host app should be setup after this step 
+    # source /opt/Xilinx/SDx/2017.1.rte.4ddr/setup.sh   # Use 2017.1.rte.1ddr or 2017.1.rte.4ddr_debug when using AWS_PLATFORM_1DDR or AWS_PLATFORM_4DDR_DEBUG. Other runtime env settings needed by the host app should be setup after this step
     # ./helloworld 
 ```
 
