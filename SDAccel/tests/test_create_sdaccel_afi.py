@@ -55,6 +55,7 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
     '''
 
     ADD_EXAMPLEPATH = True
+    ADD_RTENAME = True
 
     @classmethod
     def setup_class(cls):
@@ -68,7 +69,7 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         return
 
-    def call_create_afi_script(self, examplePath, xclbin, target):
+    def call_create_afi_script(self, examplePath, xclbin, target, rteName):
 
         full_example_path = self.get_sdaccel_example_fullpath(examplePath=examplePath)
         logger.info("SDAccel Example path={}".format(full_example_path))
@@ -79,8 +80,14 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         xclbin_basename = os.path.basename(xclbin)
         xclbin_filename = os.path.splitext(xclbin_basename)[0]
+        if (rteName == "1ddr") {
+            aws_xclbin_filename_rte = xclbin_filename.replace("4ddr", "1ddr")
+        }
+        if (rteName == "4ddr_debug") {
+            aws_xclbin_filename_rte = xclbin_filename.replace("2pr", "2pr-debug")
+        }
         aws_xclbin_path = AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath)
-        aws_xclbin_basename = os.path.join(aws_xclbin_path, xclbin_filename)
+        aws_xclbin_basename = os.path.join(aws_xclbin_path, aws_xclbin_filename_rte)
         cmd = "{}/SDAccel/tools/create_sdaccel_afi.sh -s3_bucket={} -s3_dcp_key={} -xclbin={} -o={}".format(
                 self.WORKSPACE,
                 self.s3_bucket,
@@ -112,10 +119,10 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
         return create_afi_response
 
 
-    def test_create_sdaccel_afi(self, examplePath, target="hw"):
+    def test_create_sdaccel_afi(self, examplePath, target="hw", rteName):
 
         xclbin = self.get_sdaccel_xclbin_file(examplePath)
-        create_afi_response = self.call_create_afi_script(examplePath, xclbin, target)
+        create_afi_response = self.call_create_afi_script(examplePath, xclbin, target, rteName)
 
         afi = create_afi_response.get("FpgaImageId", None)
 
