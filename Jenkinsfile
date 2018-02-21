@@ -678,7 +678,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                 }
 
                 for ( def e in entrySet(example_map) ) {
-                    def dsa_map = [ '4DDR' : '4ddr' , '1DDR' : '1ddr' , '4DDR_DEBUG' : '4ddr_debug' ]
+                    def dsa_map = [ '1DDR' : '1ddr' , '4DDR' : '4ddr' , '4DDR_DEBUG' : '4ddr_debug' ]
                 
                     for ( def dsa in entrySet(dsa_map) ) {
 
