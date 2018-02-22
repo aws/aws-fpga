@@ -80,12 +80,10 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         xclbin_basename = os.path.basename(xclbin)
         xclbin_filename = os.path.splitext(xclbin_basename)[0]
-        if (rteName is '1ddr') {
+        if (rteName == '1ddr'):
             aws_xclbin_filename_rte = xclbin_filename.replace("4ddr", "1ddr")
-        }
-        if (rteName is '4ddr_debug') {
+        if (rteName == '4ddr_debug'):
             aws_xclbin_filename_rte = xclbin_filename.replace("2pr", "2pr-debug")
-        }
         aws_xclbin_path = AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath)
         aws_xclbin_basename = os.path.join(aws_xclbin_path, aws_xclbin_filename_rte)
         cmd = "{}/SDAccel/tools/create_sdaccel_afi.sh -s3_bucket={} -s3_dcp_key={} -xclbin={} -o={}".format(
