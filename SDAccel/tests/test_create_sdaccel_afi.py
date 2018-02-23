@@ -117,7 +117,7 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
         return create_afi_response
 
 
-    def test_create_sdaccel_afi(self, examplePath, target="hw", rteName):
+    def test_create_sdaccel_afi(self, examplePath, rteName, target="hw"):
 
         xclbin = self.get_sdaccel_xclbin_file(examplePath)
         create_afi_response = self.call_create_afi_script(examplePath, xclbin, target, rteName)
