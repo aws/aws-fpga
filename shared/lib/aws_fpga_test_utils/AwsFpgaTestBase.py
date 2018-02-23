@@ -67,6 +67,7 @@ class AwsFpgaTestBase(object):
     WORKSPACE = git_repo_dir
 
     ADD_EXAMPLEPATH = False
+    ADD_RTENAME = False
 
     msix_agfi = 'agfi-09c2a21805a8b9257'
 

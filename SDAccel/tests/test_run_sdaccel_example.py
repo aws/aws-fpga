@@ -53,6 +53,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
     '''
 
     ADD_EXAMPLEPATH = True
+    ADD_RTENAME = True
 
     @classmethod
     def setup_class(cls):
@@ -69,7 +70,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
     def teardown_method(self, test_method):
         aws_fpga_test_utils.remove_xdma_driver()
 
-    def test_run_sdaccel_example(self, examplePath):
+    def test_run_sdaccel_example(self, examplePath, rteName):
 
         os.chdir(self.get_sdaccel_example_fullpath(examplePath))
 
@@ -80,7 +81,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
 
         self.get_sdaccel_aws_xclbin_file(examplePath)
 
-        run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/2017.1.rte/setup.sh && {} \"".format(em_run_cmd)
+        run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/2017.1.rte.{}/setup.sh && {} \"".format(rteName, em_run_cmd)
 
         logger.info("Running cmd={}".format(run_cmd))
         (rc, stdout_lines, stderr_lines) = self.run_cmd(run_cmd)
