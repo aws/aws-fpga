@@ -320,6 +320,7 @@ if (test_edma) {
                     if (fileExists(report_file)) {
                         junit healthScaleFactor: 10.0, testResults: report_file
                         // archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
+                        //archiveArtifacts artifacts: "/var/log/messages", fingerprint: true
                     }
                     else {
                         echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
@@ -352,6 +353,7 @@ if (test_xdma) {
                 } finally {
                     junit healthScaleFactor: 10.0, testResults: report_file
                     //archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
+                    //archiveArtifacts artifacts: "/var/log/messages", fingerprint: true
                 }
             }
         }
