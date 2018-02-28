@@ -458,6 +458,7 @@ def check_headers(dir):
             ".*\.gitignore$",
             ".*\.gitmodules$",
             ".*Jenkinsfile.*",
+            ".*supported_vivado_versions\.txt$",
 
             "hdk/.*/ccf_ctl\.v$",
             "hdk/.*/design_error\.inc$",
@@ -481,7 +482,6 @@ def check_headers(dir):
             "hdk/.*/rr_arb\.sv$",
             "hdk/.*/sync\.v$",
             "hdk/.*/README$",
-            "hdk/.*/supported_vivado_versions\.txt$",
             "hdk/.*/hdk_version\.txt$",
             "hdk/.*/dest_register_slice\.v$",
             "hdk/.*/src_register_slice\.v$",

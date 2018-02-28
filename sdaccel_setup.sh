@@ -146,6 +146,8 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     esac
 done
 
+# Install patches as required.
+setup_patches
 
 # Check XILINX_SDX is set
 if ! check_set_xilinx_sdx; then
@@ -277,10 +279,6 @@ export AWS_PLATFORM=$AWS_PLATFORM_4DDR
 info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
 info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
 info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
-
-# Install patches as required.
-
-setup_patches
 
 cd $current_dir
 
