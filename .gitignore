@@ -35,6 +35,8 @@ waves.shm
 *.a
 *.ko
 
+!SDAccel/aws_platform/xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0/libxilinxopencl.so
+
 nohup.out
 *.nohup.out
 
