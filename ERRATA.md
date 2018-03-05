@@ -25,5 +25,4 @@
 * PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)
 
 ## Known Bugs/Issues
-* SDAccel 1DDR configuration has been disabled and will be fixed in the next release
 
