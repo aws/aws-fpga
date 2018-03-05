@@ -254,7 +254,7 @@ then
 fi
 
 aws s3 ${profile_text} cp ${timestamp}_Developer_SDAccel_Kernel.tar s3://${s3_bucket}/${s3_dcps}/
-aws ec2 ${profile_text} create-fpga-image --name ${xclbin} --description ${xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar ${log_storage_text} > ${timestamp}_afi_id.txt
+aws ec2 ${profile_text} create-fpga-image --name ${stripped_xclbin} --description ${stripped_xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar ${log_storage_text} > ${timestamp}_afi_id.txt
 
 
 #STEP 5

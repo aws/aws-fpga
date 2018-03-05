@@ -678,162 +678,175 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                 }
 
                 for ( def e in entrySet(example_map) ) {
+                    def dsa_map = [ '1DDR' : '1ddr' , '4DDR' : '4ddr' , '4DDR_DEBUG' : '4ddr_debug' ]
 
-                    String build_name = e.key
-                    String example_path = e.value
+                    for ( def dsa in entrySet(dsa_map) ) {
 
-                    String sw_emu_stage_name      = "SDAccel SW_EMU ${build_name} FDF"
-                    String hw_emu_stage_name      = "SDAccel HW_EMU ${build_name} FDF"
-                    String hw_stage_name          = "SDAccel HW ${build_name} FDF"
-                    String create_afi_stage_name  = "SDAccel AFI ${build_name} FDF"
-                    String run_example_stage_name = "SDAccel RUN ${build_name} FDF"
+                        String build_name = "${e.key}_${dsa.value}"
+                        String example_path = e.value
 
-                    String sw_emu_report_file      = "sdaccel_sw_emu_${build_name}.xml"
-                    String hw_emu_report_file      = "sdaccel_hw_emu_${build_name}.xml"
-                    String hw_report_file          = "sdaccel_hw_${build_name}.xml"
-                    String create_afi_report_file  = "sdaccel_create_afi_${build_name}.xml"
-                    String run_example_report_file = "sdaccel_run_${build_name}.xml"
+                        String dsa_name = dsa.key
+                        String dsa_rte_name = dsa.value
 
-                    sdaccel_build_stages[build_name] = {
+                        String sw_emu_stage_name      = "SDAccel SW_EMU ${build_name} FDF"
+                        String hw_emu_stage_name      = "SDAccel HW_EMU ${build_name} FDF"
+                        String hw_stage_name          = "SDAccel HW ${build_name} FDF"
+                        String create_afi_stage_name  = "SDAccel AFI ${build_name} FDF"
+                        String run_example_stage_name = "SDAccel RUN ${build_name} FDF"
 
-                        stage(sw_emu_stage_name) {
-                            node(task_label.get('sdaccel_builds')) {
+                        String sw_emu_report_file      = "sdaccel_sw_emu_${build_name}.xml"
+                        String hw_emu_report_file      = "sdaccel_hw_emu_${build_name}.xml"
+                        String hw_report_file          = "sdaccel_hw_${build_name}.xml"
+                        String create_afi_report_file  = "sdaccel_create_afi_${build_name}.xml"
+                        String run_example_report_file = "sdaccel_run_${build_name}.xml"
 
-                                checkout scm
+                        sdaccel_build_stages[build_name] = {
 
-                                try {
-                                    sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600
+                            stage(sw_emu_stage_name) {
+                                node(task_label.get('sdaccel_builds')) {
 
-                                    """
-                                } catch (error) {
-                                    echo "${sw_emu_stage_name} SW EMU Build generation failed"
-                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                    throw error
-                                } finally {
-                                    if (fileExists(sw_emu_report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${sw_emu_report_file}"
-                                    }
-                                }
-                            }
-                        }
+                                    checkout scm
 
-                        stage(hw_emu_stage_name) {
-                            node(task_label.get('sdaccel_builds')) {
+                                    try {
+                                        sh """
+                                            set -e
+                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                            export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600 --rteName ${dsa_rte_name}
 
-                                checkout scm
-
-                                try {
-                                    sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600
-                                    """
-                                } catch (error) {
-                                    echo "${hw_emu_stage_name} HW EMU Build generation failed"
-                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                    throw error
-                                } finally {
-                                    if (fileExists(hw_emu_report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${hw_emu_report_file}"
+                                        """
+                                    } catch (error) {
+                                        echo "${sw_emu_stage_name} SW EMU Build generation failed"
+                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                        throw error
+                                    } finally {
+                                        if (fileExists(sw_emu_report_file)) {
+                                            junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
+                                        }
+                                        else {
+                                            echo "Pytest wasn't run for stage. Report file not generated: ${sw_emu_report_file}"
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        stage(hw_stage_name) {
-                            node(task_label.get('sdaccel_builds')) {
+                            stage(hw_emu_stage_name) {
+                                node(task_label.get('sdaccel_builds')) {
 
-                                checkout scm
+                                    checkout scm
 
-                                try {
-                                    sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200
-                                    """
-                                } catch (error) {
-                                    echo "${hw_stage_name} HW Build generation failed"
-                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                    throw error
-                                } finally {
-                                    if (fileExists(hw_report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: hw_report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${hw_report_file}"
-                                    }
-                                }
-                            }
-                        }
-
-                        stage(create_afi_stage_name) {
-                            node(task_label.get('create-afi')) {
-
-                                checkout scm
-                                try {
-                                    sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800
-                                    """
-                                } catch (error) {
-                                    echo "${create_afi_stage_name} Create AFI failed"
-                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                    throw error
-                                } finally {
-
-                                    if (fileExists(create_afi_report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: create_afi_report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${create_afi_report_file}"
-                                    }
-
-                                    String to_aws_dir = "${example_path}/to_aws"
-
-                                    if (fileExists(to_aws_dir)) {
-                                        sh "rm -rf ${to_aws_dir}"
+                                    try {
+                                        sh """
+                                            set -e
+                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                            export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600 --rteName ${dsa_rte_name}
+                                        """
+                                    } catch (error) {
+                                        echo "${hw_emu_stage_name} HW EMU Build generation failed"
+                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                        throw error
+                                    } finally {
+                                        if (fileExists(hw_emu_report_file)) {
+                                            junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
+                                        }
+                                        else {
+                                            echo "Pytest wasn't run for stage. Report file not generated: ${hw_emu_report_file}"
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        stage(run_example_stage_name) {
-                            node(task_label.get('runtime')) {
+                            stage(hw_stage_name) {
+                                node(task_label.get('sdaccel_builds')) {
 
-                                checkout scm
-                                try {
-                                    sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600
-                                    """
-                                } catch (error) {
-                                    echo "${run_example_stage_name} Runtime example failed"
-                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                    throw error
-                                } finally {
-                                    if (fileExists(run_example_report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: run_example_report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${run_example_report_file}"
+                                    checkout scm
+
+                                    try {
+                                        sh """
+                                            set -e
+                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                            export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200 --rteName ${dsa_rte_name}
+                                        """
+                                    } catch (error) {
+                                        echo "${hw_stage_name} HW Build generation failed"
+                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                        throw error
+                                    } finally {
+                                        if (fileExists(hw_report_file)) {
+                                            junit healthScaleFactor: 10.0, testResults: hw_report_file
+                                        }
+                                        else {
+                                            echo "Pytest wasn't run for stage. Report file not generated: ${hw_report_file}"
+                                        }
                                     }
                                 }
                             }
-                        }
+
+                            stage(create_afi_stage_name) {
+                                node(task_label.get('create-afi')) {
+
+                                    checkout scm
+                                    try {
+                                        sh """
+                                            set -e
+                                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                            export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800 --rteName ${dsa_rte_name}
+
+                                        """
+                                    } catch (error) {
+                                        echo "${create_afi_stage_name} Create AFI failed"
+                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                        throw error
+                                    } finally {
+
+                                        if (fileExists(create_afi_report_file)) {
+                                            junit healthScaleFactor: 10.0, testResults: create_afi_report_file
+                                        }
+                                        else {
+                                            echo "Pytest wasn't run for stage. Report file not generated: ${create_afi_report_file}"
+                                        }
+
+                                        String to_aws_dir = "${example_path}/to_aws"
+
+                                        if (fileExists(to_aws_dir)) {
+                                            sh "rm -rf ${to_aws_dir}"
+                                        }
+                                    }
+                                }
+                            }
+
+                            stage(run_example_stage_name) {
+                                node(task_label.get('runtime')) {
+
+                                    checkout scm
+                                    try {
+                                        sh """
+                                            set -e
+                                            source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
+                                            export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600 --rteName ${dsa_rte_name}
+                                        """
+                                    } catch (error) {
+                                        echo "${run_example_stage_name} Runtime example failed"
+                                        archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                        throw error
+                                    } finally {
+                                        if (fileExists(run_example_report_file)) {
+                                            junit healthScaleFactor: 10.0, testResults: run_example_report_file
+                                        }
+                                        else {
+                                            echo "Pytest wasn't run for stage. Report file not generated: ${run_example_report_file}"
+                                        }
+                                    }
+                                }
+                            }
 
 
-                    } // sdaccel_build_stages[ e.key ]
+                        } // sdaccel_build_stages[ e.key ]
+                    } // for ( dsa in dsa_list_map )
                 } // for ( e in list_map )
 
                 parallel sdaccel_build_stages

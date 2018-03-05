@@ -67,6 +67,7 @@ class AwsFpgaTestBase(object):
     WORKSPACE = git_repo_dir
 
     ADD_EXAMPLEPATH = False
+    ADD_RTENAME = False
 
     msix_agfi = 'agfi-09c2a21805a8b9257'
 
@@ -230,49 +231,59 @@ class AwsFpgaTestBase(object):
         return os.path.join(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath=examplePath), 'xclbin')
 
     @staticmethod
-    def get_sdaccel_example_s3_root_tag(examplePath, target):
+    def get_sdaccel_example_s3_root_tag(examplePath, target, rteName):
         '''
         @param examplePath: Path of the Xilinx SDAccel example
         @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        @param rteName: The runtime environment
         '''
         assert target != ''
         assert examplePath != ''
+        assert rteName != ''
         example_relative_path = os.path.relpath(examplePath, AwsFpgaTestBase.xilinx_sdaccel_examples_prefix_path)
-        return "jenkins/{}/SDAccel/{}/{}".format(os.environ['BUILD_TAG'], example_relative_path, target)
+        return "jenkins/{}/SDAccel/{}/{}/{}".format(os.environ['BUILD_TAG'], rteName, example_relative_path, target)
 
     @staticmethod
-    def get_sdaccel_example_s3_xclbin_tag(examplePath, target):
+    def get_sdaccel_example_s3_xclbin_tag(examplePath, target, rteName):
         '''
         @param examplePath: Path of the Xilinx SDAccel example
         @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        @param rteName: The runtime environment
+
         '''
         assert target != ''
         assert examplePath != ''
-        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+        assert rteName != ''
+
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target, rteName)
 
         return "{}/xclbin".format(root_tag)
 
     @staticmethod
-    def get_sdaccel_example_s3_dcp_tag(examplePath, target):
+    def get_sdaccel_example_s3_dcp_tag(examplePath, target, rteName):
         '''
         @param examplePath: Path of the Xilinx SDAccel example
         @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        @param rteName: The runtime environment
         '''
         assert target != ''
         assert examplePath != ''
-        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+        assert rteName != ''
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target, rteName)
 
         return "{}/dcp".format(root_tag)
 
     @staticmethod
-    def get_sdaccel_example_s3_afi_tag(examplePath, target):
+    def get_sdaccel_example_s3_afi_tag(examplePath, target, rteName):
         '''
         @param examplePath: Path of the Xilinx SDAccel example
         @param target: The target to build. For eg: hw, hw_emu, sw_emu
+        @param rteName: The runtime environment
         '''
         assert target != ''
         assert examplePath != ''
-        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target)
+        assert rteName != ''
+        root_tag = AwsFpgaTestBase.get_sdaccel_example_s3_root_tag(examplePath, target, rteName)
 
         return "{}/create-afi/afi-ids.txt".format(root_tag)
 
@@ -305,12 +316,14 @@ class AwsFpgaTestBase(object):
         return "{}/{}/".format(AwsFpgaTestBase.WORKSPACE, examplePath)
 
     @staticmethod
-    def fetch_sdaccel_xclbin_folder_from_s3(examplePath):
+    def fetch_sdaccel_xclbin_folder_from_s3(examplePath, rteName):
         cwd = os.getcwd()
+        assert examplePath != ''
+        assert rteName != ''
 
         os.chdir(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath))
-        rc = os.system("aws s3 cp s3://{}/{} {} --recursive".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw"), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath)))
-        assert rc == 0, "Error while copying from s3://{}/{} to {}".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw"), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath))
+        rc = os.system("aws s3 cp s3://{}/{} {} --recursive".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw", rteName=rteName), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath)))
+        assert rc == 0, "Error while copying from s3://{}/{} to {}".format(AwsFpgaTestBase.s3_bucket, AwsFpgaTestBase.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target="hw", rteName=rteName), AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath))
         xclbin_path = AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath=examplePath)
 
         logger.debug(xclbin_path)
@@ -320,15 +333,23 @@ class AwsFpgaTestBase(object):
         return xclbin_path
 
     @staticmethod
-    def get_sdaccel_xclbin_file(examplePath):
-        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath)
+    def get_sdaccel_xclbin_file(examplePath, rteName):
+        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath, rteName)
         logger.info("Checking that a non zero size xclbin file exists in {}".format(xclbin_path))
-        xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*.xclbin".format("hw")))
+        if (rteName == '1ddr'):
+            xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*_{}-*.xclbin".format("hw", "1ddr")))
+        if (rteName == '4ddr_debug'):
+            xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*_{}.xclbin".format("hw", "4ddr-xpr-2pr-debug_4_0")))
+        if (rteName == '4ddr'):
+            xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*_{}.xclbin".format("hw", "4ddr-xpr-2pr_4_0")))
         return xclbin
 
     @staticmethod
-    def get_sdaccel_aws_xclbin_file(examplePath):
-        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath)
+    def get_sdaccel_aws_xclbin_file(examplePath, rteName):
+        assert examplePath != ''
+        assert rteName != ''
+
+        xclbin_path = AwsFpgaTestBase.fetch_sdaccel_xclbin_folder_from_s3(examplePath, rteName)
         logger.info("Checking that a non zero size xclbin file exists in {}".format(xclbin_path))
         aws_xclbin = AwsFpgaTestBase.assert_non_zero_file(os.path.join(xclbin_path, "*.{}.*.awsxclbin".format("hw")))
         return aws_xclbin
