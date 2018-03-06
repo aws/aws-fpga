@@ -671,7 +671,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                 try {
                     sh """
                         set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                         python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
                     """
                 } catch (exc) {
