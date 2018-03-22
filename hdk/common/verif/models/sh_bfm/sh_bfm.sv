@@ -2329,7 +2329,9 @@ module sh_bfm #(
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
-         
+              if (dop.cl_addr[5:0] !== 6'h00) begin
+                 $fatal("Address in a SH->CL transfer should be aligned to 64 byte boundary");
+              end
               aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
               byte_cnt = 0;
@@ -2355,6 +2357,7 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
+                  $display("Address is going to cross 4K boundary \n");
                   if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
                     axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
@@ -2474,6 +2477,9 @@ module sh_bfm #(
          for (int chan = 0; chan < 4; chan++) begin
            if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
               dop = c2h_dma_list[chan].pop_front();
+              if (dop.cl_addr[5:0] !== 6'h00) begin
+                 $fatal("Address in a CL->SH transfer should be aligned to 64 byte boundary");
+              end
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
               aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               aligned = (aligned_addr == dop.cl_addr);

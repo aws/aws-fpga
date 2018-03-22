@@ -23,7 +23,9 @@ import tb_type_defines_pkg::*;
    import "DPI-C" context function void  host_memory_putc(input longint unsigned addr, byte data);         // even though a int is used, only the lower 8b are used
    import "DPI-C" context function byte  host_memory_getc(input longint unsigned addr);
 
+`ifdef DMA_TEST
    import "DPI-C" context task send_rdbuf_to_c(input string a);
+`endif
       
    export "DPI-C" task sv_printf;
    export "DPI-C" task sv_map_host_memory;
@@ -33,8 +35,10 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_pause;
    export "DPI-C" task sv_fpga_pci_peek;
    export "DPI-C" task sv_fpga_pci_poke;
+`ifdef DMA_TEST
    export "DPI-C" task sv_fpga_start_buffer_to_cl;
    export "DPI-C" task sv_fpga_start_cl_to_buffer;
+`endif
    export "DPI-C" task init_ddr;
    
    static int h2c_desc_index = 0;
@@ -209,7 +213,8 @@ end
       // allow memory to initialize
       nsec_delay(27000);
    endtask // initialize_sh_model
-   
+
+`ifdef DMA_TEST
    //DPI task to transfer HOST to CL data.
    task sv_fpga_start_buffer_to_cl(input int slot_id = 0, int chan, input int buf_size, input string wr_buffer, input longint unsigned cl_addr);
       int timeout_count, status, error_count;
@@ -272,6 +277,7 @@ end
       //This function is needed to update buffer on C side.
       send_rdbuf_to_c(rd_buffer);
    endtask // sv_fpga_start_cl_to_buffer
+`endif
    
    task power_up(input int slot_id = 0, 
                        ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0,
