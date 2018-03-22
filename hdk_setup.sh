@@ -94,6 +94,9 @@ if ! is_vivado_available; then
     return 1
 fi
 
+# Install any patches as required
+setup_patches
+
 #Searching for Vivado version and comparing it with the list of supported versions
 
 export VIVADO_VER=`vivado -version | grep Vivado | head -1`
@@ -116,9 +119,6 @@ debug_msg "Vivado check succeeded"
 # export CL_DIR=$HDK_DIR/cl/developer_designs
 
 debug_msg "Done setting environment variables.";
-
-# Install any patches as required
-setup_patches
 
 # Download correct shell DCP
 info_msg "Using HDK shell version $hdk_shell_version"
