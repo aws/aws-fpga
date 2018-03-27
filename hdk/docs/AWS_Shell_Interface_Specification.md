@@ -273,7 +273,12 @@ The clocks within each group are generated from a common VCO/PLL, which restrict
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
-Clocks within a gruop are phase aligned.
+clk\_extra\_* clocks within a group are phase aligned:
+  - clk_xtra_a1, clk_xtra_a2, clk_xtra_a3
+  - clk_xtra_b0, clk_xtra_b1
+  - clk_xtra_c0, clk_xtra_c1
+
+Paths between all other clocks are required to be treated as asynchronous.
 
 ** *Note: The Developer must NOT assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies * **  
 
