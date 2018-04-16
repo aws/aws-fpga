@@ -61,9 +61,26 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc $TARGET_DIR
 
 exec chmod +w {*}[glob $TARGET_DIR/*]
 
+set TOOL_VERSION $::env(VIVADO_TOOL_VERSION)
+set vivado_version [version -short]
+set ver_2017_4 2017.4
+puts "AWS FPGA: VIVADO_TOOL_VERSION $TOOL_VERSION"
+puts "vivado_version $vivado_version"
+
+if { [string first $ver_2017_4 $vivado_version] == 0 } {
+# encrypt .v/.sv/.vh/inc as verilog files
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile_2017_4.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
+
+# encrypt *vhdl files
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile_2017_4.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
+
+puts "encrypting using 2017.4"
+} else {
 # encrypt .v/.sv/.vh/inc as verilog files
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
 
 # encrypt *vhdl files
 encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
 
+puts "encrypting using 2017.1"
+}

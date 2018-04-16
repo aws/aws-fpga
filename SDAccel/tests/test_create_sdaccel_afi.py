@@ -55,6 +55,8 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
     '''
 
     ADD_EXAMPLEPATH = True
+    ADD_RTENAME = True
+    ADD_XILINX_VERSION = True
 
     @classmethod
     def setup_class(cls):
@@ -68,7 +70,7 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         return
 
-    def call_create_afi_script(self, examplePath, xclbin, target):
+    def call_create_afi_script(self, examplePath, xclbin, target, rteName, xilinxVersion):
 
         full_example_path = self.get_sdaccel_example_fullpath(examplePath=examplePath)
         logger.info("SDAccel Example path={}".format(full_example_path))
@@ -79,12 +81,19 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
 
         xclbin_basename = os.path.basename(xclbin)
         xclbin_filename = os.path.splitext(xclbin_basename)[0]
+        aws_xclbin_filename_rte = xclbin_filename;
+        if (rteName == '1ddr'):
+            aws_xclbin_filename_rte = xclbin_filename.replace("1ddr", "4ddr")
+        if (rteName == '4ddr_debug'):
+            aws_xclbin_filename_rte = xclbin_filename.replace("2pr-debug", "2pr")
+
         aws_xclbin_path = AwsFpgaTestBase.get_sdaccel_xclbin_dir(examplePath)
-        aws_xclbin_basename = os.path.join(aws_xclbin_path, xclbin_filename)
+        aws_xclbin_basename = os.path.join(aws_xclbin_path, aws_xclbin_filename_rte)
+
         cmd = "{}/SDAccel/tools/create_sdaccel_afi.sh -s3_bucket={} -s3_dcp_key={} -xclbin={} -o={}".format(
                 self.WORKSPACE,
                 self.s3_bucket,
-                self.get_sdaccel_example_s3_dcp_tag(examplePath=examplePath, target=target),
+                self.get_sdaccel_example_s3_dcp_tag(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion),
                 xclbin,
                 aws_xclbin_basename
             )
@@ -97,12 +106,12 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
         aws_xclbin = self.assert_non_zero_file(os.path.join(aws_xclbin_path, "*.{}.*.awsxclbin".format(target)))
         logger.info("Uploading aws_xclbin file: {}".format(aws_xclbin))
 
-        aws_xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target), basename(aws_xclbin))
+        aws_xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion), basename(aws_xclbin))
         self.s3_client().upload_file(aws_xclbin, self.s3_bucket, aws_xclbin_key)
 
         create_afi_response_file = self.assert_non_zero_file(os.path.join(full_example_path, "*afi_id.txt"))
 
-        create_afi_response_file_key = self.get_sdaccel_example_s3_afi_tag(examplePath=examplePath, target=target)
+        create_afi_response_file_key = self.get_sdaccel_example_s3_afi_tag(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion)
 
         logger.info("Uploading create_afi output file: {}".format(create_afi_response_file))
         self.s3_client().upload_file(create_afi_response_file, self.s3_bucket, create_afi_response_file_key)
@@ -112,10 +121,10 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
         return create_afi_response
 
 
-    def test_create_sdaccel_afi(self, examplePath, target="hw"):
+    def test_create_sdaccel_afi(self, examplePath, rteName, xilinxVersion, target="hw"):
 
-        xclbin = self.get_sdaccel_xclbin_file(examplePath)
-        create_afi_response = self.call_create_afi_script(examplePath, xclbin, target)
+        xclbin = self.get_sdaccel_xclbin_file(examplePath, rteName, xilinxVersion)
+        create_afi_response = self.call_create_afi_script(examplePath, xclbin, target, rteName, xilinxVersion)
 
         afi = create_afi_response.get("FpgaImageId", None)
 

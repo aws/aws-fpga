@@ -45,6 +45,8 @@ class TestBuildSDAccelExample(AwsFpgaTestBase):
 
     '''
     ADD_EXAMPLEPATH = True
+    ADD_RTENAME = True
+    ADD_XILINX_VERSION = True
 
     @classmethod
     def setup_class(cls):
@@ -59,17 +61,17 @@ class TestBuildSDAccelExample(AwsFpgaTestBase):
 
         return
 
-    def test_sw_emu(self, examplePath):
+    def test_sw_emu(self, examplePath, rteName, xilinxVersion):
         target = "sw_emu"
-        self.base_test(examplePath=examplePath, target=target, check=True)
+        self.base_test(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion, check=True)
 
-    def test_hw_emu(self, examplePath):
+    def test_hw_emu(self, examplePath, rteName, xilinxVersion):
         target = "hw_emu"
-        self.base_test(examplePath=examplePath, target=target, check=True)
+        self.base_test(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion, check=True)
 
-    def test_hw_build(self, examplePath):
+    def test_hw_build(self, examplePath, rteName, xilinxVersion):
         target = "hw"
-        self.base_test(examplePath=examplePath, target=target, check=False)
+        self.base_test(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion, check=False)
 
     def check_build(self, examplePath, target):
 
@@ -84,7 +86,7 @@ class TestBuildSDAccelExample(AwsFpgaTestBase):
 
         return xclbin
 
-    def base_test(self, examplePath, target, clean=True, check=True):
+    def base_test(self, examplePath, target, rteName, xilinxVersion, clean=True, check=True):
 
         full_example_path = self.get_sdaccel_example_fullpath(examplePath=examplePath)
         logger.info("SDAccel Example path={}".format(full_example_path))
@@ -107,7 +109,7 @@ class TestBuildSDAccelExample(AwsFpgaTestBase):
         # Check for non zero xclbin
         xclbin = self.check_build(examplePath=examplePath, target=target)
 
-        xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target), basename(xclbin))
+        xclbin_key = os.path.join(self.get_sdaccel_example_s3_xclbin_tag(examplePath=examplePath, target=target, rteName=rteName, xilinxVersion=xilinxVersion), basename(xclbin))
 
         logger.info("Uploading xclbin to {}".format(os.path.join(self.s3_bucket, xclbin_key)))
         self.s3_client().upload_file(xclbin, self.s3_bucket, xclbin_key)

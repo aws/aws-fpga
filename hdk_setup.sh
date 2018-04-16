@@ -113,6 +113,10 @@ else
     return 1
 fi
 
+VIVADO_TOOL_VERSION=`vivado -version | grep Vivado | head -1 | sed 's:Vivado *::' | sed 's: .*$::'`
+export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:7}
+echo "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
+
 debug_msg "Vivado check succeeded"
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.

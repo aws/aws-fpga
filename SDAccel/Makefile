@@ -35,7 +35,7 @@ $(info XILINX_SDX = $(XILINX_SDX))
 endif
 
 ifeq ($(RELEASE_VER),2017.1)
-    DSA := xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
+    #DSA := $(DSA)
     SRC_DIR = src
     XRT_HAL_LIB = libawsxcldrv.so
     EXE = awssak
@@ -49,9 +49,9 @@ else
 endif
 
 OPENCLLIB := 
-OPENCLFILE =  $(SDACCEL_DIR)/aws_platforms/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
+OPENCLFILE =  $(SDACCEL_DIR)/aws_platform/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
 
-ifeq ($(wildcard $(OPENCLFILE)),)
+ifeq ($(OPENCLFILE),)
   OPENCLLIB := ${XILINX_SDX}/runtime/lib/x86_64/libxilinxopencl.so
 else
   OPENCLLIB := $(OPENCLFILE)
@@ -68,6 +68,8 @@ clean:
 	make -C ${SDK_DIR}/linux_kernel_drivers/xdma clean
 
 install:
+	@echo "INSTALL_ROOT=$(INSTALL_ROOT)"
+	@echo "DSA=$(DSA)"
 	make -C ${SDK_DIR}/linux_kernel_drivers/xdma install
 	install -d $(INSTALL_ROOT)/runtime/platforms/$(DSA)/driver
 	install -d $(INSTALL_ROOT)/runtime/bin
@@ -78,7 +80,7 @@ install:
 	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_ROOT)/runtime/bin
 	#install -m 755 ${XILINX_SDX}/runtime/lib/x86_64/libxilinxopencl.so $(INSTALL_ROOT)/runtime/lib/x86_64
 	install -m 755 ${OPENCLLIB} $(INSTALL_ROOT)/runtime/lib/x86_64
-	install -m 755 ${XILINX_SDX}/runtime/lib/x86_64/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
+	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
 	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_ROOT)/setup.sh for bash"
 	@echo "export XILINX_OPENCL=$(INSTALL_ROOT)" > $(INSTALL_ROOT)/setup.sh
 	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_ROOT)/setup.sh

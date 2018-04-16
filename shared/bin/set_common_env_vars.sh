@@ -52,6 +52,7 @@ unset SDK_DIR
 
 export SDK_DIR=$AWS_FPGA_REPO_DIR/sdk
 
+export XIL_CHECK_TCL_DEBUG=1
 
 # SDACCEL
 # Setup Location of SDACCEL_DIR

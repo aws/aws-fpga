@@ -299,17 +299,20 @@ info_msg "Installing SDAccel runtime"
 
 if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.1ddr
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER install ; then
+    export DSA=xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA install ; then
         err_msg "Install of 1DDR SDAccel runtime FAILED"
         return 1
     fi
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER install ; then
+    export DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA  install ; then
         err_msg "Install of 4DDR SDAccel runtime FAILED"
         return 1
     fi
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr_debug
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER install ; then
+    export DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA  install ; then
         err_msg "Install of 4DDR DEBUG SDAccel runtime FAILED"
         return 1
     fi
@@ -319,7 +322,8 @@ if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
     info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
 else
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.dyn
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER install ; then
+    export DSA=xilinx_aws-vu9p-f1_dynamic_5_0
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA install ; then
         err_msg "Install of SDAccel runtime FAILED"
         return 1
     fi
