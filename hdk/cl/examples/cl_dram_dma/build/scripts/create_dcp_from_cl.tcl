@@ -339,7 +339,6 @@ puts $manifest_file "manifest_format_version=1\n"
 #puts "in 2017.1"
 }
 
-puts $manifest_file "manifest_format_version=1\n"
 puts $manifest_file "pci_vendor_id=$vendor_id\n"
 puts $manifest_file "pci_device_id=$device_id\n"
 puts $manifest_file "pci_subsystem_id=$subsystem_id\n"

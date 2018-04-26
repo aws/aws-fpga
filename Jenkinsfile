@@ -46,16 +46,16 @@ def dcp_recipe_scenarios = [
     // Fastest clock speeds are: A1-B2-C0
     // Test each clock recipe with the BASIC strategy
     // Test all strategies with highest clock speeds
-    '[A1-B1-C1-BASIC]',
-    '[A1-B2-C0-BASIC]',
-    '[A2-B3-C2-BASIC]',
-    '[A1-B4-C3-BASIC]',
-    '[A1-B5-C0-BASIC]',
-    '[A1-B2-C0-DEFAULT]',
-    '[A1-B2-C0-EXPLORE]',
-    '[A1-B2-C0-TIMING]',
-    '[A1-B2-C0-TIMING]',
-    '[A1-B2-C0-CONGESTION]',
+    'A1-B1-C1-BASIC',
+    'A1-B2-C0-BASIC',
+    'A2-B3-C2-BASIC',
+    'A1-B4-C3-BASIC',
+    'A1-B5-C0-BASIC',
+    'A1-B2-C0-DEFAULT',
+    'A1-B2-C0-EXPLORE',
+    'A1-B2-C0-TIMING',
+    'A1-B2-C0-TIMING',
+    'A1-B2-C0-CONGESTION',
     ]
 def fdf_test_names = ['cl_dram_dma[A0-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
     'cl_uram_example[2]', 'cl_uram_example[3]', 'cl_uram_example[4]']
@@ -105,6 +105,14 @@ def default_xilinx_version = xilinx_versions.last()
 
 def dsa_map = [ '2017.1' : [ '1DDR' : '1ddr' , '4DDR' : '4ddr' , '4DDR_DEBUG' : '4ddr_debug' ],
                 '2017.4' : [ 'DYNAMIC_5_0' : 'dyn']
+]
+
+def sdaccel_example_map = [ '2017.1' : [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ],
+                            '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+                                         'Gmem_2Banks': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+                                         'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+                                         'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+                                        ]
 ]
 
 // Get serializable entry set
@@ -435,39 +443,44 @@ if (test_dcp_recipes) {
     multi_stage_tests['Test DCP Recipes'] = {
         stage('Test DCP Recipes') {
             def nodes = [:]
-            for (cl in dcp_recipe_cl_names) {
-                String cl_name = cl
-                for (s in dcp_recipe_scenarios) {
-                    String recipe_scenario = s
-                    String node_name = "Test DCP Recipe ${default_xilinx_version} ${cl_name}${recipe_scenario}"
-                    nodes[node_name] = {
-                        node(get_task_label(task: 'dcp_gen', xilinx_version: default_xilinx_version)) {
-                            String test_name = "test_${cl_name}${recipe_scenario}"
-                            String report_file = "test_dcp_recipe_${cl_name}${recipe_scenario}.xml"
-                            String build_dir = "hdk/cl/examples/${cl_name}/build"
-                            checkout scm
-                            try {
-                                sh """
-                                  set -e
-                                  source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                  python2.7 -m pytest -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file}
-                                  """
-                            } catch(exc) {
-                                echo "${test_name} DCP generation failed: archiving results"
-                                archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
-                                throw exc
-                            } finally {
-                                if (fileExists(report_file)) {
-                                    junit healthScaleFactor: 10.0, testResults: report_file
-                                }
-                                else {
-                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+            for (version in xilinx_versions) {
+                String xilinx_version = version
+
+                for (cl in dcp_recipe_cl_names) {
+                    String cl_name = cl
+                    for (s in dcp_recipe_scenarios) {
+                        String recipe_scenario = s
+                        String node_name = "Test DCP Recipe ${cl_name}[${xilinx_version}-${recipe_scenario}]"
+                        nodes[node_name] = {
+                            node(get_task_label(task: 'dcp_gen', xilinx_version: xilinx_version)) {
+                                String test_name = "test_${cl_name}[${xilinx_version}-${recipe_scenario}]"
+                                String report_file = "test_dcp_recipe_${cl_name}[${xilinx_version}-${recipe_scenario}].xml"
+                                String build_dir = "hdk/cl/examples/${cl_name}/build"
+                                checkout scm
+                                try {
+                                    sh """
+                                      set -e
+                                      source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                      python2.7 -m pytest -s -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                                      """
+                                } catch(exc) {
+                                    echo "${test_name} DCP generation failed: archiving results"
+                                    archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
+                                    throw exc
+                                } finally {
+                                    if (fileExists(report_file)) {
+                                        junit healthScaleFactor: 10.0, testResults: report_file
+                                    }
+                                    else {
+                                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
             parallel nodes
         }
     }
@@ -793,6 +806,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 else {
                                                     echo "Pytest wasn't run for stage. Report file not generated: ${sw_emu_report_file}"
                                                 }
+                                                sh """
+                                                    set -e
+                                                    sudo git reset --hard
+                                                    sudo git clean -fdx
+                                                """
                                             }
                                         }
                                     }
@@ -820,6 +838,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 else {
                                                     echo "Pytest wasn't run for stage. Report file not generated: ${hw_emu_report_file}"
                                                 }
+                                                sh """
+                                                    set -e
+                                                    sudo git reset --hard
+                                                    sudo git clean -fdx
+                                                """
                                             }
                                         }
                                     }
@@ -834,7 +857,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_stage_name} HW Build generation failed"
@@ -847,6 +870,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 else {
                                                     echo "Pytest wasn't run for stage. Report file not generated: ${hw_report_file}"
                                                 }
+                                                sh """
+                                                    set -e
+                                                    sudo git reset --hard
+                                                    sudo git clean -fdx
+                                                """
                                             }
                                         }
                                     }
@@ -860,7 +888,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${create_afi_stage_name} Create AFI failed"
@@ -880,6 +908,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 if (fileExists(to_aws_dir)) {
                                                     sh "rm -rf ${to_aws_dir}"
                                                 }
+                                                sh """
+                                                    set -e
+                                                    sudo git reset --hard
+                                                    sudo git clean -fdx
+                                                """
                                             }
                                         }
                                     }
@@ -907,6 +940,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 else {
                                                     echo "Pytest wasn't run for stage. Report file not generated: ${run_example_report_file}"
                                                 }
+                                                sh """
+                                                    set -e
+                                                    sudo git reset --hard
+                                                    sudo git clean -fdx
+                                                """
                                             }
                                         }
                                     }

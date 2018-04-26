@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2017 Xilinx, Inc
+ * Copyright (C) 2015-2018 Xilinx, Inc
  * Author: Sonal Santan
  * Simple usermode XDMA DDR memory manager used by HAL
  * Eventually the common code here will be used by all HAL drivers.

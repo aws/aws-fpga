@@ -34,18 +34,24 @@ else
 $(info XILINX_SDX = $(XILINX_SDX))
 endif
 
+
+MODULE :=
 ifeq ($(RELEASE_VER),2017.1)
-    #DSA := $(DSA)
+    DSA := $(DSA)
     SRC_DIR = src
     XRT_HAL_LIB = libawsxcldrv.so
     EXE = awssak
+    MODULE = xdma
+    GLIBCPP_PATH = lib/lnx64.o
 else ifeq ($(RELEASE_VER),2017.4)
-   DSA := xilinx_aws-vu9p-f1_dynamic_5_0
-   SRC_DIR = src2
-   XRT_HAL_LIB = libxrt-aws.so
-   EXE = awssak2
+  DSA := xilinx_aws-vu9p-f1_dynamic_5_0
+  SRC_DIR = src2
+  XRT_HAL_LIB = libxrt-aws.so
+  EXE = awssak2
+  MODULE = xocl
+  GLIBCPP_PATH = lib/lnx64.o/Default
 else
-   $(error Environment variable RELEASE_VER not recognized: $(RELEASE_VER))
+  $(error Environment variable RELEASE_VER not recognized: $(RELEASE_VER))
 endif
 
 OPENCLLIB := 
@@ -60,17 +66,17 @@ endif
 all:
 	make -C ${SDACCEL_DIR}/userspace/$(SRC_DIR) debug=$(debug) ec2=$(ec2)
 	make -C ${SDACCEL_DIR}/tools/$(EXE) debug=$(debug) ec2=$(ec2)
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE)
 
 clean:
 	make -C ${SDACCEL_DIR}/userspace/$(SRC_DIR) clean debug=$(debug) ec2=$(ec2)
 	make -C ${SDACCEL_DIR}/tools/$(EXE) clean debug=$(debug) ec2=$(ec2)
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma clean
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE) clean
 
 install:
 	@echo "INSTALL_ROOT=$(INSTALL_ROOT)"
 	@echo "DSA=$(DSA)"
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma install
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE) install
 	install -d $(INSTALL_ROOT)/runtime/platforms/$(DSA)/driver
 	install -d $(INSTALL_ROOT)/runtime/bin
 	install -d $(INSTALL_ROOT)/runtime/lib/x86_64
@@ -78,9 +84,8 @@ install:
 	install -m 755 ${SDACCEL_DIR}/tools/$(EXE)/xbsak $(INSTALL_ROOT)/runtime/bin
 	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_ROOT)/runtime/bin
 	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_ROOT)/runtime/bin
-	#install -m 755 ${XILINX_SDX}/runtime/lib/x86_64/libxilinxopencl.so $(INSTALL_ROOT)/runtime/lib/x86_64
 	install -m 755 ${OPENCLLIB} $(INSTALL_ROOT)/runtime/lib/x86_64
-	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
+	install -m 755 ${XILINX_SDX}/$(GLIBCPP_PATH)/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
 	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_ROOT)/setup.sh for bash"
 	@echo "export XILINX_OPENCL=$(INSTALL_ROOT)" > $(INSTALL_ROOT)/setup.sh
 	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_ROOT)/setup.sh

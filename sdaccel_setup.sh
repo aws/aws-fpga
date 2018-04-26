@@ -184,7 +184,13 @@ else
 fi
 
 # settings64 removal - once we put this in the AMI, we will add a check
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+
+if [[ $RELEASE_VER =~ .*2017\.1.* ]]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+else
+    export LD_LIBRARY_PATH=`$XILINX_SDX/bin/ldlibpath.sh $XILINX_SDX/lib/lnx64.o`:$XILINX_SDX/runtime/lib/x86_64
+fi
 
 # Check if internet connection is available
 if ! check_internet; then
@@ -280,7 +286,7 @@ if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
     #-------------------4 DDR RTL Kernel Debug--------------------
 else
     #-------------------Dynamic 5.0 Platform----------------------
-    setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v022018_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
+    setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v041618_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
     info_msg "AWS Platform: Dynamic 5.0 Platform is up-to-date"
     #-------------------Dynamic 5.0 Platform----------------------
 fi
@@ -298,35 +304,36 @@ info_msg "Installing SDAccel runtime"
 
 
 if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
+    
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.1ddr
-    export DSA=xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA install ; then
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 install ; then
         err_msg "Install of 1DDR SDAccel runtime FAILED"
         return 1
     fi
+
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr
-    export DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA  install ; then
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0 install ; then
         err_msg "Install of 4DDR SDAccel runtime FAILED"
         return 1
     fi
+
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr_debug
-    export DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA  install ; then
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0 install ; then
         err_msg "Install of 4DDR DEBUG SDAccel runtime FAILED"
         return 1
     fi
+    
     export AWS_PLATFORM=$AWS_PLATFORM_4DDR
     info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
     info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
     info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
 else
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.dyn
-    export DSA=xilinx_aws-vu9p-f1_dynamic_5_0
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=$DSA install ; then
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_dynamic_5_0 install ; then
         err_msg "Install of SDAccel runtime FAILED"
         return 1
     fi
+    
     export AWS_PLATFORM=$AWS_PLATFORM_DYNAMIC_5_0
 fi
 info_msg "SDAccel runtime installed"

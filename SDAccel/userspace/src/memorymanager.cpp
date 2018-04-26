@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2017 Xilinx, Inc
+ * Copyright (C) 2015-2018 Xilinx, Inc
  * Author: Sonal Santan
  * XDMA HAL Driver layered on top of XDMA kernel driver
  *

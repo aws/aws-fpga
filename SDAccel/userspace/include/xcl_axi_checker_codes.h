@@ -1,7 +1,8 @@
 /**
+ * Copyright (C) 2015-2018 Xilinx, Inc
+ *
  * Xilinx SDAccel HAL userspace driver extension APIs
  * Performance Monitoring Exposed Parameters
- * Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the

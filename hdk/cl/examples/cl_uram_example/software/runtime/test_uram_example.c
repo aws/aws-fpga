@@ -67,7 +67,6 @@ void usage(char* program_name) {
 
 /*** Global Variables ***/
 uint32_t nb_iter;
-uint32_t glb_value;
 
 int main(int argc, char **argv) {
   int rc;
@@ -110,12 +109,12 @@ int main(int argc, char **argv) {
     printf("===== Starting with uram_example =====\n");	
     printf("===== ========================== =====\n");	
     printf("Enter your command followed by your 32 bits hexadecimal value (without 0x)\n");	
-    printf("Example: find FEEDBABE\n");
+    printf("Note that only the [28:0] bits will be stored in the URAM\n");
     printf("Example: add CAFE4B1D\n");
-    printf("Example: del DEADDEAD\n");
+    printf("Example: find CAFE4B1D\n");
+    printf("Example: del CAFE4B1D\n");
     scanf("%s %x", command, &value);
   }
-  glb_value = value;
  
   // The 3 MSB are used to encode {find, add, del} when writing to the CL
   // On a read they indicate {find_ok, del_ok, busy}
@@ -211,15 +210,15 @@ int uram_example(int slot_id, int pf_id, int bar_id, uint32_t value) {
   
   if(find_ok == 1) {
     if(del_info == 1) {
-      printf("Deletion OK : The value 0x%x has been deleted successfully\n", glb_value); 
+      printf("Deletion OK : The value 0x%08x has been deleted successfully\n", value); 
     } else {
-      printf("Find OK : The value 0x%x is present in the URAM\n", glb_value); 
+      printf("Find OK : The value 0x%08x is present in the URAM\n", value); 
     }
   } else {
     if(find_ko == 1) {
-      printf("Find KO : The value 0x%x is NOT present in the URAM\n", glb_value); 
+      printf("Find KO : The value 0x%08x is NOT present in the URAM\n", value); 
     } else {
-      printf("The value 0x%x has been added to the URAM successfully\n", glb_value);
+      printf("The value 0x%08x has been added to the URAM successfully\n", value);
     }
   }
 
