@@ -50,6 +50,15 @@ install: all
 	-rmmod -s xdma || true
 	-modprobe xdma
 
+uninstall:
+	-rm -f /etc/udev/rules.d/10-xdma.rules
+	-rmmod -s xdma || true
+	-rm -f /lib/modules/`uname -r`/extra/xdma.ko
+	depmod -a
+
+# Allow make install and uninstall targets to work without having to set ec2 in the environment.
+noop:
+
 endif
 
 ifneq ($(ec2),1)
