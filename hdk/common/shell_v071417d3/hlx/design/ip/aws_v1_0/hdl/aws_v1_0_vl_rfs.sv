@@ -2182,6 +2182,7 @@ module aws_v1_0_0_top #
    parameter [15:0]  C_SUBSYSTEM_VENDOR_ID = 16'hFEDD,
    parameter [15:0]  C_SUBSYSTEM_ID = 16'h1D51,
    parameter C_CLOCK_A0_PERIOD = "8.0",
+   parameter C_CLOCK_A1_PERIOD = "4.0",
    parameter C_CLOCK_B0_PERIOD = "4.0",
    parameter C_CLOCK_C0_PERIOD = "3.333333",
    parameter integer C_CLOCK_A_RECIPE = 0,

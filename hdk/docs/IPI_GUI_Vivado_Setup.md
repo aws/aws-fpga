@@ -38,7 +38,7 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 
 source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
 
-Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded.
+Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow. 
 
 <a name="hlxinst_win"></a>
 # Windows Install

@@ -2027,7 +2027,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A1.CLK_DOMAIN">clk_main_a0_out</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A1.CLK_DOMAIN">clk_extra_a1_out</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
@@ -2060,7 +2060,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A2.CLK_DOMAIN">clk_main_a0_out</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A2.CLK_DOMAIN">clk_extra_a1_out</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
@@ -2093,7 +2093,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A3.CLK_DOMAIN">clk_main_a0_out</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A3.CLK_DOMAIN">clk_extra_a1_out</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
@@ -4130,45 +4130,21 @@
       <spirit:name>M_AXI_PCIS</spirit:name>
       <spirit:range>128G</spirit:range>
       <spirit:width spirit:format="long">512</spirit:width>
-      <spirit:parameters>
-        <spirit:parameter>
-          <spirit:name>PREFERRED_USAGE</spirit:name>
-          <spirit:value spirit:id="ADDRSPACEPARAM_VALUE.M_AXI_PCIS.PREFERRED_USAGE">MEMORY</spirit:value>
-        </spirit:parameter>
-      </spirit:parameters>
     </spirit:addressSpace>
     <spirit:addressSpace>
       <spirit:name>M_AXI_SDA</spirit:name>
       <spirit:range>4M</spirit:range>
       <spirit:width spirit:format="long">32</spirit:width>
-      <spirit:parameters>
-        <spirit:parameter>
-          <spirit:name>PREFERRED_USAGE</spirit:name>
-          <spirit:value spirit:id="ADDRSPACEPARAM_VALUE.M_AXI_SDA.PREFERRED_USAGE">REGISTER</spirit:value>
-        </spirit:parameter>
-      </spirit:parameters>
     </spirit:addressSpace>
     <spirit:addressSpace>
       <spirit:name>M_AXI_OCL</spirit:name>
       <spirit:range>32M</spirit:range>
       <spirit:width spirit:format="long">32</spirit:width>
-      <spirit:parameters>
-        <spirit:parameter>
-          <spirit:name>PREFERRED_USAGE</spirit:name>
-          <spirit:value spirit:id="ADDRSPACEPARAM_VALUE.M_AXI_OCL.PREFERRED_USAGE">REGISTER</spirit:value>
-        </spirit:parameter>
-      </spirit:parameters>
     </spirit:addressSpace>
     <spirit:addressSpace>
       <spirit:name>M_AXI_BAR1</spirit:name>
       <spirit:range>2M</spirit:range>
       <spirit:width spirit:format="long">32</spirit:width>
-      <spirit:parameters>
-        <spirit:parameter>
-          <spirit:name>PREFERRED_USAGE</spirit:name>
-          <spirit:value spirit:id="ADDRSPACEPARAM_VALUE.M_AXI_BAR1.PREFERRED_USAGE">REGISTER</spirit:value>
-        </spirit:parameter>
-      </spirit:parameters>
     </spirit:addressSpace>
   </spirit:addressSpaces>
   <spirit:memoryMaps>
@@ -4311,7 +4287,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>978f5154</spirit:value>
+            <spirit:value>c478525c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4332,7 +4308,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>49718e29</spirit:value>
+            <spirit:value>7327bf15</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4399,7 +4375,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>7dde6f22</spirit:value>
+            <spirit:value>3f6a08f3</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4421,7 +4397,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>5207de60</spirit:value>
+            <spirit:value>45fed6b9</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -15665,6 +15641,10 @@
         <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A0_PERIOD">8.0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
+        <spirit:name>C_CLOCK_A1_PERIOD</spirit:name>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A1_PERIOD">4.0</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="string">
         <spirit:name>C_CLOCK_B0_PERIOD</spirit:name>
         <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_B0_PERIOD">4.0</spirit:value>
       </spirit:modelParameter>
@@ -15764,7 +15744,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_productguide_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>http://www.xilinx.com/cgi-bin/docs/ipdoc?c=smartconnect;v=v1_0;d=pg247-smartconnect.pdf</spirit:name>
+        <spirit:name>http://www.xilinx.com/cgi-bin/docs/ipdoc?c=aws;v=v1_0;d=pg247-smartconnect.pdf</spirit:name>
         <spirit:userFileType>pdf</spirit:userFileType>
         <spirit:logicalName>aws_v1_0_0</spirit:logicalName>
       </spirit:file>
@@ -16329,16 +16309,16 @@
       <xilinx:displayName>AWS</xilinx:displayName>
       <xilinx:vendorURL>http://www.xilinx.com</xilinx:vendorURL>
       <xilinx:coreRevision>0</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-11-15T21:58:49Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2018-03-28T23:22:46Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2017.1_sdx</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="1043eae4"/>
-      <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="b960cc28"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="b366a3f3"/>
+      <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="bd5d1c9c"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="dcd15a8a"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="23edff88"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="caf53e31"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="d0c5a948"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d2b7b8ff"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="87929d18"/>
       <xilinx:checksum xilinx:scope="cpus" xilinx:value="116b6c06"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="936ef3e9"/>
     </xilinx:packagingInfo>
