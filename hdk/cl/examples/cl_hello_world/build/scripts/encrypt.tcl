@@ -24,7 +24,9 @@ set CL_DIR $::env(CL_DIR)
 set TARGET_DIR $CL_DIR/build/src_post_encryption
 set UNUSED_TEMPLATES_DIR $HDK_SHELL_DESIGN_DIR/interfaces
 # Remove any previously encrypted files, that may no longer be used
-exec rm -f $TARGET_DIR/*
+if {[llength [glob -nocomplain -dir $TARGET_DIR *]] != 0} {
+  eval file delete -force [glob $TARGET_DIR/*]
+}
 
 #---- Developr would replace this section with design files ----
 
