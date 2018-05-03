@@ -192,6 +192,8 @@ else
     export LD_LIBRARY_PATH=`$XILINX_SDX/bin/ldlibpath.sh $XILINX_SDX/lib/lnx64.o`:$XILINX_SDX/runtime/lib/x86_64
 fi
 
+export LD_LIBRARY_PATH=$XILINX_SDX/lnx64/tools/opencv/:$LD_LIBRARY_PATH
+
 # Check if internet connection is available
 if ! check_internet; then
     return 1

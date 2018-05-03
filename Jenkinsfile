@@ -107,12 +107,16 @@ def dsa_map = [ '2017.1' : [ '1DDR' : '1ddr' , '4DDR' : '4ddr' , '4DDR_DEBUG' : 
                 '2017.4' : [ 'DYNAMIC_5_0' : 'dyn']
 ]
 
-def sdaccel_example_map = [ '2017.1' : [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ],
-                            '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-                                         'Gmem_2Banks': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-                                         'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-                                         'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-                                        ]
+def sdaccel_example_default_map = [ '2017.1' : [ 'Hello_World_all': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+                                                 'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+                                                 'wide_mem_rw_ocl_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/wide_mem_rw_ocl',
+                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd'
+                                               ],
+                                    '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+                                                 'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+                                                 'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+                                               ]
 ]
 
 // Get serializable entry set
@@ -747,9 +751,10 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                         }
 
                         // Only run the hello world test by default
-                        def example_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
-
-                        // Run all examples when parameter set
+                        //def example_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
+                        def example_map = sdaccel_example_default_map.get(xilinx_version) 
+                        
+			// Run all examples when parameter set
                         if (test_all_sdaccel_examples_fdf) {
                             example_map = readJSON file: sdaccel_examples_list
                         }
@@ -757,11 +762,38 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                         def sdaccel_build_stages = [:]
 
                         for ( def e in entrySet(example_map) ) {
-
+                                 
+			    String test_key = e.key
                             def dsa_map_for_version = dsa_map.get(xilinx_version)
+			    def dsa_map_for_test = [:] 
+			    if(xilinx_version == '2017.4') {
+			        dsa_map_for_test = dsa_map_for_version
+		            } else {
+			           echo "in  xilinx_version 2017.1"
+			    	  if(test_key =~ '_all') {
+			      		dsa_map_for_test = dsa_map_for_version
+			    	   } else if(test_key =~ '_1ddr')  {
+					dsa_map_for_test.put("1DDR", dsa_map_for_version.get("1DDR"))
+ 			    	   } else if(test_key =~ '_2ddr')  {
+                                        dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
+			           } else if(test_key =~ '_4ddr')  {
+			                dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
+				   } else if(test_key =~ '_Debug')  {
+					dsa_map_for_test.put("4DDR_DEBUG", dsa_map_for_version.get("4DDR_DEBUG"))
+			           } else {
+                              		dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
+			           }
 
+			     }
+                             
+			     Boolean test_sw_emu_supported = true 
+
+                             if(test_key =~ '_Debug') {
+                                 test_sw_emu_supported = false
+			     }
+                            
                             // dsa = [ 4DDR: 4ddr ]
-                            for ( def dsa in entrySet(dsa_map_for_version) ) {
+                            for ( def dsa in entrySet(dsa_map_for_test) ) {
 
                                 String build_name = "SDx ${e.key}_${dsa.value}_${xilinx_version}"
                                 String example_path = e.value
@@ -782,7 +814,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                 String run_example_report_file = "sdaccel_run_${e.key}_${dsa.value}_${xilinx_version}.xml"
 
                                 sdaccel_build_stages[build_name] = {
-
+                                  if(test_sw_emu_supported) { 
                                     stage(sw_emu_stage_name) {
                                         node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
 
@@ -793,7 +825,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=3600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${sw_emu_stage_name} SW EMU Build generation failed"
@@ -814,7 +846,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                             }
                                         }
                                     }
-
+                                 }  
                                     stage(hw_emu_stage_name) {
                                         node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
 
@@ -825,7 +857,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=3600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_emu_stage_name} HW EMU Build generation failed"
@@ -857,7 +889,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=25200 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_stage_name} HW Build generation failed"
@@ -888,7 +920,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=10800 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${create_afi_stage_name} Create AFI failed"
@@ -926,7 +958,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     set -e
                                                     source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=3600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${run_example_stage_name} Runtime example failed"
@@ -951,7 +983,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                                 } // sdaccel_build_stages[ e.key ]
 
-                            } //for ( def dsa in entrySet(dsa_map_for_version) ) {
+                            } //for ( def dsa in entrySet(dsa_map_for_test) ) {
                         } // for ( e in list_map )
 
                         parallel sdaccel_build_stages
