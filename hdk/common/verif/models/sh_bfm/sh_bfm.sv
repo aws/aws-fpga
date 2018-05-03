@@ -1053,14 +1053,15 @@ module sh_bfm #(
          end // if (cl_sh_wr_data.size() > 0)
       end // if (host_mem_wr_que.size() > 0)
    end
-  
+
    //
    // cl->sh Write Address Channel
    //
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
-
+      int awready_cnt = 0;
+      
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
@@ -1078,13 +1079,15 @@ module sh_bfm #(
          host_mem_wr_que.push_back(cmd);
       end
 
-      if (cl_sh_wr_cmds.size() < 4)
-        sh_cl_pcim_awready <= 1'b1;
-      else
-        sh_cl_pcim_awready <= 1'b0;
-        
+      if ((cl_sh_wr_cmds.size() < 4) || (awready_cnt == 0)) begin
+         sh_cl_pcim_awready <= 1'b1;
+         awready_cnt = $urandom_range(0, 80);
+      end
+      else begin
+         sh_cl_pcim_awready <= 1'b0;
+         awready_cnt--;
+      end
    end
-
 
    //
    // cl-sh write Data Channel
@@ -1092,6 +1095,8 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Data wr_data;
+      int wready_cnt = 0;
+      int wready_nonzero_wait = 0;
       
       if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
@@ -1103,12 +1108,18 @@ module sh_bfm #(
          if (wr_data.last == 1)
            wr_last_cnt += 1;
          
+      end // if (sh_cl_pcim_wready && cl_sh_pcim_wvalid)
+      
+      if ((cl_sh_wr_data.size() > 64) || (wready_cnt > 0)) begin
+         sh_cl_pcim_wready <= 1'b0;
+         wready_cnt--;
       end
-      if (cl_sh_wr_data.size() > 64)
-        sh_cl_pcim_wready <= 1'b0;
-      else
-        sh_cl_pcim_wready <= 1'b1;
-        
+      else begin
+         sh_cl_pcim_wready <= 1'b1;
+         wready_cnt = $urandom_range(10, 0);
+         wready_nonzero_wait = $urandom_range(8, 0);
+         wready_cnt = (wready_nonzero_wait == 0) ? wready_cnt : 0;
+      end
    end
 
    //
@@ -1145,6 +1156,7 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
+      int arready_cnt = 0;
       
       if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
@@ -1162,10 +1174,14 @@ module sh_bfm #(
          sh_cl_rd_data.push_back(cmd);
       end
 
-      if (cl_sh_rd_cmds.size() < 4)
-        sh_cl_pcim_arready <= 1'b1;
-      else
-        sh_cl_pcim_arready <= 1'b0;
+      if ((cl_sh_rd_cmds.size() < 4) || (arready_cnt == 0)) begin
+         sh_cl_pcim_arready <= 1'b1;
+         arready_cnt = $urandom_range(0, 80);
+      end
+      else begin
+         sh_cl_pcim_arready <= 1'b0;
+         arready_cnt--;
+      end
    end
 
    //
@@ -2330,7 +2346,7 @@ module sh_bfm #(
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
               if (dop.cl_addr[5:0] !== 6'h00) begin
-                 $fatal("Address in a SH->CL transfer should be aligned to 64 byte boundary");
+                 $fatal("Address in a SH->CL transfer should be aligned to 64 byte boundary for address %x \n", dop.cl_addr);
               end
               aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
