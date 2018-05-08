@@ -32,28 +32,6 @@ module cl_dram_dma #(parameter NUM_DDR=4)
 
 `include "unused_sh_bar1_template.inc"
 
-// Defining local parameters that will instantiate the
-// 3 DRAM controllers inside the CL
-  
-`ifdef DDR_A_EXISTS   
-   localparam DDR_A_PRESENT = 1;
-`else
-   localparam DDR_A_PRESENT = 0;
-`endif
-
-  
-`ifdef DDR_B_EXISTS
-   localparam DDR_B_PRESENT = 1;
-`else
-   localparam DDR_B_PRESENT = 0;
-`endif
-  
-`ifdef DDR_D_EXISTS
-   localparam DDR_D_PRESENT = 1;
-`else
-   localparam DDR_D_PRESENT = 0;
-`endif
-
 // Define the addition pipeline stag
 // needed to close timing for the various
 // place where ATG (Automatic Test Generator)
@@ -513,25 +491,6 @@ assign cl_sh_ddr_awsize_2d = '{lcl_cl_sh_ddrd.awsize, lcl_cl_sh_ddrb.awsize, lcl
 assign cl_sh_ddr_awvalid_2d = '{lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid};
 assign {lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready} = sh_cl_ddr_awready_2d;
 
-//`ifdef DDR_A_EXISTS 
-//   assign lcl_cl_sh_ddra.awready = sh_cl_ddr_awready_2d[0];
-//`else
-//   assign  lcl_cl_sh_ddra.awready = 0 ;
-//`endif
-//
-//`ifdef DDR_B_EXISTS 
-//   assign lcl_cl_sh_ddrb.awready = sh_cl_ddr_awready_2d[1];
-//`else
-//   assign  lcl_cl_sh_ddrb.awready = 0 ;
-//`endif
-//
-//`ifdef DDR_D_EXISTS 
-//   assign lcl_cl_sh_ddrd.awready = sh_cl_ddr_awready_2d[2];
-//`else
-//   assign  lcl_cl_sh_ddrd.awready = 0 ;
-//`endif
-
-
 assign cl_sh_ddr_wid_2d = '{lcl_cl_sh_ddrd.wid, lcl_cl_sh_ddrb.wid, lcl_cl_sh_ddra.wid};
 assign cl_sh_ddr_wdata_2d = '{lcl_cl_sh_ddrd.wdata, lcl_cl_sh_ddrb.wdata, lcl_cl_sh_ddra.wdata};
 assign cl_sh_ddr_wstrb_2d = '{lcl_cl_sh_ddrd.wstrb, lcl_cl_sh_ddrb.wstrb, lcl_cl_sh_ddra.wstrb};
@@ -539,59 +498,9 @@ assign cl_sh_ddr_wlast_2d = {lcl_cl_sh_ddrd.wlast, lcl_cl_sh_ddrb.wlast, lcl_cl_
 assign cl_sh_ddr_wvalid_2d = {lcl_cl_sh_ddrd.wvalid, lcl_cl_sh_ddrb.wvalid, lcl_cl_sh_ddra.wvalid};
 assign {lcl_cl_sh_ddrd.wready, lcl_cl_sh_ddrb.wready, lcl_cl_sh_ddra.wready} = sh_cl_ddr_wready_2d;
 
-////`ifdef DDR_A_EXISTS 
-//   assign lcl_cl_sh_ddra.wready = sh_cl_ddr_wready_2d[0];
-//`else
-//   assign  lcl_cl_sh_ddra.wready = 0 ;
-//`endif
-//
-//`ifdef DDR_B_EXISTS 
-//   assign lcl_cl_sh_ddrb.wready = sh_cl_ddr_wready_2d[1];
-//`else
-//   assign  lcl_cl_sh_ddrb.wready = 0 ;
-//`endif
-//
-//`ifdef DDR_D_EXISTS 
-//   assign lcl_cl_sh_ddrd.wready = sh_cl_ddr_wready_2d[2];
-//`else
-//   assign  lcl_cl_sh_ddrd.wready = 0 ;
-//`endif
-
-
-
 assign {lcl_cl_sh_ddrd.bid, lcl_cl_sh_ddrb.bid, lcl_cl_sh_ddra.bid} = {sh_cl_ddr_bid_2d[2], sh_cl_ddr_bid_2d[1], sh_cl_ddr_bid_2d[0]};
 assign {lcl_cl_sh_ddrd.bresp, lcl_cl_sh_ddrb.bresp, lcl_cl_sh_ddra.bresp} = {sh_cl_ddr_bresp_2d[2], sh_cl_ddr_bresp_2d[1], sh_cl_ddr_bresp_2d[0]};
 assign {lcl_cl_sh_ddrd.bvalid, lcl_cl_sh_ddrb.bvalid, lcl_cl_sh_ddra.bvalid} = sh_cl_ddr_bvalid_2d;
-
-//`ifdef DDR_A_EXISTS 
-//   assign lcl_cl_sh_ddra.bvalid = sh_cl_ddr_bvalid_2d[0];
-//   assign lcl_cl_sh_ddra.bid = sh_cl_ddr_bid_2d[0];
-//   assign lcl_cl_sh_ddra.bresp = sh_cl_ddr_bresp_2d[0];
-//`else
-//   assign lcl_cl_sh_ddra.bvalid = 0 ;
-//   assign lcl_cl_sh_ddra.bid = 16'b0 ;
-//   assign lcl_cl_sh_ddra.bresp = 2'b0 ;
-//`endif
-//
-//`ifdef DDR_B_EXISTS 
-//   assign lcl_cl_sh_ddrb.bvalid = sh_cl_ddr_bvalid_2d[1];
-//   assign lcl_cl_sh_ddrb.bid = sh_cl_ddr_bid_2d[1];
-//   assign lcl_cl_sh_ddrb.bresp = sh_cl_ddr_bresp_2d[1];
-//`else
-//   assign  lcl_cl_sh_ddrb.bvalid = 0 ;
-//   assign lcl_cl_sh_ddrb.bid = 16'b0 ;
-//   assign lcl_cl_sh_ddrb.bresp = 2'b0 ;
-//`endif
-//
-//`ifdef DDR_D_EXISTS 
-//   assign lcl_cl_sh_ddrd.bvalid = sh_cl_ddr_bvalid_2d[2];
-//   assign lcl_cl_sh_ddrd.bid = sh_cl_ddr_bid_2d[2];
-//   assign lcl_cl_sh_ddrd.bresp = sh_cl_ddr_bresp_2d[2];
-//`else
-//   assign  lcl_cl_sh_ddrd.bvalid = 0 ;
-//   assign lcl_cl_sh_ddrd.bid = 16'b0 ;
-//   assign lcl_cl_sh_ddrd.bresp = 2'b0 ;
-//`endif
 
 assign cl_sh_ddr_bready_2d = {lcl_cl_sh_ddrd.bready, lcl_cl_sh_ddrb.bready, lcl_cl_sh_ddra.bready};
 
@@ -604,25 +513,6 @@ assign cl_sh_ddr_arsize_2d = '{lcl_cl_sh_ddrd.arsize, lcl_cl_sh_ddrb.arsize, lcl
 assign cl_sh_ddr_arvalid_2d = {lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid};
 assign {lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready} = sh_cl_ddr_arready_2d;
 
-//`ifdef DDR_A_EXISTS 
-//   assign lcl_cl_sh_ddra.arready = sh_cl_ddr_arready_2d[0];
-//`else
-//   assign  lcl_cl_sh_ddra.arready = 0 ;
-//`endif
-//
-//`ifdef DDR_B_EXISTS 
-//   assign lcl_cl_sh_ddrb.arready = sh_cl_ddr_arready_2d[1];
-//`else
-//   assign  lcl_cl_sh_ddrb.arready = 0 ;
-//`endif
-//
-//`ifdef DDR_D_EXISTS 
-//   assign lcl_cl_sh_ddrd.arready = sh_cl_ddr_arready_2d[2];
-//`else
-//   assign  lcl_cl_sh_ddrd.arready = 0 ;
-//`endif
-
-
 assign {lcl_cl_sh_ddrd.rid, lcl_cl_sh_ddrb.rid, lcl_cl_sh_ddra.rid} = {sh_cl_ddr_rid_2d[2], sh_cl_ddr_rid_2d[1], sh_cl_ddr_rid_2d[0]};
 assign {lcl_cl_sh_ddrd.rresp, lcl_cl_sh_ddrb.rresp, lcl_cl_sh_ddra.rresp} = {sh_cl_ddr_rresp_2d[2], sh_cl_ddr_rresp_2d[1], sh_cl_ddr_rresp_2d[0]};
 assign {lcl_cl_sh_ddrd.rdata, lcl_cl_sh_ddrb.rdata, lcl_cl_sh_ddra.rdata} = {sh_cl_ddr_rdata_2d[2], sh_cl_ddr_rdata_2d[1], sh_cl_ddr_rdata_2d[0]};
@@ -630,56 +520,12 @@ assign {lcl_cl_sh_ddrd.rlast, lcl_cl_sh_ddrb.rlast, lcl_cl_sh_ddra.rlast} = sh_c
 assign {lcl_cl_sh_ddrd.rvalid, lcl_cl_sh_ddrb.rvalid, lcl_cl_sh_ddra.rvalid} = sh_cl_ddr_rvalid_2d;
 assign cl_sh_ddr_rready_2d = {lcl_cl_sh_ddrd.rready, lcl_cl_sh_ddrb.rready, lcl_cl_sh_ddra.rready};
 
-//`ifdef DDR_A_EXISTS 
-//   assign lcl_cl_sh_ddra.rvalid = sh_cl_ddr_rvalid_2d[0];
-//   assign lcl_cl_sh_ddra.rid = sh_cl_ddr_rid_2d[0] ;
-//   assign lcl_cl_sh_ddra.rresp = sh_cl_ddr_rresp_2d[0]
-//   assign lcl_cl_sh_ddra.rdata = sh_cl_ddr_rdata_2d[0];
-//   assign lcl_cl_sh_ddra.rlast = sh_cl_ddr_rlast_2d[0];
-//`else
-//   assign lcl_cl_sh_ddra.rvalid = 0 ;
-//   assign lcl_cl_sh_ddra.rid =16'b0;
-//   assign lcl_cl_sh_ddra.rresp = 2'b0;
-//   assign lcl_cl_sh_ddra.rdata = 512'b0;
-//   assign lcl_cl_sh_ddra.rlast = 2'b0;
-//`endif
-//
-//`ifdef DDR_B_EXISTS 
-//   assign lcl_cl_sh_ddrb.rvalid = sh_cl_ddr_rvalid_2d[1];
-//   assign lcl_cl_sh_ddrb.rid = sh_cl_ddr_rid_2d[1] ;
-//   assign lcl_cl_sh_ddrb.rresp = sh_cl_ddr_rresp_2d[1]
-//   assign lcl_cl_sh_ddrb.rdata = sh_cl_ddr_rdata_2d[1];
-//   assign lcl_cl_sh_ddrb.rlast = sh_cl_ddr_rlast_2d[1];
-//`else
-//   assign lcl_cl_sh_ddrb.rvalid = 0 ;
-//   assign lcl_cl_sh_ddrb.rid =16'b0;
-//   assign lcl_cl_sh_ddrb.rresp = 2'b0;
-//   assign lcl_cl_sh_ddrb.rdata = 512'b0;
-//   assign lcl_cl_sh_ddrb.rlast = 2'b0;
-//
-//`endif
-//
-//`ifdef DDR_D_EXISTS 
-//   assign lcl_cl_sh_ddrd.rvalid = sh_cl_ddr_rvalid_2d[2];
-//   assign lcl_cl_sh_ddrd.rid = sh_cl_ddr_rid_2d[2] ;
-//   assign lcl_cl_sh_ddrd.rresp = sh_cl_ddr_rresp_2d[2]
-//   assign lcl_cl_sh_ddrd.rdata = sh_cl_ddr_rdata_2d[2];
-//   assign lcl_cl_sh_ddrd.rlast = sh_cl_ddr_rlast_2d[2];
-//`else
-//   assign lcl_cl_sh_ddrd.rvalid = 0 ;
-//   assign lcl_cl_sh_ddrd.rid =16'b0;
-//   assign lcl_cl_sh_ddrd.rresp = 2'b0;
-//   assign lcl_cl_sh_ddrd.rdata = 512'b0;
-//   assign lcl_cl_sh_ddrd.rlast = 2'b0;
-//`endif
-
-
 (* dont_touch = "true" *) logic sh_ddr_sync_rst_n;
 lib_pipe #(.WIDTH(1), .STAGES(4)) SH_DDR_SLC_RST_N (.clk(clk), .rst_n(1'b1), .in_bus(sync_rst_n), .out_bus(sh_ddr_sync_rst_n));
 sh_ddr #(
-         .DDR_A_PRESENT(DDR_A_PRESENT),
-         .DDR_B_PRESENT(DDR_B_PRESENT),
-         .DDR_D_PRESENT(DDR_D_PRESENT)
+         .DDR_A_PRESENT(`DDR_A_PRESENT),
+         .DDR_B_PRESENT(`DDR_B_PRESENT),
+         .DDR_D_PRESENT(`DDR_D_PRESENT)
    ) SH_DDR
    (
    .clk(clk),
@@ -879,12 +725,12 @@ cl_sda_slv CL_SDA_SLV (
 
 `ifndef DISABLE_VJTAG_DEBUG
 
-cl_ila #(.DDR_A_PRESENT(DDR_A_PRESENT) ) CL_ILA   (
+   cl_ila #(.DDR_A_PRESENT(`DDR_A_PRESENT) ) CL_ILA   (
 
    .aclk(clk),
    .drck(drck),
    .shift(shift),
-   .tdi(tdi),
+      .tdi(tdi),
    .update(update),
    .sel(sel),
    .tdo(tdo),
@@ -895,7 +741,7 @@ cl_ila #(.DDR_A_PRESENT(DDR_A_PRESENT) ) CL_ILA   (
    .capture(capture),
    .bscanid_en(bscanid_en),
    .sh_cl_dma_pcis_q(sh_cl_dma_pcis_q),
-`ifdef DDR_A_EXISTS   
+`ifndef DDR_A_ABSENT   
    .lcl_cl_sh_ddra(lcl_cl_sh_ddra)
 `else
    .lcl_cl_sh_ddra(axi_bus_tied)
