@@ -3,11 +3,11 @@
 # Table of Contents
 
 1. [AWS EC2 FPGA Hardware and Software Development Kits](#devkit)
+    - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [FPGA Hardware Development Kit Workflow(HDK)](#fpgahdk)
     - [GUI Workflow with Vivado IP Integrator (IPI)](#ipi)
     - [FPGA Software Development Kit (SDK)](#fpgasdk)
     - [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
-    - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
     - [Developer Support](#devSupport)
 2. [Building an example AFI](#buildingAnExample)
     - [Prerequisites](#buildingafiprereq)
@@ -16,16 +16,29 @@
 <a name="devkit"></a>
 # AWS EC2 FPGA Hardware and Software Development Kits
 
-The AWS EC2 FPGA Hardware and Software Development Kits include two portions: Development workflows for developing Amazon FPGA Image (AFI) with the [HDK](./hdk) or the GUI workflow, and [SDK](./sdk) for using AFIs on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
+The AWS EC2 FPGA Hardware and Software Development Kits consists of three components: Hardware development workflows for developing Amazon FPGA Image (AFI) with the [HDK](./hdk), Software development workflows for developing AFI with [OpenCL/C/C++](./SDAccel) and [SDK](./sdk) for using AFIs on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
 
-Execute `git clone https://github.com/aws/aws-fpga.git` to download this HDK+SDK release to your EC2 Instance or local server.
+Execute `git clone https://github.com/aws/aws-fpga.git` to download this HDK+SDAccel+SDK release to your EC2 Instance or local server.
 For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
 The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environments, and known restrictions.
 
-**NOTE: The HDK and SDK are tested and supported for Linux operating systems, for the time being, other OSs haven't been tested by AWS**
+**NOTE: This developer kit is tested and supported for Linux operating systems, for the time being, other OSs haven't been tested by AWS**
 
 Please click the "Watch" button in GitHub upper right corner to stay posted.
+
+<a name="devAmi"></a>
+## FPGA Developer AMI
+
+AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances. The FPGA Developer AMI comes with Xilinx tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/C5/M4/M5/R4/T2.2XLARGE](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require 32GiB Memory (ex: C4.4XLarge, M4.2XLarge, R4.XLarge, T2.2XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
+
+This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table describes the mapping of developer kit version to AMI version:  
+
+| Developer Kit Version   | Tool Version Supported     |  Compatible AMI Version     |
+|-----------|-----------|------|
+| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
+| 1.3.7 or greater | 2017.1 | v1.3.5 or greater (Xilinx SDx 2017.4) |
+| 1.3.7 or greater | 2017.4 | v1.4.0 or greater (Xilinx SDx 2017.4) |
 
 <a name="fpgahdk"></a>
 ## FPGA HDK
@@ -76,11 +89,6 @@ The OpenCL development environment allows customers to use OpenCL with Amazon EC
 Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs.
 
 This developer kit has 50+ examples to help you get started on FPGA acceleration.  To get started, review the [SDAccel README](SDAccel/README.md)
-
-<a name="devAmi"></a>
-## FPGA Developer AMI
-
-AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances. The FPGA Developer AMI comes with Xilinx tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/M4/R4/T2.2XLARGE](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require 32GiB Memory (C4.4XLarge, M4.2XLarge, R4.XLarge, T2.2XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
 
 <a name="devSupport"></a>
 ## Developer Support

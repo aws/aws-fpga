@@ -26,4 +26,5 @@
 
 ## Known Bugs/Issues
 
-
+* AXI-L Interface ordering - The v071417d3 shell has an issues that impacts transaction ordering on the AXI-L interfaces (BAR1, OCL, SDA) only.  The Shell should preserve PCIe ordering rules on these interfaces, but there is an issue where a read request may pass a previous write request.  The shell terminates a write when the data is transferred on the W channel (WVALID/WREADY) rather than wait for the response on the B channel.  A CL workaround for this issue is to backpressure reads (deassert ARREADY) when there are any writes pending.
+ 
