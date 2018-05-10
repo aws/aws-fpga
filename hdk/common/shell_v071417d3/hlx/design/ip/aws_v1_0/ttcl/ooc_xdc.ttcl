@@ -4,6 +4,7 @@
 <: setFileExtension ".xdc" :>
 <: setFileUsedIn { out_of_context synthesis implementation } :>
 <: set CLOCK_A0_PERIOD [getIntValue "C_CLOCK_A0_PERIOD" ] :> 
+<: set CLOCK_A1_PERIOD [getIntValue "C_CLOCK_A1_PERIOD" ] :> 
 <: set CLOCK_B0_PERIOD [getIntValue "C_CLOCK_B0_PERIOD" ] :> 
 <: set CLOCK_C0_PERIOD [getIntValue "C_CLOCK_C0_PERIOD" ] :> 
 <: set CLOCK_A_RECIPE [getIntValue "C_CLOCK_A_RECIPE" ] :> 
@@ -12,14 +13,12 @@
 <: set NUM_A_CLOCKS [getIntValue "C_NUM_A_CLOCKS" ] :> 
 <: set NUM_B_CLOCKS [getIntValue "C_NUM_B_CLOCKS" ] :> 
 <: set NUM_C_CLOCKS [getIntValue "C_NUM_C_CLOCKS" ] :> 
-<: set CLOCK_A1_MULT [lindex [list 2 2 1] $CLOCK_A_RECIPE] :> 
-<: set CLOCK_A2_MULT [lindex [list 2 2 1] $CLOCK_A_RECIPE] :> 
+<: set CLOCK_A2_MULT [lindex [list 1 1 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_A3_MULT [lindex [list 1 1 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_B1_MULT [lindex [list 2 2 2 4 4 4] $CLOCK_B_RECIPE] :> 
 <: set CLOCK_C1_MULT [lindex [list 5 3 3 3] $CLOCK_C_RECIPE] :> 
-<: set CLOCK_A1_DIV [lindex [list 1 1 1] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_A2_DIV [lindex [list 3 3 8] $CLOCK_A_RECIPE] :> 
-<: set CLOCK_A3_DIV [lindex [list 2 2 4] $CLOCK_A_RECIPE] :> 
+<: set CLOCK_A3_DIV [lindex [list 4 4 4] $CLOCK_A_RECIPE] :> 
 <: set CLOCK_B1_DIV [lindex [list 1 1 1 1 1 1] $CLOCK_B_RECIPE] :> 
 <: set CLOCK_C1_DIV [lindex [list 4 4 4 4] $CLOCK_C_RECIPE] :> 
 ################################################################################
@@ -73,13 +72,13 @@
 
 create_clock           -name clk_main_a0_ooc  -period <=:CLOCK_A0_PERIOD:> [get_ports clk_main_a0]
 <: if {$NUM_A_CLOCKS>1} { :>
-create_generated_clock -name clk_extra_a1_ooc -multiply_by <=:CLOCK_A1_MULT:> -divide_by <=:CLOCK_A1_DIV:> -source [get_ports clk_main_a0] [get_ports clk_extra_a1]
+create_clock           -name clk_extra_a1_ooc  -period <=:CLOCK_A1_PERIOD:> [get_ports clk_extra_a1]
 <: } :>
 <: if {$NUM_A_CLOCKS>2} { :>
-create_generated_clock -name clk_extra_a2_ooc -multiply_by <=:CLOCK_A2_MULT:> -divide_by <=:CLOCK_A2_DIV:> -source [get_ports clk_main_a0] [get_ports clk_extra_a2]
+create_generated_clock -name clk_extra_a2_ooc -multiply_by <=:CLOCK_A2_MULT:> -divide_by <=:CLOCK_A2_DIV:> -source [get_ports clk_extra_a1] [get_ports clk_extra_a2]
 <: } :>
 <: if {$NUM_A_CLOCKS>3} { :>
-create_generated_clock -name clk_extra_a3_ooc -multiply_by <=:CLOCK_A3_MULT:> -divide_by <=:CLOCK_A3_DIV:> -source [get_ports clk_main_a0] [get_ports clk_extra_a3]
+create_generated_clock -name clk_extra_a3_ooc -multiply_by <=:CLOCK_A3_MULT:> -divide_by <=:CLOCK_A3_DIV:> -source [get_ports clk_extra_a1] [get_ports clk_extra_a3]
 <: } :>
 <: if {$NUM_B_CLOCKS>0} { :>
 create_clock           -name clk_extra_b0_ooc -period <=:CLOCK_B0_PERIOD:> [get_ports clk_extra_b0]

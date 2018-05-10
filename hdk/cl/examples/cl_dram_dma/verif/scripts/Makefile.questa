@@ -25,8 +25,8 @@
 compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
 	cd ${SIM_DIR} && ln -s -f ../questa_complib/modelsim.ini 
-	cd $(SIM_DIR) && vlog $(C_FILES) -ccflags "-I$(C_SDK_USR_INC_DIR)" -ccflags "-I$(C_SDK_USR_UTILS_DIR)" -ccflags "-I$(C_COMMON_DIR)" -ccflags "-DSV_TEST" -ccflags "-DSCOPE" -ccflags "-I$(C_INC_DIR)"
-	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
+	cd $(SIM_DIR) && vlog $(C_FILES) -ccflags "-I$(C_SDK_USR_INC_DIR)" -ccflags "-I$(C_SDK_USR_UTILS_DIR)" -ccflags "-I$(C_COMMON_DIR)/include" -ccflags "-I$(C_COMMON_DIR)/src" -ccflags "-DSV_TEST" -ccflags "-DSCOPE" -ccflags "-DQUESTA_SIM" -ccflags "-DINT_MAIN" -ccflags "-I$(C_INC_DIR)"
+	cd $(SIM_DIR) && vlog +define+DMA_TEST -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 
 run:
 ifeq ($(TEST),test_null)

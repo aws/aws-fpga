@@ -16,6 +16,9 @@
 /*
  * This file is a SV wrapper header file for fpga_pci.h. 
  */
+#ifndef FPGA_PCI_SV_H_
+#define FPGA_PCI_SV_H_
+
 #include <stdint.h>
 #include <hal/fpga_common.h>
 
@@ -66,10 +69,7 @@ typedef int pci_bar_handle_t;
  * Initialize the pci library.
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_init(void)
-{
-  return 0;
-}
+int fpga_pci_init(void);
 
 /**
  * Attach to an FPGA memory space.
@@ -84,10 +84,7 @@ int fpga_pci_init(void)
  * @returns 0 on success, non-zero on error
  */
 int fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
-    pci_bar_handle_t *handle)
-{
-  return 0;
-}
+                    pci_bar_handle_t *handle);
 
 /**
  * Flags used to specify options for fpga_pci_attach.
@@ -104,10 +101,7 @@ enum {
  *                     the memory space to detach
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_detach(pci_bar_handle_t handle)
-{
-  return 0;
-}
+int fpga_pci_detach(pci_bar_handle_t handle);
 
 /**
  * Write a value to a register.
@@ -117,13 +111,7 @@ int fpga_pci_detach(pci_bar_handle_t handle)
  * @param[in]  value   value to write to the register
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value)
-{
-
-  sv_fpga_pci_poke(handle, offset, value);
-
-  return 0;
-}
+int fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value);
 
 /**
  * Read a value from a register.
@@ -143,13 +131,7 @@ extern int sv_fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t v
  * @param[out] value   value read from the register (32-bit)
  * @returns 0 on success, non-zero on error
  */
-int fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value)
-{
-
-  sv_fpga_pci_peek(handle, offset, value);
-
-  return 0;
-}
+int fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value);
 
 /**
  * Read a value from a register.
@@ -163,4 +145,6 @@ extern int sv_fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

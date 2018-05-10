@@ -51,10 +51,10 @@ set DESIGN_DIR [file join $currentDir design]
 set SYNTH_CONST [file join $currentDir constraints cl_synth_user.xdc]
 set IMPL_CONST [file join $currentDir constraints cl_pnr_user.xdc]
 
-set PWD_DIR $::env(PWD)
+set EXAMPLE_DIR $::env(HDK_DIR)/cl/examples/cl_hello_world
 
-set CL_COMMON_DIR "${PWD_DIR}/../common/design"
-set CL_VERIF_DIR "${PWD_DIR}/../cl_hello_world/verif/tests"
+set CL_COMMON_DIR "${EXAMPLE_DIR}/../common/design"
+set CL_VERIF_DIR "${EXAMPLE_DIR}/verif/tests"
 
 import_files -fileset constrs_1 -force $SYNTH_CONST
 import_files -fileset constrs_1 -force $IMPL_CONST

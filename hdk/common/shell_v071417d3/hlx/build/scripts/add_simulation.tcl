@@ -49,13 +49,16 @@ add_files -fileset sim_1 [ list \
  ${HDK_SHELL_DIR}/verif/models/ddr4_model/ddr4_sdram_model_wrapper.sv\
 ]
 
-set_property include_dirs "${HDK_SHELL_DIR}/verif/models/ddr4_model ${HDK_SHELL_DIR}/verif/models/sh_bfm ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim ${HDK_SHELL_DIR}/verif/models/fpga ${HDK_SHELL_DESIGN_DIR}/lib ${HDK_SHELL_DIR}/verif/tb/sv ${HDK_SHELL_DIR}/verif/include ${HDK_SHELL_DESIGN_DIR}/interfaces ${HDK_SHELL_DIR}/shell_stable/hlx/design/lib ${HDK_SHELL_DIR}/../cl/examples/common/design" [get_filesets sim_1]
+set define_inc_var [get_property include_dirs [get_filesets sim_1]]
+set new_inc_var [join [list $define_inc_var "${HDK_SHELL_DIR}/verif/models/ddr4_model ${HDK_SHELL_DIR}/verif/models/sh_bfm ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim ${HDK_SHELL_DIR}/verif/models/fpga ${HDK_SHELL_DESIGN_DIR}/lib ${HDK_SHELL_DIR}/verif/tb/sv ${HDK_SHELL_DIR}/verif/include ${HDK_SHELL_DESIGN_DIR}/interfaces ${HDK_SHELL_DIR}/shell_stable/hlx/design/lib ${HDK_SHELL_DIR}/../cl/examples/common/design"]]
 
-set define_var [get_property verilog_define [get_filesets sim_1]]
-set new_var [join [list $define_var "MAXWAITS=100000"]]
+set_property include_dirs $new_inc_var [get_filesets sim_1]
+
+set define_ver_var [get_property verilog_define [get_filesets sim_1]]
+set new_ver_var [join [list $define_ver_var "MAXWAITS=100000"]]
 
 
-set_property verilog_define $new_var [get_filesets sim_1]
+set_property verilog_define $new_ver_var [get_filesets sim_1]
 
 set_property top tb [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]

@@ -52,6 +52,8 @@ class TestGenDcp(AwsFpgaTestBase):
     Test all example CLs with different strategies and clock recipes.
     '''
 
+    ADD_XILINX_VERSION = True
+
     @classmethod
     def setup_class(cls):
         '''
@@ -72,9 +74,30 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg\[0\]\. '),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg\. '),
             (('.*',), r'^CRITICAL WARNING: \[Vivado 12-1433\] Expecting a non-empty list of cells to be added to the pblock\.  Please verify the correctness of the <cells> argument. \[/home/centos/src/project_data/workspace/test_develop_manual/hdk/cl/examples/cl_dram_dma/build/constraints/cl_pnr_user\.xdc:15'),
-            (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
+            (('.*',), r'WARNING: \[Vivado_Tcl 4-391\] The following IPs are missing output products for Implementation target. These output products could be required for synthesis, please generate the output products using the generate_target or synth_ip command before running synth_design.*'),
+	    (('.*',), r'WARNING: \[DRC RPBF-3\] IO port buffering.*'),
+	    (('.*',), r'WARNING: \[Place 46-14\] The placer has determined that this design is highly congested and may have difficulty routing. Run report_design_analysis -congestion for a detailed report\.'),
+	    (('.*',), r'WARNING: \[BD 41-1661\] .*'),
+            (('.*',), r'WARNING: \[Vivado 12-584\] No ports matched \'tck\''),
+            (('.*',), r'WARNING: \[Vivado 12-830\] No fanout objects found for'),
+	    (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
             (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|TIMING)',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/CL_DMA_PCIS_SLV/CL_TST_DDR_B/CL_TST/sync_rst_n_reg\''),
-            (('cl_hello_world_vhdl_A.*',), r'WARNING: \[Memdata 28-146\] Could not find a netlist instance for the specified SCOPED_TO_REF value of: ddr4_core'),
+            (('cl_dram_dma_*',),r'^CRITICAL WARNING: \[Opt 31-430\]*'),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_microblaze_I_0\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_rst_0_0\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_ilmb_0\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_dlmb_0\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_iomodule_0_0\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ddr4_core_microblaze_mcs\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ddr4_core\''),
+            (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'axi_clock_converter_0\''),
+            (('cl_dram_dma_*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
+            (('cl_dram_dma_*',), r'WARNING: \[Vivado 12-1008\] No clocks found for command.*'),
+            (('cl_dram_dma_*',), r'WARNING: \[Memdata 28-146\] Could not find a netlist instance for the specified SCOPED_TO_REF value of: ddr4_core'),
+            (('cl_dram_dma_*',), r'WARNING: \[Memdata 28-146\] Could not find a netlist instance for the specified SCOPED_TO_REF value of: bd_bf3f'),
+	    (('cl_dram_dma_*',), r'WARNING: \[Place 46-14\] The placer has determined'),
+	    (('cl_dram_dma_*',), r'WARNING: \[Synth 8-5856\]*'),
+	    (('cl_hello_world_vhdl_A.*',), r'WARNING: \[Memdata 28-146\] Could not find a netlist instance for the specified SCOPED_TO_REF value of: ddr4_core'),
             (('cl_hello_world_vhdl_A.*',), r'WARNING: \[Memdata 28-146\] Could not find a netlist instance for the specified SCOPED_TO_REF value of: bd_bf3f'),
             (('cl_hello_world_vhdl_A.*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_microblaze_I_0\''),
             (('cl_hello_world_vhdl_A.*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_rst_0_0\''),
@@ -85,10 +108,12 @@ class TestGenDcp(AwsFpgaTestBase):
             (('cl_hello_world_vhdl_A.*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ddr4_core\''),
             (('cl_hello_world_vhdl_A.*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'axi_clock_converter_0\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Designutils 20-262\] Invalid BRAM Mode CASC\. Setting it to the default mode RAMB18\.'),
-            (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[xilinx\.com:ip:blk_mem_gen:8\.3-1\] /blk_mem_gen_\d Block Memory Generator IP is configured to use UltraRAM, but UltraRAM does not support Memory Initialization'),
-            (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-2507\] parameter declaration becomes local in flop_ccf with formal parameter declaration list'),
+            (('cl_uram_example.*',), r'WARNING: \[xilinx\.com:ip:blk_mem_gen:8\.[3-4]-1\] /blk_mem_gen_\d Block Memory Generator IP is configured to use UltraRAM, but UltraRAM does not support Memory Initialization.*'),
+	    (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-2507\] parameter declaration becomes local in flop_ccf with formal parameter declaration list'),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-5790\] Small sized RAM gen_wr_a\.gen_word_narrow\.mem_reg will be implemented using URAM because of explicit ram_style = \"ultra\" attribute'),
-            (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/vled_q_reg\*\'\.'),
+            (('cl_uram_example.*',), r'WARNING: \[Synth 8-6057\] Memory.*'),
+            (('cl_uram_example.*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
+	    (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/vled_q_reg\*\'\.'),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-1421\] No ChipScope debug cores matched \'\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ila_0\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ila_vio_counter\''),
@@ -233,7 +258,7 @@ class TestGenDcp(AwsFpgaTestBase):
 
         return tarball
 
-    def base_test(self, cl, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0', clock_recipe_c='C0', uram_option='2'):
+    def base_test(self, cl, xilinxVersion, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0', clock_recipe_c='C0', uram_option='2'):
         assert build_strategy in self.DCP_BUILD_STRATEGIES
         assert clock_recipe_a in self.DCP_CLOCK_RECIPES['A']['recipes']
         assert clock_recipe_b in self.DCP_CLOCK_RECIPES['B']['recipes']
@@ -268,7 +293,7 @@ class TestGenDcp(AwsFpgaTestBase):
         tarball = self.check_build(cl, {'A': clock_recipe_a, 'B': clock_recipe_b, 'C': clock_recipe_c}, option_tag)
 
         # Upload the DCP tarball to S3.
-        dcp_key = os.path.join(self.get_cl_s3_dcp_tag(cl, option_tag), basename(tarball))
+        dcp_key = os.path.join(self.get_cl_s3_dcp_tag(cl, option_tag, xilinxVersion), basename(tarball))
         self.s3_client().upload_file(tarball, self.s3_bucket, dcp_key)
 
         return
@@ -277,24 +302,24 @@ class TestGenDcp(AwsFpgaTestBase):
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_b", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['B']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_a", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['A']['recipes'].keys()))
-    def test_cl_dram_dma(self, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
+    def test_cl_dram_dma(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
         cl = 'cl_dram_dma'
-        self.base_test(cl, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c)
+        self.base_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c)
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_b", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['B']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_a", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['A']['recipes'].keys()))
-    def test_cl_hello_world(self, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
+    def test_cl_hello_world(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
         cl = 'cl_hello_world'
-        self.base_test(cl, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c)
+        self.base_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c)
 
-    def test_cl_hello_world_vhdl(self):
+    def test_cl_hello_world_vhdl(self, xilinxVersion):
         cl = 'cl_hello_world_vhdl'
-        self.base_test(cl)
+        self.base_test(cl, xilinxVersion)
 
     @pytest.mark.parametrize("uram_option", AwsFpgaTestBase.DCP_URAM_OPTIONS)
-    def test_cl_uram_example(self, uram_option):
+    def test_cl_uram_example(self, xilinxVersion, uram_option):
         cl = 'cl_uram_example'
         logger.info("uram_option={}".format(uram_option))
-        self.base_test(cl, clock_recipe_a='A2', uram_option=uram_option)
+        self.base_test(cl, xilinxVersion, clock_recipe_a='A2', uram_option=uram_option)

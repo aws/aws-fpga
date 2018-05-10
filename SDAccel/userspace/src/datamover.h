@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016-2017 Xilinx, Inc
+ * Copyright (C) 2016-2018 Xilinx, Inc
  * Author: Sonal Santan
  * XDMA HAL multi-threading safe, multi-channel DMA read/write support
  *

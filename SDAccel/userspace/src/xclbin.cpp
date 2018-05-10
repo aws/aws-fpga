@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Xilinx, Inc
+ * Copyright (C) 2017-2018 Xilinx, Inc
  * Author: Sonal Santan
  * AWS HAL Driver for SDAccel/OpenCL runtime evnrionemnt, for AWS EC2 F1
  *

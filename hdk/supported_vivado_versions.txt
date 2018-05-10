@@ -1,3 +1,0 @@
-Vivado v2017.1_sdx (64-bit)
-Vivado v2017.1_sdxop (64-bit)
-Vivado v2017.1_sdx_AR70350 (64-bit)

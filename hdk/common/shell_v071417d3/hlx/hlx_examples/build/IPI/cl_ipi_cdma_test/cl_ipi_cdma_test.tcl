@@ -32,19 +32,6 @@ variable script_folder
 set script_folder [_tcl::get_script_folder]
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2017.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-   puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -164,93 +151,92 @@ proc create_root_design { parentCell } {
 
   # Set parent object as current
   current_bd_instance $parentObj
-
-
+  
   # Create interface ports
   set S_SH [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aws_f1_sh1_rtl:1.0 S_SH ]
 
   # Create ports
 
   # Create instance: aws_0, and set properties
-  set aws_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 aws_0 ]
+  set aws_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws aws_0 ]
   set_property -dict [ list \
-CONFIG.AUX_PRESENT {1} \
-CONFIG.BAR1_PRESENT {1} \
-CONFIG.DDR_A_PRESENT {1} \
-CONFIG.DDR_B_PRESENT {1} \
-CONFIG.DDR_C_PRESENT {1} \
-CONFIG.DDR_D_PRESENT {1} \
-CONFIG.NUM_STAGES_SCALAR {3} \
-CONFIG.OCL_PRESENT {1} \
-CONFIG.PCIS_PRESENT {1} \
-CONFIG.SDA_PRESENT {1} \
- ] $aws_0
+    CONFIG.AUX_PRESENT {1} \
+    CONFIG.BAR1_PRESENT {1} \
+    CONFIG.DDR_A_PRESENT {1} \
+    CONFIG.DDR_B_PRESENT {1} \
+    CONFIG.DDR_C_PRESENT {1} \
+    CONFIG.DDR_D_PRESENT {1} \
+    CONFIG.NUM_STAGES_SCALAR {3} \
+    CONFIG.OCL_PRESENT {1} \
+    CONFIG.PCIS_PRESENT {1} \
+    CONFIG.SDA_PRESENT {1} \
+  ] $aws_0
 
   # Create instance: aws_0_axi_periph, and set properties
-  set aws_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 aws_0_axi_periph ]
+  set aws_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect aws_0_axi_periph ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
-CONFIG.S00_HAS_REGSLICE {4} \
- ] $aws_0_axi_periph
+    CONFIG.NUM_MI {1} \
+    CONFIG.S00_HAS_REGSLICE {4} \
+  ] $aws_0_axi_periph
 
   # Create instance: aws_0_axi_periph_1, and set properties
-  set aws_0_axi_periph_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 aws_0_axi_periph_1 ]
+  set aws_0_axi_periph_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect aws_0_axi_periph_1 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
-CONFIG.S00_HAS_REGSLICE {4} \
- ] $aws_0_axi_periph_1
+    CONFIG.NUM_MI {1} \
+    CONFIG.S00_HAS_REGSLICE {4} \
+  ] $aws_0_axi_periph_1
 
   # Create instance: aws_0_axi_periph_2, and set properties
-  set aws_0_axi_periph_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 aws_0_axi_periph_2 ]
+  set aws_0_axi_periph_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect aws_0_axi_periph_2 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
-CONFIG.S00_HAS_REGSLICE {4} \
- ] $aws_0_axi_periph_2
+    CONFIG.NUM_MI {1} \
+    CONFIG.S00_HAS_REGSLICE {4} \
+  ] $aws_0_axi_periph_2
 
   # Create instance: axi_cdma_0, and set properties
-  set axi_cdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_cdma:4.1 axi_cdma_0 ]
-  set_property -dict [ list \
-CONFIG.C_ADDR_WIDTH {64} \
-CONFIG.C_INCLUDE_SG {0} \
-CONFIG.C_M_AXI_DATA_WIDTH {512} \
-CONFIG.C_M_AXI_MAX_BURST_LEN {64} \
- ] $axi_cdma_0
+  set axi_cdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_cdma axi_cdma_0 ]
+  set_property -dict [ list           \
+    CONFIG.C_ADDR_WIDTH {64}          \
+    CONFIG.C_INCLUDE_SG {0}           \
+    CONFIG.C_M_AXI_DATA_WIDTH {512}   \
+    CONFIG.C_M_AXI_MAX_BURST_LEN {64} \
+  ] $axi_cdma_0
 
   # Create instance: axi_gpio_0, and set properties
-  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
+  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio axi_gpio_0 ]
   set_property -dict [ list \
-CONFIG.C_ALL_INPUTS {1} \
-CONFIG.C_GPIO_WIDTH {4} \
- ] $axi_gpio_0
+    CONFIG.C_ALL_INPUTS {1} \
+    CONFIG.C_GPIO_WIDTH {4} \
+  ] $axi_gpio_0
 
   # Create instance: axi_gpio_1, and set properties
-  set axi_gpio_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_1 ]
-  set_property -dict [ list \
-CONFIG.C_ALL_OUTPUTS {1} \
-CONFIG.C_GPIO_WIDTH {16} \
- ] $axi_gpio_1
+  set axi_gpio_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio axi_gpio_1 ]
+  set_property -dict [ list  \
+    CONFIG.C_ALL_OUTPUTS {1} \
+    CONFIG.C_GPIO_WIDTH {16} \
+  ] $axi_gpio_1
 
   # Create instance: axi_mem_intercon, and set properties
-  set axi_mem_intercon [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_mem_intercon ]
-  set_property -dict [ list \
-CONFIG.M00_HAS_REGSLICE {4} \
-CONFIG.M01_HAS_REGSLICE {4} \
-CONFIG.M02_HAS_REGSLICE {4} \
-CONFIG.M03_HAS_REGSLICE {4} \
-CONFIG.NUM_MI {4} \
-CONFIG.NUM_SI {2} \
-CONFIG.S00_HAS_REGSLICE {4} \
-CONFIG.S01_HAS_REGSLICE {4} \
- ] $axi_mem_intercon
+  set axi_mem_intercon [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect axi_mem_intercon ]
+  set_property -dict [ list     \
+    CONFIG.M00_HAS_REGSLICE {4} \
+    CONFIG.M01_HAS_REGSLICE {4} \
+    CONFIG.M02_HAS_REGSLICE {4} \
+    CONFIG.M03_HAS_REGSLICE {4} \
+    CONFIG.NUM_MI {4}           \
+    CONFIG.NUM_SI {2}           \
+    CONFIG.S00_HAS_REGSLICE {4} \
+    CONFIG.S01_HAS_REGSLICE {4} \
+  ] $axi_mem_intercon
 
   # Create instance: system_ila_0, and set properties
-  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.0 system_ila_0 ]
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila system_ila_0 ]
 
   # Create instance: xlconcat_0, and set properties
-  set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_0 ]
+  set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat xlconcat_0 ]
   set_property -dict [ list \
-CONFIG.NUM_PORTS {4} \
- ] $xlconcat_0
+    CONFIG.NUM_PORTS {4} \
+  ] $xlconcat_0
 
   # Create interface connections
   connect_bd_intf_net -intf_net S01_AXI_1 [get_bd_intf_pins aws_0/M_AXI_PCIS] [get_bd_intf_pins axi_mem_intercon/S01_AXI]
@@ -262,7 +248,7 @@ CONFIG.NUM_PORTS {4} \
   connect_bd_intf_net -intf_net aws_0_axi_periph_2_M00_AXI [get_bd_intf_pins aws_0_axi_periph_2/M00_AXI] [get_bd_intf_pins axi_cdma_0/S_AXI_LITE]
   connect_bd_intf_net -intf_net aws_0_axi_periph_M00_AXI [get_bd_intf_pins aws_0_axi_periph/M00_AXI] [get_bd_intf_pins axi_gpio_0/S_AXI]
   connect_bd_intf_net -intf_net axi_cdma_0_M_AXI [get_bd_intf_pins axi_cdma_0/M_AXI] [get_bd_intf_pins axi_mem_intercon/S00_AXI]
-connect_bd_intf_net -intf_net [get_bd_intf_nets axi_cdma_0_M_AXI] [get_bd_intf_pins axi_cdma_0/M_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets axi_cdma_0_M_AXI] [get_bd_intf_pins axi_cdma_0/M_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins aws_0/S_AXI_DDRA] [get_bd_intf_pins axi_mem_intercon/M00_AXI]
   connect_bd_intf_net -intf_net axi_mem_intercon_M01_AXI [get_bd_intf_pins aws_0/S_AXI_DDRB] [get_bd_intf_pins axi_mem_intercon/M01_AXI]
   connect_bd_intf_net -intf_net axi_mem_intercon_M02_AXI [get_bd_intf_pins aws_0/S_AXI_DDRC] [get_bd_intf_pins axi_mem_intercon/M02_AXI]

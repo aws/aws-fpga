@@ -34,127 +34,81 @@ else
 $(info XILINX_SDX = $(XILINX_SDX))
 endif
 
-INSTALL_ROOT = /opt/Xilinx/SDx/2017.1.rte
-INSTALL_1DDR = /opt/Xilinx/SDx/2017.1.rte.1ddr
-INSTALL_4DDR = /opt/Xilinx/SDx/2017.1.rte.4ddr
-INSTALL_4DDR_DEBUG = /opt/Xilinx/SDx/2017.1.rte.4ddr_debug
 
-DSA = xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0
-OPENCLFILE =  ${SDACCEL_DIR}/aws_platform/libxilinxopencl.so
+MODULE :=
+ifeq ($(RELEASE_VER),2017.1)
+    DSA := $(DSA)
+    SRC_DIR = src
+    XRT_HAL_LIB = libawsxcldrv.so
+    EXE = awssak
+    MODULE = xdma
+    GLIBCPP_PATH = lib/lnx64.o
+else ifeq ($(RELEASE_VER),2017.4)
+  DSA := xilinx_aws-vu9p-f1_dynamic_5_0
+  SRC_DIR = src2
+  XRT_HAL_LIB = libxrt-aws.so
+  EXE = awssak2
+  MODULE = xocl
+  GLIBCPP_PATH = lib/lnx64.o/Default
+else
+  $(error Environment variable RELEASE_VER not recognized: $(RELEASE_VER))
+endif
+
+OPENCLLIB := 
+OPENCLFILE =  $(SDACCEL_DIR)/aws_platform/$(DSA)/sw/lib/x86_64/libxilinxopencl.so
+
+ifeq ($(OPENCLFILE),)
+  OPENCLLIB := ${XILINX_SDX}/runtime/lib/x86_64/libxilinxopencl.so
+else
+  OPENCLLIB := $(OPENCLFILE)
+endif
 
 all:
-	make -C ${SDACCEL_DIR}/userspace/src debug=$(debug) ec2=$(ec2)
-	make -C ${SDACCEL_DIR}/tools/awssak debug=$(debug) ec2=$(ec2)
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma
+	make -C ${SDACCEL_DIR}/userspace/$(SRC_DIR) debug=$(debug) ec2=$(ec2)
+	make -C ${SDACCEL_DIR}/tools/$(EXE) debug=$(debug) ec2=$(ec2)
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE)
 
 clean:
-	make -C ${SDACCEL_DIR}/userspace/src clean debug=$(debug) ec2=$(ec2)
-	make -C ${SDACCEL_DIR}/tools/awssak clean debug=$(debug) ec2=$(ec2)
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma clean
+	make -C ${SDACCEL_DIR}/userspace/$(SRC_DIR) clean debug=$(debug) ec2=$(ec2)
+	make -C ${SDACCEL_DIR}/tools/$(EXE) clean debug=$(debug) ec2=$(ec2)
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE) clean
 
 install:
-	make -C ${SDK_DIR}/linux_kernel_drivers/xdma install
-	install -d $(INSTALL_1DDR)/runtime/platforms/xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0/driver
-	install -d $(INSTALL_1DDR)/runtime/bin
-	install -d $(INSTALL_1DDR)/runtime/lib/x86_64
-	install -m 755 ${SDACCEL_DIR}/userspace/src/libawsxcldrv.so $(INSTALL_1DDR)/runtime/platforms/xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0/driver
-	install -m 755 ${SDACCEL_DIR}/tools/awssak/xbsak $(INSTALL_1DDR)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_1DDR)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_1DDR)/runtime/bin
-	#install -m 755 ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so $(INSTALL_1DDR)/runtime/lib/x86_64
-	install -m 755 ${OPENCLFILE} $(INSTALL_1DDR)/runtime/lib/x86_64
-	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_1DDR)/runtime/lib/x86_64
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_1DDR)/setup.sh for bash"
-	@echo "export XILINX_OPENCL=$(INSTALL_1DDR)" > $(INSTALL_1DDR)/setup.sh
-	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_1DDR)/setup.sh
-	@echo "export PATH=\$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_1DDR)/setup.sh
-	@echo "unset XILINX_SDACCEL" >> $(INSTALL_1DDR)/setup.sh
-	@echo "unset XILINX_SDX" >> $(INSTALL_1DDR)/setup.sh
-	@echo "unset XCL_EMULATION_MODE" >> $(INSTALL_1DDR)/setup.sh
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_1DDR)/setup.csh for (t)csh"
-	@echo "setenv XILINX_OPENCL $(INSTALL_1DDR)" > $(INSTALL_1DDR)/setup.csh
-	@echo "if ( ! \$$?LD_LIBRARY_PATH ) then" >> $(INSTALL_1DDR)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64" >> $(INSTALL_1DDR)/setup.csh
-	@echo "else" >> $(INSTALL_1DDR)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_1DDR)/setup.csh
-	@echo "endif" >> $(INSTALL_1DDR)/setup.csh
-	@echo "if ( ! \$$?PATH ) then" >> $(INSTALL_1DDR)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin" >> $(INSTALL_1DDR)/setup.csh
-	@echo "else" >> $(INSTALL_1DDR)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_1DDR)/setup.csh
-	@echo "endif" >> $(INSTALL_1DDR)/setup.csh
-	@echo "unsetenv XILINX_SDACCEL" >> $(INSTALL_1DDR)/setup.csh
-	@echo "unsetenv XILINX_SDX" >> $(INSTALL_1DDR)/setup.csh
-	@echo "unsetenv XCL_EMULATION_MODE" >> $(INSTALL_1DDR)/setup.csh
-	@echo "XILINX_OPENCL="$(INSTALL_1DDR)
-	
-	install -d $(INSTALL_4DDR)/runtime/platforms/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0/driver
-	install -d $(INSTALL_4DDR)/runtime/bin
-	install -d $(INSTALL_4DDR)/runtime/lib/x86_64
-	install -m 755 ${SDACCEL_DIR}/userspace/src/libawsxcldrv.so $(INSTALL_4DDR)/runtime/platforms/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0/driver
-	install -m 755 ${SDACCEL_DIR}/tools/awssak/xbsak $(INSTALL_4DDR)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_4DDR)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_4DDR)/runtime/bin
-	#install -m 755 ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so $(INSTALL_4DDR)/runtime/lib/x86_64
-	install -m 755 ${OPENCLFILE} $(INSTALL_4DDR)/runtime/lib/x86_64
-	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_4DDR)/runtime/lib/x86_64
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_4DDR)/setup.sh for bash"
-	@echo "export XILINX_OPENCL=$(INSTALL_4DDR)" > $(INSTALL_4DDR)/setup.sh
-	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_4DDR)/setup.sh
-	@echo "export PATH=\$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_4DDR)/setup.sh
-	@echo "unset XILINX_SDACCEL" >> $(INSTALL_4DDR)/setup.sh
-	@echo "unset XILINX_SDX" >> $(INSTALL_4DDR)/setup.sh
-	@echo "unset XCL_EMULATION_MODE" >> $(INSTALL_4DDR)/setup.sh
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_4DDR)/setup.csh for (t)csh"
-	@echo "setenv XILINX_OPENCL $(INSTALL_4DDR)" > $(INSTALL_4DDR)/setup.csh
-	@echo "if ( ! \$$?LD_LIBRARY_PATH ) then" >> $(INSTALL_4DDR)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64" >> $(INSTALL_4DDR)/setup.csh
-	@echo "else" >> $(INSTALL_4DDR)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_4DDR)/setup.csh
-	@echo "endif" >> $(INSTALL_4DDR)/setup.csh
-	@echo "if ( ! \$$?PATH ) then" >> $(INSTALL_4DDR)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin" >> $(INSTALL_4DDR)/setup.csh
-	@echo "else" >> $(INSTALL_4DDR)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_4DDR)/setup.csh
-	@echo "endif" >> $(INSTALL_4DDR)/setup.csh
-	@echo "unsetenv XILINX_SDACCEL" >> $(INSTALL_4DDR)/setup.csh
-	@echo "unsetenv XILINX_SDX" >> $(INSTALL_4DDR)/setup.csh
-	@echo "unsetenv XCL_EMULATION_MODE" >> $(INSTALL_4DDR)/setup.csh
-	@echo "XILINX_OPENCL="$(INSTALL_4DDR)
-	
-	install -d $(INSTALL_4DDR_DEBUG)/runtime/platforms/xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0/driver
-	install -d $(INSTALL_4DDR_DEBUG)/runtime/bin
-	install -d $(INSTALL_4DDR_DEBUG)/runtime/lib/x86_64
-	install -m 755 ${SDACCEL_DIR}/userspace/src/libawsxcldrv.so $(INSTALL_4DDR_DEBUG)/runtime/platforms/xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0/driver
-	install -m 755 ${SDACCEL_DIR}/tools/awssak/xbsak $(INSTALL_4DDR_DEBUG)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_4DDR_DEBUG)/runtime/bin
-	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_4DDR_DEBUG)/runtime/bin
-	#install -m 755 ${XILINX_SDX}/lib/lnx64.o/libxilinxopencl.so $(INSTALL_4DDR_DEBUG)/runtime/lib/x86_64
-	install -m 755 ${OPENCLFILE} $(INSTALL_4DDR_DEBUG)/runtime/lib/x86_64
-	install -m 755 ${XILINX_SDX}/lib/lnx64.o/libstdc++.so* $(INSTALL_4DDR_DEBUG)/runtime/lib/x86_64
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_4DDR_DEBUG)/setup.sh for bash"
-	@echo "export XILINX_OPENCL=$(INSTALL_4DDR_DEBUG)" > $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "export PATH=\$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "unset XILINX_SDACCEL" >> $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "unset XILINX_SDX" >> $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "unset XCL_EMULATION_MODE" >> $(INSTALL_4DDR_DEBUG)/setup.sh
-	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_4DDR_DEBUG)/setup.csh for (t)csh"
-	@echo "setenv XILINX_OPENCL $(INSTALL_4DDR_DEBUG)" > $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "if ( ! \$$?LD_LIBRARY_PATH ) then" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "else" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "endif" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "if ( ! \$$?PATH ) then" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "else" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "endif" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "unsetenv XILINX_SDACCEL" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "unsetenv XILINX_SDX" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "unsetenv XCL_EMULATION_MODE" >> $(INSTALL_4DDR_DEBUG)/setup.csh
-	@echo "XILINX_OPENCL="$(INSTALL_4DDR_DEBUG)
+	@echo "INSTALL_ROOT=$(INSTALL_ROOT)"
+	@echo "DSA=$(DSA)"
+	make -C ${SDK_DIR}/linux_kernel_drivers/$(MODULE) install
+	install -d $(INSTALL_ROOT)/runtime/platforms/$(DSA)/driver
+	install -d $(INSTALL_ROOT)/runtime/bin
+	install -d $(INSTALL_ROOT)/runtime/lib/x86_64
+	install -m 755 ${SDACCEL_DIR}/userspace/$(SRC_DIR)/$(XRT_HAL_LIB) $(INSTALL_ROOT)/runtime/platforms/$(DSA)/driver
+	install -m 755 ${SDACCEL_DIR}/tools/$(EXE)/xbsak $(INSTALL_ROOT)/runtime/bin
+	install -m 755 ${XILINX_SDX}/runtime/bin/xclbincat $(INSTALL_ROOT)/runtime/bin
+	install -m 755 ${XILINX_SDX}/runtime/bin/xclbinsplit $(INSTALL_ROOT)/runtime/bin
+	install -m 755 ${OPENCLLIB} $(INSTALL_ROOT)/runtime/lib/x86_64
+	install -m 755 ${XILINX_SDX}/$(GLIBCPP_PATH)/libstdc++.so* $(INSTALL_ROOT)/runtime/lib/x86_64
+	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_ROOT)/setup.sh for bash"
+	@echo "export XILINX_OPENCL=$(INSTALL_ROOT)" > $(INSTALL_ROOT)/setup.sh
+	@echo "export LD_LIBRARY_PATH=\$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_ROOT)/setup.sh
+	@echo "export PATH=\$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_ROOT)/setup.sh
+	@echo "unset XILINX_SDACCEL" >> $(INSTALL_ROOT)/setup.sh
+	@echo "unset XILINX_SDX" >> $(INSTALL_ROOT)/setup.sh
+	@echo "unset XCL_EMULATION_MODE" >> $(INSTALL_ROOT)/setup.sh
+	@echo "Generating SDAccel F1 runtime environment setup script, $(INSTALL_ROOT)/setup.csh for (t)csh"
+	@echo "setenv XILINX_OPENCL $(INSTALL_ROOT)" > $(INSTALL_ROOT)/setup.csh
+	@echo "if ( ! \$$?LD_LIBRARY_PATH ) then" >> $(INSTALL_ROOT)/setup.csh
+	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64" >> $(INSTALL_ROOT)/setup.csh
+	@echo "else" >> $(INSTALL_ROOT)/setup.csh
+	@echo "    setenv LD_LIBRARY_PATH \$$XILINX_OPENCL/runtime/lib/x86_64:\$$LD_LIBRARY_PATH" >> $(INSTALL_ROOT)/setup.csh
+	@echo "endif" >> $(INSTALL_ROOT)/setup.csh
+	@echo "if ( ! \$$?PATH ) then" >> $(INSTALL_ROOT)/setup.csh
+	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin" >> $(INSTALL_ROOT)/setup.csh
+	@echo "else" >> $(INSTALL_ROOT)/setup.csh
+	@echo "    setenv PATH \$$XILINX_OPENCL/runtime/bin:\$$PATH" >> $(INSTALL_ROOT)/setup.csh
+	@echo "endif" >> $(INSTALL_ROOT)/setup.csh
+	@echo "unsetenv XILINX_SDACCEL" >> $(INSTALL_ROOT)/setup.csh
+	@echo "unsetenv XILINX_SDX" >> $(INSTALL_ROOT)/setup.csh
+	@echo "unsetenv XCL_EMULATION_MODE" >> $(INSTALL_ROOT)/setup.csh
+	@echo "XILINX_OPENCL="$(INSTALL_ROOT)
 
 .PHONY: all clean
 

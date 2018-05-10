@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdx:platform sdx:vendor="xilinx"
+              sdx:library="aws-vu9p-f1"
+              sdx:name="dynamic"
+              sdx:version="5.0"
+              sdx:schemaVersion="1.0"
+              xmlns:sdx="http://www.xilinx.com/sdx">
+  <sdx:description>
+  This platform targets the Virtex UltraScale+ AWS VU9P F1  Acceleration Development Board with VU13P. This high-performance acceleration platform features four channels of DDR4-2400 DIMMs, the expanded partial reconfiguration flow for high fabric resource availability, and Xilinx DMA Subsystem for PCI Express with PCIe Gen3 x16 connectivity.
+  </sdx:description>
+
+  <sdx:hardwarePlatforms>
+    <sdx:hardwarePlatform sdx:path="hw" sdx:name="xilinx_aws-vu9p-f1_dynamic_5_0.dsa"/>
+  </sdx:hardwarePlatforms>
+
+  <sdx:softwarePlatforms>
+    <sdx:softwarePlatform sdx:path="sw" sdx:name="xilinx_aws-vu9p-f1_dynamic_5_0.spfm"/>
+  </sdx:softwarePlatforms>
+
+</sdx:platform>

@@ -75,9 +75,14 @@ uint32_t byte_swap(uint32_t value) {
 }
 
 #ifdef SV_TEST
-void test_main(uint32_t *exit_code) {
-#else
-int main(int argc, char **argv) {
+//For cadence and questa simulators the main has to return some value
+   #ifdef INT_MAIN
+   int test_main(uint32_t *exit_code) {
+   #else 
+   void test_main(uint32_t *exit_code) {
+   #endif 
+#else 
+    int main(int argc, char **argv) {
 #endif
     //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
     #ifdef SCOPE
@@ -155,7 +160,12 @@ out:
 #else
 
 out:
+   #ifdef INT_MAIN
    *exit_code = 0;
+   return 0;
+   #else 
+   *exit_code = 0;
+   #endif
 #endif
 }
 
@@ -266,3 +276,13 @@ out:
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
 }
+
+#ifdef SV_TEST
+/*This function is used transfer string buffer from SV to C.
+  This function currently returns 0 but can be used to update a buffer on the 'C' side.*/
+int send_rdbuf_to_c(char* rd_buf)
+{
+   return 0;
+}
+
+#endif

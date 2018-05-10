@@ -25,8 +25,8 @@
 compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
 	cd ${SIM_DIR} && ln -s -f ../vcs_complib/synopsys_sim.setup 
-	cd $(SIM_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS $(DEFINES) +lint=TFIPC-L
-	cd $(SIM_DIR) && vcs tb $(TEST) $(C_FILES) -CFLAGS "-I$(C_SDK_USR_INC_DIR)" -CFLAGS "-I$(C_SDK_USR_UTILS_DIR) -std=gnu99" -CFLAGS "-I$(C_COMMON_DIR)" -CFLAGS "-DSV_TEST" -CFLAGS "-DSCOPE" -CFLAGS "-I$(C_INC_DIR)" -debug_all -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log
+	cd $(SIM_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS +define+DMA_TEST $(DEFINES) +lint=TFIPC-L
+	cd $(SIM_DIR) && vcs tb $(TEST) $(C_FILES) -CFLAGS "-I$(C_SDK_USR_INC_DIR)" -CFLAGS "-I$(C_SDK_USR_UTILS_DIR) -std=gnu99" -CFLAGS "-I$(C_COMMON_DIR)/include" -CFLAGS "-I$(C_COMMON_DIR)/src" -CFLAGS "-DSV_TEST" -CFLAGS "-DSCOPE" -CFLAGS "-I$(C_INC_DIR)" "-I$(C_SRC_DIR)" -debug_all -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log
 
 run:
 

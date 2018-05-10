@@ -13,6 +13,7 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+export TEST ?= test_dram_dma
 
 INCLUDES = -I$(SDK_DIR)/userspace/include
 
@@ -21,9 +22,9 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -std=gnu99 -g -Wall -Werror $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt -lrt -lpthread
 
-SRC = test_dram_dma.c
+SRC = common_dma.c $(TEST).c 
 OBJ = $(SRC:.c=.o)
-BIN = test_dram_dma
+BIN = $(TEST)
 
 all: check_env $(BIN)
 
