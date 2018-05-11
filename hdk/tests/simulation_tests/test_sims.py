@@ -163,6 +163,11 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    def test_cl_dram_dma__peek_poke_wc__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_peek_poke_wc'
+
     def test_cl_dram_dma__peek_poke_len__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -187,6 +192,18 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    # cl_uram_example c
+
+    def test_cl_uram_example__uram_example__c(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_uram_example/verif/scripts'
+        test_name = 'test_uram_example'
+        test_type = 'c'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)    
+    
+    # cl_dram_dma c
+
     def test_cl_dram_dma__sda__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -194,8 +211,6 @@ class TestSims(AwsFpgaTestBase):
         test_type = 'sv'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
-
-    # cl_dram_dma c
 
     def test_cl_dram_dma__dram_dma_hwsw_cosim__c(self):
 

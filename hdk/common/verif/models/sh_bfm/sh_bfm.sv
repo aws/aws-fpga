@@ -411,6 +411,7 @@ module sh_bfm #(
     .C_AXI_ADDR_WIDTH(32),
     .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
     .C_AXI_ARUSER_WIDTH(1),
+                                     
     .C_AXI_WUSER_WIDTH(1),
     .C_AXI_RUSER_WIDTH(1),
     .C_AXI_BUSER_WIDTH(1),
@@ -1020,6 +1021,7 @@ module sh_bfm #(
                   
                   if (cl_sh_wr_data[0].strb[index]) begin
                      c = cl_sh_wr_data[0].data >> (index * 8);
+                     //FIX partial DW order word = {c, word[31:8]};
                      word[8*j+:8] = c;
                   end
                end // for (int j=0; j<4; j++)
@@ -1060,6 +1062,7 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
+
       int awready_cnt = 0;
       
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
@@ -1090,7 +1093,7 @@ module sh_bfm #(
    end
 
    //
-   // cl-sh write Data Channel
+   // cl->sh write Data Channel
    //
 
    always @(posedge clk_core) begin
@@ -1209,7 +1212,7 @@ module sh_bfm #(
             rd_addr = sh_cl_rd_data[0].addr;
             first_rd_beat = 1'b0;
          end
-         
+
          beat = {512{1'b1}}; 
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
@@ -2166,8 +2169,92 @@ module sh_bfm #(
       resp = cl_sh_b_resps[0].resp;
       cl_sh_b_resps.pop_front();
       
-   endtask // poke
+   endtask // poke_pcis
 
+   //===========================================================================
+   //
+   // poke_pcis_wc
+   //
+   //   Description: Write combine version of poke (will only work on PCIS Intf)
+   //        id - AXI bus ID
+   //        addr - Address for transfer
+   //        data[$][31:0] - Queue of DWs
+   //        size - AXI size
+   //   Outputs: None
+   //
+   //==========================================================================
+   task poke_pcis_wc(input logic [63:0] addr, 
+                     logic [31:0] data [$], 
+                     logic [5:0]  id = 6'h0,
+                     logic [2:0]  size = 3'd6
+                     ); 
+      
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+      
+      logic [1:0]  resp;
+      logic [31:0] dw_idx;
+      logic [31:0] slice_dw_idx;
+      logic [31:0] total_bytes;
+      logic [31:0] max_bytes;
+      
+      total_bytes = data.size() * 4;
+
+      if (size == 3'd2 && ((total_bytes != 4) || (addr[5:0] != 6'd0))) begin
+         $display("FATAL ERROR: poke_pcis_wc:: Size = 2. DW count should be equal to 1 and addr should be DW aligned");
+         $finish;
+      end
+      
+      if (size != 3'd6 && size != 3'd2) begin
+         $display("FATAL ERROR: poke_pcis_wc:: Only Size = 2 or 6 supported");
+         $finish;
+      end
+
+      max_bytes = 4096 - addr[5:0];
+      if (total_bytes > max_bytes) begin
+         $display("FATAL ERROR: poke_pcis_wc:: AXI transaction is more than 4096 bytes");
+         $finish;
+      end
+      
+      axi_cmd.addr = addr;
+      axi_cmd.len  = (total_bytes + addr[5:0]) % 64 ? ((total_bytes + addr[5:0])>>6) : ((total_bytes + addr[5:0])>>6) - 1;
+      axi_cmd.size = size;
+      axi_cmd.id   = id;
+
+      sh_cl_wr_cmds.push_back(axi_cmd);
+
+      dw_idx = 0;
+      
+      for (int idx = 0; idx <= axi_cmd.len; idx++) begin
+         axi_data.id   = id;
+         axi_data.data = 512'd0;
+         axi_data.strb = 512'd0;
+         slice_dw_idx = idx == 0 ? addr[5:2] : 0;
+         
+         while ((slice_dw_idx < 16) && (dw_idx < total_bytes/4)) begin
+            assert(data.size() > 0) else 
+               begin
+                  $display("FATAL ERROR: poke_pcis_wc:: Something went wrong. data queue already empty");
+                  $finish;
+               end;
+            axi_data.data[slice_dw_idx*32 +: 32] = data.pop_front();
+            axi_data.strb[slice_dw_idx*4 +: 4] = 4'hf;
+            dw_idx++;
+            slice_dw_idx++;
+         end
+         axi_data.last = (axi_cmd.len == idx);
+         
+         sh_cl_wr_data.push_back(axi_data);
+      end // for (idx = 0; idx <= len; idx++)
+            
+      while (cl_sh_b_resps.size() == 0)
+        #20ns;
+      
+      resp = cl_sh_b_resps[0].resp;
+      cl_sh_b_resps.pop_front();
+      
+   endtask // poke_pcis_wc
+   
    //=================================================
    //
    // peek
@@ -2452,8 +2539,6 @@ module sh_bfm #(
               end
               c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
 
-              if ((c2h_dma_done[chan]) && (cl_sh_rd_data[0].last == 1)) c2h_dma_started[chan] = 0;
-               
               if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
                 byte_cnt[chan] = 0;
                

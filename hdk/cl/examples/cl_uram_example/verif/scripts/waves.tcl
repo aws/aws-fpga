@@ -13,28 +13,15 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-#VPATH = src:include:$(HDK_DIR)/common/software/src:$(HDK_DIR)/common/software/include
+set curr_wave [current_wave_config]
+if { [string length $curr_wave] == 0 } {
+  if { [llength [get_objects]] > 0} {
+    add_wave /
+    set_property needs_save false [current_wave_config]
+  } else {
+     send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+  }
+}
 
-INCLUDES = -I$(SDK_DIR)/userspace/include
-
-CC = gcc
-CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
-
-LDLIBS = -lfpga_mgmt -lrt -lpthread
-
-SRC = ${SDK_DIR}/userspace/utils/sh_dpi_tasks.c test_uram_example.c
-OBJ = $(SRC:.c=.o)
-BIN = test_uram_example
-
-all: $(BIN) check_env
-
-$(BIN): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-clean:
-	rm -f *.o $(BIN)
-
-check_env:
-ifndef SDK_DIR
-    $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
-endif
+run 200 us 
+quit

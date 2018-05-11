@@ -384,6 +384,27 @@ end
        `SLOT_MACRO_TASK(poke_pcis(.addr(addr), .data(data), .id(id), .strb(strb)))
    endtask
 
+   //===========================================================================
+   //
+   // poke_pcis_wc
+   //
+   //   Description: Write combine version of poke (will only work on PCIS Intf)
+   //        id - AXI bus ID
+   //        addr - Address for transfer
+   //        data[$][31:0] - Queue of DWs
+   //        size - AXI size
+   //   Outputs: None
+   //
+   //==========================================================================
+   task poke_pcis_wc(input int slot_id = 0,
+                     input logic [63:0] addr, 
+                     logic [31:0] data [$], 
+                     logic [5:0]  id = 6'h0,
+                     logic [2:0]  size = 3'd6
+                     );
+      `SLOT_MACRO_TASK(poke_pcis_wc(.addr(addr), .data(data), .id(id), .size(size)))
+   endtask
+
    //=================================================
    //
    // peek

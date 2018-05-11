@@ -1,0 +1,44 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+##################################################################
+## Makefile For IES compiles and simulations
+## Step to run :
+## 1. make create_libs IES=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all IES=1  -> Runs the test
+##################################################################
+
+compile: $(COMPLIB_DIR)
+	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && ln -s -f ../ies_complib/cds.lib
+	cd $(SIM_DIR) && ln -s -f ../ies_complib/hdl.var
+	cd $(SIM_DIR) && gcc -fPIC -g -shared -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR)/include -I$(C_COMMON_DIR)/src -I$(C_INC_DIR) -DSV_TEST -DSCOPE -DIES_SIM -DINT_MAIN -o libdpi.so $(C_FILES) -I/`ncroot`/tools/include
+	cd $(SIM_DIR) && irun -64bit -mess -v93 -top uram_ctrl -assert ${CL_ROOT}/design/ctrl_uram.vhd
+	cd $(SIM_DIR) && irun -64bit -elaborate +libext+.vhd+.v+.sv -disable_sem2009 -l compile.ies.log -I$(C_SDK_USR_INC_DIR) -I$(C_SDK_USR_UTILS_DIR) -I$(C_COMMON_DIR) -define SV_TEST -define SCOPE -define IES_SIM -define NO_DMA -I$(C_INC_DIR) -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f -top tb -top glbl -top $(TEST) -define SV_TEST -define SCOPE -define IES_SIM $(DEFINES) $(DEFINES) $(TEST_NAME) -timescale 1ps/1ps
+
+run:
+
+ifeq ($(TEST),test_null) 
+	cd $(SIM_DIR) && irun -ieee1364 -v93 -R -access +rwc -timescale 1ps/1ps -l $(C_TEST).log $(PLUSARGS) +vpdfile+$(TEST).vpd
+else
+	cd $(SIM_DIR) && irun -ieee1364 -v93 -R -access +rwc -timescale 1ps/1ps -l $(TEST).log $(PLUSARGS) +vpdfile+$(TEST).vpd
+endif
+
+$(COMPLIB_DIR):
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT) && rm -rf create_libs.tcl
