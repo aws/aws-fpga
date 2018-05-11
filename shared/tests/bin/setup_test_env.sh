@@ -26,6 +26,15 @@ fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
+gui_script_dir="/home/centos/src/scripts"
+
+if [ -d $gui_script_dir ]; then
+ if [ -e $gui_script_dir/setup_gui.sh ]; then
+   #use curl to overwrite AMI default script
+   curl https://s3.amazonaws.com/aws-fpga-developer-ami/1.4.0/Scripts/setup_gui.sh -o $gui_script_dir/setup_gui.sh || { err_msg "Failed to download errata gui script from s3 bucket"; return 2; }
+   /home/centos/src/scripts/setup_gui.sh
+  fi
+ fi
 
 python_versions=(2.7 3.4)
 

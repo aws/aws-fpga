@@ -19,7 +19,8 @@ properties([parameters([
     booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
     booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
-    booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.')
+    booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
+    booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.')
 ])])
 
 //=============================================================================
@@ -77,6 +78,16 @@ if (debug_fdf_uram) {
     test_runtime_software = false
     test_sdaccel_scripts = false
 }
+
+boolean fdf_ddr_comb = params.get('fdf_ddr_comb')
+if(fdf_ddr_comb) {
+   fdf_test_names = ['cl_dram_dma[A0-B0-C0-DEFAULT-111]', 'cl_dram_dma[A0-B0-C0-DEFAULT-110]', 'cl_dram_dma[A0-B0-C0-DEFAULT-101]','cl_dram_dma[A0-B0-C0-DEFAULT-100]','cl_dram_dma[A0-B0-C0-DEFAULT-011]','cl_dram_dma[A0-B0-C0-DEFAULT-010]','cl_dram_dma[A0-B0-C0-DEFAULT-001]','cl_dram_dma[A0-B0-C0-DEFAULT-000]']
+    test_markdown_links = false
+    test_sims = false
+    test_runtime_software = false
+    test_sdaccel_scripts = false
+}
+
 //=============================================================================
 // Globals
 //=============================================================================
@@ -114,6 +125,7 @@ def sdaccel_example_default_map = [ '2017.1' : [ 'Hello_World_all': 'SDAccel/exa
                                                ],
                                     '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
                                                  'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+						 'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
                                                  'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
                                                  'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
                                                ]

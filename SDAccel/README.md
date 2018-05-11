@@ -5,6 +5,8 @@ There are three simple steps for accelerating your application on an AWS F1 inst
 2. Create an AFI 
 3. Run the FPGA accelerated application on AWS FPGA instances
 
+## :exclamation:  NOTE: If you would like to directly go to step 3 to experience how to execute your application on F1 instance Please read [Helloworld OpenCL Runtime example](./examples/aws/helloworld_ocl_runtime/README.md)
+
 This quick start guide will use a simple "Hello World" SDAccel example to get you started.  
 
 It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR) and ~1hr (1DDR), therefore, software and hardware emulation should be used during development.
