@@ -501,6 +501,9 @@ def check_headers(dir):
             "sdk/linux_kernel_drivers/xocl/LICENSE$",
 
             "SDAccel/userspace/src/test",
+	    "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
+	    "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
+            "SDAccel/examples/aws/helloworld_ocl_runtime/vector_addition.hw.xilinx_aws-vu9p-f1_dynamic_5_0.awsxclbin"    
         ])
 
     file_provider.set_exclude_paths([

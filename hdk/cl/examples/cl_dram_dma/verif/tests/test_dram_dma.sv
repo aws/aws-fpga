@@ -22,9 +22,14 @@ module test_dram_dma();
    int timeout_count;
    int fail;
    logic [3:0] status;
+
+   //transfer1 - length less than 64 byte.
    int         len0 = 17;
+   //transfer2 - length between 64 and 256 bytes.
    int         len1 = 128;
+   //transfer3 - length greater than 4k bytes.
    int         len2 = 6000;
+   //transfer4 - length between 256 and 512 bytes.
    int         len3 = 300;
    logic       ddr_ready;
    logic       rdata;

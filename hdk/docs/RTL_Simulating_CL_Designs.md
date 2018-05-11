@@ -238,6 +238,7 @@ out:
 
 ```
 For HW/SW simulation the below header files need to be included.
+
 SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
 
 For test_dram_dma test the below two functions are used for DMA transfers from host and to host.
@@ -264,6 +265,10 @@ Once your test is written, you are ready to run a simulation. The *scripts/* dir
     $ make C_TEST={your_test_name} # compile and run using XSIM (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
     
+    $ cd verif/scripts
+    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
+    $ cd ../sim/{your_test_name} # to view the test log files
+
     $ cd verif/scripts
     $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
@@ -375,6 +380,21 @@ The SV Test API task 'poke' writes 64 bits of data to the CL via the AXI PCIeS i
 | slot_id | Slot ID |
 | addr | Write Address |
 | data | Write Data |
+| id | AXI ID |
+| size | Data Size |
+| intf | AXI CL Port |
+
+## _poke_pcis_wc_
+## Description
+The SV Test API task 'poke' writes 64 bits of data to the CL via the AXI PCIeS interface.
+## Declaration
+#### task poke_pcis_wc(input logic [63:0] addr, logic [31:0] data [$], logic [5:0]  id = 6'h0, logic [2:0]  size = 3'd6);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| addr | Write Address |
+| data [$] | DW array for Write Data|
 | id | AXI ID |
 | size | Data Size |
 | intf | AXI CL Port |

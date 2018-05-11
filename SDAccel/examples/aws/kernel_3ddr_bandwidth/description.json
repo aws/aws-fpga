@@ -1,0 +1,41 @@
+{
+    "runtime": ["OpenCL"],
+    "example" : "kernel_global",
+    "overview" : [
+        "Bandwidth test of global to local memory."
+    ],
+    "os": [
+        "Linux"
+    ],
+    "libs": [
+        "xcl"
+    ],
+    "em_cmd" : "./kernel_global",
+    "hw_cmd" : "./kernel_global",
+    "containers": [
+        {
+            "name": "krnl_kernel_global", 
+            "ldclflags": "--sp bandwidth_1.m_axi_gmem0:bank0 --sp bandwidth_1.m_axi_gmem1:bank1 --sp bandwidth_1.m_axi_gmem2:bank2",
+            "accelerators": [
+                {
+                    "name": "bandwidth",
+                    "max_memory_ports": "true",
+                    "location": "src/kernel.cl"
+                }
+            ]
+        }
+    ],
+    "contributors" : [
+        {
+            "group": "Xilinx",
+            "url" : "http://www.xilinx.com"
+        }
+    ],
+    "revision" : [
+        {
+            "date" : "MAY2018",
+            "version": "0.9",
+            "description": "Test Example"
+        },
+    ]
+}

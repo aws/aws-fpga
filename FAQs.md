@@ -105,7 +105,6 @@ It is the compiled FPGA code that is loaded into an FPGA in AWS for performing t
 The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed.
 
 
-
 **Q: What regions are supported?**
 
 AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) and us-gov-west-1 (GovCloud US).

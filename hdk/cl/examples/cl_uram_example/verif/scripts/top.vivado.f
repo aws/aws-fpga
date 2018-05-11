@@ -13,33 +13,33 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-+define+QUESTA_SIM
-+define+CARD_1=card
-+libext+.v
-+libext+.sv
-+libext+.svh
+-define VIVADO_SIM
 
--y ${CL_ROOT}/../common/design
--y ${CL_ROOT}/design
--y ${CL_ROOT}/verif/sv
--y ${SH_LIB_DIR}
--y ${SH_INF_DIR}
--y ${SH_SH_DIR}
--y ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/hdl
--y ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/sim
+-sourcelibext .v
+-sourcelibext .sv
+-sourcelibext .svh
+-sourcelibext .vhd
 
-+incdir+${CL_ROOT}/../common/design
-+incdir+${CL_ROOT}/design
-+incdir+${CL_ROOT}/verif/sv
-+incdir+${SH_LIB_DIR}
-+incdir+${SH_INF_DIR}
-+incdir+${SH_SH_DIR}
-+incdir+${HDK_COMMON_DIR}/verif/include
-+incdir+${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog
-+incdir+${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl
+-sourcelibdir ${CL_ROOT}/../common/design
+-sourcelibdir ${CL_ROOT}/design
+-sourcelibdir ${CL_ROOT}/verif/sv
+-sourcelibdir ${SH_LIB_DIR}
+-sourcelibdir ${SH_INF_DIR}
+-sourcelibdir ${SH_SH_DIR}
+-sourcelibdir ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/hdl
+-sourcelibdir ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/sim
+
+-include ${CL_ROOT}/../common/design
+-include ${CL_ROOT}/verif/sv
+-include ${SH_LIB_DIR}
+-include ${SH_INF_DIR}
+-include ${SH_SH_DIR}
+-include ${HDK_COMMON_DIR}/verif/include
+-include ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog
+-include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl
 
 ${CL_ROOT}/../common/design/cl_common_defines.vh
-${CL_ROOT}/design/cl_hello_world_defines.vh
+${CL_ROOT}/design/cl_uram_example_defines.vh
 ${HDK_SHELL_DESIGN_DIR}/ip/ila_vio_counter/sim/ila_vio_counter.v
 ${HDK_SHELL_DESIGN_DIR}/ip/ila_0/sim/ila_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/hdl/bd_a493.v
@@ -58,7 +58,7 @@ ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl/axi_infrastructure_v1_1_
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/axi_clock_converter_v2_1_vl_rfs.v
 ${SH_LIB_DIR}/../ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 
-${CL_ROOT}/design/cl_hello_world.sv
+${CL_ROOT}/design/cl_uram_example.sv
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 

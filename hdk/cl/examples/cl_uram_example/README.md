@@ -100,3 +100,41 @@ You have 3 commands available:
 
 (e.g. add DEADBEEF)
 (Please note that you do not need the "0x" in front of the 32 bits hexadecimal value)
+
+### HW/SW co-simulation
+
+This example also has HW/SW co-simulation support. You can run co-simulation test as below.
+
+__How to use it?__
+
+To run co-simulation with Vivado simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example
+```
+
+To run co-simulation with VCS simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example VCS=1
+```
+
+To run co-simulation with IES simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example IES=1
+```
+
+To run co-simulation with QUESTA simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example QUESTA=1
+```
