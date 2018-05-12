@@ -22,9 +22,13 @@
 * Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence Xcelium simulations tools
+* Questa 10.6b simulations tools have not been tested.  Xilinx 2017.4 tools only support Questa 10.6b.   
 * PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)
 
 ## Known Bugs/Issues
 
 * AXI-L Interface ordering - The v071417d3 shell has an issues that impacts transaction ordering on the AXI-L interfaces (BAR1, OCL, SDA) only.  The Shell should preserve PCIe ordering rules on these interfaces, but there is an issue where a read request may pass a previous write request.  The shell terminates a write when the data is transferred on the W channel (WVALID/WREADY) rather than wait for the response on the B channel.  A CL workaround for this issue is to backpressure reads (deassert ARREADY) when there are any writes pending.
+* Linux kernel 3.10.0-862.2.3.el7.x86_64.  By default, the AWS Developer AMI GUI setup script updates the kernel version. We have provided a patch to prevent kernel updates during GUI setup. Instead of running the setup_gui.sh as documented/included within the developer AMI, please use the patched script as shown below:
+$curl https://s3.amazonaws.com/aws-fpga-developer-ami/1.4.0/Scripts/setup_gui.sh -o /home/centos/src/scripts/setup_gui.sh
+$/home/centos/src/scripts/setup_gui.sh
  
