@@ -37,7 +37,7 @@ This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table des
 | Developer Kit Version   | Tool Version Supported     |  Compatible AMI Version     |
 |-----------|-----------|------|
 | 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
-| 1.3.7 or greater | 2017.1 | v1.3.5 or greater (Xilinx SDx 2017.4) |
+| 1.3.7 or greater | 2017.1 | v1.3.5 or greater (Xilinx SDx 2017.1) |
 | 1.3.7 or greater | 2017.4 | v1.4.0 or greater (Xilinx SDx 2017.4) |
 
 <a name="fpgahdk"></a>
