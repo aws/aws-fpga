@@ -27,8 +27,19 @@
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Release 1.3.7 (See [ERRATA](./ERRATA.md) for unsupported features)
-* Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
-* Dynamic Software Acceleration (OpenCL) platform – The AWS platform is dynamically configured during compile time to optimize unused DDR/Debug logic, free up FPGA resources and reduce compile times.  Developers can instantiate up to 60 kernels (up from the max 16 2017.1 supported). [See 2017.4 Migration Document](SDAccel/docs/SDAccel_Migrate_dynamic_DSA.md) and [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf) 
+* Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .    * This release supports Xilinx SDx 2017.4 and 2017.1.  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
+   * FPGA developer kit version is listed in [hdk_version.txt](./hdk/hdk_version.txt)
+   * FPGA developer kit supported tool versions are listed in [supported_vivado_versions](./supported_vivado_versions.txt)
+   * The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+   
+| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
+|-----------|-----------|------|
+| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
+| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
+
+* OpenCL dynamic resource optimization – The developer tools automatically remove unused DDR and debug logic to free up resources and reduce compile times.  [See 2017.4 Migration Document](SDAccel/docs/SDAccel_Migrate_dynamic_DSA.md) and [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf) 
+* Developers can instantiate up to 60 kernels (up from the max 16 2017.1 supported). 
 * OpenCL Kernel profiling – During compile time, profiling logic can be automatically inserted to enable generation of kernel profile data.  Profile data can be viewed using the SDx IDE under profile summary report and timeline trace report. [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)   
 * OpenCL Hardware Emulation Debug – GDB-like debug allows developers a view into what is going on inside the kernel during hardware emulation.  Debug capabilities include start/stop at intermediate points and memory inspection.  [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
 * Post-synthesis and place/route optimization is now supported in OpenCL development environment.  [New XOCC options: reuse_synth and reuse_impl](https://www.xilinx.com/html_docs/xilinx2018_1/sdsoc_doc/wfq1517252127836.html)
