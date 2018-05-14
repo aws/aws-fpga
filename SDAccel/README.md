@@ -45,7 +45,19 @@ It is highly recommended you read the documentation and utilize software and har
 ## AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses.
-  * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it may be more cost efficient to either: 
+  * This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+
+| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
+|-----------|-----------|------|
+| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
+| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
+
+* FPGA developer kit version is listed in [hdk_version.txt](../hdk/hdk_version.txt)
+
+* FPGA developer kit supported tool versions are listed in [supported_vivado_versions](../supported_vivado_versions.txt)
+
+* You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it may be more cost efficient to either: 
      * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a lower cost EC2 instance, with a minimum of 30GiB RAM), **OR** 
      * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html).  It is highly recommended that you validate your AWS IAM permissions prior to proceeding with this quick start.  By calling the [DescribeFpgaImages API](../hdk/docs/describe_fpga_images.md) you can check that your IAM permissions are correct.
