@@ -22,7 +22,7 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt -lrt -lpthread
 
-SRC = test_uram_example.c
+SRC = ${SDK_DIR}/userspace/utils/sh_dpi_tasks.c test_uram_example.c
 OBJ = $(SRC:.c=.o)
 BIN = test_uram_example
 

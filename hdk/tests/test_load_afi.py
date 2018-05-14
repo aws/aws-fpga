@@ -52,6 +52,8 @@ class TestLoadAfi(AwsFpgaTestBase):
     Load AFI created by test_create_afi.py
     '''
 
+    ADD_XILINX_VERSION = True
+
     @classmethod
     def setup_class(cls):
         '''
@@ -67,7 +69,7 @@ class TestLoadAfi(AwsFpgaTestBase):
     def teardown_method(self, test_method):
         aws_fpga_test_utils.remove_edma_driver()
 
-    def get_agfi(self, cl, option_tag):
+    def get_agfi(self, cl, xilinxVersion, option_tag):
         '''
         On Jenkins the afi_id_filename will be restored using unstash.
         If not running on Jenkins then get it from S3.
@@ -80,7 +82,7 @@ class TestLoadAfi(AwsFpgaTestBase):
             afi_id_path = dirname(afi_id_filename)
             if not os.path.exists(afi_id_path):
                 os.makedirs(afi_id_path)
-            afi_id_key = self.get_cl_s3_afi_tag(cl, option_tag)
+            afi_id_key = self.get_cl_s3_afi_tag(cl, option_tag, xilinxVersion)
             logger.info("Fetching from s3://{}/{}".format(self.s3_bucket, afi_id_key))
             self.s3_client().download_file(Bucket=self.s3_bucket, Key=afi_id_key, Filename=afi_id_filename)
 
@@ -99,7 +101,7 @@ class TestLoadAfi(AwsFpgaTestBase):
         self.assert_afi_public(afi)
         self.base_test(cl, agfi, afi, install_edma_driver, slots_to_test, option_tag)
 
-    def base_fdf_test(self, cl, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0', clock_recipe_c='C0', uram_option='2',
+    def base_fdf_test(self, cl, xilinxVersion, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0', clock_recipe_c='C0', uram_option='2',
                       install_edma_driver=False, slots_to_test=[]):
         assert build_strategy in self.DCP_BUILD_STRATEGIES
         assert clock_recipe_a in self.DCP_CLOCK_RECIPES['A']['recipes']
@@ -108,7 +110,7 @@ class TestLoadAfi(AwsFpgaTestBase):
         assert uram_option in self.DCP_URAM_OPTIONS
 
         option_tag = "{}_{}_{}_{}_{}".format(clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option, build_strategy)
-        (agfi, afi) = self.get_agfi(cl, option_tag)
+        (agfi, afi) = self.get_agfi(cl, xilinxVersion, option_tag)
         self.base_test(cl, agfi, afi, install_edma_driver, slots_to_test, option_tag)
 
     def byte_swap(self, value):
@@ -298,11 +300,11 @@ class TestLoadAfi(AwsFpgaTestBase):
             for slot in slots_to_test:
                 self.fpga_clear_local_image(slot)
 
-    def test_precompiled_cl_dram_dma(self):
+    def test_precompiled_cl_dram_dma(self, xilinxVersion):
         cl = 'cl_dram_dma'
         self.base_precompiled_test(cl, install_edma_driver=True)
 
-    def test_precompiled_cl_hello_world(self):
+    def test_precompiled_cl_hello_world(self, xilinxVersion):
         cl = 'cl_hello_world'
         self.base_precompiled_test(cl, install_edma_driver=False)
 
@@ -310,23 +312,23 @@ class TestLoadAfi(AwsFpgaTestBase):
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_b", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['B']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_a", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['A']['recipes'].keys()))
-    def test_cl_dram_dma(self, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
+    def test_cl_dram_dma(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
         cl = 'cl_dram_dma'
-        self.base_fdf_test(cl, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, install_edma_driver=True)
+        self.base_fdf_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, install_edma_driver=True)
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_b", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['B']['recipes'].keys()))
     @pytest.mark.parametrize("clock_recipe_a", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['A']['recipes'].keys()))
-    def test_cl_hello_world(self, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
+    def test_cl_hello_world(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
         cl = 'cl_hello_world'
-        self.base_fdf_test(cl, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, install_edma_driver=False)
+        self.base_fdf_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, install_edma_driver=False)
 
-    def test_cl_hello_world_vhdl(self):
+    def test_cl_hello_world_vhdl(self, xilinxVersion):
         cl = 'cl_hello_world_vhdl'
-        self.base_fdf_test(cl, install_edma_driver=False)
+        self.base_fdf_test(cl, xilinxVersion, install_edma_driver=False)
 
     @pytest.mark.parametrize("uram_option", AwsFpgaTestBase.DCP_URAM_OPTIONS)
-    def test_cl_uram_example(self, uram_option):
+    def test_cl_uram_example(self, xilinxVersion, uram_option):
         cl = 'cl_uram_example'
-        self.base_fdf_test(cl, clock_recipe_a='A2', uram_option=uram_option, install_edma_driver=False)
+        self.base_fdf_test(cl, xilinxVersion, clock_recipe_a='A2', uram_option=uram_option, install_edma_driver=False)

@@ -30,7 +30,18 @@ The cl\_uram\_example demonstrates basic Shell-to-CL connectivity, memory-mapped
 
 Please refer to the [FPGA PCIe memory space overview](../../../docs/AWS_Fpga_Pcie_Memory_Map.md)
 
-The URAM Register is a 32-bit read/write register.
+The URAM Register is a 32-bit read/write register. (3 bits of control and 29 bits of data)
+
+_Table 1: ctrl_uram.vhd ports_
+
+| Signal Name | Interface | Signal Type |                                                                                                Description                                                                                                |
+|:-----------|:---------:|:-----------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| clk         |   Clock   |      I      | Clock.                                                                                                                                                                                                    |
+| rstn        |   Reset   |      I      | Active-Low reset.                                                                                                                                                                                         |
+| data_in     |    Data   |      I      | Data and control.  [31] Find: Active high - Allow to find data in the URAM. [30] Add: Active high - Allow to add data in the URAM. [29] Del: Active high - Allow to delete data in the URAM. [28:0] Data. |
+| find_ok     |   Status  |      O      | Indicates the status of the find. '1' = The 28 bits data is present in the URAM.                                                                                                                          |
+| find_ko     |   Status  |      O      | Indicates the status of the find. '1' = The 28 bits data is not present in the URAM.                                                                                                                      |
+| busy        |   Status  |      O      | Indicates the status of the controller.                                                                                                                                                                   |
 
 ### Unused interfaces
 
@@ -83,9 +94,47 @@ Do not forget to run it in sudo mode:
 - `sudo ./uram_example`
 
 You have 3 commands available:
-- find: Command which allows you to find a 32 bits hexadecimal data inside the URAM
-- add : Command which allows you to add a 32 bits hexadecimal data inside the URAM
-- del : Command which allows to find and delete a 32 bits hexadecimal data inside the URAM
+- find: Command which allows you to find a 29 bits hexadecimal data inside the URAM
+- add : Command which allows you to add a 29 bits hexadecimal data inside the URAM
+- del : Command which allows to find and delete a 29 bits hexadecimal data inside the URAM
 
 (e.g. add DEADBEEF)
 (Please note that you do not need the "0x" in front of the 32 bits hexadecimal value)
+
+### HW/SW co-simulation
+
+This example also has HW/SW co-simulation support. You can run co-simulation test as below.
+
+__How to use it?__
+
+To run co-simulation with Vivado simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example
+```
+
+To run co-simulation with VCS simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example VCS=1
+```
+
+To run co-simulation with IES simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example IES=1
+```
+
+To run co-simulation with QUESTA simulator
+
+```
+source hdk_setup.sh
+cd hdk/cl/examples/cl_uram_example/verif/scripts
+make C_TEST=test_uram_example QUESTA=1
+```

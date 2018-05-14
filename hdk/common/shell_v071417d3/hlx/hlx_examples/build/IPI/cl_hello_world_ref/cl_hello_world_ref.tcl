@@ -40,19 +40,6 @@ variable script_folder
 set script_folder [_tcl::get_script_folder]
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2017.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-   puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -149,8 +136,6 @@ if { $nRet != 0 } {
 # DESIGN PROCs
 ##################################################################
 
-
-
 # Procedure to create entire design; Provide argument to make
 # procedure reusable. If parentCell is "", will use root.
 proc create_root_design { parentCell } {
@@ -181,24 +166,23 @@ proc create_root_design { parentCell } {
   # Set parent object as current
   current_bd_instance $parentObj
 
-
   # Create interface ports
   set S_SH [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aws_f1_sh1_rtl:1.0 S_SH ]
 
   # Create ports
 
   # Create instance: f1_inst, and set properties
-  set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 f1_inst ]
+  set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws f1_inst ]
   set_property -dict [ list \
-CONFIG.AUX_PRESENT {1} \
-CONFIG.OCL_PRESENT {1} \
- ] $f1_inst
+    CONFIG.AUX_PRESENT {1} \
+    CONFIG.OCL_PRESENT {1} \
+  ] $f1_inst
 
   # Create instance: f1_inst_axi_periph, and set properties
-  set f1_inst_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 f1_inst_axi_periph ]
+  set f1_inst_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect f1_inst_axi_periph ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
- ] $f1_inst_axi_periph
+    CONFIG.NUM_MI {1} \
+  ] $f1_inst_axi_periph
 
   # Create instance: hello_world_0, and set properties
   set block_name hello_world
@@ -212,35 +196,37 @@ CONFIG.NUM_MI {1} \
    }
   
   set_property -dict [ list \
-CONFIG.NUM_READ_OUTSTANDING {1} \
-CONFIG.NUM_WRITE_OUTSTANDING {1} \
- ] [get_bd_intf_pins /hello_world_0/s_axi]
+    CONFIG.NUM_READ_OUTSTANDING {1} \
+    CONFIG.NUM_WRITE_OUTSTANDING {1} \
+  ] [get_bd_intf_pins /hello_world_0/s_axi]
+
 
   # Create instance: system_ila_0, and set properties
-  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.0 system_ila_0 ]
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila system_ila_0 ]
+  
   set_property -dict [ list \
-CONFIG.C_MON_TYPE {INTERFACE} \
-CONFIG.C_NUM_MONITOR_SLOTS {1} \
-CONFIG.C_SLOT_0_APC_EN {0} \
-CONFIG.C_SLOT_0_AXI_AR_SEL_DATA {1} \
-CONFIG.C_SLOT_0_AXI_AR_SEL_TRIG {1} \
-CONFIG.C_SLOT_0_AXI_AW_SEL_DATA {1} \
-CONFIG.C_SLOT_0_AXI_AW_SEL_TRIG {1} \
-CONFIG.C_SLOT_0_AXI_B_SEL_DATA {1} \
-CONFIG.C_SLOT_0_AXI_B_SEL_TRIG {1} \
-CONFIG.C_SLOT_0_AXI_R_SEL_DATA {1} \
-CONFIG.C_SLOT_0_AXI_R_SEL_TRIG {1} \
-CONFIG.C_SLOT_0_AXI_W_SEL_DATA {1} \
-CONFIG.C_SLOT_0_AXI_W_SEL_TRIG {1} \
-CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:aximm_rtl:1.0} \
- ] $system_ila_0
+    CONFIG.C_MON_TYPE {INTERFACE} \
+    CONFIG.C_NUM_MONITOR_SLOTS {1} \
+    CONFIG.C_SLOT_0_APC_EN {0} \
+    CONFIG.C_SLOT_0_AXI_AR_SEL_DATA {1} \
+    CONFIG.C_SLOT_0_AXI_AR_SEL_TRIG {1} \
+    CONFIG.C_SLOT_0_AXI_AW_SEL_DATA {1} \
+    CONFIG.C_SLOT_0_AXI_AW_SEL_TRIG {1} \
+    CONFIG.C_SLOT_0_AXI_B_SEL_DATA {1} \
+    CONFIG.C_SLOT_0_AXI_B_SEL_TRIG {1} \
+    CONFIG.C_SLOT_0_AXI_R_SEL_DATA {1} \
+    CONFIG.C_SLOT_0_AXI_R_SEL_TRIG {1} \
+    CONFIG.C_SLOT_0_AXI_W_SEL_DATA {1} \
+    CONFIG.C_SLOT_0_AXI_W_SEL_TRIG {1} \
+    CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:aximm_rtl:1.0} \
+  ] $system_ila_0
 
   # Create interface connections
   connect_bd_intf_net -intf_net f1_inst_M_AXI_OCL [get_bd_intf_pins f1_inst/M_AXI_OCL] [get_bd_intf_pins f1_inst_axi_periph/S00_AXI]
-connect_bd_intf_net -intf_net [get_bd_intf_nets f1_inst_M_AXI_OCL] [get_bd_intf_pins f1_inst/M_AXI_OCL] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets f1_inst_M_AXI_OCL] [get_bd_intf_pins f1_inst/M_AXI_OCL] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   set_property -dict [ list \
-HDL_ATTRIBUTE.DEBUG {true} \
- ] [get_bd_intf_nets f1_inst_M_AXI_OCL]
+    HDL_ATTRIBUTE.DEBUG {true} \
+  ] [get_bd_intf_nets f1_inst_M_AXI_OCL]
   connect_bd_intf_net -intf_net f1_inst_S_SH [get_bd_intf_ports S_SH] [get_bd_intf_pins f1_inst/S_SH]
   connect_bd_intf_net -intf_net f1_inst_axi_periph_M00_AXI [get_bd_intf_pins f1_inst_axi_periph/M00_AXI] [get_bd_intf_pins hello_world_0/s_axi]
 

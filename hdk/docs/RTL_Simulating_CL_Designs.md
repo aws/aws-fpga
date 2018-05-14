@@ -14,7 +14,7 @@ One easy way is to have a pre-installed environment is to use the [AWS FPGA Deve
 
 For developers who like to work on-premises or different AMI in the cloud, AWS recommend to follow the [required license for on-premise document](./on_premise_licensing_help.md).
 
-Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vivado version](../supported_vivado_versions.txt) for the exact version of Vivado tools, and the required license components.
+Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vivado version](../../supported_vivado_versions.txt) for the exact version of Vivado tools, and the required license components.
 
 ### Install the HDK and setup environment
 
@@ -81,9 +81,9 @@ module test_peek_poke();
 
 `define WR_START_BIT   32'h00000001
 `define RD_START_BIT   32'h00000002
-   
+
    logic [63:0] pcim_address = 64'h0000_0000_1234_0000;
-   
+
    initial begin
 
       tb.sh.power_up();
@@ -103,11 +103,11 @@ module test_peek_poke();
       tb.poke_ocl(`CNTL_REG, 32'h0003);                  // start read & write
 
       #500ns;   // give the hardware time to run
-         
+
       ...
-           
+
       tb.power_down();
-      
+
       $finish;
    end
 
@@ -126,7 +126,7 @@ If your have Mentor Graphics' Questa simulator, then add "SIMULATOR=questa".
 
 ```
 ========================================  NOTE ============================================
-Use only the SV test APIs supplied with the developer's kit to stimulate your CL 
+Use only the SV test APIs supplied with the developer's kit to stimulate your CL
 design. They were designed specifically to mimic the behavior of the actual AWS Shell logic.
 If you choose to control CL signalling via another method, proper operation with Shell
 logic is not guaranteed.
@@ -146,7 +146,7 @@ As with the SystemVerilog (SV) testing, one fast way to write your own test is t
 [test_hello_world.c](../cl/examples/cl_hello_world/software/runtime/test_hello_world.c)
 
 ```
-For HW/SW simulation the below header files need to be included. 
+For HW/SW simulation the below header files need to be included.
 SV_TEST macro should be defined in HW makefile to enable HW simulation of test_hello_world.c
 
 fpga_pci_sv.h is the SV wrapper for C functions.
@@ -171,7 +171,7 @@ Logger will not work for HW simulation, so use the SV_TEST macro to exclude that
 #ifndef SV_TEST
 const struct logger *logger = &logger_stdout;
 /*
- * pci_vendor_id and pci_device_id values below are Amazon's and avaliable to use for a given FPGA slot. 
+ * pci_vendor_id and pci_device_id values below are Amazon's and avaliable to use for a given FPGA slot.
  * Users may replace these with their own if allocated to them by PCI SIG
  */
 static uint16_t pci_vendor_id = 0x1D0F; /* Amazon PCI Vendor ID */
@@ -187,7 +187,7 @@ Use cosim_printf function instead of printf
 
 ```
 cosim_printf("===== Starting with peek_poke_example =====\n");
-    
+
 ```
 
 test_main should be used for HW simulation as shown below.
@@ -196,7 +196,7 @@ test_main should be used for HW simulation as shown below.
 #ifdef SV_TEST
 void test_main(uint32_t *exit_code) {
 #else
-int main(int argc, char **argv) {  
+int main(int argc, char **argv) {
 #endif
 ```
 Also SCOPE should be defined for HW simulation with VCS and QUESTA simulators.
@@ -207,23 +207,23 @@ Also SCOPE should be defined for HW simulation with VCS and QUESTA simulators.
       svScope scope;
       scope = svGetScopeFromName("tb");
       svSetScope(scope);
-    #endif 
-    
+    #endif
+
 ```
 
 Checking for AFI ready is not required for HW/simulation as in simulation the hardware is directly accessed.
 
 ```
-#ifndef SV_TEST 
+#ifndef SV_TEST
     rc = check_afi_ready(slot_id);
 #endif
 ```
 Test exit should be codes as below for HW/SW co-simulation.
 
 ```
-#ifndef SV_TEST  
+#ifndef SV_TEST
     return rc;
-   
+
 out:
     return 1;
 #else
@@ -234,8 +234,33 @@ out:
 
 ```
 
+[test_dram_dma_hwsw_cosim.c](../cl/examples/cl_dram_dma/software/runtime/test_dram_dma_hwsw_cosim.c)
+
+```
+For HW/SW simulation the below header files need to be included.
+
+SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
+
+For test_dram_dma test the below two functions are used for DMA transfers from host and to host.
+
+//This function on the SV side sets up the string buffer and does Host to cl transfer.
+sv_fpga_start_buffer_to_cl(slot_id, channel, buffer_size, write_buffer, (0x10000000 + channel*MEM_16G));
+
+//This function on the SV side sets up the string buffer and does CL to Host transfer.
+sv_fpga_start_cl_to_buffer(slot_id, channel, buffer_size, (0x10000000 + channel*MEM_16G));
+
+//This function updates the buffer on 'C' side.
+int send_rdbuf_to_c(char* rd_buf)
+
+For HW/SW simulation the below header files need to be included.
+SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
+
+```
+
+
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
+```
     $ cd verif/scripts
     $ make C_TEST={your_test_name} # compile and run using XSIM (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
@@ -245,9 +270,17 @@ Once your test is written, you are ready to run a simulation. The *scripts/* dir
     $ cd ../sim/{your_test_name} # to view the test log files
 
     $ cd verif/scripts
+    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
+    $ cd ../sim/{your_test_name} # to view the test log files
+
+    $ cd verif/scripts
+    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
+    $ cd ../sim/{your_test_name} # to view the test log files
+
+    $ cd verif/scripts
     $ make C_TEST={your_test_name} QUESTA=1 # compile and run using QUESTA (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
-    
+```
 ## Accessing Host Memory During Simulation
 Your design may share data between host memory and logic within the CL. To verify your CL is accessing host memory, the test bench includes two types of host memory: SV and C domain host memory. If you are are only using SV to verify your CL, then use SV domain host memory. An associative array represents host memory, where the address is the key to locate a 32-bit data value.
 
@@ -257,7 +290,7 @@ Your design may share data between host memory and logic within the CL. To verif
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
 
-<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory">
+<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory"/>
 
 
 Backdoor access to host memory is provided by two functions:
@@ -266,7 +299,7 @@ Backdoor access to host memory is provided by two functions:
    function void hm_put_byte(input longint unsigned addr, byte d);
    function byte hm_get_byte(input longint unsigned addr);
 ```
-Use these functions when you need to access data in either SV or C domain host memory. They take zero simulation time and are useful for initializing memory or checking results stored in memory. 
+Use these functions when you need to access data in either SV or C domain host memory. They take zero simulation time and are useful for initializing memory or checking results stored in memory.
 
 
 # Debugging Custom Logic using the AWS HDK
@@ -277,7 +310,7 @@ The process for dumping and viewing waves can differ depending on the simulator 
 
 1. Specify scope of logic for wave dump
 2. Re-run simulation to dump waves
-3. View waves in Vivado using .tcl 
+3. View waves in Vivado using .tcl
 
 ## Specify scope of logic for wave dump
 
@@ -315,7 +348,7 @@ Once `waves.tcl` has been modified, re-run the simulatio with `make` as shown at
 
 ## View waves in Vivado using .tcl
 
-As mentioned above, all simulation results will be placed in `sim/<test_name>`.  If using the included CL examples, the waves database should appear as `tb.wdb`.  
+As mentioned above, all simulation results will be placed in `sim/<test_name>`.  If using the included CL examples, the waves database should appear as `tb.wdb`.
 
 To view the waves, first create a .tcl file called `open_waves.tcl` with the following commands:
 ```
@@ -347,6 +380,21 @@ The SV Test API task 'poke' writes 64 bits of data to the CL via the AXI PCIeS i
 | slot_id | Slot ID |
 | addr | Write Address |
 | data | Write Data |
+| id | AXI ID |
+| size | Data Size |
+| intf | AXI CL Port |
+
+## _poke_pcis_wc_
+## Description
+The SV Test API task 'poke' writes 64 bits of data to the CL via the AXI PCIeS interface.
+## Declaration
+#### task poke_pcis_wc(input logic [63:0] addr, logic [31:0] data [$], logic [5:0]  id = 6'h0, logic [2:0]  size = 3'd6);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| addr | Write Address |
+| data [$] | DW array for Write Data|
 | id | AXI ID |
 | size | Data Size |
 | intf | AXI CL Port |
@@ -699,24 +747,24 @@ The C Test API function 'void log_printf(const char *format, ...)' is used to pr
 
 | Argument | Description |
 | --- | --- |
-| *format | message to be printed | 
+| *format | message to be printed |
 
 ## _sv_printf_
 ## Description
-The C Test API function 'extern void sv_printf(char *msg)' is used to send a message buffer to the SV side of simulation. 
+The C Test API function 'extern void sv_printf(char *msg)' is used to send a message buffer to the SV side of simulation.
 ## Declaration
 #### extern void sv_printf(char *msg);
 
 | Argument | Description |
 | --- | --- |
-| *msg | Character buffer | 
+| *msg | Character buffer |
 
 ## _sv_pause_
 ## Description
-The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay to a simulation. 
+The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay to a simulation.
 ## Declaration
 #### extern void sv_pause(uint32_t x);
 
 | Argument | Description |
 | --- | --- |
-| x | Delay in micro seconds | 
+| x | Delay in micro seconds |

@@ -12,17 +12,28 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+// This test verifies that the add, find, del functions for URAM.
+// Please refer the comments in the test as to how each operation can be tested.
+// HW/SW co-simulation support is also enabled for this test. 
+// The documentation for HW/SW co-simulation and HW simulation can be found in verif/README.
 
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <fpga_pci.h>
-#include <fpga_mgmt.h>
-#include <utils/lcd.h>
+#ifdef SV_TEST
+   #include "fpga_pci_sv.h"
+#else
+   #include <fpga_pci.h>
+   #include <fpga_mgmt.h>
+   #include <utils/lcd.h>
+#endif
+
+#include <utils/sh_dpi_tasks.h>
 
 /* Constants determined by the CL */
 /* a set of register offsets; this CL has only one */
@@ -31,6 +42,7 @@
 
 #define URAM_REG_ADDR UINT64_C(0x500)
 
+#ifndef SV_TEST
 /*
  * pci_vendor_id and pci_device_id values below are Amazon's and avaliable to use for a given FPGA slot. 
  * Users may replace these with their own if allocated to them by PCI SIG
@@ -49,6 +61,7 @@ void help(void);
 /* Declating auxilary house keeping functions */
 int initialize_log(char* log_name);
 int check_afi_ready(int slot);
+#endif
 
 void help(void)
 {
@@ -68,14 +81,30 @@ void usage(char* program_name) {
 /*** Global Variables ***/
 uint32_t nb_iter;
 uint32_t glb_value;
+#ifdef SV_TEST
+//For cadence and questa simulators the main has to return some value
+   #ifdef INT_MAIN
+   int test_main(uint32_t *exit_code) {
+   #else 
+   void test_main(uint32_t *exit_code) {
+   #endif 
+#else 
+    int main(int argc, char **argv) {
+#endif
+  //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
+  #ifdef SCOPE
+    svScope scope;
+    scope = svGetScopeFromName("tb");
+    svSetScope(scope);
+  #endif
 
-int main(int argc, char **argv) {
   int rc;
   int slot_id = 0;
   char command[256];
   uint32_t value;
   int command_set = 0;
-  
+
+#ifndef SV_TEST  
   // Process command line args
   {
       int i;
@@ -104,19 +133,37 @@ int main(int argc, char **argv) {
           }
       }
   }
+#endif
 
   if (!command_set) {
     printf("===== ========================== =====\n");	
     printf("===== Starting with uram_example =====\n");	
     printf("===== ========================== =====\n");	
     printf("Enter your command followed by your 32 bits hexadecimal value (without 0x)\n");	
-    printf("Example: find FEEDBABE\n");
-    printf("Example: add CAFE4B1D\n");
-    printf("Example: del DEADDEAD\n");
+    printf("Note that only the [28:0] bits will be stored in the URAM\n");
+    
+#ifndef VIVADO_SIM
+    printf("Example: find CAFE4B1D\n");
+    printf("Example: del CAFE4B1D\n");
     scanf("%s %x", command, &value);
+#else
+    // scanf does not work with Vivado simulator.
+    // We have an example to add a value below.
+    // Use value = value | 0x40000000 to add a value.
+    // Use value = value | 0x80000000 to find a value.
+    // Use value = value | 0xa0000000 to delete a value.
+    printf("Adding a value to URAM \n");
+    value = 0xCAFE4B1D | 0x40000000;
+#endif
+
   }
+
   glb_value = value;
- 
+  
+  printf("After setting command value \n");
+
+#ifndef VIVADO_SIM
+
   // The 3 MSB are used to encode {find, add, del} when writing to the CL
   // On a read they indicate {find_ok, del_ok, busy}
   value = value & 0x1FFFFFFF;
@@ -135,12 +182,16 @@ int main(int argc, char **argv) {
           }
       }
   }
-  
+#endif
+
   /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
   rc = fpga_pci_init();
   fail_on(rc, out, "Unable to initialize the fpga_pci library");
   
+#ifndef SV_TEST
   rc = check_afi_ready(slot_id);
+#endif
+
   fail_on(rc, out, "AFI not ready");
   
   /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
@@ -148,10 +199,21 @@ int main(int argc, char **argv) {
   rc = uram_example(slot_id, FPGA_APP_PF, APP_PF_BAR0, value);
   fail_on(rc, out, "peek-poke example failed");
 
+#ifndef SV_TEST
   return rc;
 
 out:
   return 1;
+#else
+
+out:
+   #ifdef INT_MAIN
+   *exit_code = 0;
+   return 0;
+   #else 
+   *exit_code = 0;
+   #endif
+#endif
 }
 
 /*
@@ -174,9 +236,14 @@ int uram_example(int slot_id, int pf_id, int bar_id, uint32_t value) {
    * other API calls.
    * This function accepts the slot_id, physical function, and bar number
    */
-  rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
-  fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
   
+  // As HW simulation test is not run on a AFI, the below function is not valid
+#ifndef SV_TEST
+  rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
+#endif
+
+  fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
+
   // Write
   printf("Writing 0x%08x\n", value);
   rc = fpga_pci_poke(pci_bar_handle, URAM_REG_ADDR, value);
@@ -211,15 +278,15 @@ int uram_example(int slot_id, int pf_id, int bar_id, uint32_t value) {
   
   if(find_ok == 1) {
     if(del_info == 1) {
-      printf("Deletion OK : The value 0x%x has been deleted successfully\n", glb_value); 
+      printf("Deletion OK : The value 0x%08x has been deleted successfully\n", value); 
     } else {
-      printf("Find OK : The value 0x%x is present in the URAM\n", glb_value); 
+      printf("Find OK : The value 0x%08x is present in the URAM\n", value); 
     }
   } else {
     if(find_ko == 1) {
-      printf("Find KO : The value 0x%x is NOT present in the URAM\n", glb_value); 
+      printf("Find KO : The value 0x%08x is NOT present in the URAM\n", value); 
     } else {
-      printf("The value 0x%x has been added to the URAM successfully\n", glb_value);
+      printf("The value 0x%08x has been added to the URAM successfully\n", value);
     }
   }
 
@@ -237,6 +304,8 @@ out:
   return (rc != 0 ? 1 : 0);
 }
 
+/* As HW simulation test is not run on a AFI, the below function is not valid */
+#ifndef SV_TEST
 
 /*
  * check if the corresponding AFI for hello_world is loaded
@@ -288,5 +357,7 @@ int check_afi_ready(int slot_id) {
   return rc;
  
 out:
-    return 1;
+  return 1;
 }
+
+#endif

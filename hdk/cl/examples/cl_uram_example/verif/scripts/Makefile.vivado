@@ -1,0 +1,40 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+##################################################################
+## Makefile For Vivado compiles and simulations
+##################################################################
+
+compile:
+	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && xsc $(C_FILES) --additional_option "-I$(C_SDK_USR_INC_DIR)" --additional_option "-I$(C_SDK_USR_UTILS_DIR)" --additional_option "-I$(C_COMMON_DIR)/include" --additional_option "-I$(C_COMMON_DIR)/src" --additional_option "-I$(C_INC_DIR)" --additional_option "-DVIVADO_SIM" --additional_option "-DSV_TEST"
+	cd $(SIM_DIR) && xvhdl --work xil_defaultlib ${CL_ROOT}/design/ctrl_uram.vhd
+	cd $(SIM_DIR) && xvlog --sv -m64 --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --work xil_defaultlib --relax -f $(SCRIPTS_DIR)/top.vivado.f
+	cd $(SIM_DIR) && xelab -m64 --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --timescale 1ps/1ps --debug typical --relax --mt 8 -L axi_clock_converter_v2_1_11 -L generic_baseblocks_v2_1_0 -L axi_infrastructure_v1_1_0 -L axi_register_slice_v2_1_12 -L fifo_generator_v13_1_4 -L axi_data_fifo_v2_1_11 -L axi_crossbar_v2_1_13 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm -sv_lib dpi --snapshot tb xil_defaultlib.tb xil_defaultlib.glbl xil_defaultlib.$(TEST) 
+
+compile_chk:
+	mkdir -p $(SIM_DIR)
+	cd $(SIM_DIR) && xsc $(C_FILES) --additional_option "-I$(C_SDK_USR_INC_DIR)" --additional_option "-I$(C_SDK_USR_UTILS_DIR)" --additional_option "-I$(C_COMMON_DIR)/include" --additional_option "-I$(C_COMMON_DIR)/src" --additional_option "-I$(C_INC_DIR)" --additional_option "-DVIVADO_SIM" --additional_option "-DSV_TEST"
+	cd $(SIM_DIR) && xvlog --sv -m64 -d ENABLE_PROTOCOL_CHK --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --work xil_defaultlib --relax -f $(SCRIPTS_DIR)/top.vivado.f
+	cd $(SIM_DIR) && xelab -m64 -d ENABLE_PROTOCOL_CHK --initfile $(XILINX_VIVADO)/data/xsim/ip/xsim_ip.ini --timescale 1ps/1ps --debug typical --relax --mt 8 -L axi_protocol_checker_v1_1_12 -L axi_clock_converter_v2_1_11 -L generic_baseblocks_v2_1_0 -L axi_infrastructure_v1_1_0 -L axi_register_slice_v2_1_12 -L fifo_generator_v13_1_4 -L axi_data_fifo_v2_1_11 -L axi_crossbar_v2_1_13 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm -sv_lib dpi --snapshot tb xil_defaultlib.tb xil_defaultlib.glbl xil_defaultlib.$(TEST)
+
+run:
+
+ifeq ($(TEST),test_null)
+	cd $(SIM_DIR) && xsim -R -log $(C_TEST).log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
+else
+	cd $(SIM_DIR) && xsim -R -log $(TEST).log -tclbatch $(SCRIPTS_DIR)/waves.tcl tb
+endif
+

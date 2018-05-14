@@ -27,9 +27,15 @@
 
 #include <utils/sh_dpi_tasks.h>
 
-void test_main(uint32_t *exit_code) {
+//For cadence and questa simulators the main has to return some value
+#ifdef INT_MAIN
+   int test_main(uint32_t *exit_code) {
+#else 
+   void test_main(uint32_t *exit_code) {
+#endif 
 
   // NULL Test
 
   *exit_code = 0;
 }
+

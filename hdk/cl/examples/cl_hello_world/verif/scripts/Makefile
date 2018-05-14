@@ -20,7 +20,7 @@ export C_TEST ?= test_null
 export CL_ROOT = $(PWD)/../..
 export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
 
-export C_COMMON_DIR        = $(HDK_COMMON_DIR)/software/include
+export C_COMMON_DIR        = $(HDK_COMMON_DIR)/software
 export C_SDK_USR_INC_DIR   = $(SDK_DIR)/userspace/include
 export C_SDK_USR_UTILS_DIR = $(SDK_DIR)/userspace/utils
 export C_INC_DIR  = $(CL_ROOT)/software/runtime
@@ -50,7 +50,7 @@ export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces
 export SH_SH_DIR   = $(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim
 
 SV_TEST_LIST = test_hello_world
-C_FILES      = $(C_TEST_NAME) $(C_SDK_USR_UTILS_DIR)/sh_dpi_tasks.c 
+C_FILES      = $(C_TEST_NAME) $(C_SDK_USR_UTILS_DIR)/sh_dpi_tasks.c $(C_COMMON_DIR)/src/fpga_pci_sv.c 
 
 ifeq ($(XCHK), 1)
   all:	make_sim_dir compile_chk run

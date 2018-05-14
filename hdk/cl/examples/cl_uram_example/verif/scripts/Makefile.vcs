@@ -1,0 +1,43 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+##################################################################
+## Makefile For VCS compiles and simulations
+## Step to run :
+## 1. make create_libs VCS=1  -> To generate xilinx compile 
+##    libraries. This is a one time step
+## 2. make all VCS=1  -> Runs the test
+##################################################################
+
+compile: $(COMPLIB_DIR)
+	mkdir -p $(SIM_DIR)
+	cd ${SIM_DIR} && ln -s -f ../vcs_complib/synopsys_sim.setup
+	cd $(SIM_DIR) && vhdlan -full64 ${CL_ROOT}/design/ctrl_uram.vhd
+	cd $(SIM_DIR) && vlogan -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS $(DEFINES) +lint=TFIPC-L
+	cd $(SIM_DIR) && vcs tb $(TEST) $(C_FILES) -CFLAGS "-I$(C_SDK_USR_INC_DIR)" -CFLAGS "-I$(C_SDK_USR_UTILS_DIR)" -CFLAGS "-I$(C_COMMON_DIR)/include" -CFLAGS "-I$(C_COMMON_DIR)/src" -CFLAGS "-DSV_TEST" -CFLAGS "-DSCOPE" -CFLAGS "-I$(C_INC_DIR)" -debug_all -M -I +lint=TFIPC-L -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64  +memcbk -licqueue -lca -v2005 -l compile.vcs.log
+
+run:
+
+ifeq ($(TEST),test_null)
+	cd $(SIM_DIR) && ./simv -l $(C_TEST).log $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TEST).vpd
+else
+	cd $(SIM_DIR) && ./simv -l $(TEST).log $(PLUSARGS) +ntb_random_seed_automatic +vpdfile+$(TEST).vpd
+endif
+
+$(COMPLIB_DIR):
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT) && rm -rf create_libs.tcl

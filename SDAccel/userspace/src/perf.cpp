@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Xilinx, Inc
+ * Copyright (C) 2017-2018 Xilinx, Inc
  * Performance Monitoring using PCIe for AWS HAL Driver
  * Author: Paul Schumacher
  *

@@ -26,57 +26,90 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.7 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .    * This release supports Xilinx SDx 2017.4 and 2017.1.  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
+   * FPGA developer kit version is listed in [hdk_version.txt](./hdk/hdk_version.txt)
+   * FPGA developer kit supported tool versions are listed in [supported_vivado_versions](./supported_vivado_versions.txt)
+   * The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+   
+| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
+|-----------|-----------|------|
+| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
+| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
+
+* OpenCL dynamic resource optimization – The developer tools automatically remove unused DDR and debug logic to free up resources and reduce compile times.  [See 2017.4 Migration Document](SDAccel/docs/SDAccel_Migrate_dynamic_DSA.md) and [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf) 
+* Developers can instantiate up to 60 kernels (up from the max 16 2017.1 supported). 
+* OpenCL Kernel profiling – During compile time, profiling logic can be automatically inserted to enable generation of kernel profile data.  Profile data can be viewed using the SDx IDE under profile summary report and timeline trace report. [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)   
+* OpenCL Hardware Emulation Debug – GDB-like debug allows developers a view into what is going on inside the kernel during hardware emulation.  Debug capabilities include start/stop at intermediate points and memory inspection.  [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
+* Post-synthesis and place/route optimization is now supported in OpenCL development environment.  [New XOCC options: reuse_synth and reuse_impl](https://www.xilinx.com/html_docs/xilinx2018_1/sdsoc_doc/wfq1517252127836.html)
+* Customer simulation environment improvements and bug fixes:
+  * 8 Additional tests that will help developer with using the simulation environment and shell simulation model
+  * Simulation model support for non DW aligned accesses
+  * Co-simulation support
+* EDMA Driver fixes:
+  * Prevent timeouts due to scanning of the BARs for DMA hardware
+  * Driver compilation support for 4.14 linux kernel
+* HDK improvements and fixes: 
+  * cl_dram_dma improvements to make enabling/disabling DDRs easier
+  * encrypt.tcl now clears out old files
+  * URAM example timing improvements
+* IPI Improvements:
+  * [HLS example](hdk/cl/examples/cl_hls_dds_hlx/README.md) 
+  * Script based approach for running the examples
+
+   
 ## Release 1.3.6 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    Simulation model bug fix for transfer size of 64 bytes
-   *    Xilinx 2017.1 Patch AR70350 - fixes report_power hangs.  Patch is automatically applied during setup scripts using MYVIVADO environment variable
-   *    Updated synthesis scripts with -sv option when calling read_verilog
-   *    Added documentation on us-gov-west-1 (GovCloud US)
-   *    Minor EDMA driver fixes and improvements
+  * Simulation model bug fix for transfer size of 64 bytes.
+  * Xilinx 2017.1 Patch AR70350 - fixes report_power hangs.  Patch is automatically applied during setup scripts using MYVIVADO environment variable.
+  * Updated synthesis scripts with -sv option when calling read_verilog.
+  * Added documentation on us-gov-west-1 (GovCloud US).
+  * Minor EDMA driver fixes and improvements.
 
 ## Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
-   *    [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB)
-   *    [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
-   *    Improved IPI 3rd party simulator support
-   *    Simulation model fixes
-   *    SDAccel improvements - Removal of settings64 script from SDAccel setup and switching between DSAs	
+  * [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
+  * [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB).
+  * [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
+  * Improved IPI 3rd party simulator support.
+  * Simulation model fixes.
+  * SDAccel improvements - Removal of settings64 script from SDAccel setup and switching between DSAs.
 
 ## Release 1.3.4 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    EDMA/XDMA Driver improvements
-   *    Additional SDAccel Platforms
-         *    1DDR for faster build times and smaller expanded shell
-         *    RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
-   *    IP Integrator GUI (HLx) improvements 
-   *    CL\_DRAM\_DMA fixes and improvements
-         *    Dual master support
-   *    Simulation environment fixes and improvements
-         *    AXI/AXIL Protocol checkers
-         *    Shell model improvements
-         *    SW co-simulation support on cl\_hello\_world
-         *    DDR Model patch
-   *    Updated SH\_DDR module in preparation for upcoming feature release	
+  * EDMA/XDMA Driver improvements
+  * Additional SDAccel Platforms
+    * 1DDR for faster build times and smaller expanded shell
+    * RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
+  * IP Integrator GUI (HLx) improvements 
+    * CL\_DRAM\_DMA fixes and improvements
+      *  Dual master support
+  * Simulation environment fixes and improvements
+    * AXI/AXIL Protocol checkers
+    * Shell model improvements
+    * SW co-simulation support on cl\_hello\_world
+    * DDR Model patch
+  * Updated SH\_DDR module in preparation for upcoming feature release	
    
 ## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    New FPGA Image APIs for deleting and reading/editing attributes 
+  * New FPGA Image APIs for deleting and reading/editing attributes 
 
 ## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    SDAccel general availability 
+  * SDAccel general availability 
 
 ## Release 1.3.1 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    EDMA Driver release 1.0.29 - MSI-X fixes
-   *    Improved IPI documentation
-   *    Documentation updates
-   *    Build flow fixes
-   *    Public LTX files for use with hdk examples AFIs 
+  * EDMA Driver release 1.0.29 - MSI-X fixes
+  * Improved IPI documentation
+  * Documentation updates
+  * Build flow fixes
+  * Public LTX files for use with hdk examples AFIs 
 
 ## Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features)
-   *    FPGA initiated read/write over PCI (PCI-M)
-   *    Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
-   *    Expanded DMA support
-   *    Improved URAM utilization
-   *    Improved AXI Interface checking
-   *    New customer examples/workflows:  IP Integrator, VHDL and GUI
-   *    SDAccel preview is accepting developers - See [README](sdk/SDAccel/README.md) registration  
+  * FPGA initiated read/write over PCI (PCI-M)
+  * Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
+  * Expanded DMA support
+  * Improved URAM utilization
+  * Improved AXI Interface checking
+  * New customer examples/workflows:  IP Integrator, VHDL and GUI
+  * SDAccel preview is accepting developers - See [README](sdk/SDAccel/README.md) registration  
 
 
 **During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-local-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional announcements.

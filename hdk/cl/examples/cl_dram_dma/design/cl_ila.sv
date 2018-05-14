@@ -13,7 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-module cl_ila (
+module cl_ila #( parameter DDR_A_PRESENT = 1) (
 
    input aclk,
 
@@ -105,10 +105,14 @@ module cl_ila (
                    .probe42 (1'b0),
                    .probe43 (1'b0)
                    );
+generate
+begin:ddr_A_hookup
+ if (DDR_A_PRESENT == 1) begin
+
 //---------------------------- 
 // Debug Core ILA for DDRA AXI4 interface monitoring 
 //---------------------------- 
-      ila_1 CL_DDRA_ILA_0 (
+ila_1 CL_DDRA_ILA_0 (
                    .clk    (aclk),
                    .probe0 (lcl_cl_sh_ddra.awvalid),
                    .probe1 (lcl_cl_sh_ddra.awaddr),
@@ -156,6 +160,8 @@ module cl_ila (
                    .probe43 (1'b0)
                    );
 
-
+end //if(DDR_A_PRESET)
+end //label
+endgenerate
 endmodule
 

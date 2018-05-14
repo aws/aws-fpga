@@ -272,16 +272,10 @@ always_ff @(posedge clk_main_a0)
       data_in[31:0] <= data_in[31:0];
    end
 
-  logic        find;
-  logic        add;
-  logic        del;
   logic        find_ok;
   logic        find_ko;
   logic        busy;
-  
-  assign find            = data_in[31:31];
-  assign add             = data_in[30:30];
-  assign del             = data_in[29:29];
+
   assign data_out[31:31] = find_ok;
   assign data_out[30:30] = find_ko;
   assign data_out[29:29] = busy;
@@ -289,10 +283,7 @@ always_ff @(posedge clk_main_a0)
    
   uram_ctrl uram_ctrl_i (
    .clk     (clk_main_a0),
-   .rst     (rst_main_n_sync),
-   .find    (find),
-   .add     (add),
-   .del     (del),
+   .rstn    (rst_main_n_sync),
    .data_in (data_in),
    .find_ok (find_ok),
    .find_ko (find_ko),

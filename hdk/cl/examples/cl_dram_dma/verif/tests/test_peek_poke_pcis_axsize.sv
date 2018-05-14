@@ -73,7 +73,6 @@ module test_peek_poke_pcis_axsize();
       $display("[%t] : Waiting for PCIS write and read activity to complete", $realtime);
       #500ns;
 
-
       tb.power_down();
 
       //---------------------------
@@ -95,18 +94,18 @@ module test_peek_poke_pcis_axsize();
    end
 
    task compare_data(logic [511:0] act_data, exp_data);
-       if(act_data !== exp_data) begin
-          $display($time,,,"***ERROR*** : Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
-                             act_data, exp_data);
-          error_count ++;
-       end
-       else begin
-          $display("Data Matched. Actual Data:%0h <==> Expected Data: %0h", act_data, exp_data);
-       end
+      if(act_data !== exp_data) begin
+         $display($time,,,"***ERROR*** : Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
+                            act_data, exp_data);
+         error_count ++;
+      end
+      else begin
+         $display("Data Matched. Actual Data:%0h <==> Expected Data: %0h", act_data, exp_data);
+      end
    endtask
 
    task disp_err (input string s);
-     $display($time,,,"***ERROR*** : %s", s);
-     error_count ++;
+      $display($time,,,"***ERROR*** : %s", s);
+      error_count ++;
    endtask
 endmodule // test_peek_poke_pcis_axsize

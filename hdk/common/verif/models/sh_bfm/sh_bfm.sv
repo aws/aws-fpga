@@ -411,6 +411,7 @@ module sh_bfm #(
     .C_AXI_ADDR_WIDTH(32),
     .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
     .C_AXI_ARUSER_WIDTH(1),
+                                     
     .C_AXI_WUSER_WIDTH(1),
     .C_AXI_RUSER_WIDTH(1),
     .C_AXI_BUSER_WIDTH(1),
@@ -982,7 +983,7 @@ module sh_bfm #(
    AXI_Command  host_mem_wr_que[$];
    logic        first_wr_beat = 1;
    int          wr_last_cnt = 0;
-   logic [63:0] wr_addr;
+   logic [63:0] wr_addr, wr_addr_t;
    
    always @(posedge clk_core) begin
 
@@ -1000,14 +1001,15 @@ module sh_bfm #(
                logic [31:0] word;
 
                if (!tb.use_c_host_memory)
-                 if (tb.sv_host_memory.exists(wr_addr))
-                   word = tb.sv_host_memory[wr_addr];
+                 if (tb.sv_host_memory.exists({wr_addr[63:2], 2'b00}))
+                   word = tb.sv_host_memory[{wr_addr[63:2], 2'b00}];
                  else
                    word = 32'hffff_ffff;   // return a default value
                else begin
+                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
-                     t = tb.host_memory_getc(wr_addr + k);
+                     t = tb.host_memory_getc(wr_addr_t + k);
                      word = {t, word[31:8]};
                   end                  
                end
@@ -1019,18 +1021,21 @@ module sh_bfm #(
                   
                   if (cl_sh_wr_data[0].strb[index]) begin
                      c = cl_sh_wr_data[0].data >> (index * 8);
+                     //FIX partial DW order word = {c, word[31:8]};
                      word[8*j+:8] = c;
                   end
                end // for (int j=0; j<4; j++)
 
                if (!tb.use_c_host_memory)
-                 tb.sv_host_memory[wr_addr] = word;
+               begin
+                 tb.sv_host_memory[{wr_addr[63:2], 2'b00}] = word;
+               end
                else begin
+                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
                      t = word[7:0];                     
-
-                     tb.host_memory_putc(wr_addr + k, t);
+                     tb.host_memory_putc(wr_addr_t + k, t);
                      word = word >> 8;
                   end                  
                end
@@ -1050,7 +1055,7 @@ module sh_bfm #(
          end // if (cl_sh_wr_data.size() > 0)
       end // if (host_mem_wr_que.size() > 0)
    end
-  
+
    //
    // cl->sh Write Address Channel
    //
@@ -1058,6 +1063,8 @@ module sh_bfm #(
    always @(posedge clk_core) begin
       AXI_Command cmd;
 
+      int awready_cnt = 0;
+      
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
@@ -1075,20 +1082,24 @@ module sh_bfm #(
          host_mem_wr_que.push_back(cmd);
       end
 
-      if (cl_sh_wr_cmds.size() < 4)
-        sh_cl_pcim_awready <= 1'b1;
-      else
-        sh_cl_pcim_awready <= 1'b0;
-        
+      if ((cl_sh_wr_cmds.size() < 4) || (awready_cnt == 0)) begin
+         sh_cl_pcim_awready <= 1'b1;
+         awready_cnt = $urandom_range(0, 80);
+      end
+      else begin
+         sh_cl_pcim_awready <= 1'b0;
+         awready_cnt--;
+      end
    end
 
-
    //
-   // cl-sh write Data Channel
+   // cl->sh write Data Channel
    //
 
    always @(posedge clk_core) begin
       AXI_Data wr_data;
+      int wready_cnt = 0;
+      int wready_nonzero_wait = 0;
       
       if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
@@ -1100,12 +1111,18 @@ module sh_bfm #(
          if (wr_data.last == 1)
            wr_last_cnt += 1;
          
+      end // if (sh_cl_pcim_wready && cl_sh_pcim_wvalid)
+      
+      if ((cl_sh_wr_data.size() > 64) || (wready_cnt > 0)) begin
+         sh_cl_pcim_wready <= 1'b0;
+         wready_cnt--;
       end
-      if (cl_sh_wr_data.size() > 64)
-        sh_cl_pcim_wready <= 1'b0;
-      else
-        sh_cl_pcim_wready <= 1'b1;
-        
+      else begin
+         sh_cl_pcim_wready <= 1'b1;
+         wready_cnt = $urandom_range(10, 0);
+         wready_nonzero_wait = $urandom_range(8, 0);
+         wready_cnt = (wready_nonzero_wait == 0) ? wready_cnt : 0;
+      end
    end
 
    //
@@ -1142,6 +1159,7 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
+      int arready_cnt = 0;
       
       if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
@@ -1159,10 +1177,14 @@ module sh_bfm #(
          sh_cl_rd_data.push_back(cmd);
       end
 
-      if (cl_sh_rd_cmds.size() < 4)
-        sh_cl_pcim_arready <= 1'b1;
-      else
-        sh_cl_pcim_arready <= 1'b0;
+      if ((cl_sh_rd_cmds.size() < 4) || (arready_cnt == 0)) begin
+         sh_cl_pcim_arready <= 1'b1;
+         arready_cnt = $urandom_range(0, 80);
+      end
+      else begin
+         sh_cl_pcim_arready <= 1'b0;
+         arready_cnt--;
+      end
    end
 
    //
@@ -1170,7 +1192,7 @@ module sh_bfm #(
    //
 
    logic first_rd_beat;
-   logic [63:0] rd_addr;
+   logic [63:0] rd_addr, rd_addr_t;
    
    always @(posedge clk_core) begin
       AXI_Command rd_cmd;
@@ -1190,7 +1212,8 @@ module sh_bfm #(
             rd_addr = sh_cl_rd_data[0].addr;
             first_rd_beat = 1'b0;
          end
-         
+
+         beat = {512{1'b1}}; 
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
 
@@ -1199,14 +1222,15 @@ module sh_bfm #(
             end
             
             if (!tb.use_c_host_memory)
-              if (tb.sv_host_memory.exists(rd_addr))
-                c = tb.sv_host_memory[rd_addr];
+              if (tb.sv_host_memory.exists({rd_addr[63:2], 2'b00}))
+                c = tb.sv_host_memory[{rd_addr[63:2], 2'b00}];
               else
                 c = 32'hffffffff;
             else begin
+               rd_addr_t = {rd_addr[63:2], 2'b00};
                for(int k=0; k<4; k++) begin
                   byte t;
-                  t = tb.host_memory_getc(rd_addr + k);
+                  t = tb.host_memory_getc(rd_addr_t + k);
                   c = {t, c[31:8]};
                end
             end
@@ -2145,8 +2169,92 @@ module sh_bfm #(
       resp = cl_sh_b_resps[0].resp;
       cl_sh_b_resps.pop_front();
       
-   endtask // poke
+   endtask // poke_pcis
 
+   //===========================================================================
+   //
+   // poke_pcis_wc
+   //
+   //   Description: Write combine version of poke (will only work on PCIS Intf)
+   //        id - AXI bus ID
+   //        addr - Address for transfer
+   //        data[$][31:0] - Queue of DWs
+   //        size - AXI size
+   //   Outputs: None
+   //
+   //==========================================================================
+   task poke_pcis_wc(input logic [63:0] addr, 
+                     logic [31:0] data [$], 
+                     logic [5:0]  id = 6'h0,
+                     logic [2:0]  size = 3'd6
+                     ); 
+      
+      AXI_Command axi_cmd;
+      AXI_Data    axi_data;
+      
+      logic [1:0]  resp;
+      logic [31:0] dw_idx;
+      logic [31:0] slice_dw_idx;
+      logic [31:0] total_bytes;
+      logic [31:0] max_bytes;
+      
+      total_bytes = data.size() * 4;
+
+      if (size == 3'd2 && ((total_bytes != 4) || (addr[5:0] != 6'd0))) begin
+         $display("FATAL ERROR: poke_pcis_wc:: Size = 2. DW count should be equal to 1 and addr should be DW aligned");
+         $finish;
+      end
+      
+      if (size != 3'd6 && size != 3'd2) begin
+         $display("FATAL ERROR: poke_pcis_wc:: Only Size = 2 or 6 supported");
+         $finish;
+      end
+
+      max_bytes = 4096 - addr[5:0];
+      if (total_bytes > max_bytes) begin
+         $display("FATAL ERROR: poke_pcis_wc:: AXI transaction is more than 4096 bytes");
+         $finish;
+      end
+      
+      axi_cmd.addr = addr;
+      axi_cmd.len  = (total_bytes + addr[5:0]) % 64 ? ((total_bytes + addr[5:0])>>6) : ((total_bytes + addr[5:0])>>6) - 1;
+      axi_cmd.size = size;
+      axi_cmd.id   = id;
+
+      sh_cl_wr_cmds.push_back(axi_cmd);
+
+      dw_idx = 0;
+      
+      for (int idx = 0; idx <= axi_cmd.len; idx++) begin
+         axi_data.id   = id;
+         axi_data.data = 512'd0;
+         axi_data.strb = 512'd0;
+         slice_dw_idx = idx == 0 ? addr[5:2] : 0;
+         
+         while ((slice_dw_idx < 16) && (dw_idx < total_bytes/4)) begin
+            assert(data.size() > 0) else 
+               begin
+                  $display("FATAL ERROR: poke_pcis_wc:: Something went wrong. data queue already empty");
+                  $finish;
+               end;
+            axi_data.data[slice_dw_idx*32 +: 32] = data.pop_front();
+            axi_data.strb[slice_dw_idx*4 +: 4] = 4'hf;
+            dw_idx++;
+            slice_dw_idx++;
+         end
+         axi_data.last = (axi_cmd.len == idx);
+         
+         sh_cl_wr_data.push_back(axi_data);
+      end // for (idx = 0; idx <= len; idx++)
+            
+      while (cl_sh_b_resps.size() == 0)
+        #20ns;
+      
+      resp = cl_sh_b_resps[0].resp;
+      cl_sh_b_resps.pop_front();
+      
+   endtask // poke_pcis_wc
+   
    //=================================================
    //
    // peek
@@ -2324,7 +2432,9 @@ module sh_bfm #(
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
               dop = h2c_dma_list[chan].pop_front();                          
-         
+              if (dop.cl_addr[5:0] !== 6'h00) begin
+                 $fatal("Address in a SH->CL transfer should be aligned to 64 byte boundary for address %x \n", dop.cl_addr);
+              end
               aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
               byte_cnt = 0;
@@ -2350,6 +2460,7 @@ module sh_bfm #(
                   axi_cmd.addr = (aligned_addr + (burst_cnt * 64));
                   axi_cmd.len  = num_of_data_beats - last_beat - burst_cnt - 1;
                   // handle the condition if addr is crossing 4k page boundry
+                  $display("Address is going to cross 4K boundary \n");
                   if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
                     axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
@@ -2469,6 +2580,9 @@ module sh_bfm #(
          for (int chan = 0; chan < 4; chan++) begin
            if ((c2h_dma_started[chan] != 1'b0) && (c2h_dma_list[chan].size() > 0)) begin
               dop = c2h_dma_list[chan].pop_front();
+              if (dop.cl_addr[5:0] !== 6'h00) begin
+                 $fatal("Address in a CL->SH transfer should be aligned to 64 byte boundary");
+              end
               num_of_data_beats = ((dop.len + dop.cl_addr[5:0] - 1)/64) + 1;
               aligned_addr =  {dop.cl_addr[63:6], 6'h00};
               aligned = (aligned_addr == dop.cl_addr);

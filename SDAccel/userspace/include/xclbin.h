@@ -1,6 +1,8 @@
 /**
- *  Xilinx SDAccel xclbin container definition
- *  Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
+ * Copyright (C) 2015-2018 Xilinx, Inc
+ *
+ * Xilinx SDAccel xclbin container definition
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
  * License is located at

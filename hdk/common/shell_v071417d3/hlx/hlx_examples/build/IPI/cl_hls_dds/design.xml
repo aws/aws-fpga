@@ -1,0 +1,10 @@
+<ExampleDesign>
+<Vendor>xilinx.com</Vendor>
+<Library>design</Library>
+<Name>cl_hls_dds</Name>
+<Version>1.0</Version>
+<Design>init.tcl</Design>
+<DisplayName>cl_hls_dds (IPI)</DisplayName>
+<Description>cl_hls_dds (IPI)</Description>
+<Image>ccl_hls_dds.png</Image>
+</ExampleDesign>

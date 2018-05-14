@@ -32,19 +32,6 @@ variable script_folder
 set script_folder [_tcl::get_script_folder]
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2017.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-   puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -165,52 +152,51 @@ proc create_root_design { parentCell } {
 
   # Set parent object as current
   current_bd_instance $parentObj
-
-
+  
   # Create interface ports
   set S_SH [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aws_f1_sh1_rtl:1.0 S_SH ]
 
   # Create ports
 
   # Create instance: axi_bram_ctrl_0, and set properties
-  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.0 axi_bram_ctrl_0 ]
+  set axi_bram_ctrl_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl axi_bram_ctrl_0 ]
   set_property -dict [ list \
-CONFIG.DATA_WIDTH {512} \
-CONFIG.ECC_TYPE {0} \
- ] $axi_bram_ctrl_0
+    CONFIG.DATA_WIDTH {512} \
+    CONFIG.ECC_TYPE {0} \
+  ] $axi_bram_ctrl_0
 
   # Create instance: axi_bram_ctrl_0_bram, and set properties
-  set axi_bram_ctrl_0_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 axi_bram_ctrl_0_bram ]
+  set axi_bram_ctrl_0_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen axi_bram_ctrl_0_bram ]
   set_property -dict [ list \
-CONFIG.Memory_Type {True_Dual_Port_RAM} \
- ] $axi_bram_ctrl_0_bram
+    CONFIG.Memory_Type {True_Dual_Port_RAM} \
+  ] $axi_bram_ctrl_0_bram
 
   # Create instance: axi_gpio_0, and set properties
-  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
+  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio axi_gpio_0 ]
   set_property -dict [ list \
-CONFIG.C_ALL_OUTPUTS {1} \
-CONFIG.C_GPIO_WIDTH {16} \
- ] $axi_gpio_0
+    CONFIG.C_ALL_OUTPUTS {1} \
+    CONFIG.C_GPIO_WIDTH {16} \
+  ] $axi_gpio_0
 
   # Create instance: axi_smc, and set properties
-  set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
+  set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc ]
   set_property -dict [ list \
-CONFIG.NUM_SI {1} \
- ] $axi_smc
+    CONFIG.NUM_SI {1} \
+  ] $axi_smc
 
   # Create instance: f1_inst, and set properties
-  set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws:1.0 f1_inst ]
+  set f1_inst [ create_bd_cell -type ip -vlnv xilinx.com:ip:aws f1_inst ]
   set_property -dict [ list \
-CONFIG.AUX_PRESENT {1} \
-CONFIG.BAR1_PRESENT {1} \
-CONFIG.PCIS_PRESENT {1} \
- ] $f1_inst
+    CONFIG.AUX_PRESENT {1} \
+    CONFIG.BAR1_PRESENT {1} \
+    CONFIG.PCIS_PRESENT {1} \
+  ] $f1_inst
 
   # Create instance: f1_inst_axi_periph, and set properties
-  set f1_inst_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 f1_inst_axi_periph ]
+  set f1_inst_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect f1_inst_axi_periph ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
- ] $f1_inst_axi_periph
+    CONFIG.NUM_MI {1} \
+  ] $f1_inst_axi_periph
 
   # Create interface connections
   connect_bd_intf_net -intf_net axi_bram_ctrl_0_BRAM_PORTA [get_bd_intf_pins axi_bram_ctrl_0/BRAM_PORTA] [get_bd_intf_pins axi_bram_ctrl_0_bram/BRAM_PORTA]

@@ -5,7 +5,13 @@ There are three simple steps for accelerating your application on an AWS F1 inst
 2. Create an AFI 
 3. Run the FPGA accelerated application on AWS FPGA instances
 
+## :exclamation:  NOTE: If you would like to directly go to step 3 to experience how to execute your application on F1 instance Please read [Helloworld OpenCL Runtime example](./examples/aws/helloworld_ocl_runtime/README.md)
+
 This quick start guide will use a simple "Hello World" SDAccel example to get you started.  
+
+It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR) and ~1hr (1DDR), therefore, software and hardware emulation should be used during development.
+
+It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR) and ~1hr (1DDR), therefore, software and hardware emulation should be used during development.
 
 It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~4hrs (4DDR) and ~1hr (1DDR), therefore, software and hardware emulation should be used during development.
 
@@ -33,15 +39,25 @@ It is highly recommended you read the documentation and utilize software and har
 * The code for the FPGA binary can be written in C/C++, OpenCL or RTL
 * Once you have gone through this quick start example. See the [SDAccel GUI Guide](./docs/README_GUI.md) to access the fully integrated Eclipse-based environment with built-in debug, profiling and performance analysis tools. 
 
-
-
 <a name="prerequisites"></a>
 # Prerequisites
 <a name="iss"></a>
 ## AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses.
-  * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it may be more cost efficient to either: 
+  * This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+
+| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
+|-----------|-----------|------|
+| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
+| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
+
+* FPGA developer kit version is listed in [hdk_version.txt](../hdk/hdk_version.txt)
+
+* FPGA developer kit supported tool versions are listed in [supported_vivado_versions](../supported_vivado_versions.txt)
+
+* You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it may be more cost efficient to either: 
      * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a lower cost EC2 instance, with a minimum of 30GiB RAM), **OR** 
      * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html).  It is highly recommended that you validate your AWS IAM permissions prior to proceeding with this quick start.  By calling the [DescribeFpgaImages API](../hdk/docs/describe_fpga_images.md) you can check that your IAM permissions are correct.
@@ -63,14 +79,19 @@ It is highly recommended you read the documentation and utilize software and har
        $ cd $AWS_FPGA_REPO_DIR                                         
        $ source sdaccel_setup.sh
    ```
-    * Select a platform:
-      * AWS_PLATFORM_4DDR - Default AWS F1 platform with 4 DDRs and profiling support. Optimized for multi DDR use cases. This platform should be used for all production applications which require more than 1 DDR bank.
-      * AWS_PLATFORM_4DDR_DEBUG - This platform is a debug variant of the 4DDR platform and should be used for hardware debugging of kernels. This version consists of an additional debug feature which allows advanced users to insert ILA’s in the kernels for debugging purposes. All other features are identical to the AWS_PLATFORM_4DDR platform.  
-      * AWS_PLATFORM_1DDR - This platform consist of 1 DDR that is located in the shell region. This allow maximum space for kernels. This also allows much faster compile times for all the use cases which require only 1 DDR bank.  This platform does not support APM and hence no profiling data can be obtained.
-
+    * Depending on the Xilinx SDx tool version that is being used a default platform will be selected.  This section describes the valid platforms for each support tool version.  
+      * Xilinx Tool 2017.1 Platforms:
+        * AWS_PLATFORM_4DDR - (Default) AWS F1 platform with 4 DDRs and profiling support. Optimized for multi DDR use cases. This platform should be used for all production applications which require more than 1 DDR bank.
+        * AWS_PLATFORM_4DDR_DEBUG - This platform is a debug variant of the 4DDR platform and should be used for hardware debugging of kernels. This version consists of an additional debug feature which allows advanced users to insert ILA’s in the kernels for debugging purposes. All other features are identical to the AWS_PLATFORM_4DDR platform.  
+        * AWS_PLATFORM_1DDR - This platform consist of 1 DDR that is located in the shell region. This allow maximum space for kernels. This also allows much faster compile times for all the use cases which require only 1 DDR bank.  This platform does not support APM and hence no profiling data can be obtained.    
+      * Xilinx Tool 2017.4 Platform:
+        * AWS_PLATFORM_DYNAMIC_5_0 - (Default) AWS F1 platform dynamically optimized for multi DDR use cases.   
+ * Changing to a different platform can be accomplished by setting the AWS_PLATFORM environment variable.  Example:  
+     
    ```
        $ export AWS_PLATFORM=$AWS_PLATFORM_1DDR 
-   ```
+   ```  
+
 <a name="createapp"></a>
 # 1. Build the host application, Xilinx FPGA binary and verify you are ready for FPGA acceleration
 
@@ -190,11 +211,12 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 # 3. Run the FPGA accelerated application on F1
 
 Here are the steps:
-* Start an F1 instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), alternatively you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on F1.
+* Start an F1 instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatiability table](../README.md#devAmi).  Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on F1.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
      * Copy the compiled host executable (exe) to new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
-     * If using 1DDR platform or 4DDR Rtl kernel debug platform:  Depending on the host code, the \*.awsxclbin may need to be renamed. Ex:  ```cp vector_addition.hw.xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0.awsxclbin vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin```
+     * If using Xilinx SDx 2017.1 and 1DDR platform or 4DDR Rtl kernel debug platform:  
+       * Depending on the host code, the \*.awsxclbin may need to be renamed. Ex:  ```cp vector_addition.hw.xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0.awsxclbin vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin```
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
    * Clone the github repository to the new F1 instance and install runtime drivers
@@ -205,30 +227,22 @@ Here are the steps:
 ```
 
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
-<!--
----------
 
-(--Delete once Xilinx Github examples start looking for \*.awsxclbin--)
-
-* *By default the host application in this example looks for a \*.xclbin FPGA binary file, while the AWS FPGA binary file generated by create_sdaccel_afi.sh is called \*.awsxclbin.* 
-* *The \*.awsxclbin AWS FPGA binary will need to be renamed to \*.xclbin so that the host application can find it* 
-```
-    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/host/helloworld_ocl/           
-    $ rename "s/.xclbin/.xclbin_backup/" xclbin/*.xclbin         # This creates a backup for the  build XCLBIN is not overwritten 
-    $ rename "s/.awsxclbin/.xclbin/" xclbin/*.awsxclbin          # Rename awsxclbin binary to xclbin so host application can pick it up
-```
----------
--->
-* Source the Runtime Environment & Execute your Host Application
+* Source the Runtime Environment & Execute your Host Application (Xilinx SDx 2017.1):
 ```
     $ sudo sh
     # source /opt/Xilinx/SDx/2017.1.rte.4ddr/setup.sh   # Use 2017.1.rte.1ddr or 2017.1.rte.4ddr_debug when using AWS_PLATFORM_1DDR or AWS_PLATFORM_4DDR_DEBUG. Other runtime env settings needed by the host app should be setup after this step
     # ./helloworld 
 ```
-
-
+* Source the Runtime Environment & Execute your Host Application (Xilinx SDx 2017.4):
+```
+    $ sudo sh
+    # source /opt/Xilinx/SDx/2017.1.rte.dyn/setup.sh   # Other runtime env settings needed by the host app should be setup after this step
+    # ./helloworld 
+```
+    
 <a name="read"></a>
-# Additional SDAccel Information
+# Additional SDAccel Information (2017.4)
 
 * [SDAccel Guide for Amazon F1](docs/SDAccel_Guide_AWS_F1.md)
 
@@ -236,8 +250,8 @@ Here are the steps:
 
 * [OpenCL application structure video](https://www.youtube.com/watch?v=hUiX8rBcNzw)
 
-* [SDAccel Environment tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1021-sdaccel-intro-tutorial.pdf)
+* [SDAccel Environment tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
 
-* [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1023-sdaccel-user-guide.pdf)
+* [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
 
-* [SDAccel Environment optimization guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1207-sdaccel-optimization-guide.pdf)
+* [SDAccel Environment optimization guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)

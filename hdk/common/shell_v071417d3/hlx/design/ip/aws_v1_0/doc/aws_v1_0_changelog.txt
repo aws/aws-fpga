@@ -1,13 +1,18 @@
+2018.1:
+ * Version 1.0 (Rev. 2)
+ * Bug Fix: Changed relationship between clk_main_a0 and clk_extra_a* from synchronous to asynchronous.
+
 2017.4:
  * Version 1.0 (Rev. 1)
  * Changed frequency of clk_extra_c0 from 300 to 500 MHz when recipe C0 is selected.
+ * Added MODE parameter to support usage with memory subsystem in SDx.
 
 2017.1:
  * Version 1.0
  * Native Vivado Release
  * Initial release.
 
-(c) Copyright 2017 Xilinx, Inc. All rights reserved.
+(c) Copyright 2017 - 2018 Xilinx, Inc. All rights reserved.
 
 This file contains confidential and proprietary information
 of Xilinx, Inc. and is protected under U.S. and

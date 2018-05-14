@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdx:platform sdx:vendor="xilinx"
+              sdx:library="aws-vu9p-f1"
+              sdx:name="dynamic"
+              sdx:version="5.0"
+              sdx:schemaVersion="1.0"
+              xmlns:sdx="http://www.xilinx.com/sdx">
+    <sdx:description>
+    This platform targets the Virtex UltraScale+ VCU1526 Acceleration Development Board with VU13P. This high-performance acceleration platform features four channels of DDR4-2400 DIMMs, the expanded partial reconfiguration flow for high fabric resource availability, and Xilinx DMA Subsystem for PCI Express with PCIe Gen3 x16 connectivity.
+    </sdx:description>
+    <sdx:systemConfigurations>
+        <sdx:configuration sdx:name="linux_x86"
+                           sdx:displayName="Linux on x86">
+            <sdx:description>Linux on x86</sdx:description>
+        </sdx:configuration>
+    </sdx:systemConfigurations>
+</sdx:platform>

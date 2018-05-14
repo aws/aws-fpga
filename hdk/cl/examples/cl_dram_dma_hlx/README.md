@@ -1,82 +1,129 @@
-# CL DRAM DMA Example
+# HLx Flow for DRAM DMA Example
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [IPI Flow](#hlx)
-
+2. [Setup HLx Environment](#env)
+3. [Create Example Design (GUI)](#createbdgui)
+4. [Create Example Design (Command line)](#createbd)
+5. [Simulation](#sim)
+6. [Changing Simulation Sources for Tests](#othersim)
+7. [Implementing the Design](#impl)
+8. [AFI Creation](#aficreation)
+9. [CL Example Software and executing on F1](#swf1)
 
 <a name="overview"></a>
-## Overview
+### Overview
 
-For more information about the cl\_dram\_dma example, read the following information [CL DRAM DMA CL Example](./../cl_dram_dma/README.md)
+For more information about the cl_dram_dma example, read the following information [DRAM DMA CL Example](./../cl_dram_dma/README.md)
 
-<a name="hlx"></a>
-## HLx Flow for CL Example
+<a name="env"></a>
+### Setup HLx Environment
 
-### Add in the following system variables for clock recipes and IDs for cl\_dram\_dma example.
+* Clone the github and setup the HDK environment
+   ```
+   $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
+   $ cd $AWS_FPGA_REPO_DIR
+   $ source hdk_setup.sh
+   ```
+* To setup the HLx Environment, run the following commands:
+   ```
+   $ mkdir -p ~/.Xilinx/Vivado
+   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   ```
+   **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
+   
+   For more information please see: [HLx Setup Instructions](../../../../hdk/docs/IPI_GUI_Vivado_Setup.md).
 
-export CLOCK\_A\_RECIPE=0
+* You will also need to [setup AWS CLI and S3 Bucket](../../../../SDAccel/docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation
 
-export CLOCK\_B\_RECIPE=0
+<a name="createbdgui"></a>
+### Create Example Design (GUI)
 
-export CLOCK\_C\_RECIPE=0
+* To launch Vivado GUI
+   * Change directories to the cl/examples/cl_dram_dma_hlx directory
+   * Invoke Vivado by typing `vivado` in the console
+   * In the Vivado TCL Console, enter the following to configure the design
+   ```
+   set ::env(CLOCK_A_RECIPE) "0"
+   set ::env(CLOCK_B_RECIPE) "0"
+   set ::env(CLOCK_C_RECIPE) "0"
+   set ::env(device_id) "0xF001"
+   set ::env(vendor_id) "0x1D0F"
+   set ::env(subsystem_id) "0x1D51"
+   set ::env(subsystem_vendor_id) "0xFEDC"
+   ```
+   * In the Vivado TCL Console type in the following to create the cl_dram_dma example. The example will be generated in cl/examples/cl_dram_dma_hlx/example_projects. The vivado project is examples_projects/cl_dram_dma.xpr
+   ```
+   aws::make_rtl -examples cl_dram_dma
+   ```
 
-export device\_id=0xF001
+<a name="createbd"></a>
+### Create Example Design (Command line)
 
-export vendor\_id=0x1D0F
+* Alternatively, to run the Vivado GUI from command line (Linux only)
+   * Make sure your $CL_DIR is pointing to the example directory. The following will generate the IPI Block Design (BD)
+   ```
+   $ cd $HDK_DIR/cl/examples/cl_dram_dma_hlx
+   $ export CL_DIR=$(pwd)
+   $ cd $CL_DIR/build/scripts
+   $ ./aws_build_dcp_from_cl.sh -gui
+   ```    
+   **NOTE**: *The "-gui" switch is optional. It allows you to modify the example design, you will need to have a DISPLAY setup for the GUI to launch. To run the full creation and default implementation flow without the GUI, remove this switch.*
 
-export subsystem\_id=0x1D51
-
-export subsystem\_vendor\_id=0xFEDC 
-
-
-### Creating Example Design
-
-Change directories to the cl/examples/cl\_dram\_dma\_hlx directory.
-
-Invoke vivado by typing vivado in the console.
-
-In the TCL console type in the following to create the cl\_dram\_dma example.  The example will be generated in cl/examples/cl\_dram\_dma\_hlx/example_projects.  The vivado project is examples\_projects/cl\_dram\_dma.xpr.
-
-aws::make\_rtl -examples cl\_dram\_dma
-
+<a name="sim"></a>
 ### Simulation
-Click on Simulation->Run Simulation->Run Behavioral Simulation
 
-Add signals needed in the simulation.
+* To launch simulation from within the Vivado GUI, 
+   * Click on Simulation->Run Simulation->Run Behavioral Simulation
+   * Add signals needed in the simulation
+   * Type `run -all` in the TCL console
 
-Type in the following in the TCL console.
-
-run -all
-
+<a name="othersim"></a>
 ### Changing Simulation Sources for Tests
 
 cl\_dram\_dma has several simulation sources that can be used for simulation (test\_ddr, test\_dram\_dma, test\_int, test\_peek\_poke, test\_peek\_poke\_pcis\_axsize).  
 
-By default the test\_dram\_dma is used in the project.  To switch tests, right click on SIMULATION in the Project Manager and select Simulation Settings…
+By default the test\_dram\_dma is used in the project. 
 
-For Verilog options select the … box and change the following name.  Below is an example.
+To switch tests:
+* Right click on SIMULATION in the Project Manager
+* Select Simulation Settings…
+* For Verilog options select the … box and modify TEST\_NAME to test_null to disable sv stimulus
+```
+TEST_NAME=test_ddr
+```
+* Click OK
+* Click Apply
+* Click OK to go back into the Vivado project.
 
-TEST\_NAME=test\_ddr
+<a name="impl"></a>
+### Implementing the Design
 
-Click OK, Click Apply, Click OK to back into the Vivado project.
-
-### Implementing the Design/Tar file
-
-In the Design Runs tab, right click on impl\_1 and select Launch Runs… . Click OK in the Launch Runs Dialog Box.  Click OK in the Missing Synthesis Results Dialog Box.
+* To run implmentation from within the GUI is opened, in the Design Runs tab:
+   * Right click on impl\_1 in the Design Runs tab and select Launch Runs…
+   * Click OK in the Launch Runs Dialog Box.
+   * Click OK in the Missing Synthesis Results Dialog Box
 
 This will run both synthesis and implementation.
 
-The completed .tar file is located in example\_projects/cl\_dram\_dma.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar.  For information on how to create a AFI/GAFI with .tar from the design, following to the How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide documentation.
+<a name="aficreation"></a>
+### AFI Creation
 
-### CL Example Software
+The completed .tar file is located in: 
+```
+$CL_DIR/build/scripts/example_projects/cl_dram_dma.runs/faas_1/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar  
+```
+For information on how to create AFI from this tar file, follow the [steps outlined here](../README.md#3-submit-the-design-checkpoint-to-aws-to-create-the-afi).
 
-The runtime software must be complied for the AFI to run on F1.  Note the EDMA driver must be installed before running on F1.
+<a name="swf1"></a>
+### CL Example Software and executing on F1
+
+The runtime software must be compiled for the AFI to run on F1.
 
 Use the software in cl/examples/cl\_dram\_dma
-
-    $ cd cl/cl_dram_dma/software/runtime/
-    $ make all
-    $ sudo ./test_dram_dma
-
+```
+$ cd $HDK_DIR/cl/examples/cl_dram_dma/software/runtime/
+$ make all
+$ sudo ./test_dram_dma
+```

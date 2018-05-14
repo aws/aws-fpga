@@ -23,10 +23,7 @@ entity uram_ctrl is
   );
   port ( 
     clk     : in std_logic;
-    rst     : in std_logic;
-    find    : in std_logic;
-    add     : in std_logic;
-    del     : in std_logic;
+    rstn    : in std_logic;
     data_in : in std_logic_vector(31 downto 0);
     find_ok : out std_logic;
     find_ko : out std_logic;
@@ -40,10 +37,14 @@ architecture rtl of uram_ctrl is
   type state_type is (state_idle,state_add,state_find,state_del,state_wait_find,state_wait_add);
   signal current_state : state_type;
   
-  signal we_uram_a : std_logic := '0';
-  signal clk_div2 : std_logic := '0';
-  signal clk_div4 : std_logic := '0';
-  signal clk_div8 : std_logic := '0';
+  signal we_uram_a  : std_logic := '0';
+  signal clk_div2   : std_logic := '0';
+  signal clk_div4   : std_logic := '0';
+  signal clk_div8   : std_logic := '0';
+  signal busy_buf_0 : std_logic := '0';
+  signal find       : std_logic := '0';
+  signal add        : std_logic := '0';
+  signal del        : std_logic := '0';
   
   signal cpt_nb_data_uram : std_logic_vector(nb_bit_address-1 downto 0) := (others=>'0');
   signal addr_uram_a      : std_logic_vector(nb_bit_address-1 downto 0) := (others=>'0');
@@ -55,7 +56,10 @@ architecture rtl of uram_ctrl is
   
   signal data_from_uram_1_b : std_logic_vector(31 downto 0) := (others=>'0');
   
-  signal data_in_control_less : std_logic_vector(31 downto 0);
+  signal data_in_control_less : std_logic_vector(31 downto 0) := (others=>'0');
+  signal data_in_buf_0        : std_logic_vector(31 downto 0) := (others=>'0');
+  signal data_in_buf_1        : std_logic_vector(31 downto 0) := (others=>'0');
+  signal data_in_buf_2        : std_logic_vector(31 downto 0) := (others=>'0');
 
   component bd_uram
     port (
@@ -104,8 +108,11 @@ bd_uram_inst: bd_uram
       URAM_PORTB_1_dout  => data_from_uram_1_b
     );
 
-  data_in_control_less(28 downto 0) <= data_in(28 downto 0);
+  data_in_control_less(28 downto 0)  <= data_in_buf_2(28 downto 0);
   data_in_control_less(31 downto 29) <= "000";
+  find <= data_in_buf_2(31);
+  add  <= data_in_buf_2(30);
+  del  <= data_in_buf_2(29);
   
   p_clk_div2: process(clk)
   begin
@@ -131,13 +138,24 @@ bd_uram_inst: bd_uram
   process_ctrl_uram:process(clk_div8)
   begin
     if clk_div8'event and clk_div8 = '1' then
+    
+    data_in_buf_0 <= data_in;
+    data_in_buf_1 <= data_in_buf_0;
+    busy <= busy_buf_0;
+    
+    if data_in_buf_1 = data_in_buf_0 then
+      data_in_buf_2 <= data_in_buf_1;
+    else 
+      data_in_buf_2 <= data_in_buf_2;
+    end if;
+     
       -- Reset detected, set state_idle and put 0 for the number of data in the uram
-      if rst = '0' then
+      if rstn = '0' then
         current_state <= state_idle;
         cpt_nb_data_uram <= (others=>'0');
         find_ok <= '0';
         find_ko <= '0';
-        busy <= '0';
+        busy_buf_0 <= '0';
         
       -- Reset not detected
       else
@@ -155,7 +173,7 @@ bd_uram_inst: bd_uram
           
           -- State_wait_add
           when state_wait_add =>
-            busy <= '0';
+            busy_buf_0 <= '0';
             if (previous_data /= data_in_control_less) or (add = '0') then
               -- We wait a new data to avoid doing continuous add
               current_state <= state_idle;
@@ -163,11 +181,11 @@ bd_uram_inst: bd_uram
           
           -- State_idle
           when state_idle =>
-            busy    <= '0';
-            if (find = '1') and (previous_data /= data_in) then
+            busy_buf_0    <= '0';
+            if (find = '1') and (previous_data /= data_in_buf_2) then
               find_ok <= '0';
               find_ko <= '0';
-              busy    <= '1';
+              busy_buf_0    <= '1';
               -- Find detected -> New state is state_find
               current_state <= state_wait_find;
               -- Put the read address at the beginning
@@ -175,7 +193,7 @@ bd_uram_inst: bd_uram
            elsif add = '1' then
               find_ok <= '0';
               find_ko <= '0';
-              busy    <= '1';
+              busy_buf_0    <= '1';
               -- Add detected, put the data, the address and the we on the inputs of the uram
               addr_uram_a    <= cpt_nb_data_uram;
               data_to_uram_a <= data_in_control_less;
@@ -189,7 +207,7 @@ bd_uram_inst: bd_uram
           -- State_find
           when state_find =>
             -- uram empty, go back to state_idle
-            previous_data  <= data_in;
+            previous_data  <= data_in_buf_2;
             if cpt_nb_data_uram = zeros then
               current_state <= state_idle;
               find_ko <= '1';

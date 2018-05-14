@@ -41,10 +41,6 @@ if [ -z "$SDK_DIR" ]; then
     return 1
 fi
 
-# Update Xilinx SDAccel Examples from GitHub
-info_msg "Updating Xilinx SDAccel Examples"
-git submodule update --init -- SDAccel/examples/xilinx
-
 debug=0
 
 function usage {
@@ -83,6 +79,11 @@ function check_set_xilinx_sdx {
     else
         info_msg "XILINX_SDX is already set to $XILINX_SDX"
     fi
+    # get sdaccel release version, i.e. "2017.1"
+    RELEASE_VER=$(basename $XILINX_SDX)
+    RELEASE_VER=${RELEASE_VER:0:6}
+    export RELEASE_VER=$RELEASE_VER
+    echo "RELEASE_VER equals $RELEASE_VER"
 }
 
 function check_install_packages {
@@ -146,14 +147,52 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     esac
 done
 
+# Install patches as required.
+setup_patches
 
 # Check XILINX_SDX is set
 if ! check_set_xilinx_sdx; then
     return 1
 fi
 
+# Update Xilinx SDAccel Examples from GitHub
+info_msg "Using SDx $RELEASE_VER"
+if [[ $RELEASE_VER =~ .*2017\.4.* ]]; then
+    info_msg "Updating Xilinx SDAccel Examples 2017.4"
+    git submodule update --init -- SDAccel/examples/xilinx_2017.4
+    export VIVADO_TOOL_VER=2017.4
+    if [ -e $SDACCEL_DIR/examples/xilinx ]; then
+        if [ ! -L $SDACCEL_DIR/examples/xilinx ]; then
+          err_msg "ERROR:  SDAccel/examples/xilinx is not a symbolic link.  Backup any data and remove SDAccel/examples/xilinx directory.  The setup needs to create a symbolic link from SDAccel/examples/xilinx to SDAccel/examples/xilinx_2017.4"
+          return 1
+        fi
+    fi
+    rm -I $SDACCEL_DIR/examples/xilinx
+    ln -s $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
+else
+    info_msg "Updating Xilinx SDAccel Examples 2017.1"
+    git submodule update --init -- SDAccel/examples/xilinx_2017.1
+    export VIVADO_TOOL_VER=2017.1
+    if [ -e $SDACCEL_DIR/examples/xilinx ]; then
+        if [ ! -L $SDACCEL_DIR/examples/xilinx ]; then
+          err_msg "ERROR:  SDAccel/examples/xilinx is not a symbolic link.  Backup any data and remove SDAccel/examples/xilinx directory.  The setup needs to create a symbolic link from SDAccel/examples/xilinx to SDAccel/examples/xilinx_2017.1"
+          return 1
+        fi
+    fi
+    rm -I $SDACCEL_DIR/examples/xilinx
+    ln -s $SDACCEL_DIR/examples/xilinx_2017.1 $SDACCEL_DIR/examples/xilinx
+fi
+
 # settings64 removal - once we put this in the AMI, we will add a check
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+
+if [[ $RELEASE_VER =~ .*2017\.1.* ]]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+else
+    export LD_LIBRARY_PATH=`$XILINX_SDX/bin/ldlibpath.sh $XILINX_SDX/lib/lnx64.o`:$XILINX_SDX/runtime/lib/x86_64
+fi
+
+export LD_LIBRARY_PATH=$XILINX_SDX/lnx64/tools/opencv/:$LD_LIBRARY_PATH
 
 # Check if internet connection is available
 if ! check_internet; then
@@ -232,55 +271,74 @@ function setup_dsa {
     fi
 }
 
-# Download correct DSA
-#-------------------4 DDR--------------------
-#TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
-#TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
+if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
+    #-------------------4 DDR--------------------
+    setup_dsa xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0 dsa_v0911_shell_v071417d3 AWS_PLATFORM_4DDR
+    info_msg "AWS Platform: 4DDR is up-to-date"
+    #-------------------4 DDR--------------------
 
-setup_dsa xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0 dsa_v0911_shell_v071417d3 AWS_PLATFORM_4DDR
-info_msg "AWS Platform: 4DDR is up-to-date"
-#-------------------4 DDR--------------------
+    #-------------------1 DDR--------------------
+    setup_dsa xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_1DDR
+    info_msg "AWS Platform: 1DDR is up-to-date"
+    #-------------------1 DDR--------------------
 
-#-------------------1 DDR--------------------
-#TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
-#TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
+    #-------------------4 DDR RTL Kernel Debug--------------------
+    setup_dsa xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_4DDR_DEBUG
+    info_msg "AWS Platform: 4DDR RTL Kernel is up-to-date"
+    #-------------------4 DDR RTL Kernel Debug--------------------
+else
+    #-------------------Dynamic 5.0 Platform----------------------
+    setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v041618_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
+    info_msg "AWS Platform: Dynamic 5.0 Platform is up-to-date"
+    #-------------------Dynamic 5.0 Platform----------------------
+fi
 
-setup_dsa xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_1DDR
-info_msg "AWS Platform: 1DDR is up-to-date"
-#-------------------1 DDR--------------------
-
-#-------------------4 DDR RTL Kernel Debug--------------------
-#TODO DSA Version:  info_msg "Using HDK shell version $hdk_shell_version"
-#TODO DSA Version:  debug_msg "Checking HDK shell's checkpoint version"
-
-setup_dsa xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0 dsa_v11517_shell_v071417d3 AWS_PLATFORM_4DDR_DEBUG
-info_msg "AWS Platform: 4DDR RTL Kernel is up-to-date"
-#-------------------4 DDR RTL Kernel Debug--------------------
 
 
 # Start of runtime xdma driver install
 cd $SDACCEL_DIR
 info_msg "Building SDAccel runtime"
-if ! make ec2=1 debug=1 ; then
+if ! make ec2=1 debug=1 RELEASE_VER=$RELEASE_VER; then
     err_msg "Build of SDAccel runtime FAILED"
     return 1
 fi
 info_msg "Installing SDAccel runtime"
-if ! sudo make ec2=1 debug=1 INSTALL_ROOT=/opt/Xilinx/SDx/2017.1.rte SDK_DIR=$SDK_DIR DSA=$DSA XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR install ; then
-    err_msg "Install of SDAccel runtime FAILED"
-    return 1
+
+
+if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
+    
+    export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.1ddr
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0 install ; then
+        err_msg "Install of 1DDR SDAccel runtime FAILED"
+        return 1
+    fi
+
+    export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0 install ; then
+        err_msg "Install of 4DDR SDAccel runtime FAILED"
+        return 1
+    fi
+
+    export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.4ddr_debug
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0 install ; then
+        err_msg "Install of 4DDR DEBUG SDAccel runtime FAILED"
+        return 1
+    fi
+    
+    export AWS_PLATFORM=$AWS_PLATFORM_4DDR
+    info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
+    info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
+    info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
+else
+    export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.dyn
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_dynamic_5_0 install ; then
+        err_msg "Install of SDAccel runtime FAILED"
+        return 1
+    fi
+    
+    export AWS_PLATFORM=$AWS_PLATFORM_DYNAMIC_5_0
 fi
 info_msg "SDAccel runtime installed"
-
-export AWS_PLATFORM=$AWS_PLATFORM_4DDR
-
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_4DDR\" "
-info_msg "To change the platform for 1DDR:  \"export AWS_PLATFORM=\$AWS_PLATFORM_1DDR\" "
-info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
-
-# Install patches as required.
-
-setup_patches
 
 cd $current_dir
 

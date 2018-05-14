@@ -20,7 +20,7 @@ set CL_MODULE $CL_MODULE
 create_project -in_memory -part [DEVICE_TYPE] -force
 
 ########################################
-## Generate clocks based on Recipe 
+## Generate clocks based on Recipe
 ########################################
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
@@ -49,19 +49,24 @@ create_bd_design "bd_uram"
 update_compile_order -fileset sources_1
 
 # Create uram
-create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 blk_mem_gen_0
-create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 blk_mem_gen_1
+set blk_mem_gen_version [get_ipdefs *blk_mem_gen*]
+create_bd_cell -type ip -vlnv $blk_mem_gen_version blk_mem_gen_0
+create_bd_cell -type ip -vlnv $blk_mem_gen_version blk_mem_gen_1
+
 set depth_uram 819200
+set_msg_config -id {Designutils 20-262} -suppress
 set_property -dict [list CONFIG.Memory_Type {Simple_Dual_Port_RAM} CONFIG.PRIM_type_to_Implement {URAM} CONFIG.Write_Depth_A $depth_uram CONFIG.Operating_Mode_A {READ_FIRST} CONFIG.Register_PortB_Output_of_Memory_Primitives {false} CONFIG.use_bram_block {Stand_Alone} CONFIG.Enable_32bit_Address {false} CONFIG.Use_Byte_Write_Enable {false} CONFIG.Byte_Size {9} CONFIG.Assume_Synchronous_Clk {true} CONFIG.Enable_A {Use_ENA_Pin} CONFIG.Operating_Mode_B {READ_FIRST} CONFIG.Enable_B {Use_ENB_Pin} CONFIG.Register_PortA_Output_of_Memory_Primitives {false} CONFIG.Use_REGCEB_Pin {false} CONFIG.Use_RSTA_Pin {false} CONFIG.Port_B_Clock {100} CONFIG.Port_B_Enable_Rate {100}] [get_bd_cells blk_mem_gen_0]
 set_property -dict [list CONFIG.Memory_Type {Simple_Dual_Port_RAM} CONFIG.PRIM_type_to_Implement {URAM} CONFIG.Write_Depth_A $depth_uram CONFIG.Operating_Mode_A {READ_FIRST} CONFIG.Register_PortB_Output_of_Memory_Primitives {false} CONFIG.use_bram_block {Stand_Alone} CONFIG.Enable_32bit_Address {false} CONFIG.Use_Byte_Write_Enable {false} CONFIG.Byte_Size {9} CONFIG.Assume_Synchronous_Clk {true} CONFIG.Enable_A {Use_ENA_Pin} CONFIG.Operating_Mode_B {READ_FIRST} CONFIG.Enable_B {Use_ENB_Pin} CONFIG.Register_PortA_Output_of_Memory_Primitives {false} CONFIG.Use_REGCEB_Pin {false} CONFIG.Use_RSTA_Pin {false} CONFIG.Port_B_Clock {100} CONFIG.Port_B_Enable_Rate {100}] [get_bd_cells blk_mem_gen_1]
 
 # Make external
-make_bd_pins_external  [get_bd_cells blk_mem_gen_0] [get_bd_cells blk_mem_gen_1]
-make_bd_intf_pins_external  [get_bd_cells blk_mem_gen_0] [get_bd_cells blk_mem_gen_1]
-set_property name URAM_PORTA [get_bd_intf_ports BRAM_PORTA]
-set_property name URAM_PORTB [get_bd_intf_ports BRAM_PORTB]
-set_property name URAM_PORTA_1 [get_bd_intf_ports BRAM_PORTA_1]
-set_property name URAM_PORTB_1 [get_bd_intf_ports BRAM_PORTB_1]
+create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:bram_rtl:1.0 URAM_PORTA
+create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:bram_rtl:1.0 URAM_PORTB
+create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:bram_rtl:1.0 URAM_PORTA_1
+create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:bram_rtl:1.0 URAM_PORTB_1
+connect_bd_intf_net [get_bd_intf_ports URAM_PORTA]   [get_bd_intf_pins blk_mem_gen_0/BRAM_PORTA]
+connect_bd_intf_net [get_bd_intf_ports URAM_PORTB]   [get_bd_intf_pins blk_mem_gen_0/BRAM_PORTB]
+connect_bd_intf_net [get_bd_intf_ports URAM_PORTA_1] [get_bd_intf_pins blk_mem_gen_1/BRAM_PORTA]
+connect_bd_intf_net [get_bd_intf_ports URAM_PORTB_1] [get_bd_intf_pins blk_mem_gen_1/BRAM_PORTB]
 
 #Validate design
 validate_bd_design
@@ -138,8 +143,8 @@ eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DE
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {
-	puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
-	exit 1
+    puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
+    exit 1
 }
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth checkpoint.";

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 Xilinx, Inc
+ * Copyright (C) 2017-2018 Xilinx, Inc
  * Author: Sonal Santan
  * AWS HAL Driver layered on top of kernel drivers
  *

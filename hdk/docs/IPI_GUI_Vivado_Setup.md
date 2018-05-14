@@ -3,23 +3,24 @@
 ## Table of Content
 
 1. [Overview](#overview)
-2. [Install](#hlxinst)
-3. [Vivado Overview](#vivado) 
-4. [Vivado Flows Overview](#projover)
-5. [Summary](#summary)
+2. [Linux Install](#hlxinst_lin)
+3. [Windows Install](#hlxinst_win)
+4. [Vivado Overview](#vivado) 
+5. [Vivado Flows Overview](#projover)
+6. [Summary](#summary)
 
 
 
 <a name="overview"></a>
 # Overview  
 
-This document assumes you have cloned the developer kit and sourced the hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator. 
+This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator. 
 
 Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
 
-<a name="hlxinst"></a>
-# Install
+<a name="hlxinst_lin"></a>
+# Linux Install
 
 Open the following file in a text editor ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl
 
@@ -37,7 +38,47 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 
 source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
 
-Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded.
+Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow. 
+
+<a name="hlxinst_win"></a>
+# Windows Install
+
+Download, install, and configure the license for Vivado SDx 2017.1 or Vivado 2017.4 for Windows.  More information is provided at:
+
+[On Premise Licensing Help](./on_premise_licensing_help.md)
+
+Clone the `https://github.com/aws/aws-fpga` repository either through Github Desktop or Download ZIP and extract to a new folder location on the Windows machine.  This is the install location.
+
+Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as a INFO message at the top of the Tcl Console.
+
+Open vivado\_init.tcl or init.tcl in a text editor and add the following lines at the top of the file.  Note aws-fpga could have a slightly different name like aws-fpga-master.
+
+`set AWSINSTALL "C:/<replace with install location>/aws-fpga"`
+
+`source $AWSINSTALL/hdk/common/shell_v071417d3/hlx/hlx_setup.tcl`
+
+Copy these lines into the TCL console to ensure paths are correct.
+
+An error message will occur either in the TCL console or in a tab about DDR4 models.  Source the following command which only needs to be run once after cloning the github repository.  Note aws-fpga could have a slightly different name like aws-fpga-master.
+
+`source C:/<replace with install location>/aws-fpga/hdk/common/verif/scripts/hdk_initsh.tcl`
+
+Before installing the DDR4 models, another critical warning appeared dealing with the SH\_CL\_BB\_routed.dcp.  Download the DCP into the following install location from a web browser.  Note aws-fpga could have a slightly different name like aws-fpga-master.
+
+`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v071417d3/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
+
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/build/checkpoints/from_aws/`
+
+Download the following executable from a web browser to the following HLx directory.  Note aws-fpga could have a slightly different name like aws-fpga-master.
+
+`http://www.labtestproject.com/files/sha256sum/sha256sum.exe`
+
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/hlx/build/scripts`
+
+Close Vivado and launch Vivado, the HLx environment is now setup and will always be sourced and IP integrator features will be automatically loaded.
+
+Amazon CLI for Windows can be used for access to S3 to upload .tar and ingestion flow.
+
 
 <a name="vivado"></a>
 # Vivado Overview

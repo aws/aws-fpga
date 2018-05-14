@@ -1,0 +1,1 @@
+KERNEL=="renderD*",MODE="0666"

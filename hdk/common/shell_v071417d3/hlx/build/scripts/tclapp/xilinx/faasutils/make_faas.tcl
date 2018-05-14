@@ -234,7 +234,13 @@ proc [set _THISNAMESPACE]::[set _THISTOPSPACE]::make_faas {{args ""}} {
 	set first_time 0
 
 #0.860a
-	if {[string tolower [version -short]] eq "2017.1_sdx"} {	
+	if {[string tolower [version -short]] eq "2017.1"} {
+	
+		# Vendor Specific values
+		set _faas_ip_vlnv "*:ip:aws:*"
+		set _faas_board "f1_cl"
+		set _faas_interface "S_SH"
+	} else {	
 		set _faas_ip_vlnv "*[lindex [lsort [get_param bd.faas_ipname]] end]*"
 		set _faas_board [get_param bd.faas_board]
 		set _faas_interface [get_param bd.faas_interface]
@@ -265,13 +271,7 @@ proc [set _THISNAMESPACE]::[set _THISTOPSPACE]::make_faas {{args ""}} {
 			send_msg_id "$_procName 0-0" "ERROR" "Parameter bd.faas_board not set prpertly, please set the correct paramters in your vivado_init.tcl (set_param bd.faas_board xilinx.com:f1_cl:part0:1.0)"
 			return 187
 		}
-	
 
-	} else {
-		# Vendor Specific values
-		set _faas_ip_vlnv "*:ip:aws:*"
-		set _faas_board "f1_cl"
-		set _faas_interface "S_SH"
 	}
 # More Vendor Specific values
 	set max_num_cl_ip 1
@@ -665,7 +665,7 @@ while {[llength $args]} {
 #					update_compile_order -fileset sources_1
 					#Add IP in 2017.1
 					set version_split [split [version -short] "_"]
-					if {[lindex $version_split 1] eq "sdx"} {
+					if {[lindex $version_split 1] eq "sdx" || [lindex $version_split 1] eq "sdxop" } {
 						set version_add 0.2
 					} else {
 						set version_add 0.0
@@ -716,16 +716,16 @@ while {[llength $args]} {
 
 		# IPI: test for cl_top_wrapper.v, IP exists? (not in  RTL only?)
 # not used	lappend _mandatoryFiles "cl_wrapper.v"
-		lappend _mandatoryFiles [get_files -quiet cl.v]
+#		lappend _mandatoryFiles [get_files -quiet cl.v]
 	
-		dputs $debugMode "INFO: Checking for necessary files ($_mandatoryFiles)"
-		foreach {_mandatoryFile} $_mandatoryFiles {		
-			if {[lsearch $_theFiles $_mandatoryFile] < 0} {
-				set errorCode 2
-				send_msg_id "$_procName 0-$errorCode" "ERROR" "Required file $_mandatoryFile not found in current synthesis files list, please generate correct files / set correct level / or use \"$_procName -force\" to update the project"
-				return $errorCode
-			}
-		}
+#		dputs $debugMode "INFO: Checking for necessary files ($_mandatoryFiles)"
+#		foreach {_mandatoryFile} $_mandatoryFiles {		
+#			if {[lsearch $_theFiles $_mandatoryFile] < 0} {
+#				set errorCode 2
+#				send_msg_id "$_procName 0-$errorCode" "ERROR" "Required file $_mandatoryFile not found in current synthesis files list, please generate correct files / set correct level / or use \"$_procName -force\" to update the project"
+#				return $errorCode
+#			}
+#		}
 	}	
 
 

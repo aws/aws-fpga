@@ -64,15 +64,15 @@ VHDL/Verilog only (System Verilog not supported)
 
 **Q: What simulators and simulation flows are supported?**
 
-When using the Vivado GUI, the Vivado Simulator is supported and is the default simulator.  The next set of questions/answers describe linking in 3rd party vendor simulator support.
+When using the Vivado GUI, the Vivado Simulator is supported and is the default simulator.  Currently Windows only support Vivado Simulator.  The next set of questions/answers describe linking in 3rd party vendor simulator support.
 
 Customer example System Verilog testbench (.sv/BFM) is supported.
 
-When using the Vivado GUI, DPI simulation (C simulation) has limited support at this time (calls used in the svdpi.h library are not currently supported for all simulators).  DPI needs to be manually configures based upon questions and answers below.  However, the RTL example cl\_hello\_world contains simulation with test\_hello\_world.c for DPI simulation.
+When using the Vivado GUI, DPI simulation is supported (C simulation).  The RTL example cl\_hello\_world contains simulation with test\_hello\_world.c for DPI simulation where the flow can be used with other designs.
 
 **Q: How to add DPI support for XSIM simulator with GUI flow?**
 
-By default, XSIM is the default simulator for all examples.
+By default, XSIM is the default simulator for all examples.  When creating new projects the following should have configured in the project.
 
 In the TCL console in Vivado project, copy and paste the following command to set the path for the creation of the .so with test_null.c script.  This file can be copied and modified to another area where an example exists for other .c stimulus.
 
@@ -100,17 +100,17 @@ Change Target simulator to Questa Advanced Simulator. Click Yes to change the si
 
 Change the Compiled library location to the path that was used for compiling libraries.
 
-For Verilog options select the ... box and add the following Defines.
-
-`QUESTA_SIM`
+When creating new projects the following should have configured in the project.
 
 In the Compilation tab, for questa.compile.vlog.more_options add in the following value.
 
-`-timescale 1ps/1ps`
+`-timescale 1ps/1ps +define+QUESTA_SIM`
 
 Click OK, Click Apply, Click OK to back into the Vivado project.
 
 **Q: How to add DPI support for Questa simulator with GUI flow?**
+
+When creating new projects the following should have configured in the project.
 
 The project needs to be configured based upon the above question/answer for adding Questa simulator support.
 
@@ -140,6 +140,8 @@ Change Target simulator to Verilog Compiler Simulator (VCS). Click Yes to change
 
 Change the Compiled library location to the path that was used for compiling libraries.
 
+When creating new projects the following should have configured in the project.
+
 In the Compilation tab, for vcs.compile.vlogan.more_options add in the following value.
 
 `-ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k +define+VCS_SIM +lint=TFIPC-L`
@@ -150,7 +152,7 @@ Click OK, Click Apply, Click OK to back into the Vivado project.
 
 **Q: How to add DPI support for VCS simulator with GUI flow?**
 
-The project needs to be configured based upon the above question/answer for adding VCS simulator support.
+The project needs to be configured based upon the above question/answer for adding VCS simulator support.  When creating new projects the following should have configured in the project.
 
 In the TCL console in Vivado project, copy and paste the following command to set the path for the creation of the .so with test_null.c script.  This file can be copied and modified to another area where an example exists for other .c stimulus.
 
@@ -178,6 +180,8 @@ Change Target simulator to Incisive Enterprise Simulator. Click Yes to change th
 
 Change the Compiled library location to the path that was used for compiling libraries.
 
+When creating new projects the following should have configured in the project.
+
 In the Compilation tab, for ies.compile.ncvlog.more_options add in the following value.
 
 `+define+SV_TEST +define+SCOPE +define+IES_SIM`
@@ -202,7 +206,7 @@ In the TCL console in Vivado project, copy and paste the following command to se
 
 **Q: With IP Integrator flow with AWS IP configured with no DDR4 in the CL, why does errors show up with Vivado Simulator?**
 
-This is a known issue and will be fixed in the next release. For now type in run -all 3 times for the simulation to bypass the error with missing .mem files.
+This is a known issue and will be fixed in a later release. For now type in run -all 3 times or more for the simulation to bypass the error with missing .mem files.
 
 **Q: With IP Integrator Flow, why does the DDR4 IPs and Reg Slice IP need to be disabled with DDR4 in the CL enabled ?**
 

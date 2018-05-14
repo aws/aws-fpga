@@ -38,9 +38,25 @@ description = '''This script checks all files within the repository for license 
 It lists out all files that don't comply and exits with an error code 2.
 '''
 
-asl_header = '''Amazon FPGA Hardware Development Kit
+asl_header1 = '''Amazon FPGA Hardware Development Kit
 
 Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use
+this file except in compliance with the License. A copy of the License is
+located at
+
+   http://aws.amazon.com/asl/
+
+or in the "license" file accompanying this file. This file is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+implied. See the License for the specific language governing permissions and
+limitations under the License.
+'''
+
+asl_header2 = '''Amazon FPGA Hardware Development Kit
+
+Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Amazon Software License (the "License"). You may not use
 this file except in compliance with the License. A copy of the License is
@@ -262,10 +278,7 @@ Applications, subject only to applicable laws and
 regulations governing limitations on product liability.
 '''
 
-xilinx4_header = '''Copyright (C) 2017 Xilinx, Inc
-'''
-
-xilinx5_header = '''Xilinx SDAccel HAL userspace driver extension APIs
+xilinx4_header = '''Xilinx SDAccel HAL userspace driver extension APIs
 Performance Monitoring Exposed Parameters
 Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
 
@@ -282,11 +295,11 @@ License for the specific language governing permissions and limitations
 under the License.
 '''
 
-xilinx6_header = '''Xilinx SDAccel xclbin container definition
+xilinx5_header = '''Xilinx SDAccel xclbin container definition
 Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
 '''
 
-xilinx7_header = '''Xilinx SDAccel HAL userspace driver APIs
+xilinx6_header = '''Xilinx SDAccel HAL userspace driver APIs
 Copyright (C) 2015-2017, Xilinx Inc - All rights reserved
 
 Licensed under the Apache License, Version 2.0 (the "License"). You may
@@ -302,7 +315,7 @@ License for the specific language governing permissions and limitations
 under the License.
 '''
 
-xilinx8_header = '''Xilinx SDAccel HAL userspace driver extension APIs
+xilinx7_header = '''Xilinx SDAccel HAL userspace driver extension APIs
 Performance Monitoring Exposed Parameters
 Copyright (C) 2015-2016, Xilinx Inc - All rights reserved
 
@@ -319,28 +332,21 @@ License for the specific language governing permissions and limitations
 under the License.
 '''
 
-xilinx9_header = '''Copyright (C) 2015-2017 Xilinx, Inc
+xilinx8_header = '''Copyright (C) 2018 Xilinx, Inc
 '''
 
-xilinx10_header = '''Copyright (C) 2016-2017 Xilinx, Inc
-Author: Sonal Santan
-XDMA HAL multi-threading safe, multi-channel DMA read/write support
+xilinx9_header = '''Copyright (C) 2015-2018 Xilinx, Inc
+'''
 
-Licensed under the Apache License, Version 2.0 (the "License"). You may
-not use this file except in compliance with the License. A copy of the
-License is located at
+xilinx10_header = '''Copyright (C) 2016-2018 Xilinx, Inc
+'''
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-License for the specific language governing permissions and limitations
-under the License.
+xilinx11_header = '''Copyright (C) 2017-2018 Xilinx, Inc
 '''
 
 all_exp_header_lines = [
-    asl_header.split("\n"),
+    asl_header1.split("\n"),
+    asl_header2.split("\n"),
     apache_header_2016.split("\n"),
     apache_header_2017.split("\n"),
     gpl2_header.split("\n"),
@@ -356,6 +362,7 @@ all_exp_header_lines = [
     xilinx8_header.split("\n"),
     xilinx9_header.split("\n"),
     xilinx10_header.split("\n"),
+    xilinx11_header.split("\n"),
     ]
 min_header_lines = len(min(all_exp_header_lines, key=len))
 max_header_lines = len(max(all_exp_header_lines, key=len))
@@ -458,6 +465,7 @@ def check_headers(dir):
             ".*\.gitignore$",
             ".*\.gitmodules$",
             ".*Jenkinsfile.*",
+            ".*supported_vivado_versions\.txt$",
 
             "hdk/.*/ccf_ctl\.v$",
             "hdk/.*/design_error\.inc$",
@@ -481,7 +489,6 @@ def check_headers(dir):
             "hdk/.*/rr_arb\.sv$",
             "hdk/.*/sync\.v$",
             "hdk/.*/README$",
-            "hdk/.*/supported_vivado_versions\.txt$",
             "hdk/.*/hdk_version\.txt$",
             "hdk/.*/dest_register_slice\.v$",
             "hdk/.*/src_register_slice\.v$",
@@ -490,7 +497,13 @@ def check_headers(dir):
 
             "sdk/linux_kernel_drivers/xdma/10-xdma\.rules",
 
+            "sdk/linux_kernel_drivers/xocl/10-xocl\.rules",
+            "sdk/linux_kernel_drivers/xocl/LICENSE$",
+
             "SDAccel/userspace/src/test",
+	    "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
+	    "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
+            "SDAccel/examples/aws/helloworld_ocl_runtime/vector_addition.hw.xilinx_aws-vu9p-f1_dynamic_5_0.awsxclbin"    
         ])
 
     file_provider.set_exclude_paths([

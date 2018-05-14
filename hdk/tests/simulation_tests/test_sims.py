@@ -74,6 +74,62 @@ class TestSims(AwsFpgaTestBase):
         test_type = 'sv'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+    
+    def test_cl_dram_dma__dram_dma_axi_mstr__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dram_dma_axi_mstr'
+        test_type = 'sv'
+        
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dram_dma_rnd__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dram_dma_rnd'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dram_dma_4k_crossing__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dram_dma_4k_crossing'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dram_dma_single_beat_4k__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dram_dma_single_beat_4k'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dma_pcis_concurrent__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dma_pcis_concurrent'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dma_pcim_concurrent__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dma_pcim_concurrent'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dma_sda_concurrent__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dma_sda_concurrent'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
     def test_cl_dram_dma__ddr__sv(self):
 
@@ -107,6 +163,19 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    def test_cl_dram_dma__peek_poke_wc__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_peek_poke_wc'
+
+    def test_cl_dram_dma__peek_poke_len__sv(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_peek_poke_len'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
     def test_cl_dram_dma__peek_poke_pcis_axsize__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -123,12 +192,30 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
 
+    # cl_uram_example c
+
+    def test_cl_uram_example__uram_example__c(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_uram_example/verif/scripts'
+        test_name = 'test_uram_example'
+        test_type = 'c'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)    
+    
     # cl_dram_dma c
-    @pytest.mark.skip(reason="Skip till the test is fixed. Fix is planned.")
-    def test_cl_dram_dma__dram_dma__c(self):
+
+    def test_cl_dram_dma__sda__sv(self):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma'
+        test_name = 'test_sda'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)
+
+    def test_cl_dram_dma__dram_dma_hwsw_cosim__c(self):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_dram_dma_hwsw_cosim'
         test_type = 'c'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type)

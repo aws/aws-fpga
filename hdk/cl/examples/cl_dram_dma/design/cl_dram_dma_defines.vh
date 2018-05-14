@@ -27,6 +27,12 @@
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
 
+//comment below to remove DDRs from CL
+`define DDR_A_EXISTS 
+`define DDR_B_EXISTS 
+`define DDR_D_EXISTS
+
+
 // Uncomment to disable Virtual JTAG
 //`define DISABLE_VJTAG_DEBUG
 
@@ -36,6 +42,26 @@
 `define CL_DRAM_DMA_AXI_MSTR_CALR_ADDR  32'h0000_0008
 `define CL_DRAM_DMA_AXI_MSTR_CWDR_ADDR  32'h0000_000C
 `define CL_DRAM_DMA_AXI_MSTR_CRDR_ADDR  32'h0000_0010
+
+// Defining local macros that will instantiate the desired DDR controllers in
+// the CL.
+`ifndef DDR_A_ABSENT
+  `define DDR_A_PRESENT 1
+`else
+  `define DDR_A_PRESENT 0
+`endif
+
+`ifndef DDR_B_ABSENT
+  `define DDR_B_PRESENT 1
+`else
+  `define DDR_B_PRESENT 0
+`endif
+
+`ifndef DDR_D_ABSENT
+  `define DDR_D_PRESENT 1
+`else
+  `define DDR_D_PRESENT 0
+`endif
 
 `endif
 

@@ -19,7 +19,7 @@
 #######################################################################
 
 <: if {$ddr0_present != 0} { :>
-set ddr4_0_clk [get_pins -hierarchical -filter {NAME =~ */gen_mem.sh_ddr_0/ddr_cores.DDR4_0/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
+set ddr4_0_clk [get_pins -hierarchical -filter {NAME =~ *sh_ddr_0/ddr_cores.DDR4_0/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
 set_max_delay -datapath_only \
               -from [get_clocks -of_objects $ddr4_0_clk] \
               -to [get_clocks -of [get_ports clk_main_a0]] \
@@ -31,7 +31,7 @@ set_max_delay -datapath_only \
               
 <: } :>
 <: if {$ddr1_present != 0} { :>
-set ddr4_1_clk [get_pins -hierarchical -filter {NAME =~ */gen_mem.sh_ddr_0/ddr_cores.DDR4_1/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
+set ddr4_1_clk [get_pins -hierarchical -filter {NAME =~ *sh_ddr_0/ddr_cores.DDR4_1/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
 set_max_delay -datapath_only \
               -from [get_clocks -of_objects $ddr4_1_clk] \
               -to [get_clocks -of [get_ports clk_main_a0]] \
@@ -43,7 +43,7 @@ set_max_delay -datapath_only \
               
 <: } :>
 <: if {$ddr2_present != 0} { :>
-set ddr4_2_clk [get_pins -hierarchical -filter {NAME =~ */gen_mem.sh_ddr_0/ddr_cores.DDR4_2/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
+set ddr4_2_clk [get_pins -hierarchical -filter {NAME =~ *sh_ddr_0/ddr_cores.DDR4_2/inst/u_ddr4_infrastructure/gen_mmcme4.u_mmcme_adv_inst/CLKOUT0}]
 set_max_delay -datapath_only \
               -from [get_clocks -of_objects $ddr4_2_clk] \
               -to [get_clocks -of [get_ports clk_main_a0]] \
@@ -55,7 +55,7 @@ set_max_delay -datapath_only \
               
 <: } :>
 <: if {($ddr0_present != 0) || ($ddr1_present != 0) || ($ddr2_present != 0)} { :>
-set asyncFFs [get_cells -quiet -hier -filter  {NAME =~ */gen_mem.sh_ddr_0/*sync_wr_rst/in_q_reg[0] || NAME =~ */gen_mem.sh_ddr_0/*sync_wr_rst/sync_out_reg[0]}]
+set asyncFFs [get_cells -quiet -hier -filter  {NAME =~ *sh_ddr_0/*sync_wr_rst/in_q_reg[0] || NAME =~ *sh_ddr_0/*sync_wr_rst/sync_out_reg[0]}]
 set asyncFFPins [get_pins -quiet -filter REF_PIN_NAME==CLR -of $asyncFFs]
 set_false_path -quiet -to $asyncFFPins
 set_property -quiet ASYNC_REG true $asyncFFs
