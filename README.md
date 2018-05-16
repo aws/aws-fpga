@@ -2,136 +2,148 @@
 
 # Table of Contents
 
-1. [AWS EC2 FPGA Hardware and Software Development Kits](#devkit)
-    - [FPGA Developer AMI available on AWS Marketplace](#devAmi)
-    - [FPGA Hardware Development Kit Workflow(HDK)](#fpgahdk)
-    - [GUI Workflow with Vivado IP Integrator (IPI)](#ipi)
-    - [FPGA Software Development Kit (SDK)](#fpgasdk)
-    - [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
-    - [Developer Support](#devSupport)
-2. [Building an example AFI](#buildingAnExample)
-    - [Prerequisites](#buildingafiprereq)
-    - [Using an AFI on EC2 FPGA Instances](#usingAfi)
+1. [Overview of AWS EC2 FPGA Development Kit](#overviewdevkit)
+    - [Development environments](#overviewdevenv)
+    - [Runtime enviroments](#overviewrunenv)
+    - [Example applications](#overviewexapps)
+    - [Development tools](#overviewdevtools)
+2. [Getting Started](#gettingstarted)
+3. [FPGA Developer AMI available on AWS Marketplace](#devAmi)
+4. [FPGA Hardware Development Kit (HDK)](#fpgahdk)
+5. [FPGA Software Development Kit (SDK)](#fpgasdk)
+6. [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
+7. [Developer Support](#devSupport)
 
-<a name="devkit"></a>
-# AWS EC2 FPGA Hardware and Software Development Kits
+<a name="overviewdevkit"></a>
+# Overview of AWS EC2 FPGA Development Kit
 
-The AWS EC2 FPGA Hardware and Software Development Kits consists of three components: Hardware development workflows for developing Amazon FPGA Image (AFI) with the [HDK](./hdk), Software development workflows for developing AFI with [OpenCL/C/C++](./SDAccel) and [SDK](./sdk) for using AFIs on FPGA-enabled EC2 instances [such as F1](https://aws.amazon.com/ec2/instance-types/f1/).
+The AWS EC2 FPGA Development Kit is provided by AWS to support development and runtime on [AWS FPGA instances](https://aws.amazon.com/ec2/instance-types/f1/).  Amazon EC2 FPGA instances are high-performance compute instances with field programmable gate arrays (FPGAs) that are programmed to create custom hardware accelerations in EC2. F1 instances are easy to program and come with everything needed to develop, simulate, debug, compile and run hardware accelerated applications.  Using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), developers create an FPGA design. Once the FPGA design is complete, developers create the Amazon FPGA Image (AFI), and deploy it to the F1 instance in just a few clicks. AFIs are reusable, shareable and can be deployed in a scalable and secure way.  
+![Alt text](hdk/docs/images/f1-Instance-How-it-Works-flowchart.0c1fa9ad89f5b49ca7210240b3c82fce7cdb7583.png)
 
-Execute `git clone https://github.com/aws/aws-fpga.git` to download this HDK+SDAccel+SDK release to your EC2 Instance or local server.
-For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
+<a name="overviewdevenv"></a>
+## Overview of Development Environments
 
-The [Release Notes](./RELEASE_NOTES.md) document covers the list of supported features, programming environments, and known restrictions.
+| Development Environment     | Developer Interface | Accelerator Language   | Development Tool | Debug Options| Typical Development Time |
+| --------|---------|---------|-------|-------|-------|
+| [Software Defined Accelerator Development - SDAccel](SDAccel/README.md) | Script or GUI | C/C++/OpenCL/Verilog/VHDL | SDx/Vivado | SW/HW Emulation, Simulation, Chipscope | Days |
+| [Hardware Accelerator Development - HDK](hdk/README.md) | Script | Verilog/VHDL (RTL) | Vivado | Simulation, Virtual JTAG | Months |
+| [IP Integrator (HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | GUI | Verilog/VHDL/C | Vivado | Simulation, Virtual JTAG | Weeks |
 
-**NOTE: This developer kit is tested and supported for Linux operating systems, for the time being, other OSs haven't been tested by AWS**
+<a name="overviewrunenv"></a>
+## Overview of Runtime Enviroments
 
-Please click the "Watch" button in GitHub upper right corner to stay posted.
+| Runtime Environment     | Hardware Interface | Host Code Language   | FPGA Tools |
+| --------|---------|---------|-------|
+| [C/C++ Software Defined Accelerator Development](SDAccel/README.md) | OpenCL APIs | C/C++/OpenCL | [SDK](./sdk) |
+| [Hardware Accelerator Development](hdk/README.md) | XDMA Driver APIs, memcpy, peek/poke | C/C++ | [SDK](./sdk) |
+| [IP Integrator (HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | XDMA Driver APIs, memcpy, peek/poke | C/C++ | [SDK](./sdk) |
+
+<a name="overviewdevtools"></a>
+## Overview of Development Tools
+
+| Tool     | Development/Runtime | Tool location | Description |
+| --------|---------|---------|---------|
+| SDx 2017.4 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
+| Vivado 2017.4 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
+| FPGA AFI Mangement Tools | Runtime | [SDK - fpga_mgmt_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
+| Virtual JTAG | Development (Debug) | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Runtime debug waveform |
+| wait_for_afi | Development | [wait_for_afi.py](hdk/common/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |
+| notify_via_sns | Development | [notify_via_sns.py](hdk/common/scripts/notify_via_sns.py) | Notifies developer when design build process completes |
+| check_create_fpga_image | Development | [check_create_fpga_image.py](hdk/common/scripts/check_create_fpga_image.py) | Helper script that monitors the S3 bucket used for AFI generation |
+| AFI Management | Development | [Copy](hdk/docs/copy_fpga_image.md), [Delete](hdk/docs/delete_fpga_image.md), [Describe](hdk/docs/describe_fpga_images.md), [Attributes](hdk/docs/fpga_image_attributes.md) | AWS CLI EC2 commands for managing your AFIs |
+
+
+NOTE: For on-premises development, SDx/Vivado must have the correct license and use one of the [supported versions of SDx/Vivado](./supported_vivado_versions.txt). The FPGA HDK+SDK [Release Notes](./RELEASE_NOTES.md) may contain additional information.  The following links have more information on on-premises development:  [Vivado requirements](hdk/docs/on_premise_licensing_help.md) and [SDx requirements](SDAccel/docs/On_Premises_Development_Steps.md)
+
+<a name="overviewexapps"></a>
+## Overview of Example Applications
+| Accelerator Application     | Example | Development Environment   | Description |
+| --------|---------|---------|-------|
+| Custom hardware | [cl_dram_dma](hdk/cl/examples/cl_dram_dma) | HDK - RTL | Demonstrates connectivity to the F1 shell and interfacing with DRAM |
+| Custom hardware IP integration example using a GUI | [cl_dram_dma_hlx](hdk/cl/examples/cl_dram_dma_hlx) | HLx - Verilog  | Demonstrates connectivity to the F1 shell and interfacing with DRAM using the Vivado IP Integrator GUI |
+| Digital Up-Converter using High Level Synthesis | [cl_hls_dds_hlx](hdk/cl/examples/cl_hls_dds_hlx) | HLx - C-to-RTL  | Demonstrates an example application written in C that is synthesized to RTL (Verilog) |
+| Security   | [AES, RSA, SHA1](https://github.com/Xilinx/SDAccel_Examples/tree/master/security) | SDAccel - C/C++/OpenCL  | Demonstrates methods of using hardware acceleration to speed up security software algorithms  |
+| Computer Vision   | [Affine, Convolve, Huffman, IDCT](https://github.com/Xilinx/SDAccel_Examples/tree/master/vision) | SDAccel - C/C++/OpenCL  | Demonstrates methods of using hardware acceleration to speed up image detection algorithms  |
+| Misc Algorithms   | [Kmeans, SmithWaterman, MatrixMult](https://github.com/Xilinx/SDAccel_Examples/tree/master/acceleration) | SDAccel - C/C++/OpenCL  | Demonstrates methods of using hardware acceleration to compute, sorting and search algorithms  |
+| Financial   | [Blacksholes, Heston](https://github.com/KitAway/FinancialModels_AmazonF1) | SDAccel - C/C++/OpenCL  | Demonstrates methods of using hardware acceleration on Monte Carlo financial models  |
+| Custom Hardware with Software Defined Acceleration   | [RTL Kernels](https://github.com/Xilinx/SDAccel_Examples/tree/master/getting_started/rtl_kernel) | SDAccel - RTL + C/C++/OpenCL  | RTL running in the software defined development enviroment  |
+| File Compression   | [GZip](https://github.com/Xilinx/Applications/tree/master/GZip) | SDAccel - C/C++/OpenCL  | FPGA based GZIP compression |
+| WebP Image Compression   | [WebP](https://github.com/Xilinx/Applications/tree/master/webp) | SDAccel - C/C++/OpenCL  | FPGA accelerated WebP encoder application |
+
+
+<a name="gettingstarted"></a>
+# Getting Started 
+
+### Setting up a development environment 
+The developer kit is supported for Linux operating systems only.  You have the choice to develop on AWS using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premises. Next you should execute `git clone https://github.com/aws/aws-fpga.git` to download the latest release to your EC2 Instance or local server. For an SSH connection execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/).
+
+The following examples will guide you through the first development steps:
+
+  * For the HDK development environment use the [HDK Hello World Example](hdk/cl/examples/README.md)
+  * For the Software-defined development environment use the [SW Hello World Example](SDAccel/README.md)
+
+### Best practices
+* Make sure you review the [Release Notes](./RELEASE_NOTES.md) and [Errata](./ERRATA.md) documents which cover the list of supported features, programming environments, and known issues.
+* Click the "Watch" button in GitHub upper right corner to get regular updates.  Also, we recommend you will join the [AWS forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to engage with the FPGA developer community and get help when needed (both AWS and Xilinx engineers monitor this forum).
+
+### New to AWS?
+If you are new to AWS, we recommend you will start [here](https://aws.amazon.com/getting-started/), to learn how to use AWS EC2, S3 and the AWS CLI.  These services are required to start developing accelerations for AWS FPGAs. For example, executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, the server/instance has been configured with your credentials in the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket storing the FPGA design tarball reside in the same AWS region.  For configuration details please refer to [Getting started with AWS CLI.](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
+
+### New to AWS FPGAs? 
+Before you start our first AWS FPGA design, we recommend to go through one of the following examples:
+  * Hardware developers who plan on using the AWS FPGA HDK development environment, start with  [Hello World Example - Skip to steps 4-6](hdk/cl/examples/README.md)
+  * Software develoeprs who plan to use the software-defined development environment, start with [Hello World Example](SDAccel/examples/aws/helloworld_ocl_runtime/README.md)
+
+ ### In-depth training and resources
+Once you completed your hello world examples, we recommend you will dive deeper into a training workshop or application notes
+ * Software-defined flow over with the [re:Invent 2017 Workshop](https://github.com/awslabs/aws-fpga-app-notes/blob/master/reInvent17_Developer_Workshop/README.md)
+  * Application Notes: [Methods of interfacing the host application to the Hardware accelerator](https://github.com/awslabs/aws-fpga-app-notes)
+  * Learn about how the hardware accelerator interfaces to the F1 Shell
+  ** [Shell Interface](hdk/docs/AWS_Shell_Interface_Specification.md)
+  ** [Shell Address Map](hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
+  ** [Programmer view of the FPGA](./hdk/docs/Programmer_View.md)
+  ** [Virtual JTAG](hdk/docs/Virtual_JTAG_XVC.md)
+
 
 <a name="devAmi"></a>
-## FPGA Developer AMI
+# FPGA Developer AMI
 
-AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances. The FPGA Developer AMI comes with Xilinx tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/C5/M4/M5/R4/T2.2XLARGE](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require 32GiB Memory (ex: C4.4XLarge, M4.2XLarge, R4.XLarge, T2.2XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
+The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is packaging the tools and drivers needed for FPGA development on EC2 instances. It is available, at no software charge on AWS Marketplace. It can run on many [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aformentioned larger instances to run the synthesis of their acceleration code. 
 
-This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table describes the mapping of developer kit version to AMI version:  
+Currently the FPGA developer AMI supports Xilinx SDx 2017.4 and 2017.1 toolchain versions. The following compatibility table describes the mapping of developer kit version to AMI version:  
 
-| Developer Kit Version   | Tool Version Supported     |  Compatible AMI Version     |
+| FPGA Developer Kit Version   | Tool Version Supported     |  Compatible AMI Version     |
 |-----------|-----------|------|
+| 1.4.0 | 2017.4 | v1.4.0 or greater (Xilinx SDx 2017.4) |
 | 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
 | 1.3.7 or greater | 2017.1 | v1.3.5 or greater (Xilinx SDx 2017.4) |
 | 1.3.7 or greater | 2017.4 | v1.4.0 or greater (Xilinx SDx 2017.4) |
 
+<TODO> Missing a  "Software-defined Kit" section
+
 <a name="fpgahdk"></a>
-## FPGA HDK
+# Hardware Development Kit (HDK)
 
-The [HDK directory](./hdk) contains useful information and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you are using a pre-built AFI and not planning to build your own AFI. The following resources provide further details:
-
-[HDK README](./hdk/README.md)
-
-[AWS FPGA Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
-
-[FPGA PCIe Address Map](./hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
-
-<a name="ipi"></a>
-## GUI Workflow with Vivado IP Integrator (IPI)
-
-Developers have the option of working in a GUI mode using Vivado IPI.  With IPI you can create complex F1 custom designs on a graphical interface design canvas.  The HDK development kit provides AWS FPGA IP which will help you quickly develop your custom designs by enabling you to quickly drop in IP blocks into your design.
-
-The IPI flow isolates the Custom Logic (CL) from the shell, allowing the developer to focus on differentiating logic and leave the heavy lifting, undifferentiated hardware interfaces development to the AWS FPGA Shell.  Generating a logic diagram is simplified with designer automation that connects RTL, IP, and peripherals like DDR and PCIe in a correct by construction flow.  The “what you see is what you get” tool generates the equivalent code by instantiating the underlying IP and RTL with access via the Vivado project to the entire FPGA hardware design flow.  A video walk through of this flow for a simple diagram is available at https://www.xilinx.com/video/hardware/using-vivado-ip-integrator-and-amazon-f1.html.  This flow example is a good starting point for developers who want to quickly add IP blocks with high performance access to multiple external memories.
-
-The IPI RTL flow enables the developer a single graphical environment to add sources and IP, simulate, synthesize the RTL, and then stitch together the Custom Logic (CL) with the Shell’s design checkpoint (DCP).  For design debug, developers can easily instantiate logic analyzers or other debug logic, investigate timing and resource reports, and quickly link from implementation messages to the design view and source code when applicable.  This flow is a good starting point for experts in RTL design or designs who have a minimal amount of interconnection between RTL modules.
-
-The below documentation covers the setup, tutorials of the IPI flows and IPI FAQ.  Developers are advised to read all documents before starting their first AWS FPGA design with IPI.  
-
-[IPI Setup](./hdk/docs/IPI_GUI_Vivado_Setup.md)
-
-[IPI Tutorials/Examples](./hdk/docs/IPI_GUI_Examples.md)
-
-[IPI Developer Flow](./hdk/docs/IPI_GUI_Flows.md)
-
-[IPI FAQ](./hdk/docs/IPI_GUI_Vivado_FAQ.md)
-
-<a name="fpgasdk"></a>
-## FPGA SDK
-
-The [SDK directory](./sdk) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded to EC2 FPGA instance slots. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following resources provide further details:
-
-[SDK README](./sdk/README.md)
-
-[Access FPGA From Linux Applications](./hdk/docs/Programmer_View.md)
-
-[AFI Management Tools](./sdk/userspace/fpga_mgmt_tools/README.md)
+The [HDK directory](./hdk/README.md) contains useful information, examples, and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The HDK is not required if you plan to use a pre-built AFI shared from another developer. 
 
 <a name="sdaccel"></a>
-## OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications
+# Sofware-defined Development Environment 
 
-The OpenCL development environment allows customers to use OpenCL with Amazon EC2 F1 FPGA Instances to accelerate their C/C++ applications. Software developers with little to no FPGA experience, will find a familiar development experience and now can use the cloud-scale availability of FPGAs to supercharge their applications.
+The software-defined development environment allows customers to compile their C/C++ code into the FPGA as kernels, and use OpenCL APIs to pass data to the FPGA. Software developers with little to no FPGA experience will find a familiar development experience and supercharge their cloud applications.
 
-Kernels are expressed in OpenCL or C/C++ and accelerated by implementing them in custom FPGA hardware. In addition, the development environment from Xilinx called SDAccel allows the acceleration to be performed using pre-existing RTL designs.
+In addition, the development environment (called SDAccel) allows the integration of pre-existing RTL designs into the C/C++ based acceleration, allowing for fast prototpying using C/C++ and manual optimization of critical blocks with RTL (Similar approach that developers choose sometime to optimize time critical functions by using assembly level programming and not relaying on compilers to generate that function from C/C++ code)
 
-This developer kit has 50+ examples to help you get started on FPGA acceleration.  To get started, review the [SDAccel README](SDAccel/README.md)
+This developer kit has 80+ examples to help you get started on FPGA acceleration.  To get started, review the [Software-defined development environment readme](SDAccel/README.md) file.
+
+<a name="fpgasdk"></a>
+# Runtime Tools (SDK)
+
+The [SDK directory](./sdk/README.md) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded on the FPGA instance slots. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following resources provide further details: <TODO>
 
 <a name="devSupport"></a>
-## Developer Support
+# Developer Support
 
 The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) is the first place to go to post questions, learn from other users and read announcements from the EC2 FPGA team.
 
 * To be notified on important messages click on the “Watch Forum” button on the right side of the screen.
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again.
-
-<a name="buildingAnExample"></a>
-# Building a Custom Logic AFI for AWS FPGA Instances
-
-Developers can build their own Custom Logic (CL) and deploy it on AWS.
-The CL must comply with the [AWS Shell Interface Specifications](./hdk/docs/AWS_Shell_Interface_Specification.md), and pass through the build scripts.
-
-The [CL Examples directory](./hdk/cl/examples) is provided to assist developers in creating a functional CL implementation. Each example includes:
-
-1. The source code for the example under the `/design` directory.
-2. The timing, clock and placement constraints files, scripts for compiling the example design. (This requires running in an instance/server that have Xilinx tools and license installed. Developers are recommended to use the FPGA Development AMI available free of charge on [AWS Marketplace](#devAmi)).
-3. The final build, called Design Checkpoint (DCP) that can be submitted for AWS to generate the AFI.
-4. An AFI-ID for a pre-generated AFI that matches the example design.
-5. Software source code required on the FPGA-enabled instance to run the example.
-6. Software binary that can be loaded on an FPGA-enabled instance to test the AFI.
-
-In summary:
-
-- An AFI can be created using the files in #1, #2, and #3. The AFI creation can take place on any EC2 instance or on-premises.
-- The AFI can be used in an EC2 F1 instance by using the files in #4, #5 and #6.
-
-By following the example CLs, a developer will learn how to interface to the AWS Shell of the FPGA, compile the source code to create an AFI, and load/run an AFI from the F1 instance for use.
-
-
-<a name="buildingafiprereq"></a>
-### Prerequisites
-* AWS FPGA HDK and SDK run in Linux environment only.
-
-* The build stage uses Xilinx's Vivado tool set. In case you build on-premises you should have an installed Vivado that has the correct license.  Please check for [supported versions of Vivado](./supported_vivado_versions.txt). [Release Notes](./RELEASE_NOTES.md) may contain additional information.
-* Executing `aws s3 <action>` and `aws ec2 create-fpga-image` require having AWS CLI installed, having an active AWS account, and the server/instance has been configured with your credentials and the same AWS region as your S3 bucket via `aws configure` command line. It’s also required that your instance and the S3 bucket where the tarball reside in will be in the same AWS region.  Please refer to [AWS documentation for help with configuring the AWS CLI.](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
-
-The [Getting started with CL examples](./hdk/cl/examples/README.md) guide provides step-by-step instructions to build an AFI from one of the provided examples, register it with AWS, and load it on an EC2 FPGA instance.
-
-<a name="usingAfi"></a>
-## Using an AFI on EC2 FPGA Instances
-Now that you have built an AFI, or if you want to use one of the example pre-built AFIs provided by AWS, you need to launch an EC2 FGPA Instance, and install the SDK as detailed at: [SDK Quick Start](./sdk/README.md)
-
-

@@ -10,11 +10,11 @@
          *    AXI4 protocol support on all interfaces
    *    User-defined clock frequency driving all CL to Shell interfaces
    *	Multiple free running auxiliary clocks
-   *    PCIE endpoint presentation to Custom Logic(CL)
+   *    PCI-E endpoint presentation to Custom Logic(CL)
          *    Management PF (physical function)
          *    Application PF
    *    Virtual JTAG, Virtual LED, Virtual DIP Switches
-   *    PCIE interface between Shell(SH) and Custom Logic(CL).
+   *    PCI-E interface between Shell(SH) and Custom Logic(CL).
          *    SH to CL inbound 512-bit AXI4 interface
          *    CL to SH outbound 512-bit AXI4 interface
 	 *    Multiple 32-bit AXI-Lite buses for register access, mapped to different PCIe BARs
@@ -26,92 +26,71 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
-## Release 1.3.7 (See [ERRATA](./ERRATA.md) for unsupported features)
-* Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
-* Dynamic Software Acceleration (OpenCL) platform – The AWS platform is dynamically configured during compile time to optimize unused DDR/Debug logic, free up FPGA resources and reduce compile times.  Developers can instantiate up to 60 kernels (up from the max 16 2017.1 supported). [See 2017.4 Migration Document](SDAccel/docs/SDAccel_Migrate_dynamic_DSA.md) and [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf) 
-* OpenCL Kernel profiling – During compile time, profiling logic can be automatically inserted to enable generation of kernel profile data.  Profile data can be viewed using the SDx IDE under profile summary report and timeline trace report. [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)   
-* OpenCL Hardware Emulation Debug – GDB-like debug allows developers a view into what is going on inside the kernel during hardware emulation.  Debug capabilities include start/stop at intermediate points and memory inspection.  [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
-* Post-synthesis and place/route optimization is now supported in OpenCL development environment.  [New XOCC options: reuse_synth and reuse_impl](https://www.xilinx.com/html_docs/xilinx2018_1/sdsoc_doc/wfq1517252127836.html)
-* Customer simulation environment improvements and bug fixes:
-  * 8 Additional tests that will help developer with using the simulation environment and shell simulation model
-  * Simulation model support for non DW aligned accesses
-  * Co-simulation support
-* EDMA Driver fixes:
-  * Prevent timeouts due to scanning of the BARs for DMA hardware
-  * Driver compilation support for 4.14 linux kernel
-* HDK improvements and fixes: 
-  * cl_dram_dma improvements to make enabling/disabling DDRs easier
-  * encrypt.tcl now clears out old files
-  * URAM example timing improvements
-* IPI Improvements:
-  * [HLS example](hdk/cl/examples/cl_hls_dds_hlx/README.md) 
-  * Script based approach for running the examples
+## Release 1.4.0 (See [ERRATA](./ERRATA.md) for unsupported features)
+* [New Shell Stable: v04261818](./hdk/common/shell_stable).  Developer Kit v1.4.0 and greater only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit.  The previous shell (v071417d3) will be supported until XX/YY/ZZZZ.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga) for all shell version v071417d3 development.  TODO:  Change link to v1.3.X branch
+* TODO:  Add High Level statement about performance improvements due to moving to XDMA driver
+* TODO:  DMA Timeout
+* TODO:  AXI Ordering bug fix
+* TODO:  CL Interface changes?
 
-   
-## Release 1.3.6 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * Simulation model bug fix for transfer size of 64 bytes.
-  * Xilinx 2017.1 Patch AR70350 - fixes report_power hangs.  Patch is automatically applied during setup scripts using MYVIVADO environment variable.
-  * Updated synthesis scripts with -sv option when calling read_verilog.
-  * Added documentation on us-gov-west-1 (GovCloud US).
-  * Minor EDMA driver fixes and improvements.
+## Supported Tools and Environment
 
-## Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
-  * [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB).
-  * [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
-  * Improved IPI 3rd party simulator support.
-  * Simulation model fixes.
-  * SDAccel improvements - Removal of settings64 script from SDAccel setup and switching between DSAs.
+* The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms
+* The First installation of AWS FPGA SDK requires having gcc installed on the instance. If it's not available, try `sudo yum update && sudo yum group install "Development Tools"`
+* The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running.  These are provided with AWS FPGA Developer AMI at no additional cost
+* This release is tested and validated with Xilinx 2017.4 SDx/Vivado
+* Developers that choose to develop on-premises need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed. For more help, please refer to [On-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
+* The following simulators are supported with this HDK:
+**Vivado XSIM RTL simulator
+** MentorGraphic's Questa RTL simulator (with a separate license from MentorGraphics)
+** Synopsys' VCS RTL simulator (with a separate license from Synopsys)
 
-## Release 1.3.4 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * EDMA/XDMA Driver improvements
-  * Additional SDAccel Platforms
-    * 1DDR for faster build times and smaller expanded shell
-    * RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
-  * IP Integrator GUI (HLx) improvements 
-    * CL\_DRAM\_DMA fixes and improvements
-      *  Dual master support
-  * Simulation environment fixes and improvements
-    * AXI/AXIL Protocol checkers
-    * Shell model improvements
-    * SW co-simulation support on cl\_hello\_world
-    * DDR Model patch
-  * Updated SH\_DDR module in preparation for upcoming feature release	
-   
-## Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * New FPGA Image APIs for deleting and reading/editing attributes 
+## License Requirements
 
-## Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * SDAccel general availability 
+The HDK and SDK in the FPGA development kit have different licenses. For more details please refer to the [HDK License](./hdk/LICENSE.txt) and the [SDK License](./sdk/LICENSE.txt).
 
-## Release 1.3.1 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * EDMA Driver release 1.0.29 - MSI-X fixes
-  * Improved IPI documentation
-  * Documentation updates
-  * Build flow fixes
-  * Public LTX files for use with hdk examples AFIs 
+## FAQs
+ 
+**Q: How do I know which HDK version I have on my instance/machine? **
 
-## Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * FPGA initiated read/write over PCI (PCI-M)
-  * Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
-  * Expanded DMA support
-  * Improved URAM utilization
-  * Improved AXI Interface checking
-  * New customer examples/workflows:  IP Integrator, VHDL and GUI
-  * SDAccel preview is accepting developers - See [README](sdk/SDAccel/README.md) registration  
+Look for the ./hdk/hdk_version.txt file.
+
+**Q: How do I know what my Shell version is? **
+
+The Shell version of an FPGA slot is available through the FPGA Image Management tools.  See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot.
+
+**Q: How do I know what version of FPGA Image management tools are running on my instance? **
+
+The FPGA Image management tools version is reported with any command executed from these tools.  See the description of `fpga-describe-local-image` for more details.
+
+**Q: How do I update my existing design with this release?**
+
+1.	Start by either cloning the entire GitHub structure for the HDK release or downloading new directories that have changed.  AWS recommends an entire GitHub clone to ensure no files are missed
+2.	Update the CL design to conform to the new AWS_Shell_Interface_Specification TODO: add link. TODO: need a doc to outline what changes are a MUST in this upgrade, and which ones are optional?
+3.	Follow the process for AFI generation outlined in aws-fpga/hdk/cl/examples/readme.md
+4.	Update FPGA Image Management Tools to the version included in aws-fpga/sdk/management
+TODO: SDaccel design have different steps?
+
+**Q: How do I get support?**
+
+The FPGA Development forum provides an easy access to Developer support.  It's the first place to go to post questions, suggestions and receive important announcements from the AWS FPGA team. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. To be notified of important messages you will need to click the “Watch Forum” button on the right side of the screen.
+
+**Q: How do I know which HDK GitHub release I am working with? **
+
+See the release notes at the top of the GitHub directory to identify the version of your GitHub clone.  
+
+TODO: The following major features are included in this HDK release: 
 
 
-**During July, All AFIs created with previous HDK versions will no longer correctly load on an F1 instance**, hence a `fpga-load-local-image` command executed with an AFI created prior to 1.3.0 will return an error and not load.  Watch the forum for additional announcements.
-
-## Release 1.3.0 New Features Details
+## Previous release notes
+## Release 1.3.X Details (See [ERRATA](./ERRATA.md) for unsupported features)
 
 The following major features are included in this HDK release: 
 
 ### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 * The floorplan has been enhanced to enable more optimal CL designs through better timing closure and reduced congestion at the CL to Shell interface.
-* [New Shell Stable: v071417d3](./hdk/common/shell_v071417d3)
 * [AWS_Shell_Interface_Specification.md](./hdk/docs/AWS_Shell_Interface_Specification.md) has been updated.  See cl_ports.vh for the updated port list
-* DCP for the latest shell v071417d3. AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
+* AWS Shell DCP is stored in S3 and fetched/verified when `hdk_setup.sh` script is sourced.
 
 ### 2.	Integrated DMA 
 * DMA functionality has been enhanced to allow DMA transactions of up to 1MB.
@@ -130,7 +109,7 @@ The following major features are included in this HDK release:
 * Restrictions on URAM have been updated to enable 100% of the URAM with a CL to be utilized.  See documentation on enabling URAM utilization: [URAM_options](./hdk/docs/URAM_Options.md)
 
 ### 5.	Vivado IP Integrator (IPI) and GUI Workflow
-* Vivado graphical design canvas and project based flow is now supported.  This flow allows developers to create CL logic as either RTL or complex subsystems based on an IP centric block diagram.  Prior experience in RTL or system block designs is recommended.  The [IP Integrator and GUI Vivado workflow](README.md#ipi) enables a unified graphical environment to guide the developer through the common steps to design, implement, and verify FGPAs.  To get started, start with the [README that will take you through getting started steps and documents on IPI](README.md#ipi)
+* Vivado graphical design canvas and project based flow is now supported.  This flow allows developers to create CL logic as either RTL or complex subsystems based on an IP centric block diagram.  Prior experience in RTL or system block designs is recommended.  The [IP Integrator and GUI Vivado workflow](hdk/docs/IPI_GUI_Vivado_Setup.md) enables a unified graphical environment to guide the developer through the common steps to design, implement, and verify FGPAs.  To get started, start with the [README that will take you through getting started steps and documents on IPI](hdk/docs/IPI_GUI_Vivado_Setup.md)
  
 ### 6.	Build Flow improvments
 * See [Build_Scripts](./hdk/common/shell_v071417d3/build/scripts)
@@ -155,51 +134,79 @@ See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_wo
 * Synchronous (default) mode for fpga-load-local-image and fpga-clear-local-image.  For example, in synchronous mode (default) fpga-load-local-image will wait for the AFI to transition to the "loaded" state, perform a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id, and display the final state for the given FPGA slot number.  Asynchronous operation is preserved with the "-A" option to both fpga-load-local-image and fpga-clear-local-image.
 * The corresponding fpga_mgmt_load_local_image_sync and fpga_mgmt_clear_local_image_sync are provided by the fpga_mgmt library for use in C/C++ programs.
 
-## Supported Tools and Environment
+### Release 1.3.7 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
+* Dynamic Software Acceleration (OpenCL) platform – The AWS platform is dynamically configured during compile time to optimize unused DDR/Debug logic, free up FPGA resources and reduce compile times.  Developers can instantiate up to 60 kernels (up from the max 16 2017.1 supported). [See 2017.4 Migration Document](SDAccel/docs/SDAccel_Migrate_dynamic_DSA.md) and [SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf) 
+* OpenCL Kernel profiling – During compile time, profiling logic can be automatically inserted to enable generation of kernel profile data.  Profile data can be viewed using the SDx IDE under profile summary report and timeline trace report. [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)   
+* OpenCL Hardware Emulation Debug – GDB-like debug allows developers a view into what is going on inside the kernel during hardware emulation.  Debug capabilities include start/stop at intermediate points and memory inspection.  [See chapter 6 within the SDAccel Environment Profiling and Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
+* Post-synthesis and place/route optimization is now supported in OpenCL development environment.  [New XOCC options: reuse_synth and reuse_impl](https://www.xilinx.com/html_docs/xilinx2018_1/sdsoc_doc/wfq1517252127836.html)
+* Customer simulation environment improvements and bug fixes:
+  * 8 Additional tests that will help developer with using the simulation environment and shell simulation model
+  * Simulation model support for non DW aligned accesses
+  * Co-simulation support
+* EDMA Driver fixes:
+  * Prevent timeouts due to scanning of the BARs for DMA hardware
+  * Driver compilation support for 4.14 linux kernel
+* HDK improvements and fixes: 
+  * cl_dram_dma improvements to make enabling/disabling DDRs easier
+  * encrypt.tcl now clears out old files
+  * URAM example timing improvements
+* IPI Improvements:
+  * [HLS example](hdk/cl/examples/cl_hls_dds_hlx/README.md) 
+  * Script based approach for running the examples
 
-* The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms
-* First installation of AWS FPGA SDK requires having gcc installed in the instance server. If that's not available, try `sudo yum update && sudo yum group install "Development Tools"`
-* The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running.  Tools and licenses are provided with AWS FPGA Developer AMI at no additional cost
-* This release is tested and validated with Xilinx 2017.1 SDX (Vivado)
-* Developers that choose to not use the developer AMI in AWS EC2, need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed on premises.  For more help, please refer to [On-premise licensing help](./hdk/docs/on_premise_licensing_help.md)
-* Vivado XSIM RTL simulator supported by the HDK
-* MentorGraphic's Questa RTL simulator supported by the HDK (but requires a purchase of separate license from MentorGraphics)
-* Synopsys' VCS RTL simulator supported by the HDK (but requires a purchase of separate license from Synopsys)
+   
+### Release 1.3.6 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * Simulation model bug fix for transfer size of 64 bytes.
+  * Xilinx 2017.1 Patch AR70350 - fixes report_power hangs.  Patch is automatically applied during setup scripts using MYVIVADO environment variable.
+  * Updated synthesis scripts with -sv option when calling read_verilog.
+  * Added documentation on us-gov-west-1 (GovCloud US).
+  * Minor EDMA driver fixes and improvements.
 
-## License Requirements
+### Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
+  * [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB).
+  * [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
+  * Improved IPI 3rd party simulator support.
+  * Simulation model fixes.
+  * SDAccel improvements - Removal of settings64 script from SDAccel setup and switching between DSAs.
 
-The HDK and SDK in the development kit have different licenses. SDK is licensed under open source Apache license and HDK is licensed under Amazon Software License. Please refer to [HDK License](./hdk/LICENSE.txt) and [SDK License](./sdk/LICENSE.txt).
+### Release 1.3.4 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * EDMA/XDMA Driver improvements
+  * Additional SDAccel Platforms
+    * 1DDR for faster build times and smaller expanded shell
+    * RTL Kernel Debug adds support for virtual jtag debug on RTL kernels
+  * IP Integrator GUI (HLx) improvements 
+    * CL\_DRAM\_DMA fixes and improvements
+      *  Dual master support
+  * Simulation environment fixes and improvements
+    * AXI/AXIL Protocol checkers
+    * Shell model improvements
+    * SW co-simulation support on cl\_hello\_world
+    * DDR Model patch
+  * Updated SH\_DDR module in preparation for upcoming feature release	
+   
+### Release 1.3.3 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * New FPGA Image APIs for deleting and reading/editing attributes 
 
-## Release Notes FAQ
- 
-**Q: How do I know which HDK version I have on my instance/machine? **
+### Release 1.3.2 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * SDAccel general availability 
 
-Look for [hdk_version](./hdk/hdk_version.txt) 
+### Release 1.3.1 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * EDMA Driver release 1.0.29 - MSI-X fixes
+  * Improved IPI documentation
+  * Documentation updates
+  * Build flow fixes
+  * Public LTX files for use with hdk examples AFIs 
 
-**Q: How do I know what my Shell Version is? **
-
-The Shell Version of an instance is available through the FPGA Image Management tools.  See the description of `fpga-describe-local-image` for details on retrieving the shell version from an instance.
-
-**Q: How do I know what version of FPGA Image management tools are running on my instance? **
-
-The FPGA Image management tools version is reported with any command executed to those tools.  See the description of `fpga-describe-local-image` for details on the tools version identification.
-
-**Q: How do I update my design with this release?**
-
-1.	Start by either cloning the entire GitHub structure for the HDK release or downloading new directories that have changed.  AWS recommends an entire GitHub clone to ensure no files are missed
-2.	Update the CL design to conform to the new AWS_Shell_Interface_Specification
-3.	Follow the process for AFI generation outlined in aws-fpga/hdk/cl/examples/readme.md
-4.	Update FPGA Image Management Tools to the version included in aws-fpga/sdk/management
-
-**Q: How do I get support for this release?**
-
-The AWS Forum FPGA Development provides an easy access to Developer support.  The FPGA development user forum is the first place to go to post questions, suggestions and receive important announcements. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. To be notified on important messages, posts you will need to click the “Watch Forum” button on the right side of the screen.
-
-**Q: How do I know which HDK release I am working with? **
-
-See the release notes at the top of the GitHub directory to identify the version of your GitHub clone.  
-
-## Previous release notes
+### Release 1.3.0 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * FPGA initiated read/write over PCI (PCI-M)
+  * Redesigned Shell - improved the shell design to allow more complex place and route designs to meet timing
+  * Expanded DMA support
+  * Improved URAM utilization
+  * Improved AXI Interface checking
+  * New customer examples/workflows:  IP Integrator, VHDL and GUI
+  * SDAccel preview is accepting developers - See [README](sdk/SDAccel/README.md) registration  
 
 ### Release 1.2.4
    *    AWS SDK API `aws ec2 describe-fpga-images` released. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.  Requires Developer AMI 1.2.4 or awscli upgrade: `pip install --upgrade --user awscli`
@@ -226,9 +233,6 @@ See the release notes at the top of the GitHub directory to identify the version
    *    Option to exclude Chipscope (Virtual JTAG) from building CL examples (DISABLE_VJTAG_DEBUG)
 
 ### Release 1.2.0 Content Overview and New Features Details
-
-The following major features are included in this HDK release: 
-
 #### 1.	New Shell, with modified Shell/CL interface. Changes are covered in: 
 
 * New Shell Stable: 0x04151701: ./hdk/common/shell_v04151701
