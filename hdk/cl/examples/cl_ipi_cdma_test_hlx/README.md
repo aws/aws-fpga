@@ -84,7 +84,7 @@ The simulation settings are already configured.
    * Add signals needed in the simulation
    * Type `run -all` in the TCL console (could take 30 mins to 1 hour based upon machine)
 
-**NOTE**: *If Critical Warnings appear click OK and that the following command needs to ran two times. This is a known issue and will be addressed in later versions of the design.*
+**NOTE**: *If Critical Warnings appear click OK. The previous command "run -all" needs to ran two times. This is a known issue and will be addressed in later versions of the design.*
 
 <a name="impl"></a>
 ### Implementing the Design
