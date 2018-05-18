@@ -14,7 +14,7 @@
     "hw_cmd" : "./kernel_global",
     "containers": [
         {
-            "name": "krnl_kernel_global", 
+            "name": "krnl_kernel_global",
             "ldclflags": "--sp bandwidth_1.m_axi_gmem0:bank0 --sp bandwidth_1.m_axi_gmem1:bank1 --sp bandwidth_1.m_axi_gmem2:bank2",
             "accelerators": [
                 {
@@ -36,6 +36,6 @@
             "date" : "MAY2018",
             "version": "0.9",
             "description": "Test Example"
-        },
+        }
     ]
 }
