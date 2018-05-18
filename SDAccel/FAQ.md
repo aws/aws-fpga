@@ -54,8 +54,8 @@ A:
 ## Q: Bitstream creation fails to create design less that 60 MHz?
 A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, therefore, you will need to debug further using [HLS Debug suggestions](./docs/SDAccel_HLS_Debug.md)
 
-## Q: Using the .xcp file generated from xocc results in an error?
-A: Directly using the .xcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
+## Q: Using the .dcp file generated from xocc results in an error?
+A: Directly using the .dcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
 
 # Additional Resources
  * [AWS SDAccel Readme](README.md)
