@@ -49,7 +49,7 @@ A: There are 2 vivado project files:
 A: 
 1. Verify hw_emu works as expected.  Using less data in hw_emu
 1. Add assert where run fails and check same conditions for hw_emu
-1. See "Chapter 8 - Debugging Applications in the SDAccel Environment" in [2017.4 SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
+1. See "Chapter 4 - Debugging Applications in the SDAccel Environment" in [2017.4 SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
 
 ## Q: Bitstream creation fails to create design less that 60 MHz?
 A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, therefore, you will need to debug further using [HLS Debug suggestions](./docs/SDAccel_HLS_Debug.md)
