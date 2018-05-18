@@ -42,7 +42,7 @@ Figure: SDAccel Design Flow for Amazon F1
 As described in the [AWS SDAccel README], the SDAccel Development Environment enables the integration of accelerator kernels into a design to be programmed on the AWS F1 FPGA instances. In this section we explain the `xocc` command line options to create the design to be programmed onto the AWS F1 FPGA.
 
 **( A )**
-First and foremost, `xocc` requires the information about the platform it is targeting. On AWS, you must always select the target hardware using `--platform  $AWS_PLATFORM`  The alternative forms are `--platform /PATH/TO/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0` or `--platform xilinx:aws-vu9p-f1:4ddr-xpr-2pr:4.0` if the platform is installed on-premise. The on-premise flow allows you to develop your application on a local machine and execute on the the AWS F1 FPGA instances and is explained in the  [SDAccel On Premise Guide][OnPremiseDev].
+First and foremost, `xocc` requires the information about the platform it is targeting. On AWS, you must always select the target hardware using `--platform  $AWS_PLATFORM`. The on-premise flow allows you to develop your application on a local machine and execute on the the AWS F1 FPGA instances and is explained in the  [SDAccel On Premise Guide][OnPremiseDev].
 
 Furthermore, the `--target` option allows software emulation (sw\_emu), hardware emulation (hw\_emu) or hardware FPGA (hw, default) targets to be created.
 - [Software Emulation target](#sw_emu_target): **Verifies the functional behavior of the host code and kernel operation via pure software execution**
@@ -182,11 +182,11 @@ Links pointing to **2017.1** version of the user guides
 [VHLS_landing_page]: https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html
 [Vivado_landing_page]: https://www.xilinx.com/products/design-tools/vivado.html
 
-[latest SDAccel Environment User Guide]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1023-sdaccel-user-guide.pdf
-[latest UG1021]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1021-sdaccel-intro-tutorial.pdf
-[latest SDAccel Environment Optimization Guide]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf
-[latest UG949]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug949-vivado-design-methodology.pdf
-[latest UG902]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug902-vivado-high-level-synthesis.pdf
+[latest SDAccel Environment User Guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf
+[latest UG1021]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf
+[latest SDAccel Environment Optimization Guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf
+[latest UG949]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug949-vivado-design-methodology.pdf
+[latest UG902]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug902-vivado-high-level-synthesis.pdf
 
 [UG1023 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1023-sdaccel-user-guide.pdf
 [UG1021 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1021-sdaccel-intro-tutorial.pdf
