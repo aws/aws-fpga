@@ -49,13 +49,13 @@ A: There are 2 vivado project files:
 A: 
 1. Verify hw_emu works as expected.  Using less data in hw_emu
 1. Add assert where run fails and check same conditions for hw_emu
-1. See "Chapter 8 - Debugging Applications in the SDAccel Environment" in [latest SDAccel Environment User Guide]
+1. See "Chapter 4 - Debugging Applications in the SDAccel Environment" in [latest SDAccel Environment User Guide]
 
 ## Q: Bitstream creation fails to create design less that 60 MHz?
 A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, therefore, you will need to debug further using [HLS Debug suggestions](./docs/SDAccel_HLS_Debug.md)
 
-## Q: Using the .xcp file generated from xocc results in an error?
-A: Directly using the .xcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
+## Q: Using the .dcp file generated from xocc results in an error?
+A: Directly using the .dcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
 
 # Additional Resources
 
