@@ -148,15 +148,39 @@ def get_task_label(Map args=[ : ]) {
     return task_label
 }
 
+def abort_previous_running_builds() {
+    def hi = Hudson.instance
+    def pname = env.JOB_NAME.split('/')[0]
+
+    hi.getItem(pname).getItem(env.JOB_BASE_NAME).getBuilds().each{ build ->
+    def executor = build.getExecutor()
+
+    if (build.number != currentBuild.number && build.number < currentBuild.number && executor != null) {
+        executor.interrupt(
+            Result.ABORTED,
+            new CauseOfInterruption.UserInterruption(
+            "Aborted by #${currentBuild.number}"))
+        println("Aborted previous running build #${build.number}")
+    }
+    else {
+      println("Build is not running or is current build, not aborting - #${build.number}")
+    }
+  }
+}
 
 // Wait for input if we are running on a public repo to avoid malicious PRS
-if (is_public_repo())
-{
+if (is_public_repo()) {
     input "Running on a public repository, do you want to proceed with running the tests?"
 }
-else
-{
+else {
     echo "Running on a private repository"
+}
+
+
+//Abort previous builds on PR when we push new commits
+// env.CHANGE_ID is only available on PR's and not on branch builds
+if (env.CHANGE_ID) {
+    abort_previous_running_builds()
 }
 
 //=============================================================================
