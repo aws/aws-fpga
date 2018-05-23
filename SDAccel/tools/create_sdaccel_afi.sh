@@ -1,4 +1,4 @@
-#!/bin/bash                                                           
+#!/bin/bash 
 
 # Amazon FPGA Hardware Development Kit
 #                                     
@@ -181,9 +181,9 @@ cp ${timestamp}-primary.bit to_aws/${timestamp}_SH_CL_routed.dcp
 #Create Manifest file
 strategy=DEFAULT     
 hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
-shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
+shell_version=0x04261818
 tool_version=v$RELEASE_VER
-device_id=0xF000                                                                                         
+device_id=0xF010                                                                                         
 vendor_id=0x1D0F                                                                                         
 subsystem_id=0x1D51                                                                                      
 subsystem_vendor_id=0xFEDD                                                                               
@@ -206,7 +206,7 @@ fi
 #subsystem_id="0x${id1_version:0:4}";                                                                          
 #subsystem_vendor_id="0x${id1_version:4:4}";                                                                   
 
-if [[ "$board_id" != "aws-vu9p-f1" ]]
+if [[ "$board_id" != "aws-vu9p-f1-04261818" ]]
 then                                 
     err_msg "Platform $board_id used to create xclbin is not correct, you should be using aws-vu9p-f1"
     exit                                                                                              

@@ -33,7 +33,9 @@
 #include "xocl_ioctl.h"
 #include "xocl_xdma.h"
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||	\
+	(defined(RHEL_RELEASE_CODE) && \
+	RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
 static inline void drm_free_large(void *ptr)
 {
 	kvfree(ptr);
@@ -49,7 +51,9 @@ static inline int xocl_drm_mm_insert_node(struct drm_mm *mm,
 					  struct drm_mm_node *node,
 					  u64 size)
 {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||	\
+	(defined(RHEL_RELEASE_CODE) && \
+	RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
 	return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0);
 #else
 	return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0, 0);

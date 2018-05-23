@@ -70,8 +70,7 @@ static const struct pci_device_id pciidlist[] = {
 	{ PCI_DEVICE(0x10ee, 0x6A90), },
 	{ PCI_DEVICE(0x10ee, 0x6E50), },
 	{ PCI_DEVICE(0x10ee, 0x6B10), },
-	//{ PCI_DEVICE(0x1d0f, 0x1042), },
-	{ PCI_DEVICE(0x1d0f, 0xf000), },
+	{ PCI_DEVICE(0x1d0f, 0xf010), }, // shell 1.4
 	{ 0, }
 };
 
@@ -95,7 +94,7 @@ static int probe_feature_rom(struct drm_xocl_dev *xdev)
 	val = ioread32(xdev->user_bar + XOCL_FEATURE_ROM);
 	// Magic number check
 	if (val != 0x786e6c78) {
-      if (xdev->ddev->pdev->vendor == 0x1d0f && (xdev->ddev->pdev->device == 0x1042 || xdev->ddev->pdev->device == 0xf000)) {
+      if (xdev->ddev->pdev->vendor == 0x1d0f && (xdev->ddev->pdev->device == 0x1042 || xdev->ddev->pdev->device == 0xf010)) {
         printk(KERN_INFO "XOCL: Found AWS VU9P Device without featureROM\n");
         //This is AWS device. Fill the FeatureROM struct. Right now it doesn't have FeatureROM
         memset(xdev->header.EntryPointString, 0, sizeof(xdev->header.EntryPointString));
@@ -312,7 +311,9 @@ static int xocl_drm_unload(struct drm_device *drm)
 	return 0;
 }
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||  \
+        (defined(RHEL_RELEASE_CODE) && \
+        RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
 static void xocl_drm_unload2(struct drm_device *drm)
 {
 	xocl_drm_unload(drm);
@@ -420,7 +421,7 @@ int xocl_gem_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	}
 }
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 int xocl_gem_fault2(struct vm_fault *vmf)
 {
 	return xocl_gem_fault(vmf->vma, vmf);
@@ -567,7 +568,7 @@ static const struct file_operations xocl_driver_fops = {
 };
 
 static const struct vm_operations_struct xocl_vm_ops = {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 	.fault = xocl_gem_fault2,
 #else
 	.fault = xocl_gem_fault,
@@ -582,7 +583,9 @@ static struct drm_driver xocl_drm_driver = {
 	.postclose                      = xocl_client_release,
 	.open                           = xocl_client_open,
 	.load				= xocl_drm_load,
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||  \
+        (defined(RHEL_RELEASE_CODE) && \
+        RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
 	.unload                         = xocl_drm_unload2,
 #else
 	.unload				= xocl_drm_unload,
@@ -740,7 +743,7 @@ void xocl_reset_notify(struct pci_dev *pdev, bool prepare)
 }
 EXPORT_SYMBOL_GPL(xocl_reset_notify);
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 static void xocl_reset_prepare(struct pci_dev *pdev)
 {
 	xocl_reset_notify(pdev, true);
@@ -756,7 +759,7 @@ static const struct pci_error_handlers xocl_err_handler = {
 	.error_detected	= xocl_error_detected,
 	.slot_reset	= xocl_slot_reset,
 	.resume		= xocl_error_resume,
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 13, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 	.reset_prepare  = xocl_reset_prepare,
 	.reset_done     = xocl_reset_done,
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
