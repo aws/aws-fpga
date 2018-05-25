@@ -49,9 +49,10 @@ puts "AWS FPGA: Reading AWS Shell design";
 
 #Read AWS Design files
 read_verilog -sv [ list \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv\
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v\
+  $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv \
+  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v \
   $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
   $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh
 ]

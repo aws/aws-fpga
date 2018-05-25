@@ -1,0 +1,10 @@
+<ExampleDesign>
+<Vendor>xilinx.com</Vendor>
+<Library>design</Library>
+<Name>cl_dram_dma</Name>
+<Version>1.0</Version>
+<Design>init.tcl</Design>
+<DisplayName>cl_dram_dma (RTL)</DisplayName>
+<Description>cl_dram_dma (RTL)</Description>
+<Image>cl_dram_dma.png</Image>
+</ExampleDesign>

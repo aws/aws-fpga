@@ -1062,9 +1062,11 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
-
+`ifdef QUESTA_SIM
+      automatic int awready_cnt = 0;
+`else
       int awready_cnt = 0;
-      
+`endif      
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
@@ -1098,9 +1100,13 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Data wr_data;
+`ifdef QUESTA_SIM
+      automatic int wready_cnt = 0;
+      automatic int wready_nonzero_wait = 0;
+`else      
       int wready_cnt = 0;
       int wready_nonzero_wait = 0;
-      
+`endif      
       if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
          wr_data.strb = cl_sh_pcim_wstrb;
@@ -1159,8 +1165,11 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
+`ifdef QUESTA_SIM      
+      automatic int arready_cnt = 0;
+`else
       int arready_cnt = 0;
-      
+`endif
       if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
          cmd.id   = cl_sh_pcim_arid;
@@ -2539,6 +2548,8 @@ module sh_bfm #(
               end
               c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
 
+              if ((c2h_dma_done[chan]) && (cl_sh_rd_data[0].last == 1)) c2h_dma_started[chan] = 0;
+               
               if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
                 byte_cnt[chan] = 0;
                

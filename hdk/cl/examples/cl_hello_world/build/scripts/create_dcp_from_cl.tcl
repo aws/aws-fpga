@@ -198,6 +198,7 @@ source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
 ##################################################
 if {${cl.synth}} {
    source -notrace ./synth_${CL_MODULE}.tcl
+   set synth_dcp ${timestamp}.CL.post_synth.dcp
 }
 
 ##################################################
@@ -215,7 +216,7 @@ if {$implement} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Combining Shell and CL design checkpoints";
       add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
       add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
-      set_property SCOPED_TO_CELLS {CL} [get_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp]
+      set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp]
 
       #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
       read_xdc [ list \
@@ -224,7 +225,7 @@ if {$implement} {
       set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]
 
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running link_design";
-      link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {SH CL}
+      link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {WRAPPER_INST/SH WRAPPER_INST/CL}
 
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - PLATFORM.IMPL==[get_property PLATFORM.IMPL [current_design]]";
       ##################################################

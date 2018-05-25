@@ -288,7 +288,8 @@ if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
     #-------------------4 DDR RTL Kernel Debug--------------------
 else
     #-------------------Dynamic 5.0 Platform----------------------
-    setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v041618_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
+    #setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v041618_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
+    setup_dsa xilinx_aws-vu9p-f1-04261818_dynamic_5_0 dsa_v051818_shell_v04261818 AWS_PLATFORM_DYNAMIC_5_0
     info_msg "AWS Platform: Dynamic 5.0 Platform is up-to-date"
     #-------------------Dynamic 5.0 Platform----------------------
 fi
@@ -331,7 +332,7 @@ if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
     info_msg "To change the platform for 4DDR Debug:  \"export AWS_PLATFORM=\$AWS_PLATFORM_4DDR_DEBUG\" "
 else
     export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.dyn
-    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1_dynamic_5_0 install ; then
+    if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1-04261818_dynamic_5_0 install ; then
         err_msg "Install of SDAccel runtime FAILED"
         return 1
     fi

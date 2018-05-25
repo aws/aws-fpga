@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<board schema_version="2.0" vendor="xilinx.com" name="f1_cl" display_name="AWS F1 Platform" url="www.xilinx.com">
+	<compatible_board_revisions>
+		<revision id="0">1.0</revision>
+		<revision id="0">1.071417d</revision>
+	</compatible_board_revisions>
+	<file_version>1.0</file_version>
+	<description>AWS Board v071417d3</description>
+	<components>
+		<component name="part0" display_name="AWS F1 / IP Integrator FPGA" type="fpga" part_name="xcvu9p-flgb2104-2-i" vendor="xilinx">
+		</component>
+	</components>
+</board>
+

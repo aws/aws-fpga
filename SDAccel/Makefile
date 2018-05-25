@@ -44,7 +44,7 @@ ifeq ($(RELEASE_VER),2017.1)
     MODULE = xdma
     GLIBCPP_PATH = lib/lnx64.o
 else ifeq ($(RELEASE_VER),2017.4)
-  DSA := xilinx_aws-vu9p-f1_dynamic_5_0
+  DSA := $(DSA)
   SRC_DIR = src2
   XRT_HAL_LIB = libxrt-aws.so
   EXE = awssak2

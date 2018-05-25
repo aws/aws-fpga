@@ -181,11 +181,11 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x071417d3 |
+| Shell Version | 0x04261818 |
 | PCI Device ID | 0xF001 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-0233d4b4e175518ba |
-| Pre-generated AGFI ID | agfi-08f98fa67671454fe |
+| Pre-generated AFI ID | afi-0f6832ffcb43fdc24 |
+| Pre-generated AGFI ID | agfi-0367124aff5e7c5f7 |
 
