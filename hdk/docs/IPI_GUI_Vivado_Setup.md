@@ -5,16 +5,16 @@
 1. [Overview](#overview)
 2. [Linux Install](#hlxinst_lin)
 3. [Windows Install](#hlxinst_win)
-4. [Vivado Overview](#vivado) 
+4. [Vivado Overview](#vivado)
 5. [Vivado Flows Overview](#projover)
 6. [Summary](#summary)
 
 
 
 <a name="overview"></a>
-# Overview  
+# Overview
 
-This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator. 
+This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator.
 
 Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
@@ -38,7 +38,7 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 
 source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
 
-Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow. 
+Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow.
 
 <a name="hlxinst_win"></a>
 # Windows Install
@@ -83,7 +83,7 @@ Amazon CLI for Windows can be used for access to S3 to upload .tar and ingestion
 <a name="vivado"></a>
 # Vivado Overview
 
-This section is a basic overview of the Vivado GUI.  The GUI environment enables developers at all experience levels to quickly set project options and strategies to meet their design requirements,  enables interactive reports and design views to help quickly close any issues with timing or area.   
+This section is a basic overview of the Vivado GUI.  The GUI environment enables developers at all experience levels to quickly set project options and strategies to meet their design requirements,  enables interactive reports and design views to help quickly close any issues with timing or area.
 
 IP Integrator is a design entry tool in the Vivado HLx Design Suite.  It lets developers connect IPs at a block level and generates a "what you see is what you get" Register Transfer Language (RTL) file, either in VHDL or Verilog format.  The IP Integrator flow enhances the standard RTL flow and gives the developer access to designer assistance features which include:
 
@@ -106,7 +106,7 @@ For more detailed information and methodology design guidelines refer to the fol
 - <a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug949-vivado-design-methodology.pdf">ug949-vivado-design-methodology.pdf</a>
 
 
-To open the GUI, run command `vivado`.  Once Vivado is loaded, you can create an empty project, by selecting Create New Project and advancing through the menus until you see a blank canvas.  The sections below will describe the tabs/menus and refer to the screenshot below.  Feel free to interact with the tabs and menus using your blank project.    
+To open the GUI, run command `vivado`.  Once Vivado is loaded, you can create an empty project, by selecting Create New Project and advancing through the menus until you see a blank canvas.  The sections below will describe the tabs/menus and refer to the screenshot below.  Feel free to interact with the tabs and menus using your blank project.
 
 ![Diagram](./images/hlx/vivado_gui.jpg)
 
@@ -140,7 +140,7 @@ The Flow Navigator is in the green box and can be used to launch predefined desi
 
 PROJECT MANAGER section allows to Add Sources like RTL/IP/XDC sources, Language Templates for common RTL constructs/XDCs/DEBUG, and IP Catalog to add IPs to the project.  This portion of the flow targets the RTL flow.
 
-When invoking IP Catalog, the developers can search for a particular IP or look through the different categories of IP and it’s the responsibility of the developer to add and connect the IP into the developer's RTL.  
+When invoking IP Catalog, the developers can search for a particular IP or look through the different categories of IP and it’s the responsibility of the developer to add and connect the IP into the developer's RTL.
 
 
 ### IP INTEGRATOR
@@ -151,7 +151,7 @@ Double clicking on any IP in the BD brings up the Re-customize IP Dialog Box whe
 
 ### SIMULATION
 
-This section allows the developer to change simulation settings by right clicking on SIMULATION and invoking simulations by clicking Run Simulation->Run Behavioral Simulation. 
+This section allows the developer to change simulation settings by right clicking on SIMULATION and invoking simulations by clicking Run Simulation->Run Behavioral Simulation.
 
 ### RTL ANALYSIS
 
@@ -183,7 +183,7 @@ flows from a top level. For more details about each flow take a look at [IPI_GUI
 
 ## IP + RTL flow
 
-Developers can add in IPs, existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files as source files. 
+Developers can add in IPs, existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files as source files.
 
 For using IPs, at this time global mode is only supported and Out of context (OOC) is not supported at this time.
 
@@ -192,10 +192,10 @@ For using IPs, at this time global mode is only supported and Out of context (OO
 Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtl-project-with-example-design)
 for more details about RTL flow using example RTL design.
 #### Eg:
-An example can be found at [IPI_RTL_example_flow](../../hdk/docs/IPI_GUI_Examples.md#adding-example-rtl-tutorial-cl_hello_world).
+An example can be found at [IPI_RTL_example_flow](../../hdk/docs/IPI_GUI_Examples.md#rtlexistut_world).
 
 
-Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtl-project---new-rtl-design)
+Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtlnew)
 for more details about RTL flow using RTL design from scratch.
 #### Eg:
 An example can be found at [IPI_RTL_scratch_flow](./IPI_GUI_Examples.md#rtlscrtut)
@@ -209,11 +209,11 @@ Developers can add in Vivado IP into the block diagram to create/stitch a full d
 
 Refer to the section [IPI_GUI_flow](./IPI_GUI_Flows.md#ipiprojex) for more details about IPI GUI flow.
 #### Eg:
-An example can be found at [IPI_Integrator_flow](../../hdk/docs/IPI_GUI_Examples.md#cl-examples-using-ip-integrator).
+An example can be found at [IPI_Integrator_flow](../../hdk/docs/IPI_GUI_Examples.md#rtlex).
 
 ## IP Integrator for HLS IP
 
-HLS is a C programming method in order to create RTL/IP for the FPGA Developers. Developpers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository. In this flow only IPs are used to create examples.
+HLS is a C programming method in order to create RTL/IP for the FPGA Developers. Developers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository. In this flow only IPs are used to create examples.
 
 ![Diagram](./images/hlx/ipi_hls.jpg)
 
@@ -260,7 +260,7 @@ Refer to [IPI Tutorials and Examples](./IPI_GUI_Examples.md) to get started.
 
 
 <a name="summary"></a>
-# Summary  
+# Summary
 
 Now that you are familar with building an [customer examples](../cl/examples/README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
 
