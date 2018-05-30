@@ -57,6 +57,13 @@ A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, the
 ## Q: Using the .dcp file generated from xocc results in an error?
 A: Directly using the .dcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
 
+## Q: Debugging using gdb in SDX gui is not working? 
+A: Please make sure you executed the following commands before launching SDX gui.
+  1.	mv /usr/local/Modules/init init.bak
+  2.	unset –f switchml
+  3.	unset –f _moduleraw
+  4.	unset –f module
+  
 # Additional Resources
 
 The [AWS SDAccel README].
