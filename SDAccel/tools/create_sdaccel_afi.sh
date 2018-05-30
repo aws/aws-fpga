@@ -206,7 +206,7 @@ fi
 #subsystem_id="0x${id1_version:0:4}";                                                                          
 #subsystem_vendor_id="0x${id1_version:4:4}";                                                                   
 
-if [[ "$board_id" != "aws-vu9p-f1-04261818" ]]
+if [[ "$board_id" != "aws-vu9p-f1" ]]
 then                                 
     err_msg "Platform $board_id used to create xclbin is not correct, you should be using aws-vu9p-f1"
     exit                                                                                              

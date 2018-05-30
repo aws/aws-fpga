@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdx:platform sdx:vendor="xilinx"
-              sdx:library="aws-vu9p-f1"
+              sdx:library="aws-vu9p-f1-04261818"
               sdx:name="dynamic"
               sdx:version="5.0"
               sdx:schemaVersion="1.0"
