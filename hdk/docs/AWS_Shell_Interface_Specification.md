@@ -11,6 +11,8 @@
 2017/07/29   -   Updates for Jul/2017 Shell
   
 2017/11/16   -   Updates for v1.3.4
+
+2018/05/10   -   Updates for 1.4
     
 # Table of Contents:
 
@@ -273,9 +275,11 @@ The clocks within each group are generated from a common VCO/PLL, which restrict
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
-Clocks within a gruop are phase aligned.
+Clocks within a group are phase aligned.  
 
-** *Note: The Developer must NOT assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies * **  
+**NOTE**: Even though clocks within a group are phase aligned, treating them asynchronous generally allows for higher individual frequencies and easier timing closure.
+
+**NOTE**: The Developer must **NOT** assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies.  
 
 
 ### Defining Clock frequencies by Developer
@@ -298,11 +302,13 @@ Each DRAM interface is accessed via an AXI-4 interface:
 
 -   AXI-4 (CL Master and DRAM controller is slave) – 512-bit AXI-4 interface to read/write DDR.
 
-There is a single status signal that the DRAM interface is trained and ready for access. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
+There is a single status signal that the DRAM interface is trained and ready for access.  DDR access should be gated when the DRAM interface is not ready. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
 
 The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  ECC error status can be read using AWS Management Software APIs.
 
-Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. **WARNING** If the stats interfaces are not connected, the DDR controllers will not function. However, the CL developer should not otherwise use them since they are specific to Shell management functions.
+Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. 
+
+**WARNING:** If the stats interfaces are not connected, the DDR controllers will not function. However, the CL developer should not otherwise use them since they are specific to Shell management functions.
 If the DDR controllers are not used by the CL, then the interfaces should be left unconnected.
 
 **NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
@@ -311,8 +317,8 @@ If the DDR controllers are not used by the CL, then the interfaces should be lef
 ## DMA_PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) 
 
 This AXI-4 bus is used for:
-* PCIe transactions mastered by the instance and targeting AppPF BAR4
-* DMA transactions (if enabled) 
+* PCIe transactions mastered by the instance and targeting AppPF BAR4 (PCIS)
+* DMA transactions (if enabled) (XDMA) 
 
 It is a 512-bit wide AXI-4 interface. 
 
@@ -325,23 +331,35 @@ The AXI ID can be used to determine the source of the transaction:
 - 0x02 : XDMA Channel 2
 - 0x03 : XDMA Channel 3
 
+The XDMA interface has backpressure signals to stop read/write transactions.  There is an independent signal per transaction type:
+
+- cl_sh_dma_wr_full : Stop additional write transaction requests from the XDMA
+- cl_sh_dma_rd_full : Stop additional read transaction requests from the XDMA
+
+When asserted, the XDMA will stop sending further requests for the transaction type (AW or AR channel).  Note some number of requests may be asserted after the assertion of backpressure due to FIFO'ing and register slices.  This backpressure may be used to throttle XDMA requests if the XDMA requests may delay servicing PCIS requests such that the PCIS request responses would exceed the interface timeout time.
+
 <a name="pcis_timeout_details"></a>
 ### DMA_PCIS Interface Timeout Details
 
 ![alt tag](./images/dma_pcis_timeout.jpg)
 
-Transacitons on the DMA_PCIS interface must complete in 8us or the SH will timeout the transactions.  Each "issued" transaction has an independent timeout counter of 8us.  For example if 4 transactions are issued "simultaneously" (i.e. back-to-back cycles), then all 4 must completed within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The SH supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.  
+The DMA_PCIS interface multiplexes the XDMA requests and PCIS requests.  Each type of request has a different timeout time:
 
-Once a transaction is issued, it must fully completed within 8us (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads. 
+- XDMA (DMA transactions) : 5 seconds
+- PCIS (PCIe transactions mastered from the instance) : 8 us
 
-If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  After the moderation time, the CL may be accessed with the normal timeout value of 8us.
+Transactions on the DMA_PCIS interface must complete before the associated timeout time or the SH will timeout the transactions and complete the transactions on behalf of the CL (BVALID/RVALID).  Each "issued" transaction has an independent timeout counter.  For example if 4 transactions are issued from the PCIS interface "simultaneously" (i.e. back-to-back cycles), then all 4 must complete within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The SH supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.  
+
+Once a transaction is issued, it must fully completed within the timeout time (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads. 
+
+If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  After the moderation time, the CL may be accessed with the normal timeout value.
 
 <a name="pcim_interface"></a>
 ## PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)
 
 This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory.
 
-__** NOTE: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual address.** __
+**WARNING**: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual addresses.
 
 The following PCIe interface configuration parameters are provided from the Shell to the CL as informational:
 
@@ -354,7 +372,7 @@ The following PCIe interface configuration parameters are provided from the Shel
 | 0b10      | 512 Bytes |  
 | 0b11      | Reserved |  
 
--   sh_cl_cfg_max_read_req[2:0]i - PCIe maximum read request size:
+-   sh_cl_cfg_max_read_req[2:0] - PCIe maximum read request size:
 
 | Value     | Max Read Request Size |
 |:----------|:----------|
@@ -401,8 +419,7 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
       2. Once RVALID is asserted, RREADY must be asserted, and all data transferred within 8us
       3. Once BVALID is asserted, BREADY must be asserted within 8us
 
-__** NOTE: If a timeout occurs, the PCIM bus will no longer be functional.  This can be cleared by clearing the AFI.  Refer to [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) ** __
-
+**NOTE:** If a timeout occurs, the PCIM bus will no longer be functional.  This can be cleared by clearing/re-loading the AFI.  Refer to [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) 
 
 <a name="axi_lite_interfaces_for_register_access"></a>
 ## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)

@@ -27,11 +27,11 @@
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Release 1.4.0 (See [ERRATA](./ERRATA.md) for unsupported features)
-* [New Shell Stable: v04261818](./hdk/common/shell_stable).  Developer Kit v1.4.0 and greater only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit.  The previous shell (v071417d3) will be supported until XX/YY/ZZZZ.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga) for all shell version v071417d3 development.  TODO:  Change link to v1.3.X branch
+* [New Shell Stable: v04261818](./hdk/common/shell_stable).  
+    * [Shell Release Notes](./hdk/docs/AWS_Shell_RELEASE_NOTES.md)
+* Developer Kit v1.4.0 and greater only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit.  The previous shell (v071417d3) will be supported until XX/YY/ZZZZ.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga) for all shell version v071417d3 development.  TODO:  Change link to v1.3.X branch
 * TODO:  Add High Level statement about performance improvements due to moving to XDMA driver
 * TODO:  DMA Timeout
-* TODO:  AXI Ordering bug fix
-* TODO:  CL Interface changes?
 
 ## Supported Tools and Environment
 

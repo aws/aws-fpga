@@ -224,7 +224,7 @@
    output [63:0] cl_sh_ddr_awaddr,
    output [7:0] cl_sh_ddr_awlen,
    output [2:0] cl_sh_ddr_awsize,
-   output [1:0] cl_sh_ddr_awburst,              //Burst mode, only INCR/WRAP are supported
+   output [1:0] cl_sh_ddr_awburst,              //Burst mode, only INCR is supported, must be tied to 2'b01
    output  cl_sh_ddr_awvalid,
    input sh_cl_ddr_awready,
       
@@ -244,7 +244,7 @@
    output [63:0] cl_sh_ddr_araddr,
    output [7:0] cl_sh_ddr_arlen,
    output [2:0] cl_sh_ddr_arsize,
-   output [1:0] cl_sh_ddr_arburst,              //Burst mode, only INCR/WRAP are supported
+   output [1:0] cl_sh_ddr_arburst,              //Burst mode, only INCR is supported, must be tied to 2'b01
    output  cl_sh_ddr_arvalid,
    input sh_cl_ddr_arready,
       
