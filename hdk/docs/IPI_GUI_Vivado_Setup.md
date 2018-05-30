@@ -178,28 +178,48 @@ The blue box is where the Design Runs are located with similar functionality as 
 # Vivado Flows Overview
 
 The Vivado HLx environment supports IP Integrator, RTL, HLS flows in Vivado and this section will discuss these
-flows from a top level. 
+flows from a top level. For more details about each flow take a look at [IPI_GUI_Flows](./IPI_GUI_Flows.md)
 
 
-## RTL
+## IP + RTL flow
 
-Developers can add in existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files.
+Developers can add in IPs, existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files as source files. 
 
 For using IPs, at this time global mode is only supported and Out of context (OOC) is not supported at this time.
 
 ![Diagram](./images/hlx/rtl_dram_dma_sources.jpg)
 
-## IP Integrator
+Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtl-project-with-example-design)
+for more details about RTL flow using example RTL design.
+#### Eg:
+An example can be found at [IPI_RTL_example_flow](../../hdk/docs/IPI_GUI_Examples.md#adding-example-rtl-tutorial-cl_hello_world).
 
-Developers can add in Vivado IP into the block diagram to create/stitch a full design easily. RTL module referencing flow using developer RTL can be used to add custom IP to the block diagram.
+
+Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtl-project---new-rtl-design)
+for more details about RTL flow using RTL design from scratch.
+#### Eg:
+An example can be found at [IPI_RTL_scratch_flow](./IPI_GUI_Examples.md#rtlscrtut)
+
+
+## IP Integration flow
+
+Developers can add in Vivado IP into the block diagram to create/stitch a full design easily. RTL module referencing flow using developer RTL can be used to add custom IP to the block diagram. Both RTL and IP can be added as IP in this flow.
 
 ![Diagram](./images/hlx/ipi_mod_ref.jpg)
 
-## HLS
+Refer to the section [IPI_GUI_flow](./IPI_GUI_Flows.md#ipiprojex) for more details about IPI GUI flow.
+#### Eg:
+An example can be found at [IPI_Integrator_flow](../../hdk/docs/IPI_GUI_Examples.md#cl-examples-using-ip-integrator).
 
-Developers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository.
+## IP Integrator for HLS IP
+
+HLS is a C programming method in order to create RTL/IP for the FPGA Developers. Developpers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository. In this flow only IPs are used to create examples.
 
 ![Diagram](./images/hlx/ipi_hls.jpg)
+
+Eg:
+
+A link to the example will be added here in the future when we have HLS C example ready.
 
 ## General Environment
 
