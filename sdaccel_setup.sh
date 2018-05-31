@@ -289,7 +289,7 @@ if [[ ${RELEASE_VER} =~ .*2017\.1.* ]]; then
 else
     #-------------------Dynamic 5.0 Platform----------------------
     #setup_dsa xilinx_aws-vu9p-f1_dynamic_5_0 dsa_v041618_shell_v071417d3 AWS_PLATFORM_DYNAMIC_5_0
-    setup_dsa xilinx_aws-vu9p-f1-04261818_dynamic_5_0 dsa_v052518_shell_v04261818 AWS_PLATFORM_DYNAMIC_5_0
+    setup_dsa xilinx_aws-vu9p-f1-04261818_dynamic_5_0 dsa_v053018_shell_v04261818 AWS_PLATFORM_DYNAMIC_5_0
     info_msg "AWS Platform: Dynamic 5.0 Platform is up-to-date"
     #-------------------Dynamic 5.0 Platform----------------------
 fi
