@@ -1,4 +1,4 @@
-set bridge [get_debug_cores -filter {NAME=~CL/dbg_hub_1}]
+set bridge [get_debug_cores -filter {NAME=~WRAPPER_INST/CL/dbg_hub_1}]
 current_instance $bridge/inst/BSCANID.u_xsdbm_id/CORE_XSDB.UUT_MASTER/U_ICON_INTERFACE/U_CMD6_RD/U_RD_FIFO/SUBCORE_FIFO.xsdbm_v3_0_0_rdfifo_inst
 
 set wr_clock          [get_clocks -of_objects [get_ports -scoped_to_current_instance clk]]

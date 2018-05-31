@@ -32,20 +32,20 @@ if {[info exist FAAS_CL_DIR] eq 0} {
 }
 
 
-set dbg_bridge [get_debug_cores -filter {NAME=~CL/*CL_DEBUG_BRIDGE* || NAME=~CL/dbg_hub_1}]
+set dbg_bridge [get_debug_cores -filter {NAME=~WRAPPER_INST/CL/*CL_DEBUG_BRIDGE* || NAME=~WRAPPER_INST/CL/dbg_hub_1}]
 if {[llength $dbg_bridge]} {
    puts "AWS FPGA: Found debug_bridge instance $dbg_bridge in CL. Processing debug constraints"
-   if { [get_cells $dbg_bridge] == "CL/CL_DEBUG_BRIDGE/inst/xsdbm"} {
+   if { [get_cells $dbg_bridge] == "WRAPPER_INST/CL/CL_DEBUG_BRIDGE/inst/xsdbm"} {
       read_xdc  $HDK_SHELL_DIR/build/constraints/cl_debug_bridge.xdc
    }
-   if { [get_cells $dbg_bridge] == "CL/dbg_hub_1"} {
+   if { [get_cells $dbg_bridge] == "WRAPPER_INST/CL/dbg_hub_1"} {
       read_xdc  $FAAS_CL_DIR/build/constraints/cl_debug_bridge_hlx.xdc
    }   
    if {[llength [get_cells -quiet $dbg_bridge/inst]]} {
       read_xdc -cell $dbg_bridge/inst  $HDK_SHELL_DIR/build/constraints/xsdbm_timing_exception.xdc
    }
    
-   set dbg_cores [get_debug_cores -filter {NAME=~CL/*}]
+   set dbg_cores [get_debug_cores -filter {NAME=~WRAPPER_INST/CL/*}]
    if {[llength $dbg_cores] > 1} {
       set dbg_hub_cells [list \
          *runtest_i_reg \
@@ -69,7 +69,7 @@ if {[llength $dbg_bridge]} {
       ]
    }
    foreach cell $dbg_hub_cells {
-      set dbg_reg [get_cells -quiet -hier -filter NAME=~CL/*xsdbm*/$cell]
+      set dbg_reg [get_cells -quiet -hier -filter NAME=~WRAPPER_INST/CL/*xsdbm*/$cell]
       if [llength $dbg_reg] {
          foreach reg $dbg_reg {
             puts "Setting false path to dbg register $reg"

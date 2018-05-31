@@ -177,6 +177,7 @@
         .S_SH_cl_sh_ddr_awaddr       (cl_sh_ddr_awaddr        ),
         .S_SH_cl_sh_ddr_awlen        (cl_sh_ddr_awlen         ),
         .S_SH_cl_sh_ddr_awsize       (cl_sh_ddr_awsize        ),
+        .S_SH_cl_sh_ddr_awburst      (cl_sh_ddr_awburst       ),
         .S_SH_cl_sh_ddr_awvalid      (cl_sh_ddr_awvalid       ),
         .S_SH_sh_cl_ddr_awready      (sh_cl_ddr_awready       ),
         .S_SH_cl_sh_ddr_wid          (cl_sh_ddr_wid           ),
@@ -193,6 +194,7 @@
         .S_SH_cl_sh_ddr_araddr       (cl_sh_ddr_araddr        ),
         .S_SH_cl_sh_ddr_arlen        (cl_sh_ddr_arlen         ),
         .S_SH_cl_sh_ddr_arsize       (cl_sh_ddr_arsize        ),
+        .S_SH_cl_sh_ddr_arburst      (cl_sh_ddr_arburst       ),
         .S_SH_cl_sh_ddr_arvalid      (cl_sh_ddr_arvalid       ),
         .S_SH_sh_cl_ddr_arready      (sh_cl_ddr_arready       ),
         .S_SH_sh_cl_ddr_rid          (sh_cl_ddr_rid           ),
@@ -283,5 +285,7 @@
         .S_SH_bar1_sh_rresp          (bar1_sh_rresp           ),
         .S_SH_sh_bar1_rready         (sh_bar1_rready          ),
         .S_SH_sh_cl_glcount0         (sh_cl_glcount0          ),
-        .S_SH_sh_cl_glcount1         (sh_cl_glcount1          )
+        .S_SH_sh_cl_glcount1         (sh_cl_glcount1          ),
+        .S_SH_cl_sh_dma_wr_full      (cl_sh_dma_wr_full       ),
+        .S_SH_cl_sh_dma_rd_full      (cl_sh_dma_rd_full       )
 

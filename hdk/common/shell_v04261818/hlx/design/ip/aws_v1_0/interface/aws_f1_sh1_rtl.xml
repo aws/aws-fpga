@@ -1987,6 +1987,30 @@
       </spirit:wire>
     </spirit:port>
     <spirit:port>
+      <spirit:logicalName>cl_sh_dma_wr_full</spirit:logicalName>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:width>1</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>cl_sh_dma_rd_full</spirit:logicalName>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:width>1</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
       <spirit:logicalName>cl_sh_status0</spirit:logicalName>
       <spirit:wire>
         <spirit:onMaster>
@@ -2419,6 +2443,18 @@
       </spirit:wire>
     </spirit:port>
     <spirit:port>
+      <spirit:logicalName>cl_sh_ddr_awburst</spirit:logicalName>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:width>2</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
       <spirit:logicalName>cl_sh_ddr_wid</spirit:logicalName>
       <spirit:wire>
         <spirit:onMaster>
@@ -2499,6 +2535,18 @@
         </spirit:onMaster>
         <spirit:onSlave>
           <spirit:width>3</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>cl_sh_ddr_arburst</spirit:logicalName>
+      <spirit:wire>
+        <spirit:onMaster>
+          <spirit:width>2</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:width>2</spirit:width>
         </spirit:onSlave>
       </spirit:wire>
     </spirit:port>

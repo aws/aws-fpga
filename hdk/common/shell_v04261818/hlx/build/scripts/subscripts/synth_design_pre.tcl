@@ -166,79 +166,79 @@ if { [file exists ${const_dir}/aws_gen_clk_constraints.tcl] } {
 set clocks_file [open "${const_dir}/aws_gen_clk_constraints.tcl" w]
 # Set Clock Group properties based on specified recipe
 # Clock Group A
-puts $clocks_file "set_property CLKFBOUT_MULT_F   6 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F   6 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 if {[string compare $clock_recipe_a "1"] == 0} {
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F   6 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    12 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT2_DIVIDE     4 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT3_DIVIDE     3 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F   6 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    12 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT2_DIVIDE     4 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT3_DIVIDE     3 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_a "2"] == 0} {
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  96 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    96 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT2_DIVIDE    12 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT3_DIVIDE    24 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  96 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    96 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT2_DIVIDE    12 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT3_DIVIDE    24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } else { #A0
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  12 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    24 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT2_DIVIDE     8 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT3_DIVIDE     6 \[get_cells SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  12 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT2_DIVIDE     8 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT3_DIVIDE     6 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_sys_clk/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 }                              
 
 # Clock Group B
 if {[string compare $clock_recipe_b "1"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F 10 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   20 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F 10 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   20 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_b "2"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  18 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  2 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    4 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  18 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  2 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    4 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_b "3"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   20 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   20 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_b "4"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   16 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   16 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_b "5"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  3 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   12 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  3 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   12 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } else { #B0
-puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   10 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F   5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     1 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   10 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk0/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 }
 
 # Clock Group C
 if {[string compare $clock_recipe_c "1"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  8 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    6 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  8 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    6 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_c "2"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F 16 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE   12 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F 16 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE   12 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } elseif {[string compare $clock_recipe_c "3"] == 0} {
-puts $clocks_file "set_property CLKFBOUT_MULT_F  16 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    3 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  16 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    3 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 } else { #C0
-puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
-puts $clocks_file "set_property CLKOUT1_DIVIDE    3 \[get_cells SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
+puts $clocks_file "set_property CLKFBOUT_MULT_F  24 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property DIVCLK_DIVIDE     5 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT0_DIVIDE_F  4 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]"
+puts $clocks_file "set_property CLKOUT1_DIVIDE    3 \[get_cells WRAPPER_INST/SH/kernel_clks_i/clkwiz_kernel_clk1/inst/CLK_CORE_DRP_I/clk_inst/mmcme3_adv_inst\]\n"
 }
 
 close $clocks_file

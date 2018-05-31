@@ -64,10 +64,10 @@ if {$_this_flow_option eq 1} {
 	#RTL Flow or IPI Flow
 	if {$AWS_RTL_XDC_EXISTS != "" || $BD_MODE  == "None" } {
 	add_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp
-	set_property SCOPED_TO_CELLS {CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp]
+	set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp]
 	} else {
 	add_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth.dcp
-	set_property SCOPED_TO_CELLS {CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth.dcp]
+	set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth.dcp]
 	}
 	
 	read_xdc $::env(HDK_SHELL_DIR)/build/constraints/cl_ddr.xdc
@@ -77,7 +77,7 @@ if {$_this_flow_option eq 1} {
 	set_property PROCESSING_ORDER LATE [get_files $PNR_USR_LOC]
 	set_property USED_IN {implementation} [get_files $PNR_USR_LOC]	
 
-	link_design -top $top -part [get_parts -of_objects [current_project]] -reconfig_partitions {SH CL}
+	link_design -top $top -part [get_parts -of_objects [current_project]] -reconfig_partitions {WRAPPER_INST/SH WRAPPER_INST/CL}
 	source ${FAAS_CL_DIR}/build/constraints/aws_gen_clk_constraints.tcl
 
 	switch  $::env(URAM_CASCADE) {

@@ -6,6 +6,15 @@
  * Version 1.0 (Rev. 1)
  * Changed frequency of clk_extra_c0 from 300 to 500 MHz when recipe C0 is selected.
  * Added MODE parameter to support usage with memory subsystem in SDx.
+ * Revision change in one or more subcores
+
+2017.3:
+ * Version 1.0
+ * No changes
+
+2017.2:
+ * Version 1.0
+ * No changes
 
 2017.1:
  * Version 1.0
