@@ -464,6 +464,7 @@ logic[15:0] cl_sh_ddr_awid_2d[2:0];
 logic[63:0] cl_sh_ddr_awaddr_2d[2:0];
 logic[7:0] cl_sh_ddr_awlen_2d[2:0];
 logic[2:0] cl_sh_ddr_awsize_2d[2:0];
+logic[1:0] cl_sh_ddr_awburst_2d[2:0];
 logic cl_sh_ddr_awvalid_2d [2:0];
 logic[2:0] sh_cl_ddr_awready_2d;
 
@@ -483,6 +484,7 @@ logic[15:0] cl_sh_ddr_arid_2d[2:0];
 logic[63:0] cl_sh_ddr_araddr_2d[2:0];
 logic[7:0] cl_sh_ddr_arlen_2d[2:0];
 logic[2:0] cl_sh_ddr_arsize_2d[2:0];
+logic[1:0] cl_sh_ddr_arburst_2d[2:0];
 logic[2:0] cl_sh_ddr_arvalid_2d;
 logic[2:0] sh_cl_ddr_arready_2d;
 
@@ -498,6 +500,7 @@ assign cl_sh_ddr_awaddr_2d = '{lcl_cl_sh_ddrd.awaddr, lcl_cl_sh_ddrb.awaddr, lcl
 assign cl_sh_ddr_awlen_2d = '{lcl_cl_sh_ddrd.awlen, lcl_cl_sh_ddrb.awlen, lcl_cl_sh_ddra.awlen};
 assign cl_sh_ddr_awsize_2d = '{lcl_cl_sh_ddrd.awsize, lcl_cl_sh_ddrb.awsize, lcl_cl_sh_ddra.awsize};
 assign cl_sh_ddr_awvalid_2d = '{lcl_cl_sh_ddrd.awvalid, lcl_cl_sh_ddrb.awvalid, lcl_cl_sh_ddra.awvalid};
+assign cl_sh_ddr_awburst_2d = {2'b01, 2'b01, 2'b01};
 assign {lcl_cl_sh_ddrd.awready, lcl_cl_sh_ddrb.awready, lcl_cl_sh_ddra.awready} = sh_cl_ddr_awready_2d;
 
 assign cl_sh_ddr_wid_2d = '{lcl_cl_sh_ddrd.wid, lcl_cl_sh_ddrb.wid, lcl_cl_sh_ddra.wid};
@@ -517,6 +520,7 @@ assign cl_sh_ddr_araddr_2d = '{lcl_cl_sh_ddrd.araddr, lcl_cl_sh_ddrb.araddr, lcl
 assign cl_sh_ddr_arlen_2d = '{lcl_cl_sh_ddrd.arlen, lcl_cl_sh_ddrb.arlen, lcl_cl_sh_ddra.arlen};
 assign cl_sh_ddr_arsize_2d = '{lcl_cl_sh_ddrd.arsize, lcl_cl_sh_ddrb.arsize, lcl_cl_sh_ddra.arsize};
 assign cl_sh_ddr_arvalid_2d = {lcl_cl_sh_ddrd.arvalid, lcl_cl_sh_ddrb.arvalid, lcl_cl_sh_ddra.arvalid};
+assign cl_sh_ddr_arburst_2d = {2'b01, 2'b01, 2'b01};
 assign {lcl_cl_sh_ddrd.arready, lcl_cl_sh_ddrb.arready, lcl_cl_sh_ddra.arready} = sh_cl_ddr_arready_2d;
 
 assign {lcl_cl_sh_ddrd.rid, lcl_cl_sh_ddrb.rid, lcl_cl_sh_ddra.rid} = {sh_cl_ddr_rid_2d[2], sh_cl_ddr_rid_2d[1], sh_cl_ddr_rid_2d[0]};
@@ -604,6 +608,7 @@ sh_ddr #(
    .cl_sh_ddr_awlen(cl_sh_ddr_awlen_2d),
    .cl_sh_ddr_awsize(cl_sh_ddr_awsize_2d),
    .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid_2d),
+   .cl_sh_ddr_awburst(cl_sh_ddr_awburst_2d),
    .sh_cl_ddr_awready(sh_cl_ddr_awready_2d),
 
    .cl_sh_ddr_wid(cl_sh_ddr_wid_2d),
@@ -623,6 +628,7 @@ sh_ddr #(
    .cl_sh_ddr_arlen(cl_sh_ddr_arlen_2d),
    .cl_sh_ddr_arsize(cl_sh_ddr_arsize_2d),
    .cl_sh_ddr_arvalid(cl_sh_ddr_arvalid_2d),
+   .cl_sh_ddr_arburst(cl_sh_ddr_arburst_2d),
    .sh_cl_ddr_arready(sh_cl_ddr_arready_2d),
 
    .sh_cl_ddr_rid(sh_cl_ddr_rid_2d),
