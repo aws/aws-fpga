@@ -69,16 +69,14 @@ class TestXdma(AwsFpgaTestBase):
         return
 
     def setup_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
         for slot in range(AwsFpgaTestBase.num_slots):
             self.fpga_load_local_image(self.cl_dram_dma_agfi, slot)
             assert AwsFpgaTestBase.check_fpga_afi_loaded(self.cl_dram_dma_agfi, slot), "{} not loaded in slot {}".format(self.cl_dram_dma_agfi, slot)
 
     def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
         for slot in range(AwsFpgaTestBase.num_slots):
             AwsFpgaTestBase.fpga_clear_local_image(slot)

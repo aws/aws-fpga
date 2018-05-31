@@ -61,8 +61,8 @@ void fpga_read_cl_to_buffer(int slot_id, int channel, int fd, size_t buffer_size
 
 int dma_example_hwsw_cosim(int slot_id);
 
-int dma_memcmp (size_t buffer_size);
+int dma_memcmp(size_t buffer_size);
 
-int open_dma_queue(int slot_id);
+int open_dma_queue(int slot_id, int *write_fd, int *read_fd);
 
 #endif
