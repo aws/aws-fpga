@@ -270,14 +270,18 @@ if (test_hdk_scripts) {
 if (test_fpga_tools) {
     secondary_tests['Test FPGA Tools 1 Slot'] = {
         stage('Test FPGA Tools 1 Slot') {
-            String report_file = 'test_fpga_tools.xml'
+            String report_file_tools = 'test_fpga_tools.xml'
+            String report_file_sdk = 'test_fpga_sdk.xml'
+            String report_file_combined = 'test_fpga_*.xml'
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
                 checkout scm
                 try {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
+                        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
+                        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
                     """
                 }
                 catch (exception) {
@@ -286,11 +290,11 @@ if (test_fpga_tools) {
                     throw exception
                 }
                 finally {
-                    if (fileExists(report_file)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file_tools)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file_combined
                     }
                     else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
                     }
                 }
             }
@@ -298,14 +302,18 @@ if (test_fpga_tools) {
     }
     secondary_tests['Test FPGA Tools All Slots'] = {
         stage('Test FPGA Tools All Slots') {
-            String report_file = 'test_fpga_tools_all_slots.xml'
+            String report_file_tools = 'test_fpga_tools_all_slots.xml'
+            String report_file_sdk = 'test_fpga_sdk_all_slots.xml'
+            String report_file_combined = 'test_fpga_*_all_slots.xml'
             node(get_task_label(task: 'runtime_all_slots', xilinx_version: default_xilinx_version)) {
                 checkout scm
                 try {
                     sh """
                         set -e
                         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file}
+                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
+                        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
+                        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
                     """
                 }
                 catch (exception) {
@@ -314,11 +322,11 @@ if (test_fpga_tools) {
                     throw exception
                 }
                 finally {
-                    if (fileExists(report_file)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file
+                    if (fileExists(report_file_tools)) {
+                        junit healthScaleFactor: 10.0, testResults: report_file_combined
                     }
                     else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
                     }
                 }
             }
