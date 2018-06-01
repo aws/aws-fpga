@@ -93,7 +93,7 @@ Options:
        * Run the build in the foreground such that all output will go to the terminal and the build may be terminated if the terminal is closed. This option is useful if you want to wait for the build to complete. This option is safe if the terminal is running on the AWS instance, for example on a GUI desktop on the instance.
 
 * -notify
-       * Send e-mail to notify user once the build is complete.  Requires setup described in `$HDK_DIR/cl/examples/README.md`.
+       * Send e-mail to notify user once the build is complete.  Requires setup described in `$HDK_DIR/README.md`.
 
 Strategy descriptions:
 
@@ -138,7 +138,7 @@ You need to prepare the following information:
 **NOTE**: *The PCI IDs for the example CLs should be found in the README files in the respective CL example directory.
 If you are building a custom CL, then you need to incorporate these values in your design as shown in the [AWS Shell Interface Specifications](./../../../../docs/AWS_Shell_Interface_Specification.md#misc).*
 
-[Refer to step 3 for instructions on how to submit the Design Checkpoint to AWS](./../../../../cl/examples/README.md)
+[Refer to step 3 for instructions on how to submit the Design Checkpoint to AWS](./../../../../README.md)
 
 <a name="buildstratgies"></a>
 ## Build Strategies and Parallel Builds 

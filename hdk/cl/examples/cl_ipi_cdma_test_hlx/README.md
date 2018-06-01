@@ -105,7 +105,7 @@ The completed .tar file is located in:
 ```
 $CL_DIR/build/scripts/example_projects/cl_ipi_cdma_test.runs/faas_1/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar  
 ```
-For information on how to create AFI from this tar file, follow the [steps outlined here](../README.md#3-submit-the-design-checkpoint-to-aws-to-create-the-afi).
+For information on how to create AFI from this tar file, follow the [steps outlined here](../../../README.md#step3).
 
 <a name="swf1"></a>
 ### CL Example Software and executing on F1

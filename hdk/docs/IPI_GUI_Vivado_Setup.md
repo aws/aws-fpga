@@ -14,7 +14,7 @@
 <a name="overview"></a>
 # Overview
 
-This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator.
+This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../README.md) prior to using the Vivado GUI or IP Integrator.
 
 Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
@@ -262,7 +262,7 @@ Refer to [IPI Tutorials and Examples](./IPI_GUI_Examples.md) to get started.
 <a name="summary"></a>
 # Summary
 
-Now that you are familar with building an [customer examples](../cl/examples/README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
+Now that you are familar with building an [customer examples](../README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
 
 
 
