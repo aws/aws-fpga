@@ -2,7 +2,7 @@
 
 # Introduction
 
-Developers' ten to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, and Synopsys' VCS RTL simulators. Developers can write their tests in SystemVerilog and/or C languages. If a developer choose to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
+Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence and Synopsys' VCS RTL simulators. Developers can write their tests in SystemVerilog and/or C languages. If a developer choose to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
 
 <img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
 
@@ -699,7 +699,7 @@ The C Test API function 'extern void cl_peek(uint64_t addr)' Reads 32 bits of da
 | addr | Read Address |
 | data | Read Data |
 
-##_sv_map_host_memory_
+## _sv_map_host_memory_
 ## Description
 The C Test API function 'extern void sv_map_host_memory(uint8_t *memory)' maps host memory to memory allocated by memory buffer. This function calls the SV map_host_memory function via DPI calls.
 ## Declaration
@@ -759,3 +759,66 @@ The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay
 | Argument | Description |
 | --- | --- |
 | x | Delay in micro seconds |
+
+## _sv_fpga_start_buffer_to_cl_
+## Description
+The C test API function 'extern "DPI-C" task sv_fpga_start_buffer_to_cl;' is used to do DMA data transfer from Host to CL.
+## Declaration
+#### extern void sv_fpga_start_buffer_to_cl(uint32_t slot_id, uint32_t chan, uint32_t buf_size, const char *wr_buffer, uint64_t cl_addr);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel |
+| buf_size | Size of the buffer |
+| wr_buffer | Data to be transferred |
+| cl_addr | Destination CL address |
+
+## _sv_fpga_start_cl_to_buffer_
+## Description
+The C test API function 'extern "DPI-C" task sv_fpga_start_cl_to_buffer;' is used to do DMA data transfer from Host to CL.
+## Declaration
+#### extern void sv_fpga_start_cl_to_buffer(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t cl_addr);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chan | DMA channel |
+| buf_size | Size of the buffer |
+| wr_buffer | Data to be transferred |
+| cl_addr | Destination CL address |
+
+
+## _set_chk_clk_freq_
+The SV test API function 'function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);' is used to enable frequency checks in shell model.
+## Declaration
+#### function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);
+
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+| chk_freq | enable bit|
+
+## _chk_prot_err_stat_
+The SV test API function 'function logic chk_prot_err_stat(input int slot_id = 0);' is used to check protocol error status.
+## Declaration
+#### function logic chk_clk_err_cnt(input int slot_id = 0);
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+
+## _get_global_counter_0_
+The SV test API function 'function logic [63:0] get_global_counter_0(input int slot_id = 0);' is used to get global counter_0 value.
+## Declaration
+#### function logic [63:0] get_global_counter_0(input int slot_id = 0);
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
+
+## _get_global_counter_1_
+The SV test API function 'function logic [63:0] get_global_counter_1(input int slot_id = 0);' is used to get global counter_1 value.
+## Declaration
+#### function logic [63:0] get_global_counter_1(input int slot_id = 0);
+| Argument | Description |
+| --- | --- |
+| slot_id | Slot ID |
