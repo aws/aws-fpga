@@ -99,7 +99,7 @@ New shell versions will require updated CL implementation and regenerating the A
 <a name="ShellInterfaces"></a>
 # Shell Interfaces
 
-The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v071417d3/design/interfaces/cl_ports.vh).
+The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v04261818/design/interfaces/cl_ports.vh).
 
 ![alt tag](./images/AWS_Shell_CL_overview.jpg)
 

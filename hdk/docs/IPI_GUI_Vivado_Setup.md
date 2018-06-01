@@ -55,7 +55,7 @@ Open vivado\_init.tcl or init.tcl in a text editor and add the following lines a
 
 `set AWSINSTALL "C:/<replace with install location>/aws-fpga"`
 
-`source $AWSINSTALL/hdk/common/shell_v071417d3/hlx/hlx_setup.tcl`
+`source $AWSINSTALL/hdk/common/shell_v04261818/hlx/hlx_setup.tcl`
 
 Copy these lines into the TCL console to ensure paths are correct.
 
@@ -65,15 +65,15 @@ An error message will occur either in the TCL console or in a tab about DDR4 mod
 
 Before installing the DDR4 models, another critical warning appeared dealing with the SH\_CL\_BB\_routed.dcp.  Download the DCP into the following install location from a web browser.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
-`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v071417d3/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
+`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v04261818/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
 
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/build/checkpoints/from_aws/`
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/build/checkpoints/from_aws/`
 
 Download the following executable from a web browser to the following HLx directory.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
 `http://www.labtestproject.com/files/sha256sum/sha256sum.exe`
 
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/hlx/build/scripts`
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/hlx/build/scripts`
 
 Close Vivado and launch Vivado, the HLx environment is now setup and will always be sourced and IP integrator features will be automatically loaded.
 

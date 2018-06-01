@@ -54,7 +54,7 @@ It is highly recommended you read the documentation and utilize software and har
 ## Github and Environment Setup (Once per new instance or machine)
 * Clone this github repository and source the *sdaccel_setup.sh* script. This will take care of: 
   * Downloading the required files:
-    * [AWS Platform](./aws_platform/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0) that allows Xilinx FPGA Binary files to target AWS F1 instances 
+    * [AWS Platform](./aws_platform/xilinx_aws-vu9p-f1-04261818_dynamic_5_0) that allows Xilinx FPGA Binary files to target AWS F1 instances 
     * [AFI Creation script](./tools/create_sdaccel_afi.sh) that generates an AFI and AWS FPGA Binary from a Xilinx FPGA Binary
     * [SDAccel HAL](./userspace) source code and binary files for mapping SDAccel/OpenCL runtime libraries to AWS FPGA instance.
     * Installing the required libraries and drivers

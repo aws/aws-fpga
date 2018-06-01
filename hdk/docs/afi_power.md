@@ -30,7 +30,7 @@ The fpga-describe-local-image command will show that the AFI load has failed due
 
 ```
     # fpga-describe-local-image -S 0
-    AFI          0       none                    load-failed          7        afi-power-violation        17       0x071417d3
+    AFI          0       none                    load-failed          7        afi-power-violation        17       0x04261818
     AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 ```
 

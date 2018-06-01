@@ -50,7 +50,7 @@ Disabling unused DDR controllers will improve simulation performance. cl_dram_dm
 
 #### Design Changes
 
-Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v071417d3/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
+Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v04261818/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
 
 For the cl_dram_dma example a memory range has been allocated for each DDR. So, if a particular DDR controller is disabled, then the developer should take care to handle transactions to that addresss range since there will be no DDR controller to respond to the request. The address ranges for each DDR controller is described below in the [dma_pcis AXI4 bus section](#dma_pcis).
 
@@ -78,7 +78,7 @@ sh\_cl\_dma\_pcis exposes a address windows of 128GiB matching AppPF BAR4.
 
 
 This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half).
-An [axi_crossbar_0](../../../common/shell_v071417d3/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v)
+An [axi_crossbar_0](../../../common/shell_v04261818/design/ip/cl_axi_interconnect/synth/cl_axi_interconnect.v)
 will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB),
 DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB),
 DDR_D(base_addr=0xC_0000_0000, range=16GB).
