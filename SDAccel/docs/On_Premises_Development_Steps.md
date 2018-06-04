@@ -101,7 +101,8 @@ Execute the following commands to build the application for execution on AWS F1:
 
 The build process will generate the host and FPGA binaries.  
 1. Host binary: ./helloworld  
-2. FPGA binary: ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1_dynamic_5_0.xclbin
+2. FPGA binary: ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xclbin
+
 
 These binary files are ready to be uploaded to F1.
 

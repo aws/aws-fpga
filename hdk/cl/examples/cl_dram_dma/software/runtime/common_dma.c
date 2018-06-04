@@ -76,8 +76,8 @@ check_slot_config(int slot_id)
                "match the expected values. You may need to rescan the fpga with \n"
                "fpga-describe-local-image -S %i -R\n"
                "Note that rescanning can change which device file in /dev/ a FPGA will map to.\n"
-               "To remove and re-add your edma driver and reset the device file mappings, run\n"
-               "`sudo rmmod edma-drv && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/edma/edma-drv.ko`\n",
+               "To remove and re-add your xdma driver and reset the device file mappings, run\n"
+               "`sudo rmmod xdma && sudo insmod <aws-fpga>/sdk/linux_kernel_drivers/xdma/xdma.ko`\n",
                slot_id);
         fail_on(rc, out, "The PCI vendor id and device of the loaded image are "
                          "not the expected values.");

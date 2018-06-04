@@ -13,7 +13,6 @@ This file contains the following sections:
 ## 1. Overview
 The sections below give you a brief explanation of the steps required to debug your SDAccel RTL kernel design.  They include instantiating the ILA/debug cores in your RTL kernel, pausing the execution of the host code at the appriopriate stage to ensure the setup of ILA triggers, building the running the host code and starting the debug servers to debug the design in hardware.  
 
-	
 ## 2. Instantiating Debug cores in your RTL kernel design
 
 You need to instantiate debug cores like the Integrated Logic Analyzer(ILA), Virtual Input/Output(VIO) etc in your application RTL kernel code.
@@ -95,9 +94,8 @@ src/host.cpp
 Please note, the angle bracket directories need to be replaced according to the user setup.
 
 ```	
-	$SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=your_design.hw.xclbin -o=your_design.hw.awsxclbin -s3_bucket=<bucket-s3_dcp_key=<f1-dcp-folder-s3_logs_key=<f1-logs>
+	$SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=your_design.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xclbin -o=your_design.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin -s3_bucket=<bucket-s3_dcp_key=<f1-dcp-folder-s3_logs_key=<f1-logs>
 ```
-
 
 - **Setup and Execute**
 

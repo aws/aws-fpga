@@ -66,7 +66,7 @@ Click on the **plus** sign as shown below.
 ![](./figure/gui_fig_3.JPG)  
   
   
-Then browse to the \<git area\>/SDAccel/aws_platform/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0/ directory, select platform.  
+Then browse to the \<git area\>/SDAccel/aws_platform/xilinx_aws-vu9p-f1-04261818_dynamic_5_0/ directory, select platform.  
   
   
 ![](./figure/gui_fig_4.jpg)  

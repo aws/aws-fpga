@@ -139,7 +139,7 @@ flr_reset is ignored in this design
 
 <a name="software"></a>
 ## Runtime software
-DMA accesses rely on the edma driver- see the [edma driver readme](../../../../sdk/linux_kernel_drivers/edma/README.md)
+DMA accesses rely on the xdma driver- see the [xdma driver readme](../../../../sdk/linux_kernel_drivers/xdma/README.md)
 
 The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
 
