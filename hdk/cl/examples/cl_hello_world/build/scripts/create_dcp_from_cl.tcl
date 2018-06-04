@@ -298,7 +298,11 @@ if {$implement} {
    # This is what will deliver to AWS
    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
 
-   write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+   #writing unencrypted dcp for analysis to checkpoints dir.
+   write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_routed.dcp
+
+   #writing encrypted dcp which can be sent to AWS
+   write_checkpoint -encrypt -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
    # Generate debug probes file
    write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx

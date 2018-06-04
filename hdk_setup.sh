@@ -134,10 +134,9 @@ declare -a s3_hdk_ltx_files=("cl_hello_world.debug_probes.ltx"
 
 # Shell files to be downloaded
 declare -a s3_hdk_files=("SH_CL_BB_routed.dcp"
+                         "cl_hello_world.debug_probes.ltx"
+                         "cl_dram_dma.debug_probes.ltx"
                         )
-#BOZO:uncomment after uploading these files                         "cl_hello_world.debug_probes.ltx"
-#BOZO:uncomment after uploading these files                         "cl_dram_dma.debug_probes.ltx"
-#                        )
 # Downloading the shell files
 for shell_file in "${s3_hdk_files[@]}"
 do

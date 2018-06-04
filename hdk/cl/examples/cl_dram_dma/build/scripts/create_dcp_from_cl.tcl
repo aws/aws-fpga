@@ -142,8 +142,6 @@ set_msg_config -id {DRC CKLD-2}          -suppress
 set_msg_config -id {DRC REQP-1853}       -suppress
 set_msg_config -id {Timing 38-436}       -suppress
 
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
-
 # Check that an email address has been set, else unset notify_via_sns
 
 if {[string compare $notify_via_sns "1"] == 0} {
@@ -184,6 +182,8 @@ switch $strategy {
         source $HDK_SHELL_DIR/build/scripts/strategy_DEFAULT.tcl
     }
 }
+
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
 #Encrypt source code
 source encrypt.tcl
@@ -313,9 +313,11 @@ if {$implement} {
 
    #FIXME -- THIS SHOULD BE REMOVED FROM THE FINAL SCRIPT
    #write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed_before_ddr_fix.dcp
-   source top_ddr_fix.tcl
-
-   write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+   #source top_ddr_fix.tcl
+   #checkpoint can used by developer for analysis and hence donot encrypt
+   write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_routed.dcp
+   #checkpoint that will be sent to aws and hence encrypt
+   write_checkpoint -encrypt -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
    # Generate debug probes file
    write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
