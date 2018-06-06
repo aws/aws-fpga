@@ -30,3 +30,8 @@
   assign cl_sh_dma_pcis_rresp[1:0]   =   2'b0;
   assign cl_sh_dma_pcis_rlast        =   1'b0;
   assign cl_sh_dma_pcis_rvalid       =   1'b0;
+
+  // CL DMA Full Signals
+  assign cl_sh_dma_wr_full           =   1'b0;
+  assign cl_sh_dma_rd_full           =   1'b0;
+
