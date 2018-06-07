@@ -1,13 +1,13 @@
 # Quick Start Guide to Accelerating your C/C++ application on an AWS F1 FPGA Instance with SDAccel
 
-There are three simple steps for accelerating your application on an AWS F1 instance:
-1. Build the host application, Xilinx FPGA binary and verify you are ready for FPGA acceleration 
+There are three steps for accelerating your application on an Amazon EC2 FPGA instance using the sofware-defined development flow:
+1. Build the host application, and the Xilinx FPGA binary 
 2. Create an AFI 
 3. Run the FPGA accelerated application on AWS FPGA instances
 
-## :exclamation:  NOTE: If you would like to directly go to step 3 to experience how to execute your application on F1 instance Please read [Helloworld OpenCL Runtime example](./examples/aws/helloworld_ocl_runtime/README.md)
+## :exclamation: If you would like to directly go to step 3 and execute your application on F1 instance follow steps in the [Hello world OpenCL Runtime example](./examples/aws/helloworld_ocl_runtime/README.md)
 
-This quick start guide will use a simple "Hello World" SDAccel example to get you started.  
+This quick starting guide will use a simple "Hello World" SDAccel example to get you started.  
 
 It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW Target compile time is ~50 minutes, therefore, software and hardware emulation should be used during development.
 
@@ -30,11 +30,10 @@ It is highly recommended you read the documentation and utilize software and har
 
 <a name="overview"></a>
 # Overview
-* SDAccel is a complete development environment for applications accelerated with Xilinx FPGAs
+* SDAccel is a complete development environment for applications accelerated using Xilinx FPGAs
 * It leverages the OpenCL heterogeneous computing framework to offload compute intensive workloads to the FPGA
-* The accelerated application is written in C/C++ with OpenCL APIs
-* The code for the FPGA binary can be written in C/C++, OpenCL or RTL
-* Once you have gone through this quick start example. See the [SDAccel GUI Guide](./docs/README_GUI.md) to access the fully integrated Eclipse-based environment with built-in debug, profiling and performance analysis tools. 
+* The accelerated application is written in  C/C++, OpenCL or RTL with OpenCL APIs
+* Once you complete this quick starting exampl, see the [SDAccel GUI Guide](./docs/README_GUI.md) to access the fully integrated Eclipse-based environment with built-in debug, profiling and performance analysis tools. 
 
 <a name="prerequisites"></a>
 # Prerequisites
@@ -42,8 +41,8 @@ It is highly recommended you read the documentation and utilize software and har
 ## AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses.
-  * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it may be more cost efficient to either: 
-     * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a lower cost EC2 instance, with a minimum of 30GiB RAM), **OR** 
+  * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it is more cost efficient to either: 
+     * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a compute EC2 instance, with a minimum of 30GiB RAM), **OR** 
      * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html).  It is highly recommended that you validate your AWS IAM permissions prior to proceeding with this quick start.  By calling the [DescribeFpgaImages API](../hdk/docs/describe_fpga_images.md) you can check that your IAM permissions are correct.
 * [Setup AWS CLI and S3 Bucket](docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
@@ -51,7 +50,7 @@ It is highly recommended you read the documentation and utilize software and har
 * Additional dependancies may get flagged during the AWS SDAccel scripts as warnings or errors.
 
 <a name="gitsetenv"></a>
-## Github and Environment Setup (Once per new instance or machine)
+## Github and Environment Setup 
 * Clone this github repository and source the *sdaccel_setup.sh* script. This will take care of: 
   * Downloading the required files:
     * [AWS Platform](./aws_platform/xilinx_aws-vu9p-f1-04261818_dynamic_5_0) that allows Xilinx FPGA Binary files to target AWS F1 instances 
@@ -151,7 +150,7 @@ The [create_sdaccel_afi.sh](./tools/create_sdaccel_afi.sh) script is provided to
 
 **Save the \*.awsxclbin, you will need to copy it to your F1 instance along with your executable host application.**
 
-**NOTE**: *Attempting to load your FPGA Binary immediately on an F1 instance will result in an 'Invalid AFI ID' error.
+**NOTE**: *Attempting to load your AFI immediately on an F1 instance will result in an 'Invalid AFI ID' error.
 Please wait until you confirm the AFI has been created successfully.*
 
 ## Tracking the status of your registered AFI  
@@ -190,10 +189,10 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 
 
 <a name="runonf1"></a>
-# 3. Run the FPGA accelerated application on F1
+# 3. Run the FPGA accelerated application on Amazon FPGA instances
 
 Here are the steps:
-* Start an F1 instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatiability table](../README.md#devAmi).  Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on F1.
+* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatiability table](../README.md#devAmi).  Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
      * Copy the compiled host executable (exe) to new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance

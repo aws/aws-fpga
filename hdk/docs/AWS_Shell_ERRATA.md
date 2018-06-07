@@ -18,7 +18,7 @@
 
 ## Unsupported Features (Planned for future releases)
 * FPGA to FPGA communication over PCIe for F1.16xl
-* FPGA to FPGA over the 400Gbps Ring for F1.16xl
+* FPGA to FPGA over serial ring links for F1.16xl
 * Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
 * Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence Xcelium simulations tools

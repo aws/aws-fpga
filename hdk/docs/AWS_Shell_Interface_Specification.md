@@ -60,15 +60,15 @@
 <a name="overview"></a>
 # Overview
 
-With F1, each FPGA is divided into two partitions:
+With Amazon EC2 FPGA instances, each FPGA is divided into two partitions:
 
--   Shell (SH) – AWS platform logic responsible for taking care of the FPGA external peripherals, PCIe, DRAM, and Interrupts.
+-   Shell (SH) – AWS platform logic implementing the FPGA external peripherals, PCIe, DRAM, DMA, and Interrupts.
 
 -   Custom Logic (CL) – Custom acceleration logic created by an FPGA Developer.
 
-At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto EC2 F1 Instances.
+At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto the Amazon EC2 FPGA Instances.
 
-This document specifies the hardware interface and functional behavior between the SH and the CL; specifically the Shell design for xvu9p architecture used in EC2 F1 instance.
+This document specifies the hardware interface and functional behavior between the SH and the CL.
   
   
 <a name="arch_ver"></a>
@@ -77,7 +77,7 @@ This document specifies the hardware interface and functional behavior between t
 This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell 
  is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
 
-New shell versions will require updated CL implementation and regenerating the AFI.
+Starting from 1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.  Going forward, new shell versions will NOT require updated CL implementation and regenerating the AFI (still a requirement with 1.4 shell.)
   
   
 <a name="conventions"></a>
@@ -123,7 +123,7 @@ The F1 FPGA platform includes the following external interfaces:
 
 -   One x16 PCI Express 3.0 Interface.
 
--   Four DDR4 RDIMM interfaces, each interface is 72-bit wide including ECC.
+-   Four DDR4 RDIMM interfaces, each interface is 72-bit wide (including ECC).
 
 <a name="pciPresentation"></a>
 ## FPGA PCIe Representation to EC2 Instance

@@ -1,12 +1,12 @@
 # AWS FPGA: Programmer's View of the Custom Logic
 
-This document describes how an actual application running in Linux userspace would interface with the FPGA Custom Logic (CL) during runtime.
+This document describes how an application running in Linux userspace would interface with the FPGA Custom Logic (CL) during runtime.
 
-There are two parts required to work with AWS FPGA: Management and Runtime, and the next figure provides high level view of these components and how they relate to the underlying FPGA hardware.
+There are two parts required to work with AWS FPGA: Management and Runtime, and the next figure provides a high-level view of these components and how they relate to the underlying FPGA hardware.
 
 ![alt tag](./images/AWS_FPGA_Software_Overview.jpg)
 
-1. **Management Interface**: required for loading/clearing an AFI, checking the status of an AFI, debug of the AFI, Emulated LEDs and Emulated DIP Switches. The management interface is provided in one of three options, one or more can be used concurrently:
+1. **Management Interface**: is required for loading/clearing an AFI, checking the status of an AFI, debug of the AFI, Emulated LEDs and Emulated DIP Switches. The management interface is provided in one of three way, one or more can be used concurrently:
 
   **\[A\]** As linux shell commands called [FPGA Management Tools](../../sdk/userspace/fpga_mgmt_tools/README.md).
   
@@ -14,7 +14,7 @@ There are two parts required to work with AWS FPGA: Management and Runtime, and 
   
   **\[C\]** Pre-integrated with [OpenCL runtime library](../../SDAccel)
   
-2. **Runtime code**: required for reading/writing from/to the Custom Logic, handling interrupts, and using the DMA. This is provided by:
+2. **Runtime code**: is required for reading/writing from/to the Custom Logic, handling interrupts, and using the DMA. This is provided by:
   
   **\[D\]** [FPGA PCIe Lib](../../sdk/userspace/fpga_libs/fpga_pci/) is a C-library used to access the FPGA memory space behind the AppPF PCIe BARs, from Linux application space like reading/writing to register space or passing messages. This library can be compiled and linked with the developer's C/C++ application.
   

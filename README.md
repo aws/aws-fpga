@@ -73,7 +73,6 @@ NOTE: For on-premises development, SDx/Vivado must have the correct license and 
 | File Compression   | [GZip](https://github.com/Xilinx/Applications/tree/master/GZip) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up GZIP compression on an FPGA |
 | WebP Image Compression   | [WebP](https://github.com/Xilinx/Applications/tree/master/webp) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up WebP encoder application on an FPGA |
 
-
 <a name="gettingstarted"></a>
 # Getting Started 
 
@@ -98,7 +97,6 @@ Once you completed your hello world examples, we recommend diving deeper into a 
   * [Programmer view of the FPGA](./hdk/docs/Programmer_View.md)
   * [Virtual JTAG](hdk/docs/Virtual_JTAG_XVC.md)
   * [Application for methods of interfacing the host application to the Hardware accelerator](https://github.com/awslabs/aws-fpga-app-notes)
-
 
 <a name="devAmi"></a>
 # FPGA Developer AMI
@@ -143,7 +141,9 @@ The [SDK directory](./sdk/README.md) includes the runtime environment required t
 # Developer Support
 
 The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) is the first place to go to post questions, learn from other users and read announcements from the EC2 FPGA team.
-* Click the "Watch" button in GitHub upper right corner to get regular updates.  Also, we recommend you will join the [AWS forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to engage with the FPGA developer community and get help when needed (both AWS and Xilinx engineers monitor this forum).
+
+* Click the "Watch" button in GitHub upper right corner to get regular updates. 
+* We recommend you will join the [AWS forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to engage with the FPGA developer community and get help when needed (both AWS and Xilinx engineers monitor this forum).
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again.
 
 <a name="doccontents"></a>

@@ -16,7 +16,7 @@
 
 This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../README.md) prior to using the Vivado GUI or IP Integrator.
 
-Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
+Once you are familiar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
 
 <a name="hlxinst_lin"></a>
@@ -24,7 +24,7 @@ Once you are familar with building an example AFI and running on F1, the [IP Int
 
 Open the following file in a text editor ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl
 
-If either of these files do not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
+If either of these files does not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
 
 touch Vivado_init.tcl
 
@@ -45,11 +45,11 @@ Everytime Vivado is loaded, this script will always be sourced and IP integrator
 
 Download, install, and configure the license for Vivado SDx 2017.1 or Vivado 2017.4 for Windows.  More information is provided at:
 
-[On Premise Licensing Help](./on_premise_licensing_help.md)
+[On-Premises Licensing Help](./on_premise_licensing_help.md)
 
 Clone the `https://github.com/aws/aws-fpga` repository either through Github Desktop or Download ZIP and extract to a new folder location on the Windows machine.  This is the install location.
 
-Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as a INFO message at the top of the Tcl Console.
+Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as an INFO message at the top of the Tcl Console.
 
 Open vivado\_init.tcl or init.tcl in a text editor and add the following lines at the top of the file.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
@@ -130,7 +130,7 @@ The FPGA Developer AMI includes a test example.  To explore the source file prop
 
 ### Sources:IP Sources
 
-When IP has been created in your project, the "IP Sources" tab will be visable.  This tab will contain imported  IP sources and expanding the IP/Instantiation Template, developers can add the IP into the RTL.  Synthesis options on the IP should be global only.
+When IP has been created in your project, the "IP Sources" tab will be visible.  This tab will contain imported  IP sources and expanding the IP/Instantiation Template, developers can add the IP into the RTL.  Synthesis options on the IP should be global only.
 
 ## Flow Navigator
 
@@ -155,11 +155,11 @@ This section allows the developer to change simulation settings by right clickin
 
 ### RTL ANALYSIS
 
-By clicking on Open Elaborate Design, the RTL files in the design are analyzed where the develop can check RTL structures and syntax before the synthesis stage.
+By clicking on Open Elaborate Design, the RTL files in the design are analyzed where the developer can check RTL structures and syntax before the synthesis stage.
 
 ### SYNTHESIS
 
-By right clicking on SYNTHESIS, the develop is able to view Synthesis Settings and Launch Synthesis.  After synthesis stage is complete, clicking on Open Synthesized Design will open the post synthesis checkpoint for analysis.  This stage is necessary for developing timing constraints for the CL.
+By right clicking on SYNTHESIS, the developer is able to view Synthesis Settings and Launch Synthesis.  After synthesis stage is complete, clicking on Open Synthesized Design will open the post synthesis checkpoint for analysis.  This stage is necessary for developing timing constraints for the CL.
 
 ### IMPLEMENTATION
 

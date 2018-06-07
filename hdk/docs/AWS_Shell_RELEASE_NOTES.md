@@ -5,5 +5,5 @@
 * Increased XDMA PCIS interface timeout to 5 seconds
 * Clock group A supports synchronous clocks within the group (default is clocks are synchronous)
 * Added backpressure signalling to XDMA (note added signals to cl_ports.vh - **cl_sh_dma_wr_full/cl_sh_dma_rd_full**)
-* Shell update capability (Shell can be updated without requiring CL re-build)
+* Reconfigurable Shell: developers can select if to update to future shells or stay with the latest baseline Shell version
 * Added AxBURST to DDR_C interface (note added signals to cl_ports.vh - **cl_sh_ddr_awburst[1:0]/cl_sh_ddr_arburst[1:0]** _Note: Only INCR burst mode is supported so these signals must be tied to 2'b01_)
