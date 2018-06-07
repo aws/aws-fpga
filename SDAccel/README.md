@@ -9,7 +9,7 @@ There are three simple steps for accelerating your application on an AWS F1 inst
 
 This quick start guide will use a simple "Hello World" SDAccel example to get you started.  
 
-It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW compile time is ~3hrs, therefore, software and hardware emulation should be used during development.
+It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW Target compile time is ~50 minutes, therefore, software and hardware emulation should be used during development.
 
 
 # Table of Content

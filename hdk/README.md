@@ -150,6 +150,10 @@ To be notified via e-mail when the build completes:
 2. Check your e-mail address and confirm subscription
 3. When calling `aws_build_dcp_from_cl.sh`, add on the `-notify` switch
 4. Once your build is complete, an e-mail will be sent to you stating "Your build is done."
+5. For each example the known warnings are documented in warnings.txt file located in the $CL_DIR/build/scripts directory
+   [cl\_hello\_world warnings](cl/examples/cl_hello_world/build/scripts/warnings.txt )
+   [cl\_dram\_dma warnings](cl/examples/cl_dram_dma/build/scripts/warnings.txt )
+   [cl\_uram\_example warnings](cl/examples/cl_uram_example/build/scripts/warnings.txt )
 
 <a name="step3"></a>
 #### Step 3. Submit the Design Checkpoint to AWS to Create the AFI
