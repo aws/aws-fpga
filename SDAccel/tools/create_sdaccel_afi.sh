@@ -22,6 +22,7 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 
 source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
+source $AWS_FPGA_REPO_DIR/shared/bin/set_common_env_vars.sh
 
 debug=0
 
@@ -138,6 +139,19 @@ then
     usage                        
     exit 1                       
 fi                               
+
+if [ "$HDK_DIR" == "" ]
+then
+    err_msg "Env HDK_DIR not set"
+    exit 1
+fi
+
+if [ "$RELEASE_VER" == "" ]
+then
+    err_msg "Env RELEASE_VER not set, did you `source sdaccel_setup.sh`?"
+    exit 1
+fi
+
 
 timestamp=$(date +"%y_%m_%d-%H%M%S")
 

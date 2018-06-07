@@ -19,7 +19,7 @@ info_msg "Setting up environment variables"
 if [[ ":$AWS_FPGA_REPO_DIR" == ':' ]]; then
   debug_msg "AWS_FPGA_REPO_DIR not set so setting to $script_dir"
   export AWS_FPGA_REPO_DIR=$script_dir
-elif [[ $AWS_FPGA_REPO_DIR != $script_dir ]]; then
+elif [ -n "$script_dir" -a "$AWS_FPGA_REPO_DIR" != "$script_dir" ]; then
   info_msg "Changing AWS_FPGA_REPO_DIR from $AWS_FPGA_REPO_DIR to $script_dir"
   export AWS_FPGA_REPO_DIR=$script_dir
 else
