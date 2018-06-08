@@ -28,11 +28,7 @@ if {[file exist $_post_synth_dcp] eq 0} {
 	send_msg_id "[file tail [info script]] 1-187" ERROR "File $_post_synth_dcp for post synthesis DCP does not exist.  Please ensure write_checkpoint_call has occurred post_synthesis (hook script).  Try:\n\tset_property -name {STEPS.SYNTH_DESIGN.TCL.POST} -value \[file join \$aws::make_faas::_nsvars::script_dir write_checkpoint_call.tcl\] -objects \[get_runs \$_current_synth_run\]"
 }
 
-if {[string tolower [version -short]] eq "2017.1"} {	
-	set HDK_VERSION_DIR "shell_v04151701"
-} else {
-	set HDK_VERSION_DIR "shell_v071417d3"
-}
+set HDK_VERSION_DIR "shell_v04261818"
 dputs $debugMode "Using Shell: $HDK_VERSION_DIR"
 
 
@@ -114,17 +110,11 @@ set id1_version [findLineInFile [file join $FAAS_CL_DIR design cl_id_defines.vh]
 	set clock_recipe_c [get_property CONFIG.CLOCK_C_RECIPE $_cl_ips]
 }
 
-
-
 set run_aws_emulation 0
 set notify_via_sns 0	
 
-
-
-
 #set top top_sp
 #set TOP cl_top
-
 
 set logname "\{[file join $FAAS_CL_DIR SH_CL_$timestamp.log]\}"
 set vivado_script "\{[file join $SCRIPT_DIR create_dcp_from_proj.tcl]\}"
@@ -137,23 +127,3 @@ puts "Finished running the command from the TCL tab in Vivado\n\t$vivcmd"
 puts "\n\n"
 puts "Success! Design Complete: Please see log at ${logname}"
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Completed Vivado with ${vivado_script}";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

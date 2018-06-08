@@ -197,6 +197,7 @@ proc create_root_design { parentCell } {
     CONFIG.DDR_C_PRESENT {1} \
     CONFIG.NUM_A_CLOCKS {2} \
     CONFIG.PCIS_PRESENT {1} \
+    CONFIG.DEVICE_ID {0xF000} \
   ] $f1_inst
 
   # Create instance: f1_inst_axi_periph, and set properties

@@ -2115,7 +2115,7 @@ endmodule
 // DO NOT MODIFY THIS FILE.
 
 (* DowngradeIPIdentifiedWarnings="yes" *)
-module aws_v1_0_1_top #
+module aws_v1_0_2_top #
   (
    parameter integer C_MODE = 0,
    // 0 = AWS HLS (IPI) flow: All interfaces are available.
@@ -2128,14 +2128,14 @@ module aws_v1_0_1_top #
    parameter integer C_NUM_B_CLOCKS = 0,
    parameter integer C_NUM_C_CLOCKS = 0,
    parameter [15:0]  C_VENDOR_ID = 16'h1D0F,
-   parameter [15:0]  C_DEVICE_ID = 16'hF000,
+   parameter [15:0]  C_DEVICE_ID = 16'hF010,
    parameter [15:0]  C_SUBSYSTEM_VENDOR_ID = 16'hFEDD,
    parameter [15:0]  C_SUBSYSTEM_ID = 16'h1D51,
-   parameter C_CLOCK_A0_PERIOD = "8.0",
-   parameter C_CLOCK_A1_PERIOD = "4.0",
+   parameter C_CLOCK_A0_PERIOD = "4.0",
+   parameter C_CLOCK_A1_PERIOD = "8.0",
    parameter C_CLOCK_B0_PERIOD = "4.0",
    parameter C_CLOCK_C0_PERIOD = "3.333333",
-   parameter integer C_CLOCK_A_RECIPE = 0,
+   parameter integer C_CLOCK_A_RECIPE = 1,
    parameter integer C_CLOCK_B_RECIPE = 0,
    parameter integer C_CLOCK_C_RECIPE = 0,
    parameter integer C_NUM_STAGES_STATS = 1,
@@ -2145,7 +2145,7 @@ module aws_v1_0_1_top #
    //--------------------------------
    // S_SH bus-interface ports
    //--------------------------------
-   `include "aws_v1_0_1_ports.vh" // Subset of Amazon-provided port definitions (without Debug Bridge)
+   `include "aws_v1_0_2_ports.vh" // Subset of Amazon-provided port definitions (without Debug Bridge)
    ,
    
    //--------------------------------

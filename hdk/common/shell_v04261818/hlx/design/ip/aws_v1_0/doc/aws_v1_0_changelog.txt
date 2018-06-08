@@ -1,25 +1,24 @@
-2018.1:
+2017.4:
  * Version 1.0 (Rev. 2)
  * Bug Fix: Changed relationship between clk_main_a0 and clk_extra_a* from synchronous to asynchronous.
-
-2017.4:
- * Version 1.0 (Rev. 1)
- * Changed frequency of clk_extra_c0 from 300 to 500 MHz when recipe C0 is selected.
- * Added MODE parameter to support usage with memory subsystem in SDx.
+ * Bug Fix: Changed default Clock Group A recipe from A0 to A1.
+ * New Feature: Support new Amazon shell v1.4 (SHELL_VERSION = 0x04261818).
+ * New Feature: Changed default DEVICE_ID from 0xF000 to 0xF010.
  * Revision change in one or more subcores
 
 2017.3:
- * Version 1.0
+ * Version 1.0 (Rev. 1)
  * No changes
 
 2017.2:
- * Version 1.0
- * No changes
+ * Version 1.0 (Rev. 1)
+ * Bug Fix: Changed frequency of clk_extra_c0 from 300 to 500 MHz when recipe C0 is selected.
+ * New Feature: Added MODE parameter to support usage with memory subsystem in SDx.
 
 2017.1:
  * Version 1.0
- * Native Vivado Release
- * Initial release.
+ * New Feature: Native Vivado Release
+ * New Feature: Initial release.
 
 (c) Copyright 2017 - 2018 Xilinx, Inc. All rights reserved.
 

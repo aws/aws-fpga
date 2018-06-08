@@ -1989,7 +1989,7 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>FREQ_HZ</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_MAIN_A0.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A0_FREQ&apos;)))">125000000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_MAIN_A0.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A0_FREQ&apos;)))">250000000</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
@@ -2023,7 +2023,7 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>FREQ_HZ</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A1.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A1_FREQ&apos;)))">62500000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A1.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A1_FREQ&apos;)))">125000000</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
@@ -2056,7 +2056,7 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>FREQ_HZ</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A2.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A2_FREQ&apos;)))">187500000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A2.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A2_FREQ&apos;)))">375000000</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
@@ -2089,7 +2089,7 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>FREQ_HZ</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A3.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A3_FREQ&apos;)))">250000000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="dependent" spirit:id="BUSIFPARAM_VALUE.CLK_EXTRA_A3.FREQ_HZ" spirit:dependency="(spirit:decode(id(&apos;PARAM_VALUE.CLOCK_A3_FREQ&apos;)))">500000000</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
@@ -4297,7 +4297,7 @@
         <spirit:name>xilinx_blockdiagram</spirit:name>
         <spirit:displayName>Block Diagram</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:block.diagram</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_blockdiagram_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4312,7 +4312,7 @@
         <spirit:name>xilinx_xpgui</spirit:name>
         <spirit:displayName>UI Layout</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:xgui.ui</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_xpgui_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4327,7 +4327,7 @@
         <spirit:name>xilinx_implementation</spirit:name>
         <spirit:displayName>Implementation</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:implementation</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_implementation_xilinx_com_ip_ddr4_2_2__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4348,7 +4348,7 @@
         <spirit:name>xilinx_miscfiles</spirit:name>
         <spirit:displayName>Miscellaneous</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:misc.files</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_miscfiles_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4363,7 +4363,7 @@
         <spirit:name>xilinx_productguide</spirit:name>
         <spirit:displayName>Product Guide</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:docs.productguide</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_productguide_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4372,7 +4372,7 @@
         <spirit:name>xilinx_utilityxitfiles</spirit:name>
         <spirit:displayName>Utility XIT/TTCL</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:xit.util</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_utilityxitfiles_xilinx_com_ip_ddr4_2_2__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4394,7 +4394,7 @@
         <spirit:displayName>Verilog Simulation</spirit:displayName>
         <spirit:envIdentifier>verilogSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>verilog</spirit:language>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_verilogbehavioralsimulation_xilinx_com_ip_ddr4_2_2__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4407,7 +4407,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ea32c0d6</spirit:value>
+            <spirit:value>01e58ca0</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4416,7 +4416,7 @@
         <spirit:displayName>Verilog Synthesis</spirit:displayName>
         <spirit:envIdentifier>verilogSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>verilog</spirit:language>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_verilogsynthesis_xilinx_com_ip_ddr4_2_2__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -4429,7 +4429,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>91b2d4f3</spirit:value>
+            <spirit:value>7a659885</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4437,7 +4437,7 @@
         <spirit:name>xilinx_versioninformation</spirit:name>
         <spirit:displayName>Version Information</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:docs.versioninfo</spirit:envIdentifier>
-        <spirit:modelName>aws_v1_0_1_top</spirit:modelName>
+        <spirit:modelName>aws_v1_0_2_top</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_versioninformation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -15746,7 +15746,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_DEVICE_ID</spirit:name>
-        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_DEVICE_ID" spirit:bitStringLength="16">0xF000</spirit:value>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_DEVICE_ID" spirit:bitStringLength="16">0xF010</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_SUBSYSTEM_VENDOR_ID</spirit:name>
@@ -15758,11 +15758,11 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
         <spirit:name>C_CLOCK_A0_PERIOD</spirit:name>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A0_PERIOD">8.0</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A0_PERIOD">4.0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
         <spirit:name>C_CLOCK_A1_PERIOD</spirit:name>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A1_PERIOD">4.0</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A1_PERIOD">8.0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
         <spirit:name>C_CLOCK_B0_PERIOD</spirit:name>
@@ -15774,7 +15774,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_CLOCK_A_RECIPE</spirit:name>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A_RECIPE">0</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_CLOCK_A_RECIPE">1</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_CLOCK_B_RECIPE</spirit:name>
@@ -15796,13 +15796,13 @@
   </spirit:model>
   <spirit:choices>
     <spirit:choice>
-      <spirit:name>choice_list_26b6e00a</spirit:name>
-      <spirit:enumeration>0x071417d3</spirit:enumeration>
-    </spirit:choice>
-    <spirit:choice>
       <spirit:name>choice_list_74b5137e</spirit:name>
       <spirit:enumeration>ACTIVE_HIGH</spirit:enumeration>
       <spirit:enumeration>ACTIVE_LOW</spirit:enumeration>
+    </spirit:choice>
+    <spirit:choice>
+      <spirit:name>choice_list_b048ecfd</spirit:name>
+      <spirit:enumeration>0x04261818</spirit:enumeration>
     </spirit:choice>
   </spirit:choices>
   <spirit:fileSets>
@@ -15811,7 +15811,7 @@
       <spirit:file>
         <spirit:name>bd/bd.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15820,7 +15820,7 @@
         <spirit:name>xgui/aws_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15830,7 +15830,7 @@
         <spirit:userFileType>ttcl</spirit:userFileType>
         <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
         <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15858,7 +15858,7 @@
       <spirit:file>
         <spirit:name>data/aws_logo.png</spirit:name>
         <spirit:userFileType>image</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15866,7 +15866,7 @@
       <spirit:file>
         <spirit:name>http://www.xilinx.com/cgi-bin/docs/ipdoc?c=aws;v=v1_0;d=pg247-smartconnect.pdf</spirit:name>
         <spirit:userFileType>pdf</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15874,17 +15874,17 @@
       <spirit:file>
         <spirit:name>interface/aws_f1_sh1.xml</spirit:name>
         <spirit:userFileType>xml</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>interface/aws_f1_sh1_rtl.xml</spirit:name>
         <spirit:userFileType>xml</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>data/aws_logo.png</spirit:name>
         <spirit:userFileType>LOGO</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15912,31 +15912,31 @@
       <spirit:file>
         <spirit:name>ip/ddr4_core/ddr4_core.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>ip/axi_clock_converter_0/axi_clock_converter_0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/aws_v1_0_vl_rfs.sv</spirit:name>
         <spirit:fileType>systemVerilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/sim/gray.inc</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/aws_v1_0_1_ports.vh</spirit:name>
+        <spirit:name>hdl/aws_v1_0_2_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -15971,29 +15971,29 @@
       <spirit:file>
         <spirit:name>ip/ddr4_core/ddr4_core.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>ip/axi_clock_converter_0/axi_clock_converter_0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/aws_v1_0_vlsyn_rfs.sv</spirit:name>
         <spirit:fileType>systemVerilogSource</spirit:fileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/synth/gray.inc</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/aws_v1_0_1_ports.vh</spirit:name>
+        <spirit:name>hdl/aws_v1_0_2_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -16021,7 +16021,7 @@
       <spirit:file>
         <spirit:name>doc/aws_v1_0_changelog.txt</spirit:name>
         <spirit:userFileType>text</spirit:userFileType>
-        <spirit:logicalName>aws_v1_0_1</spirit:logicalName>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
   </spirit:fileSets>
@@ -16231,7 +16231,7 @@
     <spirit:parameter>
       <spirit:name>CLOCK_A_RECIPE</spirit:name>
       <spirit:displayName>Group-A Clock Recipe</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A_RECIPE" spirit:order="17" spirit:minimum="0" spirit:maximum="2" spirit:rangeType="long">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A_RECIPE" spirit:order="17" spirit:minimum="0" spirit:maximum="2" spirit:rangeType="long">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>CLOCK_B_RECIPE</spirit:name>
@@ -16260,7 +16260,7 @@
     <spirit:parameter>
       <spirit:name>CLOCK_A0_FREQ</spirit:name>
       <spirit:displayName>clk_main_a0 frequency (Hz)</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A0_FREQ" spirit:order="20">125000000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A0_FREQ" spirit:order="20">250000000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16272,7 +16272,7 @@
     <spirit:parameter>
       <spirit:name>CLOCK_A1_FREQ</spirit:name>
       <spirit:displayName>clk_extra_a1 frequency (Hz)</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A1_FREQ" spirit:order="21">62500000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A1_FREQ" spirit:order="21">125000000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16284,7 +16284,7 @@
     <spirit:parameter>
       <spirit:name>CLOCK_A2_FREQ</spirit:name>
       <spirit:displayName>clk_extra_a2 frequency (Hz)</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A2_FREQ" spirit:order="22">187500000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A2_FREQ" spirit:order="22">375000000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16296,7 +16296,7 @@
     <spirit:parameter>
       <spirit:name>CLOCK_A3_FREQ</spirit:name>
       <spirit:displayName>clk_extra_a3 frequency (Hz)</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A3_FREQ" spirit:order="23">250000000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLOCK_A3_FREQ" spirit:order="23">500000000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16368,7 +16368,7 @@
     <spirit:parameter>
       <spirit:name>DEVICE_ID</spirit:name>
       <spirit:displayName>Device ID</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.DEVICE_ID" spirit:order="29" spirit:bitStringLength="16">0xF000</spirit:value>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.DEVICE_ID" spirit:order="29" spirit:bitStringLength="16">0xF010</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16404,7 +16404,7 @@
     <spirit:parameter>
       <spirit:name>SHELL_VERSION</spirit:name>
       <spirit:displayName>Shell Version (constant)</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.SHELL_VERSION" spirit:choiceRef="choice_list_26b6e00a" spirit:order="32" spirit:bitStringLength="32">0x071417d3</spirit:value>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.SHELL_VERSION" spirit:choiceRef="choice_list_b048ecfd" spirit:order="32" spirit:bitStringLength="32">0x04261818</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -16428,19 +16428,19 @@
       </xilinx:taxonomies>
       <xilinx:displayName>AWS</xilinx:displayName>
       <xilinx:vendorURL>http://www.xilinx.com</xilinx:vendorURL>
-      <xilinx:coreRevision>1</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-04-23T22:09:06Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>2</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2018-06-05T19:20:33Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="bd9f67aa"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="3f5c2acd"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="62ceb9f8"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="bffdfc26"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="873a5476"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="7a852364"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="52e6436c"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="bf260ba4"/>
       <xilinx:checksum xilinx:scope="cpus" xilinx:value="9bfed0d6"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="ce851d4e"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="8af6b2bc"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

@@ -170,6 +170,12 @@ proc create_root_design { parentCell } {
     CONFIG.OCL_PRESENT {1} \
     CONFIG.PCIS_PRESENT {1} \
     CONFIG.SDA_PRESENT {1} \
+    CONFIG.CLOCK_A0_FREQ {125000000} \
+    CONFIG.CLOCK_A1_FREQ {62500000} \
+    CONFIG.CLOCK_A2_FREQ {187500000} \
+    CONFIG.CLOCK_A3_FREQ {250000000} \
+    CONFIG.CLOCK_A_RECIPE {0} \
+    CONFIG.DEVICE_ID {0xF000} \
   ] $aws_0
 
   # Create instance: aws_0_axi_periph, and set properties
