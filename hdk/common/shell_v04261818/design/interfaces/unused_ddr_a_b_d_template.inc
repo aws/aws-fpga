@@ -19,6 +19,7 @@
 // Array Signals to Tie-off AXI interfaces to sh_ddr module
 //-------------------------------------------------
   logic         tie_zero[2:0];
+  logic [  1:0] tie_zero_burst[2:0];
   logic [ 15:0] tie_zero_id[2:0];
   logic [ 63:0] tie_zero_addr[2:0];
   logic [  7:0] tie_zero_len[2:0];
@@ -95,6 +96,7 @@ sh_ddr #(.DDR_A_PRESENT(0),
    .cl_sh_ddr_awaddr   (tie_zero_addr),
    .cl_sh_ddr_awlen    (tie_zero_len),
    .cl_sh_ddr_awvalid  (tie_zero),
+   .cl_sh_ddr_awburst  (tie_zero_burst),
    .sh_cl_ddr_awready  (),
 
    .cl_sh_ddr_wid      (tie_zero_id),
@@ -113,6 +115,7 @@ sh_ddr #(.DDR_A_PRESENT(0),
    .cl_sh_ddr_araddr   (tie_zero_addr),
    .cl_sh_ddr_arlen    (tie_zero_len),
    .cl_sh_ddr_arvalid  (3'b0),
+   .cl_sh_ddr_arburst  (tie_zero_burst),
    .sh_cl_ddr_arready  (),
 
    .sh_cl_ddr_rid      (),
@@ -151,6 +154,10 @@ sh_ddr #(.DDR_A_PRESENT(0),
   assign tie_zero[2]        =   1'b0;
   assign tie_zero[1]        =   1'b0;
   assign tie_zero[0]        =   1'b0;
+
+  assign tie_zero_burst[2]  =   2'b01; // Only INCR is supported, must be tied to 2'b01
+  assign tie_zero_burst[1]  =   2'b01;
+  assign tie_zero_burst[0]  =   2'b01;
 
   assign tie_zero_id[2]     =  16'b0;
   assign tie_zero_id[1]     =  16'b0;

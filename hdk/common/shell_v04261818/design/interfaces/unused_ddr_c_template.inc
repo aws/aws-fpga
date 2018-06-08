@@ -18,6 +18,7 @@
   assign cl_sh_ddr_awlen    =   8'b0;
   assign cl_sh_ddr_awsize   =   3'b0;
   assign cl_sh_ddr_awvalid  =   1'b0;
+  assign cl_sh_ddr_awburst  =   2'b01;  // Only INCR is supported, must be tied to 2'b01
 
   assign cl_sh_ddr_wid      =  16'b0;
   assign cl_sh_ddr_wdata    = 512'b0;
@@ -32,6 +33,7 @@
   assign cl_sh_ddr_arlen    =   8'b0;
   assign cl_sh_ddr_arsize   =   3'b0;
   assign cl_sh_ddr_arvalid  =   1'b0;
+  assign cl_sh_ddr_arburst  =   2'b01;  // Only INCR is supported, must be tied to 2'b01
 
   assign cl_sh_ddr_rready   =   1'b0;
 
