@@ -126,6 +126,23 @@ def install_xdma_driver():
         make && \
         sudo insmod xdma.ko poll_mode=1') == 0
 
+def remove_xocl_driver():
+    logger.info("Removing the xocl driver.")
+    # This fails if the driver isn't installed
+    os.system('sudo rmmod xocl')
+
+    xocl_driver_ko_list = find_files_in_path('/lib/modules', 'xocl.ko')
+    for xocl_ko in xocl_driver_ko_list:
+        logger.info("Removing {}".format(xocl_ko))
+        assert os.system("sudo rm -f {}".format(xocl_ko)) == 0
+
+    assert os.system('sudo rm -f /etc/udev/rules.d/10-xocl.rules') == 0
+
+def remove_all_drivers():
+    remove_xdma_driver()
+    remove_edma_driver()
+    remove_xocl_driver()
+
 class FpgaLocalImage:
     def __init__(self):
         self.type = None
