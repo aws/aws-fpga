@@ -57,6 +57,18 @@
   
    4h. [Miscellanous Interfaces(vLED, vDIP..)](#misc)
 
+5. [Implementation Tips](#impl_tips)
+
+   5a. [Multi-SLR FPGA](#impl_tips_slr)
+    
+   5b. [Logic Levels](#impl_tips_logic_levels)
+   
+   5c. [Reset](#impl_tips_reset)
+   
+   5d. [Pipeline Registers](#impl_tips_pipeline)
+   
+   5e. [Vivado Analysis](#impl_tips_vivado)
+
 <a name="overview"></a>
 # Overview
 
@@ -352,7 +364,9 @@ Transactions on the DMA_PCIS interface must complete before the associated timeo
 
 Once a transaction is issued, it must fully completed within the timeout time (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads. 
 
-If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  After the moderation time, the CL may be accessed with the normal timeout value.
+If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  
+
+**WARNING**: If a timeout happens the DMA/PCIS interface may no longer be functional and the AFI/Shell must be re-loaded.  This can be done by adding the "-F" option to [fpga-load-local-image](../../sdk/userspace/fpga_mgmt_tools/README.md).
 
 <a name="pcim_interface"></a>
 ## PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)
@@ -592,7 +606,7 @@ These signals are asynchronous to the CL clocks, and the following must be done 
 
 - vDIP: The vDIP signals should be synchronized to a CL clock before being used.
 
-   ```
+   ```verilog
       always @(posedge clk_main_a0)
        begin
           pre_sync_vdip <= sh_cl_status_vdip;
@@ -609,4 +623,81 @@ There are two global counter outputs that increment every 4ns.  These can be use
 
    - sh_cl_glcount0[63:0]
    - sh_cl_glcount1[63:0]
+
+<a name="impl_tips"></a>
+## Implementation Tips
+Here are some implementation tips.
+<a name="impl_tips_slr"></a>
+### Multi-SLR FPGA
+The VU9P FPGA is a stacked FPGA that has 3 die stacked together.  Each Die is called a “Super Logic Region” (SLR).  Crossing an SLR boundary is expensive from a timing perspective.  It is good practice to pipeline interfaces between major blocks to allow the tool freedom to have SLR crossings between the major blocks.  Even with pipelined interfaces it is possible the tool has sub-optimal logic to SLR mapping (i.e. a major block is spread out over multiple SLR's).  In this case  you may want to at map major blocks to specific SLRs (define the logic that should be constrained to each SLR).  Any crossing of SLR’s should have flops on either side (or register slices for AXI).  
+
+It is ideal to place logic that interfaces to the shell in the same SLR as the Shell logic for that interface.  If this is not possible, the first flop/register slice should be placed in the same SLR:
+* MID SLR:
+   *	CL_SH_DDR
+   *	BAR1
+   *	PCIM
+* BOTTOM SLR:
+   * PCIS
+   * OCL
+   * DDR STAT3
+* MID/BOTTOM
+   * DDR STAT0
+   * DDR STAT1
+   * SDA
+
+For the interfaces that are in both the MID/BOTTOM the recommendation is to use flops for pipelining, but don’t constrain to an SLR.  Also it is recommended to not use the SDA interface because it spans two SLR's (use BAR1 or OCL instead). You can constrain logic to a particular SLR by creating PBLOCKs (one per SLR), and assigning logic to the PBLOCKs (refer to cl_dram_dma example [cl_pnr_user.xdc](../cl/examples/cl_dram_dma/build/constraints/cl_pnr_user.xdc)).
+Dataflow should be mapped so that SLR crossing is minimized (for example a pipeline should be organized such that successive stages are mostly in the same SLR).
+
+Here’s an example post on the Xilinx forum which points to some documentation related to solving this:
+<https://forums.xilinx.com/t5/UltraScale-Architecture/Ultrascale-SLR-crossing/td-p/798435>
+
+There are some good timing closure tips in this methodology doc pointed to by the Xilinx forum post:
+<https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf>
+
+<a name="impl_tips_logic_levels"></a>
+### Logic Levels
+You can report all paths that are greater than a certain number of logic levels.  This can be used to iterate on timing in synthesis rather than waiting for place and route.  For example at 250MHz a general rule of thumb is try to keep logic levels to around 10.  The following commands report on all paths that have more than 10 logic levels:
+
+   * report_design_analysis -logic_level_distribution -of [get_timing_paths -max_paths 10000 -filter {LOGIC_LEVELS > **10**}]
+ 
+   * foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS > **10**}] {puts "[get_property STARTPOINT_PIN $gtp] [get_property ENDPOINT_PIN $gtp] [get_property SLACK $gtp] [get_propert LOGIC_LEVELS $gtp]"} 
+
+<a name="impl_tips_reset"></a>
+### Reset
+Reset fanout can be minimized in an FPGA.  This helps with routing congestion.  Flops can be initialized in their declaration and generally do not require resets:
+
+```verilog
+logic[3:0] my_flops = 4’ha;
+```
+
+If logic must have a reset, use synchronous resets rather than asynchronous resets:
+```verilog
+always @(posedge clk)
+   if (reset)
+      my_flop <= 4’ha;
+   else
+      my_flop <= nxt_my_flop; 
+```
+
+If there is still significant fanout of reset, it should be replicated and pipelined.  For example each major block could have its own pipelined version of reset.
+
+<a name="impl_tips_pipeline"></a>
+### Pipeline Registers
+You have to be careful that pipeline registers do not infer a shift register component.  The shift register is placed in a single area and does not accomplish any distance pipelining.  Here is a snippet to force the tools to not infer a shift register (shreg_extract="no" directive):
+
+```verilog
+  (*shreg_extract="no"*) logic [WIDTH-1:0] pipe[STAGES-1:0] = '{default:'0};
+```
+  
+<a name="impl_tips_vivado"></a>
+### Vivado Analysis  
+Vivado has some nice analysis capabilities:
+* report_methodology (includes CDC report)
+* clock interaction report (see if paths between async clocks are erroneously being timed)
+* congestion heat map
+* power analysis
+* physical implementation analysis (placement, routing)
+* linked timing/schematic/physical views 
+
+<https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug906-vivado-design-analysis.pdf>
 

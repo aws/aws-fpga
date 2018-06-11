@@ -24,5 +24,6 @@
 * Cadence Xcelium simulations tools
 
 ## Known Bugs/Issues
+* **sh_cl_ddr_is_ready[2:0]** outputs of sh_ddr.sv are not synchronized to clk_main_a0.  Developers should synchronize these signals to clk_main_a0.
 
 
