@@ -66,8 +66,11 @@ class TestLoadAfi(AwsFpgaTestBase):
         assert AwsFpgaTestBase.running_on_f1_instance(), 'This test must be run on an F1 instance. Instance type={}'.format(aws_fpga_test_utils.get_instance_type())
         return
 
+    def setup_method(self, test_method):
+        aws_fpga_test_utils.remove_all_drivers()
+
     def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
     def get_agfi(self, cl, xilinxVersion, option_tag):
         '''
@@ -264,41 +267,22 @@ class TestLoadAfi(AwsFpgaTestBase):
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && make -f Makefile SDK_DIR={}/sdk".format(self.WORKSPACE, cl, self.WORKSPACE))
         assert rc == 0, "Runtime software build failed."
 
+        # Load the AFI onto all available FPGAs
+        # This is required for the EDMA driver to correctly install for all slots
+        # We do this because otherwise installation on slots 1-7 doesn't seem to work.
+        logger.info("Loading the AFI into all slots")
+        for slot in slots_to_test:
+            self.load_agfi(cl, agfi, afi, slot)
+
         if install_edma_driver:
-            # Uninstall drivers just in case a previous test left them installed
-            aws_fpga_test_utils.remove_edma_driver()
-            aws_fpga_test_utils.remove_xdma_driver()
-
-            # Load the AFI onto all available FPGAs
-            # This is required for the EDMA driver to correctly installfor all slots
-            # We do this because otherwise installation on slots 1-7 doesn't seem to work.
-            logger.info("Loading the AFI into all slots before installing EDMA driver")
-            for slot in range(self.num_slots):
-                self.load_agfi(cl, agfi, afi, slot)
-
             aws_fpga_test_utils.install_edma_driver()
-            # Make sure that driver was installed on all slots
-            for slot in range(self.num_slots):
-                device_name = "/dev/edma{}_queue_0".format(slot)
-                assert os.path.exists(device_name), "EDMA driver not installed on slot {}".format(slot)
-        else:
-            # Load the AFI onto all the slots to be tested
-            for slot in slots_to_test:
-                self.load_agfi(cl, agfi, afi, slot)
 
         for slot in slots_to_test:
             logger.info("Running runtime software on slot {}".format(slot))
             self.check_runtime_software(cl, slot)
 
-        if install_edma_driver:
-            logger.info("Removing EDMA driver")
-            aws_fpga_test_utils.remove_edma_driver()
-
-            for slot in range(self.num_slots):
-                self.fpga_clear_local_image(slot)
-        else:
-            for slot in slots_to_test:
-                self.fpga_clear_local_image(slot)
+        for slot in slots_to_test:
+            self.fpga_clear_local_image(slot)
 
     def test_precompiled_cl_dram_dma(self, xilinxVersion):
         cl = 'cl_dram_dma'

@@ -26,6 +26,9 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.3.8 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-693.21.1.el7.x86_64 
+
 ## Release 1.3.7 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Support for Xilinx SDx/Vivado 2017.1 and Xilinx [SDx](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf)/[Vivado](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug973-vivado-release-notes-install-license.pdf) 2017.4 .    * This release supports Xilinx SDx 2017.4 and 2017.1.  The HDK and SDAccel setup scripts configure the development environment based on the tool version found in the PATH environment variable.  
    * FPGA developer kit version is listed in [hdk_version.txt](./hdk/hdk_version.txt)

@@ -58,13 +58,10 @@ class TestEdma(AwsFpgaTestBase):
         return
 
     def setup_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
     def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
-
+        aws_fpga_test_utils.remove_all_drivers()
 
     def test_unittest(self):
         self.load_msix_workaround(slot=0)

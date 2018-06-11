@@ -68,12 +68,10 @@ class TestXdma(AwsFpgaTestBase):
         return
 
     def setup_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
     def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_edma_driver()
-        aws_fpga_test_utils.remove_xdma_driver()
+        aws_fpga_test_utils.remove_all_drivers()
 
     def test_install(self):
         aws_fpga_test_utils.install_xdma_driver()
