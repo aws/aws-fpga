@@ -159,7 +159,7 @@ fi
 info_msg "Using SDx $RELEASE_VER"
 if [[ $RELEASE_VER =~ .*2017\.4.* ]]; then
     info_msg "Updating Xilinx SDAccel Examples 2017.4"
-    git submodule update --init -- SDAccel/examples/xilinx_2017.4
+    git submodule update --init --remote -- SDAccel/examples/xilinx_2017.4
     export VIVADO_TOOL_VER=2017.4
     if [ -e $SDACCEL_DIR/examples/xilinx ]; then
         if [ ! -L $SDACCEL_DIR/examples/xilinx ]; then
@@ -171,7 +171,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* ]]; then
     ln -s $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
 else
     info_msg "Updating Xilinx SDAccel Examples 2017.1"
-    git submodule update --init -- SDAccel/examples/xilinx_2017.1
+    git submodule update --init --remote -- SDAccel/examples/xilinx_2017.1
     export VIVADO_TOOL_VER=2017.1
     if [ -e $SDACCEL_DIR/examples/xilinx ]; then
         if [ ! -L $SDACCEL_DIR/examples/xilinx ]; then
