@@ -182,19 +182,6 @@ proc hdk_setup_proc {{args ""}} {
     set HDK_SHELL_DESIGN_DIR $HDK_SHELL_DIR/design
     set ::env(HDK_SHELL_DESIGN_DIR) $HDK_SHELL_DESIGN_DIR
 
-##export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/hdk\/common\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
-#	set PATH $::env(PATH)
-#	set PATH_list [split $PATH ";"]
-#	foreach {PATH_el} $PATH_list {
-#		if {[string match "*/hdk/common/scripts*" $PATH_el] eq 0} {
-#			lappend PATH_ret $PATH_el
-#		}
-#	}
-#	set PATH [join $PATH_ret ";"]
-##	set ::env(PATH) $PATH
-#	set PATH $AWS_FPGA_REPO_DIR/hdk/common/scripts;$PATH
-
-
 debug_msg "Done setting environment variables."
 
 # Download correct shell DCP

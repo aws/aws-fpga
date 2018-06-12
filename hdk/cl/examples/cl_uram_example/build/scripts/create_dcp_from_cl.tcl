@@ -364,7 +364,7 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Finished creating 
 
 if {[string compare $notify_via_sns "1"] == 0} {
   puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Calling notification script to send e-mail to $env(EMAIL)";
-  exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+  exec $env(AWS_FPGA_REPO_DIR)/shared/bin/scripts/notify_via_sns.py
 }
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Build complete.";

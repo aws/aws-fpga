@@ -20,7 +20,7 @@
 <a name="overviewdevkit"></a>
 # Overview of AWS EC2 FPGA Development Kit
 
-The AWS EC2 FPGA Development Kit is provided by AWS to support development and runtime on [AWS FPGA instances](https://aws.amazon.com/ec2/instance-types/f1/).  Amazon EC2 FPGA instances are high-performance compute instances with field programmable gate arrays (FPGAs) that are programmed to create custom hardware accelerations in EC2. F1 instances are easy to program and AWS provides everything needed to develop, simulate, debug, compile and run hardware accelerated applications.  Using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), developers create an FPGA design. Once the FPGA design (also called CL - Custom logic) is complete, developers create the Amazon FPGA Image (AFI), and deploy it to the F1 instance in just a few clicks. AFIs are reusable, shareable and can be deployed in a scalable and secure way.  
+The AWS EC2 FPGA Development Kit is provided by AWS to support development and runtime on [AWS FPGA instances](https://aws.amazon.com/ec2/instance-types/f1/).  Amazon EC2 FPGA instances are high-performance compute instances with field programmable gate arrays (FPGAs) that are programmed to create custom hardware accelerations in EC2. F1 instances are easy to program and AWS provides everything needed to develop, simulate, debug, compile and run hardware accelerated applications.  Using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), developers create an FPGA design. Once the FPGA design (also called CL - Custom logic) is complete, developers create the Amazon FPGA Image (AFI), and deploy it to the F1 instance in just a few clicks. AFIs are reusable, shareable and can be deployed in a scalable and secure way.
 ![Alt text](hdk/docs/images/f1-Instance-How-it-Works-flowchart.jpg)
 
 <a name="overviewdevenv"></a>
@@ -50,8 +50,8 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 | Vivado 2017.4 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | FPGA AFI Management Tools | Runtime | [SDK - fpga\_mgmt\_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
 | Virtual JTAG | Development (Debug) | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Runtime debug waveform |
-| wait\_for\_afi | Development | [wait\_for\_afi.py](hdk/common/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |
-| notify\_via\_sns | Development | [notify\_via\_sns.py](hdk/common/scripts/notify_via_sns.py) | Notifies developer when design build process completes |
+| wait\_for\_afi | Development | [wait\_for\_afi.py](shared/bin/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |
+| notify\_via\_sns | Development | [notify\_via\_sns.py](shared/bin/scripts/notify_via_sns.py) | Notifies developer when design build process completes |
 | AFI Administration | Development | [Copy](hdk/docs/copy_fpga_image.md), [Delete](hdk/docs/delete_fpga_image.md), [Describe](hdk/docs/describe_fpga_images.md), [Attributes](hdk/docs/fpga_image_attributes.md) | AWS CLI EC2 commands for managing your AFIs |
 
 
@@ -74,18 +74,18 @@ NOTE: For on-premises development, SDx/Vivado must have the correct license and 
 | WebP Image Compression   | [WebP](https://github.com/Xilinx/Applications/tree/master/webp) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up WebP encoder application on an FPGA |
 
 <a name="gettingstarted"></a>
-# Getting Started 
+# Getting Started
 
 ### New to AWS?
-If you are new to AWS, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), to learn how to use AWS EC2, S3 and the AWS CLI.  These services are required to start developing accelerations for AWS FPGAs. For example, creating an AFI requires [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) installed and the execution of `aws s3 <action>` (`aws ec2 create-fpga-image`).  
+If you are new to AWS, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), to learn how to use AWS EC2, S3 and the AWS CLI.  These services are required to start developing accelerations for AWS FPGAs. For example, creating an AFI requires [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) installed and the execution of `aws s3 <action>` (`aws ec2 create-fpga-image`).
 
 ### New to AWS FPGAs and setting up a development environment?
 The developer kit is supported for Linux operating systems only.  You have the choice to develop on AWS EC2 using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premises. Within a linux environment, you should execute `git clone https://github.com/aws/aws-fpga.git` to download the latest release to your EC2 Instance or local server. Using a SSH connection, execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/).
 
 Before you start our first AWS FPGA design, we recommend to go through one of the step-by-step guides.  The guides will walk through development steps for hello world examples.  Based on the tables above, pick the development environment that best fits your needs and use the guide to get started:
-  * For fastest way to get started on FPGA accelerator development, start with the software defined development environment.  The guide starts with the [SW Hello World example](SDAccel/README.md).  
-    * Next use the same guide to develop using the C/C++/openCL/RTL based [80+ examples on github](./SDAccel/examples/xilinx_2017.4).    
-  * For custom hardware development (HDK) environment, start with the [HDK Hello World example](hdk/README.md).  
+  * For fastest way to get started on FPGA accelerator development, start with the software defined development environment.  The guide starts with the [SW Hello World example](SDAccel/README.md).
+    * Next use the same guide to develop using the C/C++/openCL/RTL based [80+ examples on github](./SDAccel/examples/xilinx_2017.4).
+  * For custom hardware development (HDK) environment, start with the [HDK Hello World example](hdk/README.md).
     * Next use the same guide to develop using the [cl\_dram\_dma](hdk/cl/examples/cl_dram_dma).
 
 ### In-depth training and resources
@@ -101,9 +101,9 @@ Once you completed your hello world examples, we recommend diving deeper into a 
 <a name="devAmi"></a>
 # FPGA Developer AMI
 
-The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes free tools and drivers needed for FPGA development on EC2 instances. FPGA development runs on several [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code. 
+The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes free tools and drivers needed for FPGA development on EC2 instances. FPGA development runs on several [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
 
-Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4 and 2017.1 toolchain versions. The following compatibility table describes the mapping of developer kit version to AMI version:  
+Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4 and 2017.1 toolchain versions. The following compatibility table describes the mapping of developer kit version to AMI version:
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
 |-----------|-----------|------|
@@ -115,26 +115,26 @@ Currently, AWS marketplace includes multiple versions of the FPGA developer AMI,
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)
 
-The [HDK directory](./hdk/README.md) contains useful information, examples, and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The developer kit is not required if you plan to use a pre-built AFI shared from another developer. 
+The [HDK directory](./hdk/README.md) contains useful information, examples, and scripts for developers wanting to start building Amazon FPGA Images (AFI).  It includes the development environment, simulation, build and AFI creation scripts.  The HDK can be installed on any on-premises server or an EC2 instance. The developer kit is not required if you plan to use a pre-built AFI shared from another developer.
 
 <a name="sdaccel"></a>
-# Software-defined Development Environment 
+# Software-defined Development Environment
 
 The software-defined development environment allows customers to compile their C/C++/OpenCL code into the FPGA as kernels, and use OpenCL APIs to pass data to the FPGA. Software developers with no FPGA experience will find a familiar development experience that supercharges cloud applications.
 
-In addition, this development environment (also called SDAccel) allows the mix of C/C++ and RTL accelerator designs into a C/C++ software based development environment.  This method enables faster prototyping using C/C++ while supporting manual optimization of critical blocks within RTL.  This approach is similar to optimizing time critical functions using software compiler optimization methods. 
+In addition, this development environment (also called SDAccel) allows the mix of C/C++ and RTL accelerator designs into a C/C++ software based development environment.  This method enables faster prototyping using C/C++ while supporting manual optimization of critical blocks within RTL.  This approach is similar to optimizing time critical functions using software compiler optimization methods.
 
 This developer kit has 80+ examples to help you get started on FPGA acceleration.  To get started, review the [Software-defined development environment readme](SDAccel/README.md).
 
 <a name="fpgasdk"></a>
 # Runtime Tools (SDK)
 
-The [SDK directory](./sdk/README.md) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded on the FPGA instance. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following sdk resources are provided: 
+The [SDK directory](./sdk/README.md) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded on the FPGA instance. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following sdk resources are provided:
   * Linux Kernel Drivers - The developer kit includes three drivers:
     * [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md) - DMA interface to/from HDK accelerators.
     * [XOCL Driver](sdk/linux_kernel_drivers/xocl) - DMA interface with software defined accelerators (also called hardware kernels).
     * [EDMA Driver](sdk/linux_kernel_drivers/edma/README.md) - Legacy DMA interface to/from HDK accelerators.
-  * [FPGA Libraries](sdk/userspace/fpga_libs) - APIs used by C/C++ host applications. 
+  * [FPGA Libraries](sdk/userspace/fpga_libs) - APIs used by C/C++ host applications.
   * [FPGA Management Tools](sdk/userspace/fpga_mgmt_tools/README.md) - AFI management APIs for runtime loading/clearing FPGA image, gathering metrics and debug interface on the F1 instance.
 
 <a name="devSupport"></a>
@@ -142,7 +142,7 @@ The [SDK directory](./sdk/README.md) includes the runtime environment required t
 
 The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) is the first place to go to post questions, learn from other users and read announcements from the EC2 FPGA team.
 
-* Click the "Watch" button in GitHub upper right corner to get regular updates. 
+* Click the "Watch" button in GitHub upper right corner to get regular updates.
 * We recommend you will join the [AWS forum](https://forums.aws.amazon.com/forum.jspa?forumID=243) to engage with the FPGA developer community and get help when needed (both AWS and Xilinx engineers monitor this forum).
 * In case you can't see "Your Stuff" details, you will need to logout using the logout button on the forums page and log back in again.
 
@@ -180,7 +180,7 @@ The documentation is located throughout this developer kit, therefore, to help d
   * [Searching code](https://help.github.com/articles/searching-code/) and [advanced search syntax](https://help.github.com/articles/understanding-the-search-syntax/)
   * [Finding files](https://help.github.com/articles/finding-files-on-github/)
   * Simply replace github.com with gitprint.com to generate a printable PDF
-  
+
 
 
 

@@ -115,7 +115,7 @@ class TestCreateAfi(AwsFpgaTestBase):
         self.s3_client().upload_file(id_filename, self.s3_bucket, id_filename_key)
 
         # Wait for the AFI to complete
-        rc = os.system(self.WORKSPACE + "/hdk/common/scripts/wait_for_afi.py --afi {}".format(afi))
+        rc = os.system(self.WORKSPACE + "/shared/bin/scripts/wait_for_afi.py --afi {}".format(afi))
         assert rc == 0
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)

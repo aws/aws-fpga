@@ -37,7 +37,7 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestHdkScripts(AwsFpgaTestBase):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
     '''
 
@@ -56,13 +56,13 @@ class TestHdkScripts(AwsFpgaTestBase):
         assert False
 
     def test_wait_for_afi(self):
-        self.run_cmd("{}/hdk/common/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
+        self.run_cmd("{}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
 
     def test_wait_for_afi_python27(self):
-        self.run_cmd("python2.7 {}/hdk/common/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
+        self.run_cmd("python2.7 {}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
 
     def test_wait_for_afi_python34(self):
-        self.run_cmd("python3.4 {}/hdk/common/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
+        self.run_cmd("python3.4 {}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
 
     @pytest.mark.skip(reason="Not implemented")
     def test_notify_via_sns(self):
