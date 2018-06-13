@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Amazon FPGA Hardware Development Kit
 #

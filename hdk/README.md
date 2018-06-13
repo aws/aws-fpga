@@ -167,7 +167,7 @@ You need to prepare the following information:
 4. Location of an S3 directory where AWS would write back logs of the AFI creation.
 5. AWS region where the AFI will be created.  Use [copy-fpga-image](./docs/copy_fpga_image.md) API to copy an AFI to a different region.
 
-To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html)).
+To upload your tarball file to S3, you can use any of [the tools supported by S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/UploadingObjects.html).
 
 For example, you can use the AWS CLI as follows:
 

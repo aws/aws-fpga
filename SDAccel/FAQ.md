@@ -64,6 +64,9 @@ A: Please make sure you executed the following commands before launching SDX gui
   3.	unset –f _moduleraw
   4.	unset –f module
   
+## Q: How do I debug error: `No current synthesis run set`? 
+A: You may have run the previous [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. It is recommended to remove it before switching from hardware development flow to SDAccel. 
+
 # Additional Resources
 
 The [AWS SDAccel README].

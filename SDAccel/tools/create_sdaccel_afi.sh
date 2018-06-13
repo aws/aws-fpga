@@ -90,6 +90,11 @@ while [ "$1" != "" ]; do
     shift                                         
 done                                              
 
+if [ "$RELEASE_VER" == "" ]
+then
+    err_msg "Env variable RELEASE_VER not set, did you `source sdaccel_setup.sh`?"
+    exit 1
+fi
 
 if [[ -e "$xclbin" ]]
 then                 

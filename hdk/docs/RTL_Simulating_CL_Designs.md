@@ -2,7 +2,7 @@
 
 # Introduction
 
-Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence and Synopsys' VCS RTL simulators. Developers can write their tests in SystemVerilog and/or C languages. If a developer choose to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
+Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK comes with a shell simulation model that supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence and Synopsys' VCS RTL simulators (See [ERRATA](../../ERRATA.md) for currently unsupported simulator versions). Developers can write their tests in SystemVerilog and/or C languages. If a developer chooses to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
 
 <img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
 
@@ -12,7 +12,7 @@ Developers tend to simulate their designs to validate the RTL design and functio
 
 One easy way is to have a pre-installed environment is to use the [AWS FPGA Developer AMI available on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes with pre-installed Vivado tools and license.
 
-For developers who like to work on-premises or different AMI in the cloud, AWS recommend to follow the [required license for on-premise document](./on_premise_licensing_help.md).
+For developers who like to work on-premises or different AMI in the cloud, AWS recommends following the [required license for on-premise document](./on_premise_licensing_help.md).
 
 Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vivado version](../../supported_vivado_versions.txt) for the exact version of Vivado tools, and the required license components.
 
@@ -29,7 +29,7 @@ AWS FPGA HDK can be cloned and installed on your EC2 instance or server by calli
 ### Try out one of HDK examples or write your own
 
 ```
-    $ cd cl/examples/cl_hello_world/verif/scripts    # simulations are launched from the scripts subdir of the design
+    $ cd hdk/cl/examples/cl_hello_world/verif/scripts    # simulations are launched from the scripts subdir of the design
     $ make                                       # run the default test using the Vivado XSIM
          Running compilation flow
          Done compilation
