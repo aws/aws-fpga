@@ -29,7 +29,7 @@ For more information about the hello\_world example, read the following informat
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    

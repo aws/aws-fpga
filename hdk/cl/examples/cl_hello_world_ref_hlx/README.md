@@ -36,7 +36,7 @@ The logic for the original cl\_hello\_world example from github is contained in 
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    
@@ -84,7 +84,7 @@ The simulation settings are already configured.
 
 **NOTE**: *If Critical Warnings appear click OK and that the following command needs to be run two times. This is a known issue and will be addressed in later versions of the design.*
 
-run -all
+`run -all`
 
 <a name="impl"></a>
 ### Implementing the Design

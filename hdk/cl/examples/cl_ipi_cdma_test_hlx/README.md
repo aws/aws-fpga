@@ -40,7 +40,7 @@ Read from VLED from Verilog task or linux command to read VLED to verify pattern
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    
@@ -86,7 +86,7 @@ The simulation settings are already configured.
 
 **NOTE**: *If Critical Warnings appear click OK and that the following command needs to be run two times. This is a known issue and will be addressed in later versions of the design.*
 
-run -all
+`run -all`
 
 <a name="impl"></a>
 ### Implementing the Design
