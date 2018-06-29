@@ -28,6 +28,7 @@ if {[info exist FAAS_CL_DIR] eq 0} {
 }
 
 source ${sdp_script_dir}/apply_debug_constraints_hlx.tcl
+set_param hd.clockRoutingWireReduction false 
 
 set timestamp $::env(timestamp)
 write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_opt.dcp

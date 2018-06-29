@@ -71,10 +71,6 @@ The simulation settings are already configured.
    * Add signals needed in the simulation
    * Type `run -all` in the TCL console
 
-**NOTE**: *If Critical Warnings appear click OK and that the following command needs to be run two times. This is a known issue and will be addressed in later versions of the design.*
-
-`run -all`
-
 <a name="impl"></a>
 ### Implementing the Design
 
