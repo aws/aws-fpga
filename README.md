@@ -112,23 +112,6 @@ Currently, AWS marketplace includes multiple versions of the FPGA developer AMI,
 | 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 | 1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 
-<a name="devAmi"></a>
-## FPGA Developer AMI
-
-AWS Marketplace offers the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) for development on EC2 instances. The FPGA Developer AMI comes with Xilinx tools and AWS CLI pre-installed.  The HDK examples and quick start can be run on any [C4/C5/M4/M5/R4/T2.2XLARGE](https://aws.amazon.com/ec2/instance-types/) EC2 instance. Given the large size of the FPGA used in AWS FPGA instances, the implementation tools require 32GiB Memory (ex: C4.4XLarge, M4.2XLarge, R4.XLarge, T2.2XLarge). C4.4XLarge and C4.8XLarge would provide the fastest execution time with 30 and 60GiB of memory respectively.
-
-This release supports Xilinx SDx 2017.4 and 2017.1.  The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
-
-| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
-|-----------|-----------|------|
-| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
-| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
-| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
-
-FPGA developer kit version is listed in [hdk_version.txt](./hdk/hdk_version.txt)
-
-FPGA developer kit supported tool versions are listed in [supported_vivado_versions](./supported_vivado_versions.txt)
-
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)
 

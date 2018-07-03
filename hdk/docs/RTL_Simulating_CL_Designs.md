@@ -257,24 +257,11 @@ SV_TEST macro should be defined in HW makefile to enable HW simulation of test_d
 
 ```
 
-
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
 ```
     $ cd verif/scripts
     $ make C_TEST={your_test_name} # compile and run using XSIM (NOTE: Do Not include .c)
-    $ cd ../sim/{your_test_name} # to view the test log files
-    
-    $ cd verif/scripts
-    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
-    $ cd ../sim/{your_test_name} # to view the test log files
-
-    $ cd verif/scripts
-    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
-    $ cd ../sim/{your_test_name} # to view the test log files
-
-    $ cd verif/scripts
-    $ make C_TEST={your_test_name} VCS=1 # compile and run using VCS (NOTE: Do Not include .c)
     $ cd ../sim/{your_test_name} # to view the test log files
 
     $ cd verif/scripts
