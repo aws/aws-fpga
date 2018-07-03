@@ -33,14 +33,16 @@
 -include ${SH_INF_DIR}
 -include ${SH_SH_DIR}
 -include ${HDK_COMMON_DIR}/verif/include
+-include ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/sim
 -include ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog
+-include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/hdl
 -include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl
 
 ${CL_ROOT}/../common/design/cl_common_defines.vh
 ${CL_ROOT}/design/cl_hello_world_defines.vh
 ${HDK_SHELL_DESIGN_DIR}/ip/ila_vio_counter/sim/ila_vio_counter.v
 ${HDK_SHELL_DESIGN_DIR}/ip/ila_0/sim/ila_0.v
-${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/hdl/bd_a493.v
+${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/sim/bd_a493.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/sim/bd_a493_xsdbm_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/xsdbm_v3_0_vl_rfs.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/ltlib_v1_0_vl_rfs.v

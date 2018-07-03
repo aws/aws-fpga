@@ -109,25 +109,26 @@ out:
 
 /* 
  * Write 4 identical buffers to the 4 different DRAM channels of the AFI
- * using fsync() between the writes and read to insure order
  */
 
 int dma_example_hwsw_cosim(int slot_id) {
-    int fd, rc;
+    int write_fd, read_fd, rc;
 
     read_buffer = NULL;
     write_buffer = NULL;
-    fd = -1;
+    write_fd = -1;
+    read_fd = -1;
 
     write_buffer = (char *)malloc(buffer_size);
     read_buffer = (char *)malloc(buffer_size);
     if (write_buffer == NULL || read_buffer == NULL) {
-        rc = ENOMEM;
+        rc = -ENOMEM;
         goto out;
     }
 
 #ifndef SV_TEST
-    fd = open_dma_queue(slot_id);
+    rc = open_dma_queue(slot_id, &write_fd, &read_fd);
+    fail_on(rc, out, "open_dma_queue failed");
 #else
     init_ddr();
 #endif
@@ -135,19 +136,11 @@ int dma_example_hwsw_cosim(int slot_id) {
     rand_string(write_buffer, buffer_size);
 
     for (channel=0; channel < 4; channel++) {
-      fpga_write_buffer_to_cl(slot_id, channel, fd, buffer_size, (0x10000000 + channel*MEM_16G));
+        fpga_write_buffer_to_cl(slot_id, channel, write_fd, buffer_size, (0x10000000 + channel*MEM_16G));
     }
 
-    /* fsync() will make sure the write made it to the target buffer 
-     * before read is done
-     */
-#ifndef SV_TEST
-    rc = fsync(fd);
-    fail_on((rc = (rc < 0)? errno:0), out, "call to fsync failed.");
-#endif
-
     for (channel=0; channel < 4; channel++) {
-      fpga_read_cl_to_buffer(slot_id, channel, fd, buffer_size, (0x10000000 + channel*MEM_16G));
+        fpga_read_cl_to_buffer(slot_id, channel, read_fd, buffer_size, (0x10000000 + channel*MEM_16G));
     }
 
 out:
@@ -159,8 +152,11 @@ out:
     if (read_buffer != NULL) {
         free(read_buffer);
     }
-    if (fd >= 0) {
-        close(fd);
+    if (write_fd >= 0) {
+        close(write_fd);
+    }
+    if (read_fd >= 0) {
+        close(read_fd);
     }
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);

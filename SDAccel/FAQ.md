@@ -49,13 +49,23 @@ A: There are 2 vivado project files:
 A: 
 1. Verify hw_emu works as expected.  Using less data in hw_emu
 1. Add assert where run fails and check same conditions for hw_emu
-1. See "Chapter 8 - Debugging Applications in the SDAccel Environment" in [2017.4 SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
+1. See "Chapter 4 - Debugging Applications in the SDAccel Environment" in [latest SDAccel Environment User Guide]
 
 ## Q: Bitstream creation fails to create design less that 60 MHz?
 A: SDAccel flow does not allow clocks running less that 60 MHz kernel clock, therefore, you will need to debug further using [HLS Debug suggestions](./docs/SDAccel_HLS_Debug.md)
 
-## Q: Using the .xcp file generated from xocc results in an error?
-A: Directly using the .xcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
+## Q: Using the .dcp file generated from xocc results in an error?
+A: Directly using the .dcp file without conversion to .xclbin file will result in an error - Error: ... invalid binary.  See [Instructions on how to create AFI and subsequent execution process](./README.md#createafi)
+
+## Q: Debugging using gdb in SDX gui is not working? 
+A: Please make sure you executed the following commands before launching SDX gui.
+  1.	mv /usr/local/Modules/init init.bak
+  2.	unset –f switchml
+  3.	unset –f _moduleraw
+  4.	unset –f module
+  
+## Q: How do I debug error: `No current synthesis run set`? 
+A: You may have run the previous [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. It is recommended to remove it before switching from hardware development flow to SDAccel. 
 
 # Additional Resources
  * [AWS SDAccel Readme](README.md)
@@ -68,3 +78,32 @@ A: Directly using the .xcp file without conversion to .xclbin file will result i
  * [2017.4 SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
  * [2017.1 SDAccel Environment Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
 
+The [AWS SDAccel README].
+
+Xilinx web portal for [Xilinx SDAccel documentation] and for [Xilinx SDAccel GitHub repository]
+
+Links pointing to **latest** version of the user guides
+   * [UG1023: SDAccel Environment User Guide][latest SDAccel Environment User Guide]
+   * [UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][latest UG1021]
+   * [UG1207: SDAccel Environment Optimization Guide][latest SDAccel Environment Optimization Guide]
+   * [UG949: UltraFast Design Methodology Guide for the Vivado Design Suite][latest UG949]
+
+Links pointing to **2017.4** version of the user guides
+   * [UG1023: SDAccel Environment User Guide][UG1023 2017.4]
+   * [UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][UG1021 2017.4]
+   * [UG1207: SDAccel Environment Optimization Guide][UG1207 2017.4]
+   * [UG1238: SDx Development Environment Release Notes, Installation, and Licensing Guide][UG1238 2017.4]
+   * [SDAccel_landing_page](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html)
+   * [Vivado HLS landing page](https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html
+   * [Vivado landing page](https://www.xilinx.com/products/design-tools/vivado.html)
+   * [SDAccel Environment User Guide](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1023-sdaccel-user-guide.pdf)
+   * [SDAccel Intro Tutorial](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1021-sdaccel-intro-tutorial.pdf)
+   * [SDAccel Environment Optimization Guide](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf)
+   * [Vivado Design Methodology](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug949-vivado-design-methodology.pdf)
+   * [2017.4 SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
+   * [2017.4 SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
+   * [2017.4 SDAccel Environment Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
+   * [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html#documentation)
+   * [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
+   * [AWS SDAccel Readme](README.md)
+   * [Debug HLS Performance: Limited memory ports](./docs/SDAccel_HLS_Debug.md)

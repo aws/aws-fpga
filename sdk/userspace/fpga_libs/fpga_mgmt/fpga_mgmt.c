@@ -24,8 +24,8 @@
 #include "fpga_mgmt_internal.h"
 
 /** Synchronous API (load/clear) default timeout and delay msecs */
-#define FPGA_MGMT_SYNC_TIMEOUT		300	
-#define FPGA_MGMT_SYNC_DELAY_MSEC	200 
+#define FPGA_MGMT_SYNC_TIMEOUT		3000
+#define FPGA_MGMT_SYNC_DELAY_MSEC	20
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {
 	.timeout = FPGA_MGMT_TIMEOUT_DFLT,

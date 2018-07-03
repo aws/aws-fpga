@@ -44,7 +44,7 @@ There are three main components which enable XVC debug on AWS FPGA enabled insta
 <a name="embeddingDebugCores"></a>
 # Embedding Debug Cores in CL 
 
-The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_v071417d3/design/ip/cl_debug_bridge/sim/cl_debug_bridge.v)
+The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_v04261818/design/ip/cl_debug_bridge/sim/cl_debug_bridge.v)
 provided by AWS as part of the HDK, and any required standard Xilinx debug IP components like ILAs and VIOs. 
 
 The following list describes the steps to successfully setup debug in a CL:  

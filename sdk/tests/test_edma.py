@@ -54,40 +54,80 @@ class TestEdma(AwsFpgaTestBase):
 
         (cls.cl_dram_dma_agfi, cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_dram_dma')
 
-        cls.get_fio_dma_tools()
+        for slot in range(AwsFpgaTestBase.num_slots):
+            AwsFpgaTestBase.load_msix_workaround(slot)
+
+        cls.setup_fio_tools()
+
         return
 
     def setup_method(self, test_method):
         aws_fpga_test_utils.remove_all_drivers()
 
+        for slot in range(AwsFpgaTestBase.num_slots):
+            self.fpga_load_local_image(self.cl_dram_dma_agfi, slot)
+            assert AwsFpgaTestBase.check_fpga_afi_loaded(self.cl_dram_dma_agfi, slot), "{} not loaded in slot {}".format(self.cl_dram_dma_agfi, slot)
+
     def teardown_method(self, test_method):
         aws_fpga_test_utils.remove_all_drivers()
 
-    def test_unittest(self):
-        self.load_msix_workaround(slot=0)
-        self.fpga_load_local_image(self.cl_dram_dma_agfi, 0)
-        aws_fpga_test_utils.install_edma_driver()
+        for slot in range(AwsFpgaTestBase.num_slots):
+            AwsFpgaTestBase.fpga_clear_local_image(slot)
+
+    @pytest.fixture(params=['poll','interrupt'])
+    def driver_mode(self, request):
+        return request.param
+
+    def test_unittest(self, driver_mode):
+        aws_fpga_test_utils.install_edma_driver(mode=driver_mode)
         assert aws_fpga_test_utils.edma_driver_installed() == True
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_unit_test.sh".format(self.WORKSPACE), echo=True)
         assert rc == 0
 
-    def test_perftest(self):
-        self.load_msix_workaround(slot=0)
-        self.fpga_load_local_image(self.cl_dram_dma_agfi, 0)
-        aws_fpga_test_utils.install_edma_driver()
+    def test_perftest(self, driver_mode):
+
+        aws_fpga_test_utils.install_edma_driver(mode=driver_mode)
         assert aws_fpga_test_utils.edma_driver_installed() == True
         (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma/unit-test && ./run_perf_test.sh".format(self.WORKSPACE), echo=True)
         assert rc == 0
 
-    @pytest.mark.skip(reason="Flaky. We Re-start tests after shell updates.")
-    def test_fio_perf(self):
-        # Build the driver so the fio script can install it.
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/edma && make".format(self.WORKSPACE), echo=True)
-        assert rc == 0
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/tests/fio_dma_tools && sudo ./edma_perf.sh 1 0 {} {} {}".format(
-            self.WORKSPACE, self.msix_agfi, self.cl_dram_dma_agfi, self.WORKSPACE), check=False, echo=True)
+    def test_fio_dma_verify(self, driver_mode):
+        aws_fpga_test_utils.install_edma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.edma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_verify_script(driver='edma')), echo=True, check=False)
         if rc != 0:
-            logger.error("FIO EDMA test failed")
+            logger.error("FIO edma verify test failed")
+            # Create some diagnostic information
+            # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
+            self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)
+            for slot in range(self.num_slots):
+                self.run_cmd("sudo fpga-describe-local-image -S {} -M".format(slot), check=False, echo=True)
+        assert rc == 0
+
+    @pytest.mark.xfail(reason='These are flaky tests. Might fail, but still need to see what\'s going on')
+    def test_fio_write_benchmark(self, driver_mode):
+        aws_fpga_test_utils.install_edma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.edma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_write_benchmark_script(driver='edma')), echo=True, check=False)
+        if rc != 0:
+            logger.error("FIO edma write benchmark test failed")
+            # Create some diagnostic information
+            # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
+            self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)
+            for slot in range(self.num_slots):
+                self.run_cmd("sudo fpga-describe-local-image -S {} -M".format(slot), check=False, echo=True)
+        assert rc == 0
+
+    @pytest.mark.xfail(reason='These are flaky tests. Might fail, but still need to see what\'s going on')
+    def test_fio_read_benchmark(self, driver_mode):
+        aws_fpga_test_utils.install_edma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.edma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_read_benchmark_script(driver='edma')), echo=True, check=False)
+        if rc != 0:
+            logger.error("FIO edma read benchmark test failed")
             # Create some diagnostic information
             # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
             self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)

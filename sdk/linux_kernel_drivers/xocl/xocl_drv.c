@@ -70,8 +70,7 @@ static const struct pci_device_id pciidlist[] = {
 	{ PCI_DEVICE(0x10ee, 0x6A90), },
 	{ PCI_DEVICE(0x10ee, 0x6E50), },
 	{ PCI_DEVICE(0x10ee, 0x6B10), },
-	//{ PCI_DEVICE(0x1d0f, 0x1042), },
-	{ PCI_DEVICE(0x1d0f, 0xf000), },
+	{ PCI_DEVICE(0x1d0f, 0xf010), }, // shell 1.4
 	{ 0, }
 };
 
@@ -95,7 +94,7 @@ static int probe_feature_rom(struct drm_xocl_dev *xdev)
 	val = ioread32(xdev->user_bar + XOCL_FEATURE_ROM);
 	// Magic number check
 	if (val != 0x786e6c78) {
-      if (xdev->ddev->pdev->vendor == 0x1d0f && (xdev->ddev->pdev->device == 0x1042 || xdev->ddev->pdev->device == 0xf000)) {
+      if (xdev->ddev->pdev->vendor == 0x1d0f && (xdev->ddev->pdev->device == 0x1042 || xdev->ddev->pdev->device == 0xf010)) {
         printk(KERN_INFO "XOCL: Found AWS VU9P Device without featureROM\n");
         //This is AWS device. Fill the FeatureROM struct. Right now it doesn't have FeatureROM
         memset(xdev->header.EntryPointString, 0, sizeof(xdev->header.EntryPointString));

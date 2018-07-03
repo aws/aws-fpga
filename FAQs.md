@@ -6,7 +6,7 @@
 
 [Marketplace FAQs](#marketplace)
 
-[F1 Instance and Tools FAQs](#instance)
+[F1 Instance and Runtime Tools FAQs](#instance)
 
 [Development Languages FAQs](#languages)
 
@@ -16,8 +16,8 @@
 
 [Troubleshooting FAQs](#troubleshooting)
 
-
-## General
+<a name="general"></a>
+## General F1 FAQs
 
 **Q: How is developing a FPGA design for the cloud different from the common practice outside the cloud?**
 
@@ -203,8 +203,8 @@ Yes. Developers are free to use any IP blocks within the Custom Logic region. Th
 **Note** * AWS supports only the IP blocks contained in the HDK.*
 
 
-
-## Getting Started
+<a name="getting-started"></a>
+## Getting Started FAQs
 **Q: What AWS knowledge do I need to learn before I can develop accelerators and run on AWS F1 instances?**
 
 [AWS Getting Started Resource Center](https://aws.amazon.com/getting-started/) has lots of resources to help developers get started.  For F1 development, launching linux virtual machines (EC2) and storing and retrieving files from S3 are required skills.
@@ -261,7 +261,8 @@ pip install awscli --upgrade --user
 The AWS CLI [documentation page](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) shows steps to update the AWS CLI.
 We recommend using the latest available version to be able to use the expanding list of commands that we add.
 
-## Marketplace
+<a name="marketplace"></a>
+## Marketplace FAQs
 **Q: What does publishing my AFI/AMI to AWS Marketplace enables?**
 
 FPGA Developers can share or sell their AFI/AMI using the AWS Marketplace to other AWS users. Once in Marketplace, AWS users can launch an F1 instance with that AFI/AMI combination with the 1-click deployment feature. Marketplace Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption. The metering, billing, collections, and disbursement of payments are managed by AWS, allowing developers to focus on marketing their solution. Please check out [AWS Marketplace Tour](https://aws.amazon.com/marketplace/management/tour/) for more details on how to become an AWS Marketplace seller, how to set pricing and collect metrics.
@@ -276,8 +277,8 @@ First, you need to [register as a Marketplace Seller](https://aws.amazon.com/mar
 
 Neither, no FPGA internal design code is exposed. AWS Marketplace customers that pick up an AMI with one or more AFIs associated with it will not see any source code nor bitstream. Marketplace customers actually have permission to use the AFI but no permission to see its code. The only reference to the AFI is through its unique AFI ID. The AMI would call `fpga-local-load-image` with the correct AFI ID for that Marketplace offering, which will result in **AWS loading the AFI into the FPGA** in a sideband channel and without sending the AFI code through the customer's instance.
 
-
-## Instance
+<a name="instance"></a>
+## F1 Instance and Runtime Tools FAQs
 **Q: What OS can run on the F1 instance?**
 
 Amazon Linux 2016.09 and CentOS 7.3 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows OSs are not supported on F1.
@@ -341,8 +342,8 @@ The developer can take advantage of a userspace polling-mode driver framework li
 
 No. The FPGAs do not have direct access to the SSDs on F1. The SSDs on F1 are high-performance, NVMe SSD devices. The developer can take advantage of a userspace polling-mode driver framework like SPDK, to implement fast and low-latency copy between the NVMe SSD and the FPGA, with the data most probably being stored in the x86 LastLevelCache (LLC).
 
-
-## Languages
+<a name="languages"></a>
+## Development Languages FAQs
 **Q: Which HDL languages are supported?**
 
 For RTL level development: Verilog and VHDL are both supported in the FPGA Developer AMI and in generating a Design Checkpoint. The Xilinx Vivado tools and simulator support mixed mode simulation of Verilog and VHDL. The AWS Shell is written in Verilog. Support for mixed mode simulation may vary if developers use other simulators. Check your simulator documentation for Verilog/VHDL/System Verilog support.
@@ -367,8 +368,8 @@ The FPGA Developer AMI has built-in support for the Xilinx XSIM simulator. All l
 
 Support for other simulators is included through the bring-your-own license in the FPGA Developer AMI. AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim, and Cadence Incisive. Licenses for these simulators must be acquired by the developer and are not available with AWS FPGA Developer AMI.
 
-
-## FPGA
+<a name="fpga"></a>
+## FPGA Specific FAQs
 **Q: What FPGA is used in AWS EC2 F1 instance?**
 
 The FPGA for F1 is the Xilinx Ultrascale+ VU9P device with the -2 speed grade. The HDK scripts have the compile scripts needed for the VU9P device.
@@ -400,14 +401,14 @@ The FPGA Shell provides a selectable frequency clocks (up to 8 clocks) from the 
 
 **Q: What memory is attached to the FPGA?**
 
-Each FPGA on F1 has 4 x DDR4 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory available localy to each F1 FPGA.
+Each FPGA on F1 has 4 x DDR4 interfaces, each is 72bits wide (64bit data). Each DRAM interface has 16GiB of RDRAM attached. This yields 64GiB of total DRAM memory available locally to each F1 FPGA.
 
 
 **Q: What FPGA debug capabilities are supported?**
 
 AWS FPGA instances offer four debugging utilities:
 
-* The first is the Virtual JTAG included in the AWS Shell. It provides an equivalent function to a physical JTAG debugger with exception that it's an emulated JTAG-over-PCIe.  Based on Xilinxs' ChipScope circuit, the Virtual JTAG is pre-integrated with AWS Shell and available to the instance over memory-mapped PCIe space. The driver is included with the F1 SDK.
+* The first is the Virtual JTAG included in the AWS Shell. It provides an equivalent function to a physical JTAG debugger with exception that it's an emulated JTAG-over-PCIe.  Based on Xilinx ChipScope circuit, the Virtual JTAG is pre-integrated with AWS Shell and available to the instance over memory-mapped PCIe space. The driver is included with the F1 SDK.
 
 * The second is the usage metrics available through the FPGA Image Management tools. The `fpga-describe-local-image` command allows the F1 instance to query metrics from the Shell and Shell to Custom Logic (CL) interfaces. See Shell Interface specification and FPGA Image Management tools for more information on supported metrics.
 
@@ -419,8 +420,8 @@ Refer to [Virtual JTAG readme](./hdk/docs/Virtual_JTAG_XVC.md) for more details.
 
 
 
-
-## Shell
+<a name="shell"></a>
+## General AWS FPGA Shell FAQs
 **Q: Do I need to interface to the AWS Shell?**
 
 Yes. The only way to interface to PCIe and the instance CPU is using the AWS Shell. The AWS Shell is included with every FPGA. There is no option to run the F1 FPGA without a Shell. The Shell takes care of the non-differentiating heavy lifting tasks like PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
@@ -436,8 +437,8 @@ Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common 
 The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
 
 
-
-## Troubleshooting
+<a name="troubleshooting"></a>
+## Troubleshooting FAQs
 **Q: Why do I see error “vivado not found” while running hdk_setup.sh?**
 
 This is an indication that Xilinx Vivado tool set are not installed. Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.

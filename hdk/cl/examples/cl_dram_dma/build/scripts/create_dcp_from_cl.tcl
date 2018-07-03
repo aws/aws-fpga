@@ -142,8 +142,6 @@ set_msg_config -id {DRC CKLD-2}          -suppress
 set_msg_config -id {DRC REQP-1853}       -suppress
 set_msg_config -id {Timing 38-436}       -suppress
 
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
-
 # Check that an email address has been set, else unset notify_via_sns
 
 if {[string compare $notify_via_sns "1"] == 0} {
@@ -185,6 +183,8 @@ switch $strategy {
     }
 }
 
+puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
+
 #Encrypt source code
 source encrypt.tcl
 
@@ -201,12 +201,20 @@ source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
 
 source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
+#################################################################
+##### Do not remove this setting. Need to workaround bug in 2017.4
+##################################################################
+set_param hd.clockRoutingWireReduction false
 
 ##################################################
 ### CL XPR OOC Synthesis
 ##################################################
 if {${cl.synth}} {
    source -notrace ./synth_${CL_MODULE}.tcl
+   set synth_dcp ${timestamp}.CL.post_synth.dcp
+} else {
+   open_checkpoint ../checkpoints/CL.post_synth.dcp
+   set synth_dcp CL.post_synth.dcp
 }
 
 ##################################################
@@ -223,8 +231,9 @@ if {$implement} {
       set_property IP_REPO_PATHS $cacheDir [current_project]
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Combining Shell and CL design checkpoints";
       add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-      add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
-      set_property SCOPED_TO_CELLS {CL} [get_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp]
+      #add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+      add_files $CL_DIR/build/checkpoints/$synth_dcp
+      set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $CL_DIR/build/checkpoints/$synth_dcp]
 
       #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
       read_xdc [ list \
@@ -233,7 +242,7 @@ if {$implement} {
       set_property PROCESSING_ORDER late [get_files cl_pnr_user.xdc]
 
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running link_design";
-      link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {SH CL}
+      link_design -top $TOP -part [DEVICE_TYPE] -reconfig_partitions {WRAPPER_INST/SH WRAPPER_INST/CL}
 
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - PLATFORM.IMPL==[get_property PLATFORM.IMPL [current_design]]";
       ##################################################
@@ -306,7 +315,13 @@ if {$implement} {
    # This is what will deliver to AWS
    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
 
-   write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+   #FIXME -- THIS SHOULD BE REMOVED FROM THE FINAL SCRIPT
+   #write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed_before_ddr_fix.dcp
+   #source top_ddr_fix.tcl
+   #checkpoint can used by developer for analysis and hence donot encrypt
+   write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_routed.dcp
+   #checkpoint that will be sent to aws and hence encrypt
+   write_checkpoint -encrypt -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
    # Generate debug probes file
    write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
@@ -371,7 +386,7 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Finished creating 
 
 if {[string compare $notify_via_sns "1"] == 0} {
   puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Calling notification script to send e-mail to $env(EMAIL)";
-  exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+  exec $env(AWS_FPGA_REPO_DIR)/shared/bin/scripts/notify_via_sns.py
 }
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Build complete.";

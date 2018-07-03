@@ -42,6 +42,9 @@ if { [catch {aws::make_ipi -examples cl_ipi_cdma_test}] == 1 } {
 }
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
+set_property USED_IN_SIMULATION 0 [get_files -regexp -of_objects [get_files -regexp -of_objects [get_filesets sources_1] {.*bd_.*\.bd}] {.*\.bmm}]
+set_property USED_IN_IMPLEMENTATION 0 [get_files -regexp -of_objects [get_files -regexp -of_objects [get_filesets sim_1] {.*bd_.*\.bd}] {.*\.bmm}]
+set_property SCOPED_TO_CELLS {card/fpga/sh/DDR4_3/inst/u_ddr4_mem_intfc/u_ddr_cal_riu/mcs0/inst/microblaze_I} [get_files -regexp -of_objects [get_filesets sim_1] {.*data/mb_bootloop_le\.elf}]
 
 #################################################
 ## Run synthesis and implementation
@@ -52,6 +55,6 @@ if {[string compare $gui "0"] == 0} {
 
   if {[string compare $notify_via_sns "1"] == 0} {
     puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Calling notification script to send e-mail to $env(EMAIL)";
-    exec $env(HDK_COMMON_DIR)/scripts/notify_via_sns.py
+    exec $env(AWS_FPGA_REPO_DIR)/shared/bin/scripts/notify_via_sns.py
   }
 }
