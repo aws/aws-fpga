@@ -16,6 +16,8 @@
 `ifndef SV_SH_DPI_TASKS
 `define SV_SH_DPI_TASKS
 
+`define BUF_SIZE 64
+
 import tb_type_defines_pkg::*;
 
    import "DPI-C" context task test_main(output int unsigned exit_code);
@@ -24,7 +26,7 @@ import tb_type_defines_pkg::*;
    import "DPI-C" context function byte  host_memory_getc(input longint unsigned addr);
 
 `ifdef DMA_TEST
-   import "DPI-C" context task send_rdbuf_to_c(input string a);
+   import "DPI-C" context task send_rdbuf_to_c(input byte a[`BUF_SIZE + 8]);
 `endif
       
    export "DPI-C" task sv_printf;
@@ -246,11 +248,11 @@ end
       int timeout_count, status, error_count;
       logic [63:0] host_memory_buffer_address;
       byte         rd_buf_t;
-      string       rd_buffer_t, rd_buffer;
+      byte         rd_buffer[`BUF_SIZE + 8];
       
       host_memory_buffer_address = 64'h0 + (chan+1)*64'h0_0001_3000;
       
-      que_cl_to_buffer(.slot_id(0), .chan(chan), .dst_addr(host_memory_buffer_address), .cl_addr(cl_addr), .len(buf_size));
+      que_cl_to_buffer(.slot_id(0), .chan(chan), .dst_addr(host_memory_buffer_address), .cl_addr(cl_addr), .len(`BUF_SIZE));
       start_que_to_buffer(.slot_id(0), .chan(chan));
       timeout_count = 0;
       do begin
@@ -265,14 +267,13 @@ end
       end
       //For Questa simulator the first 8 bytes are not transmitted correctly, so the buffer is transferred with 8 extra bytes and those bytes are removed here.
       for (int i = 0 ; i < 8; i++) begin
-         rd_buffer = {rd_buffer, "A"};
+         rd_buffer[i] = 8'h41;
       end
-      for (int i = 0 ; i < buf_size ; i++) begin
+      for (int i = 0 ; i < `BUF_SIZE; i++) begin
          rd_buf_t = hm_get_byte(.addr(host_memory_buffer_address + i));
          //Change the ascii characters back to string.
-         $sformat(rd_buffer_t, "%s", rd_buf_t);
          //Construct the rd_buffer.
-         rd_buffer = {rd_buffer, rd_buffer_t};
+         rd_buffer[i+8] = rd_buf_t;
       end
       //This function is needed to update buffer on C side.
       send_rdbuf_to_c(rd_buffer);
