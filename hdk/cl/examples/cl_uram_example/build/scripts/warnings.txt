@@ -1,0 +1,38 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+WARNING: [Constraints 18-838] Failed to create SRL placer macro for cell SH/SH/MGT_TOP 
+CRITICAL WARNING: [Place 30-823] Failed to process clock nets that should have matching clock routes. Reason: Found incompatible user defined or fixed clock roots for related clocks 'CL/SH_DR/ddr_cores.DDR4'
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/u_ila_reset_ctrl/asyncrounous_transfer.arm_in_transfer_inst/dout_reg0_reg.
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg[0]/
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg.
+WARNING: [Vivado_Tcl 4-391] The following IPs are missing output products for Implementation target. These output products could be required for synthesis, please generate the output products using the generate_target or synth_ip command before running synth_design.
+WARNING: [DRC RPBF-3] IO port buffering **** no input & output bufferring.
+WARNING: [Place 46-14] The placer has determined that this design is highly congested and may have difficulty routing. Run report_design_analysis -congestion for a detailed report.
+WARNING: [BD 41-1661] 
+WARNING: [Vivado 12-584] No ports matched 'tck'
+WARNING: [Vivado 12-830] No fanout objects found
+
+WARNING: [Designutils 20-262] Invalid BRAM Mode CASC. Setting it to the default mode RAMB18
+WARNING: [xilinx.com:ip:blk_mem_gen:8.[3-4]-1] /blk_mem_gen_d Block Memory Generator IP is configured to use UltraRAM, but UltraRAM does not support Memory Initialization
+WARNING: [Synth 8-2507] parameter declaration becomes local in flop_ccf with formal parameter declaration list
+WARNING: [Synth 8-5790] Small sized RAM gen_wr_a.gen_word_narrow.mem_reg will be implemented using URAM because of explicit ram_style = "ultra" attribute
+WARNING: [Synth 8-6057] Memory
+WARNING: [Vivado 12-180] No cels matched 
+WARNING: [Vivado 12-180] No cells matched 'CL/vled_q_reg*'.
+WARNING: [Vivado 12-1421] No ChipScope debug cores matched 
+CRITICAL WARNING: [Designutils 20-1280] Could not find module 'ila_0'
+CRITICAL WARNING: [Designutils 20-1280] Could not find module 'ila_vio_counter'
+CRITICAL WARNING: [Designutils 20-1281] Could not find module 'vio_0'

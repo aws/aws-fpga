@@ -1062,9 +1062,11 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
-
+`ifdef QUESTA_SIM
+      automatic int awready_cnt = 0;
+`else
       int awready_cnt = 0;
-      
+`endif      
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
@@ -1098,9 +1100,13 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Data wr_data;
+`ifdef QUESTA_SIM
+      automatic int wready_cnt = 0;
+      automatic int wready_nonzero_wait = 0;
+`else      
       int wready_cnt = 0;
       int wready_nonzero_wait = 0;
-      
+`endif      
       if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
          wr_data.strb = cl_sh_pcim_wstrb;
@@ -1159,8 +1165,11 @@ module sh_bfm #(
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
+`ifdef QUESTA_SIM      
+      automatic int arready_cnt = 0;
+`else
       int arready_cnt = 0;
-      
+`endif
       if (cl_sh_pcim_arvalid && sh_cl_pcim_arready) begin
          cmd.addr = cl_sh_pcim_araddr;
          cmd.id   = cl_sh_pcim_arid;

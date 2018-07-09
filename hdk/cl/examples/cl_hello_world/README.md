@@ -1,7 +1,7 @@
 # Hello World CL Example
 
 
-## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../README.md) first!!
+## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../README.md) first!!
 
 ## Table of Contents
 
@@ -63,11 +63,11 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x071417d3 |
+| Shell Version | 0x04261818 |
 | PCI Device ID | 0xF000 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDD |
-| Pre-generated AFI ID | afi-0853bcceeda387d03 |
-| Pre-generated AGFI ID | agfi-0f4478c5ca0b1dbaf |
+| Pre-generated AFI ID | afi-03d11a4ea66e883ef |
+| Pre-generated AGFI ID | agfi-0fcf87119b8e97bf3 |
 

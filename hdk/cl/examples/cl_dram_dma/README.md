@@ -1,6 +1,6 @@
 # CL_DRAM_DMA CustomLogic Example
 
-## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../README.md) first!!
+## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../../README.md) first!!
 
 ## Table of Content
 
@@ -50,7 +50,7 @@ Disabling unused DDR controllers will improve simulation performance. cl_dram_dm
 
 #### Design Changes
 
-Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v071417d3/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
+Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v04261818/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
 
 For the cl_dram_dma example a memory range has been allocated for each DDR. So, if a particular DDR controller is disabled, then the developer should take care to handle transactions to that addresss range since there will be no DDR controller to respond to the request. The address ranges for each DDR controller is described below in the [dma_pcis AXI4 bus section](#dma_pcis).
 
@@ -78,7 +78,7 @@ sh\_cl\_dma\_pcis exposes a address windows of 128GiB matching AppPF BAR4.
 
 
 This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half).
-An [axi_crossbar_0](../../../common/shell_v071417d3/design/ip/cl_axi_interconnect/hdl/cl_axi_interconnect.v)
+An [axi_crossbar_0](../../../common/shell_v04261818/design/ip/cl_axi_interconnect/synth/cl_axi_interconnect.v)
 will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB),
 DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB),
 DDR_D(base_addr=0xC_0000_0000, range=16GB).
@@ -139,7 +139,7 @@ flr_reset is ignored in this design
 
 <a name="software"></a>
 ## Runtime software
-DMA accesses rely on the edma driver- see the [edma driver readme](../../../../sdk/linux_kernel_drivers/edma/README.md)
+DMA accesses rely on the xdma driver- see the [xdma driver readme](../../../../sdk/linux_kernel_drivers/xdma/README.md)
 
 The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
 
@@ -181,11 +181,11 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x071417d3 |
+| Shell Version | 0x04261818 |
 | PCI Device ID | 0xF001 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-0233d4b4e175518ba |
-| Pre-generated AGFI ID | agfi-08f98fa67671454fe |
+| Pre-generated AFI ID | afi-0f6832ffcb43fdc24 |
+| Pre-generated AGFI ID | agfi-0367124aff5e7c5f7 |
 

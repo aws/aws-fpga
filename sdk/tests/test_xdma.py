@@ -64,27 +64,69 @@ class TestXdma(AwsFpgaTestBase):
         for slot in range(AwsFpgaTestBase.num_slots):
             AwsFpgaTestBase.load_msix_workaround(slot)
 
-        cls.get_fio_dma_tools()
+        cls.setup_fio_tools()
+
         return
 
     def setup_method(self, test_method):
         aws_fpga_test_utils.remove_all_drivers()
 
+        for slot in range(AwsFpgaTestBase.num_slots):
+            self.fpga_load_local_image(self.cl_dram_dma_agfi, slot)
+            assert AwsFpgaTestBase.check_fpga_afi_loaded(self.cl_dram_dma_agfi, slot), "{} not loaded in slot {}".format(self.cl_dram_dma_agfi, slot)
+
     def teardown_method(self, test_method):
         aws_fpga_test_utils.remove_all_drivers()
 
-    def test_install(self):
-        aws_fpga_test_utils.install_xdma_driver()
+        for slot in range(AwsFpgaTestBase.num_slots):
+            AwsFpgaTestBase.fpga_clear_local_image(slot)
+
+    @pytest.fixture(params=['poll','interrupt'])
+    def driver_mode(self, request):
+        return request.param
+
+    def test_install(self, driver_mode):
+
+        aws_fpga_test_utils.install_xdma_driver(mode=driver_mode)
         assert aws_fpga_test_utils.xdma_driver_installed() == True
 
-    @pytest.mark.skip(reason="Flaky. We Re-start tests after shell updates.")
-    def test_fio_perf(self):
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/linux_kernel_drivers/xdma && make".format(self.WORKSPACE), echo=True)
-        assert rc == 0
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/sdk/tests/fio_dma_tools && sudo ./xdma_perf.sh 1 0 {} {} {}".format(
-            self.WORKSPACE, self.msix_agfi, self.cl_dram_dma_agfi, self.WORKSPACE), echo=True, check=False)
+    def test_fio_dma_verify(self, driver_mode):
+        aws_fpga_test_utils.install_xdma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.xdma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_verify_script()), echo=True, check=False)
         if rc != 0:
-            logger.error("FIO xdmam_perf test failed")
+            logger.error("FIO xdma verify test failed")
+            # Create some diagnostic information
+            # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
+            self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)
+            for slot in range(self.num_slots):
+                self.run_cmd("sudo fpga-describe-local-image -S {} -M".format(slot), check=False, echo=True)
+        assert rc == 0
+
+    @pytest.mark.xfail(reason='These are flaky tests. Might fail, but still need to see what\'s going on')
+    def test_fio_write_benchmark(self, driver_mode):
+        aws_fpga_test_utils.install_xdma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.xdma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_write_benchmark_script()), echo=True, check=False)
+        if rc != 0:
+            logger.error("FIO xdma write benchmark test failed")
+            # Create some diagnostic information
+            # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
+            self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)
+            for slot in range(self.num_slots):
+                self.run_cmd("sudo fpga-describe-local-image -S {} -M".format(slot), check=False, echo=True)
+        assert rc == 0
+
+    @pytest.mark.xfail(reason='These are flaky tests. Might fail, but still need to see what\'s going on')
+    def test_fio_read_benchmark(self, driver_mode):
+        aws_fpga_test_utils.install_xdma_driver(mode=driver_mode)
+        assert aws_fpga_test_utils.xdma_driver_installed() == True
+
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("sudo {} {}".format(self.get_fio_tool_run_script(), self.get_fio_read_benchmark_script()), echo=True, check=False)
+        if rc != 0:
+            logger.error("FIO xdma read benchmark test failed")
             # Create some diagnostic information
             # Debug is problematic for intermittent problems because the instance is terminated when the tests finish.
             self.run_cmd("sudo fpga-describe-local-image-slots", check=False, echo=True)

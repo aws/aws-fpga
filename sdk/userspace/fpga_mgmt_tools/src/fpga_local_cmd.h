@@ -58,14 +58,14 @@ enum {
  * e.g. load + describe multi-AFI command sequences.
  *  timeout * delay_msec 
  */
-#define CLI_SYNC_TIMEOUT_DFLT		300	
-#define CLI_SYNC_DELAY_MSEC_DFLT	200	
+#define CLI_SYNC_TIMEOUT_DFLT		3000
+#define CLI_SYNC_DELAY_MSEC_DFLT	20	
 
 /**
  * Request timeout: timeout * delay_msec
  */
-#define CLI_REQUEST_TIMEOUT_DFLT   	50
-#define CLI_REQUEST_DELAY_MSEC_DFLT	200	
+#define CLI_REQUEST_TIMEOUT_DFLT   	500
+#define CLI_REQUEST_DELAY_MSEC_DFLT	20	
 
 /**
  * ec2_fpga_cmd:

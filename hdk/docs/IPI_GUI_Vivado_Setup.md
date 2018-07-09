@@ -5,18 +5,18 @@
 1. [Overview](#overview)
 2. [Linux Install](#hlxinst_lin)
 3. [Windows Install](#hlxinst_win)
-4. [Vivado Overview](#vivado) 
+4. [Vivado Overview](#vivado)
 5. [Vivado Flows Overview](#projover)
 6. [Summary](#summary)
 
 
 
 <a name="overview"></a>
-# Overview  
+# Overview
 
-This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../cl/examples/README.md) prior to using the Vivado GUI or IP Integrator. 
+This document assumes you have cloned the developer kit and sourced the hdk setup.  However, the Windows instructions below do cover how to clone the developer kit and source scripts for hdk setup.  It is highly recommended that you get familar with the F1 FPGA development by building/running the [customer examples](../README.md) prior to using the Vivado GUI or IP Integrator.
 
-Once you are familar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
+Once you are familiar with building an example AFI and running on F1, the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md) documentation will help you get started on example designs, new designs, and additional tutorials.
 
 
 <a name="hlxinst_lin"></a>
@@ -24,7 +24,7 @@ Once you are familar with building an example AFI and running on F1, the [IP Int
 
 Open the following file in a text editor ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl
 
-If either of these files do not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
+If either of these files does not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
 
 touch Vivado_init.tcl
 
@@ -38,24 +38,24 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 
 source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
 
-Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow. 
+Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow.
 
 <a name="hlxinst_win"></a>
 # Windows Install
 
 Download, install, and configure the license for Vivado SDx 2017.1 or Vivado 2017.4 for Windows.  More information is provided at:
 
-[On Premise Licensing Help](./on_premise_licensing_help.md)
+[On-Premises Licensing Help](./on_premise_licensing_help.md)
 
 Clone the `https://github.com/aws/aws-fpga` repository either through Github Desktop or Download ZIP and extract to a new folder location on the Windows machine.  This is the install location.
 
-Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as a INFO message at the top of the Tcl Console.
+Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as an INFO message at the top of the Tcl Console.
 
 Open vivado\_init.tcl or init.tcl in a text editor and add the following lines at the top of the file.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
 `set AWSINSTALL "C:/<replace with install location>/aws-fpga"`
 
-`source $AWSINSTALL/hdk/common/shell_v071417d3/hlx/hlx_setup.tcl`
+`source $AWSINSTALL/hdk/common/shell_v04261818/hlx/hlx_setup.tcl`
 
 Copy these lines into the TCL console to ensure paths are correct.
 
@@ -65,15 +65,15 @@ An error message will occur either in the TCL console or in a tab about DDR4 mod
 
 Before installing the DDR4 models, another critical warning appeared dealing with the SH\_CL\_BB\_routed.dcp.  Download the DCP into the following install location from a web browser.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
-`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v071417d3/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
+`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v04261818/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
 
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/build/checkpoints/from_aws/`
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/build/checkpoints/from_aws/`
 
 Download the following executable from a web browser to the following HLx directory.  Note aws-fpga could have a slightly different name like aws-fpga-master.
 
 `http://www.labtestproject.com/files/sha256sum/sha256sum.exe`
 
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v071417d3/hlx/build/scripts`
+`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/hlx/build/scripts`
 
 Close Vivado and launch Vivado, the HLx environment is now setup and will always be sourced and IP integrator features will be automatically loaded.
 
@@ -83,7 +83,7 @@ Amazon CLI for Windows can be used for access to S3 to upload .tar and ingestion
 <a name="vivado"></a>
 # Vivado Overview
 
-This section is a basic overview of the Vivado GUI.  The GUI environment enables developers at all experience levels to quickly set project options and strategies to meet their design requirements,  enables interactive reports and design views to help quickly close any issues with timing or area.   
+This section is a basic overview of the Vivado GUI.  The GUI environment enables developers at all experience levels to quickly set project options and strategies to meet their design requirements,  enables interactive reports and design views to help quickly close any issues with timing or area.
 
 IP Integrator is a design entry tool in the Vivado HLx Design Suite.  It lets developers connect IPs at a block level and generates a "what you see is what you get" Register Transfer Language (RTL) file, either in VHDL or Verilog format.  The IP Integrator flow enhances the standard RTL flow and gives the developer access to designer assistance features which include:
 
@@ -106,7 +106,7 @@ For more detailed information and methodology design guidelines refer to the fol
 - <a href="https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug949-vivado-design-methodology.pdf">ug949-vivado-design-methodology.pdf</a>
 
 
-To open the GUI, run command `vivado`.  Once Vivado is loaded, you can create an empty project, by selecting Create New Project and advancing through the menus until you see a blank canvas.  The sections below will describe the tabs/menus and refer to the screenshot below.  Feel free to interact with the tabs and menus using your blank project.    
+To open the GUI, run command `vivado`.  Once Vivado is loaded, you can create an empty project, by selecting Create New Project and advancing through the menus until you see a blank canvas.  The sections below will describe the tabs/menus and refer to the screenshot below.  Feel free to interact with the tabs and menus using your blank project.
 
 ![Diagram](./images/hlx/vivado_gui.jpg)
 
@@ -130,7 +130,7 @@ The FPGA Developer AMI includes a test example.  To explore the source file prop
 
 ### Sources:IP Sources
 
-When IP has been created in your project, the "IP Sources" tab will be visable.  This tab will contain imported  IP sources and expanding the IP/Instantiation Template, developers can add the IP into the RTL.  Synthesis options on the IP should be global only.
+When IP has been created in your project, the "IP Sources" tab will be visible.  This tab will contain imported  IP sources and expanding the IP/Instantiation Template, developers can add the IP into the RTL.  Synthesis options on the IP should be global only.
 
 ## Flow Navigator
 
@@ -140,7 +140,7 @@ The Flow Navigator is in the green box and can be used to launch predefined desi
 
 PROJECT MANAGER section allows to Add Sources like RTL/IP/XDC sources, Language Templates for common RTL constructs/XDCs/DEBUG, and IP Catalog to add IPs to the project.  This portion of the flow targets the RTL flow.
 
-When invoking IP Catalog, the developers can search for a particular IP or look through the different categories of IP and it’s the responsibility of the developer to add and connect the IP into the developer's RTL.  
+When invoking IP Catalog, the developers can search for a particular IP or look through the different categories of IP and it’s the responsibility of the developer to add and connect the IP into the developer's RTL.
 
 
 ### IP INTEGRATOR
@@ -151,15 +151,15 @@ Double clicking on any IP in the BD brings up the Re-customize IP Dialog Box whe
 
 ### SIMULATION
 
-This section allows the developer to change simulation settings by right clicking on SIMULATION and invoking simulations by clicking Run Simulation->Run Behavioral Simulation. 
+This section allows the developer to change simulation settings by right clicking on SIMULATION and invoking simulations by clicking Run Simulation->Run Behavioral Simulation.
 
 ### RTL ANALYSIS
 
-By clicking on Open Elaborate Design, the RTL files in the design are analyzed where the develop can check RTL structures and syntax before the synthesis stage.
+By clicking on Open Elaborate Design, the RTL files in the design are analyzed where the developer can check RTL structures and syntax before the synthesis stage.
 
 ### SYNTHESIS
 
-By right clicking on SYNTHESIS, the develop is able to view Synthesis Settings and Launch Synthesis.  After synthesis stage is complete, clicking on Open Synthesized Design will open the post synthesis checkpoint for analysis.  This stage is necessary for developing timing constraints for the CL.
+By right clicking on SYNTHESIS, the developer is able to view Synthesis Settings and Launch Synthesis.  After synthesis stage is complete, clicking on Open Synthesized Design will open the post synthesis checkpoint for analysis.  This stage is necessary for developing timing constraints for the CL.
 
 ### IMPLEMENTATION
 
@@ -178,28 +178,48 @@ The blue box is where the Design Runs are located with similar functionality as 
 # Vivado Flows Overview
 
 The Vivado HLx environment supports IP Integrator, RTL, HLS flows in Vivado and this section will discuss these
-flows from a top level. 
+flows from a top level. For more details about each flow take a look at [IPI_GUI_Flows](./IPI_GUI_Flows.md)
 
 
-## RTL
+## IP + RTL flow
 
-Developers can add in existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files.
+Developers can add in IPs, existing AWS RTL from examples, new AWS template CL files from the AWS RTL flow and custom generated Verilog/System Verilog/VHDL files as source files.
 
 For using IPs, at this time global mode is only supported and Out of context (OOC) is not supported at this time.
 
 ![Diagram](./images/hlx/rtl_dram_dma_sources.jpg)
 
-## IP Integrator
+Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtl-project-with-example-design)
+for more details about RTL flow using example RTL design.
+#### Eg:
+An example can be found at [IPI_RTL_example_flow](../../hdk/docs/IPI_GUI_Examples.md#rtlexistut_world).
 
-Developers can add in Vivado IP into the block diagram to create/stitch a full design easily. RTL module referencing flow using developer RTL can be used to add custom IP to the block diagram.
+
+Refer to the section [IPI_GUI_Flow_rtl_project_with_example_design](./IPI_GUI_Flows.md#rtlnew)
+for more details about RTL flow using RTL design from scratch.
+#### Eg:
+An example can be found at [IPI_RTL_scratch_flow](./IPI_GUI_Examples.md#rtlscrtut)
+
+
+## IP Integration flow
+
+Developers can add in Vivado IP into the block diagram to create/stitch a full design easily. RTL module referencing flow using developer RTL can be used to add custom IP to the block diagram. Both RTL and IP can be added as IP in this flow.
 
 ![Diagram](./images/hlx/ipi_mod_ref.jpg)
 
-## HLS
+Refer to the section [IPI_GUI_flow](./IPI_GUI_Flows.md#ipiprojex) for more details about IPI GUI flow.
+#### Eg:
+An example can be found at [IPI_Integrator_flow](../../hdk/docs/IPI_GUI_Examples.md#rtlex).
 
-Developers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository.
+## IP Integrator for HLS IP
+
+HLS is a C programming method in order to create RTL/IP for the FPGA Developers. Developers can add developed/generated HLS IPs in either RTL/IP Integrator flows using an IP Repository. In this flow only IPs are used to create examples.
 
 ![Diagram](./images/hlx/ipi_hls.jpg)
+
+Eg:
+
+A link to the example will be added here in the future when we have HLS C example ready.
 
 ## General Environment
 
@@ -240,9 +260,9 @@ Refer to [IPI Tutorials and Examples](./IPI_GUI_Examples.md) to get started.
 
 
 <a name="summary"></a>
-# Summary  
+# Summary
 
-Now that you are familar with building an [customer examples](../cl/examples/README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
+Now that you are familar with building an [customer examples](../README.md) on F1 (AFI) and running on F1 using the CLI/TCL method; this guide has helped you setup Vivado for IP Integrator, please move to the [IP Integrator Tutorials and Examples](./IPI_GUI_Examples.md).  This documentation will help you get started on example designs, new designs, and additional tutorials.
 
 
 

@@ -53,7 +53,7 @@ The following scripts should be modified before starting the build:
         
 Once your design is ready and you would like to start the build process, please refer to this [checklist](../CHECKLIST_BEFORE_BUILDING_CL.md).
 
-Once you verified the checklist, the detailed walkthrough on how to build and submit the CL to AWS is avaiable [here](../../common/shell_v071417d3/new_cl_template/build/README.md)
+Once you verified the checklist, the detailed walkthrough on how to build and submit the CL to AWS is avaiable [here](../../common/shell_v04261818/new_cl_template/build/README.md)
 
 
 

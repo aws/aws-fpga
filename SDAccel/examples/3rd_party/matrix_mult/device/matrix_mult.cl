@@ -91,7 +91,7 @@
 //  The combination of these values determines the number of floating-point
 //  operations per cycle.
 
-#include "../host/inc/matrixMult.h"
+#include "matrixMult.h"
 
 #ifndef SIMD_WORK_ITEMS
 #define SIMD_WORK_ITEMS 4 // default value

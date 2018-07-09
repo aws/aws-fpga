@@ -6,19 +6,13 @@ This file contains the following sections:
 1. Overview
 2. Instantiating Debug cores in your RTL Kernel design
 3. Host code changes to support debugging
-4. Changes to the design MAKEFILE
-5. Building the executable, creating the AFI, and executing the host code
-6. Start debug servers
+4. Building the executable, creating the AFI, and executing the host code
+5. Start debug servers
 
 
 ## 1. Overview
-This section gives you a brief explanation of the steps needed to debug your SDAccel RTL kernel design. 
+The sections below give you a brief explanation of the steps required to debug your SDAccel RTL kernel design.  They include instantiating the ILA/debug cores in your RTL kernel, pausing the execution of the host code at the appriopriate stage to ensure the setup of ILA triggers, building the running the host code and starting the debug servers to debug the design in hardware.  
 
-To debug your RTL Kernel design you need to use the AWS Debug Platform.  The AWS Debug platform is located in the `$SDACCEL_DIR/aws_platform` directory. You must set up the `AWS_DEBUG_PLATFORM` env variable as shown below.
-	
-	export AWS_DEBUG_PLATFORM=$SDACCEL_DIR/aws_platform/xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0/xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0.xpfm
-	
-	
 ## 2. Instantiating Debug cores in your RTL kernel design
 
 You need to instantiate debug cores like the Integrated Logic Analyzer(ILA), Virtual Input/Output(VIO) etc in your application RTL kernel code.
@@ -32,7 +26,7 @@ The ILA Debug IP can be created and added to the RTL Kernel in a couple of ways.
 2. Create the ILA IP on the fly using TCL.  A snippet of the create_ip TCL command is shown below. The example below creates the ILA IP with 7 probes and associates properties with the IP.
 
 ```
-	create_ip -name ila -vendor xilinx.com -library ip -version 6.2 -module_name ila_0
+	create_ip -name ila -vendor xilinx.com -library ip -module_name ila_0
 	
 	set_property -dict [list CONFIG.C_PROBE6_WIDTH {32} CONFIG.C_PROBE3_WIDTH {64} CONFIG.C_NUM_OF_PROBES {7} CONFIG.C_EN_STRG_QUAL {1} CONFIG.C_INPUT_PIPE_STAGES {2} CONFIG.C_ADV_TRIGGER {true} CONFIG.ALL_PROBE_SAME_MU_CNT {4} CONFIG.C_PROBE6_MU_CNT {4} CONFIG.C_PROBE5_MU_CNT {4} CONFIG.C_PROBE4_MU_CNT {4} CONFIG.C_PROBE3_MU_CNT {4} CONFIG.C_PROBE2_MU_CNT {4} CONFIG.C_PROBE1_MU_CNT {4} CONFIG.C_PROBE0_MU_CNT {4}] [get_ips ila_0]
 ```
@@ -84,31 +78,15 @@ src/host.cpp
 		q.enqueueTask(krnl_vadd);
 
 
-## 4. Changes to the design MAKEFILE
-To successfully compile the design with debug cores there are a couple of additional flags necessary in your Makefile.
 
-    
-    D_FLAGS = --xp "vivado_prop:run.impl_1.STEPS.OPT_DESIGN.TCL.POST={$(AWS_DEBUG_PLATFORM)/hw/constraints/debug_constraints.tcl}" --xp "vivado_prop:run.impl_1.STEPS.ROUTE_DESIGN.TCL.POST={$(AWS_DEBUG_PLATFORM)/hw/constraints/generate_ltx.tcl}"
-    
-    LDCLFLAGS +=$(D_FLAGS)
-    
-
-
-The flags above add a post processing step to run debug constraints. 
-They also ensure the generation of the LTX file in the xclbin directory. The –-xp arguments are arguments to the xocc compiler in SDAccel.
-
-You should now be able to run Make on the design and build it successfully.
-
-## 5. Building the executable, creating the AFI and executing the host code
+## 4. Building the executable, creating the AFI and executing the host code
 
 - **Build the executable** in your design directory (`your_design_directory`) by running the steps below:
 
 ```
 	cd your_design_directory
 
-	export DEBUG_LTX_DIR $(your_design_directory)/xclbin
-
-	make all DEVICES=$AWS_DEBUG_PLATFORM
+	make all DEVICES=$AWS_PLATFORM
 ```
 
 - **Creating and registering the AFI**
@@ -116,19 +94,14 @@ You should now be able to run Make on the design and build it successfully.
 Please note, the angle bracket directories need to be replaced according to the user setup.
 
 ```	
-	$SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=your_design.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0.xclbin -o=your_design.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0.awsxclbin -s3_bucket=<bucket-s3_dcp_key=<f1-dcp-folder-s3_logs_key=<f1-logs>
+	$SDACCEL_DIR/tools/create_sdaccel_afi.sh -xclbin=your_design.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xclbin -o=your_design.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin -s3_bucket=<bucket-s3_dcp_key=<f1-dcp-folder-s3_logs_key=<f1-logs>
 ```
-
-**IMPORTANT**: If your awsxclbin name contains the name of the AWS platform ensure that you also rename the awsxclbin file in the xclbin directory from:
-* your_design.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr-debug_4_0.awsxclbin **TO** 
-* your_design.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.awsxclbin 
-
 
 - **Setup and Execute**
 
 ```
 		$ sudo sh
-		# source /opt/Xilinx/SDx/2017.1.rte/setup.sh
+		# source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
 		# ./host
 ```
 This produces the following output: 
@@ -147,7 +120,7 @@ This produces the following output:
 ```		
 		
 
-## 6. Start Debug Servers
+## 5. Start Debug Servers
 
 #### Starting Debug Servers on Amazon F1 instance
 Instructions to start the debug servers on an Amazon F1 instance can be found [here](../../hdk/docs/Virtual_JTAG_XVC.md).

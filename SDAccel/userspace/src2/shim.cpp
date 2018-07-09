@@ -64,11 +64,11 @@
 #include "driver/aws/kernel/include/mgmt-ioctl.h"
 #else
 #define AWSMGMT_NUM_SUPPORTED_CLOCKS 4
-#define AWSMGMT_NUM_ACTUAL_CLOCKS 3
+#define AWSMGMT_NUM_ACTUAL_CLOCKS    3
 // TODO - define this in a header file
 extern char* get_afi_from_xclBin(const xclBin *);
 extern char* get_afi_from_axlf(const axlf *);
-#define DEFAULT_GLOBAL_AFI "agfi-0f9978ab78170e312"
+#define DEFAULT_GLOBAL_AFI "agfi-069ddd533a748059b" // 1.4 shell
 #endif
 
 namespace awsbwhal {
@@ -754,8 +754,7 @@ namespace awsbwhal {
 
     std::string AwsXcl::getDSAName(unsigned short deviceId, unsigned short subsystemId)
     {
-        // Hard coded to AWS DSA name
-        std::string dsa("xilinx_aws-vu9p-f1_dynamic_5_0");
+        std::string dsa("xilinx_aws-vu9p-f1-04261818_dynamic_5_0");
         return dsa;
     }
 

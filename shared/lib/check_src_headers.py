@@ -461,6 +461,7 @@ def check_headers(dir):
             ".*\.xdc$",
             ".*\.xlsx$",
             ".*\.xml$",
+            ".*\.fio$",
 
             ".*\.gitignore$",
             ".*\.gitmodules$",

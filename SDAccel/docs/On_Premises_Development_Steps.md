@@ -29,7 +29,7 @@ Before going through the steps described in this document, the user should have 
 ## Downloading the SDAccel Development Environment
 In order to develop any SDAccel application on-premises, you will need to install the same version of SDAccel as deployed on AWS F1. The SDAccel installer can be found here:
 
-https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.1_sdx_0715_1_Lin64.bin&akdm=0
+https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.4_0411_1_Lin64.bin
 
 This requires a Xilinx login. If you do not have an existing Xilinx account, select **Create your account**.
 
@@ -101,7 +101,8 @@ Execute the following commands to build the application for execution on AWS F1:
 
 The build process will generate the host and FPGA binaries.  
 1. Host binary: ./helloworld  
-2. FPGA binary: ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0.xclbin
+2. FPGA binary: ./xclbin/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xclbin
+
 
 These binary files are ready to be uploaded to F1.
 
@@ -138,11 +139,15 @@ The [AWS SDAccel README].
 
 Xilinx web portal for [Xilinx SDAccel documentation] and for [Xilinx SDAccel GitHub repository]
 
-Links pointing to **2017.1** version of the user guides
-[UG1023: SDAccel Environment User Guide][UG1023 2017.1]
-[UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][UG1021 2017.1]
-[UG1207: SDAccel Environment Optimization Guide][UG1207 2017.1]
-[UG1238: SDx Development Environment Release Notes, Installation, and Licensing Guide][UG1238 2017.1]
+Links pointing to **2017.4** version of the user guides
+
+[UG1023: SDAccel Environment User Guide][UG1023 2017.4]
+
+[UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][UG1021 2017.4]
+
+[UG1207: SDAccel Environment Optimization Guide][UG1207 2017.4]
+
+[UG1238: SDx Development Environment Release Notes, Installation, and Licensing Guide][UG1238 2017.4]
 
 [SDAccel_landing_page]: https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html
 [VHLS_landing_page]: https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html
@@ -154,10 +159,10 @@ Links pointing to **2017.1** version of the user guides
 [latest UG949]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug949-vivado-design-methodology.pdf
 [latest UG902]: https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug902-vivado-high-level-synthesis.pdf
 
-[UG1023 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1023-sdaccel-user-guide.pdf
-[UG1021 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1021-sdaccel-intro-tutorial.pdf
-[UG1207 2017.1]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1207-sdaccel-optimization-guide.pdf
-[UG1238 2017.1]:http://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1238-sdx-rnil.pdf
+[UG1023 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf
+[UG1021 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf
+[UG1207 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf
+[UG1238 2017.4]:http://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf
 [Xilinx SDAccel documentation]: https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html#documentation
 [Xilinx SDAccel GitHub repository]: https://github.com/Xilinx/SDAccel_Examples
 

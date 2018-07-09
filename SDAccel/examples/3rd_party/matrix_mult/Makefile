@@ -21,14 +21,14 @@ include $(COMMON_REPO)/libs/opencl/opencl.mk
 main_SRCS=$(wildcard host/src/*.cpp ../common/src/AOCLUtils/*.cpp) $(xcl_SRCS)
 main_HDRS=$(xcl_HDRS)
 
-main_CXXFLAGS=$(xcl_CXXFLAGS) $(opencl_CXXFLAGS)  -Ihost/inc -I../common/inc/
+main_CXXFLAGS=$(xcl_CXXFLAGS) $(opencl_CXXFLAGS)  -Ihost/inc/ -I../common/inc/
 main_LDFLAGS=$(opencl_LDFLAGS) -lrt
 
 EXES=main
 
 # Kernel                                                                                                                                                                                              
 matrix_mult_SRCS=./device/matrix_mult.cl
-matrix_mult_CLFLAGS= -k matrix_mult
+matrix_mult_CLFLAGS= -k matrix_mult -Ihost/inc/
 #Specifyinng Fifo depth for Dataflow                                                                                                                                                                  
 matrix_mult_CLFLAGS+=--xp "param:compiler.xclDataflowFifoDepth=32"
 
@@ -53,6 +53,6 @@ CXXFLAGS += -O2
 endif
 
 # Compiler
-CXX := g++
+#CXX := g++
 
 include $(COMMON_REPO)/utility/rules.mk

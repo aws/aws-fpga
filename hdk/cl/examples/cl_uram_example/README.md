@@ -18,7 +18,7 @@ This example demonstrates a basic use-case of the URAMs and the different implem
 All of the unused interfaces between the AWS Shell and the CL are tied to fixed values.
 It is recommended that the developer use similar values for every unused interface in the developer's CL.
 
-Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
+Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../../../README.md).
 
 
 <a name="description"></a>

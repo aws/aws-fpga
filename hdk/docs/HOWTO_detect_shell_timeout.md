@@ -12,7 +12,7 @@
 * If accesing DDR, note DMA accesses to DDR will accumulate which can lead to timeouts if the transactions are not completed fast enough.  This is especially true for CL designs operating at 125MHz or below.  See [cl_dram_dma](../cl/examples/cl_dram_dma).  This example illustrates best practice for DMA operations to DDR.
 * CL designs which have multiple masters to the AXI "fabric" will also incur arbitration delays.
 * If you suspect a timeout, debug by reading the metrics registers. The saved offending address should help narrow whether this is to DDR or registers/RAMs inside the FPGA. The developer should investigate if design parameters allow for long latency responses to the offending address.  If not, then the developer should investigate protocol violations.
-* After the first transaction timeout, transactions will timeout for a period of time (moderation time).  This time is 4ms.
+* **WARNING**: Once a timeout happens the DMA/PCIS interface may no longer be functional and the AFI/Shell must be re-loaded.  This can be done by adding the "-F" option to [fpga-load-local-image](../../sdk/userspace/fpga_mgmt_tools/README.md).
 
 # AXI Master Timeouts (PCIM)
 * AXI Master transactions also have an 8us timeout.  Timeout occur when the CL does not respond to some channel within 8us:

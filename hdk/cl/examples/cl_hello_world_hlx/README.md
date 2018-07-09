@@ -29,7 +29,7 @@ For more information about the hello\_world example, read the following informat
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    
@@ -118,7 +118,7 @@ The completed .tar file is located in:
 ```
 $CL_DIR/build/scripts/example\_projects/cl\_hello\_world.runs/faas\_1/build/checkpoints/to\_aws/<timestamp>.Developer\_CL.tar  
 ```
-For information on how to create AFI from this tar file, follow the [steps outlined here](../README.md#3-submit-the-design-checkpoint-to-aws-to-create-the-afi).
+For information on how to create AFI from this tar file, follow the [steps outlined here](../../../README.md#step3).
 
 <a name="swf1"></a>
 ### CL Example Software and executing on F1

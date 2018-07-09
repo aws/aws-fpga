@@ -108,6 +108,16 @@ int fpga_pci_detach(pci_bar_handle_t handle);
 int fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value);
 
 /**
+ * Write a one byte value to a register.
+ *
+ * @param[in]  handle  handle provided by fpga_pci_attach
+ * @param[in]  offset  memory location offset for register to write
+ * @param[in]  value   8-bit value to write to the register
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_pci_poke8(pci_bar_handle_t handle, uint64_t offset, uint8_t value);
+
+/**
  * Write a value to a register.
  *
  * @param[in]  handle  handle provided by fpga_pci_attach
@@ -139,6 +149,16 @@ int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset,
  * @returns 0 on success, non-zero on error
  */
 int fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value);
+
+/**
+ * Read a one byte value from a register.
+ *
+ * @param[in]  handle  handle provided by fpga_pci_attach
+ * @param[in]  offset  memory location offset for register to read
+ * @param[out] value   8-bit value read from the register
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_pci_peek8(pci_bar_handle_t handle, uint64_t offset, uint8_t *value);
 
 /**
  * Read a value from a register.

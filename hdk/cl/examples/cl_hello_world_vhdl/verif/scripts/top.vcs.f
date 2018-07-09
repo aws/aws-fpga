@@ -35,7 +35,9 @@
 +incdir+${SH_INF_DIR}
 +incdir+${SH_SH_DIR}
 +incdir+${HDK_COMMON_DIR}/verif/include
++incdir+${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/sim
 +incdir+${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog
++incdir+${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/hdl
 +incdir+${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl
 
 ${CL_ROOT}/../common/design/cl_common_defines.vh

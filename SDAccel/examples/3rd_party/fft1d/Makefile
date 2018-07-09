@@ -52,7 +52,7 @@ else
 CXXFLAGS += -O2
 endif
 
-CXX := g++
+#CXX := g++
 
 include $(COMMON_REPO)/utility/rules.mk
 
