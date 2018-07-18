@@ -31,16 +31,10 @@ Where <install_dir> is the directory that will be created for the FIO build.  Fo
 
 ## Load AGFI
 
-Load the MSI-X workaround AGFI to ensure the FPGA is in a clean state for DMA benchmarking
+Load the cl-dram-dma AGFI and force a re-load of the shell to ensure the FPGA is in a clean state for DMA benchmarking.
 
 ```
-fpga-load-local-image -S 0 -I <MSI-X workaround AGFI>
-```
-
-Load the cl-dram-dma AGFI
-
-```
-fpga-load-local-image -S 0 -I <cl-dram-dma AGFI>
+fpga-load-local-image -S 0 -I <cl-dram-dma AGFI> -F
 ```
 
 ## Load DMA Driver
