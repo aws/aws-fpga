@@ -311,9 +311,7 @@ static int xocl_drm_unload(struct drm_device *drm)
 	return 0;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||  \
-        (defined(RHEL_RELEASE_CODE) && \
-        RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 static void xocl_drm_unload2(struct drm_device *drm)
 {
 	xocl_drm_unload(drm);
@@ -583,9 +581,7 @@ static struct drm_driver xocl_drm_driver = {
 	.postclose                      = xocl_client_release,
 	.open                           = xocl_client_open,
 	.load				= xocl_drm_load,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||  \
-        (defined(RHEL_RELEASE_CODE) && \
-        RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 	.unload                         = xocl_drm_unload2,
 #else
 	.unload				= xocl_drm_unload,
