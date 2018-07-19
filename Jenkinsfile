@@ -60,7 +60,7 @@ def dcp_recipe_scenarios = [
     'A1-B2-C0-TIMING',
     'A1-B2-C0-CONGESTION',
     ]
-def fdf_test_names = ['cl_dram_dma[A0-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
+def fdf_test_names = ['cl_dram_dma[A1-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
     'cl_uram_example[2]', 'cl_uram_example[3]', 'cl_uram_example[4]']
 
 boolean debug_dcp_gen = params.get('debug_dcp_gen')
