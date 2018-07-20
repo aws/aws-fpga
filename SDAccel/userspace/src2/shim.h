@@ -189,6 +189,7 @@ public:
 
 
         // Bitstreams
+        int xclGetXclBinIdFromSysfs(uint64_t &xclbinid);
         int xclLoadXclBin(const xclBin *buffer);
         int xclLoadAxlf(const axlf *buffer);
         int xclUpgradeFirmware(const char *fileName);

@@ -118,6 +118,33 @@ namespace awsbwhal {
     }
 #endif
 
+    int AwsXcl::xclGetXclBinIdFromSysfs(uint64_t &xclbin_id_from_sysfs) 
+    {
+         const std::string devPath = "/sys/bus/pci/devices/" + xcldev::pci_device_scanner::device_list[ mBoardNumber ].user_name;
+         std::string binid_path = devPath + "/xclbinid";
+         struct stat sb;
+         if( stat( binid_path.c_str(), &sb ) < 0 ) {
+             std::cout << "ERROR: failed to stat " << binid_path << std::endl;
+             return errno;
+         }
+         std::ifstream ifs( binid_path.c_str(), std::ifstream::binary );
+         if( !ifs.good() ) {
+             return errno;
+         }
+         char* fileReadBuf = new char[sb.st_size];
+         memset(fileReadBuf, 0, sb.st_size);
+         ifs.read( fileReadBuf, sb.st_size );
+         if( ifs.gcount() > 0 ) {
+             std::string tmp_hex_string = fileReadBuf;
+             xclbin_id_from_sysfs = std::stoi(std::string(fileReadBuf),nullptr,16);
+         } else { // xclbinid exists, but no data read or reported
+             std::cout << "WARNING: 'xclbinid' invalid, unable to report xclbinid. Has the bitstream been loaded? See 'xbsak program'.\n";
+         }
+         delete [] fileReadBuf;
+         ifs.close();
+         return 0;
+    }
+
     int AwsXcl::xclLoadXclBin(const xclBin *buffer)
     {
       char *xclbininmemory = reinterpret_cast<char*> (const_cast<xclBin*> (buffer));
@@ -144,7 +171,13 @@ namespace awsbwhal {
           char* afi_id = get_afi_from_axlf(axlfbuffer);
           std::memset(&orig_info, 0, sizeof(struct fpga_mgmt_image_info));
           fpga_mgmt_describe_local_image(mBoardNumber, &orig_info, 0);
-          if (checkAndSkipReload( afi_id, &orig_info )) {
+
+         uint64_t xclbin_id_from_sysfs;
+         if( int retVal = xclGetXclBinIdFromSysfs( xclbin_id_from_sysfs ) != 0 )
+             return retVal;
+
+         if ( (xclbin_id_from_sysfs == 0) || (axlfbuffer->m_uniqueId != xclbin_id_from_sysfs) || checkAndSkipReload(afi_id, &orig_info) ) {
+              // proceed with download
               retVal = fpga_mgmt_load_local_image(mBoardNumber, afi_id);
               if (!retVal) {
                   retVal = sleepUntilLoaded( std::string(afi_id) );
