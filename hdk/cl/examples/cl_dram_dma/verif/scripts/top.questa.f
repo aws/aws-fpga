@@ -27,6 +27,7 @@
 +incdir+${CL_ROOT}/../common/design
 +incdir+${CL_ROOT}/design
 +incdir+${CL_ROOT}/verif/sv
++incdir+${CL_ROOT}/verif/tests
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 +incdir+${HDK_COMMON_DIR}/verif/include

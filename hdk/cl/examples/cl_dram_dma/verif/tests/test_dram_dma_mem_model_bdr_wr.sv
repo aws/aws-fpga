@@ -12,9 +12,11 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// This test bypasses Micron DDR models and uses AXI memory model.
+// Please refer to readme for more information about AXI memoryy model.
+// This test backdoor writes and front door reads AXI memory model.
 
-
-module test_dram_dma();
+module test_dram_dma_mem_model_bdr_wr();
 
    import tb_type_defines_pkg::*;
 
@@ -37,7 +39,7 @@ module test_dram_dma();
    initial begin
 
       logic [63:0] host_memory_buffer_address;
-
+      logic [63:0] ddr_A_addr, ddr_B_addr, ddr_C_addr, ddr_D_addr;
 
       tb.power_up(.clk_recipe_a(ClockRecipe::A1),
                   .clk_recipe_b(ClockRecipe::B0),
@@ -55,80 +57,50 @@ module test_dram_dma();
       tb.poke_ocl(.addr(64'h330), .data(0));
       tb.poke_ocl(.addr(64'h430), .data(0));
 
-      // FAST_SIM_MODE is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
       
-`ifndef FAST_SIM_MODE      
-      // allow memory to initialize
-      tb.nsec_delay(27000);
-`endif
-      
-      $display("[%t] : Initializing buffers", $realtime);
+      $display("backdoor load memory to DDR A \n");
 
-      host_memory_buffer_address = 64'h0;
-
-      //Queue data to be transfered to CL DDR
-      tb.que_buffer_to_cl(.chan(0), .src_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_1f00), .len(len0) ); // move buffer to DDR 0
+      ddr_A_addr = 64'h0;
 
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
-         tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hAA));
-         host_memory_buffer_address++;
+         tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[0].u_bfm.axi_mem_bdr_write(.addr(ddr_A_addr), .d(8'hAA));
+         ddr_A_addr++;
       end
 
-      host_memory_buffer_address = 64'h0_0000_3000;
+      $display("backdoor load memory to DDR B \n");
 
-      tb.que_buffer_to_cl(.chan(1), .src_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) ); // move buffer to DDR 1
+      ddr_B_addr = 64'h0;
 
-      for (int i = 0 ; i < len1 ; i++) begin
-         tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hBB));
-         host_memory_buffer_address++;
+      // Put test pattern in host memory
+      for (int i = 0 ; i < len0 ; i++) begin
+         tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[1].u_bfm.axi_mem_bdr_write(.addr(ddr_B_addr), .d(8'hBB));
+         ddr_B_addr++;
       end
 
-      host_memory_buffer_address = 64'h0_0000_6000;
-      tb.que_buffer_to_cl(.chan(2), .src_addr(host_memory_buffer_address), .cl_addr(64'h0008_0000_0000), .len(len2) ); // move buffer to DDR 2
+      $display("backdoor load memory to DDR C \n");
 
-      for (int i = 0 ; i < len2 ; i++) begin
-         tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hCC));
-         host_memory_buffer_address++;
+      ddr_C_addr = 64'h0;
+
+      // Put test pattern in host memory
+      for (int i = 0 ; i < len0 ; i++) begin
+         tb.card.fpga.sh.u_mem_model.axi_mem_bdr_write(.addr(ddr_C_addr), .d(8'hCC));
+         ddr_C_addr++;
       end
 
-      host_memory_buffer_address = 64'h0_0000_9000;
-      tb.que_buffer_to_cl(.chan(3), .src_addr(host_memory_buffer_address), .cl_addr(64'h000C_0000_0000), .len(len3) ); // move buffer to DDR 3
+      ddr_D_addr = 64'h0;
 
-      for (int i = 0 ; i < len3 ; i++) begin
-         tb.hm_put_byte(.addr(host_memory_buffer_address), .d(8'hDD));
-         host_memory_buffer_address++;
+      // Put test pattern in host memory
+      for (int i = 0 ; i < len0 ; i++) begin
+         tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[2].u_bfm.axi_mem_bdr_write(.addr(ddr_D_addr), .d(8'hDD));
+         ddr_D_addr++;
       end
-
-      $display("[%t] : starting H2C DMA channels ", $realtime);
-
-      //Start transfers of data to CL DDR
-      tb.start_que_to_cl(.chan(0));
-      tb.start_que_to_cl(.chan(1));
-      tb.start_que_to_cl(.chan(2));
-      tb.start_que_to_cl(.chan(3));
-
-      // wait for dma transfers to complete
-      timeout_count = 0;
-      do begin
-         status[0] = tb.is_dma_to_cl_done(.chan(0));
-         status[1] = tb.is_dma_to_cl_done(.chan(1));
-         status[2] = tb.is_dma_to_cl_done(.chan(2));
-         status[3] = tb.is_dma_to_cl_done(.chan(3));
-         #10ns;
-         timeout_count++;
-      end while ((status != 4'hf) && (timeout_count < 4000));
-
-      if (timeout_count >= 4000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
-         error_count++;
-      end
-
+      
       $display("[%t] : starting C2H DMA channels ", $realtime);
 
-      // read the data from cl and put it in the host memory
+      //read the data from cl and put it in the host memory
       host_memory_buffer_address = 64'h0_0001_0800;
-      tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_1f00), .len(len0) ); // move DDR0 to buffer
+      tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_0000), .len(len0) ); // move DDR0 to buffer
 
       host_memory_buffer_address = 64'h0_0002_1800;
       tb.que_cl_to_buffer(.chan(1), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0004_0000_0000), .len(len1) ); // move DDR1 to buffer
@@ -138,7 +110,7 @@ module test_dram_dma();
 
       host_memory_buffer_address = 64'h0_0004_3800;
       tb.que_cl_to_buffer(.chan(3), .dst_addr(host_memory_buffer_address), .cl_addr(64'h000C_0000_0000), .len(len3) ); // move DDR3 to buffer
-
+      
       //Start transfers of data from CL DDR
       tb.start_que_to_buffer(.chan(0));
       tb.start_que_to_buffer(.chan(1));
@@ -149,9 +121,6 @@ module test_dram_dma();
       timeout_count = 0;
       do begin
          status[0] = tb.is_dma_to_buffer_done(.chan(0));
-         status[1] = tb.is_dma_to_buffer_done(.chan(1));
-         status[2] = tb.is_dma_to_buffer_done(.chan(2));
-         status[3] = tb.is_dma_to_buffer_done(.chan(3));
          #10ns;
          timeout_count++;
       end while ((status != 4'hf) && (timeout_count < 1000));
@@ -215,42 +184,6 @@ module test_dram_dma();
          end
       end
       
-      tb.poke(.addr(64'h0), .data(64'h0000_0001), .size(DataSize::UINT64));
-      tb.peek(.addr(64'h0), .data(rdata), .size(DataSize::UINT64));
-
-      if (rdata !== 64'h0000_0001) begin
-         $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
-                     $realtime, 64'h0000_0001, rdata);
-         error_count++;
-      end
-
-      tb.poke(.addr(64'h0004_0000_0000), .data(64'h0000_0001), .size(DataSize::UINT64));
-      tb.peek(.addr(64'h0004_0000_0000), .data(rdata), .size(DataSize::UINT64));
-
-      if (rdata !== 64'h0000_0001) begin
-         $display("[%t] : *** ERROR *** DDR1 Data mismatch, addr:%0x read data is: %0x",
-                     $realtime, 64'h0004_0000_0000, rdata);
-         error_count++;
-      end
-
-      tb.poke(.addr(64'h0008_0000_0005), .data(64'h0000_0001), .size(DataSize::UINT64));
-      tb.peek(.addr(64'h0008_0000_0005), .data(rdata), .size(DataSize::UINT64));
-
-      if (rdata !== 64'h0000_0001) begin
-         $display("[%t] : *** ERROR *** DDR2 Data mismatch, addr:%0x read data is: %0x",
-                     $realtime, 64'h0008_0000_0000, rdata);
-         error_count++;
-      end
-
-      tb.poke(.addr(64'h000C_0000_0000), .data(64'h0000_0001), .size(DataSize::UINT64));
-      tb.peek(.addr(64'h000C_0000_0000), .data(rdata), .size(DataSize::UINT64));
-
-      if (rdata !== 64'h0000_0001) begin
-         $display("[%t] : *** ERROR *** DDR3 Data mismatch, addr:%0x read data is: %0x",
-                     $realtime, 64'h000C_0000_0000, rdata);
-         error_count++;
-      end
-      
       // Power down
       #500ns;
       tb.power_down();
@@ -273,4 +206,5 @@ module test_dram_dma();
       $finish;
    end // initial begin
 
-endmodule // test_dram_dma
+endmodule // test_dram_dma_mem_model_bdr_wr
+

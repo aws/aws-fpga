@@ -92,6 +92,8 @@ if [[ $VIVADO_VER == $VER_2017_4 || $VIVADO_VER == $VER_2017_4_OP ]];
 then
 echo "patching ddr4_rdimm_wrapper.sv file"
 sed -i s/_4G/_8G/g  $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
+sed -i -e 's/\/\/\LRDIMM/\: LRDIMM/g' $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
+sed -i -e 's/\/\/\!LRDIMM/\: NOT_LRDIMM/g' $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
 else
 echo "patching ddr4_rank.sv file"
 sed -i -e 's/{1\x27b0, ddr4_model_qb_addr\[12:0\]}/ddr4_model_qb_addr\[13:0\]/g' $ddr4_rdimm_model_dir/ddr4_rank.sv
