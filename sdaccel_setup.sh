@@ -177,8 +177,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* ]]; then
           return 1
         fi
     fi
-    rm -I $SDACCEL_DIR/examples/xilinx
-    ln -s $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
+    ln -sf $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
 else
    echo " $RELEASE_VER is not 2017.4\n" 
    exit 2
