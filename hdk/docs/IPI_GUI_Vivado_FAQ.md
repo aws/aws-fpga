@@ -233,3 +233,10 @@ This is a known issue and should be fixed in a future release. These critical wa
 
 Currently synthesis is using default directives and implementation tools using Explore as directives.  At this time in all cases don't use strategies for synthesis and implementation only change directives.   
 
+**Q: How do I encrypt a Checkpoint with Vivado?
+
+The 'write_checkpoint -encrypt' Tcl command lets you encrypt a design checkpoint as an alternative to encrypting HDL source. This feature is useful if you need to make ECO changes in the design netlist and want to therefore do encryption as a final step. This feature requires an IEEE-1735 V2 encryption license (see Xilinx Answer Record# 68071 for details).  
+
+Note that modules that are source encrypted are not affected by this command and maintain their own access rights. Source not encrypted would be encrypted using IEEE-1735-2014 V2 standard. By default, the Xilinx default encryption key is used and follows defaults set by Xilinx.  If custom access rights are required, then the -key option can be used to supply a valid key.  Lastly, note that you cannot use the -cell write_checkpoint option when using this option.
+
+The exact synax is 'write_checkpoint [-key <arg>] -encrypt <file>'.  
