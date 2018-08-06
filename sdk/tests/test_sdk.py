@@ -80,3 +80,8 @@ class TestSDK(BaseSdkTools):
         for slot in range(self.num_slots):
             self.fpga_load_local_image(self.cl_dram_dma_agfi, slot)
             self.peek_poke_test_slot(slot)
+
+    def test_readdir(self):
+        rc = self.mgmt_test_so.fpga_mgmt_test_readdir(0)
+        if rc != 0:
+            print("Test readdir failed")

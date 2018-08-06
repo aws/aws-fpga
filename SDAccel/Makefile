@@ -34,6 +34,8 @@ else
 $(info XILINX_SDX = $(XILINX_SDX))
 endif
 
+OS=$(shell lsb_release -si)
+$(info OS is $(OS))
 
 MODULE :=
 ifeq ($(RELEASE_VER),2017.4)
@@ -42,7 +44,12 @@ ifeq ($(RELEASE_VER),2017.4)
   XRT_HAL_LIB = libxrt-aws.so
   EXE = awssak2
   MODULE = xocl
+ifeq ($(OS),Ubuntu)
+  GLIBCPP_PATH = lib/lnx64.o/Ubuntu
+else
   GLIBCPP_PATH = lib/lnx64.o/Default
+endif # OS check
+
 else
   $(error Environment variable RELEASE_VER not recognized: $(RELEASE_VER))
 endif

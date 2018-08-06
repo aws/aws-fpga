@@ -16,6 +16,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <pthread.h>
 
 #include <hal/fpga_common.h>
 
@@ -241,6 +242,22 @@ int fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset,
  */
 int fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
 	uint64_t dword_len);
+
+/**
+ * Glibc 2.19 and lower support readdir_r, a reentrant version of readdir.
+ * Newer versions of glibc deprecate readdir_r and therefore require external
+ * synchronization on readdir.
+ */
+#if !defined(_BSD_SOURCE) && !defined(_SVID_SOURCE)
+/**
+ * This mutex is used internally in fpga_pci_get_all_slot_specs to provide
+ * synchronization for calls to readdir. The mutex is exported so that if
+ * software which links with this library also uses readdir in a threaded
+ * environment, it can use this lock to protect calls to readdir.
+ */
+extern pthread_mutex_t fpga_pci_readdir_mutex;
+#endif
+
 
 #ifdef __cplusplus
 }

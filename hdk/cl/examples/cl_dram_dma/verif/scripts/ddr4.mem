@@ -1,0 +1,46 @@
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+
+###########################################################
+# Format the file as hex values and in the following order:
+# bg ba row col data
+# or with a stacked part
+# rank bg ba row col data
+#########
+# Default data format is DQ<7:0> columns<7:0> (burst length of 8) MSB....LSB:
+# Example line in a memory file:
+# 1 2 411 7 8899aabbccddeeff
+# writes bg:1 ba:2 row:411 col:<0-7> (burst of 8)
+# col   7766554433221100
+# data  8899aabbccddeeff
+# In this example col 0 DQ<7:0> has FF data, col 1 DQ<7:0> has EE data etc....
+# The data is written to the array similar to a bus write where LSBs 2:0 are ignored
+# and the col is sequential.
+#########
+# To change the data format, use a 'config number_of_dqs number_of_columns' statement.
+# Valid values are number_of_dqs <4,8,16> and number_of_columns <4,8>
+# Example line in a memory file:
+# config 16 8
+# Changes the data to four hex characters per column DQ<15:0> and 8 columns (burst length of 8).
+# After this the line 
+# 0 1 2 0 88887777666655554444333322221111
+# writes bg:0 ba:1 row:2 col:<0-7>
+# col   77776666555544443333222211110000
+# data  88887777666655554444333322221111
+###########################################################
+0 0 0 0 7766554433221100
+1 1 0 0 6655443322110077
+config 16 8
+0 1 0 0 88887777666655554444333322221111

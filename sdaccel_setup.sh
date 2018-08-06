@@ -86,7 +86,7 @@ function check_set_xilinx_sdx {
     echo "RELEASE_VER equals $RELEASE_VER"
 }
 
-function check_install_packages {
+function check_install_packages_centos {
 #TODO: Check required packages are installed or install them
 #TODO: Check version of gcc is above 4.8.5 (4.6.3 does not work)
   for pkg in `cat $SDACCEL_DIR/packages.txt`; do
@@ -94,6 +94,16 @@ function check_install_packages {
       true
     else
       warn_msg " $pkg not installed - please run: sudo yum install $pkg "
+    fi
+  done
+}
+
+function check_install_packages_ubuntu {
+  for pkg in `cat $SDACCEL_DIR/packages.txt`; do
+    if apt -qq list "$pkg" >/dev/null 2>&1; then
+      true
+    else
+      warn_msg " $pkg not installed - please run: sudo apt-get install $pkg "
     fi
   done
 }
@@ -167,8 +177,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* ]]; then
           return 1
         fi
     fi
-    rm -I $SDACCEL_DIR/examples/xilinx
-    ln -s $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
+    ln -sf $SDACCEL_DIR/examples/xilinx_2017.4 $SDACCEL_DIR/examples/xilinx
 else
    echo " $RELEASE_VER is not 2017.4\n" 
    exit 2
@@ -191,8 +200,14 @@ if ! check_icd; then
 fi
 
 # Check correct packages are installed
-if ! check_install_packages; then
-    return 1
+if [ -f "/etc/redhat-release" ]; then
+    if ! check_install_packages_centos; then
+        return 1
+    fi
+else
+    if ! check_install_packages_ubuntu; then
+        return 1
+    fi
 fi
 
 function setup_dsa {

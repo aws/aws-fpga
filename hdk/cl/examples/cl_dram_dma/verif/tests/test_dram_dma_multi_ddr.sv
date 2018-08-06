@@ -50,9 +50,13 @@ module test_dram_dma_multi_ddr();
       tb.poke_ocl(.addr(64'h330), .data(0));
       tb.poke_ocl(.addr(64'h430), .data(0));
 
+      // FAST_SIM_MODE is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
+      
+`ifndef FAST_SIM_MODE
       // allow memory to initialize
       tb.nsec_delay(27000);
-
+`endif
+      
       $display("[%t] : Initializing buffers", $realtime);
  
 `ifndef DDR_A_ABSENT     

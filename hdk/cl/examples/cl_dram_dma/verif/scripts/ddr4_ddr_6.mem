@@ -1,0 +1,26 @@
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+
+config 4 8
+0 0 0 1 2e282e20
+3 3 2bf8 3f9 2e282e20
+0 0 1 0 00000000
+3 3 2bf9 3f8 00000000
+0 0 2 0 00000000
+3 3 2bfa 3f8 00000000
+0 0 4 0 00000000
+3 3 2bfc 3f8 00000000
+0 0 8 0 00000000
+3 3 2bf0 3f8 00000000
