@@ -15,21 +15,21 @@
 COMMON_REPO := $(SDACCEL_DIR)/examples/xilinx
 
 include $(COMMON_REPO)/utility/boards.mk
-include $(COMMON_REPO)/libs/xcl/xcl.mk
+include $(COMMON_REPO)/libs/xcl2/xcl2.mk
 include $(COMMON_REPO)/libs/opencl/opencl.mk
 include $(COMMON_REPO)/libs/oclHelper/oclHelper.mk
 
 # Host Application
-main_SRCS=$(wildcard host/src/*.cpp ../common/src/AOCLUtils/*.cpp) $(xcl_SRCS) $(oclHelper_SRCS)
-main_HDRS=$(xcl_HDRS)
-main_CXXFLAGS=$(xcl_CXXFLAGS) $(opencl_CXXFLAGS)  -Ihost/inc -I../common/inc/ $(oclHelper_CXXFLAGS)
+main_SRCS=$(wildcard host/src/*.cpp ../common/src/AOCLUtils/*.cpp) $(xcl2_SRCS) $(oclHelper_SRCS)
+main_HDRS=$(xcl2_HDRS)
+main_CXXFLAGS=$(xcl2_CXXFLAGS) $(opencl_CXXFLAGS)  -Ihost/inc -I../common/inc/ $(oclHelper_CXXFLAGS)
 main_LDFLAGS=$(opencl_LDFLAGS) -lrt
 
 EXES=main
 
 # Kernel                                                                                                                                                                                              
 fft1d_SRCS=./device/fft1d.cl
-fft1d_CLFLAGS= -optimizequick
+#fft1d_CLFLAGS= -optimizequick
 #Specifying Fifo depth for Dataflow                                                                                                                                                                  
 ##fft1d_CLFLAGS+=--xp "param:compiler.xclDataflowFifoDepth=32"
 
@@ -46,11 +46,7 @@ check_XCLBINS=fft1d
 
 CHECKS=check
 
-ifeq ($(DEBUG),1)
 CXXFLAGS += -g
-else
-CXXFLAGS += -O2
-endif
 
 #CXX := g++
 

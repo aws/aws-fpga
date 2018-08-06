@@ -1,9 +1,18 @@
---- third_party/fft1d/device/fft1d.cl      2017-05-09 22:47:43.000000000 +0000
-+++ sdaccel/fft1d/device/fft1d.cl 2017-09-12 19:21:02.120000000 +0000
-@@ -49 +49 @@
+--- device/fft1d.cl	2018-02-12 17:54:56.000000000 +0000
++++ device/fft1d.cl	2018-07-23 20:57:12.414000000 +0000
+@@ -46,7 +46,7 @@
+ // Include source code for an engine that produces 8 points each step
+ #include "fft_8.cl" 
+ 
 -#pragma OPENCL EXTENSION cl_intel_channels : enable
 +//#pragma OPENCL EXTENSION cl_intel_channels : enable
-@@ -64 +64,9 @@
+ 
+ #include "../host/inc/fft_config.h"
+ 
+@@ -66,11 +66,19 @@
+ #define CONT_FACTOR            (1 << LOG_CONT_FACTOR)
+ 
+ // Need some depth to our channels to accomodate their bursty filling.
 -channel float2 chanin[8] __attribute__((depth(CONT_FACTOR*8)));
 +
 +pipe float2 chanin0 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
@@ -14,52 +23,88 @@
 +pipe float2 chanin5 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
 +pipe float2 chanin6 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
 +pipe float2 chanin7 __attribute__((xcl_reqd_pipe_depth(CONT_FACTOR*8)));
-@@ -68 +76 @@
--  #pragma unroll
-+  __attribute__((opencl_unroll_hint()))
-@@ -137,2 +145,2 @@
+ 
+ uint bit_reversed(uint x, uint bits) {
+   uint y = 0;
+-  #pragma unroll 
++ __attribute__((opencl_unroll_hint()))
+   for (uint i = 0; i < bits; i++) {
+     y <<= 1;
+     y |= x & 1;
+@@ -139,15 +147,15 @@
+ }
+ 
+ // group dimension (N/(8*CONT_FACTOR), num_iterations)
 -__attribute__((reqd_work_group_size(CONT_FACTOR * POINTS, 1, 1)))
 -kernel void fetch (global float2 * restrict src) {
 +kernel __attribute__((reqd_work_group_size(CONT_FACTOR * POINTS, 1, 1)))
 +void fetch (global float2 * restrict src) {
-@@ -145 +153 @@
+ 
+   const int N = (1 << LOGN);
+   // Each thread will fetch POINTS points. Need POINTS times to pass to FFT.
+   const int BUF_SIZE = 1 << (LOG_CONT_FACTOR + LOGPOINTS + LOGPOINTS);
+ 
+   // Local memory for CONT_FACTOR * POINTS points
 -  local float2 buf[BUF_SIZE];
-+  local float2 buf[BUF_SIZE] __attribute__((xcl_array_partition(block,8,1)));
-@@ -156,2 +164,2 @@
++  __local float2 buf[BUF_SIZE] __attribute__((xcl_array_partition(block,8,1)));
+ 
+   uint iteration = get_global_id(1);
+   uint group_per_iter = get_global_id(0);
+@@ -158,17 +166,17 @@
+   uint lid = get_local_id(0);
+   uint local_addr = lid << LOGPOINTS;
+ 
 -  #pragma unroll
 -  for (uint k = 0; k < POINTS; k++) {
 +  __attribute__((opencl_unroll_hint()))
 +  for (uint k = 0; k < POINTS; k+=2) {
-@@ -160 +167,0 @@
--
-@@ -163,4 +170,4 @@
+     buf[local_addr + k] = src[global_addr + k];
+   }
+ 
+   barrier (CLK_LOCAL_MEM_FENCE);
+ 
 -  #pragma unroll
 -  for (uint k = 0; k < POINTS; k++) {
 -    uint buf_addr = bit_reversed(k,3) * CONT_FACTOR * POINTS + lid;
 -    write_channel_intel (chanin[k], buf[buf_addr]);
 +  uint buf_addr[8];
 +  __attribute__((opencl_unroll_hint()))
-+  for(uint k=0;k<8;k++) {
++  for (uint k = 0; k < 8; k++) {
 +    buf_addr[k] = bit_reversed(k,3) * CONT_FACTOR * POINTS + lid;
-@@ -167,0 +175,12 @@
+   }
+ }
+ 
+@@ -181,9 +189,24 @@
+  * 'count' represents the number of 4k sets to process
+  * 'inverse' toggles between the direct and the inverse transform
+  */
 +  // bit_reversed reverses the bit locations of the value given.
 +  // The second parameter is the width of the number (in bits) to reverse.
 +  // Only the non-symmetric numbers are changed.  E.g. 001,011,100,110 -> 100,110,100,110
-+    write_pipe (chanin0, &buf[buf_addr[0]]);
-+    write_pipe (chanin1, &buf[buf_addr[1]]);
-+    write_pipe (chanin2, &buf[buf_addr[2]]);
-+    write_pipe (chanin3, &buf[buf_addr[3]]);
-+    write_pipe (chanin4, &buf[buf_addr[4]]);
-+    write_pipe (chanin5, &buf[buf_addr[5]]);
-+    write_pipe (chanin6, &buf[buf_addr[6]]);
-+    write_pipe (chanin7, &buf[buf_addr[7]]);
 +
-@@ -180,2 +199,2 @@
++
++
++    write_pipe(chanin0, &buf[buf_addr[0]]);
++    write_pipe(chanin1, &buf[buf_addr[1]]);
++    write_pipe(chanin2, &buf[buf_addr[2]]);
++    write_pipe(chanin3, &buf[buf_addr[3]]);
++    write_pipe(chanin4, &buf[buf_addr[4]]);
++    write_pipe(chanin5, &buf[buf_addr[5]]);
++    write_pipe(chanin6, &buf[buf_addr[6]]);
++    write_pipe(chanin7, &buf[buf_addr[7]]);
++
+ 
 -__attribute((task))
 -kernel void fft1d(global float2 * restrict dest,
 +kernel __attribute((reqd_work_group_size(1, 1, 1))) //task))
 +void fft1d(global float2 * restrict dest,
-@@ -218,8 +237,9 @@
+                   int count, int inverse) {
+ 
+   const int N = (1 << LOGN);
+@@ -220,14 +243,14 @@
+     float2x8 data;
+     // Perform memory transfers only when reading data in range
+     if (i < count * (N / 8)) {
 -      data.i0 = read_channel_intel(chanin[0]);
 -      data.i1 = read_channel_intel(chanin[1]);
 -      data.i2 = read_channel_intel(chanin[2]);
@@ -68,7 +113,6 @@
 -      data.i5 = read_channel_intel(chanin[5]);
 -      data.i6 = read_channel_intel(chanin[6]);
 -      data.i7 = read_channel_intel(chanin[7]);
-+
 +      read_pipe(chanin0,&data.i0);
 +      read_pipe(chanin1,&data.i1);
 +      read_pipe(chanin2,&data.i2);
@@ -77,3 +121,6 @@
 +      read_pipe(chanin5,&data.i5);
 +      read_pipe(chanin6,&data.i6);
 +      read_pipe(chanin7,&data.i7);
+     } else {
+       data.i0 = data.i1 = data.i2 = data.i3 = 
+                 data.i4 = data.i5 = data.i6 = data.i7 = 0;
