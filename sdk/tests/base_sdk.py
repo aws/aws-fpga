@@ -37,6 +37,10 @@ except ImportError as e:
 
 logger = aws_fpga_utils.get_logger(__name__)
 
+def c_tests_log_f(level, message):
+    print("log from c: " + str(message.strip()))
+    return 0
+
 class BaseSdkTools(AwsFpgaTestBase):
     '''
     Pytest test class.
@@ -58,6 +62,7 @@ class BaseSdkTools(AwsFpgaTestBase):
         assert AwsFpgaTestBase.running_on_f1_instance(), 'This test must be run on an F1 instance. Instance type={}'.format(aws_fpga_test_utils.get_instance_type())
 
         cls.load_mgmt_so()
+        cls.load_mgmt_test_so()
 
         (cls.cl_hello_world_agfi, cls.cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_hello_world')
         (cls.cl_dram_dma_agfi, cls.cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_dram_dma')
@@ -101,7 +106,39 @@ class BaseSdkTools(AwsFpgaTestBase):
 
         cls.mgmt_so.fpga_pci_poke8.restype = ctypes.c_int
         cls.mgmt_so.fpga_pci_poke8.argtypes = [ctypes.c_int,ctypes.c_uint64,ctypes.c_uint8]
-        
+
+
+    @classmethod
+    def load_mgmt_test_so(cls):
+        env = dict(os.environ)
+        env['SDK_DIR'] = AwsFpgaTestBase.WORKSPACE + "/sdk"
+        make_proc = subprocess.Popen("make", cwd=AwsFpgaTestBase.WORKSPACE + "/sdk/tests/c_tests", env=env)
+        if make_proc.wait() != 0:
+            raise Exception("Unable to build fpga_mgmt_tests c library")
+
+        mgmt_test_so_loc = "{}/sdk/tests/c_tests/fpga_mgmt_lib_tests.so".format(AwsFpgaTestBase.WORKSPACE)
+        ctypes.cdll.LoadLibrary(mgmt_test_so_loc)
+        # Setup shared object return and argument types
+        cls.mgmt_test_so = ctypes.CDLL(mgmt_test_so_loc)
+
+        cls.mgmt_test_so.fpga_mgmt_test_readdir.restype = ctypes.c_int
+        cls.mgmt_test_so.fpga_mgmt_test_readdir.argtypes = [ctypes.c_uint]
+
+        cls.mgmt_test_so.fpga_mgmt_tests_init.restype = ctypes.c_int
+        cls.mgmt_test_so.fpga_mgmt_tests_init.argtypes = []
+
+        fpga_mgmt_tests_logger_f = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_uint32, ctypes.c_char_p)
+        cls.mgmt_test_so.fpga_mgmt_tests_provide_logger.restype = ctypes.c_int
+        cls.mgmt_test_so.fpga_mgmt_tests_provide_logger.argtypes = [fpga_mgmt_tests_logger_f, ctypes.c_char_p]
+
+        if cls.mgmt_test_so.fpga_mgmt_tests_init() != 0:
+            print("failed to initialize the fpga_mgmt_tests")
+            return
+
+        rc = cls.mgmt_test_so.fpga_mgmt_tests_provide_logger(fpga_mgmt_tests_logger_f(c_tests_log_f), "fpga_mgmt_tests")
+        if rc != 0:
+            print("Error configuring log function from python.")
+
 
     @classmethod
     def set_slot_to_device_mapping(cls):
