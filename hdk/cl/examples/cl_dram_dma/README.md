@@ -117,7 +117,7 @@ This example does not use FPGA to FPGA PCIe communication
 
 ### FPGA to FPGA communication over Ring
 
-This example does not use FPGA to FPGA Ring
+This example does not use FPGA to FPGA Ring. FPGA Ring is a unsupported feature planned for future release.
 
 
 ### Virtual JTAG

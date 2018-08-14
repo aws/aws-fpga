@@ -26,6 +26,20 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.1 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Simulation performance Improvements
+  * DDR Behavioural Model- Hardware simulations use an AXI memory model to run 4X faster by skipping DDR initialization. Please refer to this [README](./hdk/cl/examples/cl_dram_dma/verif/README.md) on how to use this feature in your simulation.
+  * DDR Backdoor Loading- Hardware simulation time is reduced by pre-loading data directly into memory models.  Please refer to this [README](./hdk/cl/examples/cl_dram_dma/verif/README.md#ddr-backdoor-loading) for example tests that demonstrate this feature.
+* Fixed Issues
+  * XOCL Driver update to address synchronization issues.
+  * Fixed XOCL driver issues when using ubuntu distribution for Linux OS.
+  * Improved Performance for [cl_dram_dma Public AFI](./hdk/cl/examples/cl_dram_dma/README.md#metadata).
+  * SDAccel 3rd party examples updated to use Shell V1.4 DSA.
+  * Fixed AFI Manifest generation in IPI flow.
+  * HLX button fixed in IPI
+  * [FPGA Library update](./sdk/userspace/README.md)
+  
+  
 ## Release 1.4.0 (See [ERRATA](./ERRATA.md) for unsupported features)
 * [New Shell Stable: v04261818](./hdk/common/shell_stable).  Starting with release v1.4.0, the AWS FPGA shell stable has been updated and only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit shell release. 
   * [Shell Release Notes](./hdk/docs/AWS_Shell_RELEASE_NOTES.md) 

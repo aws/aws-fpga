@@ -52,9 +52,9 @@ module test_dram_dma_4k_crossing();
       tb.poke_ocl(.addr(64'h330), .data(0));
       tb.poke_ocl(.addr(64'h430), .data(0));
 
-      // FAST_SIM_MODE is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
+      // AXI_MEMORY_MODEL is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
       
-`ifndef FAST_SIM_MODE
+`ifndef AXI_MEMORY_MODEL
       // allow memory to initialize
       tb.nsec_delay(27000);
 `endif
