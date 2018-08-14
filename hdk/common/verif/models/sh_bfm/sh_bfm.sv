@@ -1323,7 +1323,7 @@ module sh_bfm #(
       end
    end
 
-`ifndef FAST_SIM_MODE   
+`ifndef AXI_MEMORY_MODEL   
    //==========================================================
 
    // DDR Controller
@@ -1549,7 +1549,7 @@ module sh_bfm #(
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= 3'd0;
      else
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= {ddr_is_ready_sync, ddr_is_ready_presync, ddr_is_ready};
-`else // !`ifndef FAST_SIM_MODE
+`else // !`ifndef AXI_MEMORY_MODEL
    always_comb
       begin
          M_C_ACT_N = 0;

@@ -165,7 +165,7 @@
 
 `define EOF -1
 
-`ifndef FAST_SIM_MODE
+`ifndef AXI_MEMORY_MODEL
    initial begin
       r = $value$plusargs("HDKDIR=%s", hdk_name);
       $display("Value is %0s", hdk_name);

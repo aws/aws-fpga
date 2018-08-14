@@ -10,29 +10,29 @@ The system verilog simulation tests can be run from the [verif/scripts](scripts)
     $ make TEST=test_dram_dma QUESTA=1
     $ make TEST=test_dram_dma IES=1
     
-    //To Run Simulations in FAST mode
+    //To Run Simulations in AXI_MEMORY_MODEL mode
     
-    $ make TEST=test_dram_dma FAST=1 (Runs with XSIM by default in FAST mode)
-    $ make TEST=test_dram_dma FAST=1 VCS=1 
-    $ make TEST=test_dram_dma FAST=1 QUESTA=1 
-    $ make TEST=test_dram_dma FAST=1 IES=1
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 (Runs with XSIM by default in AXI_MEMORY_MODEL mode)
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 VCS=1 
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 QUESTA=1 
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 IES=1
     
-    //To Run Simulations in FAST mode with AXI memory models instead of DDR(ECC enabled).
+    //To Run Simulations in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR(ECC enabled).
     
     //Direct ECC error injection:
     //Injects ECC errors for read transactions with addresses in the range ECC_ADDR_LO to ECC_ADDR_HI
     
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
     
     //Random ECC error injection:
     //Injects random ECC errors for read transactions for any address range. RND_ECC_WEIGHT is the percentage of time ECC should be injected    
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
-    $ make TEST=test_dram_dma_ecc_direct FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
+    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
      
     //To Run DDR backdoor loading tests
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 (Runs with XSIM by default)
@@ -56,30 +56,30 @@ The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) direc
     $ make C_TEST=test_dram_dma_hwsw_cosim QUESTA=1
     $ make C_TEST=test_dram_dma_hwsw_cosim IES=1
     
-    //To Run in FAST mode with AXI memory models instead of DDR.
+    //To Run in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR.
     
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 (Runs with XSIM by default)
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 VCS=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 IES=1         
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 (Runs with XSIM by default)
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 IES=1         
     
-    //To Run Simulations in FAST mode with AXI memory models instead of DDR(ECC enabled).
+    //To Run Simulations in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR(ECC enabled).
     
     //Direct ECC error injection:
     //Injects ECC errors for read transactions with addresses in the range ECC_ADDR_LO to ECC_ADDR_HI
     
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
     
     //Random ECC error injection:
     //Injects random ECC errors for read transactions for any address range. RND_ECC_WEIGHT is the percentage of time ECC should be injected.
     
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim FAST=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
+    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
     
 ```
 
@@ -144,8 +144,8 @@ This test programs tester block to do PCIM reads and writes with random lengths 
 ## test_peek_poke_pcis_axsize.sv
 This test does PCIS peek and poke with different sizes. Although shell model allows different size transfers on PCIS interface, Shell only supports transfer of size 6 on PCIS interface.
 
-# _FAST mode simulations_
-FAST mode can be used for better simulation perfornmance. FAST mode enables a test to run with AXI memory models instead of DDR memory. The documentation can be found in AXI memory model section at [RTL_Simulating_CL_Designs](../../../../docs/RTL_Simulating_CL_Designs.md). Any test that accesses DDR memory can be run in FAST mode. Below are some example tests for ECC and backdoor loading support features of AXI memory model.
+# _AXI_MEMORY_MODEL mode simulations_
+AXI_MEMORY_MODEL mode can be used for better simulation perfornmance. AXI_MEMORY_MODEL mode enables a test to run with AXI memory models instead of DDR memory. The documentation can be found in AXI memory model section at [RTL_Simulating_CL_Designs](../../../../docs/RTL_Simulating_CL_Designs.md). Any test that accesses DDR memory can be run in AXI_MEMORY_MODEL mode. Below are some example tests for ECC and backdoor loading support features of AXI memory model.
 
 ## test_dram_dma_mem_model_bdr_wr
 This test backdoor writes AXI memory model, reads through frontdoor and checks that the data matches.
