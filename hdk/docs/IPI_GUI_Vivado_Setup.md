@@ -258,6 +258,22 @@ Change only directives for opt_design ,place_design, phys_opt_design, and route_
 
 Refer to [IPI Tutorials and Examples](./IPI_GUI_Examples.md) to get started.
 
+### HLx button (optional)
+
+The HLx button is a custom command that can be added to Vivado toolbar for ease of use. Here is an example: [Vivado IP Integrator video](https://www.xilinx.com/video/hardware/using-vivado-ip-integrator-and-amazon-f1.html)
+
+To add it to Vivado toolbar, please follow the steps once VIvado GUI is opened:
+- Go to Tools -> Custom Commands -> Customize Commands...
+
+![HLx_step_1](./images/hlx/HLx_button_step_1.jpg)
+- Click on the "+" icon
+- Enter a name (e.g. AWS_Make_IPI) and press Enter
+- Configure the window as follow
+
+![HLx_step_2](./images/hlx/HLx_button_step_2.jpg)
+- Finally, press OK
+
+You can now use the HLx button.
 
 <a name="summary"></a>
 # Summary

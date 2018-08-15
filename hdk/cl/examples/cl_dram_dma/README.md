@@ -117,7 +117,7 @@ This example does not use FPGA to FPGA PCIe communication
 
 ### FPGA to FPGA communication over Ring
 
-This example does not use FPGA to FPGA Ring
+This example does not use FPGA to FPGA Ring. FPGA Ring is a unsupported feature planned for future release.
 
 
 ### Virtual JTAG
@@ -186,6 +186,6 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-0f6832ffcb43fdc24 |
-| Pre-generated AGFI ID | agfi-0367124aff5e7c5f7 |
+| Pre-generated AFI ID | afi-0a3a14f0372228f55 |
+| Pre-generated AGFI ID | agfi-01dc2520aaf357e86 |
 

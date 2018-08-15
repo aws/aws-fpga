@@ -30,16 +30,16 @@ module sh_bfm #(
     // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
    input              CLK_300M_DIMM2_DP,
    input              CLK_300M_DIMM2_DN,
-   output             M_C_ACT_N,
-   output [16:0]      M_C_MA,
-   output [1:0]       M_C_BA,
-   output [1:0]       M_C_BG,
-   output [0:0]       M_C_CKE,
-   output [0:0]       M_C_ODT,
-   output [0:0]       M_C_CS_N,
-   output [0:0]       M_C_CLK_DN,
-   output [0:0]       M_C_CLK_DP,
-   output             M_C_PAR,
+   output logic       M_C_ACT_N,
+   output logic[16:0] M_C_MA,
+   output logic[1:0]  M_C_BA,
+   output logic[1:0]  M_C_BG,
+   output logic[0:0]  M_C_CKE,
+   output logic[0:0]  M_C_ODT,
+   output logic[0:0]  M_C_CS_N,
+   output logic[0:0]  M_C_CLK_DN,
+   output logic[0:0]  M_C_CLK_DP,
+   output logic       M_C_PAR,
    inout  [63:0]      M_C_DQ,
    inout  [7:0]       M_C_ECC,
    inout  [17:0]      M_C_DQS_DP,
@@ -157,6 +157,9 @@ module sh_bfm #(
    bit           debug;
 
    logic         chk_clk_freq = 1'b0;
+
+   logic         ECC_EN;
+   int           ecc_err_cnt=0;
    
    typedef struct {
       logic [63:0] buffer;
@@ -671,7 +674,15 @@ module sh_bfm #(
 */
    end
 
-   
+`ifdef ECC_DIRECT_EN
+   assign ECC_EN = 1'b1;
+`else
+ `ifdef RND_ECC_EN
+   assign ECC_EN = 1'b1;
+ `else
+   assign ECC_EN = 1'b0;
+  `endif
+`endif
    
    initial begin
       clk_core = 1'b0;
@@ -1312,6 +1323,7 @@ module sh_bfm #(
       end
    end
 
+`ifndef AXI_MEMORY_MODEL   
    //==========================================================
 
    // DDR Controller
@@ -1532,12 +1544,70 @@ module sh_bfm #(
      .c0_ddr4_s_axi_rvalid(sync_sh_cl_ddr_rvalid),
      .dbg_bus()        //No Connect
    );
-
    always_ff @(negedge sync_rst_n or posedge clk_core)
      if (!sync_rst_n)
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= 3'd0;
      else
        {sh_cl_ddr_is_ready, ddr_is_ready_sync, ddr_is_ready_presync} <= {ddr_is_ready_sync, ddr_is_ready_presync, ddr_is_ready};
+`else // !`ifndef AXI_MEMORY_MODEL
+   always_comb
+      begin
+         M_C_ACT_N = 0;
+         M_C_MA = 0;
+         M_C_BA = 0;
+         M_C_BG = 0;
+         M_C_CKE = 0;
+         M_C_ODT = 0;
+         M_C_CS_N = 0;
+         M_C_CLK_DN = 0;
+         M_C_CLK_DP = 0;
+         M_C_PAR = 0;
+         
+         sh_cl_ddr_is_ready = 'b1;
+         ddr_is_ready_sync  = 'b1;
+         ddr_is_ready_presync = 'b1;
+      end // always_comb
+      axi4_slave_bfm #(.ECC_EN(`ECC_DIRECT_EN), .ECC_ADDR_HI(`ECC_ADDR_HI), .ECC_ADDR_LO(`ECC_ADDR_LO), .RND_ECC_EN(`RND_ECC_EN), .RND_ECC_WEIGHT(`RND_ECC_WEIGHT)) u_mem_model (
+               .clk_core(clk_core),
+               .rst_n(rst_main_n),
+               .cl_sh_ddr_awid(cl_sh_ddr_awid),
+               .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
+               .cl_sh_ddr_awlen(cl_sh_ddr_awlen),
+               .cl_sh_ddr_awsize(cl_sh_ddr_awsize),
+               .cl_sh_ddr_awburst(2'b10),
+               .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid),
+               .sh_cl_ddr_awready(sh_cl_ddr_awready),
+
+               .cl_sh_ddr_wid(cl_sh_ddr_wid),
+               .cl_sh_ddr_wdata(cl_sh_ddr_wdata),
+               .cl_sh_ddr_wstrb(cl_sh_ddr_wstrb),
+               .cl_sh_ddr_wlast(cl_sh_ddr_wlast),
+               .cl_sh_ddr_wvalid(cl_sh_ddr_wvalid),
+               .sh_cl_ddr_wready(sh_cl_ddr_wready),
+               
+               .sh_cl_ddr_bid(sh_cl_ddr_bid),
+               .sh_cl_ddr_bresp(sh_cl_ddr_bresp),
+               .sh_cl_ddr_bvalid(sh_cl_ddr_bvalid),
+               .cl_sh_ddr_bready(cl_sh_ddr_bready),
+
+               .cl_sh_ddr_arid(cl_sh_ddr_arid),
+               .cl_sh_ddr_araddr(cl_sh_ddr_araddr),
+               .cl_sh_ddr_arlen(cl_sh_ddr_arlen),
+               .cl_sh_ddr_arsize(cl_sh_ddr_arsize),
+               .cl_sh_ddr_arburst(2'b10),
+               .cl_sh_ddr_arvalid(cl_sh_ddr_arvalid),
+               .sh_cl_ddr_arready(sh_cl_ddr_arready),
+
+               .sh_cl_ddr_rid(sh_cl_ddr_rid),
+               .sh_cl_ddr_rdata(sh_cl_ddr_rdata),
+               .sh_cl_ddr_rresp(sh_cl_ddr_rresp),
+               .sh_cl_ddr_rlast(sh_cl_ddr_rlast),
+               .sh_cl_ddr_rvalid(sh_cl_ddr_rvalid),
+               .cl_sh_ddr_rready(cl_sh_ddr_rready)
+            );
+`endif
+                        
+
 
 
    axil_bfm sda_axil_bfm(
@@ -1918,6 +1988,18 @@ module sh_bfm #(
       else begin
          return 1'b0;
       end
+   endfunction // chk_clk_err_cnt
+
+   //=================================================
+   //
+   // get_ecc_err_cnt
+   //
+   //   Description: Checks if there are clock errors
+   //   Outputs: None
+   //
+   //=================================================
+   function int get_ecc_err_cnt();
+      return ecc_err_cnt;
    endfunction
    
    //=================================================
@@ -2552,7 +2634,17 @@ module sh_bfm #(
                
               if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
                 byte_cnt[chan] = 0;
-               
+
+              if (cl_sh_dma_pcis_rresp == 2'b10) begin
+                if (ECC_EN == 1) begin
+                  ecc_err_cnt++;
+                  $display("ECC error detected in the read data from CL. A SLVERR response is returned\n");
+                end
+                else begin
+                  ecc_err_cnt = 0;
+                  $display("CL returned SLVERR on READ Response \n");
+                end
+              end 
               cl_sh_rd_data.pop_front();
             end // if (chan == cl_sh_rd_data[0].id)
           end

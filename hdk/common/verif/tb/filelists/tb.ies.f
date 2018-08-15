@@ -12,6 +12,7 @@
 $XILINX_VIVADO/data/verilog/src/glbl.v
 
 -y $XILINX_VIVADO/data/verilog/src/unisims
+-y {HDK_COMMON_DIR}/verif/models/fpga/
 
 +incdir+$XILINX_VIVADO/data/verilog/src
 +incdir+${HDK_COMMON_DIR}/verif/models/sh_bfm

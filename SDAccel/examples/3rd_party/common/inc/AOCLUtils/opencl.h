@@ -36,7 +36,7 @@ extern void cleanup();
 
 namespace aocl_utils {
 
-static const char *const VERSION_STR = "xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0";
+static const char *const VERSION_STR = "xilinx_aws-vu9p-f1-04261818_dynamic_5_0";
 
 // Host allocation functions
 void *alignedMalloc(size_t size);

@@ -26,7 +26,7 @@ source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
 debug=0
 
 function usage {
-   info_msg "USAGE: $script_name [-d|-debug] [-h|-help] [-s3_bucket=<bucket_name>] [-s3_dcp_key=<S3_folder_of_dcp>] [-s3_logs_key=<S3_folder_of_logs>] [-xclbin=<xclbin_filename>] [-o=<awsxclbin_filename>] [-awsprofile=<aws_profile_name>]"                                                                                               
+   info_msg "USAGE: $script_name [-h|-help] [-s3_bucket=<bucket_name>] [-s3_dcp_key=<S3_folder_of_dcp>] [-s3_logs_key=<S3_folder_of_logs>] [-xclbin=<xclbin_filename>] [-o=<awsxclbin_filename>] [-awsprofile=<aws_profile_name>]"                                                                                               
 }                                                                                                              
 
 function help {

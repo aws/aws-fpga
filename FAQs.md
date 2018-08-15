@@ -382,14 +382,14 @@ FPGA Direct is FPGA to FPGA low latency high throughput peer communication throu
 
 **Q: What is FPGA Link and how fast is it?**
 
-FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link is organized as a ring, with 2 x 100Gbps links to each adjacent card. This enables each FPGA card to send/receive data from an adjacent card at 200Gbps speeds. Details on the FPGA Link interface will be provided in the Shell Interface specification when available.
+FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link is organized as a ring, with 2 x 100Gbps links to each adjacent card. This enables each FPGA card to send/receive data from an adjacent card at 200Gbps speeds. This is a unsupported feature planned for future release. Details on the FPGA Link interface will be provided in the Shell Interface specification when available.
 
 
 **Q: What protocol is used for FPGA link?**
 
 The FPGA link is a generic raw streaming interface, no transport protocol is provided for it by AWS. It is expected that developers would take advantage of standard PCIe protocol, Ethernet protocol, or Xilinx's (reliable) Aurora protocol layer for this interface.
 
-Details on the Shell Interface to the FPGA Link IP blocks are provided in the [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) when available.
+This is a unsupported feature planned for future release. Details on the Shell Interface to the FPGA Link IP blocks are provided in the [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) when available.
 
 
 **Q: What clock speed does the FPGA utilize?**

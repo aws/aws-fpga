@@ -211,7 +211,7 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 			"fpga_pci_check_file_id failed, sysfs_name=%s, device_id=0x%04x",
 			sysfs_name, map->device_id);
 
-	char wc_suffix[3] = "\0";
+	char wc_suffix[4] = "\0";
 	if (map->resource_burstable[bar_id] && write_combining) {
 		strncpy(wc_suffix, "_wc", sizeof(wc_suffix));
 	}

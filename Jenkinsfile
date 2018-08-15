@@ -60,7 +60,7 @@ def dcp_recipe_scenarios = [
     'A1-B2-C0-TIMING',
     'A1-B2-C0-CONGESTION',
     ]
-def fdf_test_names = ['cl_dram_dma[A0-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
+def fdf_test_names = ['cl_dram_dma[A1-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
     'cl_uram_example[2]', 'cl_uram_example[3]', 'cl_uram_example[4]']
 
 boolean debug_dcp_gen = params.get('debug_dcp_gen')
@@ -853,12 +853,6 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                 }
                             }
 
-                            boolean test_sw_emu_supported = true
-
-                            if(test_key =~ '_Debug') {
-                                test_sw_emu_supported = false
-                            }
-
                             // dsa = [ 4DDR: 4ddr ]
                             for ( def dsa in entrySet(dsa_map_for_test) ) {
 
@@ -879,6 +873,33 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                 String hw_report_file          = "sdaccel_hw_${e.key}_${dsa.value}_${xilinx_version}.xml"
                                 String create_afi_report_file  = "sdaccel_create_afi_${e.key}_${dsa.value}_${xilinx_version}.xml"
                                 String run_example_report_file = "sdaccel_run_${e.key}_${dsa.value}_${xilinx_version}.xml"
+
+                                String description_file = "${example_path}/description.json"
+                                def description_json = ["targets":["hw","hw_emu","sw_emu"]]
+
+                                try {
+                                    description_json = readJSON file: description_file
+                                }
+                                catch (exc) {
+                                    echo "Could not read the file: ${description_file}"
+                                    throw exc
+                                }
+
+                                boolean test_sw_emu_supported = true
+
+                                if(description_json["targets"]) {
+                                    if(description_json["targets"].contains("sw_emu")) {
+                                        test_sw_emu_supported = true
+                                        echo "Description file ${description_file} has target sw_emu"
+                                    }
+                                    else {
+                                        test_sw_emu_supported = false
+                                        echo "Description file ${description_file} does not have target sw_emu"
+                                    }
+                                }
+                                else {
+                                    echo "Description json did not have a 'target' key"
+                                }
 
                                 sdaccel_build_stages[build_name] = {
                                     if(test_sw_emu_supported) {

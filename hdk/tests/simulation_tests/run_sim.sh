@@ -53,6 +53,30 @@ case "$test_type" in
     sv)
         make TEST="$test_name"
         ;;
+    sv_fast)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1
+        ;;
+    sv_fast_ecc_direct)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=1000 ECC_ADDR_LO=0
+        ;;
+    sv_fast_ecc_rnd)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100
+        ;;
+    sv_fast_ecc_rnd_100)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100
+        ;;
+    sv_fast_ecc_rnd_50)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=50
+        ;;
+    sv_fast_ecc_rnd_10)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=10
+        ;;
+    sv_fast_ecc_rnd_0)
+        make TEST="$test_name" AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=0
+        ;;
+    sv_ddr_bkdr)
+        make TEST="$test_name" DDR_BKDR=1
+        ;;
     vhdl)
         make TEST="$test_name"
         ;;

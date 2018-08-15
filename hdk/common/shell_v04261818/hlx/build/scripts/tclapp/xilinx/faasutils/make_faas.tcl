@@ -279,7 +279,8 @@ proc [set _THISNAMESPACE]::[set _THISTOPSPACE]::make_faas {{args ""}} {
 
 # Manually set per FaaS Vendor
 	set _faas_instance [lindex [split $_faas_ip_vlnv ":"] 2]
-	set _faas_auto_instance_until_version_short 2017.3
+	# No longer needed - Needed for 2017.1 and older releases that are not supported
+        # set _faas_auto_instance_until_version_short 2017.3
 	# _faas_auto_instance_until... automatically adds the IP when testing in earlier versions.  Auto add is enabled with bd.faas params starting in 2017.3, 2017.1_sdx
 
 
@@ -663,18 +664,19 @@ while {[llength $args]} {
 					puts "WARNING: $warnMessage"
 					create_bd_design "cl"
 #					update_compile_order -fileset sources_1
+					# No longer needed - Needed for 2017.1 and older releases that are not supported
 					#Add IP in 2017.1
-					set version_split [split [version -short] "_"]
-					if {[lindex $version_split 1] eq "sdx" || [lindex $version_split 1] eq "sdxop" } {
-						set version_add 0.2
-					} else {
-						set version_add 0.0
-					}
-					set version_short [ expr ( [lindex $version_split 0] + $version_add ) ]
-					if {$version_short < $_faas_auto_instance_until_version_short} {
-						create_bd_cell -type ip -vlnv [get_ipdefs $_faas_ip_vlnv] $_faas_instance\_0
-						make_bd_intf_pins_external  [get_bd_intf_pins $_faas_instance\_0/$_faas_interface]
-					}
+					# set version_split [split [version -short] "_"]
+					#= if {[lindex $version_split 1] eq "sdx" || [lindex $version_split 1] eq "sdxop" } {
+					# 	set version_add 0.2
+					# } else {
+					# 	set version_add 0.0
+					# }
+					# set version_short [ expr ( [lindex $version_split 0] + $version_add ) ]
+					# if {$version_short < $_faas_auto_instance_until_version_short} {
+					# 	create_bd_cell -type ip -vlnv [get_ipdefs $_faas_ip_vlnv] $_faas_instance\_0
+					# 	make_bd_intf_pins_external  [get_bd_intf_pins $_faas_instance\_0/$_faas_interface]
+					# }
 				} else {
 					set errorCode 1
 					send_msg_id "$_procName 0-$errorCode" "ERROR" "Required file $_mandatoryBD not found in current sources list, please add a block diagram named \"cl\" to your project"

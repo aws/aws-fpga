@@ -52,9 +52,13 @@ module test_dram_dma_4k_crossing();
       tb.poke_ocl(.addr(64'h330), .data(0));
       tb.poke_ocl(.addr(64'h430), .data(0));
 
+      // AXI_MEMORY_MODEL is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
+      
+`ifndef AXI_MEMORY_MODEL
       // allow memory to initialize
       tb.nsec_delay(27000);
-
+`endif
+      
       $display("[%t] : Initializing buffers", $realtime);
 
       host_memory_buffer_address = 64'h0;
@@ -234,7 +238,7 @@ module test_dram_dma_4k_crossing();
                      $realtime, 64'h0008_0000_0000, rdata);
          error_count++;
       end
-
+      
       tb.poke(.addr(64'h000C_0000_0000), .data(64'h0000_0001), .size(DataSize::UINT64));
       tb.peek(.addr(64'h000C_0000_0000), .data(rdata), .size(DataSize::UINT64));
 

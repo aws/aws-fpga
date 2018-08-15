@@ -61,7 +61,7 @@ all : $(EXENAME)
 	$(CXX) $(CXXFLAGS) $(MYCFLAGS) $(MYCXXFLAGS) -c -MM $< -o $(patsubst %.o, %.d, $@)
 
 $(EXENAME): $(OBJS) $(AWS_HAL_LIBNAME)
-	$(CXX) -o $@ $(OBJS) $(AWS_HAL_LIBNAME) $(LDFLAGS) $(LDLIBS) -lrt
+	$(CXX) -o $@ $(OBJS) $(AWS_HAL_LIBNAME) $(LDFLAGS) $(LDLIBS) -lrt -pthread
 
 clean:
 	rm -rf *.o *.d $(EXENAME)

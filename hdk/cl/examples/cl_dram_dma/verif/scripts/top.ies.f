@@ -22,11 +22,13 @@
 +incdir+${CL_ROOT}/../common/design
 +incdir+${CL_ROOT}/design
 +incdir+${CL_ROOT}/verif/sv
++incdir+${CL_ROOT}/verif/tests
 +incdir+${SH_LIB_DIR}
 +incdir+${SH_INF_DIR}
 +incdir+${CL_ROOT}/design/axi_crossbar_0
 +incdir+${SH_LIB_DIR}/../ip/cl_axi_interconnect/ipshared/7e3a/hdl
 +incdir+${HDK_COMMON_DIR}/verif/include
++incdir+${HDK_COMMON_DIR}/verif/models/fpga
 +incdir+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 -y ${SH_LIB_DIR}
