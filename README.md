@@ -77,7 +77,8 @@ NOTE: For on-premises development, SDx/Vivado must have the correct license and 
 # Getting Started
 
 ### New to AWS?
-If you are new to AWS, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), to learn how to use AWS EC2, S3 and the AWS CLI.  These services are required to start developing accelerations for AWS FPGAs. For example, creating an AFI requires [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) installed and the execution of `aws s3 <action>` (`aws ec2 create-fpga-image`).
+If you are new to AWS, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), to learn how to use AWS EC2, S3 and the AWS CLI.  These services are required to start developing accelerations for AWS FPGAs. For example, creating an AFI requires [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) installed and the execution of `aws s3 <action>` (`aws ec2 create-fpga-image`).  AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) and us-gov-west-1 (GovCloud US).
+
 
 ### New to AWS FPGAs and setting up a development environment?
 The developer kit is supported for Linux operating systems only.  You have the choice to develop on AWS EC2 using the [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premises. Within a linux environment, you should execute `git clone https://github.com/aws/aws-fpga.git` to download the latest release to your EC2 Instance or local server. Using a SSH connection, execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/).
