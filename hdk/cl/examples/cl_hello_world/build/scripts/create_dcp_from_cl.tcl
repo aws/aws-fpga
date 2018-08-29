@@ -37,7 +37,7 @@ set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set uram_option         [lindex $argv 11]
 set notify_via_sns      [lindex $argv 12]
-
+set VDEFINES            [lindex $argv 13]
 ##################################################
 ## Flow control variables 
 ##################################################
@@ -132,6 +132,7 @@ set_msg_config -id {DRC REQP-1853}       -suppress
 set_msg_config -id {Synth 8-350}         -suppress
 set_msg_config -id {Synth 8-3848}        -suppress
 set_msg_config -id {Synth 8-3917}        -suppress
+set_msg_config -id {Opt 31-430}          -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
@@ -247,6 +248,7 @@ if {$implement} {
    ########################
    # CL Optimize
    ########################
+   set place_preHookTcl  ""
    if {$opt} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running optimization";
       impl_step opt_design $TOP $opt_options $opt_directive $opt_preHookTcl $opt_postHookTcl

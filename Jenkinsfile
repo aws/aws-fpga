@@ -21,7 +21,9 @@ properties([parameters([
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
-    booleanParam(name: 'disable_runtime_tests',               defaultValue: false,  description: 'Option to disable runtime tests.')
+    booleanParam(name: 'disable_runtime_tests',               defaultValue: false,  description: 'Option to disable runtime tests.'),
+    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins')
+
 ])])
 
 //=============================================================================
@@ -144,6 +146,13 @@ def is_public_repo() {
 
 def get_task_label(Map args=[ : ]) {
     String task_label = args.xilinx_version + '_' + task_label[args.task]
+    //boolean use_test_ami = params.get('use_test_ami')
+
+    if (params.use_test_ami) {
+        echo "Test AMI Requested"
+        task_label = task_label + '_test'
+    }
+
     echo "Label Requested: $task_label"
     return task_label
 }

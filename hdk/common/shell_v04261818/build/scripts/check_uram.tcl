@@ -14,9 +14,11 @@
 # limitations under the License.
 
 global uramHeight
+global CL_MODULE
 
 ###Check oreg_b usage for uramHeight==3 and uramHeight==4
 set clean 1
+if {[string compare $CL_MODULE "cl_uram_example"] == 0} {
 if {$uramHeight > 2} {
    foreach uram [get_cells -hier -filter {REF_NAME==URAM288 && NAME=~WRAPPER_INST/CL/*} ] {
       set oregB [get_property OREG_B $uram]
@@ -83,3 +85,4 @@ if {$uramHeight == 2} {
 } else {
    error "Error: Variable \'\$uramHeight\' set to unsupported value $uramHeight. Supported values are 2, 3, or 4"
 }  
+}

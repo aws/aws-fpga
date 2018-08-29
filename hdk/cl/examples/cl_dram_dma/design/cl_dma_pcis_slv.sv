@@ -150,7 +150,12 @@ lib_pipe #(.WIDTH(1), .STAGES(4)) SLR2_PIPE_RST_N (.clk(aclk), .rst_n(1'b1), .in
        .m_axi_rready  (sh_cl_dma_pcis_q.rready)
    );
 
-
+//-----------------------------------------------------
+//TIE-OFF unused signals to prevent critical warnings
+//-----------------------------------------------------
+   assign sh_cl_dma_pcis_q.rid[15:6] = 10'b0 ;
+   assign sh_cl_dma_pcis_q.bid[15:6] = 10'b0 ;
+   
 //---------------------------- 
 // axi interconnect for DDR address decodes 
 //---------------------------- 

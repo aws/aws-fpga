@@ -1,14 +1,14 @@
 
 # AXI Slave Timeouts (DMA_PCIS)
- 
+
 * The Shell provides a timeout mechanism which terminates any outstanding AXI transactions after 8 uS. There is a separate timeout per interface. Upon the first timeout, metrics registers are updated with the offending address and a counter is incremented. Upon further timeouts the counter is incremented. These metrics registers can be read via the fpga-describe-local-image found in [Amazon FPGA Image Management Tools README](../../sdk//userspace/fpga_mgmt_tools/README.md)
- 
+
 * Timeouts can occur for three reasons:
   1. The CL doesn’t respond to the address (reserved address space)
   2. The CL has a protocol violation on AXI which hangs the bus
   3. The CL design’s latency is exceeding the timeout value.  For example if the cycle is going to DDR, accumulated DDR arbitration and access latenencies may exceed the timeout value.
 
-* Best practice is to ensure addresses to reserved address space are fully decoded in your CL design.  
+* Best practice is to ensure addresses to reserved address space are fully decoded in your CL design.
 * If accesing DDR, note DMA accesses to DDR will accumulate which can lead to timeouts if the transactions are not completed fast enough.  This is especially true for CL designs operating at 125MHz or below.  See [cl_dram_dma](../cl/examples/cl_dram_dma).  This example illustrates best practice for DMA operations to DDR.
 * CL designs which have multiple masters to the AXI "fabric" will also incur arbitration delays.
 * If you suspect a timeout, debug by reading the metrics registers. The saved offending address should help narrow whether this is to DDR or registers/RAMs inside the FPGA. The developer should investigate if design parameters allow for long latency responses to the offending address.  If not, then the developer should investigate protocol violations.
@@ -24,7 +24,7 @@
 
 # How to detect a shell timeout has occurred
 
-* Shell-CL interface timeouts can be detected by checking for non-zero timeout counters.  These metrics can be read using this command:  
+* Shell-CL interface timeouts can be detected by checking for non-zero timeout counters.  These metrics can be read using this command:
 ```
 $sudo fpga-describe-local-image -S 0 --metrics
 AFI          0       agfi-0f0e045f919413242  loaded            0        ok               0       0x04151701
@@ -75,3 +75,8 @@ DDR3
    read-count=0
 ```
 * For detailed infomation on metrics, see [Amazon FPGA Image Management Tools README](../../sdk//userspace/fpga_mgmt_tools/README.md)
+
+** NOTE **: The LSB 2 bits of timeout address (sdacl-slave-timeout-addr, virtual-jtag-slave-timeout-addr, ocl-slave-timeout-addr, bar1-slave-timeout-addr and dma-pcis-timeout-addr) in the metrics are used to report whether the timeout occurred due to READ or WRITE transaction. The bits in timeout address should be interpret as follows:
+  > timeout-addr[1:0] == 2'b01 : Interface timed out on READ transaction (Could be either on AR or R channels).
+  > timeout-addr[1:0] == 2'b10 : Interface timed out on WRITE transaction (Could be on AW, W or B channels).
+  > True 32bit aligned address that triggered first timeout = {timeout-addr[1:0], 2'b00}.
