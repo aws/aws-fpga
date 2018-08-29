@@ -37,7 +37,7 @@ set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set uram_option         [lindex $argv 11]
 set notify_via_sns      [lindex $argv 12]
-
+set VDEFINES            [lindex $argv 13]
 ##################################################
 ## Flow control variables 
 ##################################################
