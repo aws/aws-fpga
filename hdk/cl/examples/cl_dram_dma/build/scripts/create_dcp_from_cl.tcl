@@ -37,7 +37,7 @@ set clock_recipe_b      [lindex $argv  9]
 set clock_recipe_c      [lindex $argv 10]
 set uram_option         [lindex $argv 11]
 set notify_via_sns      [lindex $argv 12]
-
+set VDEFINES            [lindex $argv 13]
 ##################################################
 ## Flow control variables 
 ##################################################
@@ -104,6 +104,11 @@ puts "All reports and intermediate results will be time stamped with $timestamp"
 
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
+set_msg_config -string {PIPE_CL_SH_AURORA_STAT} -suppress
+set_msg_config -string {PIPE_CL_SH_HMC_STAT} -suppress
+set_msg_config -string {PIPE_AURORA_CHANNEL_UP} -suppress
+set_msg_config -string {PIPE_HMC_IIC} -suppress
+set_msg_config -string {PIPE_SH_CL_AURORA_STAT} -suppress
 
 # Suppress Warnings
 # These are to avoid warning messages that may not be real issues. A developer
@@ -123,7 +128,7 @@ set_msg_config -id {Vivado 12-4739}      -suppress
 set_msg_config -id {Vivado 12-5201}      -suppress
 set_msg_config -id {DRC CKLD-1}          -suppress
 set_msg_config -id {IP_Flow 19-2248}     -suppress
-set_msg_config -id {Opt 31-155}          -suppress
+#set_msg_config -id {Opt 31-155}          -suppress
 set_msg_config -id {Synth 8-115}         -suppress
 set_msg_config -id {Synth 8-3936}        -suppress
 set_msg_config -id {Vivado 12-1023}      -suppress

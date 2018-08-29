@@ -25,6 +25,9 @@
          *    CL to SH 512-bit AXI4 interface
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
+         
+## Release 1.4.2 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-862.3.3.el7.x86_64
 
 ## Release 1.4.1 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Simulation performance Improvements
