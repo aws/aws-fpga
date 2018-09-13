@@ -28,7 +28,7 @@ The DDS IP described in XAPP1299 is connected to AWS F1 IP where BAR1 is used fo
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    
@@ -70,8 +70,6 @@ The simulation settings are already configured.
    * Click on Simulation->Run Simulation->Run Behavioral Simulation
    * Add signals needed in the simulation
    * Type `run -all` in the TCL console
-
-**NOTE**: *If Critical Warnings appear click OK and that the following command needs to ran two times. This is a known issue and will be addressed in later versions of the design.*
 
 <a name="impl"></a>
 ### Implementing the Design

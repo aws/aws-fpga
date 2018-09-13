@@ -1,0 +1,81 @@
+# Amazon FPGA Hardware Development Kit 
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use 
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+[global] 
+allow_file_create=0
+ioengine=psync
+iomem=mmap
+filesize=64g
+size=16g
+bs=1m 
+ratemin=1m
+verify=xxhash
+verify_fatal=1
+verify_dump=1
+
+[write-phase-0] 
+offset=0
+rw=write
+filename=/dev/xdma0_h2c_0
+do_verify=0
+
+[verify-phase-0] 
+new_group
+wait_for=write-phase-0
+offset=0
+rw=read
+filename=/dev/xdma0_c2h_0
+do_verify=1
+
+[write-phase-1] 
+offset=16g
+rw=write
+filename=/dev/xdma0_h2c_1
+do_verify=0
+
+[verify-phase-1] 
+new_group
+wait_for=write-phase-1
+offset=16g
+rw=read
+filename=/dev/xdma0_c2h_1
+do_verify=1
+
+[write-phase-2] 
+offset=32g
+rw=write
+filename=/dev/xdma0_h2c_2
+do_verify=0
+
+[verify-phase-2] 
+new_group
+wait_for=write-phase-2
+offset=32g
+rw=read
+filename=/dev/xdma0_c2h_2
+do_verify=1
+
+[write-phase-3] 
+offset=48g
+rw=write
+filename=/dev/xdma0_h2c_3
+do_verify=0
+
+[verify-phase-3] 
+new_group
+wait_for=write-phase-3
+offset=48g
+rw=read
+filename=/dev/xdma0_c2h_3
+do_verify=1

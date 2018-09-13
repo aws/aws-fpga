@@ -33,12 +33,18 @@
 #include "xocl_ioctl.h"
 #include "xocl_xdma.h"
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||	\
-	(defined(RHEL_RELEASE_CODE) && \
-	RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
+#define XOCL_DRM_FREE_MALLOC
+#elif defined(RHEL_RELEASE_CODE)
+#if RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(7,4)
+#define XOCL_DRM_FREE_MALLOC
+#endif
+#endif
+
+#if defined(XOCL_DRM_FREE_MALLOC)
 static inline void drm_free_large(void *ptr)
 {
-	kvfree(ptr);
+        kvfree(ptr);
 }
 
 static inline void *drm_malloc_ab(size_t nmemb, size_t size)
@@ -48,15 +54,13 @@ static inline void *drm_malloc_ab(size_t nmemb, size_t size)
 #endif
 
 static inline int xocl_drm_mm_insert_node(struct drm_mm *mm,
-					  struct drm_mm_node *node,
-					  u64 size)
+                                          struct drm_mm_node *node,
+                                          u64 size)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0) ||	\
-	(defined(RHEL_RELEASE_CODE) && \
-	RHEL_RELEASE_CODE >=RHEL_RELEASE_VERSION(7,5)))
-	return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0);
+#if defined(XOCL_DRM_FREE_MALLOC)
+        return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0);
 #else
-	return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0, 0);
+        return drm_mm_insert_node_generic(mm, node, size, PAGE_SIZE, 0, 0, 0);
 #endif
 }
 
@@ -132,14 +136,16 @@ void xocl_free_bo(struct drm_gem_object *obj)
 	}
 	xobj->pages = NULL;
 
-	if (!xocl_bo_import(xobj)) {
-		DRM_DEBUG("Freeing regular buffer\n");
-		if (xobj->sgt)
-			sg_free_table(xobj->sgt);
-		xobj->sgt = NULL;
-		xocl_free_mm_node(xobj);
-	}
-	else {
+        if (!xocl_bo_import(xobj)) {
+                DRM_DEBUG("Freeing regular buffer\n");
+                if (xobj->sgt) {
+                        sg_free_table(xobj->sgt);
+                        kfree(xobj->sgt);
+                        xobj->sgt = NULL;
+                }
+                xocl_free_mm_node(xobj);
+        }
+        else {
 		DRM_DEBUG("Freeing imported buffer\n");
 		if (!(xobj->flags & XOCL_BO_ARE))
 			xocl_free_mm_node(xobj);
@@ -641,14 +647,16 @@ int xocl_sync_bo_ioctl(struct drm_device *dev,
 	if (ret >= 0) {
 		xdev->channel_usage[args->dir][channel] += ret;
 		ret = (ret == args->size) ? 0 : -EIO;
-	}
-	release_channel(xdev, args->dir, channel);
+        }
+        release_channel(xdev, args->dir, channel);
 clear:
-	if (args->offset || (args->size != xobj->base.size))
-		sg_free_table(sgt);
+        if (args->offset || (args->size != xobj->base.size)) {
+                sg_free_table(sgt);
+                kfree(sgt);
+        }
 out:
-	drm_gem_object_unreference_unlocked(gem_obj);
-	return ret;
+        drm_gem_object_unreference_unlocked(gem_obj);
+        return ret;
 }
 
 int xocl_info_bo_ioctl(struct drm_device *dev,
@@ -918,11 +926,13 @@ clear_pages:
 
 static void xocl_finish_unmgd(struct drm_xocl_unmgd *unmgd)
 {
-	if (!unmgd->pages)
-		return;
-	release_pages(unmgd->pages, unmgd->npages, 0);
-	drm_free_large(unmgd->pages);
-	unmgd->pages = NULL;
+        if (!unmgd->pages)
+                return;
+        sg_free_table(unmgd->sgt);
+        kfree(unmgd->sgt);
+        release_pages(unmgd->pages, unmgd->npages, 0);
+        drm_free_large(unmgd->pages);
+        unmgd->pages = NULL;
 }
 
 

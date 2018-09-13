@@ -24,7 +24,7 @@ See TESTING.md for details.
 from __future__ import print_function
 import boto3
 import os
-from os.path import basename, dirname, realpath
+from os.path import basename, dirname, realpath, stat
 import glob
 import pytest
 import re
@@ -398,15 +398,15 @@ class AwsFpgaTestBase(object):
         return (agfi, afi)
 
     @staticmethod
-    def fpga_clear_local_image(slot):
+    def fpga_clear_local_image(slot, request_timeout=180, sync_timeout=180):
         logger.info("Clearing FPGA slot {}".format(slot))
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-clear-local-image  -S {}".format(slot))
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-clear-local-image -S {} --request-timeout {} --sync-timeout {}".format(slot, request_timeout, sync_timeout))
         assert rc == 0, "Clearing FPGA slot {} failed.".format(slot)
 
     @staticmethod
-    def fpga_load_local_image(agfi, slot):
+    def fpga_load_local_image(agfi, slot, request_timeout=180, sync_timeout=180):
         logger.info("Loading {} into slot {}".format(agfi, slot))
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-load-local-image -S {} -I {}".format(slot, agfi))
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-load-local-image -S {} -I {} --request-timeout {} --sync-timeout {}".format(slot, agfi, request_timeout, sync_timeout))
         assert rc == 0, "Failed to load {} in slot {}.".format(agfi, slot)
 
     @staticmethod
@@ -456,16 +456,45 @@ class AwsFpgaTestBase(object):
         return filename
 
     @staticmethod
-    def get_fio_dma_tools():
-        '''Retrieve fio_dma_tools from S3'''
-        local_path = os.path.join(AwsFpgaTestBase.WORKSPACE, 'sdk/tests/fio_dma_tools/')
-        # If already exists then delete it so that get the latest
-        if os.path.exists(local_path):
-            AwsFpgaTestBase.run_cmd("rm -rf {}".format(local_path), echo=True)
-        logger.info("Downloading fio_dma_tools")
-        s3_path = 's3://' + AwsFpgaTestBase.s3_bucket + '/fio_dma_tools_compiled'
-        # For some reason S3 client doesn't have a native --recursive option so using the CLI
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("aws s3 cp {} {} --recursive".format(s3_path, local_path), echo=True)
+    def get_fio_tool_root():
+        return os.path.join(AwsFpgaTestBase.WORKSPACE, 'sdk/tests/fio_dma_tools')
+
+    @staticmethod
+    def get_fio_tool_install_path():
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), 'scripts/fio_github_repo')
+
+    @staticmethod
+    def get_fio_tool_install_script():
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), 'scripts/fio_install.py')
+
+    @staticmethod
+    def get_fio_tool_run_script():
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), 'scripts/fio')
+
+    @staticmethod
+    def get_fio_verify_script(driver='xdma'):
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), "scripts/{}_4-ch_4-1M_verify.fio".format(driver))
+
+    @staticmethod
+    def get_fio_read_benchmark_script(driver='xdma'):
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), "scripts/{}_4-ch_4-1M_read.fio".format(driver))
+
+    @staticmethod
+    def get_fio_write_benchmark_script(driver='xdma'):
+        return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), "scripts/{}_4-ch_4-1M_write.fio".format(driver))
+
+    @staticmethod
+    def setup_fio_tools(python_version=2.7):
+        '''Install and setup fio tools'''
+        # If downloaded repo already, exists, delete it so we can fetch again
+        if os.path.exists(AwsFpgaTestBase.get_fio_tool_install_path()):
+            AwsFpgaTestBase.run_cmd("rm -rf {}".format(AwsFpgaTestBase.get_fio_tool_install_path()), echo=True)
+
+        logger.info("Installing fio_dma_tools")
+
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("python{} {} {}".format(python_version, AwsFpgaTestBase.get_fio_tool_install_script(), AwsFpgaTestBase.get_fio_tool_install_path()), echo=True)
         assert rc == 0
-        assert os.path.exists("{}/scripts/fio".format(local_path))
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("chmod +x {0}/*.sh {0}/scripts/fio".format(local_path))
+        assert os.path.exists("{}".format(AwsFpgaTestBase.get_fio_tool_run_script()))
+
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("chmod +x {}".format(AwsFpgaTestBase.get_fio_tool_run_script()))
+        assert rc == 0

@@ -14,7 +14,7 @@
 <a name="overview"></a>
 ### Overview
 
-The cl\_hello\_world\_ref example demonstrates basic Shell-to-CL connectivity, memory-mapped register instantiations and the use of the Virtual LED and DIP switches. The cl\_hello\_world\_ref example implements two registers in the FPGA AppPF BAR0 memory space connected to the OCL AXI-L interface. The two registers are:
+The cl\_hello\_world\_ref example uses AWS cl_hello_world packaged up as an IP in IP integration flow using HLx. It demonstrates basic Shell-to-CL connectivity, memory-mapped register instantiations and the use of the Virtual LED and DIP switches. The cl\_hello\_world\_ref example implements two registers in the FPGA AppPF BAR0 memory space connected to the OCL AXI-L interface. The two registers are:
 
 1. Hello World Register (offset 0x500)
 
@@ -36,7 +36,7 @@ The logic for the original cl\_hello\_world example from github is contained in 
 * To setup the HLx Environment, run the following commands:
    ```
    $ mkdir -p ~/.Xilinx/Vivado
-   $ echo 'source $env::(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
+   $ echo 'source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl' >> ~/.Xilinx/Vivado/Vivado_init.tcl
    ```
    **NOTE**: *This modifies Vivado defaults, it is recommended you remove this if you wish to run non-HLx examples.* 
    
@@ -81,8 +81,6 @@ The simulation settings are already configured.
    * Click on Simulation->Run Simulation->Run Behavioral Simulation
    * Add signals needed in the simulation
    * Type `run -all` in the TCL console
-
-**NOTE**: *If Critical Warnings appear click OK and that the following command needs to ran two times. This is a known issue and will be addressed in later versions of the design.*
 
 <a name="impl"></a>
 ### Implementing the Design

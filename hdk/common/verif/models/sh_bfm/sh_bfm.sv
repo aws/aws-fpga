@@ -1006,7 +1006,7 @@ module sh_bfm #(
                  else
                    word = 32'hffff_ffff;   // return a default value
                else begin
-                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
+                  wr_addr_t = {wr_addr[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
                      t = tb.host_memory_getc(wr_addr_t + k);
@@ -1031,7 +1031,7 @@ module sh_bfm #(
                  tb.sv_host_memory[{wr_addr[63:2], 2'b00}] = word;
                end
                else begin
-                  wr_addr_t = {wr_addr_t[63:2], 2'b00};
+                  wr_addr_t = {wr_addr[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
                      t = word[7:0];                     
