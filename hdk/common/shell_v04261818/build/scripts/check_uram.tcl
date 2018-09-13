@@ -16,6 +16,11 @@
 global uramHeight
 global CL_MODULE
 
+# If CL_MODULE does not exist, set it to a default value.
+if {![info exists CL_MODULE]} {
+  set CL_MODULE cl_helloworld
+}
+
 ###Check oreg_b usage for uramHeight==3 and uramHeight==4
 set clean 1
 if {[string compare $CL_MODULE "cl_uram_example"] == 0} {
