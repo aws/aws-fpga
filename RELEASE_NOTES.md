@@ -47,7 +47,7 @@
 * [New Shell Stable: v04261818](./hdk/common/shell_stable).  Starting with release v1.4.0, the AWS FPGA shell stable has been updated and only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit shell release. 
   * [Shell Release Notes](./hdk/docs/AWS_Shell_RELEASE_NOTES.md) 
 
-* The previous shell (v071417d3) will be supported until 09/01/2018.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga/tree/REL_v1_3_8) for all shell version v071417d3 development.  
+* The previous shell (v071417d3) will be supported until 09/01/2018.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga/tree/REL_v1_3_9) for all shell version v071417d3 development.  
 
 * Release 1.4.0 greatly improves the performance of the DMA (for interrupt driven DMA on the cl\_dram\_dma example design). This is accomplished through a combination of shell changes to relax DMA timeouts and a new XDMA software driver option.  We have ported the relevant HDK examples to the XDMA driver in this release. EDMA is still supported, and developers can freely choose which DMA driver to use as part of their host application.
 
