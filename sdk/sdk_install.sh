@@ -14,6 +14,12 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
+script=${BASH_SOURCE[0]}
+if [ $script != $0 ]; then
+  echo "ERROR: You must execute this script instead of sourcing!"
+  return
+fi
+
 
 if [ -z "$SDK_DIR" ]; then
     echo "Error: SDK_DIR environment variable is not set.  Please use 'source sdk_setup.sh' from the aws-fpga directory."
