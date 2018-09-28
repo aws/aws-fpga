@@ -215,6 +215,19 @@ int dma_memcmp(size_t buffer_size) {
     int rc = 0;
     if (memcmp(write_buffer, read_buffer, buffer_size) == 0) {
         printf("DRAM DMA read the same string as it wrote on channel %d (it worked correctly!)\n", channel);
+        int i;
+        printf("Bytes written to channel %d:\n", channel);
+        for (i = 0; i < buffer_size; ++i) {
+            printf("%c", write_buffer[i]);
+        }
+
+        printf("\n\n");
+        
+        printf("Bytes read:\n");
+        for (i = 0; i < buffer_size; ++i) {
+            printf("%c", read_buffer[i]);
+        }
+        printf("\n\n");
     } else {
        int i;
        printf("Bytes written to channel %d:\n", channel);

@@ -44,6 +44,7 @@ void usage(const char* program_name);
 void rand_string(char *str, size_t size);
 
 int dma_example(int slot_id);
+int dma_data_retention_example(int slot_id);
 
 int interrupt_example(int slot_id, int interrupt_number);
 

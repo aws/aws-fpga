@@ -70,6 +70,38 @@ implied. See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
+asl_header3 = '''Amazon FPGA Hardware Development Kit
+
+Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use
+this file except in compliance with the License. A copy of the License is
+located at
+
+   http://aws.amazon.com/asl/
+
+or in the "license" file accompanying this file. This file is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+implied. See the License for the specific language governing permissions and
+limitations under the License.
+'''
+
+asl_header4 = '''Amazon FPGA Hardware Development Kit
+
+Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use
+this file except in compliance with the License. A copy of the License is
+located at
+
+   http://aws.amazon.com/asl/
+
+or in the "license" file accompanying this file. This file is distributed on
+an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+implied. See the License for the specific language governing permissions and
+limitations under the License.
+'''
+
 apache_header_2016 = '''Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License"). You may
@@ -85,6 +117,20 @@ permissions and limitations under the License.
  '''
 
 apache_header_2017 = '''Copyright 2015-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"). You may
+not use this file except in compliance with the License. A copy of the
+License is located at
+
+    http://aws.amazon.com/apache2.0/
+
+or in the "license" file accompanying this file. This file is distributed
+on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language governing
+permissions and limitations under the License.
+ '''
+
+apache_header_2018 = '''Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License"). You may
 not use this file except in compliance with the License. A copy of the
@@ -347,8 +393,11 @@ xilinx11_header = '''Copyright (C) 2017-2018 Xilinx, Inc
 all_exp_header_lines = [
     asl_header1.split("\n"),
     asl_header2.split("\n"),
+    asl_header3.split("\n"),
+    asl_header4.split("\n"),
     apache_header_2016.split("\n"),
     apache_header_2017.split("\n"),
+    apache_header_2018.split("\n"),
     gpl2_header.split("\n"),
     xilinx_xdma1.split("\n"),
     xilinx_xdma2.split("\n"),
@@ -502,8 +551,8 @@ def check_headers(dir):
             "sdk/linux_kernel_drivers/xocl/LICENSE$",
 
             "SDAccel/userspace/src/test",
-	    "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
-	    "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
+            "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
+            "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
             "SDAccel/examples/aws/helloworld_ocl_runtime/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin"
         ])
 

@@ -1,0 +1,36 @@
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+WARNING: [Constraints 18-838] Failed to create SRL placer macro for cell SH/SH/MGT_TOP 
+CRITICAL WARNING: [Place 30-823] Failed to process clock nets that should have matching clock routes. Reason: Found incompatible user defined or fixed clock roots for related clocks 'CL/SH_DR/ddr_cores.DDR4'
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/u_ila_reset_ctrl/asyncrounous_transfer.arm_in_transfer_inst/dout_reg0_reg.
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg[0]/
+CRITICAL WARNING: [Constraints 18-850] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg.
+WARNING: [Vivado_Tcl 4-391] The following IPs are missing output products for Implementation target. These output products could be required for synthesis, please generate the output products using the generate_target or synth_ip command before running synth_design.
+WARNING: [DRC RPBF-3] IO port buffering **** no input & output bufferring.
+WARNING: [Place 46-14] The placer has determined that this design is highly congested and may have difficulty routing. Run report_design_analysis -congestion for a detailed report.
+WARNING: [BD 41-1661] 
+WARNING: [Vivado 12-584] No ports matched 'tck'
+WARNING: [Vivado 12-830] No fanout objects found
+CRITICAL WARNING: [Opt 31-430] **** Aurora interface & HMC interface not used and floating
+CRITICAL WARNING: [Vivado 12-1433] Expecting a non-empty list of cells to be added to the pblock.  Please verify the correctness of the <cells> argument. [/home/centos/src/project_data/workspace/test_develop_manual/hdk/cl/examples/cl_dram_dma/build/constraints/cl_pnr_user.xdc:15  **** NA
+WARNING: [Vivado 12-180] No cells matched   ***  constraints check for BRAM, URAM & LUT cells inside cl
+WARNING: [Vivado 12-1008] No clocks found for command **** constriants from the debug_bridge. NA.
+WARNING: [Vivado 12-180] No cells matched 'CL/CL_DMA_PCIS_SLV/CL_TST_DDR_B/CL_TST/sync_rst_n_reg
+WARNING: [Memdata 28-146] Could not find a netlist instance for the specified SCOPED_TO_REF value of: ddr4_core
+WARNING: [Memdata 28-146] Could not find a netlist instance for the specified SCOPED_TO_REF value of: bd_bf3f
+WARNING: [Synth 8-5856] **** 3DRAM constraint.
+WARNING: [Place 46-14] The placer has determined high congestion
+CRITICAL WARNING: [Route 35-39] The design did not meet timing requirements') --cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)

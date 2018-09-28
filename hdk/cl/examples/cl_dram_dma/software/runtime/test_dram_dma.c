@@ -1,17 +1,19 @@
-// Amazon FPGA Hardware Development Kit
-//
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-//
-// Licensed under the Amazon Software License (the "License"). You may not use
-// this file except in compliance with the License. A copy of the License is
-// located at
-//
-//    http://aws.amazon.com/asl/
-//
-// or in the "license" file accompanying this file. This file is distributed on
-// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
-// implied. See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Amazon FPGA Hardware Development Kit
+ *
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Amazon Software License (the "License"). You may not use
+ * this file except in compliance with the License. A copy of the License is
+ * located at
+ *
+ *    http://aws.amazon.com/asl/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+ * implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -21,20 +23,31 @@
 #include <unistd.h>
 #include <poll.h>
 
-#include "common_dma.h"
+#include "fpga_pci.h"
+#include "fpga_mgmt.h"
+#include "fpga_dma.h"
+#include "utils/lcd.h"
 
-#define	MEM_16G		(1ULL << 34)
+#include "test_dram_dma_common.h"
+
+#define	MEM_16G              (1ULL << 34)
 #define USER_INTERRUPTS_MAX  (16)
 
-#ifndef SV_TEST
-/* use the stdout logger */
-const struct logger *logger = &logger_stdout;
-#endif
+/* use the standard out logger */
+static const struct logger *logger = &logger_stdout;
+
+void usage(const char* program_name);
+int dma_example(int slot_id, size_t buffer_size);
+
+void rand_string(char *str, size_t size);
+int interrupt_example(int slot_id, int interrupt_number);
+int axi_mstr_example(int slot_id);
+int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t ddr_hi_addr, uint32_t ddr_lo_addr, uint32_t  ddr_data);
 
 int main(int argc, char **argv) {
     int rc;
     int slot_id = 0;
-    int interrupt_number;
+    int interrupt_n;
 
     switch (argc) {
     case 1:
@@ -47,8 +60,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    error_count = 0;
-
     /* setup logging to print to stdout */
     rc = log_init("test_dram_dma");
     fail_on(rc, out, "Unable to initialize the log.");
@@ -59,60 +70,83 @@ int main(int argc, char **argv) {
     rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
-    rc = dma_example(slot_id);
+    /* check that the AFI is loaded */
+    log_info("Checking to see if the right AFI is loaded...");
+    rc = check_slot_config(slot_id);
+    fail_on(rc, out, "slot config is not correct");
+
+    /* run the dma test example */
+    rc = dma_example(slot_id, 1ULL << 24);
     fail_on(rc, out, "DMA example failed");
 
-    for (interrupt_number = 0; 
-         interrupt_number < USER_INTERRUPTS_MAX; interrupt_number++) {
-        rc = interrupt_example(slot_id, interrupt_number);
+    /* run interrupt examples */
+    for (interrupt_n = 0; interrupt_n < USER_INTERRUPTS_MAX; interrupt_n++) {
+        rc = interrupt_example(slot_id, interrupt_n);
         fail_on(rc, out, "Interrupt example failed");
     }
 
+    /* run axi master example */
     rc = axi_mstr_example(slot_id);
     fail_on(rc, out, "AXI Master example failed");
 
 out:
-    if (rc || (error_count > 0)) {
-        printf("TEST FAILED \n");
-	rc = (rc) ? rc : 1;
-    }
-    else {
-        printf("TEST PASSED \n");
-    }
+    log_info("TEST %s", (rc == 0) ? "PASSED" : "FAILED");
     return rc;
 }
 
-/* 
- * Write 4 identical buffers to the 4 different DRAM channels of the AFI
+void usage(const char* program_name) {
+    printf("usage: %s [--slot <slot>]\n", program_name);
+}
+
+/**
+ * This example fills a buffer with random data and then uses DMA to copy that
+ * buffer into each of the 4 DDR DIMMS.
  */
+int dma_example(int slot_id, size_t buffer_size) {
+    int write_fd, read_fd, dimm, rc;
 
-int dma_example(int slot_id) {
-    int write_fd, read_fd, rc;
-
-    read_buffer = NULL;
-    write_buffer = NULL;
     write_fd = -1;
     read_fd = -1;
 
-    write_buffer = (char *)malloc(buffer_size);
-    read_buffer = (char *)malloc(buffer_size);
+    uint8_t *write_buffer = malloc(buffer_size);
+    uint8_t *read_buffer = malloc(buffer_size);
     if (write_buffer == NULL || read_buffer == NULL) {
         rc = -ENOMEM;
         goto out;
     }
 
-    rc = open_dma_queue(slot_id, &write_fd, &read_fd);
-    fail_on(rc, out, "open_dma_queue failed");
+    read_fd = fpga_dma_open_queue(FPGA_DMA_XDMA, slot_id,
+        /*channel*/ 0, /*is_read*/ true);
+    fail_on((rc = (read_fd < 0) ? -1 : 0), out, "unable to open read dma queue");
 
-    rand_string(write_buffer, buffer_size);
+    write_fd = fpga_dma_open_queue(FPGA_DMA_XDMA, slot_id,
+        /*channel*/ 0, /*is_read*/ false);
+    fail_on((rc = (write_fd < 0) ? -1 : 0), out, "unable to open write dma queue");
 
-    for (channel=0; channel < 4; channel++) {
-        fpga_write_buffer_to_cl(slot_id, channel, write_fd, buffer_size, (0x10000000 + channel*MEM_16G));
+    rc = fill_buffer_urandom(write_buffer, buffer_size);
+    fail_on(rc, out, "unabled to initialize buffer");
+
+    for (dimm = 0; dimm < 4; dimm++) {
+        rc = fpga_dma_burst_write(write_fd, write_buffer, buffer_size,
+            dimm * MEM_16G);
+        fail_on(rc, out, "DMA write failed on DIMM: %d", dimm);
     }
 
-    for (channel=0; channel < 4; channel++) {
-        fpga_read_cl_to_buffer(slot_id, channel, read_fd, buffer_size, (0x10000000 + channel*MEM_16G));
+    bool passed = true;
+    for (dimm = 0; dimm < 4; dimm++) {
+        rc = fpga_dma_burst_read(read_fd, read_buffer, buffer_size,
+            dimm * MEM_16G);
+        fail_on(rc, out, "DMA read failed on DIMM: %d", dimm);
+
+        uint64_t differ = buffer_compare(read_buffer, write_buffer, buffer_size);
+        if (differ != 0) {
+            log_error("DIMM %d failed with %lu bytes which differ", dimm, differ);
+            passed = false;
+        } else {
+            log_info("DIMM %d passed!", dimm);
+        }
     }
+    rc = (passed) ? 0 : 1;
 
 out:
     if (write_buffer != NULL) {
