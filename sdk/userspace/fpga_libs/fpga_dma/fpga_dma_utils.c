@@ -102,10 +102,10 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
         out, "invalid channel specification");
 
     if (is_read) {
-        rc = snprintf(read_or_write, sizeof(read_or_write),
+        rc = snprintf(read_or_write, sizeof(read_or_write), "%s",
             dma_opts->drv_read_name);
     } else {
-        rc = snprintf(read_or_write, sizeof(read_or_write),
+        rc = snprintf(read_or_write, sizeof(read_or_write), "%s",
             dma_opts->drv_write_name);
     }
 
