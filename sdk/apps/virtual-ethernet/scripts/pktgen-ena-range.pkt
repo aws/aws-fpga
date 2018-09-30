@@ -1,0 +1,28 @@
+set 0 type ipv4
+range 0 dst mac start 12:DD:AB:C2:D3:B8
+range 0 dst mac min 12:DD:AB:C2:D3:B8
+range 0 dst mac max 12:DD:AB:C2:D3:B8 
+range 0 dst mac inc 00:00:00:00:00:00
+range 0 src ip start 172.31.63.86
+range 0 src ip min 172.31.63.86
+range 0 src ip max 172.31.63.86
+range 0 src ip inc 0.0.0.0
+range 0 dst ip start 172.31.58.142
+range 0 dst ip min 172.31.58.142 
+range 0 dst ip max 172.31.58.142 
+range 0 dst ip inc 0.0.0.0
+range 0 src port start 1000
+range 0 src port min 1000 
+range 0 src port max 1007 
+range 0 src port inc 1
+range 0 dst port start 2000
+range 0 dst port min 2000 
+range 0 dst port max 2007 
+range 0 dst port inc 1
+range 0 size start 0 
+range 0 size min 64
+range 0 size max 64
+range 0 size inc 0
+range 0 proto udp
+enable 0 range
+start 0

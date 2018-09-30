@@ -544,15 +544,20 @@ def check_headers(dir):
             "hdk/.*/src_register_slice\.v$",
             "hdk/cl/examples/cl_.+/\.critical_warnings",
             "hdk/cl/examples/cl_.+/\.warnings",
+            "hdk/cl/examples/cl_sde/ft_fifo_p.v",
+	          "hdk/cl/examples/cl_sde/ft_fifo.v",
+            "hdk/cl/examples/cl_sde/rr_arb.sv",
 
             "sdk/linux_kernel_drivers/xdma/10-xdma\.rules",
-
+            
             "sdk/linux_kernel_drivers/xocl/10-xocl\.rules",
             "sdk/linux_kernel_drivers/xocl/LICENSE$",
-
-            "SDAccel/userspace/src/test",
-            "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
-            "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
+	          "sdk/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt",
+	          "sdk/apps/virtual-ethernet/scripts/pktgen-ena.pkt",
+	    
+	          "SDAccel/userspace/src/test",
+	          "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
+	          "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
             "SDAccel/examples/aws/helloworld_ocl_runtime/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin"
         ])
 
@@ -561,8 +566,8 @@ def check_headers(dir):
 
             "hdk/common/shell_.*/design/ip$",
             "hdk/cl/examples/cl_.*/build/checkpoints$",
+	    "hdk/cl/examples/cl_sde/ip$",
             "hdk/.+/xsim\.dir$",
-
             "SDAccel/aws_platform",
             "SDAccel/examples/3rd_party",
             "SDAccel/examples/xilinx",
