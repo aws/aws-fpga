@@ -26,6 +26,11 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
          
+## Release 1.4.3 (See [ERRATA](./ERRATA.md) for unsupported features)
+* [DRAM Data Retention](hdk/docs/data_retention.md) - With DRAM data retention, developers can simply load a new AFI and continue using the data that is persistently kept in the DRAM attached to the FPGA, eliminating unnecessary data movements and greatly improving the overall application performance.
+* [Virtual Ethernet](./sdk/apps/virtual-ethernet/README.md) - Provides a low latency network interface for EC2 F1, that enables high performance hardware acceleration to ethernet based applications on AWS like firewalls, routers and advanced security virtual appliances. With Virtual Ethernet, developers are able to create F1 accelerators that process ethernet packets directly from user-space on the FPGA with high throughput and low-latency. 
+* [Developer AMI v1.5](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) with Vivado/SDx 2018.2 tools - New FPGA developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
+
 ## Release 1.4.2 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-862.3.3.el7.x86_64
 

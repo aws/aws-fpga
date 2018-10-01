@@ -105,16 +105,18 @@ Once you have completed your hello world examples, we recommend diving deeper in
 <a name="devAmi"></a>
 # FPGA Developer AMI
 
-The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes free tools and drivers needed for FPGA development on EC2 instances. FPGA development runs on several [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
+The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes free tools and drivers needed for FPGA development on EC2 instances. FPGA development runs on several [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: z1d.xlarge, z1d.2xlarge, c5.4xlarge, m5.2xlarge, r5.xlarge, t2.2xlarge). z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively. Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
 
-Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4 and 2017.1 toolchain versions. The following compatibility table describes the mapping of developer kit version to AMI version:
+Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4 and 2018.2 toolchain versions. The following compatibility table describes the mapping of currently supported developer kit versions to AMI versions:
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
 |-----------|-----------|------|
-| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
-| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
-| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
-| 1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
+| 1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
+| 1.4.3+ | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
+
+Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
+
 
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)
