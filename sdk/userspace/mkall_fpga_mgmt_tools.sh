@@ -72,6 +72,9 @@ build_exec
 BUILD_DIR="fpga_libs/fpga_pci"
 build_exec
 
+BUILD_DIR="fpga_libs/fpga_dma"
+build_exec
+
 BUILD_DIR="fpga_libs/fpga_mgmt"
 build_exec
 

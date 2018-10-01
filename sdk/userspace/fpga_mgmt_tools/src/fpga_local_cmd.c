@@ -317,7 +317,9 @@ static int command_load(void)
 	int ret;
 	union fpga_mgmt_load_local_image_options opt;
 
-	uint32_t flags = (f1.force_shell_reload) ? FPGA_CMD_FORCE_SHELL_RELOAD : 0;
+	uint32_t flags = 0;
+	flags |= (f1.force_shell_reload ) ? FPGA_CMD_FORCE_SHELL_RELOAD  : 0;
+	flags |= (f1.dram_data_retention) ? FPGA_CMD_DRAM_DATA_RETENTION : 0;
 
  	fpga_mgmt_init_load_local_image_options(&opt);
         opt.slot_id = f1.afi_slot;
@@ -326,7 +328,6 @@ static int command_load(void)
 	opt.clock_mains[0] = f1.clock_a0_freq;
 	opt.clock_mains[1] = f1.clock_b0_freq;
 	opt.clock_mains[2] = f1.clock_c0_freq;
-
 
 	if (f1.async) {
 		ret = fpga_mgmt_load_local_image_with_options(&opt);

@@ -47,7 +47,7 @@ static const struct axlf_section_header* get_axlf_section(const struct axlf* top
 }
 
 
-static long xclbin_precheck_cleanup(struct drm_device *dev)
+static long xclbin_precheck_cleanup(struct drm_device *dev, int preserve_mem)
 {
 	struct drm_xocl_dev *xdev = dev->dev_private;
 	struct drm_xocl_mem_topology *topology = &xdev->topology;
@@ -56,29 +56,34 @@ static long xclbin_precheck_cleanup(struct drm_device *dev)
 	unsigned i = 0;
 	printk(KERN_INFO "%s XOCL: Existing bank count = %d\n", __FUNCTION__, topology->bank_count);
 	ddr = 0;
-	for (i= 0; i < topology->bank_count; i++) {
-		if (topology->m_data[i].m_used) {
-			ddr++;
-			if (xdev->mm_usage_stat[ddr -1].bo_count !=0 ) {
-				err = -EPERM;
-				printk(KERN_INFO "%s The ddr %d has pre-existing buffer allocations, please exit and re-run.\n", __FUNCTION__, ddr -1);
+	if( !preserve_mem ) { // Data Retention
+		for (i= 0; i < topology->bank_count; i++) {
+			if (topology->m_data[i].m_used) {
+				ddr++;
+				if (xdev->mm_usage_stat[ddr -1].bo_count !=0 ) {
+					err = -EBUSY;
+					printk(KERN_INFO "%s The ddr %d has pre-existing buffer allocations, please exit and re-run.\n", __FUNCTION__, ddr -1);
+					return err;
+				}
 			}
 		}
-	}
 
-	printk(KERN_INFO "XOCL: Marker 4\n");
-	//Cleanup the topology struct from the previous xclbin
-	ddr = xocl_ddr_channel_count(dev);
-	for (i = 0; i < ddr; i++) {
-		if(topology->m_data[i].m_used) {
-			printk(KERN_INFO "Taking down DDR : %d", ddr);
-			drm_mm_takedown(&xdev->mm[i]);
+		printk(KERN_INFO "XOCL: Marker 2.1\n");
+		//Cleanup the topology struct from the previous xclbin
+		ddr = xocl_ddr_channel_count(dev);
+		printk( KERN_INFO "%s XOCL: xocl_ddr_channel_count(dev): %d\n", __FUNCTION__, ddr );
+		for (i = 0; i < ddr; i++) {
+			if(topology->m_data[i].m_used) {
+				printk(KERN_INFO "Taking down DDR : %d", i);
+				drm_mm_takedown(&xdev->mm[i]);
+			}
 		}
+
+		vfree(topology->m_data);
+		vfree(topology->topology);
+		memset(topology, 0, sizeof(struct drm_xocl_mem_topology));
 	}
 
-	vfree(topology->m_data);
-	vfree(topology->topology);
-	memset(topology, 0, sizeof(struct drm_xocl_mem_topology));
 	vfree(xdev->connectivity.connections);
 	memset(&xdev->connectivity, 0, sizeof(xdev->connectivity));
 	vfree(xdev->layout.layout);
@@ -88,6 +93,7 @@ static long xclbin_precheck_cleanup(struct drm_device *dev)
 
 	return err;
 }
+
 
 int xocl_read_axlf_ioctl(struct drm_device *dev,
 			void *data,
@@ -104,7 +110,11 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 	int32_t bank_count = 0;
 	short ddr = 0;
 	struct axlf bin_obj;
+	int preserve_mem;
 	struct drm_xocl_mem_topology *topology;
+	struct drm_xocl_mem_topology new_topology;
+	new_topology.topology = NULL;
+	new_topology.m_data = NULL;
 
 	printk(KERN_INFO "%s %s READ_AXLF IOCTL \n", DRV_NAME, __FUNCTION__);
 
@@ -131,11 +141,6 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 		return err;
 	}
 
-	//Switching the xclbin, make sure none of the buffers are used.
-        err = xclbin_precheck_cleanup(dev);
-	if(err)
-		return err;
-
 	//Copy from user space and proceed.
 	copy_buffer_size = (bin_obj.m_header.m_numSections)*sizeof(struct axlf_section_header) + sizeof(struct axlf);
 	copy_buffer = (struct axlf*)vmalloc(copy_buffer_size);
@@ -143,7 +148,7 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 		printk(KERN_ERR "Unable to create copy_buffer");
 		return -EFAULT;
 	}
-	printk(KERN_INFO "XOCL: Marker 5\n");
+	printk(KERN_INFO "XOCL: Marker 1\n");
 
 	if (copy_from_user((void *)copy_buffer, (void *)axlf_obj_ptr->xclbin, copy_buffer_size)) {
 		err = -EFAULT;
@@ -155,6 +160,69 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 	if (err) {
 		err = -EFAULT;
 		goto done;
+	}
+
+	//---
+	printk(KERN_INFO "Finding MEM_TOPOLOGY section\n");
+	memHeader = get_axlf_section(copy_buffer, MEM_TOPOLOGY);
+	if (memHeader == 0) {
+		printk(KERN_INFO "Did not find MEM_TOPOLOGY section.\n");
+		err = -EINVAL;
+		goto done;
+	}
+	printk(KERN_INFO "XOCL: Marker 2\n");
+
+	printk(KERN_INFO "%s XOCL: MEM_TOPOLOGY offset = %llx, size = %llx\n", __FUNCTION__, memHeader->m_sectionOffset , memHeader->m_sectionSize);
+
+	if((memHeader->m_sectionOffset + memHeader->m_sectionSize) > bin_obj.m_header.m_length) {
+		err = -EINVAL;
+		goto done;
+	}
+
+	buffer = (char __user *)axlf_obj_ptr->xclbin;
+	buffer += memHeader->m_sectionOffset;
+
+	new_topology.topology = vmalloc(memHeader->m_sectionSize);
+	err = copy_from_user(new_topology.topology, buffer, memHeader->m_sectionSize);
+	if (err)
+		goto done;
+
+	get_user(bank_count, buffer);
+	new_topology.size = memHeader->m_sectionSize;
+	new_topology.bank_count = bank_count;
+	new_topology.m_data_length = bank_count*sizeof(struct mem_data);
+	buffer += offsetof(struct mem_topology, m_mem_data);
+	new_topology.m_data = vmalloc(new_topology.m_data_length);
+	err = copy_from_user(new_topology.m_data, buffer, bank_count*sizeof(struct mem_data));
+	if (err )
+		goto done;
+
+	//check for null pointer, then do mem compare
+	preserve_mem = 0;
+	if( xdev->topology.topology != NULL ) {
+		// m_data can be of different length but we would not compare them if topology match fails
+		if( !memcmp(new_topology.topology, xdev->topology.topology, memHeader->m_sectionSize) &&
+		    !memcmp(new_topology.m_data, xdev->topology.m_data, new_topology.bank_count*sizeof(struct mem_data) ) ) {
+			printk( KERN_INFO "XOCL: MEM_TOPOLOGY match, preserve mem_topology.\n" );
+			preserve_mem = 1;
+		} else {
+			printk( KERN_INFO "XOCL: MEM_TOPOLOGY mismatch, do not preserve mem_topology.\n" );
+		}
+	}
+
+	//Switching the xclbin, make sure none of the buffers are used.
+	err = xclbin_precheck_cleanup(dev, preserve_mem);
+	if(err)
+		goto done;
+
+	if( !preserve_mem ) { // Data Retention
+		xdev->topology.topology = new_topology.topology;
+		xdev->topology.size = new_topology.size;
+		xdev->topology.bank_count = new_topology.bank_count;
+		xdev->topology.m_data_length = new_topology.m_data_length;
+		xdev->topology.m_data = new_topology.m_data;
+		new_topology.topology = NULL;
+		new_topology.m_data = NULL;
 	}
 
 	//----
@@ -170,15 +238,15 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 			err = -EINVAL;
 			goto done;
 		}
-		printk(KERN_INFO "XOCL: Marker 5.1\n");
+		printk(KERN_INFO "XOCL: Marker 3.1\n");
 		buffer += memHeader->m_sectionOffset;
 		xdev->layout.layout = vmalloc(memHeader->m_sectionSize);
 		err = copy_from_user(xdev->layout.layout, buffer, memHeader->m_sectionSize);
-		printk(KERN_INFO "XOCL: Marker 5.2\n");
+		printk(KERN_INFO "XOCL: Marker 3.2\n");
 		if (err)
 			goto done;
 		xdev->layout.size = memHeader->m_sectionSize;
-		printk(KERN_INFO "XOCL: Marker 5.3\n");
+		printk(KERN_INFO "XOCL: Marker 3.3\n");
 	}
 
 	//----
@@ -194,16 +262,16 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 			err = -EINVAL;
 			goto done;
 		}
-		printk(KERN_INFO "XOCL: Marker 6.1\n");
+		printk(KERN_INFO "XOCL: Marker 4.1\n");
 		buffer = (char __user *)axlf_obj_ptr->xclbin;
 		buffer += memHeader->m_sectionOffset;
 		xdev->debug_layout.layout = vmalloc(memHeader->m_sectionSize);
 		err = copy_from_user(xdev->debug_layout.layout, buffer, memHeader->m_sectionSize);
-		printk(KERN_INFO "XOCL: Marker 6.2\n");
+		printk(KERN_INFO "XOCL: Marker 4.2\n");
 		if (err)
 			goto done;
 		xdev->debug_layout.size = memHeader->m_sectionSize;
-		printk(KERN_INFO "XOCL: Marker 6.3\n");
+		printk(KERN_INFO "XOCL: Marker 4.3\n");
 	}
 
 	//---
@@ -226,58 +294,19 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 		xdev->connectivity.size = memHeader->m_sectionSize;
 	}
 
-	//---
-	printk(KERN_INFO "Finding MEM_TOPOLOGY section\n");
-	memHeader = get_axlf_section(copy_buffer, MEM_TOPOLOGY);
-	if (memHeader == 0) {
-		printk(KERN_INFO "Did not find MEM_TOPOLOGY section.\n");
-		err = -EINVAL;
-		goto done;
-	}
-	printk(KERN_INFO "XOCL: Marker 7\n");
-
-	printk(KERN_INFO "%s XOCL: MEM_TOPOLOGY offset = %llx, size = %llx\n", __FUNCTION__, memHeader->m_sectionOffset , memHeader->m_sectionSize);
-
-	if((memHeader->m_sectionOffset + memHeader->m_sectionSize) > bin_obj.m_header.m_length) {
-		err = -EINVAL;
-		goto done;
-	}
-
-
-	printk(KERN_INFO "XOCL: Marker 8\n");
-
-	buffer = (char __user *)axlf_obj_ptr->xclbin;
-	buffer += memHeader->m_sectionOffset;
-
-	xdev->topology.topology = vmalloc(memHeader->m_sectionSize);
-	err = copy_from_user(xdev->topology.topology, buffer, memHeader->m_sectionSize);
-	if (err)
-	    goto done;
-	xdev->topology.size = memHeader->m_sectionSize;
-
-	get_user(bank_count, buffer);
-	xdev->topology.bank_count = bank_count;
-	buffer += offsetof(struct mem_topology, m_mem_data);
-	xdev->topology.m_data_length = bank_count*sizeof(struct mem_data);
-	xdev->topology.m_data = vmalloc(xdev->topology.m_data_length);
-	err = copy_from_user(xdev->topology.m_data, buffer, bank_count*sizeof(struct mem_data));
-	if (err) {
-		err = -EFAULT;
-		goto done;
-	}
-
-
-	printk(KERN_INFO "XOCL: Marker 9\n");
+	printk(KERN_INFO "XOCL: Marker 5\n");
 
 	topology = &xdev->topology;
 
 	printk(KERN_INFO "XOCL: Topology Bank count = %d, data_length = %d\n", topology->bank_count, xdev->topology.m_data_length);
 
-	xdev->mm = devm_kzalloc(dev->dev, sizeof(struct drm_mm) * topology->bank_count, GFP_KERNEL);
-	xdev->mm_usage_stat = devm_kzalloc(dev->dev, sizeof(struct drm_xocl_mm_stat) * topology->bank_count, GFP_KERNEL);
-	if (!xdev->mm || !xdev->mm_usage_stat) {
-		err = -ENOMEM;
-		goto done;
+	if (!preserve_mem) { // Data Retention
+		xdev->mm = devm_kzalloc(dev->dev, sizeof(struct drm_mm) * topology->bank_count, GFP_KERNEL);
+		xdev->mm_usage_stat = devm_kzalloc(dev->dev, sizeof(struct drm_xocl_mm_stat) * topology->bank_count, GFP_KERNEL);
+		if (!xdev->mm || !xdev->mm_usage_stat) {
+			err = -ENOMEM;
+			goto done;
+		}
 	}
 
 	//Check if sizes are same across banks.
@@ -305,14 +334,16 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 	//xdev->topology.used_bank_count = ddr;
 	printk(KERN_INFO "XOCL: Unified flow, used bank count :%d bank size(KB):%llx\n", ddr, xdev->topology.bank_size);
 
-	//initialize the used banks and their sizes. Currently only fixed sizes are supported.
-	for (i=0; i < topology->bank_count; i++)
-	{
-		if (topology->m_data[i].m_used) {
-			printk(KERN_INFO "%s Allocating DDR:%d with base_addr:%llx, size %llx \n", __FUNCTION__, i,
-				topology->m_data[i].m_base_address, topology->m_data[i].m_size*1024);
-			drm_mm_init(&xdev->mm[i], topology->m_data[i].m_base_address, topology->m_data[i].m_size*1024);
-			printk(KERN_INFO "drm_mm_init called \n");
+	if (!preserve_mem) { // Data Retention
+		//initialize the used banks and their sizes. Currently only fixed sizes are supported.
+		for (i=0; i < topology->bank_count; i++)
+		{
+			if (topology->m_data[i].m_used) {
+				printk(KERN_INFO "%s Allocating DDR:%d with base_addr:%llx, size %llx \n", __FUNCTION__, i,
+					topology->m_data[i].m_base_address, topology->m_data[i].m_size*1024);
+				drm_mm_init(&xdev->mm[i], topology->m_data[i].m_base_address, topology->m_data[i].m_size*1024);
+				printk(KERN_INFO "drm_mm_init called \n");
+			}
 		}
 	}
 
@@ -322,6 +353,10 @@ int xocl_read_axlf_ioctl(struct drm_device *dev,
 done:
 	printk(KERN_INFO "%s err: %ld\n", __FUNCTION__, err);
 	vfree(copy_buffer);
+	if (new_topology.topology != NULL)
+		vfree(new_topology.topology);
+	if (new_topology.m_data != NULL)
+		vfree(new_topology.m_data);
 	return err;
 
 }

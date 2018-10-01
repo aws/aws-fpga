@@ -91,4 +91,15 @@ sed -i s/_4G/_8G/g  $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
 sed -i -e 's/\/\/\LRDIMM/\: LRDIMM/g' $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
 sed -i -e 's/\/\/\!LRDIMM/\: NOT_LRDIMM/g' $ddr4_rdimm_model_dir/ddr4_rdimm_wrapper.sv
 
+echo "patching ddr4_sdram_model_wrapper.sv file"
+echo "\`include \"arch_package.sv\"" >> $ddr4_model_dir/ddr4_sdram_model_wrapper.sv
+echo "\`include \"proj_package.sv\"" >> $ddr4_model_dir/ddr4_sdram_model_wrapper.sv
+echo "\`include \"interface.sv\"" >> $ddr4_model_dir/ddr4_sdram_model_wrapper.sv
+
+echo "patching interface.sv file"
+sed -i '/`include "ddr4_sdram_model_wrapper.sv"/d' $ddr4_model_dir/interface.sv 
+
+echo "patching proj_package.sv file"
+sed -i '/`include "ddr4_sdram_model_wrapper.sv"/d' $ddr4_model_dir/proj_package.sv
+
 rm -f $lockfile_filename

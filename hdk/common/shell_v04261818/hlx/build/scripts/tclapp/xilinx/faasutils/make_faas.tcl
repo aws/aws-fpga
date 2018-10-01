@@ -233,58 +233,43 @@ proc [set _THISNAMESPACE]::[set _THISTOPSPACE]::make_faas {{args ""}} {
 	set resource 0
 	set first_time 0
 
-#0.860a
-	if {[string tolower [version -short]] eq "2017.1"} {
-	
-		# Vendor Specific values
-		set _faas_ip_vlnv "*:ip:aws:*"
-		set _faas_board "f1_cl"
-		set _faas_interface "S_SH"
-	} else {	
-		set _faas_ip_vlnv "*[lindex [lsort [get_param bd.faas_ipname]] end]*"
-		set _faas_board [get_param bd.faas_board]
-		set _faas_interface [get_param bd.faas_interface]
+#0.860a	
+  set _faas_ip_vlnv "*[lindex [lsort [get_param bd.faas_ipname]] end]*"
+	set _faas_board [get_param bd.faas_board]
+	set _faas_interface [get_param bd.faas_interface]
 
 #TODO FILE CR (missing part0 in bd.faas_board)
-		set _faas_board_list [split $_faas_board ":"]
-		set _faas_board_length [llength $_faas_board_list]
-
-		if {[lsearch $_faas_board_list part0] > -1} {
-			dputs $debugMode "Updating board based on part0"
-			set _faas_board [lindex $_faas_board_list [expr ( [lsearch $_faas_board_list part0] - 1 ) ] ]
-			set _faas_board "xilinx.com:$_faas_board:part0:1.0"			
-		} elseif {$_faas_board_length eq 2} {
-			dputs $debugMode "Updating board based 2 elements"
+	set _faas_board_list [split $_faas_board ":"]
+	set _faas_board_length [llength $_faas_board_list]
+	if {[lsearch $_faas_board_list part0] > -1} {
+		dputs $debugMode "Updating board based on part0"
+		set _faas_board [lindex $_faas_board_list [expr ( [lsearch $_faas_board_list part0] - 1 ) ] ]
+		set _faas_board "xilinx.com:$_faas_board:part0:1.0"			
+	} elseif {$_faas_board_length eq 2} {
+		dputs $debugMode "Updating board based 2 elements"
+		set _faas_board "xilinx.com:[lindex $_faas_board_list 1]:part0:1.0"
+	} elseif {$_faas_board_length eq 3} {
+		if {[lindex $_faas_board_list 0] eq "xilinx.com"} {
+			dputs $debugMode "Updating board based on xilinx.com"
 			set _faas_board "xilinx.com:[lindex $_faas_board_list 1]:part0:1.0"
-		} elseif {$_faas_board_length eq 3} {
-			if {[lindex $_faas_board_list 0] eq "xilinx.com"} {
-				dputs $debugMode "Updating board based on xilinx.com"
-				set _faas_board "xilinx.com:[lindex $_faas_board_list 1]:part0:1.0"
-			} else {
-				dputs $debugMode "Updating board based on missing xilinx.com"
-				set _faas_board "xilinx.com:[lindex $_faas_board_list 0]:part0:1.0"
-			}
-		} elseif {$_faas_board_length eq 4} {
-			#no-op
 		} else {
-			#set_msg_config -id {common 17-39} -suppress
-			send_msg_id "$_procName 0-0" "ERROR" "Parameter bd.faas_board not set prpertly, please set the correct paramters in your vivado_init.tcl (set_param bd.faas_board xilinx.com:f1_cl:part0:1.0)"
-			return 187
+			dputs $debugMode "Updating board based on missing xilinx.com"
+			set _faas_board "xilinx.com:[lindex $_faas_board_list 0]:part0:1.0"
 		}
-
+	} elseif {$_faas_board_length eq 4} {
+		#no-op
+	} else {
+		#set_msg_config -id {common 17-39} -suppress
+		send_msg_id "$_procName 0-0" "ERROR" "Parameter bd.faas_board not set prpertly, please set the correct paramters in your vivado_init.tcl (set_param bd.faas_board xilinx.com:f1_cl:part0:1.0)"
+		return 187
 	}
+    
 # More Vendor Specific values
 	set max_num_cl_ip 1
 	# max_num_cl_ip sets a DRC to only allow upto this number of IP onto canvas, use 2 if splitting master/slave interfaces onto 2 blocks
 
 # Manually set per FaaS Vendor
 	set _faas_instance [lindex [split $_faas_ip_vlnv ":"] 2]
-	# No longer needed - Needed for 2017.1 and older releases that are not supported
-        # set _faas_auto_instance_until_version_short 2017.3
-	# _faas_auto_instance_until... automatically adds the IP when testing in earlier versions.  Auto add is enabled with bd.faas params starting in 2017.3, 2017.1_sdx
-
-
-
 
 #0.859- check for option on write_checkpoint, else encrypt here
 	set _write_checkpoint_can_encrypt 0
@@ -664,19 +649,6 @@ while {[llength $args]} {
 					puts "WARNING: $warnMessage"
 					create_bd_design "cl"
 #					update_compile_order -fileset sources_1
-					# No longer needed - Needed for 2017.1 and older releases that are not supported
-					#Add IP in 2017.1
-					# set version_split [split [version -short] "_"]
-					#= if {[lindex $version_split 1] eq "sdx" || [lindex $version_split 1] eq "sdxop" } {
-					# 	set version_add 0.2
-					# } else {
-					# 	set version_add 0.0
-					# }
-					# set version_short [ expr ( [lindex $version_split 0] + $version_add ) ]
-					# if {$version_short < $_faas_auto_instance_until_version_short} {
-					# 	create_bd_cell -type ip -vlnv [get_ipdefs $_faas_ip_vlnv] $_faas_instance\_0
-					# 	make_bd_intf_pins_external  [get_bd_intf_pins $_faas_instance\_0/$_faas_interface]
-					# }
 				} else {
 					set errorCode 1
 					send_msg_id "$_procName 0-$errorCode" "ERROR" "Required file $_mandatoryBD not found in current sources list, please add a block diagram named \"cl\" to your project"

@@ -1,0 +1,50 @@
+From 22cf178873f92d374e0694e455a9f9e1a3f6a5e6 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Thu, 14 Jun 2018 16:52:18 +0000
+Subject: [PATCH] app/pktgen: memory leak fixes for the _send_burst_* routines
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/pktgen.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/app/pktgen.c b/app/pktgen.c
+index 4b0c92f..f293b08 100644
+--- a/app/pktgen.c
++++ b/app/pktgen.c
+@@ -295,9 +295,7 @@ _send_burst_fast(port_info_t *info, uint16_t qid)
+ 			cnt -= ret;
+ 		}
+ 	if (cnt) {
+-		rte_memcpy(&mtab->m_table[0], &mtab->m_table[sav - cnt],
+-			sizeof(char *) * cnt);
+-		mtab->len = cnt;
++		rte_pktmbuf_free_bulk(&mtab->m_table[sav - cnt], cnt);
+ 	}
+ }
+ 
+@@ -349,9 +347,7 @@ _send_burst_random(port_info_t *info, uint16_t qid)
+ 			cnt -= ret;
+ 		}
+ 	if (cnt) {
+-		rte_memcpy(&mtab->m_table[0], &mtab->m_table[sav - cnt],
+-			sizeof(char *) * cnt);
+-		mtab->len = cnt;
++		rte_pktmbuf_free_bulk(&mtab->m_table[sav - cnt], cnt);
+ 	}
+ }
+ 
+@@ -390,9 +386,7 @@ _send_burst_latency(port_info_t *info, uint16_t qid, int32_t seq_idx)
+ 		cnt -= ret;
+ 	}
+ 	if (cnt) {
+-		rte_memcpy(&mtab->m_table[0], &mtab->m_table[sav - cnt],
+-			sizeof(char *) * cnt);
+-		mtab->len = cnt;
++		rte_pktmbuf_free_bulk(&mtab->m_table[sav - cnt], cnt);
+ 	}
+ }
+ 
+-- 
+1.8.3.1
+

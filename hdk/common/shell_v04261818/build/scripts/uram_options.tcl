@@ -14,7 +14,7 @@
 # limitations under the License.
 
 ##################################################
-### URAM options - 2017.1 sdx
+### URAM options
 ##################################################
 switch $uram_option {
     "2" {

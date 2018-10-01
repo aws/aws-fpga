@@ -72,6 +72,9 @@ class AwsFpgaTestBase(object):
 
     msix_agfi = 'agfi-09c2a21805a8b9257'
 
+    # sdk request timeout in seconds
+    DEFAULT_REQUEST_TIMEOUT = 6000
+
     @classmethod
     def setup_class(cls, derived_cls, filename_of_test_class):
         AwsFpgaTestBase.s3_bucket = 'aws-fpga-jenkins-testing'
@@ -398,13 +401,13 @@ class AwsFpgaTestBase(object):
         return (agfi, afi)
 
     @staticmethod
-    def fpga_clear_local_image(slot, request_timeout=180, sync_timeout=180):
+    def fpga_clear_local_image(slot, request_timeout=6000, sync_timeout=180):
         logger.info("Clearing FPGA slot {}".format(slot))
         (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-clear-local-image -S {} --request-timeout {} --sync-timeout {}".format(slot, request_timeout, sync_timeout))
         assert rc == 0, "Clearing FPGA slot {} failed.".format(slot)
 
     @staticmethod
-    def fpga_load_local_image(agfi, slot, request_timeout=180, sync_timeout=180):
+    def fpga_load_local_image(agfi, slot, request_timeout=6000, sync_timeout=180):
         logger.info("Loading {} into slot {}".format(agfi, slot))
         (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-load-local-image -S {} -I {} --request-timeout {} --sync-timeout {}".format(slot, agfi, request_timeout, sync_timeout))
         assert rc == 0, "Failed to load {} in slot {}.".format(agfi, slot)

@@ -68,7 +68,8 @@
 // TODO - define this in a header file
 extern char* get_afi_from_xclBin(const xclBin *);
 extern char* get_afi_from_axlf(const axlf *);
-#define DEFAULT_GLOBAL_AFI "agfi-069ddd533a748059b" // 1.4 shell
+// define DEFAULT_GLOBAL_AFI "agfi-069ddd533a748059b" // 1.4 shell
+#define DEFAULT_GLOBAL_AFI "agfi-0cc0ac6a40aa73ce8" // 1.4 shell 4-ddr data retention enabled
 #endif
 
 namespace awsbwhal {
@@ -172,16 +173,31 @@ namespace awsbwhal {
           std::memset(&orig_info, 0, sizeof(struct fpga_mgmt_image_info));
           fpga_mgmt_describe_local_image(mBoardNumber, &orig_info, 0);
 
-         uint64_t xclbin_id_from_sysfs;
-         if( int retVal = xclGetXclBinIdFromSysfs( xclbin_id_from_sysfs ) != 0 )
-             return retVal;
+          uint64_t xclbin_id_from_sysfs;
+          if( int retVal = xclGetXclBinIdFromSysfs( xclbin_id_from_sysfs ) != 0 )
+              return retVal;
 
-         if ( (xclbin_id_from_sysfs == 0) || (axlfbuffer->m_uniqueId != xclbin_id_from_sysfs) || checkAndSkipReload(afi_id, &orig_info) ) {
-              // proceed with download
-              retVal = fpga_mgmt_load_local_image(mBoardNumber, afi_id);
-              if (!retVal) {
-                  retVal = sleepUntilLoaded( std::string(afi_id) );
+          if ( (xclbin_id_from_sysfs == 0) || (axlfbuffer->m_uniqueId != xclbin_id_from_sysfs) || checkAndSkipReload(afi_id, &orig_info) ) {
+              // force data retention option
+              union fpga_mgmt_load_local_image_options opt;
+              fpga_mgmt_init_load_local_image_options(&opt);
+              opt.flags = FPGA_CMD_DRAM_DATA_RETENTION;
+              opt.afi_id = afi_id;
+              opt.slot_id = mBoardNumber;
+              retVal = fpga_mgmt_load_local_image_with_options(&opt);
+	      if (retVal == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE ||
+		  retVal == FPGA_ERR_DRAM_DATA_RETENTION_FAILED ||
+		  retVal == FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED) {
+                  std::cout << "INFO: Could not load AFI for data retention, code: " << retVal 
+                            << " - Loading in classic mode." << std::endl;
+		  retVal = fpga_mgmt_load_local_image(mBoardNumber, afi_id);
+	      }	  
+              // check retVal from image load
+              if (retVal) {
+                  std::cout << "Failed to load AFI, error: " << retVal << std::endl;
+                  return -retVal;
               }
+              retVal = sleepUntilLoaded( std::string(afi_id) );
               if (!retVal) {
                   drm_xocl_axlf axlf_obj = { reinterpret_cast<axlf*>(const_cast<xclBin*>(buffer)) };
                   retVal = ioctl(mUserHandle, DRM_IOCTL_XOCL_READ_AXLF, &axlf_obj);

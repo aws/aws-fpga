@@ -1,0 +1,30 @@
+From f164bc808e01197bea4d13a95fb1d192d5b404fe Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Wed, 9 May 2018 19:15:08 +0000
+Subject: [PATCH] app/pktgen-constants: changed the DEFAULT_TX_DESC to 1024
+ when RTE_LIBRTE_ENA_PMD is defined
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/pktgen-constants.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/app/pktgen-constants.h b/app/pktgen-constants.h
+index 1dc7c1a..3441476 100644
+--- a/app/pktgen-constants.h
++++ b/app/pktgen-constants.h
+@@ -16,7 +16,10 @@ extern "C" {
+ 
+ enum {
+ 	DEFAULT_PKT_BURST       = 64,	/* Increasing this number consumes memory very fast */
+-#ifdef RTE_LIBRTE_VMXNET3_PMD
++#ifdef RTE_LIBRTE_ENA_PMD
++	DEFAULT_RX_DESC         = (DEFAULT_PKT_BURST * 8),
++	DEFAULT_TX_DESC         = 1024,
++#elif RTE_LIBRTE_VMXNET3_PMD
+ 	DEFAULT_RX_DESC         = (DEFAULT_PKT_BURST * 8 * 2),
+ 	DEFAULT_TX_DESC         = DEFAULT_RX_DESC * 2,
+ #else
+-- 
+1.8.3.1
+

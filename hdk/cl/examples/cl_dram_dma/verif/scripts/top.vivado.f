@@ -25,8 +25,9 @@
 --sourcelibdir ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
 --include ${CL_ROOT}/../common/design
+--include ${CL_ROOT}/design
 --include ${CL_ROOT}/verif/sv
---include ${CL_ROOT}/verif/tests
+
 --include ${SH_LIB_DIR}
 --include ${SH_INF_DIR}
 --include ${HDK_COMMON_DIR}/verif/include
@@ -56,10 +57,24 @@ ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m01_regsli
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m02_regslice_0/sim/cl_axi_interconnect_m02_regslice_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m03_regslice_0/sim/cl_axi_interconnect_m03_regslice_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/sim/cl_axi_interconnect.v
+${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/hdl/axi_register_slice_v2_1_vl_rfs.v
+${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/axi_clock_converter_v2_1_vl_rfs.v
+${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/fifo_generator_v13_2_rfs.v
+
+${SH_LIB_DIR}/bram_2rw.sv
+${SH_LIB_DIR}/flop_fifo.sv
+${SH_LIB_DIR}/lib_pipe.sv
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/mgt_gen_axl.sv
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/ccf_ctl.v
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/mgt_acc_axl.sv
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sync.v
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/flop_ccf.sv
+${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sh_ddr.sv
 
 --define DISABLE_VJTAG_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
 ${CL_ROOT}/design/cl_dram_dma_defines.vh
+${CL_ROOT}/design/mem_scrb.sv
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv
 ${CL_ROOT}/design/cl_int_tst.sv

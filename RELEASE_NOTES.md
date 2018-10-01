@@ -26,6 +26,11 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
          
+## Release 1.4.3 (See [ERRATA](./ERRATA.md) for unsupported features)
+* [DRAM Data Retention](hdk/docs/data_retention.md) - With DRAM data retention, developers can simply load a new AFI and continue using the data that is persistently kept in the DRAM attached to the FPGA, eliminating unnecessary data movements and greatly improving the overall application performance.
+* [Virtual Ethernet](./sdk/apps/virtual-ethernet/README.md) - Provides a low latency network interface for EC2 F1, that enables high performance hardware acceleration to ethernet based applications on AWS like firewalls, routers and advanced security virtual appliances. With Virtual Ethernet, developers are able to create F1 accelerators that process ethernet packets directly from user-space on the FPGA with high throughput and low-latency. 
+* [Developer AMI v1.5](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) with Vivado/SDx 2018.2 tools - New FPGA developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
+
 ## Release 1.4.2 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-862.3.3.el7.x86_64
 
@@ -47,7 +52,7 @@
 * [New Shell Stable: v04261818](./hdk/common/shell_stable).  Starting with release v1.4.0, the AWS FPGA shell stable has been updated and only supports Xilinx 2017.4 SDx/Vivado.  All previous versions of tools and shells are not supported with this developer kit shell release. 
   * [Shell Release Notes](./hdk/docs/AWS_Shell_RELEASE_NOTES.md) 
 
-* The previous shell (v071417d3) will be supported until 09/01/2018.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga/tree/REL_v1_3_9) for all shell version v071417d3 development.  
+* The previous shell (v071417d3) will be supported until 09/01/2018.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga/tree/REL_v1_3_8) for all shell version v071417d3 development.  
 
 * Release 1.4.0 greatly improves the performance of the DMA (for interrupt driven DMA on the cl\_dram\_dma example design). This is accomplished through a combination of shell changes to relax DMA timeouts and a new XDMA software driver option.  We have ported the relevant HDK examples to the XDMA driver in this release. EDMA is still supported, and developers can freely choose which DMA driver to use as part of their host application.
 

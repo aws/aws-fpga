@@ -322,6 +322,9 @@ int fpga_mgmt_load_local_image_with_options(union fpga_mgmt_load_local_image_opt
 	memset(&cmd, 0, sizeof(union afi_cmd));
 	memset(&rsp, 0, sizeof(union afi_cmd));
 
+	/* mask off any unsupported flags */
+	opt->flags &= FPGA_CMD_DRAM_DATA_RETENTION | FPGA_CMD_FORCE_SHELL_RELOAD;
+
 	/* initialize the command structure */
 	fpga_mgmt_cmd_init_load(&cmd, &len, opt);
 

@@ -1,0 +1,13 @@
+rm -rf .Xil/
+rm -rf cl_sde_ip/
+rm -rf vivado.jou
+rm -rf vivado.log
+rm -rf ila_axi4/
+rm -rf ila_sde_h2c_dm/
+rm -rf ila_axi4_512/
+rm -rf ila_axis/
+rm -rf ila_sde_c2h_buf/
+rm -rf ila_sde_c2h_dm/
+rm -rf ila_sde_h2c_buf/
+rm -rf ila_sde_ps/
+rm -rf ila_sde_wb/

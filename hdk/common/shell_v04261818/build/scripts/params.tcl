@@ -14,7 +14,7 @@
 # limitations under the License.
 
 ##################################################
-### Tcl Procs and Params - 2017.1_sdx
+### Tcl Procs and Params
 ##################################################
 ####Set params to disable OREG_B* in URAM for synthesis and physical synthesis
 if {$uram_option != 2} {
