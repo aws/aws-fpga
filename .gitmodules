@@ -2,3 +2,7 @@
 	path = SDAccel/examples/xilinx_2017.4
 	url = https://github.com/Xilinx/SDAccel_Examples.git
 	branch = aws_2017.4
+[submodule "SDAccel/examples/xilinx_2018.2"]
+	path = SDAccel/examples/xilinx_2018.2
+	url = https://github.com/Xilinx/SDAccel_Examples.git
+	branch = master

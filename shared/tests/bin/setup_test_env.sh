@@ -34,6 +34,7 @@ pytest \
 pytest-timeout \
 GitPython \
 boto3 \
+markdown \
 )
 
 for python_version in ${python_versions[@]}; do

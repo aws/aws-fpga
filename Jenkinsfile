@@ -115,19 +115,20 @@ task_label = [
     'sdaccel_builds':    'c4.4xl'
 ]
 
-def xilinx_versions = [ '2017.4' ]
+def xilinx_versions = [ '2017.4', '2018.2' ]
 def default_xilinx_version = xilinx_versions.last()
 
-def dsa_map = [ '2017.1' : [ '1DDR' : '1ddr' , '4DDR' : '4ddr' , '4DDR_DEBUG' : '4ddr_debug' ],
-                '2017.4' : [ 'DYNAMIC_5_0' : 'dyn']
+def dsa_map = [ '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
+                '2018.2' : [ 'DYNAMIC_5_0' : 'dyn']
 ]
 
-def sdaccel_example_default_map = [ '2017.1' : [ 'Hello_World_all': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+def sdaccel_example_default_map = [ '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
                                                  'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-                                                 'wide_mem_rw_ocl_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/wide_mem_rw_ocl',
-                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd'
+                                                 'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
+                                                 'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
                                                ],
-                                    '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+                                    '2018.2' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
                                                  'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
                                                  'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
                                                  'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
@@ -837,33 +838,9 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                             String test_key = e.key
                             def dsa_map_for_version = dsa_map.get(xilinx_version)
-                            def dsa_map_for_test = [:]
-                            if(xilinx_version == '2017.4') {
-                                dsa_map_for_test = dsa_map_for_version
-                            }
-                            else {
-                                if(test_key =~ '_all') {
-                                    dsa_map_for_test = dsa_map_for_version
-                                }
-                                else if(test_key =~ '_1ddr')  {
-                                    dsa_map_for_test.put("1DDR", dsa_map_for_version.get("1DDR"))
-                                }
-                                else if(test_key =~ '_2ddr')  {
-                                    dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
-                                }
-                                else if(test_key =~ '_4ddr')  {
-                                    dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
-                                }
-                                else if(test_key =~ '_Debug')  {
-                                    dsa_map_for_test.put("4DDR_DEBUG", dsa_map_for_version.get("4DDR_DEBUG"))
-                                }
-                                else {
-                                    dsa_map_for_test.put("4DDR", dsa_map_for_version.get("4DDR"))
-                                }
-                            }
 
                             // dsa = [ 4DDR: 4ddr ]
-                            for ( def dsa in entrySet(dsa_map_for_test) ) {
+                            for ( def dsa in entrySet(dsa_map_for_version) ) {
 
                                 String build_name = "SDx ${e.key}_${dsa.value}_${xilinx_version}"
                                 String example_path = e.value
@@ -1088,7 +1065,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                                 } // sdaccel_build_stages[ e.key ]
 
-                            } //for ( def dsa in entrySet(dsa_map_for_test) ) {
+                            } //for ( def dsa in entrySet(dsa_map_for_version) ) {
                         } // for ( e in list_map )
 
                         parallel sdaccel_build_stages

@@ -18,19 +18,6 @@ variable script_folder
 set script_folder [_tcl::get_script_folder]
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2017.4
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-   puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -168,31 +155,31 @@ proc create_root_design { parentCell } {
  ] $Reset
 
   # Create instance: dlmb, and set properties
-  set dlmb [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_v10:3.0 dlmb ]
+  set dlmb [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_v10 dlmb ]
   set_property -dict [ list \
    CONFIG.C_LMB_NUM_SLAVES {3} \
  ] $dlmb
 
   # Create instance: dlmb_cntlr, and set properties
-  set dlmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 dlmb_cntlr ]
+  set dlmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr dlmb_cntlr ]
   set_property -dict [ list \
    CONFIG.C_MASK {0x00000000C0010000} \
  ] $dlmb_cntlr
 
   # Create instance: ilmb, and set properties
-  set ilmb [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_v10:3.0 ilmb ]
+  set ilmb [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_v10 ilmb ]
   set_property -dict [ list \
    CONFIG.C_LMB_NUM_SLAVES {2} \
  ] $ilmb
 
   # Create instance: ilmb_cntlr, and set properties
-  set ilmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 ilmb_cntlr ]
+  set ilmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr ilmb_cntlr ]
   set_property -dict [ list \
    CONFIG.C_MASK {0x0000000080010000} \
  ] $ilmb_cntlr
 
   # Create instance: iomodule_0, and set properties
-  set iomodule_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:iomodule:3.1 iomodule_0 ]
+  set iomodule_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:iomodule iomodule_0 ]
   set_property -dict [ list \
    CONFIG.C_INSTANCE {iomodule} \
    CONFIG.C_INTC_ADDR_WIDTH {17} \
@@ -204,13 +191,13 @@ proc create_root_design { parentCell } {
  ] $iomodule_0
 
   # Create instance: lmb_bram_I, and set properties
-  set lmb_bram_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 lmb_bram_I ]
+  set lmb_bram_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen lmb_bram_I ]
   set_property -dict [ list \
    CONFIG.Memory_Type {True_Dual_Port_RAM} \
  ] $lmb_bram_I
 
   # Create instance: microblaze_I, and set properties
-  set microblaze_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze:10.0 microblaze_I ]
+  set microblaze_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze microblaze_I ]
   set_property -dict [ list \
    CONFIG.C_ASYNC_WAKEUP {3} \
    CONFIG.C_DEBUG_ENABLED {0} \
@@ -229,22 +216,22 @@ proc create_root_design { parentCell } {
  ] $microblaze_I
 
   # Create instance: rst_0, and set properties
-  set rst_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_0 ]
+  set rst_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_0 ]
 
   # Create instance: second_dlmb_cntlr, and set properties
-  set second_dlmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 second_dlmb_cntlr ]
+  set second_dlmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr second_dlmb_cntlr ]
   set_property -dict [ list \
    CONFIG.C_MASK {0x00000000C0010000} \
  ] $second_dlmb_cntlr
 
   # Create instance: second_ilmb_cntlr, and set properties
-  set second_ilmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 second_ilmb_cntlr ]
+  set second_ilmb_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr second_ilmb_cntlr ]
   set_property -dict [ list \
    CONFIG.C_MASK {0x0000000080010000} \
  ] $second_ilmb_cntlr
 
   # Create instance: second_lmb_bram_I, and set properties
-  set second_lmb_bram_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 second_lmb_bram_I ]
+  set second_lmb_bram_I [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen second_lmb_bram_I ]
   set_property -dict [ list \
    CONFIG.Memory_Type {True_Dual_Port_RAM} \
  ] $second_lmb_bram_I

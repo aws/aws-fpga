@@ -83,6 +83,9 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
         self.get_sdaccel_aws_xclbin_file(examplePath, rteName, xilinxVersion)
 
         run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/{}.rte.{}/setup.sh && {} \"".format(xilinxVersion, rteName, em_run_cmd)
+        
+        if xilinxVersion == "2018.2":
+            run_cmd = "sudo -E /bin/bash -l -c \"source /opt/xilinx/xrt/setup.sh && {} \"".format(em_run_cmd)
 
         logger.info("Running cmd={}".format(run_cmd))
         (rc, stdout_lines, stderr_lines) = self.run_cmd(run_cmd)
