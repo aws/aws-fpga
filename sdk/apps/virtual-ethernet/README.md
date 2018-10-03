@@ -1,3 +1,15 @@
+# Virtual Ethernet
+
+The Virtual Ethernet framework facilitates streaming Ethernet frames from a network interface (or any source) into the FPGA for processing and back out to some destination. Possible use cases for this include deep packet inspection, software defined networking, stream encryption or compression, and more.
+
+## Prerequisites
+
+In order to get the most from this document, readers may want to familiarize themselves with the following:
+
+1. The [F1 customer logic flow](../../../hdk/README.md#endtoend); creating and loading AFIs (Amazon FPGA Images)
+2. [DPDK](http://dpdk.org) (Data Plane Development Kit), a framework for creating high performance network traffic handling tools in userspace by limiting context switches, locks, or other blocking logic.
+3. [EC2 Networking Concepts](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_Network_and_Security.html)
+
 # Virtual Ethernet Architecture
 
 The Virtual Ethernet architecture is built upon DPDK (http://dpdk.org). DPDK is an open source set of libraries and drivers for fast packet processing, and runs mostly in Linux user-space.
