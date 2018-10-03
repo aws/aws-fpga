@@ -1,0 +1,31 @@
+From b4c0afa36462b615583336b731f0023e8bbb0fb6 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Fri, 27 Apr 2018 17:45:08 +0000
+Subject: [PATCH 2/5] app/testpmd: removed DEV_RX_OFFLOAD_CRC_STRIP from
+ rx_mode offloads
+
+ENA does not support DEV_RX_OFFLOAD_CRC_STRIP and will not work with
+it enabled
+
+Fixes: 788e7ff29cf7 ("app/testpmd: enable CRC strip without capability check")
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/test-pmd/testpmd.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/app/test-pmd/testpmd.c b/app/test-pmd/testpmd.c
+index 35cf266..ba3d7ac 100644
+--- a/app/test-pmd/testpmd.c
++++ b/app/test-pmd/testpmd.c
+@@ -333,7 +333,6 @@ struct fwd_engine * fwd_engines[] = {
+  */
+ struct rte_eth_rxmode rx_mode = {
+ 	.max_rx_pkt_len = ETHER_MAX_LEN, /**< Default maximum frame length. */
+-	.offloads = DEV_RX_OFFLOAD_CRC_STRIP,
+ 	.ignore_offload_bitfield = 1,
+ };
+ 
+-- 
+1.8.3.1
+

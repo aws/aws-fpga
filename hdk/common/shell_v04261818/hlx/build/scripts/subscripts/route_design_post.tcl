@@ -38,18 +38,8 @@ if {$SLACK > -0.400 && $SLACK < 0} {
 set timestamp $::env(timestamp)
 file mkdir "$FAAS_CL_DIR/build/checkpoints/to_aws"
 
-set scripts_update_version 2017.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_update_version $current_vivado_version] == 0 } {
-  write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
-  write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/SH_CL_routed.dcp
-} else {
-  write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp -encrypt
-  write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/SH_CL_routed.dcp -encrypt
-}
-
-
+write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp -encrypt
+write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/to_aws/SH_CL_routed.dcp -encrypt
 
 # Generate debug probes file
 write_debug_probes -force -no_partial_ltxfile -file $FAAS_CL_DIR/build/checkpoints/to_aws/${timestamp}.debug_probes.ltx
@@ -182,17 +172,9 @@ switch $clock_recipe_c {
     }
 }
 
-set vivado_version [version -short]
-set ver_2017_4 2017.4
+set vivado_version [string range [version -short] 0 5]
 
-if { [string first $ver_2017_4 $vivado_version] == 0 } {
 puts $manifest_file "manifest_format_version=2\n"
-#puts "in 2017.4"
-} else {
-puts $manifest_file "manifest_format_version=1\n"
-#puts "in 2017.1"
-}
-
 puts $manifest_file "pci_vendor_id=$vendor_id\n"
 puts $manifest_file "pci_device_id=$device_id\n"
 puts $manifest_file "pci_subsystem_id=$subsystem_id\n"
@@ -201,9 +183,7 @@ puts $manifest_file "dcp_hash=$hash\n"
 puts $manifest_file "shell_version=$shell_version\n"
 puts $manifest_file "dcp_file_name=${timestamp}.SH_CL_routed.dcp\n"
 puts $manifest_file "hdk_version=$hdk_version\n"
-if { [string first $ver_2017_4 $vivado_version] == 0} {
-puts $manifest_file "tool_version=v2017.4\n"
-}
+puts $manifest_file "tool_version=v$vivado_version\n"
 puts $manifest_file "date=$timestamp\n"
 puts $manifest_file "clock_recipe_a=$clock_recipe_a_sw\n"
 puts $manifest_file "clock_recipe_b=$clock_recipe_b_sw\n"

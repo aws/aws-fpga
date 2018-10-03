@@ -105,6 +105,8 @@ struct ec2_fpga_cmd {
 	bool     show_mbox_device;
 	/** Reload the shell even if not required for AFI */
 	bool     force_shell_reload;
+	/** Attempt dram data retention on load */
+	bool	 dram_data_retention;
 	/** Virtual DIP switch */
 	uint16_t v_dip_switch;
 	/** Virtual JTAG TCP port */

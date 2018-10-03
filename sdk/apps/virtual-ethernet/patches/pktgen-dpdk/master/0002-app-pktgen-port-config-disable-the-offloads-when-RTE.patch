@@ -1,0 +1,29 @@
+From 4ce34868f690bb867495bc08c8c626ad4b793d92 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Thu, 14 Jun 2018 16:47:43 +0000
+Subject: [PATCH] app/pktgen-port-config: disable the offloads when
+ RTE_LIBRTE_ENA_PMD is defined
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/pktgen-port-cfg.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/app/pktgen-port-cfg.c b/app/pktgen-port-cfg.c
+index e461f85..15151b3 100644
+--- a/app/pktgen-port-cfg.c
++++ b/app/pktgen-port-cfg.c
+@@ -40,8 +40,10 @@ static struct rte_eth_conf default_port_conf = {
+ 		.max_rx_pkt_len = ETHER_MAX_LEN,
+ 		.split_hdr_size = 0,
+ 		.ignore_offload_bitfield = 1,
++#ifndef RTE_LIBRTE_ENA_PMD
+ 		.offloads = (DEV_RX_OFFLOAD_CRC_STRIP |
+ 			     DEV_RX_OFFLOAD_CHECKSUM),
++#endif
+ 	},
+ 	.rx_adv_conf = {
+ 		.rss_conf = {
+-- 
+1.8.3.1
+

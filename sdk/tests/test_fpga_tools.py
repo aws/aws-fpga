@@ -124,7 +124,7 @@ class TestFpgaTools(BaseSdkTools):
 
     def test_load_local_image(self):
         for slot in range(self.num_slots):
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image -S {} -I {}".format(slot, self.cl_hello_world_agfi), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image --request-timeout {} -S {} -I {}".format(self.DEFAULT_REQUEST_TIMEOUT, slot, self.cl_hello_world_agfi), echo=True)
             assert len(stdout) == 3
             assert len(stderr) == 1
             assert stdout[0] == "AFI          {}       {}  loaded            0        ok               0       {}".format(slot, self.cl_hello_world_agfi, self.shell_version)
@@ -132,7 +132,7 @@ class TestFpgaTools(BaseSdkTools):
             self.fpga_clear_local_image(slot)
 
             # -A
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image -S {} -I {} -A".format(slot, self.cl_hello_world_agfi), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image --request-timeout {} -S {} -I {} -A".format(self.DEFAULT_REQUEST_TIMEOUT, slot, self.cl_hello_world_agfi), echo=True)
             assert len(stdout) == 1
             assert len(stderr) == 1
             # Poll for it to be loaded
@@ -151,7 +151,7 @@ class TestFpgaTools(BaseSdkTools):
             self.fpga_clear_local_image(slot)
 
             # -H
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image -S {} -I {} -H".format(slot, self.cl_hello_world_agfi), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image --request-timeout {} -S {} -I {} -H".format(self.DEFAULT_REQUEST_TIMEOUT, slot, self.cl_hello_world_agfi), echo=True)
             assert len(stdout) == 5
             assert len(stderr) == 1
             assert stdout[0] == 'Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion'
@@ -161,7 +161,7 @@ class TestFpgaTools(BaseSdkTools):
             self.fpga_clear_local_image(slot)
 
             # -F
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image -S {} -I {} -F".format(slot, self.cl_hello_world_agfi), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image --request-timeout {} -S {} -I {} -F".format(self.DEFAULT_REQUEST_TIMEOUT, slot, self.cl_hello_world_agfi), echo=True)
             assert len(stdout) == 3
             assert len(stderr) == 1
             assert stdout[0] == "AFI          {}       {}  loaded            0        ok               0       {}".format(slot, self.cl_hello_world_agfi, self.shell_version)
@@ -172,19 +172,19 @@ class TestFpgaTools(BaseSdkTools):
         for slot in range(self.num_slots):
             # Test clearing already cleared
             self.fpga_clear_local_image(slot)
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image -S {}".format(slot), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image --request-timeout {} -S {}".format(self.DEFAULT_REQUEST_TIMEOUT, slot), echo=True)
             assert len(stdout) == 3
             assert len(stderr) == 1
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
 
             # -A (async)
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image -S {} -A".format(slot), echo=True)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image --request-timeout {} -S {} -A".format(self.DEFAULT_REQUEST_TIMEOUT, slot), echo=True)
             assert len(stdout) == 1
             assert len(stderr) == 1
 
             # Clear again immediately. It should fail because busy
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image -S {} -A".format(slot), echo=True, check=False)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image --request-timeout {} -S {} -A".format(self.DEFAULT_REQUEST_TIMEOUT, slot), echo=True, check=False)
             assert rc != 0
             assert len(stdout) == 2
             assert len(stderr) == 1
@@ -197,7 +197,7 @@ class TestFpgaTools(BaseSdkTools):
                 if fpgaLocalImage.statusName != 'cleared':
                     time.sleep(1)
                     continue
-                (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -S {}".format(slot), echo=True)
+                (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image --request-timeout {} -S {}".format(self.DEFAULT_REQUEST_TIMEOUT, slot), echo=True)
                 assert len(stdout) == 3
                 assert len(stderr) == 1
                 assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)

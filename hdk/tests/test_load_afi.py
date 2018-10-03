@@ -252,7 +252,12 @@ class TestLoadAfi(AwsFpgaTestBase):
                 assert rc == 0, "Runtime example failed."
                 assert find_fail_re.match(stdout_lines[-2]), "{} didn't fail. stdout:\n{}".format(command, "\n".join(stdout_lines))
 
-        else:
+        elif re.match(r'cl_sde', cl):
+            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime".format(
+                self.WORKSPACE, cl), echo=True)
+            assert rc == 0, "Runtime example failed."
+
+	else:
             assert False, "Invalid cl: {}".format(cl)
 
     def base_test(self, cl, agfi, afi, install_xdma_driver, slots_to_test, option_tag):
@@ -318,3 +323,12 @@ class TestLoadAfi(AwsFpgaTestBase):
     def test_cl_uram_example(self, xilinxVersion, uram_option):
         cl = 'cl_uram_example'
         self.base_fdf_test(cl, xilinxVersion, clock_recipe_a='A2', uram_option=uram_option, install_xdma_driver=False)
+
+    @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)
+    @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
+    @pytest.mark.parametrize("clock_recipe_b", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['B']['recipes'].keys()))
+    @pytest.mark.parametrize("clock_recipe_a", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['A']['recipes'].keys()))
+    def test_cl_sde(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
+        cl = 'cl_sde'
+        self.base_fdf_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, install_xdma_driver=False)
+ 

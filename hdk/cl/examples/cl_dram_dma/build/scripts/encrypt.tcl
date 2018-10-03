@@ -64,8 +64,7 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc $TARGET_DIR
 exec chmod +w {*}[glob $TARGET_DIR/*]
 
 set TOOL_VERSION $::env(VIVADO_TOOL_VERSION)
-set vivado_version [version -short]
-set ver_2017_4 2017.4
+set vivado_version [string range [version -short] 0 5]
 puts "AWS FPGA: VIVADO_TOOL_VERSION $TOOL_VERSION"
 puts "vivado_version $vivado_version"
 

@@ -145,9 +145,10 @@ def remove_xocl_driver():
     os.system('sudo rmmod xocl')
 
     xocl_driver_ko_list = find_files_in_path('/lib/modules', 'xocl.ko')
-    for xocl_ko in xocl_driver_ko_list:
-        logger.info("Removing {}".format(xocl_ko))
-        assert os.system("sudo rm -f {}".format(xocl_ko)) == 0
+    xocl_driver_ko_xz_list = find_files_in_path('/lib/modules', 'xocl.ko.xz')
+    for xocl_ko in (xocl_driver_ko_list + xocl_driver_ko_xz_list):
+        logger.info("Removing xocl {}".format(xocl_ko))
+        assert os.system("sudo rm -rf {}".format(xocl_ko)) == 0
 
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xocl.rules') == 0
 

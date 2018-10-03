@@ -18,19 +18,6 @@ variable script_folder
 set script_folder [_tcl::get_script_folder]
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2017.4
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-   puts ""
-   catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-   return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -161,13 +148,13 @@ proc create_root_design { parentCell } {
   set clk [ create_bd_port -dir I -type clk clk ]
 
   # Create instance: lut_buffer, and set properties
-  set lut_buffer [ create_bd_cell -type ip -vlnv xilinx.com:ip:lut_buffer:2.0 lut_buffer ]
+  set lut_buffer [ create_bd_cell -type ip -vlnv xilinx.com:ip:lut_buffer lut_buffer ]
   set_property -dict [ list \
    CONFIG.C_EN_BSCANID_VEC {false} \
  ] $lut_buffer
 
   # Create instance: xsdbm, and set properties
-  set xsdbm [ create_bd_cell -type ip -vlnv xilinx.com:ip:xsdbm:3.0 xsdbm ]
+  set xsdbm [ create_bd_cell -type ip -vlnv xilinx.com:ip:xsdbm xsdbm ]
   set_property -dict [ list \
    CONFIG.C_BUILD_REVISION {0} \
    CONFIG.C_CLK_INPUT_FREQ_HZ {300000000} \

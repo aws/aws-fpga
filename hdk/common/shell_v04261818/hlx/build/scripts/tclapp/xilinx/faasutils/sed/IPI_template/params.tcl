@@ -28,13 +28,6 @@
 
 #THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS PART OF THIS FILE AT ALL TIMES.
 
-if {[version -short] < "2017.1"} {
-	puts "Vivado version [version -short] not supported, please use 2017.1 or later"
-}
+set_param bd.faas_board "f1_cl"
 
-if {[version -short] ne "2017.1" && [version -short] ne "2017.2"} {
-#	set_param bd.faas_ipname "xilinx.com:ip:aws:1.0"
-	set_param bd.faas_board "f1_cl"
-#	set_param bd.faas_interface "S_SH"
-}
 

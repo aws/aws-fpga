@@ -1,0 +1,3826 @@
+From 18d3e88c4f2419036c97e45fb58d62f39986bd93 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Tue, 17 Apr 2018 19:12:12 +0000
+Subject: [PATCH] net/spp: initial commit of AWS SPP network driver
+
+The AWS FPGA SPP (Streaming Packet Port) PMD uses the AWS SDE
+(Streaming Data Engine) to provide packet streaming connectivity
+between the AWS FPGA DPDK application and the AWS FPGA CL
+(Custom Logic). The SDE and the CL communicate using the
+AXI-Stream interface.
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ config/common_base                      |    8 +
+ drivers/net/Makefile                    |    1 +
+ drivers/net/spp/Makefile                |   40 +
+ drivers/net/spp/rte_pmd_spp_version.map |    4 +
+ drivers/net/spp/spp.h                   |   51 +
+ drivers/net/spp/spp_defs.h              |  117 +++
+ drivers/net/spp/spp_ethdev.c            |  428 +++++++++
+ drivers/net/spp/spp_hal.c               | 1553 +++++++++++++++++++++++++++++++
+ drivers/net/spp/spp_hal.h               |  183 ++++
+ drivers/net/spp/spp_hal_dbg.c           |  455 +++++++++
+ drivers/net/spp/spp_hal_private.h       |  258 +++++
+ drivers/net/spp/spp_hal_regs.h          |  520 +++++++++++
+ drivers/net/spp/spp_logs.h              |   48 +
+ mk/rte.app.mk                           |    1 +
+ usertools/dpdk-devbind.py               |    4 +-
+ 15 files changed, 3670 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/spp/Makefile
+ create mode 100644 drivers/net/spp/rte_pmd_spp_version.map
+ create mode 100644 drivers/net/spp/spp.h
+ create mode 100644 drivers/net/spp/spp_defs.h
+ create mode 100644 drivers/net/spp/spp_ethdev.c
+ create mode 100644 drivers/net/spp/spp_hal.c
+ create mode 100644 drivers/net/spp/spp_hal.h
+ create mode 100644 drivers/net/spp/spp_hal_dbg.c
+ create mode 100644 drivers/net/spp/spp_hal_private.h
+ create mode 100644 drivers/net/spp/spp_hal_regs.h
+ create mode 100644 drivers/net/spp/spp_logs.h
+
+diff --git a/config/common_base b/config/common_base
+index 6b0d1cb..7d2aa64 100644
+--- a/config/common_base
++++ b/config/common_base
+@@ -227,6 +227,14 @@ CONFIG_RTE_LIBRTE_ENA_DEBUG_TX_FREE=n
+ CONFIG_RTE_LIBRTE_ENA_COM_DEBUG=n
+ 
+ #
++# Compile burst-oriented Amazon SPP PMD driver
++#
++CONFIG_RTE_LIBRTE_SPP_PMD=y
++CONFIG_RTE_LIBRTE_SPP_DEBUG_RX=n
++CONFIG_RTE_LIBRTE_SPP_DEBUG_TX=n
++CONFIG_RTE_LIBRTE_SPP_DEBUG_DRIVER=n
++
++#
+ # Compile burst-oriented Cisco ENIC PMD driver
+ #
+ CONFIG_RTE_LIBRTE_ENIC_PMD=y
+diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+index 9f9da66..c7216fb 100644
+--- a/drivers/net/Makefile
++++ b/drivers/net/Makefile
+@@ -24,6 +24,7 @@ DIRS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD) += dpaa2
+ endif
+ DIRS-$(CONFIG_RTE_LIBRTE_E1000_PMD) += e1000
+ DIRS-$(CONFIG_RTE_LIBRTE_ENA_PMD) += ena
++DIRS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp
+ DIRS-$(CONFIG_RTE_LIBRTE_ENIC_PMD) += enic
+ DIRS-$(CONFIG_RTE_LIBRTE_PMD_FAILSAFE) += failsafe
+ DIRS-$(CONFIG_RTE_LIBRTE_FM10K_PMD) += fm10k
+diff --git a/drivers/net/spp/Makefile b/drivers/net/spp/Makefile
+new file mode 100644
+index 0000000..19cf93c
+--- /dev/null
++++ b/drivers/net/spp/Makefile
+@@ -0,0 +1,40 @@
++#
++# Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++#
++# Licensed under the Apache License, Version 2.0 (the "License"). You may
++# not use this file except in compliance with the License. A copy of the
++# License is located at
++#
++#     http://aws.amazon.com/apache2.0/
++#
++# or in the "license" file accompanying this file. This file is distributed
++# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++# express or implied. See the License for the specific language governing
++# permissions and limitations under the License.
++#
++
++include $(RTE_SDK)/mk/rte.vars.mk
++
++#
++# library name
++#
++LIB = librte_pmd_spp.a
++CFLAGS += $(WERROR_FLAGS) -O2
++INCLUDES :=-I$(SRCDIR)
++
++EXPORT_MAP := rte_pmd_spp_version.map
++LIBABIVER := 1
++
++#
++# all source are stored in SRCS-y
++#
++SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_ethdev.c
++SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_hal.c
++SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_hal_dbg.c
++
++CFLAGS += $(INCLUDES)
++LDLIBS += -lrte_eal -lrte_mbuf -lrte_mempool -lrte_ring
++LDLIBS += -lrte_ethdev -lrte_net -lrte_kvargs
++LDLIBS += -lrte_bus_pci
++
++include $(RTE_SDK)/mk/rte.lib.mk
+diff --git a/drivers/net/spp/rte_pmd_spp_version.map b/drivers/net/spp/rte_pmd_spp_version.map
+new file mode 100644
+index 0000000..153f308
+--- /dev/null
++++ b/drivers/net/spp/rte_pmd_spp_version.map
+@@ -0,0 +1,4 @@
++DPDK_16.04 {
++
++        local: *;
++};
+diff --git a/drivers/net/spp/spp.h b/drivers/net/spp/spp.h
+new file mode 100644
+index 0000000..4694827
+--- /dev/null
++++ b/drivers/net/spp/spp.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_H_
++#define _SPP_H_
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include "spp_logs.h"
++#include "spp_defs.h"
++#include "spp_hal.h"
++
++struct spp_dev {
++	/* OS defined structs */
++	struct rte_pci_device	*pci_dev;
++	struct rte_eth_dev_data *rte_eth_dev_data;
++	struct rte_eth_dev	*rte_eth_dev;
++
++	struct spp_tx_channel	tx_channels[SPP_TX_CHANNELS_MAX]
++	__rte_cache_aligned;
++	struct spp_rx_channel	rx_channels[SPP_RX_CHANNELS_MAX]
++	__rte_cache_aligned;
++
++	uint8_t __iomem		*reg_mem;
++	uint8_t __iomem		*wc_mem;
++
++	int			dev_index;
++	char			name[NAME_MAX + 1];
++	struct ether_addr	ether_addr;
++	struct spp_dev_cap	dev_cap;
++};
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/drivers/net/spp/spp_defs.h b/drivers/net/spp/spp_defs.h
+new file mode 100644
+index 0000000..b24da8e
+--- /dev/null
++++ b/drivers/net/spp/spp_defs.h
+@@ -0,0 +1,117 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_DEFS_H_
++#define _SPP_DEFS_H_
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*
++ * Enables use of SDE compact descriptors within the SPP
++ * PMD at compile time.  For regular descriptors simply
++ * ifdef-out the SPP_USE_COMPACT_DESCS define.
++ *  -the SDE must also be built with compact descriptors
++ *   enabled.  If there is a mismatch in configuration
++ *   between SPP and the SDE, spp_dev_cap_get will return
++ *   an error (-EINVAL).
++ *  -also see spp_wb_meta_desc, spp_rx_desc and spp_tx_desc
++ *   for the differences in descriptor fields and sizes.
++ */
++#if 0
++#define SPP_USE_COMPACT_DESCS
++#endif
++
++#if defined(RTE_ARCH_X86) && defined(RTE_MACHINE_CPUFLAG_AVX2)
++/*
++ * Use AVX2 instructions for desc write-combining.
++ */
++#define SPP_USE_AVX2
++#endif
++
++/*
++ * Non-default experimentation at the expense of max PPS.
++ *   -cleaning the TX ring at a threshold within
++ *    spp_tx_pkt_burst.
++ *   -filling the RX ring at a threshold within
++ *    spp_rx_pkt_burst.
++ *
++ * #define SPP_USE_RING_THRESH
++ */
++
++/*
++ * HAL debug options:
++ * #define SPP_DBG_USE_DESC_SEQ_NUM
++ *	Useful in HW bringup.
++ * #define SPP_DBG_USE_MBUF_SEQ_NUM
++ *	Useful in HW bringup.
++ *	Do not use for real traffic!
++ * #define SPP_DBG_SW_LOOPBACK
++ *	Measure and tune SW PPS w/o the HW.
++ *	Go through the motions of TX/RX ring maintenance.
++ *	Single mbuf segs only!
++ *	~70MPPS aggregate TX/RX, single vCPU
++ * #define SPP_DBG_DUMP_DESCS
++ *      Useful in HW bringup.
++ * #define SPP_DBG_XSTATS_DEV_DISPLAY
++ *      Useful in HW bringup.
++ *      Dump (log-info) the TX and RX status and descs when
++ *      eth_spp_xstats_get is called.
++ */
++
++#if defined(SPP_USE_COMPACT_DESCS)
++/* Compact descs do not have a user defined field */
++#undef SPP_DBG_USE_DESC_SEQ_NUM
++#endif
++
++#define BIT(bit)                        (1 << (bit))
++#define MIN(a, b)                       (((a) < (b)) ? (a) : (b))
++#define SIZEOF_ARRAY(a)                 (size_t)(sizeof(a) / sizeof(a[0]))
++#define ROUND_UP(n, d)                  (((n) + (d) - 1) & -(d))
++#define DIV_ROUND_UP(n, d)              (((n) + (d) - 1) / (d))
++
++#define SPP_RX_RING_DESC_MAX            (1 << 15)
++#define SPP_RX_RING_DESC_MIN            (1 << 6)
++#define SPP_RX_RING_DESC_ALIGN          SPP_RX_RING_DESC_MIN
++#define SPP_TX_RING_DESC_MAX            (1 << 15)
++#define SPP_TX_RING_DESC_MIN            (1 << 6)
++#define SPP_TX_RING_DESC_ALIGN          SPP_TX_RING_DESC_MIN
++#define SPP_RX_CHANNELS_MAX             RTE_PMD_RING_MAX_RX_RINGS
++#define SPP_TX_CHANNELS_MAX             RTE_PMD_RING_MAX_TX_RINGS
++#define SPP_RX_RING_FILL_SHIFT          1
++#define SPP_TX_RING_FILL_SHIFT          1
++
++/* Vendor ID used by Amazon devices */
++#define PCI_VENDOR_ID_AMAZON          0x1d0f
++/* Amazon devices */
++#define PCI_DEVICE_ID_SDE_LOOPBACK_CL 0xf002
++
++#define SPP_SDE_CTL_REGS_BAR    0
++#define SPP_SDE_REGS_BAR        4
++#define SPP_SDE_WC_BAR          4
++#define SPP_SDE_WC_BAR_OFFSET   0
++#define SPP_SDE_WC_BAR_SIZE     (1 << 16)
++
++/** PCI device format string */
++#define PCI_DEV_FMT "%04x:%02x:%02x.%d"
++
++#define __iomem
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/drivers/net/spp/spp_ethdev.c b/drivers/net/spp/spp_ethdev.c
+new file mode 100644
+index 0000000..f2f5f0f
+--- /dev/null
++++ b/drivers/net/spp/spp_ethdev.c
+@@ -0,0 +1,428 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <rte_mbuf.h>
++#include <rte_ethdev.h>
++#include <rte_ethdev_pci.h>
++#include <rte_malloc.h>
++#include <rte_memcpy.h>
++#include <rte_memzone.h>
++#include <rte_string_fns.h>
++#include <rte_kvargs.h>
++#include <rte_errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/mman.h>
++#include "spp.h"
++
++
++static const struct rte_pci_id pci_id_spp_map[] = {
++	{ RTE_PCI_DEVICE(PCI_VENDOR_ID_AMAZON,
++			 PCI_DEVICE_ID_SDE_LOOPBACK_CL) },
++	{ .device_id = 0 },
++};
++
++struct eth_spp_xstats_name_off {
++	char		name[RTE_ETH_XSTATS_NAME_SIZE];
++	uint64_t	offset;
++};
++
++static const
++struct eth_spp_xstats_name_off spp_rx_xstats_strings[] = {
++	{ "rx_no_last_seg",
++	  offsetof(struct spp_rx_stats, no_last_seg) },
++	{ "rx_seg_packets",
++	  offsetof(struct spp_rx_stats, seg_packets) },
++	{ "rx_sde_errors",
++	  offsetof(struct spp_rx_stats, sde_errors) },
++};
++
++static const
++struct eth_spp_xstats_name_off spp_tx_xstats_strings[] = {
++	{ "tx_none_avail",
++	  offsetof(struct spp_tx_stats, no_tx_avail) },
++	{ "tx_seg_packets",
++	  offsetof(struct spp_tx_stats, seg_packets) },
++	{ "tx_sde_errors",
++	  offsetof(struct spp_tx_stats, sde_errors) },
++};
++
++static int
++eth_spp_configure(__rte_unused struct rte_eth_dev *eth_dev)
++{
++	return 0;
++}
++
++static int
++eth_spp_start(struct rte_eth_dev *eth_dev)
++{
++	eth_dev->data->dev_link.link_status = ETH_LINK_UP;
++	return 0;
++}
++
++static void
++eth_spp_stop(struct rte_eth_dev *eth_dev)
++{
++	eth_dev->data->dev_link.link_status = ETH_LINK_DOWN;
++}
++
++static int
++eth_spp_set_link_down(struct rte_eth_dev *eth_dev)
++{
++	eth_dev->data->dev_link.link_status = ETH_LINK_DOWN;
++	return 0;
++}
++
++static int
++eth_spp_set_link_up(struct rte_eth_dev *eth_dev)
++{
++	eth_dev->data->dev_link.link_status = ETH_LINK_UP;
++	return 0;
++}
++
++static void
++eth_spp_info_get(struct rte_eth_dev		*eth_dev,
++		 struct rte_eth_dev_info	*dev_info)
++{
++	struct spp_dev *spp_dev = eth_dev->data->dev_private;
++
++	dev_info->max_mac_addrs = 1;
++	dev_info->max_rx_pktlen = (uint32_t)-1;
++	dev_info->max_rx_queues = spp_dev->dev_cap.num_rx_channels;
++	dev_info->max_tx_queues = spp_dev->dev_cap.num_tx_channels;
++	dev_info->min_rx_bufsize = 0;
++
++	dev_info->rx_desc_lim.nb_max = SPP_RX_RING_DESC_MAX;
++	dev_info->rx_desc_lim.nb_min = SPP_RX_RING_DESC_MIN;
++	dev_info->rx_desc_lim.nb_align = SPP_RX_RING_DESC_ALIGN;
++
++	dev_info->tx_desc_lim.nb_max = SPP_TX_RING_DESC_MAX;
++	dev_info->tx_desc_lim.nb_min = SPP_TX_RING_DESC_MIN;
++	dev_info->tx_desc_lim.nb_align = SPP_TX_RING_DESC_ALIGN;
++
++	/* RX defaults: uses the RX channel 0 capabilities */
++	dev_info->default_rxportconf.ring_size =
++		spp_dev->dev_cap.rx_chan_cap[0].num_descs;
++
++	/* TX defaults: uses the TX channel 0 capabilities */
++	dev_info->default_txportconf.ring_size =
++		spp_dev->dev_cap.tx_chan_cap[0].num_descs;
++}
++
++static int
++eth_spp_stats_get(struct rte_eth_dev *eth_dev, struct rte_eth_stats *stats)
++{
++	struct spp_dev *spp_dev = eth_dev->data->dev_private;
++	int i;
++
++	for (i = 0; i < spp_dev->dev_cap.num_rx_channels; i++) {
++		struct spp_rx_stats *rx_stats = &spp_dev->rx_channels[i].stats;
++
++		/* Single channel stats */
++		stats->q_ipackets[i] = rx_stats->packets;
++		stats->q_ibytes[i] = rx_stats->bytes;
++
++		/* Accumulate accross TX/RX channel */
++		stats->q_errors[i] += rx_stats->errors;
++
++		/* Accumulate accross RX channels */
++		stats->ipackets += rx_stats->packets;
++		stats->ibytes += rx_stats->bytes;
++		stats->imissed += rx_stats->missed;
++		stats->ierrors += rx_stats->errors;
++		stats->rx_nombuf += rx_stats->no_mbuf;
++	}
++
++	for (i = 0; i < spp_dev->dev_cap.num_tx_channels; i++) {
++		struct spp_tx_stats *tx_stats = &spp_dev->tx_channels[i].stats;
++
++		/* Single channel stats */
++		stats->q_opackets[i] = tx_stats->packets;
++		stats->q_obytes[i] = tx_stats->bytes;
++
++		/* Accumulate accross TX/RX channel */
++		stats->q_errors[i] = tx_stats->errors;
++
++		/* Accumulate accross TX channels */
++		stats->opackets += tx_stats->packets;
++		stats->obytes += tx_stats->bytes;
++		stats->oerrors += tx_stats->errors;
++	}
++
++	return 0;
++}
++
++static void
++eth_spp_stats_reset(__rte_unused struct rte_eth_dev *eth_dev)
++{
++	struct spp_dev *spp_dev = eth_dev->data->dev_private;
++	int i;
++
++	for (i = 0; i < spp_dev->dev_cap.num_rx_channels; i++) {
++		struct spp_rx_stats *rx_stats = &spp_dev->rx_channels[i].stats;
++
++		memset(rx_stats, 0, sizeof(*rx_stats));
++	}
++
++	for (i = 0; i < spp_dev->dev_cap.num_tx_channels; i++) {
++		struct spp_tx_stats *tx_stats = &spp_dev->tx_channels[i].stats;
++
++		memset(tx_stats, 0, sizeof(*tx_stats));
++	}
++}
++
++static int
++eth_spp_xstats_get_names(__rte_unused struct rte_eth_dev	*dev,
++			 struct rte_eth_xstat_name		*xstats_names,
++			 __rte_unused unsigned			limit)
++{
++	uint32_t stat_count = 0;
++	uint32_t i;
++
++	if (xstats_names == NULL)
++		return SIZEOF_ARRAY(spp_rx_xstats_strings) +
++		       SIZEOF_ARRAY(spp_tx_xstats_strings);
++
++	for (i = 0; i < SIZEOF_ARRAY(spp_rx_xstats_strings); i++) {
++		snprintf(xstats_names[stat_count].name,
++			 sizeof(xstats_names[stat_count].name),
++			 "%s",
++			 spp_rx_xstats_strings[i].name);
++
++		stat_count++;
++	}
++
++	for (i = 0; i < SIZEOF_ARRAY(spp_tx_xstats_strings); i++) {
++		snprintf(xstats_names[stat_count].name,
++			 sizeof(xstats_names[stat_count].name),
++			 "%s",
++			 spp_tx_xstats_strings[i].name);
++
++		stat_count++;
++	}
++
++	return stat_count;
++}
++
++static uint64_t
++spp_get_rx_xstat(struct spp_dev *spp_dev, uint64_t stat_offset)
++{
++	uint64_t value = 0;
++	int i;
++
++	for (i = 0; i < spp_dev->dev_cap.num_rx_channels; i++) {
++		struct spp_rx_stats *rx_stats = &spp_dev->rx_channels[i].stats;
++
++		value += *(uint64_t *)(((char *)rx_stats) + stat_offset);
++	}
++
++	return value;
++}
++
++static uint64_t
++spp_get_tx_xstat(struct spp_dev *spp_dev, uint64_t stat_offset)
++{
++	uint64_t value = 0;
++	int i;
++
++	for (i = 0; i < spp_dev->dev_cap.num_tx_channels; i++) {
++		struct spp_tx_stats *tx_stats = &spp_dev->tx_channels[i].stats;
++
++		value += *(uint64_t *)(((char *)tx_stats) + stat_offset);
++	}
++
++	return value;
++}
++
++static int
++eth_spp_xstats_get(struct rte_eth_dev *eth_dev, struct rte_eth_xstat *xstats,
++		   unsigned int n)
++{
++	struct spp_dev *spp_dev = eth_dev->data->dev_private;
++	uint32_t total_stat_count;
++	uint32_t stat_count = 0;
++	uint32_t i;
++
++	total_stat_count = SIZEOF_ARRAY(spp_rx_xstats_strings) +
++			   SIZEOF_ARRAY(spp_tx_xstats_strings);
++
++	if (n < total_stat_count)
++		return total_stat_count;
++
++	for (i = 0; i < SIZEOF_ARRAY(spp_rx_xstats_strings); i++) {
++		xstats[stat_count].value =
++			spp_get_rx_xstat(spp_dev,
++					 spp_rx_xstats_strings[i].offset);
++		xstats[stat_count].id = stat_count;
++		stat_count++;
++	}
++
++	for (i = 0; i < SIZEOF_ARRAY(spp_tx_xstats_strings); i++) {
++		xstats[stat_count].value =
++			spp_get_tx_xstat(spp_dev,
++					 spp_tx_xstats_strings[i].offset);
++		xstats[stat_count].id = stat_count;
++		stat_count++;
++	}
++
++#if defined(SPP_DBG_XSTATS_DEV_DISPLAY)
++	spp_dev_display(spp_dev);
++#endif
++
++	return stat_count;
++}
++
++static int
++eth_spp_link_update(struct rte_eth_dev	*eth_dev,
++		    __rte_unused int	wait_to_complete)
++{
++	struct rte_eth_link *link = &eth_dev->data->dev_link;
++
++	link->link_speed = ETH_SPEED_NUM_10G;
++	link->link_duplex = ETH_LINK_FULL_DUPLEX;
++	link->link_autoneg = ETH_LINK_SPEED_AUTONEG;
++	link->link_status = ETH_LINK_UP;
++
++	return 0;
++}
++
++static int
++eth_spp_queue_start_stop_noop(__rte_unused struct rte_eth_dev	*eth_dev,
++			      __rte_unused uint16_t		queue_id)
++{
++	return 0;
++}
++
++static const struct eth_dev_ops eth_spp_ops = {
++	.dev_start		= eth_spp_start,
++	.dev_stop		= eth_spp_stop,
++	.dev_set_link_up	= eth_spp_set_link_up,
++	.dev_set_link_down	= eth_spp_set_link_down,
++	.dev_configure		= eth_spp_configure,
++	.dev_infos_get		= eth_spp_info_get,
++	.rx_queue_setup		= spp_rx_queue_setup,
++	.tx_queue_setup		= spp_tx_queue_setup,
++	.rx_queue_release	= spp_rx_queue_release,
++	.tx_queue_release	= spp_tx_queue_release,
++	.rx_queue_start		= eth_spp_queue_start_stop_noop,
++	.tx_queue_start		= eth_spp_queue_start_stop_noop,
++	.rx_queue_stop		= eth_spp_queue_start_stop_noop,
++	.tx_queue_stop		= eth_spp_queue_start_stop_noop,
++	.link_update		= eth_spp_link_update,
++	.stats_get		= eth_spp_stats_get,
++	.stats_reset		= eth_spp_stats_reset,
++	.xstats_get		= eth_spp_xstats_get,
++	.xstats_get_names	= eth_spp_xstats_get_names,
++	.xstats_reset		= eth_spp_stats_reset,
++};
++
++static int
++eth_spp_init(struct rte_eth_dev *eth_dev)
++{
++	struct rte_pci_device *pci_dev;
++	struct spp_dev *spp_dev = (struct spp_dev *)eth_dev->data->dev_private;
++	int ret = 0;
++
++	static int num_spp_devs;
++
++	memset(spp_dev, 0, sizeof(struct spp_dev));
++
++	eth_dev->dev_ops = &eth_spp_ops;
++	eth_dev->rx_pkt_burst = &spp_rx_pkt_burst;
++	eth_dev->tx_pkt_burst = &spp_tx_pkt_burst;
++	spp_dev->rte_eth_dev_data = eth_dev->data;
++	spp_dev->rte_eth_dev = eth_dev;
++
++	if (rte_eal_process_type() != RTE_PROC_PRIMARY)
++		return 0;
++
++	pci_dev = RTE_ETH_DEV_TO_PCI(eth_dev);
++	spp_dev->pci_dev = pci_dev;
++
++	SPP_INIT_LOG(DEBUG, "Initializing %x:%x:%x.%d",
++		     pci_dev->addr.domain,
++		     pci_dev->addr.bus,
++		     pci_dev->addr.devid,
++		     pci_dev->addr.function);
++
++	SPP_INIT_LOG(DEBUG,
++		     "reg_mem: virt=%p, phys=0x%" PRIx64 ", len=%" PRIu64,
++		     pci_dev->mem_resource[SPP_SDE_REGS_BAR].addr,
++		     pci_dev->mem_resource[SPP_SDE_REGS_BAR].phys_addr,
++		     pci_dev->mem_resource[SPP_SDE_REGS_BAR].len);
++
++	spp_dev->reg_mem = pci_dev->mem_resource[SPP_SDE_REGS_BAR].addr;
++	spp_dev->wc_mem = pci_dev->mem_resource[SPP_SDE_REGS_BAR].addr;
++
++	SPP_INIT_LOG(DEBUG, "wc_mem: virt=%p, len=%u",
++		     spp_dev->wc_mem, SPP_SDE_WC_BAR_SIZE);
++
++	spp_dev->dev_index = num_spp_devs;
++
++	snprintf(spp_dev->name, sizeof(spp_dev->name), "spp_%d",
++		 spp_dev->dev_index);
++
++	/* Copy MAC address and point DPDK to it */
++	eth_dev->data->mac_addrs = &spp_dev->ether_addr;
++
++	ret = spp_dev_reset(spp_dev);
++	if (ret != 0) {
++		SPP_LOG(ERR, "spp_dev_reset failed, ret=%d", ret);
++		goto out;
++	}
++
++	ret = spp_dev_cap_get(spp_dev, &spp_dev->dev_cap);
++	if (ret != 0) {
++		SPP_LOG(ERR, "spp_dev_cap_get failed, ret=%d", ret);
++		goto out;
++	}
++
++	num_spp_devs++;
++out:
++	return ret;
++}
++
++static int
++eth_spp_uninit(struct rte_eth_dev *eth_dev)
++{
++	(void)eth_dev;
++	return 0;
++}
++
++static int
++eth_spp_pci_probe(__rte_unused struct rte_pci_driver	*pci_drv,
++		  struct rte_pci_device			*pci_dev)
++{
++	return rte_eth_dev_pci_generic_probe(pci_dev,
++					     sizeof(struct spp_dev),
++					     eth_spp_init);
++}
++
++static int
++eth_spp_pci_remove(struct rte_pci_device *pci_dev)
++{
++	return rte_eth_dev_pci_generic_remove(pci_dev, eth_spp_uninit);
++}
++
++static struct rte_pci_driver rte_spp_pmd = {
++	.id_table	= pci_id_spp_map,
++	.probe		= eth_spp_pci_probe,
++	.drv_flags	= RTE_PCI_DRV_NEED_MAPPING,
++	.remove		= eth_spp_pci_remove,
++};
++
++RTE_PMD_REGISTER_PCI(net_spp, rte_spp_pmd);
++RTE_PMD_REGISTER_PCI_TABLE(net_spp, pci_id_spp_map);
++RTE_PMD_REGISTER_KMOD_DEP(net_spp, "* igb_uio | uio_pci_generic | vfio-pci");
+diff --git a/drivers/net/spp/spp_hal.c b/drivers/net/spp/spp_hal.c
+new file mode 100644
+index 0000000..fd7c430
+--- /dev/null
++++ b/drivers/net/spp/spp_hal.c
+@@ -0,0 +1,1553 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <rte_mbuf.h>
++#include <rte_ethdev.h>
++#include <rte_ethdev_pci.h>
++#include <rte_malloc.h>
++#include <rte_memcpy.h>
++#include <rte_memzone.h>
++#include <rte_io.h>
++#include <rte_string_fns.h>
++#include <rte_kvargs.h>
++#include <rte_errno.h>
++#include <unistd.h>
++#include "spp.h"
++#include "spp_hal_private.h"
++
++static inline uint16_t
++spp_tx_descs_to_clean(struct spp_tx_channel *tx_chan)
++{
++	return (spp_tx_channel_get_read_desc_completed(tx_chan) -
++		tx_chan->next_to_clean) &
++	       SPP_RING_MASK(tx_chan->ring_size);
++}
++
++static inline uint16_t
++spp_tx_avail(struct spp_tx_channel *tx_chan)
++{
++	return (tx_chan->ring_size -
++		((tx_chan->write -
++		  tx_chan->next_to_clean) &
++		 SPP_RING_MASK(tx_chan->ring_size))) - 1;
++}
++
++static inline uint16_t
++spp_rx_descs_to_fill(struct spp_rx_channel *rx_chan)
++{
++	return (rx_chan->read - rx_chan->next_to_fill) &
++	       SPP_RING_MASK(rx_chan->ring_size);
++}
++
++static inline int
++spp_tx_process_status(struct spp_tx_channel *tx_chan)
++{
++	uint32_t status = tx_chan->tx_info.tx_status->status;
++
++	if (unlikely(status)) {
++		static uint32_t prev_status;
++
++		if (status != prev_status) {
++			tx_chan->stats.sde_errors++;
++			SPP_LOG(ERR, "TX status error");
++			spp_dbg_dump_tx_chan(tx_chan);
++			prev_status = status;
++		}
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static inline int
++spp_rx_process_status(struct spp_rx_channel *rx_chan)
++{
++	uint32_t status = rx_chan->rx_info.rx_status->status;
++
++	if (unlikely(status)) {
++		static uint32_t prev_status;
++
++		if (status != prev_status) {
++			rx_chan->stats.sde_errors++;
++			SPP_LOG(ERR, "RX status error");
++			spp_dbg_dump_rx_chan(rx_chan);
++			prev_status = status;
++		}
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static inline struct rte_mbuf *
++spp_consume_sw_desc(struct spp_sw_desc *sw_desc)
++{
++	struct rte_mbuf *mbuf;
++
++	mbuf = sw_desc->mbuf;
++	sw_desc->mbuf = NULL;
++
++	return mbuf;
++}
++
++static int
++spp_alloc_rx_channel_info(struct spp_rx_info *rx_info, int dev_index,
++			  int chan_index, uint16_t num_descs,
++			  unsigned int socket_id)
++{
++	const struct rte_memzone *mz;
++	char z_name[RTE_MEMZONE_NAMESIZE];
++	size_t wb_meta_desc_size;
++	size_t wb_meta_ring_size;
++	size_t rx_desc_size;
++	size_t rx_status_size;
++	size_t size = 0;
++	rte_iova_t iova;        /* IO address */
++	char *addr;             /* virtual address */
++	int ret = 0;
++
++#if defined(SPP_USE_AVX2)
++#if defined(SPP_USE_COMPACT_DESCS)
++	if (sizeof(struct spp_wb_meta_desc) != 8) {
++		SPP_LOG(ERR,
++			"spp_wb_meta_desc is not 8B, cannot use AVX2 spp_meta_desc_memset");
++		ret = -EINVAL;
++		goto out;
++	}
++	if (sizeof(struct spp_rx_desc) != 16) {
++		SPP_LOG(ERR,
++			"spp_rx_desc is not 16B, cannot use AVX2 spp_rx_desc_memcpy");
++		ret = -EINVAL;
++		goto out;
++	}
++#else
++	if (sizeof(struct spp_wb_meta_desc) != 16) {
++		SPP_LOG(ERR,
++			"spp_wb_meta_desc is not 16B, cannot use AVX2 spp_meta_desc_memset");
++		ret = -EINVAL;
++		goto out;
++	}
++	if (sizeof(struct spp_rx_desc) != 16) {
++		SPP_LOG(ERR,
++			"spp_rx_desc is not 16B, cannot use AVX2 spp_rx_desc_memcpy");
++		ret = -EINVAL;
++		goto out;
++	}
++#endif
++#endif
++
++	wb_meta_desc_size = sizeof(struct spp_wb_meta_desc);
++	wb_meta_ring_size = RTE_ALIGN(
++		num_descs * wb_meta_desc_size,
++		RTE_CACHE_LINE_SIZE);
++
++	rx_status_size = RTE_ALIGN(sizeof(struct spp_rx_status),
++				   RTE_CACHE_LINE_SIZE);
++
++	rx_desc_size = RTE_ALIGN(sizeof(struct spp_rx_desc),
++				 RTE_CACHE_LINE_SIZE);
++
++	size = wb_meta_ring_size + rx_status_size + rx_desc_size;
++
++	snprintf(z_name, sizeof(z_name),
++		 "net_spp_rx_ring_%d_%d", dev_index, chan_index);
++	mz = rte_memzone_reserve_aligned(
++		z_name, size,
++		socket_id,
++		RTE_MEMZONE_2MB |
++		RTE_MEMZONE_SIZE_HINT_ONLY |
++		RTE_MEMZONE_IOVA_CONTIG,
++		getpagesize());
++	if (mz == NULL) {
++		SPP_LOG(CRIT, "rte_memzone_reserve_aligned failed");
++		ret = -ENOMEM;
++		goto out;
++	}
++	if (mz->iova & 0x3) {
++		SPP_LOG(CRIT, "rte_memzone_reserve_aligned iova is unaligned");
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	iova = mz->iova;
++
++	if ((unsigned long)mz->addr == iova) {
++		size_t tmp_size;
++
++		SPP_LOG(WARNING, "Memzone physical address same as virtual.");
++		SPP_LOG(WARNING, "Using rte_mem_virt2iova()");
++		for (tmp_size = 0; tmp_size < size; tmp_size += getpagesize())
++			rte_mem_lock_page(((char *)mz->addr) + tmp_size);
++		iova = rte_mem_virt2iova(mz->addr);
++		if (iova == 0) {
++			SPP_LOG(ERR,
++				"could not map virtual address to physical memory");
++			ret = -ENOMEM;
++			goto out;
++		}
++	}
++
++	addr = mz->addr;
++	memset(addr, 0, size);
++
++	rx_info->wb_meta_ring = (void *)addr;
++	rx_info->wb_meta_ring_phys_addr = iova;
++	addr += wb_meta_ring_size;
++	iova += wb_meta_ring_size;
++
++	rx_info->rx_status = (void *)addr;
++	rx_info->rx_status_phys_addr = iova;
++	addr += rx_status_size;
++	iova += rx_status_size;
++
++	rx_info->rx_desc = (void *)addr;
++	rx_info->rx_desc_phys_addr = iova;
++	addr += rx_desc_size;
++	iova += rx_desc_size;
++
++	rx_info->mem_zone = mz;
++
++	SPP_LOG(DEBUG, "z_name=%s, wb_meta_ring virt=%p, phys=%p, size=%zu",
++		z_name, rx_info->wb_meta_ring,
++		(void *)rx_info->wb_meta_ring_phys_addr,
++		wb_meta_ring_size);
++	SPP_LOG(DEBUG, "z_name=%s, rx_status virt=%p, phys=%p, size=%zu",
++		z_name, rx_info->rx_status,
++		(void *)rx_info->rx_status_phys_addr,
++		rx_status_size);
++	SPP_LOG(DEBUG, "z_name=%s, rx_desc virt=%p, phys=%p, size=%zu",
++		z_name, rx_info->rx_desc,
++		(void *)rx_info->rx_desc_phys_addr,
++		rx_desc_size);
++out:
++	return ret;
++}
++
++static int
++spp_alloc_tx_channel_info(struct spp_tx_info *tx_info, int dev_index,
++			  int chan_index, unsigned int socket_id)
++{
++	const struct rte_memzone *mz;
++	char z_name[RTE_MEMZONE_NAMESIZE];
++	size_t tx_desc_size;
++	size_t tx_status_size;
++	size_t size;
++	rte_iova_t iova;        /* IO address. */
++	char *addr;             /* virtual address. */
++	int ret = 0;
++
++#if defined(SPP_USE_AVX2)
++#if defined(SPP_USE_COMPACT_DESCS)
++	if (sizeof(struct spp_tx_desc) != 16) {
++		SPP_LOG(ERR,
++			"spp_tx_desc is not 16B, cannot use AVX2 spp_tx_desc_memcpy");
++		ret = -EINVAL;
++		goto out;
++	}
++#else
++	if (sizeof(struct spp_tx_desc) != 32) {
++		SPP_LOG(ERR,
++			"spp_tx_desc is not 32B, cannot use AVX2 spp_tx_desc_memcpy");
++		ret = -EINVAL;
++		goto out;
++	}
++#endif
++#endif
++
++	tx_status_size = RTE_ALIGN(sizeof(struct spp_tx_status),
++				   RTE_CACHE_LINE_SIZE);
++
++	tx_desc_size = RTE_ALIGN(sizeof(struct spp_tx_desc),
++				 RTE_CACHE_LINE_SIZE);
++
++	size = tx_status_size + tx_desc_size;
++
++	snprintf(z_name, sizeof(z_name),
++		 "net_spp_tx_ring_%d_%d", dev_index, chan_index);
++	mz = rte_memzone_reserve_aligned(
++		z_name, size,
++		socket_id,
++		RTE_MEMZONE_2MB |
++		RTE_MEMZONE_SIZE_HINT_ONLY |
++		RTE_MEMZONE_IOVA_CONTIG,
++		getpagesize());
++	if (mz == NULL) {
++		SPP_LOG(CRIT, "rte_memzone_reserve_aligned failed");
++		ret = -ENOMEM;
++		goto out;
++	}
++	if (mz->iova & 0x3) {
++		SPP_LOG(CRIT, "rte_memzone_reserve_aligned iova is unaligned");
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	iova = mz->iova;
++
++	if ((unsigned long)mz->addr == iova) {
++		size_t tmp_size;
++
++		SPP_LOG(WARNING, "Memzone physical address same as virtual.");
++		SPP_LOG(WARNING, "Using rte_mem_virt2iova()");
++		for (tmp_size = 0; tmp_size < size; tmp_size += getpagesize())
++			rte_mem_lock_page(((char *)mz->addr) + tmp_size);
++		iova = rte_mem_virt2iova(mz->addr);
++		if (iova == 0) {
++			SPP_LOG(ERR,
++				"could not map virtual address to physical memory");
++			ret = -ENOMEM;
++			goto out;
++		}
++	}
++
++	addr = mz->addr;
++	memset(addr, 0, size);
++
++	tx_info->tx_status = (void *)addr;
++	tx_info->tx_status_phys_addr = iova;
++	addr += tx_status_size;
++	iova += tx_status_size;
++
++	tx_info->tx_desc = (void *)addr;
++	tx_info->tx_desc_phys_addr = iova;
++	addr += tx_desc_size;
++	iova += tx_desc_size;
++
++	tx_info->mem_zone = mz;
++
++	SPP_LOG(DEBUG, "z_name=%s, tx_status virt=%p, phys=%p, size=%zu",
++		z_name, tx_info->tx_status,
++		(void *)tx_info->tx_status_phys_addr,
++		tx_status_size);
++	SPP_LOG(DEBUG, "z_name=%s, tx_desc virt=%p, phys=%p, size=%zu",
++		z_name, tx_info->tx_desc,
++		(void *)tx_info->tx_desc_phys_addr,
++		tx_desc_size);
++out:
++	return ret;
++}
++
++static inline void
++spp_rx_write_desc(struct spp_rx_channel *rx_chan, struct rte_mbuf *mbuf)
++{
++	struct spp_rx_info *rx_info = &rx_chan->rx_info;
++	struct spp_rx_desc *rx_desc = rx_info->rx_desc;
++
++	rx_desc->length = mbuf->buf_len - RTE_PKTMBUF_HEADROOM;
++	rx_desc->phys_addr = mbuf->buf_iova + RTE_PKTMBUF_HEADROOM;
++
++	spp_rx_desc_memcpy(rx_chan->wc_mem + SPP_C2H_DESC_RAM_BASE,
++			   (uint8_t *)rx_desc);
++
++#if defined(SPP_DBG_DUMP_DESCS)
++	spp_dbg_dump_rx_desc(rx_chan, rx_desc);
++#endif
++}
++
++static int
++spp_fill_rx_channel(struct spp_rx_channel *rx_chan, uint16_t num_descs)
++{
++	int ret = 0;
++	uint16_t next_to_fill = rx_chan->next_to_fill;
++	struct spp_sw_desc *sw_ring = rx_chan->sw_rx_info.sw_ring;
++	struct rte_mempool *mb_pool = rx_chan->sw_rx_info.mb_pool;
++	struct rte_mbuf *mbuf;
++	int i;
++
++	for (i = 0; i < num_descs; i++) {
++		struct spp_sw_desc *sw_desc = &sw_ring[next_to_fill];
++		if (unlikely(sw_desc->mbuf != NULL)) {
++			SPP_LOG(ERR, "next_to_fill mbuf != NULL");
++			ret = -EINVAL;
++			goto out;
++		}
++
++		mbuf = rte_pktmbuf_alloc(mb_pool);
++		if (unlikely(mbuf == NULL)) {
++			rx_chan->stats.no_mbuf++;
++			SPP_LOG(DEBUG, "rte_pktmbuf_alloc failed");
++			ret = -ENOMEM;
++			goto out;
++		}
++		sw_desc->mbuf = mbuf;
++
++		spp_rx_write_desc(rx_chan, mbuf);
++
++		next_to_fill = SPP_RING_IDX_NEXT(next_to_fill,
++						 rx_chan->ring_size);
++	}
++
++	rx_chan->next_to_fill = next_to_fill;
++out:
++	return ret;
++}
++
++static int
++spp_init_rx_channel(struct spp_rx_channel *rx_chan, unsigned int socket_id)
++{
++	int ret = 0;
++
++#if !defined(SPP_DBG_SW_LOOPBACK)
++	uint32_t value;
++
++	/* Perform a sanity check on the ring_size before the alloc */
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_CDT_LIMIT, 0);
++	value = spp_rx_chan_reg_read(rx_chan, SPP_REG_C2H_CDT_LIMIT);
++	if (value != rx_chan->ring_size) {
++		SPP_LOG(ERR, "Unsupported ring_size=%u != %u",
++			rx_chan->ring_size, value);
++		ret = -EINVAL;
++		goto out;
++	}
++#endif
++
++	ret = spp_alloc_rx_channel_info(&rx_chan->rx_info,
++					rx_chan->spp_dev->dev_index,
++					rx_chan->chan_index,
++					rx_chan->ring_size,
++					socket_id);
++	if (ret) {
++		SPP_LOG(ERR, "spp_alloc_rx_channel_info failed, ret=%d", ret);
++		goto out;
++	}
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_CDT_CONSUMED, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_CDT_LIMIT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_COMP_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DESC_FIFO, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DESC_RAM_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DM_CFG, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DM_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_CFG,
++			      SPP_C2H_WB_CFG_ALL_EN);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_STATUS_WB_ADDR_LO,
++			      rx_chan->rx_info.rx_status_phys_addr &
++			      SPP_C2H_STATUS_WB_ADDR_LO_MASK);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_STATUS_WB_ADDR_HI,
++			      rx_chan->rx_info.rx_status_phys_addr >>
++			      SPP_C2H_STATUS_WB_ADDR_HI_SHIFT);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WC_TO_CNT,
++			      SPP_C2H_WC_TO_CNT_ALL);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_ADDR_LO,
++			      rx_chan->rx_info.wb_meta_ring_phys_addr &
++			      SPP_C2H_WB_META_RING_ADDR_LO_MASK);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_ADDR_HI,
++			      rx_chan->rx_info.wb_meta_ring_phys_addr >>
++			      SPP_C2H_WB_META_RING_ADDR_HI_SHIFT);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_SIZE,
++			      rx_chan->ring_size *
++			      sizeof(struct spp_wb_meta_desc));
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_READ, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_WRITE, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_STATUS_ERR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_STATUS, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_CFG, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_IN_PKT_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_OUT_PKT_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_PTR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_AUX_RAM_PTR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_NUM_BYTES, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_AXIS_PKT_CNT, 0);
++
++	/* spp_alloc_rx_channel_info has already cleared the rx_info
++	 * write-back memzone */
++	rx_chan->rx_info.rx_status->desc_limit = rx_chan->ring_size;
++
++	ret = spp_fill_rx_channel(rx_chan, rx_chan->ring_size);
++	if (ret) {
++		SPP_LOG(ERR, "spp_fill_rx_channel failed, ret=%d", ret);
++		goto out;
++	}
++
++	rx_chan->next_to_fill = 0;
++out:
++	return ret;
++}
++
++static void
++spp_free_rx_channel_sw_descs(struct spp_rx_channel *rx_chan)
++{
++	struct spp_sw_desc *sw_ring = rx_chan->sw_rx_info.sw_ring;
++	struct rte_mbuf *mbuf;
++	uint32_t i;
++
++	for (i = 0; i < rx_chan->ring_size; i++) {
++		struct spp_sw_desc *sw_desc = &sw_ring[i];
++
++		mbuf = spp_consume_sw_desc(sw_desc);
++		if (mbuf)
++			/*
++			 * rte_pktmbuf_free_seg handles the mbuf->next=NULL,
++			 * and nb_segs=1
++			 */
++			rte_pktmbuf_free_seg(mbuf);
++	}
++}
++
++static int
++spp_destroy_rx_channel(struct spp_rx_channel *rx_chan)
++{
++	int ret = 0;
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_CDT_CONSUMED, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_CDT_LIMIT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_COMP_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DESC_FIFO, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DESC_RAM_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DM_CFG, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_DM_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_CFG, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_STATUS_WB_ADDR_LO, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_STATUS_WB_ADDR_HI, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WC_TO_CNT, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_ADDR_LO, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_ADDR_HI, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_SIZE, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_READ, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_META_RING_WRITE, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_STATUS_ERR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_WB_STATUS, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_CFG, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_STATUS, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_IN_PKT_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_OUT_PKT_CNT, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_PTR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_AUX_RAM_PTR, 0);
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_BUF_NUM_BYTES, 0);
++
++	spp_rx_chan_reg_write(rx_chan, SPP_REG_C2H_AXIS_PKT_CNT, 0);
++
++	spp_free_rx_channel_sw_descs(rx_chan);
++
++	if (rx_chan->rx_info.mem_zone) {
++		ret = rte_memzone_free(rx_chan->rx_info.mem_zone);
++		if (ret) {
++			SPP_LOG(CRIT, "rte_memzone_free failed, ret=%d", ret);
++			goto out;
++		}
++	}
++out:
++	return ret;
++}
++
++static int
++spp_init_tx_channel(struct spp_tx_channel *tx_chan, unsigned int socket_id)
++{
++	int ret = 0;
++
++#if !defined(SPP_DBG_SW_LOOPBACK)
++	uint32_t value;
++
++	/* Perform a sanity check on the ring_size before the alloc */
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_CDT_LIMIT, 0);
++	value = spp_tx_chan_reg_read(tx_chan, SPP_REG_H2C_CDT_LIMIT);
++	if (value != tx_chan->ring_size) {
++		SPP_LOG(ERR, "Unsupported ring_size=%u != %u",
++			tx_chan->ring_size, value);
++		ret = -EINVAL;
++		goto out;
++	}
++#endif
++
++	ret = spp_alloc_tx_channel_info(&tx_chan->tx_info,
++					tx_chan->spp_dev->dev_index,
++					tx_chan->chan_index,
++					socket_id);
++	if (ret) {
++		SPP_LOG(ERR, "spp_alloc_tx_channel_info failed, ret=%d", ret);
++		goto out;
++	}
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_CDT_CONSUMED, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_CDT_LIMIT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_COMP_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DESC_RAM_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_CFG, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_CFG,
++			      SPP_H2C_WB_CFG_ALL_EN);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_STATUS_WB_ADDR_LO,
++			      tx_chan->tx_info.tx_status_phys_addr &
++			      SPP_H2C_STATUS_WB_ADDR_LO_MASK);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_STATUS_WB_ADDR_HI,
++			      tx_chan->tx_info.tx_status_phys_addr >>
++			      SPP_H2C_STATUS_WB_ADDR_HI_SHIFT);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WC_TO_CNT,
++			      SPP_H2C_WC_TO_CNT_ALL);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_STATUS_ERR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_CFG, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_IN_PKT_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_OUT_PKT_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_PTR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_AUX_RAM_PTR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_ENTRIES, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_BUF_PTR, 0);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_AXIS_PKT_CNT, 0);
++
++
++	/*
++	 * spp_alloc_tx_channel_info has already cleared the tx_info write-back
++	 * memzone.
++	 */
++	tx_chan->tx_info.tx_status->desc_limit = tx_chan->ring_size;
++out:
++	return ret;
++}
++
++static void
++spp_free_tx_channel_sw_descs(struct spp_tx_channel *tx_chan)
++{
++	struct spp_sw_desc *sw_ring = tx_chan->sw_tx_info.sw_ring;
++	struct rte_mbuf *mbuf;
++	uint32_t i;
++
++	for (i = 0; i < tx_chan->ring_size; i++) {
++		struct spp_sw_desc *sw_desc = &sw_ring[i];
++
++		mbuf = spp_consume_sw_desc(sw_desc);
++		if (mbuf)
++			/*
++			 * rte_pktmbuf_free_seg handles the mbuf->next=NULL,
++			 * and nb_segs=1
++			 */
++			rte_pktmbuf_free_seg(mbuf);
++	}
++}
++
++static int
++spp_destroy_tx_channel(struct spp_tx_channel *tx_chan)
++{
++	int ret = 0;
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_CDT_CONSUMED, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_CDT_LIMIT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_COMP_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DESC_RAM_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_CFG, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_CFG, 0);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_STATUS_WB_ADDR_LO, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_STATUS_WB_ADDR_HI, 0);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WC_TO_CNT, 0);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_STATUS_ERR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_WB_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_CFG, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_STATUS, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_IN_PKT_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_OUT_PKT_CNT, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_PTR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_AUX_RAM_PTR, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_BUF_ENTRIES, 0);
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_DM_BUF_PTR, 0);
++
++	spp_tx_chan_reg_write(tx_chan, SPP_REG_H2C_AXIS_PKT_CNT, 0);
++
++	spp_free_tx_channel_sw_descs(tx_chan);
++
++	if (tx_chan->tx_info.mem_zone) {
++		ret = rte_memzone_free(tx_chan->tx_info.mem_zone);
++		if (ret) {
++			SPP_LOG(CRIT, "rte_memzone_free failed, ret=%d", ret);
++			goto out;
++		}
++	}
++out:
++	return ret;
++}
++
++static inline int
++spp_rx_pkt_get_read_last_seg(struct spp_rx_channel	*rx_chan,
++			     uint16_t			*read_last_seg)
++{
++	struct spp_wb_meta_desc *wb_meta_ring = rx_chan->rx_info.wb_meta_ring;
++	struct spp_wb_meta_desc *meta_desc;
++	uint16_t read_tmp;
++	int ret = -EBUSY;
++
++	/*
++	 * We already checked the first desc in the chain in spp_rx_pkt.
++	 * Now check all subsequent descs in the chain for EOP.
++	 */
++	read_tmp = SPP_RING_IDX_NEXT(rx_chan->read, rx_chan->ring_size);
++	meta_desc = &wb_meta_ring[read_tmp];
++
++	while (meta_desc->valid_eop_bits & SPP_WB_META_DESC_VALID) {
++		/*
++		 * Ensure that the read pointer will not equal next_to_fill
++		 * once the desc chain up to EOP is processed and the read
++		 * pointer is incremented.
++		 */
++		if (unlikely(SPP_RING_IDX_NEXT(read_tmp, rx_chan->ring_size) ==
++			     rx_chan->next_to_fill)) {
++			SPP_LOG(DEBUG, "read_next_tmp==next_to_fill=%u",
++				rx_chan->next_to_fill);
++			break;
++		}
++
++		if (meta_desc->valid_eop_bits & SPP_WB_META_DESC_EOP) {
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++			spp_dbg_wb_desc_seq_num(rx_chan, meta_desc);
++#endif
++			*read_last_seg = read_tmp;
++			ret = 0;
++			break;
++		}
++
++		read_tmp = SPP_RING_IDX_NEXT(read_tmp, rx_chan->ring_size);
++		meta_desc = &wb_meta_ring[read_tmp];
++	}
++
++	if (unlikely(ret))
++		rx_chan->stats.no_last_seg++;
++	else
++		rx_chan->stats.seg_packets++;
++
++	return ret;
++}
++
++static int
++spp_rx_pkt(struct spp_rx_channel *rx_chan, struct rte_mbuf **rx_pkt)
++{
++	struct spp_wb_meta_desc *wb_meta_ring = rx_chan->rx_info.wb_meta_ring;
++	struct spp_sw_desc *sw_ring = rx_chan->sw_rx_info.sw_ring;
++	struct spp_wb_meta_desc *meta_desc;
++	struct rte_mbuf *mbuf;
++	uint16_t read = rx_chan->read;
++	int ret = 0;
++
++	/*
++	 * Ensure that the read pointer will not equal next_to_fill
++	 * once the desc (chain) up to EOP is processed and the read
++	 * pointer is incremented.
++	 */
++	if (unlikely(SPP_RING_IDX_NEXT(read, rx_chan->ring_size) ==
++		     rx_chan->next_to_fill)) {
++		SPP_LOG(DEBUG, "read_next==next_to_fill=%u",
++			rx_chan->next_to_fill);
++		ret = -EBUSY;
++		goto out;
++	}
++
++	meta_desc = &wb_meta_ring[read];
++	RTE_ASSERT(meta_desc->valid_eop_bits & SPP_WB_META_DESC_VALID);
++
++	if (likely(meta_desc->valid_eop_bits & SPP_WB_META_DESC_EOP)) {
++		/* Single mbuf segment optimization */
++		mbuf = spp_consume_sw_desc(&sw_ring[read]);
++		if (unlikely(mbuf == NULL)) {
++			SPP_LOG(ERR, "mbuf is NULL, read=%u", read);
++			ret = -EBUSY;
++			goto out;
++		}
++		mbuf->nb_segs = 1;
++		mbuf->pkt_len = meta_desc->length;
++		mbuf->data_len = mbuf->pkt_len;
++		mbuf->data_off = RTE_PKTMBUF_HEADROOM;
++		mbuf->port = rx_chan->spp_dev->dev_index;
++		mbuf->ol_flags = 0;
++
++#if defined(SPP_DBG_SW_LOOPBACK)
++		spp_dbg_tx_rx_loopback_rx_cb(rx_chan);
++#endif
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++		spp_dbg_wb_desc_seq_num(rx_chan, meta_desc);
++#endif
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++		spp_dbg_rx_pkt_seq_num(rx_chan, mbuf,
++				       1, 1); /* sop==1, eop=1 */
++#endif
++
++		rx_chan->stats.bytes += mbuf->data_len;
++
++		spp_meta_desc_memset(meta_desc);
++		read = SPP_RING_IDX_NEXT(read, rx_chan->ring_size);
++	} else {
++		/* Multiple mbuf segments */
++		struct rte_mbuf *mbuf_head = NULL;
++		struct rte_mbuf *mbuf_tail;
++		struct rte_mbuf *mbuf_tmp;
++		uint16_t read_last_seg;
++
++		ret = spp_rx_pkt_get_read_last_seg(rx_chan, &read_last_seg);
++		if (unlikely(ret)) {
++			SPP_LOG(DEBUG, "spp_rx_pkt_get_read_last_seg failed");
++			goto out;
++		}
++
++		while (read !=
++		       SPP_RING_IDX_NEXT(read_last_seg, rx_chan->ring_size)) {
++			mbuf_tmp = spp_consume_sw_desc(&sw_ring[read]);
++			if (unlikely(mbuf_tmp == NULL)) {
++				SPP_LOG(ERR, "mbuf_tmp is NULL, read=%u", read);
++				ret = -EBUSY;
++				goto out;
++			}
++
++			if (mbuf_head == NULL) {
++				mbuf_head = mbuf_tail = mbuf_tmp;
++				mbuf_head->nb_segs = 1;
++				mbuf_head->pkt_len = meta_desc->length;
++			} else {
++				mbuf_head->nb_segs++;
++				mbuf_head->pkt_len += meta_desc->length;
++				mbuf_tail->next = mbuf_tmp;
++				mbuf_tail = mbuf_tmp;
++			}
++
++			mbuf_tmp->data_len = meta_desc->length;
++			mbuf_tmp->data_off = RTE_PKTMBUF_HEADROOM;
++			mbuf_tmp->port = rx_chan->spp_dev->dev_index;
++			mbuf_tmp->ol_flags = 0;
++
++#if defined(SPP_DBG_SW_LOOPBACK)
++			spp_dbg_tx_rx_loopback_rx_cb(rx_chan);
++#endif
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++			/*
++			 * sop: mbuf_head == mbuf_tail
++			 * eop: read == read_last_seg
++			 */
++			spp_dbg_rx_pkt_seq_num(rx_chan, mbuf_tmp,
++					       mbuf_head == mbuf_tail,
++					       read == read_last_seg);
++#endif
++
++			rx_chan->stats.bytes += mbuf_tmp->data_len;
++
++			spp_meta_desc_memset(meta_desc);
++			read = SPP_RING_IDX_NEXT(read, rx_chan->ring_size);
++			meta_desc = &wb_meta_ring[read];
++		}
++
++		mbuf = mbuf_head;
++	}
++
++	rx_chan->read = read;
++	*rx_pkt = mbuf;
++out:
++	return ret;
++}
++
++static int
++spp_clean_tx_channel(struct spp_tx_channel *tx_chan, uint16_t num_descs)
++{
++	int ret = 0;
++	uint16_t next_to_clean = tx_chan->next_to_clean;
++	struct spp_sw_desc *sw_ring = tx_chan->sw_tx_info.sw_ring;
++	struct rte_mbuf *mbuf;
++	int i;
++
++	for (i = 0; i < num_descs; i++) {
++		struct spp_sw_desc *sw_desc = &sw_ring[next_to_clean];
++
++		mbuf = spp_consume_sw_desc(sw_desc);
++		if (unlikely(mbuf == NULL)) {
++			SPP_LOG(ERR, "mbuf is NULL, next_to_clean=%u",
++				next_to_clean);
++			spp_dbg_dump_tx_chan(tx_chan);
++			ret = -EBUSY;
++			goto out;
++		}
++
++		/*
++		 * rte_pktmbuf_free_seg handles the mbuf->next=NULL,
++		 * and nb_segs=1
++		 */
++		rte_pktmbuf_free_seg(mbuf);
++
++		next_to_clean = SPP_RING_IDX_NEXT(next_to_clean,
++						  tx_chan->ring_size);
++	}
++
++	tx_chan->next_to_clean = next_to_clean;
++out:
++	return ret;
++}
++
++static inline void
++spp_tx_write_desc(struct spp_tx_channel *tx_chan, struct rte_mbuf *mbuf,
++		  uint8_t eop)
++{
++	struct spp_tx_desc *tx_desc = tx_chan->tx_info.tx_desc;
++
++#if defined(SPP_USE_COMPACT_DESCS)
++	tx_desc->length = mbuf->data_len;
++	tx_desc->phys_addr = (uint64_t)mbuf->buf_iova + mbuf->data_off;
++	if (eop)
++		tx_desc->phys_addr |= SPP_TX_DESC_EOP;
++#else
++	tx_desc->length = mbuf->data_len;
++	tx_desc->phys_addr = (uint64_t)mbuf->buf_iova + mbuf->data_off;
++	tx_desc->eop_spb_bits = (eop) ? SPP_TX_DESC_EOP : 0;
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++	if (eop)
++		spp_dbg_tx_desc_seq_num(tx_chan, tx_desc);
++#else
++	tx_desc->user = 0;
++#endif
++#endif
++
++	spp_tx_desc_memcpy(tx_chan->wc_mem + SPP_H2C_DESC_RAM_BASE,
++			   (uint8_t *)tx_desc);
++
++#if defined(SPP_DBG_DUMP_DESCS)
++	spp_dbg_dump_tx_desc(tx_chan, tx_desc);
++#endif
++#if defined(SPP_DBG_SW_LOOPBACK)
++	spp_dbg_tx_rx_loopback(tx_chan, tx_desc, mbuf);
++#endif
++}
++
++static int
++spp_tx_pkt(struct spp_tx_channel *tx_chan, struct rte_mbuf *tx_pkt)
++{
++	struct spp_sw_desc *sw_ring = tx_chan->sw_tx_info.sw_ring;
++	struct spp_sw_desc *sw_desc;
++	struct rte_mbuf *mbuf = tx_pkt;
++	uint16_t write = tx_chan->write;
++	uint16_t num_segs;
++	uint16_t num_segs_tmp = 1;
++	uint16_t tx_avail;
++	uint8_t eop;
++	int ret = 0;
++
++	num_segs = mbuf->nb_segs;
++	tx_avail = spp_tx_avail(tx_chan);
++	if (unlikely(tx_avail < num_segs)) {
++		tx_chan->stats.no_tx_avail++;
++		SPP_LOG(DEBUG, "tx_avail(%u) < num_segs(%u)", tx_avail,
++			num_segs);
++		ret = -EBUSY;
++		goto out;
++	}
++
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++	spp_dbg_tx_pkt_seq_num(tx_chan, mbuf,
++			       1,                       /* sop==1 */
++			       (mbuf->next) ? 0 : 1);   /* eop */
++#endif
++
++	sw_desc = &sw_ring[write];
++	sw_desc->mbuf = mbuf;
++
++	eop = (num_segs > 1) ? 0 : 1;
++	spp_tx_write_desc(tx_chan, mbuf, eop);
++
++	tx_chan->stats.bytes += mbuf->data_len;
++
++	write = SPP_RING_IDX_NEXT(write, tx_chan->ring_size);
++	mbuf = mbuf->next;
++	while (mbuf) {
++		/*
++		 * We checked TX avail above.  Also check that
++		 * that the mbuf seg list is not longer than
++		 * specified in mbuf->nb_segs.
++		 */
++		if (unlikely(++num_segs_tmp > num_segs)) {
++			SPP_LOG(ERR, "num_segs_tmp(%u) > num_segs(%u)",
++				num_segs_tmp, num_segs);
++			ret = -EINVAL;
++			goto out;
++		}
++
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++		spp_dbg_tx_pkt_seq_num(tx_chan, mbuf,
++				       0,                       /* sop==0 */
++				       (mbuf->next) ? 0 : 1);   /* eop */
++#endif
++
++		sw_desc = &sw_ring[write];
++		sw_desc->mbuf = mbuf;
++
++		eop = (mbuf->next) ? 0 : 1;
++		spp_tx_write_desc(tx_chan, mbuf, eop);
++
++		tx_chan->stats.bytes += mbuf->data_len;
++
++		write = SPP_RING_IDX_NEXT(write, tx_chan->ring_size);
++		mbuf = mbuf->next;
++	}
++
++	/* Check that we processed all of the expected segs (EOP set) */
++	if (unlikely(num_segs_tmp != num_segs)) {
++		SPP_LOG(ERR, "num_segs_tmp(%u) != num_segs(%u)",
++			num_segs_tmp, num_segs);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	tx_chan->write = write;
++
++	if (num_segs > 1)
++		tx_chan->stats.seg_packets++;
++out:
++	return ret;
++}
++
++/******************************************************************************/
++/******                             API                                   *****/
++/******************************************************************************/
++
++int
++spp_rx_queue_setup(struct rte_eth_dev *eth_dev, uint16_t rx_queue_id,
++		   uint16_t nb_rx_desc,
++		   unsigned int socket_id,
++		   const struct rte_eth_rxconf *rx_conf __rte_unused,
++		   struct rte_mempool *mb_pool)
++{
++	struct spp_dev *spp_dev = (struct spp_dev *)eth_dev->data->dev_private;
++	struct spp_rx_chan_cap *rx_chan_cap;
++	struct spp_rx_channel *rx_chan;
++	int ret = 0;
++
++	if (!(spp_dev->dev_cap.flags & SPP_SDE_INFO_C2H_EN)) {
++		SPP_LOG(ERR, "SDE C2H (RX) is not present");
++		ret = -EINVAL;
++		goto out;
++	}
++	if (rx_queue_id >= spp_dev->dev_cap.num_rx_channels) {
++		SPP_LOG(ERR, "rx_queue_id is invalid (0 <= %u < %u)",
++			rx_queue_id, spp_dev->dev_cap.num_rx_channels);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	rx_chan_cap = &spp_dev->dev_cap.rx_chan_cap[rx_queue_id];
++
++	if (!nb_rx_desc || (nb_rx_desc > rx_chan_cap->num_descs)) {
++		SPP_LOG(ERR, "nb_desc is invalid (0 < %u <= %u)",
++			nb_rx_desc, rx_chan_cap->num_descs);
++		ret = -EINVAL;
++		goto out;
++	}
++	if (!rte_is_power_of_2(nb_rx_desc)) {
++		SPP_LOG(ERR,
++			"Unsupported size of RX queue: %u is not a power of 2",
++			nb_rx_desc);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	rx_chan = &spp_dev->rx_channels[rx_queue_id];
++
++	if (rx_chan->configured) {
++		SPP_LOG(ERR, "API violation. Queue %u is already configured",
++			rx_queue_id);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	memset(rx_chan, 0, sizeof(*rx_chan));
++	rx_chan->ring_size = nb_rx_desc;
++	rx_chan->sw_rx_info.mb_pool = mb_pool;
++	rx_chan->reg_mem = spp_dev->reg_mem;
++	rx_chan->wc_mem = spp_dev->wc_mem;
++	rx_chan->spp_dev = spp_dev;
++	rx_chan->chan_index = rx_queue_id;
++
++	ret = spp_init_rx_channel(rx_chan, socket_id);
++	if (ret) {
++		SPP_LOG(ERR, "spp_init_rx_channel failed, ret=%d", ret);
++		goto out;
++	}
++
++	rx_chan->configured = SPP_CONF_SENTINAL;
++
++	eth_dev->data->rx_queues[rx_queue_id] = rx_chan;
++out:
++	return ret;
++}
++
++void spp_rx_queue_release(void *q)
++{
++	struct spp_rx_channel *rx_chan = q;
++	int ret;
++
++	if (rx_chan) {
++		ret = spp_destroy_rx_channel(rx_chan);
++		if (ret)
++			SPP_LOG(ERR, "spp_destroy_rx_channel failed, ret=%d",
++				ret);
++		/* Continue to clear the RX channel struct */
++
++		memset(rx_chan, 0, sizeof(*rx_chan));
++	}
++}
++
++int
++spp_tx_queue_setup(struct rte_eth_dev *eth_dev, uint16_t tx_queue_id,
++		   uint16_t nb_tx_desc,
++		   __rte_unused unsigned int socket_id,
++		   __rte_unused const struct rte_eth_txconf *tx_conf)
++{
++	struct spp_dev *spp_dev = (struct spp_dev *)eth_dev->data->dev_private;
++	struct spp_tx_chan_cap *tx_chan_cap;
++	struct spp_tx_channel *tx_chan;
++	int ret = 0;
++
++	if (!(spp_dev->dev_cap.flags & SPP_SDE_INFO_H2C_EN)) {
++		SPP_LOG(ERR, "SDE H2C (TX) is not present");
++		ret = -EINVAL;
++		goto out;
++	}
++	if (tx_queue_id >= spp_dev->dev_cap.num_tx_channels) {
++		SPP_LOG(ERR, "tx_queue_id is invalid (0 <= %u < %u)",
++			tx_queue_id, spp_dev->dev_cap.num_tx_channels);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	tx_chan_cap = &spp_dev->dev_cap.tx_chan_cap[tx_queue_id];
++
++	if (!nb_tx_desc || (nb_tx_desc > tx_chan_cap->num_descs)) {
++		SPP_LOG(ERR, "nb_desc is invalid (0 < %u <= %u)",
++			nb_tx_desc, tx_chan_cap->num_descs);
++		ret = -EINVAL;
++		goto out;
++	}
++	if (!rte_is_power_of_2(nb_tx_desc)) {
++		SPP_LOG(ERR,
++			"Unsupported size of TX queue: %u is not a power of 2",
++			nb_tx_desc);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	tx_chan = &spp_dev->tx_channels[tx_queue_id];
++
++	if (tx_chan->configured) {
++		SPP_LOG(ERR, "API violation. Queue %u is already configured",
++			tx_queue_id);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	memset(tx_chan, 0, sizeof(*tx_chan));
++	tx_chan->ring_size = nb_tx_desc;
++	tx_chan->reg_mem = spp_dev->reg_mem;
++	tx_chan->wc_mem = spp_dev->wc_mem;
++	tx_chan->spp_dev = spp_dev;
++	tx_chan->chan_index = tx_queue_id;
++
++	ret = spp_init_tx_channel(tx_chan, socket_id);
++	if (ret) {
++		SPP_LOG(ERR, "spp_init_tx_channel failed, ret=%d", ret);
++		goto out;
++	}
++
++	tx_chan->configured = SPP_CONF_SENTINAL;
++
++	eth_dev->data->tx_queues[tx_queue_id] = tx_chan;
++out:
++	return ret;
++}
++
++void spp_tx_queue_release(void *q)
++{
++	struct spp_tx_channel *tx_chan = q;
++	int ret;
++
++	if (tx_chan) {
++		ret = spp_destroy_tx_channel(tx_chan);
++		if (ret)
++			SPP_LOG(ERR, "spp_destroy_tx_channel failed, ret=%d",
++				ret);
++		/* Continue to clear the TX channel struct */
++
++		memset(tx_chan, 0, sizeof(*tx_chan));
++	}
++}
++
++uint16_t
++spp_rx_pkt_burst(void *q, struct rte_mbuf **rx_pkts, uint16_t nb_pkts)
++{
++	struct spp_rx_channel *rx_chan = q;
++	struct spp_wb_meta_desc *wb_meta_ring = rx_chan->rx_info.wb_meta_ring;
++	struct spp_wb_meta_desc *meta_desc;
++	uint16_t nb_rx_pkts = 0;
++	uint16_t num_descs;
++	int ret = 0;
++
++	while (nb_rx_pkts < nb_pkts) {
++		uint16_t read = rx_chan->read;
++
++		meta_desc = &wb_meta_ring[read];
++		if (!meta_desc->valid_eop_bits & SPP_WB_META_DESC_VALID)
++			break;
++
++		ret = spp_rx_pkt(rx_chan, &rx_pkts[nb_rx_pkts]);
++		if (unlikely(ret)) {
++			/* spp_rx_pkt bumps the relevant error stat(s) */
++			SPP_LOG(DEBUG, "spp_rx_pkt failed, ret=%d", ret);
++			break;
++		}
++
++#if defined(SPP_USE_RING_THRESH)
++		num_descs = spp_rx_descs_to_fill(rx_chan);
++		if (num_descs >=
++		    (rx_chan->ring_size >> SPP_RX_RING_FILL_SHIFT)) {
++			ret = spp_fill_rx_channel(rx_chan, num_descs);
++			if (unlikely(ret)) {
++				SPP_LOG(ERR,
++					"spp_fill_rx_channel failed, ret=%d",
++					ret);
++				goto out;
++			}
++		}
++#endif
++
++		nb_rx_pkts++;
++	}
++
++	num_descs = spp_rx_descs_to_fill(rx_chan);
++	if (num_descs) {
++		ret = spp_fill_rx_channel(rx_chan, num_descs);
++		if (unlikely(ret)) {
++			SPP_LOG(ERR, "spp_fill_rx_channel failed, ret=%d", ret);
++			goto out;
++		}
++	}
++out:
++	ret = spp_rx_process_status(rx_chan);
++	if (unlikely(ret)) {
++		SPP_LOG(ERR, "spp_rx_process_status failed, ret=%d", ret);
++		nb_rx_pkts = 0;
++	}
++
++	rx_chan->stats.packets += nb_rx_pkts;
++	return nb_rx_pkts;
++}
++
++uint16_t
++spp_tx_pkt_burst(void *q, struct rte_mbuf **tx_pkts, uint16_t nb_pkts)
++{
++	struct spp_tx_channel *tx_chan = q;
++	uint16_t nb_tx_pkts = 0;
++	uint16_t num_descs;
++	int ret;
++
++	ret = spp_tx_process_status(tx_chan);
++	if (unlikely(ret)) {
++		SPP_LOG(ERR, "spp_tx_process_status failed, ret=%d", ret);
++		goto out;
++	}
++
++	num_descs = spp_tx_descs_to_clean(tx_chan);
++	if (num_descs) {
++		ret = spp_clean_tx_channel(tx_chan, num_descs);
++		if (unlikely(ret)) {
++			SPP_LOG(ERR, "spp_clean_tx_channel failed, ret=%d",
++				ret);
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
++	while (nb_tx_pkts < nb_pkts) {
++		ret = spp_tx_pkt(tx_chan, tx_pkts[nb_tx_pkts]);
++		if (unlikely(ret)) {
++			/* spp_tx_pkt bumps the relevant error stat(s) */
++			SPP_LOG(DEBUG, "spp_tx_pkt failed, ret=%d", ret);
++			break;
++		}
++
++#if defined(SPP_USE_RING_THRESH)
++		num_descs = spp_tx_descs_to_clean(tx_chan);
++		if (num_descs >=
++		    (tx_chan->ring_size >> SPP_TX_RING_FILL_SHIFT)) {
++			ret = spp_clean_tx_channel(tx_chan, num_descs);
++			if (unlikely(ret)) {
++				SPP_LOG(ERR,
++					"spp_clean_tx_channel failed, ret=%d",
++					ret);
++				ret = -EINVAL;
++				goto out;
++			}
++		}
++#endif
++
++		nb_tx_pkts++;
++	}
++out:
++	tx_chan->stats.packets += nb_tx_pkts;
++	return nb_tx_pkts;
++}
++
++int
++spp_dev_reset(struct spp_dev *spp_dev)
++{
++#if !defined(SPP_DBG_SW_LOOPBACK)
++	uint8_t *addr = spp_dev->reg_mem + SPP_REG_SDE_RESET;
++	uint32_t value;
++	int ret = 0;
++
++	/* Check if the SDE is already in reset, or is returning all F's */
++	value = rte_read32_relaxed(addr);
++	if ((value & SPP_SDE_RESET_EN) != 0) {
++		SPP_LOG(ERR,
++			"already in reset: addr=%p, offset=0x%08x, value=0x%08x",
++			addr, SPP_REG_SDE_RESET, value);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	/* Reset the SDE and check that the reset took effect */
++	value |= SPP_SDE_RESET_EN;
++	rte_write32_relaxed(value, addr);
++
++	value = rte_read32_relaxed(addr);
++	if ((value & SPP_SDE_RESET_EN) != 1) {
++		SPP_LOG(ERR,
++			"reset enable failed: addr=%p, offset=0x%08x, value=0x%08x",
++			addr, SPP_REG_SDE_RESET, value);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	/* Bring the SDE out of reset */
++	value &= ~SPP_SDE_RESET_EN;
++	rte_write32_relaxed(value, addr);
++
++	value = rte_read32_relaxed(addr);
++	if ((value & SPP_SDE_RESET_EN) != 0) {
++		SPP_LOG(ERR,
++			"reset disable failed: addr=%p, offset=0x%08x, value=0x%08x",
++			addr, SPP_REG_SDE_RESET, value);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	SPP_LOG(DEBUG,
++		"SDE reset completed: addr=%p, offset=0x%08x, value=0x%08x",
++		addr, SPP_REG_SDE_RESET, value);
++
++out:
++	return ret;
++#else
++	(void)spp_dev;
++	return 0;
++#endif
++}
++
++int
++spp_dev_cap_get(__rte_unused struct spp_dev	*spp_dev,
++		struct spp_dev_cap		*dev_cap)
++{
++#if !defined(SPP_DBG_SW_LOOPBACK)
++	uint8_t *addr;
++	uint32_t value;
++	int ret = 0;
++
++	/* Zero out the device capabilities struct */
++	memset(dev_cap, 0, sizeof(*dev_cap));
++
++	/* Read the SDE Info */
++	addr = spp_dev->reg_mem + SPP_REG_SDE_INFO;
++	value = rte_read32_relaxed(addr);
++
++	if ((value &
++	     (SPP_SDE_INFO_C2H_EN | SPP_SDE_INFO_H2C_EN)) !=
++	    (SPP_SDE_INFO_C2H_EN | SPP_SDE_INFO_H2C_EN)) {
++		SPP_LOG(ERR,
++			"SDE Info(0x%08x), c2h=%u, h2c=%u, is not supported",
++			value,
++			(value & SPP_SDE_INFO_C2H_EN) ? 1 : 0,
++			(value & SPP_SDE_INFO_H2C_EN) ? 1 : 0);
++		ret = -EINVAL;
++		goto out;
++	}
++
++	SPP_LOG(DEBUG, "SDE Info(0x%08x), c2h=%u, h2c=%u",
++		value,
++		(value & SPP_SDE_INFO_C2H_EN) ? 1 : 0,
++		(value & SPP_SDE_INFO_H2C_EN) ? 1 : 0);
++
++	/* Setup the device capability flags */
++	dev_cap->flags = value;
++
++	/*
++	 * Setup the number of RX and TX channels
++	 *  -only one TX and RX channel is currently supported.
++	 */
++	dev_cap->num_rx_channels = 1;
++	dev_cap->num_tx_channels = 1;
++
++	/*
++	 * Sanity check against max channels.
++	 */
++	if (dev_cap->num_rx_channels > SPP_RX_CHANNELS_MAX) {
++		SPP_LOG(INFO,
++			"num_rx_channels(%u) > SPP_RX_CHANNELS_MAX(%u), "
++			"resetting to max value",
++			dev_cap->num_rx_channels, SPP_RX_CHANNELS_MAX);
++		dev_cap->num_rx_channels = SPP_RX_CHANNELS_MAX;
++	}
++	if (dev_cap->num_tx_channels > SPP_TX_CHANNELS_MAX) {
++		SPP_LOG(INFO,
++			"num_tx_channels(%u) > SPP_TX_CHANNELS_MAX(%u), "
++			"resetting to max value",
++			dev_cap->num_tx_channels, SPP_TX_CHANNELS_MAX);
++		dev_cap->num_tx_channels = SPP_TX_CHANNELS_MAX;
++	}
++
++	/* RX Channel (C2H) */
++	if (dev_cap->flags & SPP_SDE_INFO_C2H_EN) {
++		addr = spp_dev->reg_mem + SPP_REG_C2H_DESC_INFO;
++		value = rte_read32_relaxed(addr);
++
++		SPP_LOG(INFO,
++			"SDE C2H Desc Info(0x%08x), type=%s, num_descs=%u",
++			value,
++			(value & SPP_C2H_DESC_TYPE_COMPACT_EN) ?
++			"compact" : "regular",
++			(value >> SPP_C2H_DESC_RAM_DEPTH_SHIFT) &
++			SPP_C2H_DESC_RAM_DEPTH_MASK);
++
++#if defined(SPP_USE_COMPACT_DESCS)
++		if (!(value & SPP_C2H_DESC_TYPE_COMPACT_EN)) {
++			SPP_LOG(ERR, "SDE C2H Desc Info(0x%08x), "
++				"type=regular, is not supported",
++				value);
++			ret = -EINVAL;
++			goto out;
++		}
++#else
++		if (value & SPP_C2H_DESC_TYPE_COMPACT_EN) {
++			SPP_LOG(ERR, "SDE C2H Desc Info(0x%08x), "
++				"type=compact, is not supported",
++				value);
++			ret = -EINVAL;
++			goto out;
++		}
++#endif
++
++		/* The SDE currently supports one RX channel */
++		dev_cap->rx_chan_cap[0].flags =
++			value & SPP_C2H_DESC_TYPE_COMPACT_EN;
++		dev_cap->rx_chan_cap[0].num_descs =
++			(value >> SPP_C2H_DESC_RAM_DEPTH_SHIFT) &
++			SPP_C2H_DESC_RAM_DEPTH_MASK;
++	}
++
++	/* TX Channel (H2C) */
++	if (dev_cap->flags & SPP_SDE_INFO_H2C_EN) {
++		addr = spp_dev->reg_mem + SPP_REG_H2C_DESC_INFO;
++		value = rte_read32_relaxed(addr);
++
++		SPP_LOG(INFO,
++			"SDE H2C Desc Info(0x%08x), type=%s, num_descs=%u",
++			value,
++			(value & SPP_H2C_DESC_TYPE_COMPACT_EN) ?
++			"compact" : "regular",
++			(value >> SPP_H2C_DESC_RAM_DEPTH_SHIFT) &
++			SPP_H2C_DESC_RAM_DEPTH_MASK);
++
++#if defined(SPP_USE_COMPACT_DESCS)
++		if (!(value & SPP_H2C_DESC_TYPE_COMPACT_EN)) {
++			SPP_LOG(ERR, "SDE H2C Desc Info(0x%08x), "
++				"type=regular, is not supported",
++				value);
++			ret = -EINVAL;
++			goto out;
++		}
++#else
++		if (value & SPP_H2C_DESC_TYPE_COMPACT_EN) {
++			SPP_LOG(ERR, "SDE H2C Desc Info(0x%08x), "
++				"type=compact, is not supported",
++				value);
++			ret = -EINVAL;
++			goto out;
++		}
++#endif
++
++		/* The SDE currently supports one TX channel */
++		dev_cap->tx_chan_cap[0].flags =
++			value & SPP_H2C_DESC_TYPE_COMPACT_EN;
++		dev_cap->tx_chan_cap[0].num_descs =
++			(value >> SPP_H2C_DESC_RAM_DEPTH_SHIFT) &
++			SPP_H2C_DESC_RAM_DEPTH_MASK;
++	}
++
++out:
++	return ret;
++#else
++	dev_cap->flags = SPP_SDE_INFO_C2H_EN | SPP_SDE_INFO_H2C_EN;
++
++#if defined(SPP_USE_COMPACT_DESCS)
++	/* RX Channel (C2H) */
++	dev_cap->rx_chan_cap[0].flags = SPP_C2H_DESC_TYPE_COMPACT_EN;
++	dev_cap->rx_chan_cap[0].num_descs = SPP_RX_RING_DESC_MIN;
++
++	/* TX Channel (H2C) */
++	dev_cap->tx_chan_cap[0].flags = SPP_H2C_DESC_TYPE_COMPACT_EN;
++	dev_cap->tx_chan_cap[0].num_descs = SPP_TX_RING_DESC_MIN;
++#else
++	/* RX Channel (C2H) */
++	dev_cap->rx_chan_cap[0].flags = 0;
++	dev_cap->rx_chan_cap[0].num_descs = SPP_RX_RING_DESC_MIN;
++
++	/* TX Channel (H2C) */
++	dev_cap->tx_chan_cap[0].flags = 0;
++	dev_cap->tx_chan_cap[0].num_descs = SPP_TX_RING_DESC_MIN;
++#endif
++
++	dev_cap->num_rx_channels = 1;
++	dev_cap->num_tx_channels = 1;
++	return 0;
++#endif
++}
++
++void
++spp_dev_display(struct spp_dev *spp_dev)
++{
++	uint32_t i;
++
++	for (i = 0; i < spp_dev->dev_cap.num_tx_channels; i++) {
++		struct spp_tx_channel *tx_chan = &spp_dev->tx_channels[i];
++
++		spp_dbg_dump_tx_chan(tx_chan);
++	}
++	for (i = 0; i < spp_dev->dev_cap.num_rx_channels; i++) {
++		struct spp_rx_channel *rx_chan = &spp_dev->rx_channels[i];
++
++		spp_dbg_dump_rx_chan(rx_chan);
++	}
++}
+diff --git a/drivers/net/spp/spp_hal.h b/drivers/net/spp/spp_hal.h
+new file mode 100644
+index 0000000..0eafa50
+--- /dev/null
++++ b/drivers/net/spp/spp_hal.h
+@@ -0,0 +1,183 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_HAL_H_
++#define _SPP_HAL_H_
++
++#include "spp_hal_regs.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define SPP_RING_MASK(ring_size)        ((ring_size) - 1)
++#define SPP_RING_IDX(idx, ring_size)    ((idx) & SPP_RING_MASK(ring_size))
++#define SPP_RING_IDX_NEXT(idx, ring_size)       (((idx) + 1) & \
++						 SPP_RING_MASK(ring_size))
++#define SPP_CONF_SENTINAL                0x12349876
++
++struct spp_rx_chan_cap {
++	/* See SPP_REG_C2H_DESC_INFO */
++	uint16_t	flags;
++	uint16_t	num_descs;
++};
++
++struct spp_tx_chan_cap {
++	/* See SPP_REG_H2C_DESC_INFO */
++	uint16_t	flags;
++	uint16_t	num_descs;
++};
++
++struct spp_dev_cap {
++	/* See SPP_REG_SDE_INFO */
++	uint32_t		flags;
++	uint8_t			num_rx_channels;
++	uint8_t			num_tx_channels;
++	struct spp_rx_chan_cap	rx_chan_cap[SPP_RX_CHANNELS_MAX];
++	struct spp_tx_chan_cap	tx_chan_cap[SPP_TX_CHANNELS_MAX];
++};
++
++struct spp_sw_desc {
++	struct rte_mbuf *mbuf;
++};
++
++struct spp_sw_rx_info {
++	struct spp_sw_desc	sw_ring[SPP_RX_RING_DESC_MAX];
++	struct rte_mempool	*mb_pool;
++};
++
++struct spp_sw_tx_info {
++	struct spp_sw_desc sw_ring[SPP_TX_RING_DESC_MAX];
++};
++
++struct spp_rx_info {
++	/* See SPP_REG_C2H_DESC_INFO */
++	uint32_t		flags;
++	struct spp_rx_desc	*rx_desc;
++	struct spp_wb_meta_desc *wb_meta_ring;
++	struct spp_rx_status	*rx_status;
++	rte_iova_t		wb_meta_ring_phys_addr;
++	rte_iova_t		rx_desc_phys_addr;
++	rte_iova_t		rx_status_phys_addr;
++	const void		*mem_zone;
++};
++
++struct spp_tx_info {
++	/* See SPP_REG_H2C_DESC_INFO */
++	uint32_t		flags;
++	struct spp_tx_desc	*tx_desc;
++	struct spp_tx_status	*tx_status;
++	rte_iova_t		tx_desc_phys_addr;
++	rte_iova_t		tx_status_phys_addr;
++	const void		*mem_zone;
++};
++
++struct spp_dev;
++
++struct spp_tx_stats {
++	uint64_t	packets;
++	uint64_t	bytes;
++	uint64_t	errors;
++	uint64_t	no_tx_avail;
++	uint64_t	seg_packets;
++	uint64_t	sde_errors;
++};
++
++struct spp_tx_channel {
++	uint32_t				configured;
++	uint16_t				chan_index;
++
++	uint16_t				write;
++	uint16_t				next_to_clean;
++	uint16_t				pad;
++	uint32_t				ring_size;
++
++	uint8_t __iomem				*reg_mem;
++	uint8_t __iomem				*wc_mem;
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++	uint64_t				desc_seq_num;
++#endif
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++	uint64_t				mbuf_seq_num;
++#endif
++
++	struct spp_sw_tx_info sw_tx_info	__rte_cache_aligned;
++	struct spp_tx_info tx_info		__rte_cache_aligned;
++	struct spp_tx_stats stats		__rte_cache_aligned;
++
++	struct spp_dev				*spp_dev;
++};
++
++struct spp_rx_stats {
++	uint64_t	packets;
++	uint64_t	bytes;
++	uint64_t	missed;
++	uint64_t	errors;
++	uint64_t	no_mbuf;
++	uint64_t	no_last_seg;
++	uint64_t	seg_packets;
++	uint64_t	sde_errors;
++};
++
++struct spp_rx_channel {
++	uint32_t				configured;
++	uint16_t				chan_index;
++
++	uint16_t				next_to_fill;
++	uint16_t				read;
++	uint16_t				pad;
++	uint32_t				ring_size;
++
++	uint8_t __iomem				*reg_mem;
++	uint8_t __iomem				*wc_mem;
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++	uint64_t				desc_seq_num;
++#endif
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++	uint64_t				mbuf_seq_num;
++#endif
++
++	struct spp_sw_rx_info sw_rx_info	__rte_cache_aligned;
++	struct spp_rx_info rx_info		__rte_cache_aligned;
++	struct spp_rx_stats stats		__rte_cache_aligned;
++
++	struct spp_dev				*spp_dev;
++};
++
++int spp_rx_queue_setup(struct rte_eth_dev *dev, uint16_t rx_queue_id,
++		       uint16_t nb_rx_desc, unsigned int socket_id,
++		       const struct rte_eth_rxconf *rx_conf,
++		       struct rte_mempool *mb_pool);
++void spp_rx_queue_release(void *q);
++
++int spp_tx_queue_setup(struct rte_eth_dev *dev, uint16_t tx_queue_id,
++		       uint16_t nb_tx_desc, unsigned int socket_id,
++		       const struct rte_eth_txconf *tx_conf);
++void spp_tx_queue_release(void *q);
++
++uint16_t spp_rx_pkt_burst(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs);
++uint16_t spp_tx_pkt_burst(void *q, struct rte_mbuf **bufs, uint16_t nb_bufs);
++
++int spp_dev_reset(struct spp_dev *spp_dev);
++int spp_dev_cap_get(struct spp_dev *spp_dev, struct spp_dev_cap *dev_cap);
++void spp_dev_display(struct spp_dev *spp_dev);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/drivers/net/spp/spp_hal_dbg.c b/drivers/net/spp/spp_hal_dbg.c
+new file mode 100644
+index 0000000..2c87688
+--- /dev/null
++++ b/drivers/net/spp/spp_hal_dbg.c
+@@ -0,0 +1,455 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <rte_mbuf.h>
++#include <rte_ethdev.h>
++#include <rte_ethdev_pci.h>
++#include <rte_malloc.h>
++#include <rte_memcpy.h>
++#include <rte_memzone.h>
++#include <rte_io.h>
++#include <rte_string_fns.h>
++#include <rte_kvargs.h>
++#include <rte_errno.h>
++#include <unistd.h>
++#include "spp.h"
++#include "spp_hal_private.h"
++
++void
++spp_dbg_dump_rx_chan(struct spp_rx_channel *rx_chan)
++{
++	struct spp_rx_status *rx_status = rx_chan->rx_info.rx_status;
++	uint32_t value;
++	uint32_t i;
++
++	/* General status info */
++	SPP_LOG(INFO, "chan_index=%u, next_to_fill=%u, read=%u",
++		rx_chan->chan_index, rx_chan->next_to_fill,
++		rx_chan->read);
++	SPP_LOG(INFO, "(status) chan_index=%u, status=0x%08x, desc_limit=%u, "
++		"desc_completed=%u, pkt_count=%u, "
++		"meta_write=%u",
++		rx_chan->chan_index,
++		rx_status->status, rx_status->desc_limit,
++		rx_status->desc_completed, rx_status->pkt_count,
++		rx_status->meta_write);
++
++	/* Specific status info */
++	if (rx_status->status & SPP_RX_STATUS_DESC_ERR) {
++		value = spp_rx_chan_reg_read(rx_chan,
++					     SPP_REG_C2H_DESC_RAM_STATUS);
++
++		SPP_LOG(INFO,
++			"SPP_RX_STATUS_DESC_ERR: oflow_err=%u, ooo_err=%u, unalign_err=%u, "
++			"desc_full=%u, desc_empty=%u",
++			(value & SPP_C2H_DESC_OFLOW_ERR) ? 1 : 0,
++			(value & SPP_C2H_DESC_OOO_ERR) ? 1 : 0,
++			(value & SPP_C2H_DESC_UNALIGN_ERR) ? 1 : 0,
++			(value & SPP_C2H_DESC_FULL) ? 1 : 0,
++			(value & SPP_C2H_DESC_EMPTY) ? 1 : 0);
++	}
++	if (rx_status->status & SPP_RX_STATUS_DM_ERR) {
++		value = spp_rx_chan_reg_read(rx_chan, SPP_REG_C2H_DM_STATUS);
++
++		SPP_LOG(INFO,
++			"SPP_RX_STATUS_DM_ERR: bresp_err=%u, desc_len_err=%u",
++			(value & SPP_C2H_DM_BRESP_ERR) ? 1 : 0,
++			(value & SPP_C2H_DM_DESC_LEN_ERR) ? 1 : 0);
++	}
++	if (rx_status->status & SPP_RX_STATUS_WB_ERR) {
++		value =
++			spp_rx_chan_reg_read(rx_chan,
++					     SPP_REG_C2H_WB_STATUS_ERR);
++
++		SPP_LOG(INFO,
++			"SPP_RX_STATUS_WB_ERR: status_bresp_err=%u, md_bresp_err=%u",
++			(value & SPP_C2H_WB_STATUS_BRESP_ERR) ? 1 : 0,
++			(value & SPP_C2H_WB_MD_BRESP_ERR) ? 1 : 0);
++	}
++
++	/* Dump the HW metadata and SW desc rings */
++	for (i = 0; i < rx_chan->ring_size; i++) {
++		struct spp_wb_meta_desc *meta_desc =
++			&rx_chan->rx_info.wb_meta_ring[i];
++		struct spp_sw_desc *sw_desc =
++			&rx_chan->sw_rx_info.sw_ring[i];
++
++#if defined(SPP_USE_COMPACT_DESCS)
++		SPP_LOG(INFO, "chan_index=%02u, desc_index=%02u, "
++			"meta_valid=%u, eop=%u, "
++			"length=%u, "
++			"sw_desc_valid=%u, nb_segs=%u, "
++			"desc_buf_len=%u",
++			rx_chan->chan_index, i,
++			(meta_desc->valid_eop_bits &
++			 SPP_WB_META_DESC_VALID) ? 1 : 0,
++			(meta_desc->valid_eop_bits &
++			 SPP_WB_META_DESC_EOP) ? 1 : 0,
++			meta_desc->length,
++			(sw_desc->mbuf) ? 1 : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->nb_segs : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->buf_len -
++			RTE_PKTMBUF_HEADROOM : 0);
++#else
++		SPP_LOG(INFO, "chan_index=%02u, desc_index=%02u, "
++			"meta_valid=%u, eop=%u, "
++			"length=%u, user=%" PRIu64 ", "
++			"sw_desc_valid=%u, nb_segs=%u, "
++			"desc_buf_len=%u",
++			rx_chan->chan_index, i,
++			(meta_desc->valid_eop_bits &
++			 SPP_WB_META_DESC_VALID) ? 1 : 0,
++			(meta_desc->valid_eop_bits &
++			 SPP_WB_META_DESC_EOP) ? 1 : 0,
++			meta_desc->length, meta_desc->user,
++			(sw_desc->mbuf) ? 1 : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->nb_segs : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->buf_len -
++			RTE_PKTMBUF_HEADROOM : 0);
++#endif
++	}
++}
++
++void
++spp_dbg_dump_tx_chan(struct spp_tx_channel *tx_chan)
++{
++	struct spp_tx_status *tx_status = tx_chan->tx_info.tx_status;
++	uint32_t value;
++	uint32_t i;
++
++	/* General status info */
++	SPP_LOG(INFO, "chan_index=%u, next_to_clean=%u, "
++		"read_desc_completed=%u, write=%u",
++		tx_chan->chan_index, tx_chan->next_to_clean,
++		spp_tx_channel_get_read_desc_completed(
++			tx_chan),
++		tx_chan->write);
++	SPP_LOG(INFO, "(status) chan_index=%u, status=0x%08x, desc_limit=%u, "
++		"desc_completed=%u, pkt_count=%u",
++		tx_chan->chan_index, tx_status->status,
++		tx_status->desc_limit,
++		tx_status->desc_completed, tx_status->pkt_count);
++
++	/* Specific status info */
++	if (tx_status->status & SPP_RX_STATUS_DESC_ERR) {
++		value = spp_tx_chan_reg_read(tx_chan,
++					     SPP_REG_H2C_DESC_RAM_STATUS);
++
++		SPP_LOG(INFO,
++			"SPP_RX_STATUS_DESC_ERR: oflow_err=%u, ooo_err=%u, unalign_err=%u, "
++			"desc_full=%u, desc_empty=%u",
++			(value & SPP_H2C_DESC_OFLOW_ERR) ? 1 : 0,
++			(value & SPP_H2C_DESC_OOO_ERR) ? 1 : 0,
++			(value & SPP_H2C_DESC_UNALIGN_ERR) ? 1 : 0,
++			(value & SPP_H2C_DESC_FULL) ? 1 : 0,
++			(value & SPP_H2C_DESC_EMPTY) ? 1 : 0);
++	}
++	if (tx_status->status & SPP_RX_STATUS_DM_ERR) {
++		value = spp_tx_chan_reg_read(tx_chan, SPP_REG_H2C_DM_STATUS);
++
++		SPP_LOG(INFO,
++			"SPP_RX_STATUS_DM_ERR: rresp_err=%u, desc_len_err=%u",
++			(value & SPP_H2C_DM_RRESP_ERR) ? 1 : 0,
++			(value & SPP_H2C_DM_DESC_LEN_ERR) ? 1 : 0);
++	}
++	if (tx_status->status & SPP_RX_STATUS_WB_ERR) {
++		value =
++			spp_tx_chan_reg_read(tx_chan,
++					     SPP_REG_H2C_WB_STATUS_ERR);
++
++		SPP_LOG(INFO, "SPP_RX_STATUS_WB_ERR: bresp_err=%u",
++			(value & SPP_H2C_WB_STATUS_BRESP_ERR) ? 1 : 0);
++	}
++
++	/* Dump the SW desc ring */
++	for (i = 0; i < tx_chan->ring_size; i++) {
++		struct spp_sw_desc *sw_desc =
++			&tx_chan->sw_tx_info.sw_ring[i];
++
++		SPP_LOG(INFO, "chan_index=%02u, desc_index=%02u, "
++			"valid=%u, nb_segs=%u, data_len=%u",
++			tx_chan->chan_index, i,
++			(sw_desc->mbuf) ? 1 : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->nb_segs : 0,
++			(sw_desc->mbuf) ? sw_desc->mbuf->data_len : 0);
++	}
++}
++
++void
++spp_dbg_dump_rx_desc(struct spp_rx_channel	*rx_chan,
++		     struct spp_rx_desc		*rx_desc)
++{
++	spp_dbg_dump_rx_chan(rx_chan);
++	SPP_LOG(INFO, "length=%u, phys_addr=0x%" PRIx64 ", reserved=0x%08x",
++		rx_desc->length, rx_desc->phys_addr,
++		rx_desc->reserved);
++}
++
++void
++spp_dbg_dump_tx_desc(struct spp_tx_channel	*tx_chan,
++		     struct spp_tx_desc		*tx_desc)
++{
++	spp_dbg_dump_tx_chan(tx_chan);
++#if defined(SPP_USE_COMPACT_DESCS)
++	SPP_LOG(INFO, "length=%u, phys_addr=0x%" PRIx64 ", eop=%u, spb=%u, "
++		"reserved=0x%08x",
++		tx_desc->length, tx_desc->phys_addr,
++		(tx_desc->phys_addr & SPP_TX_DESC_EOP) ? 1 : 0,
++		(tx_desc->phys_addr & SPP_TX_DESC_SPB) ? 1 : 0,
++		tx_desc->reserved);
++#else
++	SPP_LOG(INFO, "length=%u, phys_addr=0x%" PRIx64 ", eop_spb_bits=%u, "
++		"reserved=0x%" PRIx64 ", user=%" PRIu64,
++		tx_desc->length, tx_desc->phys_addr,
++		tx_desc->eop_spb_bits, tx_desc->reserved, tx_desc->user);
++#endif
++}
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++void
++spp_dbg_wb_desc_seq_num(struct spp_rx_channel	*rx_chan,
++			struct spp_wb_meta_desc *meta_desc)
++{
++	if (unlikely(meta_desc->user != rx_chan->desc_seq_num)) {
++		SPP_LOG(ERR, "RX desc seq_num=%" PRIu64
++			" != rx_chan_desc_seq_num=%" PRIu64,
++			meta_desc->user, rx_chan->desc_seq_num);
++	}
++	rx_chan->desc_seq_num++;
++}
++
++void
++spp_dbg_tx_desc_seq_num(struct spp_tx_channel	*tx_chan,
++			struct spp_tx_desc	*desc)
++{
++	desc->user = tx_chan->desc_seq_num;
++	tx_chan->desc_seq_num++;
++}
++#endif
++
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++void
++spp_dbg_rx_pkt_seq_num(struct spp_rx_channel *rx_chan, struct rte_mbuf *mbuf,
++		       uint8_t sop, uint8_t eop)
++{
++	uint64_t *seq_num;
++	uint32_t num_bytes = 0;
++
++	if (sop) {
++		num_bytes += sizeof(*seq_num);
++		if (mbuf->data_len < num_bytes) {
++			SPP_LOG(ERR, "(HDR) tailroom=%u < %u too small, "
++				"sop=%u, eop=%u",
++				mbuf->data_len,
++				num_bytes,
++				sop, eop);
++			return;
++		}
++		seq_num =
++			(uint64_t *)(((uint8_t *)mbuf->buf_addr) +
++				     mbuf->data_off);
++		if (!rte_is_aligned(seq_num, sizeof(*seq_num))) {
++			SPP_LOG(ERR, "(HDR) RX mbuf seq_num=%p is not aligned, "
++				"sop=%u, eop=%u",
++				seq_num, sop, eop);
++			return;
++		}
++		if (unlikely(*seq_num != rx_chan->mbuf_seq_num)) {
++			SPP_LOG(ERR, "(HDR) RX mbuf seq_num=%" PRIu64
++				" != rx_chan_mbuf_seq_num=%" PRIu64
++				", sop=%u, eop=%u",
++				*seq_num, rx_chan->mbuf_seq_num,
++				sop, eop);
++			return;
++		}
++	}
++
++	if (eop) {
++		num_bytes += sizeof(*seq_num);
++		if (mbuf->data_len < num_bytes) {
++			SPP_LOG(ERR, "(TRAILER) data_len=%u < %u too small, "
++				"sop=%u, eop=%u",
++				mbuf->data_len,
++				num_bytes,
++				sop, eop);
++			return;
++		}
++
++		seq_num =
++			(uint64_t *)(((uint8_t *)mbuf->buf_addr) +
++				     mbuf->data_off +
++				     mbuf->data_len - sizeof(uint64_t));
++		if (!rte_is_aligned(seq_num, sizeof(*seq_num))) {
++			SPP_LOG(ERR,
++				"(TRAILER) RX mbuf seq_num=%p is not aligned, "
++				"sop=%u, eop=%u",
++				seq_num, sop,
++				eop);
++			return;
++		}
++		if (unlikely(*seq_num != rx_chan->mbuf_seq_num)) {
++			SPP_LOG(ERR, "(TRAILER) RX mbuf seq_num=%" PRIu64
++				" != rx_chan_mbuf_seq_num=%" PRIu64
++				", sop=%u, eop=%u",
++				*seq_num, rx_chan->mbuf_seq_num,
++				sop, eop);
++			return;
++		}
++
++		rx_chan->mbuf_seq_num++;
++	}
++}
++
++void
++spp_dbg_tx_pkt_seq_num(struct spp_tx_channel *tx_chan, struct rte_mbuf *mbuf,
++		       uint8_t sop, uint8_t eop)
++{
++	uint64_t *seq_num;
++	uint32_t num_bytes = 0;
++
++	if (sop) {
++		num_bytes += sizeof(*seq_num);
++		if (mbuf->data_len < num_bytes) {
++			SPP_LOG(ERR, "(HDR) data_len=%u < %u too small, "
++				"sop=%u, eop=%u",
++				mbuf->data_len,
++				num_bytes,
++				sop, eop);
++			return;
++		}
++		seq_num =
++			(uint64_t *)(((uint8_t *)mbuf->buf_addr) +
++				     mbuf->data_off);
++		if (!rte_is_aligned(seq_num, sizeof(*seq_num))) {
++			SPP_LOG(ERR, "(HDR) RX mbuf seq_num=%p is not aligned, "
++				"sop=%u, eop=%u",
++				seq_num, sop, eop);
++			return;
++		}
++		*seq_num = tx_chan->mbuf_seq_num;
++	}
++
++	if (eop) {
++		num_bytes += sizeof(*seq_num);
++		if (mbuf->data_len < num_bytes) {
++			SPP_LOG(ERR, "(TRAILER) data_len=%u < %u too small, "
++				"sop=%u, eop=%u",
++				mbuf->data_len,
++				num_bytes,
++				sop, eop);
++			return;
++		}
++
++		seq_num =
++			(uint64_t *)(((uint8_t *)mbuf->buf_addr) +
++				     mbuf->data_off +
++				     mbuf->data_len - sizeof(*seq_num));
++		if (!rte_is_aligned(seq_num, sizeof(*seq_num))) {
++			SPP_LOG(ERR,
++				"(TRAILER) RX mbuf seq_num=%p is not aligned, "
++				"sop=%u, eop=%u",
++				seq_num, sop,
++				eop);
++			return;
++		}
++		*seq_num = tx_chan->mbuf_seq_num;
++
++		tx_chan->mbuf_seq_num++;
++	}
++}
++#endif
++
++#if defined(SPP_DBG_SW_LOOPBACK)
++int spp_dbg_tx_rx_loopback(struct spp_tx_channel	*tx_chan,
++			   struct spp_tx_desc		*tx_desc,
++			   struct rte_mbuf		*tx_mbuf)
++{
++	struct spp_rx_channel *rx_chan;
++	struct spp_wb_meta_desc *rx_meta_desc;
++	uint16_t rx_chan_read;
++	int ret = 0;
++
++	/* Simulate the HW by looping TX back to RX */
++	rx_chan = &tx_chan->spp_dev->rx_channels[tx_chan->chan_index];
++
++	/* Get the current RX read index */
++	rx_chan_read = rx_chan->rx_info.rx_status->desc_limit &
++		       SPP_RING_MASK(rx_chan->ring_size);
++
++#if 0
++	{
++		/*
++		 * Swap TX and RX mbufs for zero copy loopback.
++		 *      -we're using the rx_chan_read for both the TX and RX
++		 *       sw_rings since in loopback mode, both rings move
++		 *       together at the same rate.
++		 */
++		struct rte_mbuf *tmp_mbuf;
++		tmp_mbuf = rx_chan->sw_rx_info.sw_ring[rx_chan_read].mbuf;
++		rx_chan->sw_rx_info.sw_ring[rx_chan_read].mbuf = tx_mbuf;
++		tx_chan->sw_tx_info.sw_ring[rx_chan_read].mbuf = tmp_mbuf;
++	}
++#else
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++	{
++		struct rte_mbuf *rx_mbuf;
++		uint64_t *rx_seq_num;
++		uint64_t *tx_seq_num;
++
++		/* Transfer the debug sequence number from TX to RX */
++		rx_mbuf = rx_chan->sw_rx_info.sw_ring[rx_chan_read].mbuf;
++
++		tx_seq_num =
++			(uint64_t *)(((uint8_t *)tx_mbuf->buf_addr) +
++				     tx_mbuf->data_off);
++		rx_seq_num =
++			(uint64_t *)(((uint8_t *)rx_mbuf->buf_addr) +
++				     rx_mbuf->data_off);
++		*rx_seq_num = *tx_seq_num;
++		SPP_LOG(DEBUG, "rx_seq_num=%" PRIu64, *rx_seq_num);
++	}
++#endif
++#endif
++
++	/* Fill in the RX meta desc */
++	rx_meta_desc = &rx_chan->rx_info.wb_meta_ring[rx_chan_read];
++	rx_meta_desc->length = tx_mbuf->data_len;
++#if defined(SPP_USE_COMPACT_DESCS)
++	if (likely(tx_desc->phys_addr & SPP_TX_DESC_EOP))
++		rx_meta_desc->valid_eop_bits = SPP_WB_META_DESC_VALID |
++					       SPP_WB_META_DESC_EOP;
++	else
++		rx_meta_desc->valid_eop_bits = SPP_WB_META_DESC_VALID;
++#else
++	if (likely(tx_desc->eop_spb_bits & SPP_TX_DESC_EOP))
++		rx_meta_desc->valid_eop_bits = SPP_WB_META_DESC_VALID |
++					       SPP_WB_META_DESC_EOP;
++	else
++		rx_meta_desc->valid_eop_bits = SPP_WB_META_DESC_VALID;
++#endif
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++	rx_meta_desc->user = tx_desc->user;
++#endif
++
++	/*
++	 * Bump the RX desc limit.  The TX desc limit is handled by RX
++	 * processing
++	 */
++	rx_chan->rx_info.rx_status->desc_limit++;
++
++	return ret;
++}
++#endif  /* SPP_DBG_SW_LOOPBACK */
+diff --git a/drivers/net/spp/spp_hal_private.h b/drivers/net/spp/spp_hal_private.h
+new file mode 100644
+index 0000000..c361019
+--- /dev/null
++++ b/drivers/net/spp/spp_hal_private.h
+@@ -0,0 +1,258 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_HAL_PRIVATE_H_
++#define _SPP_HAL_PRIVATE_H_
++
++#include "spp_logs.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#if !defined(SPP_DBG_SW_LOOPBACK)
++#if defined(SPP_USE_AVX2)
++
++#if defined(SPP_USE_COMPACT_DESCS)
++/* Non-debug FastPath */
++static inline void
++spp_meta_desc_memset(void *buf)
++{
++	*(uint64_t *)buf = 0;
++}
++
++/**
++ * Copy 16 bytes from one location to another,
++ * locations should not overlap.
++ */
++static inline void
++spp_rx_desc_memcpy(void *dst, const void *src)
++{
++	__m128i xmm0;
++
++	xmm0 = _mm_loadu_si128((const __m128i *)src);
++	_mm_storeu_si128((__m128i *)dst, xmm0);
++}
++
++/**
++ * Copy 16 bytes from one location to another,
++ * locations should not overlap.
++ */
++static inline void
++spp_tx_desc_memcpy(void *dst, const void *src)
++{
++	__m128i xmm0;
++
++	xmm0 = _mm_loadu_si128((const __m128i *)src);
++	_mm_storeu_si128((__m128i *)dst, xmm0);
++}
++#else
++/* Non-debug FastPath */
++static inline void
++spp_meta_desc_memset(void *buf)
++{
++	__m128i xmm0;
++
++	xmm0 = _mm_setzero_si128();
++	_mm_storeu_si128((__m128i *)buf, xmm0);
++}
++
++/**
++ * Copy 16 bytes from one location to another,
++ * locations should not overlap.
++ */
++static inline void
++spp_rx_desc_memcpy(void *dst, const void *src)
++{
++	__m128i xmm0;
++
++	xmm0 = _mm_loadu_si128((const __m128i *)src);
++	_mm_storeu_si128((__m128i *)dst, xmm0);
++}
++
++/**
++ * Copy 32 bytes from one location to another,
++ * locations should not overlap.
++ */
++static inline void
++spp_tx_desc_memcpy(void *dst, const void *src)
++{
++	__m256i ymm0;
++
++	ymm0 = _mm256_loadu_si256((const __m256i *)src);
++	_mm256_storeu_si256((__m256i *)dst, ymm0);
++}
++#endif
++
++#else /* !SPP_USE_AVX2 */
++
++static inline void
++spp_meta_desc_memset(__rte_unused void *buf)
++{
++	SPP_LOG(ERR, "SPP_USE_AVX2 only is supported");
++}
++
++static inline void
++spp_rx_desc_memcpy(__rte_unused void		*dst,
++		   __rte_unused const void	*src)
++{
++	SPP_LOG(ERR, "SPP_USE_AVX2 only is supported");
++}
++
++static inline void
++spp_tx_desc_memcpy(__rte_unused void		*dst,
++		   __rte_unused const void	*src)
++{
++	SPP_LOG(ERR, "SPP_USE_AVX2 only is supported");
++}
++#endif /* SPP_USE_AVX2 */
++
++static inline void
++spp_tx_chan_reg_write(struct spp_tx_channel *tx_chan, uint32_t offset,
++		      uint32_t value)
++{
++	uint8_t *addr = tx_chan->reg_mem + offset;
++
++	rte_write32_relaxed(value, addr);
++}
++
++static inline uint32_t
++spp_tx_chan_reg_read(struct spp_tx_channel *tx_chan, uint32_t offset)
++{
++	uint8_t *addr = tx_chan->reg_mem + offset;
++
++	return rte_read32_relaxed(addr);
++}
++
++static inline void
++spp_rx_chan_reg_write(struct spp_rx_channel *rx_chan, uint32_t offset,
++		      uint32_t value)
++{
++	uint8_t *addr = rx_chan->reg_mem + offset;
++
++	rte_write32_relaxed(value, addr);
++}
++
++static inline uint32_t
++spp_rx_chan_reg_read(struct spp_rx_channel *rx_chan, uint32_t offset)
++{
++	uint8_t *addr = rx_chan->reg_mem + offset;
++
++	return rte_read32_relaxed(addr);
++}
++
++#else
++
++/* SW loopback mode, stubs out all MMIO */
++static inline void
++spp_meta_desc_memset(__rte_unused void *buf)
++{
++}
++
++static inline void
++spp_rx_desc_memcpy(__rte_unused void *dst, __rte_unused const void *src)
++{
++}
++
++static inline void
++spp_tx_desc_memcpy(__rte_unused void *dst, __rte_unused const void *src)
++{
++}
++
++static inline void
++spp_tx_chan_reg_write(__rte_unused struct spp_tx_channel *tx_chan,
++		      __rte_unused uint32_t offset, __rte_unused
++		      uint32_t value)
++{
++}
++
++static inline uint32_t
++spp_tx_chan_reg_read(__rte_unused struct spp_tx_channel *tx_chan,
++		     __rte_unused uint32_t		offset)
++{
++	return -1;
++}
++
++static inline void
++spp_rx_chan_reg_write(__rte_unused struct spp_rx_channel	*rx_chan,
++		      __rte_unused uint32_t			offset,
++		      __rte_unused uint32_t			value)
++{
++}
++
++static inline uint32_t
++spp_rx_chan_reg_read(__rte_unused struct spp_rx_channel *rx_chan,
++		     __rte_unused uint32_t		offset)
++{
++	return -1;
++}
++
++int spp_dbg_tx_rx_loopback(struct spp_tx_channel *tx_chan,
++			   struct spp_tx_desc *tx_desc, struct rte_mbuf *mbuf);
++
++static inline void
++spp_dbg_tx_rx_loopback_rx_cb(struct spp_rx_channel *rx_chan)
++{
++	struct spp_tx_channel *tx_chan;
++
++	tx_chan = &rx_chan->spp_dev->tx_channels[rx_chan->chan_index];
++
++	/*
++	 * Bump the TX desc completed count.
++	 *	-the RX desc limit is handled by TX processing
++	 */
++	tx_chan->tx_info.tx_status->desc_completed++;
++}
++
++#endif /* !SPP_DBG_SW_LOOPBACK */
++
++static inline uint16_t
++spp_tx_channel_get_read_desc_completed(struct spp_tx_channel *tx_chan)
++{
++	uint32_t read_desc_completed;
++
++	read_desc_completed = tx_chan->tx_info.tx_status->desc_completed &
++			      SPP_RING_MASK(tx_chan->ring_size);
++
++	return read_desc_completed;
++}
++
++void spp_dbg_dump_rx_chan(struct spp_rx_channel *rx_chan);
++void spp_dbg_dump_tx_chan(struct spp_tx_channel *tx_chan);
++
++void spp_dbg_dump_rx_desc(struct spp_rx_channel *rx_chan,
++			  struct spp_rx_desc	*rx_desc);
++void spp_dbg_dump_tx_desc(struct spp_tx_channel *tx_chan,
++			  struct spp_tx_desc	*tx_desc);
++
++#if defined(SPP_DBG_USE_DESC_SEQ_NUM)
++void spp_dbg_wb_desc_seq_num(struct spp_rx_channel	*rx_chan,
++			     struct spp_wb_meta_desc	*meta_desc);
++void spp_dbg_tx_desc_seq_num(struct spp_tx_channel	*tx_chan,
++			     struct spp_tx_desc		*desc);
++#endif
++
++#if defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++void spp_dbg_tx_pkt_seq_num(struct spp_tx_channel *tx_chan,
++			    struct rte_mbuf *mbuf, uint8_t sop, uint8_t eop);
++void spp_dbg_rx_pkt_seq_num(struct spp_rx_channel *rx_chan,
++			    struct rte_mbuf *mbuf, uint8_t sop, uint8_t eop);
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/drivers/net/spp/spp_hal_regs.h b/drivers/net/spp/spp_hal_regs.h
+new file mode 100644
+index 0000000..efe8e24
+--- /dev/null
++++ b/drivers/net/spp/spp_hal_regs.h
+@@ -0,0 +1,520 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_HAL_REGS_H_
++#define _SPP_HAL_REGS_H_
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*
++ * Register definitions
++ */
++
++/*
++ * Register Base Addresses
++ */
++
++#define SPP_SDE_CTL_BASE        0x0
++#define SPP_PCIS_BASE           0x0
++#define SPP_C2H_DESC_RAM_BASE   0x0
++#define SPP_H2C_DESC_RAM_BASE   0x1000
++#define SPP_SPB_BASE            0x2000
++
++#define SPP_CSR_PCIS_BASE       0x3000
++#define SPP_CSR_PCIM_BASE       0x3200
++
++#define SPP_CSR_C2H_GLOBAL_BASE 0x3400
++#define SPP_CSR_C2H_DESC_BASE   0x3500
++#define SPP_CSR_C2H_DATA_MOVER_BASE     0x3600
++#define SPP_CSR_C2H_WB_BASE     0x3700
++#define SPP_CSR_C2H_BUF_BASE    0x3800
++#define SPP_CSR_C2H_AXIS_BASE   0x3900
++
++#define SPP_CSR_H2C_GLOBAL_BASE 0x3a00
++#define SPP_CSR_H2C_DESC_BASE   0x3b00
++#define SPP_CSR_H2C_DATA_MOVER_BASE     0x3c00
++#define SPP_CSR_H2C_WB_BASE     0x3d00
++#define SPP_CSR_H2C_BUF_BASE    0x3e00
++#define SPP_CSR_H2C_AXIS_BASE   0x3f00
++
++/*
++ * PCIS Registers
++ */
++
++#define SPP_REG_PCIS(offset)            (SPP_CSR_PCIS_BASE + (offset))
++#define SPP_REG_SDE_RESET               SPP_REG_PCIS(0x0)
++
++enum {
++	SPP_SDE_RESET_EN = BIT(0),
++};
++
++#define SPP_REG_SDE_INFO                SPP_REG_PCIS(0x4)
++
++enum {
++	SPP_SDE_INFO_C2H_EN	= BIT(0),
++	SPP_SDE_INFO_H2C_EN	= BIT(16),
++};
++
++/*
++ * C2H Registers (SPP RX)
++ */
++
++#define SPP_REG_C2H_DESC(offset)        (SPP_CSR_C2H_DESC_BASE + (offset))
++#define SPP_REG_C2H_CDT_CONSUMED        SPP_REG_C2H_DESC(0x0)
++#define SPP_REG_C2H_CDT_LIMIT           SPP_REG_C2H_DESC(0x4)
++#define SPP_REG_C2H_COMP_CNT            SPP_REG_C2H_DESC(0x8)
++#define SPP_REG_C2H_DESC_FIFO           SPP_REG_C2H_DESC(0xc)
++
++enum {
++	SPP_C2H_DESC_FIFO_WRITE_MASK	= BIT(16) - 1,
++	/* lower 16-bits */
++	SPP_C2H_DESC_FIFO_READ_SHIFT	= BIT(16),
++	/* upper 16-bits */
++};
++
++#define SPP_REG_C2H_DESC_RAM_ADDR       SPP_REG_C2H_DESC(0x10)
++#define SPP_REG_C2H_DESC_RAM_DATA       SPP_REG_C2H_DESC(0x14)
++#define SPP_REG_C2H_DESC_RAM_STATUS     SPP_REG_C2H_DESC(0x18)
++
++enum {
++	SPP_C2H_DESC_OFLOW_ERR		= BIT(0),
++	/* Error: Desc written when desc RAM is full */
++	SPP_C2H_DESC_OOO_ERR		= BIT(1),
++	/* Error: Desc written out of order */
++	SPP_C2H_DESC_UNALIGN_ERR	= BIT(2),
++	/* Error: Desc unaligned address */
++	SPP_C2H_DESC_FULL		= BIT(3),
++	/* Status: Desc RAM full */
++	SPP_C2H_DESC_EMPTY		= BIT(4),
++	/* Status: Desc RAM empty */
++
++	SPP_C2H_DESC_RAM_STATUS_ALL	=
++		SPP_C2H_DESC_OFLOW_ERR |
++		SPP_C2H_DESC_OOO_ERR |
++		SPP_C2H_DESC_UNALIGN_ERR |
++		SPP_C2H_DESC_FULL |
++		SPP_C2H_DESC_EMPTY,
++};
++
++#define SPP_REG_C2H_DESC_INFO           SPP_REG_C2H_DESC(0x20)
++
++enum {
++	SPP_C2H_DESC_TYPE_COMPACT_EN	= BIT(0),
++
++	SPP_C2H_DESC_RAM_DEPTH_MASK	= BIT(16) - 1,
++	SPP_C2H_DESC_RAM_DEPTH_SHIFT	= 16,
++};
++
++#define SPP_REG_C2H_DATA_MOVER(offset)  (SPP_CSR_C2H_DATA_MOVER_BASE + (offset))
++#define SPP_REG_C2H_DM_CFG              SPP_REG_C2H_DATA_MOVER(0x0)
++#define SPP_REG_C2H_DM_STATUS           SPP_REG_C2H_DATA_MOVER(0x4)
++
++enum {
++	SPP_C2H_DM_BRESP_ERR	= BIT(0),
++	/* Error: Bresp error */
++	SPP_C2H_DM_DESC_LEN_ERR = BIT(1),
++	/* Error: Desc length equal to zero */
++};
++
++#define SPP_REG_C2H_WB(offset)          (SPP_CSR_C2H_WB_BASE + (offset))
++#define SPP_REG_C2H_WB_CFG              SPP_REG_C2H_WB(0x0)
++
++enum {
++	SPP_C2H_WB_CFG_DESC_CNT_EN		= BIT(0),
++	SPP_C2H_WB_CFG_PKT_CNT_EN		= BIT(1),
++	SPP_C2H_WB_CFG_CDT_EN			= BIT(2),
++	SPP_C2H_WB_CFG_MD_RD_PTR_EN		= BIT(3),
++
++	SPP_C2H_WB_CFG_DESC_CTD_WC_EN		= BIT(4),
++	SPP_C2H_WB_CFG_DESC_CNT_WC_EN		= BIT(5),
++	SPP_C2H_WB_CFG_PKT_CNT_WC_EN		= BIT(6),
++	SPP_C2H_WB_CFG_MD_WR_PTR_WC_EN		= BIT(7),
++
++	SPP_C2H_WB_CFG_WC_CNT_MINUS1_DFLT	= 0,
++	SPP_C2H_WB_CFG_WC_CNT_MINUS1_MASK	= BIT(6) - 1,
++	SPP_C2H_WB_CFG_WC_CNT_MINUS1_SHIFT	= 8,
++
++	/* No C2H write-backs are enabled for PPS perf */
++	SPP_C2H_WB_CFG_ALL_EN			= 0,
++};
++
++#define SPP_REG_C2H_STATUS_WB_ADDR_LO   SPP_REG_C2H_WB(0x4)
++#define SPP_REG_C2H_STATUS_WB_ADDR_HI   SPP_REG_C2H_WB(0x8)
++
++enum {
++	SPP_C2H_STATUS_WB_ADDR_LO_MASK	= (1ULL << 32) - 1,
++	/* lower 32-bits */
++	SPP_C2H_STATUS_WB_ADDR_HI_SHIFT = 32,
++	/* upper 32-bits */
++};
++
++#define SPP_REG_C2H_WC_TO_CNT           SPP_REG_C2H_WB(0xc)
++
++enum {
++	SPP_C2H_WC_TO_TICK_CNT_DFLT	= 0x4100,
++
++	SPP_C2H_WC_TO_CNT_DFLT		= 0xf,
++	SPP_C2H_WC_TO_CNT_MASK		= BIT(4) - 1,
++	SPP_C2H_WC_TO_CNT_SHIFT		= 20,
++
++	SPP_C2H_WC_TO_CNT_ALL		= 0,
++};
++
++#define SPP_REG_C2H_WB_META_RING_ADDR_LO        SPP_REG_C2H_WB(0x18)
++#define SPP_REG_C2H_WB_META_RING_ADDR_HI        SPP_REG_C2H_WB(0x1c)
++
++enum {
++	SPP_C2H_WB_META_RING_ADDR_LO_MASK	= (1ULL << 32) - 1,
++	/* lower 32-bits */
++	SPP_C2H_WB_META_RING_ADDR_HI_SHIFT	= 32,
++	/* upper 32-bits */
++};
++
++#define SPP_REG_C2H_WB_META_RING_SIZE   SPP_REG_C2H_WB(0x20)
++#define SPP_REG_C2H_WB_META_RING_READ   SPP_REG_C2H_WB(0x24)
++
++enum {
++	SPP_C2H_WB_META_RING_READ_MASK = BIT(16) - 1,
++	/* lower 16-bits */
++};
++
++#define SPP_REG_C2H_WB_META_RING_WRITE  SPP_REG_C2H_WB(0x28)
++
++enum {
++	SPP_C2H_WB_META_RING_WRITE_MASK = BIT(16) - 1,
++	/* lower 16-bits */
++};
++
++#define SPP_REG_C2H_WB_STATUS_ERR       SPP_REG_C2H_WB(0x2c)
++
++enum {
++	SPP_C2H_WB_STATUS_BRESP_ERR	= BIT(0),
++	/* Error: Status write-back Bresp error */
++	SPP_C2H_WB_MD_BRESP_ERR		= BIT(1),
++	/* Error: Metadata write-back Bresp error */
++};
++
++#define SPP_REG_C2H_WB_STATUS           SPP_REG_C2H_WB(0x30)
++
++enum {
++	SPP_C2H_STATUS_DESC_ERR = BIT(0),
++	SPP_C2H_STATUS_DM_ERR	= BIT(1),
++	SPP_C2H_STATUS_WB_ERR	= BIT(2),
++
++	SPP_C2H_STATUS_ERR_ALL	=
++		SPP_C2H_STATUS_DESC_ERR |
++		SPP_C2H_STATUS_DM_ERR |
++		SPP_C2H_STATUS_WB_ERR,
++};
++
++#define SPP_REG_C2H_BUF(offset)         (SPP_CSR_C2H_BUF_BASE + (offset))
++#define SPP_REG_C2H_BUF_CFG             SPP_REG_C2H_BUF(0x0)
++#define SPP_REG_C2H_BUF_STATUS          SPP_REG_C2H_BUF(0x4)
++
++enum {
++	SPP_C2H_BUF_FULL	= BIT(0),
++	/* Status: Buffer full */
++	SPP_C2H_BUF_EMPTY	= BIT(1),
++	/* Status: Buffer empty */
++	SPP_C2H_AXIS_FIFO_FULL	= BIT(2),
++	/* Status: AXIS Fifo full */
++	SPP_C2H_AXIS_FIFO_EMPTY = BIT(3),
++	/* Status: AXIS Fifo empty */
++};
++
++#define SPP_REG_C2H_BUF_IN_PKT_CNT      SPP_REG_C2H_BUF(0x8)
++#define SPP_REG_C2H_BUF_OUT_PKT_CNT     SPP_REG_C2H_BUF(0xc)
++#define SPP_REG_C2H_BUF_PTR             SPP_REG_C2H_BUF(0x10)
++#define SPP_REG_C2H_AUX_RAM_PTR         SPP_REG_C2H_BUF(0x14)
++#define SPP_REG_C2H_BUF_NUM_BYTES       SPP_REG_C2H_BUF(0x18)
++
++#define SPP_REG_C2H_AXIS(offset)        (SPP_CSR_C2H_AXIS_BASE + (offset))
++#define SPP_REG_C2H_AXIS_PKT_CNT        SPP_REG_C2H_AXIS(0x0)
++
++/*
++ * H2C Registers (SPP TX)
++ */
++
++#define SPP_REG_H2C_DESC(offset)        (SPP_CSR_H2C_DESC_BASE + (offset))
++#define SPP_REG_H2C_CDT_CONSUMED        SPP_REG_H2C_DESC(0x0)
++#define SPP_REG_H2C_CDT_LIMIT           SPP_REG_H2C_DESC(0x4)
++#define SPP_REG_H2C_COMP_CNT            SPP_REG_H2C_DESC(0x8)
++#define SPP_REG_H2C_DESC_FIFO           SPP_REG_H2C_DESC(0xc)
++
++enum {
++	SPP_H2C_DESC_FIFO_WRITE_MASK	= BIT(16) - 1,
++	/* lower 16-bits */
++	SPP_H2C_DESC_FIFO_READ_SHIFT	= BIT(16),
++	/* upper 16-bits */
++};
++
++#define SPP_REG_H2C_DESC_RAM_ADDR       SPP_REG_H2C_DESC(0x10)
++#define SPP_REG_H2C_DESC_RAM_DATA       SPP_REG_H2C_DESC(0x14)
++#define SPP_REG_H2C_DESC_RAM_STATUS     SPP_REG_H2C_DESC(0x18)
++
++enum {
++	SPP_H2C_DESC_OFLOW_ERR		= BIT(0),
++	/* Error: Desc written when desc RAM is full */
++	SPP_H2C_DESC_OOO_ERR		= BIT(1),
++	/* Error: Desc written out of order */
++	SPP_H2C_DESC_UNALIGN_ERR	= BIT(2),
++	/* Error: Desc unaligned address */
++	SPP_H2C_DESC_FULL		= BIT(3),
++	/* Status: Desc RAM full */
++	SPP_H2C_DESC_EMPTY		= BIT(4),
++	/* Status: Desc RAM empty */
++};
++
++#define SPP_REG_H2C_DESC_INFO           SPP_REG_H2C_DESC(0x20)
++
++enum {
++	SPP_H2C_DESC_TYPE_COMPACT_EN	= BIT(0),
++
++	SPP_H2C_DESC_RAM_DEPTH_MASK	= BIT(16) - 1,
++	SPP_H2C_DESC_RAM_DEPTH_SHIFT	= 16,
++};
++
++#define SPP_REG_H2C_DATA_MOVER(offset)  (SPP_CSR_H2C_DATA_MOVER_BASE + (offset))
++#define SPP_REG_H2C_DM_CFG              SPP_REG_H2C_DATA_MOVER(0x0)
++#define SPP_REG_H2C_DM_STATUS           SPP_REG_H2C_DATA_MOVER(0x4)
++
++enum {
++	SPP_H2C_DM_RRESP_ERR	= BIT(0),
++	/* Error: Rresp error */
++	SPP_H2C_DM_DESC_LEN_ERR = BIT(1),
++	/* Error: Desc length equal to zero */
++};
++
++#define SPP_REG_H2C_WB(offset)          (SPP_CSR_H2C_WB_BASE + (offset))
++#define SPP_REG_H2C_WB_CFG              SPP_REG_H2C_WB(0x0)
++
++enum {
++	SPP_H2C_WB_CFG_DESC_CNT_EN		= BIT(0),
++	SPP_H2C_WB_CFG_PKT_CNT_EN		= BIT(1),
++	SPP_H2C_WB_CFG_CDT_EN			= BIT(2),
++
++	SPP_H2C_WB_CFG_DESC_CTD_WC_EN		= BIT(4),
++	SPP_H2C_WB_CFG_DESC_CNT_WC_EN		= BIT(5),
++	SPP_H2C_WB_CFG_PKT_CNT_WC_EN		= BIT(6),
++
++	SPP_H2C_WB_CFG_WC_CNT_MINUS1_DFLT	= 31,
++	SPP_H2C_WB_CFG_WC_CNT_MINUS1_MASK	= BIT(6) - 1,
++	SPP_H2C_WB_CFG_WC_CNT_MINUS1_SHIFT	= 8,
++
++	SPP_H2C_WB_CFG_WC_ALL			=
++		SPP_H2C_WB_CFG_DESC_CNT_WC_EN |
++		((SPP_H2C_WB_CFG_WC_CNT_MINUS1_DFLT &
++		  SPP_H2C_WB_CFG_WC_CNT_MINUS1_MASK) <<
++		 SPP_H2C_WB_CFG_WC_CNT_MINUS1_SHIFT),
++
++	/*
++	 * SPP only uses the descriptor completed count and we want the
++	 * write-back coalesced per the above configuration.
++	 */
++	SPP_H2C_WB_CFG_ALL_EN =
++		SPP_H2C_WB_CFG_DESC_CNT_EN |
++		SPP_H2C_WB_CFG_WC_ALL,
++};
++
++#define SPP_REG_H2C_STATUS_WB_ADDR_LO   SPP_REG_H2C_WB(0x4)
++#define SPP_REG_H2C_STATUS_WB_ADDR_HI   SPP_REG_H2C_WB(0x8)
++
++enum {
++	SPP_H2C_STATUS_WB_ADDR_LO_MASK	= (1ULL << 32) - 1,
++	/* lower 32-bits */
++	SPP_H2C_STATUS_WB_ADDR_HI_SHIFT = 32,
++	/* upper 32-bits */
++};
++
++#define SPP_REG_H2C_WC_TO_CNT           SPP_REG_H2C_WB(0xc)
++
++enum {
++	SPP_H2C_WC_TO_TICK_CNT_DFLT	= 0x4100,
++
++	SPP_H2C_WC_TO_CNT_DFLT		= 0xf,
++	SPP_H2C_WC_TO_CNT_MASK		= BIT(4) - 1,
++	SPP_H2C_WC_TO_CNT_SHIFT		= 20,
++
++	SPP_H2C_WC_TO_CNT_ALL		=
++		SPP_H2C_WC_TO_TICK_CNT_DFLT |
++		((SPP_H2C_WC_TO_CNT_DFLT &
++		  SPP_H2C_WC_TO_CNT_MASK) <<
++		 SPP_H2C_WC_TO_CNT_SHIFT),
++};
++
++#define SPP_REG_H2C_WB_STATUS_ERR       SPP_REG_H2C_WB(0x10)
++
++enum {
++	SPP_H2C_WB_STATUS_BRESP_ERR = BIT(0),
++	/* Error: Status write-back Bresp error */
++};
++
++#define SPP_REG_H2C_WB_STATUS           SPP_REG_H2C_WB(0x14)
++
++enum {
++	SPP_H2C_STATUS_DESC_ERR = BIT(0),
++	SPP_H2C_STATUS_DM_ERR	= BIT(1),
++	SPP_H2C_STATUS_WB_ERR	= BIT(2),
++
++	SPP_H2C_STATUS_ERR_ALL	=
++		SPP_H2C_STATUS_DESC_ERR |
++		SPP_H2C_STATUS_DM_ERR |
++		SPP_H2C_STATUS_WB_ERR,
++};
++
++#define SPP_REG_H2C_BUF(offset)         (SPP_CSR_H2C_BUF_BASE + (offset))
++#define SPP_REG_H2C_BUF_CFG             SPP_REG_H2C_BUF(0x0)
++#define SPP_REG_H2C_BUF_STATUS          SPP_REG_H2C_BUF(0x4)
++
++enum {
++	SPP_H2C_BUF_FULL	= BIT(0),
++	/* Status: Buffer full */
++	SPP_H2C_BUF_EMPTY	= BIT(1),
++	/* Status: Buffer empty */
++	SPP_H2C_AXIS_FIFO_FULL	= BIT(2),
++	/* Satus: AXIS Fifo full */
++	SPP_H2C_AXIS_FIFO_EMPTY = BIT(3),
++	/* Status: AXIS Fifo empty */
++};
++
++#define SPP_REG_H2C_BUF_IN_PKT_CNT      SPP_REG_H2C_BUF(0x8)
++#define SPP_REG_H2C_BUF_OUT_PKT_CNT     SPP_REG_H2C_BUF(0xc)
++#define SPP_REG_H2C_BUF_PTR             SPP_REG_H2C_BUF(0x10)
++#define SPP_REG_H2C_AUX_RAM_PTR         SPP_REG_H2C_BUF(0x14)
++#define SPP_REG_H2C_BUF_ENTRIES         SPP_REG_H2C_BUF(0x18)
++#define SPP_REG_H2C_DM_BUF_PTR          SPP_REG_H2C_BUF(0x1c)
++
++#define SPP_REG_H2C_AXIS(offset)        (SPP_CSR_H2C_AXIS_BASE + (offset))
++#define SPP_REG_H2C_AXIS_PKT_CNT        SPP_REG_H2C_AXIS(0x0)
++
++/*
++ * Structure definitions for descriptors and write-back buffers
++ */
++
++#if defined(SPP_USE_COMPACT_DESCS)
++/*
++ * The SDE C2H desc (RX) is the same size for compact and regular.
++ *  -note that the phys_addr is 48 bits for the compact desc.
++ */
++struct spp_rx_desc {
++	uint32_t	length;
++	uint64_t	phys_addr;
++	uint32_t	reserved;
++} __attribute__((packed));
++
++/*
++ * The SDE WB Meta desc (RX) is different for compact and regular.
++ */
++struct spp_wb_meta_desc {
++	uint32_t	length;
++	uint32_t	valid_eop_bits; /* see SPP_WB_META_DESC enum */
++} __attribute__((packed));
++
++enum {
++	SPP_WB_META_DESC_VALID	= BIT(0),
++	SPP_WB_META_DESC_EOP	= BIT(1),
++};
++
++/*
++ * The SDE H2C desc (TX) is different for compact and regular.
++ *  -note that the phys_addr is 48 bits for the compact desc.
++ */
++struct spp_tx_desc {
++	uint32_t	length;
++	uint64_t	phys_addr;
++	/* The phys_addr is or'd with the EOP and SPB bits */
++	uint32_t	reserved;
++} __attribute__((packed));
++
++enum {
++	SPP_TX_DESC_EOP = 1ULL << 48,   /* > 32b shift */
++	SPP_TX_DESC_SPB = 1ULL << 49,   /* > 32b shift */
++};
++#else
++struct spp_rx_desc {
++	uint32_t	length;
++	uint64_t	phys_addr;
++	uint32_t	reserved;
++} __attribute__((packed));
++
++struct spp_wb_meta_desc {
++	uint32_t	length;
++	uint32_t	valid_eop_bits; /* see SPP_WB_META_DESC enum */
++	uint64_t	user;
++} __attribute__((packed));
++
++enum {
++	SPP_WB_META_DESC_VALID	= BIT(0),
++	SPP_WB_META_DESC_EOP	= BIT(1),
++};
++
++struct spp_tx_desc {
++	uint32_t	length;
++	uint64_t	phys_addr;
++	uint32_t	eop_spb_bits; /* see SPP_TX_DESC enum */
++	uint64_t	reserved;
++	uint64_t	user;
++} __attribute__((packed));
++
++enum {
++	SPP_TX_DESC_EOP = BIT(0),
++	SPP_TX_DESC_SPB = BIT(1),
++};
++#endif
++
++struct spp_rx_status {
++	uint32_t	status; /* see SPP_RX_STATUS enum */
++	uint32_t	desc_limit;
++	uint32_t	desc_completed;
++	uint32_t	pkt_count;
++	uint32_t	meta_write;
++} __attribute__((packed));
++
++enum {
++	SPP_RX_STATUS_DESC_ERR	= BIT(0),
++	SPP_RX_STATUS_DM_ERR	= BIT(1),
++	SPP_RX_STATUS_WB_ERR	= BIT(2),
++
++	SPP_RX_STATUS_ERR_ALL	=
++		SPP_RX_STATUS_DESC_ERR |
++		SPP_RX_STATUS_DM_ERR |
++		SPP_RX_STATUS_WB_ERR,
++};
++
++struct spp_tx_status {
++	uint32_t	status; /* see SPP_TX_STATUS enum */
++	uint32_t	desc_limit;
++	uint32_t	desc_completed;
++	uint32_t	pkt_count;
++} __attribute__((packed));
++
++enum {
++	SPP_TX_STATUS_DESC_ERR	= BIT(0),
++	SPP_TX_STATUS_DM_ERR	= BIT(1),
++	SPP_TX_STATUS_WB_ERR	= BIT(2),
++
++	SPP_TX_STATUS_ERR_ALL	=
++		SPP_TX_STATUS_DESC_ERR |
++		SPP_TX_STATUS_DM_ERR |
++		SPP_TX_STATUS_WB_ERR,
++};
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/drivers/net/spp/spp_logs.h b/drivers/net/spp/spp_logs.h
+new file mode 100644
+index 0000000..59301f1
+--- /dev/null
++++ b/drivers/net/spp/spp_logs.h
+@@ -0,0 +1,48 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#ifndef _SPP_LOGS_H_
++#define _SPP_LOGS_H_
++
++#define RTE_LOGTYPE_SPP RTE_LOGTYPE_USER1
++
++#define SPP_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++
++#define SPP_INIT_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++
++#ifdef RTE_LIBRTE_SPP_DEBUG_RX
++#define SPP_RX_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++#else
++#define SPP_RX_LOG(level, fmt, args ...) do { } while (0)
++#endif
++
++#ifdef RTE_LIBRTE_SPP_DEBUG_TX
++#define SPP_TX_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++#else
++#define SPP_TX_LOG(level, fmt, args ...) do { } while (0)
++#endif
++
++#ifdef RTE_LIBRTE_SPP_DEBUG_DRIVER
++#define SPP_DRV_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++#else
++#define SPP_DRV_LOG(level, fmt, args ...) do { } while (0)
++#endif
++
++#endif /* _SPP_LOGS_H_ */
+diff --git a/mk/rte.app.mk b/mk/rte.app.mk
+index 1e32c83..3569c5f 100644
+--- a/mk/rte.app.mk
++++ b/mk/rte.app.mk
+@@ -128,6 +128,7 @@ _LDLIBS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD)      += -lrte_pmd_dpaa2
+ endif
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_E1000_PMD)      += -lrte_pmd_e1000
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_ENA_PMD)        += -lrte_pmd_ena
++_LDLIBS-$(CONFIG_RTE_LIBRTE_SPP_PMD)        += -lrte_pmd_spp
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_ENIC_PMD)       += -lrte_pmd_enic
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_FM10K_PMD)      += -lrte_pmd_fm10k
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_PMD_FAILSAFE)   += -lrte_pmd_failsafe
+diff --git a/usertools/dpdk-devbind.py b/usertools/dpdk-devbind.py
+index d0c4209..1c225dd 100755
+--- a/usertools/dpdk-devbind.py
++++ b/usertools/dpdk-devbind.py
+@@ -26,8 +26,10 @@
+               'SVendor': None, 'SDevice': None}
+ avp_vnic = {'Class': '05', 'Vendor': '1af4', 'Device': '1110',
+               'SVendor': None, 'SDevice': None}
++aws_fpga_sde = {'Class': '05', 'Vendor': '1d0f', 'Device': 'f002',
++              'SVendor': None, 'SDevice': None}
+ 
+-network_devices = [network_class, cavium_pkx, avp_vnic]
++network_devices = [network_class, cavium_pkx, avp_vnic, aws_fpga_sde]
+ crypto_devices = [encryption_class, intel_processor_class]
+ eventdev_devices = [cavium_sso, cavium_tim]
+ mempool_devices = [cavium_fpa]
+-- 
+1.8.3.1
+
