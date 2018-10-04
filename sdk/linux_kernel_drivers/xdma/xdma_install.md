@@ -9,6 +9,7 @@ XDMA is a Linux kernel driver for using DMA and/or User-defined interrupts for A
 2. [Q: How do I get the source code of the `xdma` driver and compile it?](#howToCompile)
 3. [Q: How can I make sure the installed driver will be preserved following a kernel update?](#howToUpdateKernel) 
 4. [Q: What PCIe Vendor-ID and Device-ID does XDMA driver support](#howToDIDnVID)
+5. [Q. Install of XDMA driver fails on AMI version 1.5.x or Later](#xdmainstallfail)
 
 <a name="howIKnow"></a>
 **Q: How do I know if the XDMA driver is available and installed?** 
@@ -175,3 +176,24 @@ where 0x1d0f is the vendor ID for Amazon and 0xf001 is the device ID for the cl-
 Be sure to remake and re-install the XDMA driver after modifying the device table.
 
 Amazon encourages pull requests to this github to add CL ID's to the driver, so there is no need to fork the driver or SDK.
+
+<a name="xdmainstallfail"></a>
+**Q: Install of XDMA driver fails on AMI version 1.5.x or Later**
+
+DEVAMI 1.5.0 or Later instances come with preinstalled Xilinx Runtime Environment (XRT). XOCL driver come pre-installed with XRT. This prevents XDMA driver install. Please remove XOCL driver module and then proceed to install XDMA driver.
+
+ To check if XOCL driver is running
+ 
+ ```
+ lsmod | grep xocl
+ 
+ ```
+ To Remove XOCL driver
+ 
+ ```
+ sudo rmmod xocl
+ 
+ ```
+
+ XDMA driver install can proceed once XOCL driver is removed.
+ 
