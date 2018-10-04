@@ -97,10 +97,7 @@ if(fdf_ddr_comb) {
 //=============================================================================
 
 // Map that contains stages of tests
-
-def initial_tests = [:]
-def secondary_tests = [:]
-def multi_stage_tests = [:]
+def all_tests = [:]
 
 // Task to Label map
 task_label = [
@@ -199,7 +196,7 @@ if (env.CHANGE_ID) {
 
 
 if (test_markdown_links || test_src_headers) {
-    initial_tests['Documentation Tests'] = {
+    all_tests['Documentation Tests'] = {
         node(get_task_label(task: 'md_links', xilinx_version: default_xilinx_version)) {
             checkout scm
             commitChangeset = sh(returnStdout: true, script: 'git diff-tree --no-commit-id --name-status -r HEAD').trim()
@@ -253,7 +250,7 @@ if (test_markdown_links || test_src_headers) {
 //=============================================================================
 
 if (test_hdk_scripts) {
-    initial_tests['Test HDK Scripts'] = {
+    all_tests['Test HDK Scripts'] = {
         stage('Test HDK Scripts') {
             String report_file = 'test_hdk_scripts.xml'
             node(get_task_label(task: 'source_scripts', xilinx_version: default_xilinx_version)) {
@@ -278,7 +275,7 @@ if (test_hdk_scripts) {
 }
 
 if (test_fpga_tools) {
-    secondary_tests['Test FPGA Tools 1 Slot'] = {
+    all_tests['Test FPGA Tools 1 Slot'] = {
         stage('Test FPGA Tools 1 Slot') {
             String report_file_tools = 'test_fpga_tools.xml'
             String report_file_sdk = 'test_fpga_sdk.xml'
@@ -310,7 +307,7 @@ if (test_fpga_tools) {
             }
         }
     }
-    secondary_tests['Test FPGA Tools All Slots'] = {
+    all_tests['Test FPGA Tools All Slots'] = {
         stage('Test FPGA Tools All Slots') {
             String report_file_tools = 'test_fpga_tools_all_slots.xml'
             String report_file_sdk = 'test_fpga_sdk_all_slots.xml'
@@ -345,7 +342,7 @@ if (test_fpga_tools) {
 }
 
 if (test_sims) {
-    multi_stage_tests['Run Sims'] = {
+    all_tests['Run Sims'] = {
         stage('Run Sims') {
             def cl_names = ['cl_uram_example', 'cl_dram_dma', 'cl_hello_world']
             def sim_nodes = [:]
@@ -387,7 +384,7 @@ if (test_sims) {
 }
 
 if (test_edma) {
-    secondary_tests['Test EDMA Driver'] = {
+    all_tests['Test EDMA Driver'] = {
         stage('Test EDMA Driver') {
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
 
@@ -424,7 +421,7 @@ if (test_edma) {
 }
 
 if (test_xdma) {
-    secondary_tests['Test XDMA Driver'] = {
+    all_tests['Test XDMA Driver'] = {
         stage('Test XDMA Driver') {
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
 
@@ -460,7 +457,7 @@ if(disable_runtime_tests) {
 }
 else {
     if (test_runtime_software) {
-        multi_stage_tests['Test Runtime Software'] = {
+        all_tests['Test Runtime Software'] = {
 
             stage('Test Runtime Software') {
                 def nodes = [:]
@@ -511,7 +508,7 @@ else {
 
 
 if (test_dcp_recipes) {
-    multi_stage_tests['Test DCP Recipes'] = {
+    all_tests['Test DCP Recipes'] = {
         stage('Test DCP Recipes') {
             def nodes = [:]
             for (version in xilinx_versions) {
@@ -560,7 +557,7 @@ if (test_dcp_recipes) {
 if (test_hdk_fdf) {
     // Top level stage for FDF
     // Each CL will have its own parallel FDF stage under this one.
-    multi_stage_tests['HDK_FDF'] = {
+    all_tests['HDK_FDF'] = {
         stage('HDK FDF') {
             def fdf_stages = [:]
             for (version in xilinx_versions) {
@@ -742,7 +739,7 @@ if (test_hdk_fdf) {
 //=============================================================================
 
 if (test_sdaccel_scripts) {
-    initial_tests['Test SDAccel Scripts'] = {
+    all_tests['Test SDAccel Scripts'] = {
         stage('Test SDAccel Scripts') {
             def nodes = [:]
 
@@ -777,7 +774,7 @@ if (test_sdaccel_scripts) {
 }
 
 if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
-    multi_stage_tests['Run SDAccel Tests'] = {
+    all_tests['Run SDAccel Tests'] = {
         String sdaccel_examples_list = 'sdaccel_examples_list.json'
 
         def sdaccel_all_version_stages = [:]
@@ -1083,6 +1080,4 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
 
 // Run the tests here
-parallel initial_tests
-parallel secondary_tests
-parallel multi_stage_tests
+parallel all_tests
