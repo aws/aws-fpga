@@ -33,7 +33,7 @@ It is highly recommended you read the documentation and utilize software and har
 * SDAccel is a complete development environment for applications accelerated using Xilinx FPGAs
 * It leverages the OpenCL heterogeneous computing framework to offload compute intensive workloads to the FPGA
 * The accelerated application is written in  C/C++, OpenCL or RTL with OpenCL APIs
-* Once you complete this quick starting exampl, see the [SDAccel GUI Guide](./docs/README_GUI.md) to access the fully integrated Eclipse-based environment with built-in debug, profiling and performance analysis tools. 
+* Once you complete this quick starting example, see the [SDAccel GUI Guide](./docs/README_GUI.md) to access the fully integrated Eclipse-based environment with built-in debug, profiling and performance analysis tools. 
 
 <a name="prerequisites"></a>
 # Prerequisites

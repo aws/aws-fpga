@@ -141,6 +141,8 @@ flr_reset is ignored in this design
 ## Runtime software
 DMA accesses rely on the xdma driver- see the [xdma driver readme](../../../../sdk/linux_kernel_drivers/xdma/README.md)
 
+Developers using AMI 1.5.0 or Later Instances that come with pre-installed Xilinx Runtime Environment (XRT) should [refer to this note](sdk/linux_kernel_drivers/xdma/xdma_install.md#xdmainstallfail) before installing XDMA driver.
+
 The DRAM DMA example includes runtime software to demonstate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
 
 There are two example tests in cl_dram_dma example.
