@@ -61,6 +61,15 @@ ${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/hdl/axi_register_slice_v2_1_vl_rf
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/axi_clock_converter_v2_1_vl_rfs.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/hdl/fifo_generator_v13_2_rfs.v
 
+
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_bi_delay.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_db_delay_model.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_db_dly_dir.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_dir_detect.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rcd_model.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rank.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_dimm.sv
+${HDK_COMMON_DIR}/verif/models/ddr4_rdimm_wrapper/ddr4_rdimm_wrapper.sv 
 ${SH_LIB_DIR}/bram_2rw.sv
 ${SH_LIB_DIR}/flop_fifo.sv
 ${SH_LIB_DIR}/lib_pipe.sv
@@ -70,6 +79,7 @@ ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/mgt_acc_axl.sv
 ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sync.v
 ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/flop_ccf.sv
 ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sh_ddr.sv
+
 
 --define DISABLE_VJTAG_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
