@@ -532,14 +532,14 @@ Following are a few examples of how aligned and Unaligned access from PCIe to CL
 <a name="interrupts"></a>
 ## Interrupts 
 
-16 user interrupt source are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers in the DMA controller map the 16 user interrupt sources to MSI-X vectors.  
+16 user interrupt sources are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers in the DMA controller map the 16 user interrupt sources to MSI-X vectors.  
 
 There are two sets of signals to generate interrupts:
 
 -   cl_sh_apppf_irq_req\[15:0\] (from CL to SH)
 -   sh_cl_apppf_irq_ack\[15:0\] (from SH to CL)
 
-This interface uses single clock pulses for the req/ack.  The CL asserts (active high) cl_sh_apppf_irq_req\[x\] for a single clock to assert the interrupt request to the SH.  The SH will respond with a single clock pulse on sh_cl_apppf_irq_ack[x] to acknowledge the interrupt.  Once the CL asserts a request on a particular bit[x], it should not assert a request for the same bit[x] until it has recieved the ack for bit[x] from the SH.  The CL may assert requests on other bits[y] (y!=x).
+This interface uses single clock pulses for the req/ack.  The CL asserts (active high) cl_sh_apppf_irq_req\[x\] for a single clock to assert the interrupt request to the SH.  The SH will respond with a single clock pulse on sh_cl_apppf_irq_ack[x] to acknowledge the interrupt.  Once the CL asserts a request on a particular bit[x], it should not assert a request for the same bit[x] until it has received the ack for bit[x] from the SH.  The CL may assert requests on other bits[y] (y!=x).
 
 
 <a name="misc"></a>
