@@ -453,7 +453,7 @@ if {[string match "*windows*" [string tolower $::env(OS)]]} {
 }
 
 
-puts $manifest_file "manifest_format_version=1\n"
+puts $manifest_file "manifest_format_version=2\n"
 puts $manifest_file "pci_vendor_id=$vendor_id\n"
 puts $manifest_file "pci_device_id=$device_id\n"
 puts $manifest_file "pci_subsystem_id=$subsystem_id\n"
