@@ -13,6 +13,11 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifndef VIVADO_TOOL_VERSION
+$(error Environment variable VIVADO_TOOL_VERSION not set. please source hdk_setup.sh)
+else
+$(info VIVADO_TOOL_VERSION = $(VIVADO_TOOL_VERSION))
+endif
 
 export TEST ?= test_null
 export C_TEST ?= test_null

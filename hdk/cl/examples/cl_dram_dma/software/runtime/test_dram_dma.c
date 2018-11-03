@@ -72,8 +72,10 @@ int main(int argc, char **argv) {
 
     /* check that the AFI is loaded */
     log_info("Checking to see if the right AFI is loaded...");
+#ifndef SV_TEST
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
+#endif
 
     /* run the dma test example */
     rc = dma_example(slot_id, 1ULL << 24);
