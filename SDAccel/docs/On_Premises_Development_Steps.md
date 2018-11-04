@@ -15,11 +15,17 @@ This guide provides step-by-step instructions for getting started with the on-pr
 Before going through the steps described in this document, the user should have completed at least once the steps described in the [AWS SDAccel README] in the cloud.  After completing the README steps, you will be familiar with the developer environment and will be ready to setup your own environment. 
 
 ## Requirements
-* The supported Operating Systems for SDaccel On-premises development are:
-   * Red Hat Enterprise Workstation/Server 7.2 and 7.3 (64-bit)		 
-   * Red Hat Enterprise Workstation 6.7 and 6.8 (64-bit)		 
-   * CentOS 6.8, CentOS 7.3 (64-bit)		 
-   * Ubuntu Linux 16.04.1 LTS (64-bit)		 
+* SDAccel is supported on the following 64-bit Linux Operating Systems only:
+   * 2018.2
+      * Red Hat Enterprise Linux 7.3, 7.4		 
+      * CentOS 7.3, 7.4		 
+      * Ubuntu Linux 16.04.3 LTS (Linux kernel 4.4.0)
+      * More information can be found at https://www.xilinx.com/support/documentation/sw_manuals/xilinx2018_2/ug1238-sdx-rnil.pdf
+   * 2017.4
+      * Red Hat Enterprise Linux 6.9, 7.3
+      * CentOS 6.9, 7.3
+      * Ubuntu Linux 16.04
+      * More information can be found at https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf
 * gcc5.x or later is required to compile your OpenCL host code in order to use C++14 features (cl2.hpp). 
    * It is recommended that you use the Xilinx xcpp g++ wrapper to compile your host code.
    * xcpp simply uses system g++ if it is gcc5.x or later, otherwise it uses the g++ provided by SDAccel.
@@ -29,7 +35,8 @@ Before going through the steps described in this document, the user should have 
 ## Downloading the SDAccel Development Environment
 In order to develop any SDAccel application on-premises, you will need to install the same version of SDAccel as deployed on AWS F1. The SDAccel installer can be found here:
 
-https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.4_0411_1_Lin64.bin
+2018.2: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_Lin_2018.2_0614_1954_Lin64.bin&akdm=0
+2017.4: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.4_0411_1_Lin64.bin
 
 This requires a Xilinx login. If you do not have an existing Xilinx account, select **Create your account**.
 
@@ -134,8 +141,6 @@ All these are described in the [AWS SDAccel README]
 
 	
 # Additional Resources
-
-The [AWS SDAccel README].
 
 Xilinx web portal for [Xilinx SDAccel documentation] and for [Xilinx SDAccel GitHub repository]
 
