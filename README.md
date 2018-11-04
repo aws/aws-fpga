@@ -46,8 +46,8 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Tool     | Development/Runtime | Tool location | Description |
 | --------|---------|---------|---------|
-| SDx 2017.4 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
-| Vivado 2017.4 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
+| SDx 2017.4 & 2018.2 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
+| Vivado 2017.4 & 2018.2 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | FPGA AFI Management Tools | Runtime | [SDK - fpga\_mgmt\_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
 | Virtual JTAG | Development (Debug) | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Runtime debug waveform |
 | wait\_for\_afi | Development | [wait\_for\_afi.py](shared/bin/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |

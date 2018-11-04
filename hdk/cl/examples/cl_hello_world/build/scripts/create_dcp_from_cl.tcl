@@ -194,8 +194,8 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_
 
 source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
 #################################################################
-#### Do not remove this setting. Need to workaround bug in 2017.4
-#################################################################
+#### Do not remove this setting. Need to workaround bug 
+##################################################################
 set_param hd.clockRoutingWireReduction false
 ##################################################
 ### CL XPR OOC Synthesis

@@ -30,13 +30,19 @@ compile: $(COMPLIB_DIR)
 	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 
 run:
-
+ifeq ($(VIVADO_TOOL_VERSION),v2017.4)
 ifeq ($(TEST),test_null)
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_12 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_13 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_11 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_11 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(C_TEST).log -do "run -all; quit -f" tb glbl $(TEST)
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_15 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_16 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_14 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_14 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(C_TEST).log -do "run -all; quit -f" tb glbl $(TEST)
 else
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_12 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_13 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_11 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_11 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(TEST).log -do "run -all; quit -f" tb glbl $(TEST)
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_15 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_16 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_14 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_14 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(TEST).log -do "run -all; quit -f" tb glbl $(TEST)
 endif
-
+else
+ifeq ($(TEST),test_null)
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_17 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_18 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_16 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_16 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(C_TEST).log -do "run -all; quit -f" tb glbl $(TEST)
+else
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_17 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_18 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_16 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_16 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -l $(TEST).log -do "run -all; quit -f" tb glbl $(TEST)
+endif
+endif
 $(COMPLIB_DIR):
 	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
 	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl

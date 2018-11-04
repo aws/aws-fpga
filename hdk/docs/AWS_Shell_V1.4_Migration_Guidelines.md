@@ -4,7 +4,7 @@
 This document describes the changes required when migrating your design from shell v1.3 to shell v1.4.
 The HDK build scripts have changed to reflect the new v1.4 shell’s floorplan and newer Vivado tools. It’s strongly recommended users move to these scripts. Users who have already customized v1.3 scripts should diff those with the v1.4 scripts and be sure to include all new parameters that have been added to v1.4 scripts.
 
-1. Upgrade Vivado Tools to version 2017.4. Needs [FPGA DEVELOPER AMI 1.4 or later](../../README.md#overviewdevtools)
+1. Upgrade Vivado Tools to version 2017.4 or later. Needs [FPGA DEVELOPER AMI 1.4 or later](../../README.md#overviewdevtools)
 
 2. The hierarchy for CL & SH modules have changed. Now they are instantiated in  "WRAPPER_INST" Module.
      The paths in your Build scripts, constraints &  verification components have to be updated.
@@ -31,7 +31,7 @@ NOTE: Only INCR burst mode is supported on AXI-4 buses between CL/Shell interfac
 
 6. All Xilinx IP  in your CL must to be upgraded to 2017.4 or later version. see [vivado 2017.4 release notes for recommended version](https://www.xilinx.com/support/answers/70386.html)
 
-7. [ILA cores](../common/shell_v04261818/design/ip/cl_debug_bridge) need to be upgraded for 2017.4
+7. [ILA cores](../common/shell_v04261818/design/ip/cl_debug_bridge) need to be upgraded for 2017.4 or later
      Please refer to the [cl_dram_dma](../cl/examples/cl_dram_dma/design) example for ILA hookup on PCIS interface.
 
 8. Please use below information to update CL pblock constraints to optimize your design in Shel v1.4.

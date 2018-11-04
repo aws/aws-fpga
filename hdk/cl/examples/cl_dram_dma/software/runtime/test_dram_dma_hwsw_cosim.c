@@ -51,7 +51,6 @@ const struct logger *logger = &logger_stdout;
 #else
 # define log_error(...) printf(__VA_ARGS__); printf("\n")
 # define log_info(...) printf(__VA_ARGS__); printf("\n")
-static void setup_send_rdbuf_to_c(uint8_t *read_buffer, size_t buffer_size);
 #endif
 
 /* Main will be different for different simulators and also for C. The
@@ -239,40 +238,3 @@ static inline int do_dma_write(int fd, uint8_t *buffer, size_t size,
     return fpga_dma_burst_write(fd, buffer, size, address);
 #endif
 }
-
-#if defined(SV_TEST)
-
-static uint8_t *send_rdbuf_to_c_read_buffer = NULL;
-static size_t send_rdbuf_to_c_buffer_size = 0;
-
-static void setup_send_rdbuf_to_c(uint8_t *read_buffer, size_t buffer_size)
-{
-    send_rdbuf_to_c_read_buffer = read_buffer;
-    send_rdbuf_to_c_buffer_size = buffer_size;
-}
-
-int send_rdbuf_to_c(char* rd_buf)
-{
-#ifndef VIVADO_SIM
-    /* Vivado does not support svGetScopeFromName */
-    svScope scope;
-    scope = svGetScopeFromName("tb");
-    svSetScope(scope);
-#endif
-    int i;
-
-    /* For Questa simulator the first 8 bytes are not transmitted correctly, so
-     * the buffer is transferred with 8 extra bytes and those bytes are removed
-     * here. Made this default for all the simulators. */
-    for (i = 0; i < send_rdbuf_to_c_buffer_size; ++i) {
-        send_rdbuf_to_c_read_buffer[i] = rd_buf[i+8];
-    }
-
-    /* end of line character is not transferered correctly. So assign that
-     * here. */
-    send_rdbuf_to_c_read_buffer[send_rdbuf_to_c_buffer_size - 1] = '\0';
-
-    return 0;
-} 
-
-#endif
