@@ -1,29 +1,33 @@
-Hardware Debug of SDAccel RTL Kernel Design
+Hardware Debug of SDAccel OpenCL Kernel
 ======================
 
 This file contains the following sections:
 
 1. Overview
-2. Instantiating Debug cores in your RTL Kernel design
+2. Enabling ChipScope Debug
 3. Host code changes to support debugging
 4. Building the executable, creating the AFI, and executing the host code
 5. Start debug servers
 
 
 ## 1. Overview
-The sections below give you a brief explanation of the steps required to debug your SDAccel RTL kernel design.  They include instantiating the ILA/debug cores in your RTL kernel, pausing the execution of the host code at the appriopriate stage to ensure the setup of ILA triggers, building the running the host code and starting the debug servers to debug the design in hardware.  
+The sections below give you a brief explanation of the steps required to debug your SDAccel OpenCL kernel.  They include enabling ChipScope debug,  pausing the execution of the host code at the appropriate stage to ensure the setup of ILA triggers, building the running the host code and starting the debug servers to debug the design in hardware.  
 
-## 2. Adding debug cores to your RTL kernel 
+## 2. Enabling ChipScope Debug 
 
-There are different types of debug that can be enabled in an RTL kernel design.  Debug cores can be added to the AXI interfaces on the kernel itself to monitor AXI transaction level activity (part of the ChipScope Debug feature of SDAccel) and debug cores can be instantiated in the RTL kernel to monitor signals in the RTL kernel code.
+Debug cores can be added to the AXI interfaces on the kernel itself to monitor AXI transaction level activity (part of the ChipScope Debug feature of SDAccel).
 
-### Adding debug cores to the kernel AXI interfaces
+
 
 Adding debug cores to the AXI interfaces on the kernel can be done in a couple of ways:
 
-- By opening the SDAccel GUI and enabling "ChipScope Debug" on the hardware function in the Hardware Function Settings window.
+- Using the SDAccel GUI and enabling "ChipScope Debug" on the hardware function in the Hardware Function Settings window.  
 
-- Or, by passing the --dk chipscope option to the XOCC compiler with the compute unit name and optional interface name. 
+  - Note: If you are building on AWS and need information on how to enable the SDAccel GUI on AWS F1, see​  [README_GUI.md](./README_GUI.md).  If you are building on premise, follow the directions in [On_Premises_Development_Steps.md](./On_Premises_Development_Steps.md).
+
+- Using the XOCC --dk chipscope option with the compute unit name and optional interface name. 
+
+
 
 
 To enable ChipScope debug using the GUI, perform the following steps:
@@ -34,11 +38,10 @@ To enable ChipScope debug using the GUI, perform the following steps:
 
 
 
-   ![](./figure/sda_chipscope_flow1.PNG)
+  ![](./figure/sda_chipscope_flow1.PNG)
 
 2. When the hardware function settings dialog appears, check the box for "ChipScope Debug" in the debug and profiling settings table.  By checking this box, the compute unit will now have a System ILA inserted onto it's AXI interface ports.
-
-   ![](./figure/sda_chipscope_flow2.PNG)
+  ![](./figure/sda_chipscope_flow2.PNG)
 
 
 
@@ -48,7 +51,7 @@ Alternatively, ChipScope debug can be enabled by adding an XOCC option to the CL
 --dk chipscope:<compute_unit_name>:<interface_name>
 ```
 
-For example if a project has a compute unit named krnl_vadd_1, enabling chipscope debug can be accomplished by adding the following XOCC option to the CLFLAGS in the makefile:
+For example, to add ChipScope debugging to the helloworld_ocl OpenCL example , enabling chipscope debug can be accomplished by adding the following XOCC option to the CLFLAGS in the makefile:
 
 ```
 --dk chipscope:krnl_vadd_1
@@ -57,41 +60,6 @@ For example if a project has a compute unit named krnl_vadd_1, enabling chipscop
 For detailed usage and more examples, refer to the SDAccel Debugging Guide (UG1281 v2018.2).
 
 
-
-### Adding debug cores to the RTL kernel code
-
-To debug signals internal to the RTL Kernel you need to instantiate debug cores like the Integrated Logic Analyzer(ILA), Virtual Input/Output(VIO) etc in your application RTL kernel code.
-
-The ILA Debug IP can be created and added to the RTL Kernel in a couple of ways. 
-
-
-1. Open the ILA IP customization wizard in the Vivado GUI and customize the ILA and instantiate it in the RTL code – similar to any other IP in Vivado.
-
-
-2. Create the ILA IP on the fly using TCL.  A snippet of the create_ip TCL command is shown below. The example below creates the ILA IP with 7 probes and associates properties with the IP.
-
-```
-create_ip -name ila -vendor xilinx.com -library ip -module_name ila_0
-set_property -dict [list CONFIG.C_PROBE6_WIDTH {32} CONFIG.C_PROBE3_WIDTH {64} 
-CONFIG.C_NUM_OF_PROBES {7} CONFIG.C_EN_STRG_QUAL {1} CONFIG.C_INPUT_PIPE_STAGES {2} CONFIG.C_ADV_TRIGGER {true} CONFIG.ALL_PROBE_SAME_MU_CNT {4} CONFIG.C_PROBE6_MU_CNT {4} CONFIG.C_PROBE5_MU_CNT {4} CONFIG.C_PROBE4_MU_CNT {4} CONFIG.C_PROBE3_MU_CNT {4} CONFIG.C_PROBE2_MU_CNT {4} CONFIG.C_PROBE1_MU_CNT {4} CONFIG.C_PROBE0_MU_CNT {4}] [get_ips ila_0]
-```
-
-This TCL file should be added as an RTL Kernel source in the Makefile of your design
-
-
-Now you are ready to instantiate the ILA Debug core in your RTL Kernel. The RTL code snippet below is an ILA that monitors the output of a combinatorial adder.
-
-		// ILA monitoring combinatorial adder
-		ila_0 i_ila_0 (
-			.clk(ap_clk),              // input wire        clk
-			.probe0(areset),           // input wire [0:0]  probe0  
-			.probe1(rd_fifo_tvalid_n), // input wire [0:0]  probe1 
-			.probe2(rd_fifo_tready),   // input wire [0:0]  probe2 
-			.probe3(rd_fifo_tdata),    // input wire [63:0] probe3 
-			.probe4(adder_tvalid),     // input wire [0:0]  probe4 
-			.probe5(adder_tready_n),   // input wire [0:0]  probe5 
-			.probe6(adder_tdata)       // input wire [31:0] probe6
-		);
 
 ## 3. Host code changes to support debugging
 
