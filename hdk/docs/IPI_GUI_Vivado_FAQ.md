@@ -90,7 +90,7 @@ For Questa, libraries need to be compiled and the following changes are needed t
 
 Invoke vivado (no project needs to be open).  In the TCL console run the following compile to compile libraries.
 
-`compile_simlib -simulator questa -directory path/simlib/2017.1_questa_sdx`
+`compile_simlib -simulator questa -directory path/simlib/2017.4_questa_sdx`
 
 Open any Vivado project where simulation needs to be changed to Questa.
 
@@ -130,7 +130,7 @@ For VCS, libraries need to be compiled and the following changes are needed to t
 
 Invoke vivado (no project needs to be open).  In the TCL console run the following compile to compile libraries.
 
-`compile_simlib -simulator vcs_mx -directory path/simlib/2017.1_vcs_sdx`
+`compile_simlib -simulator vcs_mx -directory path/simlib/2017.4_vcs_sdx`
 
 Open any Vivado project where simulation needs to be changed to VCS.
 
@@ -170,7 +170,7 @@ For IES, libraries need to be compiled and the following changes are needed to t
 
 Invoke vivado (no project needs to be open).  In the TCL console run the following compile to compile libraries.
 
-`compile_simlib -simulator ies -directory path/simlib/2017.1_ies_sdx`
+`compile_simlib -simulator ies -directory path/simlib/2017.4_ies_sdx`
 
 Open any Vivado project where simulation needs to be changed to IES.  Note DPI framework is required with this simulator.
 
