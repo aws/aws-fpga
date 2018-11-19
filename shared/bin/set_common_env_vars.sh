@@ -33,6 +33,15 @@ unset HDK_COMMON_DIR
 unset HDK_SHELL_DIR
 unset HDK_SHELL_DESIGN_DIR
 
+export -f allow_non_root
+
+if  allow_non_root  ; then
+	export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP:-"fpgauser"}
+	export SDK_NON_ROOT_USER=$(whoami)
+  info_msg "Allowing group ${AWS_FPGA_SDK_GROUP} access to FPGA management tools and resources"
+fi
+
+
 export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
 
 # The next variable should not be modified and should always point to the /common directory under HDK_DIR

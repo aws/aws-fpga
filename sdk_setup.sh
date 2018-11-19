@@ -30,6 +30,13 @@ current_dir=$(pwd)
 source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
 
+typeset -f allow_non_root > /tmp/sdk_root_env.exp
+echo "export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP}" >> /tmp/sdk_root_env.exp
+echo "export SDK_NON_ROOT_USER=${SDK_NON_ROOT_USER}" >> /tmp/sdk_root_env.exp
+echo "export AWS_FPGA_SDK_OVERRIDE_GROUP=${AWS_FPGA_SDK_OVERRIDE_GROUP}" >> /tmp/sdk_root_env.exp
+sudo chown root:root /tmp/sdk_root_env.exp
+sudo chmod 700 /tmp/sdk_root_env.exp
+
 #
 # Execute sdk_install.sh inside a subshell so the user's current
 # shell does not exit on errors from the install.

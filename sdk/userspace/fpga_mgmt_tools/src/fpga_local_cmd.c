@@ -43,11 +43,12 @@ struct ec2_fpga_cmd f1;
 /** 
  * Use dmesg as the default logger, stdout is available for debug.
  */
-#if 1
-const struct logger *logger = &logger_kmsg;
-#else
+#if defined(FPGA_ALLOW_NON_ROOT)
 const struct logger *logger = &logger_stdout;
+#else
+const struct logger *logger = &logger_kmsg;
 #endif
+
 
 /**
  * Display the application PFs for the given AFI slot.
