@@ -147,3 +147,7 @@ function patch_AR70350 {
     fi
 
 }
+
+function allow_non_root {
+       [ ! -z ${AWS_FPGA_ALLOW_NON_ROOT} ]
+}

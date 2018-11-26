@@ -26,6 +26,10 @@ else
 	CONFIG_LOGLEVEL=$LOGLEVEL
 fi
 
+if allow_non_root ; then
+       OPT="$OPT -DFPGA_ALLOW_NON_ROOT=1"
+fi
+
 #
 # gcc optimizations
 #OPT="-O3 -fno-strict-aliasing"

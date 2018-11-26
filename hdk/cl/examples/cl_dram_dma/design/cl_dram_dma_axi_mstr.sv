@@ -29,7 +29,7 @@ module cl_dram_dma_axi_mstr (
 );
 
  `include "cl_dram_dma_defines.vh"
- 
+
 // -----------------------------------------------------------------------------
 // Parameters
 // -----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ module cl_dram_dma_axi_mstr (
             cfg_wdata_q <= axi_mstr_cfg_bus.wdata[31:0];
          end
       end
-   
+
    //Readback mux
    always @(posedge aclk)
    begin
@@ -110,7 +110,7 @@ module cl_dram_dma_axi_mstr (
             default:    axi_mstr_cfg_bus.rdata[31:0] <= 32'hffffffff;
          endcase
    end
-   
+
    //Ack for cycle
    always_ff @(posedge aclk)
       if (!aresetn)
@@ -238,7 +238,7 @@ module cl_dram_dma_axi_mstr (
    // ----------------------
 
    assign cmd_rd_data_ns[31:0] =
-         (axi_mstr_sm_rd_data & cl_axi_mstr_bus.rvalid) ? cl_axi_mstr_bus.rdata[31:0] :
+         (axi_mstr_sm_rd_data & cl_axi_mstr_bus.rvalid) ? (cl_axi_mstr_bus.rdata[511:0] >> (8 * cmd_addr_lo_q[5:0])) :
                                                           cmd_rd_data_q[31:0]         ;
 
    always_ff @(posedge aclk)
@@ -338,8 +338,9 @@ module cl_dram_dma_axi_mstr (
 
    // Write Data
    assign cl_axi_mstr_bus.wid[15:0]    = 16'b0;                        // Only 1 outstanding command
-   assign cl_axi_mstr_bus.wdata[511:0] = {480'b0, cmd_wr_data_q[31:0]};
-   assign cl_axi_mstr_bus.wstrb[63:0]  = 64'h0000_0000_0000_000F;      // Always 4 bytes
+   assign cl_axi_mstr_bus.wdata[511:0] = {480'b0, cmd_wr_data_q[31:0]} << (8 * cmd_addr_lo_q[5:0]);
+   assign cl_axi_mstr_bus.wstrb[63:0]  = 64'h0000_0000_0000_000F << cmd_addr_lo_q[5:0];      // Always 4 bytes
+
    assign cl_axi_mstr_bus.wlast        = 1'b1;                         // Always 1 burst
    assign cl_axi_mstr_bus.wvalid       = axi_mstr_sm_wr_data;
 
@@ -356,4 +357,4 @@ module cl_dram_dma_axi_mstr (
    // Read Data
    assign cl_axi_mstr_bus.rready       = axi_mstr_sm_rd_data;
 
-endmodule   
+endmodule
