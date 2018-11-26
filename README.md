@@ -118,6 +118,7 @@ Currently, AWS marketplace includes multiple versions of the FPGA developer AMI,
 
 Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 
+ If developing using SDAccel environment please refer to this [Runtime Compatibility Table](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)
 
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)

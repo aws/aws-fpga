@@ -26,8 +26,13 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.5 (See [ERRATA](./ERRATA.md) for unsupported features) 
+
+* [Defines supported Runtime to Development Tools map for SDAccel](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)
+* Enables SDK FPGA Mgmt tool access to Non-root users [sdk/README.md#using-fpga-as-non-root-user]
+
 ## Release 1.4.4 (See [ERRATA](./ERRATA.md) for unsupported features)        
-* Fixed compile issues in Simulation while using  3rd pary simulators (synopsys VCS, Cadence IES and Menor Questasim).
+* Fixed compile issues in simulation while using 3rd party simulators (synopsys VCS, Cadence IES and Mentor Questasim).
 
 ## Release 1.4.3 (See [ERRATA](./ERRATA.md) for unsupported features)
 * [DRAM Data Retention](hdk/docs/data_retention.md) - With DRAM data retention, developers can simply load a new AFI and continue using the data that is persistently kept in the DRAM attached to the FPGA, eliminating unnecessary data movements and greatly improving the overall application performance.
