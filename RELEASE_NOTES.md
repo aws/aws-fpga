@@ -26,6 +26,15 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.5 (See [ERRATA](./ERRATA.md) for unsupported features) 
+
+* [Documents SDAccel Runtime compatibility](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)
+* [Enables SDK FPGA Mgmt tool access to Non-root users](sdk/README.md#using-fpga-as-non-root-user)
+* Fixed issues
+  * [HLX simulation failure](https://forums.aws.amazon.com/thread.jspa?threadID=293313&tstart=0)
+  * [Shell BFM  read from C host memory](https://forums.aws.amazon.com/thread.jspa?threadID=288959&tstart=0)
+  * [cl_dram_dma example design DDR read issue](https://forums.aws.amazon.com/thread.jspa?threadID=290277&tstart=50)
+
 ## Release 1.4.4 (See [ERRATA](./ERRATA.md) for unsupported features)        
 * Fixed compile issues in simulation while using 3rd party simulators (synopsys VCS, Cadence IES and Mentor Questasim).
 

@@ -69,6 +69,11 @@ cp -f $AFI_MGMT_TOOLS_SRC_DIR/fpga-* $AFI_MGMT_TOOLS_DST_DIR
 cp -f $AFI_MGMT_TOOLS_LIB_DIR/libfpga_mgmt.so.1.0.0 $AFI_MGMT_LIBS_DST_DIR
 ln -sf libfpga_mgmt.so.1 $AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so
 
+source /tmp/sdk_root_env.exp
+if allow_non_root ; then
+  chmod u+s $AFI_MGMT_TOOLS_DST_DIR/fpga-local-cmd
+fi
+
 echo "AWS FPGA: Installing shared library to $AFI_MGMT_LIBS_DST_DIR"
 ld_conf_change="0"
 while true; do

@@ -303,7 +303,7 @@ Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which i
 <a name="Reset"></a>
 ### Reset
 
-The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
+The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and is asserted while an AFI is being loaded.  The reset signal is de-asserted after the AFI load is complete and the clocks are stable. 
 
 <a name="ddr4axi"></a>
 ## DDR4 AXI

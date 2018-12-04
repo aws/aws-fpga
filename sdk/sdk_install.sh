@@ -61,5 +61,14 @@ if [ $RET != 0 ]; then
     echo "Error: install_fpga_mgmt_tools.sh returned $RET"
     exit $RET
 fi
+# Add udev rules if asked for non root access
+if allow_non_root ; then
+	  sudo $SDK_USERSPACE_DIR/add_udev_rules.sh
+	  RET=$?
+	  if [ $RET != 0 ]; then
+				 echo "Error: $SDK_USERSPACE_DIR/add_udev_rules.sh returned $RET"
+				 exit $RET
+	  fi
+fi
 
 echo "Done with SDK install."
