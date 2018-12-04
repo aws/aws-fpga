@@ -67,7 +67,7 @@ NOTE: For on-premises development, SDx/Vivado must have the correct license and 
 | Virtual Ethernet Application | [Example Application](sdk/apps/virtual-ethernet) | [HDK SDE Example](hdk/cl/examples/cl_sde) | The Virtual Ethernet framework facilitates streaming Ethernet frames from a network interface (or any source) into the FPGA for processing and back out to some destination. Possible use cases for this include deep packet inspection, software defined networking, stream encryption or compression, and more. |
 | Pipelined Workload Applications | [cl\_dram\_dma\_data\_retention](hdk/docs/data_retention.md)| [HDK](hdk/cl/examples/cl_dram_dma/software/runtime/test_dram_dma_retention.c) [SDAccel](SDAccel/examples/aws/data_retention) | Demonstrates how to preserve data in DRAMs while swapping out accelerators. Applications that use a temporal accelerator pipeline can take advantage of this feature to reduce latency between FPGA image swaps  |
 | Digital Up-Converter using High Level Synthesis | [cl\_hls\_dds\_hlx](hdk/cl/examples/cl_hls_dds_hlx) | HLx - C-to-RTL  | Demonstrates an example application written in C that is synthesized to RTL (Verilog) |
-| Security   | [AES, RSA, SHA1](https://github.com/Xilinx/SDAccel_Examples/tree/master/security) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up security software algorithms  |
+| Security   | [AES, RSA, SHA1](https://github.com/Xilinx/SDAccel_Examples/tree/2018.2/security) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up security software algorithms  |
 | Computer Vision   | [Affine, Convolve, Huffman, IDCT](https://github.com/Xilinx/SDAccel_Examples/tree/master/vision) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration to speed up image detection algorithms  |
 | Misc Algorithms   | [Kmeans, SmithWaterman, MatrixMult](https://github.com/Xilinx/SDAccel_Examples/tree/master/acceleration) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of applying hardware acceleration to a variety of sorting and search algorithms  |
 | Financial   | [Blacksholes, Heston](https://github.com/KitAway/FinancialModels_AmazonF1) | SDAccel - C/C++/OpenCL  | Developed using software defined acceleration, this example demonstrates methods of using hardware acceleration on Monte Carlo financial models  |
@@ -118,6 +118,7 @@ Currently, AWS marketplace includes multiple versions of the FPGA developer AMI,
 
 Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 
+ If developing using SDAccel environment please refer to this [Runtime Compatibility Table](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)
 
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)

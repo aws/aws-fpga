@@ -1,5 +1,12 @@
 # Create a Runtime AMI Starting with an Amazon Linux AMI or Ubuntu                          
 
+## Runtime AMI Compatability Table
+
+  | SDx Version used for AFI Development |	Compatible SDAccel Runtime |
+  |--------------------------------------|-----------------------------|
+  | 2017.4 |	Runtime installed by sourcing "sdaccel_setup.sh" while using HDK Ver 1.4.X when environment variable    RELEASE_VER=2017.4 |
+  | 2018.2 |	AWS FPGA Developer AMI 1.5.0 ( XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) |
+
 ## 1. Launch a Runtime Instance & Install Required Packages 
 
 ### Using Amazon Linux
