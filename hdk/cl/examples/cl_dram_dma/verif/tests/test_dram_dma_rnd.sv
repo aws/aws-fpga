@@ -53,9 +53,11 @@ module test_dram_dma_rnd();
       tb.poke_ocl(.addr(64'h330), .data(0));
       tb.poke_ocl(.addr(64'h430), .data(0));
 
+`ifndef AXI_MEMORY_MODEL
       // allow memory to initialize
       tb.nsec_delay(27000);
-
+`endif
+      
       $display("[%t] : Initializing buffers", $realtime);
 
       len0 = $urandom_range(8,  64);

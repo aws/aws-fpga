@@ -218,10 +218,10 @@ if __name__ == '__main__':
                     md_file_dir = dirname(md_file)
                     link_path = os.path.join(md_file_dir, link_only)
                     # github doesn't resolve paths that contain symbolic links
-                    if contains_link(link_path):
-                        logger.error("Broken link in {}: {}".format(md_file, link))
-                        logger.error("  Link contains a symbolic link.")
-                        num_broken += 1
+#                     if contains_link(link_path):
+#                         logger.error("Broken link in {}: {}".format(md_file, link))
+#                         logger.error("  Link contains a symbolic link.")
+#                         num_broken += 1
                     link_path = os.path.relpath(link_path)
                     if not os.path.exists(link_path):
                         logger.error("Broken link in {}: {}".format(md_file, link))

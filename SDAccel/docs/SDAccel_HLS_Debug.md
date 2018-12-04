@@ -78,6 +78,6 @@ For C/C++ kernels, the following directive is used:
 ```
 With these optimizations specified in the C code, the array mem is implemented in 2 Block-RAM and all three sequential values may be accessed in the same clock cycle. This results in a higher performance design. 
 
-[pragma_ref_guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug1253-sdx-pragma-reference.pdf
+[pragma_ref_guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1253-sdx-pragma-reference.pdf
 
 

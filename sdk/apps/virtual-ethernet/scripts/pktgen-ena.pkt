@@ -1,0 +1,9 @@
+set 0 dst mac 12:DD:AB:C2:D3:B8
+set 0 src ip 172.31.63.86/24
+set 0 dst ip 172.31.58.142
+set 0 sport 54321
+set 0 dport 51234
+set 0 type ipv4
+set 0 proto udp
+set 0 size 64
+start 0

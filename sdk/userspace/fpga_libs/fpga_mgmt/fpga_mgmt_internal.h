@@ -17,8 +17,8 @@
  * Default timeout:
  *   CLI_TIMEOUT_DFLT * CLI_DELAY_MSEC_DFLT
  */
-#define FPGA_MGMT_TIMEOUT_DFLT    25
-#define FPGA_MGMT_DELAY_MSEC_DFLT 200
+#define FPGA_MGMT_TIMEOUT_DFLT    250
+#define FPGA_MGMT_DELAY_MSEC_DFLT 20
 
 /** First flag bit, @see afi_cmd_hdr#len_flags */
 #define AFI_CMD_HDR_FLAGS_SHIFT 24

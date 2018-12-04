@@ -68,27 +68,36 @@ def remove_edma_driver():
     assert os.system('sudo rm -f /etc/modules-load.d/edma.conf') == 0
     os.system('sudo rmmod edma-drv')
 
-def edma_driver_install_steps():
-    logger.info("Running edma driver install steps")
-    # Check if the file exists
-    if edma_driver_installed():
-        logger.info("edma driver is already installed.")
-        remove_edma_driver()
+def get_driver_mode_string(mode='poll'):
+    valid_modes = {'poll', 'interrupt'}
 
-    assert os.system('cd $WORKSPACE/sdk/linux_kernel_drivers/edma && \
-        make clean && \
-        make && \
-        sudo insmod edma-drv.ko') == 0
+    if mode not in valid_modes:
+        raise ValueError("Driver mode can only be one of %r" % valid_modes)
 
-# Function to install the edma drivers
-def install_edma_driver():
+    mode_string = ""
+
+    if mode == 'poll':
+        mode_string = 'poll_mode=1'
+
+    return mode_string
+
+# Function to install the edma driver
+def install_edma_driver(mode='poll'):
     logger.info("Installing the edma drivers")
 
     # Check if the file exists
     if edma_driver_installed():
         logger.info("Edma driver is already installed.")
         remove_edma_driver()
-    edma_driver_install_steps()
+
+    install_command = "cd $WORKSPACE/sdk/linux_kernel_drivers/edma && \
+        make clean && \
+        make && \
+        sudo insmod edma-drv.ko {}".format(get_driver_mode_string(mode))
+
+    logger.info("Install command: {}".format(install_command))
+
+    assert os.system(install_command) == 0
 
 def xdma_driver_installed():
     if find_files_in_path('/lib/modules', 'xdma.ko'):
@@ -114,17 +123,21 @@ def remove_xdma_driver():
     assert os.system('sudo rm -f /etc/modules-load.d/xdma.conf') == 0
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xdma.rules') == 0
 
-def install_xdma_driver():
+def install_xdma_driver(mode='poll'):
     logger.info("Installing the xdma driver")
 
     # Check if the file exists
     if xdma_driver_installed():
         logger.info("xdma driver is already installed.")
         remove_xdma_driver()
-    assert os.system('cd $WORKSPACE/sdk/linux_kernel_drivers/xdma && \
+
+    install_command = "cd $WORKSPACE/sdk/linux_kernel_drivers/xdma && \
         make clean && \
         make && \
-        sudo insmod xdma.ko poll_mode=1') == 0
+        sudo insmod xdma.ko {}".format(get_driver_mode_string(mode))
+    logger.info("Install command: {}".format(install_command))
+
+    assert os.system(install_command) == 0
 
 def remove_xocl_driver():
     logger.info("Removing the xocl driver.")
@@ -132,9 +145,10 @@ def remove_xocl_driver():
     os.system('sudo rmmod xocl')
 
     xocl_driver_ko_list = find_files_in_path('/lib/modules', 'xocl.ko')
-    for xocl_ko in xocl_driver_ko_list:
-        logger.info("Removing {}".format(xocl_ko))
-        assert os.system("sudo rm -f {}".format(xocl_ko)) == 0
+    xocl_driver_ko_xz_list = find_files_in_path('/lib/modules', 'xocl.ko.xz')
+    for xocl_ko in (xocl_driver_ko_list + xocl_driver_ko_xz_list):
+        logger.info("Removing xocl {}".format(xocl_ko))
+        assert os.system("sudo rm -rf {}".format(xocl_ko)) == 0
 
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xocl.rules') == 0
 
@@ -199,7 +213,7 @@ def get_num_fpga_slots(instance_type):
 
 def read_clock_recipes():
     '''
-    @returns a struct liek the following:
+    @returns a struct like the following:
     CLOCK_RECIPES = {
         'A': {
             'clock_names': ['clk_main_a0, clk_extra_a1, ...],

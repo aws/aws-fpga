@@ -53,6 +53,6 @@ CXXFLAGS += -O2
 endif
 
 # Compiler
-CXX := g++
+#CXX := g++
 
 include $(COMMON_REPO)/utility/rules.mk

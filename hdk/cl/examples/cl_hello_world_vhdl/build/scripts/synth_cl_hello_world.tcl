@@ -16,6 +16,7 @@
 #Param needed to avoid clock name collisions
 set_param sta.enableAutoGenClkNamePersistence 0
 set CL_MODULE $CL_MODULE
+set VDEFINES $VDEFINES
 
 create_project -in_memory -part [DEVICE_TYPE] -force
 
@@ -120,7 +121,7 @@ puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthes
 
 update_compile_order -fileset sources_1
 puts "\nRunning synth_design for $CL_MODULE $CL_DIR/build/scripts \[[clock format [clock seconds] -format {%a %b %d %H:%M:%S %Y}]\]"
-eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive]
+eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS $VDEFINES -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive]
 
 set failval [catch {exec grep "FAIL" failfast.csv}]
 if { $failval==0 } {

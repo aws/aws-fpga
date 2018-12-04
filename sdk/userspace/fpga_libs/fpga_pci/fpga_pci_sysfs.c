@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <dirent.h>
+#include <pthread.h>
 
 static int fpga_pci_rescan(void);
 static int fpga_pci_check_app_pf(struct fpga_pci_resource_map *app_map, 
@@ -364,6 +365,19 @@ err:
 	return FPGA_ERR_FAIL;
 }
 
+/**
+ * Glibc 2.19 and lower support readdir_r, a reentrant version of readdir.
+ * Newer versions of glibc deprecate readdir_r and therefore require external
+ * synchronization on readdir.
+ */
+#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE)
+#   define USE_READDIR_R
+#endif
+
+#if !defined(USE_READDIR_R)
+pthread_mutex_t fpga_pci_readdir_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 int
 fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 {
@@ -372,7 +386,20 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	DIR *dirp = opendir(path);
 	fail_on(!dirp, err, "opendir failed for path=%s", path);
 
-	struct dirent entry, *result;
+	struct dirent *entry;
+#if defined(USE_READDIR_R)
+	struct dirent entry_stack, *result;
+	entry = &entry_stack;
+	memset(entry, 0, sizeof(struct dirent));
+#else
+	/**
+	 * Protect calls to readdir with a mutex because multiple threads may call
+	 * this function, which always reads from the same directory. The man page
+	 * for readdir says the POSIX spec does not require threadsafety.
+	 */
+	pthread_mutex_lock(&fpga_pci_readdir_mutex);
+#endif
+
 	int slot_dev_index = 0;
 	struct fpga_slot_spec search_spec;
 	struct fpga_pci_resource_map search_map, app_map;
@@ -390,16 +417,25 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	 *  the PCI device number (DBDF).
 	 */
 	while (true) {
-		memset(&entry, 0, sizeof(struct dirent));
-		readdir_r(dirp, &entry, &result);
+
+#if defined(USE_READDIR_R)
+		memset(entry, 0, sizeof(struct dirent));
+		readdir_r(dirp, entry, &result);
 		if (result == NULL) {
 			/** No more directories */
 			break;
 		}
+#else
+		entry = readdir(dirp);
+		if (entry == NULL) {
+			/** No more directories */
+			break;
+		}
+#endif
 
 		/** Handle the current directory entry */
 		memset(&search_map, 0, sizeof(struct fpga_pci_resource_map));
-		int ret = fpga_pci_get_resource_map_ids(entry.d_name, &search_map);
+		int ret = fpga_pci_get_resource_map_ids(entry->d_name, &search_map);
 		if (ret != 0) {
 			continue;
 		}
@@ -407,18 +443,18 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 		if (search_map.vendor_id == F1_MBOX_VENDOR_ID && 
 			search_map.device_id == F1_MBOX_DEVICE_ID) {
 			/* mbox resources */
-			ret = fpga_pci_get_resources(entry.d_name, &search_map);
-			fail_on(ret != 0, err, "Error retrieving resource information");
+			ret = fpga_pci_get_resources(entry->d_name, &search_map);
+			fail_on(ret != 0, err_unlock, "Error retrieving resource information");
 
 			/* app resources */
 			memset(&app_map, 0, sizeof(struct fpga_pci_resource_map));
 			app_dir_name[0] = 0;
 			ret = fpga_pci_mbox2app(&search_map, &app_map, 
 				app_dir_name, sizeof(app_dir_name));
-			fail_on(ret != 0, err, "Error retrieving app pf information");
+			fail_on(ret != 0, err_unlock, "Error retrieving app pf information");
 
 			ret = fpga_pci_get_resources(app_dir_name, &app_map);
-			fail_on(ret != 0, err, "Error retrieving resource information");
+			fail_on(ret != 0, err_unlock, "Error retrieving resource information");
 
 			/* copy the results into the spec_array */
 			spec_array[slot_dev_index].map[FPGA_APP_PF] = app_map;
@@ -431,13 +467,21 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 			}
 		}
 	}
-
+#if !defined(USE_READDIR_R)
+	pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+#endif
 	fail_on(!found_afi_slot, err, "No fpga-image-slots found");
 
 	closedir(dirp);
 
 	errno = 0;
 	return 0;
+
+err_unlock:
+#if !defined(USE_READDIR_R)
+	pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+#endif
+
 err:
 	if (dirp) {
 		closedir(dirp);

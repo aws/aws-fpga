@@ -13,6 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+  import "DPI-C" function string getenv(input string env_name);
 
   localparam ADDR_WIDTH                    = 17;
   localparam DQ_WIDTH                      = 72;
@@ -136,6 +137,12 @@
    wire [7:0]          M_D_ECC;
    wire [17:0]         M_D_DQS_DP;
    wire [17:0]         M_D_DQS_DN;
+
+   int                 fp[17:0];
+   string              ddr_name[17:0];
+          
+   int                 r;
+   reg [1000:0]        hdk_name;
    
    //------------------------------------------------------
    // DDR Clocks
@@ -156,91 +163,327 @@
    assign CLK_300M_DIMM3_DP =  ddr_clk;
    assign CLK_300M_DIMM3_DN = ~ddr_clk;
 
+`define EOF -1
+
+`ifndef AXI_MEMORY_MODEL
+   initial begin
+      r = $value$plusargs("HDKDIR=%s", hdk_name);
+      $display("Value is %0s", hdk_name);
+   end
+   
 `ifndef QUESTA_SIM
-  `ifndef IES_SIM
+ `ifndef IES_SIM
    //------------------------------------------------------
    // Turn off warnings from DDR models
    //------------------------------------------------------
    initial begin
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_A.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
 
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_B.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
 
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_C.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
 
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
-      u_ddr4_rdimm_D.rcd_enabled.genblk1.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
+      u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.set_memory_warnings(0, 0);
    end // initial begin
   `endif //  `ifndef IES_SIM
  `endif //  `ifndef QUESTA_SIM
+
+  function write_cfg_info_to_file(int ddr_fp);
+     $display("File poiter is %d", ddr_fp);
+     $fdisplay(ddr_fp, "config 4 8");
+  endfunction
+
+  function write_bdr_ld_data_to_file(logic [63:0] axi_addr, logic [511:0] data);
+     logic [16:0] row_a, row_b;
+     logic [1:0]  bank_a, bank_b;
+     logic [9:0]  col_a, col_b;
+     logic [1:0] bank_group_a, bank_group_b;
+     logic [63:0] data_fp[17:0];
+     logic [511:0] data_t;
+             
+     row_a = axi_addr[33:17];
+     col_a = {axi_addr[16:11], axi_addr[8], axi_addr[5:3]};
+     bank_a = {axi_addr[10:9]};
+     bank_group_a = {axi_addr[7:6]};
+
+     row_b = {row_a[16:14], ~row_a[13], row_a[12], ~row_a[11], row_a[10], ~row_a[9:3], row_a[2:0]};
+     col_b = {~col_a[9:3], col_a[2:0]};
+     bank_b = ~bank_a;
+     bank_group_b = ~bank_group_a;
+
+     for (int i=0 ; i<8; i=i+2) begin
+        data_t = data;
+        //Each device is 32-bits wide. 64-bit data is loaded as below.
+        for (int j=0; j<8; j++) begin
+           data_fp[i][(j*4+3) -: 4] = data_t[3:0]; //3-0
+           
+           data_t = data >> 4;
+           data_fp[i+1][(j*4+3) -: 4] = data_t[3:0];//7-4
+
+           data_t = data >> 8;
+           data = data_t;
+        end // for (int j=0; j<8; j++)
+        
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i+1][31:0]);
+
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
+     end
+
+     //ECC 
+     $fdisplay(fp[14], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, 'h0);
+     $fdisplay(fp[15], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, 'h0);
+
+     //ECC
+     $fdisplay(fp[14], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, 'h0);
+     $fdisplay(fp[15], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, 'h0);
+     
+     for (int i=16 ; i<18; i=i+2) begin
+        data_t = data;
+        //Each device is 32-bits wide. 64-bit data is loaded as below.
+        for (int j=0; j<8; j++) begin
+           data_fp[i][(j*4+3) -: 4] = data_t[3:0];
+
+           data_t = data >> 4;
+           data_fp[i+1][(j*4+3) -: 4] = data_t[3:0];
+
+           data_t = data >> 8;
+           data = data_t;
+        end // for (int j=0; j<8; j++)
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i+1][31:0]);
+
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
+     end // for (int i=16 ; i<18; i=i+2)
+     
+     for (int i=8 ; i<13; i=i+2) begin
+        data_t = data;
+        //Each device is 32-bits wide. 64-bit data is loaded as below.
+        for (int j=0; j<8; j++) begin
+           data_fp[i][(j*4+3) -: 4] = data_t[3:0];
+           
+           data_t = data >> 4;
+           data_fp[i+1][(j*4+3) -: 4] = data_t[3:0];
+
+           data_t = data >> 8;
+           data = data_t;
+        end // for (int j=0; j<8; j++)
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i+1][31:0]);
+
+        $fdisplay(fp[i], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i][31:0]);
+        $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
+     end // for (int i=8 ; i<13; i=i+2)
+     
+  endfunction // write_bdr_ld_data_to_file
+
+  function write_bdr_ld_raw_data_to_file(int ddr_file, logic [16:0] row_a, logic [1:0]  bank_a, logic [9:0]  col_a, logic [1:0] bank_group_a, logic [31:0] data);
+     $fdisplay(ddr_file, "%0d %0d %0d %0d %h", bank_group_a, bank_a, row_a, col_a, data);
+  endfunction // write_bdr_ld_raw_data_to_file
+  
+  function ddr_bdr_ld(string file_name);
+     logic [63:0]  addr;
+     logic [511:0] data;
+     int           axi_fp;
+     int           eof_s;
+     int           status;
+     // Line buffer
+     reg [12*100:1] line;
+     int           c;
+     
+     axi_fp = $fopen(file_name, "r");
+     
+     for (int i=0; i<18; i++) begin
+        ddr_name[i] = $sformatf("%0s/cl/examples/cl_dram_dma/verif/scripts/ddr4_ddr_%0d.mem", hdk_name, i);
+        $display("ddr_name is %0s \n", ddr_name[i]);
+        fp[i] = $fopen(ddr_name[i], "w");
+        if (!fp[i]) begin
+           $display("Could not open file %s", ddr_name[i]);
+        end
+     end
+     //Config information for memory. 
+     for (int i=0 ; i<18; i++) begin
+        write_cfg_info_to_file(fp[i]);
+     end
+     // Check the first character
+     c = $fgetc(axi_fp);
+     while (c != `EOF) begin
+        status = $ungetc(c, axi_fp);
+        //status = $fscanf(axi_fp,"%0h %0h", addr, data);
+        status = $fgets(line, axi_fp);
+        status = $sscanf(line, "%x %x", addr, data);
+        $display("eof_s is %d status is %d \n", eof_s, status);
+        $display("addr is %h data is %h \n", addr, data);
+        write_bdr_ld_data_to_file(.axi_addr(addr), .data(data));
+        c = $fgetc(axi_fp);
+     end
+     for (int i=0; i<18; i++) begin
+        $fclose(fp[i]);
+     end
+     device_bdr_ld();
+  endfunction // ddr_bdr_ld
    
+  function device_bdr_ld();
+     for (int i=0; i<18; i++) begin
+        ddr_name[i] = $sformatf("%0s/cl/examples/cl_dram_dma/verif/scripts/ddr4_ddr_%0d.mem", hdk_name, i);
+        $display("ddr_name is %s \n", ddr_name[i]);
+     end
+ `ifndef DDR_A_ABSENT
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[0]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[1]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[2]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[3]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[4]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[5]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[6]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[7]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[8]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[9]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[10]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[11]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[12]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[13]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[14]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[15]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[16]);
+     u_ddr4_rdimm_A.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[17]);
+`endif //  `ifndef DDR_A_ABSENT
+
+`ifndef DDR_B_ABSENT     
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[0]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[1]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[2]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[3]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[4]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[5]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[6]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[7]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[8]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[9]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[10]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[11]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[12]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[13]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[14]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[15]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[16]);
+     u_ddr4_rdimm_B.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[17]);
+`endif //  `ifndef DDR_B_ABSENT
+
+`ifndef DDR_C_ABSENT     
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[0]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[1]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[2]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[3]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[4]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[5]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[6]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[7]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[8]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[9]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[10]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[11]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[12]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[13]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[14]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[15]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[16]);
+     u_ddr4_rdimm_C.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[17]);
+`endif //  `ifndef DDR_C_ABSENT
+
+`ifndef DDR_D_ABSENT     
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[0].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[0]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[1].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[1]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[2].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[2]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[3].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[3]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[4].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[4]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[5].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[5]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[6].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[6]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[7].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[7]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[8].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[8]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[9].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[9]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[10].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[10]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[11].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[11]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[12].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[12]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[13].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[13]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[14].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[14]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[15].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[15]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[16].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[16]);
+     u_ddr4_rdimm_D.rcd_enabled.NOT_LRDIMM.u_ddr4_dimm.rank_instances[0].even_ranks.u_ddr4_rank.Micron_model.instance_of_sdram_devices[17].micron_mem_model.u_ddr4_model.initialize_memory_with_file(ddr_name[17]);
+`endif //  `ifndef DDR_D_ABSENT
+
+  endfunction // device_bdr_ld
+
   //===========================================================================
   //                         Memory Model instantiation
   //===========================================================================
@@ -482,3 +725,4 @@
                                   .bfunc(),
                                   .vddspd());
 
+`endif

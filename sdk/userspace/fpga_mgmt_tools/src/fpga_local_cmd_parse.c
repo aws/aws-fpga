@@ -171,6 +171,11 @@ static const char *load_afi_usage[] = {
 	"      -c, --clock-c0-freq",
 	"          Request the clock c0 frequency be set to this value in Mhz or less,",
 	"          setting other frequencies in clock group c much slower.",
+	"      -D, --dram-data-retention",
+	"          Request that dram data retention be performed for this afi load.",
+	"          This will try to detect if retention is possible and reject the",
+	"          load if it is not. To use, call load with another afi already",
+	"          loaded.",
 };
 
 static const char *clear_afi_usage[] = {
@@ -468,11 +473,12 @@ parse_args_load_afi(int argc, char *argv[])
 		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
 		{"force-shell-reload",				no_argument,		0,	'F'	},
+		{"dram-data-retention",	no_argument,		0,	'D'	},
 		{0,						0,					0,	0	},
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVF",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVFD",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
@@ -534,6 +540,10 @@ parse_args_load_afi(int argc, char *argv[])
 			print_version();
 			get_parser_completed(opt);
 			goto out_ver;
+		}
+		case 'D': {
+			f1.dram_data_retention = true;
+			break;
 		}
 		default: {
 			get_parser_completed(opt);

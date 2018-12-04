@@ -64,11 +64,12 @@
 #include "driver/aws/kernel/include/mgmt-ioctl.h"
 #else
 #define AWSMGMT_NUM_SUPPORTED_CLOCKS 4
-#define AWSMGMT_NUM_ACTUAL_CLOCKS 3
+#define AWSMGMT_NUM_ACTUAL_CLOCKS    3
 // TODO - define this in a header file
 extern char* get_afi_from_xclBin(const xclBin *);
 extern char* get_afi_from_axlf(const axlf *);
-#define DEFAULT_GLOBAL_AFI "agfi-0f9978ab78170e312"
+// define DEFAULT_GLOBAL_AFI "agfi-069ddd533a748059b" // 1.4 shell
+#define DEFAULT_GLOBAL_AFI "agfi-0cc0ac6a40aa73ce8" // 1.4 shell 4-ddr data retention enabled
 #endif
 
 namespace awsbwhal {
@@ -118,6 +119,33 @@ namespace awsbwhal {
     }
 #endif
 
+    int AwsXcl::xclGetXclBinIdFromSysfs(uint64_t &xclbin_id_from_sysfs) 
+    {
+         const std::string devPath = "/sys/bus/pci/devices/" + xcldev::pci_device_scanner::device_list[ mBoardNumber ].user_name;
+         std::string binid_path = devPath + "/xclbinid";
+         struct stat sb;
+         if( stat( binid_path.c_str(), &sb ) < 0 ) {
+             std::cout << "ERROR: failed to stat " << binid_path << std::endl;
+             return errno;
+         }
+         std::ifstream ifs( binid_path.c_str(), std::ifstream::binary );
+         if( !ifs.good() ) {
+             return errno;
+         }
+         char* fileReadBuf = new char[sb.st_size];
+         memset(fileReadBuf, 0, sb.st_size);
+         ifs.read( fileReadBuf, sb.st_size );
+         if( ifs.gcount() > 0 ) {
+             std::string tmp_hex_string = fileReadBuf;
+             xclbin_id_from_sysfs = std::stoi(std::string(fileReadBuf),nullptr,16);
+         } else { // xclbinid exists, but no data read or reported
+             std::cout << "WARNING: 'xclbinid' invalid, unable to report xclbinid. Has the bitstream been loaded? See 'xbsak program'.\n";
+         }
+         delete [] fileReadBuf;
+         ifs.close();
+         return 0;
+    }
+
     int AwsXcl::xclLoadXclBin(const xclBin *buffer)
     {
       char *xclbininmemory = reinterpret_cast<char*> (const_cast<xclBin*> (buffer));
@@ -144,11 +172,32 @@ namespace awsbwhal {
           char* afi_id = get_afi_from_axlf(axlfbuffer);
           std::memset(&orig_info, 0, sizeof(struct fpga_mgmt_image_info));
           fpga_mgmt_describe_local_image(mBoardNumber, &orig_info, 0);
-          if (checkAndSkipReload( afi_id, &orig_info )) {
-              retVal = fpga_mgmt_load_local_image(mBoardNumber, afi_id);
-              if (!retVal) {
-                  retVal = sleepUntilLoaded( std::string(afi_id) );
+
+          uint64_t xclbin_id_from_sysfs;
+          if( int retVal = xclGetXclBinIdFromSysfs( xclbin_id_from_sysfs ) != 0 )
+              return retVal;
+
+          if ( (xclbin_id_from_sysfs == 0) || (axlfbuffer->m_uniqueId != xclbin_id_from_sysfs) || checkAndSkipReload(afi_id, &orig_info) ) {
+              // force data retention option
+              union fpga_mgmt_load_local_image_options opt;
+              fpga_mgmt_init_load_local_image_options(&opt);
+              opt.flags = FPGA_CMD_DRAM_DATA_RETENTION;
+              opt.afi_id = afi_id;
+              opt.slot_id = mBoardNumber;
+              retVal = fpga_mgmt_load_local_image_with_options(&opt);
+	      if (retVal == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE ||
+		  retVal == FPGA_ERR_DRAM_DATA_RETENTION_FAILED ||
+		  retVal == FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED) {
+                  std::cout << "INFO: Could not load AFI for data retention, code: " << retVal 
+                            << " - Loading in classic mode." << std::endl;
+		  retVal = fpga_mgmt_load_local_image(mBoardNumber, afi_id);
+	      }	  
+              // check retVal from image load
+              if (retVal) {
+                  std::cout << "Failed to load AFI, error: " << retVal << std::endl;
+                  return -retVal;
               }
+              retVal = sleepUntilLoaded( std::string(afi_id) );
               if (!retVal) {
                   drm_xocl_axlf axlf_obj = { reinterpret_cast<axlf*>(const_cast<xclBin*>(buffer)) };
                   retVal = ioctl(mUserHandle, DRM_IOCTL_XOCL_READ_AXLF, &axlf_obj);
@@ -754,8 +803,7 @@ namespace awsbwhal {
 
     std::string AwsXcl::getDSAName(unsigned short deviceId, unsigned short subsystemId)
     {
-        // Hard coded to AWS DSA name
-        std::string dsa("xilinx_aws-vu9p-f1_dynamic_5_0");
+        std::string dsa("xilinx_aws-vu9p-f1-04261818_dynamic_5_0");
         return dsa;
     }
 

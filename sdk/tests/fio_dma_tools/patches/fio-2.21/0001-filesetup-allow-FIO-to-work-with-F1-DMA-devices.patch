@@ -1,0 +1,33 @@
+From 3854e91d3b99b49e7c8dc8142167981d26cecc9b Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Mon, 21 May 2018 15:55:01 +0000
+Subject: [PATCH] filesetup: allow FIO to work with F1 DMA devices
+
+           temporary patch to the real_file_size to allow both positive and
+           negative testing
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ filesetup.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/filesetup.c b/filesetup.c
+index 13079e4..2d3ddec 100644
+--- a/filesetup.c
++++ b/filesetup.c
+@@ -385,7 +385,12 @@ err:
+ 	td->io_ops->close_file(td, f);
+ 	return 1;
+ #else
++#define ALLOW_FILE_SIZE_ZERO
++#if defined(ALLOW_FILE_SIZE_ZERO)
++	f->real_file_size = 1ULL << 40;
++#else
+ 	f->real_file_size = -1ULL;
++#endif
+ 	return 0;
+ #endif
+ }
+-- 
+1.8.3.1
+

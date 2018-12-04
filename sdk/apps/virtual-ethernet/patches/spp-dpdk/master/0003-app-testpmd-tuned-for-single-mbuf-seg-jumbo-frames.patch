@@ -1,0 +1,30 @@
+From 747b76cdeccd6a9719b3f706022a886f6ccb1580 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Fri, 27 Apr 2018 20:12:27 +0000
+Subject: [PATCH 3/5] app/testpmd: tuned for single mbuf seg jumbo frames
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/test-pmd/testpmd.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/app/test-pmd/testpmd.h b/app/test-pmd/testpmd.h
+index f51cd9d..4dea20e 100644
+--- a/app/test-pmd/testpmd.h
++++ b/app/test-pmd/testpmd.h
+@@ -30,7 +30,12 @@
+  * Default size of the mbuf data buffer to receive standard 1518-byte
+  * Ethernet frames in a mono-segment memory buffer.
+  */
++#if 0 /* AWS_TUNING */
+ #define DEFAULT_MBUF_DATA_SIZE RTE_MBUF_DEFAULT_BUF_SIZE
++#else
++/* 9.5KB + headroom */
++#define DEFAULT_MBUF_DATA_SIZE (0x2600 + RTE_PKTMBUF_HEADROOM)
++#endif
+ /**< Default size of mbuf data buffer. */
+ 
+ /*
+-- 
+1.8.3.1
+

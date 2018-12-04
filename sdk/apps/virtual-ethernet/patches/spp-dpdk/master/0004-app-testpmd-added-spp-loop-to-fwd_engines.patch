@@ -1,0 +1,515 @@
+From 5d49e060683b0fcb85bab3757bf0502799c0b5d6 Mon Sep 17 00:00:00 2001
+From: Robert Johnson <robertmj@amazon.com>
+Date: Mon, 25 Jun 2018 21:13:30 +0000
+Subject: [PATCH] app/testpmd: added spp-loop to fwd_engines
+
+spp-loop randomizes mbuf segments and lengths.  It is currently used
+for testing the AWS net/spp PMD with the AWS Streaming Data Engine.
+
+Signed-off-by: Robert Johnson <robertmj@amazon.com>
+---
+ app/test-pmd/Makefile       |   1 +
+ app/test-pmd/spp_loop_fwd.c | 449 ++++++++++++++++++++++++++++++++++++++++++++
+ app/test-pmd/testpmd.c      |   3 +
+ app/test-pmd/testpmd.h      |   3 +
+ 4 files changed, 456 insertions(+)
+ create mode 100644 app/test-pmd/spp_loop_fwd.c
+
+diff --git a/app/test-pmd/Makefile b/app/test-pmd/Makefile
+index a5a827b..886b665 100644
+--- a/app/test-pmd/Makefile
++++ b/app/test-pmd/Makefile
+@@ -34,6 +34,7 @@ SRCS-y += csumonly.c
+ SRCS-y += icmpecho.c
+ SRCS-$(CONFIG_RTE_LIBRTE_IEEE1588) += ieee1588fwd.c
+ SRCS-$(CONFIG_RTE_LIBRTE_BPF) += bpf_cmd.c
++SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_loop_fwd.c
+ 
+ ifeq ($(CONFIG_RTE_LIBRTE_PMD_SOFTNIC)$(CONFIG_RTE_LIBRTE_SCHED),yy)
+ SRCS-y += tm.c
+diff --git a/app/test-pmd/spp_loop_fwd.c b/app/test-pmd/spp_loop_fwd.c
+new file mode 100644
+index 0000000..c06a7df
+--- /dev/null
++++ b/app/test-pmd/spp_loop_fwd.c
+@@ -0,0 +1,449 @@
++/*
++ * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License"). You may
++ * not use this file except in compliance with the License. A copy of the
++ * License is located at
++ *
++ *     http://aws.amazon.com/apache2.0/
++ *
++ * or in the "license" file accompanying this file. This file is distributed
++ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
++ * express or implied. See the License for the specific language governing
++ * permissions and limitations under the License.
++ */
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <string.h>
++#include <errno.h>
++#include <stdint.h>
++#include <unistd.h>
++#include <inttypes.h>
++
++#include <sys/queue.h>
++#include <sys/stat.h>
++
++#include <rte_common.h>
++#include <rte_byteorder.h>
++#include <rte_log.h>
++#include <rte_debug.h>
++#include <rte_cycles.h>
++#include <rte_memory.h>
++#include <rte_launch.h>
++#include <rte_eal.h>
++#include <rte_per_lcore.h>
++#include <rte_lcore.h>
++#include <rte_atomic.h>
++#include <rte_branch_prediction.h>
++#include <rte_memcpy.h>
++#include <rte_mempool.h>
++#include <rte_mbuf.h>
++#include <rte_interrupts.h>
++#include <rte_pci.h>
++#include <rte_ether.h>
++#include <rte_ethdev.h>
++#include <rte_string_fns.h>
++#include <rte_flow.h>
++
++#include "testpmd.h"
++#include "../../drivers/net/spp/spp_defs.h"
++
++#define SPP_LB_LOG(level, fmt, args ...) \
++	RTE_LOG(level, PMD, "%s(): " fmt "\n", __func__, ## args)
++
++/* Uses txpkts and txsplit from the CLI vs internal randomness */
++#if 0
++#define SPP_LOOP_FWD_RANDOM_CLI
++#endif
++
++/* Random mbuf segment data, also see comments below */
++#if 1
++#define SPP_LOOP_FWD_RANDOM_DATA
++#endif
++
++#if defined(SPP_LOOP_FWD_RANDOM_DATA) && defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++#error "SPP_LOOP_FWD_RANDOM_DATA and SPP_DBG_USE_MBUF_SEQ_NUM" \
++	"cannot both be defined.  Will cause data corruption."
++#endif
++
++/*
++ * Max out the randomized mbuf seg lists so that they fit into the
++ * TX and RX rings.
++ */
++#define SPP_LOOP_FWD_MAX_SEGS_PER_PKT \
++	(RTE_MIN(SPP_TX_RING_DESC_MIN, SPP_RX_RING_DESC_MIN) - 1)
++
++#if defined(SPP_LOOP_FWD_RANDOM_DATA)
++/*
++ * This fwd engine will randomize the mbuf data on TX and
++ * do a stateless integrity check on RX.
++ */
++#define SPP_LOOP_FWD_MIN_SEG_LEN        (2 * sizeof(uint64_t))
++#define SPP_LOOP_FWD_SEG_ALIGN          sizeof(uint64_t)
++#elif defined(SPP_DBG_USE_MBUF_SEQ_NUM)
++/*
++ * See spp_defs.h SPP_DBG_USE_MBUF_SEQ_NUM
++ *  -when SPP_DBG_USE_MBUF_SEQ_NUM is enabled, the minimum seg length
++ *   is 16B.
++ */
++#define SPP_LOOP_FWD_MIN_SEG_LEN        (2 * sizeof(uint64_t))
++#define SPP_LOOP_FWD_SEG_ALIGN          sizeof(uint64_t)
++#else
++#define SPP_LOOP_FWD_MIN_SEG_LEN        (1ULL)
++#define SPP_LOOP_FWD_SEG_ALIGN          (1ULL)
++#endif
++#define SPP_LOOP_FWD_MAX_SEG_LEN        (DEFAULT_MBUF_DATA_SIZE - \
++					 RTE_PKTMBUF_HEADROOM)
++
++#if defined(SPP_LOOP_FWD_RANDOM_DATA)
++static void
++spp_loop_random_tx_seg(struct rte_mbuf *mbuf, uint64_t *seq_num)
++{
++	uint64_t seq_num_tmp = *seq_num;
++	uint64_t *data64 = rte_pktmbuf_mtod(mbuf, uint64_t *);
++	uint32_t i;
++
++	for (i = 0; i < mbuf->data_len / sizeof(uint64_t); i++) {
++		*data64 = seq_num_tmp;
++		data64++;
++		seq_num_tmp++;
++	}
++
++	*seq_num = seq_num_tmp;
++}
++
++static void
++spp_loop_random_tx_pkt(struct rte_mbuf *mbuf)
++{
++	uint64_t seq_num;
++	int count = 0;
++
++	seq_num = rte_rand();
++
++	while (mbuf) {
++		SPP_LB_LOG(DEBUG, "%s: count=%u, data_len=%u",
++			   __func__, count, mbuf->data_len);
++		if (unlikely(mbuf->data_len == 0)) {
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u invalid",
++				   __func__, count, mbuf->data_len);
++			goto out;
++		}
++		if (unlikely(mbuf->data_len & (SPP_LOOP_FWD_SEG_ALIGN - 1))) {
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u not aligned",
++				   __func__, count, mbuf->data_len);
++			goto out;
++		}
++
++		spp_loop_random_tx_seg(mbuf, &seq_num);
++		mbuf = mbuf->next;
++		count++;
++	}
++out:
++	return;
++}
++
++static void
++spp_loop_random_rx_seg(struct rte_mbuf *mbuf, uint64_t *seq_num)
++{
++	uint64_t *data64 = rte_pktmbuf_mtod(mbuf, uint64_t *);
++	uint64_t seq_num_tmp = *seq_num;
++	uint32_t i;
++
++	for (i = 0; i < mbuf->data_len / sizeof(uint64_t); i++) {
++		if (*data64 != seq_num_tmp) {
++			SPP_LB_LOG(ERR, "%s: i=%u, data64(%" PRIx64
++				   ") != seq_num=(%" PRIx64
++				   "), mbuf_data_len=%u",
++				   __func__, i, *data64, seq_num_tmp,
++				   mbuf->data_len);
++		}
++		data64++;
++		seq_num_tmp++;
++	}
++
++	*seq_num = seq_num_tmp;
++}
++
++static void
++spp_loop_random_rx_pkt(struct rte_mbuf *mbuf)
++{
++	uint64_t seq_num;
++	int count = 0;
++
++	while (mbuf) {
++		SPP_LB_LOG(DEBUG, "%s: count=%u, data_len=%u",
++			   __func__, count, mbuf->data_len);
++		if (unlikely(mbuf->data_len == 0)) {
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u invalid",
++				   __func__, count, mbuf->data_len);
++			goto out;
++		}
++		if (unlikely(mbuf->data_len & (SPP_LOOP_FWD_SEG_ALIGN - 1))) {
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u not aligned",
++				   __func__, count, mbuf->data_len);
++			goto out;
++		}
++
++		if (unlikely(mbuf->data_len == 64)) {
++			/* See the comment in spp_loop_get_random_data_len */
++			SPP_LB_LOG(DEBUG, "%s: count=%u, data_len=%u, "
++				   "skipping initial testpmd pkts",
++				   __func__, count, mbuf->data_len);
++			goto out;
++		}
++
++		if (count == 0) {
++			uint64_t *data64 = rte_pktmbuf_mtod(mbuf, uint64_t *);
++			seq_num = *data64;
++		}
++
++		spp_loop_random_rx_seg(mbuf, &seq_num);
++		mbuf = mbuf->next;
++		count++;
++	}
++out:
++	return;
++}
++
++static void
++spp_loop_random_rx_pkts(struct rte_mbuf **pkts, uint16_t nb_pkts)
++{
++	int i;
++
++	for (i = 0; i < nb_pkts; i++) {
++		if (pkts[i]) {
++			spp_loop_random_rx_pkt(pkts[i]);
++			rte_pktmbuf_free(pkts[i]);
++			pkts[i] = NULL;
++		}
++	}
++}
++#else
++static void
++spp_loop_check_tx_pkt(struct rte_mbuf *mbuf)
++{
++	int count = 0;
++
++	while (mbuf) {
++		SPP_LB_LOG(DEBUG, "%s: count=%u, data_len=%u",
++			   __func__, count, mbuf->data_len);
++		if (unlikely(mbuf->data_len == 0))
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u invalid",
++				   __func__, count, mbuf->data_len);
++		if (unlikely(mbuf->data_len & (SPP_LOOP_FWD_SEG_ALIGN - 1)))
++			SPP_LB_LOG(ERR, "%s: count=%u, data_len=%u not aligned",
++				   __func__, count, mbuf->data_len);
++		mbuf = mbuf->next;
++		count++;
++	}
++}
++#endif
++
++static void
++spp_loop_free_pkts(struct rte_mbuf **pkts, uint16_t nb_pkts)
++{
++	int i;
++
++	for (i = 0; i < nb_pkts; i++) {
++		if (pkts[i]) {
++			rte_pktmbuf_free(pkts[i]);
++			pkts[i] = NULL;
++		}
++	}
++}
++
++static inline uint16_t
++spp_loop_get_random_data_len(void)
++{
++	uint16_t data_len;
++
++	/*
++	 * We avoid data_len==64 in the mbuf segments spp-loop generates
++	 * so that on the RX side we can skip the initial TX packets that
++	 * testpmd has generated via the default io forwarding engine
++	 * before spp-loop has started.  Also see spp_loop_random_rx_pkt.
++	 */
++	do {
++		data_len =
++			RTE_MAX(RTE_ALIGN_FLOOR(rte_rand() %
++						SPP_LOOP_FWD_MAX_SEG_LEN,
++						SPP_LOOP_FWD_SEG_ALIGN),
++				SPP_LOOP_FWD_MIN_SEG_LEN);
++	} while (data_len == 64);
++
++	return data_len;
++}
++
++static int
++spp_loop_random(struct rte_mbuf **pkts, uint16_t *nb_pkts)
++{
++	struct rte_mempool *mbp = current_fwd_lcore()->mbp;
++	struct rte_mbuf *tx_pkt;
++	struct rte_mbuf *tx_pkt_seg;
++	uint32_t tx_pkt_len;
++	uint16_t nb_tx_pkts = 0;
++	uint16_t nb_segs = 0;
++	int ret = 0;
++	int i;
++
++#if defined(SPP_LOOP_FWD_RANDOM_DATA)
++	spp_loop_random_rx_pkts(pkts, *nb_pkts);
++#else
++	spp_loop_free_pkts(pkts, *nb_pkts);
++#endif
++
++	/* This code is borrowed from testpmd:txonly */
++	for (nb_tx_pkts = 0; nb_tx_pkts < nb_pkt_per_burst; nb_tx_pkts++) {
++		tx_pkt = rte_mbuf_raw_alloc(mbp);
++		if (unlikely(tx_pkt == NULL)) {
++			SPP_LB_LOG(ERR, "rte_mbuf_raw_alloc failed");
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		/*
++		 * Using raw alloc is good to improve performance,
++		 * but some consumers may use the headroom and so
++		 * decrement data_off. We need to make sure it is
++		 * reset to default value.
++		 */
++		rte_pktmbuf_reset_headroom(tx_pkt);
++#if defined(SPP_LOOP_FWD_RANDOM_CLI)
++		tx_pkt->data_len = tx_pkt_seg_lengths[0];
++		if (tx_pkt_split == TX_PKT_SPLIT_RND)
++			nb_segs = random() % tx_pkt_nb_segs + 1;
++		else
++			nb_segs = tx_pkt_nb_segs;
++
++#else
++		tx_pkt->data_len = spp_loop_get_random_data_len();
++		nb_segs = RTE_MAX(
++			rte_rand() % SPP_LOOP_FWD_MAX_SEGS_PER_PKT, 1ULL);
++#endif
++		tx_pkt_len = tx_pkt->data_len;
++		tx_pkt_seg = tx_pkt;
++		for (i = 1; i < nb_segs; i++) {
++			tx_pkt_seg->next = rte_mbuf_raw_alloc(mbp);
++			if (unlikely(tx_pkt_seg->next == NULL)) {
++				SPP_LB_LOG(ERR, "rte_mbuf_raw_alloc failed");
++				ret = -ENOMEM;
++				goto out;
++			}
++			tx_pkt_seg = tx_pkt_seg->next;
++#if defined(SPP_LOOP_FWD_RANDOM_CLI)
++			tx_pkt_seg->data_len = tx_pkt_seg_lengths[i];
++#else
++			tx_pkt_seg->data_len = spp_loop_get_random_data_len();
++#endif
++			tx_pkt_len += tx_pkt_seg->data_len;
++		}
++
++		tx_pkt_seg->next = NULL; /* Last segment of packet. */
++
++		/*
++		 * Complete first mbuf of packet and append it to the
++		 * burst of packets to be transmitted.
++		 */
++		tx_pkt->nb_segs = nb_segs;
++		tx_pkt->pkt_len = tx_pkt_len;
++		tx_pkt->ol_flags = 0;
++		pkts[nb_tx_pkts] = tx_pkt;
++
++#if defined(SPP_LOOP_FWD_RANDOM_DATA)
++		spp_loop_random_tx_pkt(tx_pkt);
++#else
++		spp_loop_check_tx_pkt(tx_pkt);
++#endif
++	}
++out:
++	if (unlikely(ret != 0)) {
++		SPP_LB_LOG(ERR, "nb_tx_pkts=%u, ret=%d", nb_tx_pkts, ret);
++		spp_loop_free_pkts(pkts, nb_pkt_per_burst);
++		*nb_pkts = 0;
++	} else {
++		*nb_pkts = nb_tx_pkts;
++	}
++	return ret;
++}
++
++/*
++ * Forwarding of SPP packets in loop mode only.  Used for debug.
++ * Packet size may be randomized, data contents changed.
++ */
++static void
++spp_loop_io_forward(struct fwd_stream *fs)
++{
++	struct rte_mbuf *pkts_burst[MAX_PKT_BURST];
++	uint16_t nb_rx;
++	uint16_t nb_tx;
++	uint32_t retry;
++
++#ifdef RTE_TEST_PMD_RECORD_CORE_CYCLES
++	uint64_t start_tsc;
++	uint64_t end_tsc;
++	uint64_t core_cycles;
++#endif
++
++#ifdef RTE_TEST_PMD_RECORD_CORE_CYCLES
++	start_tsc = rte_rdtsc();
++#endif
++	int ret;
++
++	/*
++	 * Receive a burst of packets and forward them.
++	 */
++	nb_rx = rte_eth_rx_burst(fs->rx_port, fs->rx_queue,
++				 pkts_burst, nb_pkt_per_burst);
++
++	fs->rx_packets += nb_rx;
++
++	ret = spp_loop_random(pkts_burst, &nb_rx);
++	if (ret != 0) {
++		SPP_LB_LOG(ERR, "spp_loop_io_random failed");
++		goto out;
++	}
++
++#ifdef RTE_TEST_PMD_RECORD_BURST_STATS
++	fs->rx_burst_stats.pkt_burst_spread[nb_rx]++;
++#endif
++	nb_tx = rte_eth_tx_burst(fs->tx_port, fs->tx_queue,
++				 pkts_burst, nb_rx);
++	/*
++	 * Retry if necessary
++	 */
++	if (unlikely(nb_tx < nb_rx) && fs->retry_enabled) {
++		retry = 0;
++		while (nb_tx < nb_rx && retry++ < burst_tx_retry_num) {
++			rte_delay_us(burst_tx_delay_time);
++			nb_tx += rte_eth_tx_burst(fs->tx_port, fs->tx_queue,
++						  &pkts_burst[nb_tx],
++						  nb_rx - nb_tx);
++		}
++	}
++	fs->tx_packets += nb_tx;
++#ifdef RTE_TEST_PMD_RECORD_BURST_STATS
++	fs->tx_burst_stats.pkt_burst_spread[nb_tx]++;
++#endif
++	if (unlikely(nb_tx < nb_rx)) {
++		fs->fwd_dropped += (nb_rx - nb_tx);
++		do
++			rte_pktmbuf_free(pkts_burst[nb_tx]);
++		while (++nb_tx < nb_rx);
++	}
++#ifdef RTE_TEST_PMD_RECORD_CORE_CYCLES
++	end_tsc = rte_rdtsc();
++	core_cycles = (end_tsc - start_tsc);
++	fs->core_cycles = (uint64_t)(fs->core_cycles + core_cycles);
++#endif
++
++out:
++	return;
++}
++
++struct fwd_engine spp_loop_fwd_engine = {
++	.fwd_mode_name	= "spp-loop",
++	.port_fwd_begin = NULL,
++	.port_fwd_end	= NULL,
++	.packet_fwd	= spp_loop_io_forward,
++};
+diff --git a/app/test-pmd/testpmd.c b/app/test-pmd/testpmd.c
+index ba3d7ac..f124f1e 100644
+--- a/app/test-pmd/testpmd.c
++++ b/app/test-pmd/testpmd.c
+@@ -162,6 +162,9 @@ struct fwd_engine * fwd_engines[] = {
+ #ifdef RTE_LIBRTE_IEEE1588
+ 	&ieee1588_fwd_engine,
+ #endif
++#ifdef RTE_LIBRTE_SPP_PMD
++	&spp_loop_fwd_engine,
++#endif
+ 	NULL,
+ };
+ 
+diff --git a/app/test-pmd/testpmd.h b/app/test-pmd/testpmd.h
+index 4dea20e..cc98e3c 100644
+--- a/app/test-pmd/testpmd.h
++++ b/app/test-pmd/testpmd.h
+@@ -278,6 +278,9 @@ struct fwd_engine {
+ #ifdef RTE_LIBRTE_IEEE1588
+ extern struct fwd_engine ieee1588_fwd_engine;
+ #endif
++#ifdef RTE_LIBRTE_SPP_PMD
++extern struct fwd_engine spp_loop_fwd_engine;
++#endif
+ 
+ extern struct fwd_engine * fwd_engines[]; /**< NULL terminated array. */
+ 
+-- 
+1.8.3.1
+

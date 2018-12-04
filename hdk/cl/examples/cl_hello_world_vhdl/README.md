@@ -19,7 +19,7 @@ This simple *hello_world* example builds a Custom Logic (CL) that will enable th
 
 This example demonstrate a basic use-case of the Virtual LED and Virtual DIP switches.
 
-Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../README.md).
+Please read here for [general instructions to build the CL, register an AFI, and start using it on an F1 instance](./../../../README.md).
 
 
 <a name="description"></a>

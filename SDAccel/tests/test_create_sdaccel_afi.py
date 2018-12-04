@@ -131,7 +131,7 @@ class TestCreateSDAccelAfi(AwsFpgaTestBase):
         assert afi is not None, "AFI ID not available in create_afi response:{}".format(str(create_afi_response))
 
         # Wait for the AFI to complete
-        rc = os.system(self.WORKSPACE + "/hdk/common/scripts/wait_for_afi.py --afi {}".format(afi))
+        rc = os.system(self.WORKSPACE + "/shared/bin/scripts/wait_for_afi.py --afi {}".format(afi))
         assert rc == 0, "Error while waiting for afi={}".format(afi)
 
         self.assert_afi_available(afi)

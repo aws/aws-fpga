@@ -73,11 +73,12 @@ module test_peek_poke();
 
          tb.power_up();
 
-         tb.nsec_delay(1000);
+         tb.nsec_delay(2000);
          tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
          tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
          tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
+         
          $display("[%t] : Programming cl_tst registers for PCIe", $realtime);
 
          // Enable Incr ID mode, Sync mode, and Read Compare

@@ -1,30 +1,69 @@
---- third_party/fft1d/host/src/main.cpp    2017-05-09 22:47:43.000000000 +0000
-+++ sdaccel/fft1d/host/src/main.cpp       2017-09-12 16:18:56.072000000 +0000
-@@ -61,0 +62 @@
+--- host/src/main.cpp	2018-02-12 17:54:56.000000000 +0000
++++ host/src/main.cpp	2018-07-20 19:36:03.824000000 +0000
+@@ -59,6 +59,7 @@
+ static cl_kernel kernel1 = NULL;
+ static cl_program program = NULL;
+ static cl_int status = 0;
 +std::string hwtype = "hw";
-@@ -94,3 +94,0 @@
+ 
+ // FFT operates with complex numbers - store them in a struct
+ typedef struct {
+@@ -91,9 +92,6 @@
+ 
+ // Entry point.
+ int main(int argc, char **argv) {
 -  if(!init()) {
 -    return false;
 -  }
-@@ -104,0 +103,3 @@
-+  if(options.has("hw")) {
-+    hwtype = options.get<std::string>("hw");
-+  }
-@@ -110,0 +112,4 @@
-+  if(!init()) {
-+    return false;
-+  }
-+
-@@ -163 +168 @@
--  d_outData = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_BANK_2_ALTERA, sizeof(float2) * N * iterations, NULL, &status);
+   int iterations = 2000;
+ 
+   Options options(argc, argv);
+@@ -102,11 +100,16 @@
+   if(options.has("n")) {
+     iterations = options.get<int>("n");
+   }
+-
++   if(options.has("hw")) {
++     hwtype = options.get<std::string>("hw");
++  }   
+   if (iterations <= 0) {
+ 	printf("ERROR: Invalid number of iterations\n\nUsage: %s [-N=<#>]\n\tN: number of iterations to run (default 2000)\n", argv[0]);
+ 	return false;
+   }
++if(!init()) {
++ return false;
++ }
+ 
+   // Allocate host memory
+ #if USE_SVM_API == 0
+@@ -160,7 +163,7 @@
+  
+   d_inData = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float2) * N * iterations, NULL, &status);
+   checkError(status, "Failed to allocate input device buffer\n");
+-  d_outData = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_CHANNEL_2_INTELFPGA, sizeof(float2) * N * iterations, NULL, &status);
 +  d_outData = clCreateBuffer(context, CL_MEM_READ_WRITE , sizeof(float2) * N * iterations, NULL, &status);
-@@ -336 +341 @@
--  platform = findPlatform("Intel");
+   checkError(status, "Failed to allocate output device buffer\n");
+ 
+   // Copy data from host to device
+@@ -333,7 +336,7 @@
+   }
+ 
+   // Get the OpenCL platform.
+-  platform = findPlatform("Intel(R) FPGA SDK for OpenCL(TM)");
 +  platform = findPlatform("Xilinx");
-@@ -363,2 +368,4 @@
+   if(platform == NULL) {
+     printf("ERROR: Unable to find Intel(R) FPGA OpenCL platform\n");
+     return false;
+@@ -360,8 +363,10 @@
+ 
+ 
+   // Create the program.
 -  std::string binary_file = getBoardBinaryFile("fft1d", device);
 -  printf("Using AOCX: %s\n\n", binary_file.c_str());
 +  std::string fname = "xclbin/fft1d."+ hwtype + "." + VERSION_STR;
 +  printf("Looking for %s.\n",fname.c_str());
 +  std::string binary_file = getBoardBinaryFile(fname.c_str(), device);
 +  printf("Using XCLBIN: %s\n\n", binary_file.c_str());
+   program = createProgramFromBinary(context, binary_file.c_str(), &device, 1);
+ 
+   // Build the program that was just created.

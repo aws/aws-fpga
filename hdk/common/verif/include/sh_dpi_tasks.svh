@@ -604,6 +604,10 @@ end
       `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
    endfunction // is_dma_to_cl_done
 
+   function int get_ecc_err_cnt(input int slot_id = 0);
+      `SLOT_MACRO_FUNC(get_ecc_err_cnt())   
+   endfunction // is_dma_to_cl_done
+   
    function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
       `SLOT_MACRO_FUNC(is_dma_to_buffer_done(chan))
    endfunction // is_dma_to_buffer_done

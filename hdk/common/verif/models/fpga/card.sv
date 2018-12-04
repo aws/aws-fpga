@@ -15,7 +15,9 @@
 
 module card();
 
+
 `include "fpga_ddr.svh"
+
    
 fpga fpga  (
             .CLK_300M_DIMM0_DP(CLK_300M_DIMM0_DP),

@@ -1,17 +1,19 @@
-// Amazon FPGA Hardware Development Kit
-//
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-//
-// Licensed under the Amazon Software License (the "License"). You may not use
-// this file except in compliance with the License. A copy of the License is
-// located at
-//
-//    http://aws.amazon.com/asl/
-//
-// or in the "license" file accompanying this file. This file is distributed on
-// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
-// implied. See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Amazon FPGA Hardware Development Kit
+ *
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Amazon Software License (the "License"). You may not use
+ * this file except in compliance with the License. A copy of the License is
+ * located at
+ *
+ *    http://aws.amazon.com/asl/
+ *
+ * or in the "license" file accompanying this file. This file is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+ * implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -21,19 +23,31 @@
 #include <unistd.h>
 #include <poll.h>
 
-#include "common_dma.h"
+#include "fpga_pci.h"
+#include "fpga_mgmt.h"
+#include "fpga_dma.h"
+#include "utils/lcd.h"
 
-#define	MEM_16G		(1ULL << 34)
+#include "test_dram_dma_common.h"
 
-#ifndef SV_TEST
-/* use the stdout logger */
-const struct logger *logger = &logger_stdout;
-#endif
+#define	MEM_16G              (1ULL << 34)
+#define USER_INTERRUPTS_MAX  (16)
+
+/* use the standard out logger */
+static const struct logger *logger = &logger_stdout;
+
+void usage(const char* program_name);
+int dma_example(int slot_id, size_t buffer_size);
+
+void rand_string(char *str, size_t size);
+int interrupt_example(int slot_id, int interrupt_number);
+int axi_mstr_example(int slot_id);
+int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t ddr_hi_addr, uint32_t ddr_lo_addr, uint32_t  ddr_data);
 
 int main(int argc, char **argv) {
     int rc;
     int slot_id = 0;
-    int interrupt_number;
+    int interrupt_n;
 
     switch (argc) {
     case 1:
@@ -56,58 +70,85 @@ int main(int argc, char **argv) {
     rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
-    rc = dma_example(slot_id);
+    /* check that the AFI is loaded */
+    log_info("Checking to see if the right AFI is loaded...");
+#ifndef SV_TEST
+    rc = check_slot_config(slot_id);
+    fail_on(rc, out, "slot config is not correct");
+#endif
+
+    /* run the dma test example */
+    rc = dma_example(slot_id, 1ULL << 24);
     fail_on(rc, out, "DMA example failed");
 
-    interrupt_number = 0;
+    /* run interrupt examples */
+    for (interrupt_n = 0; interrupt_n < USER_INTERRUPTS_MAX; interrupt_n++) {
+        rc = interrupt_example(slot_id, interrupt_n);
+        fail_on(rc, out, "Interrupt example failed");
+    }
 
-    rc = interrupt_example(slot_id, interrupt_number);
-    fail_on(rc, out, "Interrupt example failed");
-
+    /* run axi master example */
     rc = axi_mstr_example(slot_id);
     fail_on(rc, out, "AXI Master example failed");
 
 out:
+    log_info("TEST %s", (rc == 0) ? "PASSED" : "FAILED");
     return rc;
 }
 
-/* 
- * Write 4 identical buffers to the 4 different DRAM channels of the AFI
- * using fsync() between the writes and read to insure order
+void usage(const char* program_name) {
+    printf("usage: %s [--slot <slot>]\n", program_name);
+}
+
+/**
+ * This example fills a buffer with random data and then uses DMA to copy that
+ * buffer into each of the 4 DDR DIMMS.
  */
+int dma_example(int slot_id, size_t buffer_size) {
+    int write_fd, read_fd, dimm, rc;
 
-int dma_example(int slot_id) {
-    int fd, rc;
+    write_fd = -1;
+    read_fd = -1;
 
-    read_buffer = NULL;
-    write_buffer = NULL;
-    fd = -1;
-
-    write_buffer = (char *)malloc(buffer_size);
-    read_buffer = (char *)malloc(buffer_size);
+    uint8_t *write_buffer = malloc(buffer_size);
+    uint8_t *read_buffer = malloc(buffer_size);
     if (write_buffer == NULL || read_buffer == NULL) {
-        rc = ENOMEM;
+        rc = -ENOMEM;
         goto out;
     }
 
-    fd = open_dma_queue(slot_id);
+    read_fd = fpga_dma_open_queue(FPGA_DMA_XDMA, slot_id,
+        /*channel*/ 0, /*is_read*/ true);
+    fail_on((rc = (read_fd < 0) ? -1 : 0), out, "unable to open read dma queue");
 
-    rand_string(write_buffer, buffer_size);
+    write_fd = fpga_dma_open_queue(FPGA_DMA_XDMA, slot_id,
+        /*channel*/ 0, /*is_read*/ false);
+    fail_on((rc = (write_fd < 0) ? -1 : 0), out, "unable to open write dma queue");
 
-    for (channel=0; channel < 4; channel++) {
-        fpga_write_buffer_to_cl(slot_id, channel, fd, buffer_size, (0x10000000 + channel*MEM_16G));
+    rc = fill_buffer_urandom(write_buffer, buffer_size);
+    fail_on(rc, out, "unabled to initialize buffer");
+
+    for (dimm = 0; dimm < 4; dimm++) {
+        rc = fpga_dma_burst_write(write_fd, write_buffer, buffer_size,
+            dimm * MEM_16G);
+        fail_on(rc, out, "DMA write failed on DIMM: %d", dimm);
     }
 
-    /* fsync() will make sure the write made it to the target buffer 
-     * before read is done
-     */
+    bool passed = true;
+    for (dimm = 0; dimm < 4; dimm++) {
+        rc = fpga_dma_burst_read(read_fd, read_buffer, buffer_size,
+            dimm * MEM_16G);
+        fail_on(rc, out, "DMA read failed on DIMM: %d", dimm);
 
-    rc = fsync(fd);
-    fail_on((rc = (rc < 0)? errno:0), out, "call to fsync failed.");
-
-    for (channel=0; channel < 4; channel++) {
-       fpga_read_cl_to_buffer(slot_id, channel, fd, buffer_size, (0x10000000 + channel*MEM_16G));
+        uint64_t differ = buffer_compare(read_buffer, write_buffer, buffer_size);
+        if (differ != 0) {
+            log_error("DIMM %d failed with %lu bytes which differ", dimm, differ);
+            passed = false;
+        } else {
+            log_info("DIMM %d passed!", dimm);
+        }
     }
+    rc = (passed) ? 0 : 1;
 
 out:
     if (write_buffer != NULL) {
@@ -116,8 +157,11 @@ out:
     if (read_buffer != NULL) {
         free(read_buffer);
     }
-    if (fd >= 0) {
-        close(fd);
+    if (write_fd >= 0) {
+        close(write_fd);
+    }
+    if (read_fd >= 0) {
+        close(read_fd);
     }
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
@@ -138,7 +182,7 @@ int interrupt_example(int slot_id, int interrupt_number){
     uint32_t interrupt_reg_offset = 0xd00;
 
   
-    rc = sprintf(event_file_name, "/dev/fpga%i_event%i", slot_id, interrupt_number);
+    rc = sprintf(event_file_name, "/dev/xdma%i_events_%i", slot_id, interrupt_number);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format event file name.");
 
     printf("Starting MSI-X Interrupt test \n");
@@ -148,29 +192,35 @@ int interrupt_example(int slot_id, int interrupt_number){
     printf("Polling device file: %s for interrupt events \n", event_file_name);
     if((fd = open(event_file_name, O_RDONLY)) == -1) {
         printf("Error - invalid device\n");
-        rc = 1;
-        fail_on(rc, out, "Unable to open event device");
+        fail_on((rc = 1), out, "Unable to open event device");
     }
     fds[0].fd = fd;
     fds[0].events = POLLIN;
 
-    printf("Triggering MSI-X Interrupt 0\n");
+    printf("Triggering MSI-X Interrupt %d\n", interrupt_number);
     rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
     fail_on(rc, out, "Unable to write to the fpga !");
 
-    // Poll checks whether an interrupt was generated, and also clears the interrupt in the device file, so we can detect future interrupts
+    // Poll checks whether an interrupt was generated. 
     rd = poll(fds, num_fds, poll_timeout);
-    if( rd >0 && fds[0].revents & POLLIN){
-        // Check how many interrupts were generated
-        printf("Interrupt present for Interrupt %i. It worked!\n", interrupt_number);
+    if((rd > 0) && (fds[0].revents & POLLIN)) {
+        uint32_t events_user;
+
+        // Check how many interrupts were generated, and clear the interrupt so we can detect
+        // future interrupts.
+        rc = pread(fd, &events_user, sizeof(events_user), 0);
+        fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
+
+        printf("Interrupt present for Interrupt %i, events %i. It worked!\n", 
+               interrupt_number, events_user);
+
         //Clear the interrupt register
         rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 0x1 << (16 + interrupt_number) );
         fail_on(rc, out, "Unable to write to the fpga !");
     }
     else{
         printf("No interrupt generated- something went wrong.\n");
-        rc = 1;
-        fail_on(rc, out, "Interrupt generation failed");
+        fail_on((rc = 1), out, "Interrupt generation failed");
     }
     close(fd);
 
