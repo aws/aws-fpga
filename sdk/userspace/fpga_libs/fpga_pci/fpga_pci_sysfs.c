@@ -365,16 +365,7 @@ err:
 	return FPGA_ERR_FAIL;
 }
 
-/**
- * Glibc 2.19 and lower support readdir_r, a reentrant version of readdir.
- * Newer versions of glibc deprecate readdir_r and therefore require external
- * synchronization on readdir.
- */
-#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE)
-#   define USE_READDIR_R
-#endif
-
-#if !defined(USE_READDIR_R)
+#if !defined(FPGA_PCI_USE_READDIR_R)
 pthread_mutex_t fpga_pci_readdir_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -387,7 +378,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	fail_on(!dirp, err, "opendir failed for path=%s", path);
 
 	struct dirent *entry;
-#if defined(USE_READDIR_R)
+#if defined(FPGA_PCI_USE_READDIR_R)
 	struct dirent entry_stack, *result;
 	entry = &entry_stack;
 	memset(entry, 0, sizeof(struct dirent));
@@ -418,7 +409,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	 */
 	while (true) {
 
-#if defined(USE_READDIR_R)
+#if defined(FPGA_PCI_USE_READDIR_R)
 		memset(entry, 0, sizeof(struct dirent));
 		readdir_r(dirp, entry, &result);
 		if (result == NULL) {
@@ -467,7 +458,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 			}
 		}
 	}
-#if !defined(USE_READDIR_R)
+#if !defined(FPGA_PCI_USE_READDIR_R)
 	pthread_mutex_unlock(&fpga_pci_readdir_mutex);
 #endif
 	fail_on(!found_afi_slot, err, "No fpga-image-slots found");
@@ -478,7 +469,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	return 0;
 
 err_unlock:
-#if !defined(USE_READDIR_R)
+#if !defined(FPGA_PCI_USE_READDIR_R)
 	pthread_mutex_unlock(&fpga_pci_readdir_mutex);
 #endif
 

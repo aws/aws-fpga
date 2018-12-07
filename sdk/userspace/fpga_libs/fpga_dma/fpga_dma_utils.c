@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <libgen.h>
 
+#include <sys/types.h>
+#include <dirent.h>
+
 #include "utils/log.h"
 #include "fpga_dma.h"
 #include "fpga_pci.h"
@@ -30,13 +33,19 @@
 #define MAX_FD_LEN  256
 #define PCI_DEV_FMT "%04x:%02x:%02x.%d"
 
+typedef int (*get_dev_number_t)(char *, int *);
+
 struct dma_opts_s {
     char *drv_name;
     char *drv_model_name;
     char *drv_write_name;
     char *drv_read_name;
     uint8_t n_channels;
+    get_dev_number_t get_dev_number_f;
 };
+
+static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num);
+static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num);
 
 static const struct dma_opts_s xdma_opts = {
     .drv_name = "xdma",
@@ -44,6 +53,7 @@ static const struct dma_opts_s xdma_opts = {
     .drv_write_name = "h2c",
     .drv_read_name = "c2h",
     .n_channels = 4,
+    .get_dev_number_f = fpga_dma_get_xdma_dev_number,
 };
 
 static const struct dma_opts_s edma_opts = {
@@ -52,6 +62,7 @@ static const struct dma_opts_s edma_opts = {
     .drv_write_name = "queue",
     .drv_read_name = "queue",
     .n_channels = 1,
+    .get_dev_number_f = fpga_dma_get_edma_dev_number,
 };
 
 static const struct dma_opts_s *fpga_dma_get_dma_opts(
@@ -63,7 +74,6 @@ static const struct dma_opts_s *fpga_dma_get_dma_opts(
         default: return NULL;
     }
 }
-
 
 int fpga_dma_open_queue(enum fpga_dma_driver which_driver, int slot_id,
      int channel, bool is_read)
@@ -88,12 +98,12 @@ err:
     }
 }
 
-
 int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
     int channel, bool is_read,
     char device_file[static FPGA_DEVICE_FILE_NAME_MAX_LEN])
 {
     int rc = 0;
+    int device_num;
     char read_or_write[16];
     const struct dma_opts_s *dma_opts = fpga_dma_get_dma_opts(which_driver);
     fail_on(rc = (dma_opts == NULL) ? -EINVAL : 0, out, "invalid DMA driver");
@@ -113,68 +123,21 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
         return FPGA_ERR_FAIL;
     }
 
-    if (which_driver == FPGA_DMA_EDMA) {
-        /* TODO: this is not likely to work for multiple slots */
-        #define DRV_CHANNEL_FMT "/dev/%s%i_%s_0"
-        return snprintf(device_file, MAX_FD_LEN, DRV_CHANNEL_FMT,
-            dma_opts->drv_name, slot_id, read_or_write);
-    } else if (which_driver == FPGA_DMA_XDMA) {
-        /* We have an XDMA driver, we do not know if the descriptors
-         * /dev/xdma[07]_[hc]2[ch]_0 correspond to the slots. We will discover
-         * using the sysfs mappings of the FPGA card mapping on PCI
-         */
-        struct fpga_pci_resource_map resource;
-        char dbdf[16];
-        char sysfs_path[32];
-        int actual_instance = -1;
-        char real_path[MAX_FD_LEN];
+    rc = fpga_pci_get_dma_device_num(which_driver, slot_id, &device_num);
+    fail_on(rc != 0, out, "Unable to get device number");
 
-        rc = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &resource);
-        fail_on(rc, out, "Could not get resource map");
-        rc = snprintf(dbdf,
-                      16,
-                      PCI_DEV_FMT,
-                      resource.domain,
-                      resource.bus,
-                      resource.dev,
-                      resource.func);
-        fail_on(rc < 1, out, "Could not record DBDF");
-        sprintf(sysfs_path, "/sys/class/xdma/");
-        for (int s = 0; s < FPGA_SLOT_MAX; s++) {
-            char sysfs_path_instance[MAX_FD_LEN];
-            char *possible_dbdf = NULL;
-            sprintf(sysfs_path_instance, "%sxdma%d_%s_%d/device",
-                sysfs_path, s, dma_opts->drv_read_name, channel);
-            /* Check if device exists in sys fs */
-            if (access(sysfs_path_instance, F_OK) != 0)
-                continue;
 
-            possible_dbdf = realpath(sysfs_path_instance, real_path);
-            if (possible_dbdf == NULL) {
-                fail_on(true, out, "Could not get real path of the device file");
-            }
-            possible_dbdf = basename(real_path);
-            if (strncmp(possible_dbdf, dbdf, 12) == 0) {
-                actual_instance = s;
-                break;
-            }
-            continue;
-        }
-        fail_on(actual_instance == -1, out,
-            "Could not find the actual XDMA driver instance for the slot");
-        rc = snprintf(device_file,
-                      MAX_FD_LEN,
-                      DRV_CHANNEL_FMT,
-                      dma_opts->drv_name,
-                      actual_instance,
-                      read_or_write);
-        fail_on(rc = (rc < 0) ? FPGA_ERR_FAIL : 0, out,
-            "Could not generate device_file");
-    }
+    rc = snprintf(device_file, MAX_FD_LEN, "/dev/%s%i_%s_%d",
+                  dma_opts->drv_name,
+                  device_num,
+                  read_or_write,
+                  channel);
+    fail_on(rc = (rc < 0) ? FPGA_ERR_FAIL : 0, out,
+        "Could not generate device_file");
+
 out:
     return rc;
 }
-
 
 int fpga_dma_burst_read(int fd, uint8_t *buffer, size_t xfer_sz,
     size_t address)
@@ -221,4 +184,134 @@ int fpga_dma_burst_write(int fd, uint8_t *buffer, size_t xfer_sz,
     rc = 0;
 out:
     return rc;
+}
+
+int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
+    int slot_id, int *device_num)
+{
+    int rc;
+    char dbdf[16];
+    char path[64];
+    int _device_num;
+    struct dirent *entry;
+    char real_path[MAX_FD_LEN];
+    char *possible_dbdf = NULL;
+    struct fpga_pci_resource_map resource;
+    char sysfs_path_instance[MAX_FD_LEN + sizeof(entry->d_name) + sizeof(path)];
+
+    const struct dma_opts_s *dma_opts = fpga_dma_get_dma_opts(which_driver);
+    fail_on(rc = (dma_opts == NULL) ? -EINVAL : 0, err, "invalid DMA driver");
+    rc = snprintf(path, sizeof(path), "/sys/class/%s", dma_opts->drv_name);
+    fail_on(rc < 1, err, "snprintf failed");
+
+    /* This call must be before the lock, because the call holds the lock. */
+    rc = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &resource);
+    fail_on(rc, err, "Could not get resource map");
+    rc = snprintf(dbdf,
+                  sizeof(dbdf),
+                  PCI_DEV_FMT,
+                  resource.domain,
+                  resource.bus,
+                  resource.dev,
+                  resource.func);
+    fail_on(rc < 1, err, "Could not record DBDF");
+
+    DIR *dirp = opendir(path);
+    fail_on(!dirp, err, "opendir failed for path=%s", path);
+
+#if defined(FPGA_PCI_USE_READDIR_R)
+    struct dirent entry_stack, *result;
+    entry = &entry_stack;
+    memset(entry, 0, sizeof(struct dirent));
+#else
+    /**
+     * Protect calls to readdir with a mutex because multiple threads may call
+     * this function, which always reads from the same directory. The man page
+     * for readdir says the POSIX spec does not require threadsafety.
+     */
+    pthread_mutex_lock(&fpga_pci_readdir_mutex);
+#endif
+
+    while (true) {
+        /* reset so that the loop termination detection below works */
+        _device_num = -1;
+
+#if defined(FPGA_PCI_USE_READDIR_R)
+        memset(entry, 0, sizeof(struct dirent));
+        readdir_r(dirp, entry, &result);
+        if (result == NULL) {
+            /** No more directories */
+            break;
+        }
+#else
+        entry = readdir(dirp);
+        if (entry == NULL) {
+            /** No more directories */
+            break;
+        }
+#endif
+
+        rc = (*dma_opts->get_dev_number_f)(entry->d_name, &_device_num);
+        if (rc != 0) {
+            continue;
+        }
+
+        rc = snprintf(sysfs_path_instance, sizeof(sysfs_path_instance),
+            "%s/%s/device", path, entry->d_name);
+        fail_on(rc < 2, err_unlock, "snprintf failed to build sysfs path");
+        possible_dbdf = realpath(sysfs_path_instance, real_path);
+        if (possible_dbdf == NULL) {
+            continue;
+        }
+        possible_dbdf = basename(real_path);
+        if (strncmp(possible_dbdf, dbdf, 12) == 0) {
+            break; /* found device */
+        }
+        /* continue... */
+    }
+#if !defined(FPGA_PCI_USE_READDIR_R)
+    pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+#endif
+    fail_on(_device_num == -1, err, "Unable to find device num");
+
+    closedir(dirp);
+    *device_num = _device_num;
+    errno = 0;
+    return 0;
+
+err_unlock:
+#if !defined(FPGA_PCI_USE_READDIR_R)
+    pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+#endif
+
+err:
+    if (dirp) {
+        closedir(dirp);
+    }
+    errno = 0;
+    return FPGA_ERR_FAIL;
+}
+
+static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num)
+{
+    int rc;
+    int num;
+    rc = sscanf(device_name, "xdma%d_control", &num);
+    if (rc == 1) {
+        *device_num = num;
+        return 0;
+    }
+    return FPGA_ERR_FAIL;
+}
+
+static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num)
+{
+    int rc;
+    int num;
+    rc = sscanf(device_name, "edma%d_queue_0", &num);
+    if (rc == 1) {
+        *device_num = num;
+        return 0;
+    }
+    return FPGA_ERR_FAIL;
 }
