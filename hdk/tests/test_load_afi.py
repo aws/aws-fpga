@@ -126,8 +126,6 @@ class TestLoadAfi(AwsFpgaTestBase):
     def load_agfi(self, cl, agfi, afi, slot):
         self.assert_afi_available(afi)
 
-        self.load_msix_workaround(slot)
-
         self.fpga_load_local_image(agfi, slot)
 
         logger.info("Checking slot {} AFI Load status".format(slot))

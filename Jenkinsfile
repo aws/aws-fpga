@@ -102,14 +102,14 @@ def all_tests = [:]
 // Task to Label map
 task_label = [
     'create_afi':        't2.l_50',
-    'simulation':        'c4.xl',
-    'dcp_gen':           'c4.4xl',
+    'simulation':        'z1d.l',
+    'dcp_gen':           'z1d.2xl',
     'runtime':           'f1.2xl',
     'runtime_all_slots': 'f1.16xl',
     'source_scripts':    'c4.xl',
     'md_links':          'c4.xl',
     'find_tests':        't2.l_50',
-    'sdaccel_builds':    'c4.4xl'
+    'sdaccel_builds':    'z1d.2xl'
 ]
 
 def xilinx_versions = [ '2017.4', '2018.2' ]

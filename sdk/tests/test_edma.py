@@ -54,9 +54,6 @@ class TestEdma(AwsFpgaTestBase):
 
         (cls.cl_dram_dma_agfi, cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_dram_dma')
 
-        for slot in range(AwsFpgaTestBase.num_slots):
-            AwsFpgaTestBase.load_msix_workaround(slot)
-
         cls.setup_fio_tools()
 
         return
