@@ -68,7 +68,7 @@ fpga_pci_bar_set_mem_base_size(pci_bar_handle_t handle, void *mem_base, size_t m
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 static inline void * 
@@ -112,7 +112,7 @@ fpga_pci_bar_alloc(void)
 
 	pthread_mutex_unlock(&bars_mutex);
 
-	return FPGA_ERR_FAIL;
+	return -ENOMEM;
 }
 
 static int
@@ -131,7 +131,7 @@ fpga_pci_bar_free(pci_bar_handle_t handle)
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 static int
@@ -142,7 +142,7 @@ fpga_pci_check_file_id(char *path, uint16_t id)
 
 	int ret = 0;
 	FILE *fp = fopen(path, "r");
-	fail_on(!fp, err, "Error opening %s", path);
+	fail_on(!fp, err_open, "Error opening %s", path);
 
 	uint32_t tmp_id;
 	ret = fscanf(fp, "%x", &tmp_id);
@@ -157,7 +157,9 @@ fpga_pci_check_file_id(char *path, uint16_t id)
 err_close:
 	fclose(fp);
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
+err_open:
+	return -errno;
 }
 
 static int 
@@ -165,12 +167,15 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 	bool write_combining, int *handle) 
 {
 	int fd = -1;
+	int ret = 0;
 	log_debug("enter");
 
 	void *mem_base = NULL;
 
-	fail_on(!spec, err, "spec is NULL");
-	fail_on(!handle, err, "handle is NULL");
+	fail_on_with_code(!spec, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
+		"spec is NULL");
+	fail_on_with_code(!handle, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
+		"handle is NULL");
 
 	struct fpga_pci_resource_map *map = &spec->map[pf_id];
 
@@ -185,15 +190,17 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 
 	/** Sanity check the vendor */
 	char sysfs_name[NAME_MAX + 1];
-	int ret = snprintf(sysfs_name, sizeof(sysfs_name), 
-			"/sys/bus/pci/devices/" PCI_DEV_FMT "/vendor", 
+	ret = snprintf(sysfs_name, sizeof(sysfs_name),
+			"/sys/bus/pci/devices/" PCI_DEV_FMT "/vendor",
 			map->domain, map->bus, map->dev, map->func);
 
-	fail_on(ret < 0, err, "Error building the sysfs path for vendor");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for vendor");
+	fail_on_with_code(ret < 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
+		"Error building the sysfs path for vendor");
+	fail_on_with_code((size_t) ret >= sizeof(sysfs_name), err, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM, "sysfs path too long for vendor");
 
 	ret = fpga_pci_check_file_id(sysfs_name, map->vendor_id);
-	fail_on(ret != 0, err, 
+	fail_on_with_code(ret != 0, err, ret, FPGA_ERR_PCI_MISSING,
 			"fpga_pci_check_file_id failed, sysfs_name=%s, vendor_id=0x%04x",
 			sysfs_name, map->vendor_id);
 
@@ -202,14 +209,15 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 			"/sys/bus/pci/devices/" PCI_DEV_FMT "/device", 
 			map->domain, map->bus, map->dev, map->func);
 
-	fail_on(ret < 0, err, "Error building the sysfs path for device");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, 
-			"sysfs path too long for device");
+	fail_on_with_code(ret < 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
+		"Error building the sysfs path for device");
+	fail_on_with_code((size_t) ret >= sizeof(sysfs_name), err, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM, "sysfs path too long for device");
 
 	ret = fpga_pci_check_file_id(sysfs_name, map->device_id);
-	fail_on(ret != 0, err, 
-			"fpga_pci_check_file_id failed, sysfs_name=%s, device_id=0x%04x",
-			sysfs_name, map->device_id);
+	fail_on_with_code(ret != 0, err, ret, FPGA_ERR_PCI_MISSING,
+		"fpga_pci_check_file_id failed, sysfs_name=%s, device_id=0x%04x",
+		sysfs_name, map->device_id);
 
 	char wc_suffix[4] = "\0";
 	if (map->resource_burstable[bar_id] && write_combining) {
@@ -224,23 +232,27 @@ fpga_pci_bar_attach(struct fpga_slot_spec *spec, int pf_id, int bar_id,
 			"/sys/bus/pci/devices/" PCI_DEV_FMT "/resource%u%s", 
 			map->domain, map->bus, map->dev, map->func, bar_id, wc_suffix);
 
-	fail_on(ret < 0, err, "Error building the sysfs path for resource");
-	fail_on((size_t) ret >= sizeof(sysfs_name), err, "sysfs path too long for resource");
+	fail_on_with_code(ret < 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
+		"Error building the sysfs path for resource");
+	fail_on_with_code((size_t) ret >= sizeof(sysfs_name), err, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM, "sysfs path too long for resource");
 
 	log_debug("Opening sysfs_name=%s", sysfs_name);
 
 	fd = open(sysfs_name, O_RDWR | O_SYNC);
-	fail_on(fd == -1, err, "open failed");
+	fail_on_with_code(fd == -1, err, ret, FPGA_ERR_UNRESPONSIVE, "open failed");
 
 	mem_base = mmap(0, map->resource_size[bar_id], PROT_READ | PROT_WRITE, 
 			MAP_SHARED, fd, 0);
-	fail_on(mem_base == MAP_FAILED, err, "mmap failed");
+	fail_on_with_code(mem_base == MAP_FAILED, err, ret, FPGA_ERR_UNRESPONSIVE,
+		"mmap failed");
 	close(fd);
 	fd = -1;
 
 	/** Allocate a bar */
 	int tmp_handle = fpga_pci_bar_alloc();
-	fail_on(tmp_handle < 0, err_unmap, "fpga_pci_bar_alloc failed");
+	fail_on_with_code(tmp_handle < 0, err_unmap, ret, -ENOMEM,
+		"fpga_pci_bar_alloc failed");
 
 	/** Set the bar's mem base and size */
 	ret = fpga_pci_bar_set_mem_base_size(tmp_handle, mem_base, 
@@ -261,7 +273,7 @@ err:
 		close(fd);
 	}
 	errno = 0;
-	return FPGA_ERR_FAIL;
+	return ret;
 }
 
 int
@@ -292,7 +304,7 @@ fpga_pci_attach(int slot_id, int pf_id, int bar_id, uint32_t flags,
 
 	write_combining = false;
 	if (flags & BURST_CAPABLE) {
-		ret = (spec.map[pf_id].resource_burstable[bar_id]) ? 0 : FPGA_ERR_FAIL;
+		ret = (spec.map[pf_id].resource_burstable[bar_id]) ? 0 : -EINVAL;
 		fail_on(ret, err, "bar is not BURST_CAPABLE (does not support write "
 			"combining.)");
 		write_combining = true;
@@ -318,7 +330,7 @@ fpga_pci_detach(pci_bar_handle_t handle) {
 	return 0;
 err:
 	errno = 0;
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -334,7 +346,7 @@ fpga_pci_poke(pci_bar_handle_t handle, uint64_t offset, uint32_t value) {
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL; 
+	return -EINVAL;
 }
 
 int
@@ -350,7 +362,7 @@ fpga_pci_poke8(pci_bar_handle_t handle, uint64_t offset, uint8_t value) {
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL; 
+	return -EINVAL;
 }
 
 int
@@ -366,7 +378,7 @@ fpga_pci_poke64(pci_bar_handle_t handle, uint64_t offset, uint64_t value) {
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -383,7 +395,7 @@ fpga_pci_peek(pci_bar_handle_t handle, uint64_t offset, uint32_t *value) {
 			handle, offset, *value);
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -400,7 +412,7 @@ fpga_pci_peek8(pci_bar_handle_t handle, uint64_t offset, uint8_t *value) {
 			handle, offset, *value);
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -417,7 +429,7 @@ fpga_pci_peek64(pci_bar_handle_t handle, uint64_t offset, uint64_t *value) {
 			handle, offset, *value);
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* datap, uint64_t dword_len) {
@@ -436,7 +448,7 @@ int fpga_pci_write_burst(pci_bar_handle_t handle, uint64_t offset, uint32_t* dat
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -449,7 +461,7 @@ fpga_pci_get_address(pci_bar_handle_t handle, uint64_t offset, size_t len,
 	fail_on(!*ptr, err, "fpga_plat_get_mem_at_offset failed");
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }
 
 int
@@ -471,5 +483,5 @@ fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return -EINVAL;
 }

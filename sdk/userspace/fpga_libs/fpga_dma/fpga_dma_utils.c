@@ -83,19 +83,17 @@ int fpga_dma_open_queue(enum fpga_dma_driver which_driver, int slot_id,
 
     rc = fpga_dma_device_id(which_driver, slot_id, channel, is_read,
         device_file);
-    fail_on(rc, err, "unable to get device id to open DMA queue");
+    /* TODO: this isn't really the right error code. */
+    fail_on_with_code(rc, err, rc, -EINVAL,
+        "unable to get device id to open DMA queue");
 
     fd = open(device_file, is_read ? O_RDONLY : O_WRONLY);
-    fail_on(rc = (fd < 0) ? fd : 0, err, "unable to open DMA device queue: %s",
+    fail_on_with_code(fd < 0, err, rc, fd, "unable to open DMA device queue: %s",
         device_file);
 
     return fd;
 err:
-    if (rc > 0) {
-        return -rc;
-    } else {
-        return rc;
-    }
+    return rc;
 }
 
 int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
@@ -120,7 +118,7 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
     }
 
     if (rc < 1) {
-        return FPGA_ERR_FAIL;
+        return FPGA_ERR_SOFTWARE_PROBLEM;
     }
 
     rc = fpga_pci_get_dma_device_num(which_driver, slot_id, &device_num);
@@ -132,8 +130,9 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
                   device_num,
                   read_or_write,
                   channel);
-    fail_on(rc = (rc < 0) ? FPGA_ERR_FAIL : 0, out,
+    fail_on_with_code(rc < 0, out, rc, FPGA_ERR_SOFTWARE_PROBLEM,
         "Could not generate device_file");
+    rc = 0;
 
 out:
     return rc;
@@ -153,7 +152,7 @@ int fpga_dma_burst_read(int fd, uint8_t *buffer, size_t xfer_sz,
             /* size of xfer */ xfer_sz - read_offset,
             /* read address */ address + read_offset);
         if (rc < 0) {
-            fail_on((rc = (rc < 0) ? -errno : 0), out, "call to pread failed.");
+            fail_on_with_code(rc < 0, out, rc, -errno, "call to pread failed.");
         }
         read_offset += rc;
     }
@@ -177,7 +176,7 @@ int fpga_dma_burst_write(int fd, uint8_t *buffer, size_t xfer_sz,
             /* size of xfer */ xfer_sz - write_offset,
             /* read address */ address + write_offset);
         if (rc < 0) {
-            fail_on((rc = (rc < 0) ? -errno : 0), out, "call to pwrite failed.");
+            fail_on_with_code(rc < 0, out, rc, -errno, "call to pwrite failed.");
         }
         write_offset += rc;
     }
@@ -200,9 +199,10 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
     char sysfs_path_instance[MAX_FD_LEN + sizeof(entry->d_name) + sizeof(path)];
 
     const struct dma_opts_s *dma_opts = fpga_dma_get_dma_opts(which_driver);
-    fail_on(rc = (dma_opts == NULL) ? -EINVAL : 0, err, "invalid DMA driver");
+    fail_on_with_code(!dma_opts, err, rc, -EINVAL, "invalid DMA driver");
     rc = snprintf(path, sizeof(path), "/sys/class/%s", dma_opts->drv_name);
-    fail_on(rc < 1, err, "snprintf failed");
+    fail_on_with_code(rc < 1, err, rc, FPGA_ERR_SOFTWARE_PROBLEM,
+        "snprintf failed");
 
     /* This call must be before the lock, because the call holds the lock. */
     rc = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &resource);
@@ -214,10 +214,12 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
                   resource.bus,
                   resource.dev,
                   resource.func);
-    fail_on(rc < 1, err, "Could not record DBDF");
+    fail_on_with_code(rc < 1, err, rc, FPGA_ERR_SOFTWARE_PROBLEM,
+        "Could not record DBDF");
 
     DIR *dirp = opendir(path);
-    fail_on(!dirp, err, "opendir failed for path=%s", path);
+    fail_on_with_code(!dirp, err, rc, FPGA_ERR_SOFTWARE_PROBLEM,
+        "opendir failed for path=%s", path);
 
 #if defined(FPGA_PCI_USE_READDIR_R)
     struct dirent entry_stack, *result;
@@ -258,7 +260,8 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
 
         rc = snprintf(sysfs_path_instance, sizeof(sysfs_path_instance),
             "%s/%s/device", path, entry->d_name);
-        fail_on(rc < 2, err_unlock, "snprintf failed to build sysfs path");
+        fail_on_with_code(rc < 2, err_unlock, rc, FPGA_ERR_SOFTWARE_PROBLEM,
+            "snprintf failed to build sysfs path");
         possible_dbdf = realpath(sysfs_path_instance, real_path);
         if (possible_dbdf == NULL) {
             continue;
@@ -272,7 +275,8 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
 #if !defined(FPGA_PCI_USE_READDIR_R)
     pthread_mutex_unlock(&fpga_pci_readdir_mutex);
 #endif
-    fail_on(_device_num == -1, err, "Unable to find device num");
+    fail_on_with_code(_device_num == -1, err, rc, FPGA_ERR_PCI_MISSING,
+        "Unable to find device num");
 
     closedir(dirp);
     *device_num = _device_num;
@@ -289,7 +293,7 @@ err:
         closedir(dirp);
     }
     errno = 0;
-    return FPGA_ERR_FAIL;
+    return rc;
 }
 
 static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num)
@@ -301,7 +305,7 @@ static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num)
         *device_num = num;
         return 0;
     }
-    return FPGA_ERR_FAIL;
+    return FPGA_ERR_SOFTWARE_PROBLEM;
 }
 
 static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num)
@@ -313,5 +317,5 @@ static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num)
         *device_num = num;
         return 0;
     }
-    return FPGA_ERR_FAIL;
+    return FPGA_ERR_SOFTWARE_PROBLEM;
 }

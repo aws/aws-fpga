@@ -255,7 +255,7 @@ class TestLoadAfi(AwsFpgaTestBase):
                 self.WORKSPACE, cl), echo=True)
             assert rc == 0, "Runtime example failed."
 
-	else:
+        else:
             assert False, "Invalid cl: {}".format(cl)
 
     def base_test(self, cl, agfi, afi, install_xdma_driver, slots_to_test, option_tag):
