@@ -22,6 +22,8 @@ pytest configuration
 import pytest
 
 def pytest_addoption(parser):
+    parser.addoption("--Simulator", action="store", required=False, type=str,
+        help="Simulator tool requested for this test", default="vivado")
     parser.addoption("--examplePath", action="store", required=False, type=str,
         help="Path to the Xilinx Example to test", default="SDAccel/examples/xilinx/getting_started/host/helloworld_ocl")
     parser.addoption("--rteName", action="store", required=False, type=str,
@@ -30,6 +32,11 @@ def pytest_addoption(parser):
         help="Xilinx Version. For eg: 2017.1, 2017.4, etc", default="2017.4")
 
 def pytest_generate_tests(metafunc):
+     
+    if metafunc.cls.ADD_SIMULATOR:
+        print("Configuring parameters of {}::{}".format(metafunc.module.__name__, metafunc.function.__name__))
+        print("Simulator = " + metafunc.config.getoption('Simulator'))
+        metafunc.parametrize("Simulator", [metafunc.config.getoption('Simulator')])
 
     if metafunc.cls.ADD_EXAMPLEPATH:
         print("Configuring parameters of {}::{}".format(metafunc.module.__name__, metafunc.function.__name__))

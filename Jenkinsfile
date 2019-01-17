@@ -22,8 +22,8 @@ properties([parameters([
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
     booleanParam(name: 'disable_runtime_tests',               defaultValue: false,  description: 'Option to disable runtime tests.'),
-    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins')
-
+    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins'),
+    booleanParam(name: 'internal_simulations',                defaultValue: false, description: 'This option asks for default agent from Jenkins')
 ])])
 
 //=============================================================================
@@ -133,6 +133,19 @@ def sdaccel_example_default_map = [ '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/ex
                                                ]
 ]
 
+def simulator_tool_default_map = [ '2017.4' : [ 'vivado': 'xilinx/SDx/2017.4_04112018',
+                                                'vcs': 'vcs-mx/L-2016.06-1',
+                                                'questa': 'questa/10.6b',
+                                                'ies': 'incisive/15.20.063'
+                                              ],
+                                   '2018.2' : [ 'vivado': 'xilinx/SDx/2018.2_06142018',
+                                                'vcs': 'vcs-mx/N-2017.12-SP1-1',
+                                                'questa': 'questa/10.6c_1',
+                                                'ies': 'incisive/15.20.063'
+                                              ]
+]
+
+
 // Get serializable entry set
 @NonCPS def entrySet(m) {m.collect {k, v -> [key: k, value: v]}}
 
@@ -149,6 +162,10 @@ def get_task_label(Map args=[ : ]) {
     if (params.use_test_ami) {
         echo "Test AMI Requested"
         task_label = task_label + '_test'
+    }
+    if (params.internal_simulations) {
+        echo "internal simulation agent requested"
+        task_label = 'f1'
     }
 
     echo "Label Requested: $task_label"
@@ -341,27 +358,56 @@ if (test_fpga_tools) {
     }
 }
 
+
 if (test_sims) {
     all_tests['Run Sims'] = {
         stage('Run Sims') {
             def cl_names = ['cl_uram_example', 'cl_dram_dma', 'cl_hello_world']
+            def simulators = ['vivado']
             def sim_nodes = [:]
+            if(params.internal_simulations) {
+              simulators = ['vcs', 'ies', 'questa', 'vivado']
+            }
             for (x in cl_names) {
                 for (y in xilinx_versions) {
-                    String xilinx_version = y
-                    String cl_name = x
-                    String node_name = "Sim ${cl_name} ${xilinx_version}"
-                    String key = "test_${cl_name}__"
-                    String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
-                    sim_nodes[node_name] = {
+                    for ( z in simulators)  {
+                        String xilinx_version = y
+                        String cl_name = x
+                        String simulator = z
+                        String node_name = "Sim ${cl_name} ${xilinx_version}"
+                        String key = "test_${cl_name}__"
+                        String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
+                        def tool_module_map = simulator_tool_default_map.get(xilinx_version)
+                        String vcs_module = tool_module_map.get('vcs')
+                        String questa_module = tool_module_map.get('questa')
+                        String ies_module = tool_module_map.get('ies')
+                        String vivado_module = tool_module_map.get('vivado')
+                        if(params.internal_simulations) {
+                           report_file = "test_sims_${cl_name}_${xilinx_version}_${simulator}.xml"
+                        }
+                        sim_nodes[node_name] = {
                         node(get_task_label(task: 'simulation', xilinx_version: xilinx_version)) {
                             checkout scm
                             try {
-                                sh """
-                                    set -e
-                                    source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                    python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file}
-                                """
+                                if(params.internal_simulations) {
+                                   sh """
+                                   set -e
+                                   module purge
+                                   module load python/2.7.9
+                                   module load ${vivado_module}
+                                   module load ${vcs_module}
+                                   module load ${questa_module}
+                                   module load ${ies_module}
+                                   source $WORKSPACE/hdk_setup.sh
+                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                       """
+                                } else {
+                                   sh """
+                                   set -e
+                                   source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator} 
+                                      """
+                                }
                             } catch (exc) {
                                 echo "${node_name} failed: archiving results"
                                 archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
@@ -377,6 +423,7 @@ if (test_sims) {
                         }
                     }
                 }
+              }
             }
             parallel sim_nodes
         }
