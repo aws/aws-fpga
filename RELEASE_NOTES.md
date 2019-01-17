@@ -93,7 +93,7 @@ Look for the ./hdk/hdk_version.txt file.
 
 **Q: How do I know what my Shell version is? **
 
-The Shell version of an FPGA slot is available through the FPGA Image Management tools.  See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot.
+The Shell version of an FPGA slot is available through the FPGA Image Management tools after an AFI has been loaded.  See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot.  Prior to loading an AFI, the state of the FPGA (including shell version) is undefined and non-deterministic.  
 
 **Q: How do I know what version of FPGA Image management tools are running on my instance? **
 
