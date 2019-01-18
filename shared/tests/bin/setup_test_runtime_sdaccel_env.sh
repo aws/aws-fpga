@@ -31,6 +31,10 @@ if ! source $script_dir/setup_test_env.sh; then
     return 1
 fi
 
+if ! source $script_dir/setup_test_xrtpatch.sh; then
+    return 1
+fi
+ 
 if ! source $WORKSPACE/sdaccel_setup.sh; then
     return 1
 fi
