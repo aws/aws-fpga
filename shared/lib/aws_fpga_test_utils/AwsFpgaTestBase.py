@@ -402,15 +402,30 @@ class AwsFpgaTestBase(object):
         return (agfi, afi)
 
     @staticmethod
-    def fpga_clear_local_image(slot, request_timeout=6000, sync_timeout=180):
+    def exec_as_user(as_root, command):
+        if as_root:
+            return "sudo {}".format(command)
+        else:
+            return command
+
+    @staticmethod
+    def fpga_clear_local_image(slot, request_timeout=6000, sync_timeout=180,
+            as_root=True):
         logger.info("Clearing FPGA slot {}".format(slot))
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-clear-local-image -S {} --request-timeout {} --sync-timeout {}".format(slot, request_timeout, sync_timeout))
+        cmd = "{} -S {} --request-timeout {} --sync-timeout {}".format(
+                AwsFpgaTestBase.exec_as_user(as_root, "fpga-clear-local-image"),  slot,
+                request_timeout, sync_timeout)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd(cmd)
         assert rc == 0, "Clearing FPGA slot {} failed.".format(slot)
 
     @staticmethod
-    def fpga_load_local_image(agfi, slot, request_timeout=6000, sync_timeout=180):
+    def fpga_load_local_image(agfi, slot, request_timeout=6000,
+            sync_timeout=180, as_root=True):
         logger.info("Loading {} into slot {}".format(agfi, slot))
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-load-local-image -S {} -I {} --request-timeout {} --sync-timeout {}".format(slot, agfi, request_timeout, sync_timeout))
+        cmd = "{} -S {} -I {} --request-timeout {} --sync-timeout {}".format(
+                AwsFpgaTestBase.exec_as_user(as_root, "fpga-load-local-image"), slot, agfi,
+                request_timeout, sync_timeout)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd(cmd)
         assert rc == 0, "Failed to load {} in slot {}.".format(agfi, slot)
 
     @staticmethod
@@ -424,8 +439,10 @@ class AwsFpgaTestBase(object):
         return fpgaLocalImage
 
     @staticmethod
-    def fpga_get_virtual_led(slot, remove_dashes=False):
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-get-virtual-led -S {}".format(slot))
+    def fpga_get_virtual_led(slot, remove_dashes=False, as_root=True):
+        cmd = "{} -S {}".format(AwsFpgaTestBase.exec_as_user(as_root, "fpga-get-virtual-led"),
+            slot)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd(cmd)
         assert rc == 0, "Failed to get virtual LEDs from slot {}.".format(slot)
         value = stdout_lines[1]
         if remove_dashes:
@@ -433,8 +450,9 @@ class AwsFpgaTestBase(object):
         return value
 
     @staticmethod
-    def fpga_get_virtual_dip_switch(slot, remove_dashes=False):
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-get-virtual-dip-switch -S {}".format(slot))
+    def fpga_get_virtual_dip_switch(slot, remove_dashes=False, as_root=True):
+        cmd = "{} -S {}".format(AwsFpgaTestBase.exec_as_user(as_root, "fpga-get-virtual-dip-switch"), slot)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd(cmd)
         assert rc == 0, "Failed to get virtual DIP switches from slot {}.".format(slot)
         value = stdout_lines[1]
         if remove_dashes:
@@ -442,9 +460,11 @@ class AwsFpgaTestBase(object):
         return value
 
     @staticmethod
-    def fpga_set_virtual_dip_switch(value, slot):
+    def fpga_set_virtual_dip_switch(value, slot, as_root=True):
         value = re.sub('-', '', value)
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("sudo fpga-set-virtual-dip-switch -S {} -D {}".format(slot, value))
+        cmd = "{} -S {} -D {}".format(AwsFpgaTestBase.exec_as_user(as_root, "fpga-set-virtual-dip-switch"),
+            slot, value)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd(cmd)
         assert rc == 0, "Failed to set virtual DIP switches in slot {} to {}.".format(slot, value)
 
     @staticmethod

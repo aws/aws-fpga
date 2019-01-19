@@ -11,6 +11,7 @@ properties([parameters([
     booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
     booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
+    booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
     booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
     booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
@@ -35,6 +36,7 @@ boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
+boolean test_non_root_access = params.get('test_non_root_access')
 boolean test_xdma = params.get('test_xdma')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_dcp_recipes = params.get('test_dcp_recipes')
@@ -461,6 +463,39 @@ if (test_edma) {
                     else {
                         echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
                     }
+                }
+            }
+        }
+    }
+}
+
+if (test_non_root_access) {
+    all_tests['Test non-root access to FPGA tools'] = {
+        stage('Test non-root access to FPGA tools') {
+            node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
+
+                echo "Test non-root access to FPGA tools"
+                checkout scm
+
+                String test = "sdk/tests/test_non_root_access.py"
+                String report_file = "test_non_root_access.xml"
+
+                try {
+                    sh """
+                        export AWS_FPGA_ALLOW_NON_ROOT=y
+                        export AWS_FPGA_SDK_OVERRIDE_GROUP=y
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        newgrp fpgauser
+                        export SDK_DIR="${WORKSPACE}/sdk"
+                        source  $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                        python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
+                    """
+                } catch (exc) {
+                    input message: "Non-root access test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exc
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
                 }
             }
         }
