@@ -186,7 +186,7 @@ class TestFpgaTools(BaseSdkTools):
             # Clear again immediately. It should fail because busy
             (rc, stdout, stderr) = self.run_cmd("sudo fpga-clear-local-image --request-timeout {} -S {} -A".format(self.DEFAULT_REQUEST_TIMEOUT, slot), echo=True, check=False)
             assert rc != 0
-            assert len(stdout) == 2
+            assert len(stdout) == 3
             assert len(stderr) == 1
             assert stdout[0] == 'Error: (3) busy'
 

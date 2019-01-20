@@ -105,6 +105,22 @@ int fpga_dma_burst_read(int fd, uint8_t *buffer, size_t xfer_sz,
 int fpga_dma_burst_write(int fd, uint8_t *buffer, size_t xfer_sz,
     size_t address);
 
+/**
+ * The EDMA and XDMA drivers use a device number which does not map directly
+ * onto the slot number. Use this function to map a slot number onto this device
+ * number. The device number is the number used in the files found in /dev.
+ *
+ * @param which_driver     - specifies which DMA driver to use. See
+ * @param slot_id          - fpga_dma_driver_e which FPGA slot to use; this uses
+ *                           the same slot order as fpga_pci_get_resource_map
+ * @param[out] device_num  - an out parameter for returning the device number
+ *                           requested
+ *
+ * @returns 0 on success, non-zero on failure
+ */
+int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
+    int slot_id, int *device_num);
+
 #ifdef __cplusplus
 }
 #endif

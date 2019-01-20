@@ -126,8 +126,6 @@ class TestLoadAfi(AwsFpgaTestBase):
     def load_agfi(self, cl, agfi, afi, slot):
         self.assert_afi_available(afi)
 
-        self.load_msix_workaround(slot)
-
         self.fpga_load_local_image(agfi, slot)
 
         logger.info("Checking slot {} AFI Load status".format(slot))
@@ -257,7 +255,7 @@ class TestLoadAfi(AwsFpgaTestBase):
                 self.WORKSPACE, cl), echo=True)
             assert rc == 0, "Runtime example failed."
 
-	else:
+        else:
             assert False, "Invalid cl: {}".format(cl)
 
     def base_test(self, cl, agfi, afi, install_xdma_driver, slots_to_test, option_tag):

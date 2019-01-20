@@ -59,6 +59,7 @@ enum {
 		FPGA_CMD_DRAM_DATA_RETENTION ,
 };
 
+
 /** 
  * FPGA specific errors
  * e.g. as returned by fpga-load-local-image, fpga-clear-local-image,
@@ -70,6 +71,7 @@ enum {
  *
  *  Any additions should also be added to FPGA_ERR2STR (see below).
  */
+
 enum {
     /** Negative values are compatible with standard errno returns */
 
@@ -105,14 +107,27 @@ enum {
 	 *  possible. This prevents the loss of data when retention cannot work. */
 	FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18,
 
-	/* Reserved: 19-21 */
+	/** Reserved: 19 */
+
+	/** Unable to locate PCI devices/resources */
+	FPGA_ERR_PCI_MISSING = 20,
+
+	FPGA_ERR_AFI_CMD_MALFORMED = 21,
 
 	/** Data retention was attempted, but failed and data was lost. All efforts
 	 *  are made to avoid this condition. */
 	FPGA_ERR_DRAM_DATA_RETENTION_FAILED = 22,
+
 	/** Saving DDR control calibration failed and data retention will not be
 	 *  possible. */
 	FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED = 23,
+
+	/** This error indicates a bug or unhandled external condition in the
+	 *  software. Report occurrences on github. */
+	FPGA_ERR_SOFTWARE_PROBLEM = 24,
+
+	/** Cannot communicate with the FPGA */
+	FPGA_ERR_UNRESPONSIVE = 25,
 
 	FPGA_ERR_END
 };
@@ -131,6 +146,10 @@ enum {
 	((error) == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE) ? "dram-data-retention-not-possible" : \
 	((error) == FPGA_ERR_DRAM_DATA_RETENTION_FAILED) ? "dram-data-retention-failed" : \
 	((error) == FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED) ? "dram-data-retention-setup-failed" : \
+	((error) == FPGA_ERR_PCI_MISSING) ? 				"pci-device-missing" : \
+	((error) == FPGA_ERR_SOFTWARE_PROBLEM) ?			"software-problem": \
+	((error) == FPGA_ERR_UNRESPONSIVE) ?				"unresponsive": \
+	((error) == FPGA_ERR_AFI_CMD_MALFORMED) ?			"afi-command-malformed" : \
 														"internal-error"
 
 

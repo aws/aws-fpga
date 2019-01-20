@@ -167,7 +167,7 @@ out:
     return (rc != 0 ? 1 : 0);
 }
 
-int interrupt_example(int slot_id, int interrupt_number){
+int interrupt_example(int slot_id, int interrupt_number) {
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct pollfd fds[1];
     uint32_t fd, rd,  read_data;
@@ -181,23 +181,26 @@ int interrupt_example(int slot_id, int interrupt_number){
     int poll_limit = 20;
     uint32_t interrupt_reg_offset = 0xd00;
 
+    int device_num = 0;
+    rc = fpga_pci_get_dma_device_num(FPGA_DMA_XDMA, slot_id, &device_num);
+    fail_on((rc = (rc != 0)? 1:0), out, "Unable to get xdma device number.");
   
-    rc = sprintf(event_file_name, "/dev/xdma%i_events_%i", slot_id, interrupt_number);
+    rc = sprintf(event_file_name, "/dev/xdma%i_events_%i", device_num, interrupt_number);
     fail_on((rc = (rc < 0)? 1:0), out, "Unable to format event file name.");
 
-    printf("Starting MSI-X Interrupt test \n");
+    log_info("Starting MSI-X Interrupt test");
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, fpga_attach_flags, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
-    printf("Polling device file: %s for interrupt events \n", event_file_name);
+    log_info("Polling device file: %s for interrupt events", event_file_name);
     if((fd = open(event_file_name, O_RDONLY)) == -1) {
-        printf("Error - invalid device\n");
+        log_error("Error - invalid device\n");
         fail_on((rc = 1), out, "Unable to open event device");
     }
     fds[0].fd = fd;
     fds[0].events = POLLIN;
 
-    printf("Triggering MSI-X Interrupt %d\n", interrupt_number);
+    log_info("Triggering MSI-X Interrupt %d", interrupt_number);
     rc = fpga_pci_poke(pci_bar_handle, interrupt_reg_offset , 1 << interrupt_number);
     fail_on(rc, out, "Unable to write to the fpga !");
 
@@ -211,7 +214,7 @@ int interrupt_example(int slot_id, int interrupt_number){
         rc = pread(fd, &events_user, sizeof(events_user), 0);
         fail_on((rc = (rc < 0)? 1:0), out, "call to pread failed.");
 
-        printf("Interrupt present for Interrupt %i, events %i. It worked!\n", 
+        log_info("Interrupt present for Interrupt %i, events %i. It worked!",
                interrupt_number, events_user);
 
         //Clear the interrupt register
@@ -219,7 +222,7 @@ int interrupt_example(int slot_id, int interrupt_number){
         fail_on(rc, out, "Unable to write to the fpga !");
     }
     else{
-        printf("No interrupt generated- something went wrong.\n");
+        log_error("No interrupt generated- something went wrong.");
         fail_on((rc = 1), out, "Interrupt generation failed");
     }
     close(fd);
@@ -256,7 +259,7 @@ int axi_mstr_example(int slot_id) {
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, fpga_attach_flags, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
-    printf("Starting AXI Master to DDR test \n");
+    log_info("Starting AXI Master to DDR test");
 
     /* DDR A Access */
     ddr_hi_addr = 0x00000001;
@@ -346,7 +349,7 @@ int axi_mstr_ddr_access(int slot_id, pci_bar_handle_t pci_bar_handle, uint32_t d
     fail_on(rc, out, "Unable to read AXI Master CRDR from the fpga !");
     if(read_data == ddr_data) {
         rc = 0;
-        printf("Resulting value at address 0x%x%x matched expected value 0x%x. It worked!\n", ddr_hi_addr, ddr_lo_addr, ddr_data);
+        log_info("Resulting value at address 0x%x%x matched expected value 0x%x. It worked!", ddr_hi_addr, ddr_lo_addr, ddr_data);
     }
     else{
         rc = 1;

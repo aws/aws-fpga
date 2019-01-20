@@ -149,7 +149,7 @@ Please note, the angle bracket directories need to be replaced according to the 
 
 ```
 		$ sudo sh
-		# source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh
+		# source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh
 		# ./host
 ```
 This produces the following output: 

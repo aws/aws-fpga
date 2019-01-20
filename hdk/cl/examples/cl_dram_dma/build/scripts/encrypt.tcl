@@ -45,12 +45,11 @@ file copy -force $CL_DIR/design/mem_scrb.sv                        $TARGET_DIR
 file copy -force $CL_DIR/design/cl_tst_scrb.sv                     $TARGET_DIR
 file copy -force $CL_DIR/design/axil_slave.sv                      $TARGET_DIR
 file copy -force $CL_DIR/design/cl_int_slv.sv                      $TARGET_DIR
-file copy -force $CL_DIR/design/cl_mstr_axi_tst.sv                 $TARGET_DIR
 file copy -force $CL_DIR/design/cl_pcim_mstr.sv                    $TARGET_DIR
 file copy -force $CL_DIR/design/cl_vio.sv                          $TARGET_DIR
 file copy -force $CL_DIR/design/cl_dma_pcis_slv.sv                 $TARGET_DIR
 file copy -force $CL_DIR/design/cl_ila.sv                          $TARGET_DIR
-file copy -force $CL_DIR/design/cl_ocl_slv.sv                      $TARGET_DIR 
+file copy -force $CL_DIR/design/cl_ocl_slv.sv                      $TARGET_DIR
 file copy -force $CL_DIR/design/cl_sda_slv.sv                      $TARGET_DIR
 file copy -force $CL_DIR/design/cl_dram_dma_axi_mstr.sv            $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_sh_bar1_template.inc $TARGET_DIR

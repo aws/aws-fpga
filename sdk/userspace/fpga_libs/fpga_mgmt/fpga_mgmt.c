@@ -170,6 +170,97 @@ const char *fpga_mgmt_strerror(int err)
 	return FPGA_ERR2STR(err);
 }
 
+static const char * long_help_FPGA_ERR_AFI_CMD_BUSY =
+	"The FPGA is busy with an operation such as a load or a clear.\n";
+
+static const char * long_help_FPGA_ERR_AFI_ID_INVALID =
+	"The agfi id passed is invalid or you do not have permission to load\n"
+	"the AFI.\n";
+
+static const char * long_help_FPGA_ERR_AFI_CMD_API_VERSION_INVALID =
+	"The FPGA images tools are outdated. Newer tools are available at\n"
+	"https://github.com/aws/aws-fpga\n";
+
+static const char * long_help_FPGA_ERR_CL_ID_MISMATCH =
+	"The vendor and device ID presented by the CL did not match expected\n"
+	"values provided at ingestion time.\n";
+
+static const char * long_help_FPGA_ERR_CL_DDR_CALIB_FAILED =
+	"The DDR controllers in the CL did not correctly calibrate DDR.\n";
+
+static const char * long_help_FPGA_ERR_SHELL_MISMATCH =
+	"The requested AFI relies on a shell which is not supported on this\n"
+	"instance type.\n";
+
+static const char * long_help_FPGA_ERR_POWER_VIOLATION =
+	"The loaded CL exceeded maximum allowed power consumption and was\n"
+	"automatically disabled. To clear this condition, simply reload the AFI.\n";
+
+static const char * long_help_FPGA_ERR_PCI_MISSING =
+	"Unable to locate a PCI device or resource for communicating with the\n"
+	"FPGA API. This can happen if the FPGA has stopped behaving correctly\n"
+	"and the instance will need to be stopped and restarted. This can also\n"
+	"happen if the tools are run on a system with no AWS FPGA attached.\n";
+
+static const char * long_help_ETIMEDOUT =
+	"A time out error is usually spurious and the request can be retried. If\n"
+	"it continues to fail, the FPGA may be inaccessible or the the FPGA API\n"
+	"may be unresponsive.\n";
+
+static const char * long_help_FPGA_ERR_AFI_CMD_MALFORMED =
+	"A malformed response from the FPGA API can indicate that the FPGA has\n"
+	"stopped behaving correctly and the instance will need to be stopped and\n"
+	"and restarted. If this continues to happen (after an instance restart),\n"
+	"this may be an indication that your AFI is exceeding allowed power\n"
+	"consumption limits.\n";
+
+static const char * long_help_FPGA_ERR_SOFTWARE_PROBLEM =
+	"This usually indicates a bug in the fpga image tools, but can also be a\n"
+	"symptom of a bug in the code which is using the library in cases where\n"
+	"the customer is using the library directly.\n";
+
+static const char * long_help_FPGA_ERR_UNRESPONSIVE =
+	"The FPGA or PCI subsytem is not responding. This can happen if the FPGA\n"
+	"stopped behaving correctly and the instance will need to be stopped and\n"
+	"restarted.\n";
+
+
+const char *fpga_mgmt_strerror_long(int err)
+{
+	switch (err) {
+		default:
+		case FPGA_ERR_FAIL:
+		case FPGA_ERR_OK:
+			return NULL;
+
+		case FPGA_ERR_AFI_CMD_BUSY:
+			return long_help_FPGA_ERR_AFI_CMD_BUSY;
+		case FPGA_ERR_AFI_ID_INVALID:
+			return long_help_FPGA_ERR_AFI_ID_INVALID;
+		case FPGA_ERR_AFI_CMD_API_VERSION_INVALID:
+			return long_help_FPGA_ERR_AFI_CMD_API_VERSION_INVALID;
+		case FPGA_ERR_CL_ID_MISMATCH:
+			return long_help_FPGA_ERR_CL_ID_MISMATCH;
+		case FPGA_ERR_CL_DDR_CALIB_FAILED:
+			return long_help_FPGA_ERR_CL_DDR_CALIB_FAILED;
+		case FPGA_ERR_SHELL_MISMATCH:
+			return long_help_FPGA_ERR_SHELL_MISMATCH;
+		case FPGA_ERR_POWER_VIOLATION:
+			return long_help_FPGA_ERR_POWER_VIOLATION;
+		case FPGA_ERR_PCI_MISSING:
+			return long_help_FPGA_ERR_PCI_MISSING;
+		case FPGA_ERR_AFI_CMD_MALFORMED:
+			return long_help_FPGA_ERR_AFI_CMD_MALFORMED;
+		case -EINVAL:
+		case FPGA_ERR_SOFTWARE_PROBLEM:
+			return long_help_FPGA_ERR_SOFTWARE_PROBLEM;
+		case FPGA_ERR_UNRESPONSIVE:
+			return long_help_FPGA_ERR_UNRESPONSIVE;
+		case -ETIMEDOUT:
+			return long_help_ETIMEDOUT;
+	}
+}
+
 int fpga_mgmt_clear_local_image(int slot_id) 
 {
 	int ret;

@@ -209,20 +209,11 @@ Here are the steps:
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
 
 * Source the Runtime Environment & Execute your Host Application 
-   * Xilinx SDx 2017.4:
    ```
        $ sudo sh
-       # source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh   # Other runtime env settings needed by the host app should be setup after this step
+       # source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step
        # ./helloworld 
    ```
-   
-   * Xilinx SDx 2018.2:
-   ```
-       $ sudo sh
-       # source /opt/xilinx/xrt/setup.sh   # Other runtime env settings needed by the host app should be setup after this step
-       # ./helloworld 
-   ```
-
     
 <a name="read"></a>
 # Additional SDAccel Information (2017.4)

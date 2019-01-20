@@ -49,6 +49,14 @@ int fpga_mgmt_close(void);
 const char *fpga_mgmt_strerror(int err);
 
 /**
+ * Get a longer explanation of an error string.
+ *
+ * @param[in] err  The error code to decode
+ * @returns a string with an explanation of the likely cause of this error.
+ */
+const char *fpga_mgmt_strerror_long(int err);
+
+/**
  * Sets the command timeout value in multiples of the delay_msec value.
  *
  * @param[in] value  timeout, n * delay_msec
