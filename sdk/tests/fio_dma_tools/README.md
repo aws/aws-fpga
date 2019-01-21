@@ -39,7 +39,7 @@ fpga-load-local-image -S 0 -I <cl-dram-dma AGFI> -F
 
 ## Load DMA Driver
 
-Load the XDMA or EDMA driver in an interrupt or polled mode.  In the verify and benchmark steps below, we are using the XDMA driver.
+Load the XDMA driver in an interrupt or polled mode.  In the verify and benchmark steps below, we are using the XDMA driver.
 
 ```
 insmod $SDK_DIR/linux_kernel_drivers/xdma/xdma.ko
@@ -49,18 +49,6 @@ insmod $SDK_DIR/linux_kernel_drivers/xdma/xdma.ko
 
 ```
 insmod $SDK_DIR/linux_kernel_drivers/xdma/xdma.ko poll_mode=1 
-```
-
--or-
-
-```
-insmod $SDK_DIR/linux_kernel_drivers/edma/edma-drv.ko
-```
-
--or-
-
-```
-insmod $SDK_DIR/linux_kernel_drivers/edma/edma-drv.ko poll_mode=1 
 ```
 
 ## Run DMA verify test
@@ -119,11 +107,11 @@ XDMA Read Results:
 The FIO config file naming conventions are: 
 
 ```
-<edma | xdma>_<# DMA channels>_<# FIO workers>-<IO size>_<verify | write | read>.fio
+<xdma>_<# DMA channels>_<# FIO workers>-<IO size>_<verify | write | read>.fio
 	
 	'# DMA channels' is 4 DMA channels in these sample FIO config files 
 	'# FIO workers' is 4 concurrent FIO worker processes to drive the 4 DMA channels 
-	'IO size' is the pwrite/pread user buffer size (that may be segmented by the EDMA driver into single_transaction_size DMA IO segments).
+	'IO size' is the pwrite/pread user buffer size (that may be segmented by the XDMA driver into single_transaction_size DMA IO segments).
 ```
 	
 ## What is the benefit of using `poll_mode`?
@@ -137,47 +125,14 @@ XDMA:
 ./fio xdma_4-ch_4-X_write.fio
 ./fio xdma_4-ch_4-X_read.fio
 	
-EDMA:
-./fio edma_4-ch_4-X_write.fio
-./fio edma_4-ch_4-X_read.fio
-	
 ```
 The above '4-X' scripts include 4 channel group reporting for a set of blocksizes {4KB, 8KB, 16KB, 32KB, 64KB, 256KB, 1MB, 2MB}
 
-## How do I use the EDMA driver to perform my own comparison using the same FIO benchmarking tool?
+## What is the XDMA driver test methodology?
 
-To use the EDMA driver, see the EDMA related "Load DMA Driver" steps, then simply use the "edma*.fio" config files as input to FIO in the "Run DMA benchmark tests" section.  Note that the XDMA driver must first be unloaded (e.g. `rmmod xdma`) before the EDMA driver can be loaded.  
+The XDMA driver is benchmarked in interrupt and polled modes. FIO was configured for pwrite/pread (ioengine=psync) and to allocate memory using mmap (iomem=mmap).  When using malloc instead of mmap, throughput becomes less consistent for the larger IO sizes. To maximize DMA IO concurrency, 4 parallel FIO workers each drive their own DMA channel to their own 16GB section of the 64GB FPGA DDR.
 
-```
-./fio edma_4-ch_4-1M_verify.fio
-./fio edma_4-ch_4-1M_write.fio
-./fio edma_4-ch_4-1M_read.fio
-
-EDMA Write Results:
-	
-2xl int mode: 2.2GB/s
-	
-    WRITE: bw=2126MiB/s (2229MB/s), 531MiB/s-539MiB/s (557MB/s-565MB/s), io=64.0GiB (68.7GB), run=30400-30832msec
-	  
-2xl poll mode: 9GB/s
-	
-    WRITE: bw=8633MiB/s (9053MB/s), 2158MiB/s-2311MiB/s (2263MB/s-2423MB/s), io=64.0GiB (68.7GB), run=7089-7591msec
-
-EDMA Read Results:
-	
-2xl int mode: 2.4GB/s
-	
-    READ: bw=2382MiB/s (2497MB/s), 595MiB/s-596MiB/s (624MB/s-625MB/s), io=64.0GiB (68.7GB), run=27476-27516msec
-	   
-2xl poll mode: 9GB/s
-	
-    READ: bw=8769MiB/s (9194MB/s), 2192MiB/s-2273MiB/s (2299MB/s-2384MB/s), io=64.0GiB (68.7GB), run=7207-7474msec
-```
-## What is the XDMA and EDMA driver test methodology?
-
-The FIO benchmarking tests for the Xilinx XDMA and AWS EDMA drivers are very similar, with only differences in device names and the fsync ratio (EDMA only).  The XDMA and EDMA driver are benchmarked in interrupt and polled modes. FIO was configured for pwrite/pread (ioengine=psync) and to allocate memory using mmap (iomem=mmap).  When using malloc instead of mmap, throughput becomes less consistent for the larger IO sizes. To maximize DMA IO concurrency, 4 parallel FIO workers each drive their own DMA channel to their own 16GB section of the 64GB FPGA DDR.
-
-## How did we capture the above XDMA and EDMA FIO performance metrics?
+## How did we capture the above XDMA FIO performance metrics?
 
 At the end of the test, FIO will report the individual worker (per DMA channel) results and the aggregated results for all workers in the group (e.g. 'Run status group 0 (all jobs)').  The aggregated results are the results posted above in 'Results' for the 'Run DMA benchmark tests' step.
    
