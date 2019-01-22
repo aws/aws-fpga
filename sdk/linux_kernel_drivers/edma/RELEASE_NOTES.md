@@ -1,5 +1,8 @@
 # EDMA Driver Release Notes 
 
+
+## :exclamation: Please Note: Support for EDMA driver has ended. AWS strongly recommends moving applications to XDMA driver. EDMA driver will be deprecated and removed in the Developer Kit release 1.4.7.
+
 This is the first release of the EDMA driver. This driver is still under development and performance may not be achieving maximal potential.
 
 This is a Linux kernel driver only

@@ -141,7 +141,6 @@ The [SDK directory](./sdk/README.md) includes the runtime environment required t
   * Linux Kernel Drivers - The developer kit includes three drivers:
     * [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md) - DMA interface to/from HDK accelerators.
     * [XOCL Driver](sdk/linux_kernel_drivers/xocl) - DMA interface with software defined accelerators (also called hardware kernels).
-    * [EDMA Driver](sdk/linux_kernel_drivers/edma/README.md) - Legacy DMA interface to/from HDK accelerators.
   * [FPGA Libraries](sdk/userspace/fpga_libs) - APIs used by C/C++ host applications.
   * [FPGA Management Tools](sdk/userspace/fpga_mgmt_tools/README.md) - AFI management APIs for runtime loading/clearing FPGA image, gathering metrics and debug interface on the F1 instance.
 

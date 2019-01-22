@@ -26,6 +26,29 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.6 (See [ERRATA](./ERRATA.md) for unsupported features)
+
+  * Fixes SDx 2018.2 [missing profile report items in SDAccel](https://forums.aws.amazon.com/thread.jspa?threadID=293541&tstart=0)
+    * Requires [Xilinx 2018.2 Patch AR71715](hdk/docs/SDxPatch_AR71715_and_XRT_installation_instructions.md#installing-sdx-20182-tool-patch-ar71715)
+    * Requires [Xilinx runtime release 2018.2_XDF.RC4](https://github.com/Xilinx/XRT/tree/2018.2_XDF.RC4)
+    * Please see patching & XRT installation instructions [here](hdk/docs/SDxPatch_AR71715_and_XRT_installation_instructions.md)
+  * Fixes SDx 2018.2 [multithreaded kernel driver scheduling](https://forums.aws.amazon.com/thread.jspa?threadID=293166&tstart=0)
+     * Requires [Xilinx runtime release 2018.2_XDF.RC4](https://github.com/Xilinx/XRT/tree/2018.2_XDF.RC4)
+     * Please see XRT installation instructions [here](hdk/docs/SDxPatch_AR71715_and_XRT_installation_instructions.md#installing-xilinx-runtime-xrt-20182_xdfrc4)  
+  * EDMA Driver is no longer supported. 
+      * AWS strongly recommends moving your applications to [XDMA](sdk/linux_kernel_drivers/xdma/README.md).
+      * [EDMA Driver](sdk/linux_kernel_drivers/edma/README.md) will be fully removed from Developer kit 1.4.7+.
+  * Fixed Issues
+    * [NULL definition include in header file](https://github.com/aws/aws-fpga/pull/414)
+    * [Improved messaging for AFI builder script](https://github.com/aws/aws-fpga/pull/407)
+    * [Fixes address decoding to DDR slaves in cl_dram_dma example](hdk/cl/examples/cl_dram_dma/design)  
+  * Improvements
+    * [Improves SDK FPGA managment tools error messaging](sdk/userspace/fpga_mgmt_tools/README.md)
+    * [Enhanced DMA lib for general device number mapping](sdk/userspace/fpga_libs/fpga_dma/fpga_dma_utils.c)
+    * [Improved guidelines for AFI power managment](hdk/docs/afi_power.md)
+    * [Improved Streaming Data Engine IP Integration Documentation](sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) 
+   
+   
 ## Release 1.4.5 (See [ERRATA](./ERRATA.md) for unsupported features) 
 
 * [Documents SDAccel Runtime compatibility](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)

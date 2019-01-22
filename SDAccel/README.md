@@ -125,6 +125,8 @@ The instructions below describe how to build the Xilinx FPGA Binary and host app
     $ make TARGETS=hw DEVICES=$AWS_PLATFORM all   
 ```
 
+NOTE: If you encounter an error with  `No current synthesis run set`, you may have previously run the [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. This will cause [problems](https://forums.aws.amazon.com/thread.jspa?threadID=268202&tstart=25) with the build process, thus it is recommended to remove it before starting a hardware system build.
+
 Now that you have built your Xilinx FPGA binary, see [SDAccel Power Analysis Guide](./docs/SDAccel_Power_Analysis.md) for more details on how to analyze power for your binary.
 
 <a name="createafi"></a>
