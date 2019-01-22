@@ -269,6 +269,7 @@ class TestSims(AwsFpgaTestBase):
         test_type = 'sv_fast_ecc_direct'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, Simulator=Simulator)
+
     def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_rnd(self, Simulator):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
