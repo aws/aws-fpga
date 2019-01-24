@@ -221,7 +221,7 @@ static inline int do_dma_read(int fd, uint8_t *buffer, size_t size,
     uint64_t address, int channel, int slot_id)
 {
 #if defined(SV_TEST)
-    sv_fpga_start_cl_to_buffer(slot_id, channel, size, address);
+    sv_fpga_start_cl_to_buffer(slot_id, channel, size, (uint64_t) buffer, address);
     return 0;
 #else
     return fpga_dma_burst_read(fd, buffer, size, address);
@@ -232,7 +232,7 @@ static inline int do_dma_write(int fd, uint8_t *buffer, size_t size,
     uint64_t address, int channel, int slot_id)
 {
 #if defined(SV_TEST)
-    sv_fpga_start_buffer_to_cl(slot_id, channel, size, buffer, address);
+    sv_fpga_start_buffer_to_cl(slot_id, channel, size, (uint64_t) buffer, address);
     return 0;
 #else
     return fpga_dma_burst_write(fd, buffer, size, address);

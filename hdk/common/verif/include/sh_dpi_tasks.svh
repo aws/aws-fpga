@@ -216,66 +216,62 @@ end
 
 `ifdef DMA_TEST
    //DPI task to transfer HOST to CL data.
-   task sv_fpga_start_buffer_to_cl(input int slot_id = 0, int chan, input int buf_size, input string wr_buffer, input longint unsigned cl_addr);
-      int timeout_count, status, error_count;
-      logic [63:0] host_memory_buffer_address;
-      
-      host_memory_buffer_address = 64'h0 + chan*64'h0_0000_3000;
-      que_buffer_to_cl(.slot_id(0), .chan(chan), .src_addr(host_memory_buffer_address), .cl_addr(cl_addr), .len(buf_size));
-      // Put test pattern in host memory
-      for (int i = 0 ; i < buf_size ; i++) begin
-         hm_put_byte(.addr(host_memory_buffer_address), .d(wr_buffer[i]));
-         host_memory_buffer_address++;
-      end
-      start_que_to_cl(.slot_id(0), .chan(chan));
-      timeout_count = 0;
-      do begin
-         status[chan] = tb.is_dma_to_cl_done(.chan(chan));
-         #10ns;
-         timeout_count++;
-      end while ((status[chan] != 1) && (timeout_count < 4000)); // UNMATCHED !!
-      
-      if (timeout_count >= 4000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers to cl", $realtime);
-         error_count++;
-      end
+   task sv_fpga_start_buffer_to_cl(input int slot_id = 0, int chan, input int buf_size, 
+                                   input longint unsigned host_addr, input longint unsigned cl_addr);
+       int                                        timeout_count, status, error_count;
+       logic [63:0]                               host_memory_ptr;
+       host_memory_ptr = host_addr;
+        
+       for (int i = 0 ; i < buf_size ; i++) begin
+           tb.hm_put_byte(.addr(host_memory_ptr), .d(tb.host_memory_getc(host_memory_ptr)));
+           host_memory_ptr++;
+       end
+        
+       tb.que_buffer_to_cl(.slot_id(0), .chan(chan), .src_addr(host_addr), .cl_addr(cl_addr), .len(buf_size));
+       tb.start_que_to_cl(.slot_id(0), .chan(chan));
+       timeout_count = 0;
+       do begin
+           status[chan] = tb.is_dma_to_cl_done(.chan(chan));
+           #10ns;
+           timeout_count++;
+       end while ((status[chan] != 1) && (timeout_count < 1000000)); // UNMATCHED !!
+        
+       if (timeout_count >= 1000000) begin
+           $display("[%t] : *** ERROR *** Timeout waiting for dma transfers to cl", $realtime);
+           error_count++;
+       end
    endtask // sv_fpga_start_buffer_to_cl
-   
+
    //DPI task to transfer CL to HOST data.
-   task sv_fpga_start_cl_to_buffer(input int slot_id = 0, input int chan, input int buf_size, input longint unsigned cl_addr);
-      int timeout_count, status, error_count;
-      logic [63:0] host_memory_buffer_address;
-      byte         rd_buf_t;
-      string       rd_buffer_t, rd_buffer;
-      
-      host_memory_buffer_address = 64'h0 + (chan+1)*64'h0_0001_3000;
-      
-      que_cl_to_buffer(.slot_id(0), .chan(chan), .dst_addr(host_memory_buffer_address), .cl_addr(cl_addr), .len(buf_size));
-      start_que_to_buffer(.slot_id(0), .chan(chan));
+   task sv_fpga_start_cl_to_buffer(input int slot_id = 0, input int chan, input int buf_size, 
+                                    input longint unsigned host_addr, input longint unsigned cl_addr);
+      int                                        timeout_count, status, error_count;
+      logic [63:0]                               host_memory_ptr;
+
+      host_memory_ptr = host_addr;
+      for (int i = 0 ; i < buf_size ; i++) begin
+          tb.hm_put_byte(.addr(host_memory_ptr), .d(tb.host_memory_getc(host_memory_ptr)));
+          host_memory_ptr++;
+      end
+
+      tb.que_cl_to_buffer(.slot_id(0), .chan(chan), .dst_addr(host_addr), .cl_addr(cl_addr), .len(buf_size));
+      tb.start_que_to_buffer(.slot_id(0), .chan(chan));
       timeout_count = 0;
       do begin
-         status[chan] = is_dma_to_buffer_done(.chan(chan));
-         #10ns;
-         timeout_count++;
-      end while ((status[chan] != 1) && (timeout_count < 4000)); // UNMATCHED !!
-      
-      if (timeout_count >= 4000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
-         error_count++;
+          status[chan] = tb.is_dma_to_buffer_done(.chan(chan));
+          #10ns;
+          timeout_count++;
+      end while ((status[chan] != 1) && (timeout_count < 1000000)); // UNMATCHED !!
+       
+      if (timeout_count >= 1000000) begin
+          $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+          error_count++;
       end
-      //For Questa simulator the first 8 bytes are not transmitted correctly, so the buffer is transferred with 8 extra bytes and those bytes are removed here.
-      for (int i = 0 ; i < 8; i++) begin
-         rd_buffer = {rd_buffer, "A"};
-      end
+      host_memory_ptr = host_addr;
       for (int i = 0 ; i < buf_size ; i++) begin
-         rd_buf_t = hm_get_byte(.addr(host_memory_buffer_address + i));
-         //Change the ascii characters back to string.
-         $sformat(rd_buffer_t, "%s", rd_buf_t);
-         //Construct the rd_buffer.
-         rd_buffer = {rd_buffer, rd_buffer_t};
+          tb.host_memory_putc(host_memory_ptr, tb.hm_get_byte(host_memory_ptr));
+          host_memory_ptr++;
       end
-      //This function is needed to update buffer on C side.
-      send_rdbuf_to_c(rd_buffer);
    endtask // sv_fpga_start_cl_to_buffer
 `endif
    

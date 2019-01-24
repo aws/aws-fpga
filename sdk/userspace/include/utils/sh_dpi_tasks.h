@@ -35,10 +35,10 @@ extern void cl_peek(uint64_t addr, uint32_t *data);
 extern void cl_poke(uint64_t addr, uint32_t  data);
 extern void sv_int_ack(uint32_t int_num);
 extern void sv_pause(uint32_t x);
-extern void sv_fpga_start_buffer_to_cl(uint32_t slot_id, uint32_t chan, uint32_t buf_size, const char *wr_buffer, uint64_t cl_addr);
-extern void sv_fpga_start_cl_to_buffer(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t cl_addr);
+extern void sv_fpga_start_buffer_to_cl(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t host_addr, uint64_t cl_addr);
+extern void sv_fpga_start_cl_to_buffer(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t host_addr, uint64_t cl_addr);
 extern void init_ddr(void);
-
+extern void hm_put_byte(uint64_t addr, uint8_t data);
 
 #ifdef INT_MAIN
 int test_main(uint32_t *exit_code);
@@ -52,6 +52,7 @@ int send_rdbuf_to_c(char* rd_buf);
 
 void host_memory_putc(uint64_t addr, uint8_t data);
 
+
 uint8_t host_memory_getc(uint64_t addr);
 
 
@@ -61,5 +62,6 @@ void int_handler(uint32_t int_num);
 
 #define LOW_32b(a)  ((uint32_t)((uint64_t)(a) & 0xffffffff))
 #define HIGH_32b(a) ((uint32_t)(((uint64_t)(a)) >> 32L))
+
 
 #endif
