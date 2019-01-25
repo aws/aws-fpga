@@ -72,21 +72,19 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
         aws_fpga_test_utils.remove_all_drivers()
 
     def test_run_sdaccel_example(self, examplePath, rteName, xilinxVersion):
-
+        aws_fpga_test_utils.install_xocl_driver()
         os.chdir(self.get_sdaccel_example_fullpath(examplePath))
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd("make exe")
         assert rc == 0
 
         em_run_cmd = self.get_sdaccel_example_run_cmd(examplePath)
+        check_runtime_script = os.path.join(AwsFpgaTestBase.WORKSPACE,'sdaccel_runtime_setup.sh')
 
         self.get_sdaccel_aws_xclbin_file(examplePath, rteName, xilinxVersion)
-
-        run_cmd = "sudo -E /bin/bash -l -c \"source /opt/Xilinx/SDx/{}.rte.{}/setup.sh && {} \"".format(xilinxVersion, rteName, em_run_cmd)
+         
+        run_cmd = "sudo -E /bin/bash -l -c \"source {} && {} \"".format(check_runtime_script, em_run_cmd)
         
-        if xilinxVersion == "2018.2":
-            run_cmd = "sudo -E /bin/bash -l -c \"source /opt/xilinx/xrt/setup.sh && {} \"".format(em_run_cmd)
-
         logger.info("Running cmd={}".format(run_cmd))
         (rc, stdout_lines, stderr_lines) = self.run_cmd(run_cmd)
         assert rc == 0

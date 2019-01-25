@@ -69,7 +69,7 @@ afi_cmd_hdr_set_len(union afi_cmd *cmd, size_t len)
 {
 	/* Null pointer or overflow? */
 	if (!cmd || (len & ~AFI_CMD_HDR_LEN_MASK)) {
-		return FPGA_ERR_FAIL;
+		return FPGA_ERR_SOFTWARE_PROBLEM;
 	}
 
 	cmd->hdr.len_flags &= ~AFI_CMD_HDR_LEN_MASK;
@@ -92,7 +92,7 @@ afi_cmd_hdr_set_flags(union afi_cmd *cmd, unsigned int flags)
 {
 	/* Null pointer or overflow? */
 	if (!cmd || (flags & ~AFI_CMD_HDR_ALL_FLAGS)) {
-		return FPGA_ERR_FAIL;
+		return FPGA_ERR_SOFTWARE_PROBLEM;
 	}
 
 	cmd->hdr.len_flags &= AFI_CMD_HDR_LEN_MASK;
@@ -238,7 +238,7 @@ fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return FPGA_ERR_AFI_CMD_MALFORMED;
 }
 
 
@@ -271,7 +271,7 @@ fpga_mgmt_mbox_attach(int slot_id)
 
 	return 0;
 err:
-	return FPGA_ERR_FAIL;
+	return ret;
 }
 
 int 
@@ -341,7 +341,7 @@ fpga_mgmt_handle_afi_cmd_error_rsp(const union afi_cmd *rsp, uint32_t len)
 
 	return err_rsp->error;
 err:
-	return FPGA_ERR_FAIL;
+	return FPGA_ERR_AFI_CMD_MALFORMED;
 }
 
 /**
@@ -362,8 +362,8 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 	uint32_t is_response = stored_flags & AFI_CMD_HDR_IS_RSP;
 	uint32_t payload_len = afi_cmd_hdr_get_len(rsp);
 
-	fail_on(!cmd, err, "cmd == NULL");
-	fail_on(!rsp, err, "rsp == NULL");
+	fail_on(!cmd, assertion_err, "cmd == NULL");
+	fail_on(!rsp, assertion_err, "rsp == NULL");
 
 	/** Version */
 	fail_on(MAJOR_VERSION(cmd->hdr.version) != MAJOR_VERSION(rsp->hdr.version), err,
@@ -399,7 +399,9 @@ op_err:
 id_err:
 	return -EAGAIN;
 err:
-	return FPGA_ERR_FAIL;
+	return FPGA_ERR_AFI_CMD_MALFORMED;
+assertion_err:
+	return FPGA_ERR_SOFTWARE_PROBLEM;
 }
 
 static int
@@ -411,7 +413,7 @@ fpga_mgmt_send_cmd(int slot_id,
 	/** Write the AFI cmd to the mailbox */
 	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
 	ret = fpga_hal_mbox_write(handle, (void *)cmd, *len);
-	fail_on(ret != 0, err, "fpga_hal_mbox_write failed");
+	fail_on(ret != 0, err_code, "fpga_hal_mbox_write failed");
 
 	/**
 	 * Read the AFI rsp from the mailbox.
@@ -422,7 +424,7 @@ fpga_mgmt_send_cmd(int slot_id,
 	bool done = false;
 	while (!done) {
 		ret = fpga_hal_mbox_read(handle, (void *)rsp, len);
-		fail_on(ret = (ret) ? -ETIMEDOUT : 0, err_code, "Error: operation timed out");
+		fail_on(ret, err_code, "fpga_hal_mbox_read failed with code: %d", ret);
 
 		ret = fpga_mgmt_afi_validate_header(cmd, rsp, *len);
 		if (ret == 0) {
@@ -430,15 +432,15 @@ fpga_mgmt_send_cmd(int slot_id,
 		} else {
 			fail_on(ret != -EAGAIN, err_code, 
 				"fpga_mgmt_afi_validate_header failed");
-			fail_on(retries >= AFI_MAX_RETRIES, err, "retries=%u, exceeded",
+			fail_on(retries >= AFI_MAX_RETRIES, timeout_err, "retries=%u, exceeded",
 				retries);
 			retries++;
 		}
 	}
 
 	return 0;
-err:
-	return FPGA_ERR_FAIL;
+timeout_err:
+	return -ETIMEDOUT;
 err_code:
 	return ret;
 }

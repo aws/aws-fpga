@@ -139,6 +139,11 @@ def install_xdma_driver(mode='poll'):
 
     assert os.system(install_command) == 0
 
+def xocl_driver_installed():
+    if os.system('/usr/sbin/lsmod | grep xocl') == 0:
+        return True
+    return False
+
 def remove_xocl_driver():
     logger.info("Removing the xocl driver.")
     # This fails if the driver isn't installed
@@ -152,10 +157,28 @@ def remove_xocl_driver():
 
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xocl.rules') == 0
 
+def install_xocl_driver():
+     logger.info("Installing the xocl driver")
+     #check if xocl is already installed and install only if not present
+     if xocl_driver_installed():
+        logger.info("xocl driver is already installed.")
+     else:
+        logger.info("xocl driver is not installed. inserting")
+        assert os.system("sudo insmod xocl") == 0
+
 def remove_all_drivers():
-    remove_xdma_driver()
-    remove_edma_driver()
-    remove_xocl_driver()
+    # Check if the file exists
+    if xdma_driver_installed():
+        logger.info("xdma driver is installed. removing for teardown")
+        remove_xdma_driver()
+
+    if edma_driver_installed():
+        logger.info("Edma driver is installed. removing for teardown")
+        remove_edma_driver()
+
+    if xocl_driver_installed():
+       logger.info("xocl driver is installed. removing for teardown")
+       remove_xocl_driver()
 
 class FpgaLocalImage:
     def __init__(self):

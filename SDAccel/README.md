@@ -125,6 +125,8 @@ The instructions below describe how to build the Xilinx FPGA Binary and host app
     $ make TARGETS=hw DEVICES=$AWS_PLATFORM all   
 ```
 
+NOTE: If you encounter an error with  `No current synthesis run set`, you may have previously run the [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. This will cause [problems](https://forums.aws.amazon.com/thread.jspa?threadID=268202&tstart=25) with the build process, thus it is recommended to remove it before starting a hardware system build.
+
 Now that you have built your Xilinx FPGA binary, see [SDAccel Power Analysis Guide](./docs/SDAccel_Power_Analysis.md) for more details on how to analyze power for your binary.
 
 <a name="createafi"></a>
@@ -209,20 +211,11 @@ Here are the steps:
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
 
 * Source the Runtime Environment & Execute your Host Application 
-   * Xilinx SDx 2017.4:
    ```
        $ sudo sh
-       # source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh   # Other runtime env settings needed by the host app should be setup after this step
+       # source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step
        # ./helloworld 
    ```
-   
-   * Xilinx SDx 2018.2:
-   ```
-       $ sudo sh
-       # source /opt/xilinx/xrt/setup.sh   # Other runtime env settings needed by the host app should be setup after this step
-       # ./helloworld 
-   ```
-
     
 <a name="read"></a>
 # Additional SDAccel Information (2017.4)

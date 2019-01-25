@@ -157,13 +157,16 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     esac
 done
 
-# Install patches as required.
-setup_patches
-
 # Check XILINX_SDX is set
 if ! check_set_xilinx_sdx; then
     return 1
 fi
+
+info_msg " XILINX_SDX is set to $XILINX_SDX"
+# Install patches as required.
+info_msg " Checking & installing required patches"
+setup_patches
+
 
 # Update Xilinx SDAccel Examples from GitHub
 info_msg "Using SDx $RELEASE_VER"

@@ -135,7 +135,7 @@ fpga_hal_mbox_check_len(uint32_t len)
 			len, FPGA_MBOX_MSG_DATA_LEN);
 	return 0;
 err:
-	return -1;
+	return FPGA_ERR_AFI_CMD_MALFORMED;
 }
 
 int 
@@ -145,9 +145,10 @@ fpga_hal_mbox_read_async(pci_bar_handle_t handle, void *msg, uint32_t *len)
 	assert(msg);
 	assert(len);
 
+	int ret, ret2;
 	uint32_t val;
-	int ret = fpga_pci_peek(handle, FMB_REG_STATUS, &val);
-	fail_on(ret != 0, err, "fpga_pci_peek(status) failed");
+	ret = fpga_pci_peek(handle, FMB_REG_STATUS, &val);
+	fail_on(ret != 0, err_code, "fpga_pci_peek(status) failed");
 
 	/** Check if an RX event is available */
 	if (!(val & FMB_RX_EVT)) {
@@ -160,6 +161,9 @@ fpga_hal_mbox_read_async(pci_bar_handle_t handle, void *msg, uint32_t *len)
 	ret = fpga_pci_peek(handle, FMB_REG_RD_LEN, &mb_rd_len);
 	fail_on(ret != 0, err_rx_ack, "fpga_pci_peek(mb_rd_len) failed");
 
+	ret = FPGA_ERR_AFI_CMD_MALFORMED;
+	fail_on(mb_rd_len > FPGA_MBOX_MSG_DATA_LEN / sizeof(uint32_t), err_rx_ack,
+		"mb_rd_len is too large");
 	ret = fpga_hal_mbox_check_len(mb_rd_len << 2);
 	fail_on(ret != 0, err_rx_ack, "fpga_hal_mbox_check_len failed");
 
@@ -179,7 +183,7 @@ fpga_hal_mbox_read_async(pci_bar_handle_t handle, void *msg, uint32_t *len)
 
 	/** Acknowledge the RX event */
 	ret = fpga_pci_poke(handle, FMB_REG_STATUS, FMB_RX_EVT);
-	fail_on(ret != 0, err, "fpga_pci_poke(status) failed");
+	fail_on(ret != 0, err_code, "fpga_pci_poke(status) failed");
 
 	*len = mb_rd_len << 2;
 	log_debug("Read len=%u", *len);
@@ -189,10 +193,10 @@ err_again:
 	return -EAGAIN;
 err_rx_ack:
 	/** Acknowledge the RX event */
-	ret = fpga_pci_poke(handle, FMB_REG_STATUS, FMB_RX_EVT);
-	fail_on(ret != 0, err, "fpga_pci_poke(status) failed");
-err:
-	return -1;
+	ret2 = fpga_pci_poke(handle, FMB_REG_STATUS, FMB_RX_EVT);
+	fail_on(ret2 != 0, err_code, "fpga_pci_poke(status) failed");
+err_code:
+	return ret;
 }
 
 /** Test and Clear (TC) async write acknowledgement */
@@ -256,7 +260,7 @@ fpga_hal_mbox_write_async(pci_bar_handle_t handle, void *msg, uint32_t len)
 	log_debug("Wrote len=%u", len);
 	return 0;
 err:
-	return -1;
+	return ret;
 }
 
 int 
@@ -266,25 +270,29 @@ fpga_hal_mbox_read(pci_bar_handle_t handle, void *msg, uint32_t *len)
 	assert(msg);
 	assert(len);
 
+	int ret;
 	uint32_t count = priv.mbox.timeout;
 
 	while (count) {
-		int ret = fpga_hal_mbox_read_async(handle, msg, len);
+		ret = fpga_hal_mbox_read_async(handle, msg, len);
 		if (ret == 0) {
 			goto out;
 		}
 		/** Sleep and retry on EAGAIN, otherwise error out of loop */ 
-		fail_on(ret != -EAGAIN, err, "fpga_hal_mbox_read_async failed");
+		fail_on(ret != -EAGAIN, err_code, "fpga_hal_mbox_read_async failed");
 		msleep(priv.mbox.delay_msec);
 		count--;
 	}
 
-	fail_on(!count, err, "Timeout on mbox read, timeout=%u, delay_msec=%u", 
+	fail_on(!count, timeout_err,
+			"Timeout on mbox read, timeout=%u, delay_msec=%u",
 			priv.mbox.timeout, priv.mbox.delay_msec);
 out:
 	return 0;
-err:
-	return -1;
+err_code:
+	return ret;
+timeout_err:
+	return -ETIMEDOUT;
 }
 
 int 
@@ -294,13 +302,13 @@ fpga_hal_mbox_write(pci_bar_handle_t handle, void *msg, uint32_t len)
 	assert(msg);
 	
 	int ret = fpga_hal_mbox_write_async(handle, msg, len);
-	fail_on(ret != 0, err, "fpga_hal_mbox_write_async failed");
+	fail_on(ret != 0, err_code, "fpga_hal_mbox_write_async failed");
 
 	uint32_t count = priv.mbox.timeout;
 	while (count) {
 		bool ack = false;;
 		ret = fpga_hal_mbox_write_async_tc_ack(handle, &ack);
-		fail_on(ret != 0, err, "fpga_hal_mbox_write_async_tc_ack failed");
+		fail_on(ret != 0, err_code, "fpga_hal_mbox_write_async_tc_ack failed");
 
 		if (ack) {
 			goto out;
@@ -311,10 +319,12 @@ fpga_hal_mbox_write(pci_bar_handle_t handle, void *msg, uint32_t len)
 		count--;
 	}
 
-	fail_on(!count, err, "Timeout on mbox write, timeout=%u, delay_msec=%u", 
+	fail_on(!count, timeout_err, "Timeout on mbox write, timeout=%u, delay_msec=%u",
 			priv.mbox.timeout, priv.mbox.delay_msec);
 out:
 	return 0;
-err:
-	return -1;
+err_code:
+	return ret;
+timeout_err:
+	return -ETIMEDOUT;
 }

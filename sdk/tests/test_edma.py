@@ -54,14 +54,15 @@ class TestEdma(AwsFpgaTestBase):
 
         (cls.cl_dram_dma_agfi, cl_dram_dma_afi) = cls.get_agfi_from_readme('cl_dram_dma')
 
-        for slot in range(AwsFpgaTestBase.num_slots):
-            AwsFpgaTestBase.load_msix_workaround(slot)
-
         cls.setup_fio_tools()
 
         return
 
     def setup_method(self, test_method):
+
+        for slot in range(AwsFpgaTestBase.num_slots):
+            AwsFpgaTestBase.fpga_clear_local_image(slot)
+
         aws_fpga_test_utils.remove_all_drivers()
 
         for slot in range(AwsFpgaTestBase.num_slots):
@@ -69,10 +70,11 @@ class TestEdma(AwsFpgaTestBase):
             assert AwsFpgaTestBase.check_fpga_afi_loaded(self.cl_dram_dma_agfi, slot), "{} not loaded in slot {}".format(self.cl_dram_dma_agfi, slot)
 
     def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_all_drivers()
 
         for slot in range(AwsFpgaTestBase.num_slots):
             AwsFpgaTestBase.fpga_clear_local_image(slot)
+
+        aws_fpga_test_utils.remove_all_drivers()
 
     @pytest.fixture(params=['poll','interrupt'])
     def driver_mode(self, request):

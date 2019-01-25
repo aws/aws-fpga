@@ -36,7 +36,7 @@ Command sequence
 ```
 sudo fpga-clear-local-image -S 0
  >>$sudo sh
-sh-4.2# source /opt/Xilinx/SDx/2017.4.rte.dyn/setup.sh 
+sh-4.2# source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh
 sh-4.2# ./helloworld
 
 ```

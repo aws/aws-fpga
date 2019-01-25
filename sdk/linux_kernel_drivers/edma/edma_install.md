@@ -1,6 +1,9 @@
 
 # Elastic DMA (EDMA) Installation and Frequently Asked Questions
 
+
+## :exclamation: Please Note: Support for EDMA driver has ended. AWS strongly recommends moving applications to XDMA driver. EDMA driver will be deprecated and removed starting Developer Kit release 1.4.7.
+
 EDMA is a Linux kernel driver provided by AWS for using DMA and/or User-defined interrupts for AWS FPGAs. Please see [EDMA README](README.md) for details.
 
 # Table of Contents

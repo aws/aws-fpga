@@ -11,6 +11,7 @@ properties([parameters([
     booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
     booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
+    booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
     booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
     booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
@@ -22,8 +23,8 @@ properties([parameters([
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
     booleanParam(name: 'disable_runtime_tests',               defaultValue: false,  description: 'Option to disable runtime tests.'),
-    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins')
-
+    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins'),
+    booleanParam(name: 'internal_simulations',                defaultValue: false, description: 'This option asks for default agent from Jenkins')
 ])])
 
 //=============================================================================
@@ -35,6 +36,7 @@ boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
+boolean test_non_root_access = params.get('test_non_root_access')
 boolean test_xdma = params.get('test_xdma')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_dcp_recipes = params.get('test_dcp_recipes')
@@ -102,14 +104,14 @@ def all_tests = [:]
 // Task to Label map
 task_label = [
     'create_afi':        't2.l_50',
-    'simulation':        'c4.xl',
-    'dcp_gen':           'c4.4xl',
+    'simulation':        'z1d.l',
+    'dcp_gen':           'z1d.2xl',
     'runtime':           'f1.2xl',
     'runtime_all_slots': 'f1.16xl',
     'source_scripts':    'c4.xl',
     'md_links':          'c4.xl',
     'find_tests':        't2.l_50',
-    'sdaccel_builds':    'c4.4xl'
+    'sdaccel_builds':    'z1d.2xl'
 ]
 
 def xilinx_versions = [ '2017.4', '2018.2' ]
@@ -133,6 +135,19 @@ def sdaccel_example_default_map = [ '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/ex
                                                ]
 ]
 
+def simulator_tool_default_map = [ '2017.4' : [ 'vivado': 'xilinx/SDx/2017.4_04112018',
+                                                'vcs': 'vcs-mx/L-2016.06-1',
+                                                'questa': 'questa/10.6b',
+                                                'ies': 'incisive/15.20.063'
+                                              ],
+                                   '2018.2' : [ 'vivado': 'xilinx/SDx/2018.2_06142018',
+                                                'vcs': 'vcs-mx/N-2017.12-SP1-1',
+                                                'questa': 'questa/10.6c_1',
+                                                'ies': 'incisive/15.20.063'
+                                              ]
+]
+
+
 // Get serializable entry set
 @NonCPS def entrySet(m) {m.collect {k, v -> [key: k, value: v]}}
 
@@ -149,6 +164,10 @@ def get_task_label(Map args=[ : ]) {
     if (params.use_test_ami) {
         echo "Test AMI Requested"
         task_label = task_label + '_test'
+    }
+    if (params.internal_simulations) {
+        echo "internal simulation agent requested"
+        task_label = 'f1'
     }
 
     echo "Label Requested: $task_label"
@@ -341,27 +360,56 @@ if (test_fpga_tools) {
     }
 }
 
+
 if (test_sims) {
     all_tests['Run Sims'] = {
         stage('Run Sims') {
             def cl_names = ['cl_uram_example', 'cl_dram_dma', 'cl_hello_world']
+            def simulators = ['vivado']
             def sim_nodes = [:]
+            if(params.internal_simulations) {
+              simulators = ['vcs', 'ies', 'questa', 'vivado']
+            }
             for (x in cl_names) {
                 for (y in xilinx_versions) {
-                    String xilinx_version = y
-                    String cl_name = x
-                    String node_name = "Sim ${cl_name} ${xilinx_version}"
-                    String key = "test_${cl_name}__"
-                    String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
-                    sim_nodes[node_name] = {
+                    for ( z in simulators)  {
+                        String xilinx_version = y
+                        String cl_name = x
+                        String simulator = z
+                        String node_name = "Sim ${cl_name} ${xilinx_version}"
+                        String key = "test_${cl_name}__"
+                        String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
+                        def tool_module_map = simulator_tool_default_map.get(xilinx_version)
+                        String vcs_module = tool_module_map.get('vcs')
+                        String questa_module = tool_module_map.get('questa')
+                        String ies_module = tool_module_map.get('ies')
+                        String vivado_module = tool_module_map.get('vivado')
+                        if(params.internal_simulations) {
+                           report_file = "test_sims_${cl_name}_${xilinx_version}_${simulator}.xml"
+                        }
+                        sim_nodes[node_name] = {
                         node(get_task_label(task: 'simulation', xilinx_version: xilinx_version)) {
                             checkout scm
                             try {
-                                sh """
-                                    set -e
-                                    source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                    python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file}
-                                """
+                                if(params.internal_simulations) {
+                                   sh """
+                                   set -e
+                                   module purge
+                                   module load python/2.7.9
+                                   module load ${vivado_module}
+                                   module load ${vcs_module}
+                                   module load ${questa_module}
+                                   module load ${ies_module}
+                                   source $WORKSPACE/hdk_setup.sh
+                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                       """
+                                } else {
+                                   sh """
+                                   set -e
+                                   source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator} 
+                                      """
+                                }
                             } catch (exc) {
                                 echo "${node_name} failed: archiving results"
                                 archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
@@ -377,6 +425,7 @@ if (test_sims) {
                         }
                     }
                 }
+              }
             }
             parallel sim_nodes
         }
@@ -414,6 +463,39 @@ if (test_edma) {
                     else {
                         echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
                     }
+                }
+            }
+        }
+    }
+}
+
+if (test_non_root_access) {
+    all_tests['Test non-root access to FPGA tools'] = {
+        stage('Test non-root access to FPGA tools') {
+            node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
+
+                echo "Test non-root access to FPGA tools"
+                checkout scm
+
+                String test = "sdk/tests/test_non_root_access.py"
+                String report_file = "test_non_root_access.xml"
+
+                try {
+                    sh """
+                        export AWS_FPGA_ALLOW_NON_ROOT=y
+                        export AWS_FPGA_SDK_OVERRIDE_GROUP=y
+                        set -e
+                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                        newgrp fpgauser
+                        export SDK_DIR="${WORKSPACE}/sdk"
+                        source  $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                        python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
+                    """
+                } catch (exc) {
+                    input message: "Non-root access test failed. Click Proceed or Abort when you are done debugging on the instance."
+                    throw exc
+                } finally {
+                    junit healthScaleFactor: 10.0, testResults: report_file
                 }
             }
         }

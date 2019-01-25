@@ -123,6 +123,16 @@ int check_slot_config(int slot_id)
                          "not the expected values.");
     }
 
+    char dbdf[16];
+    snprintf(dbdf,
+                  sizeof(dbdf),
+                  PCI_DEV_FMT,
+                  info.spec.map[FPGA_APP_PF].domain,
+                  info.spec.map[FPGA_APP_PF].bus,
+                  info.spec.map[FPGA_APP_PF].dev,
+                  info.spec.map[FPGA_APP_PF].func);
+    log_info("Operating on slot %d with id: %s", slot_id, dbdf);
+
 out:
     return rc;
 }

@@ -17,10 +17,8 @@
 * AFI must be re-loaded after an instance re-boot.
 
 ## Unsupported Features (Planned for future releases)
-* FPGA to FPGA communication over PCIe for F1.16xl
-* FPGA to FPGA over serial ring links for F1.16xl
+* FPGA to FPGA over serial ring links for F1.16xl and F1.4xl
 * Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
-* Preserving the DRAM content between different AFI loads (by the same running instance)
 * Cadence Xcelium simulations tools
 
 ## Known Bugs/Issues

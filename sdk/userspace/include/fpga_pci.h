@@ -256,6 +256,8 @@ int fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
  * environment, it can use this lock to protect calls to readdir.
  */
 extern pthread_mutex_t fpga_pci_readdir_mutex;
+#else
+#define FPGA_PCI_USE_READDIR_R
 #endif
 
 

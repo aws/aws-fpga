@@ -762,7 +762,7 @@ This will run both synthesis and implementation.
 
 ## CL Example Software
 
-The runtime software must be complied for the AFI to run on F1.  Note the EDMA driver must be installed before running on F1.
+The runtime software must be complied for the AFI to run on F1.  Note the [XDMA driver must be installed](../../sdk/linux_kernel_drivers/xdma/xdma_install.md) before running on F1.
 
 Use the software in cl/examples/cl\_dram\_dma
 

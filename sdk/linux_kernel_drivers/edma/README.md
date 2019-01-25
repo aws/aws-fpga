@@ -1,6 +1,8 @@
 
 # Using AWS EDMA in C/C++ application
 
+## :exclamation: Please Note: Support for EDMA driver has ended. AWS strongly recommends moving applications to XDMA driver. EDMA driver will be deprecated and removed in the Developer Kit release 1.4.7.
+
 ## Table of Content
 
 1. [Overview](#overview)

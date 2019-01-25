@@ -1,5 +1,8 @@
 # Using AWS FPGA user-defined interrupts in C/C++ application
 
+
+## :exclamation: Please Note: Support for EDMA driver has ended. AWS strongly recommends moving applications to XDMA driver. EDMA driver will be deprecated and removed in the Developer Kit release 1.4.7.
+
 AWS FPGA provides options for Custom Logic (CL) to generate user-defined interrupt events, sent to the instance via MSI-X message.
 
 At the hardware level, these interrupt event are defined in [AWS Shell Interface Specification](../../../hdk/docs/AWS_Shell_Interface_Specification.md)

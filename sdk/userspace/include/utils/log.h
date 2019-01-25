@@ -167,6 +167,19 @@ static inline __printf(1, 2) void log_dummy(const char *fmt, ...)
 		}                               \
 	} while (0)
 
+/** Usage:
+ *  fail_on(condition, label, return code variable, return code value,
+ *          message format string, [arg1, arg2, ...])
+ */
+#define fail_on_with_code(CONDITION, LABEL, RET, RET_VALUE, ...)          \
+	do {                                                                  \
+		if (CONDITION) {                                                  \
+			log_error(__VA_ARGS__);                                       \
+			RET = RET_VALUE;                                              \
+			goto LABEL;                                                   \
+		}                                                                 \
+	} while (0)
+
 #define fail_on_quiet(CONDITION, LABEL, ...)          \
     do {                                              \
         if (CONDITION) {                              \
