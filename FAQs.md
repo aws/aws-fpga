@@ -460,14 +460,9 @@ Parent process (pid 8160) has died. This helper process will now exit
 
 You would need a valid [on premise license](./hdk/docs/on_premise_licensing_help.md) provided by Xilinx.
 
-*For runs using the FPGA Developer AMI:*
+*For runs using the FPGA Developer AMI:* Please contact us through [AWS FPGA Developers forum](https://forums.aws.amazon.com/forum.jspa?forumID=243)
 
-**NOTE:**
->    * The license included on FPGA Developer AMI Versions 1.3.0_a and earlier expires on October 31 2017.
->    * If you see the above error, please update to FPGA Developer AMI Version 1.3.3 or later.
->    * All FPGA Developer AMI Versions 1.3.0_a and earlier will be deprecated once Version 1.3.3 is released.
->    * If you are using the FPGA Developer AMI Version 1.3.3 or later, please check if the environment variable `XILINXD_LICENSE_FILE` is set to `/opt/Xilinx/license/XilinxAWS.lic`
->    * If you still face the above error, please contact us on the forums and we'd be happy to help further.
+
 
 **Q: Why does Vivado in GUI mode show up blank ? or Why does Vivado in GUI mode show up as an empty window?**
 

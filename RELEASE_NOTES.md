@@ -43,10 +43,18 @@
     * [Improved messaging for AFI builder script](https://github.com/aws/aws-fpga/pull/407)
     * [Fixes address decoding to DDR slaves in cl_dram_dma example](hdk/cl/examples/cl_dram_dma/design)  
   * Improvements
-    * [Improves SDK FPGA managment tools error messaging](sdk/userspace/fpga_mgmt_tools/README.md)
+    * [Improves SDK FPGA management tools error messaging](sdk/userspace/fpga_mgmt_tools/README.md)
     * [Enhanced DMA lib for general device number mapping](sdk/userspace/fpga_libs/fpga_dma/fpga_dma_utils.c)
-    * [Improved guidelines for AFI power managment](hdk/docs/afi_power.md)
+    * [Improved guidelines for AFI power management](hdk/docs/afi_power.md)
     * [Improved Streaming Data Engine IP Integration Documentation](sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) 
+   
+  * Package versions used to validate SDAccel runtime
+  
+   | Package | AMI 1.5.0 [SDx 2018.2] | AMI 1.4.0 [SDx 2017.4] |
+   |---------|------------------------|------------------------|
+   | kernel  | 3.10.0-862.11.6.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-862.11.6.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
    
    
 ## Release 1.4.5 (See [ERRATA](./ERRATA.md) for unsupported features) 
