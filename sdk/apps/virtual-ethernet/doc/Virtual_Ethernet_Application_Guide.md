@@ -63,7 +63,7 @@ Please refer to [DPDK testpmd](#testpmd) for a quick reference guide on the supp
 
 This example maximizes PPS for 64B packets with a single vCPU using two instances to test end-to-end traffic flows.
 
-In the below diagram, the `red` line shows the Ethernet frame path from the **Packet Generator Instance** into the CL streaming application in the **Virtual Ethernet Instance**.  The `blue` line shows the Ethernet frame path from the CL streaming application in the **Virtual Ethernet Instance** to the **Packet Generator Instance**.  For best performance, the **Virtual Ethernet Instance** and the **Packet Generator Instance** should be created in the same VPC and placement group.
+In the below diagram, the `red` line shows the Ethernet frame path from the **Packet Generator Instance** into the CL streaming application in the **Virtual Ethernet Instance**.  The `blue` line shows the Ethernet frame path from the CL streaming application in the **Virtual Ethernet Instance** to the **Packet Generator Instance**.  For best performance, the **Virtual Ethernet Instance** and the **Packet Generator Instance** should be created in the same VPC and placement group<sup>[\*](#PlacementGroups)</sup>. It should also be an instance type which [supports the Elastic Network Adapter](#EnaInstances) (driver) type of Enhanced Networking. This example was tested using an `m5.2xlarge` and an `f1.2xlarge` as the **Packet Generator Instance**.
 
 ![alt tag](../images/Virtual_Ethernet_Pktgen.jpg)
 
@@ -72,7 +72,7 @@ In the below diagram, the `red` line shows the Ethernet frame path from the **Pa
     * This workflow sets up the DPDK testpmd application for port-to-port forwarding through the DPDK ENA PMD, the DPDK SPP PMD and SDE. It then runs testpmd in auto-start mode and displays packet statistics every 3 seconds (including PPS).  To exit testpmd, use `ctrl-c`.
 
 * **Traffic Generator Instance**
-    * The Traffic Generator instance uses pktgen-dpdk to send max PPS towards the Virtual Ethernet instance.
+    * The Traffic Generator instance uses pktgen-dpdk to send max PPS towards the Virtual Ethernet instance. This example was tested using an `m5.2xlarge` and an `f1.2xlarge`.
     
 * **Network Interface Setup**
     * This example workflow places the PacketGen traffic on `eth1`, and reserves `eth0` for your SSH sessions and other control plane traffic.
@@ -355,3 +355,13 @@ network_devices = [network_class, cavium_pkx, avp_vnic, aws_fpga_sde, <your tag>
 ```
 
 You should then run the `virtual_ethernet_setup.py` script which will re-run the `dpdk-devbind.py` script to bind DPDK and SPP to your Vendor and Device Id.
+
+<a name="EnaInstances"></a>
+### Q: What instance types support Enhanced Networking?
+
+At the time of writing, compatible instance types are A1, C5, C5d, C5n, F1, G3, H1, I3, `m4.16xlarge`, M5, M5a, M5d, P2, P3, R4, R5, R5a, R5d, T3, `u-6tb1.metal`, `u-9tb1.metal`, `u-12tb1.metal`, X1, X1e, and z1d. For more information, see the documentation on [Enhanced Networking on Linux](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/enhanced-networking.html).
+
+<a name="PlacementGroups"></a>
+### Q: Why can't I launch instance type X in a placement group with an F1?
+
+When you launch instances in a cluster placement group, AWS attempts to launch those instances on hardware which share high capacity networking infrastructure. It is not always possible to launch heterogeneous instance types within such a group. This depends on the underlying arrangement of this physical hardware. If it is not possible to launch an instance of the desired type in a placement group with an F1, try using another F1 instance as the packet generator instance. For more information, see the [documentation on placement groups](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html#placement-groups-cluster).
