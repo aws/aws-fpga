@@ -103,6 +103,20 @@ function check_xocl_driver {
     fi
 }
 
+function check_kernel_ver {
+
+      ins_ker_ver=$(uname -r)
+      info_msg "Installed kernel version : $ins_ker_ver"
+      if grep -Fxq "$ins_ker_ver" $AWS_FPGA_REPO_DIR/SDAccel/kernel_version.txt
+       then
+        info_msg "kernel version $ins_ker_ver has been validated for this devkit."
+      else
+          warn_msg "$ins_ker_ver does not match one of recommended kernel versions"
+          cat $AWS_FPGA_REPO_DIR/SDAccel/kernel_version.txt
+          warn_msg "Xilinx Runtime not validated against your installed kernel version."
+       fi
+ 
+}
 # Process command line args
 args=( "$@" )
 for (( i = 0; i < ${#args[@]}; i++ )); do
@@ -147,14 +161,14 @@ fi
 info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
 
-
+check_kernel_ver
 check_xdma_driver
 check_edma_driver
 
 if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
     info_msg "Xilinx Vivado version is 2018.2"
     
-    if override; then
+    if [ $override == 1 ]; then
       info_msg "XRT check overide selected."
       source /opt/xilinx/xrt/setup.sh
       return 0
