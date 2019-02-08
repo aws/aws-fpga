@@ -18,7 +18,7 @@ Before going through the steps described in this document, the user should have 
 * SDAccel is supported on the following 64-bit Linux Operating Systems only:
    * 2018.2
       * Red Hat Enterprise Linux 7.3, 7.4		 
-      * CentOS 7.3, 7.4		 
+      * CentOS 7.3, 7.4, 7.5, 7.6		 
       * Ubuntu Linux 16.04.3 LTS (Linux kernel 4.4.0)
       * More information can be found at https://www.xilinx.com/support/documentation/sw_manuals/xilinx2018_2/ug1238-sdx-rnil.pdf
    * 2017.4

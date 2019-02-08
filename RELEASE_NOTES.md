@@ -26,6 +26,19 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.7 (See [ERRATA](./ERRATA.md) for unsupported features)
+
+  * Adds [Xilinx Runtime (XRT)](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5) Support for Linux kernel 3.10.0-957.1.3.el7.x86_64 & Centos 7.6
+  * Package versions used to validate SDAccel runtime
+  
+   | Package | AMI 1.5.0 [SDx 2018.2] | AMI 1.4.0 [SDx 2017.4] |
+   |---------|------------------------|------------------------|
+   | OS      | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
+
+
 ## Release 1.4.6 (See [ERRATA](./ERRATA.md) for unsupported features)
 
   * Fixes SDx 2018.2 [missing profile report items in SDAccel](https://forums.aws.amazon.com/thread.jspa?threadID=293541&tstart=0)

@@ -281,7 +281,7 @@ Neither, no FPGA internal design code is exposed. AWS Marketplace customers that
 ## F1 Instance and Runtime Tools FAQs
 **Q: What OS can run on the F1 instance?**
 
-Amazon Linux 2016.09 and CentOS 7.3 are supported and tested on AWS EC2 F1 instance. Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows OSs are not supported on F1.
+CentOS 7.x is supported and tested on AWS EC2 F1 instance. Please see [release notes](./RELEASE_NOTES.md) for a description of compatible kernel & OS versions supported by a specific Developer kit version.  Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. Windows OSs are not supported on F1.
 
 
 **Q: What are the interfaces between the F1 instance host CPU and the FPGAs?**
