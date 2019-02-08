@@ -63,12 +63,12 @@ function help {
 }
 
 function xrt_install_instructions_2018_2 {
-    err_msg "AWS recommended XRT version release: https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC4"
+    err_msg "AWS recommended XRT version release: https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5"
     err_msg "refer to following link for instructions to install XRT"
     err_msg "https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html"
     err_msg "use following command to download and install latest validated XRT rpms for centos distributions"
-    err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm"
-    err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm"
+    err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm"
+    err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm"
     err_msg "sudo yum reinstall -y xrt_*-xrt.rpm"
     err_msg "sudo yum reinstall -y xrt_*-aws.rpm"
 }

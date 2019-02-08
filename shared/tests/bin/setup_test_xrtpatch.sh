@@ -29,11 +29,12 @@ script_dir=$(dirname $full_script)
 
 s3_ami_bucket=aws-fpga-developer-ami
 s3_ami_version=1.5.0
+xrt_release_version=XRT_2018_2_XDF_RC5
 xrt_rpm_name=xrt_201802.2.1.0_7.5.1804-xrt.rpm
 aws_xrt_rpm_name=xrt_201802.2.1.0_7.5.1804-aws.rpm
 
-xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$xrt_rpm_name
-aws_xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$aws_xrt_rpm_name
+xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$xrt_release_version/$xrt_rpm_name
+aws_xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$xrt_release_version/$aws_xrt_rpm_name
 
 VIVADO_TOOL_VERSION=`vivado -version | grep Vivado | head -1 | sed 's:Vivado *::' | sed 's: .*$::' | sed 's:v::'`
 export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:6}

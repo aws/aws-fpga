@@ -65,4 +65,24 @@
    sudo yum reinstall -y xrt_201802.2.1.0_7.5.1804-xrt.rpm
    sudo yum reinstall -y xrt_201802.2.1.0_7.5.1804-aws.rpm
    
-  ``` 
+  ```
+
+# Installing Xilinx Runtime (XRT) 2018.2_XDF.RC5
+   
+  Instructions to install XRT on Centos/RedHat & Ubuntu/Debian can be found [here](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html).
+  
+  Xilinx Runtime (XRT) 2018.2_XDF.RC5 release can be found [here](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5)
+  
+  ### Centos/RedHat Linux
+  
+  Run following commands to download and install XRT 2018.2_XDF.RC4 for 'Centos/RHEL' based distributions
+  
+  ```
+   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm
+   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm
+   sudo yum reinstall -y xrt_201802.2.1.0_7.5.1804-xrt.rpm
+   sudo yum reinstall -y xrt_201802.2.1.0_7.5.1804-aws.rpm
+   
+  ```
+
+ 
