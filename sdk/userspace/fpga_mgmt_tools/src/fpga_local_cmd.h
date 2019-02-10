@@ -19,7 +19,9 @@
 
 #pragma once
 
-#define CLI_VERSION  "v6.00"
+#ifndef CLI_VERSION
+#define CLI_VERSION "unknown"
+#endif
  
 /**
  * CLI cmds
