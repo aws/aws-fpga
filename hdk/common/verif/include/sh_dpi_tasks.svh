@@ -24,8 +24,13 @@ import tb_type_defines_pkg::*;
    import "DPI-C" context function byte  host_memory_getc(input longint unsigned addr);
 
 `ifdef DMA_TEST
-   import "DPI-C" context task send_rdbuf_to_c(input string a);
+    `ifdef XILINX_SIMULATOR
+        import "DPI-C" context function send_rdbuf_to_c(input string a);
+    `else
+        import "DPI-C" context task send_rdbuf_to_c(input string a);
+    `endif
 `endif
+
       
    export "DPI-C" task sv_printf;
    export "DPI-C" task sv_map_host_memory;
