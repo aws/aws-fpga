@@ -13,6 +13,7 @@ properties([parameters([
     booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
     booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
     booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
+    booleanParam(name: 'test_py_bindings',                    defaultValue: true,  description: 'Test Python Bindings'),
     booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
     booleanParam(name: 'test_hdk_fdf',                        defaultValue: true,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
@@ -38,6 +39,7 @@ boolean test_sims = params.get('test_sims')
 boolean test_edma = params.get('test_edma')
 boolean test_non_root_access = params.get('test_non_root_access')
 boolean test_xdma = params.get('test_xdma')
+boolean test_py_bindings = params.get('test_py_bindings')
 boolean test_runtime_software = params.get('test_runtime_software')
 boolean test_dcp_recipes = params.get('test_dcp_recipes')
 boolean test_hdk_fdf = params.get('test_hdk_fdf')
@@ -209,6 +211,29 @@ if (env.CHANGE_ID) {
     abort_previous_running_builds()
 }
 
+// Try offloading the driver to run python bindings test into a method
+// to work around method code being too large.
+def generate_and_test_py_bindings() {
+	echo "Test Python Bindings"
+	checkout scm
+
+	String test = "sdk/tests/test_py_bindings.py"
+	String report_file = "test_py_bindings.xml"
+
+	try {
+		sh """
+		set -e
+		source $WORKSPACE/shared/tests/bin/setup_test_sdk_env_al2.sh "py_bindings"
+		python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
+		"""
+	}  catch (exc) {
+		echo "${test} failed."
+		input message: "Python bindings test failed. Click Proceed or Abort when you are done debugging on the instance."
+		throw exc
+	} finally {
+		junit healthScaleFactor: 10.0, testResults: report_file
+	}
+}
 //=============================================================================
 // Shared Tests
 //=============================================================================
@@ -529,6 +554,16 @@ if (test_xdma) {
                     //archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
                     //archiveArtifacts artifacts: "/var/log/messages", fingerprint: true
                 }
+            }
+        }
+    }
+}
+
+if (test_py_bindings) {
+    all_tests['Test Python Bindings'] = {
+        stage('Test Python Bindings') {
+            node('f1.2xl_runtime_test_al2') {
+				generate_and_test_py_bindings()
             }
         }
     }

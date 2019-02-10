@@ -94,5 +94,30 @@ while true; do
 		break
 	fi
 done
-
+echo "AWS FPGA: Installing python bindings for FPGA management library"
+cat>/tmp/mod_search_path<<EF
+rm -f /tmp/py_install_paths
+if [[ \$? -ne 0 ]] ; then
+	echo "Could not install python modules"
+	exit 1
+fi
+for i in 2 3 ; do
+	which python\$i >/dev/null 2>&1 || continue
+	python\$i -c "import sys
+print(sys.path)
+" | tr , '\n' | tr -d "'[]" | grep -E "64.*site-packages$" >> /tmp/py_install_paths
+done
+EF
+bash /tmp/mod_search_path
+while read -t 2 site_package ; do
+	PYMODULES="fpga_dma.py fpga_mgmt.py fpga_pci.py"
+	for mod in $PYMODULES ; do
+		sudo sed -e "s,PY_BIND_AFI_MGMT_LIBS_DST_DIR,$AFI_MGMT_LIBS_DST_DIR,g" $SDK_DIR/userspace/python_bindings/$mod > $site_package/$mod
+		if [[ $? -ne 0 ]] ; then
+			echo "Could not install $mod"
+			exit 1
+		fi
+		echo "Installed $site_package/$mod"
+	done
+done < /tmp/py_install_paths
 echo "AWS FPGA: Done with Amazon FPGA Image (AFI) Management Tools install."
