@@ -163,7 +163,12 @@ timestamp=$(date +"%y_%m_%d-%H%M%S")
 
 #STEP 1
 #Strip XCLBIN to get DCP for ingestion
-$XILINX_SDX/runtime/bin/xclbinsplit -o ${timestamp} $xclbin
+if [[ -e "${XILINX_SDX}/runtime/bin/xclbinsplit" ]]
+then
+    $XILINX_SDX/runtime/bin/xclbinsplit -o ${timestamp} $xclbin
+else
+    /opt/xilinx/xrt/bin/xclbinsplit -o ${timestamp} $xclbin
+fi
 
 if [[ -e "${timestamp}-primary.bit" ]]
 then
@@ -286,7 +291,14 @@ echo ${timestamp}_agfi_id.txt
 
 #STEP 6
 #Create .awsxclbin
-command="$XILINX_SDX/runtime/bin/xclbincat -b ${timestamp}_agfi_id.txt -m ${timestamp}-xclbin.xml -n header.bin -o ${awsxclbin}.awsxclbin"
+if [[ -e "${XILINX_SDX}/runtime/bin/xclbincat" ]]
+then
+    xclbincat=${XILINX_SDX}/runtime/bin/xclbincat
+else
+    xclbincat=/opt/xilinx/xrt/bin/xclbincat
+fi
+
+command="$xclbincat -b ${timestamp}_agfi_id.txt -m ${timestamp}-xclbin.xml -n header.bin -o ${awsxclbin}.awsxclbin"
 if [ "$plat_name" == "dynamic" ]
 then
     command="$command -k mode:hw_pr -k featureRomTimestamp:0 -r runtime_data.rtd"

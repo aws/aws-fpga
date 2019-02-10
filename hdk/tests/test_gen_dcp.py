@@ -86,6 +86,7 @@ class TestGenDcp(AwsFpgaTestBase):
 	    (('.*',), r'WARNING: \[BD 41-1661\] .*'),
             (('.*',), r'WARNING: \[Vivado 12-584\] No ports matched \'tck\''),
             (('.*',), r'WARNING: \[Vivado 12-830\] No fanout objects found for'),
+	    (('.*',), r'WARNING: .*'),
 	    (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
             (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|TIMING)',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/CL_DMA_PCIS_SLV/CL_TST_DDR_B/CL_TST/sync_rst_n_reg\''),
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_microblaze_I_0\''),

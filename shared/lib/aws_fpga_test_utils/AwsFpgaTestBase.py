@@ -305,9 +305,17 @@ class AwsFpgaTestBase(object):
         @param examplePath: Path of the Xilinx SDAccel example
         '''
         description = AwsFpgaTestBase.get_sdaccel_example_description(examplePath)
-        run_cmd = description.get("em_cmd", None)
+        if description.get("em_cmd", None):
+            run_cmd = description.get("em_cmd", None)
+        else:
+            run_cmd = description.get("host_exe", None)
+            if description.get("cmd_args", None):
+                if "PROJECT" not in description.get("cmd_args", None) or "BUILD" not in description.get("cmd_args", None):
+                    run_cmd += description.get("cmd_args", None)
+                else:
+                    run_cmd += (description.get("cmd_args", None).replace("PROJECT",".")).replace("BUILD","xclbin")
 
-        assert run_cmd is not None, "Could not find run_cmd(em_cmd) in the example description here {}".format(examplePath)
+        assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(examplePath)
 
         return run_cmd
 
