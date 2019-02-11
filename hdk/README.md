@@ -312,6 +312,8 @@ Now, you can verify that the AFI was loaded properly.  The output shows the FPGA
 <a name="step6"></a>
 #### Step 6. Validating using the CL Example Software
 
+Developers using AMI 1.5.0 or Later Instances that come with pre-installed Xilinx Runtime Environment (XRT) should [refer to this note](../sdk/linux_kernel_drivers/xdma/xdma_install.md#xdmainstallfail) before installing XDMA driver.
+
 Each CL Example comes with a runtime software under `$CL_DIR/software/runtime/` subdirectory. You will need to build the runtime application that matches your loaded AFI.   
 
 ```
