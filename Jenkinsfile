@@ -23,8 +23,8 @@ properties([parameters([
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
-    booleanParam(name: 'disable_runtime_tests',               defaultValue: false,  description: 'Option to disable runtime tests.'),
-    booleanParam(name: 'use_test_ami',                        defaultValue: false,  description: 'This option asks for the test AMI from Jenkins'),
+    booleanParam(name: 'disable_runtime_tests',               defaultValue: false, description: 'Option to disable runtime tests.'),
+    booleanParam(name: 'use_test_ami',                        defaultValue: false, description: 'This option asks for the test AMI from Jenkins'),
     booleanParam(name: 'internal_simulations',                defaultValue: false, description: 'This option asks for default agent from Jenkins')
 ])])
 
@@ -66,8 +66,14 @@ def dcp_recipe_scenarios = [
     'A1-B2-C0-TIMING',
     'A1-B2-C0-CONGESTION',
     ]
-def fdf_test_names = ['cl_dram_dma[A1-B0-C0-DEFAULT]', 'cl_hello_world[A0-B0-C0-DEFAULT]', 'cl_hello_world_vhdl',
-    'cl_uram_example[2]', 'cl_uram_example[3]', 'cl_uram_example[4]']
+def fdf_test_names = [
+    'cl_dram_dma[A1-B0-C0-DEFAULT]',
+    'cl_hello_world[A0-B0-C0-DEFAULT]',
+    'cl_hello_world_vhdl',
+    'cl_uram_example[2]',
+    'cl_uram_example[3]',
+    'cl_uram_example[4]'
+    ]
 
 boolean debug_dcp_gen = params.get('debug_dcp_gen')
 if (debug_dcp_gen) {
@@ -116,37 +122,47 @@ task_label = [
     'sdaccel_builds':    'z1d.2xl'
 ]
 
+// Put the latest version last
 def xilinx_versions = [ '2017.4', '2018.2' ]
+
+// We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
 
-def dsa_map = [ '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
-                '2018.2' : [ 'DYNAMIC_5_0' : 'dyn']
+def dsa_map = [
+    '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
+    '2018.2' : [ 'DYNAMIC_5_0' : 'dyn']
 ]
 
-def sdaccel_example_default_map = [ '2017.4' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-                                                 'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-                                                 'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-                                                 'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-                                               ],
-                                    '2018.2' : [ 'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-                                                 'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-                                                 'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-                                                 'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-                                                 'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-                                               ]
+def sdaccel_example_default_map = [
+    '2017.4' : [
+        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
+        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+    ],
+    '2018.2' : [
+        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
+        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+    ]
 ]
 
-def simulator_tool_default_map = [ '2017.4' : [ 'vivado': 'xilinx/SDx/2017.4_04112018',
-                                                'vcs': 'vcs-mx/L-2016.06-1',
-                                                'questa': 'questa/10.6b',
-                                                'ies': 'incisive/15.20.063'
-                                              ],
-                                   '2018.2' : [ 'vivado': 'xilinx/SDx/2018.2_06142018',
-                                                'vcs': 'vcs-mx/N-2017.12-SP1-1',
-                                                'questa': 'questa/10.6c_1',
-                                                'ies': 'incisive/15.20.063'
-                                              ]
+def simulator_tool_default_map = [
+    '2017.4' : [
+        'vivado': 'xilinx/SDx/2017.4_04112018',
+        'vcs': 'vcs-mx/L-2016.06-1',
+        'questa': 'questa/10.6b',
+        'ies': 'incisive/15.20.063'
+    ],
+    '2018.2' : [
+        'vivado': 'xilinx/SDx/2018.2_06142018',
+        'vcs': 'vcs-mx/N-2017.12-SP1-1',
+        'questa': 'questa/10.6c_1',
+        'ies': 'incisive/15.20.063'
+    ]
 ]
 
 
@@ -181,26 +197,23 @@ def abort_previous_running_builds() {
     def pname = env.JOB_NAME.split('/')[0]
 
     hi.getItem(pname).getItem(env.JOB_BASE_NAME).getBuilds().each{ build ->
-    def executor = build.getExecutor()
+        def executor = build.getExecutor()
 
-    if (build.number != currentBuild.number && build.number < currentBuild.number && executor != null) {
-        executor.interrupt(
-            Result.ABORTED,
-            new CauseOfInterruption.UserInterruption(
-            "Aborted by #${currentBuild.number}"))
-        println("Aborted previous running build #${build.number}")
+        if (build.number != currentBuild.number && build.number < currentBuild.number && executor != null) {
+            executor.interrupt(
+                Result.ABORTED,
+                new CauseOfInterruption.UserInterruption("Aborted by #${currentBuild.number}"))
+            println("Aborted previous running build #${build.number}")
+        } else {
+            println("Build is not running or is current build, not aborting - #${build.number}")
+        }
     }
-    else {
-      println("Build is not running or is current build, not aborting - #${build.number}")
-    }
-  }
 }
 
 // Wait for input if we are running on a public repo to avoid malicious PRS
 if (is_public_repo()) {
     input "Running on a public repository, do you want to proceed with running the tests?"
-}
-else {
+} else {
     echo "Running on a private repository"
 }
 
@@ -211,29 +224,223 @@ if (env.CHANGE_ID) {
     abort_previous_running_builds()
 }
 
-// Try offloading the driver to run python bindings test into a method
-// to work around method code being too large.
-def generate_and_test_py_bindings() {
-	echo "Test Python Bindings"
-	checkout scm
 
-	String test = "sdk/tests/test_py_bindings.py"
-	String report_file = "test_py_bindings.xml"
+def run_junit(String report_file) {
 
-	try {
-		sh """
-		set -e
-		source $WORKSPACE/shared/tests/bin/setup_test_sdk_env_al2.sh "py_bindings"
-		python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
-		"""
-	}  catch (exc) {
-		echo "${test} failed."
-		input message: "Python bindings test failed. Click Proceed or Abort when you are done debugging on the instance."
-		throw exc
-	} finally {
-		junit healthScaleFactor: 10.0, testResults: report_file
-	}
+    if (fileExists(report_file)) {
+        junit healthScaleFactor: 10.0, testResults: report_file
+    } else {
+        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+    }
 }
+
+def git_cleanup() {
+    sh """
+    set -e
+    sudo git reset --hard
+    sudo git clean -fdx
+    """
+}
+
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+// Test Functions/////////////////////////////////////
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+def test_run_py_bindings() {
+    echo "Test Python Bindings"
+    checkout scm
+
+    String test = "sdk/tests/test_py_bindings.py"
+    String report_file = "test_py_bindings.xml"
+
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env_al2.sh "py_bindings"
+        python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
+        """
+    } catch (exc) {
+        echo "${test} failed."
+        input message: "Python bindings test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exc
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_doc_markdown_links() {
+    String report_file = 'test_md_links.xml'
+    checkout scm
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+        python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
+        """
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_doc_src_headers() {
+    String report_file = 'test_check_src_headers.xml'
+    checkout scm
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+        python2.7 -m pytest -v $WORKSPACE/shared/tests/test_check_src_headers.py --junit-xml $WORKSPACE/${report_file}
+        """
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_run_hdk_scripts() {
+    checkout scm
+    String report_file = 'test_hdk_scripts.xml'
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+        python2.7 -m pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
+        """
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_fpga_1_slot() {
+    String report_file_tools = 'test_fpga_tools.xml'
+    String report_file_sdk = 'test_fpga_sdk.xml'
+    String report_file_combined = 'test_fpga_*.xml'
+    checkout scm
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
+        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
+        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
+        """
+    }
+    catch (exception) {
+        echo "Test FPGA Tools 1 Slot failed"
+        input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exception
+    }
+    finally {
+        if (fileExists(report_file_tools)) {
+            junit healthScaleFactor: 10.0, testResults: report_file_combined
+        } else {
+            echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
+        }
+    }
+}
+
+def test_fpga_all_slots() {
+    String report_file_tools = 'test_fpga_tools_all_slots.xml'
+    String report_file_sdk = 'test_fpga_sdk_all_slots.xml'
+    String report_file_combined = 'test_fpga_*_all_slots.xml'
+    checkout scm
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
+        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
+        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
+        """
+    }
+    catch (exception) {
+        echo "Test FPGA Tools All Slots failed"
+        input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exception
+    }
+    finally {
+        if (fileExists(report_file_tools)) {
+            junit healthScaleFactor: 10.0, testResults: report_file_combined
+        } else {
+            echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
+        }
+    }
+}
+
+
+def test_run_non_root_access() {
+    echo "Test non-root access to FPGA tools"
+    checkout scm
+
+    String test = "sdk/tests/test_non_root_access.py"
+    String report_file = "test_non_root_access.xml"
+
+    try {
+        sh """
+        set -e
+        export AWS_FPGA_ALLOW_NON_ROOT=y
+        export AWS_FPGA_SDK_OVERRIDE_GROUP=y
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+        newgrp fpgauser
+        export SDK_DIR="${WORKSPACE}/sdk"
+        source  $WORKSPACE/shared/tests/bin/setup_test_env.sh
+        python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
+        """
+    } catch (exc) {
+        input message: "Non-root access test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exc
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_edma_driver() {
+    echo "Test EDMA Driver"
+    checkout scm
+
+    String test = "sdk/tests/test_edma.py"
+    String report_file = "test_edma.xml"
+
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+        """
+    } catch (exc) {
+        echo "${test} failed."
+        junit healthScaleFactor: 10.0, testResults: report_file
+        input message: "EDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exc
+    } finally {
+        run_junit(report_file)
+    }
+}
+
+def test_xdma_driver() {
+    echo "Test XDMA Driver"
+    checkout scm
+
+    String test = "sdk/tests/test_xdma.py"
+    String report_file = "test_xdma.xml"
+
+    try {
+        sh """
+        set -e
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+        """
+    } catch (exc) {
+        echo "${test} failed."
+        junit healthScaleFactor: 10.0, testResults: report_file
+        input message: "XDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
+        throw exc
+    } finally {
+        run_junit(report_file)
+    }
+}
+
 //=============================================================================
 // Shared Tests
 //=============================================================================
@@ -242,47 +449,15 @@ def generate_and_test_py_bindings() {
 if (test_markdown_links || test_src_headers) {
     all_tests['Documentation Tests'] = {
         node(get_task_label(task: 'md_links', xilinx_version: default_xilinx_version)) {
-            checkout scm
-            commitChangeset = sh(returnStdout: true, script: 'git diff-tree --no-commit-id --name-status -r HEAD').trim()
-            echo "${commitChangeset}"
-
             if (test_markdown_links) {
                 stage('Test Markdown Links') {
-                    String report_file = 'test_md_links.xml'
-                    try {
-                        sh """
-                            set -e
-                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                            python2.7 -m pytest -v $WORKSPACE/shared/tests/test_md_links.py --junit-xml $WORKSPACE/${report_file}
-                        """
-                    } finally {
-                        if (fileExists(report_file)) {
-                            junit healthScaleFactor: 10.0, testResults: report_file
-                        }
-                        else {
-                            echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                        }
-                    }
+                    test_doc_markdown_links()
                 }
             }
+
             if (test_src_headers) {
                 stage('Test Source Headers') {
-                    String report_file = 'test_check_src_headers.xml'
-                    checkout scm
-                    try {
-                        sh """
-                            set -e
-                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                            python2.7 -m pytest -v $WORKSPACE/shared/tests/test_check_src_headers.py --junit-xml $WORKSPACE/${report_file}
-                        """
-                    } finally {
-                        if (fileExists(report_file)) {
-                            junit healthScaleFactor: 10.0, testResults: report_file
-                        }
-                        else {
-                            echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                        }
-                    }
+                    test_doc_src_headers()
                 }
             }
         }
@@ -296,96 +471,36 @@ if (test_markdown_links || test_src_headers) {
 if (test_hdk_scripts) {
     all_tests['Test HDK Scripts'] = {
         stage('Test HDK Scripts') {
-            String report_file = 'test_hdk_scripts.xml'
             node(get_task_label(task: 'source_scripts', xilinx_version: default_xilinx_version)) {
-                checkout scm
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/test_hdk_scripts.py --junit-xml $WORKSPACE/${report_file}
-                    """
-                } finally {
-                    if (fileExists(report_file)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file
-                    }
-                    else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                    }
-                }
+                test_run_hdk_scripts()
             }
         }
     }
 }
 
+//=============================================================================
+// FPGA Tool Tests
+//=============================================================================
 if (test_fpga_tools) {
     all_tests['Test FPGA Tools 1 Slot'] = {
         stage('Test FPGA Tools 1 Slot') {
-            String report_file_tools = 'test_fpga_tools.xml'
-            String report_file_sdk = 'test_fpga_sdk.xml'
-            String report_file_combined = 'test_fpga_*.xml'
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
-                checkout scm
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
-                        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
-                        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
-                    """
-                }
-                catch (exception) {
-                    echo "Test FPGA Tools 1 Slot failed"
-                    input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
-                    throw exception
-                }
-                finally {
-                    if (fileExists(report_file_tools)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file_combined
-                    }
-                    else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
-                    }
-                }
+                test_fpga_1_slot()
             }
         }
     }
     all_tests['Test FPGA Tools All Slots'] = {
         stage('Test FPGA Tools All Slots') {
-            String report_file_tools = 'test_fpga_tools_all_slots.xml'
-            String report_file_sdk = 'test_fpga_sdk_all_slots.xml'
-            String report_file_combined = 'test_fpga_*_all_slots.xml'
             node(get_task_label(task: 'runtime_all_slots', xilinx_version: default_xilinx_version)) {
-                checkout scm
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_fpga_tools.py --junit-xml $WORKSPACE/${report_file_tools}
-                        sudo -E sh -c 'source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh && python2.7 -m pytest -v $WORKSPACE/sdk/tests/test_sdk.py --junit-xml $WORKSPACE/${report_file_sdk}'
-                        sudo -E chmod 666 $WORKSPACE/${report_file_sdk}
-                    """
-                }
-                catch (exception) {
-                    echo "Test FPGA Tools All Slots failed"
-                    input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
-                    throw exception
-                }
-                finally {
-                    if (fileExists(report_file_tools)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file_combined
-                    }
-                    else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file_combined}"
-                    }
-                }
+                test_fpga_all_slots()
             }
         }
     }
 }
 
-
+//=============================================================================
+// Simulations
+//=============================================================================
 if (test_sims) {
     all_tests['Run Sims'] = {
         stage('Run Sims') {
@@ -393,11 +508,12 @@ if (test_sims) {
             def simulators = ['vivado']
             def sim_nodes = [:]
             if(params.internal_simulations) {
-              simulators = ['vcs', 'ies', 'questa', 'vivado']
+                simulators = ['vcs', 'ies', 'questa', 'vivado']
             }
+
             for (x in cl_names) {
                 for (y in xilinx_versions) {
-                    for ( z in simulators)  {
+                    for (z in simulators)  {
                         String xilinx_version = y
                         String cl_name = x
                         String simulator = z
@@ -409,119 +525,72 @@ if (test_sims) {
                         String questa_module = tool_module_map.get('questa')
                         String ies_module = tool_module_map.get('ies')
                         String vivado_module = tool_module_map.get('vivado')
+
                         if(params.internal_simulations) {
-                           report_file = "test_sims_${cl_name}_${xilinx_version}_${simulator}.xml"
+                            report_file = "test_sims_${cl_name}_${xilinx_version}_${simulator}.xml"
                         }
                         sim_nodes[node_name] = {
-                        node(get_task_label(task: 'simulation', xilinx_version: xilinx_version)) {
-                            checkout scm
-                            try {
-                                if(params.internal_simulations) {
-                                   sh """
-                                   set -e
-                                   module purge
-                                   module load python/2.7.9
-                                   module load ${vivado_module}
-                                   module load ${vcs_module}
-                                   module load ${questa_module}
-                                   module load ${ies_module}
-                                   source $WORKSPACE/hdk_setup.sh
-                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
-                                       """
-                                } else {
-                                   sh """
-                                   set -e
-                                   source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                   python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator} 
-                                      """
-                                }
-                            } catch (exc) {
-                                echo "${node_name} failed: archiving results"
-                                archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
-                                throw exc
-                            } finally {
-                                if (fileExists(report_file)) {
-                                    junit healthScaleFactor: 10.0, testResults: report_file
-                                }
-                                else {
-                                    echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
+                            node(get_task_label(task: 'simulation', xilinx_version: xilinx_version)) {
+                                checkout scm
+                                try {
+                                    if(params.internal_simulations) {
+                                        sh """
+                                        set -e
+                                        module purge
+                                        module load python/2.7.9
+                                        module load ${vivado_module}
+                                        module load ${vcs_module}
+                                        module load ${questa_module}
+                                        module load ${ies_module}
+                                        source $WORKSPACE/hdk_setup.sh
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                        """
+                                    } else {
+                                        sh """
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                        """
+                                    }
+                                } catch (exc) {
+                                    echo "${node_name} failed: archiving results"
+                                    archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
+                                    throw exc
+                                } finally {
+                                    run_junit(report_file)
                                 }
                             }
                         }
                     }
                 }
-              }
             }
+
             parallel sim_nodes
         }
     }
 }
 
-if (test_edma) {
-    all_tests['Test EDMA Driver'] = {
-        stage('Test EDMA Driver') {
+//=============================================================================
+// Non root access Test
+//=============================================================================
+if (test_non_root_access) {
+    all_tests['Test non-root access to FPGA tools'] = {
+        stage('Test non-root access to FPGA tools') {
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
-
-                echo "Test EDMA Driver"
-                checkout scm
-
-                String test = "sdk/tests/test_edma.py"
-                String report_file = "test_edma.xml"
-
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
-                    """
-                } catch (exc) {
-                    echo "${test} failed."
-                    junit healthScaleFactor: 10.0, testResults: report_file
-                    input message: "EDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
-                    throw exc
-                } finally {
-                    if (fileExists(report_file)) {
-                        junit healthScaleFactor: 10.0, testResults: report_file
-                        // archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
-                        //archiveArtifacts artifacts: "/var/log/messages", fingerprint: true
-                    }
-                    else {
-                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                    }
-                }
+                test_run_non_root_access()
             }
         }
     }
 }
 
-if (test_non_root_access) {
-    all_tests['Test non-root access to FPGA tools'] = {
-        stage('Test non-root access to FPGA tools') {
+//=============================================================================
+// Driver Tests
+//=============================================================================
+if (test_edma) {
+    all_tests['Test EDMA Driver'] = {
+        stage('Test EDMA Driver') {
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
-
-                echo "Test non-root access to FPGA tools"
-                checkout scm
-
-                String test = "sdk/tests/test_non_root_access.py"
-                String report_file = "test_non_root_access.xml"
-
-                try {
-                    sh """
-                        export AWS_FPGA_ALLOW_NON_ROOT=y
-                        export AWS_FPGA_SDK_OVERRIDE_GROUP=y
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        newgrp fpgauser
-                        export SDK_DIR="${WORKSPACE}/sdk"
-                        source  $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                        python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
-                    """
-                } catch (exc) {
-                    input message: "Non-root access test failed. Click Proceed or Abort when you are done debugging on the instance."
-                    throw exc
-                } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
-                }
+                test_edma_driver()
             }
         }
     }
@@ -531,51 +600,33 @@ if (test_xdma) {
     all_tests['Test XDMA Driver'] = {
         stage('Test XDMA Driver') {
             node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
-
-                echo "Test XDMA Driver"
-                checkout scm
-
-                String test = "sdk/tests/test_xdma.py"
-                String report_file = "test_xdma.xml"
-
-                try {
-                    sh """
-                        set -e
-                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
-                    """
-                } catch (exc) {
-                    echo "${test} failed."
-                    junit healthScaleFactor: 10.0, testResults: report_file
-                    input message: "XDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
-                    throw exc
-                } finally {
-                    junit healthScaleFactor: 10.0, testResults: report_file
-                    //archiveArtifacts artifacts: "sdk/tests/fio_dma_tools/scripts/*.csv", fingerprint: true
-                    //archiveArtifacts artifacts: "/var/log/messages", fingerprint: true
-                }
+                test_xdma_driver()
             }
         }
     }
 }
 
+//=============================================================================
+// Python Binding Test
+//=============================================================================
 if (test_py_bindings) {
     all_tests['Test Python Bindings'] = {
         stage('Test Python Bindings') {
             node('f1.2xl_runtime_test_al2') {
-				generate_and_test_py_bindings()
+                test_run_py_bindings()
             }
         }
     }
 }
 
+//=============================================================================
+// Precompiled Runtime Tests
+//=============================================================================
 if(disable_runtime_tests) {
     echo "Runtime tests disabled. Not running Test Runtime Software stages"
-}
-else {
+} else {
     if (test_runtime_software) {
         all_tests['Test Runtime Software'] = {
-
             stage('Test Runtime Software') {
                 def nodes = [:]
                 def node_types = ['runtime', 'runtime_all_slots']
@@ -601,17 +652,12 @@ else {
 
                                 try {
                                     sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
+                                    set -e
+                                    source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
                                     """
                                 } finally {
-                                    if (fileExists(report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                                    }
+                                    run_junit(report_file)
                                 }
                             }
                         }
@@ -623,7 +669,9 @@ else {
     }
 }
 
-
+//=============================================================================
+// DCP Recipe Tests
+//=============================================================================
 if (test_dcp_recipes) {
     all_tests['Test DCP Recipes'] = {
         stage('Test DCP Recipes') {
@@ -644,21 +692,16 @@ if (test_dcp_recipes) {
                                 checkout scm
                                 try {
                                     sh """
-                                      set -e
-                                      source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                      python2.7 -m pytest -s -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
-                                      """
+                                    set -e
+                                    source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                    python2.7 -m pytest -s -v hdk/tests/test_gen_dcp.py::TestGenDcp::${test_name} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                                    """
                                 } catch(exc) {
                                     echo "${test_name} DCP generation failed: archiving results"
                                     archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
                                     throw exc
                                 } finally {
-                                    if (fileExists(report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                                    }
+                                    run_junit(report_file)
                                 }
                             }
                         }
@@ -671,6 +714,9 @@ if (test_dcp_recipes) {
     }
 }
 
+//=============================================================================
+// HDK Full Developer Flow Tests
+//=============================================================================
 if (test_hdk_fdf) {
     // Top level stage for FDF
     // Each CL will have its own parallel FDF stage under this one.
@@ -711,7 +757,7 @@ if (test_hdk_fdf) {
                                 // Clean out the to_aws directory to make sure there are no artifacts left over from a previous build
                                 try {
                                     sh """
-                                        rm -rf ${dcp_stash_dir}
+                                    rm -rf ${dcp_stash_dir}
                                     """
                                 } catch(exc) {
                                     // Ignore any errors
@@ -719,21 +765,16 @@ if (test_hdk_fdf) {
                                 }
                                 try {
                                     sh """
-                                      set -e
-                                      source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                      python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
-                                      """
+                                    set -e
+                                    source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                                    """
                                 } catch (exc) {
                                     echo "${fdf_test_name} DCP generation failed: archiving results"
                                     archiveArtifacts artifacts: "${build_dir}/**", fingerprint: true
                                     throw exc
                                 } finally {
-                                    if (fileExists(report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                                    }
+                                    run_junit(report_file)
                                 }
                                 try {
                                     stash name: dcp_stash_name, includes: "${dcp_stash_dir}/**"
@@ -749,7 +790,7 @@ if (test_hdk_fdf) {
                                 // Clean out the stash directories to make sure there are no artifacts left over from a previous build
                                 try {
                                     sh """
-                                        rm -rf ${dcp_stash_dir}
+                                    rm -rf ${dcp_stash_dir}
                                     """
                                 } catch(exc) {
                                     // Ignore any errors
@@ -757,7 +798,7 @@ if (test_hdk_fdf) {
                                 }
                                 try {
                                     sh """
-                                        rm -rf ${afi_stash_dir}
+                                    rm -rf ${afi_stash_dir}
                                     """
                                 } catch(exc) {
                                     // Ignore any errors
@@ -776,34 +817,27 @@ if (test_hdk_fdf) {
                                     // ERROR: [Common 17-685] Unable to load Tcl app xilinx::xsim
                                     // ERROR: [Common 17-69] Command failed: ERROR: [Common 17-685] Unable to load Tcl app xilinx::xsim
                                     sh """
-                                        set -e
-                                        source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                                    set -e
+                                    source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                                    python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
                                     """
                                 } catch (exc) {
                                     echo "${fdf_test_name} AFI generation failed: archiving results"
                                     archiveArtifacts artifacts: "${build_dir}/to_aws/**", fingerprint: true
                                     throw exc
                                 } finally {
-                                    if (fileExists(report_file)) {
-                                        junit healthScaleFactor: 10.0, testResults: report_file
-                                    }
-                                    else {
-                                        echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                                    }
+                                    run_junit(report_file)
                                 }
                                 try {
                                     stash name: afi_stash_name, includes: "${afi_stash_dir}/**"
                                 } catch (exc) {
                                     echo "stash ${afi_stash_name} failed:\n${exc}"
-                                    //throw exc
                                 }
                             }
 
                             if(disable_runtime_tests) {
                                 echo "Runtime tests disabled. Not running runtime ${fdf_test_name}"
-                            }
-                            else {
+                            } else {
                                 node(get_task_label(task: 'runtime', xilinx_version: xilinx_version)) {
                                     String test = "hdk/tests/test_load_afi.py::TestLoadAfi::test_${fdf_test_name}"
                                     String report_file = "test_load_afi_${fdf_test_name}_${xilinx_version}.xml"
@@ -812,7 +846,7 @@ if (test_hdk_fdf) {
                                     // Clean out the stash directories to make sure there are no artifacts left over from a previous build
                                     try {
                                         sh """
-                                            rm -rf ${afi_stash_dir}
+                                        rm -rf ${afi_stash_dir}
                                         """
                                     } catch(exc) {
                                         // Ignore any errors
@@ -822,21 +856,15 @@ if (test_hdk_fdf) {
                                         unstash name: afi_stash_name
                                     } catch (exc) {
                                         echo "unstash ${afi_stash_name} failed:\n${exc}"
-                                        //throw exc
                                     }
                                     try {
                                         sh """
-                                            set -e
-                                            source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-                                            python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                                        set -e
+                                        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
+                                        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
                                         """
                                     } finally {
-                                        if (fileExists(report_file)) {
-                                            junit healthScaleFactor: 10.0, testResults: report_file
-                                        }
-                                        else {
-                                            echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                                        }
+                                        run_junit(report_file)
                                     }
                                 }
                             } //else
@@ -859,7 +887,6 @@ if (test_sdaccel_scripts) {
     all_tests['Test SDAccel Scripts'] = {
         stage('Test SDAccel Scripts') {
             def nodes = [:]
-
             for (def xilinx_version in xilinx_versions) {
 
                 String node_label = get_task_label(task: 'source_scripts', xilinx_version: xilinx_version)
@@ -870,17 +897,12 @@ if (test_sdaccel_scripts) {
                         checkout scm
                         try {
                             sh """
-                                set -e
-                                source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                                python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
+                            set -e
+                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
                             """
                         } finally {
-                            if (fileExists(report_file)) {
-                                junit healthScaleFactor: 10.0, testResults: report_file
-                            }
-                            else {
-                                echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                            }
+                            run_junit(report_file)
                         }
                     }
                 }
@@ -912,7 +934,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                         try {
                             sh """
-                                rm -rf ${sdaccel_examples_list}
+                            rm -rf ${sdaccel_examples_list}
                             """
                         } catch(error) {
                             // Ignore any errors
@@ -921,20 +943,15 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                         try {
                             sh """
-                                set -e
-                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
+                            set -e
+                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
                             """
                         } catch (exc) {
                             echo "Could not find tests. Please check the repository."
                             throw exc
                         } finally {
-                            if (fileExists(report_file)) {
-                                junit healthScaleFactor: 10.0, testResults: report_file
-                            }
-                            else {
-                                echo "Pytest wasn't run for stage. Report file not generated: ${report_file}"
-                            }
+                            run_junit(report_file)
                         }
 
                         // Only run the hello world test by default
@@ -991,13 +1008,11 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     if(description_json["targets"].contains("sw_emu")) {
                                         test_sw_emu_supported = true
                                         echo "Description file ${description_file} has target sw_emu"
-                                    }
-                                    else {
+                                    } else {
                                         test_sw_emu_supported = false
                                         echo "Description file ${description_file} does not have target sw_emu"
                                     }
-                                }
-                                else {
+                                } else {
                                     echo "Description json did not have a 'target' key"
                                 }
 
@@ -1005,32 +1020,21 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     if(test_sw_emu_supported) {
                                         stage(sw_emu_stage_name) {
                                             node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
-
                                                 checkout scm
-
                                                 try {
                                                     sh """
-                                                        set -e
-                                                        source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                        export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    set -e
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                     """
                                                 } catch (error) {
                                                     echo "${sw_emu_stage_name} SW EMU Build generation failed"
                                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                                     throw error
                                                 } finally {
-                                                    if (fileExists(sw_emu_report_file)) {
-                                                        junit healthScaleFactor: 10.0, testResults: sw_emu_report_file
-                                                    }
-                                                    else {
-                                                        echo "Pytest wasn't run for stage. Report file not generated: ${sw_emu_report_file}"
-                                                    }
-                                                    sh """
-                                                        set -e
-                                                        sudo git reset --hard
-                                                        sudo git clean -fdx
-                                                    """
+                                                    run_junit(sw_emu_report_file)
+                                                    git_cleanup()
                                                 }
                                             }
                                         }
@@ -1038,64 +1042,42 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                                     stage(hw_emu_stage_name) {
                                         node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
-
                                             checkout scm
-
                                             try {
                                                 sh """
-                                                    set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                set -e
+                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_emu_stage_name} HW EMU Build generation failed"
                                                 archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                                 throw error
                                             } finally {
-                                                if (fileExists(hw_emu_report_file)) {
-                                                    junit healthScaleFactor: 10.0, testResults: hw_emu_report_file
-                                                }
-                                                else {
-                                                    echo "Pytest wasn't run for stage. Report file not generated: ${hw_emu_report_file}"
-                                                }
-                                                sh """
-                                                    set -e
-                                                    sudo git reset --hard
-                                                    sudo git clean -fdx
-                                                """
+                                                run_junit(hw_emu_report_file)
+                                                git_cleanup()
                                             }
                                         }
                                     }
 
                                     stage(hw_stage_name) {
                                         node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
-
                                             checkout scm
-
                                             try {
                                                 sh """
-                                                    set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                set -e
+                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_stage_name} HW Build generation failed"
                                                 archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
                                                 throw error
                                             } finally {
-                                                if (fileExists(hw_report_file)) {
-                                                    junit healthScaleFactor: 10.0, testResults: hw_report_file
-                                                }
-                                                else {
-                                                    echo "Pytest wasn't run for stage. Report file not generated: ${hw_report_file}"
-                                                }
-                                                sh """
-                                                    set -e
-                                                    sudo git reset --hard
-                                                    sudo git clean -fdx
-                                                """
+                                                run_junit(hw_report_file)
+                                                git_cleanup()
                                             }
                                         }
                                     }
@@ -1106,10 +1088,10 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                             checkout scm
                                             try {
                                                 sh """
-                                                    set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                set -e
+                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${create_afi_stage_name} Create AFI failed"
@@ -1117,23 +1099,13 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 throw error
                                             } finally {
 
-                                                if (fileExists(create_afi_report_file)) {
-                                                    junit healthScaleFactor: 10.0, testResults: create_afi_report_file
-                                                }
-                                                else {
-                                                    echo "Pytest wasn't run for stage. Report file not generated: ${create_afi_report_file}"
-                                                }
-
                                                 String to_aws_dir = "${example_path}/to_aws"
 
                                                 if (fileExists(to_aws_dir)) {
                                                     sh "rm -rf ${to_aws_dir}"
                                                 }
-                                                sh """
-                                                    set -e
-                                                    sudo git reset --hard
-                                                    sudo git clean -fdx
-                                                """
+                                                run_junit(create_afi_report_file)
+                                                git_cleanup()
                                             }
                                         }
                                     }
@@ -1142,17 +1114,16 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                                         if(disable_runtime_tests) {
                                             echo "Runtime tests disabled. Not running ${run_example_stage_name}"
-                                        }
-                                        else {
+                                        } else {
                                             node(get_task_label(task: 'runtime', xilinx_version: xilinx_version)) {
 
                                                 checkout scm
                                                 try {
                                                     sh """
-                                                        set -e
-                                                        source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
-                                                        export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                        python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    set -e
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
+                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                     """
                                                 } catch (error) {
                                                     echo "${run_example_stage_name} Runtime example failed"
@@ -1160,17 +1131,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                     input message: "SDAccel Runtime test failed. Click Proceed or Abort when you are done debugging on the instance."
                                                     throw error
                                                 } finally {
-                                                    if (fileExists(run_example_report_file)) {
-                                                        junit healthScaleFactor: 10.0, testResults: run_example_report_file
-                                                    }
-                                                    else {
-                                                        echo "Pytest wasn't run for stage. Report file not generated: ${run_example_report_file}"
-                                                    }
-                                                    sh """
-                                                        set -e
-                                                        sudo git reset --hard
-                                                        sudo git clean -fdx
-                                                    """
+                                                    run_junit(run_example_report_file)
+                                                    git_cleanup()
                                                 }
                                             }
                                         } //else
