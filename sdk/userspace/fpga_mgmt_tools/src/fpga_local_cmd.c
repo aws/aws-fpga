@@ -657,7 +657,7 @@ err:
 		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
 		const char *long_help = fpga_mgmt_strerror_long(ret);
 		if (long_help) {
-			printf(long_help);
+			printf("%s", long_help);
 		}
 	}
 	cli_detach();
