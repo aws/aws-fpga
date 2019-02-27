@@ -9,9 +9,9 @@
 
 ## 1. Launch a Runtime Instance & Install Required Packages 
 
-### Using Amazon Linux
+* Please note Amazon Linux 2 or Amazon Linux are not supported by Xilinx Runtime (XRT) at this time. Please use centos/RHEL or ubuntu  based instance for Xilinx SDx 2018.2 or 2018.3 runtimes.
 
-* Launch an F1 instance using an [Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B00635Y2IW)
+* Launch an F1 instance using an [Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B00635Y2IW) or [Centos 7](https://aws.amazon.com/marketplace/pp/B00O7WM7QW) 
 * Install the required updates
 
 ````
