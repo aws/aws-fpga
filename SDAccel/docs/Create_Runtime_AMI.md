@@ -9,9 +9,9 @@
 
 ## 1. Launch a Runtime Instance & Install Required Packages 
 
-### Using Amazon Linux
+* Please note Amazon Linux 2 or Amazon Linux are not supported by Xilinx XRT at this time. Please use Centos/RHEL or Ubuntu when using Xilinx XRT Runtimes for the AFIs generated using Xilinx SDx 2018.2 and 2018.3 toolsets.
 
-* Launch an F1 instance using an [Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B00635Y2IW)
+* Launch an F1 instance using an [Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B00635Y2IW) or [Centos 7](https://aws.amazon.com/marketplace/pp/B00O7WM7QW) 
 * Install the required updates
 
 ````

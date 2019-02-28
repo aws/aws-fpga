@@ -69,8 +69,10 @@ function xrt_install_instructions_2018_2 {
     err_msg "use following command to download and install latest validated XRT rpms for centos distributions"
     err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm"
     err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm"
-    err_msg "sudo yum reinstall -y xrt_*-xrt.rpm"
-    err_msg "sudo yum reinstall -y xrt_*-aws.rpm"
+    err_msg "sudo yum remove -y xrt-aws"
+    err_msg "sudo yum remove -y xrt"
+    err_msg "sudo yum install -y xrt_201802.2.1.0_7.5.1804-xrt.rpm"
+    err_msg "sudo yum install -y xrt_201802.2.1.0_7.5.1804-aws.rpm"
 }
 
 function check_xdma_driver {
