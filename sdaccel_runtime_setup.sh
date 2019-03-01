@@ -69,8 +69,10 @@ function xrt_install_instructions_2018_2 {
     err_msg "use following command to download and install latest validated XRT rpms for centos distributions"
     err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm"
     err_msg "curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm"
-    err_msg "sudo yum reinstall -y xrt_*-xrt.rpm"
-    err_msg "sudo yum reinstall -y xrt_*-aws.rpm"
+    err_msg "sudo yum remove -y xrt-aws"
+    err_msg "sudo yum remove -y xrt"
+    err_msg "sudo yum install -y xrt_201802.2.1.0_7.5.1804-xrt.rpm"
+    err_msg "sudo yum install -y xrt_201802.2.1.0_7.5.1804-aws.rpm"
 }
 
 function check_xdma_driver {
@@ -165,8 +167,8 @@ check_kernel_ver
 check_xdma_driver
 check_edma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
-    info_msg "Xilinx Vivado version is 2018.2"
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* ]]; then
+    info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
     
     if [ $override == 1 ]; then
       info_msg "XRT check overide selected."
@@ -192,7 +194,7 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
           fi
           info_msg " XRT Runtime setup Done "
        else
-          err_msg "$xrt_build_ver does not match recommended version"
+          err_msg "$xrt_build_ver does not match recommended versions"
           cat $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
           xrt_install_instructions_2018_2
           return 1

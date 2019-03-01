@@ -10,11 +10,3 @@
 	path = SDAccel/examples/xilinx_2018.3
 	url = https://github.com/Xilinx/SDAccel_Examples.git
 	branch = master	
-[submodule "SDAccel/Runtime/XRT_2018.2"]
-	path = SDAccel/Runtime/XRT_2018.2
-	url = https://github.com/Xilinx/XRT.git
-	branch = 2018.2_XDF.RC3
-[submodule "SDAccel/Runtime/XRT_2018.3"]
-	path = SDAccel/Runtime/XRT_2018.3
-	url = https://github.com/Xilinx/XRT.git
-	branch = master

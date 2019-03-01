@@ -94,13 +94,7 @@ function install_xrt_package {
 }
 
 function setup_runtime {
-    if [[ $XRT_DEV == "1" ]]; then # Build and install XRT from GitHub
-        info_msg "XRT Install, DEV"
-        build_xrt
-        if [[ $? == 0 ]]; then
-            install_xrt_package ${XRT_PATH}/build/Release
-        fi
-    elif [ -e /opt/xilinx/xrt ]; then # Check if XRT is installed  
+    if [ -e /opt/xilinx/xrt ]; then # Check if XRT is installed
         info_msg "XRT Install, non-dev"
         export XILINX_XRT=/opt/xilinx/xrt
         export LD_LIBRARY_PATH=$XILINX_XRT/lib:$LD_LIBRARY_PATH

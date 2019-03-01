@@ -61,7 +61,8 @@
 | 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
 | 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 | 1.4.0-1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
-| 1.4.3-1.4.X | 2018.2 | v1.5.0 (Xilinx Sdx 2018.2) |
+| 1.4.3-1.4.X | 2018.2 | v1.5.0 (Xilinx SDx 2018.2) |
+| 1.4.8-1.4.X | 2018.3 | v1.6.0 (Xilinx SDx 2018.3) |
 
 * FPGA developer kit version is listed in [hdk_version.txt](./hdk_version.txt)
 

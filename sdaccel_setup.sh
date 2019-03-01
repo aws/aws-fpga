@@ -183,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER
     fi
     ln -sf $SDACCEL_DIR/examples/xilinx_$RELEASE_VER $SDACCEL_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2017.4 or 2018.2).\n" 
+   echo " $RELEASE_VER is not supported (2017.4, 2018.2 & 2018.3 are supported).\n"
    exit 2
 fi
 

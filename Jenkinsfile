@@ -123,14 +123,15 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2017.4', '2018.2' ]
+def xilinx_versions = [ '2017.4', '2018.2', '2018.3' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
 
 def dsa_map = [
     '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.2' : [ 'DYNAMIC_5_0' : 'dyn']
+    '2018.2' : [ 'DYNAMIC_5_0' : 'dyn'],
+    '2018.3' : [ 'DYNAMIC_5_0' : 'dyn']
 ]
 
 def sdaccel_example_default_map = [
@@ -147,6 +148,12 @@ def sdaccel_example_default_map = [
         'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
         'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
         'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+    ],
+    '2018.3' : [
+        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
+        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
+        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
     ]
 ]
 
@@ -156,13 +163,19 @@ def simulator_tool_default_map = [
         'vcs': 'vcs-mx/L-2016.06-1',
         'questa': 'questa/10.6b',
         'ies': 'incisive/15.20.063'
-    ],
-    '2018.2' : [
-        'vivado': 'xilinx/SDx/2018.2_06142018',
-        'vcs': 'vcs-mx/N-2017.12-SP1-1',
-        'questa': 'questa/10.6c_1',
-        'ies': 'incisive/15.20.063'
-    ]
+     ],
+     '2018.2' : [
+         'vivado': 'xilinx/SDx/2018.2_06142018',
+         'vcs': 'vcs-mx/N-2017.12-SP1-1',
+         'questa': 'questa/10.6c_1',
+         'ies': 'incisive/15.20.063'
+     ],
+     '2018.3' : [
+         'vivado': 'xilinx/SDx/2018.3_1207',
+         'vcs': 'vcs-mx/N-2017.12-SP1-1',
+         'questa': 'questa/10.6c_1',
+         'ies': 'incisive/15.20.063'
+     ]
 ]
 
 
