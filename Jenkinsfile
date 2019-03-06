@@ -517,7 +517,7 @@ if (test_fpga_tools) {
 if (test_sims) {
     all_tests['Run Sims'] = {
         stage('Run Sims') {
-            def cl_names = ['cl_uram_example', 'cl_dram_dma', 'cl_hello_world']
+            def cl_names = ['cl_uram_example', 'cl_dram_dma', 'cl_hello_world', 'cl_sde']
             def simulators = ['vivado']
             def sim_nodes = [:]
             if(params.internal_simulations) {

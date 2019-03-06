@@ -198,14 +198,14 @@ end
 always 
 begin:h2c_auto_check
    logic[31:0] rdata;
-   logic[15:0] srm_inp_wr_ptr = 0;
-   logic[15:0] srm_inp_rd_ptr = 0;
+   automatic logic[15:0] srm_inp_wr_ptr = 0;
+   automatic logic[15:0] srm_inp_rd_ptr = 0;
 
    logic[511:0] ins_data;
    logic[63:0] ins_keep;
    logic[63:0] ins_user;
    logic ins_last;
-   bit got_init_base_pkt = 0;
+   automatic bit got_init_base_pkt = 0;
 
    gen_buf_t base_cur_rx_pkt;
    logic[63:0] base_cur_rx_user;
@@ -642,7 +642,7 @@ begin
 
    if (!$value$plusargs("cfg_num_pkts=%d", cfg_num_pkts))
    begin
-      cfg_num_pkts = 100;
+      cfg_num_pkts = 2;
    end
 
    //Note this is the size of the descriptor structure (either 32B or 16B)
@@ -805,7 +805,7 @@ begin
       cfg_c2h_ring_offset = $urandom_range(cfg_c2h_ring_offset_max, cfg_c2h_ring_offset_min);
 
 
-   $display($time,,,"test_reandom_h2c: test_configuration cfg_num_pkts=%0d, cfg_desc_type=%b, cfg_pkt_length_min=%0d, cfg_pkt_length_max=%0d, cfg_desc_offset_min=%0d, cfg_desc_offset_max=%0d, cfg_desc_length_min=%0d, cfg_desc_length_max=%0d, cfg_pkt_dly_min=%0d, cfg_pkt_dly_max=%0d, cfg_max_num_desc=%0d, cfg_desc_dly_min=%0d, cfg_desc_dly_max=%0d",
+   $display($time,,,"test_random_h2c: test_configuration cfg_num_pkts=%0d, cfg_desc_type=%b, cfg_pkt_length_min=%0d, cfg_pkt_length_max=%0d, cfg_desc_offset_min=%0d, cfg_desc_offset_max=%0d, cfg_desc_length_min=%0d, cfg_desc_length_max=%0d, cfg_pkt_dly_min=%0d, cfg_pkt_dly_max=%0d, cfg_max_num_desc=%0d, cfg_desc_dly_min=%0d, cfg_desc_dly_max=%0d",
                   cfg_num_pkts, cfg_desc_type, cfg_pkt_length_min, cfg_pkt_length_max, cfg_desc_offset_min, cfg_desc_offset_max, cfg_desc_length_min, cfg_desc_length_max, cfg_pkt_dly_min, cfg_pkt_dly_max, cfg_max_num_desc,
                   cfg_desc_dly_min, cfg_desc_dly_max);
 
@@ -813,43 +813,12 @@ begin
    //$srandom(seed);
 end
 
-//---------------------------------------
-// Perfromance monitor
-//---------------------------------------
-perf_mon PERF_MON_H2C (
-   .clk(`CL_PATH.clk),
-   .vld(`CL_PATH.h2c_axis_valid),
-   .keep(`CL_PATH.h2c_axis_keep),
-   .last(`CL_PATH.h2c_axis_last),
-   .start_pkt(cfg_perf_h2c_start_pkt),
-   .end_pkt(cfg_perf_h2c_end_pkt),
-   .enable(cfg_perf_mon)
-   );
-
-perf_mon PERF_MON_C2H (
-   .clk(`CL_PATH.clk),
-   .vld(`CL_PATH.c2h_axis_valid),
-   .keep(`CL_PATH.c2h_axis_keep),
-   .last(`CL_PATH.c2h_axis_last),
-   .start_pkt(cfg_perf_c2h_start_pkt),
-   .end_pkt(cfg_perf_c2h_end_pkt),
-   .enable(cfg_perf_mon)
-   );
-
 //----------------------------------
 // End of simulation summary/checks
 //----------------------------------
 task end_sim;
 begin
    $display($time,,,"END_SIM: c2h_pkts=%0d (%0d errored), h2c_pkts=%0d (%0d errored)", c2h_pkts_checked, c2h_err_cnt, h2c_pkts_checked, h2c_err_cnt);
-   if (cfg_perf_mon)
-   begin
-      PERF_MON_H2C.print_results();
-      PERF_MON_C2H.print_results();
-   end
-      
-   chk_axi_prot_error();
-
    if ((h2c_err_cnt==0) && (c2h_err_cnt==0))
       $display("!!! TEST PASSED !!!");
    else
@@ -872,97 +841,4 @@ begin
       $finish;
    end
 end
-
-//----------------------------------
-// Check protocol errors
-//----------------------------------
-task chk_axi_prot_error();
-   
-   logic [31:0] rd_data;
-   logic [63:0] err_addr;
-   logic [7:0] err_id;
-   logic wr_last_incomplete;
-   logic wr_last_early;
-
-   sde.access.peek_ocl(.addr(16'h1000), .data(rd_data));
-   wr_last_early = rd_data[0];
-   wr_last_incomplete = rd_data[1];
-   
-   if (wr_last_early || wr_last_incomplete) begin
-     sde.access.peek_ocl(.addr(16'h1004), .data(rd_data));
-     err_addr[31:0] = rd_data[31:0];
-     sde.access.peek_ocl(.addr(16'h1008), .data(rd_data));
-     err_addr[63:32] = rd_data[31:0];
-     sde.access.peek_ocl(.addr(16'h100c), .data(rd_data));
-     err_id = rd_data[7:0];
-     $display($time,,,"chk_axi_prot_error: AXI Protocol Error: err_addr = 0x%016x, err_id = 0x%02x", err_addr, err_id);
-
-     // Clear the error
-     sde.access.poke_ocl(.addr(16'h1000), .data(3'h3));
-
-     sde.access.peek_ocl(.addr(16'h1000), .data(rd_data));
-     if (rd_data[1:0] != 2'b00) begin
-        $display($time,,,"chk_axi_prot_error: *** ERROR ***: Error bits did not get cleared");
-     end
-
-     c2h_err_cnt++;
-  end
-endtask
-
-//----------------------------------
-// Check Write Back Coalesce 
-//----------------------------------
-   task monitor_h2c_counters();
-
-   logic [31:0] desc_limit_host;
-   logic [31:0] desc_limit_hw;
-   logic [31:0] max_diff;
-
-      // In every clock, make sure the difference between the host copy of limit 
-      // and hardware copy of limit is not off by more than coalesce count
-      forever begin
-         @(posedge `CL_PATH.clk) 
-         if (`CL_PATH.SDE.rst_n) begin
-           max_diff = 10;//sde.cfg_h2c_wc_cnt + 3; 
-  
-           desc_limit_host = sde.access.read_host_dw(sde.cfg_h2c_cdt_limit_addr);
-           desc_limit_hw = `CL_PATH.SDE.genblk2.SDE_H2C.SDE_H2C_WB.desc_wb_limit;
-           
-           if (sde.cfg_c2h_desc_cdt_wc_en) 
-             if (desc_limit_hw - desc_limit_hw > max_diff) begin
-                $display($time,,,"chk_axi_prot_error: *** ERROR ***: H2C Desc Limit max_diff mismatch. desc_limit_host = 0x%08x, desc_limit_hw = 0x%08x, max_diff = 0x%02x", desc_limit_host, desc_limit_hw, max_diff);
-                h2c_err_cnt++;
-             end
-         end
-      end
-    endtask
-
-
-   task monitor_c2h_counters();
-
-   logic [31:0] desc_limit_host;
-   logic [31:0] desc_limit_hw;
-   logic [31:0] max_diff;
-
-      // In every clock, make sure the difference between the host copy of limit 
-      // and hardware copy of limit is not off by more than coalesce count
-
-    forever begin
-       @(posedge `CL_PATH.clk) 
-       if (`CL_PATH.SDE.rst_n) begin
-           max_diff = 10;//sde.cfg_c2h_wc_cnt; 
-           
-           desc_limit_host = sde.access.read_host_dw(sde.cfg_h2c_cdt_limit_addr);
-           desc_limit_hw = `CL_PATH.SDE.genblk1.SDE_C2H.SDE_C2H_WB.desc_wb_limit;
-           
-           if (sde.cfg_c2h_desc_cdt_wc_en) 
-             if (desc_limit_hw - desc_limit_hw > max_diff) begin
-                 $display($time,,,"chk_axi_prot_error: *** ERROR ***: C2H Desc Limit max_diff mismatch. desc_limit_host = 0x%08x, desc_limit_hw = 0x%08x, max_diff = 0x%02x", desc_limit_host, desc_limit_hw, max_diff);
-                 c2h_err_cnt++;
-           end
-       end
-    end
-
-
-endtask
 

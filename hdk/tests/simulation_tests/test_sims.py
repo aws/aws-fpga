@@ -607,3 +607,23 @@ class TestSims(AwsFpgaTestBase):
         test_type = 'c'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, Simulator=Simulator)
+
+    # cl_sde_c2h sv
+
+    def test_cl_sde__test_simple_c2h__sv(self, Simulator):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_sde/verif/scripts'
+        test_name = 'test_simple_c2h'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, Simulator=Simulator)
+
+    # cl_sde_h2c sv
+
+    def test_cl_sde__test_simple_h2c__sv(self, Simulator):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_sde/verif/scripts'
+        test_name = 'test_simple_h2c'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, Simulator=Simulator)
