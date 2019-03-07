@@ -109,5 +109,4 @@ ${CL_ROOT}/design/cl_sde.sv
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 ${HDK_COMMON_DIR}/verif/tb/sv/dma_classes.sv
-${HDK_COMMON_DIR}/verif/tb/sv/perf_mon.sv
 ${TEST_NAME}

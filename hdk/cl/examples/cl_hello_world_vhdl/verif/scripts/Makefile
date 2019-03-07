@@ -13,6 +13,11 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifndef VIVADO_TOOL_VERSION
+$(error Environment variable VIVADO_TOOL_VERSION not set. please source hdk_setup.sh)
+else
+$(info VIVADO_TOOL_VERSION = $(VIVADO_TOOL_VERSION))
+endif
 
 export TEST ?= test_null
 export C_TEST ?= test_null
@@ -25,7 +30,8 @@ export C_SRC_DIR  = $(CL_ROOT)/software/verif_rtl/src
 export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
 export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
 
-export SIM_ROOT = $(CL_ROOT)/verif/sim
+export SIM_ROOT = $(CL_ROOT)/verif/sim/$(SIMULATOR)
+
 
 ifeq ($(C_TEST),test_null)
   export SIM_DIR = $(SIM_ROOT)/$(TEST)

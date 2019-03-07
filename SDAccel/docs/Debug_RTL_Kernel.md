@@ -54,7 +54,7 @@ For example if a project has a compute unit named krnl_vadd_1, enabling chipscop
 --dk chipscope:krnl_vadd_1
 ```
 
-For detailed usage and more examples, refer to the SDAccel Debugging Guide (UG1281 v2018.2).
+For detailed usage and more examples, refer to the SDAccel Debugging Guide (UG1281 v2018.3).
 
 
 

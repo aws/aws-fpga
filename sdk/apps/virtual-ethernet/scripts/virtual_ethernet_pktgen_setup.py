@@ -23,9 +23,15 @@ import glob
 import argparse
 import subprocess
 import logging
+import platform
 
 # DPDK make config target
 make_tgt = "x86_64-native-linuxapp-gcc"
+try:
+    if "aarch64" in platform.processor():
+        make_tgt = "arm64-armv8a-linuxapp-gcc"
+except AttributeError:
+    pass
 
 dpdk_devbind = "./usertools/dpdk-devbind.py"
 num_2MB_hugepages = 16384

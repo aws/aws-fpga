@@ -140,7 +140,7 @@ There are two emulation flows that can verify the application.
 
 Set the **Active Build Configuration** to **Emulation-SW** or **Emulation-HW** to select between the Software and Hardware Emulation flow respectively.
   
-Here we are showing Hardware Emulation flow only. For Software Emulation flow idential steps are needed.   
+Here we are showing Hardware Emulation flow only.   
 	   
 Specify the emulation mode as Hardware Emulation.  
 
@@ -164,7 +164,7 @@ After the completion of Hardware emulation run, in the Reports tab, you can insp
 ![](./figure/gui_fig_12.JPG)
 
 
-The final step of the flow is to build and run the appliction on the FPGA hardware.
+The final step of the flow is to build and run the application on the FPGA hardware.
 
 # 3. Build the application to execute on FPGA hardware
 
@@ -172,7 +172,7 @@ To build the application for running on FPGA, please select **System** from **Ac
   
 Then Click on **Build** icon (similar to Emulation flow).  
   
-This process can take few hours to complete. Upon completion, you can excute the final application either through GUI (few additional steps are required) or through the command line procedure. 
+This process can take few hours to complete. Upon completion, you can execute the final application either through the GUI (few additional steps are required) or through the command line procedure. 
 
 For executing in the command line, please exit from the GUI and follow the instructions below:
 

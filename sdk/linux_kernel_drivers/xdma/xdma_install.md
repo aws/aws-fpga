@@ -34,10 +34,16 @@ __**Step 1**__: Make sure you have `gcc` and `linux kernel source code` installe
 
 __*For AmazonLinux,RedHat,Centos*__
 
+
 ```
   $ sudo yum groupinstall "Development tools"
-  $ sudo yum install kernel-devel
+  $ sudo yum install kernel kernel-devel
 ```  
+**NOTE:** 
+* If the kernel is updated, you *will* have to REBOOT your instance to allow loading the new kernel. The build will not work if the kernel version and kernel source version do not match.
+* If you see an error that looks like `make: *** /lib/modules/4.14.88-88.76.amzn2.x86_64/build: No such file or directory. Stop.
+` make sure that you have installed matching kernel and kernel-devel versions and rebooted to load the new kernel.
+
 
 __*For Ubuntu*__  
 

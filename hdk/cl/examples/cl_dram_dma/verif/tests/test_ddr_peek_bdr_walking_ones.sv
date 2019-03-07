@@ -162,9 +162,9 @@ module test_ddr_peek_bdr_walking_ones();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $display("[%t] : TEST_FAILED", $realtime);
       end else begin
-         $display("[%t] : *** TEST PASSED ***", $realtime);
+         $display("[%t] : TEST_PASSED", $realtime);
       end
       
       $finish;

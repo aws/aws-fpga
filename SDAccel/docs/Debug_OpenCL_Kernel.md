@@ -57,7 +57,7 @@ For example, to add ChipScope debugging to the helloworld_ocl OpenCL example , e
 --dk chipscope:krnl_vadd_1
 ```
 
-For detailed usage and more examples, refer to the SDAccel Debugging Guide (UG1281 v2018.2).
+For detailed usage and more examples, refer to the SDAccel Debugging Guide (UG1281 v2018.3).
 
 
 

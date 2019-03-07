@@ -15,10 +15,11 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <stdbool.h>
-
-#include <hal/fpga_common.h>
-#include <fpga_pci.h>
+#include <stddef.h>
+#include "hal/fpga_common.h"
+#include "fpga_pci.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,7 +101,7 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags);
 
 /**
- * Gets the status of an FPGA. 
+ * Gets the status of an FPGA.
  *
  * Status values are defined in fpga_common.h, see FPGA_STATUS_XYZ.
  * Status qualifier values are defined in fpga_common.h, see FPGA_ERR_XYZ.
@@ -123,7 +124,7 @@ int fpga_mgmt_get_status(int slot_id, int *status, int *status_q);
 const char *fpga_mgmt_get_status_name(int status);
 
 /**
- * Asynchronously clears the specified FPGA image slot, including FPGA 
+ * Asynchronously clears the specified FPGA image slot, including FPGA
  * internal and external memories that are used by the slot.
  *
  * @param[in]  slot_id  the logical slot index
@@ -132,9 +133,9 @@ const char *fpga_mgmt_get_status_name(int status);
 int fpga_mgmt_clear_local_image(int slot_id);
 
 /**
- * Synchronously clears the specified FPGA image slot, including FPGA 
+ * Synchronously clears the specified FPGA image slot, including FPGA
  * internal and external memories that are used by the slot.
- * A user-specified timeout may be specified as: 
+ * A user-specified timeout may be specified as:
  *		timeout (retries) * delay_msec (polling period)
  *
  * @param[in]  slot_id	the logical slot index
@@ -143,7 +144,7 @@ int fpga_mgmt_clear_local_image(int slot_id);
  * @param[in/out]  info	struct to populate with the slot description (or NULL)
  * @returns 0 on success, non-zero on error
  */
-int fpga_mgmt_clear_local_image_sync(int slot_id, 
+int fpga_mgmt_clear_local_image_sync(int slot_id,
 		uint32_t timeout, uint32_t delay_msec,
 		struct fpga_mgmt_image_info *info);
 
@@ -207,9 +208,9 @@ int fpga_mgmt_load_local_image_sync_flags(int slot_id, char *afi_id, uint32_t fl
 		struct fpga_mgmt_image_info *info);
 
 /**
- * Synchronously loads the specified FPGA image slot to the specified slot 
+ * Synchronously loads the specified FPGA image slot to the specified slot
  * number.
- * A user-specified timeout may be specified as: 
+ * A user-specified timeout may be specified as:
  *		timeout (retries) * delay_msec (polling period)
  *
  * @param[in]  opt	See fpga_mgmt_load_local_image_options

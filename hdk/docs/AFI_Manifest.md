@@ -40,6 +40,7 @@ The manifest file is a text file formatted with key=value pairs. Some keys are m
      
 | vivado tool version | field value |
 |------------------- | -----------|
+| 2018.3 |  tool_version=v2018.3 |
 | 2018.2 |  tool_version=v2018.2 | 
 | 2017.4 |  tool_version=v2017.4 |
              

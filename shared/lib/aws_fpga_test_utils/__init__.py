@@ -41,12 +41,14 @@ except ImportError as e:
 
 logger = aws_fpga_utils.get_logger(__file__)
 
+
 def get_git_repo_root(path=None):
     if not path:
         path = os.getcwd()
     repo = git.Repo(path, search_parent_directories=True)
     repo_dir = repo.git.rev_parse("--show-toplevel")
     return repo_dir
+
 
 def edma_driver_installed():
     if find_files_in_path('/lib/modules', 'edma-drv.ko'):
@@ -56,6 +58,7 @@ def edma_driver_installed():
     if os.system('/usr/sbin/lsmod | grep edma_drv') == 0:
         return True
     return False
+
 
 def remove_edma_driver():
     logger.info("Removing the edma driver")
@@ -67,6 +70,7 @@ def remove_edma_driver():
 
     assert os.system('sudo rm -f /etc/modules-load.d/edma.conf') == 0
     os.system('sudo rmmod edma-drv')
+
 
 def get_driver_mode_string(mode='poll'):
     valid_modes = {'poll', 'interrupt'}
@@ -80,6 +84,7 @@ def get_driver_mode_string(mode='poll'):
         mode_string = 'poll_mode=1'
 
     return mode_string
+
 
 # Function to install the edma driver
 def install_edma_driver(mode='poll'):
@@ -99,6 +104,7 @@ def install_edma_driver(mode='poll'):
 
     assert os.system(install_command) == 0
 
+
 def xdma_driver_installed():
     if find_files_in_path('/lib/modules', 'xdma.ko'):
         return True
@@ -109,6 +115,7 @@ def xdma_driver_installed():
     if os.path.exists('/etc/udev/rules.d/10-xdma.rules'):
         return True
     return False
+
 
 def remove_xdma_driver():
     logger.info("Removing the xdma driver.")
@@ -122,6 +129,7 @@ def remove_xdma_driver():
 
     assert os.system('sudo rm -f /etc/modules-load.d/xdma.conf') == 0
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xdma.rules') == 0
+
 
 def install_xdma_driver(mode='poll'):
     logger.info("Installing the xdma driver")
@@ -139,10 +147,12 @@ def install_xdma_driver(mode='poll'):
 
     assert os.system(install_command) == 0
 
+
 def xocl_driver_installed():
     if os.system('/usr/sbin/lsmod | grep xocl') == 0:
         return True
     return False
+
 
 def remove_xocl_driver():
     logger.info("Removing the xocl driver.")
@@ -157,6 +167,7 @@ def remove_xocl_driver():
 
     assert os.system('sudo rm -f /etc/udev/rules.d/10-xocl.rules') == 0
 
+
 def install_xocl_driver():
      logger.info("Installing the xocl driver")
      #check if xocl is already installed and install only if not present
@@ -166,19 +177,21 @@ def install_xocl_driver():
         logger.info("xocl driver is not installed. inserting")
         assert os.system("sudo insmod xocl") == 0
 
+
 def remove_all_drivers():
     # Check if the file exists
     if xdma_driver_installed():
-        logger.info("xdma driver is installed. removing for teardown")
+        logger.info("XDMA driver is installed. Removing.")
         remove_xdma_driver()
 
     if edma_driver_installed():
-        logger.info("Edma driver is installed. removing for teardown")
+        logger.info("EDMA driver is installed. Removing.")
         remove_edma_driver()
 
     if xocl_driver_installed():
-       logger.info("xocl driver is installed. removing for teardown")
+       logger.info("XOCL driver is installed. Removing.")
        remove_xocl_driver()
+
 
 class FpgaLocalImage:
     def __init__(self):
@@ -197,13 +210,13 @@ class FpgaLocalImage:
 
     def describe_local_image(self, slot):
         '''
-Example output:
-$ sudo fpga-describe-local-image -S 0 -R -H
-Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-AFI          0       agfi-09c2a21805a8b9257  loaded            0        ok               0       0x0729172b
-Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-AFIDEVICE    0       0x1d0f      0xf001      0000:00:1d.0
-'''
+        Example output:
+        $ sudo fpga-describe-local-image -S 0 -R -H
+        Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+        AFI          0       agfi-09c2a21805a8b9257  loaded            0        ok               0       0x0729172b
+        Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+        AFIDEVICE    0       0x1d0f      0xf001      0000:00:1d.0
+        '''
         p = subprocess.Popen(['sudo', 'fpga-describe-local-image', '-S', str(slot), '-R', '-H'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (stdout_lines, stderr_lines) = p.communicate()
         rc = p.returncode
@@ -214,18 +227,22 @@ AFIDEVICE    0       0x1d0f      0xf001      0000:00:1d.0
         (type2, slot2, self.vendorId, self.deviceId, self.dbdf) = stdout_lines[3].split()
         return
 
+
 def fpga_describe_local_image(slot):
     fpgaLocalImage = FpgaLocalImage()
     fpgaLocalImage.describe_local_image(slot)
     return fpgaLocalImage
 
+
 def get_instance_id():
     instance_id = urlopen('http://169.254.169.254/latest/meta-data/instance-id').read()
     return instance_id
 
+
 def get_instance_type():
     instance_type = urlopen('http://169.254.169.254/latest/meta-data/instance-type').read()
     return instance_type
+
 
 def get_num_fpga_slots(instance_type):
     if re.match('f1\.2xlarge', instance_type):
@@ -233,6 +250,7 @@ def get_num_fpga_slots(instance_type):
     elif re.match('f1\.16xlarge', instance_type):
         return 8
     return 0
+
 
 def read_clock_recipes():
     '''
@@ -284,6 +302,7 @@ def read_clock_recipes():
                     clock_name = CLOCK_RECIPES[clock_group]['clock_names'][i]
                     CLOCK_RECIPES[clock_group]['recipes'][recipe_number][clock_name] = row[i + 1]
     return CLOCK_RECIPES
+
 
 def find_files_in_path(root_folder='/lib/modules', filename='xdma.ko'):
     found_file_list=[]

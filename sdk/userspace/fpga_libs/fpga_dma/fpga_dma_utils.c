@@ -45,7 +45,6 @@ struct dma_opts_s {
 };
 
 static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num);
-static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num);
 
 static const struct dma_opts_s xdma_opts = {
     .drv_name = "xdma",
@@ -56,21 +55,12 @@ static const struct dma_opts_s xdma_opts = {
     .get_dev_number_f = fpga_dma_get_xdma_dev_number,
 };
 
-static const struct dma_opts_s edma_opts = {
-    .drv_name = "edma",
-    .drv_model_name = "edma-drv",
-    .drv_write_name = "queue",
-    .drv_read_name = "queue",
-    .n_channels = 1,
-    .get_dev_number_f = fpga_dma_get_edma_dev_number,
-};
-
 static const struct dma_opts_s *fpga_dma_get_dma_opts(
     enum fpga_dma_driver which_driver)
 {
     switch (which_driver) {
-        case FPGA_DMA_EDMA: return &edma_opts;
         case FPGA_DMA_XDMA: return &xdma_opts;
+        case FPGA_DMA_EDMA: /* edma is no longer supported */
         default: return NULL;
     }
 }
@@ -301,18 +291,6 @@ static int fpga_dma_get_xdma_dev_number(char *device_name, int *device_num)
     int rc;
     int num;
     rc = sscanf(device_name, "xdma%d_control", &num);
-    if (rc == 1) {
-        *device_num = num;
-        return 0;
-    }
-    return FPGA_ERR_SOFTWARE_PROBLEM;
-}
-
-static int fpga_dma_get_edma_dev_number(char *device_name, int *device_num)
-{
-    int rc;
-    int num;
-    rc = sscanf(device_name, "edma%d_queue_0", &num);
     if (rc == 1) {
         *device_num = num;
         return 0;

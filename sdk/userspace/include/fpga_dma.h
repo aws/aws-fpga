@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +32,7 @@ extern "C" {
 #define FPGA_DEVICE_FILE_NAME_MAX_LEN (256)
 
 enum fpga_dma_driver {
-    FPGA_DMA_EDMA,
+    FPGA_DMA_EDMA, /* edma is no longer supported */
     FPGA_DMA_XDMA,
 };
 

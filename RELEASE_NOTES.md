@@ -26,6 +26,41 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.8 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * FPGA developer kit supports Xilinx SDx/Vivado 2018.3
+    * We recommend developers upgrade to v1.4.8 to benefit from the new features, bug fixes, and optimizations. To upgrade, use [Developer AMI v1.6.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on AWS Marketplace.  The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2018.3 tools. 
+ * Ease of Use features:
+    * Support for importing results into SDx GUI - By importing results from a script-based flow into SDx IDE, developers can leverage the tools for debug/profiling while keeping flexibility of the script-based flow
+    * Vivado HLS developers can now import designs into SDAccel environment to leverage emulation, debug and run-time software
+ * New functionality:
+    * The following HLS Video Processing cores are now license free and come installed with Vivado (VPSS, Video Mixer, Video TPG, Frame Buffer WR/RD, Gamma LUT, Demosaic, VTC) 
+    * Improved XCLBIN utilities designed for automating the management of accelerator designs
+    * Incremental compile reduces build times
+    * [Python bindings for AWS FPGA MGMT Tools](sdk/userspace/python_bindings/README.md)
+
+  * Fixed Issues
+    * [Fixes printf in main of fpga_local_cmd](https://github.com/aws/aws-fpga/pull/450)
+    * [Fixes SV dma read function to work with unprintable chars](https://github.com/aws/aws-fpga/pull/412)
+    * [Fixes Segmentation Fault in cl_sde simulation test](https://forums.aws.amazon.com/thread.jspa?threadID=298946&tstart=0)
+    * [Fixes test issues in cl_dram_dma example when using the AXI memory model for faster simulations](./hdk/cl/examples/cl_dram_dma/verif/README.md)
+ 
+  * Deprecated Features
+    * As announced in HDK 1.4.6 all EDMA driver code has been removed and deprecated from the developer kit. 
+        * AWS recommends using the [XDMA](sdk/linux_kernel_drivers/xdma/README.md) driver for your applications.
+   
+  * Package versions used for validation
+  
+   | Package | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
+   |---------|------------------------|------------------------|-----------------------|
+   | OS      | Centos 7.6 | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
+   
+
+
+
+
 ## Release 1.4.7 (See [ERRATA](./ERRATA.md) for unsupported features)
 
   * Adds [Xilinx Runtime (XRT)](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5) Support for Linux kernel 3.10.0-957.1.3.el7.x86_64 & Centos 7.6
@@ -50,7 +85,7 @@
      * Please see XRT installation instructions [here](hdk/docs/SDxPatch_AR71715_and_XRT_installation_instructions.md#installing-xilinx-runtime-xrt-20182_xdfrc4)  
   * EDMA Driver is no longer supported. 
       * AWS strongly recommends moving your applications to [XDMA](sdk/linux_kernel_drivers/xdma/README.md).
-      * [EDMA Driver](sdk/linux_kernel_drivers/edma/README.md) will be fully removed from Developer kit 1.4.7+.
+      * EDMA Driver will be fully removed from Developer kit 1.4.7+.
   * Fixed Issues
     * [NULL definition include in header file](https://github.com/aws/aws-fpga/pull/414)
     * [Improved messaging for AFI builder script](https://github.com/aws/aws-fpga/pull/407)
@@ -122,7 +157,7 @@
 * Developers that choose to develop on-premises need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed. For more help, please refer to the [on-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
 * The following simulators are supported with this HDK:
 **Vivado XSIM RTL simulator
-** MentorGraphic's Questa RTL simulator (with a separate license from MentorGraphics)
+** Mentor Graphics' Questa RTL simulator (with a separate license from MentorGraphics)
 ** Synopsys' VCS RTL simulator (with a separate license from Synopsys)
 
 ## License Requirements
@@ -177,8 +212,8 @@ The following major features are included in this HDK release:
 * Multi-queue in each direction is now supported
 * The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
 * DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software 
-* A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided.
-* [EDMA Installation Readme](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidelines
+* A corresponding AWS Elastic DMA (EDMA) driver is provided.
+* EDMA Installation Readme provides installation and usage guidelines
 * See [Kernel_Drivers_README](./sdk/linux_kernel_drivers/README.md) for more information on restrictions for this release
 
 
@@ -245,7 +280,7 @@ See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_wo
 
 ### Release 1.3.5 (See [ERRATA](./ERRATA.md) for unsupported features)
   * [Amazon FPGA Images (AFIs) Tagging](hdk/docs/describe_fpga_images.md) - To help with managing AFIs, you can optionally assign your own metadata to each AFI in the form of tags. Tags are managed using the AWS EC2 CLI commands create-tags, describe-tags and delete-tags.  Tags are custom key/value pairs that can be used to identify or group EC2 resources, including AFIs.  Tags can be used as filters in the describe-fpga-images API to search and filter the AFIs based on the tags you add.
-  * [EDMA driver fixes and improvements](sdk/linux_kernel_drivers/edma/README.md), including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB).
+  * EDMA driver fixes and improvements, including polled DMA descriptor completion mode which improves performance on smaller IO (<1MB).
   * [AFI Power metrics and warnings](hdk/docs/afi_power.md) – developers can avoid power violations by monitoring metrics that provide recent FPGA power, maximum FPGA power, and average FPGA power. CL designs can use power state pins to help developers throttle CL to avoid power violation. 
   * Improved IPI 3rd party simulator support.
   * Simulation model fixes.
@@ -326,16 +361,16 @@ See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_wo
 #### 2.    Integrated DMA in Beta Release. AWS Shell now includes DMA capabilities on behalf of the CL
 * The DMA bus toward the CL is multiplexed over sh_cl_dma_pcis AXI4 interface so the same address space can be accessed via DMA or directly via PCIe AppPF BAR4 
 * DMA usage is covered in the new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma) RTL verification/simulation and Software 
-* A corresponding AWS Elastic DMA ([EDMA](./sdk/linux_kernel_drivers/edma)) driver is provided.
-* [EDMA Installation Readme](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidelines
+* A corresponding AWS Elastic DMA (EDMA) driver is provided.
+* EDMA Installation Readme provides installation and usage guidelines
 * The initial release supports a single queue in each direction
 * DMA support is in Beta stage with a known issue for DMA READ transactions that cross 4K address boundaries.  See [Kernel_Drivers_README](./sdk/linux_kernel_drivers/README.md) for more information on restrictions for this release
 
 
 #### 3.    CL  User-defined interrupt events.  The CL can now request sending MSI-X to the instance CPU
 * * Usage covered in new [CL_DRAM_DMA example](./hdk/cl/examples/cl_dram_dma)
-* A corresponding AWS EDMA driver is provided under [/sdk/linux_kernel_drivers/edma](./sdk/linux_kernel_drivers/edma)
-* [EDMA Installation](./sdk/linux_kernel_drivers/edma/edma_install.md) provides installation and usage guidlines
+* A corresponding AWS EDMA driver is provided under `/sdk/linux_kernel_drivers/edma`
+* EDMA Installation Readme provides installation and usage guidelines
 * The initial release supports a single user-defined interrupt 
 
 #### 4.    Added a Mandatory Manifest.txt file submitted with each DCP via create-fpga-image API

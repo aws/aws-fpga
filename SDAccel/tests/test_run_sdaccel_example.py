@@ -68,11 +68,7 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
 
         return
 
-    def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_all_drivers()
-
     def test_run_sdaccel_example(self, examplePath, rteName, xilinxVersion):
-        aws_fpga_test_utils.install_xocl_driver()
         os.chdir(self.get_sdaccel_example_fullpath(examplePath))
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd("make exe")

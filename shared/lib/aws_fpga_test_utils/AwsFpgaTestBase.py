@@ -305,10 +305,19 @@ class AwsFpgaTestBase(object):
         @param examplePath: Path of the Xilinx SDAccel example
         '''
         description = AwsFpgaTestBase.get_sdaccel_example_description(examplePath)
-        run_cmd = description.get("em_cmd", None)
+        if description.get("em_cmd", None):
+            run_cmd = description.get("em_cmd", None)
+        else:
+            if description.get("host_exe", None):
+                run_cmd = "./{}".format(description.get("host_exe", None))
+                if description.get("cmd_args", None):
+                   if "PROJECT" not in description.get("cmd_args", None) and "BUILD" not in description.get("cmd_args", None):
+                       run_cmd += " {}".format(description.get("cmd_args", None))
+                   else:
+                       run_cmd += " {}".format((description.get("cmd_args", None).replace("PROJECT",".")).replace("BUILD","./xclbin"))
 
-        assert run_cmd is not None, "Could not find run_cmd(em_cmd) in the example description here {}".format(examplePath)
-
+        assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(examplePath)
+        
         return run_cmd
 
     @staticmethod
@@ -433,7 +442,7 @@ class AwsFpgaTestBase(object):
         fpgaLocalImage = aws_fpga_test_utils.fpga_describe_local_image(slot)
         assert fpgaLocalImage.statusName == 'loaded', "{} FPGA StatusName != loaded: {}".format(agfi, fpgaLocalImage.statusName)
         assert fpgaLocalImage.statusCode == '0', "{} status code != 0: {}".format(agfi, fpgaLocalImage.statusCode)
-        assert fpgaLocalImage.errorName == 'ok', "{} FPGA ErrorName != ok: {}".format(agfi, fpgaLocalImage.ErrorName)
+        assert fpgaLocalImage.errorName == 'ok', "{} FPGA ErrorName != ok: {}".format(agfi, fpgaLocalImage.errorName)
         assert fpgaLocalImage.errorCode == '0', "{} ErrorCode != 0: {}".format(agfi, fpgaLocalImage.errorCode)
         assert fpgaLocalImage.agfi == agfi, "Expected {}, actual {}".format(agfi, fpgaLocalImage.agfi)
         return fpgaLocalImage
