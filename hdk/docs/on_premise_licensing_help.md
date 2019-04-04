@@ -29,14 +29,6 @@ This document helps developers who choose to develop on-premises with specifying
  * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.4_0411_1_Lin64.bin&akdm=0
  * MD5 SUM Value: e0b59c86d5ddee601ab17a069d231207
 
-## Requirements for AWS HDK 1.3.0 to 1.3.9 (2017.1_sdx)
- * Xilinx Vivado v2017.1_sdx (64-bit)
- * License: EF-VIVADO-SDX-VU9P-OP
- * SW Build 1933108 on Fri Jul 14 11:54:19 MDT 2017
- * IP Build 1908669 on Fri Jul 14 13:31:24 MDT 2017
- * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.1_sdx_0715_1_Lin64.bin&akdm=0
- * MD5 SUM Value: cfa96d3af608954eb2bc0bf4abb892f8
-
 ## Licensing Details
  * On-Premises customers may need a new or updated license
     * Existing F1 on-premises customers will not need a new license

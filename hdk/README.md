@@ -57,8 +57,8 @@
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
 |-----------|-----------|------|
-| 1.3.0-1.3.6 | 2017.1 | v1.3.5 |
-| 1.3.7-1.3.X | 2017.1 | v1.3.5-v1.3.X (Xilinx SDx 2017.1) |
+| 1.3.0-1.3.6 | 2017.1(Deprecated) | v1.3.5(Deprecated) |
+| 1.3.7-1.3.X | 2017.1(Deprecated) | v1.3.5-v1.3.X(Deprecated) |
 | 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 | 1.4.0-1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 | 1.4.3-1.4.X | 2018.2 | v1.5.0 (Xilinx SDx 2018.2) |
