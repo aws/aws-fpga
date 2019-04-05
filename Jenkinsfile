@@ -10,7 +10,6 @@ properties([parameters([
     booleanParam(name: 'test_fpga_tools',                     defaultValue: true,  description: 'Test fpga-* commands on F1'),
     booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
-    booleanParam(name: 'test_edma',                           defaultValue: true,  description: 'Run EDMA unit and perf tests'),
     booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
     booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
     booleanParam(name: 'test_py_bindings',                    defaultValue: true,  description: 'Test Python Bindings'),
@@ -36,7 +35,6 @@ boolean test_src_headers = params.get('test_src_headers')
 boolean test_hdk_scripts = params.get('test_hdk_scripts')
 boolean test_fpga_tools = params.get('test_fpga_tools')
 boolean test_sims = params.get('test_sims')
-boolean test_edma = params.get('test_edma')
 boolean test_non_root_access = params.get('test_non_root_access')
 boolean test_xdma = params.get('test_xdma')
 boolean test_py_bindings = params.get('test_py_bindings')
@@ -408,29 +406,6 @@ def test_run_non_root_access() {
     }
 }
 
-def test_edma_driver() {
-    echo "Test EDMA Driver"
-    checkout scm
-
-    String test = "sdk/tests/test_edma.py"
-    String report_file = "test_edma.xml"
-
-    try {
-        sh """
-        set -e
-        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
-        python2.7 -m pytest -v ${test} --junit-xml $WORKSPACE/${report_file}
-        """
-    } catch (exc) {
-        echo "${test} failed."
-        junit healthScaleFactor: 10.0, testResults: report_file
-        input message: "EDMA driver test failed. Click Proceed or Abort when you are done debugging on the instance."
-        throw exc
-    } finally {
-        run_junit(report_file)
-    }
-}
-
 def test_xdma_driver() {
     echo "Test XDMA Driver"
     checkout scm
@@ -556,21 +531,21 @@ if (test_sims) {
                                         module load ${questa_module}
                                         module load ${ies_module}
                                         source $WORKSPACE/hdk_setup.sh
-                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator}
                                         """
                                     } else {
                                         sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --Simulator ${simulator}
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator}
                                         """
                                     }
                                 } catch (exc) {
-                                    echo "${node_name} failed: archiving results"
-                                    archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/verif/sim/**", fingerprint: true
+                                    echo "${node_name} failed"
                                     throw exc
                                 } finally {
                                     run_junit(report_file)
+                                    archiveArtifacts artifacts: "hdk/cl/examples/${cl_name}/**/*.sim.log", fingerprint: true
                                 }
                             }
                         }
@@ -599,16 +574,6 @@ if (test_non_root_access) {
 //=============================================================================
 // Driver Tests
 //=============================================================================
-if (test_edma) {
-    all_tests['Test EDMA Driver'] = {
-        stage('Test EDMA Driver') {
-            node(get_task_label(task: 'runtime', xilinx_version: default_xilinx_version)) {
-                test_edma_driver()
-            }
-        }
-    }
-}
-
 if (test_xdma) {
     all_tests['Test XDMA Driver'] = {
         stage('Test XDMA Driver') {

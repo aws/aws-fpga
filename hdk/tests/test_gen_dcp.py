@@ -67,18 +67,19 @@ class TestGenDcp(AwsFpgaTestBase):
 
     @classmethod
     def set_allowed_warnings(cls):
+
         cls.allowed_warnings = (
             (('.*',), r'^WARNING: \[Constraints 18-838\] Failed to create SRL placer macro for cell SH/SH/MGT_TOP'),
             (('.*',), r'^CRITICAL WARNING: \[Place 30-823\] Failed to process clock nets that should have matching clock routes\. Reason: Found incompatible user defined or fixed clock roots for related clocks \'CL/SH_DDR/ddr_cores\.DDR4'),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/u_ila_reset_ctrl/asyncrounous_transfer\.arm_in_transfer_inst/dout_reg0_reg\. '),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg\[0\]\. '),
-	    (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg\. '),
+            (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg\. '),
             (('.*',), r'^CRITICAL WARNING: \[Vivado 12-1433\] Expecting a non-empty list of cells to be added to the pblock\.  Please verify the correctness of the <cells> argument. \[/home/centos/src/project_data/workspace/test_develop_manual/hdk/cl/examples/cl_dram_dma/build/constraints/cl_pnr_user\.xdc:15'),
             (('.*',), r'^CRITICAL WARNING: \[filemgmt 20-1741\] File \'axi_register_slice_v2_1_vl_rfs.v\'.*'),
             (('.*',), r'^CRITICAL WARNING: \[filemgmt 20-1741\] File \'blk_mem_gen_v8_3_vhsyn_rfs.vhd\'.*'),
             (('.*',), r'^CRITICAL WARNING: \[filemgmt 20-1741\] File \'fifo_generator_v13_1_vhsyn_rfs.vhd\'.*'),
             (('.*',), r'^CRITICAL WARNING: \[Opt 31-430\].*'),
-	    (('.*',), r'WARNING: \[Vivado 12-3731\].*'),
+            (('.*',), r'WARNING: \[Vivado 12-3731\].*'),
             (('.*',), r'WARNING: \[Constraints 18-619\] A clock with name \'CLK_300M_DIMM._DP\'.*'),
             (('.*',), r'WARNING: \[Vivado_Tcl 4-391\] The following IPs are missing output products for Implementation target. These output products could be required for synthesis, please generate the output products using the generate_target or synth_ip command before running synth_design.*'),
             (('.*',), r'WARNING: \[DRC RPBF-3\] IO port buffering.*'),
@@ -87,8 +88,8 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'WARNING: \[Vivado 12-584\] No ports matched \'tck\''),
             (('.*',), r'WARNING: \[Vivado 12-830\] No fanout objects found for'),
     	    (('.*',), r'WARNING: \[Place 30-640\] Place Check.*'),
-	    (('.*',), r'WARNING: \[BD 41-2180\] Resetting the memory initialization file.*'),
-	    (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
+            (('.*',), r'WARNING: \[BD 41-2180\] Resetting the memory initialization file.*'),
+            (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
             (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|TIMING)',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/CL_DMA_PCIS_SLV/CL_TST_DDR_B/CL_TST/sync_rst_n_reg\''),
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_microblaze_I_0\''),
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'bd_bf3f_rst_0_0\''),
@@ -98,7 +99,7 @@ class TestGenDcp(AwsFpgaTestBase):
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ddr4_core_microblaze_mcs\''),
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ddr4_core\''),
             (('cl_dram_dma_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'axi_clock_converter_0\''),
-	    (('cl_dram_dma_*',), r'WARNING: \[Synth 8-6104\] Input port \'size\' has an internal driver .*'),
+            (('cl_dram_dma_*',), r'WARNING: \[Synth 8-6104\] Input port \'size\' has an internal driver .*'),
             (('cl_dram_dma_*',), r'WARNING: \[Synth 8-6104\] Input port \'value\' has an internal driver .*'),
             (('cl_dram_dma_*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
             (('cl_dram_dma_*',), r'WARNING: \[Vivado 12-1008\] No clocks found for command.*'),
@@ -118,16 +119,17 @@ class TestGenDcp(AwsFpgaTestBase):
             (('cl_hello_world_vhdl_A.*',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'axi_clock_converter_0\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Designutils 20-262\] Invalid BRAM Mode CASC\. Setting it to the default mode RAMB18\.'),
             (('cl_uram_example.*',), r'WARNING: \[xilinx\.com:ip:blk_mem_gen:8\.[3-4]-1\] /blk_mem_gen_\d Block Memory Generator IP is configured to use UltraRAM, but UltraRAM does not support Memory Initialization.*'),
-	    (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-2507\] parameter declaration becomes local in flop_ccf with formal parameter declaration list'),
+            (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-2507\] parameter declaration becomes local in flop_ccf with formal parameter declaration list'),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Synth 8-5790\] Small sized RAM gen_wr_a\.gen_word_narrow\.mem_reg will be implemented using URAM because of explicit ram_style = \"ultra\" attribute'),
             (('cl_uram_example.*',), r'WARNING: \[Synth 8-6057\] Memory.*'),
             (('cl_uram_example.*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
-	    (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/vled_q_reg\*\'\.'),
+            (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/vled_q_reg\*\'\.'),
             (('cl_uram_example_A._B._C._[2-4]',), r'WARNING: \[Vivado 12-1421\] No ChipScope debug cores matched \'\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ila_0\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'CRITICAL WARNING: \[Designutils 20-1280\] Could not find module \'ila_vio_counter\''),
             (('cl_uram_example_A._B._C._[2-4]',), r'CRITICAL WARNING: \[Designutils 20-1281\] Could not find module \'vio_0\''),
-            )
+        )
+
         cls.allowed_warnings_regexps = []
         for allowed_warning_spec in cls.allowed_warnings:
             option_tag_regexps = []

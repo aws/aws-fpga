@@ -183,21 +183,25 @@ uint32_t glb_value;
       }
   }
 #endif
+  
+   
 
   /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
+  printf("Starting to initialize the fpga_pci library  \n");
   rc = fpga_pci_init();
-  fail_on(rc, out, "Unable to initialize the fpga_pci library");
-  
+  fail_on(rc, out, "Unable to initialize the fpga_pci library\n TEST FAILED\n");
+  printf("Done initializing the fpga_pci library  \n");
+
 #ifndef SV_TEST
   rc = check_afi_ready(slot_id);
+  fail_on(rc, out, "AFI not ready");
 #endif
 
-  fail_on(rc, out, "AFI not ready");
-  
+    
   /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
-
+  printf("Starting Accessing the CL registers via AppPF BAR0 \n");
   rc = uram_example(slot_id, FPGA_APP_PF, APP_PF_BAR0, value);
-  fail_on(rc, out, "peek-poke example failed");
+  fail_on(rc, out, "peek-poke example failed\n TEST FAILED\n");
 
 #ifndef SV_TEST
   return rc;
@@ -207,6 +211,12 @@ out:
 #else
 
 out:
+  if (rc != 0) {
+        printf("TEST_FAILED \n");
+    }
+    else {
+        printf("TEST_PASSED \n");
+    }
    #ifdef INT_MAIN
    *exit_code = 0;
    return 0;
@@ -240,9 +250,9 @@ int uram_example(int slot_id, int pf_id, int bar_id, uint32_t value) {
   // As HW simulation test is not run on a AFI, the below function is not valid
 #ifndef SV_TEST
   rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
+  fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 #endif
 
-  fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
   // Write
   printf("Writing 0x%08x\n", value);

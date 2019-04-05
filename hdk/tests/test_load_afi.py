@@ -70,9 +70,6 @@ class TestLoadAfi(AwsFpgaTestBase):
     def setup_method(self, test_method):
         aws_fpga_test_utils.remove_all_drivers()
 
-    def teardown_method(self, test_method):
-        aws_fpga_test_utils.remove_all_drivers()
-
     def get_agfi(self, cl, xilinxVersion, option_tag):
         '''
         On Jenkins the afi_id_filename will be restored using unstash.

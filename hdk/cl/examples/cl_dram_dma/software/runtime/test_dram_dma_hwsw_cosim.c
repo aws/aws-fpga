@@ -157,7 +157,6 @@ int dma_example_hwsw_cosim(int slot_id, size_t buffer_size)
     }
 
     printf("Memory has been allocated, initializing DMA and filling the buffer...\n");
-
 #if !defined(SV_TEST)
     read_fd = fpga_dma_open_queue(FPGA_DMA_XDMA, slot_id,
         /*channel*/ 0, /*is_read*/ true);
@@ -168,26 +167,27 @@ int dma_example_hwsw_cosim(int slot_id, size_t buffer_size)
     fail_on((rc = (write_fd < 0) ? -1 : 0), out, "unable to open write dma queue");
 #else
     setup_send_rdbuf_to_c(read_buffer, buffer_size);
+    printf("Starting DDR init...\n");
     init_ddr();
+    printf("Done DDR init...\n");
 #endif
+    printf("filling buffer with  random data...\n") ;
 
     rc = fill_buffer_urandom(write_buffer, buffer_size);
-    fail_on(rc, out, "unabled to initialize buffer");
+    fail_on(rc, out, "unable to initialize buffer");
 
     printf("Now performing the DMA transactions...\n");
-
     for (dimm = 0; dimm < 4; dimm++) {
         rc = do_dma_write(write_fd, write_buffer, buffer_size,
-            dimm * MEM_16G, slot_id, dimm);
+            dimm * MEM_16G, dimm, slot_id);
         fail_on(rc, out, "DMA write failed on DIMM: %d", dimm);
     }
 
     bool passed = true;
     for (dimm = 0; dimm < 4; dimm++) {
         rc = do_dma_read(read_fd, read_buffer, buffer_size,
-            dimm * MEM_16G, slot_id, dimm);
+            dimm * MEM_16G, dimm, slot_id);
         fail_on(rc, out, "DMA read failed on DIMM: %d", dimm);
-
         uint64_t differ = buffer_compare(read_buffer, write_buffer, buffer_size);
         if (differ != 0) {
             log_error("DIMM %d failed with %lu bytes which differ", dimm, differ);
@@ -221,7 +221,7 @@ static inline int do_dma_read(int fd, uint8_t *buffer, size_t size,
     uint64_t address, int channel, int slot_id)
 {
 #if defined(SV_TEST)
-    sv_fpga_start_cl_to_buffer(slot_id, channel, size, address);
+    sv_fpga_start_cl_to_buffer(slot_id, channel, size, (uint64_t) buffer, address);
     return 0;
 #else
     return fpga_dma_burst_read(fd, buffer, size, address);
@@ -232,7 +232,7 @@ static inline int do_dma_write(int fd, uint8_t *buffer, size_t size,
     uint64_t address, int channel, int slot_id)
 {
 #if defined(SV_TEST)
-    sv_fpga_start_buffer_to_cl(slot_id, channel, size, buffer, address);
+    sv_fpga_start_buffer_to_cl(slot_id, channel, size, (uint64_t) buffer, address);
     return 0;
 #else
     return fpga_dma_burst_write(fd, buffer, size, address);

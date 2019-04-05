@@ -71,7 +71,8 @@ uint64_t buffer_compare(uint8_t *bufa, uint8_t *bufb,
     size_t i;
     uint64_t differ = 0;
     for (i = 0; i < buffer_size; ++i) {
-        if (bufa[i] != bufb[i]) {
+        
+         if (bufa[i] != bufb[i]) {
             differ += 1;
         }
     }
@@ -168,7 +169,7 @@ int send_rdbuf_to_c(char* rd_buf)
 
     /* end of line character is not transferered correctly. So assign that
      * here. */
-    send_rdbuf_to_c_read_buffer[send_rdbuf_to_c_buffer_size - 1] = '\0';
+    /*send_rdbuf_to_c_read_buffer[send_rdbuf_to_c_buffer_size - 1] = '\0';*/
 
     return 0;
 }

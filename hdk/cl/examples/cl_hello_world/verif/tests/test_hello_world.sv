@@ -52,9 +52,9 @@ logic [15:0] vled_value;
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
       if (rdata == 32'h0000_BEEF) // Check for LED register read
-        $display ("TEST PASSED");
+        $display ("*** TEST PASSED ***");
       else
-        $display ("TEST FAILED");
+        $display ("*** TEST FAILED ***");
 
       vled_value = tb.get_virtual_led();
 

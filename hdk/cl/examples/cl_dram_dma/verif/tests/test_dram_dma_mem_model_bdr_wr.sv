@@ -64,7 +64,8 @@ module test_dram_dma_mem_model_bdr_wr();
 
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
-         tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[0].u_bfm.axi_mem_bdr_write(.addr(ddr_A_addr), .d(8'hAA));
+         $display("[%t]:[%d] backdoor load memory model to DDR A mapped address: addr %h data 8'hAA. \n", $realtime, i,ddr_A_addr);
+	 tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[0].u_bfm.axi_mem_bdr_write(.addr(ddr_A_addr), .d(8'hAA));
          ddr_A_addr++;
       end
 
@@ -74,7 +75,8 @@ module test_dram_dma_mem_model_bdr_wr();
 
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
-         tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[1].u_bfm.axi_mem_bdr_write(.addr(ddr_B_addr), .d(8'hBB));
+         $display("[%t]:[%d] backdoor load memory model to DDR B mapped address: addr %h data 8'hAA. \n", $realtime, i,ddr_B_addr);
+	 tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[1].u_bfm.axi_mem_bdr_write(.addr(ddr_B_addr), .d(8'hBB));
          ddr_B_addr++;
       end
 
@@ -84,7 +86,8 @@ module test_dram_dma_mem_model_bdr_wr();
 
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
-         tb.card.fpga.sh.u_mem_model.axi_mem_bdr_write(.addr(ddr_C_addr), .d(8'hCC));
+         $display("[%t]:[%d] backdoor load memory model to DDR C mapped address: addr %h data 8'hAA. \n", $realtime, i,ddr_C_addr);
+	 tb.card.fpga.sh.u_mem_model.axi_mem_bdr_write(.addr(ddr_C_addr), .d(8'hCC));
          ddr_C_addr++;
       end
 
@@ -92,6 +95,7 @@ module test_dram_dma_mem_model_bdr_wr();
 
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
+         $display("[%t]:[%d] backdoor load memory model to DDR D mapped address: addr %h data 8'hAA. \n", $realtime, i,ddr_D_addr);
          tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[2].u_bfm.axi_mem_bdr_write(.addr(ddr_D_addr), .d(8'hDD));
          ddr_D_addr++;
       end
@@ -198,9 +202,9 @@ module test_dram_dma_mem_model_bdr_wr();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $display("[%t] : TEST_FAILED", $realtime);
       end else begin
-         $display("[%t] : *** TEST PASSED ***", $realtime);
+         $display("[%t] : TEST_PASSED", $realtime);
       end
 
       $finish;
