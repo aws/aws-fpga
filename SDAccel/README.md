@@ -1,13 +1,13 @@
 # Quick Start Guide to Accelerating your C/C++ application on an AWS F1 FPGA Instance with SDAccel
 
-There are three steps for accelerating your application on an Amazon EC2 FPGA instance using the sofware-defined development flow:
+There are three steps for accelerating your application on an Amazon EC2 FPGA instance using the software-defined development flow:
 1. Build the host application, and the Xilinx FPGA binary 
 2. Create an AFI 
 3. Run the FPGA accelerated application on AWS FPGA instances
 
 ## :exclamation: If you would like to directly go to step 3 and execute your application on F1 instance follow steps in the [Hello world OpenCL Runtime example](./examples/aws/helloworld_ocl_runtime/README.md)
 
-This quick starting guide will use a simple "Hello World" SDAccel example to get you started.  
+This quick start guide will utilize our simple "Hello World" SDAccel example to get you started.  
 
 It is highly recommended you read the documentation and utilize software and hardware emulation prior to running on F1.  The F1 HW Target compile time is ~50 minutes, therefore, software and hardware emulation should be used during development.
 
@@ -47,7 +47,7 @@ It is highly recommended you read the documentation and utilize software and har
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html).  It is highly recommended that you validate your AWS IAM permissions prior to proceeding with this quick start.  By calling the [DescribeFpgaImages API](../hdk/docs/describe_fpga_images.md) you can check that your IAM permissions are correct.
 * [Setup AWS CLI and S3 Bucket](docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
 * Install optional [packages](packages.txt) required to run all examples.  If you do not install these packages, some examples may not work properly.  The setup scripts will warn you of any missing packages.
-* Additional dependancies may get flagged during the AWS SDAccel scripts as warnings or errors.
+* Additional dependencies may get flagged during the AWS SDAccel scripts as warnings or errors.
 
 <a name="gitsetenv"></a>
 ## Github and Environment Setup 
@@ -66,7 +66,7 @@ It is highly recommended you read the documentation and utilize software and har
     * This section describes the valid platforms for shell_v04261818 
       * Xilinx Tool 2017.4 Platform:
         * AWS_PLATFORM_DYNAMIC_5_0 - (Default) AWS F1 platform dynamically optimized for multi DDR use cases.   
- * Changing to a different platform can be accomplished by setting the AWS_PLATFORM environment variable. Only one platform is supported for this release Example:  
+ * Changing to a different platform can be accomplished by setting AWS_PLATFORM environment variable. Only one platform is supported for this example:  
      
    ```
        $ export AWS_PLATFORM=$AWS_PLATFORM_DYNAMIC_5_0 
@@ -86,7 +86,7 @@ The main goal of emulation is to ensure functional correctness and to determine 
 <a name="swemu"></a>
 ## Software (SW) Emulation
 
-For CPU-based (SW) emulation, both the host code and the FPGA binary code are compiled to run on an x86 processor. The SW Emulation enables developer to iterate and refine the algorithms through fast compilation. The iteration time is similar to software compile and run cycles on a CPU. 
+For CPU-based (SW) emulation, both the host code and the FPGA binary code are compiled to run on an x86 processor. The SW Emulation enables developers to iterate and refine the algorithms through fast compilation. The iteration time is similar to software compile and run cycles on a CPU. 
 
 The instructions below describe how to run the SDAccel SW Emulation flow using the Makefile provided with a simple "hello world" example
 
@@ -196,7 +196,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 Here are the steps:
 * Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatiability table](../README.md#devAmi) and [runtime compatilibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatability-table).  Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
-     * Copy the compiled host executable (exe) to new instance
+     * Copy the compiled host executable (exe) to the new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
      * Depending on the host code, the \*.awsxclbin may need to named <hostcodename>.hw.<platformname>.awsxclbin . Ex:  ```vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin```
      * Copy any data files required for execution to the new instance
@@ -210,7 +210,7 @@ Here are the steps:
 
 * Ensure the host application can find and load the \*.awsxclbin AWS FPGA binary file. 
 
-* Source the Runtime Environment & Execute your Host Application 
+* Source the Runtime Environment & Execute your Host Application: 
    ```
        $ sudo sh
        # source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step

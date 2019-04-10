@@ -68,10 +68,10 @@ For RTL sources, the RTL Kernel Wizard is used to create .xo files. Any RTL kern
 The RTL Kernel wizard creates template RTL files with legal interfaces. These template RTL files may be used or modified to create the .xo files. Existing RTL designs must fit into the top-level interface created by RTL Kernel wizard. RTL interface requirements are explained in the [SDAccel Environment User Guide] in section "Expressing a kernel in RTL". 
 
 **( D )**
-If `--compile` option is used to create .xo files, the `--link` option allows multiple compiled kernel .xo files to be linked into a single .xclbin executable file. This option is also used to link one or more RTL kernels (packaged .xo file).
+If the `--compile` option is used to create .xo files, the `--link` option allows multiple compiled kernel .xo files to be linked into a single .xclbin executable file. This option is also used to link one or more RTL kernels (packaged .xo file).
 
 **( E )**
-For emulations targets, the Emulation Configuration utility (emconfigutil) is used to link executable with a model of the hardware platform. This utility creates a file named **emconfig.json** which is used by the Xilinx runtime to look-up the platform target during host code execution. This file must be in the same directory as host executable. Refer to the chapter on "Running Software and Hardware Emulation in XOCC Flow" in [SDAccel Environment User Guide] for more details on emconfigutil. 
+For emulations targets, the Emulation Configuration utility (emconfigutil) is used to link the executable with a model of the hardware platform. This utility creates a file named **emconfig.json** which is used by the Xilinx runtime to look-up the platform target during host code execution. This file must be in the same directory as host executable. Refer to the chapter on "Running Software and Hardware Emulation in XOCC Flow" in [SDAccel Environment User Guide] for more details on emconfigutil. 
 
 <a name="methodology"></a>
 # Methodology Flow (right hand side of chart)
@@ -89,7 +89,7 @@ Software emulation confirms the functional correctness of the application. It ha
 **( 2 )**
 Iterate around the Software emulation flow to optimize the design and ensure functional correctness.
 - Adapt the host code. Verify how changes in NDrange, work group size or the use of multiple Compute Units impact the performance.
-- Adapt the code targeted to the FPGA for the impact to performance of changes such as, but not limited to, the caching of data, bursting to utilize optimum memory transfers, larger bus bitwidth for the data transfers and alternative micro-architecture explorations. 
+- Adapt the code targeted to the FPGA for the impact to performance of changes such as, but not limited to, the caching of data, bursting to utilize optimum memory transfers, larger bus bit width for the data transfers and alternative micro-architecture explorations. 
 - Continue to verify the functionality after any "host:kernel co-optimization", of the type outlined above, and ensure the optimizations did not modify the intended behavior. 
 
 Refer the [SDAccel Environment Optimization Guide] for more details on code optimizations. 
@@ -140,7 +140,7 @@ All kernels and functions selected for acceleration must be synthesizable. Full 
 - The C constructs must be of a fixed or bounded size.
 - The implementation of those constructs must be unambiguous.
 
-An example of code which **does not** conform to these guidelines is the Standard Template Library. Many of the functions use dynamic allocation and unbounded recursions to implemet the functionality. For a function to be implemendted in hardware, the sizes need to be fixed and known at compile time, as hardware cannot dynamically change during runtime. It should be understood that some C/C++ functions or OpenCL kernels are **not suitable for implementaiton in hardware**.
+An example of code which **does not** conform to these guidelines is the Standard Template Library. Many of the functions use dynamic allocation and unbounded recursions to implement the functionality. For a function to be implemented in hardware, the sizes need to be fixed and known at compile time, as hardware cannot dynamically change during runtime. It should be understood that some C/C++ functions or OpenCL kernels are **not suitable for implementation in hardware**.
 
 Examples of code which **does** implement well in hardware are video processing algorithms (HEVC, VP8, etc), encryption and compression standards (Gzip,RSA2048), database acceleration algorithms (e.g. SQL) and general mathematic and linear algebra functions (GEMM). 
 
@@ -154,13 +154,13 @@ On the other hand, if the processing on 2M samples is simply to add a constant v
 
 <a name="hls_opt"></a>
 ## Hardware Optimization
-The final aspect to consider when selecting a function to accelerate is whether the function can take advantage of hardware parallism. Custom hardware can execute many operations in parallel and all code generally benefits from hardware pipelining. However, the degree of parallelism which is possible varies. 
+The final aspect to consider when selecting a function to accelerate is whether the function can take advantage of hardware parallelism. Custom hardware can execute many operations in parallel and all code generally benefits from hardware pipelining. However, the degree of parallelism which is possible varies. 
 
-The logic operations expressed in the code will be implemented in parallel, data dependencies permitting. As an example, given 20 operations in the code, hardware will typically be able implement multiple operaiotns per clock cycle and complete in 5-10 clock cycles. 
+The logic operations expressed in the code will be implemented in parallel, data dependencies permitting. As an example, given 20 operations in the code, hardware will typically be able implement multiple operations per clock cycle and complete in 5-10 clock cycles. 
 
-In addition, tasks (loops and sub-functions) present in the code may also be executed in parallel. For example, if one iteration of a loop takes N clock cycles and the loop requires J iterations, it will require N*J clock cycles to complete all operations in the loop. If the loop is pipelined in hardware, it will take N+J+1 interations to complete all operations. If N=10 and J=2 Million, that is 20,000,000 vs 2,000,011. Code which has many seuqnential loops and sub-funcitons benefits from hardware acceleration.
+In addition, tasks (loops and sub-functions) present in the code may also be executed in parallel. For example, if one iteration of a loop takes N clock cycles and the loop requires J iterations, it will require N*J clock cycles to complete all operations in the loop. If the loop is pipelined in hardware, it will take N+J+1 iterations to complete all operations. If N=10 and J=2 Million, that is 20,000,000 vs 2,000,011. Code which has many sequential loops and sub-functions benefits from hardware acceleration.
 
-Conversely, code which is simply a few lines of basic operations, and has no tasks (loops or sub-funcitons) will simply obtain acceleration due to parallel logic functions.
+Conversely, code which is simply a few lines of basic operations, and has no tasks (loops or sub-functions) will simply obtain acceleration due to parallel logic functions.
  
 # Additional Resources
 
