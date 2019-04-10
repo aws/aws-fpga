@@ -42,6 +42,7 @@
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 ${TEST_NAME}
 
+${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/sim/dest_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/src_register_slice/sim/src_register_slice.v
@@ -83,7 +84,6 @@ ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim/sh_ddr.sv
 
 --define DISABLE_VJTAG_DEBUG
 ${CL_ROOT}/design/axil_slave.sv
-${CL_ROOT}/design/cl_dram_dma_defines.vh
 ${CL_ROOT}/design/mem_scrb.sv
 ${CL_ROOT}/design/cl_tst_scrb.sv
 ${CL_ROOT}/design/cl_tst.sv

@@ -225,8 +225,13 @@ end
       int timeout_count, status, error_count;
       logic [63:0] host_memory_buffer_address;
       logic [63:0] host_memory_ptr;
+
+`ifdef QUESTA_SIM
+      automatic bit debug = 0;
+`else
       bit debug = 0;
-      
+`endif
+
       host_memory_ptr = wr_buffer_addr;
 
       host_memory_buffer_address = 64'h0 + chan*64'h0_0000_3000;
@@ -262,8 +267,13 @@ end
       int timeout_count, status, error_count;
       logic [63:0] host_memory_buffer_address;
       logic [63:0] host_memory_ptr;
-      bit debug = 0; 
-      
+
+`ifdef QUESTA_SIM
+      automatic bit debug = 0;
+`else
+      bit debug = 0;
+`endif
+
       host_memory_ptr = rd_buffer_addr;
 
       host_memory_buffer_address = 64'h0 + (chan+1)*64'h0_0001_3000;

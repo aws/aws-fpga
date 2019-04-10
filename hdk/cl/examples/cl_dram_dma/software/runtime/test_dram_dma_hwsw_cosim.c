@@ -144,13 +144,11 @@ int dma_example_hwsw_cosim(int slot_id, size_t buffer_size)
 {
     int write_fd, read_fd, dimm, rc;
 
-    uint8_t *read_buffer = NULL;
-    uint8_t *write_buffer = NULL;
     write_fd = -1;
     read_fd = -1;
 
-    write_buffer = aligned_alloc(1 << 12, buffer_size);
-    read_buffer = aligned_alloc(1 << 12, buffer_size);
+    uint8_t *write_buffer = malloc(buffer_size);
+    uint8_t *read_buffer = malloc(buffer_size);
     if (write_buffer == NULL || read_buffer == NULL) {
         rc = -ENOMEM;
         goto out;

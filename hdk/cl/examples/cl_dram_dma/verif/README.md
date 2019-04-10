@@ -17,23 +17,6 @@ The system verilog simulation tests can be run from the [verif/scripts](scripts)
     $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 QUESTA=1 
     $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 IES=1
     
-    //To Run Simulations in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR(ECC enabled).
-    
-    //Direct ECC error injection:
-    //Injects ECC errors for read transactions with addresses in the range ECC_ADDR_LO to ECC_ADDR_HI
-    
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
-    
-    //Random ECC error injection:
-    //Injects random ECC errors for read transactions for any address range. RND_ECC_WEIGHT is the percentage of time ECC should be injected    
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
-    $ make TEST=test_dram_dma_ecc_direct AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
-     
     //To Run DDR backdoor loading tests
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 (Runs with XSIM by default)
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 VCS=1
@@ -62,24 +45,6 @@ The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) direc
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 IES=1         
-    
-    //To Run Simulations in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR(ECC enabled).
-    
-    //Direct ECC error injection:
-    //Injects ECC errors for read transactions with addresses in the range ECC_ADDR_LO to ECC_ADDR_HI
-    
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 (Runs with XSIM by default)
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 VCS=1 
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_DIRECT=1 ECC_ADDR_HI=100 ECC_ADDR_LO=0 IES=1
-    
-    //Random ECC error injection:
-    //Injects random ECC errors for read transactions for any address range. RND_ECC_WEIGHT is the percentage of time ECC should be injected.
-    
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 (Runs with XSIM by default)
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 VCS=1 
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 ECC_RAND=1 RND_ECC_WEIGHT=100 IES=1 
     
 ```
 
@@ -152,12 +117,6 @@ This test backdoor writes AXI memory model, reads through frontdoor and checks t
 
 ## test_dram_dma_mem_model_bdr_rd
 This test backdoor reads AXI memory model, writes through frontdoor and checks that the data matches.
-
-## test_dram_dma_ecc_direct
-This test does backdoor write, injects ECC erors in AXI memory model within a address range and checks that the correct number of ECC errors are injected. The model keeps a count of the slave errors when ECC is injected and that count is used in the test to check the ECC functionality of the AXI memory model.
-
-## test_dram_dma_ecc_random
-This test does backdoor write, injects random ECC errors in AXI memory model and checks that the correct number of ECC errors are injected by looking at the random ECC error injection weight.
 
 # _DDR backdoor loading_
 The tests below use backdoor loading to populate DDR memory. The description of DDR backdoor loading can be found in DDR backdoor loading support section at [RTL_Simulating_CL_Designs](../../../../docs/RTL_Simulating_CL_Designs.md)
