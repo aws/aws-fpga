@@ -43,7 +43,7 @@ Everytime Vivado is loaded, this script will always be sourced and IP integrator
 <a name="hlxinst_win"></a>
 # Windows Install
 
-Download, install, and configure the license for Vivado SDx 2017.4 or Vivado 2018.2 for Windows.  More information is provided at:
+Download, install, and configure the license for Vivado SDx 2017.4 or Vivado 2018.2 or Vivado 2018.3 for Windows.  More information is provided at:
 
 [On-Premises Licensing Help](./on_premise_licensing_help.md)
 

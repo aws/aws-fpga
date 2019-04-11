@@ -442,7 +442,7 @@ class AwsFpgaTestBase(object):
         fpgaLocalImage = aws_fpga_test_utils.fpga_describe_local_image(slot)
         assert fpgaLocalImage.statusName == 'loaded', "{} FPGA StatusName != loaded: {}".format(agfi, fpgaLocalImage.statusName)
         assert fpgaLocalImage.statusCode == '0', "{} status code != 0: {}".format(agfi, fpgaLocalImage.statusCode)
-        assert fpgaLocalImage.errorName == 'ok', "{} FPGA ErrorName != ok: {}".format(agfi, fpgaLocalImage.ErrorName)
+        assert fpgaLocalImage.errorName == 'ok', "{} FPGA ErrorName != ok: {}".format(agfi, fpgaLocalImage.errorName)
         assert fpgaLocalImage.errorCode == '0', "{} ErrorCode != 0: {}".format(agfi, fpgaLocalImage.errorCode)
         assert fpgaLocalImage.agfi == agfi, "Expected {}, actual {}".format(agfi, fpgaLocalImage.agfi)
         return fpgaLocalImage

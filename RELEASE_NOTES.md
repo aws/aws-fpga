@@ -26,6 +26,41 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.8 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * FPGA developer kit supports Xilinx SDx/Vivado 2018.3
+    * We recommend developers upgrade to v1.4.8 to benefit from the new features, bug fixes, and optimizations. To upgrade, use [Developer AMI v1.6.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on AWS Marketplace.  The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2018.3 tools. 
+ * Ease of Use features:
+    * Support for importing results into SDx GUI - By importing results from a script-based flow into SDx IDE, developers can leverage the tools for debug/profiling while keeping flexibility of the script-based flow
+    * Vivado HLS developers can now import designs into SDAccel environment to leverage emulation, debug and run-time software
+ * New functionality:
+    * The following HLS Video Processing cores are now license free and come installed with Vivado (VPSS, Video Mixer, Video TPG, Frame Buffer WR/RD, Gamma LUT, Demosaic, VTC) 
+    * Improved XCLBIN utilities designed for automating the management of accelerator designs
+    * Incremental compile reduces build times
+    * [Python bindings for AWS FPGA MGMT Tools](sdk/userspace/python_bindings/README.md)
+
+  * Fixed Issues
+    * [Fixes printf in main of fpga_local_cmd](https://github.com/aws/aws-fpga/pull/450)
+    * [Fixes SV dma read function to work with unprintable chars](https://github.com/aws/aws-fpga/pull/412)
+    * [Fixes Segmentation Fault in cl_sde simulation test](https://forums.aws.amazon.com/thread.jspa?threadID=298946&tstart=0)
+    * [Fixes test issues in cl_dram_dma example when using the AXI memory model for faster simulations](./hdk/cl/examples/cl_dram_dma/verif/README.md)
+ 
+  * Deprecated Features
+    * As announced in HDK 1.4.6 all EDMA driver code has been removed and deprecated from the developer kit. 
+        * AWS recommends using the [XDMA](sdk/linux_kernel_drivers/xdma/README.md) driver for your applications.
+   
+  * Package versions used for validation
+  
+   | Package | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
+   |---------|------------------------|------------------------|-----------------------|
+   | OS      | Centos 7.6 | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
+   
+
+
+
+
 ## Release 1.4.7 (See [ERRATA](./ERRATA.md) for unsupported features)
 
   * Adds [Xilinx Runtime (XRT)](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5) Support for Linux kernel 3.10.0-957.1.3.el7.x86_64 & Centos 7.6
@@ -122,7 +157,7 @@
 * Developers that choose to develop on-premises need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed. For more help, please refer to the [on-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
 * The following simulators are supported with this HDK:
 **Vivado XSIM RTL simulator
-** MentorGraphic's Questa RTL simulator (with a separate license from MentorGraphics)
+** Mentor Graphics' Questa RTL simulator (with a separate license from MentorGraphics)
 ** Synopsys' VCS RTL simulator (with a separate license from Synopsys)
 
 ## License Requirements
