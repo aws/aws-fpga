@@ -5,6 +5,14 @@
 
 This document helps developers who choose to develop on-premises with specifying and licensing AWS-compatible Xilinx tools for use with the AWS FPGA HDK.
 
+## Requirements for AWS HDK 1.4.8+ (2018.3)
+ * Xilinx Vivado v2018.3 or v2018.3.op (64-bit)
+ * License: EF-VIVADO-SDX-VU9P-OP
+ * SW Build 2405991 on Thu Dec  6 23:36:41 MST 2018
+ * IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+ * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_Lin_2018.3_1207_2324_Lin64.bin&akdm=0
+ * MD5 SUM Value: aa20eba36ebe480ec7ae59a4a8c85896
+ 
 ## Requirements for AWS HDK 1.4.4+ (2018.2)
  * Xilinx Vivado v2018.2 or v2018.2.op (64-bit)
  * License: EF-VIVADO-SDX-VU9P-OP
@@ -20,14 +28,6 @@ This document helps developers who choose to develop on-premises with specifying
  * IP Build 2189296 on Tue Apr 10 19:39:46 MDT 2018
  * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.4_0411_1_Lin64.bin&akdm=0
  * MD5 SUM Value: e0b59c86d5ddee601ab17a069d231207
-
-## Requirements for AWS HDK 1.3.0 to 1.3.9 (2017.1_sdx)
- * Xilinx Vivado v2017.1_sdx (64-bit)
- * License: EF-VIVADO-SDX-VU9P-OP
- * SW Build 1933108 on Fri Jul 14 11:54:19 MDT 2017
- * IP Build 1908669 on Fri Jul 14 13:31:24 MDT 2017
- * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDx_op_2017.1_sdx_0715_1_Lin64.bin&akdm=0
- * MD5 SUM Value: cfa96d3af608954eb2bc0bf4abb892f8
 
 ## Licensing Details
  * On-Premises customers may need a new or updated license

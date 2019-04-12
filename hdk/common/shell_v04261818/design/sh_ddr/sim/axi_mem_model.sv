@@ -64,6 +64,7 @@ module axi_mem_model #( parameter NUM_MEM = 3, parameter ECC_EN = 0, parameter E
          begin:bfm_inst
             axi4_slave_bfm #(.ECC_EN(ECC_EN), .ECC_ADDR_HI(ECC_ADDR_HI), .ECC_ADDR_LO(ECC_ADDR_LO), .RND_ECC_EN(RND_ECC_EN), .RND_ECC_WEIGHT(RND_ECC_WEIGHT)) u_bfm (
                .clk_core(clk_core),
+	       .rst_n(rst_n),
                .cl_sh_ddr_awid(cl_sh_ddr_awid[gi]),
                .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr[gi]),
                .cl_sh_ddr_awlen(cl_sh_ddr_awlen[gi]),

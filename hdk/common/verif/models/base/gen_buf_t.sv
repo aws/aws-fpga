@@ -112,6 +112,8 @@
          bit ret = 0;
          int cmp_length;
 
+         logic[7:0] data_elem;
+         logic[7:0] comp_data_elem;
          bit[31:0] tmp_data;
          bit[31:0] tmp_data_to;
          string tmp_s;
@@ -128,6 +130,8 @@
 
          for (int i=0; i<cmp_length; i++)
          begin
+           data_elem = this.data[i];
+           comp_data_elem = compare_to.data[i];
             if (this.data.size()<=i)
             begin
                $display($time,,,"***ERROR*** gen_buf_t buffer too short, this.data.size()=0x%x, cmp_length=0x%x", this.data.size(), cmp_length);
@@ -138,7 +142,7 @@
                $display($time,,,"***ERROR*** gen_buf_t.compare_to buffer too short, compare_to.data.size()=0x%x, cmp_length=0x%x", compare_to.data.size(), cmp_length);
                ret = 1;
             end
-            else if (this.data[i] != compare_to.data[i])
+            else if (data_elem != comp_data_elem)
             begin
                $display($time,,,"***ERROR*** gen_buf_t.compare data mismatch address[0x%x]: buf_t=0x%x, compare_to=0x%x", i, this.data[i], compare_to.data[i]);
                ret = 1;
@@ -183,12 +187,16 @@
       virtual function compare_byte_array(logic[7:0] compare_to [$], input int length=32'hffffffff);
          bit ret = 0;
          int cmp_length;
-  
+         logic[7:0] data_elem;
+         logic[7:0] comp_data_elem;
+ 
          //If length is not specified then use length of the buffer
          cmp_length = (length==32'hffffffff)? this.data.size(): length;
  
          for (int i=0; i<cmp_length; i++)
          begin
+            data_elem = this.data[i];
+            comp_data_elem = compare_to[i];
             if (this.data.size()<=i)
             begin
                $display($time,,,"***ERROR*** gen_buf_t buffer too short, this.data.size()=0x%x, cmp_length=0x%x", this.data.size(), cmp_length);
@@ -199,7 +207,7 @@
                $display($time,,,"***ERROR*** gen_buf_t.compare_to buffer too short, compare_to.data.size()=0x%x, cmp_length=0x%x", compare_to.size(), cmp_length);
                ret = 1;
             end
-            else if (this.data[i] != compare_to[i])
+            else if (data_elem != comp_data_elem)
             begin
                $display($time,,,"***ERROR*** gen_buf_t.compare data mismatch addres[0x%x]: buf_t=0x%x, compare_to=0x%x", i, this.data[i], compare_to[i]);
                ret = 1;
@@ -211,7 +219,6 @@
             end
          end
  
-   
          compare_byte_array = ret;
       endfunction
 

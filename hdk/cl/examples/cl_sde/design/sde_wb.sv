@@ -580,10 +580,9 @@ end // if (~H2C_N_C2H)
    assign desc_wb_cnt_sent = desc_wb_cnt_q;
    assign axis_wb_pkt_cnt_sent = axis_wb_pkt_cnt_q;
    assign md_wr_ptr_sent = md_wr_ptr_q;
-   
-   always_comb begin
-      dm_wb_md_comp = sde_pkg::c2h_conv_wb_reg2comp(dm_wb_md);
-   end
+  
+   assign dm_wb_md_comp = sde_pkg::c2h_conv_wb_reg2comp(dm_wb_md);
+
 
 //    assign wr_pipe_num_bytes = (req_winner == WB_METADATA) ? WB_MD_WIDTH_BYTES : 4;
 //    assign wr_pipe_num_bytes_adj = wr_pipe_num_bytes + wr_pipe_lwr_addr;

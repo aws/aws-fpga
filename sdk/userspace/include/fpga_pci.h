@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <pthread.h>
 
-#include <hal/fpga_common.h>
+#include "hal/fpga_common.h"
 
 #ifdef __cplusplus
 extern "C" {

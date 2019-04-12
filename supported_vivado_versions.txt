@@ -1,5 +1,8 @@
 Vivado v2017.4 (64-bit)
 Vivado v2017.4.op (64-bit)
 Vivado v2018.2_AR71275_op (64-bit)
+Vivado v2018.2_AR71715 (64-bit)
 Vivado v2018.2.op (64-bit)
 Vivado v2018.2 (64-bit)
+Vivado v2018.3.op (64-bit)
+Vivado v2018.3 (64-bit)

@@ -22,6 +22,7 @@ import platform
 import glob
 import argparse
 import logging
+import platform
 
 dpdk_git = "https://github.com/DPDK/dpdk.git"
 pktgen_git = "git://dpdk.org/apps/pktgen-dpdk"
@@ -43,6 +44,11 @@ patches_dir = "../patches/pktgen-dpdk/master"
 
 # DPDK make target
 make_tgt = "x86_64-native-linuxapp-gcc"
+try:
+    if "aarch64" in platform.processor():
+        make_tgt = "arm64-armv8a-linuxapp-gcc"
+except AttributeError:
+    pass
 
 # Logger
 logger = logging.getLogger('logger')
@@ -66,7 +72,7 @@ def install_dpdk_dep():
         cmd_exec("apt -y install libnuma-dev")
         cmd_exec("apt -y install libpcap-dev")
     else:
-        cmd_exec("yum -y install numactl-devel.x86_64")
+        cmd_exec("yum -y install numactl-devel")
         cmd_exec("yum -y install libpcap-devel") 
 
 def install_pktgen_dpdk(install_path):

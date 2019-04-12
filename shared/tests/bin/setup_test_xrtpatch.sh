@@ -70,6 +70,6 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
        sudo yum install -y $aws_xrt_rpm_name
        echo " XRT patch aws rpm installed successfully"
     fi
- else
-   echo "Xilinx Vivado version is $VIVADO_TOOL_VERSION "
-fi   
+else
+   echo "Xilinx Vivado version is $VIVADO_TOOL_VERSION . Proceeding with base runtime version "
+fi

@@ -60,7 +60,7 @@ import tb_type_defines_pkg::*;
       $display ("Global counter 0 value after peek is 0x%x \n", glcntr0);
       $display ("Global counter 1 value after peek is 0x%x \n", glcntr1);
 
-      $display ("TEST PASSED");
+      $display ("*** TEST PASSED ***");
       
       $finish;
    end // initial begin

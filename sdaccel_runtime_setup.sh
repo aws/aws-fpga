@@ -100,7 +100,7 @@ function check_xocl_driver {
         err_msg " XOCL Driver not installed. Please install xocl driver using below instructions"
         err_msg " If using 2017.4 Vivado toolset please source $AWS_FPGA_REPO_DIR/sdaccel_setup.sh "
         err_msg " if using 2018.2 Vivado toolset please reinstall rpm using instructions below "
-        xrt_install_instructions_2018_2
+        err_msg "Please Refer $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
         return 1
     fi
 }
@@ -167,8 +167,8 @@ check_kernel_ver
 check_xdma_driver
 check_edma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
-    info_msg "Xilinx Vivado version is 2018.2"
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* ]]; then
+    info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
     
     if [ $override == 1 ]; then
       info_msg "XRT check overide selected."
@@ -178,7 +178,9 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
 
     if [ -f "/opt/xilinx/xrt/include/version.h" ]; then
        info_msg "XRT installed. proceeding to check version compatibility"
-       xrt_build_ver=$(grep  'xrt_build_version_hash\[\]' /opt/xilinx/xrt/include/version.h | sed 's/";//' | sed 's/^.*"//')
+       xrt_build_ver=$VIVADO_TOOL_VERSION
+       xrt_build_ver+=:
+       xrt_build_ver+=$(grep  'xrt_build_version_hash\[\]' /opt/xilinx/xrt/include/version.h | sed 's/";//' | sed 's/^.*"//')
        info_msg "Installed XRT version : $xrt_build_ver"
        if grep -Fxq "$xrt_build_ver" $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
        then
@@ -189,19 +191,20 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* ]]; then
              source /opt/xilinx/xrt/setup.sh
           else
              err_msg " Cannot find /opt/xilinx/xrt/setup.sh "
-             err_msg " Please check XRT is installed correctly "  
+             err_msg " Please check XRT is installed correctly "
+	     err_msg "Please Refer $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
              return 1
           fi
           info_msg " XRT Runtime setup Done "
        else
-          err_msg "$xrt_build_ver does not match recommended version"
+          err_msg "$xrt_build_ver does not match recommended versions"
           cat $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
-          xrt_install_instructions_2018_2
+          err_msg "Please Refer $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
           return 1
        fi
     else
        err_msg "XRT not installed. Please install XRT"
-       xrt_install_instructions_2018_2
+       err_msg "Please Refer $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
        return 1
     fi
 else

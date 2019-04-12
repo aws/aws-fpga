@@ -20,8 +20,8 @@ module test_bar1();
    logic [63:0]  bar1_addr;
    logic [31:0]  bar1_data;
 
-   logic [63:0]  bar1_addr;
-   logic [31:0]  bar1_data;
+   logic [63:0]  bar1_addr1;
+   logic [31:0]  bar1_data1;
    
    logic [31:0]  read_data;
    int           timeout_count;
@@ -30,22 +30,29 @@ module test_bar1();
    int           fail;
    
    initial begin
+      $display("[%t] : Starting to power up testbench", $realtime);
       tb.power_up();
-
+      $display("[%t] : Done powering up testbench. Entering wait", $realtime);
       tb.nsec_delay(500);
-
+      $display("[%t] : Configuring ddr stats interface", $realtime);
       tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
       tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
       
+      $display("[%t] :Done configuring ddr stats interface", $realtime);
+
       bar1_addr  = 'h0;
       for (int i=0; i<64; i=i+4) begin
          bar1_addr = bar1_addr + i;
          
          bar1_data = $urandom();
+         
+	 $display("[%t] :[%d] Writing to bar1_addr %h  write_data %h.", $realtime, i, bar1_addr, bar1_data);
 
          tb.poke_bar1(.addr(bar1_addr), .data(bar1_data));
-
+          
+	 $display("[%t] :[%d] Done Writing to bar1_addr %h  write_data %h.", $realtime, i, bar1_addr, bar1_data);
+	   
          #100ns;
 
          timeout_count = 0;
@@ -59,7 +66,7 @@ module test_bar1();
             $display("[%t] : *** ERROR *** Read data mismatch for bar1 exp_data %h act_data %h.", $realtime, bar1_data, read_data);
             error_count++;
          end
-
+         
          #100ns;
          
          timeout_count = 0;
@@ -69,8 +76,10 @@ module test_bar1();
       
       #500ns;
 
-
+      $display("[%t] : Starting to power down testbench", $realtime);
+  
       tb.power_down();
+      $display("[%t] : Done power down of testbench", $realtime);
 
       //---------------------------
       // Report pass/fail status
@@ -82,9 +91,9 @@ module test_bar1();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $display("[%t] : TEST_FAILED", $realtime);
       end else begin
-         $display("[%t] : *** TEST PASSED ***", $realtime);
+         $display("[%t] : TEST_PASSED", $realtime);
       end
 
       $finish;

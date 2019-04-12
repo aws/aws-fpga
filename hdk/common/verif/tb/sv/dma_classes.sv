@@ -432,7 +432,7 @@ class sde_dma_t;
    logic [31:0] cfg_c2h_ring_size = 512;
    logic [15:0] cfg_c2h_num_md = 64;
    logic [15:0] cfg_c2h_ring_offset = 0;
-
+   bit desc_wc = 0;
 
    int h2c_total_desc = 0;                   //Total number of descriptors posted H2C
    int c2h_total_desc = 0;                   //Total number of descriptors posted C2H
@@ -487,7 +487,7 @@ class sde_dma_t;
 
       this.page_size = page_size;
       this.access = access;
-
+      this.desc_wc = access.wc;
       this.c2h_desc_size = 16;
       this.h2c_desc_size = desc_type ? 16 : 32;
       this.c2h_wb_desc_size = desc_type ? 8 : 16;
@@ -868,27 +868,27 @@ class sde_dma_t;
          //Clear out the write data
          cur_wdata_q = {};
 
-         
-	 //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
-	 this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
-	 this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
-	 if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
-	   cur_wc_length = this.cfg_desc_wc_min;
-	 else
-	   std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
+
+         //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
+         this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
+         this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
+         if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
+             cur_wc_length = this.cfg_desc_wc_min;
+         else
+             std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
 
          //If amount of data is less than write combine length, use that amount for data length
          if (this.h2c_desc_q.size<cur_wc_length)
             cur_wc_length = this.h2c_desc_q.size;
 
          //Transfer data from h2c_desc_q to cur_wdata_q;
-         for (int i=0; i<cur_wc_length; i++)
+          for (int i=0; i<cur_wc_length; i++)
             cur_wdata_q.push_back(this.h2c_desc_q.pop_front());
 
-         if (this.verbose)
+          if (this.verbose)
             $display($time,,,"sde_dma_t:    H2C_DOORBELL: CurDW=%0d, DWLeft=%0d", cur_wdata_q.size(), h2c_desc_q.size());
 
-         access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q));
+         access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
       end
       this.h2c_desc_q = {};
    endtask // h2c_doorbell
@@ -901,7 +901,7 @@ class sde_dma_t;
       int cur_wc_length;
 
       logic [31:0] cur_wdata_q[$];
-      logic 	   induce_error = 0;
+      logic     induce_error = 0;
       logic [31:0] addr1, addr2;
 
       h2c_total_desc += this.h2c_desc_q.size()/(this.h2c_desc_size/4);
@@ -915,13 +915,13 @@ class sde_dma_t;
          cur_wdata_q = {};
 
          //Get a random write combine length -- note this works with no write combine as well (just takes a bit longer)
-	 //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
-	 this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
-	 this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
-	 if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
-	   cur_wc_length = this.cfg_desc_wc_min;
-	 else
-	   std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
+         //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
+          this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
+          this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
+          if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
+             cur_wc_length = this.cfg_desc_wc_min;
+          else
+             std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
 
          //If amount of data is less than write combine length, use that amount for data length
          if (this.h2c_desc_q.size<cur_wc_length)
@@ -934,30 +934,30 @@ class sde_dma_t;
          if (this.verbose)
             $display($time,,,"sde_dma_t:    H2C_DOORBELL: CurDW=%0d, DWLeft=%0d", cur_wdata_q.size(), h2c_desc_q.size());
 
-	 if (out_of_order) begin
-	    if (induce_error == 0) begin //{
-	       //addr1 = ($urandom_range(H2C_DESC_BASE + 'h80, H2C_DESC_BASE + 16'hFC0)) & 32'hFFFF_FFC0; //64B aligned address
-	       addr1 = H2C_DESC_BASE + 'h80;
-	       access.poke(.addr(addr1), .data(cur_wdata_q));
-	       induce_error = 1;
-	    end else begin //}{
-	       //do
-	       //	 addr2 = ($urandom_range(H2C_DESC_BASE, H2C_DESC_BASE + 16'hFC0)) & 32'hFFFF_FFC0; //64B aligned address
-	       //while (addr2 < addr1);
-	       addr2 = H2C_DESC_BASE + 'h40;
-	       access.poke(.addr(addr2), .data(cur_wdata_q));
-	    end //}
-	 end else if (unalign_addr) begin
-	    if (induce_error == 0) begin //{
-	       access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q));
-	       induce_error = 1;
-	    end else begin //}{
-	       //access.poke(.addr(H2C_DESC_BASE + $urandom_range(5,63)), .data(cur_wdata_q));
-	       access.poke(.addr(H2C_DESC_BASE + 'h20), .data(cur_wdata_q));
-	    end //}
-	 end else begin
-	    access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q));
-	 end
+         if (out_of_order) begin
+            if (induce_error == 0) begin //{
+                //addr1 = ($urandom_range(H2C_DESC_BASE + 'h80, H2C_DESC_BASE + 16'hFC0)) & 32'hFFFF_FFC0; //64B aligned address
+                addr1 = H2C_DESC_BASE + 'h80;
+                access.poke(.addr(addr1), .data(cur_wdata_q), .wc(desc_wc));
+                induce_error = 1;
+            end else begin //}{
+                //do
+                //addr2 = ($urandom_range(H2C_DESC_BASE, H2C_DESC_BASE + 16'hFC0)) & 32'hFFFF_FFC0; //64B aligned address
+                //while (addr2 < addr1);
+               addr2 = H2C_DESC_BASE + 'h40;
+               access.poke(.addr(addr2), .data(cur_wdata_q), .wc(desc_wc));
+            end //}
+        end else if (unalign_addr) begin
+            if (induce_error == 0) begin //{
+              access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
+              induce_error = 1;
+            end else begin //}{
+              //access.poke(.addr(H2C_DESC_BASE + $urandom_range(5,63)), .data(cur_wdata_q), .wc(desc_wc));
+              access.poke(.addr(H2C_DESC_BASE + 'h20), .data(cur_wdata_q), .wc(desc_wc));
+            end //}
+        end else begin
+            access.poke(.addr(H2C_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
+        end
       end
       this.h2c_desc_q = {};
    endtask
@@ -982,13 +982,13 @@ class sde_dma_t;
 
          //Get a random write combine length -- note this works with no write combine as well (just takes a bit longer)
          //CHAKRA: cur_wc_length = $urandom_range(this.cfg_desc_wc_max, this.cfg_desc_wc_min);
-	 //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
-	 this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
-	 this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
-	 if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
-	   cur_wc_length = this.cfg_desc_wc_min;
-	 else
-	   std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
+         //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
+         this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
+         this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
+         if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
+            cur_wc_length = this.cfg_desc_wc_min;
+         else
+            std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
 
          //If amount of data is less than write combine length, use that amount for data length
          if (this.c2h_desc_q.size<cur_wc_length)
@@ -1000,7 +1000,7 @@ class sde_dma_t;
 
          if (this.verbose)
             $display($time,,,"sde_dma_t:    C2H_DOORBELL: CurDW=%0d, DWLeft=%0d", cur_wdata_q.size(), c2h_desc_q.size());
-         access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q));
+         access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
       end
       this.c2h_desc_q = {};
    endtask // c2h_doorbell
@@ -1012,7 +1012,7 @@ class sde_dma_t;
       int cur_wc_length;
 
       logic [31:0] cur_wdata_q[$];
-      logic 	   induce_error = 0;
+      logic     induce_error = 0;
 
       c2h_total_desc += this.c2h_desc_q.size()/(this.c2h_desc_size/4);
       if (this.verbose)
@@ -1024,13 +1024,13 @@ class sde_dma_t;
          cur_wdata_q = {};
 
          //Get a random write combine length -- note this works with no write combine as well (just takes a bit longer)
-	 //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
-	 this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
-	 this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
-	 if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
-	   cur_wc_length = this.cfg_desc_wc_min;
-	 else
-	   std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
+         //Supported DW lengths for H2C/C2H descriptors = 1DW, 4DW, 8DW
+         this.cfg_desc_wc_max = (this.cfg_desc_wc_max > 8) ? 8 : this.cfg_desc_wc_max;
+         this.cfg_desc_wc_min = (this.cfg_desc_wc_min > 8) ? 8 : this.cfg_desc_wc_min;
+         if ((this.cfg_desc_wc_min == this.cfg_desc_wc_max) && (this.cfg_desc_wc_min == 1 || this.cfg_desc_wc_min == 4 || this.cfg_desc_wc_min == 8))
+            cur_wc_length = this.cfg_desc_wc_min;
+         else
+            std::randomize(cur_wc_length) with {cur_wc_length inside {1, 4, 8};};
 
          //If amount of data is less than write combine length, use that amount for data length
          if (this.c2h_desc_q.size<cur_wc_length)
@@ -1043,23 +1043,23 @@ class sde_dma_t;
          if (this.verbose)
             $display($time,,,"sde_dma_t:    C2H_DOORBELL: CurDW=%0d, DWLeft=%0d", cur_wdata_q.size(), c2h_desc_q.size());
 
-	 if (out_of_order) begin
-	    if (induce_error == 0) begin //{
-	       access.poke(.addr(C2H_DESC_BASE + 'h80), .data(cur_wdata_q));
-	       induce_error = 1;
-	    end else begin //}{
-	       access.poke(.addr(C2H_DESC_BASE + 'h40), .data(cur_wdata_q));
-	    end //}
-	 end else if (unalign_addr) begin
-	    if (induce_error == 0) begin //{
-	       access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q));
-	       induce_error = 1;
-	    end else begin //}{
-	       access.poke(.addr(C2H_DESC_BASE + 'h20), .data(cur_wdata_q));
-	    end //}
-	 end else begin
-	    access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q));
-	 end
+         if (out_of_order) begin
+            if (induce_error == 0) begin //{
+                access.poke(.addr(C2H_DESC_BASE + 'h80), .data(cur_wdata_q), .wc(desc_wc));
+                induce_error = 1;
+            end else begin //}{
+                access.poke(.addr(C2H_DESC_BASE + 'h40), .data(cur_wdata_q), .wc(desc_wc));
+            end //}
+         end else if (unalign_addr) begin
+            if (induce_error == 0) begin //{
+                access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
+                induce_error = 1;
+            end else begin //}{
+                access.poke(.addr(C2H_DESC_BASE + 'h20), .data(cur_wdata_q), .wc(desc_wc));
+            end //}
+         end else begin
+            access.poke(.addr(C2H_DESC_BASE), .data(cur_wdata_q), .wc(desc_wc));
+         end
       end
       this.c2h_desc_q = {};
    endtask

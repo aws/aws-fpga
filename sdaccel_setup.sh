@@ -29,6 +29,7 @@ current_dir=$(pwd)
 
 source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
+source $SDACCEL_DIR/Runtime/xrt_common_functions.sh
 
 # Source sdk_setup.sh
 info_msg "Sourcing sdk_setup.sh"
@@ -170,7 +171,7 @@ setup_patches
 
 # Update Xilinx SDAccel Examples from GitHub
 info_msg "Using SDx $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* ]]; then
+if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER =~ .*2018\.3.* ]]; then
     info_msg "Updating Xilinx SDAccel Examples $RELEASE_VER"
     git submodule update --init -- SDAccel/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
@@ -182,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* ]]; then
     fi
     ln -sf $SDACCEL_DIR/examples/xilinx_$RELEASE_VER $SDACCEL_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2017.4 or 2018.2).\n" 
+   echo " $RELEASE_VER is not supported (2017.4, 2018.2 & 2018.3 are supported).\n"
    exit 2
 fi
 
@@ -286,42 +287,7 @@ function setup_dsa {
 
 
 # Start of runtime xdma driver install
-if [[ $RELEASE_VER == "2017.4" ]]; then
-    cd $SDACCEL_DIR
-    info_msg "Building SDAccel runtime"
-    if ! make ec2=1 debug=1 RELEASE_VER=$RELEASE_VER; then
-        err_msg "Build of SDAccel runtime FAILED"
-        return 1
-    fi
-    info_msg "Installing SDAccel runtime"
-        
-        export INSTALL_ROOT=/opt/Xilinx/SDx/${RELEASE_VER}.rte.dyn
-        if ! sudo make ec2=1 debug=1 INSTALL_ROOT=$INSTALL_ROOT SDK_DIR=$SDK_DIR XILINX_SDX=$XILINX_SDX SDACCEL_DIR=$SDACCEL_DIR RELEASE_VER=$RELEASE_VER DSA=xilinx_aws-vu9p-f1-04261818_dynamic_5_0 install ; then
-            err_msg "Install of SDAccel runtime FAILED"
-            return 1
-        fi
-            
-    info_msg "SDAccel runtime installed"
-    
-    cd $current_dir
-elif [[ $RELEASE_VER == "2018.2" ]]; then
-    # Check if XRT is installed  
-    if [ -e /opt/xilinx/xrt ]; then
-        export XILINX_XRT=/opt/xilinx/xrt
-        export LD_LIBRARY_PATH=$XILINX_XRT/lib:$LD_LIBRARY_PATH
-        # copy libstdc++ from $XILINX_SDX/lib
-        if [[ $(lsb_release -si) == "Ubuntu" ]]; then
-            sudo cp $XILINX_SDX/lib/lnx64.o/Ubuntu/libstdc++.so* /opt/xilinx/xrt/lib/
-        elif [[ $(lsb_release -si) == "CentOS" ]]; then
-            sudo cp $XILINX_SDX/lib/lnx64.o/Default/libstdc++.so* /opt/xilinx/xrt/lib/
-        else
-            info_msg "Unsupported OS."
-            return 1
-        fi
-    else 
-        info_msg "SDAccel runtime not installed - This is required if you are running on F1 instance."
-    fi
-fi
+setup_runtime
 
 export AWS_PLATFORM=$AWS_PLATFORM_DYNAMIC_5_0
 info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_DYNAMIC_5_0\" "

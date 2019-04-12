@@ -1,0 +1,8 @@
+{
+    "FpgaImageId": "afi-0c8210915ce9bab5c", 
+    "FpgaImageGlobalId": "agfi-046565baf5ce48c86"
+}
+
+FpgaImageId: us-east-1 : afi-0c8210915ce9bab5c
+FpgaImageId: us-west-2 : afi-01e237aa978aa74de
+FpgaImageId: eu-west-1 : afi-0370da8e8d6e7ca3d

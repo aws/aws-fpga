@@ -46,6 +46,9 @@ else
 	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_MAX
 fi
 
+# get the HDK/SDK version number
+source $TOP/../../hdk/hdk_version.txt
+
 function build_exec {
 	cd $TOP/$BUILD_DIR 
 	echo "Entering $TOP/$BUILD_DIR"
@@ -60,7 +63,7 @@ function build_exec {
 		echo "make clean failed"
 		exit 1
 	fi
-	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX""
+	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX" -DCLI_VERSION='\"$HDK_VERSION\"'"
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "make failed"

@@ -6,6 +6,7 @@
   |--------------------------------------|-----------------------------|
   | 2017.4 |	Runtime installed by sourcing "sdaccel_setup.sh" while using HDK Ver 1.4.X when environment variable    RELEASE_VER=2017.4 |
   | 2018.2 |	AWS FPGA Developer AMI 1.5.0 ( XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) |
+  | 2018.3 |    AWS FPGA Developer AMI 1.6.0 ( XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://xilinx.github.io/XRT/2018.3/html/build.html) |
 
 ## 1. Launch a Runtime Instance & Install Required Packages 
 
@@ -80,9 +81,12 @@
 
 ### **For Vivado SDX 2018.2** 
 
- please refer to [Installing the Xilinx Runtime](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) for instructions on how to install runtime on your AMI.
+ Please refer [installing Xilinx SDx 2018.2 XRT](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) for instructions on how to install XRT on your AMI.
  
+### **For Vivado SDX 2018.3**
  
+ Please refer [installing Xilinx SDx 2018.3 XRT](https://xilinx.github.io/XRT/2018.3/html/build.html) for instructions on how to install runtime on your AMI.
+
 ## 3. Install Runtime Drivers and run your FPGA accelerated application on your Runtime Instance. 
 * Log back on to the Runtime Instance:
 
