@@ -558,8 +558,10 @@ def check_headers(dir):
             "SDAccel/userspace/src/test",
             "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
             "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
+            "SDAccel/examples/aws/helloworld_ocl_runtime/sdaccel.ini",
             "SDAccel/examples/aws/helloworld_ocl_runtime/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin",
             "SDAccel/examples/aws/helloworld_ocl_runtime/2018.3/helloworld",
+            "SDAccel/examples/aws/helloworld_ocl_runtime/2018.3/sdaccel.ini",
             "SDAccel/examples/aws/helloworld_ocl_runtime/2018.3/vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin"
         ])
 
