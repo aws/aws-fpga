@@ -31,12 +31,12 @@
   ### Install on Centos/RedHat Linux using prebuilt RPM
 
  ```
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch1/xrt_201803.2.1.0_7.5.1804-xrt.rpm -o xrt_201803.2.1.0_7.5.1804-xrt.rpm
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch1/xrt_201803.2.1.0_7.5.1804-aws.rpm -o xrt_201803.2.1.0_7.5.1804-aws.rpm
+   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch1/xrt_201830.2.1.0_7.6.1810-xrt.rpm -o xrt_201830.2.1.0_7.6.1810-xrt.rpm
+   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch1/xrt_201830.2.1.0_7.6.1810-aws.rpm -o xrt_201830.2.1.0_7.6.1810-aws.rpm
    sudo yum remove -y xrt-aws
    sudo yum remove -y xrt
-   sudo yum install -y xrt_201803.2.1.0_7.5.1804-xrt.rpm
-   sudo yum install -y xrt_201803.2.1.0_7.5.1804-aws.rpm
+   sudo yum install -y xrt_201830.2.1.0_7.6.1810-xrt.rpm
+   sudo yum install -y xrt_201830.2.1.0_7.6.1810-aws.rpm
    
   ```
 
