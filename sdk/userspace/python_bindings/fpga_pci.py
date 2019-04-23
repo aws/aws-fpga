@@ -158,42 +158,13 @@ fpga_pci_get_address.argtypes = [pci_bar_handle_t, uint64_t, uint64_t, POINTER_T
 fpga_pci_memset = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_pci_memset
 fpga_pci_memset.restype = ctypes.c_int32
 fpga_pci_memset.argtypes = [pci_bar_handle_t, uint64_t, uint32_t, uint64_t]
-class union_c__UA_pthread_mutex_t(ctypes.Union):
-    pass
-
-class struct___pthread_mutex_s(ctypes.Structure):
-    pass
-
-class struct___pthread_internal_list(ctypes.Structure):
-    pass
-
-struct___pthread_internal_list._pack_ = True # source:False
-struct___pthread_internal_list._fields_ = [
-    ('__prev', POINTER_T(struct___pthread_internal_list)),
-    ('__next', POINTER_T(struct___pthread_internal_list)),
-]
-
-struct___pthread_mutex_s._pack_ = True # source:False
-struct___pthread_mutex_s._fields_ = [
-    ('__lock', ctypes.c_int32),
-    ('__count', ctypes.c_uint32),
-    ('__owner', ctypes.c_int32),
-    ('__nusers', ctypes.c_uint32),
-    ('__kind', ctypes.c_int32),
-    ('__spins', ctypes.c_int16),
-    ('__elision', ctypes.c_int16),
-    ('__list', struct___pthread_internal_list),
-]
-
-union_c__UA_pthread_mutex_t._pack_ = True # source:False
-union_c__UA_pthread_mutex_t._fields_ = [
-    ('__data', struct___pthread_mutex_s),
-    ('__size', ctypes.c_char * 40),
-    ('__align', ctypes.c_int64),
-    ('PADDING_0', ctypes.c_ubyte * 32),
-]
-
-fpga_pci_readdir_mutex = (union_c__UA_pthread_mutex_t).in_dll(_libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'], 'fpga_pci_readdir_mutex')
+fpga_pci_readdir_mutex = None # Variable union_c__UA_pthread_mutex_t
+fpga_acquire_readdir_lock = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_acquire_readdir_lock
+fpga_acquire_readdir_lock.restype = ctypes.c_int32
+fpga_acquire_readdir_lock.argtypes = []
+fpga_release_readdir_lock = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_release_readdir_lock
+fpga_release_readdir_lock.restype = ctypes.c_int32
+fpga_release_readdir_lock.argtypes = []
 
 # values for enumeration 'c__Ea_FPGA_CMD_RSVD'
 c__Ea_FPGA_CMD_RSVD__enumvalues = {
@@ -224,9 +195,13 @@ c__Ea_FPGA_ERR_OK__enumvalues = {
     16: 'FPGA_ERR_SHELL_MISMATCH',
     17: 'FPGA_ERR_POWER_VIOLATION',
     18: 'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
+    20: 'FPGA_ERR_PCI_MISSING',
+    21: 'FPGA_ERR_AFI_CMD_MALFORMED',
     22: 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     23: 'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED',
-    24: 'FPGA_ERR_END',
+    24: 'FPGA_ERR_SOFTWARE_PROBLEM',
+    25: 'FPGA_ERR_UNRESPONSIVE',
+    26: 'FPGA_ERR_END',
 }
 FPGA_ERR_OK = 0
 FPGA_ERR_AFI_CMD_BUSY = 3
@@ -238,9 +213,13 @@ FPGA_ERR_FAIL = 14
 FPGA_ERR_SHELL_MISMATCH = 16
 FPGA_ERR_POWER_VIOLATION = 17
 FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18
+FPGA_ERR_PCI_MISSING = 20
+FPGA_ERR_AFI_CMD_MALFORMED = 21
 FPGA_ERR_DRAM_DATA_RETENTION_FAILED = 22
 FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED = 23
-FPGA_ERR_END = 24
+FPGA_ERR_SOFTWARE_PROBLEM = 24
+FPGA_ERR_UNRESPONSIVE = 25
+FPGA_ERR_END = 26
 c__Ea_FPGA_ERR_OK = ctypes.c_int # enum
 
 # values for enumeration 'c__Ea_FPGA_STATUS_LOADED'
@@ -406,6 +385,41 @@ FPGA_PAP_RREADY_TIMEOUT_ERROR = 512
 FPGA_PAP_WCHANNEL_TIMEOUT_ERROR = 1024
 FPGA_PAP_ERROR_STATUS_ALL = 1918
 c__Ea_FPGA_PAP_4K_CROSS_ERROR = ctypes.c_int # enum
+class union_c__UA_pthread_mutex_t(ctypes.Union):
+    pass
+
+class struct___pthread_mutex_s(ctypes.Structure):
+    pass
+
+class struct___pthread_internal_list(ctypes.Structure):
+    pass
+
+struct___pthread_internal_list._pack_ = True # source:False
+struct___pthread_internal_list._fields_ = [
+    ('__prev', POINTER_T(struct___pthread_internal_list)),
+    ('__next', POINTER_T(struct___pthread_internal_list)),
+]
+
+struct___pthread_mutex_s._pack_ = True # source:False
+struct___pthread_mutex_s._fields_ = [
+    ('__lock', ctypes.c_int32),
+    ('__count', ctypes.c_uint32),
+    ('__owner', ctypes.c_int32),
+    ('__nusers', ctypes.c_uint32),
+    ('__kind', ctypes.c_int32),
+    ('__spins', ctypes.c_int16),
+    ('__elision', ctypes.c_int16),
+    ('__list', struct___pthread_internal_list),
+]
+
+union_c__UA_pthread_mutex_t._pack_ = True # source:False
+union_c__UA_pthread_mutex_t._fields_ = [
+    ('__data', struct___pthread_mutex_s),
+    ('__size', ctypes.c_char * 40),
+    ('__align', ctypes.c_int64),
+    ('PADDING_0', ctypes.c_ubyte * 32),
+]
+
 __all__ = \
     ['APP_PF_BAR0', 'APP_PF_BAR1', 'APP_PF_BAR4', 'APP_PF_BAR_MAX',
     'BURST_CAPABLE', 'FPGA_APP_PF', 'FPGA_ATTACH_RESERVED',
@@ -413,13 +427,15 @@ __all__ = \
     'FPGA_CMD_DRAM_DATA_RETENTION', 'FPGA_CMD_FORCE_SHELL_RELOAD',
     'FPGA_CMD_GET_HW_METRICS', 'FPGA_CMD_RSVD',
     'FPGA_ERR_AFI_CMD_API_VERSION_INVALID', 'FPGA_ERR_AFI_CMD_BUSY',
-    'FPGA_ERR_AFI_ID_INVALID', 'FPGA_ERR_CL_DDR_CALIB_FAILED',
-    'FPGA_ERR_CL_ID_MISMATCH', 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
+    'FPGA_ERR_AFI_CMD_MALFORMED', 'FPGA_ERR_AFI_ID_INVALID',
+    'FPGA_ERR_CL_DDR_CALIB_FAILED', 'FPGA_ERR_CL_ID_MISMATCH',
+    'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
     'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED', 'FPGA_ERR_END',
-    'FPGA_ERR_FAIL', 'FPGA_ERR_OK', 'FPGA_ERR_POWER_VIOLATION',
-    'FPGA_ERR_SHELL_MISMATCH', 'FPGA_INT_STATUS_ALL',
-    'FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT',
+    'FPGA_ERR_FAIL', 'FPGA_ERR_OK', 'FPGA_ERR_PCI_MISSING',
+    'FPGA_ERR_POWER_VIOLATION', 'FPGA_ERR_SHELL_MISMATCH',
+    'FPGA_ERR_SOFTWARE_PROBLEM', 'FPGA_ERR_UNRESPONSIVE',
+    'FPGA_INT_STATUS_ALL', 'FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR',
@@ -439,13 +455,14 @@ __all__ = \
     'c__Ea_FPGA_CMD_RSVD', 'c__Ea_FPGA_ERR_OK',
     'c__Ea_FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT',
     'c__Ea_FPGA_PAP_4K_CROSS_ERROR', 'c__Ea_FPGA_STATUS_LOADED',
-    'c__Ea_MGMT_PF_BAR0', 'fpga_pci_attach', 'fpga_pci_detach',
-    'fpga_pci_get_address', 'fpga_pci_get_all_slot_specs',
-    'fpga_pci_get_resource_map', 'fpga_pci_get_slot_spec',
-    'fpga_pci_init', 'fpga_pci_memset', 'fpga_pci_peek',
-    'fpga_pci_peek64', 'fpga_pci_peek8', 'fpga_pci_poke',
-    'fpga_pci_poke64', 'fpga_pci_poke8', 'fpga_pci_readdir_mutex',
-    'fpga_pci_rescan_slot_app_pfs', 'fpga_pci_write_burst',
+    'c__Ea_MGMT_PF_BAR0', 'fpga_acquire_readdir_lock',
+    'fpga_pci_attach', 'fpga_pci_detach', 'fpga_pci_get_address',
+    'fpga_pci_get_all_slot_specs', 'fpga_pci_get_resource_map',
+    'fpga_pci_get_slot_spec', 'fpga_pci_init', 'fpga_pci_memset',
+    'fpga_pci_peek', 'fpga_pci_peek64', 'fpga_pci_peek8',
+    'fpga_pci_poke', 'fpga_pci_poke64', 'fpga_pci_poke8',
+    'fpga_pci_readdir_mutex', 'fpga_pci_rescan_slot_app_pfs',
+    'fpga_pci_write_burst', 'fpga_release_readdir_lock',
     'pci_bar_handle_t', 'struct___pthread_internal_list',
     'struct___pthread_mutex_s', 'struct_afi_device_ids',
     'struct_fpga_clocks_common', 'struct_fpga_common_cfg',
