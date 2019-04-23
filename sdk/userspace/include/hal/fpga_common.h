@@ -141,7 +141,7 @@ enum {
 	((error) == FPGA_ERR_CL_ID_MISMATCH) ?				"cl-id-mismatch" : \
 	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
 	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
-	((error) == FPGA_ERR_SHELL_MISMATCH) ?			    "afi-shell-version-mismatch" : \
+	((error) == FPGA_ERR_SHELL_MISMATCH) ?			    "shell-version-not-supported" : \
 	((error) == FPGA_ERR_POWER_VIOLATION) ?			    "afi-power-violation" : \
 	((error) == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE) ? "dram-data-retention-not-possible" : \
 	((error) == FPGA_ERR_DRAM_DATA_RETENTION_FAILED) ? "dram-data-retention-failed" : \
