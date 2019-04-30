@@ -12,8 +12,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
-
-# Python bindings for management library
+# Python bindings for mgmt library
 # -*- coding: utf-8 -*-
 #
 # WORD_SIZE is: 8
@@ -24,7 +23,7 @@ import ctypes
 
 
 _libraries = {}
-_libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'] = ctypes.CDLL('PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so')
+_libraries['libfpga_mgmt.so'] = ctypes.CDLL('libfpga_mgmt.so')
 # if local wordsize is same as target, keep ctypes pointer function.
 if ctypes.sizeof(ctypes.c_void_p) == 8:
     POINTER_T = ctypes.POINTER
@@ -74,24 +73,68 @@ else:
 
 
 
-fpga_mgmt_init = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_init
+fpga_mgmt_init = _libraries['libfpga_mgmt.so'].fpga_mgmt_init
 fpga_mgmt_init.restype = ctypes.c_int32
 fpga_mgmt_init.argtypes = []
-fpga_mgmt_close = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_close
+fpga_mgmt_close = _libraries['libfpga_mgmt.so'].fpga_mgmt_close
 fpga_mgmt_close.restype = ctypes.c_int32
 fpga_mgmt_close.argtypes = []
-fpga_mgmt_strerror = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_strerror
+fpga_mgmt_strerror = _libraries['libfpga_mgmt.so'].fpga_mgmt_strerror
 fpga_mgmt_strerror.restype = POINTER_T(ctypes.c_char)
 fpga_mgmt_strerror.argtypes = [ctypes.c_int32]
+fpga_mgmt_strerror_long = _libraries['libfpga_mgmt.so'].fpga_mgmt_strerror_long
+fpga_mgmt_strerror_long.restype = POINTER_T(ctypes.c_char)
+fpga_mgmt_strerror_long.argtypes = [ctypes.c_int32]
 uint32_t = ctypes.c_uint32
-fpga_mgmt_set_cmd_timeout = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_set_cmd_timeout
+fpga_mgmt_set_cmd_timeout = _libraries['libfpga_mgmt.so'].fpga_mgmt_set_cmd_timeout
 fpga_mgmt_set_cmd_timeout.restype = None
 fpga_mgmt_set_cmd_timeout.argtypes = [uint32_t]
-fpga_mgmt_set_cmd_delay_msec = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_set_cmd_delay_msec
+fpga_mgmt_set_cmd_delay_msec = _libraries['libfpga_mgmt.so'].fpga_mgmt_set_cmd_delay_msec
 fpga_mgmt_set_cmd_delay_msec.restype = None
 fpga_mgmt_set_cmd_delay_msec.argtypes = [uint32_t]
 class struct_fpga_mgmt_image_info(ctypes.Structure):
     pass
+
+class struct_fpga_meta_ids(ctypes.Structure):
+    pass
+
+class struct_afi_device_ids(ctypes.Structure):
+    _pack_ = True # source:True
+    _fields_ = [
+    ('vendor_id', ctypes.c_uint16),
+    ('device_id', ctypes.c_uint16),
+    ('svid', ctypes.c_uint16),
+    ('ssid', ctypes.c_uint16),
+     ]
+
+struct_fpga_meta_ids._pack_ = True # source:True
+struct_fpga_meta_ids._fields_ = [
+    ('afi_id', ctypes.c_char * 64),
+    ('afi_device_ids', struct_afi_device_ids),
+]
+
+class struct_fpga_slot_spec(ctypes.Structure):
+    pass
+
+class struct_fpga_pci_resource_map(ctypes.Structure):
+    _pack_ = True # source:True
+    _fields_ = [
+    ('vendor_id', ctypes.c_uint16),
+    ('device_id', ctypes.c_uint16),
+    ('subsystem_device_id', ctypes.c_uint16),
+    ('subsystem_vendor_id', ctypes.c_uint16),
+    ('domain', ctypes.c_uint16),
+    ('bus', ctypes.c_ubyte),
+    ('dev', ctypes.c_ubyte),
+    ('func', ctypes.c_ubyte),
+    ('resource_burstable', ctypes.c_bool * 5),
+    ('resource_size', ctypes.c_uint64 * 5),
+     ]
+
+struct_fpga_slot_spec._pack_ = True # source:True
+struct_fpga_slot_spec._fields_ = [
+    ('map', struct_fpga_pci_resource_map * 2),
+]
 
 class struct_fpga_metrics_common(ctypes.Structure):
     pass
@@ -135,47 +178,8 @@ struct_fpga_metrics_common._fields_ = [
     ('power_mean', ctypes.c_uint64),
     ('power_max', ctypes.c_uint64),
     ('power', ctypes.c_uint64),
-]
-
-class struct_fpga_slot_spec(ctypes.Structure):
-    pass
-
-class struct_fpga_pci_resource_map(ctypes.Structure):
-    _pack_ = True # source:True
-    _fields_ = [
-    ('vendor_id', ctypes.c_uint16),
-    ('device_id', ctypes.c_uint16),
-    ('subsystem_device_id', ctypes.c_uint16),
-    ('subsystem_vendor_id', ctypes.c_uint16),
-    ('domain', ctypes.c_uint16),
-    ('bus', ctypes.c_ubyte),
-    ('dev', ctypes.c_ubyte),
-    ('func', ctypes.c_ubyte),
-    ('resource_burstable', ctypes.c_bool * 5),
-    ('resource_size', ctypes.c_uint64 * 5),
-     ]
-
-struct_fpga_slot_spec._pack_ = True # source:True
-struct_fpga_slot_spec._fields_ = [
-    ('map', struct_fpga_pci_resource_map * 2),
-]
-
-class struct_fpga_meta_ids(ctypes.Structure):
-    pass
-
-class struct_afi_device_ids(ctypes.Structure):
-    _pack_ = True # source:True
-    _fields_ = [
-    ('vendor_id', ctypes.c_uint16),
-    ('device_id', ctypes.c_uint16),
-    ('svid', ctypes.c_uint16),
-    ('ssid', ctypes.c_uint16),
-     ]
-
-struct_fpga_meta_ids._pack_ = True # source:True
-struct_fpga_meta_ids._fields_ = [
-    ('afi_id', ctypes.c_char * 64),
-    ('afi_device_ids', struct_afi_device_ids),
+    ('cached_agfis', ctypes.c_uint64 * 16),
+    ('flags', ctypes.c_uint64),
 ]
 
 struct_fpga_mgmt_image_info._pack_ = True # source:False
@@ -189,25 +193,25 @@ struct_fpga_mgmt_image_info._fields_ = [
     ('metrics', struct_fpga_metrics_common),
 ]
 
-fpga_mgmt_describe_local_image = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_describe_local_image
+fpga_mgmt_describe_local_image = _libraries['libfpga_mgmt.so'].fpga_mgmt_describe_local_image
 fpga_mgmt_describe_local_image.restype = ctypes.c_int32
 fpga_mgmt_describe_local_image.argtypes = [ctypes.c_int32, POINTER_T(struct_fpga_mgmt_image_info), uint32_t]
-fpga_mgmt_get_status = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_get_status
+fpga_mgmt_get_status = _libraries['libfpga_mgmt.so'].fpga_mgmt_get_status
 fpga_mgmt_get_status.restype = ctypes.c_int32
 fpga_mgmt_get_status.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_int32), POINTER_T(ctypes.c_int32)]
-fpga_mgmt_get_status_name = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_get_status_name
+fpga_mgmt_get_status_name = _libraries['libfpga_mgmt.so'].fpga_mgmt_get_status_name
 fpga_mgmt_get_status_name.restype = POINTER_T(ctypes.c_char)
 fpga_mgmt_get_status_name.argtypes = [ctypes.c_int32]
-fpga_mgmt_clear_local_image = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_clear_local_image
+fpga_mgmt_clear_local_image = _libraries['libfpga_mgmt.so'].fpga_mgmt_clear_local_image
 fpga_mgmt_clear_local_image.restype = ctypes.c_int32
 fpga_mgmt_clear_local_image.argtypes = [ctypes.c_int32]
-fpga_mgmt_clear_local_image_sync = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_clear_local_image_sync
+fpga_mgmt_clear_local_image_sync = _libraries['libfpga_mgmt.so'].fpga_mgmt_clear_local_image_sync
 fpga_mgmt_clear_local_image_sync.restype = ctypes.c_int32
 fpga_mgmt_clear_local_image_sync.argtypes = [ctypes.c_int32, uint32_t, uint32_t, POINTER_T(struct_fpga_mgmt_image_info)]
-fpga_mgmt_load_local_image = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image
+fpga_mgmt_load_local_image = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image
 fpga_mgmt_load_local_image.restype = ctypes.c_int32
 fpga_mgmt_load_local_image.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_char)]
-fpga_mgmt_load_local_image_flags = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image_flags
+fpga_mgmt_load_local_image_flags = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image_flags
 fpga_mgmt_load_local_image_flags.restype = ctypes.c_int32
 fpga_mgmt_load_local_image_flags.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_char), uint32_t]
 class union_fpga_mgmt_load_local_image_options(ctypes.Union):
@@ -230,29 +234,29 @@ union_fpga_mgmt_load_local_image_options._fields_ = [
     ('PADDING_0', ctypes.c_ubyte * 992),
 ]
 
-fpga_mgmt_init_load_local_image_options = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_init_load_local_image_options
+fpga_mgmt_init_load_local_image_options = _libraries['libfpga_mgmt.so'].fpga_mgmt_init_load_local_image_options
 fpga_mgmt_init_load_local_image_options.restype = ctypes.c_int32
 fpga_mgmt_init_load_local_image_options.argtypes = [POINTER_T(union_fpga_mgmt_load_local_image_options)]
-fpga_mgmt_load_local_image_with_options = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image_with_options
+fpga_mgmt_load_local_image_with_options = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image_with_options
 fpga_mgmt_load_local_image_with_options.restype = ctypes.c_int32
 fpga_mgmt_load_local_image_with_options.argtypes = [POINTER_T(union_fpga_mgmt_load_local_image_options)]
-fpga_mgmt_load_local_image_sync = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync
+fpga_mgmt_load_local_image_sync = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync
 fpga_mgmt_load_local_image_sync.restype = ctypes.c_int32
 fpga_mgmt_load_local_image_sync.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_char), uint32_t, uint32_t, POINTER_T(struct_fpga_mgmt_image_info)]
-fpga_mgmt_load_local_image_sync_flags = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync_flags
+fpga_mgmt_load_local_image_sync_flags = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync_flags
 fpga_mgmt_load_local_image_sync_flags.restype = ctypes.c_int32
 fpga_mgmt_load_local_image_sync_flags.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_char), uint32_t, uint32_t, uint32_t, POINTER_T(struct_fpga_mgmt_image_info)]
-fpga_mgmt_load_local_image_sync_with_options = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync_with_options
+fpga_mgmt_load_local_image_sync_with_options = _libraries['libfpga_mgmt.so'].fpga_mgmt_load_local_image_sync_with_options
 fpga_mgmt_load_local_image_sync_with_options.restype = ctypes.c_int32
 fpga_mgmt_load_local_image_sync_with_options.argtypes = [POINTER_T(union_fpga_mgmt_load_local_image_options), uint32_t, uint32_t, POINTER_T(struct_fpga_mgmt_image_info)]
-fpga_mgmt_get_vLED_status = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_get_vLED_status
+fpga_mgmt_get_vLED_status = _libraries['libfpga_mgmt.so'].fpga_mgmt_get_vLED_status
 fpga_mgmt_get_vLED_status.restype = ctypes.c_int32
 fpga_mgmt_get_vLED_status.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_uint16)]
 uint16_t = ctypes.c_uint16
-fpga_mgmt_set_vDIP = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_set_vDIP
+fpga_mgmt_set_vDIP = _libraries['libfpga_mgmt.so'].fpga_mgmt_set_vDIP
 fpga_mgmt_set_vDIP.restype = ctypes.c_int32
 fpga_mgmt_set_vDIP.argtypes = [ctypes.c_int32, uint16_t]
-fpga_mgmt_get_vDIP_status = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_mgmt_get_vDIP_status
+fpga_mgmt_get_vDIP_status = _libraries['libfpga_mgmt.so'].fpga_mgmt_get_vDIP_status
 fpga_mgmt_get_vDIP_status.restype = ctypes.c_int32
 fpga_mgmt_get_vDIP_status.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_uint16)]
 
@@ -263,14 +267,18 @@ c__Ea_FPGA_CMD_RSVD__enumvalues = {
     4: 'FPGA_CMD_CLEAR_HW_METRICS',
     8: 'FPGA_CMD_FORCE_SHELL_RELOAD',
     16: 'FPGA_CMD_DRAM_DATA_RETENTION',
-    30: 'FPGA_CMD_ALL_FLAGS',
+    64: 'FPGA_CMD_EXTENDED_METRICS_SIZE',
+    128: 'FPGA_CMD_PREFETCH',
+    222: 'FPGA_CMD_ALL_FLAGS',
 }
 FPGA_CMD_RSVD = 1
 FPGA_CMD_GET_HW_METRICS = 2
 FPGA_CMD_CLEAR_HW_METRICS = 4
 FPGA_CMD_FORCE_SHELL_RELOAD = 8
 FPGA_CMD_DRAM_DATA_RETENTION = 16
-FPGA_CMD_ALL_FLAGS = 30
+FPGA_CMD_EXTENDED_METRICS_SIZE = 64
+FPGA_CMD_PREFETCH = 128
+FPGA_CMD_ALL_FLAGS = 222
 c__Ea_FPGA_CMD_RSVD = ctypes.c_int # enum
 
 # values for enumeration 'c__Ea_FPGA_ERR_OK'
@@ -285,9 +293,14 @@ c__Ea_FPGA_ERR_OK__enumvalues = {
     16: 'FPGA_ERR_SHELL_MISMATCH',
     17: 'FPGA_ERR_POWER_VIOLATION',
     18: 'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
+    19: 'FPGA_ERR_HARDWARE_BUSY',
+    20: 'FPGA_ERR_PCI_MISSING',
+    21: 'FPGA_ERR_AFI_CMD_MALFORMED',
     22: 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     23: 'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED',
-    24: 'FPGA_ERR_END',
+    24: 'FPGA_ERR_SOFTWARE_PROBLEM',
+    25: 'FPGA_ERR_UNRESPONSIVE',
+    26: 'FPGA_ERR_END',
 }
 FPGA_ERR_OK = 0
 FPGA_ERR_AFI_CMD_BUSY = 3
@@ -299,9 +312,14 @@ FPGA_ERR_FAIL = 14
 FPGA_ERR_SHELL_MISMATCH = 16
 FPGA_ERR_POWER_VIOLATION = 17
 FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18
+FPGA_ERR_HARDWARE_BUSY = 19
+FPGA_ERR_PCI_MISSING = 20
+FPGA_ERR_AFI_CMD_MALFORMED = 21
 FPGA_ERR_DRAM_DATA_RETENTION_FAILED = 22
 FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED = 23
-FPGA_ERR_END = 24
+FPGA_ERR_SOFTWARE_PROBLEM = 24
+FPGA_ERR_UNRESPONSIVE = 25
+FPGA_ERR_END = 26
 c__Ea_FPGA_ERR_OK = ctypes.c_int # enum
 
 # values for enumeration 'c__Ea_FPGA_STATUS_LOADED'
@@ -412,15 +430,19 @@ c__Ea_FPGA_PAP_4K_CROSS_ERROR = ctypes.c_int # enum
 __all__ = \
     ['APP_PF_BAR0', 'APP_PF_BAR1', 'APP_PF_BAR4', 'APP_PF_BAR_MAX',
     'FPGA_APP_PF', 'FPGA_CMD_ALL_FLAGS', 'FPGA_CMD_CLEAR_HW_METRICS',
-    'FPGA_CMD_DRAM_DATA_RETENTION', 'FPGA_CMD_FORCE_SHELL_RELOAD',
-    'FPGA_CMD_GET_HW_METRICS', 'FPGA_CMD_RSVD',
+    'FPGA_CMD_DRAM_DATA_RETENTION', 'FPGA_CMD_EXTENDED_METRICS_SIZE',
+    'FPGA_CMD_FORCE_SHELL_RELOAD', 'FPGA_CMD_GET_HW_METRICS',
+    'FPGA_CMD_PREFETCH', 'FPGA_CMD_RSVD',
     'FPGA_ERR_AFI_CMD_API_VERSION_INVALID', 'FPGA_ERR_AFI_CMD_BUSY',
-    'FPGA_ERR_AFI_ID_INVALID', 'FPGA_ERR_CL_DDR_CALIB_FAILED',
-    'FPGA_ERR_CL_ID_MISMATCH', 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
+    'FPGA_ERR_AFI_CMD_MALFORMED', 'FPGA_ERR_AFI_ID_INVALID',
+    'FPGA_ERR_CL_DDR_CALIB_FAILED', 'FPGA_ERR_CL_ID_MISMATCH',
+    'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
     'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED', 'FPGA_ERR_END',
-    'FPGA_ERR_FAIL', 'FPGA_ERR_OK', 'FPGA_ERR_POWER_VIOLATION',
-    'FPGA_ERR_SHELL_MISMATCH', 'FPGA_INT_STATUS_ALL',
+    'FPGA_ERR_FAIL', 'FPGA_ERR_HARDWARE_BUSY', 'FPGA_ERR_OK',
+    'FPGA_ERR_PCI_MISSING', 'FPGA_ERR_POWER_VIOLATION',
+    'FPGA_ERR_SHELL_MISMATCH', 'FPGA_ERR_SOFTWARE_PROBLEM',
+    'FPGA_ERR_UNRESPONSIVE', 'FPGA_INT_STATUS_ALL',
     'FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT',
@@ -453,10 +475,10 @@ __all__ = \
     'fpga_mgmt_load_local_image_with_options',
     'fpga_mgmt_set_cmd_delay_msec', 'fpga_mgmt_set_cmd_timeout',
     'fpga_mgmt_set_vDIP', 'fpga_mgmt_strerror',
-    'struct_afi_device_ids', 'struct_fpga_clocks_common',
-    'struct_fpga_common_cfg', 'struct_fpga_ddr_if_metrics_common',
-    'struct_fpga_meta_ids', 'struct_fpga_metrics_common',
-    'struct_fpga_mgmt_image_info',
+    'fpga_mgmt_strerror_long', 'struct_afi_device_ids',
+    'struct_fpga_clocks_common', 'struct_fpga_common_cfg',
+    'struct_fpga_ddr_if_metrics_common', 'struct_fpga_meta_ids',
+    'struct_fpga_metrics_common', 'struct_fpga_mgmt_image_info',
     'struct_fpga_mgmt_load_local_image_options_0',
     'struct_fpga_pci_resource_map', 'struct_fpga_slot_spec',
     'uint16_t', 'uint32_t',

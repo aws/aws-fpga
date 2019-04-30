@@ -177,7 +177,7 @@ fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len, uint32_t flags)
 	afi_cmd_hdr_set_flags(cmd, 0);
 
 	/** Fill in cmd body; only allow specific flags to be set */
-	req->fpga_cmd_flags = flags &
+	req->fpga_cmd_flags = FPGA_CMD_EXTENDED_METRICS_SIZE | flags &
 		(FPGA_CMD_GET_HW_METRICS | FPGA_CMD_CLEAR_HW_METRICS);
 
 	*len = sizeof(struct afi_cmd_hdr) + payload_len;

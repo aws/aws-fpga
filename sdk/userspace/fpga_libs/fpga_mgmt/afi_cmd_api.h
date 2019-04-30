@@ -23,7 +23,7 @@
 
 #include <hal/fpga_common.h>
 
-#define AFI_CMD_DATA_LEN	512 
+#define AFI_CMD_DATA_LEN	4096
 
 
 #define AFI_CMD_API_MAJOR_VERSION      0x2

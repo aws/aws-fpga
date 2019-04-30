@@ -14,7 +14,7 @@
  */
 
 /** @file
- * FPGA common header 
+ * FPGA common header
  */
 
 #pragma once
@@ -25,6 +25,7 @@
 #define FPGA_SLOT_MAX           8
 #define AFI_ID_STR_MAX			64
 #define FPGA_DDR_IFS_MAX		4
+#define FPGA_CACHED_AGFIS_MAX		16
 
 /**
  * FPGA Mixed Mode Clock Manager (MMCM) config.
@@ -43,30 +44,34 @@
 enum {
 	/** reserved */
 	FPGA_CMD_RSVD = 1 << 0,
-	/** return FPGA image hardware metrics */ 
+	/** return FPGA image hardware metrics */
 	FPGA_CMD_GET_HW_METRICS = 1 << 1,
-	/** return FPGA image hardware metrics (clear on read */ 
+	/** return FPGA image hardware metrics (clear on read */
 	FPGA_CMD_CLEAR_HW_METRICS = 1 << 2,
 	FPGA_CMD_FORCE_SHELL_RELOAD = 1 << 3,
-
-
 	/** request that ddr data retention is used during load */
 	FPGA_CMD_DRAM_DATA_RETENTION = 1 << 4,
+	FPGA_CMD_EXTENDED_METRICS_SIZE = 1 << 6,
+	FPGA_CMD_PREFETCH = 1 << 7,
 
-	FPGA_CMD_ALL_FLAGS = FPGA_CMD_GET_HW_METRICS | 
+
+
+	FPGA_CMD_ALL_FLAGS = FPGA_CMD_GET_HW_METRICS |
 		FPGA_CMD_CLEAR_HW_METRICS |
 		FPGA_CMD_FORCE_SHELL_RELOAD |
-		FPGA_CMD_DRAM_DATA_RETENTION ,
+		FPGA_CMD_DRAM_DATA_RETENTION |
+		FPGA_CMD_EXTENDED_METRICS_SIZE |
+		FPGA_CMD_PREFETCH,
 };
 
 
-/** 
+/**
  * FPGA specific errors
  * e.g. as returned by fpga-load-local-image, fpga-clear-local-image,
  *   and fpga-describe-local-image.
  *
  *  -note that these must fit into an int32_t and must be positive integers.
- *  -this is compatible with the standard errno values such as -EINVAL, -EIO, 
+ *  -this is compatible with the standard errno values such as -EINVAL, -EIO,
  *  -EPERM, -ENOENT that are also used.
  *
  *  Any additions should also be added to FPGA_ERR2STR (see below).
@@ -91,7 +96,7 @@ enum {
 	/** Reserved: 6-10 */
 
 	/** Invalid AFI_CMD_API_VERSION, see afi_cmd_api.h */
-	FPGA_ERR_AFI_CMD_API_VERSION_INVALID = 11, 
+	FPGA_ERR_AFI_CMD_API_VERSION_INVALID = 11,
 	/** CL PCI IDs did not match (e.g. between LF and CL reported values */
 	FPGA_ERR_CL_ID_MISMATCH = 12,
 	/** CL DDR calibration failed */
@@ -106,6 +111,8 @@ enum {
 	/** In some cases it is possible to detect when data retention is not
 	 *  possible. This prevents the loss of data when retention cannot work. */
 	FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18,
+
+	FPGA_ERR_HARDWARE_BUSY = 19,
 
 	/** Reserved: 19 */
 
@@ -150,6 +157,7 @@ enum {
 	((error) == FPGA_ERR_SOFTWARE_PROBLEM) ?			"software-problem": \
 	((error) == FPGA_ERR_UNRESPONSIVE) ?				"unresponsive": \
 	((error) == FPGA_ERR_AFI_CMD_MALFORMED) ?			"afi-command-malformed" : \
+	((error) == FPGA_ERR_HARDWARE_BUSY) ?				"hardware-busy" : \
 														"internal-error"
 
 
@@ -160,7 +168,7 @@ enum {
  * Any additions should also be added to FPGA_STATUS2STR (see below).
  */
 enum {
-	/**< FPGA slot has an AFI loaded */ 
+	/**< FPGA slot has an AFI loaded */
 	FPGA_STATUS_LOADED = 0,
 	/**< FPGA slot is cleared */
     FPGA_STATUS_CLEARED = 1,
@@ -223,7 +231,7 @@ struct fpga_pci_resource_map {
 	uint16_t device_id;
 	uint16_t subsystem_device_id;
 	uint16_t subsystem_vendor_id;
-	
+
 	/** e.g. PCI Domain:Bus:Device.Function */
 	uint16_t  domain;
 	uint8_t   bus;
@@ -290,7 +298,7 @@ struct fpga_metrics_common {
 	uint64_t pcim_axi_protocol_error_addr;
 	uint32_t pcim_axi_protocol_error_count;
 	/** reserved */
-	uint8_t reserved2[12]; 
+	uint8_t reserved2[12];
 	/** FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT: address and count */
 	uint64_t ocl_slave_timeout_addr;
 	uint32_t ocl_slave_timeout_count;
@@ -317,6 +325,8 @@ struct fpga_metrics_common {
 	uint64_t power_mean;
 	uint64_t power_max;
 	uint64_t power;
+	uint64_t cached_agfis[FPGA_CACHED_AGFIS_MAX];
+	uint64_t flags;
 } __attribute__((packed));
 
 /** Common int_status */
@@ -336,11 +346,11 @@ enum {
 	/** CL BAR1 did not respond to cycle from host */
 	FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT = 1 << 29,
 
-	FPGA_INT_STATUS_ALL = 
+	FPGA_INT_STATUS_ALL =
 		FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT |
-		FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR | 
+		FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR |
 		FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR |
 		FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT,
@@ -358,11 +368,11 @@ enum {
 	FPGA_PAP_RREADY_TIMEOUT_ERROR = 1 << 9,
 	FPGA_PAP_WCHANNEL_TIMEOUT_ERROR = 1 << 10,
 
-	FPGA_PAP_ERROR_STATUS_ALL = 
+	FPGA_PAP_ERROR_STATUS_ALL =
 		FPGA_PAP_4K_CROSS_ERROR | FPGA_PAP_BM_EN_ERROR |
 		FPGA_PAP_REQ_SIZE_ERROR | FPGA_PAP_WR_INCOMPLETE_ERROR |
 		FPGA_PAP_FIRST_BYTE_EN_ERROR | FPGA_PAP_LAST_BYTE_EN_ERROR |
 		FPGA_PAP_BREADY_TIMEOUT_ERROR |
-		FPGA_PAP_RREADY_TIMEOUT_ERROR | 
+		FPGA_PAP_RREADY_TIMEOUT_ERROR |
 		FPGA_PAP_WCHANNEL_TIMEOUT_ERROR,
 };
