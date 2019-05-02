@@ -13,7 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-module axi4_slave_bfm
+module axi4_slave_bfm #( parameter ECC_EN = 0, parameter ECC_ADDR_HI = 'h410, parameter ECC_ADDR_LO = 'h400, parameter RND_ECC_EN = 0, parameter RND_ECC_WEIGHT = 100)
    (
 
    input clk_core,
@@ -29,19 +29,19 @@ module axi4_slave_bfm
    input[1:0] cl_sh_ddr_awburst,        //Note only INCR/WRAP supported.  If un-supported mode on this signal, will default to INCR
    //input[10:0] cl_sh_ddr_awuser,
    input cl_sh_ddr_awvalid,
-   output logic[2:0] sh_cl_ddr_awready,
+   output logic sh_cl_ddr_awready,
 
    input[15:0] cl_sh_ddr_wid,
    input[511:0] cl_sh_ddr_wdata,
    input[63:0] cl_sh_ddr_wstrb,
-   input[2:0] cl_sh_ddr_wlast,
-   input[2:0] cl_sh_ddr_wvalid,
-   output logic[2:0] sh_cl_ddr_wready,
+   input cl_sh_ddr_wlast,
+   input cl_sh_ddr_wvalid,
+   output logic sh_cl_ddr_wready,
 
    output logic[15:0] sh_cl_ddr_bid,
    output logic[1:0] sh_cl_ddr_bresp,
-   output logic[2:0] sh_cl_ddr_bvalid,
-   input[2:0] cl_sh_ddr_bready,
+   output logic sh_cl_ddr_bvalid,
+   input cl_sh_ddr_bready,
 
    input[15:0] cl_sh_ddr_arid,
    input[63:0] cl_sh_ddr_araddr,
@@ -49,15 +49,15 @@ module axi4_slave_bfm
    input[2:0] cl_sh_ddr_arsize,
    //input[10:0] cl_sh_ddr_aruser,
    input[1:0] cl_sh_ddr_arburst,     //Note only INCR/WRAP supported.  If un-supported mode on this signal, will default to INCR
-   input[2:0] cl_sh_ddr_arvalid,
-   output logic[2:0] sh_cl_ddr_arready,
+   input cl_sh_ddr_arvalid,
+   output logic sh_cl_ddr_arready,
 
    output logic[15:0] sh_cl_ddr_rid,
    output logic[511:0] sh_cl_ddr_rdata,
    output logic[1:0] sh_cl_ddr_rresp,
-   output logic[2:0] sh_cl_ddr_rlast,
-   output logic[2:0] sh_cl_ddr_rvalid,
-   input[2:0]        cl_sh_ddr_rready
+   output logic sh_cl_ddr_rlast,
+   output logic sh_cl_ddr_rvalid,
+   input        cl_sh_ddr_rready
    );
 
 `include "axi_bfm_defines.svh"
