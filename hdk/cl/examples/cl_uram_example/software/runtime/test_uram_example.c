@@ -142,7 +142,7 @@ uint32_t glb_value;
     printf("Enter your command followed by your 32 bits hexadecimal value (without 0x)\n");	
     printf("Note that only the [28:0] bits will be stored in the URAM\n");
     
-#ifndef VIVADO_SIM
+#ifndef SV_TEST
     printf("Example: find CAFE4B1D\n");
     printf("Example: del CAFE4B1D\n");
     scanf("%s %x", command, &value);
@@ -162,7 +162,7 @@ uint32_t glb_value;
   
   printf("After setting command value \n");
 
-#ifndef VIVADO_SIM
+#ifndef SV_TEST
 
   // The 3 MSB are used to encode {find, add, del} when writing to the CL
   // On a read they indicate {find_ok, del_ok, busy}

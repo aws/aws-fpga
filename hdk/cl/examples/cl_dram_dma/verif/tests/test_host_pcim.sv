@@ -147,11 +147,28 @@ module test_host_pcim();
          tb.poke_ocl(.addr(`NUM_INST), .data(32'h0000_0000));
 
          // Start writes and reads
-         tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT | `RD_START_BIT));
+         tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT));
+         //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
+	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
+         $display("[%t] : Waiting for PCIe write activity to complete", $realtime);
+         #500ns;
+         timeout_count = 0;
 
-         $display("[%t] : Waiting for PCIe write and read activity to complete", $realtime);
-         #50000ns;
-
+         do begin
+            tb.peek_ocl(.addr(`CNTL_REG), .data(read_data));
+            timeout_count++;
+         end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
+         
+         if ((timeout_count == 100) && (read_data[2:0] !== 3'b000)) begin
+            $error("[%t] : *** ERROR *** Timeout waiting for writes to complete.", $realtime);
+            error_count++;
+         end 
+           
+         tb.poke_ocl(.addr(`CNTL_REG), .data(`RD_START_BIT));
+         // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
+         $display("[%t] : Waiting for PCIe read activity to complete", $realtime);
+         #500ns;
+         
          timeout_count = 0;
          do begin
             tb.peek_ocl(.addr(`CNTL_REG), .data(read_data));
@@ -159,7 +176,7 @@ module test_host_pcim();
          end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
 
          if ((timeout_count == 100) && (read_data[2:0] !== 3'b000)) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for writes and reads to complete.", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for reads to complete.", $realtime);
             error_count++;
          end else begin
             // Stop reads and writes ([1] for reads, [0] for writes)
@@ -175,7 +192,7 @@ module test_host_pcim();
             cycle_count[63:32] = read_data;
 	    $display("[%t] :[INFO]:Write Timer Value is 0x%016x", $realtime, cycle_count);
             if (cycle_count == 64'h0) begin
-               $display("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
+               $error("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
                error_count++;
             end
 
@@ -187,7 +204,7 @@ module test_host_pcim();
             cycle_count[63:32] = read_data;
 	    $display("[%t] :[INFO]:Read Timer Value is 0x%016x", $realtime, cycle_count);
             if (cycle_count == 64'h0) begin
-               $display("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
+               $error("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
                error_count++;
             end
 
@@ -204,7 +221,7 @@ module test_host_pcim();
 	       $display("[%t] :[INFO]:Error Addr Register Value is 0x%016x", $realtime, error_addr);
                tb.peek_ocl(.addr(`RD_ERR_INDEX), .data(read_data));
                error_index = read_data[3:0];
-               $display("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
+               $error("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
                error_count++;
             end
          end // else: !if((timeout_count == 100) && (read_data[2:0] !== 3'b000))
@@ -222,7 +239,7 @@ module test_host_pcim();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end

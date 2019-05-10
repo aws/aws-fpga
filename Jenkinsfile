@@ -505,7 +505,7 @@ if (test_sims) {
                         String xilinx_version = y
                         String cl_name = x
                         String simulator = z
-                        String node_name = "Sim ${cl_name} ${xilinx_version}"
+                        String node_name = "Sim ${cl_name} ${xilinx_version} ${simulator}"
                         String key = "test_${cl_name}__"
                         String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
                         def tool_module_map = simulator_tool_default_map.get(xilinx_version)
