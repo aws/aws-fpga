@@ -1,8 +1,10 @@
 # Reducing AFI load times
 
-To support customers using multiple FPGA images in sequence, AWS strives to minimize the time to load an Amazon FPGA image (AFI). Many of these improvements will be available to users with no action required through automatic improvements to Amazon systems, but customers can use AWS F1 features like caching and [data retention](data_retention.md) to maximize AFI pipeline performance. Data retention (the -D flag) is especially valuable because it significantly reduces AFI load times, and can eliminate the time consumption of copying and reloading data from FPGA DRAM.
+To support customers using multiple FPGA images in sequence, AWS strives to minimize the time to load an Amazon FPGA image (AFI). 
+Many of these improvements will be available to users with no action required through automatic improvements to Amazon systems, but customers can use AWS F1 features like caching and [data retention](data_retention.md) to maximize AFI pipeline performance. 
+Data retention (the -D flag) is especially valuable because it significantly reduces AFI load times, and can eliminate the time consumption of copying and reloading data from FPGA DRAM.
 
-Starting in tools version XXXXX, customers can view locally cached AFIs via fpga-describe-local-image, and request AFIs be cached without actually modifying the FPGA with the -p flag in fpga-describe-local-image.
+Customers can view locally cached AFIs via fpga-describe-local-image, and request AFIs be cached without actually modifying the FPGA with the -p flag in fpga-describe-local-image.
 
 ## Caching recently used AFIs
 AWS will automatically cache the most recent 16 AFIs used on that FPGA slot. If more than 16 AFIs are loaded, the least recently used AFI will be removed from the cache. The cache will also be cleared when an FPGA slot is cleared with fpga-clear-local-image, or when an instance is stopped or terminated.
@@ -30,7 +32,7 @@ Cached agfis:
 
 ## Other load time considerations
 
-To minimize AFI load time, in addition to caching the AGFI and using data rentention (-D flag), also ensure:
+To minimize AFI load time, in addition to caching the AGFI and using data retention (-D flag), also ensure:
 
 * The AFI being loaded is on the same shell as the previous AFI
 * The AFI being loaded is using a new shell, especially shell 1.4 or above

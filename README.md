@@ -46,8 +46,8 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Tool     | Development/Runtime | Tool location | Description |
 | --------|---------|---------|---------|
-| SDx 2017.4 & 2018.2 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
-| Vivado 2017.4 & 2018.2 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
+| SDx 2017.4, 2018.2 & 2018.3 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
+| Vivado 2017.4, 2018.2 & 2018.3 | Development | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | FPGA AFI Management Tools | Runtime | [SDK - fpga\_mgmt\_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
 | Virtual JTAG | Development (Debug) | [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Runtime debug waveform |
 | wait\_for\_afi | Development | [wait\_for\_afi.py](shared/bin/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |
@@ -95,7 +95,7 @@ Before you start your first AWS FPGA design, we recommend that you go through on
 
 ### In-depth training and resources
 Once you have completed your hello world examples, we recommend diving deeper into a training workshop or application notes
- * Software-defined [re:Invent 2017 Workshop](https://github.com/awslabs/aws-fpga-app-notes/blob/master/reInvent17_Developer_Workshop/README.md) demonstrates a video encoder acceleration and how to debug and optimize your accelerator.
+ * Software-defined [re:Invent 2018 Workshop](https://github.com/awslabs/aws-fpga-app-notes/blob/master/reInvent18_Developer_Workshop/README.md) demonstrates a 2D Filter acceleration and how to debug and optimize your accelerator.
  * Custom hardware developers need to learn about how the hardware accelerator interfaces to the F1 Shell
   * [Shell Interface](hdk/docs/AWS_Shell_Interface_Specification.md)
   * [Shell Address Map](hdk/docs/AWS_Fpga_Pcie_Memory_Map.md)
@@ -108,13 +108,14 @@ Once you have completed your hello world examples, we recommend diving deeper in
 
 The [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes free tools and drivers needed for FPGA development on EC2 instances. FPGA development runs on several [EC2 instance types](https://aws.amazon.com/ec2/instance-types/). Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: z1d.xlarge, z1d.2xlarge, c5.4xlarge, m5.2xlarge, r5.xlarge, t2.2xlarge). z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively. Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
 
-Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4 and 2018.2 toolchain versions. The following compatibility table describes the mapping of currently supported developer kit versions to AMI versions:
+Currently, AWS marketplace includes multiple versions of the FPGA developer AMI, supporting Xilinx SDx 2017.4, 2018.2 and 2018.3 toolchain versions. The following compatibility table describes the mapping of currently supported developer kit versions to AMI versions:
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
 |-----------|-----------|------|
 | 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
 | 1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
 | 1.4.3+ | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
+| 1.4.8+ | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
 
 Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 

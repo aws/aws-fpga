@@ -26,8 +26,30 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.9 (See [ERRATA](./ERRATA.md) for unsupported features)
+  * New functionality:
+    * Improved AFI load times for pipelined accelerator designs. For more details please see [Amazon FPGA image (AFI) pre-fetch and caching features](./hdk/docs/load_times.md).
+
+ * Ease of Use features:
+    * [Improved SDK Error messaging](./sdk/userspace/fpga_libs/fpga_mgmt/fpga_mgmt.c)
+    * [Improved documentation](./hdk/docs/IPI_GUI_Vivado_Setup.md#switching-between-hdk-and-hlx-flows) to help with transition from [HLX to HDK command line flows](https://forums.aws.amazon.com/thread.jspa?threadID=302718&tstart=0) and vice versa
+    * Incorporates feedback from [aws-fpga Issue 458](https://github.com/aws/aws-fpga/issues/458) by making the ```init_ddr``` function, used in design simulations to initialize DDR, more generic by moving out ATG deselection logic to a new ```deselect_atg_hw``` task 
+
+ * Bug Fixes:
+    * Fixed Shell simulation model (sh_bfm) issue on PCIM AXI read data channel back pressure which was described in HDK 1.4.8 Errata.
+    * Fixed HDK simulation example which [demonstrates DMA and PCIM traffic in parallel](./hdk/cl/examples/cl_dram_dma/verif/tests/test_dma_pcim_concurrent.sv).
+
+ * Package versions used for validation
+  
+   | Package | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
+   |---------|------------------------|------------------------|-----------------------|
+   | OS      | Centos 7.6 | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
+   
 ## Release 1.4.8 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * FPGA developer kit supports Xilinx SDx/Vivado 2018.3
+ * FPGA developer kit supports Xilinx SDx/Vivado 2018.3
     * We recommend developers upgrade to v1.4.8 to benefit from the new features, bug fixes, and optimizations. To upgrade, use [Developer AMI v1.6.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on AWS Marketplace.  The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2018.3 tools. 
  * Ease of Use features:
     * Support for importing results into SDx GUI - By importing results from a script-based flow into SDx IDE, developers can leverage the tools for debug/profiling while keeping flexibility of the script-based flow
@@ -57,9 +79,6 @@
    | kernel-devel | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
    | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
    
-
-
-
 
 ## Release 1.4.7 (See [ERRATA](./ERRATA.md) for unsupported features)
 
