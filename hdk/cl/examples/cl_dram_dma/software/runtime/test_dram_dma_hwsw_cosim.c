@@ -167,6 +167,7 @@ int dma_example_hwsw_cosim(int slot_id, size_t buffer_size)
     setup_send_rdbuf_to_c(read_buffer, buffer_size);
     printf("Starting DDR init...\n");
     init_ddr();
+    deselect_atg_hw();
     printf("Done DDR init...\n");
 #endif
     printf("filling buffer with  random data...\n") ;

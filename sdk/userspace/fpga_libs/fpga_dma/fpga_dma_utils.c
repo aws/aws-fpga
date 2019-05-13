@@ -221,7 +221,7 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
      * this function, which always reads from the same directory. The man page
      * for readdir says the POSIX spec does not require threadsafety.
      */
-    pthread_mutex_lock(&fpga_pci_readdir_mutex);
+    fpga_acquire_readdir_lock();
 #endif
 
     while (true) {
@@ -263,7 +263,7 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
         /* continue... */
     }
 #if !defined(FPGA_PCI_USE_READDIR_R)
-    pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+    fpga_release_readdir_lock();
 #endif
     fail_on_with_code(_device_num == -1, err, rc, FPGA_ERR_PCI_MISSING,
         "Unable to find device num");
@@ -275,7 +275,7 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
 
 err_unlock:
 #if !defined(FPGA_PCI_USE_READDIR_R)
-    pthread_mutex_unlock(&fpga_pci_readdir_mutex);
+    fpga_release_readdir_lock();
 #endif
 
 err:

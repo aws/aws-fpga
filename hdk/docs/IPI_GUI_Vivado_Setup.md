@@ -26,19 +26,22 @@ Open the following file in a text editor ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/
 
 If either of these files does not exist, change directories into ~/.Xilinx/Vivado and use the following command to create the file.
 
-touch Vivado_init.tcl
+`touch Vivado_init.tcl`
 
 Get the absolute path of the $HDK\_SHELL\_DIR with the following command.
 
-echo $HDK\_SHELL\_DIR
+`echo $HDK_SHELL_DIR`
 
-If your $HDK\_SHELL\_DIR is empty or does not list <path>/$HDK\_SHELL\_DIR/<shell dir>, then you may need to source the [hdk_setup](../README.md).
+**NOTE: If your $HDK\_SHELL\_DIR is empty or does not list <path>/$HDK\_SHELL\_DIR/<shell dir>, then you may need to source the [hdk_setup](../README.md).**
 
 In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHELL\_DIR path.
 
-source <output from echo $HDK\_SHELL\_DIR>/hlx/hlx_setup.tcl
+`source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl`
 
-Everytime Vivado is loaded, this script will always be sourced and IP integrator features will be automatically loaded. Remove this line if you no longer wish to use HLx Flow.
+<a name="hlxhdk_switch"></a>
+### Switching between HDK and HLx flows
+* ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl scripts are sourced when Vivado starts up. Once you go through the Linux Install setup, IP integrator features will be automatically loaded every time. 
+* If you wish to switch to the HDK flow, Please remove the `source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl` line from your init.tcl or Vivado\_init.tcl file
 
 <a name="hlxinst_win"></a>
 # Windows Install

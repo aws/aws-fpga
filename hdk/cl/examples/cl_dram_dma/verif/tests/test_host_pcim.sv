@@ -13,9 +13,9 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-// PCIM test with different lengths for each write and read transfer
+// This test initiates dma and pcim traffic in parallel.
 
-module test_peek_poke_len();
+module test_host_pcim();
 
 `define CFG_REG           64'h00
 `define CNTL_REG          64'h08
@@ -46,8 +46,25 @@ module test_peek_poke_len();
 
 `define WR_START_BIT   32'h00000001
 `define RD_START_BIT   32'h00000002
-
+   
    import tb_type_defines_pkg::*;
+
+   int         error_count;
+   int         timeout_count;
+
+   logic [3:0] status;
+
+   //transfer1 - length less than 64 byte.
+   int         len0 = 17;
+   //transfer2 - length between 64 and 256 bytes.
+   int         len1 = 128;
+   //transfer3 - length greater than 4k bytes.
+   int         len2 = 6000;
+   //transfer4 - length between 256 and 512 bytes.
+   int         len3 = 300;
+   
+   logic       ddr_ready;
+   logic       rdata;
 
    logic [63:0]  pcim_addr;
    logic [31:0]  pcim_data;
@@ -59,36 +76,52 @@ module test_peek_poke_len();
 
    logic [3:0]   error_index;
 
-   int           timeout_count;
-
-   int           error_count;
    int           fail;
 
-   int           len;
+   int           wr_len;
+   int           rd_len;
    
    initial begin
-      error_count = 0;
-      fail = 0;
 
-      len = 0 ;
+      logic [63:0] host_memory_buffer_address;
+
+
+      tb.power_up(.clk_recipe_a(ClockRecipe::A1),
+                  .clk_recipe_b(ClockRecipe::B0),
+                  .clk_recipe_c(ClockRecipe::C0));
+
+      tb.nsec_delay(1000);
+      tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
+      tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
+      tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
+
+      // de-select the ATG hardware
+
+      tb.poke_ocl(.addr(64'h130), .data(0));
+      tb.poke_ocl(.addr(64'h230), .data(0));
+      tb.poke_ocl(.addr(64'h330), .data(0));
+      tb.poke_ocl(.addr(64'h430), .data(0));
+
+      // AXI_MEMORY_MODEL is used to bypass DDR micron models and run with AXI memory models. More information can be found in the readme.md
       
-      for(int addr =0; addr <=63; addr = addr+4) begin
-         pcim_addr = 64'h0000_0000_1234_0000 + addr;
+`ifndef AXI_MEMORY_MODEL      
+      // allow memory to initialize
+      tb.nsec_delay(27000);
+`endif
+      
+      $display("[%t] : Initializing buffers", $realtime);
+      
+      host_memory_buffer_address = 64'h0;
+
+         #100ns;
+
+         //PCIM test 
+         
+         $display("[%t] : Programming cl_tst registers for PCIe", $realtime);
+         
+         pcim_addr = 64'h0000_0000_1234_0000;
          pcim_data = 32'h6c93_af50;
 
-         tb.power_up();
-
-         tb.nsec_delay(1000);
-         tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
-         tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
-         tb.poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
-
-         $display("[%t] : Programming cl_tst registers for PCIe", $realtime);
-
-         len = len+1;
-         
-         $display("[%t] : Number of AXI data phases %d \n", $realtime, len);
-         
          // Enable Incr ID mode, Sync mode, and Read Compare
          tb.poke_ocl(.addr(`CFG_REG), .data(32'h0100_0018));
 
@@ -99,23 +132,23 @@ module test_peek_poke_len();
          tb.poke_ocl(.addr(`WR_ADDR_LOW), .data(pcim_addr[31:0]));    // write address low
          tb.poke_ocl(.addr(`WR_ADDR_HIGH), .data(pcim_addr[63:32]));  // write address high
          tb.poke_ocl(.addr(`WR_DATA), .data(pcim_data[31:0]));        // write data
-         tb.poke_ocl(.addr(`WR_LEN), .data(len));           // write 128 bytes
+         tb.poke_ocl(.addr(`WR_LEN), .data(32'h0000_0001));           // write 128 bytes
 
-         pcim_addr = 64'h0000_0000_1234_0000 + addr;
+         pcim_addr = 64'h0000_0000_1234_0000;
          pcim_data = 32'h6c93_af50;
          
          tb.poke_ocl(.addr(`RD_INSTR_INDEX), .data(32'h0000_0000));   // read index
          tb.poke_ocl(.addr(`RD_ADDR_LOW), .data(pcim_addr[31:0]));    // read address low
          tb.poke_ocl(.addr(`RD_ADDR_HIGH), .data(pcim_addr[63:32]));  // read address high
          tb.poke_ocl(.addr(`RD_DATA), .data(pcim_data[31:0]));        // read data
-         tb.poke_ocl(.addr(`RD_LEN), .data(len));           // read 128 bytes
+         tb.poke_ocl(.addr(`RD_LEN), .data(32'h0000_0001));           // read 128*16 bytes
 
          // Number of instructions, zero based ([31:16] for read, [15:0] for write)
          tb.poke_ocl(.addr(`NUM_INST), .data(32'h0000_0000));
 
          // Start writes and reads
          tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT));
-	 //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
+         //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
 	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
          $display("[%t] : Waiting for PCIe write activity to complete", $realtime);
          #500ns;
@@ -132,7 +165,7 @@ module test_peek_poke_len();
          end 
            
          tb.poke_ocl(.addr(`CNTL_REG), .data(`RD_START_BIT));
-        // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
+         // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
          $display("[%t] : Waiting for PCIe read activity to complete", $realtime);
          #500ns;
          
@@ -157,6 +190,7 @@ module test_peek_poke_len();
             cycle_count[31:0] = read_data;
             tb.peek_ocl(.addr(`WR_CYCLE_CNT_HIGH), .data(read_data));
             cycle_count[63:32] = read_data;
+	    $display("[%t] :[INFO]:Write Timer Value is 0x%016x", $realtime, cycle_count);
             if (cycle_count == 64'h0) begin
                $error("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
                error_count++;
@@ -168,6 +202,7 @@ module test_peek_poke_len();
             cycle_count[31:0] = read_data;
             tb.peek_ocl(.addr(`RD_CYCLE_CNT_HIGH), .data(read_data));
             cycle_count[63:32] = read_data;
+	    $display("[%t] :[INFO]:Read Timer Value is 0x%016x", $realtime, cycle_count);
             if (cycle_count == 64'h0) begin
                $error("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
                error_count++;
@@ -177,19 +212,21 @@ module test_peek_poke_len();
 
             // Check for compare error
             tb.peek_ocl(.addr(`RD_ERR), .data(read_data));
+	    $display("[%t] :[INFO]:RD_ERR register is 0x%016x", $realtime, read_data);
             if (read_data != 32'h0000_0000) begin
                tb.peek_ocl(.addr(`RD_ERR_ADDR_LOW), .data(read_data));
                error_addr[31:0] = read_data;
                tb.peek_ocl(.addr(`RD_ERR_ADDR_HIGH), .data(read_data));
                error_addr[63:32] = read_data;
+	       $display("[%t] :[INFO]:Error Addr Register Value is 0x%016x", $realtime, error_addr);
                tb.peek_ocl(.addr(`RD_ERR_INDEX), .data(read_data));
                error_index = read_data[3:0];
                $error("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
                error_count++;
             end
-         end
-      end // for (int addr =0; addr <=63; addr++)
-      
+         end // else: !if((timeout_count == 100) && (read_data[2:0] !== 3'b000))
+      // Power down
+      #500ns;
       tb.power_down();
 
       //---------------------------
@@ -208,7 +245,6 @@ module test_peek_poke_len();
       end
 
       $finish;
-   end
+   end // initial begin
 
-endmodule // test_peek_poke_len
-
+endmodule // test_host_pcim

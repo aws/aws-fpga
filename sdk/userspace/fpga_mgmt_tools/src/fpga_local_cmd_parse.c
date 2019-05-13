@@ -99,10 +99,10 @@ static const char *describe_afi_usage[] = {
 	"          Rescan the AFIDEVICE to update the per-AFI PCI VendorId and",
 	"          DeviceId that may be dynamically modified due to a",
 	"          fpga-load-local-image or fpga-clear-local-image command.",
-	"          NOTE1: this option removes the AFIDEVICE from the sysfs PCI", 
+	"          NOTE1: this option removes the AFIDEVICE from the sysfs PCI",
 	"          subsystem and then rescans the PCI subsystem in order for",
 	"          the modified AFI PCI IDs to be refreshed.",
-	"          NOTE2: it is the developer's responsibility to remove any", 
+	"          NOTE2: it is the developer's responsibility to remove any",
 	"          driver previously installed on the older PCIe VendorId",
 	"          and DeviceId before fpga-clear-local-image,",
 	"          fpga-load-local-image, or re-scan.",
@@ -130,10 +130,10 @@ static const char *load_afi_usage[] = {
 	"      NOTE: By default, this command automatically rescans the AFIDEVICE",
 	"      to update the per-AFI PCI VendorId and DeviceId that may be",
 	"      dynamically modified during each FPGA image load.",
-	"      The rescan operation removes the AFIDEVICE from the sysfs PCI", 
+	"      The rescan operation removes the AFIDEVICE from the sysfs PCI",
 	"      subsystem and then rescans the PCI subsystem in order for",
 	"      the modified AFI PCI IDs to be refreshed.",
-	"      It is the developer's responsibility to remove any", 
+	"      It is the developer's responsibility to remove any",
 	"      driver previously installed on the older PCIe VendorId",
 	"      and DeviceId before the FPGA image is loaded.",
 	"  GENERAL OPTIONS",
@@ -176,6 +176,10 @@ static const char *load_afi_usage[] = {
 	"          This will try to detect if retention is possible and reject the",
 	"          load if it is not. To use, call load with another afi already",
 	"          loaded.",
+	"      -P, --prefetch-image",
+	"          Prefetch the indicated AFI and store it in the cache for faster loading.",
+	"          Fastest load times can be achieved by using cached AFIs and enabling data retention (-D).",
+	"          See Reducing AFI load times documentation.",
 };
 
 static const char *clear_afi_usage[] = {
@@ -193,10 +197,10 @@ static const char *clear_afi_usage[] = {
 	"      NOTE: By default, this command automatically rescans the AFIDEVICE",
 	"      to update the default AFI PCI VendorId and DeviceId that are",
 	"      dynamically modified during each FPGA image clear.",
-	"      The rescan operation removes the AFIDEVICE from the sysfs PCI", 
+	"      The rescan operation removes the AFIDEVICE from the sysfs PCI",
 	"      subsystem and then rescans the PCI subsystem in order for",
 	"      the modified AFI PCI IDs to be refreshed.",
-	"      It is the developer's responsibility to remove any", 
+	"      It is the developer's responsibility to remove any",
 	"      driver previously installed on the older PCIe VendorId",
 	"      and DeviceId before the FPGA image is cleared.",
 	"  GENERAL OPTIONS",
@@ -263,7 +267,7 @@ static const char *get_virtual_led_usage[] = {
 	"      Example: fpga-get-virtual-led -S 0",
 	"  DESCRIPTION",
 	"      Returns the current status of the virtual LED exposed by the AFI, a",
-	"      series of 0 (zeros) and 1 (ones), first digit from the righti maps", 
+	"      series of 0 (zeros) and 1 (ones), first digit from the righti maps",
 	"      to cl_sh_vled[0]. For example, a return value 0000000001000000",
 	"      indicates that cl_sh_vled[6] is set(on)",
 	"  GENERAL OPTIONS",
@@ -327,15 +331,15 @@ static const char *set_virtual_dip_usage[] = {
 };
 
 /**
- * Generic usage printing engine. 
+ * Generic usage printing engine.
  *
  * @param[in]	prog_name		program name
  * @param[in]   usage			usage array of strings
  * @param[in]   num_entries		number of entries in the usage array of strings
  */
-static void 
+static void
 print_usage(const char *prog_name, const char *usage[], size_t num_entries)
-{   
+{
 	(void)prog_name;
 
 	size_t i;
@@ -345,27 +349,27 @@ print_usage(const char *prog_name, const char *usage[], size_t num_entries)
 }
 
 /**
- * Print the version number of this program. 
+ * Print the version number of this program.
  */
-static void 
+static void
 print_version(void)
-{   
+{
 	printf("AFI Management Tools Version: %s\n", CLI_VERSION);
 }
 
 /**
  * Check the given option and set the f1.parser_completed flag.
  *
- * -parser_completed is set when the parser will complete the option 
- *  (help or version output) and no further command processing is necessary, 
+ * -parser_completed is set when the parser will complete the option
+ *  (help or version output) and no further command processing is necessary,
  *  though a non-zero return value is still returned from parse_args.
  * -the parser_completed flag may then be used to skip the "Error" output
- *  that is generically used for parsing or other errors beyond the parsing 
+ *  that is generically used for parsing or other errors beyond the parsing
  *  stage.
  *
  * @param[in]	opt		the option to check
  */
-static void 
+static void
 get_parser_completed(char opt)
 {
 	if ((opt == 'h') || (opt == 'V')) {
@@ -379,19 +383,19 @@ get_parser_completed(char opt)
  * @param[in]   timeout		timeout in seconds
  *
  * @returns
- *  0   on success 
+ *  0   on success
  * -1   on failure
  */
 static int
 config_request_timeout(uint32_t timeout)
 {
-	size_t timeout_tmp = 
+	size_t timeout_tmp =
 			CLI_REQUEST_TIMEOUT_DFLT * CLI_REQUEST_DELAY_MSEC_DFLT / MSEC_PER_SEC;
-	size_t timeout_max = 
+	size_t timeout_max =
 			((size_t)(uint32_t)-1) * CLI_REQUEST_DELAY_MSEC_DFLT / MSEC_PER_SEC;
 
 	/** Check min and max values */
-	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err, 
+	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err,
 			"Error: The timeout must be between %zu and %zu seconds",
 			timeout_tmp, timeout_max);
 
@@ -404,7 +408,7 @@ config_request_timeout(uint32_t timeout)
 	f1.request_timeout = timeout_tmp;
 	f1.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
 
-	log_debug("Setting timeout to %u secs, request_timeout=%u, request_delay_msec=%u", 
+	log_debug("Setting timeout to %u secs, request_timeout=%u, request_delay_msec=%u",
 			timeout, f1.request_timeout, f1.request_delay_msec);
 	return 0;
 err:
@@ -417,19 +421,19 @@ err:
  * @param[in]   timeout		timeout in seconds
  *
  * @returns
- *  0   on success 
+ *  0   on success
  * -1   on failure
  */
 static int
 config_sync_timeout(uint32_t timeout)
 {
-	size_t timeout_tmp = 
+	size_t timeout_tmp =
 			CLI_SYNC_TIMEOUT_DFLT * CLI_SYNC_DELAY_MSEC_DFLT / MSEC_PER_SEC;
-	size_t timeout_max = 
+	size_t timeout_max =
 			((size_t)(uint32_t)-1) * CLI_SYNC_DELAY_MSEC_DFLT / MSEC_PER_SEC;
 
 	/** Check min and max values */
-	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err, 
+	fail_on_user((timeout < timeout_tmp) || (timeout > timeout_max), err,
 			"Error: The timeout must be between %zu and %zu seconds",
 			timeout_tmp, timeout_max);
 
@@ -442,7 +446,7 @@ config_sync_timeout(uint32_t timeout)
 	f1.sync_timeout = timeout_tmp;
 	f1.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
 
-	log_debug("Setting timeout to %u secs, sync_timeout=%u, sync_delay_msec=%u", 
+	log_debug("Setting timeout to %u secs, sync_timeout=%u, sync_delay_msec=%u",
 			timeout, f1.sync_timeout, f1.sync_delay_msec);
 	return 0;
 err:
@@ -455,7 +459,7 @@ err:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_load_afi(int argc, char *argv[])
 {
 	int opt = 0;
@@ -474,16 +478,17 @@ parse_args_load_afi(int argc, char *argv[])
 		{"version",				no_argument,		0,	'V'	},
 		{"force-shell-reload",				no_argument,		0,	'F'	},
 		{"dram-data-retention",	no_argument,		0,	'D'	},
+		{"prefetch-image",	no_argument,		0,	'P'	},
 		{0,						0,					0,	0	},
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVFD",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVFDP",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u", 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
 					FPGA_SLOT_MAX);
 			break;
 		}
@@ -491,8 +496,8 @@ parse_args_load_afi(int argc, char *argv[])
 		    fail_on_user(strnlen(optarg, AFI_ID_STR_MAX) == AFI_ID_STR_MAX, err,
 					"fpga-image-id must be less than %u bytes", AFI_ID_STR_MAX);
 
-			strncpy(f1.afi_id, optarg, sizeof(f1.afi_id)); 
-			f1.afi_id[sizeof(f1.afi_id) - 1] = 0; 
+			strncpy(f1.afi_id, optarg, sizeof(f1.afi_id));
+			f1.afi_id[sizeof(f1.afi_id) - 1] = 0;
 			break;
 		}
 		case 'a': {
@@ -545,13 +550,18 @@ parse_args_load_afi(int argc, char *argv[])
 			f1.dram_data_retention = true;
 			break;
 		}
+		case 'P': {
+			f1.prefetch = true;
+			f1.async = true;
+			break;
+		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
+
 	if ((f1.afi_slot == (uint32_t) -1) ||
 		(f1.afi_id[0] == 0)) {
 		goto err;
@@ -570,7 +580,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_clear_afi(int argc, char *argv[])
 {
 	int opt = 0;
@@ -592,7 +602,7 @@ parse_args_clear_afi(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u", 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
 					FPGA_SLOT_MAX);
 			break;
 		}
@@ -625,12 +635,12 @@ parse_args_clear_afi(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		goto err;
 	}
 
@@ -647,7 +657,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_describe_afi(int argc, char *argv[])
 {
 	int opt = 0;
@@ -670,7 +680,7 @@ parse_args_describe_afi(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -705,12 +715,12 @@ parse_args_describe_afi(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		goto err;
 	}
 
@@ -728,7 +738,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_describe_afi_slots(int argc, char *argv[])
 {
 	int opt = 0;
@@ -768,14 +778,14 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
+
 	return 0;
 err:
-	print_usage(argv[0], describe_afi_slots_usage, 
+	print_usage(argv[0], describe_afi_slots_usage,
 			sizeof_array(describe_afi_slots_usage));
 out_ver:
 	return -EINVAL;
@@ -789,7 +799,7 @@ static  char default_tcp_port[5] = "10201";
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_start_virtual_jtag(int argc, char *argv[])
 {
 	int opt = 0;
@@ -813,7 +823,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -838,16 +848,16 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
-	
+
 	return 0;
 
 err:
@@ -862,7 +872,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_get_virtual_led(int argc, char *argv[])
 {
 	int opt;
@@ -881,7 +891,7 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -897,12 +907,12 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -919,7 +929,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_get_virtual_dip(int argc, char *argv[])
 {
 	int opt;
@@ -938,7 +948,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -954,16 +964,16 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		}
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
-	
+
 	return 0;
 err:
         print_usage(argv[0], get_virtual_dip_usage, sizeof_array(get_virtual_dip_usage));
@@ -977,7 +987,7 @@ out_ver:
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-static int 
+static int
 parse_args_set_virtual_dip(int argc, char *argv[])
 {
 	int opt;
@@ -1000,20 +1010,20 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		switch (opt) {
 		case 'S': {
 			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, 
+			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
 		case 'D': {
-			fail_on_user(strlen(optarg) != 16, err, 
+			fail_on_user(strlen(optarg) != 16, err,
 					"virtual-dip must be 16 digits of zero or one");
 			for (i=0;i<16;i++) {
 				if (optarg[i] == '1')
 					status = status | 0x1;
 				else if (optarg[i] == '0')
 					status = status;
-				else 
-					fail_on_user(1, err, 
+				else
+					fail_on_user(1, err,
 					"illegal digit for virtual-dip %c", optarg[i]);
 				if (i!=15)
 					status = status << 1;
@@ -1035,12 +1045,12 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 
 		default: {
 			get_parser_completed(opt);
-			goto err;   
+			goto err;
 		}
 		}
 	}
-	
-	if (f1.afi_slot == (uint32_t) -1) { 
+
+	if (f1.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -1048,14 +1058,14 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		printf("Error: Missing DIP Switch values !");
 		goto err;
 	}
-	
-	return 0;	
+
+	return 0;
 err:
         print_usage(argv[0], set_virtual_dip_usage, sizeof_array(set_virtual_dip_usage));
 out_ver:
 	return -EINVAL;
 }
-	
+
 typedef int (*parse_args_func_t)(int argc, char *argv[]);
 
 struct parse_args_str2func {
@@ -1070,11 +1080,11 @@ struct parse_args_str2func {
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-int 
+int
 parse_args(int argc, char *argv[])
 {
 	fail_on(argc < 2, err, "Error: opcode string must be specified");
-	fail_on_user(!argv[0] || !argv[1], err, 
+	fail_on_user(!argv[0] || !argv[1], err,
 			"Error: program name or opcode string is NULL");
 
 	static struct parse_args_str2func str2func[] = {

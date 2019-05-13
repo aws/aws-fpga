@@ -14,6 +14,10 @@
 // limitations under the License.
 // This test tests add, delete and find operations of a URAM.
 
+//------------------------------------------------------------------------------------------
+// Description: This test checks if Find, Add & Del commands implemented by the uram_example CL work accurately.
+//-------------------------------------------------------------------------------------------
+
 module test_uram_example();
 
 import tb_type_defines_pkg::*;
@@ -41,22 +45,23 @@ logic [31:0] glb_value;
                  
       tb.poke(.addr(64'h500), .data(value), .intf(AxiPort::PORT_OCL));
 
-      // Wait for the busy status to be cleared
+      // Wait for the busy status to be cleared. 
       
       busy = 1;
       do begin 
          if (timeout == 10) begin
-            $display("Timeout - Something went wrong with the HW. Please do\n");
+            $display("Timeout - Command not finished after 100ns.");
+	    $error("TEST FAILED") ;
             $finish;
          end
          if (timeout) begin
-            $display("Please wait, it may take time ...\n");
+            $display("Please wait, Command in execution ...\n");
          end
          // Wait for the HW to process
          tb.nsec_delay(10000);
          timeout++;
 
-         // Read
+         // Read CL register to determine if the command is done. bit 29 indicates command done.
          tb.peek(.addr(64'h500), .data(value), .intf(AxiPort::PORT_OCL));
 
          find_ok = value[31];
@@ -80,6 +85,7 @@ logic [31:0] glb_value;
          end 
          else begin
             $display("The value 0x%x has been added to the URAM successfully\n", value);
+	    $display("TEST PASSED");
          end
       end // if (find_ok == 1)
    endtask // uram_task
