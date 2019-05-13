@@ -36,11 +36,11 @@
 #define TYPE_FMT	"%-10s"
 
 /**
- * Globals 
+ * Globals
  */
 struct ec2_fpga_cmd f1;
 
-/** 
+/**
  * Use dmesg as the default logger, stdout is available for debug.
  */
 #if defined(FPGA_ALLOW_NON_ROOT)
@@ -58,14 +58,14 @@ const struct logger *logger = &logger_kmsg;
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 {
-	fail_on(slot_id >= FPGA_SLOT_MAX, err, "slot_id(%d) >= %d", 
+	fail_on(slot_id >= FPGA_SLOT_MAX, err, "slot_id(%d) >= %d",
 		slot_id, FPGA_SLOT_MAX);
 
 	if (f1.show_headers) {
-		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");         
+		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");
 	}
 
 	/** Retrieve and display associated application PFs (if any) */
@@ -80,12 +80,12 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 		}
 
 		printf(TYPE_FMT "  %2u       0x%04x      0x%04x      " PCI_DEV_FMT "\n",
-				"AFIDEVICE", slot_id, app_map->vendor_id, app_map->device_id, 
+				"AFIDEVICE", slot_id, app_map->vendor_id, app_map->device_id,
 				app_map->domain, app_map->bus, app_map->dev, app_map->func);
 		found_app_pf = true;
 	}
 	if (!found_app_pf) {
-		printf(TYPE_FMT "    unknown    unknown    unknown\n", "AFIDEVICE"); 
+		printf(TYPE_FMT "    unknown    unknown    unknown\n", "AFIDEVICE");
 	}
 
 	return 0;
@@ -96,12 +96,12 @@ err:
 /**
  * Display the FPGA image information.
  *
- * @param[in]   info the fpga info 
+ * @param[in]   info the fpga info
  *
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 cli_show_image_info(struct fpga_mgmt_image_info *info)
 {
 	assert(info);
@@ -118,9 +118,9 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 	char *afi_id = (!info->ids.afi_id[0]) ? "none" : info->ids.afi_id;
 	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
 
-	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n", 
-			FPGA_STATUS2STR(info->status), info->status, 
-			FPGA_ERR2STR(info->status_q), info->status_q, 
+	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n",
+			FPGA_STATUS2STR(info->status), info->status,
+			FPGA_ERR2STR(info->status_q), info->status_q,
 			info->sh_version);
 
 	if (f1.rescan) {
@@ -141,114 +141,114 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 		}
 
 		struct fpga_metrics_common *fmc = &info->metrics;
-		printf("sdacl-slave-timeout=%u\n", 
+		printf("sdacl-slave-timeout=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
 
-		printf("virtual-jtag-slave-timeout=%u\n", 
+		printf("virtual-jtag-slave-timeout=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT) ?  1 : 0);
 
-		printf("ocl-slave-timeout=%u\n", 
+		printf("ocl-slave-timeout=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("bar1-slave-timeout=%u\n", 
+		printf("bar1-slave-timeout=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("dma-pcis-timeout=%u\n", 
+		printf("dma-pcis-timeout=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-range-error=%u\n", 
-				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR) ? 
-				1 : 0); 
+		printf("pcim-range-error=%u\n",
+				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR) ?
+				1 : 0);
 
-		printf("pcim-axi-protocol-error=%u\n", 
+		printf("pcim-axi-protocol-error=%u\n",
 				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-4K-cross-error=%u\n", 
+		printf("pcim-axi-protocol-4K-cross-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-bus-master-enable-error=%u\n", 
+		printf("pcim-axi-protocol-bus-master-enable-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BM_EN_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-request-size-error=%u\n", 
+		printf("pcim-axi-protocol-request-size-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_REQ_SIZE_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-write-incomplete-error=%u\n", 
+		printf("pcim-axi-protocol-write-incomplete-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-first-byte-enable-error=%u\n", 
+		printf("pcim-axi-protocol-first-byte-enable-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-last-byte-enable-error=%u\n", 
+		printf("pcim-axi-protocol-last-byte-enable-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-bready-error=%u\n", 
+		printf("pcim-axi-protocol-bready-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-rready-error=%u\n", 
+		printf("pcim-axi-protocol-rready-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("pcim-axi-protocol-wchannel-error=%u\n", 
+		printf("pcim-axi-protocol-wchannel-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
-				1 : 0); 
+				1 : 0);
 
-		printf("sdacl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_slave_timeout_addr); 
-		printf("sdacl-slave-timeout-count=%u\n", fmc->sdacl_slave_timeout_count); 
+		printf("sdacl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_slave_timeout_addr);
+		printf("sdacl-slave-timeout-count=%u\n", fmc->sdacl_slave_timeout_count);
 
-		printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr); 
-		printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count); 
+		printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr);
+		printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count);
 
-		printf("ocl-slave-timeout-addr=0x%" PRIx64 "\n", fmc->ocl_slave_timeout_addr); 
-		printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count); 
+		printf("ocl-slave-timeout-addr=0x%" PRIx64 "\n", fmc->ocl_slave_timeout_addr);
+		printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count);
 
-		printf("bar1-slave-timeout-addr=0x%" PRIx64 "\n", fmc->bar1_slave_timeout_addr); 
-		printf("bar1-slave-timeout-count=%u\n", fmc->bar1_slave_timeout_count); 
+		printf("bar1-slave-timeout-addr=0x%" PRIx64 "\n", fmc->bar1_slave_timeout_addr);
+		printf("bar1-slave-timeout-count=%u\n", fmc->bar1_slave_timeout_count);
 
-		printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr); 
-		printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count); 
+		printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr);
+		printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count);
 
-		printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr); 
-		printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count); 
+		printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr);
+		printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count);
 
-		printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr); 
-		printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count); 
+		printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr);
+		printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count);
 
-		printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count); 
-		printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count); 
+		printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count);
+		printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count);
 
 		for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
 			struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];
 
 			printf("DDR%u\n", i);
-			printf("   write-count=%" PRIu64 "\n", ddr_if->write_count); 
-			printf("   read-count=%" PRIu64 "\n", ddr_if->read_count); 
+			printf("   write-count=%" PRIu64 "\n", ddr_if->write_count);
+			printf("   read-count=%" PRIu64 "\n", ddr_if->read_count);
 		}
 
 		printf("Clock Group A Frequency (Mhz)\n");
 		for (i = 0; i < CLOCK_COUNT_A; i++) {
 			frequency = fmc->clocks[0].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency); 
+			printf("%" PRIu64 "  ", frequency);
 		}
 		printf("\nClock Group B Frequency (Mhz)\n");
 		for (i = 0; i < CLOCK_COUNT_B; i++) {
 			frequency = fmc->clocks[1].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency); 
+			printf("%" PRIu64 "  ", frequency);
 		}
 		printf("\nClock Group C Frequency (Mhz)\n");
 		for (i = 0; i < CLOCK_COUNT_C; i++) {
 			frequency = fmc->clocks[2].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency); 
+			printf("%" PRIu64 "  ", frequency);
 		}
 		printf("\n");
 
@@ -256,6 +256,13 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 		printf("   Last measured: %" PRIu64 " watts\n",fmc->power);
 		printf("   Average: %" PRIu64 " watts\n",fmc->power_mean);
 		printf("   Max measured: %" PRIu64 " watts\n",fmc->power_max);
+		printf("Cached agfis:\n");
+		for (i = 0; i < sizeof_array(fmc->cached_agfis); i++) {
+			if (fmc->cached_agfis[i] == 0) {
+				break;
+			}
+			printf("   agfi-0%016" PRIx64 "\n", fmc->cached_agfis[i]);
+		}
 	}
 
 	return 0;
@@ -275,9 +282,9 @@ cli_attach(void)
 	int ret = FPGA_ERR_FAIL;
 
 	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
-		/** 
+		/**
 		 * ec2-afi-describe-slots does not use the Mbox logic, local
-		 * information only 
+		 * information only
 		 */
 		goto out;
 	}
@@ -321,6 +328,7 @@ static int command_load(void)
 	uint32_t flags = 0;
 	flags |= (f1.force_shell_reload ) ? FPGA_CMD_FORCE_SHELL_RELOAD  : 0;
 	flags |= (f1.dram_data_retention) ? FPGA_CMD_DRAM_DATA_RETENTION : 0;
+	flags |= (f1.prefetch) ? FPGA_CMD_PREFETCH : 0;
 
  	fpga_mgmt_init_load_local_image_options(&opt);
         opt.slot_id = f1.afi_slot;
@@ -354,7 +362,7 @@ err:
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 command_clear(void)
 {
 	int ret;
@@ -366,7 +374,7 @@ command_clear(void)
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-		ret = fpga_mgmt_clear_local_image_sync(f1.afi_slot, 
+		ret = fpga_mgmt_clear_local_image_sync(f1.afi_slot,
 				f1.sync_timeout, f1.sync_delay_msec, &info);
 		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image_sync failed");
 
@@ -444,7 +452,7 @@ err:
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 command_start_virtual_jtag(void)
 {
 	printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",
@@ -457,7 +465,7 @@ command_start_virtual_jtag(void)
 /**
  * Display the virtual status from the get virtual led or dip command.
  *
- * @param[in]   status  the virtual led or dip status to display. 
+ * @param[in]   status  the virtual led or dip status to display.
  *
  * @returns
  *  0	on success, non-zero on failure
@@ -487,7 +495,7 @@ cli_show_virtual_led_dip_status(uint16_t status)
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 command_get_virtual_led(void)
 {
 	uint16_t status;
@@ -508,7 +516,7 @@ command_get_virtual_led(void)
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 command_get_virtual_dip(void)
 {
 	uint16_t status;
@@ -529,7 +537,7 @@ command_get_virtual_dip(void)
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 command_set_virtual_dip(void)
 {
 	int ret;
@@ -553,7 +561,7 @@ static const command_func_t command_table[CLI_CMD_END] = {
 };
 
 /**
- * Main CLI cmd/rsp processing engine. 
+ * Main CLI cmd/rsp processing engine.
  *
  * @returns
  *  0	on success, non-zero on failure
@@ -576,7 +584,7 @@ err:
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 cli_init_f1(void)
 {
 	memset(&f1, 0, sizeof(f1));
@@ -599,7 +607,7 @@ cli_init_f1(void)
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 cli_create(void)
 {
 	return cli_init_f1();
@@ -611,7 +619,7 @@ cli_create(void)
  * @returns
  *  0	on success, non-zero on failure
  */
-static int 
+static int
 cli_destroy(void)
 {
 	return cli_init_f1();
@@ -620,13 +628,13 @@ cli_destroy(void)
 /**
  * CLI main
  *
- * @param[in]	argc	argument count  
+ * @param[in]	argc	argument count
  * @param[in]   argv	argument vector
  *
  * @returns
  *  0	on success, non-zero on failure
  */
-int 
+int
 main(int argc, char *argv[])
 {
 	int ret = cli_create();
@@ -637,7 +645,7 @@ main(int argc, char *argv[])
 
 	ret = log_attach(logger, NULL, 0);
 	fail_on_user(ret != 0, err, "%s", CLI_ROOT_ACCESS_ERR_STR);
-		
+
 	ret = parse_args(argc, argv);
 	fail_on(ret != 0, err, "parse_args failed");
 
@@ -647,8 +655,8 @@ main(int argc, char *argv[])
 	ret = cli_main();
 	fail_on(ret != 0, err, "cli_main failed");
 err:
-	/** 
-	 * f1.parser_completed may be set by parse_args when it internally 
+	/**
+	 * f1.parser_completed may be set by parse_args when it internally
 	 * completes the command without error due to help or version output.
 	 * In this case a non-zero error is returned by parse_args and we do not
 	 * want to print the "Error" below.

@@ -24,8 +24,8 @@
 #include "fpga_mgmt_internal.h"
 
 /** Synchronous API (load/clear) default timeout and delay msecs */
-#define FPGA_MGMT_SYNC_TIMEOUT		3000
-#define FPGA_MGMT_SYNC_DELAY_MSEC	20
+#define FPGA_MGMT_SYNC_TIMEOUT		30000
+#define FPGA_MGMT_SYNC_DELAY_MSEC	2
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {
 	.timeout = FPGA_MGMT_TIMEOUT_DFLT,
@@ -414,7 +414,7 @@ int fpga_mgmt_load_local_image_with_options(union fpga_mgmt_load_local_image_opt
 	memset(&rsp, 0, sizeof(union afi_cmd));
 
 	/* mask off any unsupported flags */
-	opt->flags &= FPGA_CMD_DRAM_DATA_RETENTION | FPGA_CMD_FORCE_SHELL_RELOAD;
+	opt->flags &= FPGA_CMD_ALL_FLAGS;
 
 	/* initialize the command structure */
 	fpga_mgmt_cmd_init_load(&cmd, &len, opt);

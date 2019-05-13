@@ -1233,7 +1233,10 @@ module sh_bfm #(
             first_rd_beat = 1'b0;
          end
 
-         beat = {512{1'b1}}; 
+         beat = {512{1'b1}};
+
+       if (cl_sh_pcim_rready) begin 
+
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
 
@@ -1262,7 +1265,7 @@ module sh_bfm #(
             $display("[%t] : DEBUG beat 0x%0128x", $realtime, beat);
          end
          sh_cl_pcim_rdata <= beat;
-
+       end //if(cl_sh_pcim_rready)
       end
       else begin
          sh_cl_pcim_rvalid <= 1'b0;

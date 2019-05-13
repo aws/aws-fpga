@@ -104,17 +104,18 @@ class TestFpgaTools(BaseSdkTools):
 
             # Test -M (Return FPGA image hardware metrics.)
             (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -M -S {}".format(slot), echo=True)
-            assert len(stdout) == 57
+            assert len(stdout) == 58
             assert len(stderr) == 1
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
             assert stdout[2] == 'sdacl-slave-timeout=0'
             assert stdout[50] == 'Clock Group C Frequency (Mhz)'
             assert stdout[51] == '0  0  '
+            assert stdout[-2].startswith('Cached agfis:')
 
             # Test -C (Return FPGA image hardware metrics (clear on read).)
-            (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -M -S {}".format(slot), echo=True)
-            assert len(stdout) == 57
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -C -M -S {}".format(slot), echo=True)
+            assert len(stdout) == 58
             assert len(stderr) == 1
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
@@ -203,6 +204,14 @@ class TestFpgaTools(BaseSdkTools):
                 assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
                 assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
                 break
+
+    def test_afi_caching(self):
+        for slot in range(self.num_slots):
+            self.fpga_clear_local_image(slot)
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image --request-timeout {} -S {} -I {} -P".format(self.DEFAULT_REQUEST_TIMEOUT, slot, self.cl_dram_dma_agfi), echo=True)
+            assert rc == 0
+            (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -M -S {}".format(slot), echo=True)
+            assert re.match(self.cl_dram_dma_agfi, stdout[-2].strip())
 
     @pytest.mark.skip(reason="No way to test right now.")
     def test_start_virtual_jtag(self):

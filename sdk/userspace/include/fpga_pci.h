@@ -247,19 +247,17 @@ int fpga_pci_memset(pci_bar_handle_t handle, uint64_t offset, uint32_t value,
  * Glibc 2.19 and lower support readdir_r, a reentrant version of readdir.
  * Newer versions of glibc deprecate readdir_r and therefore require external
  * synchronization on readdir.
- */
-#if !defined(_BSD_SOURCE) && !defined(_SVID_SOURCE)
-/**
- * This mutex is used internally in fpga_pci_get_all_slot_specs to provide
- * synchronization for calls to readdir. The mutex is exported so that if
- * software which links with this library also uses readdir in a threaded
+ *
+ * The mutex is used internally in fpga_pci_get_all_slot_specs to provide
+ * synchronization for calls to readdir. The calls to lock/unlock this mutex is exported
+ * so that if software which links with this library also uses readdir in a threaded
  * environment, it can use this lock to protect calls to readdir.
  */
-extern pthread_mutex_t fpga_pci_readdir_mutex;
-#else
-#define FPGA_PCI_USE_READDIR_R
-#endif
+__attribute__((visibility("hidden"))) extern pthread_mutex_t fpga_pci_readdir_mutex;
 
+int fpga_acquire_readdir_lock(void);
+
+int fpga_release_readdir_lock(void);
 
 #ifdef __cplusplus
 }

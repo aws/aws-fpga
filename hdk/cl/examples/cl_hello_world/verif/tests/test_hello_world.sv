@@ -13,6 +13,10 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+//------------------------------------------------------------------------------
+// Description: This test checks the byte swap feature of the hello_world CL. It also checks
+// if the upper word of the CL register is written to Vdip
+//-------------------------------------------------------------------------------
 
 module test_hello_world();
 
@@ -46,7 +50,7 @@ logic [15:0] vled_value;
       if (rdata == 32'hEFBE_ADDE) // Check for byte swap in register read
         $display ("TEST PASSED");
       else
-        $display ("TEST FAILED");
+        $error ("TEST FAILED");
 
       tb.peek_ocl(.addr(`VLED_REG_ADDR), .data(rdata));         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
@@ -54,7 +58,7 @@ logic [15:0] vled_value;
       if (rdata == 32'h0000_BEEF) // Check for LED register read
         $display ("*** TEST PASSED ***");
       else
-        $display ("*** TEST FAILED ***");
+        $error ("*** TEST FAILED ***");
 
       vled_value = tb.get_virtual_led();
 
