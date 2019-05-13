@@ -45,6 +45,7 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_fpga_start_cl_to_buffer;
 `endif
    export "DPI-C" task init_ddr;
+   export "DPI-C" task deselect_atg_hw;
    
    static int h2c_desc_index = 0;
    static int c2h_desc_index = 0;
@@ -208,16 +209,22 @@ end
       poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
       poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
 
-      //de-select the ATG hardware
+     
+      // allow memory to initialize
+      nsec_delay(27000);
+   endtask // initialize_sh_model
+
+
+   task deselect_atg_hw();
+
+    //de-select the ATG hardware
 
       poke_ocl(.addr(64'h130), .data(0));
       poke_ocl(.addr(64'h230), .data(0));
       poke_ocl(.addr(64'h330), .data(0));
       poke_ocl(.addr(64'h430), .data(0));
-
-      // allow memory to initialize
-      nsec_delay(27000);
-   endtask // initialize_sh_model
+      nsec_delay(1000);
+   endtask
 
 `ifdef DMA_TEST
    //DPI task to transfer HOST to CL data.

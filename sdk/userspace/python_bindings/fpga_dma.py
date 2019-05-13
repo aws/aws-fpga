@@ -12,7 +12,6 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
-
 # Python bindings for dma library
 # -*- coding: utf-8 -*-
 #
@@ -24,7 +23,7 @@ import ctypes
 
 
 _libraries = {}
-_libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'] = ctypes.CDLL('PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so')
+_libraries['libfpga_mgmt.so'] = ctypes.CDLL('libfpga_mgmt.so')
 # if local wordsize is same as target, keep ctypes pointer function.
 if ctypes.sizeof(ctypes.c_void_p) == 8:
     POINTER_T = ctypes.POINTER
@@ -75,19 +74,22 @@ fpga_dma_driver__enumvalues = {
 FPGA_DMA_EDMA = 0
 FPGA_DMA_XDMA = 1
 fpga_dma_driver = ctypes.c_int # enum
-fpga_dma_open_queue = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_dma_open_queue
+fpga_dma_open_queue = _libraries['libfpga_mgmt.so'].fpga_dma_open_queue
 fpga_dma_open_queue.restype = ctypes.c_int32
 fpga_dma_open_queue.argtypes = [fpga_dma_driver, ctypes.c_int32, ctypes.c_int32, ctypes.c_bool]
-fpga_dma_device_id = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_dma_device_id
+fpga_dma_device_id = _libraries['libfpga_mgmt.so'].fpga_dma_device_id
 fpga_dma_device_id.restype = ctypes.c_int32
 fpga_dma_device_id.argtypes = [fpga_dma_driver, ctypes.c_int32, ctypes.c_int32, ctypes.c_bool, ctypes.c_char * 256]
 size_t = ctypes.c_uint64
-fpga_dma_burst_read = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_dma_burst_read
+fpga_dma_burst_read = _libraries['libfpga_mgmt.so'].fpga_dma_burst_read
 fpga_dma_burst_read.restype = ctypes.c_int32
 fpga_dma_burst_read.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_ubyte), size_t, size_t]
-fpga_dma_burst_write = _libraries['PY_BIND_AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so'].fpga_dma_burst_write
+fpga_dma_burst_write = _libraries['libfpga_mgmt.so'].fpga_dma_burst_write
 fpga_dma_burst_write.restype = ctypes.c_int32
 fpga_dma_burst_write.argtypes = [ctypes.c_int32, POINTER_T(ctypes.c_ubyte), size_t, size_t]
+fpga_pci_get_dma_device_num = _libraries['libfpga_mgmt.so'].fpga_pci_get_dma_device_num
+fpga_pci_get_dma_device_num.restype = ctypes.c_int32
+fpga_pci_get_dma_device_num.argtypes = [fpga_dma_driver, ctypes.c_int32, POINTER_T(ctypes.c_int32)]
 
 # values for enumeration 'c__Ea_FPGA_CMD_RSVD'
 c__Ea_FPGA_CMD_RSVD__enumvalues = {
@@ -96,14 +98,18 @@ c__Ea_FPGA_CMD_RSVD__enumvalues = {
     4: 'FPGA_CMD_CLEAR_HW_METRICS',
     8: 'FPGA_CMD_FORCE_SHELL_RELOAD',
     16: 'FPGA_CMD_DRAM_DATA_RETENTION',
-    30: 'FPGA_CMD_ALL_FLAGS',
+    64: 'FPGA_CMD_EXTENDED_METRICS_SIZE',
+    128: 'FPGA_CMD_PREFETCH',
+    222: 'FPGA_CMD_ALL_FLAGS',
 }
 FPGA_CMD_RSVD = 1
 FPGA_CMD_GET_HW_METRICS = 2
 FPGA_CMD_CLEAR_HW_METRICS = 4
 FPGA_CMD_FORCE_SHELL_RELOAD = 8
 FPGA_CMD_DRAM_DATA_RETENTION = 16
-FPGA_CMD_ALL_FLAGS = 30
+FPGA_CMD_EXTENDED_METRICS_SIZE = 64
+FPGA_CMD_PREFETCH = 128
+FPGA_CMD_ALL_FLAGS = 222
 c__Ea_FPGA_CMD_RSVD = ctypes.c_int # enum
 
 # values for enumeration 'c__Ea_FPGA_ERR_OK'
@@ -118,9 +124,14 @@ c__Ea_FPGA_ERR_OK__enumvalues = {
     16: 'FPGA_ERR_SHELL_MISMATCH',
     17: 'FPGA_ERR_POWER_VIOLATION',
     18: 'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
+    19: 'FPGA_ERR_HARDWARE_BUSY',
+    20: 'FPGA_ERR_PCI_MISSING',
+    21: 'FPGA_ERR_AFI_CMD_MALFORMED',
     22: 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     23: 'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED',
-    24: 'FPGA_ERR_END',
+    24: 'FPGA_ERR_SOFTWARE_PROBLEM',
+    25: 'FPGA_ERR_UNRESPONSIVE',
+    26: 'FPGA_ERR_END',
 }
 FPGA_ERR_OK = 0
 FPGA_ERR_AFI_CMD_BUSY = 3
@@ -132,9 +143,14 @@ FPGA_ERR_FAIL = 14
 FPGA_ERR_SHELL_MISMATCH = 16
 FPGA_ERR_POWER_VIOLATION = 17
 FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18
+FPGA_ERR_HARDWARE_BUSY = 19
+FPGA_ERR_PCI_MISSING = 20
+FPGA_ERR_AFI_CMD_MALFORMED = 21
 FPGA_ERR_DRAM_DATA_RETENTION_FAILED = 22
 FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED = 23
-FPGA_ERR_END = 24
+FPGA_ERR_SOFTWARE_PROBLEM = 24
+FPGA_ERR_UNRESPONSIVE = 25
+FPGA_ERR_END = 26
 c__Ea_FPGA_ERR_OK = ctypes.c_int # enum
 
 # values for enumeration 'c__Ea_FPGA_STATUS_LOADED'
@@ -273,6 +289,8 @@ class struct_fpga_metrics_common(ctypes.Structure):
     ('power_mean', ctypes.c_uint64),
     ('power_max', ctypes.c_uint64),
     ('power', ctypes.c_uint64),
+    ('cached_agfis', ctypes.c_uint64 * 16),
+    ('flags', ctypes.c_uint64),
      ]
 
 
@@ -324,16 +342,19 @@ c__Ea_FPGA_PAP_4K_CROSS_ERROR = ctypes.c_int # enum
 __all__ = \
     ['APP_PF_BAR0', 'APP_PF_BAR1', 'APP_PF_BAR4', 'APP_PF_BAR_MAX',
     'FPGA_APP_PF', 'FPGA_CMD_ALL_FLAGS', 'FPGA_CMD_CLEAR_HW_METRICS',
-    'FPGA_CMD_DRAM_DATA_RETENTION', 'FPGA_CMD_FORCE_SHELL_RELOAD',
-    'FPGA_CMD_GET_HW_METRICS', 'FPGA_CMD_RSVD', 'FPGA_DMA_EDMA',
+    'FPGA_CMD_DRAM_DATA_RETENTION', 'FPGA_CMD_EXTENDED_METRICS_SIZE',
+    'FPGA_CMD_FORCE_SHELL_RELOAD', 'FPGA_CMD_GET_HW_METRICS',
+    'FPGA_CMD_PREFETCH', 'FPGA_CMD_RSVD', 'FPGA_DMA_EDMA',
     'FPGA_DMA_XDMA', 'FPGA_ERR_AFI_CMD_API_VERSION_INVALID',
-    'FPGA_ERR_AFI_CMD_BUSY', 'FPGA_ERR_AFI_ID_INVALID',
-    'FPGA_ERR_CL_DDR_CALIB_FAILED', 'FPGA_ERR_CL_ID_MISMATCH',
-    'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
+    'FPGA_ERR_AFI_CMD_BUSY', 'FPGA_ERR_AFI_CMD_MALFORMED',
+    'FPGA_ERR_AFI_ID_INVALID', 'FPGA_ERR_CL_DDR_CALIB_FAILED',
+    'FPGA_ERR_CL_ID_MISMATCH', 'FPGA_ERR_DRAM_DATA_RETENTION_FAILED',
     'FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE',
     'FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED', 'FPGA_ERR_END',
-    'FPGA_ERR_FAIL', 'FPGA_ERR_OK', 'FPGA_ERR_POWER_VIOLATION',
-    'FPGA_ERR_SHELL_MISMATCH', 'FPGA_INT_STATUS_ALL',
+    'FPGA_ERR_FAIL', 'FPGA_ERR_HARDWARE_BUSY', 'FPGA_ERR_OK',
+    'FPGA_ERR_PCI_MISSING', 'FPGA_ERR_POWER_VIOLATION',
+    'FPGA_ERR_SHELL_MISMATCH', 'FPGA_ERR_SOFTWARE_PROBLEM',
+    'FPGA_ERR_UNRESPONSIVE', 'FPGA_INT_STATUS_ALL',
     'FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT',
     'FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT',
@@ -355,8 +376,8 @@ __all__ = \
     'c__Ea_FPGA_PAP_4K_CROSS_ERROR', 'c__Ea_FPGA_STATUS_LOADED',
     'c__Ea_MGMT_PF_BAR0', 'fpga_dma_burst_read',
     'fpga_dma_burst_write', 'fpga_dma_device_id', 'fpga_dma_driver',
-    'fpga_dma_open_queue', 'size_t', 'struct_afi_device_ids',
-    'struct_fpga_clocks_common', 'struct_fpga_common_cfg',
-    'struct_fpga_ddr_if_metrics_common', 'struct_fpga_meta_ids',
-    'struct_fpga_metrics_common', 'struct_fpga_pci_resource_map',
-    'struct_fpga_slot_spec']
+    'fpga_dma_open_queue', 'fpga_pci_get_dma_device_num', 'size_t',
+    'struct_afi_device_ids', 'struct_fpga_clocks_common',
+    'struct_fpga_common_cfg', 'struct_fpga_ddr_if_metrics_common',
+    'struct_fpga_meta_ids', 'struct_fpga_metrics_common',
+    'struct_fpga_pci_resource_map', 'struct_fpga_slot_spec']

@@ -60,8 +60,8 @@ enum {
  * e.g. load + describe multi-AFI command sequences.
  *  timeout * delay_msec 
  */
-#define CLI_SYNC_TIMEOUT_DFLT		3000
-#define CLI_SYNC_DELAY_MSEC_DFLT	20	
+#define CLI_SYNC_TIMEOUT_DFLT		30000
+#define CLI_SYNC_DELAY_MSEC_DFLT	2
 
 /**
  * Request timeout: timeout * delay_msec
@@ -109,6 +109,8 @@ struct ec2_fpga_cmd {
 	bool     force_shell_reload;
 	/** Attempt dram data retention on load */
 	bool	 dram_data_retention;
+	/** Don't actually load the FPGA, just cache the files for a later load */
+	bool	 prefetch;
 	/** Virtual DIP switch */
 	uint16_t v_dip_switch;
 	/** Virtual JTAG TCP port */

@@ -300,6 +300,14 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
 
+    def test_cl_dram_dma__host_pcim__sv(self, simulator):
+
+        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
+        test_name = 'test_host_pcim'
+        test_type = 'sv'
+
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+
     def test_cl_dram_dma__dma_pcim_concurrent__sv(self, simulator):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
