@@ -142,7 +142,7 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
 done
 
 
-if ! is_vivado_available; then
+if ! exists vivado; then
    if [[ -z "${VIVADO_TOOL_VERSION}" ]]; then
       err_msg " You are not using FPGA Developer AMI and VIVADO_TOOL_VERSION ENV variable is Empty. "
       err_msg " ENV Variable VIVADO_TOOL_VERSION is required to be set for runtime "
