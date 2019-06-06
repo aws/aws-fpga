@@ -53,6 +53,9 @@ class TestFpgaTools(BaseSdkTools):
 
         logger.info("PCI devices:\n{}".format("\n".join(self.list_pci_devices())))
 
+        logger.info("verify that the slots are in order")
+        assert self.slot2device.values() == sorted(self.slot2device.values())
+
         (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image-slots", echo=True)
         assert len(stdout) == self.num_slots + 1
         assert len(stderr) == 1
