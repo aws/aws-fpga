@@ -158,19 +158,19 @@ def sdaccel_example_default_map = [
 def simulator_tool_default_map = [
     '2017.4' : [
         'vivado': 'xilinx/SDx/2017.4_04112018',
-        'vcs': 'vcs-mx/L-2016.06-1',
+        'vcs': 'synopsys/vcs-mx/M-2017.03-SP2-11',
         'questa': 'questa/10.6b',
         'ies': 'incisive/15.20.063'
      ],
      '2018.2' : [
          'vivado': 'xilinx/SDx/2018.2_06142018',
-         'vcs': 'vcs-mx/N-2017.12-SP1-1',
+         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
          'questa': 'questa/10.6c_1',
          'ies': 'incisive/15.20.063'
      ],
      '2018.3' : [
          'vivado': 'xilinx/SDx/2018.3_1207',
-         'vcs': 'vcs-mx/N-2017.12-SP1-1',
+         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
          'questa': 'questa/10.6c_1',
          'ies': 'incisive/15.20.063'
      ]
@@ -525,19 +525,21 @@ if (test_sims) {
                                         sh """
                                         set -e
                                         module purge
-                                        module load python/2.7.9
+                                        module load python/3.7.2
+                                        module load python/2.7.14
+                                        module load batch
                                         module load ${vivado_module}
                                         module load ${vcs_module}
                                         module load ${questa_module}
                                         module load ${ies_module}
                                         source $WORKSPACE/hdk_setup.sh
-                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator}
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator} --batch 'TRUE'
                                         """
                                     } else {
                                         sh """
                                         set -e
                                         source $WORKSPACE/shared/tests/bin/setup_test_hdk_env.sh
-                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator}
+                                        python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator} --batch 'FALSE'
                                         """
                                     }
                                 } catch (exc) {
