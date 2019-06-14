@@ -82,7 +82,7 @@ module test_ddr();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end
@@ -163,7 +163,7 @@ module test_ddr();
          end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
 
          if ((timeout_count == 100) && (read_data[2:0] !== 3'b000)) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for writes and reads to complete.", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for writes and reads to complete.", $realtime);
             error_count++;
          end else begin
             // Stop reads and writes ([1] for reads, [0] for writes)
@@ -178,7 +178,7 @@ module test_ddr();
             tb.peek_ocl(.addr(base_addr + 64'h0f4), .data(read_data));
             cycle_count[63:32] = read_data;
             if (cycle_count == 64'h0) begin
-               $display("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
+               $error("[%t] : *** ERROR *** Write Timer value was 0x0 at end of test.", $realtime);
                error_count++;
             end
 
@@ -189,7 +189,7 @@ module test_ddr();
             tb.peek_ocl(.addr(base_addr + 64'h0fc), .data(read_data));
             cycle_count[63:32] = read_data;
             if (cycle_count == 64'h0) begin
-               $display("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
+               $error("[%t] : *** ERROR *** Read Timer value was 0x0 at end of test.", $realtime);
                error_count++;
             end
 
@@ -204,7 +204,7 @@ module test_ddr();
                error_addr[63:32] = read_data;
                tb.peek_ocl(.addr(base_addr + 64'h0bc), .data(read_data));
                error_index = read_data[3:0];
-               $display("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
+               $error("[%t] : *** ERROR *** Read compare error from address 0x%016x, index 0x%1x", $realtime, error_addr, error_index);
                error_count++;
             end
          end

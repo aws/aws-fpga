@@ -123,7 +123,7 @@ module test_peek_poke_wc();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end
@@ -133,7 +133,7 @@ module test_peek_poke_wc();
 
    task compare_data(logic [511:0] act_data, exp_data);
       if(act_data !== exp_data) begin
-         $display($time,,,"***ERROR*** : Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
+         $error($time,,,"***ERROR*** : Data Mismatch. Actual Data:%0h <==> Expected Data: %0h",
                             act_data, exp_data);
          error_count ++;
       end
@@ -143,7 +143,7 @@ module test_peek_poke_wc();
    endtask // compare_data
    
    task disp_err (input string s);
-      $display($time,,,"***ERROR*** : %s", s);
+      $error($time,,,"***ERROR*** : %s", s);
       error_count ++;
    endtask // disp_err
    

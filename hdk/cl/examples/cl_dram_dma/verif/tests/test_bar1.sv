@@ -63,7 +63,7 @@ module test_bar1();
          end while ((read_data[31:0] !== bar1_data[31:0]) && (timeout_count < 1000)); // UNMATCHED !!
 
          if ((timeout_count == 1000) || (read_data[31:0] !== bar1_data[31:0])) begin
-            $display("[%t] : *** ERROR *** Read data mismatch for bar1 exp_data %h act_data %h.", $realtime, bar1_data, read_data);
+            $error("[%t] : *** ERROR *** Read data mismatch for bar1 exp_data %h act_data %h.", $realtime, bar1_data, read_data);
             error_count++;
          end
          
@@ -91,7 +91,7 @@ module test_bar1();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : TEST_FAILED", $realtime);
+         $error("[%t] : TEST_FAILED", $realtime);
       end else begin
          $display("[%t] : TEST_PASSED", $realtime);
       end

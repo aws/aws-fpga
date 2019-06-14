@@ -139,7 +139,7 @@ module test_dma_pcim_concurrent();
          end while ((status[0] !== 'h1) && (timeout_count < 4000));
 
          if (timeout_count > 4000) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
 
@@ -161,7 +161,7 @@ module test_dma_pcim_concurrent();
          end while ((status[0] !== 'h1) && (timeout_count < 4000));
 
          if (timeout_count > 4000) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
 
@@ -174,7 +174,7 @@ module test_dma_pcim_concurrent();
          host_memory_buffer_address = 64'h0_0001_0800;
          for (int i = 0 ; i<len0 ; i++) begin
             if (tb.hm_get_byte(.addr(host_memory_buffer_address + i)) !== 8'hAA) begin
-               $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
+               $error("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
                         $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
                error_count++;
             end

@@ -66,9 +66,9 @@ module test_int();
                timeout_count++;
                if (timeout_count == 100) begin
                   if (vector_num !== vector_num2) begin
-                     $display("[%t] : *** ERROR *** Timeout waiting for cl_int_tst Done bits to be set (vectors %2d, %2d).", $realtime, vector_num, vector_num2);
+                     $error("[%t] : *** ERROR *** Timeout waiting for cl_int_tst Done bits to be set (vectors %2d, %2d).", $realtime, vector_num, vector_num2);
                   end else begin
-                     $display("[%t] : *** ERROR *** Timeout waiting for cl_int_tst Done bit to be set (vector %2d).", $realtime, vector_num);
+                     $error("[%t] : *** ERROR *** Timeout waiting for cl_int_tst Done bit to be set (vector %2d).", $realtime, vector_num);
                   end
                   error_count++;
                end
@@ -77,9 +77,9 @@ module test_int();
             tb.peek_ocl(.addr(base_addr + 64'h000), .data(read_data));
             if (read_data !== 32'h0000_0000) begin
                if (vector_num !== vector_num2) begin
-                  $display("[%t] : *** ERROR *** Done bits were not cleared for vectors %2d, %2d.", $realtime, vector_num, vector_num2);
+                  $error("[%t] : *** ERROR *** Done bits were not cleared for vectors %2d, %2d.", $realtime, vector_num, vector_num2);
                end else begin
-                  $display("[%t] : *** ERROR *** Done bit was not cleared for vector %2d.", $realtime, vector_num);
+                  $error("[%t] : *** ERROR *** Done bit was not cleared for vector %2d.", $realtime, vector_num);
                end
                error_count++;
             end
@@ -100,7 +100,7 @@ module test_int();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end

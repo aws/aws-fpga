@@ -140,7 +140,7 @@ module test_dram_dma_rnd();
       end while ((status != 4'hf) && (timeout_count < 10000));
 
       if (timeout_count >= 10000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+         $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
          error_count++;
       end
      
@@ -179,7 +179,7 @@ module test_dram_dma_rnd();
       end while ((status != 4'hf) && (timeout_count < 10000));
 
       if (timeout_count >= 10000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+         $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
          error_count++;
       end
 
@@ -192,7 +192,7 @@ module test_dram_dma_rnd();
       host_memory_buffer_address = 64'h0_000A_0000;
       for (int i = 0 ; i<len0 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address + i)) !== 8'hAA) begin
-            $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
             error_count++;
          end
@@ -205,7 +205,7 @@ module test_dram_dma_rnd();
       host_memory_buffer_address = 64'h0_000B_0000;
       for (int i = 0 ; i< len1 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hBB) begin
-            $display("[%t] : *** ERROR *** DDR1 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR1 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
             error_count++;
          end
@@ -218,7 +218,7 @@ module test_dram_dma_rnd();
       host_memory_buffer_address = 64'h0_000C_0000;
       for (int i = 0 ; i< len2 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hCC) begin
-            $display("[%t] : *** ERROR *** DDR2 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR2 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
             error_count++;
          end
@@ -231,7 +231,7 @@ module test_dram_dma_rnd();
       host_memory_buffer_address = 64'h0_000D_0000;
       for (int i = 0 ; i< len3 ; i++) begin
          if (tb.hm_get_byte(.addr(host_memory_buffer_address)) !== 8'hDD) begin
-            $display("[%t] : *** ERROR *** DDR3 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR3 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
             error_count++;
          end
@@ -252,7 +252,7 @@ module test_dram_dma_rnd();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end
