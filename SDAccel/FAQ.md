@@ -63,6 +63,9 @@ A: Please make sure you executed the following commands before launching the SDx
 ## Q: How do I debug error: `No current synthesis run set`? 
 A: You may have run the previous [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. It is recommended to remove it before switching from hardware development flow to SDAccel. 
 
+## Q: I am getting an error: `symbol lookup error: /opt/xilinx/xrt/lib/libxrt_aws.so: undefined symbol: uuid_parse` What should I do?
+A: This error occured because the XRT RPM was built without linking in a library needed for the uuid symbols.
+   To fix it, use the latest XRT RPM's documented in the [XRT installation document](docs/XRT_installation_instructions.md)
 # Additional Resources
 
 The [AWS SDAccel README].
