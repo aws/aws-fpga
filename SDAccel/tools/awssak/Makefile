@@ -24,14 +24,15 @@ CXX := g++
 CXXFLAGS := -Wall -Werror -std=c++11
 
 ROOT = $(SDACCEL_DIR)
-HAL_INC := -I../../include -I$(ROOT)/userspace/include
+HAL_INC := -I$(SDACCEL_DIR)/userspace/src -I$(SDACCEL_DIR)/userspace/include -I$(SDK_DIR)/userspace/include -I$(SDK_DIR)/linux_kernel_drivers
 
 CXXFLAGS += $(HAL_INC)
 
 ifeq ($(ec2),1)
-AWSBM_HAL_LIBNAME := $(ROOT)/userspace/src/libawsxcldrv.a
+AWS_HAL_LIBNAME := $(ROOT)/userspace/src/libxrt-aws.a
 else
-AWSBM_HAL_LIBNAME := $(ROOT)/userspace/src/libawsbmdrv.a
+AWS_HAL_LIBNAME := $(ROOT)/userspace/src/libxrtbm-aws.a
+CXXFLAGS += -DINTERNAL_RELEASE
 endif
 
 ifeq ($(debug),1)
@@ -59,8 +60,8 @@ all : $(EXENAME)
 	$(CXX) $(CXXFLAGS) $(MYCFLAGS) $(MYCXXFLAGS) -c $< -o $@
 	$(CXX) $(CXXFLAGS) $(MYCFLAGS) $(MYCXXFLAGS) -c -MM $< -o $(patsubst %.o, %.d, $@)
 
-$(EXENAME): $(OBJS) $(AWSBM_HAL_LIBNAME)
-	$(CXX) -o $@ $(OBJS) $(AWSBM_HAL_LIBNAME) $(LDFLAGS) $(LDLIBS) -lrt
+$(EXENAME): $(OBJS) $(AWS_HAL_LIBNAME)
+	$(CXX) -o $@ $(OBJS) $(AWS_HAL_LIBNAME) $(LDFLAGS) $(LDLIBS) -lrt -pthread
 
 clean:
 	rm -rf *.o *.d $(EXENAME)

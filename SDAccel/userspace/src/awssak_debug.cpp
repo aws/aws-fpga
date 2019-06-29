@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <sys/file.h>
 
-#include "xclbin2.h"
+#include "xclbin.h"
 #include "scan.h"
 #include "awssak.h"
 

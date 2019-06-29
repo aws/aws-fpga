@@ -67,8 +67,8 @@
    $ mkdir -p $XLNXRTE/lib/lnx64.o
    $ mkdir -p $XLNXRTE/runtime/bin
    $ mkdir -p $XLNXRTE/runtime/lib/x86_64
-   $ cp $SDACCEL_DIR/userspace/src2/libxrt-aws.so $XLNXRTE/runtime/platforms/xilinx_aws-vu9p-f1-04261818_dynamic_5_0/driver/
-   $ cp $SDACCEL_DIR/tools/awssak2/xbsak $XLNXRTE/runtime/bin/
+   $ cp $SDACCEL_DIR/userspace/src/libxrt-aws.so $XLNXRTE/runtime/platforms/xilinx_aws-vu9p-f1-04261818_dynamic_5_0/driver/
+   $ cp $SDACCEL_DIR/tools/awssak/xbsak $XLNXRTE/runtime/bin/
    $ cp $XIILNX_SDX/lib/lnx64.o/$GLIBPATH/libstdc++.so* xlnxrte/lib/x86_64/
    $ cp $XIILNX_SDX/runtime/bin/xclbinsplit xlnxrte/runtime/bin/
    $ cp $XIILNX_SDX/runtime/bin/xclbincat xlnxrte/runtime/bin/
