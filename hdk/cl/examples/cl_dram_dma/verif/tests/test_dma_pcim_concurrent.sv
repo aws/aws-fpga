@@ -142,6 +142,11 @@ module test_dma_pcim_concurrent();
             $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
+        
+         // DMA transfers are posted writes. The above code checks only if the dma transfer is setup and done. 
+         // We need to wait for writes to finish to memory before issuing reads.
+         $display("[%t] : Waiting for DMA write activity to complete", $realtime);
+         #500ns;
 
          $display("[%t] : starting C2H DMA channels ", $realtime);
 
@@ -216,8 +221,8 @@ module test_dma_pcim_concurrent();
         
          // Start writes and reads
          tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT));
-	 //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
-	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
+        //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
+        // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
          $display("[%t] : Waiting for PCIe write activity to complete", $realtime);
          #500ns;
          timeout_count = 0;
@@ -233,8 +238,7 @@ module test_dma_pcim_concurrent();
          end 
            
          tb.poke_ocl(.addr(`CNTL_REG), .data(`RD_START_BIT));
-	 // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
-
+         // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
          $display("[%t] : Waiting for PCIe read activity to complete", $realtime);
          #500ns;
          

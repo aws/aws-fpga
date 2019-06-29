@@ -642,7 +642,7 @@ class TestSims(AwsFpgaTestBase):
 
     # cl_hello_world vhdl
 
-    def test_cl_hello_world__hello_world__vhdl(self, simulator, batch):
+    def test_cl_vhdl_hello_world__hello_world__vhdl(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world_vhdl/verif/scripts'
         test_name = 'test_hello_world'

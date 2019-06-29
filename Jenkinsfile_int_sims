@@ -5,26 +5,26 @@
 //=============================================================================
 properties([parameters([
     string(name: 'branch', defaultValue: ''),
-    booleanParam(name: 'test_markdown_links',                 defaultValue: true,  description: 'Test markdown files and check for broken links'),
-    booleanParam(name: 'test_src_headers',                    defaultValue: true,  description: 'Check copyright heaers of source files'),
-    booleanParam(name: 'test_fpga_tools',                     defaultValue: true,  description: 'Test fpga-* commands on F1'),
-    booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
+    booleanParam(name: 'test_markdown_links',                 defaultValue: false,  description: 'Test markdown files and check for broken links'),
+    booleanParam(name: 'test_src_headers',                    defaultValue: false,  description: 'Check copyright heaers of source files'),
+    booleanParam(name: 'test_fpga_tools',                     defaultValue: false,  description: 'Test fpga-* commands on F1'),
+    booleanParam(name: 'test_hdk_scripts',                    defaultValue: false,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
-    booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
-    booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
-    booleanParam(name: 'test_py_bindings',                    defaultValue: true,  description: 'Test Python Bindings'),
-    booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
+    booleanParam(name: 'test_non_root_access',                defaultValue: false,  description: 'Test non-root access to FPGA tools'),
+    booleanParam(name: 'test_xdma',                           defaultValue: false,  description: 'Test XDMA driver'),
+    booleanParam(name: 'test_py_bindings',                    defaultValue: false,  description: 'Test Python Bindings'),
+    booleanParam(name: 'test_runtime_software',               defaultValue: false,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
-    booleanParam(name: 'test_hdk_fdf',                        defaultValue: true,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
-    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: true,  description: 'Test SDAccel setup scripts'),
+    booleanParam(name: 'test_hdk_fdf',                        defaultValue: false,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
+    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: false,  description: 'Test SDAccel setup scripts'),
     booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
-    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
+    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: false,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
     booleanParam(name: 'disable_runtime_tests',               defaultValue: false, description: 'Option to disable runtime tests.'),
     booleanParam(name: 'use_test_ami',                        defaultValue: false, description: 'This option asks for the test AMI from Jenkins'),
-    booleanParam(name: 'internal_simulations',                defaultValue: false, description: 'This option asks for default agent from Jenkins')
+    booleanParam(name: 'internal_simulations',                defaultValue: true, description: 'This option asks for default agent from Jenkins')
 ])])
 
 //=============================================================================

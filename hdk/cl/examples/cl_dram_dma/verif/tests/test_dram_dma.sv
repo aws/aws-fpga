@@ -124,8 +124,13 @@ module test_dram_dma();
          error_count++;
       end
 
-      $display("[%t] : starting C2H DMA channels ", $realtime);
+         // DMA transfers are posted writes. The above code checks only if the dma transfer is setup and done. 
+         // We need to wait for writes to finish to memory before issuing reads.
+      $display("[%t] : Waiting for DMA write transfers to complete", $realtime);
+      #2us;
 
+      $display("[%t] : starting C2H DMA channels ", $realtime);
+       
       // read the data from cl and put it in the host memory
       host_memory_buffer_address = 64'h0_0001_0800;
       tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(64'h0000_0000_1f00), .len(len0) ); // move DDR0 to buffer
@@ -234,6 +239,10 @@ module test_dram_dma();
       end
 
       tb.poke(.addr(64'h0008_0000_0005), .data(64'h0000_0001), .size(DataSize::UINT64));
+      //This write goes to DDRC which is in shell. This writes takes 2 more hops when compared to  writes to DDRA/B/D. 
+      //The back to back write & read are causing read to happen before write when the random backpressure on write channel is more than read channel.
+      // Hence adding wait time since this is a posted write.
+      #100ns;
       tb.peek(.addr(64'h0008_0000_0005), .data(rdata), .size(DataSize::UINT64));
 
       if (rdata !== 64'h0000_0001) begin

@@ -121,6 +121,11 @@ module test_dram_dma_4k_crossing();
          error_count++;
       end
 
+      // DMA transfers are posted writes. The above code checks only if the dma transfer is setup and done. 
+      // We need to wait for writes to finish to memory before issuing reads.
+      $display("[%t] : Waiting for DMA write activity to complete", $realtime);
+      #500ns;
+
       $display("[%t] : starting C2H DMA channels ", $realtime);
 
       // read the data from cl and put it in the host memory

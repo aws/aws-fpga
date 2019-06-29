@@ -96,6 +96,11 @@ module test_dma_pcis_concurrent();
             error_count++;
          end
 
+         // DMA transfers are posted writes. The above code checks only if the dma transfer is setup and done. 
+         // We need to wait for writes to finish to memory before issuing reads.
+         $display("[%t] : Waiting for DMA write activity to complete", $realtime);
+         #500ns;
+
          $display("[%t] : starting C2H DMA channels ", $realtime);
 
          // read the data from cl and put it in the host memory
@@ -134,8 +139,10 @@ module test_dma_pcis_concurrent();
          end
       end // fork begin
       begin   
-         #100ns;
+         #600ns;
+         // Waitng for DMA transfer setup time
          //PCIS test
+         
          tb.poke(.addr(64'h0008_0000_0005), .data(64'h0000_0001), .size(DataSize::UINT64));
          tb.peek(.addr(64'h0008_0000_0005), .data(rdata), .size(DataSize::UINT64));
 
