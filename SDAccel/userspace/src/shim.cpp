@@ -542,6 +542,8 @@ namespace awsbwhal {
             mLogStream << __func__ << ", " << std::this_thread::get_id() << std::endl;
             mLogStream.close();
         }
+
+        fpga_mgmt_close();
     }
 
     AwsXcl::AwsXcl(unsigned index, const char *logfileName,
@@ -561,6 +563,8 @@ namespace awsbwhal {
             std::cout << "WARNING: AwsXcl - Cannot open userPF: " << devName << std::endl;
         }
 #endif
+
+        fpga_mgmt_init();
 
 #ifdef INTERNAL_TESTING
         if(mUserHandle > 0) {

@@ -72,6 +72,23 @@ typedef int pci_bar_handle_t;
 int fpga_pci_init(void);
 
 /**
+ * Initialize the fpga_mgmt library.
+ * Calls fpga_pci_init.
+ *
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_mgmt_init(void);
+
+/**
+ * Closes the fpga_mgmt library and its dependencies and releases any acquired
+ * resources.
+ *
+ * @returns 0 on success, non-zero on error
+ */
+int fpga_mgmt_close(void);
+
+
+/**
  * Attach to an FPGA memory space.
  *
  * @param[in]  slot_id  logical slot index
