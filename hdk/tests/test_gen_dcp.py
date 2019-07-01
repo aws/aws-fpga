@@ -69,11 +69,14 @@ class TestGenDcp(AwsFpgaTestBase):
     def set_allowed_warnings(cls):
 
         cls.allowed_warnings = (
-            (('.*',), r'^WARNING: \[Constraints 18-838\] Failed to create SRL placer macro for cell SH/SH/MGT_TOP'),
+            (('.*',), r'^WARNING: \[Constraints 18-838\] Failed to create SRL placer macro for cell SH/SH/MGT_TOP.*'),
+            (('.*',), r'^WARNING: \[Shape Builder 18-838\] Failed to create SRL placer macro for cell WRAPPER_INST/SH/SH/MGT_TOP.*'),
+	    (('.*',), r'^WARNING: \[Common 17-576\] \'fanout_opt\' is deprecated.*'),
             (('.*',), r'^CRITICAL WARNING: \[Place 30-823\] Failed to process clock nets that should have matching clock routes\. Reason: Found incompatible user defined or fixed clock roots for related clocks \'CL/SH_DDR/ddr_cores\.DDR4'),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/u_ila_reset_ctrl/asyncrounous_transfer\.arm_in_transfer_inst/dout_reg0_reg\. '),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg\[0\]\. '),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/en_adv_trigger_2_reg\. '),
+            (('.*',), r'^CRITICAL WARNING: \[Shape Builder 18-850\] Failed to place register with ASYNC_REG property shape that starts with register WRAPPER_INST/SH/SH/MGT_TOP.*'),
             (('.*',), r'^CRITICAL WARNING: \[Vivado 12-1433\] Expecting a non-empty list of cells to be added to the pblock\.  Please verify the correctness of the <cells> argument. \[/home/centos/src/project_data/workspace/test_develop_manual/hdk/cl/examples/cl_dram_dma/build/constraints/cl_pnr_user\.xdc:15'),
             (('.*',), r'^CRITICAL WARNING: \[filemgmt 20-1741\] File \'axi_register_slice_v2_1_vl_rfs.v\'.*'),
             (('.*',), r'^CRITICAL WARNING: \[filemgmt 20-1741\] File \'blk_mem_gen_v8_3_vhsyn_rfs.vhd\'.*'),
@@ -87,7 +90,7 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'WARNING: \[BD 41-1661\] .*'),
             (('.*',), r'WARNING: \[Vivado 12-584\] No ports matched \'tck\''),
             (('.*',), r'WARNING: \[Vivado 12-830\] No fanout objects found for'),
-    	    (('.*',), r'WARNING: \[Place 30-640\] Place Check.*'),
+            (('.*',), r'WARNING: \[Place 30-640\] Place Check.*'),
             (('.*',), r'WARNING: \[BD 41-2180\] Resetting the memory initialization file.*'),
             (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)',), r'^CRITICAL WARNING: \[Route 35-39\] The design did not meet timing requirements'),
             (('cl_dram_dma_A1_B2_C0_2_(CONGESTION|TIMING)',), r'WARNING: \[Vivado 12-180\] No cells matched \'CL/CL_DMA_PCIS_SLV/CL_TST_DDR_B/CL_TST/sync_rst_n_reg\''),
