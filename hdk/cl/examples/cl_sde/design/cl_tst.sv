@@ -63,7 +63,7 @@ module  cl_tst #(parameter DATA_WIDTH=512, parameter NUM_RD_TAG=512) (
    output logic rready
    );
 
-parameter DATA_DW = DATA_WIDTH / 32;
+  localparam DATA_DW = DATA_WIDTH / 32;
 
 //--------------------------
 // Internal signals
@@ -705,7 +705,7 @@ assign wr_loop_addr_adj = (cfg_loop_addr_mode)? wr_loop_count << cfg_wr_loop_add
 //assign awuser = (cfg_user_mode)? inst_wr_rdata[127:112]: (inst_wr_rdata[103:96]+1) * user_length_mult;
 
 //This is the number of DW to adjust
-parameter ADJ_DW_WIDTH =   (DATA_WIDTH==512)?   4:
+localparam ADJ_DW_WIDTH =   (DATA_WIDTH==512)?   4:
                         (DATA_WIDTH==256)?   3:
                         (DATA_WIDTH==128)?   2:
                                              1;

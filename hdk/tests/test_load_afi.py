@@ -248,7 +248,7 @@ class TestLoadAfi(AwsFpgaTestBase):
                 assert find_fail_re.match(stdout_lines[-2]), "{} didn't fail. stdout:\n{}".format(command, "\n".join(stdout_lines))
 
         elif re.match(r'cl_sde', cl):
-            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime".format(
+            (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && make clean && make all".format(
                 self.WORKSPACE, cl), echo=True)
             assert rc == 0, "Runtime example failed."
 
@@ -264,9 +264,12 @@ class TestLoadAfi(AwsFpgaTestBase):
             slots_to_test = range(self.num_slots)
 
         # Make sure that the test can be built first
-        logger.info("Building runtime software")
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && make -f Makefile SDK_DIR={}/sdk".format(self.WORKSPACE, cl, self.WORKSPACE))
-        assert rc == 0, "Runtime software build failed."
+        if cl != 'cl_sde':
+           logger.info("Building runtime software")
+           (rc, stdout_lines, stderr_lines) = self.run_cmd("cd {}/hdk/cl/examples/{}/software/runtime && make -f Makefile SDK_DIR={}/sdk".format(self.WORKSPACE, cl, self.WORKSPACE))
+           assert rc == 0, "Runtime software build failed."
+        else:
+           logger.info("cl_sde runtime test is app. No build needed")
 
         # Load the AFI onto all available FPGAs
         # This is required for the XDMA driver to correctly install for all slots
@@ -292,6 +295,10 @@ class TestLoadAfi(AwsFpgaTestBase):
 
     def test_precompiled_cl_hello_world(self, xilinxVersion):
         cl = 'cl_hello_world'
+        self.base_precompiled_test(cl, install_xdma_driver=False)
+
+    def test_precompiled_cl_sde(self, xilinxVersion):
+        cl = 'cl_sde'
         self.base_precompiled_test(cl, install_xdma_driver=False)
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)

@@ -16,6 +16,7 @@
 
 // CL Streaming
 
+`include "cl_sde_defines.vh"
 
 module  cl_sde
 
@@ -210,6 +211,9 @@ module  cl_sde
    logic [2:0]   pre_sde_arid_q;
    logic [2:0]   pre_sde_rid_q;
 
+   logic [9:0]  float_bid ;
+   logic [9:0]  float_rid ;
+
 `include "unused_flr_template.inc"
 `include "unused_ddr_a_b_d_template.inc"
 `include "unused_ddr_c_template.inc"
@@ -393,7 +397,7 @@ always @(posedge clk_main_a0)
      .aclk           (clk_main_a0),
      .aresetn        (rst_main_n_sync_bot_slr),
 
-     .s_axi_awid     (sh_cl_dma_pcis_awid    ),
+     .s_axi_awid     ({10'b0, sh_cl_dma_pcis_awid}    ),
      .s_axi_awaddr   (sh_cl_dma_pcis_awaddr  ),
      .s_axi_awlen    (sh_cl_dma_pcis_awlen   ),
      .s_axi_awsize   (sh_cl_dma_pcis_awsize  ),
@@ -404,17 +408,17 @@ always @(posedge clk_main_a0)
      .s_axi_wlast    (sh_cl_dma_pcis_wlast   ),
      .s_axi_wvalid   (sh_cl_dma_pcis_wvalid  ),
      .s_axi_wready   (cl_sh_dma_pcis_wready  ),
-     .s_axi_bid      (cl_sh_dma_pcis_bid     ),
+     .s_axi_bid      ({float_bid, cl_sh_dma_pcis_bid}    ),
      .s_axi_bresp    (cl_sh_dma_pcis_bresp   ),
      .s_axi_bvalid   (cl_sh_dma_pcis_bvalid  ),
      .s_axi_bready   (sh_cl_dma_pcis_bready  ),
-     .s_axi_arid     (sh_cl_dma_pcis_arid    ),
+     .s_axi_arid     ({10'b0, sh_cl_dma_pcis_arid}   ),
      .s_axi_araddr   (sh_cl_dma_pcis_araddr  ),
      .s_axi_arlen    (sh_cl_dma_pcis_arlen   ),
      .s_axi_arsize   (sh_cl_dma_pcis_arsize  ),
      .s_axi_arvalid  (sh_cl_dma_pcis_arvalid ),
      .s_axi_arready  (cl_sh_dma_pcis_arready ),
-     .s_axi_rid      (cl_sh_dma_pcis_rid     ),
+     .s_axi_rid      ({float_rid, cl_sh_dma_pcis_rid}    ),
      .s_axi_rdata    (cl_sh_dma_pcis_rdata   ),
      .s_axi_rresp    (cl_sh_dma_pcis_rresp   ),
      .s_axi_rlast    (cl_sh_dma_pcis_rlast   ),
@@ -653,6 +657,7 @@ sde #(.C2H_BUF_DEPTH(`C2H_BUF_DEPTH),
 
 //If simulation instantiate the Stream BFM
 `ifdef SIMULATION
+
       stream_bfm STREAM_BFM
         (.clk         (clk_main_a0),
          .rst_n       (rst_main_n_sync),
@@ -673,13 +678,14 @@ sde #(.C2H_BUF_DEPTH(`C2H_BUF_DEPTH),
 
          );
 `else
-   logic         bfm_h2c_axis_ready = 0;
 
-   logic         bfm_c2h_axis_valid = 0;
-   logic [511:0] bfm_c2h_axis_data = 0;
-   logic [63:0]  bfm_c2h_axis_keep = 0;
-   logic         bfm_c2h_axis_last = 0;
-   logic [63:0]  bfm_c2h_axis_user = 0;
+   assign bfm_h2c_axis_ready = 0;
+
+   assign bfm_c2h_axis_valid = 0;
+   assign bfm_c2h_axis_data = 0;
+   assign bfm_c2h_axis_keep = 0;
+   assign bfm_c2h_axis_last = 0;
+   assign bfm_c2h_axis_user = 0;
 `endif
 
 //Instantiate the RTL Stream block

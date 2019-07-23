@@ -742,7 +742,7 @@ end // if (~H2C_N_C2H)
      if (rst_n) begin
         wr_done_q <= wr_done;
         
-        if (cfg_desc_cdt_wc_en & (desc_wb_limit_q != 32'h0) & ~wr_done_q & ~desc_cdt_req_pend)
+        if (cfg_wb_desc_cnt_en & cfg_desc_cdt_wc_en & (desc_wb_limit_q != 32'h0) & ~wr_done_q & ~desc_cdt_req_pend)
           assert (desc_wb_limit - desc_wb_limit_q <= (cfg_wc_cnt * 2)) else begin
              $display("%m: *** ERROR ***: Desc Limit Write Coalesce Error. desc_wb_limit = 0x%x, desc_wb_limit_q = 0x%x, cfg_wc_cnt = 0x%x. @ %0t", desc_wb_limit, desc_wb_limit_q, cfg_wc_cnt, $time);
              $finish;
@@ -760,7 +760,7 @@ end // if (~H2C_N_C2H)
              $finish;
           end
         
-        if (cfg_md_wr_ptr_wc_en && (md_wr_ptr >= md_wr_ptr_q) & ~wr_done_q & ~md_wr_ptr_req_pend)
+        if (cfg_wb_md_ptr_en & cfg_md_wr_ptr_wc_en && (md_wr_ptr >= md_wr_ptr_q) & ~wr_done_q & ~md_wr_ptr_req_pend)
           assert (md_wr_ptr - md_wr_ptr_q <= (cfg_wc_cnt * 2)) else begin
              $display("%m: *** ERROR ***: Desc Limit Write Coalesce Error. md_wr_ptr = 0x%x, md_wr_ptr_q = 0x%x, cfg_wc_cnt = 0x%x. @ %0t", md_wr_ptr, md_wr_ptr_q, cfg_wc_cnt, $time);
              $finish;

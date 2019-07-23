@@ -46,7 +46,7 @@ boolean test_all_sdaccel_examples_fdf = params.get('test_all_sdaccel_examples_fd
 boolean test_helloworld_sdaccel_example_fdf = params.get('test_helloworld_sdaccel_example_fdf')
 boolean disable_runtime_tests = params.get('disable_runtime_tests')
 
-def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world']
+def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world', 'cl_sde']
 def dcp_recipe_cl_names = ['cl_dram_dma', 'cl_hello_world']
 def dcp_recipe_scenarios = [
     // Default values are tested in FDF: A0-B0-C0-DEFAULT
@@ -68,6 +68,7 @@ def fdf_test_names = [
     'cl_dram_dma[A1-B0-C0-DEFAULT]',
     'cl_hello_world[A0-B0-C0-DEFAULT]',
     'cl_hello_world_vhdl',
+    'cl_sde[A0-B0-C0-DEFAULT]',
     'cl_uram_example[2]',
     'cl_uram_example[3]',
     'cl_uram_example[4]'
@@ -75,7 +76,7 @@ def fdf_test_names = [
 
 boolean debug_dcp_gen = params.get('debug_dcp_gen')
 if (debug_dcp_gen) {
-    fdf_test_names = ['cl_hello_world[A0-B0-C0-DEFAULT]']
+    fdf_test_names = ['cl_sde[A0-B0-C0-DEFAULT]']
     test_markdown_links = false
     test_sims = false
     test_runtime_software = false

@@ -15,26 +15,29 @@
 
 export TEST ?= test_sde_loopback
 
-INCLUDES = -I$(SDK_DIR)/userspace/include
+SLOT_NUM = 0
+APP_SCRIPTS_DIR = $(SDK_DIR)/apps/virtual-ethernet/scripts
+APP_INSTALL_DIR = veth_app
+DPDK_DIR = $(APP_INSTALL_DIR)/dpdk
+RMDIR = sudo rm -rf
+STATS_PERIOD = 0
 
-CC = gcc
-CFLAGS = -DCONFIG_LOGLEVEL=4 -std=gnu99 -g -Wall -Werror $(INCLUDES)
+.PHONY: all clean
 
-LDLIBS = -lfpga_mgmt -lrt -lpthread
+all: check_env install run
 
-SRC = common_dma.c $(TEST).c 
-OBJ = $(SRC:.c=.o)
-BIN = $(TEST)
+install: check_env
+	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
+	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_setup.py $(DPDK_DIR) $(SLOT_NUM)
 
-all: check_env
-
-#$(BIN): $(OBJ)
-#	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+run: check_env
+	sudo $(DPDK_DIR)/x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=$(STATS_PERIOD) & \
 
 clean:
-	rm -f *.o $(BIN)
+	$(RMDIR) $(APP_INSTALL_DIR)
 
 check_env:
 ifndef SDK_DIR
     $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
 endif
+
