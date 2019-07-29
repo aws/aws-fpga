@@ -117,7 +117,7 @@ module test_dram_dma_mem_model_bdr_rd();
       end while ((status != 4'hf) && (timeout_count < 4000));
 
       if (timeout_count >= 4000) begin
-         $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+         $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
          error_count++;
       end
 
@@ -130,7 +130,7 @@ module test_dram_dma_mem_model_bdr_rd();
       // Put test pattern in host memory
       for (int i = 0 ; i < len0 ; i++) begin
          if (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[0].u_bfm.axi_mem_bdr_read(.addr(ddr_A_addr)) !== 8'hAA) begin
-            $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, ddr_A_addr, (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[0].u_bfm.axi_mem_bdr_read(.addr(ddr_A_addr))));
             error_count++;
          end
@@ -145,7 +145,7 @@ module test_dram_dma_mem_model_bdr_rd();
       // Put test pattern in host memory
       for (int i = 0 ; i < len1 ; i++) begin
          if (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[1].u_bfm.axi_mem_bdr_read(.addr(ddr_B_addr)) !== 8'hBB) begin
-            $display("[%t] : *** ERROR *** DDR1 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR1 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, ddr_B_addr, (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[1].u_bfm.axi_mem_bdr_read(.addr(ddr_B_addr))));
             error_count++;
          end
@@ -159,7 +159,7 @@ module test_dram_dma_mem_model_bdr_rd();
       // Put test pattern in hst memory
       for (int i = 0 ; i < len2 ; i++) begin
          if (tb.card.fpga.sh.u_mem_model.axi_mem_bdr_read(.addr(ddr_C_addr)) !== 8'hCC) begin
-            $display("[%t] : *** ERROR *** DDR2 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR2 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, ddr_C_addr, (tb.card.fpga.sh.u_mem_model.axi_mem_bdr_read(.addr(ddr_C_addr))));
             error_count++;
          end
@@ -173,7 +173,7 @@ module test_dram_dma_mem_model_bdr_rd();
       // Put test pattern in host memory
       for (int i = 0 ; i < len3 ; i++) begin
          if (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[2].u_bfm.axi_mem_bdr_read(.addr(ddr_D_addr)) !== 8'hDD) begin
-            $display("[%t] : *** ERROR *** DDR3 Data mismatch, addr:%0x read data is: %0x",
+            $error("[%t] : *** ERROR *** DDR3 Data mismatch, addr:%0x read data is: %0x",
                      $realtime, ddr_D_addr, (tb.card.fpga.CL.SH_DDR.u_mem_model.bfm_inst[2].u_bfm.axi_mem_bdr_read(.addr(ddr_D_addr))));
             error_count++;
          end
@@ -194,7 +194,7 @@ module test_dram_dma_mem_model_bdr_rd();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : TEST_FAILED", $realtime);
+         $error("[%t] : TEST_FAILED", $realtime);
       end else begin
          $display("[%t] : TEST_PASSED", $realtime);
       end

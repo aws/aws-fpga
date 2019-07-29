@@ -1,6 +1,5 @@
 /**
  * Copyright (C) 2015-2018 Xilinx, Inc
- *
  * Xilinx SDAccel HAL userspace driver extension APIs
  * Performance Monitoring Exposed Parameters
  *
@@ -21,7 +20,7 @@
 #define _XCL_PERF_H_
 
 // DSA version (e.g., XCL_PLATFORM=xilinx_adm-pcie-7v3_1ddr_1_1)
-
+// Simply a default as its read from the device using lspci (see CR 870994)
 #define DSA_MAJOR_VERSION 1
 #define DSA_MINOR_VERSION 1
 
@@ -33,6 +32,9 @@
 #define XPAR_AXI_PERF_MON_0_SLOT1_NAME                  "Host"
 #define XPAR_AXI_PERF_MON_0_OCL_REGION_SLOT             0
 #define XPAR_AXI_PERF_MON_0_HOST_SLOT                   1
+
+#define XPAR_SPM0_HOST_SLOT                             0
+#define XPAR_SPM0_FIRST_KERNEL_SLOT                     1
 
 #define XPAR_AXI_PERF_MON_0_OCL_REGION_SLOT2            2
 #define XPAR_AXI_PERF_MON_0_OCL_REGION_SLOT3            3
@@ -72,7 +74,7 @@
 
 /* AXI Stream FIFOs */
 #define XPAR_AXI_PERF_MON_0_TRACE_NUMBER_FIFO           3
-#define XPAR_AXI_PERF_MON_0_TRACE_WORD_WIDTH            128
+#define XPAR_AXI_PERF_MON_0_TRACE_WORD_WIDTH            64
 #define XPAR_AXI_PERF_MON_0_TRACE_NUMBER_SAMPLES        4096
 #define MAX_TRACE_NUMBER_SAMPLES                        8192
 
@@ -81,7 +83,11 @@
 #define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_2              0x012000
 // CR 877788: the extra 0x80001000 is a bug in Vivado where the AXI4 base address is not set correctly
 // TODO: remove it once that bug is fixed!
-#define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL       (0x2000000000 + 0x80001000)
+//#define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL       (0x2000000000 + 0x80001000)
+#define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL       0x2000000000
+// Default for new monitoring
+//#define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL2      (0x0400000000 + 0x80001000)
+#define XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL2      0x0400000000
 
 /********************* APM 1: Monitor PCIe DMA Masters ************************/
 
@@ -167,6 +173,8 @@
 /************************ APM Profile Counters ********************************/
 
 #define XAPM_MAX_NUMBER_SLOTS             8
+// Max slots = floor(max slots on trace funnel / 2) = floor(63 / 2) = 31
+#define XSPM_MAX_NUMBER_SLOTS             31
 #define XAPM_METRIC_COUNTERS_PER_SLOT     8
 
 /* Metric counters per slot */
@@ -213,6 +221,7 @@
 
 /* Cycles to add to timestamp if overflow occurs */
 #define LOOP_ADD_TIME                    (1<<16)
+#define LOOP_ADD_TIME_SPM                (1<<44)
 
 /********************** Definitions: Enums, Structs ***************************/
 
@@ -256,11 +265,19 @@ enum xclPerfMonEventType {
 };
 
 /*
+ * Xocc follows this convention
+ * Even IDs are Reads
+ * Odd IDs are Writes
+ */
+#define IS_WRITE(x) ((x) & 1)
+#define IS_READ(x) (!((x) & 1))
+
+/*
  * Performance monitor IDs for host SW events
  * NOTE: HW events start at 0, SDSoC SW events start at 4000
  */
 enum xclPerfMonEventID {
-  XCL_PERF_MON_IGNORE_EVENT = 0,
+  XCL_PERF_MON_HW_EVENT = 0,
   XCL_PERF_MON_GENERAL_ID = 3000,
   XCL_PERF_MON_QUEUE_ID = 3001,
   XCL_PERF_MON_READ_ID = 3002,
@@ -305,46 +322,42 @@ enum xclPerfMonEventID {
   XCL_PERF_MON_CU5_ID = 3205,
   XCL_PERF_MON_CU6_ID = 3206,
   XCL_PERF_MON_CU7_ID = 3207,
-  XCL_PERF_MON_PROGRAM_END = 4090
+  XCL_PERF_MON_PROGRAM_END = 4090,
+  XCL_PERF_MON_IGNORE_EVENT = 4095
 };
 
 /* Performance monitor counter results */
 typedef struct {
   //unsigned int   NumSlots;
   float          SampleIntervalUsec;
-  unsigned int   WriteBytes[XAPM_MAX_NUMBER_SLOTS];
-  unsigned int   WriteTranx[XAPM_MAX_NUMBER_SLOTS];
-  unsigned int   WriteLatency[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short WriteMinLatency[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short WriteMaxLatency[XAPM_MAX_NUMBER_SLOTS];
-  unsigned int   ReadBytes[XAPM_MAX_NUMBER_SLOTS];
-  unsigned int   ReadTranx[XAPM_MAX_NUMBER_SLOTS];
-  unsigned int   ReadLatency[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short ReadMinLatency[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short ReadMaxLatency[XAPM_MAX_NUMBER_SLOTS];
+  unsigned int   WriteBytes[XSPM_MAX_NUMBER_SLOTS];
+  unsigned int   WriteTranx[XSPM_MAX_NUMBER_SLOTS];
+  unsigned int   WriteLatency[XSPM_MAX_NUMBER_SLOTS];
+  unsigned short WriteMinLatency[XSPM_MAX_NUMBER_SLOTS];
+  unsigned short WriteMaxLatency[XSPM_MAX_NUMBER_SLOTS];
+  unsigned int   ReadBytes[XSPM_MAX_NUMBER_SLOTS];
+  unsigned int   ReadTranx[XSPM_MAX_NUMBER_SLOTS];
+  unsigned int   ReadLatency[XSPM_MAX_NUMBER_SLOTS];
+  unsigned short ReadMinLatency[XSPM_MAX_NUMBER_SLOTS];
+  unsigned short ReadMaxLatency[XSPM_MAX_NUMBER_SLOTS];
 } xclCounterResults;
 
 /* Performance monitor trace results */
 typedef struct {
-  unsigned char  LogID; /* 0: event flags, 1: host timestamp */
+  xclPerfMonEventID EventID;
+  xclPerfMonEventType EventType;
+  unsigned long long Timestamp;
   unsigned char  Overflow;
-  unsigned char  WriteStartEvent;
-  unsigned char  WriteEndEvent;
-  unsigned char  ReadStartEvent;
-  unsigned short Timestamp;
-  unsigned int   HostTimestamp;
-  unsigned char  RID[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  ARID[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  BID[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  AWID[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  EventFlags[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  ExtEventFlags[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  WriteAddrLen[XAPM_MAX_NUMBER_SLOTS];
-  unsigned char  ReadAddrLen[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short WriteBytes[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short ReadBytes[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short WriteAddrId[XAPM_MAX_NUMBER_SLOTS];
-  unsigned short ReadAddrId[XAPM_MAX_NUMBER_SLOTS];
+  unsigned int TraceID;
+  unsigned char Error;
+  unsigned char Reserved;
+  // Used in HW Emulation
+  unsigned long long  HostTimestamp;
+  unsigned char  EventFlags;
+  unsigned char  WriteAddrLen;
+  unsigned char  ReadAddrLen;
+  unsigned short WriteBytes;
+  unsigned short ReadBytes;
 } xclTraceResults;
 
 typedef struct {

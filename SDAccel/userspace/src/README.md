@@ -1,6 +1,6 @@
 # SDAccel Hardware Abstraction Layer for AWS FPGA
 
-This directory includes the source code and binary files for mapping SDAccel/OpenCL runtime library call to AWS specific hardware. This API is documented in [xclhal2.h](../include/xclhal2.h).
+This directory includes the source code and binary files for mapping SDAccel/OpenCL runtime library call to AWS specific hardware. This API is documented in [xclhal.h](../include/xclhal.h).
  
 It supports the following functionality.
 

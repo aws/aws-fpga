@@ -24,6 +24,16 @@ int fpga_pci_init(void)
   return 0;
 }
 
+int fpga_mgmt_init(void)
+{
+  return 0;
+}
+
+int fpga_mgmt_close(void)
+{
+  return 0;
+}
+
 /**
  * Attach to an FPGA memory space.
  *

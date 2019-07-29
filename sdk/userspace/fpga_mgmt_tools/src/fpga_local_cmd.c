@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <getopt.h>
 
+#include <unistd.h>
+
 #include <fpga_mgmt.h>
 #include <utils/lcd.h>
 
@@ -640,7 +642,7 @@ main(int argc, char *argv[])
 	int ret = cli_create();
 	fail_on(ret != 0, err, "cli_create failed");
 
-	ret = log_init("fpga-local-cmd");
+	ret = log_init("fpga-local-cmd(%u)", getpid());
 	fail_on(ret != 0, err, "log_init failed");
 
 	ret = log_attach(logger, NULL, 0);

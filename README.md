@@ -37,7 +37,7 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Runtime Environment     | Hardware Interface | Host Code Language   | FPGA Tools |
 | --------|---------|---------|-------|
-| [C/C++ Software Defined Accelerator Development](SDAccel/README.md) | OpenCL APIs, [XOCL Driver](./sdk/linux_kernel_drivers/xocl), [HAL](SDAccel/userspace/src2) | C/C++ | [SDK](./sdk), SDx |
+| [C/C++ Software Defined Accelerator Development](SDAccel/README.md) | OpenCL APIs, [XOCL Driver](./sdk/linux_kernel_drivers/xocl), [HAL](SDAccel/userspace/src) | C/C++ | [SDK](./sdk), SDx |
 | [Hardware Accelerator Development](hdk/README.md) | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | C/C++ | [SDK](./sdk), Vivado |
 | [IP Integrator or High Level Synthesis (HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | C/C++ | [SDK](./sdk), Vivado |
 

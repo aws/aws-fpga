@@ -63,7 +63,7 @@ module  cl_tst #(parameter DATA_WIDTH=512, parameter NUM_RD_TAG=512) (
    output logic rready
    );
 
-parameter DATA_DW = DATA_WIDTH / 32;
+  localparam DATA_DW = DATA_WIDTH / 32;
 
 //--------------------------
 // Internal signals
@@ -157,7 +157,7 @@ always_ff @(negedge rst_n or posedge clk)
 // configuration
 //-------------------------------------------
 
-//Offset 0x00: 
+//Offset 0x00:
 //             0 - Continuous mode - Keep looping through all the isntructions.
 //             1 - Incrementing loop data (every time through loop increment the start data)
 //             2 - PRBS mode (else incremeting).  Data will be generated with PRBS.  If not enabled, data will be incrementing per DW
@@ -177,7 +177,7 @@ always_ff @(negedge rst_n or posedge clk)
 //             15:0 - Read Start -- This is not implemented (not sure we need this)
 //             31:0 - Max Write ahead -- This is not implemented (not sure we need this)
 //Offset 0x08:
-//             0 - Write Go (read back write in progress) - Write this bit to start executing the write instructions.  Reads back '1' while write instructions are in progress. 
+//             0 - Write Go (read back write in progress) - Write this bit to start executing the write instructions.  Reads back '1' while write instructions are in progress.
 //             1 - Read Go (read back write in progress) - Write this bit to start executing the read instructions.  Reads back '1' while read instructions are in progress.
 //             2 - Read response pending (read only).  REad only, reads back '1' while read responses are pending.
 //Offset 0x0c:
@@ -189,7 +189,7 @@ always_ff @(negedge rst_n or posedge clk)
 //Offset 0x14:
 //             3:0 - Max Read outstanding - Max number of read requests to issue (how many simultaneous read requests)
 //
-// Offset 0x1c: Write Index  - Write instruction Index            
+// Offset 0x1c: Write Index  - Write instruction Index
 // Offset 0x20: Write address low - Write instruction address
 // Offset 0x24: Write address high - Write instruction address
 // Offset 0x28: Write data - Write instruction start data.  All other data will be incrementing or PRBS
@@ -353,7 +353,7 @@ always @(posedge clk)
       cfg_wr_stretch <= 0;
       cfg_rd_stretch <= 0;
    end
-   else 
+   else
    begin
       cfg_wr_stretch <= cfg_wr || (cfg_wr_stretch && !tst_cfg_ack);
       cfg_rd_stretch <= cfg_rd || (cfg_rd_stretch && !tst_cfg_ack);
@@ -458,28 +458,28 @@ always @(posedge clk)
 always @(posedge clk)
 begin
       case (cfg_addr_q)
-         8'h0:       tst_cfg_rdata <= {5'h0, cfg_inc_awid, cfg_const_data_mode, cfg_inc_id_mode, 
-                                       2'h0, cfg_rd_loop_addr_shift[5:0], 
-                                       2'h0, cfg_wr_loop_addr_shift[5:0], 
+         8'h0:       tst_cfg_rdata <= {5'h0, cfg_inc_awid, cfg_const_data_mode, cfg_inc_id_mode,
+                                       2'h0, cfg_rd_loop_addr_shift[5:0],
+                                       2'h0, cfg_wr_loop_addr_shift[5:0],
                                        cfg_user_mode, cfg_loop_addr_mode, cfg_iter_mode, cfg_sync_mode, cfg_rd_compare_en, cfg_prbs_mode, cfg_inc_data_loop_mode, cfg_cont_mode};
          8'h4:       tst_cfg_rdata <= {cfg_max_write, cfg_read_start};
          8'h8:       tst_cfg_rdata <= {rd_resp_pend, rd_inp, wr_inp};
          8'hc:       tst_cfg_rdata <= {wr_state[1:0], rd_tag_avail[15:0]};
          8'h10:      tst_cfg_rdata <= {cfg_rd_num_inst, cfg_wr_num_inst};
          8'h14:      tst_cfg_rdata <= {cfg_max_read_req};
-     
-         8'h1c:      tst_cfg_rdata <= cfg_wr_inst_index; 
+
+         8'h1c:      tst_cfg_rdata <= cfg_wr_inst_index;
          8'h20:      tst_cfg_rdata <= wr_cfg_inst_rdata_q;
-         8'h24:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 32; 
-         8'h28:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 64; 
+         8'h24:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 32;
+         8'h28:      tst_cfg_rdata <= wr_cfg_inst_rdata_q >> 64;
          8'h2c:      tst_cfg_rdata <= {wr_cfg_inst_rdata_q[127:96]};
 
          8'h30:      tst_cfg_rdata <= {31'b0, cfg_atg_enable};
 
          8'h3c:      tst_cfg_rdata <= cfg_rd_inst_index;
          8'h40:      tst_cfg_rdata <= rd_cfg_inst_rdata_q;
-         8'h44:      tst_cfg_rdata <= rd_cfg_inst_rdata_q >> 32; 
-         8'h48:      tst_cfg_rdata <= rd_cfg_inst_rdata_q >> 64; 
+         8'h44:      tst_cfg_rdata <= rd_cfg_inst_rdata_q >> 32;
+         8'h48:      tst_cfg_rdata <= rd_cfg_inst_rdata_q >> 64;
          8'h4c:      tst_cfg_rdata <= {rd_cfg_inst_rdata_q[127:96]};
 
          8'h60:      tst_cfg_rdata <= cfg_rd_data_index;
@@ -538,7 +538,7 @@ always_ff @(posedge clk)
       tst_cfg_ack <= 0;
    else
       tst_cfg_ack <= ((cfg_wr_stretch||cfg_rd_stretch) && !cfg_ram_access && !tst_cfg_ack) ||
-                     ((cfg_wr_stretch||cfg_rd_stretch) && cfg_ram_access && rd_cfg_read_ram_ack && !tst_cfg_ack); 
+                     ((cfg_wr_stretch||cfg_rd_stretch) && cfg_ram_access && rd_cfg_read_ram_ack && !tst_cfg_ack);
 
 //---------------------------------------
 // Inst RAMs
@@ -581,7 +581,7 @@ always @(posedge clk)
 
 
 //--------------------------------
-// Write state machine      
+// Write state machine
 //--------------------------------
 
 logic[7:0] wr_running_length = 0;
@@ -612,7 +612,7 @@ begin
       begin
          if (awready)
             wr_state_nxt = WR_DAT;
-         else  
+         else
             wr_state_nxt = WR_ADDR;
       end
 
@@ -665,7 +665,7 @@ always @(posedge clk)
 always @(posedge clk)
    if (cfg_wr_go)
       wr_cyc_count <= 0;
-   else if ((wr_state==WR_DAT) && (wr_state_nxt!=WR_DAT))
+   else if (bvalid && bready)
       wr_cyc_count <= wr_cyc_count + 1;
 
 //Timer
@@ -705,7 +705,7 @@ assign wr_loop_addr_adj = (cfg_loop_addr_mode)? wr_loop_count << cfg_wr_loop_add
 //assign awuser = (cfg_user_mode)? inst_wr_rdata[127:112]: (inst_wr_rdata[103:96]+1) * user_length_mult;
 
 //This is the number of DW to adjust
-parameter ADJ_DW_WIDTH =   (DATA_WIDTH==512)?   4:
+localparam ADJ_DW_WIDTH =   (DATA_WIDTH==512)?   4:
                         (DATA_WIDTH==256)?   3:
                         (DATA_WIDTH==128)?   2:
                                              1;
@@ -727,7 +727,7 @@ always_ff @( posedge clk)
       awlen <= inst_wr_rdata[103:96];
       awuser <= (cfg_user_mode)? inst_wr_rdata[127:112]: ((inst_wr_rdata[103:96]+1) * user_length_mult) - wr_first_adj - inst_wr_rdata[104+:ADJ_DW_WIDTH];
    end
-   else 
+   else
    begin
       awid <= (cfg_inc_awid)? awid + 1: 0;
       awaddr <=0 ;
@@ -760,7 +760,7 @@ logic[DATA_WIDTH-1:0] first_wdata = 0;         //Pre-compute this for timing
 always @(posedge clk)
    begin
       for (int i=0; i<DATA_DW; i++)
-         //FIXME -- Do we want 32-bits here for loopcount, try 8 to help timing         
+         //FIXME -- Do we want 32-bits here for loopcount, try 8 to help timing
          //first_wdata[32*i+:32] <=  inst_wr_rdata[95:64] + (wr_loop_count[31:0] & {32{cfg_inc_data_loop_mode}}) + i;
          //first_wdata[32*i+:32] <=  inst_wr_rdata[95:64] + (wr_loop_count[7:0] & {32{cfg_inc_data_loop_mode}}) + i;
          first_wdata[32*i+:32] <=  (cfg_const_data_mode)? inst_wr_rdata[95:64]: inst_wr_rdata[95:64] + i;
@@ -803,7 +803,7 @@ always @(posedge clk)
 //   end
 //   else
    begin
-      wdata <= wdata_nxt; 
+      wdata <= wdata_nxt;
       wstrb <= wstrb_nxt;
    end
 
@@ -854,8 +854,8 @@ logic[63:0] rd_loop_addr_adj = 0;             //Adjust address based on loop cou
 logic[63:0] rd_loop_addr_adj_q = 0;
 
 logic[511:0] rd_got_first_phase = 0;          //Got first read phase
-//logic[511:0] rd_got_first_phase_q;     
-logic rd_got_first_phase_q = 0;     
+//logic[511:0] rd_got_first_phase_q;
+logic rd_got_first_phase_q = 0;
 
 `define RD_TRK_RAM_WIDTH   8+64+DATA_WIDTH+8+8+1
 
@@ -897,7 +897,7 @@ typedef struct packed {
 rd_trk_t rd_trk_wr;
 rd_trk_t rd_trk_rd;
 
-logic rd_stop_pend;  
+logic rd_stop_pend;
 
 always @(posedge clk)
    rd_tag_mask <= ~({512{1'b1}} << (cfg_max_read_req+1));
@@ -941,9 +941,9 @@ always @(posedge clk)
 logic[8:0] rd_tag_alloc_winner_comb;
 always_comb
 begin
-   rd_tag_alloc_winner_comb = 0; 
-  
-   //Always do inc_id_mode for timing 
+   rd_tag_alloc_winner_comb = 0;
+
+   //Always do inc_id_mode for timing
    rd_tag_alloc_winner_comb = rd_tag_inc_nxt_alloc;
    //if (cfg_inc_id_mode)
    //   rd_tag_alloc_winner_comb = rd_tag_inc_nxt_alloc;
@@ -969,7 +969,7 @@ always_ff @(posedge clk)
       rd_tag_alloc_winner <= 0;
    end
    else if (!rd_tag_some_avail)
-   begin 
+   begin
       rd_tag_some_avail <= (cfg_inc_id_mode)? rd_tag_avail[rd_tag_inc_nxt_alloc]: |(rd_tag_avail & rd_tag_mask);
       rd_tag_alloc_winner <= rd_tag_alloc_winner_comb;
    end
@@ -1001,10 +1001,9 @@ always_ff @(posedge clk)
 
 
 //If in sync mode, reads cannot pass writes
-//wire rd_wr_holdoff = cfg_sync_mode && wr_inp && ((rd_cyc_count+1) >= wr_cyc_count);
-wire rd_wr_holdoff = cfg_sync_mode && wr_inp && rd_cyc_holdoff;
+wire rd_wr_holdoff = cfg_sync_mode && rd_cyc_holdoff;
 
-//Increment the read instruction 
+//Increment the read instruction
 assign rd_tag_pop = rd_inp && rd_tag_some_avail && !rd_fifo_full && !rd_wr_holdoff;
 
 always @(posedge clk)
@@ -1088,7 +1087,7 @@ always_ff @(posedge clk)
 //         rd_trk[rid_q].running_length <= rd_trk[rid].running_length + 1;
 //         rd_trk[rid_q].req_data <= rd_data_nxt;
 //      end
-//   end 
+//   end
 //rd_trk_wr.req_data[32*i+:32] = inst_rd_rdata_q[95:64] + (rd_loop_count[7:0] & {32{cfg_inc_data_loop_mode}}) + i;
 
 always_comb
@@ -1119,8 +1118,8 @@ always @(posedge clk)
       rd_md_ram_wr_addr <= rd_md_ram_wr_addr_pre;
       rd_md_ram_wr <= rd_md_ram_wr_pre;
       rd_md_ram_wr_data <= rd_md_ram_wr_data_pre;
-   end   
-   
+   end
+
 
 always @(posedge clk)
    begin
@@ -1165,7 +1164,7 @@ begin
    rd_data_mask = ((rd_trk_rd.running_length==0) && rlast_q)?     ({DATA_WIDTH{1'b1}} << (rd_trk_first_adj*32)) & (~({DATA_WIDTH{1'b1}} << (({ADJ_DW_WIDTH+5{1'b1}} + 1) -  (rd_trk_rd.last_adj[0+:ADJ_DW_WIDTH] * 32)) )):
                   (rd_trk_rd.running_length==0)?                  ({DATA_WIDTH{1'b1}} << (rd_trk_first_adj*32)):
                   (rlast_q)?                                      ~({DATA_WIDTH{1'b1}} << (({ADJ_DW_WIDTH+5{1'b1}} + 1) -  (rd_trk_rd.last_adj[0+:ADJ_DW_WIDTH] * 32)) ):
-                                                                  {DATA_WIDTH{1'b1}}; 
+                                                                  {DATA_WIDTH{1'b1}};
 
    //for (int i=1; i<DATA_DW; i++)
    //begin
@@ -1202,7 +1201,7 @@ begin
    end
 end
 
-//Do the read compare 
+//Do the read compare
 always @(posedge clk)
    if (cfg_clr_error)
    begin
@@ -1217,7 +1216,7 @@ always @(posedge clk)
       cfg_rd_cmp_error_address <= rd_cyc_addr_q;
       cfg_rd_cmp_error_data_index <= rd_dat_ram_addr_q;
    end
-      
+
 //Do adjustment for non-aligned
 wire[ADJ_DW_WIDTH-1:0] rd_req_first_adj = (inst_rd_rdata_q[63:0] >> 2);
 
@@ -1245,7 +1244,7 @@ flop_fifo #(.DEPTH(4), .WIDTH(9+11+8+64)) RD_REQ_FIFO (
    .push(rd_tag_pop_qq),
    .push_data({rd_cur_req_tag, rd_push_user, inst_rd_rdata_q[103:96], rd_push_addr}),
    .pop(arvalid & arready),
-   
+
    .pop_data({arid[8:0], aruser, arlen, araddr}),
    .half_full(),
    .watermark(rd_fifo_full),
@@ -1253,7 +1252,7 @@ flop_fifo #(.DEPTH(4), .WIDTH(9+11+8+64)) RD_REQ_FIFO (
    );
 
 //------------------------------
-// Read track RAM 
+// Read track RAM
 
 bram_1w1r #(.WIDTH(`RD_TRK_RAM_WIDTH), .ADDR_WIDTH(9), .DEPTH(512)) RD_TRK_RAM (
    .clk(clk),
@@ -1290,7 +1289,7 @@ always @(posedge clk)
    end
 
 assign rd_md_ram_rd_data = (rd_md_ram_col_q_pre)?  rd_md_ram_wr_data_q_pre:
-                           (rd_md_ram_col_q)?      rd_md_ram_wr_data_q: 
+                           (rd_md_ram_col_q)?      rd_md_ram_wr_data_q:
                                                    rd_md_ram_rd_data_ram;
 
 
@@ -1400,11 +1399,11 @@ always @(posedge clk)
                                                                                              rresp_error_first;
    end
 
-  
+
 ////Write addres recording
 //always_ff @(posedge clk)
 //   if (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'he0) && (cfg_wdata_q[31]))
-//   begin 
+//   begin
 //      for (int i=0; i<32; i++)
 //         wr_addr_rec[i] <= {64{1'b1}};
 //      wr_addr_rec_ptr <= 0;
@@ -1418,7 +1417,7 @@ always @(posedge clk)
 ////Read address recording
 //always_ff @(posedge clk)
 //   if (cfg_wr_stretch && tst_cfg_ack && (cfg_addr_q==8'he0) && (cfg_wdata_q[31]))
-//   begin 
+//   begin
 //      for (int i=0; i<32; i++)
 //         rd_addr_rec[i] <= {64{1'b1}};
 //      rd_addr_rec_ptr <= 0;
@@ -1462,5 +1461,5 @@ begin
 end
 endfunction
 
-   
+
 endmodule

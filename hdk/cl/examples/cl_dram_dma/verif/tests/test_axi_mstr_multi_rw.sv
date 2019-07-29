@@ -134,7 +134,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q),
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q) );
        if (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0] !== tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q[31:0]) begin
-         $display("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
+         $error("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
                         $realtime, tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_hi_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_lo_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0],
@@ -200,7 +200,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q),
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q) );
        if (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0] !== tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q[31:0]) begin
-         $display("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
+         $error("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
                         $realtime, tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_hi_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_lo_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0],
@@ -266,7 +266,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q),
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q) );
        if (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0] !== tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q[31:0]) begin
-         $display("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
+         $error("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
                         $realtime, tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_hi_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_lo_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0],
@@ -333,7 +333,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q),
                                    (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q) );
        if (tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0] !== tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_rd_data_q[31:0]) begin
-         $display("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
+         $error("[%t] : *** ERROR *** Data mismatch, addr:0x%0h_%0h write data is: 0x%h read data is: 0x%h",
                         $realtime, tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_hi_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_addr_lo_q[31:0],
                                    tb.card.fpga.CL.CL_DRAM_DMA_AXI_MSTR.cmd_wr_data_q[31:0],
@@ -356,7 +356,7 @@ end //}
        $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
        if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : TEST_FAILED", $realtime);
+         $error("[%t] : TEST_FAILED", $realtime);
        end else begin
          $display("[%t] : TEST_PASSED", $realtime);
        end

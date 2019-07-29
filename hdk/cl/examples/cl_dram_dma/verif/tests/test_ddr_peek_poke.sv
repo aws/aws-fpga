@@ -61,7 +61,7 @@ module test_ddr_peek_poke();
          $display("Read  to Addr %b", addr);
          tb.peek(.addr(addr), .data(wide_read_data), .size(DataSize::UINT512));
          if (wide_read_data != {512{1'b1}}) begin
-            $display("Read Data mismatch for Addr %h: Exp %h, Act %h", addr, {512{1'b1}}, wide_read_data);
+            $error("Read Data mismatch for Addr %h: Exp %h, Act %h", addr, {512{1'b1}}, wide_read_data);
             error_count++;
          end
 //Walk through DDR address range to check if two adjacent bits are wrongly wired.         
@@ -75,7 +75,7 @@ module test_ddr_peek_poke();
          $display("Read  to Addr %b", addr);
          tb.peek(.addr(addr), .data(wide_read_data), .size(DataSize::UINT512));
          if (wide_read_data != {512{1'b1}}) begin
-            $display("Read Data mismatch for Addr %h: Exp %h, Act %h", addr, {512{1'b1}}, wide_read_data);
+            $error("Read Data mismatch for Addr %h: Exp %h, Act %h", addr, {512{1'b1}}, wide_read_data);
             error_count++;
          end         
       end 
@@ -95,7 +95,7 @@ module test_ddr_peek_poke();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end

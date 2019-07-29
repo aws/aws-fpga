@@ -37,11 +37,21 @@ int fpga_mgmt_init(void)
 	for (unsigned int i = 0; i < sizeof_array(fpga_mgmt_state.slots); ++i) {
 		fpga_mgmt_state.slots[i].handle = PCI_BAR_HANDLE_INIT;
 	}
+	fpga_mgmt_state.initialized = true;
 	return fpga_pci_init();
 }
 
 int fpga_mgmt_close(void)
 {
+	if (!fpga_mgmt_state.initialized) {
+		return FPGA_ERR_OK;
+	}
+	fpga_mgmt_state.initialized = false;
+	for (unsigned int i = 0; i < sizeof_array(fpga_mgmt_state.slots); ++i) {
+		if (fpga_mgmt_state.slots[i].handle != PCI_BAR_HANDLE_INIT) {
+			fpga_mgmt_mbox_detach(i);
+		}
+	}
 	return FPGA_ERR_OK;
 }
 
@@ -75,14 +85,10 @@ int fpga_mgmt_get_sh_version(int slot_id, uint32_t *sh_version)
 
 	*sh_version = ver.sh_version;
 err:
-	if (handle != PCI_BAR_HANDLE_INIT) {
-		fpga_mgmt_mbox_detach(slot_id);
-	}
-	
 	return ret;
 }
 
-int fpga_mgmt_describe_local_image(int slot_id,
+static int fpga_mgmt_describe_cmd(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
 	int ret;
@@ -125,11 +131,27 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	fail_on(ret, out, "fpga_mgmt_get_sh_version failed");
 	info->sh_version = sh_version;
 
-	ret = fpga_pci_get_slot_spec(slot_id, &info->spec);
-	fail_on(ret, out, "fpga_pci_get_slot_spec failed");
-
 	/* copy the metrics into the out param */
 	info->metrics = metrics->fmc;
+
+out:
+	return ret;
+}
+
+int fpga_mgmt_describe_local_image(int slot_id,
+	struct fpga_mgmt_image_info *info, uint32_t flags)
+{
+	int ret;
+
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
+
+	ret = fpga_mgmt_describe_cmd(slot_id, info, flags);
+	fail_on(ret, out, "fpga_mgmt_describe_cmd");
+
+	ret = fpga_pci_get_slot_spec(slot_id, &info->spec);
+	fail_on(ret, out, "fpga_pci_get_slot_spec failed");
 
 out:
 	return ret;
@@ -139,6 +161,10 @@ int fpga_mgmt_get_status(int slot_id, int *status, int *status_q)
 {
 	int ret;
 	struct fpga_mgmt_image_info info;
+
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
 
 	fail_slot_id(slot_id, out, ret);
 
@@ -268,6 +294,10 @@ int fpga_mgmt_clear_local_image(int slot_id)
 	union afi_cmd cmd;
 	union afi_cmd rsp;
 
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
+
 	fail_slot_id(slot_id, out, ret);
 
 	memset(&cmd, 0, sizeof(union afi_cmd));
@@ -298,11 +328,17 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 	int status;
 	int ret;
 
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
+
 	/** Allow timeout adjustments that are greater than the defaults */
 	uint32_t timeout_tmp = (timeout > FPGA_MGMT_SYNC_TIMEOUT) ?
 		timeout : FPGA_MGMT_SYNC_TIMEOUT;
 	uint32_t delay_msec_tmp = (delay_msec > FPGA_MGMT_SYNC_DELAY_MSEC) ?
 		delay_msec : FPGA_MGMT_SYNC_DELAY_MSEC;
+
+	fail_on_with_code(slot_id >= FPGA_SLOT_MAX, out, ret, -EINVAL, "invalid slot");
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
 
@@ -322,7 +358,7 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 
 	/** Wait until the status is "cleared" or timeout */
 	while (!done) {
-		ret = fpga_mgmt_describe_local_image(slot_id, &tmp_info, 0); /** flags==0 */
+		ret = fpga_mgmt_describe_cmd(slot_id, &tmp_info, 0); /** flags==0 */
 
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_CLEARED) {
@@ -373,6 +409,10 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
 	}
 
+	/* now fill in the slot spec information after the rescan */
+	ret = fpga_pci_get_slot_spec(slot_id, &tmp_info.spec);
+	fail_on(ret, out, "fpga_pci_get_slot_spec failed");
+
 	if (info) {
 		*info = tmp_info;
 	}
@@ -407,6 +447,10 @@ int fpga_mgmt_load_local_image_with_options(union fpga_mgmt_load_local_image_opt
 	uint32_t len;
 	union afi_cmd cmd;
 	union afi_cmd rsp;
+
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
 
 	fail_slot_id(opt->slot_id, out, ret);
 
@@ -463,11 +507,17 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 	int status;
 	int ret;
 
+	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"fpga_mgmt_init must be called before the library can be used");
+
 	/** Allow timeout adjustments that are greater than the defaults */
 	uint32_t timeout_tmp = (timeout > FPGA_MGMT_SYNC_TIMEOUT) ?
 		timeout : FPGA_MGMT_SYNC_TIMEOUT;
 	uint32_t delay_msec_tmp = (delay_msec > FPGA_MGMT_SYNC_DELAY_MSEC) ?
 		delay_msec : FPGA_MGMT_SYNC_DELAY_MSEC;
+
+	fail_on_with_code(opt->slot_id >= FPGA_SLOT_MAX, out, ret, -EINVAL, "invalid slot");
 
 	memset(&tmp_info, 0, sizeof(tmp_info));
 	
@@ -487,7 +537,7 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 
 	/** Wait until the status is "loaded" or timeout */
 	while (!done) {
-		ret = fpga_mgmt_describe_local_image(opt->slot_id, &tmp_info, 0); /** flags==0 */
+		ret = fpga_mgmt_describe_cmd(opt->slot_id, &tmp_info, 0); /** flags==0 */
 
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_LOADED) {
@@ -542,6 +592,10 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 		ret = fpga_pci_rescan_slot_app_pfs(opt->slot_id);
 		fail_on(ret, out, "fpga_pci_rescan_slot_app_pfs failed");
 	}
+
+	/* now fill in the slot spec information after the rescan */
+	ret = fpga_pci_get_slot_spec(opt->slot_id, &tmp_info.spec);
+	fail_on(ret, out, "fpga_pci_get_slot_spec failed");
 
 	if (info) {
 		*info = tmp_info;

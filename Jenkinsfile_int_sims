@@ -5,26 +5,26 @@
 //=============================================================================
 properties([parameters([
     string(name: 'branch', defaultValue: ''),
-    booleanParam(name: 'test_markdown_links',                 defaultValue: true,  description: 'Test markdown files and check for broken links'),
-    booleanParam(name: 'test_src_headers',                    defaultValue: true,  description: 'Check copyright heaers of source files'),
-    booleanParam(name: 'test_fpga_tools',                     defaultValue: true,  description: 'Test fpga-* commands on F1'),
-    booleanParam(name: 'test_hdk_scripts',                    defaultValue: true,  description: 'Test the HDK setup scripts'),
+    booleanParam(name: 'test_markdown_links',                 defaultValue: false,  description: 'Test markdown files and check for broken links'),
+    booleanParam(name: 'test_src_headers',                    defaultValue: false,  description: 'Check copyright heaers of source files'),
+    booleanParam(name: 'test_fpga_tools',                     defaultValue: false,  description: 'Test fpga-* commands on F1'),
+    booleanParam(name: 'test_hdk_scripts',                    defaultValue: false,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
-    booleanParam(name: 'test_non_root_access',                defaultValue: true,  description: 'Test non-root access to FPGA tools'),
-    booleanParam(name: 'test_xdma',                           defaultValue: true,  description: 'Test XDMA driver'),
-    booleanParam(name: 'test_py_bindings',                    defaultValue: true,  description: 'Test Python Bindings'),
-    booleanParam(name: 'test_runtime_software',               defaultValue: true,  description: 'Test precompiled AFIs'),
+    booleanParam(name: 'test_non_root_access',                defaultValue: false,  description: 'Test non-root access to FPGA tools'),
+    booleanParam(name: 'test_xdma',                           defaultValue: false,  description: 'Test XDMA driver'),
+    booleanParam(name: 'test_py_bindings',                    defaultValue: false,  description: 'Test Python Bindings'),
+    booleanParam(name: 'test_runtime_software',               defaultValue: false,  description: 'Test precompiled AFIs'),
     booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
-    booleanParam(name: 'test_hdk_fdf',                        defaultValue: true,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
-    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: true,  description: 'Test SDAccel setup scripts'),
+    booleanParam(name: 'test_hdk_fdf',                        defaultValue: false,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
+    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: false,  description: 'Test SDAccel setup scripts'),
     booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
-    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
+    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: false,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
     booleanParam(name: 'disable_runtime_tests',               defaultValue: false, description: 'Option to disable runtime tests.'),
     booleanParam(name: 'use_test_ami',                        defaultValue: false, description: 'This option asks for the test AMI from Jenkins'),
-    booleanParam(name: 'internal_simulations',                defaultValue: false, description: 'This option asks for default agent from Jenkins')
+    booleanParam(name: 'internal_simulations',                defaultValue: true, description: 'This option asks for default agent from Jenkins')
 ])])
 
 //=============================================================================
@@ -46,7 +46,7 @@ boolean test_all_sdaccel_examples_fdf = params.get('test_all_sdaccel_examples_fd
 boolean test_helloworld_sdaccel_example_fdf = params.get('test_helloworld_sdaccel_example_fdf')
 boolean disable_runtime_tests = params.get('disable_runtime_tests')
 
-def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world', 'cl_sde']
+def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world']
 def dcp_recipe_cl_names = ['cl_dram_dma', 'cl_hello_world']
 def dcp_recipe_scenarios = [
     // Default values are tested in FDF: A0-B0-C0-DEFAULT
@@ -68,7 +68,6 @@ def fdf_test_names = [
     'cl_dram_dma[A1-B0-C0-DEFAULT]',
     'cl_hello_world[A0-B0-C0-DEFAULT]',
     'cl_hello_world_vhdl',
-    'cl_sde[A0-B0-C0-DEFAULT]',
     'cl_uram_example[2]',
     'cl_uram_example[3]',
     'cl_uram_example[4]'
@@ -76,7 +75,7 @@ def fdf_test_names = [
 
 boolean debug_dcp_gen = params.get('debug_dcp_gen')
 if (debug_dcp_gen) {
-    fdf_test_names = ['cl_sde[A0-B0-C0-DEFAULT]']
+    fdf_test_names = ['cl_hello_world[A0-B0-C0-DEFAULT]']
     test_markdown_links = false
     test_sims = false
     test_runtime_software = false
@@ -934,15 +933,13 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                             sh """
                             set -e
                             source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file}
                             """
                         } catch (exc) {
                             echo "Could not find tests. Please check the repository."
                             throw exc
                         } finally {
                             run_junit(report_file)
-                            archiveArtifacts artifacts: "${sdaccel_examples_list}.*", fingerprint: true
-
                         }
 
                         // Only run the hello world test by default

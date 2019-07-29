@@ -1,8 +1,7 @@
-/**
- * Copyright (C) 2016-2018 Xilinx, Inc
- * Author: Sonal Santan
- * Performance Monitoring Internal Parameters
- * XDMA HAL multi-threading safe, multi-channel DMA read/write support
+/*
+ * Copyright (C) 2018 Xilinx, Inc
+ * Performance Monitoring Internal Parameters using PCIe for AWS HAL Driver.
+ * NOTE: partially taken from file xaxipmon_hw.h in v5.0 of APM driver
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -28,11 +27,56 @@
 
 /* Address offsets in core */
 #define AXI_FIFO_RDFR                   0x18
+#define AXI_FIFO_RDFO                   0x1c
 #define AXI_FIFO_RDFD                   0x20
 #define AXI_FIFO_RDFD_AXI_FULL          0x1000
+#define AXI_FIFO_TDFD                   0x10
 #define AXI_FIFO_RLR                    0x24
 #define AXI_FIFO_SRR                    0x28
 #define AXI_FIFO_RESET_VALUE            0xA5
+
+/************************ SDx Performance Monitor(SPM) ************************/
+
+/* Address offsets in core */
+#define XSPM_CONTROL_OFFSET                      0x08
+#define XSPM_TRACE_CTRL_OFFSET                   0x10
+#define XSPM_EVENT_OFFSET                        0x18
+#define XSPM_SAMPLE_OFFSET                       0x20
+#define XSPM_FIFO_COUNTS_OFFSET                  0x28
+#define XSPM_FIFO_READ_COUNTS_OFFSET             0x30
+#define XSPM_WRITE_BYTES_OFFSET                  0x40
+#define XSPM_WRITE_TRANX_OFFSET                  0x44
+#define XSPM_WRITE_LATENCY_OFFSET                0x48
+#define XSPM_READ_BYTES_OFFSET                   0x4C
+#define XSPM_READ_TRANX_OFFSET                   0x50
+#define XSPM_READ_LATENCY_OFFSET                 0x54
+//#define XSPM_MIN_MAX_WRITE_LATENCY_OFFSET        0x58
+//#define XSPM_MIN_MAX_READ_LATENCY_OFFSET         0x5C
+#define XSPM_OUTSTANDING_COUNTS_OFFSET           0x58
+#define XSPM_LAST_WRITE_ADDRESS_OFFSET           0x5C
+#define XSPM_LAST_WRITE_DATA_OFFSET              0x60
+#define XSPM_LAST_READ_ADDRESS_OFFSET            0x64
+#define XSPM_LAST_READ_DATA_OFFSET               0x68
+#define XSPM_SAMPLE_WRITE_BYTES_OFFSET           0x80
+#define XSPM_SAMPLE_WRITE_TRANX_OFFSET           0x84
+#define XSPM_SAMPLE_WRITE_LATENCY_OFFSET         0x88
+#define XSPM_SAMPLE_READ_BYTES_OFFSET            0x8C
+#define XSPM_SAMPLE_READ_TRANX_OFFSET            0x90
+#define XSPM_SAMPLE_READ_LATENCY_OFFSET          0x94
+//#define XSPM_SAMPLE_MIN_MAX_WRITE_LATENCY_OFFSET 0x98
+//#define XSPM_SAMPLE_MIN_MAX_READ_LATENCY_OFFSET  0x9C
+#define XSPM_SAMPLE_OUTSTANDING_COUNTS_OFFSET    0x98
+#define XSPM_SAMPLE_LAST_WRITE_ADDRESS_OFFSET    0x9C
+#define XSPM_SAMPLE_LAST_WRITE_DATA_OFFSET       0xA0
+#define XSPM_SAMPLE_LAST_READ_ADDRESS_OFFSET     0xA4
+#define XSPM_SAMPLE_LAST_READ_DATA_OFFSET        0xA8
+
+/* SPM Control Register masks */
+#define XSPM_CR_RESET_ON_SAMPLE_MASK             0x00000010
+#define XSPM_CR_FIFO_RESET_MASK                  0x00000008
+#define XSPM_CR_TRACE_ENABLE_MASK                0x00000004
+#define XSPM_CR_COUNTER_RESET_MASK               0x00000002
+#define XSPM_CR_COUNTER_ENABLE_MASK              0x00000001
 
 /************************ APM Constant Definitions ****************************/
 
@@ -113,7 +157,7 @@
 #define XAPM_SINC8_OFFSET               0x0284  /**< Sampled Incrementer 8 Register */
 #define XAPM_SMC9_OFFSET                0x0290  /**< Sampled Metric Counter 9 Register */
 #define XAPM_SINC9_OFFSET               0x0294  /**< Sampled Incrementer 9 Register */
-
+                                        
 #define XAPM_MC10_OFFSET                0x01A0  /**< Metric Counter 10 Register */
 #define XAPM_MC11_OFFSET                0x01B0  /**< Metric Counter 11 Register */
 #define XAPM_MC12_OFFSET                0x0500  /**< Metric Counter 12 Register */
@@ -152,7 +196,7 @@
 #define XAPM_MC45_OFFSET                0x0990  /**< Metric Counter 45 Register */
 #define XAPM_MC46_OFFSET                0x09A0  /**< Metric Counter 46 Register */
 #define XAPM_MC47_OFFSET                0x09B0  /**< Metric Counter 47 Register */
-
+                                        
 #define XAPM_SMC10_OFFSET               0x02A0  /**< Sampled Metric Counter 10 Register */
 #define XAPM_SMC11_OFFSET               0x02B0  /**< Sampled Metric Counter 11 Register */
 #define XAPM_SMC12_OFFSET               0x0600  /**< Sampled Metric Counter 12 Register */
@@ -208,7 +252,7 @@
 #define XAPM_SMC61_OFFSET               0x0A58  /**< Sampled Metric Counter 61 Register */
 #define XAPM_SMC62_OFFSET               0x0AB4  /**< Sampled Metric Counter 62 Register */
 #define XAPM_SMC63_OFFSET               0x0AB8  /**< Sampled Metric Counter 63 Register */
-
+                                        
 #define XAPM_CTL_OFFSET                 0x0300  /**< Control Register */
 #define XAPM_ID_OFFSET                  0x0304  /**< Latency ID Register */
 #define XAPM_IDMASK_OFFSET              0x0308  /**< ID Mask Register */

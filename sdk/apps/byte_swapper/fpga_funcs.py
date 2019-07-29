@@ -25,6 +25,7 @@ class FPGAFuncs(object):
         self.AFI = os.environ['BSWAPPER_AFI'].encode('utf-8')
         self.register = int(os.environ['BSWAPPER_REG'], 0)
         logger.info("Slot to be loaded: {}\nAFI: {}\nregister: 0x{:x}".format(self.slot, self.AFI, self.register))
+        fpga_mgmt.fpga_mgmt_init()
 
     def get_slot_info(self):
         logger.info("Retrieving slot info (slot={}).".format(self.slot))
@@ -81,3 +82,6 @@ class FPGAFuncs(object):
         ret = fpga_mgmt.fpga_mgmt_clear_local_image(self.slot)
         if ret != 0:
             raise RuntimeError("Could not clear slot {}".format(self.slot))
+
+    def clean_up(self):
+        fpga_mgmt.fpgma_mgmt_close()

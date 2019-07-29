@@ -74,5 +74,5 @@ The following table displays information about the CL that is required to regist
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID (N.Virginia:us-east-1) | afi-08fca33060fff4a62 |
-| Pre-generated AGFI ID | agfi-0f4eca32dc6100729 |
+| Pre-generated AFI ID (N.Virginia:us-east-1) | afi-030f5efdbdb03e186 |
+| Pre-generated AGFI ID | agfi-0e6adf0cd6932d880 |

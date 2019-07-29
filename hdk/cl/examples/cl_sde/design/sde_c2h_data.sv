@@ -202,44 +202,44 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    always_comb
      begin
-        req_state_next <= req_state;
+        req_state_next = req_state;
         case (req_state)
           REQ_IDLE :
             if (desc_dm_desc_valid)
-              req_state_next <= REQ_WAIT_DATA; // REQ_GET_DESC;
+              req_state_next = REQ_WAIT_DATA; // REQ_GET_DESC;
             else
-              req_state_next <= REQ_IDLE;
+              req_state_next = REQ_IDLE;
 
 //          REQ_GET_DESC:
-//            req_state_next <= REQ_WAIT_DATA;
+//            req_state_next = REQ_WAIT_DATA;
 
           REQ_WAIT_DATA:
             if (curr_txn_data_avail & ~dp_wb_ff_full & bresp_prealloc_avail)
-              req_state_next <= REQ_ADDR;
+              req_state_next = REQ_ADDR;
             else
-              req_state_next <= REQ_WAIT_DATA;
+              req_state_next = REQ_WAIT_DATA;
 
           REQ_ADDR:
             if (dm_pm_awvalid & pm_dm_awready)
-              req_state_next <= REQ_DATA;
+              req_state_next = REQ_DATA;
             else
-              req_state_next <= REQ_ADDR;
+              req_state_next = REQ_ADDR;
 
           REQ_DATA:
             if (data_tx_done && data_desc_done)
-              req_state_next <= REQ_IDLE;
+              req_state_next = REQ_IDLE;
             else if (data_tx_done)
-              req_state_next <= REQ_WAIT_CALC;
+              req_state_next = REQ_WAIT_CALC;
             else
-              req_state_next <= REQ_DATA;
+              req_state_next = REQ_DATA;
 
           REQ_WAIT_CALC:
             // Only required to be in this state when servicing multiple packets per descriptor
             // Need to wait 1 clock for the buf_dm_num_bytes to get updated after the end of REQ_DATA phase
-            req_state_next <= REQ_WAIT_DATA;
+            req_state_next = REQ_WAIT_DATA;
 
           default:
-            req_state_next <= req_state;
+            req_state_next = req_state;
 
         endcase // case (req_state)
      end // always_comb

@@ -37,7 +37,7 @@ module ram_fifo_ft #(parameter WIDTH=32, parameter PTR_WIDTH=7, parameter WATERM
                                        // to see if FIFO is not 
    );
 
-parameter[31:0] NUM_LOC = 1'b1 << PTR_WIDTH;
+localparam[31:0] NUM_LOC = 1'b1 << PTR_WIDTH;
 
 logic ram_pop;
 logic[WIDTH-1:0] ram_rdata;

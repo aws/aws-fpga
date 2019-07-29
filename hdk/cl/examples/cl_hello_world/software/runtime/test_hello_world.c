@@ -52,10 +52,6 @@ static uint16_t pci_device_id = 0xF000; /* PCI Device ID preassigned by Amazon f
  * check if the corresponding AFI for hello_world is loaded
  */
 int check_afi_ready(int slot_id);
-/*
- * An example to attach to an arbitrary slot, pf, and bar with register access.
- */
-int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id);
 
 void usage(char* program_name) {
     printf("usage: %s [--slot <slot-id>][<poke-value>]\n", program_name);
@@ -64,6 +60,11 @@ void usage(char* program_name) {
 uint32_t byte_swap(uint32_t value);
  
 #endif
+
+/*
+ * An example to attach to an arbitrary slot, pf, and bar with register access.
+ */
+int peek_poke_example(uint32_t value, int slot_id, int pf_id, int bar_id);
 
 uint32_t byte_swap(uint32_t value) {
     uint32_t swapped_value = 0;
@@ -76,14 +77,15 @@ uint32_t byte_swap(uint32_t value) {
 
 #ifdef SV_TEST
 //For cadence and questa simulators the main has to return some value
-   #ifdef INT_MAIN
-   int test_main(uint32_t *exit_code) {
-   #else 
-   void test_main(uint32_t *exit_code) {
-   #endif 
+# ifdef INT_MAIN
+int test_main(uint32_t *exit_code)
+# else 
+void test_main(uint32_t *exit_code)
+# endif 
 #else 
-    int main(int argc, char **argv) {
+int main(int argc, char **argv)
 #endif
+{
     //The statements within SCOPE ifdef below are needed for HW/SW co-simulation with VCS
     #ifdef SCOPE
       svScope scope;
@@ -121,8 +123,8 @@ uint32_t byte_swap(uint32_t value) {
     }
 #endif
 
-    /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
-    rc = fpga_pci_init();
+    /* initialize the fpga_mgmt library */
+    rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_pci library");
 
 #ifndef SV_TEST
@@ -172,7 +174,7 @@ out:
 /* As HW simulation test is not run on a AFI, the below function is not valid */
 #ifndef SV_TEST
 
- int check_afi_ready(int slot_id) {
+int check_afi_ready(int slot_id) {
    struct fpga_mgmt_image_info info = {0}; 
    int rc;
 
@@ -218,7 +220,7 @@ out:
    return rc;
  out:
    return 1;
- }
+}
 
 #endif
 

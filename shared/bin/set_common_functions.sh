@@ -41,12 +41,13 @@ function is_myvivado_set {
     fi
 }
 
-
-function is_vivado_available {
-    if ! vivado -version > /dev/null 2>&1 ; then
-        false
+# Function to check whether a command exists.
+exists() {
+    if command -v $1 >/dev/null 2>&1
+    then
+        return 0
     else
-        true
+        return 1
     fi
 }
 

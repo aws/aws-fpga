@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017-2018 Xilinx, Inc
  * Debug functionality to AWS hal driver
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
  * License is located at
@@ -16,8 +17,8 @@
 
 
 #include "shim.h"
-#include "datamover.h"
 #include "perfmon_parameters.h"
+#include "xclbin.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -30,6 +31,7 @@
 #include <thread>
 #include <vector>
 #include <time.h>
+#include <string>
 
 #ifndef _WINDOWS
 // TODO: Windows build support
@@ -47,22 +49,69 @@ namespace awsbwhal {
   // Helper functions
   // ****************
 
-  uint64_t AwsXcl::getProtocolCheckerBaseAddress(int type) {
-    switch (type) {
-    case 0:
-      return LAPC0_BASE;
-    case 1:
-      return LAPC1_BASE;
-    case 2:
-      return LAPC2_BASE;
-    case 3:
-      return LAPC3_BASE;
-    };
-    return 0;
+  void AwsXcl::readDebugIpLayout()
+  {
+    if (mIsDebugIpLayoutRead)
+      return;
+
+    //
+    // Profiling - addresses and names
+    // Parsed from debug_ip_layout.rtd contained in xclbin
+    if (mLogStream.is_open()) {
+      mLogStream << "debug_ip_layout: reading profile addresses and names..." << std::endl;
+    }
+    mMemoryProfilingNumberSlots = getIPCountAddrNames(AXI_MM_MONITOR, mPerfMonBaseAddress, mPerfMonSlotName);
+    mIsDeviceProfiling = (mMemoryProfilingNumberSlots > 0);
+
+    std::string fifoName;
+    uint64_t fifoCtrlBaseAddr = mOffsets[XCL_ADDR_SPACE_DEVICE_PERFMON];
+    getIPCountAddrNames(AXI_MONITOR_FIFO_LITE, &fifoCtrlBaseAddr, &fifoName);
+    mPerfMonFifoCtrlBaseAddress = fifoCtrlBaseAddr;
+
+    uint64_t fifoReadBaseAddr = XPAR_AXI_PERF_MON_0_TRACE_OFFSET_AXI_FULL2;
+    getIPCountAddrNames(AXI_MONITOR_FIFO_FULL, &fifoReadBaseAddr, &fifoName);
+    mPerfMonFifoReadBaseAddress = fifoReadBaseAddr;
+
+    if (mLogStream.is_open()) {
+      for (unsigned int i = 0; i < mMemoryProfilingNumberSlots; ++i) {
+        mLogStream << "debug_ip_layout: AXI_MM_MONITOR slot " << i << ": "
+                   << "base address = 0x" << std::hex << mPerfMonBaseAddress[i]
+                   << ", name = " << mPerfMonSlotName[i] << std::endl;
+      }
+      mLogStream << "debug_ip_layout: AXI_MONITOR_FIFO_LITE: "
+                 << "base address = 0x" << std::hex << fifoCtrlBaseAddr << std::endl;
+      mLogStream << "debug_ip_layout: AXI_MONITOR_FIFO_FULL: "
+                 << "base address = 0x" << std::hex << fifoReadBaseAddr << std::endl;
+    }
+
+    // Only need to read it once
+    mIsDebugIpLayoutRead = true;
   }
 
-  uint32_t AwsXcl::getCheckerNumberSlots(int type) {
-    return getBankCount();
+  // Gets the information about the specified IP from the sysfs debug_ip_table.
+  // The IP types are defined in xclbin.h
+  uint32_t AwsXcl::getIPCountAddrNames(int type, uint64_t *baseAddress, std::string * portNames) {
+    debug_ip_layout *map;
+    std::string path = "/sys/bus/pci/devices/" + mDevUserName + "/debug_ip_layout";
+    std::ifstream ifs(path.c_str(), std::ifstream::binary);
+    uint32_t count = 0;
+    char buffer[4096];
+    if( ifs ) {
+      //sysfs max file size is 4096
+      ifs.read(buffer, 4096);
+      if (ifs.gcount() > 0) {
+        map = (debug_ip_layout*)(buffer);
+        for( unsigned int i = 0; i < map->m_count; i++ ) {
+          if (map->m_debug_ip_data[i].m_type == type) {
+            if(baseAddress)baseAddress[count] = map->m_debug_ip_data[i].m_base_address;
+            if(portNames) portNames[count] = (char*)map->m_debug_ip_data[i].m_name;
+            ++count;
+          }
+        }
+      }
+      ifs.close();
+    }
+    return count;
   }
 
   // Read APM performance counters
@@ -85,13 +134,14 @@ namespace awsbwhal {
         LAPC_SNAPSHOT_STATUS_2_OFFSET, LAPC_SNAPSHOT_STATUS_3_OFFSET
     };
 
-    uint32_t numSlots = getCheckerNumberSlots(0);
-
+    uint64_t baseAddress[XLAPC_MAX_NUMBER_SLOTS];
+    uint32_t numSlots = getIPCountAddrNames(LAPC, baseAddress, nullptr);
     uint32_t temp[XLAPC_STATUS_PER_SLOT];
-    for (int s = 0; s < numSlots; ++s) {
-      uint64_t baseAddress = getProtocolCheckerBaseAddress(s);
+    aCheckerResults->NumSlots = numSlots;
+    snprintf(aCheckerResults->DevUserName, 256, "%s", mDevUserName.c_str());
+    for (uint32_t s = 0; s < numSlots; ++s) {
       for (int c=0; c < XLAPC_STATUS_PER_SLOT; c++)
-        size += xclRead(XCL_ADDR_SPACE_DEVICE_CHECKER, baseAddress+statusRegisters[c], &temp[c], 4);
+        size += xclRead(XCL_ADDR_SPACE_DEVICE_CHECKER, baseAddress[s]+statusRegisters[c], &temp[c], 4);
 
       aCheckerResults->OverallStatus[s]      = temp[XLAPC_OVERALL_STATUS];
       std::copy(temp+XLAPC_CUMULATIVE_STATUS_0, temp+XLAPC_SNAPSHOT_STATUS_0, aCheckerResults->CumulativeStatus[s]);
@@ -102,6 +152,7 @@ namespace awsbwhal {
   }
 
   // Read APM performance counters
+  
   size_t AwsXcl::xclDebugReadCounters(xclDebugCountersResults* aCounterResults) {
     if (mLogStream.is_open()) {
       mLogStream << __func__ << ", " << std::this_thread::get_id()
@@ -110,51 +161,47 @@ namespace awsbwhal {
     }
 
     size_t size = 0;
-    uint32_t scaleFactor = getPerfMonByteScaleFactor(XCL_PERF_MON_MEMORY);
-    uint64_t baseAddress = getPerfMonBaseAddress(XCL_PERF_MON_MEMORY);
 
-    uint64_t metricAddress[] = {
-        // Slot 0
-        baseAddress + XAPM_MC0_OFFSET,  baseAddress + XAPM_MC1_OFFSET,
-        baseAddress + XAPM_MC3_OFFSET,  baseAddress + XAPM_MC4_OFFSET,
-        // Slot 1
-        baseAddress + XAPM_MC6_OFFSET,  baseAddress + XAPM_MC7_OFFSET,
-        baseAddress + XAPM_MC9_OFFSET,  baseAddress + XAPM_MC10_OFFSET,
-        // Slot 2
-        baseAddress + XAPM_MC12_OFFSET, baseAddress + XAPM_MC13_OFFSET,
-        baseAddress + XAPM_MC15_OFFSET, baseAddress + XAPM_MC16_OFFSET,
-        // Slot 3
-        baseAddress + XAPM_MC18_OFFSET, baseAddress + XAPM_MC19_OFFSET,
-        baseAddress + XAPM_MC21_OFFSET, baseAddress + XAPM_MC22_OFFSET,
-        // Slot 4
-        baseAddress + XAPM_MC24_OFFSET, baseAddress + XAPM_MC25_OFFSET,
-        baseAddress + XAPM_MC27_OFFSET, baseAddress + XAPM_MC28_OFFSET,
-        // Slot 5
-        baseAddress + XAPM_MC30_OFFSET, baseAddress + XAPM_MC31_OFFSET,
-        baseAddress + XAPM_MC33_OFFSET, baseAddress + XAPM_MC34_OFFSET,
-        // Slot 6
-        baseAddress + XAPM_MC36_OFFSET, baseAddress + XAPM_MC37_OFFSET,
-        baseAddress + XAPM_MC39_OFFSET, baseAddress + XAPM_MC40_OFFSET,
-        // Slot 7
-        baseAddress + XAPM_MC42_OFFSET, baseAddress + XAPM_MC43_OFFSET,
-        baseAddress + XAPM_MC45_OFFSET, baseAddress + XAPM_MC46_OFFSET,
+    uint64_t spm_offsets[] = {
+        XSPM_SAMPLE_WRITE_BYTES_OFFSET,
+        XSPM_SAMPLE_WRITE_TRANX_OFFSET,
+        XSPM_SAMPLE_READ_BYTES_OFFSET,
+        XSPM_SAMPLE_READ_TRANX_OFFSET,
+        XSPM_SAMPLE_OUTSTANDING_COUNTS_OFFSET,
+        XSPM_SAMPLE_LAST_WRITE_ADDRESS_OFFSET,
+        XSPM_SAMPLE_LAST_WRITE_DATA_OFFSET,
+        XSPM_SAMPLE_LAST_READ_ADDRESS_OFFSET,
+        XSPM_SAMPLE_LAST_READ_DATA_OFFSET
     };
 
     // Read all metric counters
-    uint32_t countnum = 0;
-    uint32_t numSlots = getPerfMonNumberSlots(XCL_PERF_MON_MEMORY);
+    uint64_t baseAddress[XSPM_MAX_NUMBER_SLOTS];
+    uint32_t numSlots = getIPCountAddrNames(AXI_MM_MONITOR, baseAddress, nullptr);
 
-    uint32_t temp[XAPM_DEBUG_METRIC_COUNTERS_PER_SLOT];
+    uint32_t temp[XSPM_DEBUG_SAMPLE_COUNTERS_PER_SLOT];
 
+    aCounterResults->NumSlots = numSlots;
+    snprintf(aCounterResults->DevUserName, 256, "%s", mDevUserName.c_str());
     for (uint32_t s=0; s < numSlots; s++) {
-      for (int c=0; c < XAPM_DEBUG_METRIC_COUNTERS_PER_SLOT; c++)
-        size += xclRead(XCL_ADDR_SPACE_DEVICE_PERFMON, metricAddress[countnum++], &temp[c], 4);
+      uint32_t sampleInterval;
+      // Read sample interval register to latch the sampled metric counters
+      size += xclRead(XCL_ADDR_SPACE_DEVICE_PERFMON,
+                    baseAddress[s] + XSPM_SAMPLE_OFFSET,
+                    &sampleInterval, 4);
 
-      aCounterResults->WriteBytes[s]      = temp[0] * scaleFactor;
+      for (int c=0; c < XSPM_DEBUG_SAMPLE_COUNTERS_PER_SLOT; c++)
+        size += xclRead(XCL_ADDR_SPACE_DEVICE_PERFMON, baseAddress[s]+spm_offsets[c], &temp[c], 4);
+
+      aCounterResults->WriteBytes[s]      = temp[0];
       aCounterResults->WriteTranx[s]      = temp[1];
 
-      aCounterResults->ReadBytes[s]       = temp[2] * scaleFactor;
+      aCounterResults->ReadBytes[s]       = temp[2];
       aCounterResults->ReadTranx[s]       = temp[3];
+      aCounterResults->OutStandCnts[s]    = temp[4];
+      aCounterResults->LastWriteAddr[s]   = temp[5];
+      aCounterResults->LastWriteData[s]   = temp[6];
+      aCounterResults->LastReadAddr[s]    = temp[7];
+      aCounterResults->LastReadData[s]    = temp[8];
     }
     return size;
   }
@@ -166,10 +213,12 @@ size_t xclDebugReadIPStatus(xclDeviceHandle handle, xclDebugReadType type, void*
   if (!drv)
     return -1;
   switch (type) {
-    case XCL_DEBUG_READ_TYPE_APM :
-      return drv->xclDebugReadCounters(reinterpret_cast<xclDebugCountersResults*>(debugResults));
     case XCL_DEBUG_READ_TYPE_LAPC :
       return drv->xclDebugReadCheckers(reinterpret_cast<xclDebugCheckersResults*>(debugResults));
+    case XCL_DEBUG_READ_TYPE_SPM :
+      return drv->xclDebugReadCounters(reinterpret_cast<xclDebugCountersResults*>(debugResults));
+    default :
+      break;
   };
   return -1;
 }

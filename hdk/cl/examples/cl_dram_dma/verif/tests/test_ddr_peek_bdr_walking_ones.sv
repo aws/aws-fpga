@@ -162,7 +162,7 @@ module test_ddr_peek_bdr_walking_ones();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : TEST_FAILED", $realtime);
+         $error("[%t] : TEST_FAILED", $realtime);
       end else begin
          $display("[%t] : TEST_PASSED", $realtime);
       end
@@ -180,7 +180,7 @@ module test_ddr_peek_bdr_walking_ones();
          $display("Read Data for Addr %h: Act %h", bdr_addr, read_data);
 
          if (read_data != data) begin
-            $display("Read Data mismatch for Addr %h: Exp %h, Act %h", bdr_addr, data, read_data);
+            $error("Read Data mismatch for Addr %h: Exp %h, Act %h", bdr_addr, data, read_data);
             error_count++;
          end
       end

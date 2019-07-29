@@ -25,5 +25,6 @@
 
 // Uncomment to disable Virtual JTAG
 //`define DISABLE_VJTAG_DEBUG
+`define NO_SDE_DEBUG_ILA
 
 `endif
