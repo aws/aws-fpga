@@ -489,7 +489,7 @@ fpga_pci_mbox_scan(struct fpga_slot_spec spec_array_out[], int size)
 	}
 
 	/*
-	 * Loop through the sysfs device directories
+   * Loop through the sysfs device directories
 	 * -we first find the mbox dev then handle the app dev as a fixed
 	 *  mapping based off of the mbox dev's pci resource map
 	 *  (see fpga_pci_mbox2app).

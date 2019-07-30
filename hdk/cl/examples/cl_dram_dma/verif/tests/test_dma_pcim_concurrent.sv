@@ -221,6 +221,7 @@ module test_dma_pcim_concurrent();
         
          // Start writes and reads
          tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT));
+
         //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
         // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
          $display("[%t] : Waiting for PCIe write activity to complete", $realtime);

@@ -14,5 +14,4 @@
 ## SDAccel (For additional restrictions see [SDAccel ERRATA](./SDAccel/ERRATA.md))
 * Virtual Ethernet is not supported when using SDAccel
 * DRAM Data retention is not supported for kernels that provision less than 4 DDRs
-* Combinatorial loops in CL designs are not supported.
-   
+* Combinatorial loops in CL designs are not supported. 

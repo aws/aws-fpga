@@ -148,11 +148,11 @@ module test_host_pcim();
 
          // Start writes and reads
          tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT | `RD_START_BIT));
-	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
+      	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
          $display("[%t] : Waiting for PCIe write and read activity to complete", $realtime);
          #500ns;
          timeout_count = 0;
-           
+          
          do begin
             tb.peek_ocl(.addr(`CNTL_REG), .data(read_data));
             timeout_count++;

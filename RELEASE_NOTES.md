@@ -26,6 +26,7 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+
 ## Release 1.4.10 (See [ERRATA](./ERRATA.md) for unsupported features)
 * New functionality:
     * SDK now sorts the slots in DBDF order. Any scripts or integration maintainers should note that the slot order will be different from previous versions and should make any updates accordingly.
