@@ -514,6 +514,7 @@ if (test_sims) {
                         if(cl_name == 'cl_vhdl_hello_world') {
                            cl_dir_name = "cl_hello_world_vhdl"
                         }
+
                         String node_name = "Sim ${cl_name} ${xilinx_version} ${simulator}"
                         String key = "test_${cl_name}__"
                         String report_file = "test_sims_${cl_name}_${xilinx_version}.xml"
