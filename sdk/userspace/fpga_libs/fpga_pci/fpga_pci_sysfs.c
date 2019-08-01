@@ -419,8 +419,43 @@ int fpga_release_readdir_lock() {
 #endif
 }
 
-int
-fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
+static inline bool fpga_slot_spec_is_initialized(struct fpga_slot_spec *spec)
+{
+	struct fpga_pci_resource_map *map = &spec->map[FPGA_MGMT_PF];
+	return !(map->domain == 0 && map->bus == 0 &&
+		map->dev == 0 && map->func == 0);
+}
+
+
+static int
+fpga_pci_slot_spec_compare(const void *a, const void *b)
+{
+	struct fpga_slot_spec *spec_a = (*((struct fpga_slot_spec **)a));
+	struct fpga_slot_spec *spec_b = (*((struct fpga_slot_spec **)b));
+
+	int test;
+
+	/* make sure than uninitialized entries fall to the bottom of the list */
+	bool a_initialized = fpga_slot_spec_is_initialized(spec_a);
+	bool b_initialized = fpga_slot_spec_is_initialized(spec_b);
+	if (a_initialized != b_initialized) {
+		return (a_initialized) ? -1 : 1;
+	}
+
+	test = spec_a->map[FPGA_MGMT_PF].domain - spec_b->map[FPGA_MGMT_PF].domain;
+	if (test != 0) return test;
+
+	test = spec_a->map[FPGA_MGMT_PF].bus - spec_b->map[FPGA_MGMT_PF].bus;
+	if (test != 0) return test;
+
+	test = spec_a->map[FPGA_MGMT_PF].dev - spec_b->map[FPGA_MGMT_PF].dev;
+	if (test != 0) return test;
+
+	return spec_a->map[FPGA_MGMT_PF].func - spec_b->map[FPGA_MGMT_PF].func;
+}
+
+static int
+fpga_pci_mbox_scan(struct fpga_slot_spec spec_array_out[], int size)
 {
 	int ret;
 	bool found_afi_slot = false;
@@ -434,7 +469,7 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	entry = &entry_stack;
 	memset(entry, 0, sizeof(struct dirent));
 #else
-	/**
+	/*
 	 * Protect calls to readdir with a mutex because multiple threads may call
 	 * this function, which always reads from the same directory. The man page
 	 * for readdir says the POSIX spec does not require threadsafety.
@@ -442,21 +477,22 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 	fpga_acquire_readdir_lock();
 #endif
 
-	int slot_dev_index = 0;
-	struct fpga_slot_spec search_spec;
-	struct fpga_pci_resource_map search_map, app_map;
-	char app_dir_name[NAME_MAX + 1];
+	unsigned int slot_dev_index = 0;
+	struct fpga_pci_resource_map search_map;
 
-	memset(&search_spec, 0, sizeof(struct fpga_slot_spec));
+	/* allocate space for sorting the spec_array */
+	struct fpga_slot_spec *spec_array[FPGA_SLOT_MAX];
+	struct fpga_slot_spec spec_array_storage[FPGA_SLOT_MAX];
+	memset(spec_array_storage, 0, sizeof(spec_array_storage));
+	for (int i = 0; i < FPGA_SLOT_MAX; ++i) {
+		spec_array[i] = &spec_array_storage[i];
+	}
 
-	/**
-	 * Loop through the sysfs device directories
+	/*
+   * Loop through the sysfs device directories
 	 * -we first find the mbox dev then handle the app dev as a fixed
 	 *  mapping based off of the mbox dev's pci resource map
 	 *  (see fpga_pci_mbox2app).
-	 * -this approach is simple and more efficient than the
-	 *  alternative of requiring an additional sort of the dirent entries by
-	 *  the PCI device number (DBDF).
 	 */
 	while (true) {
 
@@ -488,23 +524,11 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 			ret = fpga_pci_get_resources(entry->d_name, &search_map);
 			fail_on(ret != 0, err_unlock, "Error retrieving resource information");
 
-			/* app resources */
-			memset(&app_map, 0, sizeof(struct fpga_pci_resource_map));
-			app_dir_name[0] = 0;
-			ret = fpga_pci_mbox2app(&search_map, &app_map,
-				app_dir_name, sizeof(app_dir_name));
-			fail_on(ret != 0, err_unlock, "Error retrieving app pf information");
-
-			ret = fpga_pci_get_resources(app_dir_name, &app_map);
-			fail_on(ret != 0, err_unlock, "Error retrieving resource information");
-
 			/* copy the results into the spec_array */
-			spec_array[slot_dev_index].map[FPGA_APP_PF] = app_map;
-			spec_array[slot_dev_index].map[FPGA_MGMT_PF] = search_map;
-
+			spec_array[slot_dev_index]->map[FPGA_MGMT_PF] = search_map;
 			found_afi_slot = true;
 			slot_dev_index += 1;
-			if (slot_dev_index >= size) {
+			if (slot_dev_index >= sizeof_array(spec_array)) {
 				break;
 			}
 		}
@@ -516,6 +540,13 @@ fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
 		"No fpga-image-slots found");
 
 	closedir(dirp);
+
+	/* sort the spec_array and copy it into the out parameter */
+	qsort(spec_array, sizeof_array(spec_array), sizeof(spec_array[0]),
+		fpga_pci_slot_spec_compare);
+	for (unsigned int i = 0; i < min((unsigned) size, sizeof_array(spec_array)); ++i) {
+		spec_array_out[i] = *spec_array[i];
+	}
 
 	errno = 0;
 	return 0;
@@ -533,6 +564,56 @@ err:
 	return ret;
 }
 
+/**
+ * Fill in the application PF information in a slot spec which already
+ * has the mailbox PF initialized.
+ */
+static int
+fpga_pci_complete_slot_spec(struct fpga_slot_spec *spec)
+{
+	int ret;
+	char app_dir_name[NAME_MAX + 1];
+	struct fpga_pci_resource_map app_map;
+
+	/* fill in app resources */
+	memset(&app_map, 0, sizeof(struct fpga_pci_resource_map));
+	app_dir_name[0] = 0;
+	ret = fpga_pci_mbox2app(&spec->map[FPGA_MGMT_PF], &app_map,
+		app_dir_name, sizeof(app_dir_name));
+	fail_on(ret != 0, out, "Error retrieving app pf information");
+
+	ret = fpga_pci_get_resources(app_dir_name, &app_map);
+	fail_on(ret != 0, out, "Error retrieving resource information");
+
+	/* copy the results into the spec_array */
+	spec->map[FPGA_APP_PF] = app_map;
+
+out:
+	return ret;
+}
+
+int
+fpga_pci_get_all_slot_specs(struct fpga_slot_spec spec_array[], int size)
+{
+	int rc;
+
+	rc = fpga_pci_mbox_scan(spec_array, size);
+	fail_on(rc, out, "failed to enumerate FPGA slots");
+
+	for (int i = 0; i < size; ++i) {
+		/* after encountering the first empty slot, stop iterating */
+		if (!fpga_slot_spec_is_initialized(&spec_array[i])) {
+			break;
+		}
+		/* fill in app resources */
+		rc = fpga_pci_complete_slot_spec(&spec_array[i]);
+		fail_on(rc, out, "unabled to get APP PF info for slot %d", i);
+	}
+
+out:
+	return rc;
+}
+
 int
 fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 {
@@ -548,10 +629,14 @@ fpga_pci_get_slot_spec(int slot_id, struct fpga_slot_spec *spec)
 
 	/* tell fpga_pci_get_all_slot_specs not to search past the slot number */
 	size = min(sizeof_array(spec_array), (unsigned) slot_id + 1);
-	ret = fpga_pci_get_all_slot_specs(spec_array, size);
-	fail_on(ret, err, "Unable to read PCI device information.");
 
-	if (spec_array[slot_id].map[FPGA_APP_PF].vendor_id == 0) {
+	ret = fpga_pci_mbox_scan(spec_array, size);
+	fail_on(ret, err, "failed to enumerate FPGA slots");
+
+	ret = fpga_pci_complete_slot_spec(&spec_array[slot_id]);
+	fail_on(ret, err, "unabled to get APP PF info for slot %d", slot_id);
+
+	if (!fpga_slot_spec_is_initialized(&spec_array[slot_id])) {
 		log_error("No device matching specified id: %d", slot_id);
 		return -ENOENT;
 	}

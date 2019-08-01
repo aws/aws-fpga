@@ -44,6 +44,7 @@ class TestSims(AwsFpgaTestBase):
     """
 
     ADD_SIMULATOR = True
+    ADD_BATCH = True
 
     @classmethod
     def setup_class(cls):
@@ -121,7 +122,9 @@ class TestSims(AwsFpgaTestBase):
 
         return return_dict
 
-    def run_sim(self, test_dir="", test_name="", test_type="", simulator=""):
+    def run_sim(self, test_dir="", test_name="", test_type="", simulator="", batch=""):
+
+        vivado_version = os.environ.get('VIVADO_TOOL_VERSION', 'unknown')
 
         # Error on defaults
         if not(test_dir and test_name and test_type):
@@ -131,12 +134,13 @@ class TestSims(AwsFpgaTestBase):
                         '--test-name', test_name,
                         '--test-dir', test_dir,
                         '--test-type', test_type,
-                        '--simulator', simulator
+                        '--simulator', simulator,
+                        '--batch', batch,
+                        '--vivado-version', vivado_version
                         ]
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd(" ".join(command_line))
 
-        vivado_version = os.environ.get('VIVADO_TOOL_VERSION', 'unknown')
 
         # write simulation output
         if simulator == "vivado":
@@ -172,506 +176,505 @@ class TestSims(AwsFpgaTestBase):
 
     # cl_dram_dma sv
 
-    def test_cl_dram_dma__dram_dma__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma__sv_fast(self, simulator):
+    def test_cl_dram_dma__dram_dma__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_axi_mstr__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_axi_mstr__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_axi_mstr'
         test_type = 'sv'
         
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_rnd__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_rnd__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_rnd'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast(self, simulator):
+    def test_cl_dram_dma__dram_dma_rnd__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_rnd'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_rnd'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_rnd'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_4k_crossing__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_4k_crossing__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_4k_crossing'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_single_beat_4k__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_single_beat_4k'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast(self, simulator):
+    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_single_beat_4k'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_single_beat_4k'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_single_beat_4k'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcis_concurrent__sv(self, simulator):
+    def test_cl_dram_dma__dma_pcis_concurrent__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcis_concurrent'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast(self, simulator):
+    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcis_concurrent'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcis_concurrent'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcis_concurrent'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__host_pcim__sv(self, simulator):
+    def test_cl_dram_dma__host_pcim__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_host_pcim'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcim_concurrent__sv(self, simulator):
-
+    def test_cl_dram_dma__dma_pcim_concurrent__sv(self, simulator, batch):
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcim_concurrent'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast(self, simulator):
+    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcim_concurrent'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_direct(self, simulator):
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
+    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcim_concurrent'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_pcim_concurrent'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_sda_concurrent__sv(self, simulator):
+    def test_cl_dram_dma__dma_sda_concurrent__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_sda_concurrent'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast(self, simulator):
+    def test_cl_dram_dma__dma_sda_concurrent__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_sda_concurrent'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_sda_concurrent'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_rnd(self, simulator):
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
+    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dma_sda_concurrent'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__ddr__sv(self, simulator):
+    def test_cl_dram_dma__ddr__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_ddr'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__clk_recipe__sv(self, simulator):
+    def test_cl_dram_dma__clk_recipe__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_clk_recipe'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__int__sv(self, simulator):
+    def test_cl_dram_dma__int__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_int'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke__sv(self, simulator):
+    def test_cl_dram_dma__peek_poke__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke__sv_fast(self, simulator):
+    def test_cl_dram_dma__peek_poke__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__peek_poke__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__peek_poke__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_wc__sv(self, simulator):
+    def test_cl_dram_dma__peek_poke_wc__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_wc'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_wc__sv_fast(self, simulator):
+    def test_cl_dram_dma__peek_poke_wc__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_wc'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_wc__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__peek_poke_wc__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_wc'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_wc__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__peek_poke_wc__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_wc'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_len__sv(self, simulator):
+    def test_cl_dram_dma__peek_poke_len__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_len'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_len__sv_fast(self, simulator):
+    def test_cl_dram_dma__peek_poke_len__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_len'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_len__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__peek_poke_len__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_len'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_len__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__peek_poke_len__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_len'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_pcis_axsize__sv(self, simulator):
+    def test_cl_dram_dma__peek_poke_pcis_axsize__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_pcis_axsize'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast(self, simulator):
+    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_pcis_axsize'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast_ecc_direct(self, simulator):
+    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast_ecc_direct(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_pcis_axsize'
         test_type = 'sv_fast_ecc_direct'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast_ecc_rnd(self, simulator):
+    def test_cl_dram_dma__peek_poke_pcis_axsize__sv_fast_ecc_rnd(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_peek_poke_pcis_axsize'
         test_type = 'sv_fast_ecc_rnd'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__ddr_peek_poke__sv(self, simulator):
+    def test_cl_dram_dma__ddr_peek_poke__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_ddr_peek_poke'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__ddr_peek_bdr_walking_ones__sv(self, simulator):
+    def test_cl_dram_dma__ddr_peek_bdr_walking_ones__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_ddr_peek_bdr_walking_ones'
         test_type = 'sv_ddr_bkdr'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_dram_bdr_row_col_combo__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_dram_bdr_row_col_combo__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_dram_bdr_row_col_combo'
         test_type = 'sv_ddr_bkdr'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_mem_model_bdr_wr__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_mem_model_bdr_wr__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_mem_model_bdr_wr'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_mem_model_bdr_rd__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_mem_model_bdr_rd__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_mem_model_bdr_rd'
         test_type = 'sv_fast'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__axi_mstr_multi_rw__sv(self, simulator):
+    def test_cl_dram_dma__axi_mstr_multi_rw__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_axi_mstr_multi_rw'
         test_type = 'sv'
 
-    def test_cl_dram_dma__bar1__sv(self, simulator):
+    def test_cl_dram_dma__bar1__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_bar1'
         test_type = 'sv'
 
-    def test_cl_dram_dma__dram_dma_allgn_addr_4k__sv(self, simulator):
+    def test_cl_dram_dma__dram_dma_allgn_addr_4k__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_allgn_addr_4k'
         test_type = 'sv'
 
-    def test_ddr_peek_bdr_walking_ones__sv(self, simulator):
+    def test_ddr_peek_bdr_walking_ones__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_ddr_peek_bdr_walking_ones'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_uram_example c
 
-    def test_cl_uram_example__uram_example__c(self, simulator):
+    def test_cl_uram_example__uram_example__c(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_uram_example/verif/scripts'
         test_name = 'test_uram_example'
         test_type = 'c'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)    
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)    
     
     # cl_dram_dma c
 
-    def test_cl_dram_dma__sda__sv(self, simulator):
+    def test_cl_dram_dma__sda__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_sda'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_hwsw_cosim__c(self, simulator):
+    def test_cl_dram_dma__dram_dma_hwsw_cosim__c(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_hwsw_cosim'
         test_type = 'c'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_hello_world sv
 
-    def test_cl_hello_world__hello_world__sv(self, simulator):
+    def test_cl_hello_world__hello_world__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
         test_name = 'test_hello_world'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_test_gl_cntr sv
 
-    def test_cl_hello_world__gl_cntr__sv(self, simulator):
+    def test_cl_hello_world__gl_cntr__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
         test_name = 'test_gl_cntr'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_hello_world vhdl
 
-    def test_cl_hello_world__hello_world__vhdl(self, simulator):
+    def test_cl_vhdl_hello_world__hello_world__vhdl(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world_vhdl/verif/scripts'
         test_name = 'test_hello_world'
         test_type = 'vhdl'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_hello_world c
 
-    def test_cl_hello_world__hello_world__c(self, simulator):
+    def test_cl_hello_world__hello_world__c(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
         test_name = 'test_hello_world'
         test_type = 'c'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_sde_c2h sv
 
-    def test_cl_sde__test_simple_c2h__sv(self, simulator):
+    def test_cl_sde__test_simple_c2h__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_sde/verif/scripts'
         test_name = 'test_simple_c2h'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     # cl_sde_h2c sv
 
-    def test_cl_sde__test_simple_h2c__sv(self, simulator):
+    def test_cl_sde__test_simple_h2c__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_sde/verif/scripts'
         test_name = 'test_simple_h2c'
         test_type = 'sv'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator)
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)

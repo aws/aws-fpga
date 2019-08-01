@@ -147,36 +147,19 @@ module test_host_pcim();
          tb.poke_ocl(.addr(`NUM_INST), .data(32'h0000_0000));
 
          // Start writes and reads
-         tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT));
-         //Even in SYNC mode ATG doesn't wait for write response before issuing read transactions.
-	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
-         $display("[%t] : Waiting for PCIe write activity to complete", $realtime);
+         tb.poke_ocl(.addr(`CNTL_REG), .data(`WR_START_BIT | `RD_START_BIT));
+      	 // adding 500ns wait to account for random back pressure from sh_bfm on write address & write data channels.
+         $display("[%t] : Waiting for PCIe write and read activity to complete", $realtime);
          #500ns;
          timeout_count = 0;
-
-         do begin
-            tb.peek_ocl(.addr(`CNTL_REG), .data(read_data));
-            timeout_count++;
-         end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
-         
-         if ((timeout_count == 100) && (read_data[2:0] !== 3'b000)) begin
-            $error("[%t] : *** ERROR *** Timeout waiting for writes to complete.", $realtime);
-            error_count++;
-         end 
-           
-         tb.poke_ocl(.addr(`CNTL_REG), .data(`RD_START_BIT));
-         // adding 500ns wait to account for random back pressure from sh_bfm on read request channel.
-         $display("[%t] : Waiting for PCIe read activity to complete", $realtime);
-         #500ns;
-         
-         timeout_count = 0;
+          
          do begin
             tb.peek_ocl(.addr(`CNTL_REG), .data(read_data));
             timeout_count++;
          end while ((read_data[2:0] !== 3'b000) && (timeout_count < 100));
 
          if ((timeout_count == 100) && (read_data[2:0] !== 3'b000)) begin
-            $error("[%t] : *** ERROR *** Timeout waiting for reads to complete.", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for writes & reads to complete.", $realtime);
             error_count++;
          end else begin
             // Stop reads and writes ([1] for reads, [0] for writes)

@@ -31,7 +31,7 @@
 #include <linux/list.h>
 #include <linux/wait.h>
 #include "xclfeatures.h"
-#include "xclbin2.h" // originally xclbin.h
+#include "xclbin.h"
 #include "xocl_ioctl.h"
 #include "xocl_exec.h"
 #include "xocl_xvc.h"

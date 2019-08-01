@@ -2,7 +2,6 @@
 * In the interest of providing more examples for the user, we present this guide that tells how to port third party OpenCL examples to the SDAccel flow.
 * In this guide, we show the changes necessary to port third party host code and kernel code for 2 different examples.
 * We also show some [differences between the third party OpenCL and Xilinx SDAccel implementations](#xilinx-and-third-party-implementation-differences) that the user should be aware of.
-* There is a third example (matrix_mult, not discussed here) available at SDAccel/examples/3rd_party.
 
 ## The file structure of the third party examples used in this guide.
  * The following shows the common file structure of the third party examples used in this guide.
@@ -27,16 +26,16 @@ common/src/AOCLUtils/options.cpp
 
 ## Changes to the host code.
 
- * The changes needed for the **vector_addition** host code can be found [here](../examples/3rd_party/vector_addition) in the file named vector_addition_main.cpp.diff.
- * The changes needed for the **fft1d** host code can be found [here](../examples/3rd_party/fft1d) in the file named fft1d_main.cpp.diff.
- * All the modified dependency files can be found in the [SDAccel/examples/3rd_party/common](../examples/3rd_party/common) directory.
+ * The changes needed for the **vector_addition** host code can be found [here](vector_addition) in the file named vector_addition_main.cpp.diff.
+ * The changes needed for the **fft1d** host code can be found [here](fft1d) in the file named fft1d_main.cpp.diff.
+ * All the modified dependency files can be found in the [SDAccel/examples/3rd_party/common](common) directory.
 
 ## Changes to the kernel code.
 
 * The kernel code, found in the &lt;example_name>/device directory, will most likely need modifications.
 * The **vector addition** kernel does not need changes.
 * The **fft1d** example needs several changes due to the differences between the third party and Xilinx implementations.
-* The changes needed for the fft1d.cl file are found [here](../examples/3rd_party/fft1d) in the file named fft1d_fft1d.cl.diff.
+* The changes needed for the fft1d.cl file are found [here](fft1d) in the file named fft1d_fft1d.cl.diff.
 * See table below regarding [implementation differences between third party and Xilinx](#xilinx-and-third-party-implementation-differences).
 
 * The &lt;example_name>/device/twid_radix4_8.cl file will get many warnings about casting from double to float.
@@ -46,18 +45,18 @@ common/src/AOCLUtils/options.cpp
 sed 's/\([0-9]\)\( \{0,\}[,}]\)/\1f\2/g' twid_radix4_8.cl > tmp
 mv tmp twid_radix4_8.cl
 ```
-* The script above can be found [here](../examples/3rd_party/fft1d) named cast_float_const.sh.
+* The script above can be found [here](fft1d) named cast_float_const.sh.
 
 ## Changes to the Makefile.
 
 * The third party Makefile can be replaced by a version that is similar to the SDAccel example Makefiles.
-* For example, for the third party **vector_addition** code, the Makefile can be found [here](../examples/3rd_party/vector_addition).
-* The **fft1d** example Makefile can be found [here](../examples/3rd_party/fft1d).  
+* For example, for the third party **vector_addition** code, the Makefile can be found [here](vector_addition).
+* The **fft1d** example Makefile can be found [here](fft1d).  
 
 
 ## Compiling and running.
 * The steps to compile and run would be the same as those used for the SDAccel examples with the exception that the host program would need the -hw=&lt;mode> switch when running in emulation mode.
-* For the complete guide on compiling and running the SDAccel examples, see [this](../README.md).
+* For the complete guide on compiling and running the SDAccel examples, see [this](../../README.md).
 
 * To run in software emulation mode, use the following commands.
  ```
@@ -80,7 +79,7 @@ make TARGETS=hw DEVICES=$AWS_PLATFORM all
 ./main
 ```
 
-* For more information on running this example on an F1 instance, see [this](../README.md#runonf1).
+* For more information on running this example on an F1 instance, see [this](../../README.md#runonf1).
 
 
 ## Xilinx and third party Implementation Differences

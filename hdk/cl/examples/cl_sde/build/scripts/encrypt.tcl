@@ -68,7 +68,7 @@ file copy -force $CL_DIR/design/sde_desc.sv     $TARGET_DIR
 file copy -force $CL_DIR/design/sde_pm.sv       $TARGET_DIR
 file copy -force $CL_DIR/design/sde_ps_acc.sv   $TARGET_DIR
 file copy -force $CL_DIR/design/sde_ps.sv       $TARGET_DIR
-
+file copy -force $CL_DIR/design/cl_sde_defines.vh $TARGET_DIR
 file copy -force $CL_DIR/design/cl_id_defines.vh   $TARGET_DIR
 file copy -force $CL_DIR/design/cl_pkt_tst.sv $TARGET_DIR
 file copy -force $CL_DIR/design/cl_tst.sv     $TARGET_DIR

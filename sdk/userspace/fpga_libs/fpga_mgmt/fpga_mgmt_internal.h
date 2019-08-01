@@ -13,6 +13,14 @@
  * permissions and limitations under the License.
  */
 
+#pragma once
+
+#include <stdint.h>
+
+#include "afi_cmd_api.h"
+#include "hal/fpga_common.h"
+#include "fpga_pci.h"
+
 /**
  * Default timeout:
  *   CLI_TIMEOUT_DFLT * CLI_DELAY_MSEC_DFLT
@@ -40,6 +48,7 @@ extern struct fgpa_mgmt_state_s {
 	} slots[FPGA_SLOT_MAX];
 	uint32_t timeout;
 	uint32_t delay_msec;
+	bool initialized;
 } fpga_mgmt_state;
 
 // FIXME

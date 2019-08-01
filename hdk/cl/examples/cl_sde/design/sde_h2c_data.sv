@@ -183,33 +183,33 @@ module sde_h2c_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    always_comb
      begin
-        req_state_next <= req_state;
+        req_state_next = req_state;
         case (req_state)
           REQ_IDLE :
             if (desc_dm_desc_valid)
-              req_state_next <= REQ_WAIT_DATA; // REQ_GET_DESC;
+              req_state_next = REQ_WAIT_DATA; // REQ_GET_DESC;
             else
-              req_state_next <= REQ_IDLE;
+              req_state_next = REQ_IDLE;
 
 //          REQ_GET_DESC:
-//            req_state_next <= REQ_WAIT_DATA;
+//            req_state_next = REQ_WAIT_DATA;
 
           REQ_WAIT_DATA:
             if (curr_txn_space_avail && ~rd_txn_trk_ff_full)
-              req_state_next <= REQ_ADDR;
+              req_state_next = REQ_ADDR;
             else
-              req_state_next <= REQ_WAIT_DATA;
+              req_state_next = REQ_WAIT_DATA;
 
           REQ_ADDR:
             if (desc_req_done && desc_done)
-              req_state_next <= REQ_IDLE;
+              req_state_next = REQ_IDLE;
             else if (desc_req_done)
-              req_state_next <= REQ_WAIT_DATA;
+              req_state_next = REQ_WAIT_DATA;
             else
-              req_state_next <= REQ_ADDR;
+              req_state_next = REQ_ADDR;
           
           default:
-            req_state_next <= req_state;
+            req_state_next = req_state;
 
         endcase // case (req_state)
      end // always_comb

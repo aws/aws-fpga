@@ -7,7 +7,7 @@ Developers tend to simulate their designs to validate the RTL design and functio
 | 3rd party simulator Tool | 2017.4 Vivado tool | 2018.2 Vivado tool | 2018.3 Vivado tool |
 |--------------------------|--------------------|--------------------|--------------------|
 | Xilinx Vivado XSIM | Vivado v2017.4.op (64-bit) | Vivado v2018.2_AR71275_op (64-bit) | Vivado v2018.3.op (64-bit) |
-| Synopsys VCS  | vcs-mx/L-2016.06-1 | vcs-mx/N-2017.12-SP1-1 | vcs-mx/N-2017.12-SP2 |
+| Synopsys VCS  | vcs-mx/M-2017.03-SP2-11 | vcs-mx/N-2017.12-SP1-1 | vcs-mx/N-2017.12-SP2 |
 | Mentor Graphics Questa | 10.6b | 10.6c_1 | 10.6c_1 |
 | Cadence Incisive Enterprise Simulator(IES) | 15.20.063 | 15.20.063 | 15.20.063 |
 

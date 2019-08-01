@@ -117,7 +117,7 @@ module test_dram_dma_dram_bdr_row_col_combo();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : TEST_FAILED", $realtime);
+         $error("[%t] : TEST_FAILED", $realtime);
       end else begin
          $display("[%t] : TEST_PASSED", $realtime);
       end

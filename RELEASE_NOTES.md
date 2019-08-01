@@ -26,8 +26,30 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+
+## Release 1.4.10 (See [ERRATA](./ERRATA.md) for unsupported features)
+* New functionality:
+    * SDK now sorts the slots in DBDF order. Any scripts or integration maintainers should note that the slot order will be different from previous versions and should make any updates accordingly.
+  
+* Bug Fixes:
+    * Fixes a bug in the [Automatic Traffic Generator (ATG)](./hdk/cl/examples/cl_dram_dma/design/cl_tst.sv). In SYNC mode, the ATG did not wait for write response transaction before issuing read transactions.
+    * Released [Xilinx runtime(XRT) version 2018.3.3.2](https://github.com/Xilinx/XRT/releases/tag/2018.3.3.2) to fix the following error:
+           `symbol lookup error: /opt/xilinx/xrt/lib/libxrt_aws.so: undefined symbol: uuid_parse!`
+    * This release fixes a bug wherein concurrent AFI load requests on two or more slots resulted in a race condition which sometimes resulted in Error: `(20) pci-device-missing`
+    * This release fixes a issue with coding style of logic which could infer a latch during synthesis in [sde_ps_acc module](./hdk/cl/examples/cl_sde/design/sde_ps_acc.sv) within cl_sde example 
+
+* Package versions used for validation
+  
+   | Package | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
+   |---------|------------------------|------------------------|-----------------------|
+   | OS      | Centos 7.6 | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |
+   
+
 ## Release 1.4.9 (See [ERRATA](./ERRATA.md) for unsupported features)
-  * New functionality:
+ * New functionality:
     * Improved AFI load times for pipelined accelerator designs. For more details please see [Amazon FPGA image (AFI) pre-fetch and caching features](./hdk/docs/load_times.md).
 
  * Ease of Use features:

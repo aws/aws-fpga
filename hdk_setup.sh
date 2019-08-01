@@ -30,18 +30,6 @@ current_dir=$(pwd)
 
 debug=0
 
-# This function checks if an environment module exists
-# Returns 0 if it exists, and returns 1 if it doesn't
-function does_module_exist() {
-
-    output=`/usr/bin/ls /usr/local/Modules/$MODULE_VERSION/modulefiles | grep $1`
-
-    if [[ $output == "$1" ]]; then
-        return 0;
-    else
-        return 1;
-    fi
-}
 
 function usage {
   echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-h|-help]"
@@ -88,7 +76,7 @@ hdk_shell_version=$(readlink $HDK_COMMON_DIR/shell_stable)
 debug_msg "Checking for Vivado install:"
 
 # before going too far make sure Vivado is available
-if ! is_vivado_available; then
+if ! exists vivado; then
     err_msg "Please install/enable Vivado."
     err_msg "  If you are using the FPGA Developer AMI then please request support."
     return 1
@@ -127,10 +115,7 @@ debug_msg "Done setting environment variables.";
 # Download correct shell DCP
 info_msg "Using HDK shell version $hdk_shell_version"
 debug_msg "Checking HDK shell's checkpoint version"
-hdk_shell_s3_bucket=aws-fpga-hdk-resources
-declare -a s3_hdk_ltx_files=("cl_hello_world.debug_probes.ltx"
-                             "cl_dram_dma.debug_probes.ltx"
-                             )
+hdk_resources_s3_bucket=aws-fpga-hdk-resources
 
 # Shell files to be downloaded
 declare -a s3_hdk_files=("SH_CL_BB_routed.dcp"
@@ -148,13 +133,13 @@ do
   fi
   hdk_shell_dir=$HDK_SHELL_DIR/build/$sub_dir/from_aws
   hdk_file=$hdk_shell_dir/$shell_file
-  s3_shell_dir=$hdk_shell_s3_bucket/hdk/$hdk_shell_version/build/$sub_dir/from_aws
+  s3_shell_dir=hdk/$hdk_shell_version/build/$sub_dir/from_aws
   # Download the sha256
   if [ ! -e $hdk_shell_dir ]; then
       mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
   fi
   # Use curl instead of AWS CLI so that credentials aren't required.
-  curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }
+  curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }
   if grep -q '<?xml version' $hdk_file.sha256; then
     err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256"
     cat $hdk_file.sha256
@@ -177,7 +162,7 @@ do
   if [ ! -e $hdk_file ]; then
     info_msg "Downloading latest HDK shell $shell_file from $s3_shell_dir/$shell_file"
     # Use curl instead of AWS CLI so that credentials aren't required.
-    curl -s https://s3.amazonaws.com/$s3_shell_dir/$shell_file -o $hdk_file || { err_msg "HDK shell checkpoint download failed"; return 2; }
+    curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file -o $hdk_file || { err_msg "HDK shell checkpoint download failed"; return 2; }
   fi
 
   # Check sha256

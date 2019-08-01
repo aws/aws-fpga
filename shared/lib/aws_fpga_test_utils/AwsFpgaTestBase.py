@@ -66,6 +66,7 @@ class AwsFpgaTestBase(object):
     git_repo_dir = get_git_repo_root(dirname(__file__))
     WORKSPACE = git_repo_dir
 
+    ADD_BATCH = False
     ADD_SIMULATOR = False
     ADD_EXAMPLEPATH = False
     ADD_RTENAME = False

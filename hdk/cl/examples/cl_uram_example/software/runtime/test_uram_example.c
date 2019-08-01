@@ -187,10 +187,10 @@ uint32_t glb_value;
    
 
   /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
-  printf("Starting to initialize the fpga_pci library  \n");
-  rc = fpga_pci_init();
-  fail_on(rc, out, "Unable to initialize the fpga_pci library\n TEST FAILED\n");
-  printf("Done initializing the fpga_pci library  \n");
+  printf("Starting to initialize the fpga_mgmt library\n");
+  rc = fpga_mgmt_init();
+  fail_on(rc, out, "Unable to initialize the fpga_mgmt library\n TEST FAILED\n");
+  printf("Done initializing the fpga_mgmt library\n");
 
 #ifndef SV_TEST
   rc = check_afi_ready(slot_id);
@@ -203,14 +203,18 @@ uint32_t glb_value;
   rc = uram_example(slot_id, FPGA_APP_PF, APP_PF_BAR0, value);
   fail_on(rc, out, "peek-poke example failed\n TEST FAILED\n");
 
+  fpga_mgmt_close();
+
 #ifndef SV_TEST
   return rc;
 
 out:
+  fpga_mgmt_close();
   return 1;
 #else
 
 out:
+  fpga_mgmt_close();
   if (rc != 0) {
         printf("TEST_FAILED \n");
     }

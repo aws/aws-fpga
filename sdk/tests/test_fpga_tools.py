@@ -26,6 +26,7 @@ import sys
 import time
 import traceback
 import ctypes
+import multiprocessing.dummy
 try:
     import aws_fpga_test_utils
     from aws_fpga_test_utils.AwsFpgaTestBase import AwsFpgaTestBase
@@ -52,6 +53,9 @@ class TestFpgaTools(BaseSdkTools):
             self.fpga_clear_local_image(slot)
 
         logger.info("PCI devices:\n{}".format("\n".join(self.list_pci_devices())))
+
+        logger.info("verify that the slots are in order")
+        assert self.slot2device.values() == sorted(self.slot2device.values())
 
         (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image-slots", echo=True)
         assert len(stdout) == self.num_slots + 1
@@ -255,3 +259,15 @@ class TestFpgaTools(BaseSdkTools):
             assert len(stderr) == 1
             assert stdout[0] == 'FPGA slot id {} has the following Virtual DIP Switches:'.format(slot)
             assert stdout[1] == '1111-1111-1111-1111'
+
+    def test_parallel_slot_loads(self):
+        def run_slot(slot):
+            for afi in [self.cl_dram_dma_agfi, self.cl_hello_world_agfi, self.cl_dram_dma_agfi]:
+                (rc, stdout, stderr) = self.run_cmd("sudo fpga-load-local-image -HS{} -I {}".format(slot, afi))
+                assert rc == 0
+                logger.info(stdout)
+
+
+        slots = range(self.num_slots)
+        pool = multiprocessing.dummy.Pool(len(slots))
+        pool.map(run_slot, slots)

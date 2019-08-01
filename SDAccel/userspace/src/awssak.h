@@ -38,7 +38,7 @@
 #include <map>
 #include <iomanip>
 
-#include "xclbin2.h"
+#include "xclbin.h"
 #include "xcl_axi_checker_codes.h"
 #include "scan.h"
 #include "dmatest.h"

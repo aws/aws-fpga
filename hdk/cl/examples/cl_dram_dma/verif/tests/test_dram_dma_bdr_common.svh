@@ -28,11 +28,6 @@
       //Front Door read data
       for ( int i=0; i<num_xfers; i++) begin
          bdr_addr = addr << i;
-         // tb.peek(.addr(bdr_addr), .data(read_data), .size(DataSize::UINT512));
-         // if (read_data != 64'h1122334455667788) begin
-         //    $display("Read Data mismatch for Addr %h: Exp %h, Act %h", bdr_addr, 64'h1122334455667788, read_data);
-         //    error_count++;
-         // end
          //read the data from cl and put it in the host memory
          host_memory_buffer_address = 64'h0_0001_0000;
          tb.que_cl_to_buffer(.chan(0), .dst_addr(host_memory_buffer_address), .cl_addr(bdr_addr), .len(len0) ); // move DDR0 to buffer
@@ -49,7 +44,7 @@
          end while ((status != 4'hf) && (timeout_count < 1000));
 
          if (timeout_count >= 1000) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
 
@@ -64,7 +59,7 @@
          for (int i = 0 ; i<len0 ; i++) begin
             data = rd_data_t[7:0];
             if (tb.hm_get_byte(.addr(host_memory_buffer_address + i)) !== data) begin
-               $display("[%t] : *** ERROR *** DDR Data mismatch, addr:%0x Actual read data is: %0x Expected is: %0x",
+               $error("[%t] : *** ERROR *** DDR Data mismatch, addr:%0x Actual read data is: %0x Expected is: %0x",
                         $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)), data);
                error_count++;
             end

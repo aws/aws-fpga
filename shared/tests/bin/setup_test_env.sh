@@ -27,7 +27,7 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
-python_versions=(2.7 3.4)
+python_versions=(2.7 3.6)
 
 python_packages=(\
 pytest \
@@ -53,13 +53,12 @@ for python_version in ${python_versions[@]}; do
             echo "error: Install of $yum_pip_package failed"
             return 1
         fi
-        sudo $pip install --upgrade pip
     fi
 
     for p in ${python_packages[@]}; do
         if ! $pip show $p > /dev/null; then
             echo "Installing $p"
-            if ! sudo $pip install $p; then
+            if ! $pip install --user $p; then
                 echo "error: Install of $python $p failed"
                 return 1
             fi

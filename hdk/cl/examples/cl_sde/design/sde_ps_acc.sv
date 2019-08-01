@@ -71,10 +71,12 @@ if (LIMITED_SUPPORT == 0) begin
    logic [ACC_WIDTH-1:0]            acc_in_wdata_d;
    logic [ACC_DW_IDX_WIDTH:0]       acc_wr_num_dw;
 
-   always_comb
+   always_comb begin
+     pcis_wr_num_dw_d = '0;
      for (int dw_idx = 0; dw_idx < (PCIS_DATA_WIDTH>>5); dw_idx++)
        if (pcis_wstrb[dw_idx*4])
-         pcis_wr_num_dw_d <= dw_idx + 1;
+         pcis_wr_num_dw_d = dw_idx + 1;
+   end
 
    always @(posedge clk)
      if (!rst_n) begin
@@ -190,10 +192,12 @@ else begin
    logic [ACC_WIDTH-1:0]            acc_in_wdata_d;
    logic [ACC_DW_IDX_WIDTH:0]       acc_wr_num_dw;
 
-   always_comb
+   always_comb begin
+     pcis_wr_num_dw_d = '0;
      for (int dw_idx = 0; dw_idx < (PCIS_DATA_WIDTH>>5)/2; dw_idx++) //(512/32)/2=8
        if ((pcis_wstrb[dw_idx*4]) && (dw_idx == 0 || dw_idx == 3 || dw_idx == 7))
-         pcis_wr_num_dw_d <= dw_idx + 1; //Supported DW= 1DW, 4DW and 8DW
+         pcis_wr_num_dw_d = dw_idx + 1; //Supported DW= 1DW, 4DW and 8DW
+   end
 
    always @(posedge clk)
      if (!rst_n) begin

@@ -79,18 +79,18 @@ module cl_pkt_tst #(parameter DATA_WIDTH = 512,  // Should be atleast 32
 
     );
 
-   parameter DATA_DW = DATA_WIDTH / 32;
+   localparam DATA_DW = DATA_WIDTH / 32;
 
 `ifdef SIM
    // For simulation
-   parameter PREAMBLE_PKT_CNT = 32'hF;
-   parameter PREAMBLE_TKEEP = {{(TKEEP_WIDTH-4){1'b0}}, {4{1'b1}}};
+   localparam PREAMBLE_PKT_CNT = 32'hF;
+   localparam PREAMBLE_TKEEP = {{(TKEEP_WIDTH-4){1'b0}}, {4{1'b1}}};
 `else
-   parameter PREAMBLE_PKT_CNT = 32'hFF;
-   parameter PREAMBLE_TKEEP = {{(TKEEP_WIDTH-8){1'b0}}, {8{1'b1}}};
+   localparam PREAMBLE_PKT_CNT = 32'hFF;
+   localparam PREAMBLE_TKEEP = {{(TKEEP_WIDTH-8){1'b0}}, {8{1'b1}}};
 `endif
-   parameter TX_WAIT_CNT = 32'hF;
-   parameter RX_LOCK_CNT_MINUS1 = 32'h4;
+   localparam TX_WAIT_CNT = 32'hF;
+   localparam RX_LOCK_CNT_MINUS1 = 32'h4;
 
    typedef enum logic [2:0] {IDLE = 0,
                              PREAMBLE = 1,

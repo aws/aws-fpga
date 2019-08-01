@@ -40,9 +40,9 @@ $(info OS is $(OS))
 MODULE :=
 ifeq ($(RELEASE_VER),2017.4)
   DSA := $(DSA)
-  SRC_DIR = src2
+  SRC_DIR = src
   XRT_HAL_LIB = libxrt-aws.so
-  EXE = awssak2
+  EXE = awssak
   MODULE = xocl
 ifeq ($(OS),Ubuntu)
   GLIBCPP_PATH = lib/lnx64.o/Ubuntu

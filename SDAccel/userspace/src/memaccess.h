@@ -29,8 +29,9 @@
 #include <algorithm>
 #include <numeric>
 
-#include "xclhal2.h"
-#include "xclbin2.h"
+#include "xclhal.h"
+#include "xclbin.h"
+
 namespace xcldev {
   class memaccess {
     xclDeviceHandle mHandle;

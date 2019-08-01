@@ -144,9 +144,14 @@ module test_dma_sda_concurrent();
          end while ((status[0] !== 'h1) && (timeout_count < 4000));
 
          if (timeout_count > 4000) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
+
+         // DMA transfers are posted writes. The above code checks only if the dma transfer is setup and done. 
+         // We need to wait for writes to finish to memory before issuing reads.
+         $display("[%t] : Waiting for DMA write activity to complete", $realtime);
+         #500ns;
 
          $display("[%t] : starting C2H DMA channels ", $realtime);
 
@@ -166,7 +171,7 @@ module test_dma_sda_concurrent();
          end while ((status[0] !== 'h1) && (timeout_count < 4000));
 
          if (timeout_count > 4000) begin
-            $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
+            $error("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
             error_count++;
          end
 
@@ -179,7 +184,7 @@ module test_dma_sda_concurrent();
          host_memory_buffer_address = 64'h0_0001_0800;
          for (int i = 0 ; i<len0 ; i++) begin
             if (tb.hm_get_byte(.addr(host_memory_buffer_address + i)) !== 8'hAA) begin
-               $display("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
+               $error("[%t] : *** ERROR *** DDR0 Data mismatch, addr:%0x read data is: %0x",
                         $realtime, (host_memory_buffer_address + i), tb.hm_get_byte(.addr(host_memory_buffer_address + i)));
                error_count++;
             end
@@ -206,7 +211,7 @@ module test_dma_sda_concurrent();
             end while ((read_data[31:0] !== sda_data[31:0]) && (timeout_count < 1000)); // UNMATCHED !!
 
             if ((timeout_count == 1000) || (read_data[31:0] !== sda_data[31:0])) begin
-               $display("[%t] : *** ERROR *** Read data mismatch for sda exp_data %h act_data %h.", $realtime, sda_data, read_data);
+               $error("[%t] : *** ERROR *** Read data mismatch for sda exp_data %h act_data %h.", $realtime, sda_data, read_data);
                error_count++;
             end
 
@@ -233,7 +238,7 @@ module test_dma_sda_concurrent();
       $display("[%t] : Detected %3d errors during this test", $realtime, error_count);
 
       if (fail || (tb.chk_prot_err_stat())) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end

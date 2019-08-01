@@ -215,7 +215,7 @@ module test_clk_recipe();
       tb.power_down();
       
       if (tb.chk_clk_err_cnt()) begin
-         $display("[%t] : *** TEST FAILED ***", $realtime);
+         $error("[%t] : *** TEST FAILED ***", $realtime);
       end else begin
          $display("[%t] : *** TEST PASSED ***", $realtime);
       end
