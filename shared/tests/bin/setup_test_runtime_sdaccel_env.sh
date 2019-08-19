@@ -27,6 +27,8 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
+export LD_LIBRARY_PATH=$XILINX_SDX/lnx64/tools/opencv/:$LD_LIBRARY_PATH
+
 if ! source $script_dir/setup_test_env.sh; then
     return 1
 fi

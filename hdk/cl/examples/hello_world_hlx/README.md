@@ -101,6 +101,7 @@ The runtime software must be compiled for the AFI to run on F1.
 
 Copy the software directory to any directory and compile with the following commands:
 ```
+$ source $AWS_FPGA_REPO_DIR/sdk_setup.sh
 $ cp -r $HDK_COMMON_DIR/shell_stable/hlx/hlx_examples/build/IPI/hello_world/software <any_directory>
 $ cd software
 $ make all

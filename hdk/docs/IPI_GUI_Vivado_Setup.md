@@ -46,7 +46,7 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 <a name="hlxinst_win"></a>
 # Windows Install
 
-Download, install, and configure the license for Vivado SDx 2017.4 or Vivado 2018.2 or Vivado 2018.3 for Windows.  More information is provided at:
+Download, install, and configure the license for Vivado SDx 2017.4, 2018.2, 2018.3 or 2019.1 for Windows.  More information is provided at:
 
 [On-Premises Licensing Help](./on_premise_licensing_help.md)
 

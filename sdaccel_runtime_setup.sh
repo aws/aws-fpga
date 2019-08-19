@@ -117,8 +117,8 @@ function check_kernel_ver {
           cat $AWS_FPGA_REPO_DIR/SDAccel/kernel_version.txt
           warn_msg "Xilinx Runtime not validated against your installed kernel version."
        fi
- 
 }
+
 # Process command line args
 args=( "$@" )
 for (( i = 0; i < ${#args[@]}; i++ )); do
@@ -144,11 +144,13 @@ done
 
 if ! exists vivado; then
    if [[ -z "${VIVADO_TOOL_VERSION}" ]]; then
-      err_msg " You are not using FPGA Developer AMI and VIVADO_TOOL_VERSION ENV variable is Empty. "
-      err_msg " ENV Variable VIVADO_TOOL_VERSION is required to be set for runtime "
+      err_msg " VIVADO_TOOL_VERSION ENV variable is not set."
+      err_msg " ENV Variable VIVADO_TOOL_VERSION needs to be set for runtime usage. "
+      err_msg " If AFI was generated using V2019.1 tools use the command : export VIVADO_TOOL_VERSION=2019.1 "
+      err_msg " If AFI was generated using V2018.3 tools use the command : export VIVADO_TOOL_VERSION=2018.3 "
       err_msg " If AFI was generated using V2018.2 tools use the command : export VIVADO_TOOL_VERSION=2018.2 "
       err_msg " If AFI was generated using V2017.4 tools use the command : export VIVADO_TOOL_VERSION=2017.4 "
-      err_msg " If you are using the FPGA Developer AMI then please request support on AWS FPGA Developers Forum."
+      err_msg " Please set VIVADO_TOOL_VERSION to the correct value and re-run script."
       return 1
    else
       info_msg " VIVADO tools not found. Reading VIVADO_TOOL_VERSION ENV variable to determine runtime version... "
@@ -167,7 +169,7 @@ check_kernel_ver
 check_xdma_driver
 check_edma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* ]]; then
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* || "$VIVADO_TOOL_VERSION" =~ .*2019\.1.* ]]; then
     info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
     
     if [ $override == 1 ]; then
@@ -190,12 +192,12 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\
           if [ -f "/opt/xilinx/xrt/setup.sh" ]; then 
              source /opt/xilinx/xrt/setup.sh
           else
-             err_msg " Cannot find /opt/xilinx/xrt/setup.sh "
-             err_msg " Please check XRT is installed correctly "
-	     err_msg "Please Refer $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
+             err_msg " Cannot find /opt/xilinx/xrt/setup.sh"
+             err_msg " Please check XRT is installed correctly"
+             err_msg " Please Refer to $AWS_FPGA_REPO/SDAccel/doc/XRT_installation_instructions.md for XRT installation instructions"
              return 1
           fi
-          info_msg " XRT Runtime setup Done "
+          info_msg " XRT Runtime setup Done"
        else
           err_msg "$xrt_build_ver does not match recommended versions"
           cat $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
@@ -209,7 +211,6 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2018\
     fi
 else
    info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION "
-   #info_msg " checking for file: /opt/Xilinx/SDx/${VIVADO_TOOL_VERSION}.rte.dyn/setup.sh"
    info_msg " Now checking XOCL driver..."
    check_xocl_driver
    if [ -f "/opt/Xilinx/SDx/${VIVADO_TOOL_VERSION}.rte.dyn/setup.sh" ]; then

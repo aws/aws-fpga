@@ -164,42 +164,19 @@ Conversely, code which is simply a few lines of basic operations, and has no tas
  
 # Additional Resources
 
-The [AWS SDAccel README].
-
-Xilinx web portal for [Xilinx SDAccel documentation] and for [Xilinx SDAccel GitHub repository]
-
-
-Links pointing to **2017.4** version of the user guides
-1. [UG1023: SDAccel Environment User Guide][UG1023 2017.4]
-1. [UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][UG1021 2017.4]
-1. [UG1207: SDAccel Environment Optimization Guide][UG1207 2017.4]
-1. [UG949: UltraFast Design Methodology Guide for the Vivado Design Suite][UG949 2017.4]
-1. [UG1238: SDx Development Environment Release Notes, Installation, and Licensing Guide][UG1238 2017.4]
-
-
-
-[SDAccel_landing_page]: https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html
-[VHLS_landing_page]: https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html
-[Vivado_landing_page]: https://www.xilinx.com/products/design-tools/vivado.html
-
-[SDAccel Environment User Guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf
-[UG1021]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf
-[SDAccel Environment Optimization Guide]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf
-[UG949]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug949-vivado-design-methodology.pdf
-[UG902]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug902-vivado-high-level-synthesis.pdf
-
-[UG1023 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf
-[UG1021 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf
-[UG1207 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf
-[UG1238 2017.4]:http://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1238-sdx-rnil.pdf
-[Xilinx SDAccel documentation]: https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html#documentation
-[Xilinx SDAccel GitHub repository]: https://github.com/Xilinx/SDAccel_Examples
-[UG949 2017.4]: https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug949-vivado-design-methodology.pdf
-
-[AWS SDAccel Readme]: ../README.md
-[OnPremiseDev]: ./On_Premises_Development_Steps.md
-[Power_Analysis]: ./SDAccel_Power_Analysis.md
-[GUI_README]: ./README_GUI.md
-[FAQ]:../FAQ.md
+* The [AWS SDAccel README](../README.md).
+* Xilinx web portal for [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html?resultsTablePreSelect=xlnxdocumenttypes:SeeAll#documentation) 
+* [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
+* [Xilinx SDAccel landing page](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html)
+* [Vivado HLS landing page](https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html)
+* [Vivado landing page](https://www.xilinx.com/products/design-tools/vivado.html)
+* [SDAccel Environment User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
+* [SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
+* [SDAccel Environment Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
+* [UltraFast Design Methodology Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug949-vivado-design-methodology.pdf)
+* [Vivado High Level Synthesis User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug902-vivado-high-level-synthesis.pdf)
+* [On Premise Development steps](On_Premises_Development_Steps.md)
+* [SDAccel Power Analysis](SDAccel_Power_Analysis.md)
+* [FAQ](../FAQ.md)
 
 

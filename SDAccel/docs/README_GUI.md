@@ -7,7 +7,7 @@ The guide explains how to:
 1. Verify the application
 1. Build the application to execute on FPGA hardware
 
-**Note**: It is highly recommended to review the [SDAccel Guide][SDAccel_Guide] to fully understand the SDAccel flow before using the GUI.
+**Note**: It is highly recommended to review the [AWS F1 SDAccel Guide](SDAccel_Guide_AWS_F1.md) to fully understand the SDAccel flow before using the GUI.
 
 ## Cloning the aws-fpga Git repository
 The AWS Github repository contains the example used in this tutorial.  

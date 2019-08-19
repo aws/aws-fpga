@@ -1,22 +1,45 @@
---- third_party/vector_add/host/src/main.cpp       2017-05-09 22:47:50.000000000 +0000
-+++ sdaccel/vector_add/host/src/main.cpp  2017-09-12 18:55:22.172000000 +0000
-@@ -70,0 +71,2 @@
+--- third_party/vector_add/host/src/main.cpp	2018-02-12 17:55:18.000000000 +0000
++++ aws/vector_add/host/src/main.cpp	2019-09-15 22:53:15.593553611 +0000
+@@ -67,6 +67,7 @@
+ #endif /* USE_SVM_API == 0 */
+ scoped_array<scoped_array<float> > ref_output; // num_devices elements
+ scoped_array<unsigned> n_per_device; // num_devices elements
 +std::string hwtype = "hw";
-+
-@@ -85,0 +88,3 @@
+
+ // Function prototypes
+ float rand_float();
+@@ -84,6 +85,9 @@
+     N = options.get<unsigned>("n");
+   }
+
 +  if(options.has("hw")) {
 +    hwtype = options.get<std::string>("hw");
 +  }
-@@ -123 +128 @@
--  platform = findPlatform("Intel");
-+  platform = findPlatform("Xilinx");
-@@ -125 +130 @@
--    printf("ERROR: Unable to find Intel FPGA OpenCL platform.\n");
+   // Initialize OpenCL.
+   if(!init_opencl()) {
+     return -1;
+@@ -120,9 +124,9 @@
+   }
+
+   // Get the OpenCL platform.
+-  platform = findPlatform("Intel(R) FPGA SDK for OpenCL(TM)");
++  platform = findPlatform("Xilinx);
+   if(platform == NULL) {
+-    printf("ERROR: Unable to find Intel(R) FPGA OpenCL platform.\n");
 +    printf("ERROR: Unable to find Xilinx FPGA OpenCL platform.\n");
-@@ -143,2 +148,4 @@
+     return false;
+   }
+
+@@ -140,8 +144,10 @@
+
+   // Create the program for all device. Use the first device as the
+   // representative device (assuming all device are of the same type).
 -  std::string binary_file = getBoardBinaryFile("vector_add", device[0]);
 -  printf("Using AOCX: %s\n", binary_file.c_str());
 +  std::string fname = "xclbin/vector_add."+ hwtype + "." + VERSION_STR;
 +  printf("Looking for %s.\n",fname.c_str());
 +  std::string binary_file = getBoardBinaryFile(fname.c_str(), device[0]);
 +  printf("Using XCLBIN: %s\n", binary_file.c_str());
+   program = createProgramFromBinary(context, binary_file.c_str(), device, num_devices);
+
+   // Build the program that was just created.

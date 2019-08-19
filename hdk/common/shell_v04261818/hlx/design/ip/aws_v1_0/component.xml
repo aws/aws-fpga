@@ -4407,7 +4407,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>01e58ca0</spirit:value>
+            <spirit:value>ebc2f515</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -4429,7 +4429,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>7a659885</spirit:value>
+            <spirit:value>ffa0fbf3</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -15920,7 +15920,61 @@
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/aws_v1_0_vl_rfs.sv</spirit:name>
+        <spirit:name>hdl/sim/axi4_slave_bfm.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/axi_bfm_defines.svh</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/axi_mem_model.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/lib_pipe.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/ccf_ctl.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/sync.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/flop_ccf.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/mgt_acc_axl.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/mgt_gen_axl.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/sim/sh_ddr.sv</spirit:name>
         <spirit:fileType>systemVerilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
@@ -15936,6 +15990,12 @@
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/aws_v1_0_top.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -15979,7 +16039,37 @@
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/aws_v1_0_vlsyn_rfs.sv</spirit:name>
+        <spirit:name>hdl/lib_pipe.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/ccf_ctl.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/sync.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/flop_ccf.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/mgt_acc_axl.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/mgt_gen_axl.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/synth/sh_ddr.sv</spirit:name>
         <spirit:fileType>systemVerilogSource</spirit:fileType>
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
@@ -15993,6 +16083,12 @@
         <spirit:name>hdl/aws_v1_0_2_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/aws_v1_0_top.sv</spirit:name>
+        <spirit:fileType>systemVerilogSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_c59ef6a9</spirit:userFileType>
         <spirit:logicalName>aws_v1_0_2</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -16429,14 +16525,14 @@
       <xilinx:displayName>AWS</xilinx:displayName>
       <xilinx:vendorURL>http://www.xilinx.com</xilinx:vendorURL>
       <xilinx:coreRevision>2</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-06-05T19:20:33Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2019-08-08T23:47:40Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="bd9f67aa"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="3f5c2acd"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="62ceb9f8"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="873a5476"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="15853875"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="7a852364"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="bf260ba4"/>
       <xilinx:checksum xilinx:scope="cpus" xilinx:value="9bfed0d6"/>

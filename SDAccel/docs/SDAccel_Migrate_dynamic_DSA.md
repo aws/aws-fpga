@@ -47,7 +47,7 @@ set_property sdx_kernel_type rtl [ipx::current_core]
 * Profiling hardware no longer pre-built in the platform. Instead, it is added compile time to the design.
 * This requires an update to the xocc command options.     
   * (2017.4) Add the -profile_kernel option the xocc command to enable profile instrumentation when compiling the kernel; set profile=true in the sdaccel.ini file to collect profile data when running the application.
-  
+  * (2019.1) Add the -profile_kernel option the xocc command to enable profile instrumentation when compiling the kernel; set profile=true in the xrt.ini file to collect profile data when running the application.
 ## Additional resources
 * [SDAccel Development Enviroment - Changes for 2017.4](https://www.xilinx.com/html_docs/xilinx2017_4/sdaccel_doc/jdl1512623841682.html)
 * [SDAccel Development Enviroment - Whats new for 2017.4](https://www.xilinx.com/html_docs/xilinx2017_4/sdaccel_doc/rke1512623904797.html)

@@ -63,11 +63,34 @@ class TestFindSDAccelExamples(AwsFpgaTestBase):
         xilinx_sdaccel_example_map = {}
 
         for root, dirs, files in os.walk(self.xilinx_sdaccel_examples_dir):
+            ignore = False
+
             if os.path.exists(root + "/description.json") and os.path.exists(root + "/Makefile"):
+                with open(root + "/description.json", "r") as description_file:
+                    description = json.load(description_file)
+
+                    if "containers" in description:
+                        if len(description["containers"]) > 1:
+                            ignore = True
+                            logger.info("Ignoring {} as >1 containers found in description.json.".format(root))
+
+                    else:
+                        ignore = True
+                        logger.info("Ignoring {} as no containers found in description.json.".format(root))
+                        continue
+
+                    if "nboard" in description:
+                        if "xilinx_aws-vu9p-f1-04261818" in description["nboard"]:
+                            ignore = True
+                            logger.info("Ignoring {} as F1 device found in nboard.".format(root))
+                            continue
+            else:
+                ignore = True
+                logger.warn("Ignoring: {} as no Makefile/description.json exist".format(root))
+
+            if not ignore:
                 xilinx_examples_makefiles.append(root)
                 logger.info("Adding: " + root)
-            else:
-                logger.info("Ignoring: " + root)
 
         assert len(xilinx_examples_makefiles) != 0, "Could not find any Xilinx SDAccel example in %s" % self.xilinx_sdaccel_examples_dir
 

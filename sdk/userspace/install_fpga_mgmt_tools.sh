@@ -68,6 +68,7 @@ echo "AWS FPGA: Copying Amazon FPGA Image (AFI) Management Tools to $AFI_MGMT_TO
 cp -f $AFI_MGMT_TOOLS_SRC_DIR/fpga-* $AFI_MGMT_TOOLS_DST_DIR
 cp -f $AFI_MGMT_TOOLS_LIB_DIR/libfpga_mgmt.so.1.0.0 $AFI_MGMT_LIBS_DST_DIR
 ln -sf libfpga_mgmt.so.1 $AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so
+ln -sf libfpga_mgmt.so.1.0.0 $AFI_MGMT_LIBS_DST_DIR/libfpga_mgmt.so.1
 
 source /tmp/sdk_root_env.exp
 if allow_non_root ; then

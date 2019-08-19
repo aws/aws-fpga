@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
     int rc;
     int slot_id;
 
-    /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
-    rc = fpga_pci_init();
+    /* initialize the fpga_mgmt library */
+    rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_pci library");
 
     /* This demo works with single FPGA slot, we pick slot #0 as it works for both f1.2xl and f1.16xl */
@@ -66,18 +66,13 @@ int main(int argc, char **argv) {
     rc = check_afi_ready(slot_id);
     fail_on(rc, out, "AFI not ready");
 
-
     printf("\n");
 
     printf("===== Hello World Example =====\n");
     rc = peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR1);
     fail_on(rc, out, "peek-poke example failed");
 
-
-
-
     return rc;
-
 
 out:
     return 1;
