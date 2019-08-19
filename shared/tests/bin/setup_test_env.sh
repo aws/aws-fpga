@@ -27,6 +27,11 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
+instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+instance_type=`curl http://169.254.169.254/latest/meta-data/instance-type`
+
+echo "Test Running on INSTANCE ID: $instance_id INSTANCE TYPE: $instance_type"
+
 python_versions=(2.7 3.6)
 
 python_packages=(\
