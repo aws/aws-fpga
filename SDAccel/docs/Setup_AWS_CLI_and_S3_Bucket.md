@@ -1,7 +1,7 @@
 ## Setup CLI and Create S3 Bucket
-The developer is required to create a S3 bucket for the AFI generation.  The bucket will contain a tar file and logs which are generated from the AFI creation service. 
+The developer is required to create an S3 bucket for the AFI generation. The bucket will contain a tar file and logs which are generated from the AFI creation service. 
 
-To install the AWS CLI, please follow the instructions here: (http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+To install the AWS CLI, please follow the [instructions here](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
 The AWS SDAccel scripts require JSON output format and the scripts will not work properly if you use any other output format types (ex: text, table).  JSON is the default output format of the AWS CLI.
 

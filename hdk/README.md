@@ -53,9 +53,9 @@
 #### AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
-  * This release supports Xilinx SDx 2017.4 only.  The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+* The compatibility table describes the mapping of developer kit version to [FPGA developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
 
-| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA developer AMI Version     |
+| Developer Kit Version   | Tool Version Supported     |  Compatible FPGA Developer AMI Version     |
 |-----------|-----------|------|
 | 1.3.0-1.3.6 | 2017.1(Deprecated) | v1.3.5(Deprecated) |
 | 1.3.7-1.3.X | 2017.1(Deprecated) | v1.3.5-v1.3.X(Deprecated) |
@@ -63,8 +63,9 @@
 | 1.4.0-1.4.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
 | 1.4.3-1.4.X | 2018.2 | v1.5.0 (Xilinx SDx 2018.2) |
 | 1.4.8-1.4.X | 2018.3 | v1.6.0 (Xilinx SDx 2018.3) |
+| 1.4.8-1.4.X | 2019.1 | v1.7.0 (Xilinx SDx 2019.1) |
 
-* FPGA developer kit version is listed in [hdk_version.txt](./hdk_version.txt)
+* The FPGA Developer Kit version is listed in [hdk_version.txt](./hdk_version.txt)
 
 * FPGA developer kit supported tool versions are listed in [supported\_vivado\_versions](../supported_vivado_versions.txt)
 

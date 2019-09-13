@@ -171,7 +171,7 @@ setup_patches
 
 # Update Xilinx SDAccel Examples from GitHub
 info_msg "Using SDx $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER =~ .*2018\.3.* ]]; then
+if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER =~ .*2018\.3.* || $RELEASE_VER =~ .*2019\.1.* ]]; then
     info_msg "Updating Xilinx SDAccel Examples $RELEASE_VER"
     git submodule update --init -- SDAccel/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
@@ -183,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER
     fi
     ln -sf $SDACCEL_DIR/examples/xilinx_$RELEASE_VER $SDACCEL_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2017.4, 2018.2 & 2018.3 are supported).\n"
+   echo " $RELEASE_VER is not supported (2017.4, 2018.2, 2018.3 and 2019.1 are supported).\n"
    return 2
 fi
 

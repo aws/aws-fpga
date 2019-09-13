@@ -54,8 +54,5 @@ class TestSdkScripts(AwsFpgaTestBase):
         logger.info(self)
         assert False
 
-    def test_fio_tools_setup_python27(self):
-        self.setup_fio_tools(python_version=2.7)
-
-    def test_fio_tools_setup_python34(self):
-        self.setup_fio_tools(python_version=3.4)
+    def test_fio_tools_setup(self):
+        self.setup_fio_tools()

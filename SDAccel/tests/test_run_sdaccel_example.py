@@ -68,13 +68,14 @@ class TestRunSDAccelExample(AwsFpgaTestBase):
 
         return
 
+    @pytest.mark.flaky(reruns=2, reruns_delay=2)
     def test_run_sdaccel_example(self, examplePath, rteName, xilinxVersion):
         os.chdir(self.get_sdaccel_example_fullpath(examplePath))
 
         (rc, stdout_lines, stderr_lines) = self.run_cmd("make exe")
         assert rc == 0
 
-        em_run_cmd = self.get_sdaccel_example_run_cmd(examplePath)
+        em_run_cmd = self.get_sdaccel_example_run_cmd(examplePath, xilinxVersion)
         check_runtime_script = os.path.join(AwsFpgaTestBase.WORKSPACE,'sdaccel_runtime_setup.sh')
 
         self.get_sdaccel_aws_xclbin_file(examplePath, rteName, xilinxVersion)

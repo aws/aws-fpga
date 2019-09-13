@@ -316,8 +316,8 @@ Each DRAM interface is accessed via an AXI-4 interface:
 
 There is a single status signal that the DRAM interface is trained and ready for access.  DDR access should be gated when the DRAM interface is not ready. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
 
-The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  A CL can be designed to handle ECC errors by monitoring RRESP on the DDR AXI interfaces. The CL will receive a SLVERR RRESP on an ECC error. 
-**NOTE:** Initializing the DDR is required before reading to initialize the ECC. False ECC errors may occur when the DDR is un-initialized.
+The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  A CL can be designed to handle ECC errors by monitoring RRESP on the DDR AXI interfaces. The CL will receive a SLVERR RRESP on an uncorrectable ECC error. 
+**NOTE:** Writing to a DDR location is required before reading the DDR location to initialize the ECC. False ECC errors may occur when un-initialized DDR locations are read.
 
 Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. 
 

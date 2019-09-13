@@ -26,11 +26,21 @@ fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
+setup_test_env_script_dir=$script_dir
 
 if ! source $script_dir/setup_test_env.sh; then
-    return 1
+  return 1
 fi
 
 if ! source $WORKSPACE/sdk_setup.sh; then
-    return 1
+  return 1
+fi
+
+if [ x$1 == "xpy_bindings" ] ; then
+  source $WORKSPACE/.virtualenvs/python3/bin/activate
+  aws s3 cp s3://aws-fpga-jenkins-testing/python_bindings_dependencies/setup.sh .
+  chmod 755 ./setup.sh
+  ./setup.sh
+  export PYTHONPATH=$PYTHONPATH:$SDK_DIR/apps
+  source $WORKSPACE/.virtualenvs/python2/bin/activate
 fi

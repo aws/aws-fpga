@@ -301,9 +301,10 @@ class AwsFpgaTestBase(object):
         return "{}/create-afi/afi-ids.txt".format(root_tag)
 
     @staticmethod
-    def get_sdaccel_example_run_cmd(examplePath):
+    def get_sdaccel_example_run_cmd(examplePath, xilinxVersion):
         '''
         @param examplePath: Path of the Xilinx SDAccel example
+        @param xilinxVersion: The Xilinx tool version
         '''
         description = AwsFpgaTestBase.get_sdaccel_example_description(examplePath)
         if description.get("em_cmd", None):
@@ -313,9 +314,15 @@ class AwsFpgaTestBase(object):
                 run_cmd = "./{}".format(description.get("host_exe", None))
                 if description.get("cmd_args", None):
                    if "PROJECT" not in description.get("cmd_args", None) and "BUILD" not in description.get("cmd_args", None):
-                       run_cmd += " {}".format(description.get("cmd_args", None))
+                       if "2019.1" not in xilinxVersion:
+                           run_cmd += " {}".format(description.get("cmd_args", None))
+                       else:
+                           run_cmd += " {}".format(description.get("cmd_args", None).replace(".xclbin",".hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xclbin"))
                    else:
-                       run_cmd += " {}".format((description.get("cmd_args", None).replace("PROJECT",".")).replace("BUILD","./xclbin"))
+                       if "2019.1" not in xilinxVersion:
+                           run_cmd += " {}".format((description.get("cmd_args", None).replace("PROJECT",".")).replace("BUILD","./xclbin"))
+                       else:
+                           run_cmd += " {}".format(((description.get("cmd_args", None).replace(".xclbin",".hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin")).replace("PROJECT",".")).replace("BUILD","./xclbin"))
 
         assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(examplePath)
         
@@ -518,7 +525,7 @@ class AwsFpgaTestBase(object):
         return os.path.join(AwsFpgaTestBase.get_fio_tool_root(), "scripts/{}_4-ch_4-1M_write.fio".format(driver))
 
     @staticmethod
-    def setup_fio_tools(python_version=2.7):
+    def setup_fio_tools():
         '''Install and setup fio tools'''
         # If downloaded repo already, exists, delete it so we can fetch again
         if os.path.exists(AwsFpgaTestBase.get_fio_tool_install_path()):
@@ -526,7 +533,7 @@ class AwsFpgaTestBase(object):
 
         logger.info("Installing fio_dma_tools")
 
-        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("python{} {} {}".format(python_version, AwsFpgaTestBase.get_fio_tool_install_script(), AwsFpgaTestBase.get_fio_tool_install_path()), echo=True)
+        (rc, stdout_lines, stderr_lines) = AwsFpgaTestBase.run_cmd("python {} {}".format(AwsFpgaTestBase.get_fio_tool_install_script(), AwsFpgaTestBase.get_fio_tool_install_path()), echo=True)
         assert rc == 0
         assert os.path.exists("{}".format(AwsFpgaTestBase.get_fio_tool_run_script()))
 

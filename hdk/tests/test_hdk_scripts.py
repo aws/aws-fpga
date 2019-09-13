@@ -58,12 +58,6 @@ class TestHdkScripts(AwsFpgaTestBase):
     def test_wait_for_afi(self):
         self.run_cmd("{}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
 
-    def test_wait_for_afi_python27(self):
-        self.run_cmd("python2.7 {}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
-
-    def test_wait_for_afi_python34(self):
-        self.run_cmd("python3.4 {}/shared/bin/scripts/wait_for_afi.py --afi {}".format(self.WORKSPACE, self.afi))
-
     @pytest.mark.skip(reason="Not implemented")
     def test_notify_via_sns(self):
         assert False

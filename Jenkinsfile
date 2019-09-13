@@ -122,7 +122,7 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2017.4', '2018.2', '2018.3' ]
+def xilinx_versions = [ '2017.4', '2018.2', '2018.3', '2019.1' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
@@ -130,7 +130,8 @@ def default_xilinx_version = xilinx_versions.last()
 def dsa_map = [
     '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
     '2018.2' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.3' : [ 'DYNAMIC_5_0' : 'dyn']
+    '2018.3' : [ 'DYNAMIC_5_0' : 'dyn'],
+    '2019.1' : [ 'DYNAMIC_5_0' : 'dyn']
 ]
 
 def sdaccel_example_default_map = [
@@ -153,6 +154,12 @@ def sdaccel_example_default_map = [
         'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
         'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
         'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
+    ],
+    '2019.1' : [
+        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/hello_world/helloworld_ocl',
+        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl_5.0_shell',
+        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth_5.0_shell',
+        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
     ]
 ]
 
@@ -171,6 +178,12 @@ def simulator_tool_default_map = [
      ],
      '2018.3' : [
          'vivado': 'xilinx/SDx/2018.3_1207',
+         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
+         'questa': 'questa/10.6c_1',
+         'ies': 'incisive/15.20.063'
+     ],
+     '2019.1' : [
+         'vivado': 'xilinx/SDx/2019.1.op2552052',
          'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
          'questa': 'questa/10.6c_1',
          'ies': 'incisive/15.20.063'
@@ -270,7 +283,7 @@ def test_run_py_bindings() {
     try {
         sh """
         set -e
-        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env_al2.sh "py_bindings"
+        source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh "py_bindings"
         python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
         """
     } catch (exc) {
@@ -368,7 +381,7 @@ def test_fpga_all_slots() {
     }
     catch (exception) {
         echo "Test FPGA Tools All Slots failed"
-        input message: "1 slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
+        input message: "All slot FPGA Tools test failed. Click Proceed or Abort when you are done debugging on the instance."
         throw exception
     }
     finally {
@@ -396,7 +409,6 @@ def test_run_non_root_access() {
         source $WORKSPACE/shared/tests/bin/setup_test_sdk_env.sh
         newgrp fpgauser
         export SDK_DIR="${WORKSPACE}/sdk"
-        source  $WORKSPACE/shared/tests/bin/setup_test_env.sh
         python2.7 -m pytest -v $WORKSPACE/${test} --junit-xml $WORKSPACE/${report_file}
         """
     } catch (exc) {
@@ -598,15 +610,15 @@ if (test_xdma) {
 //=============================================================================
 // Python Binding Test
 //=============================================================================
-if (test_py_bindings) {
-    all_tests['Test Python Bindings'] = {
-        stage('Test Python Bindings') {
-            node('f1.2xl_runtime_test_al2') {
-                test_run_py_bindings()
-            }
-        }
-    }
-}
+// if (test_py_bindings) {
+//     all_tests['Test Python Bindings'] = {
+//         stage('Test Python Bindings') {
+//             node('f1.2xl_runtime_test_al2') {
+//                 test_run_py_bindings()
+//             }
+//         }
+//     }
+// }
 
 //=============================================================================
 // Precompiled Runtime Tests
@@ -872,34 +884,34 @@ if (test_hdk_fdf) {
 // SDAccel Tests
 //=============================================================================
 
-if (test_sdaccel_scripts) {
-    all_tests['Test SDAccel Scripts'] = {
-        stage('Test SDAccel Scripts') {
-            def nodes = [:]
-            for (def xilinx_version in xilinx_versions) {
-
-                String node_label = get_task_label(task: 'source_scripts', xilinx_version: xilinx_version)
-                String node_name = "Test SDAccel Scripts ${xilinx_version}"
-                nodes[node_name] = {
-                    node(node_label) {
-                        String report_file = "test_sdaccel_scripts_${xilinx_version}.xml"
-                        checkout scm
-                        try {
-                            sh """
-                            set -e
-                            source $WORKSPACE/shared/tests/bin/setup_test_env.sh
-                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
-                            """
-                        } finally {
-                            run_junit(report_file)
-                        }
-                    }
-                }
-            }
-            parallel nodes
-        }
-    }
-}
+// if (test_sdaccel_scripts) {
+//     all_tests['Test SDAccel Scripts'] = {
+//         stage('Test SDAccel Scripts') {
+//             def nodes = [:]
+//             for (def xilinx_version in xilinx_versions) {
+//
+//                 String node_label = get_task_label(task: 'source_scripts', xilinx_version: xilinx_version)
+//                 String node_name = "Test SDAccel Scripts ${xilinx_version}"
+//                 nodes[node_name] = {
+//                     node(node_label) {
+//                         String report_file = "test_sdaccel_scripts_${xilinx_version}.xml"
+//                         checkout scm
+//                         try {
+//                             sh """
+//                             set -e
+//                             source $WORKSPACE/shared/tests/bin/setup_test_env.sh
+//                             python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_sdaccel_scripts.py --junit-xml $WORKSPACE/${report_file}
+//                             """
+//                         } finally {
+//                             run_junit(report_file)
+//                         }
+//                     }
+//                 }
+//             }
+//             parallel nodes
+//         }
+//     }
+// }
 
 if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
     all_tests['Run SDAccel Tests'] = {

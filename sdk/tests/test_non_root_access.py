@@ -78,6 +78,6 @@ class TestNonRootAccess(AwsFpgaTestBase):
         for slot in range(AwsFpgaTestBase.num_slots):
             (rc, out, err) = self.run_cmd("bash -x {}/sdk/tests/non_root_log_into_group.sh {}".format(os.environ['WORKSPACE'], slot))
             logger.info("{}\n{}".format(out, err))
-            assert  rc == 0
+            assert rc == 0
             AwsFpgaTestBase.fpga_set_virtual_dip_switch("1111111111111111", slot, as_root=False)
-            assert  AwsFpgaTestBase.fpga_get_virtual_led(slot, as_root=False) == "1010-1101-1101-1110"
+            assert AwsFpgaTestBase.fpga_get_virtual_led(slot, as_root=False) == "1010-1101-1101-1110"

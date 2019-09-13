@@ -1,0 +1,6 @@
+pytest
+pytest-timeout
+pytest-rerunfailures
+boto3
+markdown
+GitPython
