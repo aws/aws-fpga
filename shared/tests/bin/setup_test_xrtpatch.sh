@@ -75,7 +75,7 @@ elif [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* ]]; then
     echo "Xilinx Vivado version is 2018.3"
 
     s3_ami_version=1.6.0
-    xrt_release_version=XRT_2018_3_RC3_Patch2
+    xrt_release_version=XRT_2018_3_RC5
     xrt_rpm_name=xrt_201830.2.1.0_7.6.1810-xrt.rpm
     aws_xrt_rpm_name=xrt_201830.2.1.0_7.6.1810-aws.rpm
 

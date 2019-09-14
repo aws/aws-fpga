@@ -137,7 +137,7 @@ This assumes you have:
 
 The [create_sdaccel_afi.sh](./tools/create_sdaccel_afi.sh) script is provided to facilitate AFI creation from a Xilinx FPGA Binary, it:
 * Takes in your Xilinx FPGA Binary \*.xclbin file
-* Calls *aws ec2 create_fgpa_image* to generate an AFI under the hood
+* Calls *aws ec2 create_fpga_image* to generate an AFI under the hood
 * Generates a \<timestamp\>_afi_id.txt which contains the identifiers for your AFI
 * Creates an AWS FPGA Binary file with an \*.awsxclbin extension that is composed of: Metadata and AGFI-ID. 
      * **This \*.awsxclbin is the AWS FPGA Binary file that will need to be loaded by your host application to the FPGA**

@@ -1,122 +1,61 @@
-# XRT Installation Instructions
+# Xilinx Runtime (XRT) and SDx Tool versions
 
-# Installing Xilinx Runtime (XRT) 2018.3 RC3 Patch 2
+* Xilinx Runtime versions match with the tool that you created your SDAccel AFI with. 
+* We provide pre-built RPM's for Centos/RHEL and instructions for building XRT 
+* Use the below table as reference to install and use the correct XRT version for your applications.
 
-  * Applicable SDx Tool Version: 2018.3
+| Xilinx SDx Tool Version | XRT Release Tag | SHA | `xrt` and `xrt-aws` pre-built RPM's (Centos/RHEL) |
+|---|---|---|---|
+|2019.1| [2019.1_RC2](https://github.com/Xilinx/XRT/releases/tag/2019.1_RC2) | dd210161e204e882027d22132725d8ffdf285149 | [xrt_201910.2.2.0_7.6.1810-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-xrt.rpm) [xrt_201910.2.2.0_7.6.1810-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-aws.rpm) |
+|2018.3| [2018.3_RC5](https://github.com/Xilinx/XRT/releases/tag/2018.3_RC5) | 8654da1f0d2bd196c9887bdcfe1479103a93e90a | [xrt_201830.2.1.0_7.6.1810-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.6.0/Patches/XRT_2018_3_RC5/xrt_201830.2.1.0_7.6.1810-xrt.rpm) [xrt_201830.2.1.0_7.6.1810-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.6.0/Patches/XRT_2018_3_RC5/xrt_201830.2.1.0_7.6.1810-aws.rpm) |
+|2018.2| [2018.2_XDF.RC5](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5) | 65ffad62f427c0bd1bc65b6ea555a810295468b7 | [xrt_201802.2.1.0_7.5.1804-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm) [xrt_201802.2.1.0_7.5.1804-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm) |
+|2017.4| N/A** | N/A** | N/A** |
+** Use XOCL for 2017.4
 
-  * XRT Release Tag:  2018.3.3.2 (SHA: f96913247f94f4bc3b5134c92a0decc138351038)
-  
-  * [Xilinx Runtime (XRT) 2018.3 RC3 Patch 2 release](https://github.com/Xilinx/XRT/releases/tag/2018.3.3.2)
-  
- ### Instructions to build & install XRT
- 
-   Pre-requisite commands used to build XRT for AWS F1 platform for this release
-   
-  ```
-    git clone http://www.github.com/aws/aws-fpga.git
-    cd aws-fpga
-    source sdaccel_setup.sh
-    mkdir $SDACCEL_DIR/Runtime
-    cd $SDACCEL_DIR/Runtime
-    export XRT_PATH="${SDACCEL_DIR}/Runtime/XRT_2018.3.3.2"
-    git clone http://www.github.com/Xilinx/XRT.git -b 2018.3.3.2 ${XRT_PATH}
-    cd ${XRT_PATH}
-    sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
-    cd build
-    
-  ```
-  
-  Follow [Xilinx's instructions to build & install XRT on Centos/Redhat & Ubuntu/Debian](https://xilinx.github.io/XRT/master/html/build.html#xrt-for-pcie-platforms) to build XRT for a supported OS.
-  
-  ### Install on Centos/RHEL using prebuilt RPM
+# Centos/RHEL build and install steps
 
- ```
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch2/xrt_201830.2.1.0_7.6.1810-xrt.rpm -o xrt_201830.2.1.0_7.6.1810-xrt.rpm
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.6.0/Patches/XRT_2018_3_RC3_Patch2/xrt_201830.2.1.0_7.6.1810-aws.rpm -o xrt_201830.2.1.0_7.6.1810-aws.rpm
-   sudo yum remove -y xrt-aws
-   sudo yum remove -y xrt
-   sudo yum install -y xrt_201830.2.1.0_7.6.1810-xrt.rpm
-   sudo yum install -y xrt_201830.2.1.0_7.6.1810-aws.rpm
-   
-  ```
+```bash
+XRT_RELEASE_TAG=2019.1_RC2 # Substitute XRT_RELEASE_TAG=<TAG from above table>
 
-# Installing Xilinx Runtime (XRT) 2018.2_XDF.RC4
-   
-  * Applicable SDx Tool Version: 2018.2
+git clone https://github.com/aws/aws-fpga.git
 
-  * XRT Release Tag: 2018.2_XDF.RC4 (SHA: 343186f76f59edd01bc48d84cf67fe22a0a3f338)
-   
-  * [Xilinx Runtime (XRT) 2018.2_XDF.RC4 release](https://github.com/Xilinx/XRT/tree/2018.2_XDF.RC4)
-  
-  ### Instructions to build & install XRT
- 
-   Pre-requisite commands used to build XRT for AWS F1 platform for this release
-   
-  ```
-    git clone http://www.github.com/aws/aws-fpga.git
-    cd aws-fpga
- 	source sdaccel_setup.sh
-	mkdir $SDACCEL_DIR/Runtime
-	cd $SDACCEL_DIR/Runtime
-	export XRT_PATH="${SDACCEL_DIR}/Runtime/XRT_20182rc4"
-	git clone http://www.github.com/Xilinx/XRT.git -b 2018.2_XDF.RC4 ${XRT_PATH}
-	cd ${XRT_PATH}
-	sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
-	cd build
-	  
- ```
-  Follow [ Xilinx's instructions to build & install XRT on Centos/RedHat & Ubuntu/Debian](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) to build XRT for supported OS.
-    
-  ### Install on Centos/RedHat Linux using prebuilt RPMs
-  
-  Run following commands to download and install XRT 2018.2_XDF.RC4 for 'Centos/RHEL'
-  
-  ```
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm
-   sudo yum remove -y xrt
-   sudo yum install -y xrt_201802.2.1.0_7.5.1804-xrt.rpm
-   sudo yum install -y xrt_201802.2.1.0_7.5.1804-aws.rpm
-   
-  ```
+cd aws-fpga
+source sdaccel_setup.sh
+cd $SDACCEL_DIR/Runtime
+export XRT_PATH="${SDACCEL_DIR}/Runtime/${XRT_RELEASE_TAG}"
+git clone http://www.github.com/Xilinx/XRT.git -b ${XRT_RELEASE_TAG} ${XRT_PATH}
 
-# Installing Xilinx Runtime (XRT) 2018.2_XDF.RC5
-   
-  * Applicable SDx Tool Version: 2018.2
+cd ${XRT_PATH}
+sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
 
-  * XRT Release Tag: 2018.2_XDF.RC5 (SHA: 65ffad62f427c0bd1bc65b6ea555a810295468b7)
-  
-  * [Xilinx Runtime (XRT) 2018.2_XDF.RC5 release](https://github.com/Xilinx/XRT/releases/tag/2018.2_XDF.RC5)
-  
- ### Instructions to build & install XRT
- 
-   Pre-requisite commands used to build XRT for AWS F1 platform for this release
-    
-  ```
-    git clone http://www.github.com/aws/aws-fpga.git
-    cd aws-fpga
- 	source sdaccel_setup.sh
-	mkdir $SDACCEL_DIR/Runtime
-	cd $SDACCEL_DIR/Runtime
-	export XRT_PATH="${SDACCEL_DIR}/Runtime/XRT_20182rc5 "
-	git clone http://www.github.com/Xilinx/XRT.git -b 2018.2_XDF.RC5 ${XRT_PATH}
-	cd ${XRT_PATH}
-	sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
-	cd build
-  
- ```
-  Follow [ Xilinx's instructions to build & install XRT on Centos/RedHat & Ubuntu/Debian](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) to build XRT for supported OS.
- 
-  ### Install on Centos/RedHat Linux using prebuilt RPMs
-  
-  Run following commands to download and install XRT 2018.2_XDF.RC5 for 'Centos/RHEL'
-  
-  ```
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt_201802.2.1.0_7.5.1804-xrt.rpm
-   curl -s https://s3.amazonaws.com/aws-fpga-developer-ami/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt_201802.2.1.0_7.5.1804-aws.rpm
-   sudo yum remove -y xrt-aws
-   sudo yum remove -y xrt
-   sudo yum install -y xrt_201802.2.1.0_7.5.1804-xrt.rpm
-   sudo yum install -y xrt_201802.2.1.0_7.5.1804-aws.rpm
-   
-  ```
+cd build
+scl enable devtoolset-6 bash
+./build.sh
+
+cd Release
+sudo yum reinstall xrt_*.rpm -y
+```
+
+# Centos/RHEL pre-built RPM install steps
+
+### 2019.1
+
+```bash
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-xrt.rpm -o xrt.rpm
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-aws.rpm-o xrt-aws.rpm
+sudo yum reinstall xrt*.rpm -y
+```
+### 2018.3
+
+```bash
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.6.0/Patches/XRT_2018_3_RC5/xrt_201830.2.1.0_7.6.1810-xrt.rpm -o xrt.rpm
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.6.0/Patches/XRT_2018_3_RC5/xrt_201830.2.1.0_7.6.1810-aws.rpm -o xrt-aws.rpm  
+sudo yum reinstall xrt*.rpm -y
+```
+### 2018.2
+
+```bash
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-xrt.rpm -o xrt.rpm
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.5.0/Patches/XRT_2018_2_XDF_RC5/xrt_201802.2.1.0_7.5.1804-aws.rpm -o xrt-aws.rpm
+sudo yum reinstall xrt*.rpm -y
+```

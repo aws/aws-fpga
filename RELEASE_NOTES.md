@@ -264,7 +264,7 @@ The following major features are included in this HDK release:
 * Restrictions on URAM have been updated to enable 100% of the URAM with a CL to be utilized.  See documentation on enabling URAM utilization: [URAM_options](./hdk/docs/URAM_Options.md)
 
 ### 5.    Vivado IP Integrator (IPI) and GUI Workflow
-* Vivado graphical design canvas and project-based flow is now supported.  This flow allows developers to create CL logic as either RTL or complex subsystems based on an IP centric block diagram.  Prior experience in RTL or system block designs is recommended.  The [IP Integrator and GUI Vivado workflow](hdk/docs/IPI_GUI_Vivado_Setup.md) enables a unified graphical environment to guide the developer through the common steps to design, implement, and verify FGPAs.  To get started, start with the [README that will take you through getting started steps and documents on IPI](hdk/docs/IPI_GUI_Vivado_Setup.md)
+* Vivado graphical design canvas and project-based flow is now supported.  This flow allows developers to create CL logic as either RTL or complex subsystems based on an IP centric block diagram.  Prior experience in RTL or system block designs is recommended.  The [IP Integrator and GUI Vivado workflow](hdk/docs/IPI_GUI_Vivado_Setup.md) enables a unified graphical environment to guide the developer through the common steps to design, implement, and verify FPGAs. To get started, start with the [README that will take you through getting started steps and documents on IPI](hdk/docs/IPI_GUI_Vivado_Setup.md)
  
 ### 6.    Build Flow improvments
 * See [Build_Scripts](./hdk/common/shell_v04261818/build/scripts)
