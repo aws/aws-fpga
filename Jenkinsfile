@@ -1006,6 +1006,7 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                 }
 
                                 boolean test_sw_emu_supported = true
+                                boolean test_hw_emu_supported = true
 
                                 if(description_json["targets"]) {
                                     if(description_json["targets"].contains("sw_emu")) {
@@ -1013,6 +1014,13 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                         echo "Description file ${description_file} has target sw_emu"
                                     } else {
                                         test_sw_emu_supported = false
+                                        echo "Description file ${description_file} does not have target sw_emu"
+                                    }
+                                    if(description_json["targets"].contains("hw_emu")) {
+                                        test_hw_emu_supported = true
+                                        echo "Description file ${description_file} has target sw_emu"
+                                    } else {
+                                        test_hw_emu_supported = false
                                         echo "Description file ${description_file} does not have target sw_emu"
                                     }
                                 } else {
@@ -1043,23 +1051,25 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                         }
                                     }
 
-                                    stage(hw_emu_stage_name) {
-                                        node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
-                                            checkout scm
-                                            try {
-                                                sh """
-                                                set -e
-                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
-                                                """
-                                            } catch (error) {
-                                                echo "${hw_emu_stage_name} HW EMU Build generation failed"
-                                                archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                                throw error
-                                            } finally {
-                                                run_junit(hw_emu_report_file)
-                                                git_cleanup()
+                                    if(test_hw_emu_supported) {
+                                        stage(hw_emu_stage_name) {
+                                            node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
+                                                checkout scm
+                                                try {
+                                                    sh """
+                                                    set -e
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    """
+                                                } catch (error) {
+                                                    echo "${hw_emu_stage_name} HW EMU Build generation failed"
+                                                    archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+                                                    throw error
+                                                } finally {
+                                                    run_junit(hw_emu_report_file)
+                                                    git_cleanup()
+                                                }
                                             }
                                         }
                                     }
