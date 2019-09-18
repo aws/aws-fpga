@@ -25,7 +25,7 @@ AWS designed its FPGA instances to provide a developer experience with ease of u
 
 - Developers don’t need to purchase / design / bringup or debug the physical hardware where the FPGA is hosted, nor the platform/server hardware: all the hardware is verified, monitored, and maintained by AWS.
 
-- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA developer AMI developers have a choice to a wide range of instance (different CPU and Memory configuration) allowing developers to optimize their development flow.
+- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA Developer AMI developers have a choice to a wide range of instance (different CPU and Memory configuration) allowing developers to optimize their development flow.
 
 - AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premises development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
 
@@ -152,6 +152,15 @@ Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to rev
 Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
 
 Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to resrict access to this API.
+
+
+**Q: How do I increase my AFI limit?**
+
+AFI limit increases may be requested by opening up a Support Case from your [EC2 Support Console](https://console.aws.amazon.com/support/cases#/create)
+
+Select a `Service limit increase` of the Limit Type - `EC2 FPGA` for the region where a limit increase is needed.
+
+You will hear back from our support team once the limit is increased.
 
 **Q: Can I bring my own bitstream for loading on an F1 FPGA?**
 

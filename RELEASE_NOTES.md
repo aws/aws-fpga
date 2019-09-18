@@ -1,6 +1,4 @@
-
 # AWS EC2 FPGA HDK+SDK Release Notes
-
 
 ##  AWS EC2 F1 Platform Features:
    *    1-8 Xilinx UltraScale+ VU9P based FPGA slots
@@ -25,6 +23,35 @@
          *    CL to SH 512-bit AXI4 interface
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
+
+## Release 1.4.11 (See [ERRATA](./ERRATA.md) for unsupported features)
+* FPGA developer kit supports Xilinx SDx/Vivado 2019.1
+    * We recommend developers upgrade to v1.4.11 to benefit from the new features, bug fixes, and optimizations. 
+    * To upgrade, use [Developer AMI v1.7.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace. The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2019.1 tools. 
+* New functionality:
+    * Added a [developer resources section](./developer_resources/README.md) that provides guides on how to setup your own GUI Desktop and compute cluster environment.
+    * Developers can now ask for AFI limit increases via the [AWS Support Center Console](https://console.aws.amazon.com/support/cases#/create).
+        * Create a case to increase your `EC2 FPGA` service limit from the console.
+    * HLx IPI flow updates
+        * HLx support for AXI Fast Memory mode.
+        * HLx support for 3rd party simulations.
+        * HLx support for changes in shell and AWS IP updates(e.g. sh_ddr).     
+* Bug Fixes:
+    * Documentation fixes in the [Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md)
+    * Fixes for forum questions
+        * [Unable to compile aws_v1_0_vl_rfs.sv in Synopsys VCS](https://forums.aws.amazon.com/thread.jspa?threadID=308829&tstart=0)
+        * [Use fpga_mgmt init in HLx runtime](https://forums.aws.amazon.com/thread.jspa?messageID=912063)
+    * New XRT versions added to the [XRT Installation Instructions](./SDAccel/docs/XRT_installation_instructions.md) to fix segmentation faults when using xclbin instead of awsxclbin files.
+* Deprecations:
+    * Removed GUI Setup scripts from AMI v1.7.0 onwards. See [developer resources section](./developer_resources/README.md) guides on how to setup your own GUI Desktop and compute cluster environment.
+* Package versions used for validation
+  
+   | Package | AMI 1.7.0 [2019.1] | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
+   |---------|---|------------------------|------------------------|-----------------------|
+   | OS      | Centos 7.6 | Centos 7.6 | Centos 7.5, 7.6 | Centos 7.4 |
+   | kernel  | 3.10.0-957.27.2.el7.x86_64 | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64  | 3.10.0-693.21.1.el7.x86_64 |
+   | kernel-devel | 3.10.0-957.27.2.el7.x86_64 | 3.10.0-957.5.1.el7.x86_64 | 3.10.0-862.11.6.el7.x86_64, 3.10.0-957.1.3.el7.x86_64 | 3.10.0-693.21.1.el7.x86_64 |
+   | LIBSTDC++ | libstdc++-4.8.5-36.el7_6.2.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-36.el7.x86_64 | libstdc++-4.8.5-16.el7_4.2.x86_64 |   
 
 ## Release 1.4.10 (See [ERRATA](./ERRATA.md) for unsupported features)
 * New functionality:
@@ -160,7 +187,7 @@
 ## Release 1.4.3 (See [ERRATA](./ERRATA.md) for unsupported features)
 * [DRAM Data Retention](hdk/docs/data_retention.md) - With DRAM data retention, developers can simply load a new AFI and continue using the data that is persistently kept in the DRAM attached to the FPGA, eliminating unnecessary data movements and greatly improving the overall application performance.
 * [Virtual Ethernet](./sdk/apps/virtual-ethernet/README.md) - Provides a low latency network interface for EC2 F1, that enables high performance hardware acceleration to ethernet based applications on AWS like firewalls, routers and advanced security virtual appliances. With Virtual Ethernet, developers are able to create F1 accelerators that process ethernet packets directly from user-space on the FPGA with high throughput and low-latency. 
-* [Developer AMI v1.5](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) with Vivado/SDx 2018.2 tools - New FPGA developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
+* [Developer AMI v1.5](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) with Vivado/SDx 2018.2 tools - New FPGA Developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
 
 ## Release 1.4.2 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-862.3.3.el7.x86_64

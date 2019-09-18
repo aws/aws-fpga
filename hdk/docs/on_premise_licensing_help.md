@@ -5,6 +5,14 @@
 
 This document helps developers who choose to develop on-premises with specifying and licensing AWS-compatible Xilinx tools for use with the AWS FPGA HDK.
 
+## Requirements for AWS HDK 1.4.11+ (2019.1)
+ * Xilinx Vivado v2019.1 or v2019.1.op (64-bit)
+ * License: EF-VIVADO-SDX-VU9P-OP
+ * SW Build 2552052 on Fri May 24 14:47:09 MDT 2019
+ * IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+ * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_SDAccel_2019.1_0524_1430_Lin64.bin
+ * MD5 SUM Value: aa20eba36ebe480ec7ae59a4a8c85896
+ 
 ## Requirements for AWS HDK 1.4.8+ (2018.3)
  * Xilinx Vivado v2018.3 or v2018.3.op (64-bit)
  * License: EF-VIVADO-SDX-VU9P-OP
