@@ -71,14 +71,12 @@ You only pay for the EC2 resources you use to run and store your workloads.
 The following table shows the estimated time for the different steps in this tutorial.
 The time it takes to complete each step will vary based on the instance types the instance types that use.
 
-| **Step**                                                    | **t3-2xlarge Duration** | **c5.4xlarge Duration** | **t3.micro Duration** | **z1d.xlarge Duration** | **m5.2xlarge Duration** | **r5.xlarge Duration** |
-|-------------------------------------------------------------|-------------------------|-------------------------|-----------------------|-------------------------|-------------------------|------------------------|
-| [Subscribe to AWS FPGA Developer AMI](#subscribe)           |  1 min                  |  1 min                  |  1 min                |  1 min                  |  1 min                  |  1 min                 |
-| [Launch with CloudFormation](#launch)                       | 23 min                  | 18 min                  | 21 min                | 17 min                  | 18 min                  | 20 min                 |
-| [Connect to the DCV Remote Desktop session](#connect)       |  1 min                  |  1 min                  |  1 min                |  1 min                  |  1 min                  |  1 min                 |
-| cl_hello_world DCP on Desktop                               | 91m40s                  | 75m44s                  | Not enough memory     | 77m9s                   | 83m42s                  |                        |
-| Launch ParallelCluster               |                         |                         |                       |                         |                         |                        |
-| cl_hello_world DCP on ParallelCluster    |                         |                         |                       |                         |                         |                        |
+| **Step**                                                    | **t3-2xlarge Duration** | **c5.4xlarge Duration** | **z1d.xlarge Duration** | **m5.2xlarge Duration** | **r5.xlarge Duration** |
+|-------------------------------------------------------------|-------------------------|-------------------------|-------------------------|-------------------------|------------------------|
+| [Subscribe to AWS FPGA Developer AMI](#subscribe)           |  1 min                  |  1 min                  |  1 min                  |  1 min                  |  1 min                 |
+| [Launch with CloudFormation](#launch)                       | 23 min                  | 18 min                  | 17 min                  | 18 min                  | 20 min                 |
+| [Connect to the DCV Remote Desktop session](#connect)       |  1 min                  |  1 min                  |  1 min                  |  1 min                  |  1 min                 |
+| cl_hello_world DCP on Desktop                               | 91m40s                  | 75m44s                  | 77m9s                   | 83m42s                  | 83m20s                 |
 
 It will take ~20 minutes for CloudFormation to automatically create your GUI Desktop environment.
 
@@ -130,32 +128,45 @@ window to make it easy to navigate between this guide and the AWS Console.
 
    | *Parameter* | *Variable Name* | *Description*
    |-------------|-----------------|--------------|
-   | *VPC ID*    | VPCId           | VPC ID for where the remote desktop instance should be launched
-   | *Subnet ID*   | Subnet   | For the Subnet ID, you should choose one in the Availability Zone where you want the instance launched
-   | *Remote Desktop Instance Type*   | remoteDesktopInstanceType   | This is the instance type that will be used. As this is a 2D workstation, we are not supporting GPU instance types.
-   | *EC2 Key Name*   | EC2KeyName   | Name of an existing EC2 KeyPair to enable SSH access to the instance. More info: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
-   | _OPTIONAL_: *Static Private IP Address*   | StaticPrivateIpAddress   | *OPTIONAL:* If you already have a private VPC address range, you can specify the private IP address to use, leave as *NO_VALUE* if you choose not use this
-   | *Assign a public IP address*   | UsePublicIp   | Should a public IP address be given to the instance, this is overridden by `*CreateElasticIP = True*`
-   | *Create an Elastic IP address*   | CreateElasticIP   | Should an Elastic IP address be created and assigned, this allows for persistent IP address assignment
-   | _OPTIONAL_: *S3 bucket for read access*   | S3BucketName   | *OPTIONAL:* S3 bucket to allow this instance read access (List and Get), leave as *NO_VALUE* if you choose not use this
-   | *CIDR block for remote access (ports 22 and 8443)*   | AccessCidr   | This is the CIDR block for allowing remote access, for ports 22 and 8443
-   | *User name for DCV login*   | UserName   | User name for DCV remote desktop login, default is *_simuser_*
-   | *Password for DCV login*   | UserPass   | Password for DCV remote desktop login. The default password is `Ch4ng3M3!`
-   | _OPTIONAL_: *Existing Security Group (e.g. sg-abcd1234efgh)*   | ExistingSecurityGroup   | *OPTIONAL:* Needs to be a SG ID, for example sg-abcd1234efgh. This is an already existing Security Group ID that is in the same VPC, this is an addition to the security groups that are automatically created to enable access to the remote desktop, leave as NO_VALUE if you choose not use this. Use this link to see you existing secuirity groups: https://us-west-1.console.aws.amazon.com/vpc/home?#SecurityGroups[Security Groups]
-
+   | *VPC ID*    | VPCId  | VPC ID for where the remote desktop instance should be launched.
+   | *VPC CIDR Block* | VPCCidrBlock | We use this to create a security group that allows NFS access to and from the remote desktop instance. Pick the CIDR from the VPC ID Parameter above(For eg: `vpc-123abc(10.0.0.0/16)`).
+   | *FPGA Developer AMI Version* | FpgaDevAmiVersion | Select the FPGA Developer AMI Version you want to launch your instances with. Picks the latest version by default.
+   | *User name for DCV login* | UserName | User name for DCV remote desktop login, default is *_simuser_*
+   | *Password for DCV login* | UserPass | Password for DCV remote desktop login.
+   | *Subnet ID* | Subnet | Select a Subnet ID in the Availability Zone where you want the instance launched. Pick a subnet from the VPC selected above.
+   | *EC2 Key Name* | EC2KeyName | Name of an existing EC2 KeyPair to enable SSH access to the instance.   
+   | *Remote Desktop Instance Type* | remoteDesktopInstanceType | Select an instance type for your remote desktop.
+   | *CIDR block for remote access (ports 22 and 8443)* | AccessCidr | Put the IP ranges from where you allow remote access to your remote desktop. This opens up ports 22 and 8443 for the CIDR range. We recommend setting it to the output of [Check My IP](http://checkip.amazonaws.com/). For eg: `12.34.56.78/32` so that only you can access the instance. 
+   | *Project Data Size* | ProjectDataSize | Enter the size in GB for your project_data EBS volume. You can always [increase your volume size later](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/requesting-ebs-volume-modifications.html). Default is 5GB.
+   | _OPTIONAL_: *Existing Security Group (e.g. sg-abcd1234efgh)*   | ExistingSecurityGroup   | *OPTIONAL:* Needs to be a SG ID, for example sg-abcd1234efgh. This is an [already existing Security Group ID that is in the same VPC](https://console.aws.amazon.com/vpc/home?#SecurityGroups), this is an addition to the security groups that are automatically created to enable access to the remote desktop, leave as NO_VALUE if you choose not use this.
+   | _OPTIONAL_: *Static Private IP Address* | StaticPrivateIpAddress   | *OPTIONAL:* If you already have a private VPC address range, you can specify the private IP address to use, leave as *NO_VALUE* if you choose not use this
+   | *Assign a Public IP address* | UsePublicIp   | Should a public IP address be given to the instance, this is overridden by `*CreateElasticIP = True*`
+   | *Create an Elastic IP address* | CreateElasticIP | Should an Elastic IP address be created and assigned, this allows for persistent IP address assignment
+   | _OPTIONAL_: *S3 bucket for read access* | S3BucketName | *OPTIONAL:* S3 bucket to allow this instance read access (List and Get), leave as *NO_VALUE* if you choose not use this
+   | _OPTIONAL_: *ParallelCluster Scheduler* | Scheduler | *OPTIONAL:* Select a scheduler to setup with ParallelCluster. Only necessary if you want to deploy a compute cluster.
+   | _OPTIONAL_: *ParallelCluster Subnet ID* | PclusterSubnet | *OPTIONAL:* Select a Subnet ID in the Availability Zone where you want the cluster instances launched. Pick a subnet from the VPC selected above.
+   | _OPTIONAL_: *Scheduler instance type* | MasterInstanceType | *OPTIONAL:* Select an instance type you want the scheduler master to run on. This can be a small/free tier instance.
+   | _OPTIONAL_: *DCP Build instance type* | DcpInstanceType | *OPTIONAL:* Select an instance type for building DCP's. z1d.xlarge, c5.4xlarge, m5.2xlarge, r5.xlarge, t3.2xlarge, t2.2xlarge are recommended.
+   | _OPTIONAL_: *F1 instance type* | F1InstanceType | *OPTIONAL:* Select a runtime instance type for your Runtime queue.
+   
 1. After you have entered values for the parameters, *_click_* *Next*.
+
 1. *_Accept_* the default values of the *Configure stack options* and *Advanced options* sections and *_click_* *Next*.
+
 1. *_Review_* the CloudFormation stack settings.
+
 1. *_Click_* all checkboxes in the blue *Capabilities* box at the bottom of the page.
    ![Capabilities](images/capabilities_checkbox.png)
+   
 1. *_Click_* *Create stack*.
 
     This will start the deployment process. 
     AWS CloudFormation will create all of the resources specified in the template and set them up.
+
 1. Verify stack was created successfully
 
    In the *Events* tab, you should see `*CREATE_COMPLETE*` for the `AWS::CloudFormation::Stack` event Type.
-
+   In the *Stack Info* tab, you should see `*CREATE_COMPLETE*` in the Status field.
    It will take ~20 minutes for the stack creation to complete. This is due to the large number of packages that need to be installed. Upon completion you should see the connection information (IP address) in the *Outputs* section of the stack.
 
 <a name="connect"></a>
@@ -340,14 +351,50 @@ pcluster ssh fpgadev-torque qstat
 
 ## FAQ
 
+* How do I find out if my template deployment completed?
+
+  * In the *Events* tab, you should see `*CREATE_COMPLETE*` for the `AWS::CloudFormation::Stack` event Type.
+  * In the *Stack Info* tab, you should see `*CREATE_COMPLETE*` in the Status field.
+
 * How do I update to a new template?
+
+    You can update your deployed stack by going to the [CloudFormation console](https://console.aws.amazon.com/cloudformation) -> Stacks -> Your Stack and selecting the `Update` button at the top.
+
+    You have three ways of updating:
+
+    1. Use current template
+        
+        This option lets you update parameters in the currently deployed stack.
+        Click next after selecting this option to see the parameters, change them and go through the deployment steps as before. 
+    
+    1. Replace current template
+        
+        This option lets you select an updated template.
+        
+        If you want to update your stack with a new template that we have released, select this option and point to our template URL:
+        `https://aws-fpga-hdk-resources.s3.amazonaws.com/developer_resources/cfn_templates/dcv_with_pcluster.yaml`
+        
+        This will let you get any fixes and updates that we publish to the template.
+        
+    1. Modify the template in the CloudFormation Designer
+        
+        This option lets you graphically edit the template and add parts depending on your need.
+        Check the [Official CloudFormation Designer documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/working-with-templates-cfn-designer.html) for more details on how to get started!
 
 * How do I terminate my instance?
 
-* How do I find out if my template deployment completed?
-
-* How do I run Vivado GUI on my parallelcluster instances?
-
+    To clean up resources created by a CloudFormation stack, we strongly suggest deleting the stack instead of deleting resources individually.
+    
+    CloudFormation will handle the instance termination for you.
+    
+    To delete a stack, please follow the [CloudFormation User Guide](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html)
+    
+* How do I troubleshoot CloudFormation stack deployment issues?
+    
+    To start off, please check the [CloudFormation Troubleshooting Guide](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html)
+    
+    Next, post a question on the [FPGA Development forum](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) **OR** file a support ticket from the [Support Center](https://console.aws.amazon.com/support) and someone should be able to help you out!
+        
 <a name="references"></a>
 
 ## References

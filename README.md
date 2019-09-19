@@ -85,7 +85,10 @@ AWS FPGA generation and EC2 F1 instances are supported in the us-east-1 (N. Virg
 
 
 ### New to AWS FPGAs and setting up a development environment?
-The developer kit is supported for Linux operating systems only.  You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premises. Within a linux environment, you can execute `git clone https://github.com/aws/aws-fpga.git` to download the latest release to your EC2 Instance or local server.  Help on cloning from github is available [here](https://help.github.com/articles/which-remote-url-should-i-use/). When using a SSH connection, execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/).
+The developer kit is supported for Linux operating systems only. 
+You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premises. Within a linux environment, you can execute `git clone https://github.com/aws/aws-fpga.git` to download the latest release to your EC2 Instance or local server.  Help on cloning from github is available [here](https://help.github.com/articles/which-remote-url-should-i-use/). When using a SSH connection, execute `git clone git@github.com:aws/aws-fpga.git`. [To get help with connecting to Github via SSH](https://help.github.com/articles/connecting-to-github-with-ssh/).
+
+To setup your instance for development, checkout our [Developer Resources](./developer_resources/README.md) where we provide Step-By-Step guides to setting up a GUI Desktop or a compute cluster.
 
 Before you start your first AWS FPGA design, we recommend that you go through one of the step-by-step guides.  The guides will walk through development steps for hello world examples.  Based on the tables above, pick the development environment that best fits your needs and use the guide to get started:
   * For fastest way to get started on FPGA accelerator development, start with the software defined development environment.  The guide starts with the [SW Hello World example](SDAccel/README.md).

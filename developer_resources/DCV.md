@@ -60,7 +60,6 @@ If you experience issues please refer to the [Official DCV documentation](https:
    Options: 
    
    * Disable firewalld to allow all connections
-
    ```
    sudo systemctl stop firewalld
    ```
@@ -68,6 +67,7 @@ If you experience issues please refer to the [Official DCV documentation](https:
    * Open up the firewall only for tcp port 8443
    
    ```
+   sudo systemctl start firewalld
    sudo firewall-cmd --zone=public --add-port=8443/tcp --permanent
    sudo firewall-cmd --reload
    ```
