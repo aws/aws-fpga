@@ -16,7 +16,8 @@ Deploy a CloudFormation template to Launch an EC2 instance with the FPGA Develop
      * [Launch with CloudFormation](#launch-with-cloudformation)
      * [Connect to the DCV Remote Desktop session](#connect-to-the-dcv-remote-desktop-session)
      * [Launch Vivado](#launch-vivado)
-     * [Launch Vivado on ParallelCluster](#launch-vivado-on-parallelcluster)
+     * [ParallelCluster Configuration](#pcluster-config)
+     * [Building a DCP On ParallelCluster Using SGE](#building-a-dcp-on-parallelcluster-using-sge)
      * [Building a DCP On ParallelCluster Using Slurm](#building-a-dcp-on-parallelcluster-using-slurm)
      * [Building a DCP On ParallelCluster Using Torque](#building-a-dcp-on-parallelcluster-using-torque)
   * [FAQ](#faq)
@@ -214,27 +215,46 @@ Now that your remote desktop is setup, you can launch the Vivado Design Suite (i
 
    ![Vivado Startup](images/vivado_startup.png)
 
-<a name="launch_vivado_pcluster"></a>
+<a name="pcluster-config"></a>
 
-### Launch Vivado on ParallelCluster
+### ParallelCluster Configuration
 
-The CloudFormation template will create two ParallelCluster clusters.
+The template creates a ParallelCluster configuration and an AMI for the cluster instances.
+If you selected a scheduler, then it will also create two ParallelCluster clusters.
+If you didn't select a scheduler in the template you can still manually start a cluster.
+
+The configuration file for ParallelCluster is found in `~/.parallelcluster/config` and the
+configuration parameters are documented [here](https://docs.aws.amazon.com/parallelcluster/latest/ug/configuration.html).
+It supports the following schedulers:
+* sge
+* slurm
+* torque
+
+The template creates a custom ParallelCluster AMI based on the FPGA Developer AMI so that they have
+the Xilinx tools installed.
+They also mount `~/src/project_data` from your DCV instance so that your project data is accessible
+on the ParallelCluster compute nodes.
+
+If you selected a scheduler then the template will create two ParallelCluster clusters, where
+${Scheduler} is the scheduler you selected when you launched the template.
 
 * The fpgadev-${Scheduler} cluster is for running compute intense jobs such as DCP generation.
 * The fpgarun-${Scheduler} cluster is for testing your AFI on F1 instances.
 
-Both clusters are configured to terminate all the compute nodes if there are no jobs running,
-but when jobs are queued the cluster launch enough compute nodes to run the jobs.
+If you didn't select a scheduler then you can start the clusters manually using the following commands
+replacing ${Scheduler} with the scheduler you want to use.
 
-When the jobs complete the nodes will again be terminated.
+```
+pcluster create -t fpgadev-${Scheduler} fpgadev-${Scheduler}
+pcluster create -t fpgarun-${Scheduler} fpgarun-${Scheduler}
+```
 
-The configuration file for ParallelCluster is found in `~/.parallelcluster/config` and the
-configuration parameters are documented [here](https://docs.aws.amazon.com/parallelcluster/latest/ug/configuration.html).
+All the clusters are configured to terminate the compute nodes if they are idle for more than one minute.
+When jobs are queued the cluster will automatically launch enough compute nodes to run the jobs.
+The configuration file limits the max number of compute nodes in the cluster to two nodes.
+You can modify the `max_queue_size` parameter in the configuration file if you need to increase that limit.
 
-The compute nodes use a custom AMI based on the FPGA Developer AMI so that they have
-the Xilinx tools installed.
-They also mount `~/src/project_data` so that you can edit your files on your DCV desktop
-and have them accessible on the ParallelCluster compute nodes.
+You can check the status of the clusters using the `pcluster list` command.
 
 ```
 $ pcluster list
@@ -242,14 +262,19 @@ fpgadev-sge     CREATE_IN_PROGRESS  2.4.1
 fpgarun-sge     CREATE_IN_PROGRESS  2.4.1
 ```
 
-Wait until the status is
+If no clusters are listed then it is possible that the custom AMI isn't complete.
+You can check the status of the custom AMI generation by looking in the log file
+at `~/.parallelcluster/create-ami.log`.
+
+Wait until the cluster status is *CREATE_COMPLETE*.
 
 ```
+$ pcluster list
 fpgadev-sge    CREATE_COMPLETE  2.4.1
 fpgarun-sge    CREATE_COMPLETE  2.4.1
 ```
 
-You can get information about the cluster by running:
+You can get information about the cluster by running the `pcluster status` command.
 
 ```
 $ pcluster status fpgadev-sge
@@ -286,7 +311,15 @@ Note that the master in this tutorial is configured as a t3.micro instance so it
 compute resources required for running jobs.
 It's role is to manage jobs running in the cluster.
 
-To submit a job on an SGE cluster
+The following sections show how to run a the cl_hello_world example's DCP generation job
+on ParallelCluster using the different schedulers.
+The script to do the DCP generation is at `~/src/project_data/build_cl_hello_world.sh`.
+
+<a name="building-a-dcp-on-parallelcluster-using-sge"/>
+
+### Building a DCP On ParallelCluster Using SGE
+
+Use the `qsub` command to submit the job on an SGE cluster.
 
 ```
 $ pcluster ssh fpgadev-sge qsub ~/src/project_data/build_cl_hello_world.sh
@@ -308,13 +341,13 @@ job-ID  prior   name       user         state submit/start at     queue         
 ParallelCluster will detect that the job is queued and start a new compute node to run it.
 You can verify this by going to the EC2 console.
 
-When the compute node starts the job will transition to running stat.
+When the compute node starts, the job will transition to running state.
 
 ```
 $ pcluster ssh fpgadev-sge qstat
 job-ID  prior   name       user         state submit/start at     queue                          slots ja-task-ID 
 -----------------------------------------------------------------------------------------------------------------
-      1 0.55500 build_cl_h username     r     09/17/2019 18:38:15 all.q@ip-172-31-12-135.ec2.int     1  
+      1 0.55500 build_cl_h ${UserName}  r     09/17/2019 18:38:15 all.q@ip-172-31-12-135.ec2.int     1  
 ```
 
 The output of the job is written to your home directory on the master.
@@ -326,27 +359,47 @@ build_cl_hello_world.sh.o1
 src
 ```
 
-<a name="slurm"/>
+<a name="building-a-dcp-on-parallelcluster-using-slurm"/>
 
 ### Building a DCP On ParallelCluster Using Slurm
 
-The commands to use if you use Slurm as your scheduler are below.
+The process for using Slurm is similar, except the scheduler commands are different.
+Use the `sbatch` command to submit a job.
 
 ```
-pcluster ssh fpgadev-slurm sbatch src/project_data/build_cl_hello_world.sh
-pcluster ssh fpgadev-slurm slist
+$ pcluster ssh fpgadev-slurm sbatch src/project_data/build_cl_hello_world.sh
+Submitted batch job 1
 ```
 
-<a name="torque"/>
+Use the `squeue` command to check the status.
+
+```
+$ pcluster ssh fpgadev-slurm squeue
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+                 1   compute build_cl cartalla  R       0:06      1 ip-172-31-13-182
+```
+
+<a name="building-a-dcp-on-parallelcluster-using-torque"/>
 
 ### Building a DCP On ParallelCluster Using Torque
 
-The commands to use if you use Torque as your scheduler are below.
+The process for using Torque is the same as sge except the output is different.
+Use the `qsub` command to submit a job.
 
 ```
-pcluster ssh fpgadev-torque qsub src/project_data/build_cl_hello_world.sh
-pcluster ssh fpgadev-torque qstat
+$ pcluster ssh fpgadev-torque qsub src/project_data/build_cl_hello_world.sh
+1.ip-172-31-5-142.ec2.internal
 ```
+
+Use the `qstat` command to check the status.
+
+```
+$ pcluster ssh fpgadev-torque qstat
+Job ID                    Name             User            Time Use S Queue
+------------------------- ---------------- --------------- -------- - -----
+1.ip-172-31-5-142.ec2.interna ...ello_world.sh cartalla               0 Q batch
+```
+
 <a name="faq"></a>
 
 ## FAQ
