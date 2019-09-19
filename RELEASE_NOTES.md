@@ -174,7 +174,7 @@
    
 ## Release 1.4.5 (See [ERRATA](./ERRATA.md) for unsupported features) 
 
-* [Documents SDAccel Runtime compatibility](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatability-table)
+* [Documents SDAccel Runtime compatibility](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
 * [Enables SDK FPGA Mgmt tool access to Non-root users](sdk/README.md#using-fpga-as-non-root-user)
 * Fixed issues
   * [HLX simulation failure](https://forums.aws.amazon.com/thread.jspa?threadID=293313&tstart=0)

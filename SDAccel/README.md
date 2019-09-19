@@ -191,7 +191,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 <a name="runonf1"></a>
 # 3. Run the FPGA accelerated application on Amazon FPGA instances
 
-* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatability-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
+* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
      * Copy the compiled host executable (exe) to the new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
