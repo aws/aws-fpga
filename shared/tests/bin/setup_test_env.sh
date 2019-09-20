@@ -27,48 +27,20 @@ full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 
-python_versions=(2.7 3.6)
+instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
+instance_type=`curl http://169.254.169.254/latest/meta-data/instance-type`
 
-python_packages=(\
-pytest \
-pytest-timeout \
-GitPython \
-boto3 \
-markdown \
-)
-
-for python_version in ${python_versions[@]}; do
-    python=python$python_version
-    pip=pip$python_version
-    yum_python_package=${python/./}
-    yum_pip_package=$yum_python_package-pip
-    if [ ! -e /usr/bin/$python ]; then
-        if ! sudo yum -y install $yum_python_package; then
-            echo "error: Install of $yum_python_package failed"
-            return 1
-        fi
-    fi
-    if [ ! -e /usr/bin/$pip ]; then
-        if ! sudo yum -y install $yum_pip_package; then
-            echo "error: Install of $yum_pip_package failed"
-            return 1
-        fi
-    fi
-
-    for p in ${python_packages[@]}; do
-        if ! $pip show $p > /dev/null; then
-            echo "Installing $p"
-            if ! $pip install --user $p; then
-                echo "error: Install of $python $p failed"
-                return 1
-            fi
-        fi
-    done
-done
+echo "Test Running on INSTANCE ID: $instance_id INSTANCE TYPE: $instance_type"
 
 if [ ":$WORKSPACE" == ":" ]; then
     export WORKSPACE=$(git rev-parse --show-toplevel)
 fi
+export WORKON_HOME=$WORKSPACE/.virtualenvs
+
+$script_dir/install_python_venv.sh
+
+# Setup default environment to work on
+source $WORKSPACE/.virtualenvs/python2/bin/activate
 
 export PYTHONPATH=$WORKSPACE/shared/lib:$PYTHONPATH
 

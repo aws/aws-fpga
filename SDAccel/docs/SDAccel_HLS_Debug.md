@@ -1,4 +1,4 @@
-# Debug HLS Performance: Limited memory ports.
+# Debug HLS Performance: Limited memory ports
 
 In an ideal FPGA implementation, the kernel will process 1 data sample per clock cycle. In the High-Level Synthesis (HLS) technology used in SDAccel, this is referred to an II=1 implementation, where II is the Initiation Interval of design, or the number of clock cycles before the design can read new data inputs.
 

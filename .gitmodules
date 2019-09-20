@@ -10,3 +10,6 @@
 	path = SDAccel/examples/xilinx_2018.3
 	url = https://github.com/Xilinx/SDAccel_Examples.git
 	branch = master	
+[submodule "SDAccel/examples/xilinx_2019.1"]
+	path = SDAccel/examples/xilinx_2019.1
+	url = https://github.com/Xilinx/SDAccel_Examples.git

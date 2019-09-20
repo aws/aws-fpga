@@ -63,9 +63,7 @@ It is highly recommended you read the documentation and utilize software and har
        $ cd $AWS_FPGA_REPO_DIR                                         
        $ source sdaccel_setup.sh
    ```
-    * This section describes the valid platforms for shell_v04261818 
-      * Xilinx Tool 2017.4 Platform:
-        * AWS_PLATFORM_DYNAMIC_5_0 - (Default) AWS F1 platform dynamically optimized for multi DDR use cases.   
+    * Valid platforms for shell_v04261818: `AWS_PLATFORM_DYNAMIC_5_0` (Default) AWS F1 platform dynamically optimized for multi DDR use cases.
  * Changing to a different platform can be accomplished by setting AWS_PLATFORM environment variable. Only one platform is supported for this example:  
      
    ```
@@ -139,7 +137,7 @@ This assumes you have:
 
 The [create_sdaccel_afi.sh](./tools/create_sdaccel_afi.sh) script is provided to facilitate AFI creation from a Xilinx FPGA Binary, it:
 * Takes in your Xilinx FPGA Binary \*.xclbin file
-* Calls *aws ec2 create_fgpa_image* to generate an AFI under the hood
+* Calls *aws ec2 create_fpga_image* to generate an AFI under the hood
 * Generates a \<timestamp\>_afi_id.txt which contains the identifiers for your AFI
 * Creates an AWS FPGA Binary file with an \*.awsxclbin extension that is composed of: Metadata and AGFI-ID. 
      * **This \*.awsxclbin is the AWS FPGA Binary file that will need to be loaded by your host application to the FPGA**
@@ -193,12 +191,11 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 <a name="runonf1"></a>
 # 3. Run the FPGA accelerated application on Amazon FPGA instances
 
-Here are the steps:
-* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatiability table](../README.md#devAmi) and [runtime compatilibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatability-table).  Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
+* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
      * Copy the compiled host executable (exe) to the new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
-     * Depending on the host code, the \*.awsxclbin may need to named <hostcodename>.hw.<platformname>.awsxclbin . Ex:  ```vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin```
+     * Depending on the host code, the \*.awsxclbin may need to named \<hostcodename>.hw.\<platformname>.awsxclbin .For Example:  ```vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin```
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
    * Clone the github repository to the new F1 instance and install runtime drivers
@@ -212,7 +209,7 @@ Here are the steps:
 
 * Source the Runtime Environment & Execute your Host Application: 
    ```
-       $ sudo sh
+       $ sudo -E /bin/bash
        # source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step
        # ./helloworld 
    ```

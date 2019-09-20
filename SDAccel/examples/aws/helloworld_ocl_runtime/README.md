@@ -31,23 +31,19 @@ vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin --awsxclbin
 <a name="execute"></a>
 ## Execution
 
-
-#### :exclamation: PLEASE NOTE: xclbin & awsxclbin file formats have changed for SDx 2018.3. xclbin & awsxclbin files generated using earlier SDx versions are not compatible with 2018.3 based XRTs. If you are using a 2018.3 based XRT, please copy over awsxclbin & helloworld executable files provided in the 2018.3 subdirectory to this folder.
-
-Command sequence
+#### :exclamation: PLEASE NOTE: xclbin & awsxclbin file formats have changed from SDx 2018.3 onwards. xclbin & awsxclbin files generated using earlier SDx versions are not compatible with 2018.3/2019.1 based XRTs. If you are using a 2018.3/2019.1 based XRT, please copy over awsxclbin & helloworld executable files provided in the 2018.3_2019.1 subdirectory to this folder.
 
 ```
 sudo fpga-clear-local-image -S 0
- >>$sudo sh
-sh-4.2# source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh
-sh-4.2# ./helloworld
-
+sudo -E /bin/bash
+source $AWS_FPGA_REPO_DIR/sdaccel_runtime_setup.sh
+./helloworld
 ```
 
 <a name="metadata"></a>
 ## Hello World Example Metadata
 
-| Key    | Region  |  Value for 2017.4 or 2018.2 | Value for 2018.3 |
+| Key    | Region  |  SDx 2017.4 or 2018.2 | SDx 2018.3 or 2019.1 |
 |--------|---------|-----------------------------|------------------|
 |afi id  | us-east-1(N. Virginia) | afi-0532379b26ea13f26 | afi-0c8210915ce9bab5c |
 |afi id  | us-west-2(oregon) | afi-0ab098d3fbfc43c7e | afi-01e237aa978aa74de |

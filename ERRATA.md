@@ -9,6 +9,15 @@
 * DRAM Data retention is not supported for CL designs with less than 4 DDRs enabled
 * Combinatorial loops in CL designs are not supported.
 
+### 2019.1 
+* Vivado `compile_simlib` command fails to generate the following verilog IP libraries for the following simulators.
+
+| Library(verilog) | Simulator |
+|---|---|
+| `sync_ip` | Cadence IES |
+| `hdmi_gt_controller_v1_0_0` | Synopsys VCS |
+* We are working with Xilinx to provide a fix for these.
+
 ## SDK
 
 ## SDAccel (For additional restrictions see [SDAccel ERRATA](./SDAccel/ERRATA.md))

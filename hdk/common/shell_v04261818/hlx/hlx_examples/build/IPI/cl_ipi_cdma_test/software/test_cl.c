@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
     int rc;
     int slot_id;
 
-    /* initialize the fpga_pci library so we could have access to FPGA PCIe from this applications */
-    rc = fpga_pci_init();
-    fail_on(rc, out, "Unable to initialize the fpga_pci library");
+    /* initialize the fpga_mgmt library so we could have access to FPGA PCIe from this applications */
+    rc = fpga_mgmt_init();
+    fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
     /* This demo works with single FPGA slot, we pick slot #0 as it works for both f1.2xl and f1.16xl */
 

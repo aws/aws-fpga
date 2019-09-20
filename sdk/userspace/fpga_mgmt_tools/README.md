@@ -144,7 +144,7 @@ The following command displays the current state for the given FPGA slot number.
 
 ### Looking at Metrics
 
-The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA image hardware metrics including FPGA PCI and DDR ECC metrics.
+The `fpga-describe-local-image` **`metrics`** option may be used to display FPGA image hardware metrics including FPGA PCI and DDR metrics.
 
 Additionally, the `fpga-describe-local-image` **`clear-metrics`** option may be used to display and clear FPGA image hardware metrics (clear on read).
 

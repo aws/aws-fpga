@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 
     /* initialize the fpga_mgmt library */
     rc = fpga_mgmt_init();
-    fail_on(rc, out, "Unable to initialize the fpga_pci library");
+    fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
 
 #ifndef SV_TEST
     rc = check_afi_ready(slot_id);

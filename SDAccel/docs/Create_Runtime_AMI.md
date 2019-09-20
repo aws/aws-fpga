@@ -1,19 +1,20 @@
 # Create a Runtime AMI Starting with an Amazon Linux AMI or Ubuntu                          
 
-## Runtime AMI Compatability Table
+## Runtime AMI Compatibility Table
 
   | SDx Version used for AFI Development |	Compatible SDAccel Runtime |
   |--------------------------------------|-----------------------------|
   | 2017.4 |	Runtime installed by sourcing "sdaccel_setup.sh" while using HDK Ver 1.4.X when environment variable    RELEASE_VER=2017.4 |
-  | 2018.2 |	AWS FPGA Developer AMI 1.5.0 ( XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) |
-  | 2018.3 |    AWS FPGA Developer AMI 1.6.0 ( XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://xilinx.github.io/XRT/2018.3/html/build.html) |
+  | 2018.2 |	AWS FPGA Developer AMI 1.5.0 (XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) |
+  | 2018.3 |    AWS FPGA Developer AMI 1.6.0 (XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://xilinx.github.io/XRT/2018.3/html/build.html) |
+  | 2019.1 |    AWS FPGA Developer AMI 1.7.0 (XRT is pre-installed) or [Runtime installed with XRT Version 2.1.0](https://xilinx.github.io/XRT/2019.1/html/build.html) |
 
 ## 1. Launch a Runtime Instance & Install Required Packages 
 
 * Please note Amazon Linux 2 or Amazon Linux are not supported by Xilinx XRT at this time. Please use Centos/RHEL or Ubuntu when using Xilinx XRT Runtimes for the AFIs generated using Xilinx SDx 2018.2 and 2018.3 toolsets.
 
-* Launch an F1 instance using an [Amazon Linux AMI](https://aws.amazon.com/marketplace/pp/B00635Y2IW) or [Centos 7](https://aws.amazon.com/marketplace/pp/B00O7WM7QW) 
-* Install the required updates
+* Launch an F1 instance using [Centos 7](https://aws.amazon.com/marketplace/pp/B00O7WM7QW) or Amazon Linux AMI's 
+* Update to get the latest packages.
 
 ````
   $ sudo yum update
@@ -54,11 +55,11 @@
 
 * Using an instance running [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or an on-premises machine with access to a Xilinx SDAccel Tools Installation, first source $AWS_FPGA_REPO_DIR/sdaccel_setup.sh  and then run following commands:
 
-* if using Ubuntu or debian distribution set GLIBPATH env variable to Ubuntu. If using any other OS distribution set GLIBPATH to default. 
+* If using Ubuntu or Debian distributions set GLIBPATH env variable to Ubuntu. If using any other OS distribution set GLIBPATH to default. 
 
-* set env variable 'XLNXRTE' to intended runtime install directory path.
+* Set env variable 'XLNXRTE' to intended runtime install directory path.
 
-### **For Vivado SDX 2017.4**
+### **Xilinx SDX 2017.4: **
 
 ````
    $ export GLIBPATH= <Ubuntu or default -- see note above>
@@ -79,14 +80,12 @@
 * You may need to update path in $XLNXRTE/setup.sh and $XLNXRTE/setup.csh script to match your runtime instance.
 * Copy $XLNXRTE directory created to $HOME on your Runtime Instance.
 
-### **For Vivado SDX 2018.2** 
-
- Please refer [installing Xilinx SDx 2018.2 XRT](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html) for instructions on how to install XRT on your AMI.
+### **Xilinx SDx 2018.2:** [Install 2018.2 XRT](https://www.xilinx.com/html_docs/xilinx2018_2_xdf/sdaccel_doc/ejy1538090924727.html).
  
-### **For Vivado SDX 2018.3**
- 
- Please refer [installing Xilinx SDx 2018.3 XRT](https://xilinx.github.io/XRT/2018.3/html/build.html) for instructions on how to install runtime on your AMI.
+### **Xilinx SDx 2018.3:** [Install 2018.3 XRT](https://xilinx.github.io/XRT/2018.3/html/build.html).
 
+### **Xilinx SDx 2019.1:** [Install 2019.1 XRT](https://xilinx.github.io/XRT/2019.1/html/build.html).
+ 
 ## 3. Install Runtime Drivers and run your FPGA accelerated application on your Runtime Instance. 
 * Log back on to the Runtime Instance:
 
