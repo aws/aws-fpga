@@ -25,7 +25,7 @@
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
 ## Release 1.4.11 (See [ERRATA](./ERRATA.md) for unsupported features)
-* FPGA developer kit supports Xilinx SDx/Vivado 2019.1
+* FPGA developer kit now supports Xilinx SDx/Vivado 2019.1
     * We recommend developers upgrade to v1.4.11 to benefit from the new features, bug fixes, and optimizations. 
     * To upgrade, use [Developer AMI v1.7.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace. The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2019.1 tools. 
 * New functionality:
@@ -43,7 +43,7 @@
         * [Use fpga_mgmt init in HLx runtime](https://forums.aws.amazon.com/thread.jspa?messageID=912063)
     * New XRT versions added to the [XRT Installation Instructions](./SDAccel/docs/XRT_installation_instructions.md) to fix segmentation faults when using xclbin instead of awsxclbin files.
 * Deprecations:
-    * Removed GUI Setup scripts from AMI v1.7.0 onwards. See [developer resources section](./developer_resources/README.md) guides on how to setup your own GUI Desktop and compute cluster environment.
+    * Removed GUI Setup scripts from AMI v1.7.0 onwards. See the [developer resources section](./developer_resources/README.md) that provides guides on how to setup your own GUI Desktop and compute cluster environment.
 * Package versions used for validation
   
    | Package | AMI 1.7.0 [2019.1] | AMI 1.6.0 [2018.3] |AMI 1.5.0 [2018.2] | AMI 1.4.0 [2017.4] |
