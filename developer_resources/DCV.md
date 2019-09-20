@@ -26,6 +26,27 @@ If you experience issues please refer to the [Official DCV documentation](https:
 
 ## Installation Process
 
+1. [Setup your FPGA Developer AMI Instance with an IAM Role](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#setting-up-license-ec2) that grants your instance access to NICE DCV endpoints.
+
+    NICE DCV is available for free to use on EC2.
+
+    The NICE DCV server automatically detects that it is running on an Amazon EC2 instance and periodically connects to an Amazon S3 bucket to determine whether a valid license is available. The IAM role enables this functionality.
+    
+    Please follow the steps mentioned in the above guide to attach an IAM role to your instance with the following policy:
+    ```
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::dcv-license.region/*"
+            }
+        ]
+    }
+    ```
+    **NOTE:** Without access to the DCV bucket mentioned in the [NICE DCV licensing setup guide](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#setting-up-license-ec2), your server license is only valid of 15 days.
+
 1. On your FPGA Developer AMI Instance [update the Instance Security Group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#adding-security-group-rule) to allow TCP Port **8443** Ingress
 
 1. [Install NICE DCV pre-requisites](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html)
