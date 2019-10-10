@@ -198,7 +198,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
      * Depending on the host code, the \*.awsxclbin may need to named \<hostcodename>.hw.\<platformname>.awsxclbin .For Example:  ```vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin```
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
-   * Clone the github repository to the new F1 instance and install runtime drivers
+     
 ```
    $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
    $ cd $AWS_FPGA_REPO_DIR 
