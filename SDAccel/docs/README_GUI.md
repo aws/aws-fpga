@@ -71,7 +71,7 @@ You will get a Welcome screen. You need to set Platform path by selecting **Add 
   
 <br> 
   
-![](./figure/gui_fig_2.JPG)  
+![](./figure/gui_fig_2.png)  
   
   
   
@@ -79,7 +79,7 @@ Click on the **plus** sign as shown below.
   
 
   
-![](./figure/gui_fig_3.JPG)  
+![](./figure/gui_fig_3.png)  
   
   
 
