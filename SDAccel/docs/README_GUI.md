@@ -29,7 +29,7 @@ The SDAccel examples from the github are downloaded by the above steps. However,
 
 First change directory to **helloworld_ocl** example. 
 ```
-    $ cd <git area>/SDAccel/examples/xilinx_2017.4/getting_started/host/helloworld_ocl
+    $ cd <git area>/SDAccel/examples/xilinx/getting_started/hello_world/helloworld_ocl
 ```
 The github examples use common header files and those needs to be copied in the local project source folder to make it easier to use. 
 Type the command **make local-files** to copy all necessary files in the local directory.
@@ -46,9 +46,9 @@ To debug using gdb inside from SDX gui few additional commands are needed to exe
 
 ```
    $ mv /usr/local/Modules/init init.bak
-   $ unset –f switchml
-   $ unset –f _moduleraw
-   $ unset –f module
+   $ unset -f switchml
+   $ unset -f _moduleraw
+   $ unset -f module
    $ sdx
 ```
   
