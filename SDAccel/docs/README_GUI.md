@@ -62,7 +62,7 @@ We will now cover the following steps:
 Add workspace inside the current directory named "GUI_test" as shown below. A new directory **GUI_test** will be created and used to store all logfiles of our runs.  
   
   
-![](./figure/gui_fig_1.JPG)  
+![](./figure/gui_fig_1.png)  
 
 <br>
   
