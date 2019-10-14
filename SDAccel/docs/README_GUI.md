@@ -62,7 +62,7 @@ We will now cover the following steps:
 Add workspace inside the current directory named "GUI_test" as shown below. A new directory **GUI_test** will be created and used to store all logfiles of our runs.  
   
   
-![](./figure/gui_fig_1.JPG)  
+![](./figure/gui_fig_1.png)  
 
 <br>
   
@@ -71,7 +71,7 @@ You will get a Welcome screen. You need to set Platform path by selecting **Add 
   
 <br> 
   
-![](./figure/gui_fig_2.JPG)  
+![](./figure/gui_fig_2.png)  
   
   
   
@@ -79,7 +79,7 @@ Click on the **plus** sign as shown below.
   
 
   
-![](./figure/gui_fig_3.JPG)  
+![](./figure/gui_fig_3.png)  
   
   
 
