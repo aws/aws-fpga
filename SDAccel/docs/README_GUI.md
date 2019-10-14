@@ -46,9 +46,9 @@ To debug using gdb inside from SDX gui few additional commands are needed to exe
 
 ```
    $ mv /usr/local/Modules/init init.bak
-   $ unset –f switchml
-   $ unset –f _moduleraw
-   $ unset –f module
+   $ unset -f switchml
+   $ unset -f _moduleraw
+   $ unset -f module
    $ sdx
 ```
   
