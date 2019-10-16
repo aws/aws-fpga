@@ -89,7 +89,7 @@ For CPU-based (SW) emulation, both the host code and the FPGA binary code are co
 The instructions below describe how to run the SDAccel SW Emulation flow using the Makefile provided with a simple "hello world" example
 
 ```
-    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/host/helloworld_ocl/          
+    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/hello_world/helloworld_ocl/          
     $ make clean                                                                 
     $ make check TARGETS=sw_emu DEVICES=$AWS_PLATFORM all     
 ```
@@ -104,7 +104,7 @@ The SDAccel hardware emulation flow enables the developer to check the correctne
 The instructions below describe how to run the HW Emulation flow using the Makefile provided with a simple "hello world" example: 
 
 ```
-    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/host/helloworld_ocl/             
+    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/hello_world/helloworld_ocl/             
     $ make clean                                                                   
     $ make check TARGETS=hw_emu DEVICES=$AWS_PLATFORM all      
 ```
@@ -118,7 +118,7 @@ The SDAccel system build flow enables the developer to build their host applicat
 The instructions below describe how to build the Xilinx FPGA Binary and host application using the Makefile provided with a simple "hello world" example: 
 
 ```
-    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/host/helloworld_ocl/           
+    $ cd $SDACCEL_DIR/examples/xilinx/getting_started/hello_world/helloworld_ocl/           
     $ make clean                                                             
     $ make TARGETS=hw DEVICES=$AWS_PLATFORM all   
 ```
@@ -198,7 +198,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
      * Depending on the host code, the \*.awsxclbin may need to named \<hostcodename>.hw.\<platformname>.awsxclbin .For Example:  ```vector_addition.hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin```
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
-   * Clone the github repository to the new F1 instance and install runtime drivers
+     
 ```
    $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
    $ cd $AWS_FPGA_REPO_DIR 

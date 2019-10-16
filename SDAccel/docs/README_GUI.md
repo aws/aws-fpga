@@ -29,7 +29,7 @@ The SDAccel examples from the github are downloaded by the above steps. However,
 
 First change directory to **helloworld_ocl** example. 
 ```
-    $ cd <git area>/SDAccel/examples/xilinx_2017.4/getting_started/host/helloworld_ocl
+    $ cd <git area>/SDAccel/examples/xilinx/getting_started/hello_world/helloworld_ocl
 ```
 The github examples use common header files and those needs to be copied in the local project source folder to make it easier to use. 
 Type the command **make local-files** to copy all necessary files in the local directory.
@@ -46,9 +46,9 @@ To debug using gdb inside from SDX gui few additional commands are needed to exe
 
 ```
    $ mv /usr/local/Modules/init init.bak
-   $ unset –f switchml
-   $ unset –f _moduleraw
-   $ unset –f module
+   $ unset -f switchml
+   $ unset -f _moduleraw
+   $ unset -f module
    $ sdx
 ```
   
@@ -62,7 +62,7 @@ We will now cover the following steps:
 Add workspace inside the current directory named "GUI_test" as shown below. A new directory **GUI_test** will be created and used to store all logfiles of our runs.  
   
   
-![](./figure/gui_fig_1.JPG)  
+![](./figure/gui_fig_1.png)  
 
 <br>
   
@@ -71,7 +71,7 @@ You will get a Welcome screen. You need to set Platform path by selecting **Add 
   
 <br> 
   
-![](./figure/gui_fig_2.JPG)  
+![](./figure/gui_fig_2.png)  
   
   
   
@@ -79,7 +79,7 @@ Click on the **plus** sign as shown below.
   
 
   
-![](./figure/gui_fig_3.JPG)  
+![](./figure/gui_fig_3.png)  
   
   
 
