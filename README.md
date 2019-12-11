@@ -98,6 +98,9 @@ Before you start your first AWS FPGA design, we recommend that you go through on
 
 ### In-depth training and resources
 Once you have completed your hello world examples, we recommend diving deeper into a training workshop or application notes
+ * Software-defined [re:Invent 2019 Workshop](https://github.com/Xilinx/SDAccel-AWS-F1-Developer-Labs).
+    * Lab modules will take you through accelerating compute intensive functions like Inverse Discrete Cosine Transform, Bloom Filter, 2D video convolution, etc.
+    * You will learn how to identify functions to accelerate and use profiling on example applications use that information to optimize your data movement between the HOST and FPGA.
  * Software-defined [re:Invent 2018 Workshop](https://github.com/awslabs/aws-fpga-app-notes/blob/master/reInvent18_Developer_Workshop/README.md) demonstrates a 2D Filter acceleration and how to debug and optimize your accelerator.
  * Custom hardware developers need to learn about how the hardware accelerator interfaces to the F1 Shell
   * [Shell Interface](hdk/docs/AWS_Shell_Interface_Specification.md)
@@ -192,7 +195,3 @@ The documentation is located throughout this developer kit, therefore, to help d
   * [Searching code](https://help.github.com/articles/searching-code/) and [advanced search syntax](https://help.github.com/articles/understanding-the-search-syntax/)
   * [Finding files](https://help.github.com/articles/finding-files-on-github/)
   * Simply replace github.com with gitprint.com to generate a printable PDF
-
-
-
-
