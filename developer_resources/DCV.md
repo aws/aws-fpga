@@ -52,6 +52,7 @@ If you experience issues please refer to the [Official DCV documentation](https:
 1. [Install NICE DCV pre-requisites](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html)
 
    ```
+   sudo yum -y install kernel-devel
    sudo yum -y groupinstall "GNOME Desktop"
    sudo yum -y install glx-utils
    ```
@@ -83,19 +84,21 @@ If you experience issues please refer to the [Official DCV documentation](https:
    * Disable firewalld to allow all connections
    ```
    sudo systemctl stop firewalld
+   sudo systemctl disable firewalld
    ```
    
    * Open up the firewall only for tcp port 8443
    
    ```
    sudo systemctl start firewalld
+   sudo systemctl enable firewalld
    sudo firewall-cmd --zone=public --add-port=8443/tcp --permanent
    sudo firewall-cmd --reload
    ```
 
 1. Create a virtual session to connect to    
    
-   **NOTE: that you will have to create a new session if you restart your instance.** 
+   **NOTE: You will have to create a new session if you restart your instance.** 
 
    ```
    dcv create-session --type virtual --user centos centos
