@@ -24,6 +24,10 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.12 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Added support for Xilinx tool versions released in the AWS China Marketplace.
+* Updated NICE DCV setup instructions.
+
 ## Release 1.4.11 (See [ERRATA](./ERRATA.md) for unsupported features)
 * FPGA developer kit now supports Xilinx SDx/Vivado 2019.1
     * We recommend developers upgrade to v1.4.11 to benefit from the new features, bug fixes, and optimizations. 

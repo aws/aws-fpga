@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include <hal/fpga_common.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * FPGA_PCI_BARS_MAX:
  *  -compile time tunable via mkall_fpga_mgmt_tools.sh, with the below default.
