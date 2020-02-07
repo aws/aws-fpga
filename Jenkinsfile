@@ -19,6 +19,8 @@ properties([parameters([
     booleanParam(name: 'test_sdaccel_scripts',                defaultValue: true,  description: 'Test SDAccel setup scripts'),
     booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
     booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
+    booleanParam(name: 'test_all_vitis_examples_fdf',         defaultValue: false, description: 'Run Full Developer Flow testing of all Vitis examples. This overrides test_helloworld_sdaccel_example'),
+    booleanParam(name: 'test_helloworld_vitis_example_fdf',   defaultValue: true,  description: 'Run Full Developer Flow testing of the Hello World Vitis example'),
     booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
     booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
     booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
@@ -44,6 +46,8 @@ boolean test_hdk_fdf = params.get('test_hdk_fdf')
 boolean test_sdaccel_scripts = params.get('test_sdaccel_scripts')
 boolean test_all_sdaccel_examples_fdf = params.get('test_all_sdaccel_examples_fdf')
 boolean test_helloworld_sdaccel_example_fdf = params.get('test_helloworld_sdaccel_example_fdf')
+boolean test_all_vitis_examples_fdf = params.get('test_all_vitis_examples_fdf')
+boolean test_helloworld_vitis_example_fdf = params.get('test_helloworld_vitis_example_fdf')
 boolean disable_runtime_tests = params.get('disable_runtime_tests')
 
 def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world', 'cl_sde']
@@ -122,7 +126,9 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2017.4', '2018.2', '2018.3', '2019.1' ]
+def xilinx_versions = [ '2019.1', '2019.2' ]
+
+def vitis_versions = ['2019.2']
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
@@ -131,7 +137,11 @@ def dsa_map = [
     '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
     '2018.2' : [ 'DYNAMIC_5_0' : 'dyn'],
     '2018.3' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2019.1' : [ 'DYNAMIC_5_0' : 'dyn']
+    '2019.1' : [ 'DYNAMIC_5_0' : 'dyn'],
+]
+
+def xsa_map = [
+    '2019.2' : [ 'DYNAMIC':'dyn']
 ]
 
 def sdaccel_example_default_map = [
@@ -163,6 +173,15 @@ def sdaccel_example_default_map = [
     ]
 ]
 
+def vitis_example_default_map = [
+    '2019.2' : [
+        'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
+        'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
+        'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug'
+    ]
+]
+
 def simulator_tool_default_map = [
     '2017.4' : [
         'vivado': 'xilinx/SDx/2017.4_04112018',
@@ -187,9 +206,16 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
          'questa': 'questa/10.6c_1',
          'ies': 'incisive/15.20.063'
+     ],
+     '2019.2' : [
+         'vivado': 'xilinx/Vivado/2019.2',
+         'vcs': 'synopsys/vcs-mx/O-2018.09-SP2-1',
+         'questa': 'questa/2019.2',
+         'ies': 'incisive/15.20.063'
      ]
 ]
 
+// ies 073 is not available for download
 
 // Get serializable entry set
 @NonCPS def entrySet(m) {m.collect {k, v -> [key: k, value: v]}}
@@ -888,7 +914,7 @@ if (test_hdk_fdf) {
 // if (test_sdaccel_scripts) {
 //     all_tests['Test SDAccel Scripts'] = {
 //         stage('Test SDAccel Scripts') {
-//             def nodes = [:]
+//             def nodes = [:]git
 //             for (def xilinx_version in xilinx_versions) {
 //
 //                 String node_label = get_task_label(task: 'source_scripts', xilinx_version: xilinx_version)
@@ -914,86 +940,340 @@ if (test_hdk_fdf) {
 //     }
 // }
 
-if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
-    all_tests['Run SDAccel Tests'] = {
-        String sdaccel_examples_list = 'sdaccel_examples_list.json'
+// if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
+//     all_tests['Run SDAccel Tests'] = {
+//         String sdaccel_examples_list = 'sdaccel_examples_list.json'
+//
+//         def sdaccel_all_version_stages = [:]
+//
+//         for (def version in xilinx_versions) {
+//
+//             String xilinx_version = version
+//             String sdaccel_base_stage_name = "SDx FDF $xilinx_version"
+//             String sdaccel_find_stage_name = "SDx Find tests $xilinx_version"
+//
+//             sdaccel_all_version_stages[sdaccel_base_stage_name] = {
+//                 stage (sdaccel_find_stage_name) {
+//
+//                     node(get_task_label(task: 'find_tests', xilinx_version: xilinx_version)) {
+//
+//                         checkout scm
+//                         String report_file = "test_find_sdaccel_examples_${xilinx_version}.xml"
+//
+//                         try {
+//                             sh """
+//                             rm -rf ${sdaccel_examples_list}
+//                             """
+//                         } catch(error) {
+//                             // Ignore any errors
+//                             echo "Failed to clean ${sdaccel_examples_list}"
+//                         }
+//
+//                         try {
+//                             sh """
+//                             set -e
+//                             source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+//                             python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+//                             """
+//                         } catch (exc) {
+//                             echo "Could not find tests. Please check the repository."
+//                             throw exc
+//                         } finally {
+//                             run_junit(report_file)
+//                             archiveArtifacts artifacts: "${sdaccel_examples_list}.*", fingerprint: true
+//
+//                         }
+//
+//                         // Only run the hello world test by default
+//                         //def example_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
+//                         def example_map = sdaccel_example_default_map.get(xilinx_version)
+//
+//                         // Run all examples when parameter set
+//                         if (test_all_sdaccel_examples_fdf) {
+//                             example_map = readJSON file: sdaccel_examples_list
+//                         }
+//
+//                         def sdaccel_build_stages = [:]
+//
+//                         for ( def e in entrySet(example_map) ) {
+//
+//                             String test_key = e.key
+//                             def dsa_map_for_version = dsa_map.get(xilinx_version)
+//
+//                             // dsa = [ 4DDR: 4ddr ]
+//                             for ( def dsa in entrySet(dsa_map_for_version) ) {
+//
+//                                 String build_name = "SDx ${e.key}_${dsa.value}_${xilinx_version}"
+//                                 String example_path = e.value
+//
+//                                 String dsa_name = dsa.key
+//                                 String dsa_rte_name = dsa.value
+//
+//                                 String sw_emu_stage_name      = "SDx SW_EMU ${build_name}"
+//                                 String hw_emu_stage_name      = "SDx HW_EMU ${build_name}"
+//                                 String hw_stage_name          = "SDx HW ${build_name}"
+//                                 String create_afi_stage_name  = "SDx AFI ${build_name}"
+//                                 String run_example_stage_name = "SDx RUN ${build_name}"
+//
+//                                 String sw_emu_report_file      = "sdaccel_sw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
+//                                 String hw_emu_report_file      = "sdaccel_hw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
+//                                 String hw_report_file          = "sdaccel_hw_${e.key}_${dsa.value}_${xilinx_version}.xml"
+//                                 String create_afi_report_file  = "sdaccel_create_afi_${e.key}_${dsa.value}_${xilinx_version}.xml"
+//                                 String run_example_report_file = "sdaccel_run_${e.key}_${dsa.value}_${xilinx_version}.xml"
+//
+//                                 String description_file = "${example_path}/description.json"
+//                                 def description_json = ["targets":["hw","hw_emu","sw_emu"]]
+//
+//                                 try {
+//                                     description_json = readJSON file: description_file
+//                                 }
+//                                 catch (exc) {
+//                                     echo "Could not read the file: ${description_file}"
+//                                     throw exc
+//                                 }
+//
+//                                 boolean test_sw_emu_supported = true
+//                                 boolean test_hw_emu_supported = true
+//
+//                                 if(description_json["targets"]) {
+//                                     if(description_json["targets"].contains("sw_emu")) {
+//                                         test_sw_emu_supported = true
+//                                         echo "Description file ${description_file} has target sw_emu"
+//                                     } else {
+//                                         test_sw_emu_supported = false
+//                                         echo "Description file ${description_file} does not have target sw_emu"
+//                                     }
+//                                     if(description_json["targets"].contains("hw_emu")) {
+//                                         test_hw_emu_supported = true
+//                                         echo "Description file ${description_file} has target sw_emu"
+//                                     } else {
+//                                         test_hw_emu_supported = false
+//                                         echo "Description file ${description_file} does not have target sw_emu"
+//                                     }
+//                                 } else {
+//                                     echo "Description json did not have a 'target' key"
+//                                 }
+//
+//                                 sdaccel_build_stages[build_name] = {
+//                                     if(test_sw_emu_supported) {
+//                                         stage(sw_emu_stage_name) {
+//                                             node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
+//                                                 checkout scm
+//                                                 try {
+//                                                     sh """
+//                                                     set -e
+//                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+//                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+//                                                     python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+//                                                     """
+//                                                 } catch (error) {
+//                                                     echo "${sw_emu_stage_name} SW EMU Build generation failed"
+//                                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+//                                                     throw error
+//                                                 } finally {
+//                                                     run_junit(sw_emu_report_file)
+//                                                     git_cleanup()
+//                                                 }
+//                                             }
+//                                         }
+//                                     }
+//
+//                                     if(test_hw_emu_supported) {
+//                                         stage(hw_emu_stage_name) {
+//                                             node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
+//                                                 checkout scm
+//                                                 try {
+//                                                     sh """
+//                                                     set -e
+//                                                     source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+//                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+//                                                     python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+//                                                     """
+//                                                 } catch (error) {
+//                                                     echo "${hw_emu_stage_name} HW EMU Build generation failed"
+//                                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+//                                                     throw error
+//                                                 } finally {
+//                                                     run_junit(hw_emu_report_file)
+//                                                     git_cleanup()
+//                                                 }
+//                                             }
+//                                         }
+//                                     }
+//
+//                                     stage(hw_stage_name) {
+//                                         node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
+//                                             checkout scm
+//                                             try {
+//                                                 sh """
+//                                                 set -e
+//                                                 source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+//                                                 export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+//                                                 python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+//                                                 """
+//                                             } catch (error) {
+//                                                 echo "${hw_stage_name} HW Build generation failed"
+//                                                 archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+//                                                 throw error
+//                                             } finally {
+//                                                 run_junit(hw_report_file)
+//                                                 git_cleanup()
+//                                             }
+//                                         }
+//                                     }
+//
+//                                     stage(create_afi_stage_name) {
+//                                         node(get_task_label(task: 'create_afi', xilinx_version: xilinx_version)) {
+//
+//                                             checkout scm
+//                                             try {
+//                                                 sh """
+//                                                 set -e
+//                                                 source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
+//                                                 export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+//                                                 python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+//                                                 """
+//                                             } catch (error) {
+//                                                 echo "${create_afi_stage_name} Create AFI failed"
+//                                                 archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+//                                                 throw error
+//                                             } finally {
+//
+//                                                 String to_aws_dir = "${example_path}/to_aws"
+//
+//                                                 if (fileExists(to_aws_dir)) {
+//                                                     sh "rm -rf ${to_aws_dir}"
+//                                                 }
+//                                                 run_junit(create_afi_report_file)
+//                                                 git_cleanup()
+//                                             }
+//                                         }
+//                                     }
+//
+//                                     stage(run_example_stage_name) {
+//
+//                                         if(disable_runtime_tests) {
+//                                             echo "Runtime tests disabled. Not running ${run_example_stage_name}"
+//                                         } else {
+//                                             node(get_task_label(task: 'runtime', xilinx_version: xilinx_version)) {
+//
+//                                                 checkout scm
+//                                                 try {
+//                                                     sh """
+//                                                     set -e
+//                                                     source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
+//                                                     export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
+//                                                     python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+//                                                     """
+//                                                 } catch (error) {
+//                                                     echo "${run_example_stage_name} Runtime example failed"
+//                                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
+//                                                     input message: "SDAccel Runtime test failed. Click Proceed or Abort when you are done debugging on the instance."
+//                                                     throw error
+//                                                 } finally {
+//                                                     run_junit(run_example_report_file)
+//                                                     git_cleanup()
+//                                                 }
+//                                             }
+//                                         } //else
+//
+//                                     }
+//
+//                                 } // sdaccel_build_stages[ e.key ]
+//
+//                             } //for ( def dsa in entrySet(dsa_map_for_version) ) {
+//                         } // for ( e in list_map )
+//
+//                         parallel sdaccel_build_stages
+//                     }
+//                 }
+//             }
+//         } //for (def xilinx_version in xilinx_versions) {
+//         parallel sdaccel_all_version_stages
+//     }
+// }
 
-        def sdaccel_all_version_stages = [:]
+//=============================================================================
+// Vitis Tests
+//=============================================================================
+if (test_helloworld_vitis_example_fdf || test_all_vitis_examples_fdf) {
+    all_tests['Run Vitis Tests'] = {
+        String vitis_examples_list = 'vitis_examples_list.json'
 
-        for (def version in xilinx_versions) {
+        def vitis_all_version_stages = [:]
+
+        for (def version in vitis_versions) {
 
             String xilinx_version = version
-            String sdaccel_base_stage_name = "SDx FDF $xilinx_version"
-            String sdaccel_find_stage_name = "SDx Find tests $xilinx_version"
+            String vitis_base_stage_name = "Vitis FDF $xilinx_version"
+            String vitis_find_stage_name = "Vitis Find tests $xilinx_version"
 
-            sdaccel_all_version_stages[sdaccel_base_stage_name] = {
-                stage (sdaccel_find_stage_name) {
+            vitis_all_version_stages[vitis_base_stage_name] = {
+                stage (vitis_find_stage_name) {
 
                     node(get_task_label(task: 'find_tests', xilinx_version: xilinx_version)) {
 
                         checkout scm
-                        String report_file = "test_find_sdaccel_examples_${xilinx_version}.xml"
+                        String report_file = "test_find_vitis_examples_${xilinx_version}.xml"
 
                         try {
                             sh """
-                            rm -rf ${sdaccel_examples_list}
+                            rm -rf ${vitis_examples_list}
                             """
                         } catch(error) {
                             // Ignore any errors
-                            echo "Failed to clean ${sdaccel_examples_list}"
+                            echo "Failed to clean ${vitis_examples_list}"
                         }
 
                         try {
                             sh """
                             set -e
-                            source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                            python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_find_sdaccel_examples.py --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
+                            source $WORKSPACE/shared/tests/bin/setup_test_build_vitis_env.sh
+                            python2.7 -m pytest -v $WORKSPACE/Vitis/tests/test_find_vitis_examples.py --junit-xml $WORKSPACE/${report_file} --xilinxVersion ${xilinx_version}
                             """
                         } catch (exc) {
                             echo "Could not find tests. Please check the repository."
                             throw exc
                         } finally {
                             run_junit(report_file)
-                            archiveArtifacts artifacts: "${sdaccel_examples_list}.*", fingerprint: true
+                            archiveArtifacts artifacts: "${vitis_examples_list}.*", fingerprint: true
 
                         }
 
-                        // Only run the hello world test by default
-                        //def example_map = [ 'Hello_World': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl' ]
-                        def example_map = sdaccel_example_default_map.get(xilinx_version)
+                        def example_map = vitis_example_default_map.get(xilinx_version)
 
                         // Run all examples when parameter set
-                        if (test_all_sdaccel_examples_fdf) {
-                            example_map = readJSON file: sdaccel_examples_list
+                        if (test_all_vitis_examples_fdf) {
+                            example_map = readJSON file: vitis_examples_list
                         }
 
-                        def sdaccel_build_stages = [:]
+                        def vitis_build_stages = [:]
 
                         for ( def e in entrySet(example_map) ) {
 
                             String test_key = e.key
-                            def dsa_map_for_version = dsa_map.get(xilinx_version)
+                            def xsa_map_for_version = xsa_map.get(xilinx_version)
 
                             // dsa = [ 4DDR: 4ddr ]
-                            for ( def dsa in entrySet(dsa_map_for_version) ) {
+                            for ( def dsa in entrySet(xsa_map_for_version) ) {
 
-                                String build_name = "SDx ${e.key}_${dsa.value}_${xilinx_version}"
+                                String build_name = "Vitis ${e.key}_${dsa.value}_${xilinx_version}"
                                 String example_path = e.value
 
                                 String dsa_name = dsa.key
                                 String dsa_rte_name = dsa.value
 
-                                String sw_emu_stage_name      = "SDx SW_EMU ${build_name}"
-                                String hw_emu_stage_name      = "SDx HW_EMU ${build_name}"
-                                String hw_stage_name          = "SDx HW ${build_name}"
-                                String create_afi_stage_name  = "SDx AFI ${build_name}"
-                                String run_example_stage_name = "SDx RUN ${build_name}"
+                                String sw_emu_stage_name      = "Vitis SW_EMU ${build_name}"
+                                String hw_emu_stage_name      = "Vitis HW_EMU ${build_name}"
+                                String hw_stage_name          = "Vitis HW ${build_name}"
+                                String create_afi_stage_name  = "Vitis AFI ${build_name}"
+                                String run_example_stage_name = "Vitis RUN ${build_name}"
 
-                                String sw_emu_report_file      = "sdaccel_sw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
-                                String hw_emu_report_file      = "sdaccel_hw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
-                                String hw_report_file          = "sdaccel_hw_${e.key}_${dsa.value}_${xilinx_version}.xml"
-                                String create_afi_report_file  = "sdaccel_create_afi_${e.key}_${dsa.value}_${xilinx_version}.xml"
-                                String run_example_report_file = "sdaccel_run_${e.key}_${dsa.value}_${xilinx_version}.xml"
+                                String sw_emu_report_file      = "vitis_sw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
+                                String hw_emu_report_file      = "vitis_hw_emu_${e.key}_${dsa.value}_${xilinx_version}.xml"
+                                String hw_report_file          = "vitis_hw_${e.key}_${dsa.value}_${xilinx_version}.xml"
+                                String create_afi_report_file  = "vitis_create_afi_${e.key}_${dsa.value}_${xilinx_version}.xml"
+                                String run_example_report_file = "vitis_run_${e.key}_${dsa.value}_${xilinx_version}.xml"
 
                                 String description_file = "${example_path}/description.json"
                                 def description_json = ["targets":["hw","hw_emu","sw_emu"]]
@@ -1006,8 +1286,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     throw exc
                                 }
 
-                                boolean test_sw_emu_supported = true
-                                boolean test_hw_emu_supported = true
+                                boolean test_sw_emu_supported = false
+                                boolean test_hw_emu_supported = false
 
                                 if(description_json["targets"]) {
                                     if(description_json["targets"].contains("sw_emu")) {
@@ -1026,9 +1306,12 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                     }
                                 } else {
                                     echo "Description json did not have a 'target' key"
+                                    test_sw_emu_supported = true
+                                    test_hw_emu_supported = true
                                 }
 
-                                sdaccel_build_stages[build_name] = {
+                                vitis_build_stages[build_name] = {
+
                                     if(test_sw_emu_supported) {
                                         stage(sw_emu_stage_name) {
                                             node(get_task_label(task: 'sdaccel_builds', xilinx_version: xilinx_version)) {
@@ -1036,9 +1319,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 try {
                                                     sh """
                                                     set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_vitis_env.sh
+                                                    python2.7 -m pytest -v $WORKSPACE/Vitis/tests/test_build_vitis_example.py::TestBuildVitisExample::test_sw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${sw_emu_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                     """
                                                 } catch (error) {
                                                     echo "${sw_emu_stage_name} SW EMU Build generation failed"
@@ -1059,9 +1341,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 try {
                                                     sh """
                                                     set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_build_vitis_env.sh
+                                                    python2.7 -m pytest -v $WORKSPACE/Vitis/tests/test_build_vitis_example.py::TestBuildVitisExample::test_hw_emu --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_emu_report_file} --timeout=21600 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                     """
                                                 } catch (error) {
                                                     echo "${hw_emu_stage_name} HW EMU Build generation failed"
@@ -1081,9 +1362,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                             try {
                                                 sh """
                                                 set -e
-                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_build_sdaccel_example.py::TestBuildSDAccelExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                source $WORKSPACE/shared/tests/bin/setup_test_build_vitis_env.sh
+                                                python2.7 -m pytest -s -v $WORKSPACE/Vitis/tests/test_build_vitis_example.py::TestBuildVitisExample::test_hw_build --examplePath ${example_path} --junit-xml $WORKSPACE/${hw_report_file} --timeout=36000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${hw_stage_name} HW Build generation failed"
@@ -1103,9 +1383,8 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                             try {
                                                 sh """
                                                 set -e
-                                                source $WORKSPACE/shared/tests/bin/setup_test_build_sdaccel_env.sh
-                                                export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                python2.7 -m pytest -s -v $WORKSPACE/SDAccel/tests/test_create_sdaccel_afi.py::TestCreateSDAccelAfi::test_create_sdaccel_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                source $WORKSPACE/shared/tests/bin/setup_test_build_vitis_env.sh
+                                                python2.7 -m pytest -s -v $WORKSPACE/Vitis/tests/test_create_vitis_afi.py::TestCreateVitisAfi::test_create_vitis_afi --examplePath ${example_path} --junit-xml $WORKSPACE/${create_afi_report_file} --timeout=18000 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                 """
                                             } catch (error) {
                                                 echo "${create_afi_stage_name} Create AFI failed"
@@ -1135,14 +1414,13 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
                                                 try {
                                                     sh """
                                                     set -e
-                                                    source $WORKSPACE/shared/tests/bin/setup_test_runtime_sdaccel_env.sh
-                                                    export AWS_PLATFORM=\$AWS_PLATFORM_${dsa_name}
-                                                    python2.7 -m pytest -v $WORKSPACE/SDAccel/tests/test_run_sdaccel_example.py::TestRunSDAccelExample::test_run_sdaccel_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
+                                                    source $WORKSPACE/shared/tests/bin/setup_test_runtime_vitis_env.sh
+                                                    python2.7 -m pytest -v $WORKSPACE/Vitis/tests/test_run_vitis_example.py::TestRunVitisExample::test_run_vitis_example --examplePath ${example_path} --junit-xml $WORKSPACE/${run_example_report_file} --timeout=14400 --rteName ${dsa_rte_name} --xilinxVersion ${xilinx_version}
                                                     """
                                                 } catch (error) {
                                                     echo "${run_example_stage_name} Runtime example failed"
                                                     archiveArtifacts artifacts: "${example_path}/**", fingerprint: true
-                                                    input message: "SDAccel Runtime test failed. Click Proceed or Abort when you are done debugging on the instance."
+                                                    input message: "Vitis Runtime test failed. Click Proceed or Abort when you are done debugging on the instance."
                                                     throw error
                                                 } finally {
                                                     run_junit(run_example_report_file)
@@ -1153,20 +1431,19 @@ if (test_helloworld_sdaccel_example_fdf || test_all_sdaccel_examples_fdf) {
 
                                     }
 
-                                } // sdaccel_build_stages[ e.key ]
+                                } // vitis_build_stages[ e.key ]
 
-                            } //for ( def dsa in entrySet(dsa_map_for_version) ) {
+                            } //for ( def dsa in entrySet(xsa_map_for_version) ) {
                         } // for ( e in list_map )
 
-                        parallel sdaccel_build_stages
+                        parallel vitis_build_stages
                     }
                 }
             }
         } //for (def xilinx_version in xilinx_versions) {
-        parallel sdaccel_all_version_stages
+        parallel vitis_all_version_stages
     }
 }
-
 //=============================================================================
 // SDK Tests
 //=============================================================================

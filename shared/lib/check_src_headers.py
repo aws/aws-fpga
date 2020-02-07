@@ -574,6 +574,8 @@ def check_headers(dir):
             "SDAccel/aws_platform",
             "SDAccel/examples/3rd_party",
             "SDAccel/examples/xilinx",
+            "Vitis/aws_platform",
+            "Vitis/examples/xilinx",
         ])
 
     file_path_list = sorted(file_provider.get_files(dir))

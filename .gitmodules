@@ -13,3 +13,7 @@
 [submodule "SDAccel/examples/xilinx_2019.1"]
 	path = SDAccel/examples/xilinx_2019.1
 	url = https://github.com/Xilinx/SDAccel_Examples.git
+[submodule "Vitis/examples/xilinx_2019.2"]
+	path = Vitis/examples/xilinx_2019.2
+	branch = master
+	url = https://github.com/Xilinx/Vitis_Accel_Examples

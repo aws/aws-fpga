@@ -22,24 +22,18 @@
 ## 2. make all QUESTA=1  -> Runs the test
 ##################################################################
 
+LIBLISTS = $(COMMON_LIBLISTS)
+LIBLISTS_ARGS = $(shell echo " $(strip $(LIBLISTS))" | sed 's|\ | -L |g')
+
 compile: $(COMPLIB_DIR)
 	mkdir -p $(SIM_DIR)
 	cd ${SIM_DIR} && ln -s -f ../questa_complib/modelsim.ini 
 	cd $(SIM_DIR) && vlog $(C_TEST_NAME) -ccflags "-I$(C_INC_DIR)"
-	cd $(SIM_DIR) && vcom -work work -64 -93 -f $(SCRIPTS_DIR)/top_vhdl.$(SIMULATOR).f	
+	cd $(SIM_DIR) && vcom -work work -64 -93 -f $(SCRIPTS_DIR)/top_vhdl.$(SIMULATOR).f
 	cd $(SIM_DIR) && vlog -mfcu -sv -64 -timescale 1ps/1ps -93 -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/secureip -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 
 run:
-ifeq ($(VIVADO_TOOL_VERSION), v2017.4)
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_15 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_16 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_14 -L $(COMPLIB_DIR)/fifo_generator_v13_2_1 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_14 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -do "run -all; quit -f" tb glbl $(TEST)
-else ifeq ($(VIVADO_TOOL_VERSION), v2018.3)
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_18 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_19 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_17 -L $(COMPLIB_DIR)/fifo_generator_v13_2_3 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_17 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -do "run -all; quit -f" tb glbl $(TEST)
-else ifeq ($(VIVADO_TOOL_VERSION), v2019.1)
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_19 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_20 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_18 -L $(COMPLIB_DIR)/fifo_generator_v13_2_4 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_18 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -do "run -all; quit -f" tb glbl $(TEST)
-else
-	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random -L $(COMPLIB_DIR)/unisims_ver -L $(COMPLIB_DIR)/unisim -L $(COMPLIB_DIR)/unifast_ver -L $(COMPLIB_DIR)/unifast -L $(COMPLIB_DIR)/unimacro_ver -L $(COMPLIB_DIR)/unimacro -L $(COMPLIB_DIR)/secureip -L $(COMPLIB_DIR)/axi_register_slice_v2_1_17 -L $(COMPLIB_DIR)/axi_infrastructure_v1_1_0 -L $(COMPLIB_DIR)/axi_crossbar_v2_1_18 -L $(COMPLIB_DIR)/xpm -L $(COMPLIB_DIR)/axi_clock_converter_v2_1_16 -L $(COMPLIB_DIR)/fifo_generator_v13_2_2 -L $(COMPLIB_DIR)/fifo_generator_v13_1_4 -L $(COMPLIB_DIR)/axi_data_fifo_v2_1_16 -L $(COMPLIB_DIR)/generic_baseblocks_v2_1_0 -do "run -all; quit -f" tb glbl $(TEST)
-endif
-
+	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random $(LIBLISTS_ARGS) -do "run -all; quit -f" tb glbl $(TEST)
 
 $(COMPLIB_DIR):
 	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
