@@ -14,8 +14,6 @@
 6. [OpenCL Development Environment with Amazon EC2 F1 FPGA Instances to accelerate your C/C++ applications](#sdaccel)
 7. [Developer Support](#devSupport)
 8. [Recommended Documentation](#doccontents)
-9. [Github tips and tricks](#githubtipstricks)
-
 
 <a name="overviewdevkit"></a>
 # Overview of AWS EC2 FPGA Development Kit
@@ -28,7 +26,7 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Development Environment     | Description | Accelerator Language   | Development Tool | Debug Options| Typical Developer / FPGA Experience |
 | --------|---------|---------|-------|-------|-------|
-| [Software Defined Accelerator Development - SDAccel](SDAccel/README.md) | Development experience leverages an optimized compiler to allow easy new accelerator development or migration of existing C/C++/openCL, Verilog/VHDL to AWS FPGA instances | C/C++/OpenCL, Verilog/VHDL (RTL) | SDx/Vivado (GUI or scipt) | SW/HW Emulation, Simulation, GDB, Virtual JTAG (Chipscope) | SW or HW Developer with zero FPGA experience |
+| Software Defined Accelerator Development - [Vitis](Vitis/README.md)/[SDAccel](SDAccel/README.md) | Development experience leverages an optimized compiler to allow easy new accelerator development or migration of existing C/C++/openCL, Verilog/VHDL to AWS FPGA instances | C/C++/OpenCL, Verilog/VHDL (RTL) | Vitis/SDx/Vivado (GUI or script) | SW/HW Emulation, Simulation, GDB, Virtual JTAG (Chipscope) | SW or HW Developer with zero FPGA experience |
 | [Hardware Accelerator Development - HDK](hdk/README.md) | Fully custom hardware development experience provides hardware developers with the tools required for developing AFIs for AWS FPGA instances  | Verilog/VHDL | Vivado | Simulation, Virtual JTAG | HW Developer with advanced FPGA experience |
 | [IP Integrator or High Level Synthesis (HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | Graphical interface development experience for integrating IP and high level synthesis development | Verilog/VHDL/C | Vivado (GUI) | Simulation, Virtual JTAG | HW Developer with intermediate FPGA experience |
 
@@ -37,7 +35,7 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Runtime Environment     | Hardware Interface | Host Code Language   | FPGA Tools |
 | --------|---------|---------|-------|
-| [C/C++ Software Defined Accelerator Development](SDAccel/README.md) | OpenCL APIs, [XOCL Driver](./sdk/linux_kernel_drivers/xocl), [HAL](SDAccel/userspace/src) | C/C++ | [SDK](./sdk), SDx |
+| C/C++ Software Defined Accelerator Development - [Vitis](Vitis/README.md) / [SDAccel](SDAccel/README.md) | OpenCL APIs and XRT | C/C++ | [SDK](./sdk), Vitis / SDAccel|
 | [Hardware Accelerator Development](hdk/README.md) | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | C/C++ | [SDK](./sdk), Vivado |
 | [IP Integrator or High Level Synthesis (HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | C/C++ | [SDK](./sdk), Vivado |
 
@@ -46,8 +44,9 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Tool     | Development/Runtime | Tool location | Description |
 | --------|---------|---------|---------|
+| Vitis 2019.2 Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development using the new Vitis toolset](Vitis/README.md) |
+| Vivado 2017.4, 2018.2, 2018.3, 2019.1 & 2019.2 | Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | SDx 2017.4, 2018.2, 2018.3  & 2019.1| Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
-| Vivado 2017.4, 2018.2, 2018.3 & 2019.1 | Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | FPGA AFI Management Tools | Runtime | [SDK - fpga\_mgmt\_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
 | Virtual JTAG | Development (Debug) | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Runtime debug waveform |
 | wait\_for\_afi | Development | [wait\_for\_afi.py](shared/bin/scripts/wait_for_afi.py) | Helper script that notifies via email on AFI generation completion |
@@ -55,7 +54,8 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 | AFI Administration | Development | [Copy](hdk/docs/copy_fpga_image.md), [Delete](hdk/docs/delete_fpga_image.md), [Describe](hdk/docs/describe_fpga_images.md), [Attributes](hdk/docs/fpga_image_attributes.md) | AWS CLI EC2 commands for managing your AFIs |
 
 
-NOTE: For on-premises development, SDx/Vivado must have the correct license and use one of the [supported versions of SDx/Vivado](./supported_vivado_versions.txt). The FPGA HDK+SDK [Release Notes](./RELEASE_NOTES.md) may contain additional information.  The following links have more information on on-premises development:  [Vivado requirements](hdk/docs/on_premise_licensing_help.md) and [SDx requirements](SDAccel/docs/On_Premises_Development_Steps.md)
+> For on-premises development, SDx/Vitis/Vivado must have the correct license and use one of the [supported versions of SDx/Vitis/Vivado](./supported_vivado_versions.txt). 
+> The following links have more information on on-premises development: [Vivado requirements](hdk/docs/on_premise_licensing_help.md), [Vitis requirements](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_2/ug1393-vitis-application-acceleration.pdf) and [SDx requirements](SDAccel/docs/On_Premises_Development_Steps.md)
 
 <a name="overviewexapps"></a>
 ## Overview of Example Applications
@@ -120,7 +120,7 @@ Currently, AWS marketplace includes multiple versions of the FPGA Developer AMI,
 | 1.4.3+ | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
 | 1.4.8+ | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
 | 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
-
+| 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
 Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 
 If developing using SDAccel environment please refer to this [Runtime Compatibility Table](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
@@ -137,7 +137,11 @@ The software-defined development environment allows customers to compile their C
 
 In addition, this development environment (also called SDAccel) allows the mix of C/C++ and RTL accelerator designs into a C/C++ software based development environment.  This method enables faster prototyping using C/C++ while supporting manual optimization of critical blocks within RTL.  This approach is similar to optimizing time critical functions using software compiler optimization methods.
 
-This developer kit has 80+ examples to help you get started on FPGA acceleration.  To get started, review the [Software-defined development environment readme](SDAccel/README.md).
+This developer kit has 80+ examples to help you get started on FPGA acceleration. 
+
+To get started with Xilinx SDAccel, review the [Software-defined development environment readme](SDAccel/README.md).
+To get started with Xilinx Vitis, review the [Vitis unified development environment readme](Vitis/README.md).
+
 
 <a name="fpgasdk"></a>
 # Runtime Tools (SDK)
@@ -183,16 +187,3 @@ The documentation is located throughout this developer kit, therefore, to help d
 | AFI Administration | [copy\_fpga\_image](hdk/docs/copy_fpga_image.md), [delete\_fpga\_image](hdk/docs/delete_fpga_image.md), [describe\_fpga\_images](hdk/docs/describe_fpga_images.md), [fpga\_image\_attributes](hdk/docs/fpga_image_attributes.md) | CLI documentation for administering AFIs |
 | AFI Creation Error Codes | [create\_fpga\_image\_error\_codes](hdk/docs/create_fpga_image_error_codes.md) | CLI documentation for managing AFIs |
 | Developing on-premises | [HDK: on\_premise\_licensing\_help](hdk/docs/on_premise_licensing_help.md), [SDAccel: On\_Premises\_Development\_Steps](SDAccel/docs/On_Premises_Development_Steps.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) running on AWS EC2 |
-
-
-<a name="githubtipstricks"></a>
-# Github tips and tricks
-  * [Cloning the repository](https://help.github.com/articles/cloning-a-repository/)
-  * [Forking the repository](https://help.github.com/articles/fork-a-repo/)
-  * [Searching code](https://help.github.com/articles/searching-code/) and [advanced search syntax](https://help.github.com/articles/understanding-the-search-syntax/)
-  * [Finding files](https://help.github.com/articles/finding-files-on-github/)
-  * Simply replace github.com with gitprint.com to generate a printable PDF
-
-
-
-

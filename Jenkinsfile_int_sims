@@ -5,100 +5,15 @@
 //=============================================================================
 properties([parameters([
     string(name: 'branch', defaultValue: ''),
-    booleanParam(name: 'test_markdown_links',                 defaultValue: false,  description: 'Test markdown files and check for broken links'),
-    booleanParam(name: 'test_src_headers',                    defaultValue: false,  description: 'Check copyright heaers of source files'),
-    booleanParam(name: 'test_fpga_tools',                     defaultValue: false,  description: 'Test fpga-* commands on F1'),
-    booleanParam(name: 'test_hdk_scripts',                    defaultValue: false,  description: 'Test the HDK setup scripts'),
     booleanParam(name: 'test_sims',                           defaultValue: true,  description: 'Run all Simulations'),
-    booleanParam(name: 'test_non_root_access',                defaultValue: false,  description: 'Test non-root access to FPGA tools'),
-    booleanParam(name: 'test_xdma',                           defaultValue: false,  description: 'Test XDMA driver'),
-    booleanParam(name: 'test_py_bindings',                    defaultValue: false,  description: 'Test Python Bindings'),
-    booleanParam(name: 'test_runtime_software',               defaultValue: false,  description: 'Test precompiled AFIs'),
-    booleanParam(name: 'test_dcp_recipes',                    defaultValue: false, description: 'Run DCP generation with all clock recipes and build strategies.'),
-    booleanParam(name: 'test_hdk_fdf',                        defaultValue: false,  description: 'Run Full developer flow testing on cl_hello_world and cl_dram_dma'),
-    booleanParam(name: 'test_sdaccel_scripts',                defaultValue: false,  description: 'Test SDAccel setup scripts'),
-    booleanParam(name: 'test_all_sdaccel_examples_fdf',       defaultValue: false, description: 'Run Full Developer Flow testing of all SDAccel examples. This overrides test_helloworld_sdaccel_example'),
-    booleanParam(name: 'test_helloworld_sdaccel_example_fdf', defaultValue: false,  description: 'Run Full Developer Flow testing of the Hello World SDAccel example'),
-    booleanParam(name: 'debug_dcp_gen',                       defaultValue: false, description: 'Only run FDF on cl_hello_world. Overrides test_*.'),
-    booleanParam(name: 'debug_fdf_uram',                      defaultValue: false, description: 'Debug the FDF for cl_uram_example.'),
-    booleanParam(name: 'fdf_ddr_comb',                        defaultValue: false, description: 'run FDF for cl_dram_dma ddr combinations.'),
-    booleanParam(name: 'disable_runtime_tests',               defaultValue: false, description: 'Option to disable runtime tests.'),
-    booleanParam(name: 'use_test_ami',                        defaultValue: false, description: 'This option asks for the test AMI from Jenkins'),
     booleanParam(name: 'internal_simulations',                defaultValue: true, description: 'This option asks for default agent from Jenkins')
 ])])
 
 //=============================================================================
 // Configuration
 //=============================================================================
-boolean test_markdown_links = params.get('test_markdown_links')
-boolean test_src_headers = params.get('test_src_headers')
-boolean test_hdk_scripts = params.get('test_hdk_scripts')
-boolean test_fpga_tools = params.get('test_fpga_tools')
+
 boolean test_sims = params.get('test_sims')
-boolean test_non_root_access = params.get('test_non_root_access')
-boolean test_xdma = params.get('test_xdma')
-boolean test_py_bindings = params.get('test_py_bindings')
-boolean test_runtime_software = params.get('test_runtime_software')
-boolean test_dcp_recipes = params.get('test_dcp_recipes')
-boolean test_hdk_fdf = params.get('test_hdk_fdf')
-boolean test_sdaccel_scripts = params.get('test_sdaccel_scripts')
-boolean test_all_sdaccel_examples_fdf = params.get('test_all_sdaccel_examples_fdf')
-boolean test_helloworld_sdaccel_example_fdf = params.get('test_helloworld_sdaccel_example_fdf')
-boolean disable_runtime_tests = params.get('disable_runtime_tests')
-
-def runtime_sw_cl_names = ['cl_dram_dma', 'cl_hello_world']
-def dcp_recipe_cl_names = ['cl_dram_dma', 'cl_hello_world']
-def dcp_recipe_scenarios = [
-    // Default values are tested in FDF: A0-B0-C0-DEFAULT
-    // Fastest clock speeds are: A1-B2-C0
-    // Test each clock recipe with the BASIC strategy
-    // Test all strategies with highest clock speeds
-    'A1-B1-C1-BASIC',
-    'A1-B2-C0-BASIC',
-    'A2-B3-C2-BASIC',
-    'A1-B4-C3-BASIC',
-    'A1-B5-C0-BASIC',
-    'A1-B2-C0-DEFAULT',
-    'A1-B2-C0-EXPLORE',
-    'A1-B2-C0-TIMING',
-    'A1-B2-C0-TIMING',
-    'A1-B2-C0-CONGESTION',
-    ]
-def fdf_test_names = [
-    'cl_dram_dma[A1-B0-C0-DEFAULT]',
-    'cl_hello_world[A0-B0-C0-DEFAULT]',
-    'cl_hello_world_vhdl',
-    'cl_uram_example[2]',
-    'cl_uram_example[3]',
-    'cl_uram_example[4]'
-    ]
-
-boolean debug_dcp_gen = params.get('debug_dcp_gen')
-if (debug_dcp_gen) {
-    fdf_test_names = ['cl_hello_world[A0-B0-C0-DEFAULT]']
-    test_markdown_links = false
-    test_sims = false
-    test_runtime_software = false
-    test_sdaccel_scripts = false
-}
-
-boolean debug_fdf_uram = params.get('debug_fdf_uram')
-if (debug_fdf_uram) {
-    fdf_test_names = ['cl_uram_example[2]', 'cl_uram_example[3]', 'cl_uram_example[4]']
-    test_markdown_links = false
-    test_sims = false
-    test_runtime_software = false
-    test_sdaccel_scripts = false
-}
-
-boolean fdf_ddr_comb = params.get('fdf_ddr_comb')
-if(fdf_ddr_comb) {
-   fdf_test_names = ['cl_dram_dma[A0-B0-C0-DEFAULT-111]', 'cl_dram_dma[A0-B0-C0-DEFAULT-110]', 'cl_dram_dma[A0-B0-C0-DEFAULT-101]','cl_dram_dma[A0-B0-C0-DEFAULT-100]','cl_dram_dma[A0-B0-C0-DEFAULT-011]','cl_dram_dma[A0-B0-C0-DEFAULT-010]','cl_dram_dma[A0-B0-C0-DEFAULT-001]','cl_dram_dma[A0-B0-C0-DEFAULT-000]']
-    test_markdown_links = false
-    test_sims = false
-    test_runtime_software = false
-    test_sdaccel_scripts = false
-}
 
 //=============================================================================
 // Globals
@@ -121,63 +36,16 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2019.1' ]
+def xilinx_versions = [ '2019.2' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
 
-def dsa_map = [
-    '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.2' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.3' : [ 'DYNAMIC_5_0' : 'dyn']
-]
-
-def sdaccel_example_default_map = [
-    '2017.4' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ],
-    '2018.2' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ],
-    '2018.3' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ]
-]
-
 def simulator_tool_default_map = [
-    '2017.4' : [
-        'vivado': 'xilinx/SDx/2017.4_04112018',
-        'vcs': 'synopsys/vcs-mx/M-2017.03-SP2-11',
-        'questa': 'questa/10.6b',
-        'ies': 'incisive/15.20.063'
-     ],
-     '2018.2' : [
-         'vivado': 'xilinx/SDx/2018.2_06142018',
-         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
-         'questa': 'questa/10.6c_1',
-         'ies': 'incisive/15.20.063'
-     ],
-     '2018.3' : [
-         'vivado': 'xilinx/SDx/2018.3_1207',
-         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
-         'questa': 'questa/10.6c_1',
-         'ies': 'incisive/15.20.063'
-     ],
-     '2019.1' : [
-         'vivado': 'xilinx/SDx/2019.1.op2552052',
-         'vcs': 'synopsys/vcs-mx/O-2018.09-SP1',
-         'questa': 'questa/10.6c_1',
+     '2019.2' : [
+         'vivado': 'xilinx/Vivado/2019.2',
+         'vcs': 'synopsys/vcs-mx/O-2018.09-SP2-1',
+         'questa': 'questa/2019.2',
          'ies': 'incisive/15.20.063'
      ]
 ]
@@ -194,12 +62,7 @@ def is_public_repo() {
 
 def get_task_label(Map args=[ : ]) {
     String task_label = args.xilinx_version + '_' + task_label[args.task]
-    //boolean use_test_ami = params.get('use_test_ami')
 
-    if (params.use_test_ami) {
-        echo "Test AMI Requested"
-        task_label = task_label + '_test'
-    }
     if (params.internal_simulations) {
         echo "internal simulation agent requested"
         task_label = 'f1_3rd_party_sims'

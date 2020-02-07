@@ -22,7 +22,8 @@ endif
 export TEST ?= test_null
 export C_TEST ?= test_null
 
-export CL_ROOT = $(PWD)/../..
+export SCRIPTS_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+export CL_ROOT = $(realpath $(SCRIPTS_DIR)/../..)
 export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
 
 export C_COMMON_DIR        = $(HDK_COMMON_DIR)/software
@@ -45,29 +46,29 @@ ifeq ($(C_TEST),test_null)
   ifeq ($(AXI_MEMORY_MODEL), 1)
     ifeq ($(ECC_DIRECT), 1)
         export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_fast_ecc_direct
-    else 
+    else
       ifeq ($(ECC_RAND), 1)
         export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_fast_ecc_rnd
       else
         ifeq ($(DDR_BKDR), 1)
          export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_fast_bkdr
-	else 
+	else
          export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_fast
-	endif 
+	endif
       endif
     endif
   else
    ifeq ($(ECC_DIRECT), 1)
         export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_ecc_direct
-    else 
+    else
       ifeq ($(ECC_RAND), 1)
         export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_ecc_rnd
       else
         ifeq ($(DDR_BKDR), 1)
          export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv_bkdr
-	else 
+	else
          export SIM_DIR = $(SIM_ROOT)/$(TEST)_sv
-	endif 
+	endif
       endif
     endif
   endif
@@ -75,7 +76,6 @@ else
   export SIM_DIR = $(SIM_ROOT)/$(C_TEST)_c
 endif
 
-export SCRIPTS_DIR = $(PWD)
 export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
 export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
 export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces

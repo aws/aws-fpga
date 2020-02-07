@@ -247,6 +247,8 @@ def get_instance_type():
 def get_num_fpga_slots(instance_type):
     if re.match('f1\.2xlarge', instance_type):
         return 1
+    if re.match('f1\.4xlarge', instance_type):
+        return 2
     elif re.match('f1\.16xlarge', instance_type):
         return 8
     return 0

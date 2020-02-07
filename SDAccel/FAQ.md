@@ -75,6 +75,10 @@ A: You may have run the previous [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_S
 A: This error occured because the XRT RPM was built without linking in a library needed for the uuid symbols.
    To fix it, use the latest XRT RPM's documented in the [XRT installation document](docs/XRT_installation_instructions.md)
 
+## Q: What is the lowest frequency SDAccel design supported on the AWS F1 Platform?
+A: We support creating AFI's from CL's that have been built to work at Frequencies no lower than 80MHz.
+   Re-clocking/Loading a dynamic clock frequency lower than 80MHz will also result in an error.
+
 # Additional Resources
 
 * The [AWS SDAccel README](README.md).

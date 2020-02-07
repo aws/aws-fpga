@@ -61,6 +61,9 @@ export SDK_DIR=$AWS_FPGA_REPO_DIR/sdk
 # SDACCEL
 # Setup Location of SDACCEL_DIR
 export SDACCEL_DIR=$AWS_FPGA_REPO_DIR/SDAccel
+#  Vitis
+# Setup Location of VITIS_DIR
+export VITIS_DIR=$AWS_FPGA_REPO_DIR/Vitis
 
 # PYTHONPATH
 # Update PYTHONPATH with libraries used for unit testing

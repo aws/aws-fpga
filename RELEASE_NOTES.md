@@ -24,6 +24,16 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.13 (See [ERRATA](./ERRATA.md) for unsupported features)
+* FPGA developer kit now supports Xilinx Vivado/Vitis 2019.2
+* To upgrade, use [Developer AMI v1.8.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace.
+       
+## Release 1.4.12 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Added supported versions for BJS AMI's
+* Added link to the re:Invent 19 F1 workshop
+* Fixed missing extern C declaration by PR #473 
+* Documentation Path fixes from PR #466, #468 and #470 
+
 ## Release 1.4.11 (See [ERRATA](./ERRATA.md) for unsupported features)
 * FPGA developer kit supports Xilinx SDx/Vivado 2019.1
     * We recommend developers upgrade to v1.4.11 to benefit from the new features, bug fixes, and optimizations. 

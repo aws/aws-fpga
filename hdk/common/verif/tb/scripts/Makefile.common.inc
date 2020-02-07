@@ -98,6 +98,68 @@ endif
 endif
 endif
 
+COMMON_LIBLISTS =\
+   unisims_ver\
+   unisim\
+   unifast_ver\
+   unifast\
+   unimacro_ver\
+   unimacro\
+   secureip\
+   xpm
+
+ifeq ($(VIVADO_TOOL_VERSION), v2017.4)
+   COMMON_LIBLISTS +=\
+      axi_register_slice_v2_1_15\
+      axi_infrastructure_v1_1_0\
+      axi_crossbar_v2_1_16\
+      axi_clock_converter_v2_1_14\
+      fifo_generator_v13_2_1\
+      fifo_generator_v13_1_4\
+      axi_data_fifo_v2_1_14\
+      generic_baseblocks_v2_1_0
+else ifeq ($(VIVADO_TOOL_VERSION), v2018.3)
+   COMMON_LIBLISTS +=\
+      axi_register_slice_v2_1_18\
+      axi_infrastructure_v1_1_0\
+      axi_crossbar_v2_1_19\
+      axi_clock_converter_v2_1_17\
+      fifo_generator_v13_2_3\
+      fifo_generator_v13_1_4\
+      axi_data_fifo_v2_1_17\
+      generic_baseblocks_v2_1_0
+else ifeq ($(VIVADO_TOOL_VERSION), v2019.1)
+   COMMON_LIBLISTS +=\
+      axi_register_slice_v2_1_19\
+      axi_infrastructure_v1_1_0\
+      axi_crossbar_v2_1_20\
+      axi_clock_converter_v2_1_18\
+      fifo_generator_v13_2_4\
+      fifo_generator_v13_1_4\
+      axi_data_fifo_v2_1_18\
+      generic_baseblocks_v2_1_0
+else ifeq ($(VIVADO_TOOL_VERSION), v2019.2)
+   COMMON_LIBLISTS +=\
+      axi_register_slice_v2_1_20\
+      axi_infrastructure_v1_1_0\
+      axi_crossbar_v2_1_21\
+      axi_clock_converter_v2_1_19\
+      fifo_generator_v13_2_5\
+      fifo_generator_v13_1_4\
+      axi_data_fifo_v2_1_19\
+      generic_baseblocks_v2_1_0
+else
+   COMMON_LIBLISTS +=\
+      axi_register_slice_v2_1_17\
+      axi_infrastructure_v1_1_0\
+      axi_crossbar_v2_1_18\
+      axi_clock_converter_v2_1_16\
+      fifo_generator_v13_2_2\
+      fifo_generator_v13_1_4\
+      axi_data_fifo_v2_1_16\
+      generic_baseblocks_v2_1_0
+endif
+
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
 
 regression: $(SV_TEST_LIST) $(C_TEST_LIST) 
