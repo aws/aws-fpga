@@ -22,7 +22,8 @@ endif
 export TEST ?= test_null
 export C_TEST ?= test_null
 
-export CL_ROOT = $(PWD)/../..
+export SCRIPTS_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+export CL_ROOT = $(realpath $(SCRIPTS_DIR)/../..)
 
 export C_INC_DIR  = $(CL_ROOT)/software/verif_rtl/include
 export C_SRC_DIR  = $(CL_ROOT)/software/verif_rtl/src
@@ -40,7 +41,6 @@ else
 endif
 
 
-export SCRIPTS_DIR = $(PWD)
 export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
 export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
 export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces

@@ -29,7 +29,7 @@ current_dir=$(pwd)
 
 source $script_dir/shared/bin/set_common_functions.sh
 source $script_dir/shared/bin/set_common_env_vars.sh
-source $SDACCEL_DIR/Runtime/xrt_common_functions.sh
+source $VITIS_DIR/Runtime/xrt_common_functions.sh
 
 # Source sdk_setup.sh
 info_msg "Sourcing sdk_setup.sh"
@@ -51,9 +51,9 @@ function usage {
 function help {
     info_msg "$script_name"
     info_msg " "
-    info_msg "Sets up the environment for AWS FPGA SDAccel tools."
+    info_msg "Sets up the environment for AWS FPGA Vitis tools."
     info_msg " "
-    info_msg "sdaccel_setup.sh script will:"
+    info_msg "vitis_setup.sh script will:"
     info_msg "  (1) install FPGA Management Tools,"
     info_msg "  (2) check if Xilinx tools are available,"
     info_msg "  (3) check if required packages are installed,"
@@ -63,25 +63,25 @@ function help {
     usage
 }
 
-function check_set_xilinx_sdx {
-    if [[ ":$XILINX_SDX" == ':' ]]; then
-        debug_msg "XILINX_SDX is not set"
-        which sdx
+function check_set_xilinx_vitis {
+    if [[ ":$XILINX_VITIS" == ':' ]]; then
+        debug_msg "XILINX_VITIS is not set"
+        which vitis
         RET=$?
         if [ $RET != 0 ]; then
-            debug_msg "sdx not found in path."
-            err_msg "XILINX_SDX variable not set and sdx not in the path"
-            err_msg "Please set XILINX_SDX variable to point to your location of your Xilinx installation or add location of sdx exectuable to your PATH variable"
+            debug_msg "vitis not found in path."
+            err_msg "XILINX_VITIS variable not set and vitis not in the path"
+            err_msg "Please set XILINX_VITIS variable to point to your location of your Xilinx installation or add location of vitis exectuable to your PATH variable"
             return $RET
         else
-            export XILINX_SDX=`which sdx | sed 's:/bin/sdx::'`
-            info_msg "Setting XILINX_SDX to $XILINX_SDX"
+            export XILINX_VITIS=`which vitis | sed 's:/bin/vitis::'`
+            info_msg "Setting XILINX_VITIS to $XILINX_VITIS"
         fi
     else
-        info_msg "XILINX_SDX is already set to $XILINX_SDX"
+        info_msg "XILINX_VITIS is already set to $XILINX_VITIS"
     fi
-    # get sdaccel release version, i.e. "2017.1"
-    RELEASE_VER=$(basename $XILINX_SDX)
+    # get Vitis release version, i.e. "2019.2"
+    RELEASE_VER=$(basename $XILINX_VITIS)
     RELEASE_VER=${RELEASE_VER:0:6}
     export RELEASE_VER=$RELEASE_VER
     echo "RELEASE_VER equals $RELEASE_VER"
@@ -90,7 +90,7 @@ function check_set_xilinx_sdx {
 function check_install_packages_centos {
 #TODO: Check required packages are installed or install them
 #TODO: Check version of gcc is above 4.8.5 (4.6.3 does not work)
-  for pkg in `cat $SDACCEL_DIR/packages.txt`; do
+  for pkg in `cat $VITIS_DIR/packages.txt`; do
     if yum list installed "$pkg" >/dev/null 2>&1; then
       true
     else
@@ -100,7 +100,7 @@ function check_install_packages_centos {
 }
 
 function check_install_packages_ubuntu {
-  for pkg in `cat $SDACCEL_DIR/packages.txt`; do
+  for pkg in `cat $VITIS_DIR/packages.txt`; do
     if apt -qq list "$pkg" >/dev/null 2>&1; then
       true
     else
@@ -158,43 +158,39 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     esac
 done
 
-# Check XILINX_SDX is set
-if ! check_set_xilinx_sdx; then
+# Check XILINX_VITIS is set
+if ! check_set_xilinx_vitis; then
     return 1
 fi
 
-info_msg " XILINX_SDX is set to $XILINX_SDX"
+info_msg " XILINX_VITIS is set to $XILINX_VITIS"
 # Install patches as required.
 info_msg " Checking & installing required patches"
 setup_patches
 
 
-# Update Xilinx SDAccel Examples from GitHub
-info_msg "Using SDx $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2017\.4.* || $RELEASE_VER =~ .*2018\.2.* || $RELEASE_VER =~ .*2018\.3.* || $RELEASE_VER =~ .*2019\.1.* ]]; then
-    info_msg "Updating Xilinx SDAccel Examples $RELEASE_VER"
-    git submodule update --init -- SDAccel/examples/xilinx_$RELEASE_VER
+# Update Xilinx Vitis Examples from GitHub
+info_msg "Using Vitis $RELEASE_VER"
+if [[ $RELEASE_VER =~ .*2019\.2.* ]]; then
+    info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
+    git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
-    if [ -e $SDACCEL_DIR/examples/xilinx ]; then
-        if [ ! -L $SDACCEL_DIR/examples/xilinx ]; then
-          err_msg "ERROR:  SDAccel/examples/xilinx is not a symbolic link.  Backup any data and remove SDAccel/examples/xilinx directory.  The setup needs to create a symbolic link from SDAccel/examples/xilinx to SDAccel/examples/xilinx_$RELEASE_VER"
+    if [ -e $VITIS_DIR/examples/xilinx ]; then
+        if [ ! -L $VITIS_DIR/examples/xilinx ]; then
+          err_msg "ERROR:  Vitis/examples/xilinx is not a symbolic link.  Backup any data and remove Vitis/examples/xilinx directory.  The setup needs to create a symbolic link from Vitis/examples/xilinx to Vitis/examples/xilinx_$RELEASE_VER"
           return 1
         fi
     fi
-    ln -sf $SDACCEL_DIR/examples/xilinx_$RELEASE_VER $SDACCEL_DIR/examples/xilinx
+    ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2017.4, 2018.2, 2018.3 and 2019.1 are supported).\n"
+   echo " $RELEASE_VER is not supported (2019.2 is supported).\n"
    return 2
 fi
 
 # settings64 removal - once we put this in the AMI, we will add a check
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_SDX/lib/lnx64.o
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_VITIS/lib/lnx64.o
 
-export LD_LIBRARY_PATH=`$XILINX_SDX/bin/ldlibpath.sh $XILINX_SDX/lib/lnx64.o`:$XILINX_SDX/runtime/lib/x86_64
-export LD_LIBRARY_PATH=$XILINX_SDX/lnx64/tools/opencv/:$LD_LIBRARY_PATH
-
-# add variable to allow compilation using 2017.4 and 2018.2 on newer OSes
-export XOCC_ADD_OPTIONS="--xp param:compiler.useHlsGpp=1 --xp param:compiler.minFrequencyLimit=80"
+export LD_LIBRARY_PATH=`$XILINX_VITIS/bin/ldlibpath.sh $XILINX_VITIS/lib/lnx64.o`
 
 # Check if internet connection is available
 if ! check_internet; then
@@ -217,79 +213,80 @@ else
     fi
 fi
 
-function setup_dsa {
+function setup_xsa {
 
     if [ "$#" -ne 3 ]; then
-        err_msg "Illegal number of parameters sent to the setup_dsa function!"
+        err_msg "Illegal number of parameters sent to the setup_xsa function!"
         return 1
     fi
 
-    DSA=$1
-    DSA_S3_BASE_DIR=$2
+    XSA=$1
+    XSA_S3_BASE_DIR=$2
     PLATFORM_ENV_VAR_NAME=$3
 
-    dsa_dir=$SDACCEL_DIR/aws_platform/$DSA/hw/
-    sdk_dsa=$dsa_dir/$DSA.dsa
-    sdk_dsa_s3_bucket=aws-fpga-hdk-resources
-    s3_sdk_dsa=$sdk_dsa_s3_bucket/SDAccel/$DSA_S3_BASE_DIR/$DSA/$DSA.dsa
+    xsa_dir=$VITIS_DIR/aws_platform/$XSA/hw/
+    vitis_xsa=$xsa_dir/$XSA.xsa
+    vitis_xsa_s3_bucket=aws-fpga-hdk-resources
+    s3_vitis_xsa=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/$XSA.xsa
 
     # set a variable to point to the platform for build and emulation runs
-    export "$PLATFORM_ENV_VAR_NAME"=$SDACCEL_DIR/aws_platform/$DSA/$DSA.xpfm
+    export "$PLATFORM_ENV_VAR_NAME"=$VITIS_DIR/aws_platform/$XSA/$XSA.xpfm
 
     # Download the sha256
-    if [ ! -e $dsa_dir ]; then
-        mkdir -p $dsa_dir || { err_msg "Failed to create $dsa_dir"; return 2; }
+    if [ ! -e $xsa_dir ]; then
+        mkdir -p $xsa_dir || { err_msg "Failed to create $xsa_dir"; return 2; }
     fi
 
     # Use curl instead of AWS CLI so that credentials aren't required.
-    curl -s https://s3.amazonaws.com/$s3_sdk_dsa.sha256 -o $sdk_dsa.sha256 || { err_msg "Failed to download DSA checkpoint version from $s3_sdk_dsa.sha256 -o $sdk_dsa.sha256"; return 2; }
-    if grep -q '<?xml version' $sdk_dsa.sha256; then
-        err_msg "Failed to download SDK DSA checkpoint version from $s3_sdk_dsa.sha256"
-        cat sdk_dsa.sha256
+    curl -s https://s3.amazonaws.com/$s3_vitis_xsa.sha256 -o $vitis_xsa.sha256 || { err_msg "Failed to download XSA version from $s3_vitis_xsa.sha256 -o $vitis_xsa.sha256"; return 2; }
+    if grep -q '<?xml version' $vitis_xsa.sha256; then
+        err_msg "Failed to download VITIS XSA version from $s3_vitis_xsa.sha256"
+        cat vitis_xsa.sha256
         return 2
     fi
-    exp_sha256=$(cat $sdk_dsa.sha256)
+    exp_sha256=$(cat $vitis_xsa.sha256)
     debug_msg "  latest   version=$exp_sha256"
-    # If DSA already downloaded check its sha256
-    if [ -e $sdk_dsa ]; then
-        act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+    # If XSA already downloaded check its sha256
+    if [ -e $vitis_xsa ]; then
+        act_sha256=$( sha256sum $vitis_xsa | awk '{ print $1 }' )
         debug_msg "  existing version=$act_sha256"
         if [[ $act_sha256 != $exp_sha256 ]]; then
-            info_msg "SDK DSA checkpoint version is incorrect"
-            info_msg "  Saving old checkpoint to $sdk_dsa.back"
-            mv $sdk_dsa $sdk_dsa.back
+            info_msg "VITIS XSA version is incorrect"
+            info_msg "  Saving old XSA to $vitis_xsa.back"
+            mv $vitis_xsa $vitis_xsa.back
         fi
     else
-        info_msg "SDK DSA hasn't been downloaded yet."
+        info_msg "VITIS XSA hasn't been downloaded yet."
     fi
 
-    if [ ! -e $sdk_dsa ]; then
-        info_msg "Downloading latest SDK DSA checkpoint from $s3_sdk_dsa"
+    if [ ! -e $vitis_xsa ]; then
+        info_msg "Downloading latest VITIS XSA from $s3_vitis_xsa"
         # Use curl instead of AWS CLI so that credentials aren't required.
-        curl -s https://s3.amazonaws.com/$s3_sdk_dsa -o $sdk_dsa || { err_msg "SDK dsa checkpoint download failed"; return 2; }
+        curl -s https://s3.amazonaws.com/$s3_vitis_xsa -o $vitis_xsa || { err_msg "VITIS XSA download failed"; return 2; }
     fi
     # Check sha256
-    act_sha256=$( sha256sum $sdk_dsa | awk '{ print $1 }' )
+    act_sha256=$( sha256sum $vitis_xsa | awk '{ print $1 }' )
     if [[ $act_sha256 != $exp_sha256 ]]; then
-        err_msg "Incorrect SDK dsa checkpoint version:"
+        err_msg "Incorrect VITIS XSA version:"
         err_msg "  expected version=$exp_sha256"
         err_msg "  actual   version=$act_sha256"
-        err_msg "  There may be an issue with the uploaded checkpoint or the download failed."
+        err_msg "  There may be an issue with the uploaded XSA or the download failed."
         return 2
     fi
 }
 
-    #-------------------Dynamic 5.0 Platform----------------------
-    setup_dsa xilinx_aws-vu9p-f1-04261818_dynamic_5_0 dsa_v062918_shell_v04261818 AWS_PLATFORM_DYNAMIC_5_0
-    info_msg "AWS Platform: Dynamic 5.0 Platform is up-to-date"
-    #-------------------Dynamic 5.0 Platform----------------------
+    #-------------------201920_1 Vitis Platform----------------------
+    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_1 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_1
+    info_msg "AWS Platform: 201920_1 Vitis Platform is up-to-date"
+    #-------------------201920_1 Vitis Platform----------------------
 
 
-
-# Start of runtime xdma driver install
+# Setup XRT as we need it for building
 setup_runtime
 
-export AWS_PLATFORM=$AWS_PLATFORM_DYNAMIC_5_0
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_DYNAMIC_5_0\" "
+export AWS_PLATFORM=$AWS_PLATFORM_201920_1
+info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_1\" "
 
-info_msg "SDAccel Setup PASSED"
+info_msg "Vitis Setup PASSED"
+
+info_msg "To run a runtime example, start the MPD service by calling: \`systemctl is-active --quiet mpd || sudo systemctl start mpd\`"

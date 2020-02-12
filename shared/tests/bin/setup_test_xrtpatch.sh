@@ -108,6 +108,43 @@ elif [[ "$VIVADO_TOOL_VERSION" =~ .*2018\.3.* ]]; then
        sudo yum install -y $aws_xrt_rpm_name
        echo " XRT patch aws rpm installed successfully"
     fi
+elif [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.1.* ]]; then
+    echo "Xilinx Vivado version is 2019.1"
+
+    s3_ami_version=1.7.0
+    xrt_release_version=XRT_2019_1_0_3
+    xrt_rpm_name=xrt_201910.2.2.0_7.7.1908-xrt.rpm
+    aws_xrt_rpm_name=xrt_201910.2.2.0_7.7.1908-aws.rpm
+
+    xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$xrt_release_version/$xrt_rpm_name
+    aws_xrt_rpm_path=$s3_ami_bucket/$s3_ami_version/Patches/$xrt_release_version/$aws_xrt_rpm_name
+
+    if [ -f "/opt/xilinx/xrt/include/version.h" ]; then
+       echo "XRT installed. proceeding to check version compatibility"
+       xrt_build_ver=$(grep  'xrt_build_version_hash\[\]' /opt/xilinx/xrt/include/version.h | sed 's/";//' | sed 's/^.*"//')
+       echo "Installed XRT version hash : $xrt_build_ver"
+       if grep -Fxq "$xrt_build_ver" $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
+       then
+          echo "XRT version $xrt_build_ver is up-to-date."
+       else
+          echo "$xrt_build_ver is stale. upgrading XRT to"
+          cat $AWS_FPGA_REPO_DIR/SDAccel/sdaccel_xrt_version.txt
+          curl -s https://s3.amazonaws.com/$xrt_rpm_path  -o $xrt_rpm_name || { echo " Error: Failed to download xrt rpm from  $xrt_rpm_path"; return 2; }
+          curl -s https://s3.amazonaws.com/$aws_xrt_rpm_path -o $aws_xrt_rpm_name || { echo " Error: Failed to download aws xrt rpm from  $aws_xrt_rpm_path"; return 2; }
+          sudo yum reinstall -y $xrt_rpm_name
+          echo " XRT patch rpm installed successfully"
+          sudo yum reinstall -y $aws_xrt_rpm_name
+          echo " XRT patch aws rpm installed successfully"
+       fi
+    else
+       echo "XRT not installed. Please install XRT"
+       curl -s https://s3.amazonaws.com/$xrt_rpm_path  -o $xrt_rpm_name || { echo " Error: Failed to download xrt rpm from  $xrt_rpm_path"; return 2; }
+       curl -s https://s3.amazonaws.com/$aws_xrt_rpm_path -o $aws_xrt_rpm_name || { echo " Error: Failed to download aws xrt rpm from  $aws_xrt_rpm_path"; return 2; }
+       sudo yum reinstall -y $xrt_rpm_name
+       echo " XRT patch rpm installed successfully"
+       sudo yum install -y $aws_xrt_rpm_name
+       echo " XRT patch aws rpm installed successfully"
+    fi
 else
    echo "Xilinx Vivado version is $VIVADO_TOOL_VERSION . Proceeding with base runtime version "
 fi
