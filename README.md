@@ -91,8 +91,8 @@ You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https:/
 To setup your instance for development, checkout our [Developer Resources](./developer_resources/README.md) where we provide Step-By-Step guides to setting up a GUI Desktop or a compute cluster.
 
 Before you start your first AWS FPGA design, we recommend that you go through one of the step-by-step guides.  The guides will walk through development steps for hello world examples.  Based on the tables above, pick the development environment that best fits your needs and use the guide to get started:
-  * For fastest way to get started on FPGA accelerator development, start with the software defined development environment.  The guide starts with the [SW Hello World example](SDAccel/README.md).
-    * Next use the same guide to develop using the C/C++/openCL/RTL based [80+ examples on github](./SDAccel/examples/xilinx_2017.4).
+  * For fastest way to get started on FPGA accelerator development, start with the software-defined development environment. The guide starts with the [Hello World example](Vitis/README.md).
+    * Next use the same guide to develop using the C/C++/openCL/RTL based [60+ examples on github](./Vitis/examples/xilinx_2019.2).
   * For custom hardware development (HDK) environment, start with the [HDK Hello World example](hdk/README.md).
     * Next use the same guide to develop using the [cl\_dram\_dma](hdk/cl/examples/cl_dram_dma).
 
@@ -124,9 +124,11 @@ Currently, AWS marketplace includes multiple versions of the FPGA Developer AMI,
 | 1.4.8+ | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
 | 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
 | 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
-Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life.  See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 
-If developing using SDAccel environment please refer to this [Runtime Compatibility Table](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
+Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life. See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
+
+For software-defined development please look at the runtime compatibility table based on the Xilinx toolset in use:
+[SDAccel](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table) or [Vitis](Vitis/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
 
 <a name="fpgahdk"></a>
 # Hardware Development Kit (HDK)
