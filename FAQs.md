@@ -502,6 +502,6 @@ You would need a valid [on premise license](./hdk/docs/on_premise_licensing_help
 We have seen this issue when running RDP in 32 bit color mode where Vivado shows up as a blank window.
 Please modify RDP options to choose any color depth less than 32 bit and try re-connecting.
 
-**Q: Why did my AFI creation fail with `***ERROR***: DCP has DNA_PORT instantiation, ingestion failed, exiting`?
+**Q: Why did my AFI creation fail with `***ERROR***: DCP has DNA_PORT instantiation, ingestion failed, exiting`?**
 
 AWS does not support creating AFI's with the Device DNA instantiated within your design. Please create your design without instantiating the DNA_PORT primitive to be able to create your AFI.

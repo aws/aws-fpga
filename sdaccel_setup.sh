@@ -158,10 +158,18 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
     esac
 done
 
+
+if [[ ! -z "$XILINX_VITIS" ]]; then
+    debug_msg "XILINX_VITIS is set"
+    err_msg "XILINX_VITIS variable is set, but you are calling sdaccel_setup.sh. This likely means that you are calling source sdaccel_setup.sh with Xilinx Vitis installed. Xilinx has replaced SDAccel with Vitis from 2019.2 release onwards. Please checkout the Vitis README and flow instead."
+    return 1
+fi
+
 # Check XILINX_SDX is set
 if ! check_set_xilinx_sdx; then
     return 1
 fi
+
 
 info_msg " XILINX_SDX is set to $XILINX_SDX"
 # Install patches as required.

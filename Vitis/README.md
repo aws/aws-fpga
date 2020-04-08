@@ -38,7 +38,7 @@ The F1 HW Target compile time is ~50 minutes, therefore, software and hardware e
 <a name="iss"></a>
 ## AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
-* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses.
+* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vitis and required licenses.
   * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it is more cost efficient to either: 
      * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a compute EC2 instance, with a minimum of 30GiB RAM), **OR** 
      * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
@@ -175,7 +175,7 @@ When AFI creation completes successfully, the output should contain:
     ...
 ```
 
-If the “State” code indicates the AFI generation has "failed", the AFI creation logs can be found in the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided to create_sdaccel_afi.sh above. These will detail the errors encountered during the AFI creation process.
+If the “State” code indicates the AFI generation has "failed", the AFI creation logs can be found in the bucket location (```s3://<bucket-name>/<logs-folder-name>```) provided to create_vitis_afi.sh above. These will detail the errors encountered during the AFI creation process.
 
 For help with AFI creation issues, see [create-fpga-image error codes](../hdk/docs/create_fpga_image_error_codes.md)
 
@@ -183,11 +183,10 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 <a name="runonf1"></a>
 # 3. Run the FPGA accelerated application on Amazon FPGA instances
 
-* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](./docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
-   * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
-     * Copy the compiled host executable (exe) to the new instance
+* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](./docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your Vitis applications on Amazon FPGA instances.
+   * *Assuming the developer flow (compilation) was done on a separate build instance you will need to:*
+     * Copy the compiled host executable (exe) to the new F1 instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance
-     * Depending on the host code, the \*.awsxclbin may need to named \<hostcodename>.hw.\<platformname>.awsxclbin .For Example:  ```vector_addition.hw.xilinx_aws-vu9p-f1_shell-v04261818_201920_1.awsxclbin```
      * Copy any data files required for execution to the new instance
      * [Clone the github repository to the new F1 instance and install runtime drivers](#gitsetenv)
 
@@ -196,7 +195,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR 
     $ source vitis_setup.sh
-    $ ./helloworld ./vector_addition.awsxclbin
+    $ ./host ./vadd.awsxclbin
     ```
 
 * Alternatively, to only setup the runtime environment & execute your host application: 
@@ -204,7 +203,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
     $ cd $AWS_FPGA_REPO_DIR
     $ source vitis_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step
     # Wait till the MPD service has initialized. Check systemctl status mpd
-    $ ./helloworld ./vector_addition.awsxclbin 
+    $ ./host ./vadd.awsxclbin 
     ```
 * The runtime setup script also starts the Xilinx XRT Message Proxy Daemon(MPD) service. To learn more about the XRT implementation, check the [XRT Instructions](./docs/XRT_installation_instructions.md#mpd)
 
