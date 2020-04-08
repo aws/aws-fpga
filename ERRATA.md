@@ -8,7 +8,7 @@
 * Multiple SDE instances per CL is not supported in this release. Support is planned for a future release.
 * DRAM Data retention is not supported for CL designs with less than 4 DDRs enabled
 * Combinatorial loops in CL designs are not supported.  
-* Connecting one of the clocks provided from the shell (clk_main_a0, clk_extra_a1, etc...) directly to a BUFG in the CL is not supported by the Xilinx tools and may result in a non-functional clock. To workaround this limitation, it is recommended to use an MMCM to feed the BUFG (clk_from_shell -> MMCM -> BUFG).
+* Connecting one of the clocks provided from the shell (clk_main_a0, clk_extra_a1, etc...) directly to a BUFG in the CL is not supported by the Xilinx tools and may result in a non-functional clock. To workaround this limitation, it is recommended to use an MMCM to feed the BUFG (clk_from_shell -> MMCM -> BUFG). Please refer to [Xilinx AR# 73360](https://www.xilinx.com/support/answers/73360.html) for further details.
 
 ### 2019.1 
 * Vivado `compile_simlib` command fails to generate the following verilog IP libraries for the following simulators.
