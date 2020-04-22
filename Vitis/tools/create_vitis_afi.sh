@@ -23,6 +23,8 @@ script_name=$(basename $full_script)
 
 source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
 source $AWS_FPGA_REPO_DIR/shared/bin/set_common_env_vars.sh
+script_dir=$(dirname $full_script)
+
 
 debug=0
 
@@ -91,12 +93,6 @@ while [ "$1" != "" ]; do
     shift                                         
 done                                              
 
-if [ "$HDK_DIR" == "" ]
-then
-    err_msg "Env HDK_DIR not set"
-    exit 1
-fi
-echo $HDK_DIR
 if [ "$RELEASE_VER" == "" ]
 then
     err_msg "Env variable RELEASE_VER not set, did you source sdaccel_setup.sh?"
@@ -199,7 +195,7 @@ cp ${timestamp}_SH_CL_routed.dcp ./to_aws/
 #STEP 2
 #Create Manifest file
 strategy=DEFAULT     
-hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
+hdk_version=$(grep 'HDK_VERSION' $script_dir/../../hdk/hdk_version.txt | sed 's/=/ /g' | awk '{print $2}')
 shell_version=0x04261818
 tool_version=v$RELEASE_VER
 device_id=0xF010
