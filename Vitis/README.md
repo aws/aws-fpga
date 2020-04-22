@@ -193,13 +193,6 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 * To setup tools, runtime environment & execute your Host Application: 
     ```
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
-    $ cd $AWS_FPGA_REPO_DIR 
-    $ source vitis_setup.sh
-    $ ./host ./vadd.awsxclbin
-    ```
-
-* Alternatively, to only setup the runtime environment & execute your host application: 
-    ```
     $ cd $AWS_FPGA_REPO_DIR
     $ source vitis_runtime_setup.sh   # Other runtime env settings needed by the host app should be setup after this step
     # Wait till the MPD service has initialized. Check systemctl status mpd
