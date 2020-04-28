@@ -35,7 +35,7 @@ See [SDE HW Guide](../../../../sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) fo
 <a name="Interfaces"></a>
 ## Interfaces and Address Range
 ### Interfaces
-CL_SDE uses two interfaces from the Shell. 
+CL_SDE uses three interfaces from the Shell. 
 The PCIS interface is used to provide connectivity between the [Virtual Ethernet Application](../../../../sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.md) and the SDE.
 The OCL interface is used to provide connectivity between the host and all the test/control/utility blocks (except the SDE). 
 The PCIM interfaces is used by the SDE to read and write to host memory. 
