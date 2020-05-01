@@ -59,7 +59,7 @@ The boto3 package is the AWS Python API.
 It can be used to start and terminate instances and any other API operation that you have
 permissions for.
 
-Configuration of account credentials is explained in the [Quickstart](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration).
+Configuration of account credentials is explained in the [Quickstart](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration).
 
 The following command will install the latest release.
 
