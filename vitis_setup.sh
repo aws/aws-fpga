@@ -275,17 +275,17 @@ function setup_xsa {
     fi
 }
 
-    #-------------------201920_1 Vitis Platform----------------------
-    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_1 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_1
-    info_msg "AWS Platform: 201920_1 Vitis Platform is up-to-date"
-    #-------------------201920_1 Vitis Platform----------------------
+    #-------------------201920_2 Vitis Platform----------------------
+    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_2 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_2
+    info_msg "AWS Platform: 201920_2 Vitis Platform is up-to-date"
+    #-------------------201920_2 Vitis Platform----------------------
 
 
 # Setup XRT as we need it for building
 setup_runtime
 
-export AWS_PLATFORM=$AWS_PLATFORM_201920_1
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_1\" "
+export AWS_PLATFORM=$AWS_PLATFORM_201920_2
+info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_2\" "
 
 info_msg "Vitis Setup PASSED"
 

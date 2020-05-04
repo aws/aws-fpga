@@ -145,6 +145,7 @@ To be notified via e-mail when the build completes:
 1. Set up notification via SNS:
 
 ```
+    $ pip install --user --upgrade boto3 # boto3 package is required by the notify_via_sns script
     $ export EMAIL=your.email@example.com
     $ $AWS_FPGA_REPO_DIR/shared/bin/scripts/notify_via_sns.py
 

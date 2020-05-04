@@ -51,7 +51,7 @@ The F1 HW Target compile time is ~50 minutes, therefore, software and hardware e
 ## Github and Environment Setup 
 * Clone this github repository and source the *vitis_setup.sh* script. This will take care of: 
   * Downloading the required files:
-    * [AWS Platform](./aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_1) that allows Xilinx FPGA Binary files to target AWS F1 instances 
+    * [AWS Platform](./aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2) that allows Xilinx FPGA Binary files to target AWS F1 instances 
     * [AFI Creation script](./tools/create_vitis_afi.sh) that generates an AFI and AWS FPGA Binary from a Xilinx FPGA Binary
     * Installing the required XRT, libraries and drivers
 
@@ -60,7 +60,7 @@ The F1 HW Target compile time is ~50 minutes, therefore, software and hardware e
        $ cd $AWS_FPGA_REPO_DIR                                         
        $ source vitis_setup.sh
    ```
-    * Valid platforms for shell_v04261818: `AWS_PLATFORM_201920_1` (Default) AWS F1 Vitis platform.
+    * Valid platforms for shell_v04261818: `AWS_PLATFORM_201920_2` (Default) AWS F1 Vitis platform.
 
 <a name="createapp"></a>
 # 1. Build the host application, Xilinx FPGA binary and verify you are ready for FPGA acceleration
