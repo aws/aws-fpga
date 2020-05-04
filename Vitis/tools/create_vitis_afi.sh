@@ -213,9 +213,9 @@ clock_main_a0=$(echo `grep -B 1 SYSTEM ${timestamp}_clocks.json | grep -o -e '[0
 clock_extra_b0=$(echo `grep -B 2 DATA_CLK ${timestamp}_clocks.json | grep freq | grep -o -e '[0-9]*'`)
 clock_extra_c0=$(echo `grep -B 2 KERNEL_CLK ${timestamp}_clocks.json | grep -o -e '[0-9]*'`)
 
-if [[ "$vendor" != "xilinx" && "$board_id" != "aws-vu9p-f1" && "$plat_name" != "shell-v04261818" && "$major" != "201920" && "$minor" != "1" ]]
+if [[ "$vendor" != "xilinx" && "$board_id" != "aws-vu9p-f1" && "$plat_name" != "shell-v04261818" && "$major" != "201920" && "$minor" != "2" ]]
 then                                 
-    err_msg "Platform ${vendor}_${board_id}_${plat_name}_${major}_${minor} used to create xclbin is not correct, you should be using xilinx_aws-vu9p-f1_shell-v04261818_201920_1"
+    err_msg "Platform ${vendor}_${board_id}_${plat_name}_${major}_${minor} used to create xclbin is not correct, you should be using xilinx_aws-vu9p-f1_shell-v04261818_201920_2"
     exit                                                                                              
 fi                                                                                                    
 
