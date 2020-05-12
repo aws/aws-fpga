@@ -165,8 +165,8 @@ fi
 
 info_msg " XILINX_VITIS is set to $XILINX_VITIS"
 # Install patches as required.
-info_msg " Checking & installing required patches"
-setup_patches
+#info_msg " Checking & installing required patches"
+#setup_patches
 
 
 # Update Xilinx Vitis Examples from GitHub

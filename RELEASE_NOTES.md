@@ -24,6 +24,12 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.15 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Added Xilinx AR#73068 patching
+* Added DMA range error to the interrupt status register metrics
+* Enhanced DDR model rebuild qualifiers in hdk_setup.sh 
+* Updated Virtual JTAG Documentation
+
 ## Release 1.4.14 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Updated Vitis Platform file to fix a DDR bandwidth issue
 * Added Vitis Debug Documentation

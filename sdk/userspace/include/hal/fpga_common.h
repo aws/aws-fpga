@@ -331,10 +331,12 @@ struct fpga_metrics_common {
 
 /** Common int_status */
 enum {
-    /** SDACL slave timeout (CL did not respond to cycle from host) */
+	/** SDACL slave timeout (CL did not respond to cycle from host) */
 	FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT = 1 << 0,
 	/** Virtual JTAG timeout */
-    FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT = 1 << 1,
+	FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT = 1 << 1,
+	/** A DMA engine made an out of range access */
+	FPGA_INT_STATUS_DMA_RANGE_ERROR = 1 << 7,
 	/** CL did not respond to DMA cycle from host */
 	FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT = 1 << 17,
 	/** PCIe master cycle from CL out of range */
@@ -349,6 +351,7 @@ enum {
 	FPGA_INT_STATUS_ALL =
 		FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_DMA_RANGE_ERROR |
 		FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT |
 		FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR |
 		FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR |
