@@ -24,6 +24,10 @@
          *    1 DDR controller implemented in the SH (always available)
          *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
 
+## Release 1.4.14 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Updated Vitis Platform file to fix a DDR bandwidth issue
+* Added Vitis Debug Documentation
+
 ## Release 1.4.13 (See [ERRATA](./ERRATA.md) for unsupported features)
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2019.2
 * To upgrade, use [Developer AMI v1.8.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace.
