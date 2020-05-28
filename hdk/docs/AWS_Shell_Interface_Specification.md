@@ -222,9 +222,10 @@ These parameters are used to control which DDR controllers are impemented in the
               ...
  ```   
 
-### DRAM Content Preservation between AFI Loads (Future)
+### DRAM Content Preservation between AFI Loads
 
-In future Shell versions a DRAM content preservation feature will be implemented. This feature allows the DDR state to be preserved when dynamically changing CL logic. The current Shell version will not guarantee preservation of DRAM contents if the CL logic is re-loaded.
+Shell version 1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a v1.4 shell will enable DRAM content preservation by default.
+Please refer to the [guide on how to use the DRAM data retention mode to preserve the content of DRAM across AFI loads](./data_retention.md) for more details on utilizing this feature.
 
 <a name="dma"></a>
 ## DMA
@@ -701,4 +702,3 @@ Vivado has some nice analysis capabilities:
 * linked timing/schematic/physical views 
 
 <https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug906-vivado-design-analysis.pdf>
-
