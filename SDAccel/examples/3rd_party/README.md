@@ -81,7 +81,6 @@ make TARGETS=hw DEVICES=$AWS_PLATFORM all
 
 * For more information on running this example on an F1 instance, see [this](../../README.md#runonf1).
 
-
 ## Xilinx and third party Implementation Differences
 #### Host Code
 | third party FPGA     | Xilinx     |
@@ -104,18 +103,12 @@ make TARGETS=hw DEVICES=$AWS_PLATFORM all
 | declares and initializes an struct object together | declare an struct object and then initialize it separately |
 
 ## SUPPORT
-For more information check here:
-[SDAccel User Guides][]
+For more information check the [SDAccel User Guides](http://www.xilinx.com/support/documentation-navigation/development-tools/software-development/sdaccel.html?resultsTablePreSelect=documenttype:SeeAll#documentation)
 
-For questions and to get help on this project or your own projects, visit the [SDAccel Forums][].
+For questions and to get help on this project or your own projects, visit the [SDAccel Forums](https://forums.xilinx.com/t5/SDAccel/bd-p/SDx)
 
 ## REVISION HISTORY
 
 Date    | Readme Version | Revision Description
 --------|----------------|-------------------------
 SEP2017 | 1.0            | Initial release
-
-
-
-[SDAccel Forums]: https://forums.xilinx.com/t5/SDAccel/bd-p/SDx
-[SDAccel User Guides]: http://www.xilinx.com/support/documentation-navigation/development-tools/software-development/sdaccel.html?resultsTablePreSelect=documenttype:SeeAll#documentation
