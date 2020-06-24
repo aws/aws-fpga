@@ -46,7 +46,7 @@ function help {
   info_msg "  (4) Calls aws ec2 create-fpga-image"                                                             
   info_msg "  (5) Creates new XCLBIN (called AWSXCLBIN) that is composed of: Metadata and AGFI-ID"             
   echo " "                                                                                                     
-  usage                                                                                                        
+  usage                                                                                                                          
 }                                                                                                              
 
 if [ "$1" == "" ]
@@ -238,11 +238,11 @@ echo "pci_vendor_id=$vendor_id" >&3
 echo "pci_device_id=$device_id" >&3                                           
 echo "pci_subsystem_id=$subsystem_id" >&3                                     
 echo "pci_subsystem_vendor_id=$subsystem_vendor_id" >&3                       
-echo "dcp_hash=$hash" >&3                                                     
+echo "dcp_hash=$hash" >&3                                                                    
 echo "shell_version=$shell_version" >&3                                       
 echo "dcp_file_name=${timestamp}_SH_CL_routed.dcp" >&3                        
 echo "hdk_version=$hdk_version" >&3                                           
-echo "tool_version=$tool_version" >&3                                               
+echo "tool_version=$tool_version" >&3                                                                 
 echo "date=$timestamp" >&3                                                    
 echo "clock_main_a0=$clock_main_a0" >&3                                       
 echo "clock_extra_b0=$clock_extra_b0" >&3                                     
@@ -276,13 +276,13 @@ fi
 log_storage_text=""
 if [ "${s3_logs}" != "" ]
 then
-    log_storage_text="--logs-storage-location Bucket=${s3_bucket},Key=${s3_logs}"
+    log_storage_text="--logs-storage-location Bucket=${s3_bucket},Key=${s3_logs}"       
 fi
-
+                        
 aws s3 ${profile_text} cp ${timestamp}_Developer_SDAccel_Kernel.tar s3://${s3_bucket}/${s3_dcps}/
 aws ec2 ${profile_text} create-fpga-image --name ${stripped_xclbin} --description ${stripped_xclbin} --input-storage-location Bucket=${s3_bucket},Key=${s3_dcps}/${timestamp}_Developer_SDAccel_Kernel.tar ${log_storage_text} > ${timestamp}_afi_id.txt
 
-
+                   
 #STEP 5
 #Manipulate the AFI ID
 test=`grep agfi ${timestamp}_afi_id.txt | awk -F: '{print $2}' | sed 's/ \"//g' | sed 's/\".*//g' | sed ':a;N;$!ba;s/\n/ /g'`
