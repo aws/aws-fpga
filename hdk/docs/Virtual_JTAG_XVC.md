@@ -142,6 +142,7 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 `> connect_hw_server -url <hostname or IP address>:3121`
 
+If the above command fails, it is most likely because hw_server is not running on target F1 instance. Please follow see this [FAQ](#hw_serverRunOnF1Instance) on how to start hw_server
 
 <img src="./images/connect_hw_server.jpg" width="600">  
 
@@ -153,7 +154,7 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 **NOTES:**
 
--  If the above command fails, its most likely that either the virtual jtag server is not running, the IP/Port are wrong, or a firewall/security-group rule is blocking the connection. See the [FAQ](#faq) section in the end of this document.
+-  If the above command fails, its most likely that either the virtual jtag server or hw_server is not running, the IP/Port are wrong, or a firewall/security-group rule is blocking the connection. See the [FAQ](#faq) section in the end of this document.
 
 
 Upon successful connection, Vivado's Hardware panel will be populated with a debug bridge instance. 
@@ -258,11 +259,27 @@ No, you need the Vivado Lab Edition which does not require a license.
 
 Yes, you must start the the  `$ fpga-start-virtual-jtag` with a different Slot/Port for each FPGA.  You can launch multiple Vivado sessions, and have each session connect to the corresponding TCP port associated with the FPGA.
 
-
+<a name="hw_serverRunOnF1Instance"></a>
 **Q: What are some of the best practices I should be aware when working with Virtual JTAG?**
 
 If you are running Vivado on a remote machine trying to connect to Virtual JTAG - we recommend running the hw_server on the F1 instance - to ensure optimal performance between Vivado and the Virtual JTAG server.
-
+On your target F1 Instance:
+```
+[$] sudo su 
+[$]# hw_server &
+****** Xilinx hw_server v2019.2
+  **** Build date : Oct 24 2019 at 19:23:45
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+ 
+INFO: hw_server application started
+INFO: Use Ctrl-C to exit hw_server application
+ 
+INFO: To connect to this hw_server instance use url: TCP:ip-xxx-xx-xx-xxx.ec2.internal:3121
+ 
+[$]# fpga-start-virtual-jtag -P 10201 -S 0
+Starting Virtual JTAG XVC Server for FPGA slot id 0, listening to TCP port 10201.
+Press CTRL-C to stop the service.
+```
 
 **Q: Can other instances running on the same F1 server access the Virtual JTAG of my instance?**
 
