@@ -42,7 +42,7 @@ sudo yum reinstall xrt_*.rpm -y
 
 ```bash
 curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-xrt.rpm -o xrt.rpm
-curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-aws.rpm-o xrt-aws.rpm
+curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/XRT_2019_1_RC2/xrt_201910.2.2.0_7.6.1810-aws.rpm -o xrt-aws.rpm
 sudo yum reinstall xrt*.rpm -y
 ```
 ### 2018.3
