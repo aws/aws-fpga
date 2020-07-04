@@ -92,7 +92,7 @@ To setup your instance for development, checkout our [Developer Resources](./dev
 
 Before you start your first AWS FPGA design, we recommend that you go through one of the step-by-step guides.  The guides will walk through development steps for hello world examples.  Based on the tables above, pick the development environment that best fits your needs and use the guide to get started:
   * For fastest way to get started on FPGA accelerator development, start with the software-defined development environment. The guide starts with the [Hello World example](Vitis/README.md).
-    * Next use the same guide to develop using the C/C++/openCL/RTL based [60+ examples on github](./Vitis/examples/xilinx_2019.2).
+    * Next use the same guide to develop using the C/C++/openCL/RTL based [60+ examples on github](https://github.com/Xilinx/Vitis_Accel_Examples/tree/bb80c8ec699c3131e8874735bd99475ac6fe2ec7).
   * For custom hardware development (HDK) environment, start with the [HDK Hello World example](hdk/README.md).
     * Next use the same guide to develop using the [cl\_dram\_dma](hdk/cl/examples/cl_dram_dma).
 
