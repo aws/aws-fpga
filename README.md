@@ -44,7 +44,7 @@ The AWS EC2 FPGA Development Kit is provided by AWS to support development and r
 
 | Tool     | Development/Runtime | Tool location | Description |
 | --------|---------|---------|---------|
-| Vitis 2019.2 Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development using the new Vitis toolset](Vitis/README.md) |
+| Vitis 2019.2 | Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development using the new Vitis toolset](Vitis/README.md) |
 | Vivado 2017.4, 2018.2, 2018.3, 2019.1 & 2019.2 | Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Hardware Accelerator Development](hdk/README.md) |
 | SDx 2017.4, 2018.2, 2018.3  & 2019.1| Development | [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) | Used for [Software Defined Accelerator Development](SDAccel/README.md) |
 | FPGA AFI Management Tools | Runtime | [SDK - fpga\_mgmt\_tools](sdk/userspace/fpga_mgmt_tools) | Command-line tools used for FPGA management while running on the F1 instance |
