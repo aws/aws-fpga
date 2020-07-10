@@ -42,9 +42,9 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestFpgaTools(BaseSdkTools):
     '''
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
-    
+
     Test FPGA AFI Management tools described in ../userspace/fpga_mgmt_tools/README.md
     '''
 
@@ -115,8 +115,8 @@ class TestFpgaTools(BaseSdkTools):
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
             assert stdout[2] == 'sdacl-slave-timeout=0'
-            assert stdout[50] == 'Clock Group C Frequency (Mhz)'
-            assert stdout[51] == '0  0  '
+            assert stdout[51] == 'Clock Group C Frequency (Mhz)'
+            assert stdout[52] == '0  0  '
             assert stdout[-2].startswith('Cached agfis:')
 
             # Test -C (Return FPGA image hardware metrics (clear on read).)
@@ -126,8 +126,8 @@ class TestFpgaTools(BaseSdkTools):
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
             assert stdout[2] == 'sdacl-slave-timeout=0'
-            assert stdout[50] == 'Clock Group C Frequency (Mhz)'
-            assert stdout[51] == '0  0  '
+            assert stdout[51] == 'Clock Group C Frequency (Mhz)'
+            assert stdout[52] == '0  0  '
 
     @pytest.mark.flaky(reruns=2, reruns_delay=5)
     def test_load_local_image(self):
