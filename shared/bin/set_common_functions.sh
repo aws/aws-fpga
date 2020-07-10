@@ -41,6 +41,15 @@ function is_myvivado_set {
     fi
 }
 
+function is_xilinx_path_set {
+    if env | grep -q ^XILINX_PATH
+    then
+        true
+    else
+        false
+    fi
+}
+
 # Function to check whether a command exists.
 exists() {
     if command -v $1 >/dev/null 2>&1
@@ -60,10 +69,16 @@ function get_base_vivado_version {
         local MYVIVADO_ENV_VAR_BACKUP=$MYVIVADO
 
         unset MYVIVADO
-        local __vivado_version=$(get_vivado_version)
+        local __vivado_version=$(get_vivado_v
+        ersion)
         export MYVIVADO=$MYVIVADO_ENV_VAR_BACKUP
+    elif is_xilinx_path_set
+    then
+        local XILINX_PATH_ENV_VAR_BACKUP=$XILINX_PATH
+        unset XILINX_PATH
+        local __vivado_version=$(get_vivado_version)
+        export XILINX_PATH=$XILINX_PATH_ENV_VAR_BACKUP
     else
-
         local __vivado_version=$(get_vivado_version)
     fi
 
@@ -102,6 +117,18 @@ function get_vivado_version {
 
 function setup_patches {
     patch_AR71715
+    patch_AR73068
+}
+
+function is_patch_applied {
+    local patch_name="$1"
+    local long_vivado_version=$(get_vivado_version)
+
+    if [[ "$long_vivado_version" =~ .*"$patch_name".* ]]; then
+      true
+    else
+      false
+    fi
 }
 
 function patch_AR71715 {
@@ -118,7 +145,7 @@ function patch_AR71715 {
 
     local base_vivado_version=$(get_base_vivado_version)
     is_patch_valid=false
-    info_msg "Base vivado version is $base_vivado_version ; Checking if patch AR71715 needs to be installed"
+    info_msg "Base vivado version is $base_vivado_version. Checking if patch AR71715 needs to be installed"
     for vivado_version in "${valid_vivado_versions[@]}"
     do
         if [ ":$vivado_version" == ":$base_vivado_version" ]; then
@@ -151,6 +178,101 @@ function patch_AR71715 {
     fi
 }
 
+function install_patch {
+    local patch_name="$1"
+    local patch_bucket="$2"
+    local patch_object="$3"
+    local patch_dir_name="${patch_object%.*}"
+
+    if is_patch_applied $patch_name
+    then
+        info_msg "$patch_name is already applied. Skipping."
+    else
+        info_msg "Applying $patch_name"
+        info_msg "in bucket $patch_bucket"
+        info_msg "object $patch_object"
+
+        # Checking if the patches directory exists and making it if it doesn't
+        [ -d $script_dir/patches ] || mkdir -p $script_dir/patches
+
+        info_msg "Downloading the $patch_name from $patch_bucket/$patch_object."
+        debug_msg "curl -s $patch_bucket/$patch_object -o $script_dir/patches/$patch_object"
+
+        curl -s $patch_bucket/$patch_object -o $script_dir/patches/$patch_object || { err_msg "Failed to download Patch $object from $patch_bucket/$patch_object"; return 2; }
+
+        info_msg "Extracting the $patch_name to $script_dir/patches/$patch_dir_name."
+
+        unzip -q -o $script_dir/patches/$patch_object -d $script_dir/patches/$patch_dir_name  || { err_msg "Failed to extract $script_dir/patches/$patch_object to $script_dir/patches/$patch_dir_name"; return 2; }
+
+        # XILINX_PATH should not have AR73068 at this point.
+        info_msg "Appending XILINX_PATH with $script_dir/patches/$patch_dir_name/vivado"
+
+        export XILINX_PATH=$XILINX_PATH:$script_dir/patches/$patch_dir_name/vivado
+    fi
+}
+
+function patch_AR73068_2019_2 {
+    info_msg "Patching Vivado 2019.2 with Xilinx Patch AR73068"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/AR73068"
+    local patch_object="AR73068_Vivado_2019_2_preliminary_rev1.zip"
+
+    install_patch "AR73068" "$patch_bucket" "$patch_object"
+}
+
+function patch_AR73068_2019_1 {
+    info_msg "Patching Vivado 2019.1 with Xilinx Patch AR73068"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.7.0/Patches/AR73068"
+    local patch_object="AR73068_Vivado_2019_1_preliminary_rev1.zip"
+
+    install_patch "AR73068" "$patch_bucket" "$patch_object"
+}
+
+function patch_AR73068_2018_3 {
+    info_msg "Patching Vivado 2018.3 with Xilinx Patch AR73068"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.6.0/Patches/AR73068"
+    local patch_object="AR73068_Vivado_2018_3_preliminary_rev1.zip"
+
+    install_patch "AR73068" "$patch_bucket" "$patch_object"
+}
+
+function patch_AR73068_2018_2 {
+    info_msg "Patching Vivado 2018.2 with Xilinx Patch AR73068"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.5.0/Patches/AR73068"
+    local patch_object="AR73068_Vivado_2018_2_preliminary_rev1.zip"
+
+    install_patch "AR73068" "$patch_bucket" "$patch_object"
+}
+
+function patch_AR73068_2017_4 {
+    info_msg "Patching Vivado 2017.4 with Xilinx Patch AR73068"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.4.0/Patches/AR73068"
+    local patch_object="AR73068_Vivado_2017_4_preliminary_rev2.zip"
+
+    install_patch "AR73068" "$patch_bucket" "$patch_object"
+}
+
+function patch_AR73068 {
+    local base_vivado_version=$(get_base_vivado_version)
+
+    if [[ "${base_vivado_version}" =~ "Vivado v2019.2" ]]; then
+      patch_AR73068_2019_2
+    elif [[ "${base_vivado_version}" =~ "Vivado v2019.1" ]]; then
+      patch_AR73068_2019_1
+    elif [[ "${base_vivado_version}" =~ "Vivado v2018.3" ]]; then
+      patch_AR73068_2018_3
+    elif [[ "${base_vivado_version}" =~ "Vivado v2018.2" ]]; then
+      patch_AR73068_2018_2
+    elif [[ "${base_vivado_version}" =~ "Vivado v2017.4" ]]; then
+      patch_AR73068_2017_4
+    else
+      warn_msg "Unknown Vivado version: ${base_vivado_version}. Not applying Xilinx Patch AR73068"
+    fi
+}
 
 function allow_non_root {
        [ ! -z ${AWS_FPGA_ALLOW_NON_ROOT} ]

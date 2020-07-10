@@ -139,6 +139,7 @@ do
       mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
   fi
   # Use curl instead of AWS CLI so that credentials aren't required.
+  debug_msg "curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"
   curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }
   if grep -q '<?xml version' $hdk_file.sha256; then
     err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256"
