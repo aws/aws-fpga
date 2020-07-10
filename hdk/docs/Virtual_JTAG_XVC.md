@@ -229,7 +229,6 @@ The following list describes the steps to successfully setup debug in a CL:
 
 
 # Frequently Asked Questions 
-
   
 
 **Q: Do I need to run Vivado or Hardware Manager on the target EC2 instance to debug?**  
@@ -239,6 +238,11 @@ No, you may run Vivado on a "remote" host as long as your instance/VPC has the r
 
 **Q: How do I configure Linux firewalls and EC2 network security groups to enable remote debug?**
 
+If your OS has the `firewalld` service running, you can disable it for the time being for setting up remote debug by calling: 
+```sudo systemctl stop firewalld```
+
+You will also have to allow incoming and outgoing traffic to TCP ports 3121 and 10201. 
+To open up incoming and outgoing traffic on those ports for your instance, please refer to the [EC2 Security Group documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html#sg-rules-other-instances)
 
 **Q: Can I have a secure connection (i.e. SSL/TLS) to the target FPGA-enable EC2 Instance running Virtual JTAG service?**
 
@@ -250,10 +254,9 @@ You may use the ssh "port forwarding" option (-L) to forward connections from th
 No, you need the Vivado Lab Edition which does not require a license.
 
   
-
 **Q: How do I stop the Virtual JTAG service on the target instance?**
 
-  
+After starting the Virtual JTAG service, you can stop it by calling `Ctrl + C` from your keyboard.  
 
 **Q: Can I debug multiple FPGAs on same target EC2 instance concurrently?**
 
