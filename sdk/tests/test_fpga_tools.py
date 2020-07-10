@@ -110,7 +110,7 @@ class TestFpgaTools(BaseSdkTools):
 
             # Test -M (Return FPGA image hardware metrics.)
             (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -M -S {}".format(slot), echo=True)
-            assert len(stdout) == 58
+            assert len(stdout) == 59
             assert len(stderr) == 1
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
@@ -121,7 +121,7 @@ class TestFpgaTools(BaseSdkTools):
 
             # Test -C (Return FPGA image hardware metrics (clear on read).)
             (rc, stdout, stderr) = self.run_cmd("sudo fpga-describe-local-image -C -M -S {}".format(slot), echo=True)
-            assert len(stdout) == 58
+            assert len(stdout) == 59
             assert len(stderr) == 1
             assert stdout[0] == 'AFI          {}       none                    cleared           1        ok               0       {}'.format(slot, self.shell_version)
             assert stdout[1] == 'AFIDEVICE    {}       0x1d0f      0x1042      {}'.format(slot, self.slot2device[slot])
