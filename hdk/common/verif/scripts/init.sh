@@ -16,12 +16,12 @@
 # limitations under the License.
 
 if [[ ":$HDK_COMMON_DIR" == ":" ]]; then
-  echo "error: HDK_COMMON_DIR not set. Source hdk_setup.sh first."
+  echo "ERROR: HDK_COMMON_DIR not set. Source hdk_setup.sh first."
   exit 2
 fi
 
 if [[ ":$VIVADO_VER" == ":" ]]; then
-  echo "error: VIVADO_VER not set. Source hdk_setup.sh first."
+  echo "ERROR: VIVADO_VER not set. Source hdk_setup.sh first."
   exit 2
 fi
 
@@ -39,12 +39,12 @@ lockfile_filename=$models_dir/build.lock
 # Prevent multiple users from building in the same directory.
 # Set the number of retries to 0 so that we will just fail
 # and let the other process complete the build.
-if [ -e /bin/lockfile ]; then
-  if ! lockfile -r 0 $lockfile_filename; then
-    echo "error: $lockfile_filename exists"
-    echo "error: Another process is already building the models."
-    exit 2
-  fi
+if [ -e $lockfile_filename ]; then
+  echo "ERROR: $lockfile_filename exists"
+  echo "ERROR: Another process is already building the models."
+  exit 2
+else
+  touch $lockfile_filename
 fi
 
 echo "$VIVADO_VER" > $models_dir/.vivado_version

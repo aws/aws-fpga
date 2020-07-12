@@ -142,6 +142,7 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 `> connect_hw_server -url <hostname or IP address>:3121`
 
+If the above command fails, it is most likely because hw_server is not running on target F1 instance. Please follow see this [FAQ](#hw_serverRunOnF1Instance) on how to start hw_server
 
 <img src="./images/connect_hw_server.jpg" width="600">  
 
@@ -153,7 +154,7 @@ To connect the debug Xilinx Hardware Manager to Virtual JTAG XVC server on the t
 
 **NOTES:**
 
--  If the above command fails, its most likely that either the virtual jtag server is not running, the IP/Port are wrong, or a firewall/security-group rule is blocking the connection. See the [FAQ](#faq) section in the end of this document.
+-  If the above command fails, its most likely that either the virtual jtag server or hw_server is not running, the IP/Port are wrong, or a firewall/security-group rule is blocking the connection. See the [FAQ](#faq) section in the end of this document.
 
 
 Upon successful connection, Vivado's Hardware panel will be populated with a debug bridge instance. 
@@ -228,7 +229,6 @@ The following list describes the steps to successfully setup debug in a CL:
 
 
 # Frequently Asked Questions 
-
   
 
 **Q: Do I need to run Vivado or Hardware Manager on the target EC2 instance to debug?**  
@@ -238,6 +238,11 @@ No, you may run Vivado on a "remote" host as long as your instance/VPC has the r
 
 **Q: How do I configure Linux firewalls and EC2 network security groups to enable remote debug?**
 
+If your OS has the `firewalld` service running, you can disable it for the time being for setting up remote debug by calling: 
+```sudo systemctl stop firewalld```
+
+You will also have to allow incoming and outgoing traffic to TCP ports 3121 and 10201. 
+To open up incoming and outgoing traffic on those ports for your instance, please refer to the [EC2 Security Group documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html#sg-rules-other-instances)
 
 **Q: Can I have a secure connection (i.e. SSL/TLS) to the target FPGA-enable EC2 Instance running Virtual JTAG service?**
 
@@ -249,20 +254,35 @@ You may use the ssh "port forwarding" option (-L) to forward connections from th
 No, you need the Vivado Lab Edition which does not require a license.
 
   
-
 **Q: How do I stop the Virtual JTAG service on the target instance?**
 
-  
+After starting the Virtual JTAG service, you can stop it by calling `Ctrl + C` from your keyboard.  
 
 **Q: Can I debug multiple FPGAs on same target EC2 instance concurrently?**
 
 Yes, you must start the the  `$ fpga-start-virtual-jtag` with a different Slot/Port for each FPGA.  You can launch multiple Vivado sessions, and have each session connect to the corresponding TCP port associated with the FPGA.
 
-
+<a name="hw_serverRunOnF1Instance"></a>
 **Q: What are some of the best practices I should be aware when working with Virtual JTAG?**
 
 If you are running Vivado on a remote machine trying to connect to Virtual JTAG - we recommend running the hw_server on the F1 instance - to ensure optimal performance between Vivado and the Virtual JTAG server.
-
+On your target F1 Instance:
+```
+[$] sudo su 
+[$]# hw_server &
+****** Xilinx hw_server v2019.2
+  **** Build date : Oct 24 2019 at 19:23:45
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+ 
+INFO: hw_server application started
+INFO: Use Ctrl-C to exit hw_server application
+ 
+INFO: To connect to this hw_server instance use url: TCP:ip-xxx-xx-xx-xxx.ec2.internal:3121
+ 
+[$]# fpga-start-virtual-jtag -P 10201 -S 0
+Starting Virtual JTAG XVC Server for FPGA slot id 0, listening to TCP port 10201.
+Press CTRL-C to stop the service.
+```
 
 **Q: Can other instances running on the same F1 server access the Virtual JTAG of my instance?**
 

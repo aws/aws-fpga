@@ -169,6 +169,10 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR) ?
 				1 : 0);
 
+		printf("dma-range-error=%u\n",
+				(fmc->int_status & FPGA_INT_STATUS_DMA_RANGE_ERROR) ?
+				1 : 0);
+
 		printf("pcim-axi-protocol-4K-cross-error=%u\n",
 				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
 				1 : 0);

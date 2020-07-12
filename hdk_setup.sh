@@ -139,6 +139,7 @@ do
       mkdir -p $hdk_shell_dir || { err_msg "Failed to create $hdk_shell_dir"; return 2; }
   fi
   # Use curl instead of AWS CLI so that credentials aren't required.
+  debug_msg "curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"
   curl -s https://$hdk_resources_s3_bucket.s3.amazonaws.com/$s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256 || { err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256 -o $hdk_file.sha256"; return 2; }
   if grep -q '<?xml version' $hdk_file.sha256; then
     err_msg "Failed to download HDK shell's $shell_file version from $s3_shell_dir/$shell_file.sha256"
@@ -198,32 +199,23 @@ else
   models_vivado_version=NOT_BUILT
   info_msg "DDR4 model files in "$ddr4_model_dir/" do NOT exist. Running model creation step.";
 fi
-if [[ $models_vivado_version != $VIVADO_VER ]]; then
-  ddr4_build_dir=$AWS_FPGA_REPO_DIR/ddr4_model_build
-  info_msg "  Building in $ddr4_build_dir"
-  info_msg "  This could take 5-10 minutes, please be patient!";
-  mkdir -p $ddr4_build_dir
-  pushd $ddr4_build_dir &> /dev/null
-  # Run init.sh then clean-up
-  if ! $HDK_DIR/common/verif/scripts/init.sh $models_dir; then
-    err_msg "DDR4 model build failed."
-    err_msg "  Build dir=$ddr4_build_dir"
-    popd &> /dev/null
-    return 2
-  fi
-  info_msg "DDR4 model build passed."
-  popd &> /dev/null
-  rm -rf $ddr4_build_dir
-else
-  debug_msg "DDR4 model files exist in "$ddr4_model_dir/". Skipping model creation step.";
+if [[ $models_vivado_version != $VIVADO_VER ]] && [ ! -e $models_dir/build.lock ]; then
+  rm -rf $HDK_COMMON_DIR/verif/scripts/.done 2>&1 >/dev/null
 fi
-if [[ ":$CL_DIR" == ':' ]]; then
-  info_msg "ATTENTION: Don't forget to set the CL_DIR variable for the directory of your Custom Logic.";
+ddr4_build_dir=$HDK_COMMON_DIR/verif/scripts/tmp
+if [ -d $ddr4_build_dir ] && [ ! -e $models_dir/build.lock ]; then rm -rf $ddr4_build_dir; fi
+if ! make -s -C $HDK_DIR/common/verif/scripts MODEL_DIR=$models_dir; then
+  err_msg "  build dir=$ddr4_build_dir"
+  return 2
+fi
+
+if [[ ":$cl_dir" == ':' ]]; then
+  info_msg "attention: don't forget to set the cl_dir variable for the directory of your custom logic.";
 else
-  info_msg "CL_DIR is $CL_DIR"
-  if [ ! -d $CL_DIR ]; then
-    err_msg "CL_DIR doesn't exist. Set CL_DIR to a valid directory."
-    unset CL_DIR
+  info_msg "cl_dir is $cl_dir"
+  if [ ! -d $cl_dir ]; then
+    err_msg "cl_dir doesn't exist. set cl_dir to a valid directory."
+    unset cl_dir
   fi
 fi
 
