@@ -126,45 +126,23 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2019.1', '2019.2' ]
+def xilinx_versions = [ '2019.1', '2019.2', '2020.1' ]
 
-def vitis_versions = ['2019.2']
+def vitis_versions = ['2019.2', '2020.1']
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
 
 def dsa_map = [
-    '2017.4' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.2' : [ 'DYNAMIC_5_0' : 'dyn'],
-    '2018.3' : [ 'DYNAMIC_5_0' : 'dyn'],
     '2019.1' : [ 'DYNAMIC_5_0' : 'dyn'],
 ]
 
 def xsa_map = [
-    '2019.2' : [ 'DYNAMIC':'dyn']
+    '2019.2' : [ 'DYNAMIC':'dyn'],
+    '2020.1' : [ 'DYNAMIC':'dyn']
 ]
 
 def sdaccel_example_default_map = [
-    '2017.4' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ],
-    '2018.2' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'kernel_3ddr_bandwidth_4ddr': 'SDAccel/examples/aws/kernel_3ddr_bandwidth',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ],
-    '2018.3' : [
-        'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/host/helloworld_ocl',
-        'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl',
-        'Kernel_Global_Bw_4ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'SDAccel/examples/xilinx/getting_started/rtl_kernel/rtl_vadd_hw_debug'
-    ],
     '2019.1' : [
         'Hello_World_1ddr': 'SDAccel/examples/xilinx/getting_started/hello_world/helloworld_ocl',
         'Gmem_2Banks_2ddr': 'SDAccel/examples/xilinx/getting_started/kernel_to_gmem/gmem_2banks_ocl_5.0_shell',
@@ -179,28 +157,18 @@ def vitis_example_default_map = [
         'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
         'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
         'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug'
+    ],
+    '2020.1' : [
+        'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
+        'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
+        'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug',
+        'gemm_blas': 'Vitis/examples/xilinx/library_examples/gemm',
+        'gzip_app': 'Vitis/examples/xilinx/library_examples/gzip_app'
     ]
 ]
 
 def simulator_tool_default_map = [
-    '2017.4' : [
-        'vivado': 'xilinx/SDx/2017.4_04112018',
-        'vcs': 'synopsys/vcs-mx/M-2017.03-SP2-11',
-        'questa': 'questa/10.6b',
-        'ies': 'incisive/15.20.063'
-     ],
-     '2018.2' : [
-         'vivado': 'xilinx/SDx/2018.2_06142018',
-         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
-         'questa': 'questa/10.6c_1',
-         'ies': 'incisive/15.20.063'
-     ],
-     '2018.3' : [
-         'vivado': 'xilinx/SDx/2018.3_1207',
-         'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
-         'questa': 'questa/10.6c_1',
-         'ies': 'incisive/15.20.063'
-     ],
      '2019.1' : [
          'vivado': 'xilinx/SDx/2019.1.op2552052',
          'vcs': 'synopsys/vcs-mx/N-2017.12-SP2',
@@ -212,6 +180,12 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs-mx/O-2018.09-SP2-1',
          'questa': 'questa/2019.2',
          'ies': 'incisive/15.20.063'
+     ],
+     '2020.1' : [
+         'vivado': 'xilinx/Vivado/2020.1',
+         'vcs': 'synopsys/vcs-mx/P-2019.06-SP1-1',
+         'questa': 'questa/2019.4',
+         'ies': 'incisive/15.20.079'
      ]
 ]
 

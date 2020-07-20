@@ -107,58 +107,18 @@ COMMON_LIBLISTS =\
    unimacro\
    secureip\
    xpm
-
-ifeq ($(VIVADO_TOOL_VERSION), v2017.4)
-   COMMON_LIBLISTS +=\
-      axi_register_slice_v2_1_15\
-      axi_infrastructure_v1_1_0\
-      axi_crossbar_v2_1_16\
-      axi_clock_converter_v2_1_14\
-      fifo_generator_v13_2_1\
-      fifo_generator_v13_1_4\
-      axi_data_fifo_v2_1_14\
-      generic_baseblocks_v2_1_0
-else ifeq ($(VIVADO_TOOL_VERSION), v2018.3)
-   COMMON_LIBLISTS +=\
-      axi_register_slice_v2_1_18\
-      axi_infrastructure_v1_1_0\
-      axi_crossbar_v2_1_19\
-      axi_clock_converter_v2_1_17\
-      fifo_generator_v13_2_3\
-      fifo_generator_v13_1_4\
-      axi_data_fifo_v2_1_17\
-      generic_baseblocks_v2_1_0
-else ifeq ($(VIVADO_TOOL_VERSION), v2019.1)
-   COMMON_LIBLISTS +=\
-      axi_register_slice_v2_1_19\
-      axi_infrastructure_v1_1_0\
-      axi_crossbar_v2_1_20\
-      axi_clock_converter_v2_1_18\
-      fifo_generator_v13_2_4\
-      fifo_generator_v13_1_4\
-      axi_data_fifo_v2_1_18\
-      generic_baseblocks_v2_1_0
-else ifeq ($(VIVADO_TOOL_VERSION), v2019.2)
-   COMMON_LIBLISTS +=\
-      axi_register_slice_v2_1_20\
-      axi_infrastructure_v1_1_0\
-      axi_crossbar_v2_1_21\
-      axi_clock_converter_v2_1_19\
-      fifo_generator_v13_2_5\
-      fifo_generator_v13_1_4\
-      axi_data_fifo_v2_1_19\
-      generic_baseblocks_v2_1_0
-else
-   COMMON_LIBLISTS +=\
-      axi_register_slice_v2_1_17\
-      axi_infrastructure_v1_1_0\
-      axi_crossbar_v2_1_18\
-      axi_clock_converter_v2_1_16\
-      fifo_generator_v13_2_2\
-      fifo_generator_v13_1_4\
-      axi_data_fifo_v2_1_16\
-      generic_baseblocks_v2_1_0
-endif
+COMMON_LIBLISTS +=\
+   $(shell cd $(COMPLIB_DIR) >/dev/null 2>&1;\
+   for i in\
+      axi_register_slice_v2_1_\
+      axi_infrastructure_v1_1_\
+      axi_crossbar_v2_1_\
+      axi_clock_converter_v2_1_\
+      fifo_generator_v13_2_\
+      fifo_generator_v13_1_\
+      axi_data_fifo_v2_1_\
+      generic_baseblocks_v2_1_;\
+   do ls | grep $$i; done)
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
 
@@ -177,3 +137,7 @@ $(HDK_COMMON_DIR)/verif/models/sh_bfm/cl_ports_sh_bfm.vh: $(HDK_SHELL_DESIGN_DIR
 
 make_sim_dir: $(HDK_COMMON_DIR)/verif/models/sh_bfm/cl_ports_sh_bfm.vh
 	mkdir -p $(SIM_ROOT)
+
+show_common_liblists:
+	@ for i in $(COMMON_LIBLISTS); do echo $$i; done
+

@@ -48,7 +48,7 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 
 Download, install, and configure the license for Vivado SDx 2017.4, 2018.2, 2018.3 or 2019.1 for Windows.  More information is provided at:
 
-[On-Premises Licensing Help](./on_premise_licensing_help.md)
+[On-Premises Licensing Help](../../docs/on_premise_licensing_help.md)
 
 Clone the `https://github.com/aws/aws-fpga` repository either through Github Desktop or Download ZIP and extract to a new folder location on the Windows machine.  This is the install location.
 

@@ -20,6 +20,8 @@ If the check fails, the design is susceptible to the issue and will need to be r
 For designs under development, we recommend applying the patch to your on-premises tools or update to developer kit v1.4.15. 
 For additional details, please refer to the [Xilinx Answer Record #73068](https://www.xilinx.com/support/answers/73068.html)
 
+We recommend using [Developer Kit Release v1.4.15a](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) or newer to allow for patching and fixing the DDR4 IP timing exception by re-generating the IP.
+
 ### 2019.1 
 * Vivado `compile_simlib` command fails to generate the following verilog IP libraries for the following simulators.
 * Please refer to the Xilinx Answer record for details.

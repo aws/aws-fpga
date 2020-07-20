@@ -554,7 +554,7 @@ def check_headers(dir):
             "sdk/linux_kernel_drivers/xocl/LICENSE$",
             "sdk/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt",
             "sdk/apps/virtual-ethernet/scripts/pktgen-ena.pkt",
-	    
+
             "SDAccel/userspace/src/test",
             "SDAccel/examples/aws/kernel_3ddr_bandwidth/description.json",
             "SDAccel/examples/aws/helloworld_ocl_runtime/helloworld",
@@ -576,6 +576,7 @@ def check_headers(dir):
             "SDAccel/examples/xilinx",
             "Vitis/aws_platform",
             "Vitis/examples/xilinx",
+            "Vitis/docs/Alveo_to_AWS_F1_Migration/example",
         ])
 
     file_path_list = sorted(file_provider.get_files(dir))

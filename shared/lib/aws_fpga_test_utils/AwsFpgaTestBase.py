@@ -414,7 +414,7 @@ class AwsFpgaTestBase(object):
                            run_cmd += " {}".format(((description.get("cmd_args", None).replace(".xclbin",".hw.xilinx_aws-vu9p-f1-04261818_dynamic_5_0.awsxclbin")).replace("PROJECT",".")).replace("BUILD","./xclbin"))
 
         assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(examplePath)
-        
+
         return run_cmd
 
     @staticmethod
@@ -662,6 +662,10 @@ class AwsFpgaTestBase(object):
     def assert_non_zero_file(filter):
 
         filenames = glob.glob(filter)
+
+        # Removing .link.xclbin found in Vitis2020.1
+
+        filenames = [x for x in filenames if ".link." not in x]
 
         assert len(filenames) > 0, "No {} file found in {}".format(filter, os.getcwd())
         assert len(filenames) == 1, "More than 1 {} file found: {}\n{}".format(filter, len(filenames), filenames)

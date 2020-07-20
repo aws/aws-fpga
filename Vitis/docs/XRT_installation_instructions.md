@@ -6,6 +6,7 @@
 
 | Xilinx Vitis Tool Version | XRT Release Tag | SHA | `xrt` and `xrt-aws` pre-built RPM's (Centos/RHEL) |
 |---|---|---|---|
+|2020.1| [202010.2.6.AWS](https://github.com/Xilinx/XRT/releases/tag/202010.2.6.AWS) | d09c4a458c16e8d843b3165dcf929c38f7a32b6f | [xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm) [xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm) |
 |2019.2| [2019.2.0.3](https://github.com/Xilinx/XRT/releases/tag/2019.2.0.3) | 9e13d57c4563e2c19bf5f518993f6e5a8dadc18a | [xrt_201920.2.3.0_7.7.1908-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-xrt.rpm) [xrt_201920.2.3.0_7.7.1908-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-aws.rpm) |
 
 <a name="mpd"></a>

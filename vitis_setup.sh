@@ -171,7 +171,7 @@ info_msg " XILINX_VITIS is set to $XILINX_VITIS"
 
 # Update Xilinx Vitis Examples from GitHub
 info_msg "Using Vitis $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2019\.2.* ]]; then
+if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ]]; then
     info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
     git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
@@ -183,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2019\.2.* ]]; then
     fi
     ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2019.2 is supported).\n"
+   echo " $RELEASE_VER is not supported (2019.2 or 2020.1 is supported).\n"
    return 2
 fi
 

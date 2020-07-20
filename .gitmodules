@@ -1,19 +1,10 @@
-[submodule "SDAccel/examples/xilinx_2017.4"]
-	path = SDAccel/examples/xilinx_2017.4
-	url = https://github.com/Xilinx/SDAccel_Examples.git
-	branch = aws_2017.4
-[submodule "SDAccel/examples/xilinx_2018.2"]
-	path = SDAccel/examples/xilinx_2018.2
-	url = https://github.com/Xilinx/SDAccel_Examples.git
-	branch = 2018.2_xdf
-[submodule "SDAccel/examples/xilinx_2018.3"]
-	path = SDAccel/examples/xilinx_2018.3
-	url = https://github.com/Xilinx/SDAccel_Examples.git
-	branch = master	
 [submodule "SDAccel/examples/xilinx_2019.1"]
 	path = SDAccel/examples/xilinx_2019.1
 	url = https://github.com/Xilinx/SDAccel_Examples.git
 [submodule "Vitis/examples/xilinx_2019.2"]
 	path = Vitis/examples/xilinx_2019.2
 	branch = master
+	url = https://github.com/Xilinx/Vitis_Accel_Examples
+[submodule "Vitis/examples/xilinx_2020.1"]
+	path = Vitis/examples/xilinx_2020.1
 	url = https://github.com/Xilinx/Vitis_Accel_Examples
