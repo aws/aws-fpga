@@ -17,3 +17,6 @@
 	path = Vitis/examples/xilinx_2019.2
 	branch = master
 	url = https://github.com/Xilinx/Vitis_Accel_Examples
+[submodule "Vitis/examples/xilinx_2020.1"]
+	path = Vitis/examples/xilinx_2020.1
+	url = https://github.com/Xilinx/Vitis_Accel_Examples

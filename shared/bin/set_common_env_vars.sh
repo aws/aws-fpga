@@ -75,3 +75,6 @@ PYTHONPATH=$python_lib:$PYTHONPATH
 
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/shared\/bin\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/shared/bin/scripts:$PATH
+
+# Enable xilinx licensing
+export XILINX_ENABLE_AWS_WHITELIST=095707098027

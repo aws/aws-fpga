@@ -152,7 +152,7 @@ check_kernel_ver
 check_xdma_driver
 check_edma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.* ]]; then
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020\.1.* ]]; then
     info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
     
     if [ $override == 1 ]; then
@@ -193,7 +193,7 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.* ]]; then
        return 1
     fi
 else
-   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2 is supported for Vitis "
+   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2 or 2020.1 are supported for Vitis "
    return 1
 fi
 
