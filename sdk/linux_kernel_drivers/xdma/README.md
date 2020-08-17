@@ -199,7 +199,7 @@ Only the POLLIN mask is supported and is used to notify that an event has occurr
 
 Refer to [User-defined interrupts events README](./user_defined_interrupts_README.md) for more details.
 
-The application MUST issue a `pread` of the ready file descriptor to return and clear the `events_irq` variable within the XDMA driver in order to be notified of future user interrupts.  An example of using `poll` and `pread` for user defined interrupts is provided within the test_dram_dma.c `interrupt_example()`.
+The application MUST issue a `pread` of the ready file descriptor to return and clear the `events_irq` variable within the XDMA driver in order to be notified of future user interrupts.  An example of using `poll` and `pread` for user defined interrupts is provided within the [test_dram_dma.c](../../../hdk/cl/examples/cl_dram_dma/software/runtime/test_dram_dma.c) `interrupt_example()`.
 
 <a name="concurrency"></a>
 ## Concurrency and Multi-Threading
