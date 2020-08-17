@@ -42,7 +42,7 @@ Before diving into the detail specification of the XDMA, here’s a short, intui
 The Program below uses standard Linux system call `open()` to create a file descriptor (fd), mapping to a pair of XDMA channels (one for `read()` and one for `write()`).  The XDMA hardware engine is named the `XDMA Core`.  The XDMA write channel is called H2C (Host to Core).  The XDMA read channel is called C2H (Core to Host). The Core refers to the FPGA and the Host refers to the instance CPU.
 
 
-```
+```C
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
