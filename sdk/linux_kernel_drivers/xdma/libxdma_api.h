@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 
@@ -125,6 +137,14 @@ int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
  */
 ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
 			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
+
+ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel, bool write, u64 ep_addr,
+			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
+
+
+ssize_t xdma_xfer_completion(void *cb_hndl, void *dev_hndl, int channel, bool write, u64 ep_addr,
+			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
+
 			
 
 /////////////////////missing API////////////////////

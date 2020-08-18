@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef __XDMA_MODULE_H__
 #define __XDMA_MODULE_H__
 
@@ -48,13 +49,18 @@
 #include <linux/splice.h>
 #include <linux/version.h>
 #include <linux/uio.h>
+#include <linux/spinlock_types.h>
 
 #include "libxdma.h"
+#include "xdma_thread.h"
 
 #define MAGIC_ENGINE	0xEEEEEEEEUL
 #define MAGIC_DEVICE	0xDDDDDDDDUL
 #define MAGIC_CHAR	0xCCCCCCCCUL
 #define MAGIC_BITSTREAM 0xBBBBBBBBUL
+
+extern unsigned int desc_blen_max;
+extern unsigned int sgdma_timeout;
 
 struct xdma_cdev {
 	unsigned long magic;		/* structure ID for sanity checks */
@@ -98,12 +104,19 @@ struct xdma_pci_dev {
 	void *data;
 };
 
-struct xdma_io_cb {
-	void __user *buf;
-	size_t len;
-	unsigned int pages_nr;
-	struct sg_table sgt;
-	struct page **pages;
+struct cdev_async_io {
+	struct kiocb *iocb;
+	struct xdma_io_cb *cb;
+	bool write;
+	bool cancel;
+	int cmpl_cnt;
+	int req_cnt;
+	spinlock_t lock;
+	struct work_struct wrk_itm;
+	struct cdev_async_io *next;
+	ssize_t res;
+	ssize_t res2;
+	int err_cnt;
 };
 
 #endif /* ifndef __XDMA_MODULE_H__ */

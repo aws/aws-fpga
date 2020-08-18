@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef XDMA_LIB_H
 #define XDMA_LIB_H
 
@@ -35,6 +36,14 @@
 #include <linux/kernel.h>
 #include <linux/pci.h>
 #include <linux/workqueue.h>
+#if	KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
+#include <linux/swait.h>
+#endif
+/*
+ *  if the config bar is fixed, the driver does not neeed to search through
+ *  all of the bars
+ */
+//#define XDMA_CONFIG_BAR_NUM	1
 
 /* Switch debug printing on/off */
 #define XDMA_DEBUG 0
@@ -53,9 +62,9 @@
  * interrupts per engine, rad2_vul.sv:237
  * .REG_IRQ_OUT	(reg_irq_from_ch[(channel*2) +: 2]),
  */
-#define XDMA_ENG_IRQ_NUM (1)
-#define MAX_EXTRA_ADJ (15)
-#define RX_STATUS_EOP (1)
+#define XDMA_ENG_IRQ_NUM	(1)
+#define MAX_EXTRA_ADJ		(0x3F)
+#define RX_STATUS_EOP		(1)
 
 /* Target internal components on XDMA control BAR */
 #define XDMA_OFS_INT_CTRL	(0x2000UL)
@@ -65,7 +74,7 @@
 #define XDMA_TRANSFER_MAX_DESC (2048)
 
 /* maximum size of a single DMA transfer descriptor */
-#define XDMA_DESC_BLEN_BITS 	28
+#define XDMA_DESC_BLEN_BITS	28
 #define XDMA_DESC_BLEN_MAX	((1 << (XDMA_DESC_BLEN_BITS)) - 1)
 
 /* bits of the SG DMA control register */
@@ -79,6 +88,7 @@
 #define XDMA_CTRL_IE_DESC_ERROR			(0x1FUL << 19)
 #define XDMA_CTRL_NON_INCR_ADDR			(1UL << 25)
 #define XDMA_CTRL_POLL_MODE_WB			(1UL << 26)
+#define XDMA_CTRL_STM_MODE_WB			(1UL << 27)
 
 /* bits of the SG DMA status register */
 #define XDMA_STAT_BUSY			(1UL << 0)
@@ -134,7 +144,7 @@
 /* all combined */
 #define XDMA_STAT_H2C_ERR_MASK	\
 	(XDMA_STAT_COMMON_ERR_MASK | XDMA_STAT_DESC_ERR_MASK | \
-	 XDMA_STAT_H2C_R_ERR_MASK | XDMA_STAT_H2C_W_ERR_MASK) 
+	 XDMA_STAT_H2C_R_ERR_MASK | XDMA_STAT_H2C_W_ERR_MASK)
 
 #define XDMA_STAT_C2H_ERR_MASK	\
 	(XDMA_STAT_COMMON_ERR_MASK | XDMA_STAT_DESC_ERR_MASK | \
@@ -157,7 +167,7 @@
 #define XDMA_ID_C2H 0x1fc1U
 
 /* for C2H AXI-ST mode */
-#define CYCLIC_RX_PAGES_MAX	256	
+#define CYCLIC_RX_PAGES_MAX	256
 
 #define LS_BYTE_MASK 0x000000FFUL
 
@@ -242,6 +252,23 @@ enum dev_capabilities {
 };
 
 /* SECTION: Structure definitions */
+
+struct xdma_io_cb {
+	void __user *buf;
+	size_t len;
+	void *private;
+	unsigned int pages_nr;
+	struct sg_table sgt;
+	struct page **pages;
+	/** total data size */
+	unsigned int count;
+	/** MM only, DDR/BRAM memory addr */
+	u64 ep_addr;
+	/** write: if write to the device */
+	struct xdma_request_cb *req;
+	u8 write:1;
+	void (*io_done)(unsigned long cb_hndl, int err);
+};
 
 struct config_regs {
 	u32 identifier;
@@ -388,11 +415,18 @@ struct sw_desc {
 struct xdma_transfer {
 	struct list_head entry;		/* queue of non-completed transfers */
 	struct xdma_desc *desc_virt;	/* virt addr of the 1st descriptor */
+	struct xdma_result *res_virt;   /* virt addr of result, c2h streaming */
+	dma_addr_t res_bus;		/* bus addr for result descriptors */
 	dma_addr_t desc_bus;		/* bus addr of the first descriptor */
 	int desc_adjacent;		/* adjacent descriptors at desc_bus */
 	int desc_num;			/* number of descriptors in transfer */
+	int desc_index;			/* index for 1st desc. in transfer */
 	enum dma_data_direction dir;
+#if	KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
+	struct swait_queue_head wq;
+#else
 	wait_queue_head_t wq;		/* wait queue for transfer completion */
+#endif
 
 	enum transfer_state state;	/* state of the transfer */
 	unsigned int flags;
@@ -401,6 +435,7 @@ struct xdma_transfer {
 	int last_in_request;		/* flag if last within request */
 	unsigned int len;
 	struct sg_table *sgt;
+	struct xdma_io_cb *cb;
 };
 
 struct xdma_request_cb {
@@ -408,7 +443,10 @@ struct xdma_request_cb {
 	unsigned int total_len;
 	u64 ep_addr;
 
-	struct xdma_transfer xfer;
+	/* Use two transfers in case single request needs to be split */
+	struct xdma_transfer tfer[2];
+
+	struct xdma_io_cb *cb;
 
 	unsigned int sw_desc_idx;
 	unsigned int sw_desc_cnt;
@@ -442,7 +480,8 @@ struct xdma_engine {
 	int max_extra_adj;	/* descriptor prefetch capability */
 	int desc_dequeued;	/* num descriptors of completed transfers */
 	u32 status;		/* last known status of device */
-	u32 interrupt_enable_mask_value;/* only used for MSIX mode to store per-engine interrupt mask value */
+	/* only used for MSIX mode to store per-engine interrupt mask value */
+	u32 interrupt_enable_mask_value;
 
 	/* Transfer list management */
 	struct list_head transfer_list;	/* queue of transfers */
@@ -450,10 +489,13 @@ struct xdma_engine {
 	/* Members applicable to AXI-ST C2H (cyclic) transfers */
 	struct xdma_result *cyclic_result;
 	dma_addr_t cyclic_result_bus;	/* bus addr for transfer */
-	struct xdma_request_cb *cyclic_req; 
-	struct sg_table cyclic_sgt; 
-	u8 eop_found; /* used only for cyclic(rx:c2h) */
+	struct xdma_request_cb *cyclic_req;
+	struct sg_table cyclic_sgt;
+	u8 *perf_buf_virt;
+	dma_addr_t perf_buf_bus; /* bus address */
 
+	u8 eop_found; /* used only for cyclic(rx:c2h) */
+	int eop_count;
 	int rx_tail;	/* follows the HW */
 	int rx_head;	/* where the SW reads from */
 	int rx_overrun;	/* flag if overrun occured */
@@ -466,20 +508,37 @@ struct xdma_engine {
 	dma_addr_t poll_mode_bus;	/* bus addr for descriptor writeback */
 
 	/* Members associated with interrupt mode support */
+#if	KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
+	struct swait_queue_head shutdown_wq;
+#else
 	wait_queue_head_t shutdown_wq;	/* wait queue for shutdown sync */
+#endif
 	spinlock_t lock;		/* protects concurrent access */
 	int prev_cpu;			/* remember CPU# of (last) locker */
 	int msix_irq_line;		/* MSI-X vector for this engine */
 	u32 irq_bitmask;		/* IRQ bit mask for this engine */
 	struct work_struct work;	/* Work queue for interrupt handling */
 
-	spinlock_t desc_lock;		/* protects concurrent access */
+	struct mutex desc_lock;		/* protects concurrent access */
 	dma_addr_t desc_bus;
 	struct xdma_desc *desc;
+	int desc_idx;			/* current descriptor index */
+	int desc_used;			/* total descriptors used */
 
 	/* for performance test support */
 	struct xdma_performance_ioctl *xdma_perf;	/* perf test control */
+#if	KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
+	struct swait_queue_head xdma_perf_wq;
+#else
 	wait_queue_head_t xdma_perf_wq;	/* Perf test sync */
+#endif
+
+	struct xdma_kthread *cmplthp;
+	/* completion status thread list for the queue */
+	struct list_head cmplthp_list;
+	/* pending work thread list */
+	/* cpu attached to intr_work */
+	unsigned int intr_work_cpu;
 };
 
 struct xdma_user_irq {
@@ -490,14 +549,14 @@ struct xdma_user_irq {
 	wait_queue_head_t events_wq;	/* wait queue to sync waiting threads */
 	irq_handler_t handler;
 
-	void *dev;	
+	void *dev;
 };
 
 /* XDMA PCIe device specific book-keeping */
 #define XDEV_FLAG_OFFLINE	0x1
 struct xdma_dev {
 	struct list_head list_head;
-        struct list_head rcu_node;
+	struct list_head rcu_node;
 
 	unsigned long magic;		/* structure ID for sanity checks */
 	struct pci_dev *pdev;	/* pci device struct from probe() */
@@ -509,7 +568,7 @@ struct xdma_dev {
 	unsigned int flags;
 
 	/* PCIe BAR management */
-	void *__iomem bar[XDMA_BAR_NUM];	/* addresses for mapped BARs */
+	void __iomem *bar[XDMA_BAR_NUM];	/* addresses for mapped BARs */
 	int user_bar_idx;	/* BAR index of user logic */
 	int config_bar_idx;	/* BAR index of XDMA config logic */
 	int bypass_bar_idx;	/* BAR index of XDMA bypass logic */
@@ -525,7 +584,7 @@ struct xdma_dev {
 	int irq_line;		/* flag if irq allocated successfully */
 	int msi_enabled;	/* flag if msi was enabled for the device */
 	int msix_enabled;	/* flag if msi-x was enabled for the device */
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,12,0)
+#if KERNEL_VERSION(4, 12, 0) > LINUX_VERSION_CODE
 	struct msix_entry entry[32];	/* msi-x vector/entry table */
 #endif
 	struct xdma_user_irq user_irq[16];	/* user IRQ management */
@@ -605,8 +664,8 @@ void get_perf_stats(struct xdma_engine *engine);
 
 int xdma_cyclic_transfer_setup(struct xdma_engine *engine);
 int xdma_cyclic_transfer_teardown(struct xdma_engine *engine);
-ssize_t xdma_engine_read_cyclic(struct xdma_engine *, char __user *, size_t,
-			 int);
+ssize_t xdma_engine_read_cyclic(struct xdma_engine *engine,
+		char __user *buf, size_t count, int timeout_ms);
 int engine_addrmode_set(struct xdma_engine *engine, unsigned long arg);
-
+int engine_service_poll(struct xdma_engine *engine, u32 expected_desc_count);
 #endif /* XDMA_LIB_H */

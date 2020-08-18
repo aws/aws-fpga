@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef _XDMA_IOCALLS_POSIX_H_
 #define _XDMA_IOCALLS_POSIX_H_
 
@@ -50,17 +51,16 @@
  * _IOC_SIZE(nr)	    returns size
  */
 
-struct xdma_performance_ioctl
-{
-        /* IOCTL_XDMA_IOCTL_Vx */
-        uint32_t version;
-        uint32_t transfer_size;
-        /* measurement */
-        uint32_t stopped;
-        uint32_t iterations;
-        uint64_t clock_cycle_count;
-        uint64_t data_cycle_count;
-        uint64_t pending_count;
+struct xdma_performance_ioctl {
+	/* IOCTL_XDMA_IOCTL_Vx */
+	uint32_t version;
+	uint32_t transfer_size;
+	/* measurement */
+	uint32_t stopped;
+	uint32_t iterations;
+	uint64_t clock_cycle_count;
+	uint64_t data_cycle_count;
+	uint64_t pending_count;
 };
 
 

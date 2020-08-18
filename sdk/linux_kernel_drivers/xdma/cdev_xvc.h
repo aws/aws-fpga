@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef __XVC_IOCTL_H__
 #define __XVC_IOCTL_H__
 
@@ -37,9 +38,9 @@
 struct xvc_ioc {
 	unsigned int opcode;
 	unsigned int length;
-	unsigned char *tms_buf;
-	unsigned char *tdi_buf;
-	unsigned char *tdo_buf;
+	const char __user *tms_buf;
+	const char __user *tdi_buf;
+	void __user *tdo_buf;
 };
 
 #define XDMA_IOCXVC	_IOWR(XVC_MAGIC, 1, struct xvc_ioc)
