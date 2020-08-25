@@ -217,6 +217,7 @@ cl_debug_bridge CL_DEBUG_BRIDGE (
       .bscanid(bscanid)
    );
 ```
+**NOTE:** According to [UG908](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2019_2/ug908-vivado-programming-debugging.pdf), the debug hub clock should be atleast 2.5x faster than the JTAG clock frequency. The JTAG clock frequency is fixed in the AWS Shell at 31.25MHz. Therefore the frequency of the clock connected to the cl_debug_bridge should be at-least 2.5 x 31.25MHz = 78.125MHz. Otherwise the debug network will not work. However, the minimum clock frequency requirement does not apply for ILA and rest of the CL logic. If CL design is running on a slower clock from the available [clock_recipes](https://github.com/aws/aws-fpga/blob/master/hdk/docs/clock_recipes.csv) then care must be taken that cl_debug_bridge is clocked at 78.125MHz or above speed.
 
 The following list describes the steps to successfully setup debug in a CL:  
 
@@ -288,7 +289,7 @@ Press CTRL-C to stop the service.
 
 No, other customer instances running on the same F1 server do not have access to the Virtual JTAG of your instance.
 
-**Q: I am getting this error:**
+**Q: Why am I getting this error?**
 
 ```
 % fpga-start-virtual-jtag -P 10201 -S 0
@@ -297,11 +298,24 @@ Press CTRL-C to stop the service.
 Error: (1) internal-error
 ```
 
-This could mean there is already a server running with thtat TCP port.  Either find this process and kill it, or choose a different TCP port.
+This could mean there is already a server running with that TCP port.  Either find this process and kill it, or choose a different TCP port.
 
+**Q: Why am I getting this error?**
+
+```
+ERROR: [Xicom 50-38] xicom: Device:0, user chain number:1, slave index:3. Reading intermittently wrong data from core. Try slower target speed. Make sure design meets timing requirements.
+ERROR: [Xicom 50-38] xicom: Device:0, user chain number:1, slave index:3, is not a valid CseXsdb Slave core.
+ERROR: [Labtools 27-3176] hw_server failed during internal command.
+Resolution: Check that the hw_server is running and the hardware connectivity to the target
+
+```
+
+This means the clock connected to the cl_debug_bridge module is slower than the required minimum of 78.125MHz. Please choose a faster clock to connect to your cl_debug_bridge.
 
 **Q: What is XVC and where can I learn about it?**
 
 Xilinc Virtual Cable (XVC) is a protocol for transferring JTAG commands over TCP/IP network connection between a debug tool (like Vivado Lab Edition Hardware Manager) and a debug target.
 
 More information including a link to the full specification for XVC version 1.0 is available [here](https://www.xilinx.com/products/intellectual-property/xvc.html).  
+
+
