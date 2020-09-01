@@ -176,7 +176,7 @@ SOFTWARE.
 '''
 
 xilinx_xdma1 = '''Xilinx XDMA IP Core Linux Driver
-Copyright(c) 2015 - 2017 Xilinx, Inc.
+Copyright(c) 2015 - 2020 Xilinx, Inc.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms and conditions of the GNU General Public License,
@@ -192,12 +192,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 The full GNU General Public License is included in this distribution in
 the file called "LICENSE".
-'''
-
-xilinx_xdma2 = '''Xilinx XDMA IP Core Linux Driver
-
-Copyright(c) Sidebranch.
-Copyright(c) Xilinx, Inc.
 '''
 
 xilinx1 = '''\xa9 Copyright 2017 Xilinx, Inc. All rights reserved.
@@ -400,7 +394,6 @@ all_exp_header_lines = [
     apache_header_2018.split("\n"),
     gpl2_header.split("\n"),
     xilinx_xdma1.split("\n"),
-    xilinx_xdma2.split("\n"),
     xilinx1.split("\n"),
     xilinx2_header.split("\n"),
     xilinx3_header.split("\n"),
