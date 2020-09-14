@@ -162,7 +162,9 @@ def vitis_example_default_map = [
         'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
         'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
         'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
-        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug'
+        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug',
+        'gemm_blas': 'Vitis/examples/xilinx/library_examples/gemm',
+        'gzip_app': 'Vitis/examples/xilinx/library_examples/gzip_app'
     ]
 ]
 
@@ -181,9 +183,9 @@ def simulator_tool_default_map = [
      ],
      '2020.1' : [
          'vivado': 'xilinx/Vivado/2020.1',
-         'vcs': 'synopsys/vcs-mx/O-2018.09-SP2-1',
-         'questa': 'questa/2019.2',
-         'ies': 'incisive/15.20.063'
+         'vcs': 'synopsys/vcs-mx/P-2019.06-SP1-1',
+         'questa': 'questa/2019.4',
+         'ies': 'incisive/15.20.079'
      ]
 ]
 

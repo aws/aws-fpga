@@ -4,7 +4,7 @@
 This document describes the changes required when migrating your design from shell v1.3 to shell v1.4.
 The HDK build scripts have changed to reflect the new v1.4 shell’s floorplan and newer Vivado tools. It’s strongly recommended users move to these scripts. Users who have already customized v1.3 scripts should diff those with the v1.4 scripts and be sure to include all new parameters that have been added to v1.4 scripts.
 
-1. Upgrade Vivado Tools to version 2017.4 or later. Needs [FPGA DEVELOPER AMI 1.4 or later](../../README.md#overviewdevtools)
+1. Upgrade Vivado Tools to version 2019.1 or later. Needs [FPGA DEVELOPER AMI 1.4 or later](../../README.md#fpga-developer-ami)
 
 2. The hierarchy for CL & SH modules have changed. Now they are instantiated in  "WRAPPER_INST" Module.
      The paths in your Build scripts, constraints &  verification components have to be updated.

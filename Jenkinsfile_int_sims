@@ -47,6 +47,12 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs-mx/O-2018.09-SP2-1',
          'questa': 'questa/2019.2',
          'ies': 'incisive/15.20.063'
+     ],
+     '2020.1' : [
+         'vivado': 'xilinx/Vivado/2020.1',
+         'vcs': 'synopsys/vcs-mx/P-2019.06-SP1-1',
+         'questa': 'questa/2019.4',
+         'ies': 'incisive/15.20.079'
      ]
 ]
 

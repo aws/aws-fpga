@@ -52,18 +52,20 @@
 <a name="iss"></a>
 #### AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
-* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
+* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](../docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
 * The compatibility table describes the mapping of developer kit version to [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA Developer AMI Version     |
 |-----------|-----------|------|
 | 1.3.0-1.3.6 | 2017.1(Deprecated) | v1.3.5(Deprecated) |
 | 1.3.7-1.3.X | 2017.1(Deprecated) | v1.3.5-v1.3.X(Deprecated) |
-| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
-| 1.4.0-1.4.2 | 2017.4 | v1.4.0-v1.4.X (Xilinx SDx 2017.4) |
-| 1.4.3-1.4.7 | 2018.2 | v1.5.0 (Xilinx SDx 2018.2) |
-| 1.4.8-1.4.10 | 2018.3 | v1.6.0 (Xilinx SDx 2018.3) |
-| 1.4.11-1.4.X | 2019.1 | v1.7.0 (Xilinx SDx 2019.1) |
+| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado 2017.4) |
+| 1.4.0-1.4.15 | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado 2017.4) |
+| 1.4.3-1.4.15 | 2018.2 | v1.5.0 (Xilinx Vivado 2018.2) |
+| 1.4.8-1.4.15 | 2018.3 | v1.6.0 (Xilinx Vivado 2018.3) |
+| 1.4.11-1.4.x | 2019.1 | v1.7.0 (Xilinx Vivado 2019.1) |
+| 1.4.11-1.4.x | 2019.2 | v1.8.x (Xilinx Vivado 2019.2) |
+| 1.4.16-1.4.x | 2020.1 | v1.9.x (Xilinx Vivado 2020.1) |
 
 * The FPGA Developer Kit version is listed in [hdk_version.txt](./hdk_version.txt)
 
@@ -73,23 +75,31 @@
 
 * [Setup AWS CLI and S3 Bucket](../SDAccel/docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
   * To install the AWS CLI, please follow the [AWS CLI Installation guide](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
-
+    ```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page) and default region
+    ```
 
 Use the aws-cli [region](http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html) command line argument to override the profile default region.  Supported regions include: us-east-1, us-west-2, eu-west-1 and us-gov-west-1.
 
 <a name="setup"></a>
 #### Install the HDK and setup environment
 
-The AWS FPGA HDK can be cloned to your EC2 instance or server by executing:
+The AWS FPGA HDK can be cloned to your instance by executing:
 
-When using the developer AMI:  ```AWS_FPGA_REPO_DIR=/home/centos/src/project_data/aws-fpga```
+> When using the FPGA Developer AMI, add:  
+> `AWS_FPGA_REPO_DIR=/home/centos/src/project_data/aws-fpga`
     
+```bash
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
     $ source hdk_setup.sh
+```
 
-Note that sourcing `hdk_setup.sh` will set required environment variables that are used throughout the examples in the HDK.  DDR simulation models and DCP(s) are downloaded from S3 during hdk setup.  New terminal or xterm requires `hdk_setup.sh` to be rerun.  
+Sourcing `hdk_setup.sh` does the following:
+* It sets required environment variables that are used throughout the examples in the HDK.  
+* Downloads DDR simulation models and DCP(s) from S3.  
+
+New terminals or xterm require `hdk_setup.sh` to be rerun so that the correct environment variables are set.  
 
 <a name="examples"></a>
 #### Review examples 
@@ -102,15 +112,18 @@ The [Examples readme](./cl/examples/cl_examples_list.md) provides an overview of
 <a name="fastpath"></a>
 #### Fast path to running CL Examples on FPGA Instance
 
-For developers that want to skip the development flow and start running the examples on the FPGA instance.  You can skip steps 1 through 3 if you are not interested in the development process.  Step 4 through 6 will show you how to use one of the predesigned AFI examples.  By using the public AFIs, developers can skip the build flow steps and jump to step 4. [Public AFIs are available for each example and can be found in the example/README](cl/examples/cl_hello_world/README.md#metadata).  
+For developers that want to skip the development flow and start running the examples on the FPGA instance.  You can skip steps 1 through 3 if you are not interested in the development process.  Step 4 through 6 will show you how to use one of the pre-designed AFI examples. 
+By using the public AFIs, developers can skip the build flow steps and jump to step 4. [Public AFIs are available for each example and can be found in the example/README](cl/examples/cl_hello_world/README.md#metadata).
 
 <a name="step1"></a>
 #### Step 1. Pick one of the examples and start in the example directory
 
 It is recommended that you complete this step-by-step guide using HDK hello world example.  Next use this same guide to develop using the [cl\_dram\_dma](cl/examples/cl_dram_dma).  When your ready, copy one of the examples provided and modify the design files, scripts and constraints directory.
 
+```
     $ cd $HDK_DIR/cl/examples/cl_hello_world    # you can change cl_hello_world to cl_dram_dma, cl_uram_example or cl_hello_world_vhdl
     $ export CL_DIR=$(pwd)
+```
 
 Setting up the CL_DIR environment variable is crucial as the build scripts rely on that value.
 Each example follows the recommended directory structure to match the expected structure for HDK simulation and build scripts.
@@ -121,20 +134,25 @@ Each example follows the recommended directory structure to match the expected s
 This [checklist](./cl/CHECKLIST_BEFORE_BUILDING_CL.md) should be consulted before you start the build process.
 
 **NOTE** *This step requires you to have Xilinx Vivado Tools and Licenses installed*
-
+```
     $ vivado -mode batch        # Verify Vivado is installed.
+```
 
 Executing the `aws_build_dcp_from_cl.sh` script will perform the entire implementation process converting the CL design into a completed Design Checkpoint that meets timing and placement constrains of the target FPGA.
 The output is a tarball file comprising the DCP file, and other log/manifest files, formatted as `YY_MM_DD-hhmm.Developer_CL.tar`.
 This file would be submitted to AWS to create an AFI. By default the build script will use Clock Group A Recipe A0 which uses a main clock of 125 MHz.
 
+```    
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
+```
 
 In order to use a 250 MHz main clock the developer can specify the A1 Clock Group A Recipe as in the following example:
 
+```
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh -clock_recipe_a A1
+```
 
 Other clock recipes can be specified as well. More details on the [Clock Group Recipes Table](./docs/clock_recipes.csv) and how to specify different recipes can be found in the following [README](./common/shell_v04261818/new_cl_template/build/README.md).
 

@@ -31,11 +31,7 @@ First change directory to **helloworld_ocl** example.
 ```
     $ cd <git area>/SDAccel/examples/xilinx/getting_started/hello_world/helloworld_ocl
 ```
-The github examples use common header files and those needs to be copied in the local project source folder to make it easier to use. 
-Type the command **make local-files** to copy all necessary files in the local directory.
-```
-    $ make local-files
-```
+
 The SDAccel GUI is invoked with the **sdx** command.
 
 ```
