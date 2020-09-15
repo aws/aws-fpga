@@ -270,7 +270,7 @@ function patch_AR73068 {
     elif [[ "${base_vivado_version}" =~ "Vivado v2017.4" ]]; then
       patch_AR73068_2017_4
     else
-      warn_msg "Unknown Vivado version: ${base_vivado_version}. Not applying Xilinx Patch AR73068"
+      info_msg "Xilinx Patch AR73068 not applicable for Vivado version: ${base_vivado_version}."
     fi
 }
 

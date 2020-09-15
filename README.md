@@ -56,7 +56,9 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 | 1.4.3 - 1.4.15a | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
 | 1.3.7 - 1.4.15a | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
 
-⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. While v1.4.16 will not support older Xilinx tools, you can still use them using HDK releases v1.4.15a or earlier. Please checkout [the latest v1.4.15a release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
+⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. 
+While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15a or earlier. 
+Please checkout [the latest v1.4.15a release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
 
 ⚠️ Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life. See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 
@@ -141,15 +143,20 @@ You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https:/
 ### Quickstarts
 Before you create your own AWS FPGA design, we recommend that you go through one of the step-by-step Quickstart guides:
 
-Follow the quickstarts: 
 | Description | Quickstart | Next Steps |
 |----|----|----|
 | Software Defined Accelerator Development using Xilinx Vitis | [Vitis hello_world Quickstart](Vitis/README.md) | [60+ Vitis examples](./Vitis/examples/), [Vitis Library Examples](./docs/examples/example_list.md) |
 | Software Defined Accelerator Development using Xilinx SDAccel | [SDAccel hello_world Quickstart](SDAccel/README.md) | [60+ SDAccel examples](./SDAccel/examples/) |
-| Custom Hardware Development(HDK) | [HDK hello_world Quickstart](hdk/README.md) | [Other Custom Hardware examples](./docs/examples/example_list.md) |
+| Custom Hardware Development(HDK) | [HDK hello_world Quickstart](hdk/README.md) | [CL to Shell and DRAM connectivity example](./hdk/cl/examples/cl_dram_dma), [Virtual Ethernet Application](./sdk/apps/virtual-ethernet) using the [Streaming Data Engine](./hdk/cl/examples/cl_sde) |
 | IP Integrator/High Level Design(HLx) | [IPI hello_world Quickstart](hdk/cl/examples/cl_hello_world_hlx/README.md) | [IPI GUI Examples](hdk/docs/IPI_GUI_Examples.md) |
 
 ℹ️ <b>INFO:</b> For more in-depth applications and examples of using High level synthesis, Vitis Libraries, App Notes and Workshops, please refer to our [Example List](./docs/examples/example_list.md)
+
+### How Tos
+| How To | Docs | Next Steps |
+|----|----|----|
+| Migrate Alveo U200 designs to F1 | TODO | TODO |
+| Migrate Alveo U200 designs to F1 | TODO | TODO |
 
 # Documentation Overview
 

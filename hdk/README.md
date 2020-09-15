@@ -313,7 +313,7 @@ If fpga-describe-local-image API call returns a status 'Busy', the FPGA is still
 Now, let us try loading your AFI to FPGA `slot 0`:
 
 ```
-    $ sudo fpga-load-local-image -S 0 -I agfi-0f0e045f919413242
+    $ sudo fpga-load-local-image -S 0 -I agfi-0fcf87119b8e97bf3
 ```
 
 
@@ -322,11 +322,10 @@ Now, let us try loading your AFI to FPGA `slot 0`:
 Now, you can verify that the AFI was loaded properly.  The output shows the FPGA in the “loaded” state after the FPGA image "load" operation.  The "-R" option performs a PCI device remove and recan in order to expose the unique AFI Vendor and Device Id.
 ```
     $ sudo fpga-describe-local-image -S 0 -R -H
-
     Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-    AFI          0       agfi-0f0e045f919413242  loaded            0        ok               0       <shell version>
+    AFI          0       agfi-0fcf87119b8e97bf3  loaded            0        ok               0       0x04261818
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-    AFIDEVICE    0       0x6789      0x1d50      0000:00:0f.0
+    AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 ```
     
 <a name="step6"></a>
