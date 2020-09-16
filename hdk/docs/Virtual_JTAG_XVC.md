@@ -188,7 +188,7 @@ The connection Vivado and the target instance can be terminated by closing the X
 
 # Embedding Debug Cores in the CL 
 
-Before beginning, it should be noted that the following only applies to the HDK flow.  For adding debug cores to a design using SDAccel, see [Debug_RTL_Kernel.md](../../SDAccel/docs/Debug_RTL_Kernel.md) for instructions on how to do so.
+> ⚠️ **NOTE:** Before beginning, it should be noted that the following only applies to the HDK flow. [SDAccel instructions](../../SDAccel/docs/Debug_RTL_Kernel.md) and [Vitis instructions](../../Vitis/docs/Debug_Vitis_Kernel.md) are also available.
 
 The Custom Logic (CL) is required to include the [CL Debug Bridge](../common/shell_v04261818/design/ip/cl_debug_bridge/sim/cl_debug_bridge.v) provided by AWS as part of the HDK, and any required standard Xilinx debug IP components like ILAs and VIOs.
 

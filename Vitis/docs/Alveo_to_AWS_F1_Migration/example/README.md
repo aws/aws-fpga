@@ -5,8 +5,6 @@ This example illustrates how to port a Vitis application developed for an Alveo 
 The Vitis development flow provides platform independent APIs and interfaces to the developer. This greatly facilitates the process of migrating applications across similar FPGA acceleration cards. In this example, the source code for the software program and for the FPGA kernels remains unchanged. Only command line changes are necessary to port the application from Alveo U200 to AWS F1.
 
 
-
-
 ## Example Overview  
 
 The accelerator used in this example is a simple vector-add kernel. The `src` directory contains the source code for the project:
@@ -142,7 +140,6 @@ In order to port the vector-add example from Alveo U200 to AWS F1, the only chan
     Loading: './vadd.awsxclbin'
     TEST PASSED
     ```
-
 
 
 ## Summary

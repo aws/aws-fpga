@@ -12,6 +12,7 @@
     - [Getting Familiar with AWS](#getting-familiar-with-aws)
     - [First time setup](#setting-up-development-environment-for-the-first-time)
     - [Quickstarts](#quickstarts)
+    - [How To's](#how-tos)
 1. [Documentation Overview](#documentation-overview)
 1. [Developer Support](#developer-support)
 
@@ -29,11 +30,11 @@ After creating an FPGA design (also called CL - Custom logic), developers can cr
 
 ## Development Environments
 
-| Development Environment | Description | Accelerator Language | Hardware Interface | Development Tool | Debug Options| Typical Developer |
-| --------|---------|-------|---------|-------|-------|-------|
-| [Software Defined Accelerator Development](Vitis/README.md) | Development experience leverages an optimized compiler to allow easy new accelerator development or migration of existing C/C++/openCL, Verilog/VHDL to AWS FPGA instances | C/C++/OpenCL, Verilog/VHDL (RTL) | OpenCL APIs and XRT | [Vitis/SDAccel](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)| SW/HW Emulation, Simulation, GDB, Virtual JTAG (Chipscope) | SW or HW Developer with zero FPGA experience |
-| [Hardware Accelerator Development](hdk/README.md) | Fully custom hardware development experience provides hardware developers with the tools required for developing AFIs for AWS FPGA instances  | Verilog/VHDL | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | [Vivado](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)| Simulation, Virtual JTAG | HW Developer with advanced FPGA experience |
-| [IP Integrator/High Level Design(HLx)](hdk/docs/IPI_GUI_Vivado_Setup.md) | Graphical interface development experience for integrating IP and high level synthesis development | Verilog/VHDL/C | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | [Vivado](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)| Simulation, Virtual JTAG | HW Developer with intermediate FPGA experience |
+| Development Environment | Description | Accelerator Language | Hardware Interface | Debug Options| Typical Developer |
+| --------|---------|-------|---------|-------|-------|
+| Software Defined Accelerator Development using [Vitis](Vitis/README.md)/[SDAccel](SDAccel/README.md)| Development experience leverages an optimized compiler to allow easy new accelerator development or migration of existing C/C++/openCL, Verilog/VHDL to AWS FPGA instances | C/C++/OpenCL, Verilog/VHDL (RTL) | OpenCL APIs and XRT | SW/HW Emulation, Simulation, GDB, Virtual JTAG (Chipscope) | SW or HW Developer with zero FPGA experience |
+| [Hardware Accelerator Development using Vivado](hdk/README.md) | Fully custom hardware development experience provides hardware developers with the tools required for developing AFIs for AWS FPGA instances  | Verilog/VHDL | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | Simulation, Virtual JTAG | HW Developer with advanced FPGA experience |
+| [IP Integrator/High Level Design(HLx) using Vivado](hdk/docs/IPI_GUI_Vivado_Setup.md) | Graphical interface development experience for integrating IP and high level synthesis development | Verilog/VHDL/C | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | Simulation, Virtual JTAG | HW Developer with intermediate FPGA experience |
 
 > For on-premise development, SDAccel/Vitis/Vivado must have the [correct license and use one of the supported tool versions](./docs/on_premise_licensing_help.md). 
 
@@ -153,10 +154,9 @@ Before you create your own AWS FPGA design, we recommend that you go through one
 ℹ️ <b>INFO:</b> For more in-depth applications and examples of using High level synthesis, Vitis Libraries, App Notes and Workshops, please refer to our [Example List](./docs/examples/example_list.md)
 
 ### How Tos
-| How To | Docs | Next Steps |
-|----|----|----|
-| Migrate Alveo U200 designs to F1 | TODO | TODO |
-| Migrate Alveo U200 designs to F1 | TODO | TODO |
+| How To | Description | 
+|----|----|
+| [Migrate Alveo U200 designs to F1](./Vitis/docs/Alveo_to_AWS_F1_Migration.md) | This application note shows the ease of migrating an Alveo U200 design to F1. | 
 
 # Documentation Overview
 

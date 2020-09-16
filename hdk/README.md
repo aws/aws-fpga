@@ -27,9 +27,9 @@
   * Familiarity with concepts related to designing for FPGAs, DMA, DDR, AXI protocol and linux drivers
   * RTL simulation 
   * Experience with simulation debug or FPGA runtime waveform viewer debug methods
-* Developers not familiar with these areas should start with [software defined acceleration](../SDAccel/README.md)    
-* Developers with existing RTL IP that are not familiar with the areas listed above should start with RTL Kernel development using [software defined acceleration](../SDAccel/README.md).
-* Developers looking for a faster HDK development path, should start with RTL Kernel development using [software defined acceleration](../SDAccel/README.md) 
+* Developers not familiar with these areas should start with [software defined acceleration](../Vitis/README.md)    
+* Developers with existing RTL IP that are not familiar with the areas listed above should start with RTL Kernel development using [software defined acceleration](../Vitis/README.md).
+* Developers looking for a faster HDK development path, should start with RTL Kernel development using [software defined acceleration](../Vitis/README.md) 
 
 * The [documents directory](./docs) provides the specification for the AWS Shell (SH) to Custom Logic (CL) interface:
   * [Shell Interface](./docs/AWS_Shell_Interface_Specification.md)
@@ -44,7 +44,8 @@
   * Developers should not need to change any file under the `/common` directory
   * `shell_stable` directory contains the files needed by developers to build a CL using a current production shell.
 
-* The [Custom Logic (cl) directory](./cl) is where the Custom Logic is expected to be developed (For RTL-based development using Verilog or VHDL). It includes a number of examples under the [examples directory](./cl/examples), as well as a placeholder for the developer's own Custom Logic under [developer_designs directory](./cl/developer_designs).  For more details on the examples, see the [examples table](./cl/examples/cl_examples_list.md).
+* The [Custom Logic (cl) directory](./cl) is where the Custom Logic is expected to be developed (For RTL-based development using Verilog or VHDL). It includes a number of examples under the [examples directory](./cl/examples), as well as a placeholder for the developer's own Custom Logic under [developer_designs directory](./cl/developer_designs).
+For more details on the examples, see the [examples table](./cl/examples/cl_examples_list.md).
 
 <a name="gettingstarted"></a>
 ## Getting Started
@@ -59,10 +60,9 @@
 |-----------|-----------|------|
 | 1.3.0-1.3.6 | 2017.1(Deprecated) | v1.3.5(Deprecated) |
 | 1.3.7-1.3.X | 2017.1(Deprecated) | v1.3.5-v1.3.X(Deprecated) |
-| 1.3.7-1.3.X | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado 2017.4) |
-| 1.4.0-1.4.15 | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado 2017.4) |
-| 1.4.3-1.4.15 | 2018.2 | v1.5.0 (Xilinx Vivado 2018.2) |
-| 1.4.8-1.4.15 | 2018.3 | v1.6.0 (Xilinx Vivado 2018.3) |
+| 1.3.7-1.4.15a | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado 2017.4) |
+| 1.4.3-1.4.15a | 2018.2 | v1.5.0 (Xilinx Vivado 2018.2) |
+| 1.4.8-1.4.15a | 2018.3 | v1.6.0 (Xilinx Vivado 2018.3) |
 | 1.4.11-1.4.x | 2019.1 | v1.7.0 (Xilinx Vivado 2019.1) |
 | 1.4.11-1.4.x | 2019.2 | v1.8.x (Xilinx Vivado 2019.2) |
 | 1.4.16-1.4.x | 2020.1 | v1.9.x (Xilinx Vivado 2020.1) |
@@ -354,7 +354,7 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 
 * Before starting your new design review the specification for the AWS Shell (SH) to Custom Logic (CL) [interface](./docs/AWS_Shell_Interface_Specification.md).
 * Try the [debug flow](docs/Virtual_JTAG_XVC.md) and understand the [shell timeout behavior](docs/HOWTO_detect_shell_timeout.md).
-* When your ready, copy an example to [start your own CL design](./cl/developer_designs/Starting_Your_Own_CL.md) and make a simple modification to get familiar with customizing the hardware developer kit for your development needs.
+* When you are ready, copy an example to [start your own CL design](./cl/developer_designs/Starting_Your_Own_CL.md) and make a simple modification to get familiar with customizing the hardware developer kit for your development needs.
 
 
 
