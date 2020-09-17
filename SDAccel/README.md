@@ -43,7 +43,7 @@ It is highly recommended you read the documentation and utilize software and har
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with SDAccel and required licenses.
   * You may use this F1 instance to [build your host application and Xilinx FPGA binary](#createapp), however, it is more cost efficient to either: 
      * Launch the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on a compute EC2 instance, with a minimum of 30GiB RAM), **OR** 
-     * Follow the [On-Premises Instructions](../hdk/docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
+     * Follow the [On-Premises Instructions](../docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
 * Setup AWS IAM permissions for creating FPGA Images (CreateFpgaImage and DescribeFpgaImages). [EC2 API Permissions are described in more detail](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html).  It is highly recommended that you validate your AWS IAM permissions prior to proceeding with this quick start.  By calling the [DescribeFpgaImages API](../hdk/docs/describe_fpga_images.md) you can check that your IAM permissions are correct.
 * [Setup AWS CLI and S3 Bucket](docs/Setup_AWS_CLI_and_S3_Bucket.md) to enable AFI creation.
 * Install optional [packages](packages.txt) required to run all examples.  If you do not install these packages, some examples may not work properly.  The setup scripts will warn you of any missing packages.
@@ -191,7 +191,7 @@ For help with AFI creation issues, see [create-fpga-image error codes](../hdk/do
 <a name="runonf1"></a>
 # 3. Run the FPGA accelerated application on Amazon FPGA instances
 
-* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#devAmi) and [runtime compatibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
+* Start an FPGA instance using [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) and check the AMI [compatibility table](../README.md#fpga-developer-ami) and [runtime compatibility table](docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table). Alternatively, you can [create your own Runtime AMI](docs/Create_Runtime_AMI.md) for running your SDAccel applications on Amazon FPGA instances.
    * *Assuming the developer flow (compilation) was done on a separate instance you will need to:*
      * Copy the compiled host executable (exe) to the new instance
      * Copy the \*.awsxclbin AWS FPGA binary file to the new instance

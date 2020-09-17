@@ -72,8 +72,7 @@ Now you are ready to instantiate the ILA Debug core in your RTL Kernel. The RTL 
 
 ## 3. Host code changes to support debugging
 
-The application host code needs to be modified to ensure you can set up the ILA trigger conditions **prior** to  running the kernel.   
-
+The application host code needs to be modified to ensure you can set up the ILA trigger conditions **prior** to running the kernel.   
 
 
 The host code shown below introduces the wait for the setup of ILA Trigger conditions and the arming of the ILA.

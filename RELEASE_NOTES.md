@@ -1,28 +1,15 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
-##  AWS EC2 F1 Platform Features:
-   *    1-8 Xilinx UltraScale+ VU9P based FPGA slots
-   *    Per FPGA Slot, Interfaces available for Custom Logic(CL):
-         *    One x16 PCIe Gen 3 Interface
-         *    Four DDR4 RDIMM interfaces (with ECC)
-         *    AXI4 protocol support on all interfaces
-   *    User-defined clock frequency driving all CL to Shell interfaces
-   *    Multiple free running auxiliary clocks
-   *    PCI-E endpoint presentation to Custom Logic(CL)
-         *    Management PF (physical function)
-         *    Application PF
-   *    Virtual JTAG, Virtual LED, Virtual DIP Switches
-   *    PCI-E interface between Shell(SH) and Custom Logic(CL).
-         *    SH to CL inbound 512-bit AXI4 interface
-         *    CL to SH outbound 512-bit AXI4 interface
-     *    Multiple 32-bit AXI-Lite buses for register access, mapped to different PCIe BARs
-         *    Maximum payload size set by the Shell
-         *    Maximum read request size set by the Shell
-         *    AXI4 error handling 
-    *    DDR interface between SH and CL
-         *    CL to SH 512-bit AXI4 interface
-         *    1 DDR controller implemented in the SH (always available)
-         *    3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
+## Release 1.4.16 (See [ERRATA](./ERRATA.md) for unsupported features)
+* FPGA developer kit now supports Xilinx Vivado/Vitis 2020.1
+    * To upgrade, use [Developer AMI v1.9.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace.
+* Updated Vitis examples to include usage of Vitis Libraries.
+* Added documentation and examples to show Xilinx Alveo design migration to F1.
+
+## Release 1.4.15a (See [ERRATA](./ERRATA.md) for unsupported features)
+* Fixed Xilinx AR#73068 patching
+    * DDR4 IP needs to be regenerated for the patch to take effect.
+* Updated cl_dram_dma public AFI.
 
 ## Release 1.4.15 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Added Xilinx AR#73068 patching
@@ -233,55 +220,6 @@
 * The previous shell (v071417d3) will be supported until 09/01/2018.  Developers are required to use the [developer kit v1.3.X branch](https://github.com/aws/aws-fpga/tree/REL_v1_3_8) for all shell version v071417d3 development.  
 
 * Release 1.4.0 greatly improves the performance of the DMA (for interrupt driven DMA on the cl\_dram\_dma example design). This is accomplished through a combination of shell changes to relax DMA timeouts and a new XDMA software driver option.  We have ported the relevant HDK examples to the XDMA driver in this release. EDMA is still supported, and developers can freely choose which DMA driver to use as part of their host application.
-
-
-## Supported Tools and Environment
-
-* The HDK and SDK are designed for **Linux** environment and has not been tested on other platforms
-* The First installation of AWS FPGA SDK requires having gcc installed on the instance. If it's not available, try `sudo yum update && sudo yum group install "Development Tools"`
-* The HDK build step requires having Xilinx's Vivado tool and Vivado License Management running.  These are provided with AWS FPGA Developer AMI at no additional cost
-* This release is tested and validated with Xilinx 2017.4 SDx/Vivado
-* Developers that choose to develop on-premises need to have Xilinx license 'EF-VIVADO-SDX-VU9P-OP' installed. For more help, please refer to the [on-premises licensing help](./hdk/docs/on_premise_licensing_help.md)
-* The following simulators are supported with this HDK:
-**Vivado XSIM RTL simulator
-** Mentor Graphics' Questa RTL simulator (with a separate license from MentorGraphics)
-** Synopsys' VCS RTL simulator (with a separate license from Synopsys)
-
-## License Requirements
-
-The HDK and SDK in the FPGA development kit have different licenses. For more details please refer to the [HDK License](./hdk/LICENSE.txt) and the [SDK License](./sdk/LICENSE.txt).
-
-## FAQs
- 
-**Q: How do I know which HDK version I have on my instance/machine? **
-
-Look for the ./hdk/hdk_version.txt file.
-
-**Q: How do I know what my Shell version is? **
-
-The Shell version of an FPGA slot is available through the FPGA Image Management tools after an AFI has been loaded.  See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot.  Prior to loading an AFI, the state of the FPGA (including shell version) is undefined and non-deterministic.  
-
-**Q: How do I know what version of FPGA Image management tools are running on my instance? **
-
-The FPGA Image management tools version is reported with any command executed from these tools.  See the description of `fpga-describe-local-image` for more details.
-
-**Q: How do I update my existing design with this release?**
-
-1.    Start by either cloning the entire GitHub structure for the HDK release or downloading new directories that have changed.  AWS recommends an entire GitHub clone to ensure no files are missed
-2.    Update the CL design to conform to the new AWS_Shell_Interface_Specification TODO: add link. TODO: need a doc to outline what changes are a MUST in this upgrade, and which ones are optional?
-3.    Follow the process for AFI generation outlined in aws-fpga/hdk/cl/examples/readme.md
-4.    Update FPGA Image Management Tools to the version included in aws-fpga/sdk/management
-TODO: SDaccel design have different steps?
-
-**Q: How do I get support?**
-
-The FPGA Development forum provides an easy access to Developer support.  It's the first place to go to post questions, suggestions and receive important announcements from the AWS FPGA team. To gain access to the user forum, please go to https://forums.aws.amazon.com/index.jspa and login. To be notified of important messages you will need to click the “Watch Forum” button on the right side of the screen.
-
-**Q: How do I know which HDK GitHub release I am working with? **
-
-See the release notes at the top of the GitHub directory to identify the version of your GitHub clone.  
-
-TODO: The following major features are included in this HDK release: 
 
 
 ## Previous release notes

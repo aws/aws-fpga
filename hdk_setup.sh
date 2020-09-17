@@ -209,13 +209,13 @@ if ! make -s -C $HDK_DIR/common/verif/scripts MODEL_DIR=$models_dir; then
   return 2
 fi
 
-if [[ ":$cl_dir" == ':' ]]; then
-  info_msg "attention: don't forget to set the cl_dir variable for the directory of your custom logic.";
+if [[ ":$CL_DIR" == ':' ]]; then
+  info_msg "attention: don't forget to set the CL_DIR variable for the directory of your custom logic.";
 else
-  info_msg "cl_dir is $cl_dir"
-  if [ ! -d $cl_dir ]; then
-    err_msg "cl_dir doesn't exist. set cl_dir to a valid directory."
-    unset cl_dir
+  info_msg "CL_DIR is $CL_DIR"
+  if [ ! -d $CL_DIR ]; then
+    err_msg "CL_DIR doesn't exist. set CL_DIR to a valid directory."
+    unset CL_DIR
   fi
 fi
 
