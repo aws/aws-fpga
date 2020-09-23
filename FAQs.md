@@ -139,21 +139,6 @@ Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI i
 
 Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to restrict access to this API.
 
-**Q: Can I share an AFI with other AWS accounts?**
-
-Yes, sharing allows accounts other than the owner account to load and use an AFI.  Use [modify-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to update `loadPermission` attribute to grant/remove AFI load permission.  AWS AFIs support two load permission types:
-* `UserId`: share AFI with specific AWS accounts using account IDs.
-* `UserGroups`: only supports `all` group to make an AFI public or private.
-
-Use [reset-fpga-image-attribute](./hdk/docs/fpga_image_attributes.md) API to revoke all load permissions.
-
-**Q: Can I delete an AFI?**
-
-Yes, use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) to delete an AFI in a specific region.  Deleting an AFI in one region does not affect AFIs in other regions.
-
-Use [delete-fpga-image](./hdk/docs/delete_fpga_image.md) carefully. Once all AFIs of the same global AFI ID are deleted, the AFIs cannot be recovered from deletion.  Review [IAM policy best practices](http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) to resrict access to this API.
-
-
 **Q: How do I increase my AFI limit?**
 
 AFI limit increases may be requested by opening up a Support Case from your [EC2 Support Console](https://console.aws.amazon.com/support/cases#/create)
