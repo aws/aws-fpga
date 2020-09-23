@@ -64,11 +64,10 @@ static unsigned int interrupt_mode;
 module_param(interrupt_mode, uint, 0644);
 MODULE_PARM_DESC(interrupt_mode, "0 - MSI-x , 1 - MSI, 2 - Legacy");
 
-static unsigned int enable_credit_mp = 1;
+static unsigned int enable_credit_mp = 0;
 module_param(enable_credit_mp, uint, 0644);
-MODULE_PARM_DESC(
-	enable_credit_mp,
-	"Set 0 to disable credit feature, default is 1 ( credit control enabled)");
+MODULE_PARM_DESC(enable_credit_mp,
+	"Set 1 to enable credit feature, default is 0 (no credit control)");
 
 unsigned int desc_blen_max = XDMA_DESC_BLEN_MAX;
 module_param(desc_blen_max, uint, 0644);

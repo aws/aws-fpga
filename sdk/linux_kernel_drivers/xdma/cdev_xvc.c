@@ -219,7 +219,7 @@ static long xvc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 unlock:
 #if KERNEL_VERSION(5, 1, 0) >= LINUX_VERSION_CODE
-	mmiowb();
+	wmb();
 #endif
 	spin_unlock(&xcdev->lock);
 
