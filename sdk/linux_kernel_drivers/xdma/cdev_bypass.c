@@ -21,6 +21,8 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+#define pr_fmt(fmt)	KBUILD_MODNAME ":%s: " fmt, __func__
+
 #include "libxdma_api.h"
 #include "xdma_cdev.h"
 

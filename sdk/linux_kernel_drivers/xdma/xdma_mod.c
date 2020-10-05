@@ -50,6 +50,10 @@ MODULE_LICENSE("GPL v2");
 static int xpdev_cnt;
 
 static const struct pci_device_id pci_ids[] = {
+	{ PCI_DEVICE(0x10ee, 0x9048), },
+	{ PCI_DEVICE(0x10ee, 0x9044), },
+	{ PCI_DEVICE(0x10ee, 0x9042), },
+	{ PCI_DEVICE(0x10ee, 0x9041), },
 	{ PCI_DEVICE(0x10ee, 0x903f), },
 	{ PCI_DEVICE(0x10ee, 0x9038), },
 	{ PCI_DEVICE(0x10ee, 0x9028), },

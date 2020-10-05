@@ -82,10 +82,7 @@ void xdma_device_close(struct pci_dev *pdev, void *dev_handle);
 /* 
  * xdma_device_restart - restart the fpga
  * @pdev: ptr to struct pci_dev
- * TODO:
- *	may need more refining on the parameter list
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_device_restart(struct pci_dev *pdev, void *dev_handle);
 
@@ -106,7 +103,6 @@ int xdma_device_restart(struct pci_dev *pdev, void *dev_handle);
  * @name: to be passed to the handler, ignored if handler is NULL`
  * @dev: to be passed to the handler, ignored if handler is NULL`
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
 			 irq_handler_t handler, void *dev);
@@ -116,7 +112,6 @@ int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
  * @pdev: ptr to the the pci_dev struct	
  * @mask: bitmask of user interrupts (0 ~ 15)to be registered
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_user_isr_enable(void *dev_hndl, unsigned int mask);
 int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
@@ -133,23 +128,8 @@ int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
  * @timeout: timeout in mili-seconds, *currently ignored
  * return # of bytes transfered or
  *	 < 0 in case of error
- * TODO: exact error code will be defined later
  */
 ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
 			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
-
-ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel, bool write, u64 ep_addr,
-			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
-
-
-ssize_t xdma_xfer_completion(void *cb_hndl, void *dev_hndl, int channel, bool write, u64 ep_addr,
-			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
-
-			
-
-/////////////////////missing API////////////////////
-
-//xdma_get_channle_state - if no interrupt on DMA hang is available
-//xdma_channle_restart
 
 #endif

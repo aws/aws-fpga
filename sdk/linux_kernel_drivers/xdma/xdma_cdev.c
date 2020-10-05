@@ -527,7 +527,6 @@ int xpdev_create_interfaces(struct xdma_pci_dev *xpdev)
 	}
 	xpdev_flag_set(xpdev, XDF_CDEV_SG);
 
-	/* ??? Bypass */
 	/* Initialize Bypass Character Device */
 	if (xdev->bypass_bar_idx > 0) {
 		for (i = 0; i < xpdev->h2c_channel_max; i++) {
@@ -615,28 +614,11 @@ int xdma_cdev_init(void)
 		return -EINVAL;
 	}
 
-	/* using kmem_cache_create to enable sequential cleanup */
-	cdev_cache = kmem_cache_create("cdev_cache",
-					sizeof(struct cdev_async_io), 0,
-					SLAB_HWCACHE_ALIGN, NULL);
-
-	if (!cdev_cache) {
-		pr_info("memory allocation for cdev_cache failed. OOM\n");
-		return -ENOMEM;
-	}
-
-	xdma_threads_create(num_online_cpus());
-
 	return 0;
 }
 
 void xdma_cdev_cleanup(void)
 {
-	if (cdev_cache)
-		kmem_cache_destroy(cdev_cache);
-
 	if (g_xdma_class)
 		class_destroy(g_xdma_class);
-
-	xdma_threads_destroy();
 }

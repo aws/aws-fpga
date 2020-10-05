@@ -28,8 +28,7 @@
 #include <linux/ioctl.h>
 
 /*
- * !!! TODO !!!
- * need a better way set the bar offset dynamicly
+ * the bar offset can be changed at compile time via xvc_bar_offset
  */
 #define XVC_BAR_OFFSET_DFLT	0x40000	/* DSA 4.0 */
 

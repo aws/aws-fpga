@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-#define pr_fmt(fmt) KBUILD_MODNAME ":%s: " fmt, __func__
+#define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -35,25 +35,6 @@
 #include "libxdma.h"
 #include "libxdma_api.h"
 #include "cdev_sgdma.h"
-#include "xdma_thread.h"
-
-/* SECTION: Module licensing */
-
-#ifdef __LIBXDMA_MOD__
-#include "version.h"
-#define DRV_MODULE_NAME "libxdma"
-#define DRV_MODULE_DESC "Xilinx XDMA Base Driver"
-
-static char version[] =
-	DRV_MODULE_DESC " " DRV_MODULE_NAME " v" DRV_MODULE_VERSION "\n";
-
-MODULE_AUTHOR("Xilinx, Inc.");
-MODULE_DESCRIPTION(DRV_MODULE_DESC);
-MODULE_VERSION(DRV_MODULE_VERSION);
-MODULE_LICENSE("GPL v2");
-#endif
-
-extern unsigned int desc_blen_max;
 
 /* Module Parameters */
 static unsigned int poll_mode;
@@ -64,37 +45,13 @@ static unsigned int interrupt_mode;
 module_param(interrupt_mode, uint, 0644);
 MODULE_PARM_DESC(interrupt_mode, "0 - MSI-x , 1 - MSI, 2 - Legacy");
 
-static unsigned int enable_credit_mp = 0;
+static unsigned int enable_credit_mp;
 module_param(enable_credit_mp, uint, 0644);
-MODULE_PARM_DESC(enable_credit_mp,
-	"Set 1 to enable credit feature, default is 0 (no credit control)");
+MODULE_PARM_DESC(enable_credit_mp, "Set 1 to enable creidt feature, default is 0 (no credit control)");
 
 unsigned int desc_blen_max = XDMA_DESC_BLEN_MAX;
 module_param(desc_blen_max, uint, 0644);
-MODULE_PARM_DESC(desc_blen_max,
-		 "per descriptor max. buffer length, default is (1 << 28) - 1");
-
-#define XDMA_PERF_NUM_DESC 128
-
-/* Kernel version adaptative code */
-#if KERNEL_VERSION(4, 19, 0) <= LINUX_VERSION_CODE
-/* since 4.18, using simple wait queues is not recommended
- * except for realtime constraint (see swait.h comments)
- * and will likely be removed in future kernel versions
- */
-#define xlx_wake_up	swake_up_one
-#define xlx_wait_event_interruptible_timeout \
-			swait_event_interruptible_timeout_exclusive
-#elif KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
-#define xlx_wake_up	swake_up
-#define xlx_wait_event_interruptible_timeout \
-			swait_event_interruptible_timeout
-#else
-#define xlx_wake_up	wake_up_interruptible
-#define xlx_wait_event_interruptible_timeout \
-			wait_event_interruptible_timeout
-#endif
-
+MODULE_PARM_DESC(desc_blen_max, "per descriptor max. buffer length, default is (1 << 28) - 1");
 
 /*
  * xdma device management
@@ -107,7 +64,8 @@ static LIST_HEAD(xdev_rcu_list);
 static DEFINE_SPINLOCK(xdev_rcu_lock);
 
 #ifndef list_last_entry
-#define list_last_entry(ptr, type, member) list_entry((ptr)->prev, type, member)
+#define list_last_entry(ptr, type, member) \
+		list_entry((ptr)->prev, type, member)
 #endif
 
 static inline void xdev_list_add(struct xdma_dev *xdev)
@@ -125,7 +83,7 @@ static inline void xdev_list_add(struct xdma_dev *xdev)
 	mutex_unlock(&xdev_mutex);
 
 	dbg_init("dev %s, xdev 0x%p, xdma idx %d.\n",
-		 dev_name(&xdev->pdev->dev), xdev, xdev->idx);
+		dev_name(&xdev->pdev->dev), xdev, xdev->idx);
 
 	spin_lock(&xdev_rcu_lock);
 	list_add_tail_rcu(&xdev->rcu_node, &xdev_rcu_list);
@@ -160,10 +118,9 @@ struct xdma_dev *xdev_find_by_pdev(struct pci_dev *pdev)
 	mutex_unlock(&xdev_mutex);
 	return NULL;
 }
-EXPORT_SYMBOL_GPL(xdev_find_by_pdev);
 
 static inline int debug_check_dev_hndl(const char *fname, struct pci_dev *pdev,
-				       void *hndl)
+				 void *hndl)
 {
 	struct xdma_dev *xdev;
 
@@ -172,13 +129,13 @@ static inline int debug_check_dev_hndl(const char *fname, struct pci_dev *pdev,
 
 	xdev = xdev_find_by_pdev(pdev);
 	if (!xdev) {
-		pr_info("%s pdev 0x%p, hndl 0x%p, NO match found!\n", fname,
-			pdev, hndl);
+		pr_info("%s pdev 0x%p, hndl 0x%p, NO match found!\n",
+			fname, pdev, hndl);
 		return -EINVAL;
 	}
 	if (xdev != hndl) {
-		pr_err("%s pdev 0x%p, hndl 0x%p != 0x%p!\n", fname, pdev, hndl,
-		       xdev);
+		pr_err("%s pdev 0x%p, hndl 0x%p != 0x%p!\n",
+			fname, pdev, hndl, xdev);
 		return -EINVAL;
 	}
 
@@ -187,8 +144,7 @@ static inline int debug_check_dev_hndl(const char *fname, struct pci_dev *pdev,
 
 #ifdef __LIBXDMA_DEBUG__
 /* SECTION: Function definitions */
-inline void __write_register(const char *fn, u32 value, void *iomem,
-			     unsigned long off)
+inline void __write_register(const char *fn, u32 value, void *iomem, unsigned long off)
 {
 	pr_err("%s: w reg 0x%lx(0x%p), 0x%x.\n", fn, off, iomem, value);
 	iowrite32(value, iomem);
@@ -215,9 +171,8 @@ static inline u64 build_u64(u64 hi, u64 lo)
 
 static void check_nonzero_interrupt_status(struct xdma_dev *xdev)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 	u32 w;
 
 	w = read_register(&reg->user_int_enable);
@@ -252,9 +207,8 @@ static void check_nonzero_interrupt_status(struct xdma_dev *xdev)
 /* channel_interrupts_enable -- Enable interrupts we are interested in */
 static void channel_interrupts_enable(struct xdma_dev *xdev, u32 mask)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 
 	write_register(mask, &reg->channel_int_enable_w1s, XDMA_OFS_INT_CTRL);
 }
@@ -262,9 +216,8 @@ static void channel_interrupts_enable(struct xdma_dev *xdev, u32 mask)
 /* channel_interrupts_disable -- Disable interrupts we not interested in */
 static void channel_interrupts_disable(struct xdma_dev *xdev, u32 mask)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 
 	write_register(mask, &reg->channel_int_enable_w1c, XDMA_OFS_INT_CTRL);
 }
@@ -272,9 +225,8 @@ static void channel_interrupts_disable(struct xdma_dev *xdev, u32 mask)
 /* user_interrupts_enable -- Enable interrupts we are interested in */
 static void user_interrupts_enable(struct xdma_dev *xdev, u32 mask)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 
 	write_register(mask, &reg->user_int_enable_w1s, XDMA_OFS_INT_CTRL);
 }
@@ -282,9 +234,8 @@ static void user_interrupts_enable(struct xdma_dev *xdev, u32 mask)
 /* user_interrupts_disable -- Disable interrupts we not interested in */
 static void user_interrupts_disable(struct xdma_dev *xdev, u32 mask)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 
 	write_register(mask, &reg->user_int_enable_w1c, XDMA_OFS_INT_CTRL);
 }
@@ -292,19 +243,18 @@ static void user_interrupts_disable(struct xdma_dev *xdev, u32 mask)
 /* read_interrupts -- Print the interrupt controller status */
 static u32 read_interrupts(struct xdma_dev *xdev)
 {
-	struct interrupt_regs *reg =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *reg = (struct interrupt_regs *)
+		(xdev->bar[xdev->config_bar_idx] + XDMA_OFS_INT_CTRL);
 	u32 lo;
 	u32 hi;
 
 	/* extra debugging; inspect complete engine set of registers */
 	hi = read_register(&reg->user_int_request);
 	dbg_io("ioread32(0x%p) returned 0x%08x (user_int_request).\n",
-	       &reg->user_int_request, hi);
+		&reg->user_int_request, hi);
 	lo = read_register(&reg->channel_int_request);
 	dbg_io("ioread32(0x%p) returned 0x%08x (channel_int_request)\n",
-	       &reg->channel_int_request, lo);
+		&reg->channel_int_request, lo);
 
 	/* return interrupts: user in upper 16-bits, channel in lower 16-bits */
 	return build_u32(hi, lo);
@@ -316,26 +266,26 @@ void enable_perf(struct xdma_engine *engine)
 
 	w = XDMA_PERF_CLEAR;
 	write_register(w, &engine->regs->perf_ctrl,
-		       (unsigned long)(&engine->regs->perf_ctrl) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->perf_ctrl) -
+			(unsigned long)(&engine->regs));
 	read_register(&engine->regs->identifier);
 	w = XDMA_PERF_AUTO | XDMA_PERF_RUN;
 	write_register(w, &engine->regs->perf_ctrl,
-		       (unsigned long)(&engine->regs->perf_ctrl) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->perf_ctrl) -
+			(unsigned long)(&engine->regs));
 	read_register(&engine->regs->identifier);
 
 	dbg_perf("IOCTL_XDMA_PERF_START\n");
+
 }
-EXPORT_SYMBOL_GPL(enable_perf);
 
 void get_perf_stats(struct xdma_engine *engine)
 {
 	u32 hi;
 	u32 lo;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return;
 	}
 
@@ -361,39 +311,38 @@ void get_perf_stats(struct xdma_engine *engine)
 	lo = read_register(&engine->regs->perf_pnd_lo);
 	engine->xdma_perf->pending_count = build_u64(hi, lo);
 }
-EXPORT_SYMBOL_GPL(get_perf_stats);
 
-static int engine_reg_dump(struct xdma_engine *engine)
+static void engine_reg_dump(struct xdma_engine *engine)
 {
 	u32 w;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
 	w = read_register(&engine->regs->identifier);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (id).\n", engine->name,
-		&engine->regs->identifier, w);
+	pr_info("%s: ioread32(0x%p) = 0x%08x (id).\n",
+		engine->name, &engine->regs->identifier, w);
 	w &= BLOCK_ID_MASK;
 	if (w != BLOCK_ID_HEAD) {
-		pr_err("%s: engine id missing, 0x%08x exp. & 0x%x = 0x%x\n",
-		       engine->name, w, BLOCK_ID_MASK, BLOCK_ID_HEAD);
-		return -EINVAL;
+		pr_info("%s: engine id missing, 0x%08x exp. & 0x%x = 0x%x\n",
+			 engine->name, w, BLOCK_ID_MASK, BLOCK_ID_HEAD);
+		return;
 	}
 	/* extra debugging; inspect complete engine set of registers */
 	w = read_register(&engine->regs->status);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (status).\n", engine->name,
-		&engine->regs->status, w);
+	pr_info("%s: ioread32(0x%p) = 0x%08x (status).\n",
+		engine->name, &engine->regs->status, w);
 	w = read_register(&engine->regs->control);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (control)\n", engine->name,
-		&engine->regs->control, w);
+	pr_info("%s: ioread32(0x%p) = 0x%08x (control)\n",
+		engine->name, &engine->regs->control, w);
 	w = read_register(&engine->sgdma_regs->first_desc_lo);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_lo)\n", engine->name,
-		&engine->sgdma_regs->first_desc_lo, w);
+	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_lo)\n",
+		engine->name, &engine->sgdma_regs->first_desc_lo, w);
 	w = read_register(&engine->sgdma_regs->first_desc_hi);
-	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_hi)\n", engine->name,
-		&engine->sgdma_regs->first_desc_hi, w);
+	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_hi)\n",
+		engine->name, &engine->sgdma_regs->first_desc_hi, w);
 	w = read_register(&engine->sgdma_regs->first_desc_adjacent);
 	pr_info("%s: ioread32(0x%p) = 0x%08x (first_desc_adjacent).\n",
 		engine->name, &engine->sgdma_regs->first_desc_adjacent, w);
@@ -403,10 +352,15 @@ static int engine_reg_dump(struct xdma_engine *engine)
 	w = read_register(&engine->regs->interrupt_enable_mask);
 	pr_info("%s: ioread32(0x%p) = 0x%08x (interrupt_enable_mask)\n",
 		engine->name, &engine->regs->interrupt_enable_mask, w);
-
-	return 0;
 }
 
+/**
+ * engine_status_read() - read status of SG DMA engine (optionally reset)
+ *
+ * Stores status in engine->status.
+ *
+ * @return -1 on failure, status register otherwise
+ */
 static void engine_status_dump(struct xdma_engine *engine)
 {
 	u32 v = engine->status;
@@ -415,7 +369,7 @@ static void engine_status_dump(struct xdma_engine *engine)
 	int len = 0;
 
 	len = sprintf(buf, "SG engine %s status: 0x%08x: ", engine->name, v);
-
+	
 	if ((v & XDMA_STAT_BUSY))
 		len += sprintf(buf + len, "BUSY,");
 	if ((v & XDMA_STAT_DESC_STOPPED))
@@ -461,7 +415,7 @@ static void engine_status_dump(struct xdma_engine *engine)
 				len += sprintf(buf + len, "SLAVE_ERR ");
 			buf[len - 1] = ',';
 		}
-
+		
 	} else {
 		/* C2H only */
 		if ((v & XDMA_STAT_C2H_R_ERR_MASK)) {
@@ -494,55 +448,39 @@ static void engine_status_dump(struct xdma_engine *engine)
 	pr_info("%s\n", buffer);
 }
 
-/**
- * engine_status_read() - read status of SG DMA engine (optionally reset)
- *
- * Stores status in engine->status.
- *
- * @return error value on failure, 0 otherwise
- */
-static int engine_status_read(struct xdma_engine *engine, bool clear, bool dump)
+static void engine_status_read(struct xdma_engine *engine, bool clr, bool dump)
 {
-	int rv = 0;
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
-	if (dump) {
-		rv = engine_reg_dump(engine);
-		if (rv < 0) {
-			pr_err("Failed to dump register\n");
-			return rv;
-		}
-	}
+	if (dump)
+		engine_reg_dump(engine);
 
 	/* read status register */
-	if (clear)
+	if (clr)
 		engine->status = read_register(&engine->regs->status_rc);
 	else
 		engine->status = read_register(&engine->regs->status);
 
 	if (dump)
 		engine_status_dump(engine);
-
-	return rv;
 }
 
 /**
  * xdma_engine_stop() - stop an SG DMA engine
  *
  */
-static int xdma_engine_stop(struct xdma_engine *engine)
+static void xdma_engine_stop(struct xdma_engine *engine)
 {
 	u32 w;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
-	dbg_tfr("%s(engine=%p)\n", __func__, engine);
+	dbg_tfr("xdma_engine_stop(engine=%p)\n", engine);
 
 	w = 0;
 	w |= (u32)XDMA_CTRL_IE_DESC_ALIGN_MISMATCH;
@@ -551,29 +489,33 @@ static int xdma_engine_stop(struct xdma_engine *engine)
 	w |= (u32)XDMA_CTRL_IE_DESC_ERROR;
 
 	if (poll_mode) {
-		w |= (u32)XDMA_CTRL_POLL_MODE_WB;
+		w |= (u32) XDMA_CTRL_POLL_MODE_WB;
 	} else {
 		w |= (u32)XDMA_CTRL_IE_DESC_STOPPED;
 		w |= (u32)XDMA_CTRL_IE_DESC_COMPLETED;
+
+		/* Disable IDLE STOPPED for MM */
+		if ((engine->streaming && (engine->dir == DMA_FROM_DEVICE)) ||
+		    (engine->xdma_perf))
+			w |= (u32)XDMA_CTRL_IE_IDLE_STOPPED;
 	}
 
 	dbg_tfr("Stopping SG DMA %s engine; writing 0x%08x to 0x%p.\n",
-		engine->name, w, (u32 *)&engine->regs->control);
+			engine->name, w, (u32 *)&engine->regs->control);
 	write_register(w, &engine->regs->control,
 			(unsigned long)(&engine->regs->control) -
-				(unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs));
 	/* dummy read of status register to flush all previous writes */
-	dbg_tfr("%s(%s) done\n", __func__, engine->name);
-	return 0;
+	dbg_tfr("xdma_engine_stop(%s) done\n", engine->name);
 }
 
-static int engine_start_mode_config(struct xdma_engine *engine)
+static void engine_start_mode_config(struct xdma_engine *engine)
 {
 	u32 w;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
 	/* If a perf test is running, enable the engine interrupts */
@@ -586,10 +528,9 @@ static int engine_start_mode_config(struct xdma_engine *engine)
 		w |= XDMA_CTRL_IE_READ_ERROR;
 		w |= XDMA_CTRL_IE_DESC_ERROR;
 
-		write_register(
-			w, &engine->regs->interrupt_enable_mask,
+		write_register(w, &engine->regs->interrupt_enable_mask,
 			(unsigned long)(&engine->regs->interrupt_enable_mask) -
-				(unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs));
 	}
 
 	/* write control register of SG DMA engine */
@@ -601,28 +542,29 @@ static int engine_start_mode_config(struct xdma_engine *engine)
 
 	if (poll_mode) {
 		w |= (u32)XDMA_CTRL_POLL_MODE_WB;
-	} else {
+	} else { 
 		w |= (u32)XDMA_CTRL_IE_DESC_STOPPED;
 		w |= (u32)XDMA_CTRL_IE_DESC_COMPLETED;
-	}
 
+		if ((engine->streaming && (engine->dir == DMA_FROM_DEVICE)) ||
+		    (engine->xdma_perf))
+			w |= (u32)XDMA_CTRL_IE_IDLE_STOPPED;
+	}
 	/* set non-incremental addressing mode */
 	if (engine->non_incr_addr)
 		w |= (u32)XDMA_CTRL_NON_INCR_ADDR;
 
 	dbg_tfr("iowrite32(0x%08x to 0x%p) (control)\n", w,
-		(void *)&engine->regs->control);
-
+			(void *)&engine->regs->control);
 	/* start the engine */
 	write_register(w, &engine->regs->control,
-		       (unsigned long)(&engine->regs->control) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->control) -
+			(unsigned long)(&engine->regs));
 
 	/* dummy read of status register to flush all previous writes */
 	w = read_register(&engine->regs->status);
 	dbg_tfr("ioread32(0x%p) = 0x%08x (dummy read flushes writes).\n",
-		&engine->regs->status, w);
-	return 0;
+			&engine->regs->status, w);
 }
 
 /**
@@ -646,46 +588,29 @@ static struct xdma_transfer *engine_start(struct xdma_engine *engine)
 	struct xdma_transfer *transfer;
 	u32 w;
 	int extra_adj = 0;
-	int rv;
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return NULL;
-	}
 
 	/* engine must be idle */
-	if (engine->running) {
-		pr_info("%s engine is not in idle state to start\n",
-			engine->name);
+	if (unlikely(!engine || engine->running)) {
+		pr_err("engine 0x%p running.\n", engine);
 		return NULL;
 	}
-
 	/* engine transfer queue must not be empty */
-	if (list_empty(&engine->transfer_list)) {
-		pr_debug("%s engine transfer queue must not be empty\n",
-			 engine->name);
+	if (unlikely(list_empty(&engine->transfer_list))) {
+		pr_err("engine %s queue empty.\n", engine->name);
 		return NULL;
 	}
 	/* inspect first transfer queued on the engine */
 	transfer = list_entry(engine->transfer_list.next, struct xdma_transfer,
-			      entry);
-	if (!transfer) {
-		pr_debug("%s queued transfer must not be empty\n",
-			 engine->name);
+				entry);
+	if (unlikely(!transfer)) {
+		pr_err("engine %s no xfer queued.\n", engine->name);
 		return NULL;
 	}
 
 	/* engine is no longer shutdown */
 	engine->shutdown = ENGINE_SHUTDOWN_NONE;
 
-	dbg_tfr("%s(%s): transfer=0x%p.\n", __func__, engine->name, transfer);
-
-	/* Add credits for Streaming mode C2H */
-	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
-		if (enable_credit_mp)
-			write_register(engine->desc_used,
-					&engine->sgdma_regs->credits, 0);
-	}
+	dbg_tfr("engine_start(%s): transfer=0x%p.\n", engine->name, transfer);
 
 	/* initialize number of descriptors of dequeued transfers */
 	engine->desc_dequeued = 0;
@@ -693,48 +618,38 @@ static struct xdma_transfer *engine_start(struct xdma_engine *engine)
 	/* write lower 32-bit of bus address of transfer first descriptor */
 	w = cpu_to_le32(PCI_DMA_L(transfer->desc_bus));
 	dbg_tfr("iowrite32(0x%08x to 0x%p) (first_desc_lo)\n", w,
-		(void *)&engine->sgdma_regs->first_desc_lo);
+			(void *)&engine->sgdma_regs->first_desc_lo);
 	write_register(w, &engine->sgdma_regs->first_desc_lo,
-		       (unsigned long)(&engine->sgdma_regs->first_desc_lo) -
-			       (unsigned long)(&engine->sgdma_regs));
+			(unsigned long)(&engine->sgdma_regs->first_desc_lo) -
+			(unsigned long)(&engine->sgdma_regs));
 	/* write upper 32-bit of bus address of transfer first descriptor */
 	w = cpu_to_le32(PCI_DMA_H(transfer->desc_bus));
 	dbg_tfr("iowrite32(0x%08x to 0x%p) (first_desc_hi)\n", w,
-		(void *)&engine->sgdma_regs->first_desc_hi);
+			(void *)&engine->sgdma_regs->first_desc_hi);
 	write_register(w, &engine->sgdma_regs->first_desc_hi,
-		       (unsigned long)(&engine->sgdma_regs->first_desc_hi) -
-			       (unsigned long)(&engine->sgdma_regs));
+			(unsigned long)(&engine->sgdma_regs->first_desc_hi) -
+			(unsigned long)(&engine->sgdma_regs));
 
 	if (transfer->desc_adjacent > 0) {
 		extra_adj = transfer->desc_adjacent - 1;
 		if (extra_adj > MAX_EXTRA_ADJ)
 			extra_adj = MAX_EXTRA_ADJ;
 	}
-	dbg_tfr("iowrite32(0x%08x to 0x%p) (first_desc_adjacent)\n", extra_adj,
-		(void *)&engine->sgdma_regs->first_desc_adjacent);
-	write_register(
-		extra_adj, &engine->sgdma_regs->first_desc_adjacent,
-		(unsigned long)(&engine->sgdma_regs->first_desc_adjacent) -
+	dbg_tfr("iowrite32(0x%08x to 0x%p) (first_desc_adjacent)\n",
+		extra_adj, (void *)&engine->sgdma_regs->first_desc_adjacent);
+	write_register(extra_adj, &engine->sgdma_regs->first_desc_adjacent,
+			(unsigned long)(&engine->sgdma_regs->first_desc_adjacent) -
 			(unsigned long)(&engine->sgdma_regs));
 
 	dbg_tfr("ioread32(0x%p) (dummy read flushes writes).\n",
 		&engine->regs->status);
-
-#if KERNEL_VERSION(5, 1, 0) >= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(5, 1, 0)
 	mmiowb();
 #endif
+	engine_start_mode_config(engine);
 
-	rv = engine_start_mode_config(engine);
-	if (rv < 0) {
-		pr_err("Failed to start engine mode config\n");
-		return NULL;
-	}
+	engine_status_read(engine, 0, 0);
 
-	rv = engine_status_read(engine, 0, 0);
-	if (rv < 0) {
-		pr_err("Failed to read engine status\n");
-		return NULL;
-	}
 	dbg_tfr("%s engine 0x%p now running\n", engine->name, engine);
 	/* remember the engine is running */
 	engine->running = 1;
@@ -749,29 +664,22 @@ static struct xdma_transfer *engine_start(struct xdma_engine *engine)
  * @engine pointer to struct xdma_engine
  *
  */
-static int engine_service_shutdown(struct xdma_engine *engine)
+static void engine_service_shutdown(struct xdma_engine *engine)
 {
-	int rv;
 	/* if the engine stopped with RUN still asserted, de-assert RUN now */
 	dbg_tfr("engine just went idle, resetting RUN_STOP.\n");
-	rv = xdma_engine_stop(engine);
-	if (rv < 0) {
-		pr_err("Failed to stop engine\n");
-		return rv;
-	}
+	xdma_engine_stop(engine);
 	engine->running = 0;
 
 	/* awake task on engine's shutdown wait queue */
-	xlx_wake_up(&engine->shutdown_wq);
-	return 0;
+	wake_up_interruptible(&engine->shutdown_wq);
 }
 
-static struct xdma_transfer *engine_transfer_completion(
-		struct xdma_engine *engine,
+struct xdma_transfer *engine_transfer_completion(struct xdma_engine *engine,
 		struct xdma_transfer *transfer)
 {
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return NULL;
 	}
 
@@ -782,33 +690,17 @@ static struct xdma_transfer *engine_transfer_completion(
 
 	/* synchronous I/O? */
 	/* awake task on transfer's wait queue */
-	xlx_wake_up(&transfer->wq);
-
-	/* Send completion notification for Last transfer */
-	if (transfer->cb && transfer->last_in_request)
-		transfer->cb->io_done((unsigned long)transfer->cb, 0);
+	wake_up_interruptible(&transfer->wq);
 
 	return transfer;
 }
 
-static struct xdma_transfer *
-engine_service_transfer_list(struct xdma_engine *engine,
-			     struct xdma_transfer *transfer,
-			     u32 *pdesc_completed)
+struct xdma_transfer *engine_service_transfer_list(struct xdma_engine *engine,
+		struct xdma_transfer *transfer, u32 *pdesc_completed)
 {
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return NULL;
-	}
-
-	if (!pdesc_completed) {
-		pr_err("%s completed descriptors are null.\n", engine->name);
-		return NULL;
-	}
-
-	if (unlikely(!transfer)) {
-		pr_info("%s xfer empty, pdesc completed %u.\n", engine->name,
-			*pdesc_completed);
+	if (unlikely(!engine || !pdesc_completed || !transfer)) {
+		pr_err("engine 0x%p, pdesc_completed 0x%p, xfer 0x%p.\n",
+			engine, pdesc_completed, transfer);
 		return NULL;
 	}
 
@@ -817,12 +709,11 @@ engine_service_transfer_list(struct xdma_engine *engine,
 	 * except for the last (i.e. use > instead of >=).
 	 */
 	while (transfer && (!transfer->cyclic) &&
-	       (*pdesc_completed > transfer->desc_num)) {
+		(*pdesc_completed > transfer->desc_num)) {
 		/* remove this transfer from pdesc_completed */
 		*pdesc_completed -= transfer->desc_num;
 		dbg_tfr("%s engine completed non-cyclic xfer 0x%p (%d desc)\n",
 			engine->name, transfer, transfer->desc_num);
-
 		/* remove completed transfer from list */
 		list_del(engine->transfer_list.next);
 		/* add to dequeued number of descriptors during this run */
@@ -830,16 +721,14 @@ engine_service_transfer_list(struct xdma_engine *engine,
 		/* mark transfer as succesfully completed */
 		transfer->state = TRANSFER_STATE_COMPLETED;
 
-		/*
-		 * Complete transfer - sets transfer to NULL if an async
-		 * transfer has completed
-		 */
+		/* Complete transfer - sets transfer to NULL if an async
+		 * transfer has completed */
 		transfer = engine_transfer_completion(engine, transfer);
 
 		/* if exists, get the next transfer on the list */
 		if (!list_empty(&engine->transfer_list)) {
 			transfer = list_entry(engine->transfer_list.next,
-					      struct xdma_transfer, entry);
+					struct xdma_transfer, entry);
 			dbg_tfr("Non-completed transfer %p\n", transfer);
 		} else {
 			/* no further transfers? */
@@ -850,11 +739,11 @@ engine_service_transfer_list(struct xdma_engine *engine,
 	return transfer;
 }
 
-static int engine_err_handle(struct xdma_engine *engine,
-			     struct xdma_transfer *transfer, u32 desc_completed)
+static void engine_err_handle(struct xdma_engine *engine,
+		struct xdma_transfer *transfer, u32 desc_completed)
 {
 	u32 value;
-	int rv = 0;
+
 	/*
 	 * The BUSY bit is expected to be clear now but older HW has a race
 	 * condition which could cause it to be still set.  If it's set, re-read
@@ -863,49 +752,36 @@ static int engine_err_handle(struct xdma_engine *engine,
 	if (engine->status & XDMA_STAT_BUSY) {
 		value = read_register(&engine->regs->status);
 		if ((value & XDMA_STAT_BUSY))
-			printk_ratelimited(KERN_INFO "%s has errors but is still BUSY\n",
-				engine->name);
+			printk_ratelimited(KERN_INFO
+					"%s has errors but is still BUSY\n",
+					engine->name);
 	}
 
-	printk_ratelimited(KERN_INFO "%s, s 0x%x, aborted xfer 0x%p, cmpl %d/%d\n",
+	printk_ratelimited(KERN_INFO
+			"%s, s 0x%x, aborted xfer 0x%p, cmpl %d/%d\n",
 			engine->name, engine->status, transfer, desc_completed,
 			transfer->desc_num);
-
+	
 	/* mark transfer as failed */
 	transfer->state = TRANSFER_STATE_FAILED;
-	rv = xdma_engine_stop(engine);
-	if (rv < 0)
-		pr_err("Failed to stop engine\n");
-	return rv;
+	xdma_engine_stop(engine);
 }
 
-static struct xdma_transfer *
-engine_service_final_transfer(struct xdma_engine *engine,
-			      struct xdma_transfer *transfer,
-			      u32 *pdesc_completed)
+struct xdma_transfer *engine_service_final_transfer(struct xdma_engine *engine,
+			struct xdma_transfer *transfer, u32 *pdesc_completed)
 {
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !pdesc_completed || !transfer)) {
+		pr_err("engine 0x%p, pdesc_completed 0x%p, xfer 0x%p.\n",
+			engine, pdesc_completed, transfer);
 		return NULL;
 	}
-
-	if (!pdesc_completed) {
-		pr_err("%s completed descriptors are null.\n", engine->name);
-		return NULL;
-	}
-
 	/* inspect the current transfer */
-	if (unlikely(!transfer)) {
-		pr_info("%s xfer empty, pdesc completed %u.\n", engine->name,
-			*pdesc_completed);
-		return NULL;
-	}
 	if (((engine->dir == DMA_FROM_DEVICE) &&
 	     (engine->status & XDMA_STAT_C2H_ERR_MASK)) ||
 	    ((engine->dir == DMA_TO_DEVICE) &&
 	     (engine->status & XDMA_STAT_H2C_ERR_MASK))) {
-		pr_info("engine %s, status error 0x%x.\n", engine->name,
-			engine->status);
+		pr_info("engine %s, status error 0x%x.\n",
+			engine->name, engine->status);
 		engine_status_dump(engine);
 		engine_err_handle(engine, transfer, *pdesc_completed);
 		goto transfer_del;
@@ -913,7 +789,7 @@ engine_service_final_transfer(struct xdma_engine *engine,
 
 	if (engine->status & XDMA_STAT_BUSY)
 		pr_debug("engine %s is unexpectedly busy - ignoring\n",
-			 engine->name);
+			engine->name);
 
 	/* the engine stopped on current transfer? */
 	if (*pdesc_completed < transfer->desc_num) {
@@ -934,7 +810,7 @@ engine_service_final_transfer(struct xdma_engine *engine,
 			 */
 			WARN_ON(*pdesc_completed > transfer->desc_num);
 		}
-		/* mark transfer as successfully completed */
+		/* mark transfer as succesfully completed */
 		transfer->state = TRANSFER_STATE_COMPLETED;
 	}
 
@@ -953,11 +829,11 @@ transfer_del:
 	return transfer;
 }
 
-static int engine_service_perf(struct xdma_engine *engine, u32 desc_completed)
+static void engine_service_perf(struct xdma_engine *engine, u32 desc_completed)
 {
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
 	/* performance measurement is running? */
@@ -966,7 +842,7 @@ static int engine_service_perf(struct xdma_engine *engine, u32 desc_completed)
 		if (engine->status & XDMA_STAT_DESC_COMPLETED) {
 			engine->xdma_perf->iterations = desc_completed;
 			dbg_perf("transfer->xdma_perf->iterations=%d\n",
-				 engine->xdma_perf->iterations);
+				engine->xdma_perf->iterations);
 		}
 
 		/* a descriptor stopped the engine? */
@@ -976,35 +852,33 @@ static int engine_service_perf(struct xdma_engine *engine, u32 desc_completed)
 			 * wake any XDMA_PERF_IOCTL_STOP waiting for
 			 * the performance run to finish
 			 */
-			xlx_wake_up(&engine->xdma_perf_wq);
+			wake_up_interruptible(&engine->xdma_perf_wq);
 			dbg_perf("transfer->xdma_perf stopped\n");
 		}
 	}
-	return 0;
 }
 
-static int engine_transfer_dequeue(struct xdma_engine *engine)
+static void engine_transfer_dequeue(struct xdma_engine *engine)
 {
 	struct xdma_transfer *transfer;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
 	/* pick first transfer on the queue (was submitted to the engine) */
 	transfer = list_entry(engine->transfer_list.next, struct xdma_transfer,
-			      entry);
-	if (!transfer || transfer != &engine->cyclic_req->tfer[1]) {
-		pr_err("%s, xfer 0x%p != 0x%p.\n", engine->name, transfer,
-		       &engine->cyclic_req->tfer[1]);
-		return -EINVAL;
+		entry);
+	if (!transfer || transfer != &engine->cyclic_req->xfer) {
+		pr_info("%s, xfer 0x%p != 0x%p.\n",
+			engine->name, transfer, &engine->cyclic_req->xfer);
+		return;
 	}
 	dbg_tfr("%s engine completed cyclic transfer 0x%p (%d desc).\n",
 		engine->name, transfer, transfer->desc_num);
 	/* remove completed transfer from list */
 	list_del(engine->transfer_list.next);
-	return 0;
 }
 
 static int engine_ring_process(struct xdma_engine *engine)
@@ -1013,35 +887,31 @@ static int engine_ring_process(struct xdma_engine *engine)
 	int start;
 	int eop_count = 0;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !engine->cyclic_result)) {
+		pr_err("engine 0x%p, cyclic_result 0x%p.\n",
+			engine, engine ? engine->cyclic_result : NULL);
 		return -EINVAL;
 	}
-
 	result = engine->cyclic_result;
-	if (!result) {
-		pr_err("%s Cyclic transfer resources not available.\n",
-		       engine->name);
-		return -EINVAL;
-	}
 
 	/* where we start receiving in the ring buffer */
 	start = engine->rx_tail;
 
 	/* iterate through all newly received RX result descriptors */
-	dbg_tfr("%s, result %d, 0x%x, len 0x%x.\n", engine->name,
-		engine->rx_tail, result[engine->rx_tail].status,
+	dbg_tfr("%s, result %d, 0x%x, len 0x%x.\n",
+		engine->name, engine->rx_tail, result[engine->rx_tail].status,
 		result[engine->rx_tail].length);
 	while (result[engine->rx_tail].status && !engine->rx_overrun) {
 		/* EOP bit set in result? */
-		if (result[engine->rx_tail].status & RX_STATUS_EOP)
+		if (result[engine->rx_tail].status & RX_STATUS_EOP){
 			eop_count++;
+		}
 
 		/* increment tail pointer */
 		engine->rx_tail = (engine->rx_tail + 1) % CYCLIC_RX_PAGES_MAX;
 
-		dbg_tfr("%s, head %d, tail %d, 0x%x, len 0x%x.\n", engine->name,
-			engine->rx_head, engine->rx_tail,
+		dbg_tfr("%s, head %d, tail %d, 0x%x, len 0x%x.\n",
+			engine->name, engine->rx_head, engine->rx_tail,
 			result[engine->rx_tail].status,
 			result[engine->rx_tail].length);
 
@@ -1058,23 +928,17 @@ static int engine_ring_process(struct xdma_engine *engine)
 
 static int engine_service_cyclic_polled(struct xdma_engine *engine)
 {
-	int eop_count;
+	int eop_count = 0;
 	int rc = 0;
 	struct xdma_poll_wb *writeback_data;
 	u32 sched_limit = 0;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
-		return -EINVAL;
-	}
-
-	eop_count = engine->eop_count;
 	writeback_data = (struct xdma_poll_wb *)engine->poll_mode_addr_virt;
 
 	while (eop_count == 0) {
@@ -1092,36 +956,23 @@ static int engine_service_cyclic_polled(struct xdma_engine *engine)
 
 		eop_count = engine_ring_process(engine);
 		if (eop_count < 0) {
-			pr_err("Failed to process engine ring\n");
+			pr_err("%s failed to process engine ring\n",
+				engine->name);
 			return eop_count;
 		}
 	}
 
 	if (eop_count == 0) {
-		rc = engine_status_read(engine, 1, 0);
-		if (rc < 0) {
-			pr_err("Failed to read engine status\n");
-			return rc;
-		}
+		engine_status_read(engine, 1, 0);
 		if ((engine->running) && !(engine->status & XDMA_STAT_BUSY)) {
 			/* transfers on queue? */
-			if (!list_empty(&engine->transfer_list)) {
-				rc = engine_transfer_dequeue(engine);
-				if (rc < 0) {
-					pr_err("Failed to dequeue transfer\n");
-					return rc;
-				}
-			}
+			if (!list_empty(&engine->transfer_list))
+				engine_transfer_dequeue(engine);
 
-			rc = engine_service_shutdown(engine);
-			if (rc < 0) {
-				pr_err("Failed to shutdown engine\n");
-				return rc;
-			}
+			engine_service_shutdown(engine);
 		}
 	}
-	eop_count--;
-	engine->eop_count = eop_count;
+
 	return rc;
 }
 
@@ -1129,62 +980,40 @@ static int engine_service_cyclic_interrupt(struct xdma_engine *engine)
 {
 	int eop_count = 0;
 	struct xdma_transfer *xfer;
-	int rv;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
-		return -EINVAL;
-	}
+	engine_status_read(engine, 1, 0);
 
-	rv = engine_status_read(engine, 1, 0);
-	if (rv < 0) {
-		pr_err("Failed to read engine status\n");
-		return rv;
-	}
 	eop_count = engine_ring_process(engine);
-	if (eop_count < 0) {
-		pr_err("Failed to process engine ring\n");
-		return eop_count;
-	}
 	/*
 	 * wake any reader on EOP, as one or more packets are now in
 	 * the RX buffer
 	 */
-	xfer = &engine->cyclic_req->tfer[0];
-	if (enable_credit_mp) {
-		xlx_wake_up(&xfer->wq);
-	} else {
+	xfer = &engine->cyclic_req->xfer;
+	if(enable_credit_mp){
+		wake_up_interruptible(&xfer->wq);
+	}else{
 		if (eop_count > 0) {
 			/* awake task on transfer's wait queue */
 			dbg_tfr("wake_up_interruptible() due to %d EOP's\n",
 				eop_count);
 			engine->eop_found = 1;
-			xlx_wake_up(&xfer->wq);
+			wake_up_interruptible(&xfer->wq);
 		}
 	}
 
 	/* engine was running but is no longer busy? */
 	if ((engine->running) && !(engine->status & XDMA_STAT_BUSY)) {
 		/* transfers on queue? */
-		if (!list_empty(&engine->transfer_list)) {
-			rv = engine_transfer_dequeue(engine);
-			if (rv < 0) {
-				pr_err("Failed to dequeue transfer\n");
-				return rv;
-			}
-		}
+		if (!list_empty(&engine->transfer_list))
+			engine_transfer_dequeue(engine);
 
-		rv = engine_service_shutdown(engine);
-		if (rv < 0) {
-			pr_err("Failed to shutdown engine\n");
-			return rv;
-		}
+		engine_service_shutdown(engine);
 	}
 
 	return 0;
@@ -1195,16 +1024,11 @@ static int engine_service_cyclic(struct xdma_engine *engine)
 {
 	int rc = 0;
 
-	dbg_tfr("%s()\n", __func__);
+	dbg_tfr("engine_service_cyclic()");
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
@@ -1216,13 +1040,14 @@ static int engine_service_cyclic(struct xdma_engine *engine)
 	return rc;
 }
 
-static int engine_service_resume(struct xdma_engine *engine)
+
+static void engine_service_resume(struct xdma_engine *engine)
 {
 	struct xdma_transfer *transfer_started;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
 
 	/* engine stopped? */
@@ -1232,16 +1057,18 @@ static int engine_service_resume(struct xdma_engine *engine)
 			/* (re)start engine */
 			transfer_started = engine_start(engine);
 			if (!transfer_started) {
-				pr_err("Failed to start dma engine\n");
-				return -EINVAL;
+				pr_err("%s failed to start dma engine\n",
+					engine->name);
+				return;
 			}
 			dbg_tfr("re-started %s engine with pending xfer 0x%p\n",
 				engine->name, transfer_started);
-			/* engine was requested to be shutdown? */
+
+		/* engine was requested to be shutdown? */
 		} else if (engine->shutdown & ENGINE_SHUTDOWN_REQUEST) {
 			engine->shutdown |= ENGINE_SHUTDOWN_IDLE;
 			/* awake task on engine's shutdown wait queue */
-			xlx_wake_up(&engine->shutdown_wq);
+			wake_up_interruptible(&engine->shutdown_wq);
 		} else {
 			dbg_tfr("no pending transfers, %s engine stays idle.\n",
 				engine->name);
@@ -1254,7 +1081,6 @@ static int engine_service_resume(struct xdma_engine *engine)
 			WARN_ON(1);
 		}
 	}
-	return 0;
 }
 
 /**
@@ -1273,8 +1099,8 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 	int rv = 0;
 	struct xdma_poll_wb *wb_data;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return -EINVAL;
 	}
 
@@ -1285,11 +1111,7 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 	/* Service the engine */
 	if (!engine->running) {
 		dbg_tfr("Engine was not running!!! Clearing status\n");
-		rv = engine_status_read(engine, 1, 0);
-		if (rv < 0) {
-			pr_err("Failed to read engine status\n");
-			return rv;
-		}
+		engine_status_read(engine, 1, 0);
 		return 0;
 	}
 
@@ -1298,26 +1120,17 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 	 * engine status. For polled mode descriptor completion, this read is
 	 * unnecessary and is skipped to reduce latency
 	 */
-	if ((desc_count == 0) || (err_flag != 0)) {
-		rv = engine_status_read(engine, 1, 0);
-		if (rv < 0) {
-			pr_err("Failed to read engine status\n");
-			return rv;
-		}
-	}
+	if ((desc_count == 0) || (err_flag != 0))
+		engine_status_read(engine, 1, 0);
 
 	/*
 	 * engine was running but is no longer busy, or writeback occurred,
 	 * shut down
 	 */
 	if ((engine->running && !(engine->status & XDMA_STAT_BUSY)) ||
-	    (desc_count != 0)) {
-		rv = engine_service_shutdown(engine);
-		if (rv < 0) {
-			pr_err("Failed to shutdown engine\n");
-			return rv;
-		}
-	}
+		(desc_count != 0))
+		engine_service_shutdown(engine);
+
 	/*
 	 * If called from the ISR, or if an error occurred, the descriptor
 	 * count will be zero.  In this scenario, read the descriptor count
@@ -1332,7 +1145,7 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 	if (!list_empty(&engine->transfer_list)) {
 		/* pick first transfer on queue (was submitted to the engine) */
 		transfer = list_entry(engine->transfer_list.next,
-				      struct xdma_transfer, entry);
+				struct xdma_transfer, entry);
 
 		dbg_tfr("head of queue transfer 0x%p has %d descriptors\n",
 			transfer, (int)transfer->desc_num);
@@ -1341,11 +1154,7 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 			(int)desc_count,
 			(int)desc_count - engine->desc_dequeued);
 
-		rv = engine_service_perf(engine, desc_count);
-		if (rv < 0) {
-			pr_err("Failed to service descriptors\n");
-			return rv;
-		}
+		engine_service_perf(engine, desc_count);
 	}
 
 	/* account for already dequeued transfers during this engine run */
@@ -1367,11 +1176,9 @@ static int engine_service(struct xdma_engine *engine, int desc_writeback)
 	}
 
 	/* Restart the engine following the servicing */
-	rv = engine_service_resume(engine);
-	if (rv < 0)
-		pr_err("Failed to resume engine\n");
+	engine_service_resume(engine);
 
-	return rv;
+	return 0;
 }
 
 /* engine_service_work */
@@ -1379,68 +1186,57 @@ static void engine_service_work(struct work_struct *work)
 {
 	struct xdma_engine *engine;
 	unsigned long flags;
-	int rv;
 
 	engine = container_of(work, struct xdma_engine, work);
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return;
 	}
 
 	/* lock the engine */
 	spin_lock_irqsave(&engine->lock, flags);
 
-	dbg_tfr("engine_service() for %s engine %p\n", engine->name, engine);
-	if (engine->cyclic_req) {
-		rv = engine_service_cyclic(engine);
-		if (rv < 0) {
-			pr_err("Failed to service cyclic engine\n");
-			goto unlock;
-		}
-	} else {
-		rv = engine_service(engine, 0);
-		if (rv < 0) {
-			pr_err("Failed to service engine\n");
-			goto unlock;
-		}
-	}
+	dbg_tfr("engine_service() for %s engine %p\n",
+		engine->name, engine);
+	if (engine->cyclic_req)
+                engine_service_cyclic(engine);
+	else
+		engine_service(engine, 0);
+
 	/* re-enable interrupts for this engine */
-	if (engine->xdev->msix_enabled) {
-		write_register(
-			engine->interrupt_enable_mask_value,
-			&engine->regs->interrupt_enable_mask_w1s,
-			(unsigned long)(&engine->regs
-						 ->interrupt_enable_mask_w1s) -
-				(unsigned long)(&engine->regs));
+	if (engine->xdev->msix_enabled){
+		write_register(engine->interrupt_enable_mask_value,
+			       &engine->regs->interrupt_enable_mask_w1s,
+			(unsigned long)(&engine->regs->interrupt_enable_mask_w1s) -
+			(unsigned long)(&engine->regs));
 	} else
 		channel_interrupts_enable(engine->xdev, engine->irq_bitmask);
-
+		
 	/* unlock the engine */
-unlock:
 	spin_unlock_irqrestore(&engine->lock, flags);
 }
 
-static u32 engine_service_wb_monitor(struct xdma_engine *engine,
-				     u32 expected_wb)
+static int engine_service_wb_monitor(struct xdma_engine *engine,
+					u32 expected_wb, u32 *wb)
 {
 	struct xdma_poll_wb *wb_data;
 	u32 desc_wb = 0;
 	u32 sched_limit = 0;
 	unsigned long timeout;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return -EINVAL;
 	}
 	wb_data = (struct xdma_poll_wb *)engine->poll_mode_addr_virt;
 
 	/*
-	 * Poll the writeback location for the expected number of
-	 * descriptors / error events This loop is skipped for cyclic mode,
-	 * where the expected_desc_count passed in is zero, since it cannot be
-	 * determined before the function is called
-	 */
+ 	 * Poll the writeback location for the expected number of
+ 	 * descriptors / error events This loop is skipped for cyclic mode,
+ 	 * where the expected_desc_count passed in is zero, since it cannot be
+ 	 * determined before the function is called
+ 	 */
 
 	timeout = jiffies + (POLL_TIMEOUT_SECONDS * HZ);
 	while (expected_wb != 0) {
@@ -1448,9 +1244,10 @@ static u32 engine_service_wb_monitor(struct xdma_engine *engine,
 
 		if (desc_wb & WB_ERR_MASK)
 			break;
-		else if (desc_wb >= expected_wb)
+		else if (desc_wb == expected_wb)
 			break;
-
+			
+		/* RTO - prevent system from hanging in polled mode */
 		if (time_after(jiffies, timeout)) {
 			dbg_tfr("Polling timeout occurred");
 			dbg_tfr("desc_wb = 0x%08x, expected 0x%08x\n", desc_wb,
@@ -1462,9 +1259,9 @@ static u32 engine_service_wb_monitor(struct xdma_engine *engine,
 		}
 
 		/*
-		 * Define NUM_POLLS_PER_SCHED to limit how much time is spent
-		 * in the scheduler
-		 */
+ 		 * Define NUM_POLLS_PER_SCHED to limit how much time is spent
+ 		 * in the scheduler
+ 		 */
 
 		if (sched_limit != 0) {
 			if ((sched_limit % NUM_POLLS_PER_SCHED) == 0)
@@ -1473,25 +1270,21 @@ static u32 engine_service_wb_monitor(struct xdma_engine *engine,
 		sched_limit++;
 	}
 
-	return desc_wb;
+	*wb = desc_wb;
+	return 0;
 }
 
-int engine_service_poll(struct xdma_engine *engine,
-			       u32 expected_desc_count)
+static int engine_service_poll(struct xdma_engine *engine,
+                u32 expected_desc_count)
 {
 	struct xdma_poll_wb *writeback_data;
 	u32 desc_wb = 0;
 	unsigned long flags;
 	int rv = 0;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
@@ -1503,13 +1296,15 @@ int engine_service_poll(struct xdma_engine *engine,
 	}
 
 	/*
-	 * Poll the writeback location for the expected number of
-	 * descriptors / error events This loop is skipped for cyclic mode,
-	 * where the expected_desc_count passed in is zero, since it cannot be
-	 * determined before the function is called
-	 */
+ 	 * Poll the writeback location for the expected number of
+ 	 * descriptors / error events This loop is skipped for cyclic mode,
+ 	 * where the expected_desc_count passed in is zero, since it cannot be
+ 	 * determined before the function is called
+ 	 */
 
-	desc_wb = engine_service_wb_monitor(engine, expected_desc_count);
+	rv = engine_service_wb_monitor(engine, expected_desc_count, &desc_wb);
+	if (rv < 0)
+		return rv;
 
 	spin_lock_irqsave(&engine->lock, flags);
 	dbg_tfr("%s service.\n", engine->name);
@@ -1526,8 +1321,8 @@ static irqreturn_t user_irq_service(int irq, struct xdma_user_irq *user_irq)
 {
 	unsigned long flags;
 
-	if (!user_irq) {
-		pr_err("Invalid user_irq\n");
+	if (unlikely(!user_irq)) {
+		pr_err("user_irq NULL.\n");
 		return IRQ_NONE;
 	}
 
@@ -1557,21 +1352,16 @@ static irqreturn_t xdma_isr(int irq, void *dev_id)
 	struct xdma_dev *xdev;
 	struct interrupt_regs *irq_regs;
 
-	dbg_irq("(irq=%d, dev 0x%p) <<<< ISR.\n", irq, dev_id);
-	if (!dev_id) {
-		pr_err("Invalid dev_id on irq line %d\n", irq);
-		return -IRQ_NONE;
-	}
-	xdev = (struct xdma_dev *)dev_id;
-
-	if (!xdev) {
-		WARN_ON(!xdev);
-		dbg_irq("%s(irq=%d) xdev=%p ??\n", __func__, irq, xdev);
+	if (unlikely(!dev_id)) {
+		pr_err("irq %d, xdev NULL.\n", irq);
 		return IRQ_NONE;
 	}
 
+	dbg_irq("(irq=%d, dev 0x%p) <<<< ISR.\n", irq, dev_id);
+	xdev = (struct xdma_dev *)dev_id;
+
 	irq_regs = (struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					     XDMA_OFS_INT_CTRL);
+			XDMA_OFS_INT_CTRL);
 
 	/* read channel interrupt requests */
 	ch_irq = read_register(&irq_regs->channel_int_request);
@@ -1590,8 +1380,8 @@ static irqreturn_t xdma_isr(int irq, void *dev_id)
 
 	if (user_irq) {
 		int user = 0;
-		u32 mask = 1;
-		int max = xdev->user_max;
+                u32 mask = 1;
+		int max = xdev->h2c_channel_max;
 
 		for (; user < max && user_irq; user++, mask <<= 1) {
 			if (user_irq & mask) {
@@ -1652,12 +1442,12 @@ static irqreturn_t xdma_user_irq(int irq, void *dev_id)
 {
 	struct xdma_user_irq *user_irq;
 
-	dbg_irq("(irq=%d) <<<< INTERRUPT SERVICE ROUTINE\n", irq);
-
-	if (!dev_id) {
-		pr_err("Invalid dev_id on irq line %d\n", irq);
+	if (unlikely(!dev_id)) {
+		pr_err("irq %d, dev_id NULL.\n", irq);
 		return IRQ_NONE;
 	}
+
+	dbg_irq("(irq=%d) <<<< INTERRUPT SERVICE ROUTINE\n", irq);
 	user_irq = (struct xdma_user_irq *)dev_id;
 
 	return user_irq_service(irq, user_irq);
@@ -1674,29 +1464,29 @@ static irqreturn_t xdma_channel_irq(int irq, void *dev_id)
 	struct xdma_engine *engine;
 	struct interrupt_regs *irq_regs;
 
-	dbg_irq("(irq=%d) <<<< INTERRUPT service ROUTINE\n", irq);
-	if (!dev_id) {
-		pr_err("Invalid dev_id on irq line %d\n", irq);
+	if (unlikely(!dev_id)) {
+		pr_err("irq %d, dev_id NULL.\n", irq);
 		return IRQ_NONE;
 	}
+	dbg_irq("(irq=%d) <<<< INTERRUPT service ROUTINE\n", irq);
 
 	engine = (struct xdma_engine *)dev_id;
 	xdev = engine->xdev;
 
-	if (!xdev) {
-		WARN_ON(!xdev);
-		dbg_irq("%s(irq=%d) xdev=%p ??\n", __func__, irq, xdev);
+	if (unlikely(!xdev)) {
+		pr_err("xdma_channel_irq(irq=%d) engine 0x%p, xdev NULL.\n",
+			irq, engine);
 		return IRQ_NONE;
 	}
 
 	irq_regs = (struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					     XDMA_OFS_INT_CTRL);
+			XDMA_OFS_INT_CTRL);
 
 	/* Disable the interrupt for this engine */
-	write_register(
-		engine->interrupt_enable_mask_value,
-		&engine->regs->interrupt_enable_mask_w1c,
-		(unsigned long)(&engine->regs->interrupt_enable_mask_w1c) -
+	write_register(engine->interrupt_enable_mask_value,
+			&engine->regs->interrupt_enable_mask_w1c,
+			(unsigned long)
+			(&engine->regs->interrupt_enable_mask_w1c) -
 			(unsigned long)(&engine->regs));
 	/* Dummy read to flush the above write */
 	read_register(&irq_regs->channel_int_pending);
@@ -1774,20 +1564,20 @@ static int is_config_bar(struct xdma_dev *xdev, int idx)
 	int flag = 0;
 	u32 mask = 0xffff0000; /* Compare only XDMA ID's not Version number */
 	struct interrupt_regs *irq_regs =
-		(struct interrupt_regs *)(xdev->bar[idx] + XDMA_OFS_INT_CTRL);
+		(struct interrupt_regs *) (xdev->bar[idx] + XDMA_OFS_INT_CTRL);
 	struct config_regs *cfg_regs =
 		(struct config_regs *)(xdev->bar[idx] + XDMA_OFS_CONFIG);
 
 	irq_id = read_register(&irq_regs->identifier);
 	cfg_id = read_register(&cfg_regs->identifier);
 
-	if (((irq_id & mask) == IRQ_BLOCK_ID) &&
-	    ((cfg_id & mask) == CONFIG_BLOCK_ID)) {
+	if (((irq_id & mask)== IRQ_BLOCK_ID) &&
+	    ((cfg_id & mask)== CONFIG_BLOCK_ID)) {
 		dbg_init("BAR %d is the XDMA config BAR\n", idx);
 		flag = 1;
 	} else {
 		dbg_init("BAR %d is NOT the XDMA config BAR: 0x%x, 0x%x.\n",
-			 idx, irq_id, cfg_id);
+			idx, irq_id, cfg_id);
 		flag = 0;
 	}
 
@@ -1795,8 +1585,8 @@ static int is_config_bar(struct xdma_dev *xdev, int idx)
 }
 
 #ifndef XDMA_CONFIG_BAR_NUM
-static int identify_bars(struct xdma_dev *xdev, int *bar_id_list, int num_bars,
-			 int config_bar_pos)
+static void identify_bars(struct xdma_dev *xdev, int *bar_id_list, int num_bars,
+			int config_bar_pos)
 {
 	/*
 	 * The following logic identifies which BARs contain what functionality
@@ -1812,18 +1602,13 @@ static int identify_bars(struct xdma_dev *xdev, int *bar_id_list, int num_bars,
 	 * correctly with both 32-bit and 64-bit BARs.
 	 */
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
-		return -EINVAL;
+	if (unlikely(!xdev || !bar_id_list)) {
+		pr_err("xdev 0x%p, bar_id_list 0x%p.\n", xdev, bar_id_list);
+		return;
 	}
 
-	if (!bar_id_list) {
-		pr_err("Invalid bar id list.\n");
-		return -EINVAL;
-	}
-
-	dbg_init("xdev 0x%p, bars %d, config at %d.\n", xdev, num_bars,
-		 config_bar_pos);
+	dbg_init("xdev 0x%p, bars %d, config at %d.\n",
+		xdev, num_bars, config_bar_pos);
 
 	switch (num_bars) {
 	case 1:
@@ -1859,10 +1644,11 @@ static int identify_bars(struct xdma_dev *xdev, int *bar_id_list, int num_bars,
 		pr_info("Unexpected # BARs (%d), XDMA config BAR only.\n",
 			num_bars);
 		break;
+
 	}
-	pr_info("%d BARs: config %d, user %d, bypass %d.\n", num_bars,
-		config_bar_pos, xdev->user_bar_idx, xdev->bypass_bar_idx);
-	return 0;
+	pr_info("%d BARs: config %d, user %d, bypass %d.\n",
+		num_bars, config_bar_pos, xdev->user_bar_idx,
+		xdev->bypass_bar_idx);
 }
 #endif
 
@@ -1911,6 +1697,7 @@ static int map_bars(struct xdma_dev *xdev, struct pci_dev *dev)
 
 		/* Try to identify BAR as XDMA control BAR */
 		if ((bar_len >= XDMA_BAR_SIZE) && (xdev->config_bar_idx < 0)) {
+
 			if (is_config_bar(xdev, i)) {
 				xdev->config_bar_idx = i;
 				config_bar_pos = bar_id_idx;
@@ -1930,11 +1717,7 @@ static int map_bars(struct xdma_dev *xdev, struct pci_dev *dev)
 		goto fail;
 	}
 
-	rv = identify_bars(xdev, bar_id_list, bar_id_idx, config_bar_pos);
-	if (rv < 0) {
-		pr_err("Failed to identify bars\n");
-		return rv;
-	}
+	identify_bars(xdev, bar_id_list, bar_id_idx, config_bar_pos);
 
 	/* successfully mapped all required BAR regions */
 	return 0;
@@ -2001,24 +1784,19 @@ static int enable_msi_msix(struct xdma_dev *xdev, struct pci_dev *pdev)
 {
 	int rv = 0;
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
-		return -EINVAL;
-	}
-
-	if (!pdev) {
-		pr_err("Invalid pdev\n");
+	if (unlikely(!xdev || !pdev)) {
+		pr_err("xdev 0x%p, pdev 0x%p.\n", xdev, pdev);
 		return -EINVAL;
 	}
 
 	if (!interrupt_mode && msi_msix_capable(pdev, PCI_CAP_ID_MSIX)) {
 		int req_nvec = xdev->c2h_channel_max + xdev->h2c_channel_max +
-			       xdev->user_max;
+				 xdev->user_max;
 
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 		dbg_init("Enabling MSI-X\n");
 		rv = pci_alloc_irq_vectors(pdev, req_nvec, req_nvec,
-					   PCI_IRQ_MSIX);
+					PCI_IRQ_MSIX);
 #else
 		int i;
 
@@ -2056,7 +1834,7 @@ static void pci_check_intr_pend(struct pci_dev *pdev)
 	pci_read_config_word(pdev, PCI_STATUS, &v);
 	if (v & PCI_STATUS_INTERRUPT) {
 		pr_info("%s PCI STATUS Interrupt pending 0x%x.\n",
-			dev_name(&pdev->dev), v);
+                        dev_name(&pdev->dev), v);
 		pci_write_config_word(pdev, PCI_STATUS, PCI_STATUS_INTERRUPT);
 	}
 }
@@ -2082,9 +1860,9 @@ static void pci_keep_intx_enabled(struct pci_dev *pdev)
 static void prog_irq_msix_user(struct xdma_dev *xdev, bool clear)
 {
 	/* user */
-	struct interrupt_regs *int_regs =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *int_regs = (struct interrupt_regs *)
+					(xdev->bar[xdev->config_bar_idx] +
+					 XDMA_OFS_INT_CTRL);
 	u32 i = xdev->c2h_channel_max + xdev->h2c_channel_max;
 	u32 max = i + xdev->user_max;
 	int j;
@@ -2099,22 +1877,21 @@ static void prog_irq_msix_user(struct xdma_dev *xdev, bool clear)
 		else
 			for (k = 0; k < 4 && i < max; i++, k++, shift += 8)
 				val |= (i & 0x1f) << shift;
-
-		write_register(
-			val, &int_regs->user_msi_vector[j],
+		
+		write_register(val, &int_regs->user_msi_vector[j],
 			XDMA_OFS_INT_CTRL +
-				((unsigned long)&int_regs->user_msi_vector[j] -
-				 (unsigned long)int_regs));
+			((unsigned long)&int_regs->user_msi_vector[j] -
+			 (unsigned long)int_regs));
 
 		dbg_init("vector %d, 0x%x.\n", j, val);
 	}
 }
 
-static void prog_irq_msix_channel(struct xdma_dev *xdev, bool clear)
+static void prog_irq_msix_channel(struct xdma_dev *xdev, bool clear) 
 {
-	struct interrupt_regs *int_regs =
-		(struct interrupt_regs *)(xdev->bar[xdev->config_bar_idx] +
-					  XDMA_OFS_INT_CTRL);
+	struct interrupt_regs *int_regs = (struct interrupt_regs *)
+					(xdev->bar[xdev->config_bar_idx] +
+					 XDMA_OFS_INT_CTRL);
 	u32 max = xdev->c2h_channel_max + xdev->h2c_channel_max;
 	u32 i;
 	int j;
@@ -2130,12 +1907,11 @@ static void prog_irq_msix_channel(struct xdma_dev *xdev, bool clear)
 		else
 			for (k = 0; k < 4 && i < max; i++, k++, shift += 8)
 				val |= (i & 0x1f) << shift;
-
+		
 		write_register(val, &int_regs->channel_msi_vector[j],
-			       XDMA_OFS_INT_CTRL +
-				       ((unsigned long)&int_regs
-						->channel_msi_vector[j] -
-					(unsigned long)int_regs));
+			XDMA_OFS_INT_CTRL +
+			((unsigned long)&int_regs->channel_msi_vector[j] -
+			 (unsigned long)int_regs));
 		dbg_init("vector %d, 0x%x.\n", j, val);
 	}
 }
@@ -2156,7 +1932,7 @@ static void irq_msix_channel_teardown(struct xdma_dev *xdev)
 		if (!engine->msix_irq_line)
 			break;
 		dbg_sg("Release IRQ#%d for engine %p\n", engine->msix_irq_line,
-		       engine);
+			engine);
 		free_irq(engine->msix_irq_line, engine);
 	}
 
@@ -2165,7 +1941,7 @@ static void irq_msix_channel_teardown(struct xdma_dev *xdev)
 		if (!engine->msix_irq_line)
 			break;
 		dbg_sg("Release IRQ#%d for engine %p\n", engine->msix_irq_line,
-		       engine);
+			engine);
 		free_irq(engine->msix_irq_line, engine);
 	}
 }
@@ -2178,18 +1954,17 @@ static int irq_msix_channel_setup(struct xdma_dev *xdev)
 	u32 vector;
 	struct xdma_engine *engine;
 
-	if (!xdev) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!xdev)) {
+		pr_err("xdev NULL.\n");
 		return -EINVAL;
 	}
-
 	if (!xdev->msix_enabled)
 		return 0;
 
 	j = xdev->h2c_channel_max;
 	engine = xdev->engine_h2c;
 	for (i = 0; i < xdev->h2c_channel_max; i++, engine++) {
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 		vector = pci_irq_vector(xdev->pdev, i);
 #else
 		vector = xdev->entry[i].vector;
@@ -2207,7 +1982,7 @@ static int irq_msix_channel_setup(struct xdma_dev *xdev)
 
 	engine = xdev->engine_c2h;
 	for (i = 0; i < xdev->c2h_channel_max; i++, j++, engine++) {
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 		vector = pci_irq_vector(xdev->pdev, j);
 #else
 		vector = xdev->entry[j].vector;
@@ -2231,20 +2006,19 @@ static void irq_msix_user_teardown(struct xdma_dev *xdev)
 	int i;
 	int j;
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
+	if (unlikely(!xdev)) {
+		pr_err("xdev NULL.\n");
 		return;
 	}
 
 	if (!xdev->msix_enabled)
 		return;
 
-	j = xdev->h2c_channel_max + xdev->c2h_channel_max;
-
 	prog_irq_msix_user(xdev, 1);
 
+	j = xdev->h2c_channel_max + xdev->c2h_channel_max;
 	for (i = 0; i < xdev->user_max; i++, j++) {
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 		u32 vector = pci_irq_vector(xdev->pdev, j);
 #else
 		u32 vector = xdev->entry[j].vector;
@@ -2262,16 +2036,16 @@ static int irq_msix_user_setup(struct xdma_dev *xdev)
 
 	/* vectors set in probe_scan_for_msi() */
 	for (i = 0; i < xdev->user_max; i++, j++) {
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 		u32 vector = pci_irq_vector(xdev->pdev, j);
 #else
 		u32 vector = xdev->entry[j].vector;
 #endif
 		rv = request_irq(vector, xdma_user_irq, 0, xdev->mod_name,
-				 &xdev->user_irq[i]);
+				&xdev->user_irq[i]);
 		if (rv) {
-			pr_info("user %d couldn't use IRQ#%d, %d\n", i, vector,
-				rv);
+			pr_info("user %d couldn't use IRQ#%d, %d\n",
+				i, vector, rv);
 			break;
 		}
 		pr_info("%d-USR-%d, IRQ#%d with 0x%p\n", xdev->idx, i, vector,
@@ -2281,7 +2055,7 @@ static int irq_msix_user_setup(struct xdma_dev *xdev)
 	/* If any errors occur, free IRQs that were successfully requested */
 	if (rv) {
 		for (i--, j--; i >= 0; i--, j--) {
-#if KERNEL_VERSION(4, 12, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
 			u32 vector = pci_irq_vector(xdev->pdev, j);
 #else
 			u32 vector = xdev->entry[j].vector;
@@ -2318,23 +2092,22 @@ static int irq_legacy_setup(struct xdma_dev *xdev, struct pci_dev *pdev)
 	dbg_init("Legacy Interrupt register value = %d\n", val);
 	if (val > 1) {
 		val--;
-		w = (val << 24) | (val << 16) | (val << 8) | val;
+		w = (val << 24) | (val << 16) | (val << 8)| val;
 		/* Program IRQ Block Channel vactor and IRQ Block User vector
-		 * with Legacy interrupt value
-		 */
-		reg = xdev->bar[xdev->config_bar_idx] + 0x2080; // IRQ user
+		 * with Legacy interrupt value */
+		reg = xdev->bar[xdev->config_bar_idx] + 0x2080;	// IRQ user
 		write_register(w, reg, 0x2080);
 		write_register(w, reg + 0x4, 0x2084);
 		write_register(w, reg + 0x8, 0x2088);
 		write_register(w, reg + 0xC, 0x208C);
-		reg = xdev->bar[xdev->config_bar_idx] + 0x20A0; // IRQ Block
+		reg = xdev->bar[xdev->config_bar_idx] + 0x20A0;	// IRQ Block
 		write_register(w, reg, 0x20A0);
 		write_register(w, reg + 0x4, 0x20A4);
 	}
 
 	xdev->irq_line = (int)pdev->irq;
 	rv = request_irq(pdev->irq, xdma_isr, IRQF_SHARED, xdev->mod_name,
-			 xdev);
+			xdev);
 	if (rv)
 		dbg_init("Couldn't use IRQ#%d, %d\n", pdev->irq, rv);
 	else
@@ -2360,7 +2133,6 @@ static int irq_setup(struct xdma_dev *xdev, struct pci_dev *pdev)
 
 	if (xdev->msix_enabled) {
 		int rv = irq_msix_channel_setup(xdev);
-
 		if (rv)
 			return rv;
 		rv = irq_msix_user_setup(xdev);
@@ -2381,23 +2153,23 @@ static void dump_desc(struct xdma_desc *desc_virt)
 {
 	int j;
 	u32 *p = (u32 *)desc_virt;
-	static char *const field_name[] = { "magic|extra_adjacent|control",
-					    "bytes",
-					    "src_addr_lo",
-					    "src_addr_hi",
-					    "dst_addr_lo",
-					    "dst_addr_hi",
-					    "next_addr",
-					    "next_addr_pad" };
+	static char * const field_name[] = {	"magic|extra_adjacent|control",
+						"bytes",
+						"src_addr_lo",
+						"src_addr_hi",
+						"dst_addr_lo",
+						"dst_addr_hi",
+						"next_addr",
+						"next_addr_pad"};
 	char *dummy;
 
 	/* remove warning about unused variable when debug printing is off */
 	dummy = field_name[0];
 
 	for (j = 0; j < 8; j += 1) {
-		pr_info("0x%08lx/0x%02lx: 0x%08x 0x%08x %s\n", (uintptr_t)p,
-			(uintptr_t)p & 15, (int)*p, le32_to_cpu(*p),
-			field_name[j]);
+		pr_info("0x%08lx/0x%02lx: 0x%08x 0x%08x %s\n",
+			 (uintptr_t)p, (uintptr_t)p & 15, (int)*p,
+			 le32_to_cpu(*p), field_name[j]);
 		p++;
 	}
 	pr_info("\n");
@@ -2412,8 +2184,8 @@ static void transfer_dump(struct xdma_transfer *transfer)
 		transfer, transfer->state, transfer->flags, transfer->dir,
 		transfer->len, transfer->last_in_request);
 
-	pr_info("transfer 0x%p, desc %d, bus 0x%llx, adj %d.\n", transfer,
-		transfer->desc_num, (u64)transfer->desc_bus,
+	pr_info("transfer 0x%p, desc %d, bus 0x%llx, adj %d.\n",
+		transfer, transfer->desc_num, (u64)transfer->desc_bus,
 		transfer->desc_adjacent);
 	for (i = 0; i < transfer->desc_num; i += 1)
 		dump_desc(desc_virt + i);
@@ -2437,10 +2209,12 @@ static int transfer_desc_init(struct xdma_transfer *transfer, int count)
 	struct xdma_desc *desc_virt = transfer->desc_virt;
 	dma_addr_t desc_bus = transfer->desc_bus;
 	int i;
+	int adj = count - 1;
+	int extra_adj;
+	u32 temp_control;
 
-	if (count > XDMA_TRANSFER_MAX_DESC) {
-		pr_err("Engine cannot transfer more than %d descriptors\n",
-		       XDMA_TRANSFER_MAX_DESC);
+	if (unlikely(count > XDMA_TRANSFER_MAX_DESC)) {
+		pr_err("xfer 0x%p, too many desc 0x%x.\n", transfer, count);
 		return -EINVAL;
 	}
 
@@ -2453,14 +2227,31 @@ static int transfer_desc_init(struct xdma_transfer *transfer, int count)
 		desc_virt[i].next_lo = cpu_to_le32(PCI_DMA_L(desc_bus));
 		desc_virt[i].next_hi = cpu_to_le32(PCI_DMA_H(desc_bus));
 		desc_virt[i].bytes = cpu_to_le32(0);
-		desc_virt[i].control = cpu_to_le32(DESC_MAGIC);
+
+		/* any adjacent descriptors? */
+		if (adj > 0) {
+			extra_adj = adj - 1;
+			if (extra_adj > MAX_EXTRA_ADJ)
+				extra_adj = MAX_EXTRA_ADJ;
+
+			adj--;
+		} else {
+			extra_adj = 0;
+		}
+
+		temp_control = DESC_MAGIC | (extra_adj << 8);
+
+		desc_virt[i].control = cpu_to_le32(temp_control);
 	}
 	/* { i = number - 1 } */
 	/* zero the last descriptor next pointer */
 	desc_virt[i].next_lo = cpu_to_le32(0);
 	desc_virt[i].next_hi = cpu_to_le32(0);
 	desc_virt[i].bytes = cpu_to_le32(0);
-	desc_virt[i].control = cpu_to_le32(DESC_MAGIC);
+
+	temp_control = DESC_MAGIC;
+
+	desc_virt[i].control = cpu_to_le32(temp_control);
 
 	return 0;
 }
@@ -2474,13 +2265,13 @@ static int transfer_desc_init(struct xdma_transfer *transfer, int count)
  * @second_bus bus address of second descriptor
  */
 static void xdma_desc_link(struct xdma_desc *first, struct xdma_desc *second,
-			   dma_addr_t second_bus)
+		dma_addr_t second_bus)
 {
 	/*
 	 * remember reserved control in first descriptor, but zero
 	 * extra_adjacent!
 	 */
-	u32 control = le32_to_cpu(first->control) & 0x0000f0ffUL;
+	u32 control = le32_to_cpu(first->control) & 0x00FFC0FFUL;
 	/* second descriptor given? */
 	if (second) {
 		/*
@@ -2507,13 +2298,14 @@ static void xdma_desc_link(struct xdma_desc *first, struct xdma_desc *second,
 static void xdma_desc_adjacent(struct xdma_desc *desc, int next_adjacent)
 {
 	/* remember reserved and control bits */
-	u32 control = le32_to_cpu(desc->control) & 0xffffc0ffUL;
+	u32 control = le32_to_cpu(desc->control) & 0xFFFFC0FFUL;
 
 	if (next_adjacent)
 		next_adjacent = next_adjacent - 1;
 	if (next_adjacent > MAX_EXTRA_ADJ)
 		next_adjacent = MAX_EXTRA_ADJ;
 	control |= (next_adjacent << 8);
+
 	/* write control and next_adjacent */
 	desc->control = cpu_to_le32(control);
 }
@@ -2524,45 +2316,28 @@ static int xdma_desc_control_set(struct xdma_desc *first, u32 control_field)
 	/* remember magic and adjacent number */
 	u32 control = le32_to_cpu(first->control) & ~(LS_BYTE_MASK);
 
-	if (control_field & ~(LS_BYTE_MASK)) {
-		pr_err("Invalid control field\n");
+	if (unlikely(control_field & ~(LS_BYTE_MASK))) {
+		pr_err("control_field bad 0x%x.\n", control_field);
 		return -EINVAL;
 	}
 	/* merge adjacent and control field */
 	control |= control_field;
 	/* write control and next_adjacent */
 	first->control = cpu_to_le32(control);
+
 	return 0;
 }
 
 /* xdma_desc_clear -- Clear bits in control field of a descriptor. */
-static int xdma_desc_control_clear(struct xdma_desc *first, u32 clear_mask)
+static void xdma_desc_control_clear(struct xdma_desc *first, u32 clear_mask)
 {
 	/* remember magic and adjacent number */
 	u32 control = le32_to_cpu(first->control);
-
-	if (clear_mask & ~(LS_BYTE_MASK)) {
-		pr_err("Invalid clear mask\n");
-		return -EINVAL;
-	}
 
 	/* merge adjacent and control field */
 	control &= (~clear_mask);
 	/* write control and next_adjacent */
 	first->control = cpu_to_le32(control);
-	return 0;
-}
-
-/* xdma_desc_done - recycle cache-coherent linked list of descriptors.
- *
- * @dev Pointer to pci_dev
- * @number Number of descriptors to be allocated
- * @desc_virt Pointer to (i.e. virtual address of) first descriptor in list
- * @desc_bus Bus address of first descriptor in list
- */
-static inline void xdma_desc_done(struct xdma_desc *desc_virt, int count)
-{
-	memset(desc_virt, 0, count * sizeof(struct xdma_desc));
 }
 
 /* xdma_desc() - Fill a descriptor with the transfer details
@@ -2577,7 +2352,7 @@ static inline void xdma_desc_done(struct xdma_desc *desc_virt, int count)
  * Does not modify the next pointer
  */
 static void xdma_desc_set(struct xdma_desc *desc, dma_addr_t rc_bus_addr,
-			  u64 ep_addr, int len, int dir)
+		u64 ep_addr, int len, int dir)
 {
 	/* transfer length */
 	desc->bytes = cpu_to_le32(len);
@@ -2601,41 +2376,34 @@ static void xdma_desc_set(struct xdma_desc *desc, dma_addr_t rc_bus_addr,
 /*
  * should hold the engine->lock;
  */
-static int transfer_abort(struct xdma_engine *engine,
-			  struct xdma_transfer *transfer)
+static void transfer_abort(struct xdma_engine *engine,
+			struct xdma_transfer *transfer)
 {
 	struct xdma_transfer *head;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
+		return;
 	}
-
-	if (!transfer) {
-		pr_err("Invalid DMA transfer\n");
-		return -EINVAL;
-	}
-
-	if (transfer->desc_num == 0) {
-		pr_err("%s void descriptors in the transfer list\n",
-		       engine->name);
-		return -EINVAL;
+	if (unlikely(!transfer || (transfer->desc_num == 0))) {
+		pr_err("engine %s, xfer 0x%p, desc 0.\n",
+			engine->name, transfer);
+		return;
 	}
 
 	pr_info("abort transfer 0x%p, desc %d, engine desc queued %d.\n",
 		transfer, transfer->desc_num, engine->desc_dequeued);
 
 	head = list_entry(engine->transfer_list.next, struct xdma_transfer,
-			  entry);
+			entry);
 	if (head == transfer)
 		list_del(engine->transfer_list.next);
-	else
+        else
 		pr_info("engine %s, transfer 0x%p NOT found, 0x%p.\n",
 			engine->name, transfer, head);
 
 	if (transfer->state == TRANSFER_STATE_SUBMITTED)
 		transfer->state = TRANSFER_STATE_ABORTED;
-	return 0;
 }
 
 /* transfer_queue() - Queue a DMA transfer on the engine
@@ -2646,39 +2414,29 @@ static int transfer_abort(struct xdma_engine *engine,
  * Takes and releases the engine spinlock
  */
 static int transfer_queue(struct xdma_engine *engine,
-			  struct xdma_transfer *transfer)
+		struct xdma_transfer *transfer)
 {
 	int rv = 0;
 	struct xdma_transfer *transfer_started;
 	struct xdma_dev *xdev;
 	unsigned long flags;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !engine->xdev)) {
+		pr_err("bad engine 0x%p, xdev 0x%p.\n",
+			engine, engine ? engine->xdev : NULL);
 		return -EINVAL;
 	}
-
-	if (!engine->xdev) {
-		pr_err("Invalid xdev\n");
+	if (unlikely(!transfer || (transfer->desc_num == 0))) {
+		pr_err("engine %s, xfer 0x%p, desc 0.\n",
+			engine->name, transfer);
 		return -EINVAL;
 	}
-
-	if (!transfer) {
-		pr_err("%s Invalid DMA transfer\n", engine->name);
-		return -EINVAL;
-	}
-
-	if (transfer->desc_num == 0) {
-		pr_err("%s void descriptors in the transfer list\n",
-		       engine->name);
-		return -EINVAL;
-	}
-	dbg_tfr("%s (transfer=0x%p).\n", __func__, transfer);
+	dbg_tfr("transfer_queue(transfer=0x%p).\n", transfer);
 
 	xdev = engine->xdev;
 	if (xdma_device_flag_check(xdev, XDEV_FLAG_OFFLINE)) {
-		pr_info("dev 0x%p offline, transfer 0x%p not queued.\n", xdev,
-			transfer);
+		pr_info("dev 0x%p offline, transfer 0x%p not queued.\n",
+			xdev, transfer);
 		return -EBUSY;
 	}
 
@@ -2704,12 +2462,9 @@ static int transfer_queue(struct xdma_engine *engine,
 	/* engine is idle? */
 	if (!engine->running) {
 		/* start engine */
-		dbg_tfr("%s(): starting %s engine.\n", __func__, engine->name);
+		dbg_tfr("transfer_queue(): starting %s engine.\n",
+			engine->name);
 		transfer_started = engine_start(engine);
-		if (!transfer_started) {
-			pr_err("Failed to start dma engine\n");
-			goto shutdown;
-		}
 		dbg_tfr("transfer=0x%p started %s engine with transfer 0x%p.\n",
 			transfer, engine->name, transfer_started);
 	} else {
@@ -2732,9 +2487,10 @@ static void engine_alignments(struct xdma_engine *engine)
 	u32 address_bits;
 
 	w = read_register(&engine->regs->alignments);
-	dbg_init("engine %p name %s alignments=0x%08x\n", engine, engine->name,
-		 (int)w);
+	dbg_init("engine %p name %s alignments=0x%08x\n", engine,
+		engine->name, (int)w);
 
+	/* RTO  - add some macros to extract these fields */
 	align_bytes = (w & 0x00ff0000U) >> 16;
 	granularity_bytes = (w & 0x0000ff00U) >> 8;
 	address_bits = (w & 0x000000ffU);
@@ -2762,64 +2518,54 @@ static void engine_free_resource(struct xdma_engine *engine)
 	/* Release memory use for descriptor writebacks */
 	if (engine->poll_mode_addr_virt) {
 		dbg_sg("Releasing memory for descriptor writeback\n");
-		dma_free_coherent(&xdev->pdev->dev, sizeof(struct xdma_poll_wb),
-				  engine->poll_mode_addr_virt,
-				  engine->poll_mode_bus);
+		dma_free_coherent(&xdev->pdev->dev,
+				sizeof(struct xdma_poll_wb),
+				engine->poll_mode_addr_virt,
+				engine->poll_mode_bus);
 		dbg_sg("Released memory for descriptor writeback\n");
 		engine->poll_mode_addr_virt = NULL;
 	}
 
 	if (engine->desc) {
 		dbg_init("device %s, engine %s pre-alloc desc 0x%p,0x%llx.\n",
-			 dev_name(&xdev->pdev->dev), engine->name, engine->desc,
-			 engine->desc_bus);
+			dev_name(&xdev->pdev->dev), engine->name,
+			engine->desc, engine->desc_bus);
 		dma_free_coherent(&xdev->pdev->dev,
-				  XDMA_TRANSFER_MAX_DESC *
-					  sizeof(struct xdma_desc),
-				  engine->desc, engine->desc_bus);
+			XDMA_TRANSFER_MAX_DESC * sizeof(struct xdma_desc),
+			engine->desc, engine->desc_bus);
 		engine->desc = NULL;
 	}
 
 	if (engine->cyclic_result) {
-		dma_free_coherent(
-			&xdev->pdev->dev,
-			XDMA_TRANSFER_MAX_DESC * sizeof(struct xdma_result),
+		dma_free_coherent(&xdev->pdev->dev,
+			CYCLIC_RX_PAGES_MAX * sizeof(struct xdma_result),
 			engine->cyclic_result, engine->cyclic_result_bus);
 		engine->cyclic_result = NULL;
 	}
 }
 
-static int engine_destroy(struct xdma_dev *xdev, struct xdma_engine *engine)
+static void engine_destroy(struct xdma_dev *xdev, struct xdma_engine *engine)
 {
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
-		return -EINVAL;
-	}
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
+	if (unlikely(!xdev || !engine)) {
+		pr_err("xdev 0x%p, engine 0x%p.\n", xdev, engine);
+		return;
 	}
 
 	dbg_sg("Shutting down engine %s%d", engine->name, engine->channel);
 
 	/* Disable interrupts to stop processing new events during shutdown */
 	write_register(0x0, &engine->regs->interrupt_enable_mask,
-		       (unsigned long)(&engine->regs->interrupt_enable_mask) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->interrupt_enable_mask) -
+			(unsigned long)(&engine->regs));
 
 	if (enable_credit_mp && engine->streaming &&
-	    engine->dir == DMA_FROM_DEVICE) {
+		engine->dir == DMA_FROM_DEVICE) {
 		u32 reg_value = (0x1 << engine->channel) << 16;
-		struct sgdma_common_regs *reg =
-			(struct sgdma_common_regs
-				 *)(xdev->bar[xdev->config_bar_idx] +
-				    (0x6 * TARGET_SPACING));
+		struct sgdma_common_regs *reg = (struct sgdma_common_regs *)
+				(xdev->bar[xdev->config_bar_idx] +
+				 (0x6*TARGET_SPACING));	
 		write_register(reg_value, &reg->credit_mode_enable_w1c, 0);
 	}
-
-	if (poll_mode)
-		xdma_thread_remove_work(engine);
 
 	/* Release memory use for descriptor writebacks */
 	engine_free_resource(engine);
@@ -2827,7 +2573,6 @@ static int engine_destroy(struct xdma_dev *xdev, struct xdma_engine *engine)
 	memset(engine, 0, sizeof(struct xdma_engine));
 	/* Decrement the number of engines available */
 	xdev->engines_num--;
-	return 0;
 }
 
 /**
@@ -2837,51 +2582,42 @@ static int engine_destroy(struct xdma_dev *xdev, struct xdma_engine *engine)
  */
 struct xdma_transfer *engine_cyclic_stop(struct xdma_engine *engine)
 {
-	int rv;
 	struct xdma_transfer *transfer = 0;
-	int size = engine->xdma_perf->transfer_size;
 
 	/* transfers on queue? */
 	if (!list_empty(&engine->transfer_list)) {
 		/* pick first transfer on the queue (was submitted to engine) */
 		transfer = list_entry(engine->transfer_list.next,
-				      struct xdma_transfer, entry);
-		if (!transfer) {
-			pr_err("(engine=%s) has void transfer in queue.\n",
-			       engine->name);
-			return NULL;
-		}
-		rv = xdma_engine_stop(engine);
-		if (rv < 0) {
-			pr_err("Failed to stop engine\n");
-			return NULL;
-		}
+					struct xdma_transfer, entry);
+
+		xdma_engine_stop(engine);
 		engine->running = 0;
 
-		if (transfer->cyclic) {
+		if (transfer && transfer->cyclic) {
 			if (engine->xdma_perf)
 				dbg_perf("Stopping perf transfer on %s\n",
-					 engine->name);
+					engine->name);
 			else
 				dbg_perf("Stopping cyclic transfer on %s\n",
-					 engine->name);
+					engine->name);
+
 			/* free up the buffer allocated for perf run */
 			if (engine->perf_buf_virt)
 				dma_free_coherent(&engine->xdev->pdev->dev,
-						size, engine->perf_buf_virt,
-						engine->perf_buf_bus);
+					engine->xdma_perf->transfer_size,
+					engine->perf_buf_virt,
+					engine->perf_buf_bus);
 			engine->perf_buf_virt = NULL;
 			list_del(&transfer->entry);
 		} else {
 			dbg_sg("(engine=%p) running transfer is not cyclic\n",
-			       engine);
+				engine);
 		}
 	} else {
 		dbg_sg("(engine=%p) found not running transfer.\n", engine);
 	}
 	return transfer;
 }
-EXPORT_SYMBOL_GPL(engine_cyclic_stop);
 
 static int engine_writeback_setup(struct xdma_engine *engine)
 {
@@ -2889,33 +2625,34 @@ static int engine_writeback_setup(struct xdma_engine *engine)
 	struct xdma_dev *xdev;
 	struct xdma_poll_wb *writeback;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !engine->xdev)) {
+		pr_err("engine 0x%p, xdev NULL.\n", engine);
 		return -EINVAL;
 	}
-
 	xdev = engine->xdev;
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
-		return -EINVAL;
-	}
 
+	/*
+	 * RTO - doing the allocation per engine is wasteful since a full page
+	 * is allocated each time - better to allocate one page for the whole
+	 * device during probe() and set per-engine offsets here
+	 */
 	writeback = (struct xdma_poll_wb *)engine->poll_mode_addr_virt;
 	writeback->completed_desc_count = 0;
 
 	dbg_init("Setting writeback location to 0x%llx for engine %p",
-		 engine->poll_mode_bus, engine);
+		engine->poll_mode_bus, engine);
 	w = cpu_to_le32(PCI_DMA_L(engine->poll_mode_bus));
-	write_register(w, &engine->regs->poll_mode_wb_lo,
-		       (unsigned long)(&engine->regs->poll_mode_wb_lo) -
-			       (unsigned long)(&engine->regs));
+	write_register(w, &engine->regs->poll_mode_wb_lo, 
+			(unsigned long)(&engine->regs->poll_mode_wb_lo) - 
+			(unsigned long)(&engine->regs));
 	w = cpu_to_le32(PCI_DMA_H(engine->poll_mode_bus));
-	write_register(w, &engine->regs->poll_mode_wb_hi,
-		       (unsigned long)(&engine->regs->poll_mode_wb_hi) -
-			       (unsigned long)(&engine->regs));
+	write_register(w, &engine->regs->poll_mode_wb_hi, 
+			(unsigned long)(&engine->regs->poll_mode_wb_hi) - 
+			(unsigned long)(&engine->regs));
 
 	return 0;
 }
+
 
 /* engine_create() - Create an SG DMA engine bookkeeping data structure
  *
@@ -2934,8 +2671,8 @@ static int engine_init_regs(struct xdma_engine *engine)
 	int rv = 0;
 
 	write_register(XDMA_CTRL_NON_INCR_ADDR, &engine->regs->control_w1c,
-		       (unsigned long)(&engine->regs->control_w1c) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->control_w1c) -
+			(unsigned long)(&engine->regs));
 
 	engine_alignments(engine);
 
@@ -2951,31 +2688,34 @@ static int engine_init_regs(struct xdma_engine *engine)
 		rv = engine_writeback_setup(engine);
 		if (rv) {
 			dbg_init("%s descr writeback setup failed.\n",
-				 engine->name);
+				engine->name);
 			goto fail_wb;
 		}
 	} else {
 		/* enable the relevant completion interrupts */
 		reg_value |= XDMA_CTRL_IE_DESC_STOPPED;
 		reg_value |= XDMA_CTRL_IE_DESC_COMPLETED;
+
+		if (engine->streaming && engine->dir == DMA_FROM_DEVICE)
+			reg_value |= XDMA_CTRL_IE_IDLE_STOPPED;
 	}
 
 	/* Apply engine configurations */
 	write_register(reg_value, &engine->regs->interrupt_enable_mask,
-		       (unsigned long)(&engine->regs->interrupt_enable_mask) -
-			       (unsigned long)(&engine->regs));
+			(unsigned long)(&engine->regs->interrupt_enable_mask) -
+			(unsigned long)(&engine->regs));
 
 	engine->interrupt_enable_mask_value = reg_value;
 
 	/* only enable credit mode for AXI-ST C2H */
 	if (enable_credit_mp && engine->streaming &&
-	    engine->dir == DMA_FROM_DEVICE) {
+		engine->dir == DMA_FROM_DEVICE) {
+
 		struct xdma_dev *xdev = engine->xdev;
 		u32 reg_value = (0x1 << engine->channel) << 16;
-		struct sgdma_common_regs *reg =
-			(struct sgdma_common_regs
-				 *)(xdev->bar[xdev->config_bar_idx] +
-				    (0x6 * TARGET_SPACING));
+		struct sgdma_common_regs *reg = (struct sgdma_common_regs *)
+				(xdev->bar[xdev->config_bar_idx] +
+				 (0x6*TARGET_SPACING));	
 
 		write_register(reg_value, &reg->credit_mode_enable_w1s, 0);
 	}
@@ -2991,9 +2731,8 @@ static int engine_alloc_resource(struct xdma_engine *engine)
 	struct xdma_dev *xdev = engine->xdev;
 
 	engine->desc = dma_alloc_coherent(&xdev->pdev->dev,
-					  XDMA_TRANSFER_MAX_DESC *
-						  sizeof(struct xdma_desc),
-					  &engine->desc_bus, GFP_KERNEL);
+			XDMA_TRANSFER_MAX_DESC * sizeof(struct xdma_desc),
+			&engine->desc_bus, GFP_KERNEL);
 	if (!engine->desc) {
 		pr_warn("dev %s, %s pre-alloc desc OOM.\n",
 			dev_name(&xdev->pdev->dev), engine->name);
@@ -3001,25 +2740,24 @@ static int engine_alloc_resource(struct xdma_engine *engine)
 	}
 
 	if (poll_mode) {
-		engine->poll_mode_addr_virt =
-			dma_alloc_coherent(&xdev->pdev->dev,
-					   sizeof(struct xdma_poll_wb),
-					   &engine->poll_mode_bus, GFP_KERNEL);
+		engine->poll_mode_addr_virt = dma_alloc_coherent(
+					&xdev->pdev->dev,
+					sizeof(struct xdma_poll_wb),
+					&engine->poll_mode_bus, GFP_KERNEL);
 		if (!engine->poll_mode_addr_virt) {
-			pr_warn("%s, %s poll pre-alloc writeback OOM.\n",
+                        pr_warn("%s, %s poll pre-alloc writeback OOM.\n",
 				dev_name(&xdev->pdev->dev), engine->name);
 			goto err_out;
 		}
 	}
 
 	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
-		engine->cyclic_result = dma_alloc_coherent(
-			&xdev->pdev->dev,
-			XDMA_TRANSFER_MAX_DESC * sizeof(struct xdma_result),
+		engine->cyclic_result = dma_alloc_coherent(&xdev->pdev->dev,
+			CYCLIC_RX_PAGES_MAX * sizeof(struct xdma_result),
 			&engine->cyclic_result_bus, GFP_KERNEL);
 
 		if (!engine->cyclic_result) {
-			pr_warn("%s, %s pre-alloc result OOM.\n",
+                        pr_warn("%s, %s pre-alloc result OOM.\n",
 				dev_name(&xdev->pdev->dev), engine->name);
 			goto err_out;
 		}
@@ -3033,7 +2771,7 @@ err_out:
 }
 
 static int engine_init(struct xdma_engine *engine, struct xdma_dev *xdev,
-		       int offset, enum dma_data_direction dir, int channel)
+			int offset, enum dma_data_direction dir, int channel)
 {
 	int rv;
 	u32 val;
@@ -3055,9 +2793,9 @@ static int engine_init(struct xdma_engine *engine, struct xdma_dev *xdev,
 	/* register address */
 	engine->regs = (xdev->bar[xdev->config_bar_idx] + offset);
 	engine->sgdma_regs = xdev->bar[xdev->config_bar_idx] + offset +
-			     SGDMA_OFFSET_FROM_CHANNEL;
+				SGDMA_OFFSET_FROM_CHANNEL;
 	val = read_register(&engine->regs->identifier);
-	if (val & 0x8000U)
+        if (val & 0x8000U)
 		engine->streaming = 1;
 
 	/* remember SG DMA direction */
@@ -3067,7 +2805,7 @@ static int engine_init(struct xdma_engine *engine, struct xdma_dev *xdev,
 		engine->streaming ? "ST" : "MM");
 
 	dbg_init("engine %p name %s irq_bitmask=0x%08x\n", engine, engine->name,
-		 (int)engine->irq_bitmask);
+		(int)engine->irq_bitmask);
 
 	/* initialize the deferred work for transfer completion */
 	INIT_WORK(&engine->work, engine_service_work);
@@ -3086,167 +2824,67 @@ static int engine_init(struct xdma_engine *engine, struct xdma_dev *xdev,
 	if (rv)
 		return rv;
 
-	if (poll_mode)
-		xdma_thread_add_work(engine);
-
 	return 0;
 }
 
 /* transfer_destroy() - free transfer */
 static void transfer_destroy(struct xdma_dev *xdev, struct xdma_transfer *xfer)
 {
-    /* free descriptors */
-	xdma_desc_done(xfer->desc_virt, xfer->desc_num);
+	/* free descriptors */
+	memset(xfer->desc_virt, 0, xfer->desc_num * sizeof(struct xdma_desc));
 
 	if (xfer->last_in_request && (xfer->flags & XFER_FLAG_NEED_UNMAP)) {
-		struct sg_table *sgt = xfer->sgt;
+        	struct sg_table *sgt = xfer->sgt;
 
 		if (sgt->nents) {
 			pci_unmap_sg(xdev->pdev, sgt->sgl, sgt->nents,
-				     xfer->dir);
+				xfer->dir);
 			sgt->nents = 0;
 		}
 	}
 }
 
 static int transfer_build(struct xdma_engine *engine,
-			struct xdma_request_cb *req, struct xdma_transfer *xfer,
-			unsigned int desc_max)
+			struct xdma_request_cb *req, unsigned int desc_max)
 {
+	struct xdma_transfer *xfer = &req->xfer;
 	struct sw_desc *sdesc = &(req->sdesc[req->sw_desc_idx]);
 	int i = 0;
 	int j = 0;
-	dma_addr_t bus = xfer->res_bus;
 
 	for (; i < desc_max; i++, j++, sdesc++) {
 		dbg_desc("sw desc %d/%u: 0x%llx, 0x%x, ep 0x%llx.\n",
-			 i + req->sw_desc_idx, req->sw_desc_cnt, sdesc->addr,
-			 sdesc->len, req->ep_addr);
+			i + req->sw_desc_idx, req->sw_desc_cnt,
+			sdesc->addr, sdesc->len, req->ep_addr);
 
 		/* fill in descriptor entry j with transfer details */
 		xdma_desc_set(xfer->desc_virt + j, sdesc->addr, req->ep_addr,
-			      sdesc->len, xfer->dir);
+				 sdesc->len, xfer->dir);
 		xfer->len += sdesc->len;
 
 		/* for non-inc-add mode don't increment ep_addr */
 		if (!engine->non_incr_addr)
 			req->ep_addr += sdesc->len;
-
-		if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
-			memset(xfer->res_virt + j, 0,
-				sizeof(struct xdma_result));
-			xfer->desc_virt[j].src_addr_lo =
-						cpu_to_le32(PCI_DMA_L(bus));
-			xfer->desc_virt[j].src_addr_hi =
-						cpu_to_le32(PCI_DMA_H(bus));
-			bus += sizeof(struct xdma_result);
-		}
-
 	}
-	req->sw_desc_idx += desc_max;
+	req->sw_desc_idx += desc_max; 
 	return 0;
 }
 
-
-static int transfer_init(struct xdma_engine *engine,
-			struct xdma_request_cb *req, struct xdma_transfer *xfer)
+static int transfer_init(struct xdma_engine *engine, struct xdma_request_cb *req)
 {
+	struct xdma_transfer *xfer = &req->xfer;
 	unsigned int desc_max = min_t(unsigned int,
 				req->sw_desc_cnt - req->sw_desc_idx,
 				XDMA_TRANSFER_MAX_DESC);
-	unsigned int desc_align = 0;
 	int i = 0;
 	int last = 0;
-	u32 control;
-	unsigned long flags;
-
-	memset(xfer, 0, sizeof(*xfer));
-
-	/* lock the engine state */
-	spin_lock_irqsave(&engine->lock, flags);
-	/* initialize wait queue */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0)
-	init_swait_queue_head(&xfer->wq);
-#else
-	init_waitqueue_head(&xfer->wq);
-#endif
-
-	/* remember direction of transfer */
-	xfer->dir = engine->dir;
-	xfer->desc_virt = engine->desc + engine->desc_idx;
-	xfer->res_virt = engine->cyclic_result + engine->desc_idx;
-	xfer->desc_bus = engine->desc_bus +
-			(sizeof(struct xdma_desc) * engine->desc_idx);
-	xfer->res_bus = engine->cyclic_result_bus +
-			(sizeof(struct xdma_result) * engine->desc_idx);
-	xfer->desc_index = engine->desc_idx;
-
-	/* TODO: Need to handle desc_used >= XDMA_TRANSFER_MAX_DESC */
-
-	if ((engine->desc_idx + desc_max) >= XDMA_TRANSFER_MAX_DESC)
-		desc_max = XDMA_TRANSFER_MAX_DESC - engine->desc_idx;
-
-	transfer_desc_init(xfer, desc_max);
-
-	dbg_sg("xfer= %p transfer->desc_bus = 0x%llx.\n",
-		xfer, (u64)xfer->desc_bus);
-	transfer_build(engine, req, xfer, desc_max);
-
-	/*
-	 * Contiguous descriptors cannot cross PAGE boundary
-	 * The 1st descriptor may start in the middle of the page,
-	 * calculate the 1st block of adj desc accordingly
-	 */
-	desc_align = 128 - (engine->desc_idx % 128) - 1;
-	if (desc_align > (desc_max - 1))
-		desc_align = desc_max - 1;
-
-	xfer->desc_adjacent = desc_align;
-
-	/* terminate last descriptor */
-	last = desc_max - 1;
-	/* stop engine, EOP for AXI ST, req IRQ on last descriptor */
-	control = XDMA_DESC_STOPPED;
-	control |= XDMA_DESC_EOP;
-	control |= XDMA_DESC_COMPLETED;
-	xdma_desc_control_set(xfer->desc_virt + last, control);
-
-	xfer->desc_num = desc_max;
-	engine->desc_idx = (engine->desc_idx + desc_max) %
-					XDMA_TRANSFER_MAX_DESC;
-	engine->desc_used += desc_max;
-
-	/* fill in adjacent numbers */
-	for (i = 0; i < xfer->desc_num && desc_align; i++, desc_align--)
-		xdma_desc_adjacent(xfer->desc_virt + i, desc_align);
-
-	for (; i < xfer->desc_num; i++)
-		xdma_desc_adjacent(xfer->desc_virt + i, xfer->desc_num - i - 1);
-
-	spin_unlock_irqrestore(&engine->lock, flags);
-	return 0;
-}
-
-
-static int transfer_init_cyclic(struct xdma_engine *engine,
-				struct xdma_request_cb *req,
-				struct xdma_transfer *xfer)
-{
-	unsigned int desc_max =
-		min_t(unsigned int, req->sw_desc_cnt - req->sw_desc_idx,
-		      XDMA_TRANSFER_MAX_DESC);
-	int i = 0;
 	u32 control;
 	int rv;
 
 	memset(xfer, 0, sizeof(*xfer));
 
 	/* initialize wait queue */
-#if KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
-	init_swait_queue_head(&xfer->wq);
-#else
 	init_waitqueue_head(&xfer->wq);
-#endif
 
 	/* remember direction of transfer */
 	xfer->dir = engine->dir;
@@ -3255,27 +2893,25 @@ static int transfer_init_cyclic(struct xdma_engine *engine,
 	xfer->desc_bus = engine->desc_bus;
 
 	rv = transfer_desc_init(xfer, desc_max);
-	if (rv < 0) {
-		pr_err("Failed to initialize descriptors\n");
+	if (rv < 0)
 		return rv;
-	}
-
+	
 	dbg_sg("transfer->desc_bus = 0x%llx.\n", (u64)xfer->desc_bus);
 
-	transfer_build(engine, req, xfer, desc_max);
+	transfer_build(engine, req, desc_max);
 
+	/* terminate last descriptor */
+	last = desc_max - 1;
+	xdma_desc_link(xfer->desc_virt + last, 0, 0);
 	/* stop engine, EOP for AXI ST, req IRQ on last descriptor */
 	control = XDMA_DESC_STOPPED;
 	control |= XDMA_DESC_EOP;
 	control |= XDMA_DESC_COMPLETED;
-	rv = xdma_desc_control_set(xfer->desc_virt + desc_max - 1, control);
-	if (rv < 0) {
-		pr_err("Failed to set desc control\n");
+	rv = xdma_desc_control_set(xfer->desc_virt + last, control);
+	if (rv < 0)
 		return rv;
-	}
 
-	xfer->desc_num = desc_max;
-	xfer->desc_adjacent = 1;
+	xfer->desc_num = xfer->desc_adjacent = desc_max;
 
 	dbg_sg("transfer 0x%p has %d descriptors\n", xfer, xfer->desc_num);
 	/* fill in adjacent numbers */
@@ -3291,13 +2927,13 @@ static void sgt_dump(struct sg_table *sgt)
 	int i;
 	struct scatterlist *sg = sgt->sgl;
 
-	pr_info("sgt 0x%p, sgl 0x%p, nents %u/%u.\n", sgt, sgt->sgl, sgt->nents,
-		sgt->orig_nents);
+	pr_info("sgt 0x%p, sgl 0x%p, nents %u/%u.\n",
+		sgt, sgt->sgl, sgt->nents, sgt->orig_nents);
 
 	for (i = 0; i < sgt->orig_nents; i++, sg = sg_next(sg))
-		pr_info("%d, 0x%p, pg 0x%p,%u+%u, dma 0x%llx,%u.\n", i, sg,
-			sg_page(sg), sg->offset, sg->length, sg_dma_address(sg),
-			sg_dma_len(sg));
+		pr_info("%d, 0x%p, pg 0x%p,%u+%u, dma 0x%llx,%u.\n",
+			i, sg, sg_page(sg), sg->offset, sg->length,
+			sg_dma_address(sg), sg_dma_len(sg)); 
 }
 
 static void xdma_request_cb_dump(struct xdma_request_cb *req)
@@ -3308,8 +2944,9 @@ static void xdma_request_cb_dump(struct xdma_request_cb *req)
 		req, req->total_len, req->ep_addr, req->sw_desc_cnt, req->sgt);
 	sgt_dump(req->sgt);
 	for (i = 0; i < req->sw_desc_cnt; i++)
-		pr_info("%d/%u, 0x%llx, %u.\n", i, req->sw_desc_cnt,
-			req->sdesc[i].addr, req->sdesc[i].len);
+		pr_info("%d/%u, 0x%llx, %u.\n",
+			i, req->sw_desc_cnt, req->sdesc[i].addr,
+			req->sdesc[i].len);
 }
 #endif
 
@@ -3322,11 +2959,11 @@ static void xdma_request_free(struct xdma_request_cb *req)
 		kfree(req);
 }
 
-static struct xdma_request_cb *xdma_request_alloc(unsigned int sdesc_nr)
+static struct xdma_request_cb * xdma_request_alloc(unsigned int sdesc_nr)
 {
 	struct xdma_request_cb *req;
 	unsigned int size = sizeof(struct xdma_request_cb) +
-			    sdesc_nr * sizeof(struct sw_desc);
+				sdesc_nr * sizeof(struct sw_desc);
 
 	req = kzalloc(size, GFP_KERNEL);
 	if (!req) {
@@ -3342,8 +2979,8 @@ static struct xdma_request_cb *xdma_request_alloc(unsigned int sdesc_nr)
 	return req;
 }
 
-static struct xdma_request_cb *xdma_init_request(struct sg_table *sgt,
-						 u64 ep_addr)
+static struct xdma_request_cb * xdma_init_request(struct sg_table *sgt,
+						u64 ep_addr)
 {
 	struct xdma_request_cb *req;
 	struct scatterlist *sg = sgt->sgl;
@@ -3351,26 +2988,26 @@ static struct xdma_request_cb *xdma_init_request(struct sg_table *sgt,
 	int extra = 0;
 	int i, j = 0;
 
-	for (i = 0; i < max; i++, sg = sg_next(sg)) {
+	for (i = 0;  i < max; i++, sg = sg_next(sg)) {
 		unsigned int len = sg_dma_len(sg);
 
 		if (unlikely(len > desc_blen_max))
 			extra += (len + desc_blen_max - 1) / desc_blen_max;
 	}
 
-	dbg_tfr("ep 0x%llx, desc %u+%u.\n", ep_addr, max, extra);
+//pr_info("ep 0x%llx, desc %u+%u.\n", ep_addr, max, extra);
 
 	max += extra;
 	req = xdma_request_alloc(max);
 	if (!req)
 		return NULL;
 
-	req->sgt = sgt;
+	req->sgt = sgt;	
 	req->ep_addr = ep_addr;
 
-	for (i = 0, sg = sgt->sgl; i < sgt->nents; i++, sg = sg_next(sg)) {
+	for (i = 0, sg = sgt->sgl;  i < sgt->nents; i++, sg = sg_next(sg)) {
 		unsigned int tlen = sg_dma_len(sg);
-		dma_addr_t addr = sg_dma_address(sg);
+		dma_addr_t addr = sg_dma_address(sg);	
 
 		req->total_len += tlen;
 		while (tlen) {
@@ -3378,21 +3015,26 @@ static struct xdma_request_cb *xdma_init_request(struct sg_table *sgt,
 			if (tlen > desc_blen_max) {
 				req->sdesc[j].len = desc_blen_max;
 				addr += desc_blen_max;
-				tlen -= desc_blen_max;
+				tlen -= desc_blen_max;	
 			} else {
 				req->sdesc[j].len = tlen;
 				tlen = 0;
 			}
 			j++;
+			if (j > max)
+				break;
 		}
 	}
 
-	if (j > max) {
-		pr_err("Cannot transfer more than supported length %d\n",
-		       desc_blen_max);
+	if (unlikely(j > max)) {
+		pr_err("too many sdesc %d > %d\n", j, max);
+#ifdef __LIBXDMA_DEBUG__
+		xdma_request_cb_dump(req);
+#endif
 		xdma_request_free(req);
 		return NULL;
 	}
+
 	req->sw_desc_cnt = j;
 #ifdef __LIBXDMA_DEBUG__
 	xdma_request_cb_dump(req);
@@ -3401,377 +3043,12 @@ static struct xdma_request_cb *xdma_init_request(struct sg_table *sgt,
 }
 
 ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
-			 struct sg_table *sgt, bool dma_mapped, int timeout_ms)
+			struct sg_table *sgt, bool dma_mapped, int timeout_ms)
 {
 	struct xdma_dev *xdev = (struct xdma_dev *)dev_hndl;
 	struct xdma_engine *engine;
-	int rv = 0, tfer_idx = 0, i;
+	int rv = 0;
 	ssize_t done = 0;
-	struct scatterlist *sg = sgt->sgl;
-	int nents;
-	enum dma_data_direction dir = write ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
-	struct xdma_request_cb *req = NULL;
-	struct xdma_result *result;
-
-	if (!dev_hndl)
-		return -EINVAL;
-
-	if (debug_check_dev_hndl(__func__, xdev->pdev, dev_hndl) < 0)
-		return -EINVAL;
-
-	if (write == 1) {
-		if (channel >= xdev->h2c_channel_max) {
-			pr_err("H2C channel %d >= %d.\n", channel,
-				xdev->h2c_channel_max);
-			return -EINVAL;
-		}
-		engine = &xdev->engine_h2c[channel];
-	} else if (write == 0) {
-		if (channel >= xdev->c2h_channel_max) {
-			pr_err("C2H channel %d >= %d.\n", channel,
-				xdev->c2h_channel_max);
-			return -EINVAL;
-		}
-		engine = &xdev->engine_c2h[channel];
-	}
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
-		return -EINVAL;
-	}
-
-	xdev = engine->xdev;
-	if (xdma_device_flag_check(xdev, XDEV_FLAG_OFFLINE)) {
-		pr_info("xdev 0x%p, offline.\n", xdev);
-		return -EBUSY;
-	}
-
-	/* check the direction */
-	if (engine->dir != dir) {
-		pr_info("0x%p, %s, %d, W %d, 0x%x/0x%x mismatch.\n", engine,
-			engine->name, channel, write, engine->dir, dir);
-		return -EINVAL;
-	}
-
-	if (!dma_mapped) {
-		nents = pci_map_sg(xdev->pdev, sg, sgt->orig_nents, dir);
-		if (!nents) {
-			pr_info("map sgl failed, sgt 0x%p.\n", sgt);
-			return -EIO;
-		}
-		sgt->nents = nents;
-	} else {
-		if (!sgt->nents) {
-			pr_err("sg table has invalid number of entries 0x%p.\n",
-			       sgt);
-			return -EIO;
-		}
-	}
-
-	req = xdma_init_request(sgt, ep_addr);
-	if (!req) {
-		rv = -ENOMEM;
-		goto unmap_sgl;
-	}
-
-	dbg_tfr("%s, len %u sg cnt %u.\n", engine->name, req->total_len,
-		req->sw_desc_cnt);
-
-	sg = sgt->sgl;
-	nents = req->sw_desc_cnt;
-	mutex_lock(&engine->desc_lock);
-
-	while (nents) {
-		unsigned long flags;
-		struct xdma_transfer *xfer;
-
-		/* build transfer */
-		rv = transfer_init(engine, req, &req->tfer[0]);
-		if (rv < 0) {
-			mutex_unlock(&engine->desc_lock);
-			goto unmap_sgl;
-		}
-		xfer = &req->tfer[0];
-
-		if (!dma_mapped)
-			xfer->flags = XFER_FLAG_NEED_UNMAP;
-
-		/* last transfer for the given request? */
-		nents -= xfer->desc_num;
-		if (!nents) {
-			xfer->last_in_request = 1;
-			xfer->sgt = sgt;
-		}
-
-		dbg_tfr("xfer, %u, ep 0x%llx, done %lu, sg %u/%u.\n", xfer->len,
-			req->ep_addr, done, req->sw_desc_idx, req->sw_desc_cnt);
-
-#ifdef __LIBXDMA_DEBUG__
-		transfer_dump(xfer);
-#endif
-
-		rv = transfer_queue(engine, xfer);
-		if (rv < 0) {
-			mutex_unlock(&engine->desc_lock);
-			pr_info("unable to submit %s, %d.\n", engine->name, rv);
-			goto unmap_sgl;
-		}
-
-		/*
-		 * When polling, determine how many descriptors have been queued
-		 * on the engine to determine the writeback value expected
-		 */
-		if (poll_mode) {
-			unsigned int desc_count;
-
-			spin_lock_irqsave(&engine->lock, flags);
-			desc_count = xfer->desc_num;
-			spin_unlock_irqrestore(&engine->lock, flags);
-			dbg_tfr("%s poll desc_count=%d\n", engine->name,
-				desc_count);
-			rv = engine_service_poll(engine, desc_count);
-			if (rv < 0) {
-				mutex_unlock(&engine->desc_lock);
-				pr_err("Failed to service polling\n");
-				goto unmap_sgl;
-			}
-
-		} else {
-			xlx_wait_event_interruptible_timeout(
-				xfer->wq,
-				(xfer->state != TRANSFER_STATE_SUBMITTED),
-				msecs_to_jiffies(timeout_ms));
-		}
-
-		spin_lock_irqsave(&engine->lock, flags);
-
-		switch (xfer->state) {
-		case TRANSFER_STATE_COMPLETED:
-			spin_unlock_irqrestore(&engine->lock, flags);
-
-			result = xfer->res_virt;
-
-			dbg_tfr("transfer %p, %u, ep 0x%llx compl, +%lu.\n",
-				xfer, xfer->len, req->ep_addr - xfer->len,
-				done);
-
-			/* For C2H streaming use writeback results */
-			if (engine->streaming &&
-			    engine->dir == DMA_FROM_DEVICE) {
-				for (i = 0; i < xfer->desc_num; i++)
-					done += result[i].length;
-			} else
-				done += xfer->len;
-
-			rv = 0;
-			break;
-		case TRANSFER_STATE_FAILED:
-			pr_info("xfer 0x%p,%u, failed, ep 0x%llx.\n", xfer,
-				xfer->len, req->ep_addr - xfer->len);
-			spin_unlock_irqrestore(&engine->lock, flags);
-
-#ifdef __LIBXDMA_DEBUG__
-			transfer_dump(xfer);
-			sgt_dump(sgt);
-#endif
-			rv = -EIO;
-			break;
-		default:
-			/* transfer can still be in-flight */
-			pr_info("xfer 0x%p,%u, s 0x%x timed out, ep 0x%llx.\n",
-				xfer, xfer->len, xfer->state, req->ep_addr);
-			rv = engine_status_read(engine, 0, 1);
-			if (rv < 0) {
-				pr_err("Failed to read engine status\n");
-			} else if (rv == 0) {
-				//engine_status_dump(engine);
-				rv = transfer_abort(engine, xfer);
-				if (rv < 0) {
-					pr_err("Failed to stop engine\n");
-				} else if (rv == 0) {
-					rv = xdma_engine_stop(engine);
-					if (rv < 0)
-						pr_err("Failed to stop engine\n");
-				}
-			}
-			spin_unlock_irqrestore(&engine->lock, flags);
-
-#ifdef __LIBXDMA_DEBUG__
-			transfer_dump(xfer);
-			sgt_dump(sgt);
-#endif
-			rv = -ERESTARTSYS;
-			break;
-		}
-
-		engine->desc_used -= xfer->desc_num;
-		transfer_destroy(xdev, xfer);
-
-		/* use multiple transfers per request if we could not fit
-		 * all data within single descriptor chain.
-		 */
-		tfer_idx++;
-
-		if (rv < 0) {
-			mutex_unlock(&engine->desc_lock);
-			goto unmap_sgl;
-		}
-	} /* while (sg) */
-	mutex_unlock(&engine->desc_lock);
-
-unmap_sgl:
-	if (!dma_mapped && sgt->nents) {
-		pci_unmap_sg(xdev->pdev, sgt->sgl, sgt->orig_nents, dir);
-		sgt->nents = 0;
-	}
-
-	if (req)
-		xdma_request_free(req);
-
-	if (rv < 0)
-		return rv;
-
-	return done;
-}
-EXPORT_SYMBOL_GPL(xdma_xfer_submit);
-
-ssize_t xdma_xfer_completion(void *cb_hndl, void *dev_hndl, int channel,
-			bool write, u64 ep_addr, struct sg_table *sgt,
-			bool dma_mapped, int timeout_ms)
-{
-
-	struct xdma_dev *xdev = (struct xdma_dev *)dev_hndl;
-	struct xdma_io_cb *cb = (struct xdma_io_cb *)cb_hndl;
-	struct xdma_engine *engine;
-	int rv = 0, tfer_idx = 0;
-	ssize_t done = 0;
-	int nents;
-	enum dma_data_direction dir = write ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
-	struct xdma_request_cb *req = NULL;
-	struct xdma_transfer *xfer;
-	int i;
-	struct xdma_result *result;
-
-	if (write == 1) {
-		if (channel >= xdev->h2c_channel_max) {
-			pr_warn("H2C channel %d >= %d.\n",
-				channel, xdev->h2c_channel_max);
-			return -EINVAL;
-		}
-		engine = &xdev->engine_h2c[channel];
-	} else if (write == 0) {
-		if (channel >= xdev->c2h_channel_max) {
-			pr_warn("C2H channel %d >= %d.\n",
-				channel, xdev->c2h_channel_max);
-			return -EINVAL;
-		}
-		engine = &xdev->engine_c2h[channel];
-	} else {
-		pr_warn("write %d, exp. 0|1.\n", write);
-		return -EINVAL;
-	}
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
-		return -EINVAL;
-	}
-
-	xdev = engine->xdev;
-	req = cb->req;
-
-	nents = req->sw_desc_cnt;
-	while (nents) {
-		xfer = &req->tfer[tfer_idx];
-		nents -= xfer->desc_num;
-		switch (xfer->state) {
-		case TRANSFER_STATE_COMPLETED:
-			dbg_tfr("transfer %p, %u, ep 0x%llx compl, +%lu.\n",
-				xfer, xfer->len, req->ep_addr - xfer->len,
-				done);
-
-			result = xfer->res_virt;
-			/* For C2H streaming use writeback results */
-			if (engine->streaming &&
-				engine->dir == DMA_FROM_DEVICE) {
-				for (i = 0; i < xfer->desc_num; i++)
-					done += result[i].length;
-			} else
-				done += xfer->len;
-
-			rv = 0;
-			break;
-		case TRANSFER_STATE_FAILED:
-			pr_info("xfer 0x%p,%u, failed, ep 0x%llx.\n",
-				xfer, xfer->len, req->ep_addr - xfer->len);
-
-#ifdef __LIBXDMA_DEBUG__
-			transfer_dump(xfer);
-			sgt_dump(sgt);
-#endif
-			rv = -EIO;
-			break;
-		default:
-			/* transfer can still be in-flight */
-			pr_info("xfer 0x%p,%u, s 0x%x timed out, ep 0x%llx.\n",
-				xfer, xfer->len, xfer->state, req->ep_addr);
-			engine_status_read(engine, 0, 1);
-			engine_status_dump(engine);
-			transfer_abort(engine, xfer);
-
-			xdma_engine_stop(engine);
-
-#ifdef __LIBXDMA_DEBUG__
-			transfer_dump(xfer);
-			sgt_dump(sgt);
-#endif
-			rv = -ERESTARTSYS;
-			break;
-		}
-
-		transfer_destroy(xdev, xfer);
-		engine->desc_used -= xfer->desc_num;
-
-		tfer_idx++;
-
-		if (rv < 0)
-			goto unmap_sgl;
-	} /* while (sg) */
-
-unmap_sgl:
-	if (!dma_mapped && sgt->nents) {
-		pci_unmap_sg(xdev->pdev, sgt->sgl, sgt->orig_nents, dir);
-		sgt->nents = 0;
-	}
-
-	if (req)
-		xdma_request_free(req);
-
-	return done;
-
-}
-EXPORT_SYMBOL_GPL(xdma_xfer_completion);
-
-
-ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
-				bool write, u64 ep_addr, struct sg_table *sgt,
-				bool dma_mapped, int timeout_ms)
-{
-	struct xdma_dev *xdev = (struct xdma_dev *)dev_hndl;
-	struct xdma_engine *engine;
-	struct xdma_io_cb *cb = (struct xdma_io_cb *)cb_hndl;
-	int rv = 0, tfer_idx = 0;
 	struct scatterlist *sg = sgt->sgl;
 	int nents;
 	enum dma_data_direction dir = write ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
@@ -3802,14 +3079,9 @@ ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
 		return -EINVAL;
 	}
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n",
-			engine->name, engine->magic);
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
@@ -3834,10 +3106,9 @@ ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
 		}
 		sgt->nents = nents;
 	} else {
-		if (!sgt->nents) {
-			pr_err("sg table has invalid number of entries 0x%p.\n",
-			       sgt);
-			return -EIO;
+		if (unlikely(!sgt->nents)) {
+			pr_err("%s, sgt NOT dma_mapped.\n", engine->name);
+			return -EINVAL;
 		}
 	}
 
@@ -3847,39 +3118,24 @@ ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
 		goto unmap_sgl;
 	}
 
-	//used when doing completion.
-	req->cb = cb;
-	cb->req = req;
 	dbg_tfr("%s, len %u sg cnt %u.\n",
 		engine->name, req->total_len, req->sw_desc_cnt);
 
 	sg = sgt->sgl;
 	nents = req->sw_desc_cnt;
-	while (nents) {
+	mutex_lock(&engine->desc_lock);
 
+	while (nents) {
+		unsigned long flags;
 		struct xdma_transfer *xfer;
 
-		/* one transfer at a time */
-		xfer = &req->tfer[tfer_idx];
-		/* build transfer */
-		rv = transfer_init(engine, req, xfer);
+		/* build transfer */	
+		rv = transfer_init(engine, req);
 		if (rv < 0) {
-			pr_info("transfer_init failed\n");
-
-			if (!dma_mapped && sgt->nents) {
-				pci_unmap_sg(xdev->pdev, sgt->sgl,
-						sgt->orig_nents, dir);
-				sgt->nents = 0;
-			}
-
-			/* Transfer failed return BUSY */
-			if (cb->io_done)
-				cb->io_done((unsigned long)cb, -EBUSY);
-
-			goto rel_req;
+			mutex_unlock(&engine->desc_lock);
+			goto unmap_sgl;
 		}
-
-		xfer->cb = cb;
+		xfer = &req->xfer;
 
 		if (!dma_mapped)
 			xfer->flags = XFER_FLAG_NEED_UNMAP;
@@ -3891,9 +3147,9 @@ ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
 			xfer->sgt = sgt;
 		}
 
-		dbg_tfr("xfer %p, len %u, ep 0x%llx, sg %u/%u. nents = %d\n",
-			xfer, xfer->len, req->ep_addr, req->sw_desc_idx,
-			req->sw_desc_cnt, nents);
+		dbg_tfr("xfer, %u, ep 0x%llx, done %lu, sg %u/%u.\n",
+			xfer->len, req->ep_addr, done, req->sw_desc_idx,
+			req->sw_desc_cnt);
 
 #ifdef __LIBXDMA_DEBUG__
 		transfer_dump(xfer);
@@ -3901,17 +3157,78 @@ ssize_t xdma_xfer_submit_nowait(void *cb_hndl, void *dev_hndl, int channel,
 
 		rv = transfer_queue(engine, xfer);
 		if (rv < 0) {
+			mutex_unlock(&engine->desc_lock);
 			pr_info("unable to submit %s, %d.\n", engine->name, rv);
 			goto unmap_sgl;
 		}
 
-		/* use multiple transfers per request if we could not fit all
-		 * data within single descriptor chain.
+		/*
+		 * When polling, determine how many descriptors have been queued		 * on the engine to determine the writeback value expected
 		 */
-		tfer_idx++;
-	}
+		if (poll_mode) {
+			unsigned int desc_count;
 
-	return -EIOCBQUEUED;
+			spin_lock_irqsave(&engine->lock, flags);
+                        desc_count = xfer->desc_num;
+			spin_unlock_irqrestore(&engine->lock, flags);
+
+                        dbg_tfr("%s poll desc_count=%d\n",
+				engine->name, desc_count);
+			rv = engine_service_poll(engine, desc_count);
+
+		} else {
+			rv = wait_event_interruptible_timeout(xfer->wq,
+                	        (xfer->state != TRANSFER_STATE_SUBMITTED),
+				msecs_to_jiffies(timeout_ms));
+		}
+
+		spin_lock_irqsave(&engine->lock, flags);
+
+		switch(xfer->state) {
+		case TRANSFER_STATE_COMPLETED:
+			spin_unlock_irqrestore(&engine->lock, flags);
+
+			dbg_tfr("transfer %p, %u, ep 0x%llx compl, +%lu.\n",
+				xfer, xfer->len, req->ep_addr - xfer->len, done);
+			done += xfer->len;
+			rv = 0;
+			break;
+		case TRANSFER_STATE_FAILED:
+			pr_info("xfer 0x%p,%u, failed, ep 0x%llx.\n",
+				 xfer, xfer->len, req->ep_addr - xfer->len);
+			spin_unlock_irqrestore(&engine->lock, flags);
+
+#ifdef __LIBXDMA_DEBUG__
+			transfer_dump(xfer);
+			sgt_dump(sgt);
+#endif
+			rv = -EIO;
+			break;
+		default:
+			/* transfer can still be in-flight */
+			pr_info("xfer 0x%p,%u, s 0x%x timed out, ep 0x%llx.\n",
+				 xfer, xfer->len, xfer->state, req->ep_addr);
+			engine_status_read(engine, 0, 1);
+			//engine_status_dump(engine);
+			transfer_abort(engine, xfer);
+
+			xdma_engine_stop(engine);
+			spin_unlock_irqrestore(&engine->lock, flags);
+
+#ifdef __LIBXDMA_DEBUG__
+			transfer_dump(xfer);
+			sgt_dump(sgt);
+#endif
+			rv = -ERESTARTSYS;
+			break;
+		}
+
+		transfer_destroy(xdev, xfer);
+
+		if (rv < 0)
+			break;
+	} /* while (sg) */
+	mutex_unlock(&engine->desc_lock);
 
 unmap_sgl:
 	if (!dma_mapped && sgt->nents) {
@@ -3919,30 +3236,30 @@ unmap_sgl:
 		sgt->nents = 0;
 	}
 
-rel_req:
 	if (req)
 		xdma_request_free(req);
 
-	return rv;
-}
-EXPORT_SYMBOL_GPL(xdma_xfer_submit_nowait);
+	if (rv < 0)
+		return rv;
 
+	return done;
+}
 
 int xdma_performance_submit(struct xdma_dev *xdev, struct xdma_engine *engine)
 {
-	u32 max_consistent_size = XDMA_PERF_NUM_DESC * 32 * 1024; /* 4MB */
+	u32 max_consistent_size = 128 * 32 * 1024; /* 1024 pages, 4MB */
 	struct xdma_transfer *transfer;
 	u64 ep_addr = 0;
-	int num_desc_in_a_loop = XDMA_PERF_NUM_DESC;
+	int num_desc_in_a_loop = 128;
 	int size_in_desc = engine->xdma_perf->transfer_size;
 	int size = size_in_desc * num_desc_in_a_loop;
+	int free_desc = 0;
 	int i;
 	int rv = -ENOMEM;
-	unsigned char free_desc = 0;
 
-	if (size_in_desc > max_consistent_size) {
-		pr_err("%s max consistent size %d is more than supported %d\n",
-		       engine->name, size_in_desc, max_consistent_size);
+	if (unlikely(size_in_desc > max_consistent_size)) {
+		pr_err("%s, size too big %d > %u.\n",
+			engine->name, size_in_desc, max_consistent_size);
 		return -EINVAL;
 	}
 
@@ -3951,23 +3268,20 @@ int xdma_performance_submit(struct xdma_dev *xdev, struct xdma_engine *engine)
 		num_desc_in_a_loop = size / size_in_desc;
 	}
 
-	engine->perf_buf_virt = dma_alloc_coherent(&xdev->pdev->dev,
-						size_in_desc,
-						&engine->perf_buf_bus,
-						GFP_KERNEL);
-	if (!engine->perf_buf_virt) {
-		pr_err("dev %s, %s DMA allocation OOM.\n",
-		       dev_name(&xdev->pdev->dev), engine->name);
-		return rv;
+	engine->perf_buf_virt = dma_alloc_coherent(&xdev->pdev->dev, size,
+					&engine->perf_buf_bus, GFP_KERNEL);
+	if (unlikely(!engine->perf_buf_virt)) {
+		pr_err("engine %s perf buf OOM.\n", engine->name);
+		return -ENOMEM;
 	}
 
 	/* allocate transfer data structure */
 	transfer = kzalloc(sizeof(struct xdma_transfer), GFP_KERNEL);
-	if (!transfer) {
-		pr_err("dev %s, %s transfer request OOM.\n",
-		       dev_name(&xdev->pdev->dev), engine->name);
-		goto err_engine_transfer;
+	if (unlikely(!transfer)) {
+		pr_err("engine %s transfer OOM.\n", engine->name);
+		goto free_buffer;
 	}
+
 	/* 0 = write engine (to_dev=0) , 1 = read engine (to_dev=1) */
 	transfer->dir = engine->dir;
 	/* set number of descriptors */
@@ -3975,90 +3289,81 @@ int xdma_performance_submit(struct xdma_dev *xdev, struct xdma_engine *engine)
 
 	/* allocate descriptor list */
 	if (!engine->desc) {
-		engine->desc = dma_alloc_coherent(
-			&xdev->pdev->dev,
+		engine->desc = dma_alloc_coherent(&xdev->pdev->dev,
 			num_desc_in_a_loop * sizeof(struct xdma_desc),
 			&engine->desc_bus, GFP_KERNEL);
-		if (!engine->desc) {
-			pr_err("%s DMA memory allocation for descriptors failed\n",
-			       engine->name);
-			goto err_engine_desc;
+		if (unlikely(!engine->desc)) {
+			pr_err("%s desc OOM.\n", engine->name);
+			goto free_xfer;
 		}
 		dbg_init("device %s, engine %s pre-alloc desc 0x%p,0x%llx.\n",
-			 dev_name(&xdev->pdev->dev), engine->name, engine->desc,
-			 engine->desc_bus);
+			dev_name(&xdev->pdev->dev), engine->name,
+			engine->desc, engine->desc_bus);
 		free_desc = 1;
 	}
 	transfer->desc_virt = engine->desc;
 	transfer->desc_bus = engine->desc_bus;
 
 	rv = transfer_desc_init(transfer, transfer->desc_num);
-	if (rv < 0) {
-		pr_err("Failed to initialize descriptors\n");
-		goto err_dma_desc;
-	}
+	if (rv < 0)
+		goto free_desc;
 
 	dbg_sg("transfer->desc_bus = 0x%llx.\n", (u64)transfer->desc_bus);
 
 	for (i = 0; i < transfer->desc_num; i++) {
 		struct xdma_desc *desc = transfer->desc_virt + i;
-		dma_addr_t rc_bus_addr = engine->perf_buf_bus;
+		dma_addr_t rc_bus_addr = engine->perf_buf_bus +
+						size_in_desc * i;
 
 		/* fill in descriptor entry with transfer details */
 		xdma_desc_set(desc, rc_bus_addr, ep_addr, size_in_desc,
-			      engine->dir);
+			engine->dir);
 	}
 
 	/* stop engine and request interrupt on last descriptor */
 	rv = xdma_desc_control_set(transfer->desc_virt, 0);
 	if (rv < 0) {
-		pr_err("Failed to set desc control\n");
-		goto err_dma_desc;
+		pr_err("%s: Failed to set desc control\n", engine->name);
+		goto free_desc;
 	}
+
 	/* create a linked loop */
 	xdma_desc_link(transfer->desc_virt + transfer->desc_num - 1,
-		       transfer->desc_virt, transfer->desc_bus);
+		transfer->desc_virt, transfer->desc_bus);
 
 	transfer->cyclic = 1;
 
 	/* initialize wait queue */
-#if KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
-	init_swait_queue_head(&transfer->wq);
-#else
 	init_waitqueue_head(&transfer->wq);
-#endif
-
-	//printk("=== Descriptor print for PERF\n");
-	//transfer_dump(transfer);
 
 	dbg_perf("Queueing XDMA I/O %s request for performance measurement.\n",
-		 engine->dir ? "write (to dev)" : "read (from dev)");
+		engine->dir ? "write (to dev)" : "read (from dev)");
 	rv = transfer_queue(engine, transfer);
-	if (rv < 0) {
-		pr_err("Failed to queue transfer\n");
-		goto err_dma_desc;
-	}
+	if (rv < 0)
+		goto free_desc;
+
 	return 0;
 
-err_dma_desc:
+free_desc:
 	if (free_desc && engine->desc)
 		dma_free_coherent(&xdev->pdev->dev,
 				num_desc_in_a_loop * sizeof(struct xdma_desc),
 				engine->desc, engine->desc_bus);
 	engine->desc = NULL;
-err_engine_desc:
-	if (transfer)
+
+free_xfer:
+	if (transfer) {
 		list_del(&transfer->entry);
-	kfree(transfer);
-	transfer = NULL;
-err_engine_transfer:
+		kfree(transfer);
+	}
+
+free_buffer:
 	if (engine->perf_buf_virt)
 		dma_free_coherent(&xdev->pdev->dev, size_in_desc,
-				engine->perf_buf_virt, engine->perf_buf_bus);
+			engine->perf_buf_virt, engine->perf_buf_bus);
 	engine->perf_buf_virt = NULL;
 	return rv;
 }
-EXPORT_SYMBOL_GPL(xdma_performance_submit);
 
 static struct xdma_dev *alloc_dev_instance(struct pci_dev *pdev)
 {
@@ -4066,15 +3371,15 @@ static struct xdma_dev *alloc_dev_instance(struct pci_dev *pdev)
 	struct xdma_dev *xdev;
 	struct xdma_engine *engine;
 
-	if (!pdev) {
-		pr_err("Invalid pdev\n");
+	if (unlikely(!pdev)) {
+		pr_err("pdev NULL.\n");
 		return NULL;
 	}
 
 	/* allocate zeroed device book keeping structure */
 	xdev = kzalloc(sizeof(struct xdma_dev), GFP_KERNEL);
 	if (!xdev) {
-		pr_info("OOM, xdma_dev.\n");
+		pr_info("xdev OOM.\n");
 		return NULL;
 	}
 	spin_lock_init(&xdev->lock);
@@ -4103,13 +3408,8 @@ static struct xdma_dev *alloc_dev_instance(struct pci_dev *pdev)
 		spin_lock_init(&engine->lock);
 		mutex_init(&engine->desc_lock);
 		INIT_LIST_HEAD(&engine->transfer_list);
-#if KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
-		init_swait_queue_head(&engine->shutdown_wq);
-		init_swait_queue_head(&engine->xdma_perf_wq);
-#else
 		init_waitqueue_head(&engine->shutdown_wq);
 		init_waitqueue_head(&engine->xdma_perf_wq);
-#endif
 	}
 
 	engine = xdev->engine_c2h;
@@ -4117,13 +3417,8 @@ static struct xdma_dev *alloc_dev_instance(struct pci_dev *pdev)
 		spin_lock_init(&engine->lock);
 		mutex_init(&engine->desc_lock);
 		INIT_LIST_HEAD(&engine->transfer_list);
-#if KERNEL_VERSION(4, 6, 0) <= LINUX_VERSION_CODE
-		init_swait_queue_head(&engine->shutdown_wq);
-		init_swait_queue_head(&engine->xdma_perf_wq);
-#else
 		init_waitqueue_head(&engine->shutdown_wq);
 		init_waitqueue_head(&engine->xdma_perf_wq);
-#endif
 	}
 
 	return xdev;
@@ -4133,13 +3428,8 @@ static int request_regions(struct xdma_dev *xdev, struct pci_dev *pdev)
 {
 	int rv;
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
-		return -EINVAL;
-	}
-
-	if (!pdev) {
-		pr_err("Invalid pdev\n");
+	if (unlikely(!xdev || !pdev)) {
+		pr_err("xdev 0x%p, pdev 0x%p.\n", xdev, pdev);
 		return -EINVAL;
 	}
 
@@ -4159,8 +3449,8 @@ static int request_regions(struct xdma_dev *xdev, struct pci_dev *pdev)
 
 static int set_dma_mask(struct pci_dev *pdev)
 {
-	if (!pdev) {
-		pr_err("Invalid pdev\n");
+	if (unlikely(!pdev)) {
+		pr_err("pdev NULL.\n");
 		return -EINVAL;
 	}
 
@@ -4188,13 +3478,13 @@ static int set_dma_mask(struct pci_dev *pdev)
 	return 0;
 }
 
-static int get_engine_channel_id(struct engine_regs *regs)
+static u32 get_engine_channel_id(struct engine_regs *regs)
 {
-	int value;
+	u32 value;
 
-	if (!regs) {
-		pr_err("Invalid engine registers\n");
-		return -EINVAL;
+	if (unlikely(!regs)) {
+		pr_err("regs NULL.\n");
+		return 0xFFFFFFFF;
 	}
 
 	value = read_register(&regs->identifier);
@@ -4202,13 +3492,13 @@ static int get_engine_channel_id(struct engine_regs *regs)
 	return (value & 0x00000f00U) >> 8;
 }
 
-static int get_engine_id(struct engine_regs *regs)
+static u32 get_engine_id(struct engine_regs *regs)
 {
-	int value;
+	u32 value;
 
-	if (!regs) {
-		pr_err("Invalid engine registers\n");
-		return -EINVAL;
+	if (unlikely(!regs)) {
+		pr_err("regs NULL.\n");
+		return 0xFFFFFFFF;
 	}
 
 	value = read_register(&regs->identifier);
@@ -4219,10 +3509,9 @@ static void remove_engines(struct xdma_dev *xdev)
 {
 	struct xdma_engine *engine;
 	int i;
-	int rv;
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
+	if (unlikely(!xdev)) {
+		pr_err("xdev NULL.\n");
 		return;
 	}
 
@@ -4231,9 +3520,7 @@ static void remove_engines(struct xdma_dev *xdev)
 		engine = &xdev->engine_h2c[i];
 		if (engine->magic == MAGIC_ENGINE) {
 			dbg_sg("Remove %s, %d", engine->name, i);
-			rv = engine_destroy(xdev, engine);
-			if (rv < 0)
-				pr_err("Failed to destroy H2C engine %d\n", i);
+			engine_destroy(xdev, engine);
 			dbg_sg("%s, %d removed", engine->name, i);
 		}
 	}
@@ -4242,16 +3529,14 @@ static void remove_engines(struct xdma_dev *xdev)
 		engine = &xdev->engine_c2h[i];
 		if (engine->magic == MAGIC_ENGINE) {
 			dbg_sg("Remove %s, %d", engine->name, i);
-			rv = engine_destroy(xdev, engine);
-			if (rv < 0)
-				pr_err("Failed to destroy C2H engine %d\n", i);
+			engine_destroy(xdev, engine);
 			dbg_sg("%s, %d removed", engine->name, i);
 		}
 	}
 }
 
 static int probe_for_engine(struct xdma_dev *xdev, enum dma_data_direction dir,
-			    int channel)
+			int channel)
 {
 	struct engine_regs *regs;
 	int offset = channel * CHANNEL_SPACING;
@@ -4263,8 +3548,7 @@ static int probe_for_engine(struct xdma_dev *xdev, enum dma_data_direction dir,
 
 	/* register offset for the engine */
 	/* read channels at 0x0000, write channels at 0x1000,
-	 * channels at 0x100 interval
-	 */
+	 * channels at 0x100 interval */
 	if (dir == DMA_TO_DEVICE) {
 		engine_id_expected = XDMA_ID_H2C;
 		engine = &xdev->engine_h2c[channel];
@@ -4279,23 +3563,24 @@ static int probe_for_engine(struct xdma_dev *xdev, enum dma_data_direction dir,
 	channel_id = get_engine_channel_id(regs);
 
 	if ((engine_id != engine_id_expected) || (channel_id != channel)) {
-		dbg_init(
-			"%s %d engine, reg off 0x%x, id mismatch 0x%x,0x%x,exp 0x%x,0x%x, SKIP.\n",
-			dir == DMA_TO_DEVICE ? "H2C" : "C2H", channel, offset,
-			engine_id, channel_id, engine_id_expected,
-			channel_id != channel);
+		dbg_init("%s %d engine, reg off 0x%x, id mismatch 0x%x,0x%x,"
+			"exp 0x%x,0x%x, SKIP.\n",
+		 	dir == DMA_TO_DEVICE ? "H2C" : "C2H",
+			 channel, offset, engine_id, channel_id,
+			engine_id_expected, channel_id != channel);
 		return -EINVAL;
 	}
 
 	dbg_init("found AXI %s %d engine, reg. off 0x%x, id 0x%x,0x%x.\n",
-		 dir == DMA_TO_DEVICE ? "H2C" : "C2H", channel, offset,
-		 engine_id, channel_id);
+		 dir == DMA_TO_DEVICE ? "H2C" : "C2H", channel,
+		 offset, engine_id, channel_id);
 
 	/* allocate and initialize engine */
 	rv = engine_init(engine, xdev, offset, dir, channel);
 	if (rv != 0) {
 		pr_info("failed to create AXI %s %d engine.\n",
-			dir == DMA_TO_DEVICE ? "H2C" : "C2H", channel);
+			dir == DMA_TO_DEVICE ? "H2C" : "C2H",
+			channel);
 		return rv;
 	}
 
@@ -4307,8 +3592,8 @@ static int probe_engines(struct xdma_dev *xdev)
 	int i;
 	int rv = 0;
 
-	if (!xdev) {
-		pr_err("Invalid xdev\n");
+	if (unlikely(!xdev)) {
+		pr_err("xdev NULL.\n");
 		return -EINVAL;
 	}
 
@@ -4330,7 +3615,7 @@ static int probe_engines(struct xdma_dev *xdev)
 	return 0;
 }
 
-#if KERNEL_VERSION(3, 5, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
 static void pci_enable_capability(struct pci_dev *pdev, int cap)
 {
 	pcie_capability_set_word(pdev, PCI_EXP_DEVCTL, cap);
@@ -4351,7 +3636,7 @@ static void pci_enable_capability(struct pci_dev *pdev, int cap)
 #endif
 
 void *xdma_device_open(const char *mname, struct pci_dev *pdev, int *user_max,
-		       int *h2c_channel_max, int *c2h_channel_max)
+			int *h2c_channel_max, int *c2h_channel_max)
 {
 	struct xdma_dev *xdev = NULL;
 	int rv = 0;
@@ -4373,12 +3658,12 @@ void *xdma_device_open(const char *mname, struct pci_dev *pdev, int *user_max,
 	if (xdev->user_max == 0 || xdev->user_max > MAX_USER_IRQ)
 		xdev->user_max = MAX_USER_IRQ;
 	if (xdev->h2c_channel_max == 0 ||
-	    xdev->h2c_channel_max > XDMA_CHANNEL_NUM_MAX)
+	    xdev->h2c_channel_max > XDMA_CHANNEL_NUM_MAX) 
 		xdev->h2c_channel_max = XDMA_CHANNEL_NUM_MAX;
 	if (xdev->c2h_channel_max == 0 ||
-	    xdev->c2h_channel_max > XDMA_CHANNEL_NUM_MAX)
+	    xdev->c2h_channel_max > XDMA_CHANNEL_NUM_MAX) 
 		xdev->c2h_channel_max = XDMA_CHANNEL_NUM_MAX;
-
+		
 	rv = pci_enable_device(pdev);
 	if (rv) {
 		dbg_init("pci_enable_device() failed, %d.\n", rv);
@@ -4465,7 +3750,6 @@ err_enable:
 	kfree(xdev);
 	return NULL;
 }
-EXPORT_SYMBOL_GPL(xdma_device_open);
 
 void xdma_device_close(struct pci_dev *pdev, void *dev_hndl)
 {
@@ -4479,11 +3763,11 @@ void xdma_device_close(struct pci_dev *pdev, void *dev_hndl)
 	if (debug_check_dev_hndl(__func__, pdev, dev_hndl) < 0)
 		return;
 
-	dbg_sg("remove(dev = 0x%p) where pdev->dev.driver_data = 0x%p\n", pdev,
-	       xdev);
+	dbg_sg("remove(dev = 0x%p) where pdev->dev.driver_data = 0x%p\n",
+		   pdev, xdev);
 	if (xdev->pdev != pdev) {
 		dbg_sg("pci_dev(0x%lx) != pdev(0x%lx)\n",
-		       (unsigned long)xdev->pdev, (unsigned long)pdev);
+			(unsigned long)xdev->pdev, (unsigned long)pdev);
 	}
 
 	channel_interrupts_disable(xdev, ~0);
@@ -4510,14 +3794,12 @@ void xdma_device_close(struct pci_dev *pdev, void *dev_hndl)
 
 	kfree(xdev);
 }
-EXPORT_SYMBOL_GPL(xdma_device_close);
 
 void xdma_device_offline(struct pci_dev *pdev, void *dev_hndl)
 {
 	struct xdma_dev *xdev = (struct xdma_dev *)dev_hndl;
 	struct xdma_engine *engine;
 	int i;
-	int rv;
 
 	if (!dev_hndl)
 		return;
@@ -4533,16 +3815,13 @@ void xdma_device_offline(struct pci_dev *pdev, void *dev_hndl)
 		unsigned long flags;
 
 		engine = &xdev->engine_h2c[i];
-
+		
 		if (engine->magic == MAGIC_ENGINE) {
 			spin_lock_irqsave(&engine->lock, flags);
 			engine->shutdown |= ENGINE_SHUTDOWN_REQUEST;
 
-			rv = xdma_engine_stop(engine);
-			if (rv < 0)
-				pr_err("Failed to stop engine\n");
-			else
-				engine->running = 0;
+			xdma_engine_stop(engine);
+			engine->running = 0;
 			spin_unlock_irqrestore(&engine->lock, flags);
 		}
 	}
@@ -4555,11 +3834,8 @@ void xdma_device_offline(struct pci_dev *pdev, void *dev_hndl)
 			spin_lock_irqsave(&engine->lock, flags);
 			engine->shutdown |= ENGINE_SHUTDOWN_REQUEST;
 
-			rv = xdma_engine_stop(engine);
-			if (rv < 0)
-				pr_err("Failed to stop engine\n");
-			else
-				engine->running = 0;
+			xdma_engine_stop(engine);
+			engine->running = 0;
 			spin_unlock_irqrestore(&engine->lock, flags);
 		}
 	}
@@ -4572,7 +3848,6 @@ void xdma_device_offline(struct pci_dev *pdev, void *dev_hndl)
 
 	pr_info("xdev 0x%p, done.\n", xdev);
 }
-EXPORT_SYMBOL_GPL(xdma_device_offline);
 
 void xdma_device_online(struct pci_dev *pdev, void *dev_hndl)
 {
@@ -4587,9 +3862,9 @@ void xdma_device_online(struct pci_dev *pdev, void *dev_hndl)
 	if (debug_check_dev_hndl(__func__, pdev, dev_hndl) < 0)
 		return;
 
-	pr_info("pdev 0x%p, xdev 0x%p.\n", pdev, xdev);
+pr_info("pdev 0x%p, xdev 0x%p.\n", pdev, xdev);
 
-	for (i = 0; i < xdev->h2c_channel_max; i++) {
+	for (i  = 0; i < xdev->h2c_channel_max; i++) {
 		engine = &xdev->engine_h2c[i];
 		if (engine->magic == MAGIC_ENGINE) {
 			engine_init_regs(engine);
@@ -4599,7 +3874,7 @@ void xdma_device_online(struct pci_dev *pdev, void *dev_hndl)
 		}
 	}
 
-	for (i = 0; i < xdev->c2h_channel_max; i++) {
+	for (i  = 0; i < xdev->c2h_channel_max; i++) {
 		engine = &xdev->engine_c2h[i];
 		if (engine->magic == MAGIC_ENGINE) {
 			engine_init_regs(engine);
@@ -4617,11 +3892,10 @@ void xdma_device_online(struct pci_dev *pdev, void *dev_hndl)
 		user_interrupts_enable(xdev, xdev->mask_irq_user);
 		read_interrupts(xdev);
 	}
-
+	
 	xdma_device_flag_clear(xdev, XDEV_FLAG_OFFLINE);
 	pr_info("xdev 0x%p, done.\n", xdev);
 }
-EXPORT_SYMBOL_GPL(xdma_device_online);
 
 int xdma_device_restart(struct pci_dev *pdev, void *dev_hndl)
 {
@@ -4636,10 +3910,9 @@ int xdma_device_restart(struct pci_dev *pdev, void *dev_hndl)
 	pr_info("NOT implemented, 0x%p.\n", xdev);
 	return -EINVAL;
 }
-EXPORT_SYMBOL_GPL(xdma_device_restart);
 
 int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
-			   irq_handler_t handler, void *dev)
+			irq_handler_t handler, void *dev)
 {
 	struct xdma_dev *xdev = (struct xdma_dev *)dev_hndl;
 	int i;
@@ -4663,7 +3936,6 @@ int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
 
 	return 0;
 }
-EXPORT_SYMBOL_GPL(xdma_user_isr_register);
 
 int xdma_user_isr_enable(void *dev_hndl, unsigned int mask)
 {
@@ -4682,7 +3954,6 @@ int xdma_user_isr_enable(void *dev_hndl, unsigned int mask)
 
 	return 0;
 }
-EXPORT_SYMBOL_GPL(xdma_user_isr_enable);
 
 int xdma_user_isr_disable(void *dev_hndl, unsigned int mask)
 {
@@ -4693,67 +3964,40 @@ int xdma_user_isr_disable(void *dev_hndl, unsigned int mask)
 
 	if (debug_check_dev_hndl(__func__, xdev->pdev, dev_hndl) < 0)
 		return -EINVAL;
-
+	
 	xdev->mask_irq_user &= ~mask;
 	user_interrupts_disable(xdev, mask);
 	read_interrupts(xdev);
 
 	return 0;
 }
-EXPORT_SYMBOL_GPL(xdma_user_isr_disable);
 
-#ifdef __LIBXDMA_MOD__
-static int __init xdma_base_init(void)
-{
-	pr_info("%s", version);
-	return 0;
-}
-
-static void __exit xdma_base_exit(void)
-{
-	pr_info("%s", __func__);
-}
-
-module_init(xdma_base_init);
-module_exit(xdma_base_exit);
-#endif
 /* makes an existing transfer cyclic */
 static void xdma_transfer_cyclic(struct xdma_transfer *transfer)
 {
 	/* link last descriptor to first descriptor */
 	xdma_desc_link(transfer->desc_virt + transfer->desc_num - 1,
-		       transfer->desc_virt, transfer->desc_bus);
+			transfer->desc_virt, transfer->desc_bus);
 	/* remember transfer is cyclic */
 	transfer->cyclic = 1;
 }
 
 static int transfer_monitor_cyclic(struct xdma_engine *engine,
-				   struct xdma_transfer *transfer,
-				   int timeout_ms)
+			struct xdma_transfer *transfer, int timeout_ms)
 {
 	struct xdma_result *result;
 	int rc = 0;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
-		return -EINVAL;
-	}
-
-	if (!transfer) {
-		pr_err("%s: xfer empty.\n", engine->name);
+	if (unlikely(!engine || !engine->cyclic_result || !transfer)) {
+		pr_err("engine 0x%p, cyclic_result 0x%p, xfer 0x%p.\n",
+			engine, engine->cyclic_result, transfer);
 		return -EINVAL;
 	}
 
 	result = engine->cyclic_result;
-	if (!result) {
-		pr_err("%s Cyclic transfer resources not available.\n",
-		       engine->name);
-		return -EINVAL;
-	}
 
 	if (poll_mode) {
-		int i;
-
+		int i ; 
 		for (i = 0; i < 5; i++) {
 			rc = engine_service_poll(engine, 0);
 			if (rc) {
@@ -4761,46 +4005,33 @@ static int transfer_monitor_cyclic(struct xdma_engine *engine,
 					engine->name, rc);
 				rc = -ERESTARTSYS;
 			}
-			if (result[engine->rx_head].status) {
-				rc = 0;
-				break;
-			}
+			if (result[engine->rx_head].status)
+				return 0;
 		}
 	} else {
-		if (enable_credit_mp) {
+		if (enable_credit_mp){
 			dbg_tfr("%s: rx_head=%d,rx_tail=%d, wait ...\n",
 				engine->name, engine->rx_head, engine->rx_tail);
-
-			rc = xlx_wait_event_interruptible_timeout(
-				transfer->wq,
-				(engine->rx_head != engine->rx_tail ||
-				 engine->rx_overrun),
-				msecs_to_jiffies(timeout_ms));
-
+			rc = wait_event_interruptible_timeout( transfer->wq,
+					(engine->rx_head!=engine->rx_tail ||
+					 engine->rx_overrun),
+					msecs_to_jiffies(timeout_ms));
 			dbg_tfr("%s: wait returns %d, rx %d/%d, overrun %d.\n",
-				engine->name, rc, engine->rx_head,
+				 engine->name, rc, engine->rx_head,
 				engine->rx_tail, engine->rx_overrun);
 		} else {
-			rc = xlx_wait_event_interruptible_timeout(
-				transfer->wq,
-				engine->eop_found,
-				msecs_to_jiffies(timeout_ms));
-
+			rc = wait_event_interruptible_timeout( transfer->wq,
+					engine->eop_found,
+					msecs_to_jiffies(timeout_ms));
 			dbg_tfr("%s: wait returns %d, eop_found %d.\n",
 				engine->name, rc, engine->eop_found);
 		}
-		/* condition evaluated to false after the timeout elapsed */
-		if (rc == 0)
-			rc = -ETIME;
-		/* condition evaluated to true */
-		else if (rc > 0)
-			rc = 0;
 	}
 
-	return rc;
+	return 0;
 }
 
-static struct scatterlist *sglist_index(struct sg_table *sgt, unsigned int idx)
+struct scatterlist *sglist_index(struct sg_table *sgt, unsigned int idx)
 {
 	struct scatterlist *sg = sgt->sgl;
 	int i;
@@ -4818,48 +4049,44 @@ static struct scatterlist *sglist_index(struct sg_table *sgt, unsigned int idx)
 }
 
 static int copy_cyclic_to_user(struct xdma_engine *engine, int pkt_length,
-			       int head, char __user *buf, size_t count)
+				int head, char __user *buf, size_t count)
 {
 	struct scatterlist *sg;
 	int more = pkt_length;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!buf || !engine)) {
+		pr_err("engine 0x%p, buf 0x%p.\n", engine, buf);
 		return -EINVAL;
 	}
 
-	if (!buf) {
-		pr_err("%s invalid user buffer pointer\n", engine->name);
-		return -EINVAL;
-	}
-
-	dbg_tfr("%s, pkt_len %d, head %d, user buf idx %u.\n", engine->name,
-		pkt_length, head, engine->user_buffer_index);
+	dbg_tfr("%s, pkt_len %d, head %d, user buf idx %u.\n",
+		engine->name, pkt_length, head, engine->user_buffer_index);
 
 	sg = sglist_index(&engine->cyclic_sgt, head);
 	if (!sg) {
-		pr_info("%s, head %d OOR, sgl %u.\n", engine->name, head,
-			engine->cyclic_sgt.orig_nents);
+		pr_info("%s, head %d OOR, sgl %u.\n",
+			engine->name, head, engine->cyclic_sgt.orig_nents);
 		return -EIO;
 	}
 
 	/* EOP found? Transfer anything from head to EOP */
 	while (more) {
-		unsigned int copy = more > PAGE_SIZE ? PAGE_SIZE : more;
+		unsigned int copy = more > PAGE_SIZE ? PAGE_SIZE : more; 
 		unsigned int blen = count - engine->user_buffer_index;
 		int rv;
 
 		if (copy > blen)
 			copy = blen;
 
-		dbg_tfr("%s sg %d, 0x%p, copy %u to user %u.\n", engine->name,
-			head, sg, copy, engine->user_buffer_index);
+		dbg_tfr("%s sg %d, 0x%p, copy %u to user %u.\n",
+			engine->name, head, sg, copy,
+			engine->user_buffer_index);
 
 		rv = copy_to_user(&buf[engine->user_buffer_index],
-				  page_address(sg_page(sg)), copy);
+			page_address(sg_page(sg)), copy);
 		if (rv) {
-			pr_info("%s copy_to_user %u failed %d\n", engine->name,
-				copy, rv);
+			pr_info("%s copy_to_user %u failed %d\n",
+				engine->name, copy, rv);
 			return -EIO;
 		}
 
@@ -4870,7 +4097,7 @@ static int copy_cyclic_to_user(struct xdma_engine *engine, int pkt_length,
 			/* user buffer used up */
 			break;
 		}
-
+		
 		head++;
 		if (head >= CYCLIC_RX_PAGES_MAX) {
 			head = 0;
@@ -4894,17 +4121,11 @@ static int complete_cyclic(struct xdma_engine *engine, char __user *buf,
 	int num_credit = 0;
 	unsigned long flags;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !engine->cyclic_result)) {
+		pr_err("engine 0x%p, cyclic_result NULL.\n", engine);
 		return -EINVAL;
 	}
 	result = engine->cyclic_result;
-
-	if (!result) {
-		pr_err("%s Cyclic transfer resources not available.\n",
-		       engine->name);
-		return -EINVAL;
-	}
 
 	spin_lock_irqsave(&engine->lock, flags);
 
@@ -4912,12 +4133,12 @@ static int complete_cyclic(struct xdma_engine *engine, char __user *buf,
 	head = engine->rx_head;
 
 	/* iterate over newly received results */
-	while ((engine->rx_head != engine->rx_tail || engine->rx_overrun) &&
-	       pkt_length < (int)count) {
-		WARN_ON(result[engine->rx_head].status == 0);
+	while (engine->rx_head != engine->rx_tail||engine->rx_overrun) {
+
+		WARN_ON(result[engine->rx_head].status==0);
 
 		dbg_tfr("%s, result[%d].status = 0x%x length = 0x%x.\n",
-			engine->name, engine->rx_head,
+			engine->name, engine->rx_head, 
 			result[engine->rx_head].status,
 			result[engine->rx_head].length);
 
@@ -4932,23 +4153,24 @@ static int complete_cyclic(struct xdma_engine *engine, char __user *buf,
 				result[engine->rx_head].length, PAGE_SIZE);
 			fault = 1;
 		} else if (result[engine->rx_head].length == 0) {
-			pr_info("%s, result[%d].length 0x%x.\n", engine->name,
-				engine->rx_head,
+			pr_info("%s, result[%d].length 0x%x.\n",
+				engine->name, engine->rx_head,
 				result[engine->rx_head].length);
 			fault = 1;
 			/* valid result */
 		} else {
 			pkt_length += result[engine->rx_head].length;
-			num_credit++;
+			num_credit++; 
 			/* seen eop? */
 			//if (result[engine->rx_head].status & RX_STATUS_EOP)
-			if (result[engine->rx_head].status & RX_STATUS_EOP) {
+			if (result[engine->rx_head].status & RX_STATUS_EOP){
 				eop = 1;
 				engine->eop_found = 1;
 			}
 
-			dbg_tfr("%s, pkt_length=%d (%s)\n", engine->name,
-				pkt_length, eop ? "with EOP" : "no EOP yet");
+			dbg_tfr("%s, pkt_length=%d (%s)\n",
+				engine->name, pkt_length,
+				eop ? "with EOP" : "no EOP yet");
 		}
 		/* clear result */
 		result[engine->rx_head].status = 0;
@@ -4957,20 +4179,21 @@ static int complete_cyclic(struct xdma_engine *engine, char __user *buf,
 		engine->rx_head = (engine->rx_head + 1) % CYCLIC_RX_PAGES_MAX;
 
 		/* stop processing if a fault/eop was detected */
-		if (fault || eop)
+		if (fault || eop){
 			break;
+		}
 	}
 
 	spin_unlock_irqrestore(&engine->lock, flags);
 
 	if (fault)
 		return -EIO;
-
+		
 	rc = copy_cyclic_to_user(engine, pkt_length, head, buf, count);
-	engine->rx_overrun = 0;
+	engine->rx_overrun = 0; 
 	/* if copy is successful, release credits */
-	if (rc > 0)
-		write_register(num_credit, &engine->sgdma_regs->credits, 0);
+	if(rc > 0)
+		write_register(num_credit,&engine->sgdma_regs->credits, 0);
 
 	return rc;
 }
@@ -4983,25 +4206,20 @@ ssize_t xdma_engine_read_cyclic(struct xdma_engine *engine, char __user *buf,
 	int rc_len = 0;
 	struct xdma_transfer *transfer;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || (engine->magic != MAGIC_ENGINE))) {
+		pr_err("bad engine 0x%p, magic 0x%lx.\n",
+			engine, engine ? engine->magic : 0UL);
 		return -EINVAL;
 	}
 
-	if (engine->magic != MAGIC_ENGINE) {
-		pr_err("%s has invalid magic number %lx\n", engine->name,
-		       engine->magic);
+	if (unlikely(!engine->cyclic_req)) {
+		pr_err("engine %s, cyclic_req NULL.\n", engine->name);
 		return -EINVAL;
 	}
+	transfer = &engine->cyclic_req->xfer;
 
-	transfer = &engine->cyclic_req->tfer[0];
-	if (!transfer) {
-		pr_err("Invalid DMA transfer\n");
-		return -EINVAL;
-	}
-
-	engine->user_buffer_index = 0;
-
+        engine->user_buffer_index = 0;
+        
 	do {
 		rc = transfer_monitor_cyclic(engine, transfer, timeout_ms);
 		if (rc < 0)
@@ -5011,16 +4229,13 @@ ssize_t xdma_engine_read_cyclic(struct xdma_engine *engine, char __user *buf,
 			return rc;
 		rc_len += rc;
 
-		if (rc_len >= (int)count)
-			return rc_len;
-
 		i++;
 		if (i > 10)
 			break;
 	} while (!engine->eop_found);
 
-	//Always reset EOP found indication regardless of credit mechanims
-	engine->eop_found = 0;
+	if(enable_credit_mp)
+		engine->eop_found = 0;
 
 	return rc_len;
 }
@@ -5062,17 +4277,17 @@ static int sgt_alloc_with_pages(struct sg_table *sgt, unsigned int npages,
 	for (i = 0; i < npages; i++, sg = sg_next(sg)) {
 		struct page *pg = alloc_page(GFP_KERNEL);
 
-		if (!pg) {
+        	if (!pg) {
 			pr_info("%d/%u, page OOM.\n", i, npages);
 			goto err_out;
 		}
 
 		if (pdev) {
-			dma_addr_t bus =
-				pci_map_page(pdev, pg, 0, PAGE_SIZE, dir);
-			if (unlikely(pci_dma_mapping_error(pdev, bus))) {
-				pr_info("%d/%u, page 0x%p map err.\n", i,
-					npages, pg);
+			dma_addr_t bus = pci_map_page(pdev, pg, 0, PAGE_SIZE,
+							dir);
+                	if (unlikely(pci_dma_mapping_error(pdev, bus))) {
+				pr_info("%d/%u, page 0x%p map err.\n",
+					 i, npages, pg);
 				__free_page(pg);
 				goto err_out;
 			}
@@ -5088,7 +4303,7 @@ static int sgt_alloc_with_pages(struct sg_table *sgt, unsigned int npages,
 
 err_out:
 	sgt_free_with_pages(sgt, dir, pdev);
-	return -ENOMEM;
+	return -ENOMEM; 
 }
 
 int xdma_cyclic_transfer_setup(struct xdma_engine *engine)
@@ -5100,19 +4315,15 @@ int xdma_cyclic_transfer_setup(struct xdma_engine *engine)
 	int i;
 	int rc;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine || !engine->xdev)) {
+		pr_err("engine 0x%p, xdev NULL.\n", engine);
 		return -EINVAL;
 	}
-
 	xdev = engine->xdev;
-	if (!xdev) {
-		pr_err("Invalid DMA devie\n");
-		return -EINVAL;
-	}
 
 	if (engine->cyclic_req) {
-		dbg_tfr("%s: exclusive access already taken.\n", engine->name);
+		pr_info("%s: exclusive access already taken.\n",
+			engine->name);
 		return -EBUSY;
 	}
 
@@ -5124,10 +4335,10 @@ int xdma_cyclic_transfer_setup(struct xdma_engine *engine)
 	engine->eop_found = 0;
 
 	rc = sgt_alloc_with_pages(&engine->cyclic_sgt, CYCLIC_RX_PAGES_MAX,
-				  engine->dir, xdev->pdev);
+				engine->dir, xdev->pdev);
 	if (rc < 0) {
-		pr_info("%s cyclic pages %u OOM.\n", engine->name,
-			CYCLIC_RX_PAGES_MAX);
+		pr_info("%s cyclic pages %u OOM.\n",
+			engine->name, CYCLIC_RX_PAGES_MAX);
 		goto err_out;
 	}
 
@@ -5142,34 +4353,27 @@ int xdma_cyclic_transfer_setup(struct xdma_engine *engine)
 	xdma_request_cb_dump(engine->cyclic_req);
 #endif
 
-	xfer = &engine->cyclic_req->tfer[0];
-	rc = transfer_init_cyclic(engine, engine->cyclic_req, xfer);
+	rc = transfer_init(engine, engine->cyclic_req);
 	if (rc < 0)
 		goto err_out;
 
+	xfer = &engine->cyclic_req->xfer;
+
 	/* replace source addresses with result write-back addresses */
 	memset(engine->cyclic_result, 0,
-	       CYCLIC_RX_PAGES_MAX * sizeof(struct xdma_result));
+		CYCLIC_RX_PAGES_MAX * sizeof(struct xdma_result));
 	bus = engine->cyclic_result_bus;
-	for (i = 0; i < xfer->desc_num; i++) {
+        for (i = 0; i < xfer->desc_num; i++) {
 		xfer->desc_virt[i].src_addr_lo = cpu_to_le32(PCI_DMA_L(bus));
-		xfer->desc_virt[i].src_addr_hi = cpu_to_le32(PCI_DMA_H(bus));
-		bus += sizeof(struct xdma_result);
-	}
+        	xfer->desc_virt[i].src_addr_hi = cpu_to_le32(PCI_DMA_H(bus));
+                bus += sizeof(struct xdma_result);
+        }
 	/* set control of all descriptors */
-	for (i = 0; i < xfer->desc_num; i++) {
-		rc = xdma_desc_control_clear(xfer->desc_virt + i, LS_BYTE_MASK);
-		if (rc < 0) {
-			pr_err("Failed to clear desc control\n");
-			goto err_out;
-		}
-		rc = xdma_desc_control_set(xfer->desc_virt + i,
-					   XDMA_DESC_EOP | XDMA_DESC_COMPLETED);
-		if (rc < 0) {
-			pr_err("Failed to set desc control\n");
-			goto err_out;
-		}
-	}
+        for (i = 0; i < xfer->desc_num; i++) {
+                xdma_desc_control_clear(xfer->desc_virt + i, LS_BYTE_MASK);
+                xdma_desc_control_set(xfer->desc_virt + i,
+				 XDMA_DESC_EOP | XDMA_DESC_COMPLETED);
+        }
 
 	/* make this a cyclic transfer */
 	xdma_transfer_cyclic(xfer);
@@ -5178,34 +4382,27 @@ int xdma_cyclic_transfer_setup(struct xdma_engine *engine)
 	transfer_dump(xfer);
 #endif
 
-	if (enable_credit_mp) {
-		//write_register(RX_BUF_PAGES,&engine->sgdma_regs->credits);
+	if (enable_credit_mp)
 		write_register(128, &engine->sgdma_regs->credits, 0);
-	}
-
-	/* start cyclic transfer */
-	rc = transfer_queue(engine, xfer);
-	if (rc < 0) {
-		pr_err("Failed to queue transfer\n");
-		goto err_out;
-	}
-
-	xfer->last_in_request = 1;
 
 	spin_unlock_irqrestore(&engine->lock, flags);
 
-	return 0;
+	/* start cyclic transfer */
+	rc = transfer_queue(engine, xfer);
+	if (!rc)
+		return 0;
 
+	spin_lock_irqsave(&engine->lock, flags);
 	/* unwind on errors */
 err_out:
 	if (engine->cyclic_req) {
-		xdma_request_free(engine->cyclic_req);
+		xdma_request_free(engine->cyclic_req);	
 		engine->cyclic_req = NULL;
 	}
-
+	
 	if (engine->cyclic_sgt.orig_nents) {
 		sgt_free_with_pages(&engine->cyclic_sgt, engine->dir,
-				    xdev->pdev);
+				xdev->pdev);
 		engine->cyclic_sgt.orig_nents = 0;
 		engine->cyclic_sgt.nents = 0;
 		engine->cyclic_sgt.sgl = NULL;
@@ -5218,10 +4415,8 @@ err_out:
 
 static int cyclic_shutdown_polled(struct xdma_engine *engine)
 {
-	int rv;
-
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return -EINVAL;
 	}
 
@@ -5229,58 +4424,36 @@ static int cyclic_shutdown_polled(struct xdma_engine *engine)
 
 	dbg_tfr("Polling for shutdown completion\n");
 	do {
-		rv = engine_status_read(engine, 1, 0);
-		if (rv < 0) {
-			pr_err("Failed to read engine status\n");
-			goto failure;
-		}
+		engine_status_read(engine, 1, 0);
 		schedule();
 	} while (engine->status & XDMA_STAT_BUSY);
 
 	if ((engine->running) && !(engine->status & XDMA_STAT_BUSY)) {
 		dbg_tfr("Engine has stopped\n");
 
-		if (!list_empty(&engine->transfer_list)) {
-			rv = engine_transfer_dequeue(engine);
-			if (rv < 0) {
-				pr_err("Failed to dequeue transfer\n");
-				goto failure;
-			}
-		}
+		if (!list_empty(&engine->transfer_list))
+			engine_transfer_dequeue(engine);
 
-		rv = engine_service_shutdown(engine);
-		if (rv < 0) {
-			pr_err("Failed to shutdown engine\n");
-			goto failure;
-		}
+		engine_service_shutdown(engine);
 	}
-failure:
+
 	dbg_tfr("Shutdown completion polling done\n");
 	spin_unlock(&engine->lock);
 
-	return rv;
+	return 0;
 }
 
 static int cyclic_shutdown_interrupt(struct xdma_engine *engine)
 {
 	int rc;
 
-	if (!engine) {
-		pr_err("dma engine NULL\n");
+	if (unlikely(!engine)) {
+		pr_err("engine NULL.\n");
 		return -EINVAL;
 	}
 
-	rc = xlx_wait_event_interruptible_timeout(engine->shutdown_wq,
-					       !engine->running,
-					       msecs_to_jiffies(10000));
-
-#if 0
-	if (rc) {
-		dbg_tfr("wait_event_interruptible=%d\n", rc);
-		return rc;
-	}
-#endif
-
+	rc = wait_event_interruptible_timeout(engine->shutdown_wq,
+				!engine->running, msecs_to_jiffies(10000));
 	if (engine->running) {
 		pr_info("%s still running?!, %d\n", engine->name, rc);
 		return -EINVAL;
@@ -5305,10 +4478,10 @@ int xdma_cyclic_transfer_teardown(struct xdma_engine *engine)
 	spin_lock_irqsave(&engine->lock, flags);
 	if (transfer) {
 		dbg_tfr("%s: stop transfer 0x%p.\n", engine->name, transfer);
-		if (transfer != &engine->cyclic_req->tfer[0]) {
+		if (transfer != &engine->cyclic_req->xfer) {
 			pr_info("%s unexpected transfer 0x%p/0x%p\n",
 				engine->name, transfer,
-				&engine->cyclic_req->tfer[0]);
+				&engine->cyclic_req->xfer);
 		}
 	}
 	/* allow engine to be serviced after stop request */
@@ -5319,7 +4492,6 @@ int xdma_cyclic_transfer_teardown(struct xdma_engine *engine)
 		rc = cyclic_shutdown_polled(engine);
 	else
 		rc = cyclic_shutdown_interrupt(engine);
-
 	if (rc < 0) {
 		pr_err("Failed to shutdown cyclic transfers\n");
 		return rc;
@@ -5335,7 +4507,7 @@ int xdma_cyclic_transfer_teardown(struct xdma_engine *engine)
 
 	if (engine->cyclic_sgt.orig_nents) {
 		sgt_free_with_pages(&engine->cyclic_sgt, engine->dir,
-				    xdev->pdev);
+				xdev->pdev);
 		engine->cyclic_sgt.orig_nents = 0;
 		engine->cyclic_sgt.nents = 0;
 		engine->cyclic_sgt.sgl = NULL;
@@ -5349,7 +4521,7 @@ int xdma_cyclic_transfer_teardown(struct xdma_engine *engine)
 int engine_addrmode_set(struct xdma_engine *engine, unsigned long arg)
 {
 	int rv;
-	unsigned long dst;
+	unsigned long dst; 
 	u32 w = XDMA_CTRL_NON_INCR_ADDR;
 
 	dbg_perf("IOCTL_XDMA_ADDRMODE_SET\n");
@@ -5358,15 +4530,13 @@ int engine_addrmode_set(struct xdma_engine *engine, unsigned long arg)
 	if (rv == 0) {
 		engine->non_incr_addr = !!dst;
 		if (engine->non_incr_addr)
-			write_register(
-				w, &engine->regs->control_w1s,
+			write_register(w, &engine->regs->control_w1s, 
 				(unsigned long)(&engine->regs->control_w1s) -
-					(unsigned long)(&engine->regs));
+				(unsigned long)(&engine->regs));
 		else
-			write_register(
-				w, &engine->regs->control_w1c,
-				(unsigned long)(&engine->regs->control_w1c) -
-					(unsigned long)(&engine->regs));
+			write_register(w, &engine->regs->control_w1c,
+				(unsigned long)(&engine->regs->control_w1c) - 
+				(unsigned long)(&engine->regs));
 	}
 	engine_alignments(engine);
 

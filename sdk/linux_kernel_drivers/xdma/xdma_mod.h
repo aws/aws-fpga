@@ -52,7 +52,6 @@
 #include <linux/spinlock_types.h>
 
 #include "libxdma.h"
-#include "xdma_thread.h"
 
 #define MAGIC_ENGINE	0xEEEEEEEEUL
 #define MAGIC_DEVICE	0xDDDDDDDDUL
@@ -104,19 +103,12 @@ struct xdma_pci_dev {
 	void *data;
 };
 
-struct cdev_async_io {
-	struct kiocb *iocb;
-	struct xdma_io_cb *cb;
-	bool write;
-	bool cancel;
-	int cmpl_cnt;
-	int req_cnt;
-	spinlock_t lock;
-	struct work_struct wrk_itm;
-	struct cdev_async_io *next;
-	ssize_t res;
-	ssize_t res2;
-	int err_cnt;
+struct xdma_io_cb {
+	void __user *buf;
+	size_t len;
+	unsigned int pages_nr;
+	struct sg_table sgt;
+	struct page **pages;
 };
 
 #endif /* ifndef __XDMA_MODULE_H__ */
