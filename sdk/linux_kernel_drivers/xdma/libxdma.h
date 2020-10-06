@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -36,26 +36,32 @@
 #include <linux/pci.h>
 #include <linux/workqueue.h>
 
+/*
+ * if the config bar is fixed, the driver does not neeed to search through
+ * all of the bars
+ */
+//#define XDMA_CONFIG_BAR_NUM	1
+
 /* Switch debug printing on/off */
-#define XDMA_DEBUG 0
+#define XDMA_DEBUG		0
 
 /* SECTION: Preprocessor macros/constants */
-#define XDMA_BAR_NUM (6)
+#define XDMA_BAR_NUM		(6)
 
 /* maximum amount of register space to map */
-#define XDMA_BAR_SIZE (0x8000UL)
+#define XDMA_BAR_SIZE		(0x8000UL)
 
 /* Use this definition to poll several times between calls to schedule */
-#define NUM_POLLS_PER_SCHED 100
+#define NUM_POLLS_PER_SCHED	100
 
-#define XDMA_CHANNEL_NUM_MAX (4)
+#define XDMA_CHANNEL_NUM_MAX	(4)
 /*
  * interrupts per engine, rad2_vul.sv:237
  * .REG_IRQ_OUT	(reg_irq_from_ch[(channel*2) +: 2]),
  */
-#define XDMA_ENG_IRQ_NUM (1)
-#define MAX_EXTRA_ADJ (15)
-#define RX_STATUS_EOP (1)
+#define XDMA_ENG_IRQ_NUM	(1)
+#define MAX_EXTRA_ADJ		(0x3F)
+#define RX_STATUS_EOP		(1)
 
 /* Target internal components on XDMA control BAR */
 #define XDMA_OFS_INT_CTRL	(0x2000UL)
@@ -65,7 +71,7 @@
 #define XDMA_TRANSFER_MAX_DESC (2048)
 
 /* maximum size of a single DMA transfer descriptor */
-#define XDMA_DESC_BLEN_BITS 	28
+#define XDMA_DESC_BLEN_BITS	28
 #define XDMA_DESC_BLEN_MAX	((1 << (XDMA_DESC_BLEN_BITS)) - 1)
 
 /* bits of the SG DMA control register */
@@ -157,7 +163,7 @@
 #define XDMA_ID_C2H 0x1fc1U
 
 /* for C2H AXI-ST mode */
-#define CYCLIC_RX_PAGES_MAX	256	
+#define CYCLIC_RX_PAGES_MAX	256
 
 #define LS_BYTE_MASK 0x000000FFUL
 
@@ -442,7 +448,8 @@ struct xdma_engine {
 	int max_extra_adj;	/* descriptor prefetch capability */
 	int desc_dequeued;	/* num descriptors of completed transfers */
 	u32 status;		/* last known status of device */
-	u32 interrupt_enable_mask_value;/* only used for MSIX mode to store per-engine interrupt mask value */
+	/* only used for MSIX mode to store per-engine interrupt mask value */
+	u32 interrupt_enable_mask_value;
 
 	/* Transfer list management */
 	struct list_head transfer_list;	/* queue of transfers */
@@ -452,6 +459,10 @@ struct xdma_engine {
 	dma_addr_t cyclic_result_bus;	/* bus addr for transfer */
 	struct xdma_request_cb *cyclic_req; 
 	struct sg_table cyclic_sgt; 
+
+	u8 *perf_buf_virt;
+	dma_addr_t perf_buf_bus; /* bus address */
+
 	u8 eop_found; /* used only for cyclic(rx:c2h) */
 
 	int rx_tail;	/* follows the HW */
@@ -473,7 +484,7 @@ struct xdma_engine {
 	u32 irq_bitmask;		/* IRQ bit mask for this engine */
 	struct work_struct work;	/* Work queue for interrupt handling */
 
-	spinlock_t desc_lock;		/* protects concurrent access */
+	struct mutex desc_lock;		/* protects concurrent access */
 	dma_addr_t desc_bus;
 	struct xdma_desc *desc;
 
@@ -490,14 +501,14 @@ struct xdma_user_irq {
 	wait_queue_head_t events_wq;	/* wait queue to sync waiting threads */
 	irq_handler_t handler;
 
-	void *dev;	
+	void *dev;
 };
 
 /* XDMA PCIe device specific book-keeping */
 #define XDEV_FLAG_OFFLINE	0x1
 struct xdma_dev {
 	struct list_head list_head;
-        struct list_head rcu_node;
+	struct list_head rcu_node;
 
 	unsigned long magic;		/* structure ID for sanity checks */
 	struct pci_dev *pdev;	/* pci device struct from probe() */
@@ -509,7 +520,7 @@ struct xdma_dev {
 	unsigned int flags;
 
 	/* PCIe BAR management */
-	void *__iomem bar[XDMA_BAR_NUM];	/* addresses for mapped BARs */
+	void __iomem *bar[XDMA_BAR_NUM];	/* addresses for mapped BARs */
 	int user_bar_idx;	/* BAR index of user logic */
 	int config_bar_idx;	/* BAR index of XDMA config logic */
 	int bypass_bar_idx;	/* BAR index of XDMA bypass logic */
@@ -605,8 +616,8 @@ void get_perf_stats(struct xdma_engine *engine);
 
 int xdma_cyclic_transfer_setup(struct xdma_engine *engine);
 int xdma_cyclic_transfer_teardown(struct xdma_engine *engine);
-ssize_t xdma_engine_read_cyclic(struct xdma_engine *, char __user *, size_t,
-			 int);
+ssize_t xdma_engine_read_cyclic(struct xdma_engine *engine, char __user *buf,
+				size_t count, int timeout_ms);
 int engine_addrmode_set(struct xdma_engine *engine, unsigned long arg);
 
 #endif /* XDMA_LIB_H */

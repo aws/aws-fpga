@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,12 +21,19 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
 
 #include <linux/ioctl.h>
 #include "version.h"
 #include "xdma_cdev.h"
 #include "cdev_ctrl.h"
+
+#if KERNEL_VERSION(5, 0, 0) <= LINUX_VERSION_CODE
+#define xlx_access_ok(X, Y, Z) access_ok(Y, Z)
+#else
+#define xlx_access_ok(X, Y, Z) access_ok(X, Y, Z)
+#endif
 
 /*
  * character device file operations for control bus (through control bridge)
@@ -36,13 +43,13 @@ static ssize_t char_ctrl_read(struct file *fp, char __user *buf, size_t count,
 {
 	struct xdma_cdev *xcdev = (struct xdma_cdev *)fp->private_data;
 	struct xdma_dev *xdev;
-	void *reg;
+	void __iomem *reg;
 	u32 w;
 	int rv;
 
 	rv = xcdev_check(__func__, xcdev, 0);
 	if (rv < 0)
-		return rv;	
+		return rv;
 	xdev = xcdev->xdev;
 
 	/* only 32-bit aligned and 32-bit multiples */
@@ -52,8 +59,8 @@ static ssize_t char_ctrl_read(struct file *fp, char __user *buf, size_t count,
 	reg = xdev->bar[xcdev->bar] + *pos;
 	//w = read_register(reg);
 	w = ioread32(reg);
-	dbg_sg("char_ctrl_read(@%p, count=%ld, pos=%d) value = 0x%08x\n", reg,
-		(long)count, (int)*pos, w);
+	dbg_sg("%s(@%p, count=%ld, pos=%d) value = 0x%08x\n",
+			__func__, reg, (long)count, (int)*pos, w);
 	rv = copy_to_user(buf, &w, 4);
 	if (rv)
 		dbg_sg("Copy to userspace failed but continuing\n");
@@ -67,13 +74,13 @@ static ssize_t char_ctrl_write(struct file *file, const char __user *buf,
 {
 	struct xdma_cdev *xcdev = (struct xdma_cdev *)file->private_data;
 	struct xdma_dev *xdev;
-	void *reg;
+	void __iomem *reg;
 	u32 w;
 	int rv;
 
 	rv = xcdev_check(__func__, xcdev, 0);
 	if (rv < 0)
-		return rv;	
+		return rv;
 	xdev = xcdev->xdev;
 
 	/* only 32-bit aligned and 32-bit multiples */
@@ -83,12 +90,11 @@ static ssize_t char_ctrl_write(struct file *file, const char __user *buf,
 	/* first address is BAR base plus file position offset */
 	reg = xdev->bar[xcdev->bar] + *pos;
 	rv = copy_from_user(&w, buf, 4);
-	if (rv) {
+	if (rv)
 		pr_info("copy from user failed %d/4, but continuing.\n", rv);
-	}
 
-	dbg_sg("char_ctrl_write(0x%08x @%p, count=%ld, pos=%d)\n", w, reg,
-		(long)count, (int)*pos);
+	dbg_sg("%s(0x%08x @%p, count=%ld, pos=%d)\n",
+			__func__, w, reg, (long)count, (int)*pos);
 	//write_register(w, reg);
 	iowrite32(w, reg);
 	*pos += 4;
@@ -133,9 +139,13 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	rv = xcdev_check(__func__, xcdev, 0);
 	if (rv < 0)
-		return rv;	
-	xdev = xcdev->xdev;
+		return rv;
 
+	xdev = xcdev->xdev;
+	if (!xdev) {
+		pr_info("cmd %u, xdev NULL.\n", cmd);
+		return -EINVAL;
+	}
 	pr_info("cmd 0x%x, xdev 0x%p, pdev 0x%p.\n", cmd, xdev, xdev->pdev);
 
 	if (_IOC_TYPE(cmd) != XDMA_IOC_MAGIC) {
@@ -145,10 +155,10 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 
 	if (_IOC_DIR(cmd) & _IOC_READ)
-		result = !access_ok(VERIFY_WRITE, (void __user *)arg,
+		result = !xlx_access_ok(VERIFY_WRITE, (void __user *)arg,
 				_IOC_SIZE(cmd));
 	else if (_IOC_DIR(cmd) & _IOC_WRITE)
-		result =  !access_ok(VERIFY_READ, (void __user *)arg,
+		result =  !xlx_access_ok(VERIFY_READ, (void __user *)arg,
 				_IOC_SIZE(cmd));
 
 	if (result) {
@@ -158,7 +168,7 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	switch (cmd) {
 	case XDMA_IOCINFO:
-		if (copy_from_user((void *)&ioctl_obj, (void *) arg,
+		if (copy_from_user((void *)&ioctl_obj, (void __user *) arg,
 			 sizeof(struct xdma_ioc_base))) {
 			pr_err("copy_from_user failed.\n");
 			return -EFAULT;
@@ -169,20 +179,11 @@ long char_ctrl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				ioctl_obj.magic, XDMA_XCL_MAGIC);
 			return -ENOTTY;
 		}
-
 		return version_ioctl(xcdev, (void __user *)arg);
 	case XDMA_IOCOFFLINE:
-		if (!xdev) {
-			pr_info("cmd %u, xdev NULL.\n", cmd);
-			return -EINVAL;
-		}
 		xdma_device_offline(xdev->pdev, xdev);
 		break;
 	case XDMA_IOCONLINE:
-		if (!xdev) {
-			pr_info("cmd %u, xdev NULL.\n", cmd);
-			return -EINVAL;
-		}
 		xdma_device_online(xdev->pdev, xdev);
 		break;
 	default:
@@ -205,7 +206,7 @@ int bridge_mmap(struct file *file, struct vm_area_struct *vma)
 
 	rv = xcdev_check(__func__, xcdev, 0);
 	if (rv < 0)
-		return rv;	
+		return rv;
 	xdev = xcdev->xdev;
 
 	off = vma->vm_pgoff << PAGE_SHIFT;

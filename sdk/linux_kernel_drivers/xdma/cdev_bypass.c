@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,11 +21,12 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+#define pr_fmt(fmt)	KBUILD_MODNAME ":%s: " fmt, __func__
 
 #include "libxdma_api.h"
 #include "xdma_cdev.h"
 
-#define write_register(v,mem,off) iowrite32(v, mem)
+#define write_register(v, mem, off) iowrite32(v, mem)
 
 static int copy_desc_data(struct xdma_transfer *transfer, char __user *buf,
 		size_t *buf_offset, size_t buf_size)
@@ -34,8 +35,15 @@ static int copy_desc_data(struct xdma_transfer *transfer, char __user *buf,
 	int copy_err;
 	int rc = 0;
 
-	BUG_ON(!buf);
-	BUG_ON(!buf_offset);
+	if (!buf) {
+		pr_err("Invalid user buffer\n");
+		return -EINVAL;
+	}
+
+	if (!buf_offset) {
+		pr_err("Invalid user buffer offset\n");
+		return -EINVAL;
+	}
 
 	/* Fill user buffer with descriptor data */
 	for (i = 0; i < transfer->desc_num; i++) {
@@ -76,7 +84,7 @@ static ssize_t char_bypass_read(struct file *file, char __user *buf,
 	xdev = xcdev->xdev;
 	engine = xcdev->engine;
 
-	dbg_sg("In char_bypass_read()\n");
+	dbg_sg("In %s()\n", __func__);
 
 	if (count & 3) {
 		dbg_sg("Buffer size must be a multiple of 4 bytes\n");
@@ -119,7 +127,7 @@ static ssize_t char_bypass_write(struct file *file, const char __user *buf,
 	struct xdma_cdev *xcdev = (struct xdma_cdev *)file->private_data;
 
 	u32 desc_data;
-	u32 *bypass_addr;
+	void __iomem *bypass_addr;
 	size_t buf_offset = 0;
 	int rc = 0;
 	int copy_err;
@@ -145,18 +153,21 @@ static ssize_t char_bypass_write(struct file *file, const char __user *buf,
 		return -ENODEV;
 	}
 
-	dbg_sg("In char_bypass_write()\n");
+	dbg_sg("In %s()\n", __func__);
 
 	spin_lock(&engine->lock);
 
 	/* Write descriptor data to the bypass BAR */
-	bypass_addr = (u32 *)xdev->bar[xdev->bypass_bar_idx];
-	bypass_addr += engine->bypass_offset;
+	bypass_addr = xdev->bar[xdev->bypass_bar_idx];
+	bypass_addr = (void __iomem *)(
+			(u32 __iomem *)bypass_addr + engine->bypass_offset
+			);
 	while (buf_offset < count) {
 		copy_err = copy_from_user(&desc_data, &buf[buf_offset],
 			sizeof(u32));
 		if (!copy_err) {
-			write_register(desc_data, bypass_addr, bypass_addr - engine->bypass_offset);
+			write_register(desc_data, bypass_addr,
+					bypass_addr - engine->bypass_offset);
 			buf_offset += sizeof(u32);
 			rc = buf_offset;
 		} else {
@@ -188,5 +199,5 @@ static const struct file_operations bypass_fops = {
 
 void cdev_bypass_init(struct xdma_cdev *xcdev)
 {
-        cdev_init(&xcdev->cdev, &bypass_fops);
+	cdev_init(&xcdev->cdev, &bypass_fops);
 }

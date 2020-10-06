@@ -1,12 +1,24 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
- * Copyright(c) Sidebranch.
- * Copyright(c) Xilinx, Inc.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The full GNU General Public License is included in this distribution in
+ * the file called "LICENSE".
  *
  * Karen Xie <karen.xie@xilinx.com>
- * Leon Woestenberg <leon@sidebranch.com>
  *
  ******************************************************************************/
 
@@ -70,10 +82,7 @@ void xdma_device_close(struct pci_dev *pdev, void *dev_handle);
 /* 
  * xdma_device_restart - restart the fpga
  * @pdev: ptr to struct pci_dev
- * TODO:
- *	may need more refining on the parameter list
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_device_restart(struct pci_dev *pdev, void *dev_handle);
 
@@ -94,7 +103,6 @@ int xdma_device_restart(struct pci_dev *pdev, void *dev_handle);
  * @name: to be passed to the handler, ignored if handler is NULL`
  * @dev: to be passed to the handler, ignored if handler is NULL`
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
 			 irq_handler_t handler, void *dev);
@@ -104,7 +112,6 @@ int xdma_user_isr_register(void *dev_hndl, unsigned int mask,
  * @pdev: ptr to the the pci_dev struct	
  * @mask: bitmask of user interrupts (0 ~ 15)to be registered
  * return < 0 in case of error
- * TODO: exact error code will be defined later
  */
 int xdma_user_isr_enable(void *dev_hndl, unsigned int mask);
 int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
@@ -121,15 +128,8 @@ int xdma_user_isr_disable(void *dev_hndl, unsigned int mask);
  * @timeout: timeout in mili-seconds, *currently ignored
  * return # of bytes transfered or
  *	 < 0 in case of error
- * TODO: exact error code will be defined later
  */
 ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
 			struct sg_table *sgt, bool dma_mapped, int timeout_ms);
-			
-
-/////////////////////missing API////////////////////
-
-//xdma_get_channle_state - if no interrupt on DMA hang is available
-//xdma_channle_restart
 
 #endif

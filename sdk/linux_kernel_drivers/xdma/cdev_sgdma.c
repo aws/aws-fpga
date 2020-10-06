@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -23,6 +23,7 @@
  ******************************************************************************/
 #define pr_fmt(fmt)     KBUILD_MODNAME ":%s: " fmt, __func__
 
+#include <linux/types.h>
 #include <asm/cacheflush.h>
 #include "libxdma_api.h"
 #include "xdma_cdev.h"
@@ -56,12 +57,9 @@ static loff_t char_sgdma_llseek(struct file *file, loff_t off, int whence)
 	if (newpos < 0)
 		return -EINVAL;
 	file->f_pos = newpos;
-	dbg_fops("char_sgdma_llseek: pos=%lld\n", (signed long long)newpos);
 
-#if 0
-	pr_err("0x%p, off 0x%lld, whence %d -> pos %lld.\n",
+	dbg_fops("0x%p, off %lld, whence %d -> pos %lld.\n",
 		file, (signed long long)off, whence, (signed long long)off);
-#endif
 
 	return newpos;
 }
@@ -84,7 +82,10 @@ static loff_t char_sgdma_llseek(struct file *file, loff_t off, int whence)
 static int check_transfer_align(struct xdma_engine *engine,
 	const char __user *buf, size_t count, loff_t pos, int sync)
 {
-	BUG_ON(!engine);
+	if (!engine) {
+		pr_err("Invalid DMA engine\n");
+		return -EINVAL;
+	}
 
 	/* AXI ST or AXI MM non-incremental addressing mode? */
 	if (engine->non_incr_addr) {
@@ -175,17 +176,16 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 {
 	struct sg_table *sgt = &cb->sgt;
 	unsigned long len = cb->len;
-	char *buf = cb->buf;
+	char __user *buf = cb->buf;
 	struct scatterlist *sg;
-	unsigned int pages_nr = (((unsigned long)buf + len + PAGE_SIZE -1) -
+	unsigned int pages_nr = (((unsigned long)buf + len + PAGE_SIZE - 1) -
 				 ((unsigned long)buf & PAGE_MASK))
 				>> PAGE_SHIFT;
 	int i;
 	int rv;
 
-	if (pages_nr == 0) {
+	if (pages_nr == 0)
 		return -EINVAL;
-	}
 
 	if (sg_alloc_table(sgt, pages_nr, GFP_KERNEL)) {
 		pr_err("sgl OOM.\n");
@@ -211,8 +211,8 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 	if (rv != pages_nr) {
 		pr_err("unable to pin down all %u user pages, %d.\n",
 			pages_nr, rv);
-		rv = -EFAULT;
 		cb->pages_nr = rv;
+		rv = -EFAULT;
 		goto err_out;
 	}
 
@@ -228,9 +228,9 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 
 	sg = sgt->sgl;
 	for (i = 0; i < pages_nr; i++, sg = sg_next(sg)) {
-		//unsigned int offset = (uintptr_t)buf & ~PAGE_MASK;
 		unsigned int offset = offset_in_page(buf);
-		unsigned int nbytes = min_t(unsigned int, PAGE_SIZE - offset, len);
+		unsigned int nbytes = min_t(unsigned int,
+					PAGE_SIZE - offset, len);
 
 		flush_dcache_page(cb->pages[i]);
 		sg_set_page(sg, cb->pages[i], nbytes, offset);
@@ -239,7 +239,11 @@ static int char_sgdma_map_user_buf_to_sgl(struct xdma_io_cb *cb, bool write)
 		len -= nbytes;
 	}
 
-	BUG_ON(len);
+	if (len) {
+		pr_err("Invalid user buffer length. Cannot map to sgl\n");
+		return -EINVAL;
+	}
+
 	cb->pages_nr = pages_nr;
 	return 0;
 
@@ -249,7 +253,7 @@ err_out:
 	return rv;
 }
 
-static ssize_t char_sgdma_read_write(struct file *file, char __user *buf,
+static ssize_t char_sgdma_read_write(struct file *file, const char __user *buf,
 		size_t count, loff_t *pos, bool write)
 {
 	int rv;
@@ -283,7 +287,7 @@ static ssize_t char_sgdma_read_write(struct file *file, char __user *buf,
 	}
 
 	memset(&cb, 0, sizeof(struct xdma_io_cb));
-	cb.buf = buf;
+	cb.buf = (char __user *)buf;
 	cb.len = count;
 	rv = char_sgdma_map_user_buf_to_sgl(&cb, write);
 	if (rv < 0)
@@ -291,10 +295,6 @@ static ssize_t char_sgdma_read_write(struct file *file, char __user *buf,
 
 	res = xdma_xfer_submit(xdev, engine->channel, write, *pos, &cb.sgt,
 				0, sgdma_timeout * 1000);	
-	//pr_err("xfer_submit return=%lld.\n", (s64)res);
-
-	//interrupt_status(xdev);
-
 	char_sgdma_unmap_user_buf(&cb, write);
 
 	return res;
@@ -302,138 +302,134 @@ static ssize_t char_sgdma_read_write(struct file *file, char __user *buf,
 
 
 static ssize_t char_sgdma_write(struct file *file, const char __user *buf,
-                size_t count, loff_t *pos)
+				size_t count, loff_t *pos)
 {
-        return char_sgdma_read_write(file, (char *)buf, count, pos, 1);
+	return char_sgdma_read_write(file, (char *)buf, count, pos, 1);
 }
 
 static ssize_t char_sgdma_read(struct file *file, char __user *buf,
-		size_t count, loff_t *pos)
+				size_t count, loff_t *pos)
 {
-	struct xdma_cdev *xcdev = (struct xdma_cdev *)file->private_data;
-	struct xdma_engine *engine;
-	int rv;
-
-	rv = xcdev_check(__func__, xcdev, 1);
-	if (rv < 0)
-		return rv;
-
-	engine = xcdev->engine;
-
-	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
-		rv = xdma_cyclic_transfer_setup(engine);
-		if (rv < 0 && rv != -EBUSY)
-			return rv;
-		/* 600 sec. timeout */
-		return xdma_engine_read_cyclic(engine, buf, count, 600000);
-	}
-
-        return char_sgdma_read_write(file, (char *)buf, count, pos, 0);
+	return char_sgdma_read_write(file, (char *)buf, count, pos, 0);
 }
 
 static int ioctl_do_perf_start(struct xdma_engine *engine, unsigned long arg)
 {
-        int rv;
-        struct xdma_dev *xdev;
+	int rv;
+	struct xdma_dev *xdev;
 
-        BUG_ON(!engine);
-        xdev = engine->xdev;
-        BUG_ON(!xdev);
+	if (!engine || !engine->xdev) {
+		pr_err("Invalid DMA engine 0x%p, 0x%p.\n",
+			engine, engine ? engine->xdev : NULL);
+		return -EINVAL;
+	}
 
-        /* performance measurement already running on this engine? */
-        if (engine->xdma_perf) {
-                dbg_perf("IOCTL_XDMA_PERF_START failed!\n");
-                dbg_perf("Perf measurement already seems to be running!\n");
-                return -EBUSY;
-        }
-        engine->xdma_perf = kzalloc(sizeof(struct xdma_performance_ioctl),
-                GFP_KERNEL);
+	xdev = engine->xdev;
 
-        if (!engine->xdma_perf)
-                return -ENOMEM;
+	/* if performance measurement already running on this engine */
+	if (engine->xdma_perf) {
+		dbg_perf("Perf measurement already seems to be running!\n");
+		return -EBUSY;
+	}
 
-        rv = copy_from_user(engine->xdma_perf,
-                (struct xdma_performance_ioctl *)arg,
-                sizeof(struct xdma_performance_ioctl));
+	engine->xdma_perf = kzalloc(sizeof(struct xdma_performance_ioctl),
+					GFP_KERNEL);
+	if (!engine->xdma_perf)
+		return -ENOMEM;
 
-        if (rv < 0) {
-                dbg_perf("Failed to copy from user space 0x%lx\n", arg);
-                return -EINVAL;
-        }
-        if (engine->xdma_perf->version != IOCTL_XDMA_PERF_V1) {
-                dbg_perf("Unsupported IOCTL version %d\n",
-                        engine->xdma_perf->version);
-                return -EINVAL;
-        }
+	rv = copy_from_user(engine->xdma_perf,
+				(struct xdma_performance_ioctl *)arg,
+				sizeof(struct xdma_performance_ioctl));
+	if (rv < 0) {
+		dbg_perf("Failed to copy from user space 0x%lx\n", arg);
+		return -EINVAL;
+	}
+	if (engine->xdma_perf->version != IOCTL_XDMA_PERF_V1) {
+		dbg_perf("Unsupported IOCTL version %d\n",
+			engine->xdma_perf->version);
+		return -EINVAL;
+	}
 
 	enable_perf(engine);
-        dbg_perf("transfer_size = %d\n", engine->xdma_perf->transfer_size);
-        /* initialize wait queue */
-        init_waitqueue_head(&engine->xdma_perf_wq);
-        xdma_performance_submit(xdev, engine);
+	dbg_perf("transfer_size = %d\n", engine->xdma_perf->transfer_size);
 
-        return 0;
+	/* initialize wait queue */
+	init_waitqueue_head(&engine->xdma_perf_wq);
+	
+	rv = xdma_performance_submit(xdev, engine);
+	if (rv < 0)
+		pr_err("Failed to submit dma performance\n");
+
+	return 0;
 }
 
 static int ioctl_do_perf_stop(struct xdma_engine *engine, unsigned long arg)
 {
-        struct xdma_transfer *transfer = NULL;
-        int rv;
+	struct xdma_transfer *transfer = NULL;
+	int rv;
 
-        dbg_perf("IOCTL_XDMA_PERF_STOP\n");
+	if (!engine) {
+		pr_err("DMA engine NULL.\n");
+		return -EINVAL;
+	}
 
-        /* no performance measurement running on this engine? */
-        if (!engine->xdma_perf) {
-                dbg_perf("No measurement in progress\n");
-                return -EINVAL;
+	dbg_perf("IOCTL_XDMA_PERF_STOP\n");
+
+	/* if no performance measurement running on this engine */
+	if (!engine->xdma_perf) {
+		dbg_perf("No measurement in progress\n");
+		return -EINVAL;
+	}
+
+	/* stop measurement */
+	dbg_perf("Waiting for measurement to stop\n");
+	transfer = engine_cyclic_stop(engine);
+	if (!transfer) {
+		pr_err("Failed to stop cyclic transfer\n");
+		return -EINVAL;
         }
 
-        /* stop measurement */
-        transfer = engine_cyclic_stop(engine);
-        dbg_perf("Waiting for measurement to stop\n");
+	get_perf_stats(engine);
+	rv = copy_to_user((void __user *)arg, engine->xdma_perf,
+			sizeof(struct xdma_performance_ioctl));
+	if (rv) {
+		dbg_perf("Error copying result to user\n");
+		return -EINVAL;
+	}
 
-        if (engine->xdma_perf) {
-                get_perf_stats(engine);
+	kfree(transfer);
+	kfree(engine->xdma_perf);
+	engine->xdma_perf = NULL;
 
-                rv = copy_to_user((void __user *)arg, engine->xdma_perf,
-                        sizeof(struct xdma_performance_ioctl));
-                if (rv) {
-                        dbg_perf("Error copying result to user\n");
-                        return -EINVAL;
-                }
-        } else {
-                dbg_perf("engine->xdma_perf == NULL?\n");
-        }
-
-        kfree(engine->xdma_perf);
-        engine->xdma_perf = NULL;
-
-        return 0;
+	return 0;
 }
 
 static int ioctl_do_perf_get(struct xdma_engine *engine, unsigned long arg)
 {
-        int rc;
+	int rc;
 
-        BUG_ON(!engine);
+	if (!engine) {
+		pr_err("DMA engine NULL.\n");
+		return -EINVAL;
+	}
 
-        dbg_perf("IOCTL_XDMA_PERF_GET\n");
+	dbg_perf("IOCTL_XDMA_PERF_GET\n");
 
-        if (engine->xdma_perf) {
+	if (engine->xdma_perf) {
                 get_perf_stats(engine);
 
-                rc = copy_to_user((void __user *)arg, engine->xdma_perf,
-                        sizeof(struct xdma_performance_ioctl));
-                if (rc) {
-                        dbg_perf("Error copying result to user\n");
-                        return -EINVAL;
-                }
-        } else {
-                dbg_perf("engine->xdma_perf == NULL?\n");
-                return -EPROTO;
-        }
+		rc = copy_to_user((void __user *)arg, engine->xdma_perf,
+				sizeof(struct xdma_performance_ioctl));
+		if (rc) {
+			dbg_perf("Error copying result to user\n");
+			return -EINVAL;
+		}
+	} else {
+		dbg_perf("engine->xdma_perf == NULL?\n");
+		return -EPROTO;
+	}
 
-        return 0;
+	return 0;
 }
 
 static int ioctl_do_addrmode_set(struct xdma_engine *engine, unsigned long arg) 
@@ -446,7 +442,10 @@ static int ioctl_do_addrmode_get(struct xdma_engine *engine, unsigned long arg)
 	int rv;
 	unsigned long src;
 
-	BUG_ON(!engine);
+	if (!engine) {
+		pr_err("DMA engine NULL.\n");
+		return -EINVAL;
+	}
 	src = !!engine->non_incr_addr;
 
 	dbg_perf("IOCTL_XDMA_ADDRMODE_GET\n");
@@ -455,22 +454,24 @@ static int ioctl_do_addrmode_get(struct xdma_engine *engine, unsigned long arg)
 	return rv;
 }
 
-static int ioctl_do_align_get(struct xdma_engine *engine, unsigned long arg) 
+static int ioctl_do_align_get(struct xdma_engine *engine, unsigned long arg)
 {
-	BUG_ON(!engine);
+	if (!engine) {
+		pr_err("DMA engine NULL.\n");
+		return -EINVAL;
+	}
 
 	dbg_perf("IOCTL_XDMA_ALIGN_GET\n");
 	return put_user(engine->addr_align, (int __user *)arg);
 }
 
 static long char_sgdma_ioctl(struct file *file, unsigned int cmd,
-                unsigned long arg)
+				unsigned long arg)
 {
 	struct xdma_cdev *xcdev = (struct xdma_cdev *)file->private_data;
 	struct xdma_dev *xdev;
 	struct xdma_engine *engine;
-
-        int rv = 0;
+	int rv = 0;
 
 	rv = xcdev_check(__func__, xcdev, 1);
 	if (rv < 0)
@@ -480,15 +481,15 @@ static long char_sgdma_ioctl(struct file *file, unsigned int cmd,
 	engine = xcdev->engine;
 
         switch (cmd) {
-        case IOCTL_XDMA_PERF_START:
-                rv = ioctl_do_perf_start(engine, arg);
-                break;
-        case IOCTL_XDMA_PERF_STOP:
-                rv = ioctl_do_perf_stop(engine, arg);
-                break;
-        case IOCTL_XDMA_PERF_GET:
-                rv = ioctl_do_perf_get(engine, arg);
-                break;
+	case IOCTL_XDMA_PERF_START:
+		rv = ioctl_do_perf_start(engine, arg);
+		break;
+	case IOCTL_XDMA_PERF_STOP:
+		rv = ioctl_do_perf_stop(engine, arg);
+		break;
+	case IOCTL_XDMA_PERF_GET:
+		rv = ioctl_do_perf_get(engine, arg);
+		break;
 	case IOCTL_XDMA_ADDRMODE_SET:
 		rv = ioctl_do_addrmode_set(engine, arg);
 		break;
@@ -498,13 +499,13 @@ static long char_sgdma_ioctl(struct file *file, unsigned int cmd,
 	case IOCTL_XDMA_ALIGN_GET:
 		rv = ioctl_do_align_get(engine, arg);
 		break;
-        default:
-                dbg_perf("Unsupported operation\n");
-                rv = -EINVAL;
-                break;
-        }
+	default:
+		dbg_perf("Unsupported operation 0x%x.\n", cmd);
+		rv = -EINVAL;
+		break;
+	}
 
-        return rv;
+	return rv;
 }
 
 static int char_sgdma_open(struct inode *inode, struct file *file)
@@ -520,8 +521,7 @@ static int char_sgdma_open(struct inode *inode, struct file *file)
 	if (engine->streaming && engine->dir == DMA_FROM_DEVICE) {
 		if (engine->device_open == 1)
 			return -EBUSY;
-		else
-			engine->device_open = 1;
+		engine->device_open = 1;
 	}
 
 	return 0;
