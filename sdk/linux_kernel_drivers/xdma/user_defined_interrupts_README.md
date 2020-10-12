@@ -34,7 +34,7 @@ The driver needs to be installed once, regardless of how many FPGA slots are ava
 
 The next example shows how an application can register to two events (aka user-defined interrupts) on slot 0
 
-```
+```C
   fd4=open(“/dev/xdma0_events_4”, O_RDONLY);
   fd6=open(“/dev/xdma0_events_6”, O_RDONLY);
 

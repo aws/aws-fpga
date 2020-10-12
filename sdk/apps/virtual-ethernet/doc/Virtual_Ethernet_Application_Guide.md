@@ -328,7 +328,7 @@ lspci -D | grep "1d0f:ec20"
 
 Within `<install_dir>/dpdk/drivers/net/spp` there is a file called `spp_ethdev.c`.  Your Vendor and Device ID should be added to the following table in `spp_ethdev.c` and then DPDK should be recompiled.
 
-```
+```C
 static const struct rte_pci_id pci_id_spp_map[] = {
         { RTE_PCI_DEVICE(PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_SDE_LOOPBACK_CL) },
         { RTE_PCI_DEVICE(<Your Vendor ID>, <Your Device ID>) },
@@ -345,7 +345,7 @@ make
 
 Within `<install dir>/dpdk/usertools` there is a file called `dpdk-devbind.py`.  Your Vendor and Device ID should be added to the following table in `dpdk-devbind.py`.
 
-```
+```python
 aws_fpga_sde = {'Class': '05', 'Vendor': '1d0f', 'Device': 'f002',
               'SVendor': None, 'SDevice': None}
 <your tag> = {'Class': '05', 'Vendor': '<Your Vendor ID>', 'Device': '<Your Device ID>',
