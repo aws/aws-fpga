@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef __XDMA_MODULE_H__
 #define __XDMA_MODULE_H__
 
@@ -48,6 +49,7 @@
 #include <linux/splice.h>
 #include <linux/version.h>
 #include <linux/uio.h>
+#include <linux/spinlock_types.h>
 
 #include "libxdma.h"
 
@@ -55,6 +57,9 @@
 #define MAGIC_DEVICE	0xDDDDDDDDUL
 #define MAGIC_CHAR	0xCCCCCCCCUL
 #define MAGIC_BITSTREAM 0xBBBBBBBBUL
+
+extern unsigned int desc_blen_max;
+extern unsigned int sgdma_timeout;
 
 struct xdma_cdev {
 	unsigned long magic;		/* structure ID for sanity checks */

@@ -3,7 +3,7 @@ The developer is required to create an S3 bucket for the AFI generation. The buc
 
 To install the AWS CLI, please follow the [instructions here](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
-The AWS SDAccel scripts require JSON output format and the scripts will not work properly if you use any other output format types (ex: text, table). JSON is the default output format of the AWS CLI.
+The AWS Vitis scripts require JSON output format and the scripts will not work properly if you use any other output format types (ex: text, table). JSON is the default output format of the AWS CLI.
 
 ```
     $ aws configure         # to set your credentials (found in your console.aws.amazon.com page), region (us-east-1) and output (json) 

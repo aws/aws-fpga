@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,6 +21,7 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef _XDMA_IOCALLS_POSIX_H_
 #define _XDMA_IOCALLS_POSIX_H_
 
@@ -64,14 +65,14 @@ struct xdma_ioc_base {
 };
 
 struct xdma_ioc_info {
-        struct xdma_ioc_base	base;
-        unsigned short		vendor;
-        unsigned short		device;
-        unsigned short		subsystem_vendor;
-        unsigned short		subsystem_device;
-        unsigned int		dma_engine_version;
-        unsigned int		driver_version;
-        unsigned long long 	feature_id;
+	struct xdma_ioc_base	base;
+	unsigned short		vendor;
+	unsigned short		device;
+	unsigned short		subsystem_vendor;
+	unsigned short		subsystem_device;
+	unsigned int		dma_engine_version;
+	unsigned int		driver_version;
+	unsigned long long	feature_id;
 	unsigned short		domain;
 	unsigned char		bus;
 	unsigned char		dev;

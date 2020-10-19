@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Xilinx XDMA IP Core Linux Driver
- * Copyright(c) 2015 - 2017 Xilinx, Inc.
+ * Copyright(c) 2015 - 2020 Xilinx, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,12 +21,13 @@
  * Karen Xie <karen.xie@xilinx.com>
  *
  ******************************************************************************/
+
 #ifndef __XDMA_VERSION_H__
 #define __XDMA_VERSION_H__
 
-#define DRV_MOD_MAJOR		2017
+#define DRV_MOD_MAJOR		2020
 #define DRV_MOD_MINOR		1
-#define DRV_MOD_PATCHLEVEL	47
+#define DRV_MOD_PATCHLEVEL	01
 
 #define DRV_MODULE_VERSION      \
 	__stringify(DRV_MOD_MAJOR) "." \
