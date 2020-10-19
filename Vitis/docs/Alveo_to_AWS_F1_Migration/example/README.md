@@ -7,18 +7,18 @@ The Vitis development flow provides platform independent APIs and interfaces to 
 
 ## Example Overview  
 
-The accelerator used in this example is a simple vector-add kernel. The `src` directory contains the source code for the project:
+The accelerator used in this example is a simple vector-add kernel. The [`src`](./src) directory contains the source code for the project:
 
-- `vadd.cpp` contains the C++ source code of the accelerator which adds 2 arbitrarily sized input vectors. 
-- `host.cpp` contains the main function running on the host CPU. The host application is written in C++ and uses OpenCL™ APIs to interact with the FPGA accelerator.
+- [`vadd.cpp`](./src/vadd.cpp)  contains the C++ source code of the accelerator which adds 2 arbitrarily sized input vectors. 
+- [`host.cpp`](./src/host.cpp) contains the main function running on the host CPU. The host application is written in C++ and uses OpenCL™ APIs to interact with the FPGA accelerator.
 
-The `u200` and `f1` directories contain the Makefiles and scripts for building for Alveo U200 and AWS F1 respectively.
+The [`u200`](./u200) and  The [`u200`](./u200) and [`f1`](./f1) directories contain the Makefiles and scripts for building for Alveo U200 and AWS F1 respectively.  directories contain the Makefiles and scripts for building for Alveo U200 and AWS F1 respectively.
 
 
 
 ## Building for Alveo U200
 
-*Note: The instructions below assume that the required tools and platforms are installed and that the environment is properly setup to run Vitis.*
+*Note: The instructions below assume that the required tools and platforms are installed and that the environment is properly setup to run Vitis. It is also a good idea to complete the Vitis example flow end-to-end before running this example.*
 
 1. Go to the `u200` directory 
 
