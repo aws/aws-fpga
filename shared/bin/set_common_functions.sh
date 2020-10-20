@@ -69,8 +69,7 @@ function get_base_vivado_version {
         local MYVIVADO_ENV_VAR_BACKUP=$MYVIVADO
 
         unset MYVIVADO
-        local __vivado_version=$(get_vivado_v
-        ersion)
+        local __vivado_version=$(get_vivado_version)
         export MYVIVADO=$MYVIVADO_ENV_VAR_BACKUP
     elif is_xilinx_path_set
     then
@@ -116,8 +115,9 @@ function get_vivado_version {
 }
 
 function setup_patches {
+    local caller_script="${BASH_SOURCE[1]}"
     patch_AR71715
-    patch_AR73068
+    patch_AR73068 "$caller_script"
 }
 
 function is_patch_applied {
@@ -211,13 +211,28 @@ function install_patch {
     fi
 }
 
-function patch_AR73068_2019_2 {
-    info_msg "Patching Vivado 2019.2 with Xilinx Patch AR73068"
+function fix_patch_vitis_AR73068_2019_2 {
+    local patch_object="$1"
+    local patch_dir_name="${patch_object%.*}"
+    pushd patches/$patch_dir_name
 
+    sed -i '/.*checksum.*/d' ./vivado/data/ip/xilinx/ddr4_v2_2/component.xml
+    sed -i 's/coreRevision>73068/coreRevision>8/' ./vivado/data/ip/xilinx/ddr4_v2_2/component.xml
+    popd
+}
+
+function patch_AR73068_2019_2 {
+    info_msg "Patching Vivado/Vitis 2019.2 with Xilinx Patch AR73068"
+    local fix_patch="$1"
     local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/AR73068"
     local patch_object="AR73068_Vivado_2019_2_preliminary_rev1.zip"
 
     install_patch "AR73068" "$patch_bucket" "$patch_object"
+
+    if [[ "$fix_patch" == true ]]; then
+      info_msg "Fixing Patch AR73068 for Vitis"
+      fix_patch_vitis_AR73068_2019_2 "$patch_object"
+    fi
 }
 
 function patch_AR73068_2019_1 {
@@ -258,9 +273,17 @@ function patch_AR73068_2017_4 {
 
 function patch_AR73068 {
     local base_vivado_version=$(get_base_vivado_version)
+    local caller_script="$1"
+    local fix_patch=false
+
+    # Vitis specific changes
+    if [[ "$caller_script" =~ "vitis_setup.sh" ]]; then
+      info_msg "Patching Vitis with AR73068"
+      fix_patch=true
+    fi
 
     if [[ "${base_vivado_version}" =~ "Vivado v2019.2" ]]; then
-      patch_AR73068_2019_2
+      patch_AR73068_2019_2 "$fix_patch"
     elif [[ "${base_vivado_version}" =~ "Vivado v2019.1" ]]; then
       patch_AR73068_2019_1
     elif [[ "${base_vivado_version}" =~ "Vivado v2018.3" ]]; then

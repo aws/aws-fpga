@@ -103,7 +103,7 @@ class TestBuildVitisExample(AwsFpgaTestBase):
         if check:
             check_string = "check"
 
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("make {0} TARGET={1} DEVICE={2} all".format(check_string, target, os.environ['AWS_PLATFORM']))
+        (rc, stdout_lines, stderr_lines) = self.run_cmd("make {0} TARGET={1} DEVICE={2} all PROFILE=yes".format(check_string, target, os.environ['AWS_PLATFORM']))
         assert rc == 0, "Vitis build failed with rc={}".format(rc)
 
         # Check for non zero xclbin
