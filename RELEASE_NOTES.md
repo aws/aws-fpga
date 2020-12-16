@@ -1,5 +1,9 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
+## User Controlled DDR Autoprecharge preview
+* Added AWS Shell v12142010
+* Updated cl_dram_dma example to tie off user bits.
+
 ## Release 1.4.17 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Updated XDMA Driver to allow builds on newer kernels
 * Updated documentation on Alveo U200 to F1 platform porting

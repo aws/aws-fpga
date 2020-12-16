@@ -1,5 +1,8 @@
 # AWS Shell Release Notes
-
+# v12142010
+* Added DDR Autoprecharge user bits `cl_sh_ddr_awuser` and `cl_sh_ddr_aruser` to DDR_C interface
+  (added signals to cl_ports.vh and are tied to 0)
+ 
 # v04261818
 * Fixed AXI-L Interface Ordering.  Read requests on the AXI-L interfaces (BAR1, OCL, SDA) will not pass previous write requests.
 * Increased XDMA PCIS interface timeout to 5 seconds

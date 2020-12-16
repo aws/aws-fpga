@@ -96,6 +96,7 @@ module sh_bfm #(
 
    logic [15:0]  cl_sh_ddr_awid_q;
    logic [63:0]  cl_sh_ddr_awaddr_q;
+   logic         cl_sh_ddr_awuser_q;
    logic [7:0]   cl_sh_ddr_awlen_q;
    logic         cl_sh_ddr_awvalid_q;
    logic         sh_cl_ddr_awready_q;
@@ -113,6 +114,7 @@ module sh_bfm #(
    
    logic [15:0]  cl_sh_ddr_arid_q;
    logic [63:0]  cl_sh_ddr_araddr_q;
+   logic         cl_sh_ddr_aruser_q;
    logic [7:0]   cl_sh_ddr_arlen_q;
    logic         cl_sh_ddr_arvalid_q;
    logic         sh_cl_ddr_arready_q;
@@ -126,6 +128,7 @@ module sh_bfm #(
 
    logic [15:0]  sync_cl_sh_ddr_awid;
    logic [63:0]  sync_cl_sh_ddr_awaddr;
+   logic [18:0]  sync_cl_sh_ddr_awuser;
    logic [7:0]   sync_cl_sh_ddr_awlen;
    logic         sync_cl_sh_ddr_awvalid;
    logic         sync_sh_cl_ddr_awready;
@@ -143,6 +146,7 @@ module sh_bfm #(
 
    logic [15:0]  sync_cl_sh_ddr_arid;
    logic [63:0]  sync_cl_sh_ddr_araddr;
+   logic [18:0]  sync_cl_sh_ddr_aruser;
    logic [7:0]   sync_cl_sh_ddr_arlen;
    logic         sync_cl_sh_ddr_arvalid;
    logic         sync_sh_cl_ddr_arready;
@@ -1330,12 +1334,13 @@ module sh_bfm #(
    //==========================================================
 
    // DDR Controller
-   axi_register_slice DDR_3_AXI4_REG_SLC (
+   axi_register_slice_axuser DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
      .aresetn        (intf_sync_rst_n),
 
      .s_axi_awid     (cl_sh_ddr_awid),
      .s_axi_awaddr   (cl_sh_ddr_awaddr),
+     .s_axi_awuser   (cl_sh_ddr_awuser),
      .s_axi_awlen    (cl_sh_ddr_awlen),
      .s_axi_awvalid  (cl_sh_ddr_awvalid),
      .s_axi_awready  (sh_cl_ddr_awready),
@@ -1350,6 +1355,7 @@ module sh_bfm #(
      .s_axi_bready   (cl_sh_ddr_bready),
      .s_axi_arid     (cl_sh_ddr_arid),
      .s_axi_araddr   (cl_sh_ddr_araddr),
+     .s_axi_aruser   (cl_sh_ddr_aruser),
      .s_axi_arlen    (cl_sh_ddr_arlen),
      .s_axi_arvalid  (cl_sh_ddr_arvalid),
      .s_axi_arready  (sh_cl_ddr_arready),
@@ -1362,6 +1368,7 @@ module sh_bfm #(
   
      .m_axi_awid     (cl_sh_ddr_awid_q),   
      .m_axi_awaddr   (cl_sh_ddr_awaddr_q), 
+     .m_axi_awuser   (cl_sh_ddr_awuser_q), 
      .m_axi_awlen    (cl_sh_ddr_awlen_q),  
      .m_axi_awvalid  (cl_sh_ddr_awvalid_q),
      .m_axi_awready  (sh_cl_ddr_awready_q),
@@ -1376,6 +1383,7 @@ module sh_bfm #(
      .m_axi_bready   (cl_sh_ddr_bready_q), 
      .m_axi_arid     (cl_sh_ddr_arid_q),   
      .m_axi_araddr   (cl_sh_ddr_araddr_q), 
+     .m_axi_aruser   (cl_sh_ddr_aruser_q), 
      .m_axi_arlen    (cl_sh_ddr_arlen_q),  
      .m_axi_arvalid  (cl_sh_ddr_arvalid_q),
      .m_axi_arready  (sh_cl_ddr_arready_q),
@@ -1394,7 +1402,7 @@ module sh_bfm #(
      .s_axi_awid(cl_sh_ddr_awid_q),
      .s_axi_awaddr(cl_sh_ddr_awaddr_q),
      .s_axi_awlen(cl_sh_ddr_awlen_q),
-     .s_axi_awuser(19'b0),
+     .s_axi_awuser({18'b0,cl_sh_ddr_awuser_q}),
      .s_axi_awvalid(cl_sh_ddr_awvalid_q),
      .s_axi_awready(sh_cl_ddr_awready_q),
 
@@ -1412,7 +1420,7 @@ module sh_bfm #(
      .s_axi_arid(cl_sh_ddr_arid_q),
      .s_axi_araddr(cl_sh_ddr_araddr_q),
      .s_axi_arlen(cl_sh_ddr_arlen_q),
-     .s_axi_aruser(19'b0),
+     .s_axi_aruser({18'b0,cl_sh_ddr_aruser_q}),
      .s_axi_arvalid(cl_sh_ddr_arvalid_q),
      .s_axi_arready(sh_cl_ddr_arready_q),
 
@@ -1429,7 +1437,7 @@ module sh_bfm #(
      .m_axi_awid(sync_cl_sh_ddr_awid),
      .m_axi_awaddr(sync_cl_sh_ddr_awaddr),
      .m_axi_awlen(sync_cl_sh_ddr_awlen),
-     .m_axi_awuser(),
+     .m_axi_awuser(sync_cl_sh_ddr_awuser),
      .m_axi_awvalid(sync_cl_sh_ddr_awvalid),
      .m_axi_awready(sync_sh_cl_ddr_awready),
 
@@ -1447,7 +1455,7 @@ module sh_bfm #(
      .m_axi_arid(sync_cl_sh_ddr_arid),
      .m_axi_araddr(sync_cl_sh_ddr_araddr),
      .m_axi_arlen(sync_cl_sh_ddr_arlen),
-     .m_axi_aruser(),
+     .m_axi_aruser(sync_cl_sh_ddr_aruser),
      .m_axi_arvalid(sync_cl_sh_ddr_arvalid),
      .m_axi_arready(sync_sh_cl_ddr_arready),
 
@@ -1507,6 +1515,7 @@ module sh_bfm #(
      .c0_ddr4_s_axi_awid(sync_cl_sh_ddr_awid),
      .c0_ddr4_s_axi_awaddr(sync_cl_sh_ddr_awaddr[33:0]),
      .c0_ddr4_s_axi_awlen(sync_cl_sh_ddr_awlen),
+     .c0_ddr4_s_axi_awuser(sync_cl_sh_ddr_awuser[0]),
      .c0_ddr4_s_axi_awsize(3'h6),
      .c0_ddr4_s_axi_awburst(2'b00),
      .c0_ddr4_s_axi_awlock(1'b0),
@@ -1530,6 +1539,7 @@ module sh_bfm #(
      .c0_ddr4_s_axi_arid(sync_cl_sh_ddr_arid),
      .c0_ddr4_s_axi_araddr(sync_cl_sh_ddr_araddr[33:0]),
      .c0_ddr4_s_axi_arlen(sync_cl_sh_ddr_arlen),
+     .c0_ddr4_s_axi_aruser(sync_cl_sh_ddr_aruser[0]),
      .c0_ddr4_s_axi_arsize(3'h6),
      .c0_ddr4_s_axi_arburst(2'b0),
      .c0_ddr4_s_axi_arlock(1'b0),

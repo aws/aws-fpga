@@ -121,7 +121,7 @@ By using the public AFIs, developers can skip the build flow steps and jump to s
 It is recommended that you complete this step-by-step guide using HDK hello world example.  Next use this same guide to develop using the [cl\_dram\_dma](cl/examples/cl_dram_dma).  When your ready, copy one of the examples provided and modify the design files, scripts and constraints directory.
 
 ```
-    $ cd $HDK_DIR/cl/examples/cl_hello_world    # you can change cl_hello_world to cl_dram_dma, cl_uram_example or cl_hello_world_vhdl
+    $ cd $HDK_DIR/cl/examples/cl_dram_dma
     $ export CL_DIR=$(pwd)
 ```
 
@@ -173,9 +173,7 @@ To be notified via e-mail when the build completes:
 3. When calling `aws_build_dcp_from_cl.sh`, add on the `-notify` switch
 4. Once your build is complete, an e-mail will be sent to you stating "Your build is done."
 5. For each example the known warnings are documented in warnings.txt file located in the $CL_DIR/build/scripts directory
-   [cl\_hello\_world warnings](cl/examples/cl_hello_world/build/scripts/warnings.txt )
    [cl\_dram\_dma warnings](cl/examples/cl_dram_dma/build/scripts/warnings.txt )
-   [cl\_uram\_example warnings](cl/examples/cl_uram_example/build/scripts/warnings.txt )
 
 <a name="step3"></a>
 #### Step 3. Submit the Design Checkpoint to AWS to Create the AFI
@@ -339,7 +337,7 @@ Each CL Example comes with a runtime software under `$CL_DIR/software/runtime/` 
 ```
     $ cd $CL_DIR/software/runtime/
     $ make all
-    $ sudo ./test_hello_world
+    $ sudo ./test_dram_dma
 ```
 
 For additional information per example, review the README.md located in the $CL_DIR/README.md

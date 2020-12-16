@@ -1,13 +1,13 @@
 # CL_DRAM_DMA CustomLogic Example
 
-## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../../README.md) first!!
+## ⚠️ <b>NOTE:</b> If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../../README.md) first!!
 
 ## Table of Content
 
 1. [Overview](#overview)
-2. [Functional Description of the example RTL](#functionalDescription)
-3. [Software](#software)
-4. [DRAM DMA Example Metadata](#metadata)
+1. [Shell v12142010 usage](#v12142010)
+1. [Functional Description of the example RTL](#functionalDescription)
+1. [Software](#software)
 
 
 <a name="overview"></a>
@@ -27,11 +27,22 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 5) pcim_ AXI4 traffic for host memory accesses from CL
 
 
-
 ### System diagram  
 
 ![Diagram](design/cl_dram_dma.jpg)
 
+<a name="v12142010"></a>
+# Changes made in Shell v12142010
+
+The DDR IP in the shell is upgraded to support user controlled auto-precharge using the axi signals awuser and aruser.
+cl_sh_ddr_awuser and cl_sh_ddr_aruser ports are added to the Shell CL interface.
+
+# Changes made in cl_dram_dma
+
+Similar to the Shell the DDR IPs are upgraded to support user controlled auto-precharge using the axi signals awuser and aruser.
+[sh_ddr.sv](../../../common/shell_v12142010/design/sh_ddr/sim/sh_ddr.sv) module is updated to accomodate the awuser and axuser signals for the DDR Controllers.
+
+The awuser and aruser signals are tied to 0, both at the CL to Shell and instantiation of sh_ddr.
   
 <a name="functionalDescription"></a>
 # Functional Description
@@ -50,7 +61,7 @@ Disabling unused DDR controllers will improve simulation performance. cl_dram_dm
 
 #### Design Changes
 
-Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v04261818/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
+Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v12142010/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
 
 For the cl_dram_dma example a memory range has been allocated for each DDR. So, if a particular DDR controller is disabled, then the developer should take care to handle transactions to that addresss range since there will be no DDR controller to respond to the request. The address ranges for each DDR controller is described below in the [dma_pcis AXI4 bus section](#dma_pcis).
 
@@ -176,18 +187,4 @@ cd $CL_DIR/verif/scripts
 
 make C_TEST=test_dram_dma_hwsw_cosim
 
-<a name="metadata"></a>
-## DRAM DMA Example Metadata
-The following table displays information about the CL that is required to register it as an AFI with AWS.
-Alternatively, you can directly use a pre-generated AFI for this CL.
-
-| Key   | Value     |
-|-----------|------|
-| Shell Version | 0x04261818 |
-| PCI Device ID | 0xF001 |
-| PCI Vendor ID | 0x1D0F (Amazon) |
-| PCI Subsystem ID | 0x1D51 |
-| PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-063e6afe717a22158 |
-| Pre-generated AGFI ID | agfi-0b5c35827af676702 |
 

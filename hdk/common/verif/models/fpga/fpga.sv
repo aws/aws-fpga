@@ -117,6 +117,7 @@ module fpga(
    //------------------------------------------------------
    logic [15:0] cl_sh_ddr_awid;
    logic [63:0] cl_sh_ddr_awaddr;
+   logic        cl_sh_ddr_awuser;
    logic [7:0]  cl_sh_ddr_awlen;
 
    logic        cl_sh_ddr_awvalid;
@@ -136,6 +137,7 @@ module fpga(
    
    logic [15:0]  cl_sh_ddr_arid;
    logic [63:0]  cl_sh_ddr_araddr;
+   logic         cl_sh_ddr_aruser;
    logic [7:0]   cl_sh_ddr_arlen;
    
    logic         cl_sh_ddr_arvalid;
@@ -548,6 +550,7 @@ module fpga(
              
              .cl_sh_ddr_awid(cl_sh_ddr_awid),
              .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
+             .cl_sh_ddr_awuser(cl_sh_ddr_awuser),
              .cl_sh_ddr_awlen(cl_sh_ddr_awlen),
              .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid),
              .sh_cl_ddr_awready(sh_cl_ddr_awready),
@@ -566,6 +569,7 @@ module fpga(
              
              .cl_sh_ddr_arid(cl_sh_ddr_arid),
              .cl_sh_ddr_araddr(cl_sh_ddr_araddr),
+             .cl_sh_ddr_aruser(cl_sh_ddr_aruser),
              .cl_sh_ddr_arlen(cl_sh_ddr_arlen),
              .cl_sh_ddr_arvalid(cl_sh_ddr_arvalid),
              .sh_cl_ddr_arready(sh_cl_ddr_arready),
@@ -931,6 +935,7 @@ module fpga(
 
               .cl_sh_ddr_awid(cl_sh_ddr_awid),
               .cl_sh_ddr_awaddr(cl_sh_ddr_awaddr),
+              .cl_sh_ddr_awuser(cl_sh_ddr_awuser),
               .cl_sh_ddr_awlen(cl_sh_ddr_awlen),
               .cl_sh_ddr_awvalid(cl_sh_ddr_awvalid),
               .sh_cl_ddr_awready(sh_cl_ddr_awready),
@@ -949,6 +954,7 @@ module fpga(
               
               .cl_sh_ddr_arid(cl_sh_ddr_arid),
               .cl_sh_ddr_araddr(cl_sh_ddr_araddr),
+              .cl_sh_ddr_aruser(cl_sh_ddr_aruser),
               .cl_sh_ddr_arlen(cl_sh_ddr_arlen),
               .cl_sh_ddr_arvalid(cl_sh_ddr_arvalid),
               .sh_cl_ddr_arready(sh_cl_ddr_arready),

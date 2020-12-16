@@ -34,6 +34,7 @@
 --include ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/sim
 --include ${HDK_SHELL_DESIGN_DIR}/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog
 --include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/hdl
+--include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_axuser/hdl
 --include ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/hdl
 --include ${CL_ROOT}/design/axi_crossbar_0
 --include ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/7e3a/hdl
@@ -47,6 +48,7 @@ ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/sim/dest_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/src_register_slice/sim/src_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/sim/axi_register_slice.v
+${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_axuser/sim/axi_register_slice_axuser.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/sim/axi_register_slice_light.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/9909/hdl/axi_data_fifo_v2_1_vl_rfs.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/c631/hdl/axi_crossbar_v2_1_vl_rfs.v
