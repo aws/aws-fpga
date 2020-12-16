@@ -1,6 +1,7 @@
-# CL_DRAM_DMA CustomLogic Example
+# CL_DRAM_DMA Custom Logic Example
 
-## :exclamation:  NOTE: If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../../README.md) first!!
+## ⚠️ <b>NOTE:</b> The example in this branch does not use DMA for data transfers as Shell v04182104 does not have a DMA engine.
+## ⚠️ <b>NOTE:</b> If this is your first time using F1, you should read [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](./../../../../README.md) first!!
 
 ## Table of Content
 
@@ -11,7 +12,7 @@
 
 
 <a name="overview"></a>
-# Overview  
+# Overview
 
 The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Shell/CL interfaces and functionality, including:
 
@@ -28,11 +29,11 @@ The CL_DRAM_DMA example demonstrates the use and connectivity for many of the Sh
 
 
 
-### System diagram  
+### System diagram
 
 ![Diagram](design/cl_dram_dma.jpg)
 
-  
+
 <a name="functionalDescription"></a>
 # Functional Description
 
@@ -50,13 +51,13 @@ Disabling unused DDR controllers will improve simulation performance. cl_dram_dm
 
 #### Design Changes
 
-Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_v04261818/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
+Individual DDR controllers can be enabled and disabled by simply updating the appropriate defines in the [cl_dram_dma_defines.vh](design/cl_dram_dma_defines.vh) file. The [sh_ddr.sv](../../../common/shell_stable/design/sh_ddr/sim/sh_ddr.sv) file contains the necessary logic to remove and tie-off appropriate interfaces for the disabled DDR controllers.
 
 For the cl_dram_dma example a memory range has been allocated for each DDR. So, if a particular DDR controller is disabled, then the developer should take care to handle transactions to that addresss range since there will be no DDR controller to respond to the request. The address ranges for each DDR controller is described below in the [dma_pcis AXI4 bus section](#dma_pcis).
 
 #### Test Changes
 
-If a particular ddr controller is disabled, make sure that the test is not accessing address space for that DDR controller. 
+If a particular ddr controller is disabled, make sure that the test is not accessing address space for that DDR controller.
 
 Please look at [dma_pcis AXI4 bus section](#dma_pcis) for address ranges.
 
@@ -69,7 +70,7 @@ tb.poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
 tb.poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
 tb.poke_stat(.addr(8'h0c), .ddr_idx(3), .data(32'h0000_0000));
 
-Make sure that the Host to Card and Card to Host DMA transfers only access enabled DDR controller address space.
+Make sure that the Host to Card and Card to Host transfers only access enabled DDR controller address space.
 
 <a name="dma_pcis"></a>
 ### dma_pcis AXI4 bus
@@ -78,7 +79,7 @@ sh\_cl\_dma\_pcis exposes a address windows of 128GiB matching AppPF BAR4.
 
 
 This memory space is mapped to the 64GiB DRAM space (the upper half of the 128GiB will just wrap around to the lower half).
-An [axi_crossbar_0](../../../common/shell_v04261818/design/ip/cl_axi_interconnect/synth/cl_axi_interconnect.v)
+An [axi_crossbar_0](../../../common/shell_stable/design/ip/cl_axi_interconnect/synth/cl_axi_interconnect.v)
 will interleave inbound addresses according to DDR_A (base_addr=0x0_0000_00000, range=16GB),
 DDR_B(base_addr=0x4_0000_0000, range=16GB), DDR_C(base_addr=0x8_0000_0000, range=16GB),
 DDR_D(base_addr=0xC_0000_0000, range=16GB).
@@ -106,7 +107,7 @@ Address bits [9:0] will be used to access the location of the RAM, but the upper
 ### pcim\_ AXI4
 
 
-The cl_sh_pcim\_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](design/cl_pcim_mstr.sv). It can be used to read/write from the host memory. 
+The cl_sh_pcim\_  AXI4 bus is driven by Automatic Test Generator (ATG) and connected to [cl_pcim_mstr.sv](design/cl_pcim_mstr.sv). It can be used to read/write from the host memory.
 
 ### irq/ack
 [cl_int_slv.sv](design/cl_int_slv.sv) provides an example for generating the IRQ requests and checks if ACK has been received.
@@ -135,21 +136,21 @@ CL_DRAM_DMA uses the main `clk_main_a0`.  It's frequency is set in the cl_clk un
 ### Reset
 
 flr_reset is ignored in this design
-  
+
 
 <a name="software"></a>
 ## Runtime software
-DMA accesses rely on the [XDMA driver](../../../../sdk/linux_kernel_drivers/xdma/README.md)
+[XDMA driver](../../../../sdk/linux_kernel_drivers/xdma/README.md) is required by the runtime software.
 
 Developers using AMI 1.5.0 or Later Instances that come with pre-installed Xilinx Runtime Environment (XRT) should [refer to this note](../../../../sdk/linux_kernel_drivers/xdma/xdma_install.md#xdmainstallfail) before installing the XDMA driver.
 
-The DRAM DMA example includes runtime software to demonstrate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
+The DRAM DMA example includes runtime software to demonstrate working PCIM accesses and interrupt handling. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
 
 There are two example tests in cl_dram_dma example.
 
 # test_dram_dma.c
 
-This test runs a regular software test with data transfer with all 4 DMA channels enabled.
+This test runs a regular software test with data transfer initiated in a peek and poke fashion on the PCIM interface.
 
 ## Compile and run instructions
 cd $CL_DIR/software/runtime
@@ -160,7 +161,7 @@ sudo ./test_dram_dma
 
 # test_dram_dma_hwsw_cosim.c
 
-This test runs a software test with HW/SW co-simulation enabled with all 4 DMA channels enabled.
+This provides a test framework for users to run a software test with HW/SW co-simulation enabled. No actual funtional tests are enabled in the current release.
 
 ## Compile and run instructions
 
@@ -183,11 +184,10 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x04261818 |
+| Shell Version | 0x04182104 |
 | PCI Device ID | 0xF001 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID | afi-063e6afe717a22158 |
-| Pre-generated AGFI ID | agfi-0b5c35827af676702 |
-
+| Pre-generated AFI ID | afi-0d6e760c88d57121e |
+| Pre-generated AGFI ID | agfi-0224fa0d9c7c82b9e |

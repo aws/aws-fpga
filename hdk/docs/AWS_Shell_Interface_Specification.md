@@ -7,13 +7,15 @@
 2016/12/06   -   Added capability to remove DDR controllers in the CL through parameters in `sh_ddr.sv`
 
 2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Virtual LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details)
-                          
+
 2017/07/29   -   Updates for Jul/2017 Shell
-  
+
 2017/11/16   -   Updates for v1.3.4
 
 2018/05/10   -   Updates for 1.4
-    
+
+2021/05/12   -   Updates for Small Shell 
+
 # Table of Contents:
 
 1. [Overview](#overview)
@@ -28,45 +30,43 @@
 
    3a. [EC2 Instance view of FPGA PCIe](#pciPresentation)
 
-   
+
       * [Management PF](#management_pf)
 
       * [Application PF](#application_pf)
-   
+
    3b. [DDR4 DRAM Interfaces](#ddr)
-   
-   3c. [DMA](#dma)
- 
+
 4. [Interfaces between Shell and CL](#interfaces_between_shell_and_cl)
 
    4a. [CL/Shell AXI Interfaces](#cl_shell_axi_interfaces)
-   
+
    4b. [Clocks and Resets](#ClocksNReset)
-   
+
    4c. [DDR4 AXI](#ddr4axi)
 
    4d. [PCIS Interface](#pcis_interface)
- 
-      *  [DMA_PCIS Interface Timeout Details](#pcis_timeout_details)
- 
+
+      *  [PCIS Interface Timeout Details](#pcis_timeout_details)
+
    4e. [PCIM Interface](#pcim_interface)
 
    4f. [AXI-Lite interfaces for register access](#axi_lite_interfaces_for_register_access)
 
    4g. [Interrupts](#interrupts)
-  
+
    4h. [Miscellanous Interfaces(vLED, vDIP..)](#misc)
 
 5. [Implementation Tips](#impl_tips)
 
    5a. [Multi-SLR FPGA](#impl_tips_slr)
-    
+
    5b. [Logic Levels](#impl_tips_logic_levels)
-   
+
    5c. [Reset](#impl_tips_reset)
-   
+
    5d. [Pipeline Registers](#impl_tips_pipeline)
-   
+
    5e. [Vivado Analysis](#impl_tips_vivado)
 
 <a name="overview"></a>
@@ -74,27 +74,26 @@
 
 With Amazon EC2 FPGA instances, each FPGA is divided into two partitions:
 
--   Shell (SH) – AWS platform logic implementing the FPGA external peripherals, PCIe, DRAM, DMA, and Interrupts.
+-   Shell (SH) – AWS platform logic implementing the FPGA external peripherals, PCIe, DRAM, and Interrupts.
 
 -   Custom Logic (CL) – Custom acceleration logic created by an FPGA Developer.
 
 At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto the Amazon EC2 FPGA Instances.
 
 This document specifies the hardware interface and functional behavior between the SH and the CL.
-  
-  
+
+
 <a name="arch_ver"></a>
 ## Architecture and Version
 
-This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell 
- is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
+This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell
+ is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under [v04182104](../common/shell_v04182104/)
 
-Starting from 1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.  Going forward, new shell versions will NOT require updated CL implementation and regenerating the AFI (still a requirement with 1.4 shell.)
-  
-  
+Starting from 1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.
+
 <a name="conventions"></a>
 ## Conventions
-  
+
 **CL –** Custom Logic: the Logic to be provided by the developer and integrated with AWS Shell.
 
 **DW –** Doubleword: referring to 4-byte (32-bit) data size.
@@ -105,13 +104,13 @@ Starting from 1.4, The shell is reconfigurable, allowing, in most cases, develop
 
 **M –** Typically refers to the Master side of an AXI bus.
 
-**S –** Typical refers to the Slave side of AXI bus.  
-  
-  
+**S –** Typical refers to the Slave side of AXI bus.
+
+
 <a name="ShellInterfaces"></a>
 # Shell Interfaces
 
-The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v04261818/design/interfaces/cl_ports.vh).
+The following diagram and table summarize the various interfaces between the Shell and CL as defined in [cl_ports.vh](../common/shell_v04182104/design/interfaces/cl_ports.vh).
 
 ![alt tag](./images/AWS_Shell_CL_overview.jpg)
 
@@ -120,7 +119,7 @@ The following diagram and table summarize the various interfaces between the She
 |:-------------|:-----------|
 | Clocks and Resets  | There are multiple clocks and resets provided by the Shell to the CL. Refer to the [Clocks and Resets](#clocks-and-reset) section for more information. |
 | DDR4  | The master interface to the DDR4 Controllers utilizes an AXI-4 interface. Refer to the [DDR4 AXI Interface](#ddr4axi) section for more information. |
-| DMA_PCIS  | The PCIe Slave (PCIS) Interface is an AXI-4 interface used for Inbound PCIe transactions. Refer to the [PCIS Interface](#pcis_interface) section for more information. |
+| PCIS  | The PCIe Slave (PCIS) Interface is an AXI-4 interface used for Inbound PCIe transactions. Refer to the [PCIS Interface](#pcis_interface) section for more information. |
 | PCIM | The PCIe Master (PCIM) Interface is an AXI-4 interface used for Outbound PCIe transactions. Refer to the [PCIM Interface](#pcim_interface) section for more information.     |
 | SDA |  The SDA Interface is an AXI-Lite interface associated with MgmtPF and BAR4. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
 | OCL | The OCL Interface is an AXI-Lite interface associated with AppPF and BAR0. Please refer to the [AXI-Lite Interfaces](#axi_lite_interfaces_for_register_access) for more information. |
@@ -146,7 +145,7 @@ There are two PCIe Physical Functions (PFs) presented to the F1 instance:
 
 -   Application PF (AppPF)– The AppPF is used for CL specific functionality.
 
-The [Software Programmers' View](./Programmer_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs. 
+The [Software Programmers' View](./Programmer_View.md) provides the intended software programmer's view and associated software modules and libraries around the two before mentioned PFs.
 
 Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
@@ -163,13 +162,13 @@ b)  Three BARs:
 
       - BAR0 - 16KiB
       - BAR2 - 16KiB
-      - BAR4 - 4MiB  
+      - BAR4 - 4MiB
 
 c)  No BusMaster support.
 
 d)  A range of 32-bit addressable registers.
 
-The Management PF is persistent throughout the lifetime of the instance, and it will not be reset or cleared (even during the AFI Load/Clear process).  
+The Management PF is persistent throughout the lifetime of the instance, and it will not be reset or cleared (even during the AFI Load/Clear process).
 
 
 <a name="application_pf"></a>
@@ -186,7 +185,7 @@ c)  PCIe BAR2 as a 64-bit prefetchable BAR sized as 64KiB. This BAR is not CL vi
 d)  PCIe BAR4 as a 64-bit prefetchable BAR sized as 128GiB. This BAR may be used to map the entire External/Internal memory space to the instance address space if desired, through `mmap()` type calls or use `fpga_pci_lib` APIs.
 
 e)  BusMaster capability to allow the CL to master transactions towards the instance memory.
-    
+
 f)  CL’s specific PCIe VendorID, DeviceID, VendorSystemID and SubsystemID as registered through `aws ec2 fpgaImageCreate`
 
 The Developer can write drivers for the AppPF or leverage the reference driver provided in the SDK.
@@ -199,7 +198,7 @@ The PCIe interface connecting the FPGA to the instance is in the Shell, and the 
 
 <a name="ddr"></a>
 ## DDR4 DRAM
-One of the four DRAM interface controllers is implemented in the Shell, and three are implemented in the CL. This allows for optimized resource utilization of the FPGA (allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design). 
+One of the four DRAM interface controllers is implemented in the Shell, and three are implemented in the CL. This allows for optimized resource utilization of the FPGA (allowing higher utilization for the CL place and route region to maximize usable FPGA resources). For those interfaces, the designs and the constraints are provided by AWS and must be instantiated in the CL (by instantiating `sh_ddr.sv` in the CL design).
 
 There are four DRAM interfaces labeled A, B, C, and D. Interfaces A, B, and D are in the CL while interface C is implemented in the Shell. The sh_ddr design block, sh_ddr.sv, instantiates the three DRAM interfaces in the CL (A, B, D).
 
@@ -211,25 +210,21 @@ There are three parameters (all default to '1') that define which DDR controller
   - DDR_A_PRESENT
   - DDR_B_PRESENT
   - DDR_D_PRESENT
-  
+
 These parameters are used to control which DDR controllers are impemented in the CL design.  An example instantiation (includes DDR_A and DDR_B, excludes DDR_D):
- ```   
+ ```
     sh_ddr #(.DDR_A_PRESENT(1),
            .DDR_B_PRESENT(1),
            .DDR_D_PRESENT(0))
            SH_DDR (
               .clk(clk),
               ...
- ```   
+ ```
 
 ### DRAM Content Preservation between AFI Loads
 
 Shell version 1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a v1.4 shell will enable DRAM content preservation by default.
 Please refer to the [guide on how to use the DRAM data retention mode to preserve the content of DRAM across AFI loads](./data_retention.md) for more details on utilizing this feature.
-
-<a name="dma"></a>
-## DMA
-There is an integrated DMA controller inside the Shell (Xilinx DMA), which writes/reads data to/from the CL via the sh_cl_pcis_dma bus. Because of the shared DMA/PCIS interface, this maps to the same address space exposed by the AppPF BAR4 address.  Drivers and example software are provided, please refer to the example design [CL_DRAM_DMA Example](../cl/examples/cl_dram_dma/README.md).
 
 <a name="interfaces_between_shell_and_cl"></a>
 # Interfaces between Shell and CL
@@ -237,7 +232,7 @@ There is an integrated DMA controller inside the Shell (Xilinx DMA), which write
 <a name="cl_shell_axi_interfaces"></a>
 ## CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
 
-All interfaces except the inter-FPGA links use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can access lower speed control interfaces that use the AXI-Lite protocol. 
+All interfaces except the inter-FPGA links use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can access lower speed control interfaces that use the AXI-Lite protocol.
 
 For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfaces have the following restrictions:
 
@@ -269,7 +264,7 @@ These signals are not included on the AXI-4 interfaces of the shell.  If connect
 ## Clocks and Reset
 
 ### Clocks
-There are multiple clocks provided by the Shell to the CL, grouped into 3 groups marked \_a, \_b and \_c: 
+There are multiple clocks provided by the Shell to the CL, grouped into 3 groups marked \_a, \_b and \_c:
 
    - clk_main_a0
    - clk_extra_a1
@@ -288,11 +283,11 @@ The clocks within each group are generated from a common VCO/PLL, which restrict
 
 The maximum frequency on clk_main_a0 is 250MHz.
 
-Clocks within a group are phase aligned.  
+Clocks within a group are phase aligned.
 
 **NOTE**: Even though clocks within a group are phase aligned, treating them asynchronous generally allows for higher individual frequencies and easier timing closure.
 
-**NOTE**: The Developer must **NOT** assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies.  
+**NOTE**: The Developer must **NOT** assume frequency lock or alignment between clocks from different groups, even if they are set for same frequencies.
 
 
 ### Defining Clock frequencies by Developer
@@ -304,12 +299,12 @@ Group A recipe must be defined in the [AFI Manifest](./AFI_Manifest.md), which i
 <a name="Reset"></a>
 ### Reset
 
-The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and is asserted while an AFI is being loaded.  The reset signal is de-asserted after the AFI load is complete and the clocks are stable. 
+The shell provides an active_low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and is asserted while an AFI is being loaded.  The reset signal is de-asserted after the AFI load is complete and the clocks are stable.
 
 <a name="ddr4axi"></a>
 ## DDR4 AXI
 
-Each of the four DDR4 Controllers has an AXI-4 interface with a 512 bit data bus. The AXI-4 interfaces for the three DDR4 Controllers instantiated in the CL (`sh_ddr.sv`) are connected inside of the CL. However, for the DDR-4 controller that is instantiated in the Shell, DDRC, there is an AXI-4 interface between the Shell and CL.  
+Each of the four DDR4 Controllers has an AXI-4 interface with a 512 bit data bus. The AXI-4 interfaces for the three DDR4 Controllers instantiated in the CL (`sh_ddr.sv`) are connected inside of the CL. However, for the DDR-4 controller that is instantiated in the Shell, DDRC, there is an AXI-4 interface between the Shell and CL.
 
 Each DRAM interface is accessed via an AXI-4 interface:
 
@@ -317,63 +312,42 @@ Each DRAM interface is accessed via an AXI-4 interface:
 
 There is a single status signal that the DRAM interface is trained and ready for access.  DDR access should be gated when the DRAM interface is not ready. The addressing uses ROW/COLUMN/BANK (Interleaved) mapping of AXI address to DRAM Row/Col/BankGroup. The Read and Write channels are serviced with round-robin arbitration (i.e. equal priority).
 
-The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  A CL can be designed to handle ECC errors by monitoring RRESP on the DDR AXI interfaces. The CL will receive a SLVERR RRESP on an uncorrectable ECC error. 
+The DRAM interface uses the Xilinx DDR-4 Interface controller. The AXI-4 interface adheres to the Xilinx specification. Uncorrectable ECC errors are signaled with RRESP.  A CL can be designed to handle ECC errors by monitoring RRESP on the DDR AXI interfaces. The CL will receive a SLVERR RRESP on an uncorrectable ECC error.
 **NOTE:** Writing to a DDR location is required before reading the DDR location to initialize the ECC. False ECC errors may occur when un-initialized DDR locations are read.
 
-Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules. 
+Additionally, there are three statistics interfaces between the Shell and CL (one for each CL DDR controller). If the DDR controllers are being used by the CL, then the interfaces must be connected between the Shell and the DRAM interface controller modules.
 
 **WARNING:** If the stats interfaces are not connected, the DDR controllers will not function. However, the CL developer should not otherwise use them since they are specific to Shell management functions.
 If the DDR controllers are not used by the CL, then the interfaces should be left unconnected.
 
 **NOTE:** *There is no performance or frequency difference between the four DRAM controllers regardless whether they resides in the CL or the Shell logic*
 
-<a name="pcis_interface"></a>  
-## DMA_PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit) 
+<a name="pcis_interface"></a>
+## PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Master, CL is Slave, 512-bit)
 
-This AXI-4 bus is used for:
-* PCIe transactions mastered by the instance and targeting AppPF BAR4 (PCIS)
-* DMA transactions (if enabled) (XDMA) 
+This AXI-4 bus is used for PCIe transactions mastered by the instance and targeting AppPF BAR4 (PCIS). It is a 512-bit wide AXI-4 interface.
 
-It is a 512-bit wide AXI-4 interface. 
-
-A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xFFFFFFFF` data back to the instance. This error is reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.  Refer to  [DMA_PCIS Interface Timeout Details](#pcis_timeout_details) and [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) for more details.
-
-The AXI ID can be used to determine the source of the transaction:
-- 0x20 : PCI Interface
-- 0x00 : XDMA Channel 0
-- 0x01 : XDMA Channel 1
-- 0x02 : XDMA Channel 2
-- 0x03 : XDMA Channel 3
-
-The XDMA interface has backpressure signals to stop read/write transactions.  There is an independent signal per transaction type:
-
-- cl_sh_dma_wr_full : Stop additional write transaction requests from the XDMA
-- cl_sh_dma_rd_full : Stop additional read transaction requests from the XDMA
-
-When asserted, the XDMA will stop sending further requests for the transaction type (AW or AR channel).  Note some number of requests may be asserted after the assertion of backpressure due to FIFO'ing and register slices.  This backpressure may be used to throttle XDMA requests if the XDMA requests may delay servicing PCIS requests such that the PCIS request responses would exceed the interface timeout time.
+A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xFFFFFFFF` data back to the instance. This error is reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.  Refer to  [PCIS Interface Timeout Details](#pcis_timeout_details) and [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) for more details.
 
 <a name="pcis_timeout_details"></a>
-### DMA_PCIS Interface Timeout Details
+### PCIS Interface Timeout Details
 
 ![alt tag](./images/dma_pcis_timeout.jpg)
 
-The DMA_PCIS interface multiplexes the XDMA requests and PCIS requests.  Each type of request has a different timeout time:
+The PCIS interface has a timeout period of 8us for PCIe transactions mastered from the instance.
 
-- XDMA (DMA transactions) : 5 seconds
-- PCIS (PCIe transactions mastered from the instance) : 8 us
+Transactions on the PCIS interface must complete before the associated timeout time or the Shell will timeout the transactions and complete the transactions on behalf of the CL (BVALID/RVALID).  Each "issued" transaction has an independent timeout counter.  For example if 4 transactions are issued from the PCIS interface "simultaneously" (i.e. back-to-back cycles), then all 4 must complete within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The Shell supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.
 
-Transactions on the DMA_PCIS interface must complete before the associated timeout time or the SH will timeout the transactions and complete the transactions on behalf of the CL (BVALID/RVALID).  Each "issued" transaction has an independent timeout counter.  For example if 4 transactions are issued from the PCIS interface "simultaneously" (i.e. back-to-back cycles), then all 4 must complete within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The SH supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.  
+Once a transaction is issued, it must be fully completed within the timeout time (Address, Data, Ready).  Any transaction that does not complete in time will be terminated by the shell. This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads.
 
-Once a transaction is issued, it must fully completed within the timeout time (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads. 
+If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).
 
-If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).  
-
-**WARNING**: If a timeout happens the DMA/PCIS interface may no longer be functional and the AFI/Shell must be re-loaded.  This can be done by adding the "-F" option to [fpga-load-local-image](../../sdk/userspace/fpga_mgmt_tools/README.md).
+**WARNING**: If a timeout happens the PCIS interface may no longer be functional and the AFI, and the Shell must be re-loaded.  This can be done by adding the "-F" option to [fpga-load-local-image](../../sdk/userspace/fpga_mgmt_tools/README.md).
 
 <a name="pcim_interface"></a>
 ## PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Master, Shell is Slave, 512-bit)
 
-This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory.
+This is a 512-bit wide AXI-4 interface for the CL to master cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory. Customers can also use this interface to connect their own DMA Engine from CL. 
 
 **WARNING**: The CL must use Physical Addresses, and developers must be careful not to use userspace/virtual addresses.
 
@@ -383,10 +357,10 @@ The following PCIe interface configuration parameters are provided from the Shel
 
 | Value     | Max Payload Size |
 |:----------|:-----------------|
-| 0b00      | 128 Bytes |  
-| 0b01      | 256 Bytes (Most probable value) |  
-| 0b10      | 512 Bytes |  
-| 0b11      | Reserved |  
+| 0b00      | 128 Bytes |
+| 0b01      | 256 Bytes (Most probable value) |
+| 0b10      | 512 Bytes |
+| 0b11      | Reserved |
 
 -   sh_cl_cfg_max_read_req[2:0] - PCIe maximum read request size:
 
@@ -414,7 +388,7 @@ All AXI-4 transactions to the PCIe interface must adhere to the PCIe Byte Enable
 
 Note on AXI-4 byte enables are signaled using WSTRB.
 
-### AXI4 Error Handling for CL outbound transactions 
+### AXI4 Error Handling for CL outbound transactions
 
 Transactions on AXI4 interface will be terminated and reported as SLVERR on the RRESP/BRESP signals and will not be passed to the instance in the following cases:
 
@@ -435,7 +409,7 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
       2. Once RVALID is asserted, RREADY must be asserted, and all data transferred within 8us
       3. Once BVALID is asserted, BREADY must be asserted within 8us
 
-**NOTE:** If a timeout occurs, the PCIM bus will no longer be functional.  This can be cleared by clearing/re-loading the AFI.  Refer to [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md) 
+**NOTE:** If a timeout occurs, the PCIM bus will no longer be functional.  This can be cleared by clearing/re-loading the AFI.  Refer to [HOWTO_detect_shell_timeout.md](./HOWTO_detect_shell_timeout.md)
 
 <a name="axi_lite_interfaces_for_register_access"></a>
 ## AXI-Lite interfaces for register access -- (SDA, OCL, BAR1)
@@ -456,11 +430,11 @@ Each AXI (AXI-4/AXI-L) transaction is terminated with a response (BRESP/RRESP). 
 
 The Shell supports DW aligned and unaligned transfers from PCIe (address is aligned/not aligned to DW-4byte boundary)
 
-Following are a few examples of how aligned and Unaligned access from PCIe to CL on DMA_PCIS interface work: 
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on DMA_PCIS interface work:
 
  1) Writing 8 bytes to DW aligned address through PCIe on AXI4 Interface(DMA_PCIS- 512 bit interface):
- 
-    If the transaction on the pcie is as follows:                                                              
+
+    If the transaction on the pcie is as follows:
     Addr      : 0x0000002000000000
     dw_cnt    : 2
     first_be  : 4’b1111
@@ -472,8 +446,8 @@ Following are a few examples of how aligned and Unaligned access from PCIe to CL
     wstrb     = 64’h0000_0000_0000_00ff
 
  2) Writing 8 bytes to DW un-aligned address on AXI4 Interface(DMA_PCIS- 512 bit interface):
- 
-    If the transaction on the pcie is as follows:                                                          
+
+    If the transaction on the pcie is as follows:
     Addr      : 0x0000002000000001
     dw_cnt    : 3
     first_be  : 4’b1110
@@ -490,28 +464,28 @@ The addresses for the Read transactions will work similar to writes.
 If a transaction from PCIe is initiated on AXI-Lite (SDA/OCL/BAR1) interfaces with dw_cnt greater than 1, i.e. >32bits,
 the transaction is split into multipe 32 bit transactions by the Shell.
 
-Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL/BAR1 AXI-Lite interfaces work: 
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL/BAR1 AXI-Lite interfaces work:
 
- 1) Writing 8 bytes to DW aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface): 
- 
-    If the transaction on the pcie is as follows:     
+ 1) Writing 8 bytes to DW aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface):
+
+    If the transaction on the pcie is as follows:
     Addr      : 0x0000000002000000
     dw_cnt    : 2
     first_be  : 4’b1111
     last_be   : 4’b1111
- 
+
     Then the transaction on the AXI-Lite interface will be split and will have the following axi attributes:
     Transaction is split into 2 transfers.
- 
+
     1st transfer awaddr = 32’h0000_0000
     wstrb = 4’hf
- 
+
     2nd  transfer awaddr = 32’h0000_0004
     wstrb = 4’hf
 
   2) Writing 64 bits to DW un aligned address on AXI Lite Interface(SDA/OCL/BAR1- 32 bit interface):
-  
-     If the transaction on the pcie is as follows:     
+
+     If the transaction on the pcie is as follows:
       Addr      : 0x0000000002000001
       dw_cnt    : 3
       first_be  : 4’b1110
@@ -519,22 +493,22 @@ Following are a few examples of how aligned and Unaligned access from PCIe to CL
 
      Transaction on AXI-Lite interface will be split and will have the following axi attributes:
      Transaction is split into 3 transfers.
- 
+
      1st transfer awaddr = 32’h0000_0001
      wstrb = 4’he
- 
+
      2nd  transfer awaddr = 32’h0000_0004
      wstrb = 4’hf
- 
+
      3rd  transfer awaddr = 32’h0000_0008
      wstrb = 4’h1
 
  The transaction splitting and addresses for the Read transactions will work similar to writes.
 
 <a name="interrupts"></a>
-## Interrupts 
+## Interrupts
 
-16 user interrupt sources are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers in the DMA controller map the 16 user interrupt sources to MSI-X vectors.  
+16 user interrupt sources are supported.  There is mapping logic that maps the user interrupts to MSI-X vectors.  Mapping registers in the DMA controller map the 16 user interrupt sources to MSI-X vectors.
 
 There are two sets of signals to generate interrupts:
 
@@ -566,7 +540,7 @@ Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID,
     -   \[15:0\] – Subsystem Vendor ID
 
     -  \[31:16\] – Subsystem ID
-    
+
 In future revisions of the HDK, AWS scripts may override the cl_sh_id0/id1 to include an integrity hash function.
 
 ### General Control/Status
@@ -581,7 +555,7 @@ The functionality of these signals is TBD.
 
 -   sh_cl_ctl1[31:0] – Placeholder for generic Shell to CL control information.
 
--   sh_cl_pwr_state[1:0] – This is the power state of the FPGA. 
+-   sh_cl_pwr_state[1:0] – This is the power state of the FPGA.
 
     -   0x0 – Power is normal
 
@@ -631,23 +605,23 @@ There are two global counter outputs that increment every 4ns.  These can be use
 Here are some implementation tips.
 <a name="impl_tips_slr"></a>
 ### Multi-SLR FPGA
-The VU9P FPGA is a stacked FPGA that has 3 die stacked together.  Each Die is called a “Super Logic Region” (SLR).  Crossing an SLR boundary is expensive from a timing perspective.  It is good practice to pipeline interfaces between major blocks to allow the tool freedom to have SLR crossings between the major blocks.  Even with pipelined interfaces it is possible the tool has sub-optimal logic to SLR mapping (i.e. a major block is spread out over multiple SLR's).  In this case  you may want to at map major blocks to specific SLRs (define the logic that should be constrained to each SLR).  Any crossing of SLR’s should have flops on either side (or register slices for AXI).  
+The VU9P FPGA is a stacked FPGA that has 3 die stacked together.  Each Die is called a “Super Logic Region” (SLR).  Crossing an SLR boundary is expensive from a timing perspective.  It is good practice to pipeline interfaces between major blocks to allow the tool freedom to have SLR crossings between the major blocks.  Even with pipelined interfaces it is possible the tool has sub-optimal logic to SLR mapping (i.e. a major block is spread out over multiple SLR's).  In this case  you may want to at map major blocks to specific SLRs (define the logic that should be constrained to each SLR).  Any crossing of SLR’s should have flops on either side (or register slices for AXI).
 
-It is ideal to place logic that interfaces to the shell in the same SLR as the Shell logic for that interface.  If this is not possible, the first flop/register slice should be placed in the same SLR:
+It is ideal to place logic that interfaces to the Small Shell in the same SLR as the Shell logic for that interface.  If this is not possible, the first flop/register slice should be placed in the same SLR:
 * MID SLR:
    *	CL_SH_DDR
    *	BAR1
-   *	PCIM
+   *	PCIS
+   *	OCL
+   *	SDA
 * BOTTOM SLR:
-   * PCIS
-   * OCL
-   * DDR STAT3
+   * PCIM
 * MID/BOTTOM
    * DDR STAT0
    * DDR STAT1
-   * SDA
+   * DDR STAT3
 
-For the interfaces that are in both the MID/BOTTOM the recommendation is to use flops for pipelining, but don’t constrain to an SLR.  Also it is recommended to not use the SDA interface because it spans two SLR's (use BAR1 or OCL instead). You can constrain logic to a particular SLR by creating PBLOCKs (one per SLR), and assigning logic to the PBLOCKs (refer to cl_dram_dma example [cl_pnr_user.xdc](../cl/examples/cl_dram_dma/build/constraints/cl_pnr_user.xdc)).
+For the interfaces that are in both the MID/BOTTOM the recommendation is to use flops for pipelining, but don’t constrain to an SLR. You can constrain logic to a particular SLR by creating PBLOCKs (one per SLR), and assigning logic to the PBLOCKs (refer to cl_dram_dma example [cl_pnr_user.xdc](../cl/examples/cl_dram_dma/build/constraints/cl_pnr_user.xdc)).
 Dataflow should be mapped so that SLR crossing is minimized (for example a pipeline should be organized such that successive stages are mostly in the same SLR).
 
 <a name="impl_tips_logic_levels"></a>
@@ -655,8 +629,8 @@ Dataflow should be mapped so that SLR crossing is minimized (for example a pipel
 You can report all paths that are greater than a certain number of logic levels.  This can be used to iterate on timing in synthesis rather than waiting for place and route.  For example at 250MHz a general rule of thumb is try to keep logic levels to around 10.  The following commands report on all paths that have more than 10 logic levels:
 
    * report_design_analysis -logic_level_distribution -of [get_timing_paths -max_paths 10000 -filter {LOGIC_LEVELS > **10**}]
- 
-   * foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS > **10**}] {puts "[get_property STARTPOINT_PIN $gtp] [get_property ENDPOINT_PIN $gtp] [get_property SLACK $gtp] [get_propert LOGIC_LEVELS $gtp]"} 
+
+   * foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS > **10**}] {puts "[get_property STARTPOINT_PIN $gtp] [get_property ENDPOINT_PIN $gtp] [get_property SLACK $gtp] [get_propert LOGIC_LEVELS $gtp]"}
 
 <a name="impl_tips_reset"></a>
 ### Reset
@@ -672,7 +646,7 @@ always @(posedge clk)
    if (reset)
       my_flop <= 4’ha;
    else
-      my_flop <= nxt_my_flop; 
+      my_flop <= nxt_my_flop;
 ```
 
 If there is still significant fanout of reset, it should be replicated and pipelined.  For example each major block could have its own pipelined version of reset.
@@ -684,13 +658,13 @@ You have to be careful that pipeline registers do not infer a shift register com
 ```verilog
   (*shreg_extract="no"*) logic [WIDTH-1:0] pipe[STAGES-1:0] = '{default:'0};
 ```
-  
+
 <a name="impl_tips_vivado"></a>
-### Vivado Analysis  
+### Vivado Analysis
 Vivado has the following analysis capabilities:
 * report_methodology (includes CDC report)
 * clock interaction report (see if paths between async clocks are erroneously being timed)
 * congestion heat map
 * power analysis
 * physical implementation analysis (placement, routing)
-* linked timing/schematic/physical views 
+* linked timing/schematic/physical views

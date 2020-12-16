@@ -63,7 +63,7 @@ done
 
 vivado_version=${vivado_version//./_}
 if [ $batch == "TRUE" ]; then
-COMMAND="batch_submit.py -q vcs-lo --jd Cad-centos7_2 --jn github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} --wait --echo -c make"
+COMMAND="srun -c 1 --mem 64GB -p regress -J github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} -L VCSMXRunTime_Net make"
 else
 COMMAND="make"
 fi

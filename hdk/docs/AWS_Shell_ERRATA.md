@@ -1,11 +1,11 @@
-# AWS EC2 FPGA Shell Errata (04261818)
+# AWS EC2 FPGA Shell Errata (04182104)
 
 ## Implementation Restrictions
 * PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
   * All PCIe transactions must adhere to the PCIe Express base spec
   * 4Kbyte Address boundary for all transactions(PCIe restriction)
   * Multiple outstanding outbound PCIe Read transactions with same ID not supported
-  * PCIE extended tag not supported, so read-request is limited to 32 outstanding
+  * PCIE extended tag not supported, so read-request is limited to 64 outstanding
   * Address must match DoubleWord(DW) address of the transaction
   * WSTRB(write strobe) must reflect appropriate valid bytes for AXI write beats
   * Only Increment burst type is supported

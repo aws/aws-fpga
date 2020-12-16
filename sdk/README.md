@@ -14,7 +14,7 @@ The SDK is **NOT** used to build or register AFI, rather it is only used for man
 
 You can setup and install the SDK with the following few steps.  Note that the first two steps may be skipped if you have already ran them in the above HDK setup.
 
-    $ git clone https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
+    $ git clone -b small_shell https://github.com/aws/aws-fpga   # Fetch the HDK and SDK code
     $ cd aws-fpga                                 # Move to the root directory of the repository before running the next script
     $ source sdk_setup.sh                         # Set up the envronment variables, build and install the SDK
 

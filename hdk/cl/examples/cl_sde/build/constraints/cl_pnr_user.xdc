@@ -10,14 +10,14 @@ set_property PARENT pblock_CL [get_pblocks pblock_CL_top]
 
 create_pblock pblock_CL_mid
 add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/AXIL_OCL_REG_SLC_MID_SLR/*}]
-add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PCIM_REG_SLC_MID_SLR/*}]
+#add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PCIM_REG_SLC_MID_SLR/*}]
 add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PCIS_REG_SLC_MID_SLR/*}]
 add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/SDE/*}]
 add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/CL_SDE_SRM/*}]
-add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/CL_TST_PCIM/*}]
+#add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/CL_TST_PCIM/*}]
 #not yet# add_cells_to_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PIPE_RST_N_MID_SLR/*}]
 
-#1.3 Shell# 
+#1.3 Shell#
 #resize_pblock [get_pblocks pblock_CL_mid] -add {CLOCKREGION_X0Y5:CLOCKREGION_X3Y9}
 
 #1.4 Shell#
@@ -33,8 +33,8 @@ set_property SNAPPING_MODE ON [get_pblocks pblock_CL_mid]
 set_property PARENT pblock_CL [get_pblocks pblock_CL_mid]
 
 create_pblock pblock_CL_bot
-add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/AXIL_OCL_REG_SLC_BOT_SLR/*}]
-add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PCIS_REG_SLC_BOT_SLR/*}]
+#add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/AXIL_OCL_REG_SLC_BOT_SLR/*}]
+#add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PCIS_REG_SLC_BOT_SLR/*}]
 #not yet# add_cells_to_pblock [get_pblocks pblock_CL_bot] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/PIPE_RST_N_BOT_SLR/*}]
 
 #1.3 Shell#
@@ -47,7 +47,7 @@ resize_pblock [get_pblocks pblock_CL_bot] -add {LAGUNA_X12Y0:LAGUNA_X15Y239}
 resize_pblock [get_pblocks pblock_CL_bot] -add {RAMB18_X7Y0:RAMB18_X7Y119}
 resize_pblock [get_pblocks pblock_CL_bot] -add {RAMB36_X7Y0:RAMB36_X7Y59}
 resize_pblock [get_pblocks pblock_CL_bot] -add {URAM288_X2Y0:URAM288_X2Y79}
-resize_pblock [get_pblocks pblock_CL_bot] -add {CLOCKREGION_X0Y0:CLOCKREGION_X2Y4}
+resize_pblock [get_pblocks pblock_CL_bot] -add {CLOCKREGION_X0Y0:CLOCKREGION_X2Y4 CLOCKREGION_X3Y0:CLOCKREGION_X5Y2}
 set_property SNAPPING_MODE ON [get_pblocks pblock_CL_bot]
 
 set_property PARENT pblock_CL [get_pblocks pblock_CL_bot]
@@ -55,4 +55,3 @@ set_property PARENT pblock_CL [get_pblocks pblock_CL_bot]
 # Remove physical connstraints for ILAs
 remove_cells_from_pblock [get_pblocks pblock_CL_mid] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/SDE/*ILA}]
 add_cells_to_pblock [get_pblocks pblock_CL] [get_cells -quiet -hierarchical -filter {NAME =~ WRAPPER_INST/CL/SDE/*ILA}]
-

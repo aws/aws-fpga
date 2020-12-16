@@ -118,6 +118,7 @@ function setup_patches {
     local caller_script="${BASH_SOURCE[1]}"
     patch_AR71715
     patch_AR73068 "$caller_script"
+    patch_AR75524
 }
 
 function is_patch_applied {
@@ -129,6 +130,49 @@ function is_patch_applied {
     else
       false
     fi
+}
+
+function patch_AR75524 {
+    local base_vivado_version=$(get_base_vivado_version)
+    local caller_script="$1"
+    local fix_patch=true
+
+    if [[ "${base_vivado_version}" =~ "Vivado v2020.1" ]]; then
+      patch_AR75524_2020_1 "$fix_patch"
+    else
+      info_msg "Xilinx Patch AR73068 not applicable for Vivado version: ${base_vivado_version}."
+    fi
+
+}
+
+function patch_AR75524_2020_1 {
+    info_msg "Patching Vivado 2020.1 with Xilinx Patch AR75524"
+
+    local patch_bucket="https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/AR75524"
+    local patch_object="AR75524_Vivado_2020_1_preliminary_rev1_1598992708192.zip"
+    local fix_patch="$1"
+
+    install_patch "AR75524" "$patch_bucket" "$patch_object"
+
+    if [[ "$fix_patch" == true ]]; then
+      info_msg "Fixing Patch AR75524 - updating example_top.ttcl"
+      fix_patch_AR75524_2020_1 "$patch_object" "$patch_bucket"
+    fi
+}
+
+function fix_patch_AR75524_2020_1 {
+
+    local patch_object="$1"
+    local patch_bucket="$2"
+
+    local patch_fix_object="example_top.ttcl"
+    local patch_dir_name="${patch_object%.*}"
+    pushd patches/$patch_dir_name
+
+    curl -s https://s3.amazonaws.com/$patch_bucket/$patch_fix_object -o $patch_fix_object || { err_msg "Failed to download Patch $patch_fix_object from $patch_bucket/$patch_fix_object"; return 2; }
+    mv -f $patch_fix_object vivado/data/ip/xilinx/ddr4_v2_2/hdl/$patch_fix_object
+
+    popd
 }
 
 function patch_AR71715 {

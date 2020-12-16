@@ -1,0 +1,212 @@
+2020.2:
+ * Version 2.2 (Rev. 10)
+ * Feature Enhancement: Ping-Pong Phy Ultrascaleplus enhancement
+ * Revision change in one or more subcores
+
+2020.1.1:
+ * Version 2.2 (Rev. 9)
+ * No changes
+
+2020.1:
+ * Version 2.2 (Rev. 9)
+ * Bug Fix: (Xilinx Answer 73068) Design Advisory for UltraScale/UltraScale+ DDR4/DDR3 IP - Memory IP Timing Exceptions May Manifest as Post Calibration Data Errors or DQS Gate Tracking Errors in Hardware
+ * Bug Fix: (Xilinx Answer 72582) Space Grade Kintex UltraScale XQRKU060 Device Byte Planner Errors or MIG 66-99 Error in Bank 46 or Bank 25
+ * Other: Updated for 2020.1
+ * Revision change in one or more subcores
+
+2019.2.2:
+ * Version 2.2 (Rev. 8)
+ * No changes
+
+2019.2.1:
+ * Version 2.2 (Rev. 8)
+ * No changes
+
+2019.2:
+ * Version 2.2 (Rev. 8)
+ * General: Updated for 2019.2
+ * Revision change in one or more subcores
+
+2019.1.3:
+ * Version 2.2 (Rev. 7)
+ * No changes
+
+2019.1.2:
+ * Version 2.2 (Rev. 7)
+ * No changes
+
+2019.1.1:
+ * Version 2.2 (Rev. 7)
+ * No changes
+
+2019.1:
+ * Version 2.2 (Rev. 7)
+ * General: Updated for 2019.1
+ * Revision change in one or more subcores
+
+2018.3.1:
+ * Version 2.2 (Rev. 6)
+ * No changes
+
+2018.3:
+ * Version 2.2 (Rev. 6)
+ * Bug Fix: UltraScale+ AXI TG ECC Example Design fix (synthesis issue only)
+ * Bug Fix: UltraScale AXI TG undersized WRAP accesses fix
+ * Bug Fix: (Xilinx Answer 71697) The FSVE1156 package allowed incorrect data widths
+ * Bug Fix: VREF value for x4 components changed to match x4 DIMM's
+ * Feature Enhancement: (Xilinx Answer 71696) Added support for changing Refresh Parameters through TCL flow
+ * Feature Enhancement: Interleave Burst Support added to PHY only designs
+ * Revision change in one or more subcores
+
+2018.2:
+ * Version 2.2 (Rev. 5)
+ * General: Updated for 2018.2
+ * Revision change in one or more subcores
+
+2018.1:
+ * Version 2.2 (Rev. 4)
+ * Bug Fix: Updated enablement dependency of app_wdf_data_mask and updated the same in PG150
+ * Bug Fix: AXI arbitration fix- Resolved high latency issue for low bandwidth transaction case
+ * Revision change in one or more subcores
+
+2017.4:
+ * Version 2.2 (Rev. 3)
+ * General: Updated for 2017.4
+ * Revision change in one or more subcores
+
+2017.3:
+ * Version 2.2 (Rev. 2)
+ * Bug Fix: (Xilinx Answer 69827) UltraScale+ Memory IP - The SFVB784 package has incorrect data rates in PL Memory Interfaces
+ * Feature Enhancement: Clamshell support for DDR4 ping-pong PHY mode
+ * Revision change in one or more subcores
+
+2017.2:
+ * Version 2.2 (Rev. 1)
+ * Bug Fix: tMRD value updated to 8 for 075E speed grade memory devices.
+ * Bug Fix: Calibration SW code fixes.
+ * Feature Enhancement: Added Self-refresh/Save-restore support for 3DS parts.
+ * Feature Enhancement: Updated 3DS part names to add package info and 3DS part upgrade flow changes for package addition in 3DS parts names.
+ * Feature Enhancement: Added GUI option for Partial Reconfiguration flow support as Disable OBUF on reset_n.
+ * Feature Enhancement: GUI update to provide detailed information about memory part in memory details.
+ * Feature Enhancement: Addition of wr_rd_complete port in example_top file for PHY only and ping-pong PHY.
+ * Revision change in one or more subcores
+
+2017.1:
+ * Version 2.2
+ * Bug Fix: (Xilinx Answer 67392) UltraScale and UltraScale+ Memory IP - pulse width violations can occur
+ * Bug Fix: (Xilinx Answer 68236) Upgrading locked IP might fail for select RDIMMs
+ * Feature Enhancement: 3DS component support
+ * Feature Enhancement: Partial Reconfiguration support
+ * Feature Enhancement: Enabled ECC support for Microblaze MCS
+ * Feature Enhancement: Self-Refresh and Save-Restore support for LRDIMM
+ * Feature Enhancement: DDP wide component supported
+ * Feature Enhancement: Removed Selection of CS enable/disable from GUI
+ * Revision change in one or more subcores
+
+2016.4:
+ * Version 2.1 (Rev. 1)
+ * Bug Fix: PFD range checks in GUI for Manual M and D Reference Input clock selection.
+ * Bug Fix: Old PHY IPs Update to fix the Phy core generation & Stitching Optimization error in Locked IP Upgrade flow.
+ * Bug Fix: 3DS parts performance simulation Updates
+ * Bug Fix: DDR4 Self Refresh/Save Restore update for Multi rank design
+ * Bug Fix: (Xilinx Answer 67957) UltraScale Memory IP - "Phy core regeneration & stitching failed" occurs when opening an older Vivado project without upgrading the Memory IP
+ * Bug Fix: (Xilinx Answer 67933) UltraScale Memory IP - Error messages generated after archiving and moving a project containing Memory IP with a custom part.
+ * Bug Fix: (Xilinx Answer 67891) DDR4/DDR3 IP - Ping-Pong PHY behavioral simulations fail with data errors when using BFM simulation mode
+ * Revision change in one or more subcores
+
+2016.3:
+ * Version 2.1
+ * Port Change: ECC ports are added to provide status of ECC when AXI is disabled.
+ * Bug Fix: Added ports for proper ECC functionality and also adds the app_wdf_mask signal back to the User Interface to support Partial Writes AR67455.
+ * Bug Fix: Enables generating 80-bit wide DDR4 interfaces for xcku115-flvf1924 FPGAs AR67632.
+ * Bug Fix: Corrected the speed grade of 093F to 093E AR67631.
+ * Bug Fix: Corrected issue within User Interface logic that potentially caused data errors and incorrect app_rdy behavior. AR67544
+ * Bug Fix: Resolved custom part issues related to moving IP, opt_design errors when skipping "Generate Output Products", and Core Container flow.  ARs 67684, 67335, and 66360.
+ * Bug Fix: Usage of six or more DDP (Dual Die Package/Twin Die) components is limited to 2133Mbps operation. DDR4 tool now properly adheres to this spec. AR66938
+ * Feature Enhancement: Microblaze MCS 3.0 support.
+ * Feature Enhancement: Clamshell support for DDR4 controller and Phy only mode
+ * Feature Enhancement: Migration support for DDR4 controller and Phy only mode
+ * Feature Enhancement: Parity support for DDR4 RDIMMs
+ * Feature Enhancement: Self Refresh and Save Restore support for AXI Interface
+ * Revision change in one or more subcores
+
+2016.2:
+ * Version 2.0 (Rev. 1)
+ * Updated for 2016.2
+ * Revision change in one or more subcores
+
+2016.1:
+ * Version 2.0
+ * Updated for 2016.1
+ * Resolved issues related to certain speed grades incorrectly preventing previously allowed input clock periods.  See Xilinx Answer 62543 for details.
+ * Added DBI (Data Bus Inversion) Support
+ * Revision change in one or more subcores
+
+2015.4.2:
+ * Version 1.1
+ * No changes
+
+2015.4.1:
+ * Version 1.1
+ * No changes
+
+2015.4:
+ * Version 1.1
+ * Updated for 2015.4
+ * Revision change in one or more subcores
+
+2015.3:
+ * Version 1.0
+ * Initial release
+ * Derived from MIG IP in previous releases
+ * IP revision number added to HDL module, library, and include file names, to support designs with both locked and upgraded IP instances
+ * Resolved issue related to Dynamic DCI does not work for select ES devices.
+ * Resolved issue related to CAS Latency setting of 17 resulting in calibration failures during DQS Gate Calibration.
+ * Resolved issue related to [Xicom 50-24] error message occurring after programming device.
+ * Resolved issue related to customization GUI showing incorrect Enable Chip Select Pin option when recustomizing IP.
+
+(c) Copyright 2013 - 2020 Xilinx, Inc. All rights reserved.
+
+This file contains confidential and proprietary information
+of Xilinx, Inc. and is protected under U.S. and
+international copyright and other intellectual property
+laws.
+
+DISCLAIMER
+This disclaimer is not a license and does not grant any
+rights to the materials distributed herewith. Except as
+otherwise provided in a valid license issued to you by
+Xilinx, and to the maximum extent permitted by applicable
+law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+(2) Xilinx shall not be liable (whether in contract or tort,
+including negligence, or under any other theory of
+liability) for any loss or damage of any kind or nature
+related to, arising under or in connection with these
+materials, including for any direct, or any indirect,
+special, incidental, or consequential loss or damage
+(including loss of data, profits, goodwill, or any type of
+loss or damage suffered as a result of any action brought
+by a third party) even if such damage or loss was
+reasonably foreseeable or Xilinx had been advised of the
+possibility of the same.
+
+CRITICAL APPLICATIONS
+Xilinx products are not designed or intended to be fail-
+safe, or for use in any application requiring fail-safe
+performance, such as life-support or safety devices or
+systems, Class III medical devices, nuclear facilities,
+applications related to the deployment of airbags, or any
+other applications that could lead to death, personal
+injury, or severe property or environmental damage
+(individually and collectively, "Critical
+Applications"). Customer assumes the sole risk and
+liability of any use of Xilinx products in Critical
+Applications, subject only to applicable laws and
+regulations governing limitations on product liability.
+
+THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+PART OF THIS FILE AT ALL TIMES.

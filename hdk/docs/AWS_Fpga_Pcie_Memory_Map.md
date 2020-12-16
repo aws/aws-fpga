@@ -23,7 +23,7 @@ Even though all of these PCIe BARs are mapped to the EC2 Instance memory-mapped 
   |   |------- BAR2
   |   |         * 64-bit BAR, prefetchable
   |   |         * 64KiB (0 to 0xFFFF)
-  |   |         * NOT exposed to CL, used by internal DMA inside the Shell
+  |   |         * NOT exposed to CL, used by XDMA IP inside the Shell
   |   |------- BAR4
   |             * 64-bit BAR, prefetchable
   |             * 128GiB (0 to 0x1F-FFFF-FFFF)

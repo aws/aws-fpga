@@ -119,8 +119,6 @@ hdk_resources_s3_bucket=aws-fpga-hdk-resources
 
 # Shell files to be downloaded
 declare -a s3_hdk_files=("SH_CL_BB_routed.dcp"
-                         "cl_hello_world.debug_probes.ltx"
-                         "cl_dram_dma.debug_probes.ltx"
                         )
 # Downloading the shell files
 for shell_file in "${s3_hdk_files[@]}"

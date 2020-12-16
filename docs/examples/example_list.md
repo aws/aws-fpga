@@ -4,16 +4,9 @@
 | --------|---------|---------|-------|
 | Custom hardware | [cl\_hello\_world](../../hdk/cl/examples/cl_hello_world) | HDK - RTL (Verilog) | Simple [getting started example](../../hdk/README.md) with minimal hardware |
 | Custom hardware | [cl\_dram\_dma](../../hdk/cl/examples/cl_dram_dma) | HDK - RTL (Verilog) | Demonstrates CL connectivity to the F1 shell and connectivity to/from all DDRs |
-| Custom hardware | [IP integration example using a GUI - cl\_dram\_dma\_hlx](../../hdk/cl/examples/cl_dram_dma_hlx) | HLx - Verilog  | Demonstrates CL connectivity to the F1 shell and connectivity to/from DRAM using the Vivado IP Integrator GUI |
 | Custom hardware | [Virtual Ethernet Application](../../sdk/apps/virtual-ethernet) | [Streaming Data Engine](../../hdk/cl/examples/cl_sde) | The Virtual Ethernet framework facilitates streaming Ethernet frames from a network interface (or any source) into the FPGA for processing and back out to some destination. Possible use cases for this include deep packet inspection, software defined networking, stream encryption or compression, and more. |
-| Custom hardware | [Pipelined Workload Applications - cl\_dram\_dma\_data\_retention](../../hdk/docs/data_retention.md)| [HDK](../../hdk/cl/examples/cl_dram_dma/software/runtime/test_dram_dma_retention.c) [SDAccel](../../SDAccel/examples/aws/data_retention) | Demonstrates how to preserve data in DRAMs while swapping out accelerators. Applications that use a temporal accelerator pipeline can take advantage of this feature to reduce latency between FPGA image swaps  |
-| High Level Synthesis | [Digital Up-Converter - cl\_hls\_dds\_hlx](../../hdk/cl/examples/cl_hls_dds_hlx) | HLx - C-to-RTL  | Demonstrates an example application written in C that is synthesized to RTL (Verilog) |
-| Custom Hardware with Software Defined Acceleration | [RTL Kernels](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels) | Vitis - RTL (Verilog) + C/C++/OpenCL  | These examples demonstrate developing new hardware designs (RTL) in a Software Defined workflow|
-| Vitis Compression Libraries | [File Compression using GZip](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/gzip_app) | Vitis - C/C++/OpenCL  | This example demonstrates how to use Vitis Libraries to speed up GZIP compression on an FPGA |
-| Vitis BLAS libraries | [Matrix Transposer using BLAS](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/transp) | Vitis - C/C++/OpenCL  | This example shows how to use Vitis BLAS Libraries to create a Matrix Transposer on an FPGA |
-| Vitis Financial libraries | [Monte Carlo European Engine](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/MCEuropeanEngine) | Vitis - C/C++/OpenCL  | This example shows how to use Vitis Financial Libraries to accelerate MCEuropean Engine on an FPGA|
 
-## Application Notes 
+## Application Notes
 
 App Note | Description |
 |---------|---------|

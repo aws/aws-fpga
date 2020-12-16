@@ -65,14 +65,15 @@ The software is provided as part of the [Virtual Ethernet Application](../../../
 
 <a name="Metadata"></a>
 ## CL_SDE Example Metadata
-The following table displays information about the CL that is required to register it as an AFI with AWS. Alternatively, you can directly use a pre-generated AFI for this CL.
+The following table displays information about the CL that is required to register it as an AFI with AWS. 
+Alternatively, you can directly use a pre-generated AFI for this CL.
 
 | Key   | Value     |
 |-----------|------|
-| Shell Version | 0x04261818 |
+| Shell Version | 0x04182104 |
 | PCI Device ID | 0xF002 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AFI ID (N.Virginia:us-east-1) | afi-030f5efdbdb03e186 |
-| Pre-generated AGFI ID | agfi-0e6adf0cd6932d880 |
+| Pre-generated AFI ID (N.Virginia:us-east-1) | afi-0a7c2d98b6ef2e6f2 |
+| Pre-generated AGFI ID | agfi-0e73f9baab00b6be4 |

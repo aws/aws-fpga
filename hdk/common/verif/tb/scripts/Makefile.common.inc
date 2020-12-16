@@ -19,12 +19,12 @@ ifeq ($(QUESTA), 1)
   include Makefile.questa
     ifeq ($(AXI_MEMORY_MODEL), 1)
     ifeq ($(ECC_DIRECT), 1)
-      DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
-    else 
+      DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
+    else
       ifeq ($(ECC_RAND), 1)
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       else
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       endif
     endif
   else
@@ -40,12 +40,12 @@ ifeq ($(VCS), 1)
   include Makefile.vcs
   ifeq ($(AXI_MEMORY_MODEL), 1)
     ifeq ($(ECC_DIRECT), 1)
-      DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
-    else 
+      DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
+    else
       ifeq ($(ECC_RAND), 1)
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       else
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       endif
     endif
   else
@@ -61,12 +61,12 @@ ifeq ($(IES), 1)
   include Makefile.ies
   ifeq ($(AXI_MEMORY_MODEL), 1)
     ifeq ($(ECC_DIRECT), 1)
-      DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
-    else 
+      DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
+    else
       ifeq ($(ECC_RAND), 1)
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       else
-        DEFAULT_DEFINES = +define+AXI_MEMORY_MODEL +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
+        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
       endif
     endif
   else
@@ -80,12 +80,12 @@ else
   include Makefile.vivado
   ifeq ($(AXI_MEMORY_MODEL), 1)
     ifeq ($(ECC_DIRECT), 1)
-      DEFAULT_DEFINES = --define AXI_MEMORY_MODEL --define NO_DDR --define ECC_DIRECT_EN=1 --define RND_ECC_EN=0 --define RND_ECC_WEIGHT=0 --define ECC_ADDR_HI=$(ECC_ADDR_HI) --define ECC_ADDR_LO=$(ECC_ADDR_LO)
-    else 
+      DEFAULT_DEFINES = --define FAST_SIM_MODE --define NO_DDR --define ECC_DIRECT_EN=1 --define RND_ECC_EN=0 --define RND_ECC_WEIGHT=0 --define ECC_ADDR_HI=$(ECC_ADDR_HI) --define ECC_ADDR_LO=$(ECC_ADDR_LO)
+    else
       ifeq ($(ECC_RAND), 1)
-        DEFAULT_DEFINES = --define AXI_MEMORY_MODEL --define NO_DDR --define ECC_DIRECT_EN=0 --define RND_ECC_EN=1 --define RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) --define ECC_ADDR_HI=0 --define ECC_ADDR_LO=0
+        DEFAULT_DEFINES = --define FAST_SIM_MODE --define NO_DDR --define ECC_DIRECT_EN=0 --define RND_ECC_EN=1 --define RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) --define ECC_ADDR_HI=0 --define ECC_ADDR_LO=0
       else
-        DEFAULT_DEFINES = --define AXI_MEMORY_MODEL --define NO_DDR --define ECC_DIRECT_EN=0 --define RND_ECC_EN=0 --define RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) --define ECC_ADDR_HI=0 --define ECC_ADDR_LO=0
+        DEFAULT_DEFINES = --define FAST_SIM_MODE --define NO_DDR --define ECC_DIRECT_EN=0 --define RND_ECC_EN=0 --define RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) --define ECC_ADDR_HI=0 --define ECC_ADDR_LO=0
       endif
     endif
   else
@@ -122,7 +122,7 @@ COMMON_LIBLISTS +=\
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.$(SIMULATOR).inc
 
-regression: $(SV_TEST_LIST) $(C_TEST_LIST) 
+regression: $(SV_TEST_LIST) $(C_TEST_LIST)
 
 $(SV_TEST_LIST):
 	make TEST=$(@F)
@@ -140,4 +140,3 @@ make_sim_dir: $(HDK_COMMON_DIR)/verif/models/sh_bfm/cl_ports_sh_bfm.vh
 
 show_common_liblists:
 	@ for i in $(COMMON_LIBLISTS); do echo $$i; done
-

@@ -55,7 +55,7 @@ Once developers create their DCP, they submit the design through an AWS EC2 API 
 
 **Q: What new skill sets will be required from an FPGA developer in the cloud?**
 
-AWS takes care of  all the non-differentiating, heavy lifting of hardware design, debug and implementation of PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring. 
+AWS takes care of  all the non-differentiating, heavy lifting of hardware design, debug and implementation of PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
 
 This enables AWS FPGA developers to focus on their own differentiating logic, instead of spending time on hardware bring-up/debug and maintenance.
 
@@ -113,8 +113,8 @@ AWS FPGA generation and EC2 F1 instances are supported in us-east-1 (N. Virginia
 
 **Q: What is the process for creating an AFI?**
 
-* The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md). 
-* Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP). 
+* The AFI process starts by creating Custom Logic (CL) code that conforms to the [Shell Specification](./hdk/docs/AWS_Shell_Interface_Specification.md).
+* Then, the CL must be compiled using the HDK scripts which leverages Vivado tools to create a Design Checkpoint (DCP).
 * That DCP is submitted to AWS for generating an AFI using the `aws ec2 create-fpga-image` API.
   * Use the AWS CLI `describe-fpga-images` API to get information about the created AFIs using the AFI ID provided by `create-fpga-image`, or to list available AFIs for your account. See [describe-fpga-images](./hdk/docs/describe_fpga_images.md) document for details on how to use this API.
 
@@ -168,7 +168,7 @@ AWS prefers not to limit developers to a specific template in terms of how we ad
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption, SDAccel and Design Checkpoint generation are included at no additional cost.
+If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption and Design Checkpoint generation are included at no additional cost.
 
 If you want to run using other methods or on a local machine, you will need to obtain any necessary licenses, specifically you will need to have setup the appropriate Xilinx Vivado license. For more details, please refer to [On-premises licensing help](docs/on_premise_licensing_help.md)
 
@@ -181,23 +181,23 @@ No. AWS supports a cloud-only development model and provides the necessary eleme
 **Q: Do I need to design for a specific power envelope?**
 
 Yes, the Xilinx UltraScale+ FPGA devices used on the F1 instances have a maximum power limit that must be maintained.
-If a loaded AFI consumes maximum power, the F1 instance will automatically gate the input clocks provided to the AFI in order to prevent errors within the FPGA. 
-Developers are provided warnings when power (Vccint) is greater than 85 watts. Above that level, the CL is in danger of being clock gated.  
+If a loaded AFI consumes maximum power, the F1 instance will automatically gate the input clocks provided to the AFI in order to prevent errors within the FPGA.
+Developers are provided warnings when power (Vccint) is greater than 85 watts. Above that level, the CL is in danger of being clock gated.
 
 [Additional details on AFI power](hdk/docs/afi_power.md)
 
 
 **Q: What IP blocks are provided in the HDK?**
 
-The HDK includes IP for AWS Shell and DRAM interface controllers. 
-Inside the Shell, there is a PCIe interface, DMA Engine, and one DRAM interface controller. 
-These blocks are only accessible via the AXI interfaces defined by the Shell-Custom Logic interface. 
+The HDK includes IP for AWS Shell and DRAM interface controllers.
+Inside the Shell, there is a PCIe interface, XDMA IP, and one DRAM interface controller.
+These blocks are only accessible via the AXI interfaces defined by the Shell-Custom Logic interface.
 The HDK provides additional IP blocks for the other DRAM interfaces, enabling up to 3 additional DRAM interfaces instantiated by the developer in the Custom Logic region.
 
 
 **Q: Can I use other IP blocks from Xilinx or other 3rd parties?**
 
-Yes. Developers are free to use any IP blocks within the Custom Logic region. 
+Yes. Developers are free to use any IP blocks within the Custom Logic region.
 Those can be 3rd party IPs or IP available in the Vivado IP catalog.
 
 **Note** * AWS supports only the IP blocks contained in the HDK.*
@@ -212,17 +212,17 @@ For F1 development, launching EC2 instances and storing and retrieving files fro
 
 **Q: What do I need to get started on building accelerators for FPGA instances?**
 
-Getting started requires downloading the latest HDK and SDK from the [AWS FPGA GitHub repository](https://github.com/aws/aws-fpga). 
+Getting started requires downloading the latest HDK and SDK from the [AWS FPGA GitHub repository](https://github.com/aws/aws-fpga).
 The HDK and SDK provide the needed code and information for building FPGA code. The HDK provides all the information needed for developing an FPGA image from source code, while the SDK provides all the runtime software for managing the Amazon FPGA Image (AFI) loaded into the F1 instance FPGA.
 
-Typically, FPGA development process requires a simulator to perform functional test on the source code, and a Vivado tool set for synthesis of source code into compiled FPGA code. 
+Typically, FPGA development process requires a simulator to perform functional test on the source code, and a Vivado tool set for synthesis of source code into compiled FPGA code.
 The FPGA Developer AMI provided by AWS includes the complete Xilinx Vivado tools for simulation (XSIM) and synthesis of FPGA.
 
 
 
 **Q: How do I develop accelerator code for an FPGA in an F1 instance?**
 
-Start with the [Shell interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md). 
+Start with the [Shell interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md).
 This document describes the interface between Custom Logic and the AWS Shell. All Custom Logic for an accelerator resides within the Custom Logic region of the F1 FPGA.
 
 The [HDK README](./hdk/README.md) walks the developer through the steps to build an FPGA image from one of the provided examples as well as starting a new code.
@@ -269,18 +269,18 @@ We recommend using the latest available version to be able to use the expanding 
 ## Marketplace FAQs
 **Q: What does publishing my AFI/AMI to AWS Marketplace enables?**
 
-FPGA Developers can share or sell their AFI/AMI using the AWS Marketplace to other AWS users. 
-Once in Marketplace, AWS users can launch an F1 instance with that AFI/AMI combination with the 1-click deployment feature. 
-Marketplace Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption. 
-The metering, billing, collections, and disbursement of payments are managed by AWS, allowing developers to focus on marketing their solution. 
+FPGA Developers can share or sell their AFI/AMI using the AWS Marketplace to other AWS users.
+Once in Marketplace, AWS users can launch an F1 instance with that AFI/AMI combination with the 1-click deployment feature.
+Marketplace Sellers can take advantage of the Management Portal to better build and analyze their business, using it to drive marketing activities and customer adoption.
+The metering, billing, collections, and disbursement of payments are managed by AWS, allowing developers to focus on marketing their solution.
 
 Please check out [AWS Marketplace Tour](https://aws.amazon.com/marketplace/management/tour/) for more details on how to become an AWS Marketplace seller, how to set pricing and collect metrics.
 
 
 **Q: How can I publish my AFI to AWS Marketplace?**
 
-* First, you need to [register as a Marketplace Seller](https://aws.amazon.com/marketplace/management/register/). 
-* In parallel you should create an AMI that includes the drivers and runtime libraries needed to use your AFI. 
+* First, you need to [register as a Marketplace Seller](https://aws.amazon.com/marketplace/management/register/).
+* In parallel you should create an AMI that includes the drivers and runtime libraries needed to use your AFI.
 * Finally, follow the [standard flow](https://aws.amazon.com/marketplace/help/200940360) to publish your AMI on AWS marketplace, providing the associated AFI IDs. In other words, AFIs are not published directly on AWS marketplace, rather AFI(s) should be associated with an AMI that gets published.
 
 
@@ -292,9 +292,9 @@ Neither, no FPGA internal design code is exposed. AWS Marketplace customers that
 ## F1 Instance and Runtime Tools FAQs
 **Q: What OS can run on the F1 instance?**
 
-CentOS 7.x is supported and tested on AWS EC2 F1 instance. 
+CentOS 7.x is supported and tested on AWS EC2 F1 instance.
 Please see [release notes](./RELEASE_NOTES.md) for a description of compatible Kernel & OS versions supported by a specific Developer kit version.
-Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1. 
+Developers can utilize the source code in the SDK directory to compile other variants of Linux for use on F1.
 
 NOTE: Windows OSs are not supported on F1.
 
@@ -340,7 +340,7 @@ The AWS infrastructure scrubs FPGA state on termination of an F1 instance and an
 
 **Q: How do the FPGAs connect to the x86 CPU?**
 
-Each FPGA in F1 is connected to the instance CPU via a x16 PCIe Gen3 interface. 
+Each FPGA in F1 is connected to the instance CPU via a x16 PCIe Gen3 interface.
 Physical Functions (PF) within the FPGA are directly mapped into the F1 instance. Software on the instance can directly access the address in the PF to take advantage of the high performance PCIe interface.
 
 
@@ -360,21 +360,20 @@ No. The FPGAs do not have direct access to the SSDs on F1. The SSDs on F1 are hi
 ## Development Languages FAQs
 **Q: Which HDL languages are supported?**
 
-For RTL level development: Verilog and VHDL are both supported in the FPGA Developer AMI and in generating a Design Checkpoint. 
-The Xilinx Vivado tools and simulator support mixed mode simulation of Verilog and VHDL. 
-The AWS Shell is written in Verilog. Support for mixed mode simulation may vary if developers use other simulators. 
+For RTL level development: Verilog and VHDL are both supported in the FPGA Developer AMI and in generating a Design Checkpoint.
+The Xilinx Vivado tools and simulator support mixed mode simulation of Verilog and VHDL.
+The AWS Shell is written in Verilog. Support for mixed mode simulation may vary if developers use other simulators.
 Check your simulator documentation for Verilog/VHDL/System Verilog support.
 
 
 **Q: Is OpenCL and/or SDAccel Supported?**
 
-Yes. Please review the [SDAccel README to get started](SDAccel/README.md)
+Yes. OpenCL and SDAcell are supported except for Small Shell which does not have built-in DMA required by both flows.
 
 
 **Q: Can I use High Level Synthesis(HLS) Tools to generate an AFI?**
 
-Yes. Vivado HLS and SDAccel are directly supported through the FPGA Developer AMI. 
-Any other HLS tool that generates compatible Verilog or VHDL for Vivado input can also be used for writing in HLS.
+HLS flow is not supported for small shell.
 
 
 **Q: What RTL simulators are supported?**
@@ -387,20 +386,20 @@ AWS tests the HDK with Synopsys VCS, Mentor Questa/ModelSim, and Cadence Incisiv
 ## FPGA Specific FAQs
 **Q: What FPGA is used in AWS EC2 F1 instance?**
 
-The FPGA for F1 is the Xilinx Ultrascale+ VU9P device with the -2 speed grade. 
+The FPGA for F1 is the Xilinx Ultrascale+ VU9P device with the -2 speed grade.
 The HDK scripts have the compile scripts needed for the VU9P device.
 
 
 **Q: What is FPGA Direct and how fast is it?**
 
-FPGA Direct is FPGA to FPGA low latency high throughput peer communication through the PCIe links on each FPGA, where all FPGAs shared the same memory space. 
-The PCIe BAR space in the Application PF (see [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details) allows the developer to map regions of the Custom Logic, such as external DRAM space, to other FPGAs. 
+FPGA Direct is FPGA to FPGA low latency high throughput peer communication through the PCIe links on each FPGA, where all FPGAs shared the same memory space.
+The PCIe BAR space in the Application PF (see [Shell Interface specification](./hdk/docs/AWS_Shell_Interface_Specification.md) for more details) allows the developer to map regions of the Custom Logic, such as external DRAM space, to other FPGAs.
 The implementation of communication protocol and data transfer engine across the PCIe interface using FPGA direct is left to the developer.
 
 
 **Q: What is FPGA Link and how fast is it?**
 
-FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link is organized as a ring, with 2 x 100Gbps links to each adjacent card. This enables each FPGA card to send/receive data from an adjacent card at 200Gbps speeds. 
+FPGA Link is based on 4 x 100Gbps links on each FPGA card. The FPGA Link is organized as a ring, with 2 x 100Gbps links to each adjacent card. This enables each FPGA card to send/receive data from an adjacent card at 200Gbps speeds.
 This is an unsupported feature planned for future release. Details on the FPGA Link interface will be provided in the Shell Interface specification when available.
 
 
@@ -453,7 +452,7 @@ Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common 
 
 **Q: What resources within the FPGA does the AWS Shell consume?**
 
-The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
+The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, XDMA IP, DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
 
 
 <a name="troubleshooting"></a>
@@ -490,20 +489,20 @@ Please modify RDP options to choose any color depth less than 32 bit and try re-
 **Q: Why did my AFI creation fail with `***ERROR***: DCP has DNA_PORT instantiation, ingestion failed, exiting`?**
 
 AWS does not support creating AFI's with the Device DNA instantiated within your design. Please create your design without instantiating the DNA_PORT primitive to be able to create your AFI.
- 
+
 **Q: How do I know which HDK version I have on my instance/machine? **
 
 Look for the ./hdk/hdk_version.txt file.
 
 **Q: How do I know what my Shell version is? **
 
-The Shell version of an FPGA slot is available through the FPGA Image Management tools after an AFI has been loaded.  
-See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot. 
-Prior to loading an AFI, the state of the FPGA (including shell version) is undefined and non-deterministic.  
+The Shell version of an FPGA slot is available through the FPGA Image Management tools after an AFI has been loaded.
+See the description of `fpga-describe-local-image` for more details on retrieving the shell version from a slot.
+Prior to loading an AFI, the state of the FPGA (including shell version) is undefined and non-deterministic.
 
 **Q: How do I know what version of FPGA Image management tools are running on my instance? **
 
-The FPGA Image management tools version is reported with any command executed from these tools.  
+The FPGA Image management tools version is reported with any command executed from these tools.
 See the description of `fpga-describe-local-image` for more details.
 
 **Q: How do I update my existing design with a new release?**

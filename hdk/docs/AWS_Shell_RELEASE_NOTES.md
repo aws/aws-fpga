@@ -1,5 +1,8 @@
 # AWS Shell Release Notes
-
+# v04182104
+* Removed DMA engine to free up FPGA resources
+* Updated IP to allow for 64 outstanding read requests
+ 
 # v04261818
 * Fixed AXI-L Interface Ordering.  Read requests on the AXI-L interfaces (BAR1, OCL, SDA) will not pass previous write requests.
 * Increased XDMA PCIS interface timeout to 5 seconds

@@ -26,7 +26,7 @@ module sh_bfm #(
    (
 
     //---------------------------------------------------------------------------------------
-    //DDR C interface is in shell. 
+    //DDR C interface is in shell.
     // ------------------- DDR4 x72 RDIMM 2100 Interface C ----------------------------------
    input              CLK_300M_DIMM2_DP,
    input              CLK_300M_DIMM2_DN,
@@ -52,8 +52,8 @@ module sh_bfm #(
      output logic        sh_RST_DIMM_B_N,
      output logic        sh_RST_DIMM_D_N,
    `endif
-`endif  
-    
+`endif
+
    //---------------------------------------------------------------------------------------
    //cl_ports_sh_bfm.vh is generated from cl_ports.vh in $(HDK_SHELL_DESIGN_DIR)/interfaces.
    //This is to ensure that there is no integration issues.
@@ -63,22 +63,22 @@ module sh_bfm #(
    );
 
 `include "axi_bfm_defines.svh"
-   
+
    import tb_type_defines_pkg::*;
 
-   
+
    AXI_Command sh_cl_wr_cmds[$];
    AXI_Data    sh_cl_wr_data[$];
    AXI_Command sh_cl_rd_cmds[$];
    AXI_Data    cl_sh_rd_data[$];
    AXI_Command sh_cl_b_resps[$];
-   
+
    AXI_Command cl_sh_wr_cmds[$];
    AXI_Data    cl_sh_wr_data[$];
    AXI_Command cl_sh_rd_cmds[$];
    AXI_Command sh_cl_rd_data[$];
    AXI_Command cl_sh_b_resps[$];
-   
+
    logic         clk_core;
    logic         rst_n;
    logic         pre_sync0_rst_n;
@@ -96,6 +96,7 @@ module sh_bfm #(
 
    logic [15:0]  cl_sh_ddr_awid_q;
    logic [63:0]  cl_sh_ddr_awaddr_q;
+   logic         cl_sh_ddr_awuser_q;
    logic [7:0]   cl_sh_ddr_awlen_q;
    logic         cl_sh_ddr_awvalid_q;
    logic         sh_cl_ddr_awready_q;
@@ -110,9 +111,10 @@ module sh_bfm #(
    logic [1:0]   sh_cl_ddr_bresp_q;
    logic         sh_cl_ddr_bvalid_q;
    logic         cl_sh_ddr_bready_q;
-   
+
    logic [15:0]  cl_sh_ddr_arid_q;
    logic [63:0]  cl_sh_ddr_araddr_q;
+   logic         cl_sh_ddr_aruser_q;
    logic [7:0]   cl_sh_ddr_arlen_q;
    logic         cl_sh_ddr_arvalid_q;
    logic         sh_cl_ddr_arready_q;
@@ -126,6 +128,7 @@ module sh_bfm #(
 
    logic [15:0]  sync_cl_sh_ddr_awid;
    logic [63:0]  sync_cl_sh_ddr_awaddr;
+   logic [18:0]  sync_cl_sh_ddr_awuser;
    logic [7:0]   sync_cl_sh_ddr_awlen;
    logic         sync_cl_sh_ddr_awvalid;
    logic         sync_sh_cl_ddr_awready;
@@ -143,6 +146,7 @@ module sh_bfm #(
 
    logic [15:0]  sync_cl_sh_ddr_arid;
    logic [63:0]  sync_cl_sh_ddr_araddr;
+   logic [18:0]  sync_cl_sh_ddr_aruser;
    logic [7:0]   sync_cl_sh_ddr_arlen;
    logic         sync_cl_sh_ddr_arvalid;
    logic         sync_sh_cl_ddr_arready;
@@ -160,7 +164,7 @@ module sh_bfm #(
 
    logic         ECC_EN;
    int           ecc_err_cnt=0;
-   
+
    typedef struct {
       logic [63:0] buffer;
       logic [27:0] len;
@@ -169,17 +173,17 @@ module sh_bfm #(
 
    DMA_OP h2c_dma_list[0:3][$];
    int    h2c_dma_wr_cmd_cnt[0:3];
-   
+
    DMA_OP c2h_dma_list[0:3][$];
    DMA_OP c2h_data_dma_list[0:3][$];
-   
+
    logic [3:0]     h2c_dma_started;
    logic [3:0]     c2h_dma_started;
    logic [3:0]     c2h_dma_done;
    logic [3:0]     h2c_dma_done;
 
    logic [7:0] read_data_buffer[];
-  
+
    real MAIN_A0_DLY  = 4ns;
    real CORE_DLY     = 4ns;
    real EXTRA_A1_DLY = 8ns;
@@ -209,7 +213,7 @@ module sh_bfm #(
    real extra_b1_clk_period ;
    real extra_c0_clk_period ;
    real extra_c1_clk_period ;
-   
+
    logic [97 - 1:0]    pcis_pc_status;
    logic               pcis_pc_asserted;
    logic [97 - 1:0]    pcim_pc_status;
@@ -227,7 +231,7 @@ module sh_bfm #(
    int   counter;
 
    logic [63:0] glcount0, glcount1;
-   
+
    //-------------------------------------------------------------------------------------------------------------
    // Xilinx AXI Protocol Checker Instance (for CL_SH_DMA_PCIS*).
    // Protocol checker checks for protocol violations on the interface where protocol checker
@@ -319,7 +323,7 @@ module sh_bfm #(
   );
 
   //----------------------------------------------------------------
-   // Xilinx AXI Protocol Checker Instance (for CL_SH_PCIM*) 
+   // Xilinx AXI Protocol Checker Instance (for CL_SH_PCIM*)
    //----------------------------------------------------------------
   axi_protocol_checker_v1_1_12_top #(
     .C_AXI_PROTOCOL(0),
@@ -405,7 +409,7 @@ module sh_bfm #(
   );
 
    //-------------------------------------------------------------------------
-   // [axi_pc] Xilinx AXI Protocol Checker Instance (for OCL AXL interface) 
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for OCL AXL interface)
    //-------------------------------------------------------------------------
   axi_protocol_checker_v1_1_12_top #(
     .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
@@ -414,7 +418,7 @@ module sh_bfm #(
     .C_AXI_ADDR_WIDTH(32),
     .C_AXI_AWUSER_WIDTH(1), // Actually, these are all 0
     .C_AXI_ARUSER_WIDTH(1),
-                                     
+
     .C_AXI_WUSER_WIDTH(1),
     .C_AXI_RUSER_WIDTH(1),
     .C_AXI_BUSER_WIDTH(1),
@@ -492,7 +496,7 @@ module sh_bfm #(
   );
 
    //-------------------------------------------------------------------------
-   // [axi_pc] Xilinx AXI Protocol Checker Instance (for SDA AXL interface) 
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for SDA AXL interface)
    //-------------------------------------------------------------------------
   axi_protocol_checker_v1_1_12_top #(
     .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
@@ -578,7 +582,7 @@ module sh_bfm #(
   );
 
    //-------------------------------------------------------------------------
-   // [axi_pc] Xilinx AXI Protocol Checker Instance (for BAR1 AXL interface) 
+   // [axi_pc] Xilinx AXI Protocol Checker Instance (for BAR1 AXL interface)
    //-------------------------------------------------------------------------
   axi_protocol_checker_v1_1_12_top #(
     .C_AXI_PROTOCOL(2),     // 2 = AXI4-Lite
@@ -662,7 +666,7 @@ module sh_bfm #(
     .pc_axi_rvalid(bar1_sh_rvalid),
     .pc_axi_rready(sh_bar1_rready)
   );
-   
+
    initial begin
       debug = 1'b0;
 /* TODO: Use the code below once plusarg support is enabled
@@ -683,56 +687,56 @@ module sh_bfm #(
    assign ECC_EN = 1'b0;
   `endif
 `endif
-   
+
    initial begin
       clk_core = 1'b0;
       forever #CORE_DLY clk_core = ~clk_core;
    end
-   
+
    initial begin
       clk_main_a0 = 1'b0;
       forever #MAIN_A0_DLY clk_main_a0 = ~clk_main_a0;
    end
-   
+
    initial begin
       clk_extra_a1 = 1'b0;
       forever #EXTRA_A1_DLY clk_extra_a1 = ~clk_extra_a1;
    end
-   
+
    initial begin
       clk_extra_a2 = 1'b0;
       forever #EXTRA_A2_DLY clk_extra_a2 = ~clk_extra_a2;
    end
-   
+
    initial begin
       clk_extra_a3 = 1'b0;
       forever #EXTRA_A3_DLY clk_extra_a3 = ~clk_extra_a3;
    end
-   
+
    initial begin
       clk_extra_b0 = 1'b0;
       forever #EXTRA_B0_DLY clk_extra_b0 = ~clk_extra_b0;
    end
-   
+
    initial begin
       clk_extra_b1 = 1'b0;
       forever #EXTRA_B1_DLY clk_extra_b1 = ~clk_extra_b1;
-   end      
-   
+   end
+
    initial begin
       clk_extra_c0 = 1'b0;
       forever #EXTRA_C0_DLY clk_extra_c0 = ~clk_extra_c0;
    end
-   
+
    initial begin
       clk_extra_c1 = 1'b0;
       forever #EXTRA_C1_DLY clk_extra_c1 = ~clk_extra_c1;
    end
-   
+
    logic rst_n_i;
    logic rst_main_n_i = 0;
    logic rst_xtra_n_i;
-   
+
    always @(posedge clk_core)
      rst_n <= rst_n_i;
 
@@ -760,7 +764,7 @@ module sh_bfm #(
           pre_sync3_rst_n <= pre_sync2_rst_n;
           sync_rst_n      <= pre_sync3_rst_n;
        end
-  
+
    assign sh_cl_pwr_state = 2'b00;
 
    initial begin
@@ -787,7 +791,7 @@ module sh_bfm #(
        begin
           glcount0 <= 0;
        end
-     else 
+     else
        begin
           glcount0 <= glcount0+1;
        end
@@ -797,11 +801,11 @@ module sh_bfm #(
        begin
           glcount1 <= 0;
        end
-     else 
+     else
        begin
           glcount1 <= glcount1+1;
        end
-   
+
    always_ff @(posedge clk_main_a0)
      begin
        sh_cl_glcount0 <= glcount0;
@@ -846,7 +850,7 @@ module sh_bfm #(
       for(int i=0; i<4; i++)
         h2c_dma_wr_cmd_cnt[i] = 0;
    end
-   
+
    //
    // sh->cl Address Write Channel
    //
@@ -858,10 +862,10 @@ module sh_bfm #(
          sh_cl_dma_pcis_awid    <= sh_cl_wr_cmds[0].id;
          sh_cl_dma_pcis_awlen   <= sh_cl_wr_cmds[0].len;
          sh_cl_dma_pcis_awsize  <= /*sh_cl_wr_cmds[0].size*/3'h6;
-         
+
          sh_cl_dma_pcis_awvalid <= !sh_cl_dma_pcis_awvalid ? 1'b1 :
                                !cl_sh_dma_pcis_awready ? 1'b1 : 1'b0;
-         
+
          if (cl_sh_dma_pcis_awready && sh_cl_dma_pcis_awvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_wr_cmds.size());
@@ -889,10 +893,10 @@ module sh_bfm #(
          sh_cl_dma_pcis_wdata <= sh_cl_wr_data[0].data;
          sh_cl_dma_pcis_wstrb <= sh_cl_wr_data[0].strb;
          sh_cl_dma_pcis_wlast <= sh_cl_wr_data[0].last;
-         
+
          sh_cl_dma_pcis_wvalid <= !sh_cl_dma_pcis_wvalid ? 1'b1 :
                               !cl_sh_dma_pcis_wready ? 1'b1 : 1'b0;
-         
+
          if (cl_sh_dma_pcis_wready && sh_cl_dma_pcis_wvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, sh_cl_wr_data.size());
@@ -900,11 +904,11 @@ module sh_bfm #(
 
             if (sh_cl_dma_pcis_wlast)
               h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id]--;
-            
-            h2c_dma_done[sh_cl_wr_data[0].id] =  (h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id] == 0); 
+
+            h2c_dma_done[sh_cl_wr_data[0].id] =  (h2c_dma_wr_cmd_cnt[sh_cl_wr_data[0].id] == 0);
             sh_cl_wr_data.pop_front();
          end
-         
+
       end
       else
          sh_cl_dma_pcis_wvalid <= 1'b0;
@@ -941,10 +945,10 @@ module sh_bfm #(
          sh_cl_dma_pcis_arid    <= sh_cl_rd_cmds[0].id;
          sh_cl_dma_pcis_arlen   <= sh_cl_rd_cmds[0].len;
          sh_cl_dma_pcis_arsize  <= /*sh_cl_rd_cmds[0].size*/3'h6;
-         
+
          sh_cl_dma_pcis_arvalid <= !sh_cl_dma_pcis_arvalid ? 1'b1 :
                                !cl_sh_dma_pcis_arready ? 1'b1 : 1'b0;
-         
+
          if (cl_sh_dma_pcis_arready && sh_cl_dma_pcis_arvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, sh_cl_rd_cmds.size());
@@ -979,7 +983,7 @@ module sh_bfm #(
                $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, cl_sh_dma_pcis_rdata[(i*32)+:32]);
             end
          end
-         
+
          cl_sh_rd_data.push_back(data);
       end
 
@@ -995,7 +999,7 @@ module sh_bfm #(
    logic        first_wr_beat = 1;
    int          wr_last_cnt = 0;
    logic [63:0] wr_addr, wr_addr_t;
-   
+
    always @(posedge clk_core) begin
 
       if (host_mem_wr_que.size() > 0) begin
@@ -1022,14 +1026,14 @@ module sh_bfm #(
                      byte t;
                      t = tb.host_memory_getc(wr_addr_t + k);
                      word = {t, word[31:8]};
-                  end                  
+                  end
                end
-               
+
                for(int j=0; j<4; j++) begin
                   logic [7:0] c;
                   int         index;
                   index = j + (i * 4);
-                  
+
                   if (cl_sh_wr_data[0].strb[index]) begin
                      c = cl_sh_wr_data[0].data >> (index * 8);
                      //FIX partial DW order word = {c, word[31:8]};
@@ -1045,12 +1049,12 @@ module sh_bfm #(
                   wr_addr_t = {wr_addr[63:2], 2'b00};
                   for(int k=0; k<4; k++) begin
                      byte t;
-                     t = word[7:0];                     
+                     t = word[7:0];
                      tb.host_memory_putc(wr_addr_t + k, t);
                      word = word >> 8;
-                  end                  
+                  end
                end
-               
+
                wr_addr += 4;
             end
             if (cl_sh_wr_data[0].last == 1) begin
@@ -1059,9 +1063,9 @@ module sh_bfm #(
                if (debug) begin
                   $display("[%t] - DEBUG reseting...", $realtime);
                end
-               
+
             end
-            
+
             cl_sh_wr_data.pop_front();
          end // if (cl_sh_wr_data.size() > 0)
       end // if (host_mem_wr_que.size() > 0)
@@ -1077,20 +1081,20 @@ module sh_bfm #(
       automatic int awready_cnt = 0;
 `else
       int awready_cnt = 0;
-`endif      
+`endif
       if (cl_sh_pcim_awvalid && sh_cl_pcim_awready) begin
          cmd.addr = cl_sh_pcim_awaddr;
          cmd.id   = cl_sh_pcim_awid;
          cmd.len  = cl_sh_pcim_awlen;
          cmd.size = cl_sh_pcim_awsize;
          cmd.last = 0;
-         
+
          if(cl_sh_pcim_awsize != 6) begin
           $display("FATAL ERROR: AwSize other than 6 are not supported");
           $finish;
          end
-         
-         cl_sh_wr_cmds.push_back(cmd);         
+
+         cl_sh_wr_cmds.push_back(cmd);
          sh_cl_b_resps.push_back(cmd);
          host_mem_wr_que.push_back(cmd);
       end
@@ -1114,10 +1118,10 @@ module sh_bfm #(
 `ifdef QUESTA_SIM
       automatic int wready_cnt = 0;
       automatic int wready_nonzero_wait = 0;
-`else      
+`else
       int wready_cnt = 0;
       int wready_nonzero_wait = 0;
-`endif      
+`endif
       if (sh_cl_pcim_wready && cl_sh_pcim_wvalid) begin
          wr_data.data = cl_sh_pcim_wdata;
          wr_data.strb = cl_sh_pcim_wstrb;
@@ -1127,9 +1131,9 @@ module sh_bfm #(
 
          if (wr_data.last == 1)
            wr_last_cnt += 1;
-         
+
       end // if (sh_cl_pcim_wready && cl_sh_pcim_wvalid)
-      
+
       if ((cl_sh_wr_data.size() > 64) || (wready_cnt > 0)) begin
          sh_cl_pcim_wready <= 1'b0;
          wready_cnt--;
@@ -1167,16 +1171,16 @@ module sh_bfm #(
       end
       else
         sh_cl_pcim_bvalid <= 1'b0;
-      
+
    end
-   
+
    //
    // sh->cl Address Read Channel
    //
 
    always @(posedge clk_core) begin
       AXI_Command cmd;
-`ifdef QUESTA_SIM      
+`ifdef QUESTA_SIM
       automatic int arready_cnt = 0;
 `else
       int arready_cnt = 0;
@@ -1192,7 +1196,7 @@ module sh_bfm #(
           $display("FATAL ERROR: ArSize other than 6 are not supported");
           $finish;
          end
-         
+
          cl_sh_rd_cmds.push_back(cmd);
          sh_cl_rd_data.push_back(cmd);
       end
@@ -1213,7 +1217,7 @@ module sh_bfm #(
 
    logic first_rd_beat;
    logic [63:0] rd_addr, rd_addr_t;
-   
+
    always @(posedge clk_core) begin
       AXI_Command rd_cmd;
       logic [511:0] beat;
@@ -1227,7 +1231,7 @@ module sh_bfm #(
 
          sh_cl_pcim_rlast <= (sh_cl_rd_data[0].len == 0) ? 1'b1 :
                                 (sh_cl_rd_data[0].len == 1) && sh_cl_pcim_rvalid && cl_sh_pcim_rready ? 1'b1 : 1'b0;
-         
+
          if (first_rd_beat == 1'b1) begin
             rd_addr = sh_cl_rd_data[0].addr;
             first_rd_beat = 1'b0;
@@ -1235,7 +1239,7 @@ module sh_bfm #(
 
          beat = {512{1'b1}};
 
-       if (cl_sh_pcim_rready) begin 
+       if (cl_sh_pcim_rready) begin
 
          for(int i=rd_addr[5:2]; i<16; i++) begin
             logic [31:0] c;
@@ -1243,7 +1247,7 @@ module sh_bfm #(
             if (debug) begin
                $display("[%t] : DEBUG reading addr 0x%016x", $realtime, rd_addr);
             end
-            
+
             if (!tb.use_c_host_memory)
               if (tb.sv_host_memory.exists({rd_addr[63:2], 2'b00}))
                 c = tb.sv_host_memory[{rd_addr[63:2], 2'b00}];
@@ -1269,7 +1273,7 @@ module sh_bfm #(
       end
       else begin
          sh_cl_pcim_rvalid <= 1'b0;
-         sh_cl_pcim_rlast  <= 1'b0;         
+         sh_cl_pcim_rlast  <= 1'b0;
          first_rd_beat = 1'b1;
       end
 
@@ -1280,10 +1284,10 @@ module sh_bfm #(
             first_rd_beat = 1'b1;
          end
          else
-           sh_cl_rd_data[0].len--;         
+           sh_cl_rd_data[0].len--;
 
       end
-      
+
    end
 
    //=================================================
@@ -1326,16 +1330,17 @@ module sh_bfm #(
       end
    end
 
-`ifndef AXI_MEMORY_MODEL   
+`ifndef AXI_MEMORY_MODEL
    //==========================================================
 
    // DDR Controller
-   axi_register_slice DDR_3_AXI4_REG_SLC (
+   axi_register_slice_axuser DDR_3_AXI4_REG_SLC (
      .aclk           (clk_core),
      .aresetn        (intf_sync_rst_n),
 
      .s_axi_awid     (cl_sh_ddr_awid),
      .s_axi_awaddr   (cl_sh_ddr_awaddr),
+     .s_axi_awuser   (cl_sh_ddr_awuser),
      .s_axi_awlen    (cl_sh_ddr_awlen),
      .s_axi_awvalid  (cl_sh_ddr_awvalid),
      .s_axi_awready  (sh_cl_ddr_awready),
@@ -1350,6 +1355,7 @@ module sh_bfm #(
      .s_axi_bready   (cl_sh_ddr_bready),
      .s_axi_arid     (cl_sh_ddr_arid),
      .s_axi_araddr   (cl_sh_ddr_araddr),
+     .s_axi_aruser   (cl_sh_ddr_aruser),
      .s_axi_arlen    (cl_sh_ddr_arlen),
      .s_axi_arvalid  (cl_sh_ddr_arvalid),
      .s_axi_arready  (sh_cl_ddr_arready),
@@ -1359,31 +1365,33 @@ module sh_bfm #(
      .s_axi_rlast    (sh_cl_ddr_rlast),
      .s_axi_rvalid   (sh_cl_ddr_rvalid),
      .s_axi_rready   (cl_sh_ddr_rready),
-  
-     .m_axi_awid     (cl_sh_ddr_awid_q),   
-     .m_axi_awaddr   (cl_sh_ddr_awaddr_q), 
-     .m_axi_awlen    (cl_sh_ddr_awlen_q),  
+
+     .m_axi_awid     (cl_sh_ddr_awid_q),
+     .m_axi_awaddr   (cl_sh_ddr_awaddr_q),
+     .m_axi_awuser   (cl_sh_ddr_awuser_q),
+     .m_axi_awlen    (cl_sh_ddr_awlen_q),
      .m_axi_awvalid  (cl_sh_ddr_awvalid_q),
      .m_axi_awready  (sh_cl_ddr_awready_q),
-     .m_axi_wdata    (cl_sh_ddr_wdata_q),  
-     .m_axi_wstrb    (cl_sh_ddr_wstrb_q),  
-     .m_axi_wlast    (cl_sh_ddr_wlast_q),  
-     .m_axi_wvalid   (cl_sh_ddr_wvalid_q), 
-     .m_axi_wready   (sh_cl_ddr_wready_q), 
-     .m_axi_bid      (sh_cl_ddr_bid_q),    
-     .m_axi_bresp    (sh_cl_ddr_bresp_q),  
-     .m_axi_bvalid   (sh_cl_ddr_bvalid_q), 
-     .m_axi_bready   (cl_sh_ddr_bready_q), 
-     .m_axi_arid     (cl_sh_ddr_arid_q),   
-     .m_axi_araddr   (cl_sh_ddr_araddr_q), 
-     .m_axi_arlen    (cl_sh_ddr_arlen_q),  
+     .m_axi_wdata    (cl_sh_ddr_wdata_q),
+     .m_axi_wstrb    (cl_sh_ddr_wstrb_q),
+     .m_axi_wlast    (cl_sh_ddr_wlast_q),
+     .m_axi_wvalid   (cl_sh_ddr_wvalid_q),
+     .m_axi_wready   (sh_cl_ddr_wready_q),
+     .m_axi_bid      (sh_cl_ddr_bid_q),
+     .m_axi_bresp    (sh_cl_ddr_bresp_q),
+     .m_axi_bvalid   (sh_cl_ddr_bvalid_q),
+     .m_axi_bready   (cl_sh_ddr_bready_q),
+     .m_axi_arid     (cl_sh_ddr_arid_q),
+     .m_axi_araddr   (cl_sh_ddr_araddr_q),
+     .m_axi_aruser   (cl_sh_ddr_aruser_q),
+     .m_axi_arlen    (cl_sh_ddr_arlen_q),
      .m_axi_arvalid  (cl_sh_ddr_arvalid_q),
      .m_axi_arready  (sh_cl_ddr_arready_q),
-     .m_axi_rid      (sh_cl_ddr_rid_q),    
-     .m_axi_rdata    (sh_cl_ddr_rdata_q),  
-     .m_axi_rresp    (sh_cl_ddr_rresp_q),  
-     .m_axi_rlast    (sh_cl_ddr_rlast_q),  
-     .m_axi_rvalid   (sh_cl_ddr_rvalid_q), 
+     .m_axi_rid      (sh_cl_ddr_rid_q),
+     .m_axi_rdata    (sh_cl_ddr_rdata_q),
+     .m_axi_rresp    (sh_cl_ddr_rresp_q),
+     .m_axi_rlast    (sh_cl_ddr_rlast_q),
+     .m_axi_rvalid   (sh_cl_ddr_rvalid_q),
      .m_axi_rready   (cl_sh_ddr_rready_q)
      );
 
@@ -1394,7 +1402,7 @@ module sh_bfm #(
      .s_axi_awid(cl_sh_ddr_awid_q),
      .s_axi_awaddr(cl_sh_ddr_awaddr_q),
      .s_axi_awlen(cl_sh_ddr_awlen_q),
-     .s_axi_awuser(19'b0),
+     .s_axi_awuser({18'b0,cl_sh_ddr_awuser_q}),
      .s_axi_awvalid(cl_sh_ddr_awvalid_q),
      .s_axi_awready(sh_cl_ddr_awready_q),
 
@@ -1412,7 +1420,7 @@ module sh_bfm #(
      .s_axi_arid(cl_sh_ddr_arid_q),
      .s_axi_araddr(cl_sh_ddr_araddr_q),
      .s_axi_arlen(cl_sh_ddr_arlen_q),
-     .s_axi_aruser(19'b0),
+     .s_axi_aruser({18'b0,cl_sh_ddr_aruser_q}),
      .s_axi_arvalid(cl_sh_ddr_arvalid_q),
      .s_axi_arready(sh_cl_ddr_arready_q),
 
@@ -1429,7 +1437,7 @@ module sh_bfm #(
      .m_axi_awid(sync_cl_sh_ddr_awid),
      .m_axi_awaddr(sync_cl_sh_ddr_awaddr),
      .m_axi_awlen(sync_cl_sh_ddr_awlen),
-     .m_axi_awuser(),
+     .m_axi_awuser(sync_cl_sh_ddr_awuser),
      .m_axi_awvalid(sync_cl_sh_ddr_awvalid),
      .m_axi_awready(sync_sh_cl_ddr_awready),
 
@@ -1447,7 +1455,7 @@ module sh_bfm #(
      .m_axi_arid(sync_cl_sh_ddr_arid),
      .m_axi_araddr(sync_cl_sh_ddr_araddr),
      .m_axi_arlen(sync_cl_sh_ddr_arlen),
-     .m_axi_aruser(),
+     .m_axi_aruser(sync_cl_sh_ddr_aruser),
      .m_axi_arvalid(sync_cl_sh_ddr_arvalid),
      .m_axi_arready(sync_sh_cl_ddr_arready),
 
@@ -1507,10 +1515,11 @@ module sh_bfm #(
      .c0_ddr4_s_axi_awid(sync_cl_sh_ddr_awid),
      .c0_ddr4_s_axi_awaddr(sync_cl_sh_ddr_awaddr[33:0]),
      .c0_ddr4_s_axi_awlen(sync_cl_sh_ddr_awlen),
+    //  .c0_ddr4_s_axi_awuser(sync_cl_sh_ddr_awuser[0]),
      .c0_ddr4_s_axi_awsize(3'h6),
      .c0_ddr4_s_axi_awburst(2'b00),
      .c0_ddr4_s_axi_awlock(1'b0),
-     .c0_ddr4_s_axi_awcache(4'h0),    
+     .c0_ddr4_s_axi_awcache(4'h0),
      .c0_ddr4_s_axi_awprot(3'h0),
      .c0_ddr4_s_axi_awqos(4'h0),
      .c0_ddr4_s_axi_awvalid(sync_cl_sh_ddr_awvalid),
@@ -1530,6 +1539,7 @@ module sh_bfm #(
      .c0_ddr4_s_axi_arid(sync_cl_sh_ddr_arid),
      .c0_ddr4_s_axi_araddr(sync_cl_sh_ddr_araddr[33:0]),
      .c0_ddr4_s_axi_arlen(sync_cl_sh_ddr_arlen),
+    //  .c0_ddr4_s_axi_aruser(sync_cl_sh_ddr_aruser[0]),
      .c0_ddr4_s_axi_arsize(3'h6),
      .c0_ddr4_s_axi_arburst(2'b0),
      .c0_ddr4_s_axi_arlock(1'b0),
@@ -1565,7 +1575,7 @@ module sh_bfm #(
          M_C_CLK_DN = 0;
          M_C_CLK_DP = 0;
          M_C_PAR = 0;
-         
+
          sh_cl_ddr_is_ready = 'b1;
          ddr_is_ready_sync  = 'b1;
          ddr_is_ready_presync = 'b1;
@@ -1587,7 +1597,7 @@ module sh_bfm #(
                .cl_sh_ddr_wlast(cl_sh_ddr_wlast),
                .cl_sh_ddr_wvalid(cl_sh_ddr_wvalid),
                .sh_cl_ddr_wready(sh_cl_ddr_wready),
-               
+
                .sh_cl_ddr_bid(sh_cl_ddr_bid),
                .sh_cl_ddr_bresp(sh_cl_ddr_bresp),
                .sh_cl_ddr_bvalid(sh_cl_ddr_bvalid),
@@ -1609,7 +1619,7 @@ module sh_bfm #(
                .cl_sh_ddr_rready(cl_sh_ddr_rready)
             );
 `endif
-                        
+
 
 
 
@@ -1676,11 +1686,11 @@ module sh_bfm #(
                          .axil_rresp(bar1_sh_rresp),
                          .axil_rready(sh_bar1_rready));
 
-   
-   // Check core clock frequency when chk_clk_freq is set 
+
+   // Check core clock frequency when chk_clk_freq is set
    always @(posedge clk_core)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
          core_rising_edge = $time;
          @(posedge clk_core)
             core_clk_period = $time - core_rising_edge;
@@ -1691,10 +1701,10 @@ module sh_bfm #(
        end
     end
 
-   // Check main clock frequency when chk_clk_freq is set 
+   // Check main clock frequency when chk_clk_freq is set
    always @(posedge clk_main_a0)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           main_rising_edge = $time;
           @(posedge clk_main_a0)
              main_clk_period = $time - main_rising_edge;
@@ -1705,10 +1715,10 @@ module sh_bfm #(
        end
     end
 
-   // Check extra a1 clock frequency when chk_clk_freq is set 
+   // Check extra a1 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_a1)
    begin
-      if (chk_clk_freq) begin  
+      if (chk_clk_freq) begin
          extra_a1_rising_edge = $time;
          @(posedge clk_extra_a1)
             extra_a1_clk_period = $time - extra_a1_rising_edge;
@@ -1716,13 +1726,13 @@ module sh_bfm #(
             clk_err_count++;
             $display("Error - extra a1 clk frequency check failed. Expected %x Actual %x", extra_a1_clk_period, EXTRA_A1_DLY);
          end
-       end 
+       end
     end
 
-   // Check extra a2 clock frequency when chk_clk_freq is set 
+   // Check extra a2 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_a2)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           extra_a2_rising_edge = $time;
           @(posedge clk_extra_a2)
              extra_a2_clk_period = $time - extra_a2_rising_edge;
@@ -1733,10 +1743,10 @@ module sh_bfm #(
        end
     end
 
-   // Check extra a3 clock frequency when chk_clk_freq is set 
+   // Check extra a3 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_a3)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           extra_a3_rising_edge = $time;
           @(posedge clk_extra_a3)
              extra_a3_clk_period = $time - extra_a3_rising_edge;
@@ -1746,11 +1756,11 @@ module sh_bfm #(
           end
        end
     end
-   
-   // Check extra b0 clock frequency when chk_clk_freq is set 
+
+   // Check extra b0 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_b0)
     begin
-      if (chk_clk_freq) begin  
+      if (chk_clk_freq) begin
         extra_b0_rising_edge = $time;
         @(posedge clk_extra_b0)
            extra_b0_clk_period = $time - extra_b0_rising_edge;
@@ -1761,10 +1771,10 @@ module sh_bfm #(
       end
     end
 
-   // Check extra b1 clock frequency when chk_clk_freq is set 
+   // Check extra b1 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_b1)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           extra_b1_rising_edge = $time;
           @(posedge clk_extra_b1)
              extra_b1_clk_period = $time - extra_b1_rising_edge;
@@ -1775,10 +1785,10 @@ module sh_bfm #(
        end
     end
 
-   // Check extra c0 clock frequency when chk_clk_freq is set 
+   // Check extra c0 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_c0)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           extra_c0_rising_edge = $time;
           @(posedge clk_extra_c0)
              extra_c0_clk_period = $time - extra_c0_rising_edge;
@@ -1789,10 +1799,10 @@ module sh_bfm #(
        end
     end
 
-   // Check extra c1 clock frequency when chk_clk_freq is set 
+   // Check extra c1 clock frequency when chk_clk_freq is set
    always @(posedge clk_extra_c1)
     begin
-       if (chk_clk_freq) begin 
+       if (chk_clk_freq) begin
           extra_c1_rising_edge = $time;
           @(posedge clk_extra_c1)
              extra_c1_clk_period = $time - extra_c1_rising_edge;
@@ -1803,7 +1813,7 @@ module sh_bfm #(
        end
     end
 
-   
+
    //=================================================
    //
    // power_up
@@ -1812,8 +1822,8 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task power_up(input ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0, 
-                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0, 
+   task power_up(input ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0,
+                       ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0,
                        ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
       case (clk_recipe_a)
          ClockRecipe::A0: begin
@@ -1862,7 +1872,7 @@ module sh_bfm #(
             $display("Error - Invalid Clock Profile Selected.");
             $finish;
          end
-      endcase 
+      endcase
       case (clk_recipe_b)
          ClockRecipe::B0: begin
             EXTRA_B0_DLY = 2ns;
@@ -1949,7 +1959,7 @@ module sh_bfm #(
       $display("[%t] : Start checking clock frequency...", $realtime);
       chk_clk_freq = chk_freq;
    endfunction // set_chk_clk_freq
-   
+
    //=================================================
    //
    // chk_prot_err_stat
@@ -2004,7 +2014,7 @@ module sh_bfm #(
    function int get_ecc_err_cnt();
       return ecc_err_cnt;
    endfunction
-   
+
    //=================================================
    //
    // nsec_delay
@@ -2076,7 +2086,7 @@ module sh_bfm #(
    function logic[63:0] get_global_counter_1();
       return sh_cl_glcount1;
    endfunction // get_global_counter_0
-   
+
    //=================================================
    //
    // Kernel_reset
@@ -2131,9 +2141,9 @@ module sh_bfm #(
          $display("[%t] : DEBUG mapping host memory to 0x%16x", $realtime, addr);
       end
       host_memory_addr = addr;
-      tb.use_c_host_memory = 1'b1;      
+      tb.use_c_host_memory = 1'b1;
    endtask // map_host_memory
-  
+
    //=================================================
    //
    // set_ack_bit
@@ -2166,11 +2176,11 @@ module sh_bfm #(
    //   Outputs: None
    //
    //=================================================
-   task poke(input logic [63:0] addr, 
-             logic [511:0] data, 
-             logic [5:0] id = 6'h0, 
-             DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+   task poke(input logic [63:0] addr,
+             logic [511:0] data,
+             logic [5:0] id = 6'h0,
+             DataSize::DATA_SIZE size = DataSize::UINT32,
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS);
 
       logic [63:0] strb;
 
@@ -2187,38 +2197,38 @@ module sh_bfm #(
            $finish;
         end
       endcase // case (size)
-      
+
       case (intf)
         AxiPort::PORT_DMA_PCIS: begin
            AXI_Command axi_cmd;
            AXI_Data    axi_data;
 
            logic [1:0] resp;
-           
+
            axi_cmd.addr = addr;
            axi_cmd.len  = 0;
            axi_cmd.size = size;
            axi_cmd.id   = id;
-    
+
            sh_cl_wr_cmds.push_back(axi_cmd);
 
            axi_data.data = data << (addr[5:0] * 8);
            axi_data.strb = strb << addr[5:0];
-           
+
            axi_data.id   = id;
            axi_data.last = 1'b1;
-           
+
            #20ns sh_cl_wr_data.push_back(axi_data);
-      
+
            while (cl_sh_b_resps.size() == 0)
              #20ns;
-      
+
            resp = cl_sh_b_resps[0].resp;
            cl_sh_b_resps.pop_front();
         end
         AxiPort::PORT_SDA: begin
            sda_axil_bfm.poke(addr, data);
-        end        
+        end
         AxiPort::PORT_OCL: begin
            ocl_axil_bfm.poke(addr, data);
         end
@@ -2230,19 +2240,19 @@ module sh_bfm #(
           $finish;
         end
       endcase // case (intf)
-      
+
    endtask // poke
 
-   task poke_pcis(input logic [63:0] addr, 
-                  logic [511:0] data, 
-                  logic [63:0] strb, 
+   task poke_pcis(input logic [63:0] addr,
+                  logic [511:0] data,
+                  logic [63:0] strb,
                   logic [5:0] id = 6'h0);
-      
+
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
       logic [1:0]             resp;
-           
+
       axi_cmd.addr = addr;
       axi_cmd.len  = 0;
       axi_cmd.id   = id;
@@ -2251,18 +2261,18 @@ module sh_bfm #(
 
       axi_data.data = data;
       axi_data.strb = strb;
-           
+
       axi_data.id   = id;
       axi_data.last = 1'b1;
-           
+
       #20ns sh_cl_wr_data.push_back(axi_data);
-      
+
       while (cl_sh_b_resps.size() == 0)
         #20ns;
-      
+
       resp = cl_sh_b_resps[0].resp;
       cl_sh_b_resps.pop_front();
-      
+
    endtask // poke_pcis
 
    //===========================================================================
@@ -2277,28 +2287,28 @@ module sh_bfm #(
    //   Outputs: None
    //
    //==========================================================================
-   task poke_pcis_wc(input logic [63:0] addr, 
-                     logic [31:0] data [$], 
+   task poke_pcis_wc(input logic [63:0] addr,
+                     logic [31:0] data [$],
                      logic [5:0]  id = 6'h0,
                      logic [2:0]  size = 3'd6
-                     ); 
-      
+                     );
+
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
-      
+
       logic [1:0]  resp;
       logic [31:0] dw_idx;
       logic [31:0] slice_dw_idx;
       logic [31:0] total_bytes;
       logic [31:0] max_bytes;
-      
+
       total_bytes = data.size() * 4;
 
       if (size == 3'd2 && ((total_bytes != 4) || (addr[5:0] != 6'd0))) begin
          $display("FATAL ERROR: poke_pcis_wc:: Size = 2. DW count should be equal to 1 and addr should be DW aligned");
          $finish;
       end
-      
+
       if (size != 3'd6 && size != 3'd2) begin
          $display("FATAL ERROR: poke_pcis_wc:: Only Size = 2 or 6 supported");
          $finish;
@@ -2309,7 +2319,7 @@ module sh_bfm #(
          $display("FATAL ERROR: poke_pcis_wc:: AXI transaction is more than 4096 bytes");
          $finish;
       end
-      
+
       axi_cmd.addr = addr;
       axi_cmd.len  = (total_bytes + addr[5:0]) % 64 ? ((total_bytes + addr[5:0])>>6) : ((total_bytes + addr[5:0])>>6) - 1;
       axi_cmd.size = size;
@@ -2318,15 +2328,15 @@ module sh_bfm #(
       sh_cl_wr_cmds.push_back(axi_cmd);
 
       dw_idx = 0;
-      
+
       for (int idx = 0; idx <= axi_cmd.len; idx++) begin
          axi_data.id   = id;
          axi_data.data = 512'd0;
          axi_data.strb = 512'd0;
          slice_dw_idx = idx == 0 ? addr[5:2] : 0;
-         
+
          while ((slice_dw_idx < 16) && (dw_idx < total_bytes/4)) begin
-            assert(data.size() > 0) else 
+            assert(data.size() > 0) else
                begin
                   $display("FATAL ERROR: poke_pcis_wc:: Something went wrong. data queue already empty");
                   $finish;
@@ -2337,18 +2347,18 @@ module sh_bfm #(
             slice_dw_idx++;
          end
          axi_data.last = (axi_cmd.len == idx);
-         
+
          sh_cl_wr_data.push_back(axi_data);
       end // for (idx = 0; idx <= len; idx++)
-            
+
       while (cl_sh_b_resps.size() == 0)
         #20ns;
-      
+
       resp = cl_sh_b_resps[0].resp;
       cl_sh_b_resps.pop_front();
-      
+
    endtask // poke_pcis_wc
-   
+
    //=================================================
    //
    // peek
@@ -2368,28 +2378,28 @@ module sh_bfm #(
    //   Outputs: Read Data Value
    //
    //=================================================
-   task peek(input logic [63:0] addr, 
-             output logic [511:0] data, 
-             input logic [5:0] id = 6'h0, 
-             DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+   task peek(input logic [63:0] addr,
+             output logic [511:0] data,
+             input logic [5:0] id = 6'h0,
+             DataSize::DATA_SIZE size = DataSize::UINT32,
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS);
       data = 0;
       case (intf)
         AxiPort::PORT_DMA_PCIS : begin
            AXI_Command axi_cmd;
            int         byte_idx;
            int         mem_arr_idx;
-           
+
            axi_cmd.addr = addr;
            axi_cmd.len  = 0;
            axi_cmd.size = size;
            axi_cmd.id   = id;
-           
+
            sh_cl_rd_cmds.push_back(axi_cmd);
-           
+
            byte_idx     = addr[5:0];
            mem_arr_idx  = byte_idx*8;
-           
+
            while (cl_sh_rd_data.size() == 0)
              #20ns;
            for (int num_bytes =0; num_bytes < 2**size; num_bytes++) begin
@@ -2407,27 +2417,27 @@ module sh_bfm #(
            bar1_axil_bfm.peek(addr, data);
         end
       endcase // case (intf)
-      
+
    endtask // peek
 
-   task peek_pcis(input logic [63:0] addr, 
-             output logic [511:0] data, 
+   task peek_pcis(input logic [63:0] addr,
+             output logic [511:0] data,
              input logic [5:0] id = 6'h0);
-      
+
       AXI_Command axi_cmd;
-           
+
       axi_cmd.addr = addr;
       axi_cmd.len  = 0;
       axi_cmd.id   = id;
-      
+
       sh_cl_rd_cmds.push_back(axi_cmd);
-      
+
       while (cl_sh_rd_data.size() == 0)
         #20ns;
-      
+
       data = cl_sh_rd_data[0].data;
       cl_sh_rd_data.pop_front();
-      
+
    endtask // peek_pcis
 
    //=================================================
@@ -2436,7 +2446,7 @@ module sh_bfm #(
    //
    //   Description: used to move a data buffer to the CL via the PCIS AXI interface using one of four channels.
    //        The size of the transfer is determined by the number of bytes in the buffer.
-   //        
+   //
    //        chan    = 0-3 channel number
    //        buffer  = AXI bus ID
    //        cl_addr = starting CL AXI addr
@@ -2447,13 +2457,13 @@ module sh_bfm #(
    //=================================================
    function void dma_buffer_to_cl(input logic [1:0] chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
       DMA_OP dop;
-      
+
       dop.buffer = src_addr;
       dop.cl_addr = cl_addr;
       dop.len = len;
-      
+
       h2c_dma_list[chan].push_back(dop);
-      
+
    endfunction // dma_buffer_to_cl
 
    function automatic void dma_cl_to_buffer(input logic [1:0] chan, logic [63:0] dst_addr, input [63:0] cl_addr, logic [27:0] len);
@@ -2468,7 +2478,7 @@ module sh_bfm #(
       h2c_dma_started[chan] = 1'b1;
       h2c_dma_done[chan] = 1'b0;
    endfunction // start_dma_to_cl
-   
+
    function void start_dma_to_buffer(input int chan);
       c2h_dma_started[chan] = 1'b1;
       c2h_dma_done[chan] = 1'b0;
@@ -2476,10 +2486,10 @@ module sh_bfm #(
 
    function bit is_dma_to_cl_done(input int chan);  // 1 = done
       //$display("In function is_dma_to_cl_done h2c_dma_done is %x \n", h2c_dma_done[chan]);
-      
+
       return h2c_dma_done[chan];
    endfunction // is_dma_to_cl_done
-   
+
    function bit is_dma_to_buffer_done(input int chan); // 1 = done
       //$display("In function is_dma_to_buffer_done c2h_dma_done is %x \n", c2h_dma_done[chan]);
       return c2h_dma_done[chan];
@@ -2488,7 +2498,7 @@ module sh_bfm #(
    function bit is_ddr_ready();  // 1 = done
       return ddr_is_ready;
    endfunction // is_ddr_ready
-   
+
    //=================================================
    //
    // sh->cl xdma Interface
@@ -2513,7 +2523,7 @@ module sh_bfm #(
          logic [5:0] start_addr;
          bit aligned;
          bit last_data_beat;
-         
+
          num_of_data_beats = 0;
          last_data_beat    = 0;
          byte_cnt          = 0;
@@ -2522,10 +2532,10 @@ module sh_bfm #(
          last_beat         = 0;
          start_addr        = 0;
          aligned           = 0;
-              
+
          for (int chan = 0; chan < 4; chan++) begin
            if ((h2c_dma_started[chan] != 1'b0) && (h2c_dma_list[chan].size() > 0)) begin
-              dop = h2c_dma_list[chan].pop_front();                          
+              dop = h2c_dma_list[chan].pop_front();
               if (dop.cl_addr[5:0] !== 6'h00) begin
                  $fatal("Address in a SH->CL transfer should be aligned to 64 byte boundary for address %x \n", dop.cl_addr);
               end
@@ -2542,7 +2552,7 @@ module sh_bfm #(
                   axi_cmd.len  = (num_of_data_beats==1) ? 0 :
                                   aligned ? (num_of_data_beats - 1 - last_beat) : 0;
                   // handle the condition if addr is crossing 4k page boundry
-                  if(dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095) begin 
+                  if(dop.cl_addr[11:0] + ((axi_cmd.len + 1) * 64) > 4095) begin
                     axi_cmd.len = ((4096 - dop.cl_addr[11:0])/64) - 1;
                   end
                 end
@@ -2563,14 +2573,14 @@ module sh_bfm #(
                 axi_cmd.size = 6;
                 sh_cl_wr_cmds.push_back(axi_cmd);
                 h2c_dma_wr_cmd_cnt[chan]++;
-                 
+
                 // loop to do multiple data beats
                 for(int j = 0; j <= axi_cmd.len; j++) begin
                   axi_data.data = 0;
                   axi_data.strb = 64'b0;
                   axi_data.id   = chan;
-                  last_data_beat = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;              
-                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64; 
+                  last_data_beat = (((num_of_data_beats - 1) - burst_cnt) == 0) ? 1 : 0;
+                  num_bytes = last_beat ? (dop.len + dop.cl_addr[5:0])%64 : 64;
                   axi_data.last = (j == axi_cmd.len) ? 1 : 0;
                   if(num_of_data_beats == 1) begin
                     num_bytes = (dop.len == 64) ? 64 : (dop.len)%64;
@@ -2617,16 +2627,16 @@ module sh_bfm #(
       else begin
         DMA_OP dop;
         static int byte_cnt[4];
-        
+
         for (int chan = 0; chan < 4; chan++) begin
           if((cl_sh_rd_data.size() > 0) && (c2h_dma_started[chan] != 1'b0)) begin
             if(chan == cl_sh_rd_data[0].id) begin
-              dop = c2h_data_dma_list[chan].pop_front();            
-              
+              dop = c2h_data_dma_list[chan].pop_front();
+
               for (int i = dop.cl_addr[5:0]; i < 64 ; i++) begin
                 tb.hm_put_byte(.addr(dop.buffer + byte_cnt[chan]), .d(cl_sh_rd_data[0].data[(i*8)+:8]));
                 if (debug) begin
-                  $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x", 
+                  $display("[%t] - DEBUG read data  dop.buffer[%2d]: %0x  read_que data: %0x",
                                             $realtime, i, dop.buffer[i], cl_sh_rd_data[0].data[(i*8)+:8]);
                 end
                 byte_cnt[chan]++;
@@ -2634,7 +2644,7 @@ module sh_bfm #(
               c2h_dma_done[chan] = (c2h_data_dma_list[chan].size() == 0);
 
               if ((c2h_dma_done[chan]) && (cl_sh_rd_data[0].last == 1)) c2h_dma_started[chan] = 0;
-               
+
               if ((cl_sh_rd_data[0].last == 1) && (byte_cnt[chan] >= dop.len)) // end of current DMA op, reset byte count
                 byte_cnt[chan] = 0;
 
@@ -2647,14 +2657,14 @@ module sh_bfm #(
                   ecc_err_cnt = 0;
                   $display("CL returned SLVERR on READ Response \n");
                 end
-              end 
+              end
               cl_sh_rd_data.pop_front();
             end // if (chan == cl_sh_rd_data[0].id)
           end
         end
       end
    end
-  
+
    //=================================================
    //
    // cl->sh xdma Interface
@@ -2715,7 +2725,7 @@ module sh_bfm #(
                   if( (axi_cmd.addr[11:0] + ((axi_cmd.len + 1) * 64)) > 4095) begin
                     axi_cmd.len = ((4096 - axi_cmd.addr[11:0])/64) - 1;
                   end
-                  
+
                   axi_cmd.id   = chan;
                 end
                 axi_cmd.size = 6;
@@ -2763,7 +2773,7 @@ module sh_bfm #(
             sh_ddr_stat_wr2    = 0;
          end
      endcase // case (ddr_idx)
-     
+
   endtask
 
 endmodule // sh_bfm

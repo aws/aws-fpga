@@ -2,18 +2,16 @@
 
 # Introduction
 
-Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK comes with a shell simulation model that supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence Incisive and Synopsys' VCS RTL simulators. See table below for supported simulator versions. 
+Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK comes with a shell simulation model that supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence Incisive and Synopsys' VCS RTL simulators. Small shell currently only supports Vivado 2020.2. See table below for supported simulator versions. 
 
-| Simulator | Vivado 2017.4 | Vivado 2018.2 | Vivado 2018.3 | Vivado 2019.1 |
-|--------------------------|--------------------|--------------------|--------------------|---|
-| Xilinx Vivado XSIM | Vivado v2017.4 | Vivado v2018.2 | Vivado v2018.3 |Vivado v2019.1 |
-| Synopsys VCS | M-2017.03-SP2-11 | N-2017.12-SP1-1 | N-2017.12-SP2 | O-2018.09 |
-| Mentor Graphics Questa | 10.6b | 10.6c_1 | 10.6c_1 | 10.7c |
-| Cadence Incisive Enterprise Simulator(IES) | 15.20.063 | 15.20.063 | 15.20.063 | 15.20.065 |
+|    Simulator            | Vivado 2020.2  |
+|-------------------------|----------------|
+| Xilinx Vivado XSIM      | Vivado v2020.2 |
+| Synopsys VCS            | Q-2020.03      |
+| Mentor Graphics Questa  | 2020.2         |
+| Cadence Incisive Enterprise Simulator(IES) | 15.20.083 |
 
 Developers can write their tests in SystemVerilog and/or C languages. If a developer chooses to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
-
-<img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
 
 # Quick Start
 
@@ -30,7 +28,7 @@ Please refer to the [release notes](../../RELEASE_NOTES.md) or the [supported Vi
 AWS FPGA HDK can be cloned and installed on your EC2 instance or server by calling:
 
 ```
-    $ git clone https://github.com/aws/aws-fpga
+    $ git clone -b small_shell https://github.com/aws/aws-fpga
     $ cd aws-fpga
     $ source hdk_setup.sh
 ```
@@ -243,29 +241,6 @@ out:
 
 ```
 
-[test_dram_dma_hwsw_cosim.c](../cl/examples/cl_dram_dma/software/runtime/test_dram_dma_hwsw_cosim.c)
-
-```
-For HW/SW simulation the below header files need to be included.
-
-SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
-
-For test_dram_dma test the below two functions are used for DMA transfers from host and to host.
-
-//This function on the SV side sets up the string buffer and does Host to cl transfer.
-sv_fpga_start_buffer_to_cl(slot_id, channel, buffer_size, write_buffer, (0x10000000 + channel*MEM_16G));
-
-//This function on the SV side sets up the string buffer and does CL to Host transfer.
-sv_fpga_start_cl_to_buffer(slot_id, channel, buffer_size, (0x10000000 + channel*MEM_16G));
-
-//This function updates the buffer on 'C' side.
-int send_rdbuf_to_c(char* rd_buf)
-
-For HW/SW simulation the below header files need to be included.
-SV_TEST macro should be defined in HW makefile to enable HW simulation of test_dram_dma.c
-
-```
-
 Once your test is written, you are ready to run a simulation. The *scripts/* directory is where you must launch all simulations.
 
 ```
@@ -289,9 +264,6 @@ Your design may share data between host memory and logic within the CL. To verif
 ```
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
-
-<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory"/>
-
 
 Backdoor access to host memory is provided by two functions:
 
@@ -580,79 +552,6 @@ Issues a PCIe Function Level Reset (FLR).
 | --- | --- |
 | slot_id | Slot ID |
 
-## _que_buffer_to_cl_
-## Description
-Queues a buffer for the DMA to send data to the CL.
-## Declaration
-#### function void que_buffer_to_cl(input int slot_id = 0, int chan, logic [63:0] src_addr, logic [63:0] cl_addr, logic [27:0] len);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-| src_addr | Data's Source Address |
-| cl_addr | Custom Logic Address |
-| len | Length of DMA in bytes |
-
-
-## _que_cl_to_buffer_
-## Description
-Queues a buffer for the DMA to receive data from the CL.
-## Declaration
-#### function void que_cl_to_buffer(input int slot_id = 0, int chan, logic [63:0] dst_addr, logic [63:0] cl_addr, logic [27:0] len);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-| dst_addr | Data's Destination Address |
-| cl_addr | Custom Logic Address |
-| len | Length of DMA in bytes |
-
-## _start_que_to_cl_
-## Description
-Starts the DMA operation to the CL.
-## Declaration
-#### function void start_que_to_cl(input int slot_id = 0, int chan);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-
-## _start_que_to_buffer_
-## Description
-Starts the DMA operation from the CL.
-## Declaration
-#### function void start_que_to_buffer(input int slot_id = 0, int chan);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-
-## _is_dma_to_cl_done_
-## Description
-Returns non-zero if the DMA to the CL is complete.
-## Declaration
-#### function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-
-## _is_dma_to_buffer_done_
-## Description
-Returns non-zero if the DMA to the buffer is complete.
-## Declaration
-#### function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel to use (0-3) |
-
 ## _map_host_memory_
 ## Description
 The SV Test API function 'task map_host_memory(input logic [63:0] addr)' maps host memory to 64-bit address.
@@ -768,35 +667,6 @@ The C test API function 'extern void sv_pause(uint32_t x);' is used to add delay
 | Argument | Description |
 | --- | --- |
 | x | Delay in micro seconds |
-
-## _sv_fpga_start_buffer_to_cl_
-## Description
-The C test API function 'extern "DPI-C" task sv_fpga_start_buffer_to_cl;' is used to do DMA data transfer from Host to CL.
-## Declaration
-#### extern void sv_fpga_start_buffer_to_cl(uint32_t slot_id, uint32_t chan, uint32_t buf_size, const char *wr_buffer, uint64_t cl_addr);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel |
-| buf_size | Size of the buffer |
-| wr_buffer | Data to be transferred |
-| cl_addr | Destination CL address |
-
-## _sv_fpga_start_cl_to_buffer_
-## Description
-The C test API function 'extern "DPI-C" task sv_fpga_start_cl_to_buffer;' is used to do DMA data transfer from Host to CL.
-## Declaration
-#### extern void sv_fpga_start_cl_to_buffer(uint32_t slot_id, uint32_t chan, uint32_t buf_size, uint64_t cl_addr);
-
-| Argument | Description |
-| --- | --- |
-| slot_id | Slot ID |
-| chan | DMA channel |
-| buf_size | Size of the buffer |
-| wr_buffer | Data to be transferred |
-| cl_addr | Destination CL address |
-
 
 ## _set_chk_clk_freq_
 The SV test API function 'function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);' is used to enable frequency checks in shell model.

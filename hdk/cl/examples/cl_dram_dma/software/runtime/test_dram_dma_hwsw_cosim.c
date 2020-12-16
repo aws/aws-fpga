@@ -37,6 +37,9 @@
 
 #define MEM_16G              (1ULL << 34)
 
+/* comment this off to enable DMA tests */
+#define DMA_DISABLE
+
 void usage(const char* program_name);
 int dma_example_hwsw_cosim(int slot_id, size_t buffer_size);
 
@@ -67,11 +70,13 @@ int main(int argc, char **argv)
 
 #endif
 {
+#if !defined(DMA_DISABLE)
     size_t buffer_size;
 #if defined(SV_TEST)
     buffer_size = 128;
 #else
     buffer_size = 1ULL << 24;
+#endif
 #endif
 
     /* The statements within SCOPE ifdef below are needed for HW/SW
@@ -106,14 +111,14 @@ int main(int argc, char **argv)
     /* initialize the fpga_plat library */
     rc = fpga_mgmt_init();
     fail_on(rc, out, "Unable to initialize the fpga_mgmt library");
-
 #endif
 
+#if !defined(DMA_DISABLE)
     rc = dma_example_hwsw_cosim(slot_id, buffer_size);
     fail_on(rc, out, "DMA example failed");
+#endif
 
 out:
-
 #if !defined(SV_TEST)
     return rc;
 #else
@@ -142,6 +147,7 @@ void usage(const char* program_name) {
  */
 int dma_example_hwsw_cosim(int slot_id, size_t buffer_size)
 {
+#if !defined(DMA_DISABLE)
     int write_fd, read_fd, dimm, rc;
 
     write_fd = -1;
@@ -214,6 +220,10 @@ out:
 #endif
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
+#else
+    printf("WARNING: This shell does NOT support DMA functionaity. Skipping dma_example_hwsw_cosim() routine.\n");
+    return 0;
+#endif
 }
 
 static inline int do_dma_read(int fd, uint8_t *buffer, size_t size,

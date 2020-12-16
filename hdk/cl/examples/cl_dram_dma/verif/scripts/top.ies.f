@@ -59,6 +59,7 @@ ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/sim/dest_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/src_register_slice/sim/src_register_slice.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice/sim/axi_register_slice.v
+${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_axuser/sim/axi_register_slice_axuser.v
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_register_slice_light/sim/axi_register_slice_light.v
 
 +define+DISABLE_VJTAG_DEBUG

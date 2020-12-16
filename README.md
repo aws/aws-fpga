@@ -1,25 +1,45 @@
-# Table of Contents
+# Small Shell
+This branch provides a Small Shell which is 30% smaller in size than the 1.4 Shell. Small Shell occupies only 14 Clock Regions worth of real estate in the FPGA: 10 Clock Regions in Middle SLR, and 4 Clock Regions in Bottom SLR. Smaller physical footprint of the Shell increases the available resources to the CL. This feature is available in Shell [v04182104](hdk/common/shell_v04182104) provided in this developer kit.
 
+⚠️ <b>NOTE:</b> Small Shell does not include DMA capability. Customers should implement their own DMA engine in the CL, or use [SDE IP](sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) provided in the Developer Kit.
+
+⚠️ <b>NOTE:</b> CL's with Small Shell require Xilinx 2020.2 tools
+
+⚠️ <b>NOTE:</b> Vitis and HLx flows are not supported with Small Shell since DMA engine is not included.
+
+Following table shows the resources available to CL in comparison with 1.4 Shell:
+
+|FPGA Resource Type	|Total Resource in VU9P FPGA	|Available for CL with 1.4 Shell	|Available for CL with Small Shell	|Improvement	|Improvement %	|
+|---	|---	|---	|---	|---	|---	|
+|CLB LUT	|1,181,768	|895,200	|980,272	|85,072	|9.50%	|
+|LUT as Logic	|1,181,768	|895,200	|980,272	|85,072	|9.50%	|
+|LUT as Memory	|591,840	|450,720	|493,004	|42,284	|9.38%	|
+|CLB Registers	|2,363,536	|1,790,400	|1,960,544	|170,144	|9.50%	|
+|CARRY8	|147,721	|111,900	|122,534	|10,634	|9.50%	|
+|Block RAM Tile	|2,160	|1,680	|1,824	|144	|8.57%	|
+|URAM	|960	|560	|636	|76	|13.57%	|
+|DSPs	|6,840	|5,640	|6,000	|360	|6.38%	|
+|MMCM	|30	|20	|23	|3	|15.00%	|
+
+**Additional Features:**
+
+1. Improved FPGA <-> Host Performance by 5-20% due to increase in Number of PCIM Outstanding Read Transactions to 64. This allows CL to issue more number of read requests over PCIM and therefore achieving higher performance. This results in ~20% increase in performance for smaller read request lengths = 0x1 and 0x3; and ~5% increase in performance for request lengths = 0x7, 0xF, 0x1F and 0x3F.
+2. Small Shell reduces routing congestion and ease timing closure because of additional resources in the Bottom SLR.
+3. AWS recommends customers to place their DMA Engine in Bottom SLR because the PCIM interface between Shell<->CL is now moved to Bottom SLR.
+
+# Table of Contents
 1. [Overview of AWS EC2 FPGA Development Kit](#overview-of-aws-ec2-fpga-development-kit)
-    - [Development Flow](#development-flow)
-    - [Development environments](#development-environments)
-    - [FPGA Developer AMI](#fpga-developer-ami)
-    - [FPGA Hardware Development Kit (HDK)](#hardware-development-kit-hdk)
-    - [FPGA Software Development Kit (SDK)](#runtime-tools-sdk)
-    - [Software Defined Development Environment](#software-defined-development-environment)
-1. [Amazon EC2 F1 platform features](#amazon-ec2-f1-platform-features)
 1. [Getting Started](#getting-started)
     - [Getting Familiar with AWS](#getting-familiar-with-aws)
     - [First time setup](#setting-up-development-environment-for-the-first-time)
     - [Quickstarts](#quickstarts)
-    - [How To's](#how-tos)
 1. [Documentation Overview](#documentation-overview)
 1. [Developer Support](#developer-support)
 
 # Overview of AWS EC2 FPGA Development Kit
 
 AWS EC2 FPGA Development Kit is a set of development and runtime tools to develop, simulate, debug, compile and run hardware accelerated applications on [Amazon EC2 F1 instances](https://aws.amazon.com/ec2/instance-types/f1/).
-It is distributed between this github repository and [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) provided by AWS with no cost of development tools.
+It is distributed between this github repository and FPGA Developer AMI - [Centos](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) / [AL2](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) provided by AWS with no cost of development tools.
 
 ⚠️ <b>NOTE:</b> The developer kit is supported for Linux operating systems only.
 
@@ -32,113 +52,49 @@ After creating an FPGA design (also called CL - Custom logic), developers can cr
 
 | Development Environment | Description | Accelerator Language | Hardware Interface | Debug Options| Typical Developer |
 | --------|---------|-------|---------|-------|-------|
-| Software Defined Accelerator Development using [Vitis](Vitis/README.md)/[SDAccel](SDAccel/README.md)| Development experience leverages an optimized compiler to allow easy new accelerator development or migration of existing C/C++/openCL, Verilog/VHDL to AWS FPGA instances | C/C++/OpenCL, Verilog/VHDL (RTL) | OpenCL APIs and XRT | SW/HW Emulation, Simulation, GDB, Virtual JTAG (Chipscope) | SW or HW Developer with zero FPGA experience |
 | [Hardware Accelerator Development using Vivado](hdk/README.md) | Fully custom hardware development experience provides hardware developers with the tools required for developing AFIs for AWS FPGA instances  | Verilog/VHDL | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | Simulation, Virtual JTAG | HW Developer with advanced FPGA experience |
-| [IP Integrator/High Level Design(HLx) using Vivado](hdk/docs/IPI_GUI_Vivado_Setup.md) | Graphical interface development experience for integrating IP and high level synthesis development | Verilog/VHDL/C | [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md), [peek/poke](sdk/userspace/README.md) | Simulation, Virtual JTAG | HW Developer with intermediate FPGA experience |
 
-> For on-premise development, SDAccel/Vitis/Vivado must have the [correct license and use one of the supported tool versions](./docs/on_premise_licensing_help.md). 
+> For on-premise development, Vivado must have the [correct license and use one of the supported tool versions](./docs/on_premise_licensing_help.md).
 
 ## FPGA Developer AMI
 
-The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1. 
+The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1.
 
-Given the large size of the FPGA used inside AWS F1 Instances, Xilinx tools work best with 32GiB Memory. 
-z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge instance types would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively. 
+Given the large size of the FPGA used inside AWS F1 Instances, Xilinx tools work best with 32GiB Memory.
+z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge instance types would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively.
 Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
 
 AWS marketplace offers multiple versions of the FPGA Developer AMI. The following compatibility table describes the mapping of currently supported developer kit versions to AMI versions:
 
 | Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
 |-----------|-----------|------|
-| 1.4.16+ | 2020.1 | v1.9.0-v1.9.X (Xilinx Vivado/Vitis 2020.1) |
-| 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
-| 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
-| 1.4.8 - 1.4.15a | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
-| 1.4.3 - 1.4.15a | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
-| 1.3.7 - 1.4.15a | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
-
-⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. 
-While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15a or earlier. 
-Please checkout [the latest v1.4.15a release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
-
-⚠️ Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life. See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
-
-For software-defined development please look at the runtime compatibility table based on the Xilinx toolset in use:
-[SDAccel](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table) or [Vitis](Vitis/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
-
-## Hardware Development Kit (HDK)
-
-The [HDK directory](./hdk/README.md) contains documentation, examples, simulation, build and AFI creation scripts to start building Amazon FPGA Images (AFI).  
-The HDK can be installed on any on-premises server or an EC2 instance. 
-The developer kit is not required if you plan to use a pre-built AFI shared from another developer.
-
-## Software-defined Development Environment
-
-The software-defined development environment allows customers to compile their C/C++/OpenCL code into the FPGA as kernels, and use OpenCL APIs to pass data to the FPGA. 
-Software developers with no FPGA experience will find a familiar development experience that supercharges cloud applications.
-
-In addition, this development environment allows for a mix of C/C++ and RTL accelerator designs into a C/C++ software based development environment. This method enables faster prototyping using C/C++ while supporting manual optimization of critical blocks within RTL. This approach is similar to optimizing time critical functions using software compiler optimization methods.
-
-To get started with Xilinx SDAccel, review the [Software-defined development environment readme](SDAccel/README.md).
-To get started with Xilinx Vitis, review the [Vitis unified development environment readme](Vitis/README.md).
-
-## Runtime Tools (SDK)
-
-The [SDK directory](./sdk/README.md) includes the runtime environment required to run on EC2 FPGA instances. It includes the drivers and tools to manage the AFIs that are loaded on the FPGA instance. The SDK isn't required during the AFI development process; it is only required once an AFI is loaded onto an EC2 FPGA instance. The following sdk resources are provided:
-  * Linux Kernel Drivers - The developer kit includes three drivers:
-    * [XDMA Driver](sdk/linux_kernel_drivers/xdma/README.md) - DMA interface to/from HDK accelerators.
-  * [FPGA Libraries](sdk/userspace/fpga_libs) - APIs used by C/C++ host applications.
-  * [FPGA Management Tools](sdk/userspace/fpga_mgmt_tools/README.md) - AFI management APIs for runtime loading/clearing FPGA image, gathering metrics and debug interface on the F1 instance.
-
-# Amazon EC2 F1 Platform Features
-* 1-8 Xilinx UltraScale+ VU9P based FPGA slots
-* Per FPGA Slot, Interfaces available for Custom Logic(CL):
-    * One x16 PCIe Gen 3 Interface
-    * Four DDR4 RDIMM interfaces (with ECC)
-    * AXI4 protocol support on all interfaces
-* User-defined clock frequency driving all CL to Shell interfaces
-* Multiple free running auxiliary clocks
-* PCI-E endpoint presentation to Custom Logic(CL)
-    * Management PF (physical function)
-    * Application PF
-* Virtual JTAG, Virtual LED, Virtual DIP Switches
-* PCI-E interface between Shell(SH) and Custom Logic(CL).
-    * SH to CL inbound 512-bit AXI4 interface
-    * CL to SH outbound 512-bit AXI4 interface
-    * Multiple 32-bit AXI-Lite buses for register access, mapped to different PCIe BARs
-    * Maximum payload size set by the Shell
-    * Maximum read request size set by the Shell
-    * AXI4 error handling 
-* DDR interface between SH and CL
-    * CL to SH 512-bit AXI4 interface
-    * 1 DDR controller implemented in the SH (always available)
-    * 3 DDR controllers implemented in the CL (configurable number of implemented controllers allowed)
+| 1.4.18+ | 2020.2 | v1.10.X (Xilinx Vivado/Vitis 2020.2) |
 
 # Getting Started
 
 ### Getting familiar with AWS
-If you have never used AWS before, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), and focus on the basics of the [AWS EC2](https://aws.amazon.com/ec2/) and [AWS S3](https://aws.amazon.com/s3/) services. 
+If you have never used AWS before, we recommend you start with [AWS getting started training](https://aws.amazon.com/getting-started/), and focus on the basics of the [AWS EC2](https://aws.amazon.com/ec2/) and [AWS S3](https://aws.amazon.com/s3/) services.
 Understanding the fundamentals of these services will make it easier to work with AWS F1 and the FPGA Developer Kit.
 
 FPGA Image generation and EC2 F1 instances are supported in the us-east-1 (N. Virginia), us-west-2 (Oregon), eu-west-1 (Ireland) and us-gov-west-1 ([GovCloud US](https://aws.amazon.com/govcloud-us/)) [regions](https://aws.amazon.com/about-aws/global-infrastructure/).
 
-> ⚠️ <b>NOTE:</b> By default, your AWS Account will have an EC2 F1 Instance launch limit of 0. 
+> ⚠️ <b>NOTE:</b> By default, your AWS Account will have an EC2 F1 Instance launch limit of 0.
 > Before using F1 instances, you will have to open a [Support Case](https://console.aws.amazon.com/support/home#/case/create) to increase the EC2 Instance limits to allow launching F1 instances.
 
-### Setting up development environment for the first time 
+### Setting up development environment for the first time
 
-You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premise. 
+You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premise.
 
 > ℹ️ <b>INFO:</b> We suggest starting with the FPGA Developer AMI with [build instances](#fpga-developer-ami) on EC2 as it has Xilinx tools and licenses setup for you to be able to quickly get into development.
 
 > ℹ️ <b>INFO:</b> For on-premise development, you will need to have [Xilinx tools and licenses available for you to use](./docs/on_premise_licensing_help.md)
 
-1. Start a Build Instance first to start your development. 
+1. Start a Build Instance first to start your development.
     > 💡 <b>TIP:</b> This instance does not have to be an F1 instance. You only require an F1 instance to run your AFI's(Amazon FPGA Image) once you have gone through your design build and AFI creation steps.
-    
+
     > ℹ️ <b>INFO:</b> If you need to follow GUI Development flows, please checkout our [Developer Resources](./developer_resources/README.md) where we provide Step-By-Step guides to setting up a GUI Desktop.
-1. Clone the [FPGA Developer Kit](https://github.com/aws/aws-fpga) on your instance.
-    ```git clone https://github.com/aws/aws-fpga.git```
+1. Clone the small_shell branch of [FPGA Developer Kit](https://github.com/aws/aws-fpga) on your instance.  
+    ```git clone -b small_shell https://github.com/aws/aws-fpga.git```  
 1. Follow the quickstarts from the next section.
 
 ### Quickstarts
@@ -146,17 +102,7 @@ Before you create your own AWS FPGA design, we recommend that you go through one
 
 | Description | Quickstart | Next Steps |
 |----|----|----|
-| Software Defined Accelerator Development using Xilinx Vitis | [Vitis hello_world Quickstart](Vitis/README.md) | [60+ Vitis examples](./Vitis/examples/), [Vitis Library Examples](./docs/examples/example_list.md) |
-| Software Defined Accelerator Development using Xilinx SDAccel | [SDAccel hello_world Quickstart](SDAccel/README.md) | [60+ SDAccel examples](./SDAccel/examples/) |
 | Custom Hardware Development(HDK) | [HDK hello_world Quickstart](hdk/README.md) | [CL to Shell and DRAM connectivity example](./hdk/cl/examples/cl_dram_dma), [Virtual Ethernet Application](./sdk/apps/virtual-ethernet) using the [Streaming Data Engine](./hdk/cl/examples/cl_sde) |
-| IP Integrator/High Level Design(HLx) | [IPI hello_world Quickstart](hdk/cl/examples/cl_hello_world_hlx/README.md) | [IPI GUI Examples](hdk/docs/IPI_GUI_Examples.md) |
-
-ℹ️ <b>INFO:</b> For more in-depth applications and examples of using High level synthesis, Vitis Libraries, App Notes and Workshops, please refer to our [Example List](./docs/examples/example_list.md)
-
-### How Tos
-| How To | Description | 
-|----|----|
-| [Migrate Alveo U200 designs to F1](./Vitis/docs/Alveo_to_AWS_F1_Migration.md) | This application note shows the ease of migrating an Alveo U200 design to F1. | 
 
 # Documentation Overview
 
@@ -164,22 +110,17 @@ Documentation is located throughout this developer kit and the table below conso
 
 | Topic | Document Name |  Description |
 |-----------|-----------|------|
-| AWS setup | [Setup AWS CLI and S3 Bucket](./SDAccel/docs/Setup_AWS_CLI_and_S3_Bucket.md) | Setup instructions for preparing for AFI creation |
-| Developer Kit | [RELEASE NOTES](./RELEASE_NOTES.md), [Errata](./ERRATA.md) | Release notes and Errata for all developer kit features, excluding the shell  |
+| AWS setup | [Setup AWS CLI and S3 Bucket](./docs/Setup_AWS_CLI_and_S3_Bucket.md) | Setup instructions for preparing for AFI creation |
+| Developer Kit | [RELEASE NOTES](./RELEASE_NOTES.md) | Release notes for all developer kit features, excluding the shell  |
 | Developer Kit | [Errata](./ERRATA.md) | Errata for all developer kit features, excluding the shell  |
 | F1 Shell | [AWS Shell RELEASE NOTES](./hdk/docs/AWS_Shell_RELEASE_NOTES.md) | Release notes for F1 shell |
 | F1 Shell | [AWS Shell ERRATA](./hdk/docs/AWS_Shell_ERRATA.md) | Errata for F1 shell |
 | F1 Shell | [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) | Shell-CL interface specification for HDK developers building AFI |
 | F1 Shell - Timeout and AXI Protocol Protection | [How to detect a shell timeout](hdk/docs/HOWTO_detect_shell_timeout.md) | The shell will terminate transactions after a time period or on an illegal transaction.  This describes how to detect and gather data to help debug CL issues caused by timeouts. |
-| Vitis | [Debug Vitis Kernel](./Vitis/docs/Debug_Vitis_Kernel.md) | Instructions on debugging Vitis Kernel |
-| Vitis | [Create Runtime AMI](./Vitis/docs/Create_Runtime_AMI.md) | Instructions on creating a runtime AMI when using Xilinx Vitis|
-| Vitis | [XRT Instructions](./Vitis/docs/XRT_installation_instructions.md) | Instructions on building, installing XRT with MPD daemon considerations for F1 |
-| SDAccel | [Debug RTL Kernel](./SDAccel/docs/Debug_RTL_Kernel.md) | Instructions on debugging RTL Kernel with SDAccel |
-| SDAccel | [Create Runtime AMI](./SDAccel/docs/Create_Runtime_AMI.md) | Instructions on creating a runtime AMI when using Xilinx SDAccel|
 | HDK - Host Application | [Programmer View](./hdk/docs/Programmer_View.md) | Host application to CL interface specification |
 | HDK - CL Debug | [Debug using Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) | Debugging CL using Virtual JTAG (Chipscope)  |
 | HDK - Simulation | [Simulating CL Designs](./hdk/docs/RTL_Simulating_CL_Designs.md) | Shell-CL simulation specification |
-| HDK - Driver | [README](./sdk/linux_kernel_drivers/xdma/README.md) | Describes the DMA driver (XDMA) used by HDK examples and includes a link to an installation guide |
+| HDK - Driver | [README](./sdk/linux_kernel_drivers/xdma/README.md) | Describes the XDMA driver used by HDK examples and includes a link to an installation guide |
 | AFI | [AFI Management SDK](./sdk/userspace/fpga_mgmt_tools/README.md) | CLI documentation for managing AFI on the F1 instance |
 | AFI - EC2 CLI | [copy\_fpga\_image](./hdk/docs/copy_fpga_image.md), [delete\_fpga\_image](./hdk/docs/delete_fpga_image.md), [describe\_fpga\_images](./hdk/docs/describe_fpga_images.md), [fpga\_image\_attributes](./hdk/docs/fpga_image_attributes.md) | CLI documentation for administering AFIs |
 | AFI - Creation Error Codes | [create\_fpga\_image\_error\_codes](hdk/docs/create_fpga_image_error_codes.md) | CLI documentation for managing AFIs |

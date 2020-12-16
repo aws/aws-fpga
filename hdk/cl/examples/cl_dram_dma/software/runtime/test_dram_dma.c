@@ -33,12 +33,14 @@
 #define	MEM_16G              (1ULL << 34)
 #define USER_INTERRUPTS_MAX  (16)
 
+/* comment this off to enable DMA tests */
+#define DMA_DISABLE 
+
 /* use the standard out logger */
 static const struct logger *logger = &logger_stdout;
 
 void usage(const char* program_name);
 int dma_example(int slot_id, size_t buffer_size);
-
 void rand_string(char *str, size_t size);
 int interrupt_example(int slot_id, int interrupt_number);
 int axi_mstr_example(int slot_id);
@@ -72,14 +74,17 @@ int main(int argc, char **argv) {
 
     /* check that the AFI is loaded */
     log_info("Checking to see if the right AFI is loaded...");
+
 #ifndef SV_TEST
     rc = check_slot_config(slot_id);
     fail_on(rc, out, "slot config is not correct");
 #endif
 
+#ifndef DMA_DISABLE
     /* run the dma test example */
     rc = dma_example(slot_id, 1ULL << 24);
     fail_on(rc, out, "DMA example failed");
+#endif
 
     /* run interrupt examples */
     for (interrupt_n = 0; interrupt_n < USER_INTERRUPTS_MAX; interrupt_n++) {
@@ -105,6 +110,7 @@ void usage(const char* program_name) {
  * buffer into each of the 4 DDR DIMMS.
  */
 int dma_example(int slot_id, size_t buffer_size) {
+#ifndef DMA_DISABLE
     int write_fd, read_fd, dimm, rc;
 
     write_fd = -1;
@@ -165,6 +171,10 @@ out:
     }
     /* if there is an error code, exit with status 1 */
     return (rc != 0 ? 1 : 0);
+#else
+    printf("WARNING: This shell does NOT support DMA functionality. Skipping dma_example() routine.\n");
+    return 0;
+#endif
 }
 
 int interrupt_example(int slot_id, int interrupt_number) {

@@ -11,5 +11,3 @@ This checklist includes important items that the developer should check before c
 5. Update the timing and placement constraints under `$CL_DIR/build/constraints` for your design specific changes.
 
 6. Update `$CL_DIR/build/scripts/create_dcp_from_cl.tcl` for your design specific changes, specifically around IP sources and xdc files, and your specific design xdc files.
-
-7. If you ran the HLx flow before, make sure you [follow the steps to switch between HLx and HDK flows](../docs/IPI_GUI_Vivado_Setup.md#hlxhdk_switch)

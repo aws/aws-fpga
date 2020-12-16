@@ -68,7 +68,7 @@ __**Step 2**__: Clone the git repo locally under my_fpga_dir for example:
 ```
   $ mkdir -p <my_fpga_repo>
   $ cd <my_fpga_repo>
-  $ git clone https://github.com/aws/aws-fpga
+  $ git clone -b small_shell https://github.com/aws/aws-fpga
 ```
 
 *Note: the above mentioned git call would fail if the local git repository already exists.*

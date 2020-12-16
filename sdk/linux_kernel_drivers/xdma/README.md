@@ -30,7 +30,9 @@ XDMA driver source code is distributed with AWS FPGA HDK and SDK.
 
 [XDMA Installation Guide](./xdma_install.md) provides detailed guidelines on how to compile, install and troubleshoot a XDMA installation.
 
-** NOTE: Usage of XDMA is not mandatory. AWS provides memory-mapped PCIe address space for direct communication between CPU and FPGA. **
+⚠️ <b>NOTE:</b> Usage of XDMA is not mandatory. AWS provides memory-mapped PCIe address space for direct communication between CPU and FPGA.
+
+⚠️ <b>NOTE:</b> This document provides general XDMA driver usage information for all shell variations. Small Shell does NOT provide built-in DMA, so any DMA related driver function should NOT be used for this shell. However, the XDMA driver is required to be installed if [User-defined Interrupt](./user_defined_interrupts_README.md) is needed.
 
 For a complete description of the different CPU to FPGA communication options and various options available, please review the [Programmers' View](../../../hdk/docs/Programmer_View.md).
 
@@ -86,7 +88,7 @@ int main()
     if ((write_fd = open("/dev/xdma0_h2c_0",O_WRONLY)) == -1) {
         perror("open failed with errno");
     }
-    
+
     /* Open a XDMA read channel (Core to Host) */
     if ((read_fd = open("/dev/xdma0_c2h_0",O_RDONLY)) == -1) {
         perror("open failed with errno");
@@ -97,14 +99,14 @@ int main()
     if (ret < 0) {
         perror("write failed with errno");
     }
-    
+
     printf("Tried to write %u bytes, succeeded in writing %u bytes\n", BUF_SIZE, ret);
 
     ret = pread(read_fd, dstBuf, BUF_SIZE, OFFSET_IN_FPGA_DRAM);
     if (ret < 0) {
         perror("read failed with errno");
     }
-    
+
     printf("Tried reading %u byte, succeeded in read %u bytes\n", BUF_SIZE, ret);
 
     if (close(write_fd) < 0) {
@@ -115,9 +117,9 @@ int main()
     }
 
     printf("Data read is %s\n", dstBuf);
-    
+
     return 0;
-} 
+}
 ```
 
 <a name="detailed"></a>
@@ -150,7 +152,7 @@ A corresponding `close()` is used to release the DMA channel.
 
 The two standard Linux/POSIX APIs for write are listed below:
 
-***ssize_t write(int fd, void\* buf, size_t count)*** 
+***ssize_t write(int fd, void\* buf, size_t count)***
 
 ***ssize_t pwrite(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explanation](#seek))
 
@@ -158,20 +160,20 @@ The file-descriptor (fd) must have been opened successfully before calling `writ
 
 `buf`, the pointer to the source buffer to write to FPGA can have arbitrary size and alignment.
 
-The XDMA driver is responsible for mapping the `buf` memory range to list of physical addresses that the hardware DMA can use. 
+The XDMA driver is responsible for mapping the `buf` memory range to list of physical addresses that the hardware DMA can use.
 
 The XDMA driver takes care of pinning the user-space `buf` memory so that it cannot be swapped out during the DMA transfer.
 
 <a name="read"></a>
-## Read APIs 
+## Read APIs
 
-***ssize_t read(int fd, void\* buf, size_t count)*** 
+***ssize_t read(int fd, void\* buf, size_t count)***
 
 ***ssize_t pread(int fd, void\* buf, size_t count, off_t offset)***   (Recommended, see [explaination](#seek))
 
 Both `read()` and `pread()` are blocking calls, and the call waits until data is returned.
 
-Read returns the number of successful bytes, and it is the user responsibility to call `read()` with the correct offset again if the return value is not equal to count. In a case of DMA timeout (10 seconds), EIO is returned. 
+Read returns the number of successful bytes, and it is the user responsibility to call `read()` with the correct offset again if the return value is not equal to count. In a case of DMA timeout (10 seconds), EIO is returned.
 
 Possible errors:<br />
 EIO - DMA timeout or transaction failure.<br />
@@ -182,7 +184,7 @@ ENOMEM - System is out of memory.<br />
 <a name="seek"></a>
 ## Seek API
 
-The XDMA driver implements the standard `lseek()` Linux/POSIX system call, which modifies the character device file position. The position is used in `read()`/`write()` to point the FPGA memory space. 
+The XDMA driver implements the standard `lseek()` Linux/POSIX system call, which modifies the character device file position. The position is used in `read()`/`write()` to point the FPGA memory space.
 
 **WARNING: ** Calling `lseek()` without proper locking is prone to errors, as concurrent/multi-threaded design could call `lseek()` concurrently and without an atomic follow up with `read()/write()`.
 
@@ -217,7 +219,7 @@ The driver handles some error cases and passes other errors to the user.
 
 XDMA is designed to attempt a graceful recovery from errors, specifically application crashes or bugs in the Custom Logic portion of the FPGA. While the design attempts to cover all known cases, there may be corner cases that are not recoverable. The XDMA driver prints errors to Linux `dmesg` service indicating an unrecoverable error  (see FAQ: How would I check if XDMA encountered errors?).
 
-#### Error: Application Process Crash 
+#### Error: Application Process Crash
 
 In case of a crash in the userspace application, the operating system kernel tears down of all open file descriptors (XDMA channels) associated with the process. Release (equivalent of `close()`) is called for every open file descriptor.  In-flight DMA reads or writes are aborted and an error is reported in Linux `dmesg`. The FPGA itself and the XDMA driver may be left in an unknown state (see FAQ: How would I check if XDMA encountered errors?).
 
@@ -245,10 +247,10 @@ Follow the [installation guide](./xdma_install.md) for more details.
 Once the XDMA driver is running, all the available devices will be listed in /dev directory as /dev/xdmaX.
 
     `$ ls /dev/xdma*`
-    
+
 Each XDMA device exposes multiple channels under `/dev/xdmaX_h2c_Y` and `/dev/xdmaX_c2h_Y` and the developer can work directly with these character devices.
 
-**Q: When my `write()`/`pwrite()` call is returned, am I guaranteed that the data reached the FPGA?** 
+**Q: When my `write()`/`pwrite()` call is returned, am I guaranteed that the data reached the FPGA?**
 
 No. System calls to `write()`/`pwrite()` return the number of bytes which were written or read. It is up to the caller to make the call again if the operation did not complete.
 
@@ -259,8 +261,8 @@ During normal operations, XDMA does NOT drop data.
 Two cases in which XDMA does drop data are:
 1. Abrupt crash of the user process managing this channel
 2. Timeout on the XDMA transfer.
-  
-  
+
+
 **Q: Does my `read()`/`pread()` or `write()`/`pwrite()` time out?**
 
 If the `read()` or `write` function returns -1, an error has occurred, and this error is reported in errno pseudo variable.
@@ -274,13 +276,13 @@ XDMA would output its log through the standard Linux dmesg service.
 **Q: Does XDMA use interrupts during data transfers?**
 
 The XDMA kernel driver can use MSI-X interrupts, one interrupt pair is used for a XDMA read/write channel.
-To know what IRQ number is used for XDMA, the user can 
+To know what IRQ number is used for XDMA, the user can
 
 ` $ cat /proc/interrupts | grep xdma`
 
 **Q: Does XDMA support polled DMA descriptor completion mode for data transfers?**
- 
-XDMA supports both interrupt and polled DMA descriptor completion modes.  
+
+XDMA supports both interrupt and polled DMA descriptor completion modes.
 
 Abbreviated interrupt vs polled mode processing steps to show the differences:
 
@@ -290,8 +292,8 @@ Interupt mode:
 
 Polled mode:
 
-1.) Submit the DMA descriptor to the FPGA HW, 2.) efficiently poll a DMA coherent writeback buffer that the FPGA HW updates to indicate descriptor completion, then cleanup the DMA IO.  Note that the thread that is polling the writeback buffer releases control back to the Linux scheduler every 100 iterations to avoid hogging the vCPU and also includes a timeout feature. 
-  
+1.) Submit the DMA descriptor to the FPGA HW, 2.) efficiently poll a DMA coherent writeback buffer that the FPGA HW updates to indicate descriptor completion, then cleanup the DMA IO.  Note that the thread that is polling the writeback buffer releases control back to the Linux scheduler every 100 iterations to avoid hogging the vCPU and also includes a timeout feature.
+
 Due to the reduction in processing steps and thread context switches, polled DMA descriptor completion mode may have significant performance advantages over interrupt mode in certain application use cases that use smaller IO sizes (e.g. < 1MB).  Developers are encouraged to experiment with both interrupt and polled DMA descriptor completion modes and use the mode that best suits your application.
 
 XDMA polled DMA descriptor completion mode is enabled at XDMA driver load time:

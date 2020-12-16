@@ -39,7 +39,7 @@ The tools come pre-installed in `/usr/bin` for Amazon Linux, version 2016.09 or 
 
 Alternatively, the tools can be downloaded and installed from AWS SDK/HDK GitHub repository [aws-fpga](https://github.com/aws/aws-fpga), as follows:
 
-    $ git clone https://github.com/aws/aws-fpga
+    $ git clone -b small_shell https://github.com/aws/aws-fpga
     $ cd aws-fpga
     $ source sdk_setup.sh
 

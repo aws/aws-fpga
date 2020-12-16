@@ -14,7 +14,7 @@
 // limitations under the License.
 
 module  cl_tst_scrb #(parameter DATA_WIDTH=512,
-                      NUM_RD_TAG=512,
+                      NUM_RD_TAG=32,
                       SCRB_BURST_LEN_MINUS1 = 15,
                       SCRB_MAX_ADDR = 64'h3FFFFF,
                       NO_SCRB_INST = 0
@@ -70,7 +70,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
    output                            slv_rvalid,
    output [10:0]                     slv_ruser,
    input logic                       slv_rready,
-   
+
    output logic [8:0]                awid,
    output logic [63:0]               awaddr,
    output logic [7:0]                awlen,
@@ -153,22 +153,22 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
              scrb_enable_q <= 1'b0;
            else
              scrb_enable_q <= scrb_enable;
-         
+
          // Instance mem_scrb
-         mem_scrb 
+         mem_scrb
            #(.DATA_WIDTH(DATA_WIDTH),
              .ID_WIDTH  (6),
              .USER_WIDTH(11),
              .BURST_LEN_MINUS1 (SCRB_BURST_LEN_MINUS1),
              .MAX_ADDR(SCRB_MAX_ADDR)
-             ) 
+             )
          MEM_SCRB (
-            
+
                    .clk(clk),
                    .rst_n(rst_n),
 
                    .awid(scrb_awid),
-                   .awaddr(scrb_awaddr), 
+                   .awaddr(scrb_awaddr),
                    .awlen(scrb_awlen),
                    .awvalid(scrb_awvalid),
                    .awuser(scrb_awuser),
@@ -198,7 +198,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
 
                    .dbg_state(scrb_dbg_state),
                    .dbg_addr (scrb_dbg_addr)
-            
+
                    );
 
       end // block: gen_scrb_inst
@@ -223,12 +223,12 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
          assign scrb_aruser   = '{default:'0};
          assign scrb_arready  = '{default:'0};
          assign scrb_rready   = '{default:'0};
-         
+
       end // block: gen_noscrb
-         
+
    endgenerate
-   
-   
+
+
    // Instance cl_tst
    logic [8:0]                       atg_awid;
    logic [63:0]                      atg_awaddr;
@@ -270,7 +270,7 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
       cl_tst #(.DATA_WIDTH(DATA_WIDTH),
                .NUM_RD_TAG(NUM_RD_TAG)
                ) CL_TST (
-   
+
          .clk(clk),
          .rst_n(rst_n),
 
@@ -282,9 +282,9 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
          .tst_cfg_rdata(tst_cfg_rdata),
 
          .atg_enable(atg_enable),
-                                               
+
          .awid(atg_awid),
-         .awaddr(atg_awaddr), 
+         .awaddr(atg_awaddr),
          .awlen(atg_awlen),
          .awvalid(atg_awvalid),
          .awuser(atg_awuser),
@@ -320,47 +320,47 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
       );
 
 
-assign awid    = scrb_enable ? scrb_awid    : 
+assign awid    = scrb_enable ? scrb_awid    :
                  atg_enable  ? atg_awid     :
                  {2'b0, slv_awid}    ;
-assign awaddr  = scrb_enable ? scrb_awaddr  : 
+assign awaddr  = scrb_enable ? scrb_awaddr  :
                  atg_enable  ? atg_awaddr   :
                  slv_awaddr;
-assign awlen   = scrb_enable ? scrb_awlen   : 
+assign awlen   = scrb_enable ? scrb_awlen   :
                  atg_enable  ? atg_awlen    :
                  slv_awlen   ;
-assign awsize   = scrb_enable ? 3'b110   : 
+assign awsize   = scrb_enable ? 3'b110   :
                   atg_enable  ? 3'b110   :
                   slv_awsize   ;
-assign awvalid = scrb_enable ? scrb_awvalid : 
+assign awvalid = scrb_enable ? scrb_awvalid :
                  atg_enable  ? atg_awvalid  :
                  slv_awvalid;
-assign awuser  = scrb_enable ? scrb_awuser  : 
+assign awuser  = scrb_enable ? scrb_awuser  :
                  atg_enable  ? atg_awuser   :
                  slv_awuser;
 assign atg_awready  =  atg_enable & awready ;
 assign scrb_awready =  scrb_enable & awready ;
 assign slv_awready = ~atg_enable & ~scrb_enable & awready;
 
-assign wid     = scrb_enable ? scrb_wid    : 
+assign wid     = scrb_enable ? scrb_wid    :
                  atg_enable  ? atg_wid     :
                  {2'b0, slv_wid}   ;
-assign wdata   = scrb_enable ? scrb_wdata  : 
+assign wdata   = scrb_enable ? scrb_wdata  :
                  atg_enable  ? atg_wdata   :
                  slv_wdata;
-assign wstrb   = scrb_enable ? scrb_wstrb  : 
+assign wstrb   = scrb_enable ? scrb_wstrb  :
                  atg_enable  ? atg_wstrb   :
                  slv_wstrb;
-assign wlast   = scrb_enable ? scrb_wlast  : 
+assign wlast   = scrb_enable ? scrb_wlast  :
                  atg_enable  ? atg_wlast   :
                  slv_wlast;
-assign wvalid  = scrb_enable ? scrb_wvalid : 
+assign wvalid  = scrb_enable ? scrb_wvalid :
                  atg_enable  ? atg_wvalid  :
                  slv_wvalid;
 assign atg_wready   =  atg_enable & wready ;
 assign scrb_wready  =  scrb_enable & wready ;
 assign slv_wready = ~atg_enable & ~scrb_enable & wready;
-   
+
 assign atg_bid     = bid   ;
 assign atg_bresp   = bresp ;
 assign atg_bvalid  = atg_enable & bvalid;
@@ -373,26 +373,26 @@ assign slv_bid    = bid[6:0]   ;
 assign slv_bresp  = bresp ;
 assign slv_bvalid = ~scrb_enable & ~atg_enable & bvalid;
 assign slv_buser  = buser[10:0] ;
-assign bready = scrb_enable ? scrb_bready : 
+assign bready = scrb_enable ? scrb_bready :
                 atg_enable  ? atg_bready  :
                 slv_bready;
 
-assign arid    = scrb_enable ? {3'b0, scrb_arid}    : 
+assign arid    = scrb_enable ? {3'b0, scrb_arid}    :
                  atg_enable  ? atg_arid             :
                  {2'b0, slv_arid};
-assign araddr  = scrb_enable ? scrb_araddr  : 
+assign araddr  = scrb_enable ? scrb_araddr  :
                  atg_enable  ? atg_araddr   :
                  slv_araddr;
-assign arlen   = scrb_enable ? scrb_arlen   : 
+assign arlen   = scrb_enable ? scrb_arlen   :
                  atg_enable  ? atg_arlen    :
                  slv_arlen;
 assign arsize  = scrb_enable ? 3'b110 :
                  atg_enable  ? 3'b110 :
                  slv_arsize;
-assign arvalid = scrb_enable ? scrb_arvalid : 
+assign arvalid = scrb_enable ? scrb_arvalid :
                  atg_enable  ? atg_arvalid  :
                  slv_arvalid;
-assign aruser  = scrb_enable ? scrb_aruser  : 
+assign aruser  = scrb_enable ? scrb_aruser  :
                  atg_enable  ? atg_aruser   :
                  slv_aruser;
 assign atg_arready  =  atg_enable & arready ;
@@ -417,10 +417,8 @@ assign slv_rresp   = rresp ;
 assign slv_rlast   = rlast ;
 assign slv_rvalid  = ~scrb_enable & ~atg_enable & rvalid;
 assign slv_ruser   = ruser[10:0] ;
-assign rready = scrb_enable ? scrb_rready : 
+assign rready = scrb_enable ? scrb_rready :
                 atg_enable  ? atg_rready  :
                 slv_rready;
-   
+
 endmodule // cl_tst_scrb
-
-

@@ -176,200 +176,11 @@ class TestSims(AwsFpgaTestBase):
 
     # cl_dram_dma sv
 
-    def test_cl_dram_dma__dram_dma__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_axi_mstr__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_axi_mstr'
-        test_type = 'sv'
-        
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_rnd__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_rnd'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_rnd'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_direct(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_rnd'
-        test_type = 'sv_fast_ecc_direct'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_rnd__sv_fast_ecc_rnd(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_rnd'
-        test_type = 'sv_fast_ecc_rnd'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_4k_crossing__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_4k_crossing'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_single_beat_4k'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_single_beat_4k'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_direct(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_single_beat_4k'
-        test_type = 'sv_fast_ecc_direct'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_single_beat_4k__sv_fast_ecc_rnd(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_single_beat_4k'
-        test_type = 'sv_fast_ecc_rnd'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcis_concurrent__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcis_concurrent'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcis_concurrent'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_direct(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcis_concurrent'
-        test_type = 'sv_fast_ecc_direct'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcis_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcis_concurrent'
-        test_type = 'sv_fast_ecc_rnd'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
     def test_cl_dram_dma__host_pcim__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_host_pcim'
         test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcim_concurrent__sv(self, simulator, batch):
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcim_concurrent'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcim_concurrent'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_direct(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcim_concurrent'
-        test_type = 'sv_fast_ecc_direct'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_pcim_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_pcim_concurrent'
-        test_type = 'sv_fast_ecc_rnd'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_sda_concurrent__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_sda_concurrent'
-        test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_sda_concurrent'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_direct(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_sda_concurrent'
-        test_type = 'sv_fast_ecc_direct'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-    def test_cl_dram_dma__dma_sda_concurrent__sv_fast_ecc_rnd(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dma_sda_concurrent'
-        test_type = 'sv_fast_ecc_rnd'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
@@ -541,30 +352,6 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    def test_cl_dram_dma__dram_dma_dram_bdr_row_col_combo__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_dram_bdr_row_col_combo'
-        test_type = 'sv_ddr_bkdr'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_mem_model_bdr_wr__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_mem_model_bdr_wr'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    def test_cl_dram_dma__dram_dma_mem_model_bdr_rd__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_mem_model_bdr_rd'
-        test_type = 'sv_fast'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
     def test_cl_dram_dma__axi_mstr_multi_rw__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -577,12 +364,6 @@ class TestSims(AwsFpgaTestBase):
         test_name = 'test_bar1'
         test_type = 'sv'
 
-    def test_cl_dram_dma__dram_dma_allgn_addr_4k__sv(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
-        test_name = 'test_dram_dma_allgn_addr_4k'
-        test_type = 'sv'
-
     def test_ddr_peek_bdr_walking_ones__sv(self, simulator, batch):
 
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
@@ -591,16 +372,6 @@ class TestSims(AwsFpgaTestBase):
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
-    # cl_uram_example c
-
-    def test_cl_uram_example__uram_example__c(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_uram_example/verif/scripts'
-        test_name = 'test_uram_example'
-        test_type = 'c'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)    
-    
     # cl_dram_dma c
 
     def test_cl_dram_dma__sda__sv(self, simulator, batch):
@@ -636,16 +407,6 @@ class TestSims(AwsFpgaTestBase):
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world/verif/scripts'
         test_name = 'test_gl_cntr'
         test_type = 'sv'
-
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
-
-    # cl_hello_world vhdl
-
-    def test_cl_vhdl_hello_world__hello_world__vhdl(self, simulator, batch):
-
-        test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_hello_world_vhdl/verif/scripts'
-        test_name = 'test_hello_world'
-        test_type = 'vhdl'
 
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
