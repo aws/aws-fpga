@@ -26,7 +26,7 @@
 
 #include "sh_dpi_tasks.h"
 
-#define HELLO_WORLD_REG_ADDR UINT64_C(0x00)
+#define HELLO_WORLD_REG_ADDR UINT64_C(0x500)
 
 void test_main(uint32_t *exit_code) {
 
