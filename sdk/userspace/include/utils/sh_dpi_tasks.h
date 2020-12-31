@@ -33,6 +33,12 @@ extern void sv_map_host_memory(uint8_t *memory);
 
 extern void cl_peek(uint64_t addr, uint32_t *data);
 extern void cl_poke(uint64_t addr, uint32_t  data);
+extern void cl_peek_pcis(uint64_t addr, uint32_t *data);
+extern void cl_poke_pcis(uint64_t addr, uint32_t  data);
+extern void cl_peek_sda(uint64_t addr, uint32_t *data);
+extern void cl_poke_sda(uint64_t addr, uint32_t  data);
+extern void cl_peek_ocl(uint64_t addr, uint32_t *data);
+extern void cl_poke_ocl(uint64_t addr, uint32_t  data);
 extern void cl_peek_bar1(uint64_t addr, uint32_t *data);
 extern void cl_poke_bar1(uint64_t addr, uint32_t  data);
 extern void sv_int_ack(uint32_t int_num);
