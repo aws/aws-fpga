@@ -36,6 +36,14 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_map_host_memory;
    export "DPI-C" task cl_peek;
    export "DPI-C" task cl_poke;
+   export "DPI-C" task cl_peek_pcis;
+   export "DPI-C" task cl_poke_pcis;
+   export "DPI-C" task cl_peek_sda;
+   export "DPI-C" task cl_poke_sda;
+   export "DPI-C" task cl_peek_ocl;
+   export "DPI-C" task cl_poke_ocl;
+   export "DPI-C" task cl_peek_bar1;
+   export "DPI-C" task cl_poke_bar1;
    export "DPI-C" task sv_int_ack;
    export "DPI-C" task sv_pause;
    export "DPI-C" task sv_fpga_pci_peek;
@@ -64,6 +72,38 @@ import tb_type_defines_pkg::*;
    
    task cl_poke(input longint unsigned addr, int unsigned data);
       tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
+   endtask
+   
+   task cl_peek_pcis(input longint unsigned addr, output int unsigned data);
+      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_DMA_PCIS));
+   endtask
+   
+   task cl_poke_pcis(input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_DMA_PCIS));
+   endtask
+
+   task cl_peek_sda(input longint unsigned addr, output int unsigned data);
+      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_SDA));
+   endtask
+   
+   task cl_poke_sda(input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_SDA));
+   endtask
+
+   task cl_peek_ocl(input longint unsigned addr, output int unsigned data);
+      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
+   endtask
+   
+   task cl_poke_ocl(input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
+   endtask
+
+   task cl_peek_bar1(input longint unsigned addr, output int unsigned data);
+      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_BAR1));
+   endtask
+   
+   task cl_poke_bar1(input longint unsigned addr, int unsigned data);
+      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_BAR1));
    endtask
 
    task sv_int_ack(input int unsigned int_num);
