@@ -1,13 +1,13 @@
 # Xilinx Runtime (XRT) and Vitis Tool versions
 
 * Xilinx Runtime versions match with the tool that you created your Vitis AFI with. 
-* We provide pre-built RPM's for Centos/RHEL and instructions for building XRT 
+* We provide pre-built RPM's for Centos/RHEL/AL2 and instructions for building XRT 
 * Use the below table as reference to install and use the correct XRT version for your applications.
 
-| Xilinx Vitis Tool Version | XRT Release Tag | SHA | `xrt` and `xrt-aws` pre-built RPM's (Centos/RHEL) |
+| Xilinx Vitis Tool Version | XRT Release Tag | SHA | `xrt`|`xrt-aws` RPM's (Centos/RHEL) |`xrt`|`xrt-aws` RPM's (AL2) 
 |---|---|---|---|
-|2020.1| [202010.2.6.AWS](https://github.com/Xilinx/XRT/releases/tag/202010.2.6.AWS) | d09c4a458c16e8d843b3165dcf929c38f7a32b6f | [xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm) [xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm) |
-|2019.2| [2019.2.0.3](https://github.com/Xilinx/XRT/releases/tag/2019.2.0.3) | 9e13d57c4563e2c19bf5f518993f6e5a8dadc18a | [xrt_201920.2.3.0_7.7.1908-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-xrt.rpm) [xrt_201920.2.3.0_7.7.1908-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-aws.rpm) |
+|2020.1| [202010.2.6.AWS](https://github.com/Xilinx/XRT/releases/tag/202010.2.6.AWS) | d09c4a458c16e8d843b3165dcf929c38f7a32b6f | [xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-xrt.rpm) [xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_7.7.1908-x86_64-aws.rpm) | [xrt_202010.2.6.0_2-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_2-x86_64-xrt.rpm) [xrt_202010.2.6.0_2-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.9.0/Patches/XRT_2020_1/xrt_202010.2.6.0_2-x86_64-aws.rpm)|
+|2019.2| [2019.2.0.3](https://github.com/Xilinx/XRT/releases/tag/2019.2.0.3) | 9e13d57c4563e2c19bf5f518993f6e5a8dadc18a | [xrt_201920.2.3.0_7.7.1908-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-xrt.rpm) [xrt_201920.2.3.0_7.7.1908-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-aws.rpm) | N/A |
 
 <a name="mpd"></a>
 # MPD
@@ -62,13 +62,35 @@ cd Release
 sudo yum reinstall xrt_*.rpm -y
 ```
 
-# Centos/RHEL pre-built RPM install steps
-
-### 2019.2
+# AL2 build and install steps
 
 ```bash
-curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-xrt.rpm -o xrt.rpm
-curl -s https://aws-fpga-developer-ami.s3.amazonaws.com/1.8.0/Patches/XRT_2019_2/xrt_201920.2.3.0_7.7.1908-aws.rpm -o xrt-aws.rpm
+XRT_RELEASE_TAG=202010.2.6.AWS # Substitute XRT_RELEASE_TAG=<TAG from above table>
+
+git clone https://github.com/aws/aws-fpga.git
+
+cd aws-fpga
+source vitis_setup.sh
+cd $VITIS_DIR/Runtime
+export XRT_PATH="${VITIS_DIR}/Runtime/${XRT_RELEASE_TAG}"
+git clone http://www.github.com/Xilinx/XRT.git -b ${XRT_RELEASE_TAG} ${XRT_PATH}
+
+cd ${XRT_PATH}
+sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
+
+cd build
+./build.sh
+
+cd Release
+sudo yum reinstall xrt_*.rpm -y
+```
+
+# Centos/RHEL/AL2 pre-built RPM install steps
+
+
+```bash
+curl -s <xrt rpm link from above table> -o xrt.rpm
+curl -s <xrt-aws rpm link from above table> -o xrt-aws.rpm
 sudo yum reinstall xrt*.rpm -y
 ```
 
