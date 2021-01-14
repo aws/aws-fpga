@@ -11,7 +11,7 @@ when you run `hdk_setup.sh`
 
 Patch AR75524 allows Xilinx 2020.1 toolset to generate the DDR controller IP with user bits to control DDR Autoprecharge.
 
-⚠️ <b>NOTE:</b> Shell v12142010 is only available to use in `us-east-1` and on F1.16XL instances.
+⚠️ <b>NOTE:</b> Shell v12142010 is only available to use in `us-east-1`.
 
 
 # Table of Contents
