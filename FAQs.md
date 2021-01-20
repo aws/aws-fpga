@@ -103,7 +103,15 @@ Every FPGA deployed in AWS cloud includes an AWS Shell, and the developer Custom
 
 It is the compiled FPGA code that is loaded into an FPGA in AWS for performing the Custom Logic (CL) function created by the developer. AFIs are maintained by AWS according and associated with the AWS account that created them. The AFI includes the CL and AWS FPGA Shell. An AFI ID is used to reference a particular AFI from an F1 instance.
 
-The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 100 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed.
+The developer can create multiple AFIs at no extra cost, up to a defined limited (typically 500 AFIs per region per AWS account). An AFI can be loaded into as many FPGAs as needed.
+
+**Q: How do I increase my AFI limit?**
+
+You can increase your AFI limit by creating an [AWS Support Case](https://console.aws.amazon.com/support/home#/case/create). 
+1. Select the `Service Limit Increase` tab 
+2. In the `Limit Type`, select `EC2 FPGA`
+3. Select the region(s) where you want your limit to be increased
+4. Add justification for the limit increase. 
 
 
 **Q: What regions are supported?**

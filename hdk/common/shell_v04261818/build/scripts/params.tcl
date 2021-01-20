@@ -25,3 +25,6 @@ if {$uram_option != 2} {
 ####Enable support of clocking from one RP to another (SH-->CL)
 set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1 
 
+# Maintain DONT TOUCH functionality for 2020.2 onwards
+if {[string match *2020.2* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}
+
