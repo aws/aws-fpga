@@ -99,9 +99,9 @@ Starting from 1.4, The shell is reconfigurable, allowing, in most cases, develop
 
 **DW –** Doubleword: referring to 4-byte (32-bit) data size.
 
-[**AXI-4** ARM Advanced eXtensible Interface.](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.set.amba/index.html)
+[**AXI-4** ARM Advanced eXtensible Interface.](https://developer.arm.com/architectures/system-architectures/amba/amba-4)
 
-[**AXI-4 Stream –** ARM Advanced eXtensible Stream Interface.](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.set.amba/index.html)
+[**AXI-4 Stream –** ARM Advanced eXtensible Stream Interface.](https://developer.arm.com/architectures/system-architectures/amba/amba-4)
 
 **M –** Typically refers to the Master side of an AXI bus.
 
