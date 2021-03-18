@@ -66,6 +66,8 @@ For more details on the examples, see the [examples table](./cl/examples/cl_exam
 | 1.4.11-1.4.x | 2019.1 | v1.7.0 (Xilinx Vivado 2019.1) |
 | 1.4.11-1.4.x | 2019.2 | v1.8.x (Xilinx Vivado 2019.2) |
 | 1.4.16-1.4.x | 2020.1 | v1.9.x (Xilinx Vivado 2020.1) |
+| 1.4.18-1.4.x | 2020.2 | v1.10.x (Xilinx Vivado 2020.2) |
+
 
 * The FPGA Developer Kit version is listed in [hdk_version.txt](./hdk_version.txt)
 

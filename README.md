@@ -50,6 +50,7 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 
 | Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
 |-----------|-----------|------|
+| 1.4.18+ | 2020.2 | v1.10.X (Xilinx Vivado/Vitis 2020.2) |
 | 1.4.16+ | 2020.1 | v1.9.0-v1.9.X (Xilinx Vivado/Vitis 2020.1) |
 | 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
 | 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |

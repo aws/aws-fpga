@@ -1,5 +1,8 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
+## Release 1.4.18 (See [ERRATA](./ERRATA.md) for unsupported features)
+* FPGA developer kit now supports Xilinx Vivado/Vitis 2020.2
+
 ## Release 1.4.17 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Updated XDMA Driver to allow builds on newer kernels
 * Updated documentation on Alveo U200 to F1 platform porting

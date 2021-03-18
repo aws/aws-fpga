@@ -3,6 +3,11 @@
 **NOTE: If you are developing on the AWS cloud and using AWS FPGA Developer AMI provided on AWS Marketplace, you can skip this document.**
 
 This document helps developers who choose to develop on-premises with specifying and licensing AWS-compatible Xilinx tools for use with the AWS FPGA HDK.
+## Requirements for AWS HDK 1.4.18+ (2020.2)
+ * Xilinx Vivado or Vitis v2020.2
+ * License: EF-VIVADO-SDX-VU9P-OP
+ * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2020.2_1118_1232.tar.gz
+ * MD5 SUM Value: 523e8596f114ab5e389c14df50ecb1d8
 
 ## Requirements for AWS HDK 1.4.16+ (2020.1)
  * Xilinx Vivado or Vitis v2020.1
@@ -10,7 +15,7 @@ This document helps developers who choose to develop on-premises with specifying
  * URL: https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2020.1_0602_1208.tar.gz
  * MD5 SUM Value: b018f7b331ab0446137756156ff944d9
  
- ## Requirements for AWS HDK 1.4.13+ (2019.2)
+## Requirements for AWS HDK 1.4.13+ (2019.2)
  * Xilinx Vivado or Vitis v2019.2
  * License: EF-VIVADO-SDX-VU9P-OP
  * URL: https://www.xilinx.com/member/forms/download/xef-vitis.html?filename=Xilinx_Vitis_2019.2_1106_2127.tar.gz

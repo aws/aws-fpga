@@ -45,4 +45,6 @@ set aws::make_faas::public::bd_faas_examples_directory [file normalize [file joi
 set aws::make_faas::public::bd_faas_initscript [file join $aws::make_faas::public::bd_faas_build_directory scripts aws_bd_faas_initscript.tcl]
 set ::env(FAAS_HOOK_TCL) $::aws::make_faas::public::bd_faas_initscript
 
-
+# Maintain DONT TOUCH functionality for 2020.2 onwards
+if {[string match *2020.2* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}
+#

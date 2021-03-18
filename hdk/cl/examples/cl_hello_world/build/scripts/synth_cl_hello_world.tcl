@@ -21,7 +21,7 @@ set VDEFINES $VDEFINES
 create_project -in_memory -part [DEVICE_TYPE] -force
 
 ########################################
-## Generate clocks based on Recipe 
+## Generate clocks based on Recipe
 ########################################
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";

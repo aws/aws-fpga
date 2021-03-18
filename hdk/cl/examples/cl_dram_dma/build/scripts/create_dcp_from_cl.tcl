@@ -19,7 +19,7 @@ package require tar
 set TOP top_sp
 
 ## Replace with the name of your module
-set CL_MODULE cl_dram_dma 
+set CL_MODULE cl_dram_dma
 
 #################################################
 ## Command-line Arguments
@@ -39,7 +39,7 @@ set uram_option         [lindex $argv 11]
 set notify_via_sns      [lindex $argv 12]
 set VDEFINES            [lindex $argv 13]
 ##################################################
-## Flow control variables 
+## Flow control variables
 ##################################################
 set cl.synth   1
 set implement  1
@@ -147,6 +147,9 @@ set_msg_config -id {DRC CKLD-2}          -suppress
 set_msg_config -id {DRC REQP-1853}       -suppress
 set_msg_config -id {Timing 38-436}       -suppress
 
+set_msg_config -severity "CRITICAL WARNING" -string "WRAPPER_INST/SH" -suppress
+set_msg_config -severity "WARNING"          -string "WRAPPER_INST/SH" -suppress
+
 # Check that an email address has been set, else unset notify_via_sns
 
 if {[string compare $notify_via_sns "1"] == 0} {
@@ -159,7 +162,7 @@ if {[string compare $notify_via_sns "1"] == 0} {
 }
 
 ##################################################
-### Strategy options 
+### Strategy options
 ##################################################
 switch $strategy {
     "BASIC" {
@@ -200,7 +203,7 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
 ########################################
-## Generate clocks based on Recipe 
+## Generate clocks based on Recipe
 ########################################
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
@@ -254,7 +257,7 @@ if {$implement} {
       # Apply Clock Properties for Clock Table Recipes
       ##################################################
       puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Sourcing aws_clock_properties.tcl to apply properties to clocks. ";
-      
+
       # Apply properties to clocks
       source $HDK_SHELL_DIR/build/scripts/aws_clock_properties.tcl
 
@@ -385,5 +388,3 @@ if {[string compare $notify_via_sns "1"] == 0} {
 }
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Build complete.";
-
-
