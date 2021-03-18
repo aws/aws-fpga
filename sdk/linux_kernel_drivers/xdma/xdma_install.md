@@ -194,12 +194,12 @@ DEVAMI 1.5.0 or Later instances come with preinstalled Xilinx Runtime Environmen
  lsmod | grep xocl
  
  ```
- To Remove XOCL driver
+ To Remove XRT and XOCL driver
  
  ```
- sudo rmmod xocl
- 
+ sudo systemctl stop mpd
+ sudo yum remove -y xrt xrt-aws
  ```
 
- XDMA driver install can proceed once XOCL driver is removed.
+ XDMA driver install can proceed once XRT is removed.
  

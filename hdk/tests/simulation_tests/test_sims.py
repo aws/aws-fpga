@@ -39,7 +39,7 @@ logger = aws_fpga_utils.get_logger(__name__)
 class TestSims(AwsFpgaTestBase):
     """
     Pytest test class.
-    
+
     NOTE: Cannot have an __init__ method.
     """
 
@@ -197,7 +197,7 @@ class TestSims(AwsFpgaTestBase):
         test_dir = self.WORKSPACE + '/hdk/cl/examples/cl_dram_dma/verif/scripts'
         test_name = 'test_dram_dma_axi_mstr'
         test_type = 'sv'
-        
+
         self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
 
     def test_cl_dram_dma__dram_dma_rnd__sv(self, simulator, batch):
@@ -599,8 +599,8 @@ class TestSims(AwsFpgaTestBase):
         test_name = 'test_uram_example'
         test_type = 'c'
 
-        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)    
-    
+        self.run_sim(test_dir=test_dir, test_name=test_name, test_type=test_type, simulator=simulator, batch=batch)
+
     # cl_dram_dma c
 
     def test_cl_dram_dma__sda__sv(self, simulator, batch):

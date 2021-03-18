@@ -126,9 +126,9 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2019.1', '2019.2', '2020.1' ]
+def xilinx_versions = [ '2019.1', '2019.2', '2020.1' , '2020.2' ]
 
-def vitis_versions = ['2019.2', '2020.1']
+def vitis_versions = ['2019.2', '2020.1' , '2020.2' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
@@ -139,7 +139,8 @@ def dsa_map = [
 
 def xsa_map = [
     '2019.2' : [ 'DYNAMIC':'dyn'],
-    '2020.1' : [ 'DYNAMIC':'dyn']
+    '2020.1' : [ 'DYNAMIC':'dyn'],
+    '2020.2' : [ 'DYNAMIC':'dyn']
 ]
 
 def sdaccel_example_default_map = [
@@ -159,6 +160,14 @@ def vitis_example_default_map = [
         'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug'
     ],
     '2020.1' : [
+        'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
+        'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
+        'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug',
+        'gemm_blas': 'Vitis/examples/xilinx/library_examples/gemm',
+        'gzip_app': 'Vitis/examples/xilinx/library_examples/gzip_app'
+    ],
+    '2020.2' : [
         'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
         'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
         'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
@@ -186,6 +195,12 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs-mx/P-2019.06-SP1-1',
          'questa': 'questa/2019.4',
          'ies': 'incisive/15.20.079'
+     ],
+     '2020.2' : [
+         'vivado': 'xilinx/Vivado/2020.2',
+         'vcs': 'synopsys/vcs-mx/Q-2020.03',
+         'questa': 'questa/2020.2',
+         'ies': 'incisive/15.20.083'
      ]
 ]
 

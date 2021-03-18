@@ -29,6 +29,10 @@ if {[string compare $notify_via_sns "1"] == 0} {
   }
 }
 
+# suppress warnings coming from Shell
+set_msg_config -severity "CRITICAL WARNING" -string "WRAPPER_INST/SH" -suppress
+set_msg_config -severity "WARNING"          -string "WRAPPER_INST/SH" -suppress
+
 #################################################
 ## Create BD (Block Design) of example Hello World design
 #################################################
