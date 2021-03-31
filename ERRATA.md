@@ -10,6 +10,22 @@
 * Combinatorial loops in CL designs are not supported.  
 * Connecting one of the clocks provided from the shell (clk_main_a0, clk_extra_a1, etc...) directly to a BUFG in the CL is not supported by the Xilinx tools and may result in a non-functional clock. To workaround this limitation, it is recommended to use an MMCM to feed the BUFG (clk_from_shell -> MMCM -> BUFG). Please refer to [Xilinx AR# 73360](https://www.xilinx.com/support/answers/73360.html) for further details.
 
+### flop_ccf.sv bug
+
+We have identified a bug in the `flop_ccf.sv` module that can potentially impact timing closure of designs. 
+The module is instantiated in `sh_ddr.sv` and inadvertently introduces a timing path on the reset logic. 
+Although there is no functional impact, it may increase Vivado tool’s effort in timing closure of design. 
+There should be no functional impact from this bug if your design has already met timing. 
+This bug is fixed in aws-fpga release v1.4.19
+
+Q: Which designs does this bug affect?
+A: This bug only affects designs that instantiate the sh_ddr module.
+
+Q: How do I fix my design if I am affected by this bug?
+A: Pull aws-fpga release v1.4.19 or laterfrom the aws-fpga github and rebuild your cl design. 
+The flop_ccf.sv files from the latest release that contain the fix are: [sh_ddr/synth/flop_ccf.sv](https://github.com/aws/aws-fpga/blob/master/hdk/common/shell_v04261818/design/sh_ddr/synth/flop_ccf.sv) & 
+[sh_ddr/sim/flop_ccf.sv](https://github.com/aws/aws-fpga/blob/master/hdk/common/shell_v04261818/design/sh_ddr/sim/flop_ccf.sv)
+
 ### Xilinx Design Advisory for UltraScale/UltraScale+ DDR4/DDR3 IP - Memory IP Timing Exceptions (AR# 73068)
 AWS EC2 F1 customers using the DDR4 IP in customer logic (HDK or SDAccel/Vitis designs) may be impacted by a recent design advisory from Xilinx.
 
