@@ -19,5 +19,5 @@
 # Check if /build and /design directories exist, abort
 # Check if $HDK_COMMON_DIR exist
 
-cp -rl $HDK_SHELL_DIR/new_cl_template/build .
-cp -r $HDK_SHELL_DIR/new_cl_template/design .
+cp -rL $HDK_SHELL_DIR/new_cl_template/build .
+cp -r  $HDK_SHELL_DIR/new_cl_template/design .
