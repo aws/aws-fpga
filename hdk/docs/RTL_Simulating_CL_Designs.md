@@ -2,7 +2,7 @@
 
 # Introduction
 
-Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK comes with a shell simulation model that supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence Incisive and Synopsys' VCS RTL simulators. Small shell currently only supports Vivado 2020.2. See table below for supported simulator versions. 
+Developers tend to simulate their designs to validate the RTL design and functionality, before hitting the build stage and registering it with AWS EC2 as Amazon FPGA Image (AFI). AWS FPGA HDK comes with a shell simulation model that supports RTL-level simulation using Xilinx' Vivado XSIM,  MentorGraphics' Questa, Cadence Incisive and Synopsys' VCS RTL simulators. Small shell F1.S.1.0 currently only supports Vivado 2020.2. See table below for supported simulator versions. 
 
 |    Simulator            | Vivado 2020.2  |
 |-------------------------|----------------|

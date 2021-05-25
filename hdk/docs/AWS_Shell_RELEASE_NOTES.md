@@ -1,5 +1,5 @@
 # AWS Shell Release Notes
-# v04182104
+# F1.S.1.0 (v04182104)
 * Removed DMA engine to free up FPGA resources
 * Updated IP to allow for 64 outstanding read requests
  
