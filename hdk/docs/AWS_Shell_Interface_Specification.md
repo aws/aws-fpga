@@ -1,18 +1,4 @@
 # AWS Shell Interface Specification
-
-## Revision History
-
-2016/11/28   -   Initial public release with HDK release version
-
-2016/12/06   -   Added capability to remove DDR controllers in the CL through parameters in `sh_ddr.sv`
-
-2017/02/02   -   Major updates for Feb/2017 Shell, that includes interrupts, wider and more buses,  DMA, Virtual LED and other. (Please refer to [Release Notes](../../RELEASE_NOTES.md) for details)
-                          
-2017/07/29   -   Updates for Jul/2017 Shell
-  
-2017/11/16   -   Updates for v1.3.4
-
-2018/05/10   -   Updates for 1.4
     
 # Table of Contents:
 
@@ -89,7 +75,7 @@ This document specifies the hardware interface and functional behavior between t
 This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell 
  is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under `/hdk/common/shell_latest`
 
-Starting from 1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.  Going forward, new shell versions will NOT require updated CL implementation and regenerating the AFI (still a requirement with 1.4 shell.)
+Starting from F1.X.1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.  Going forward, new shell versions will NOT require updated CL implementation and regenerating the AFI (still a requirement with F1.X.1.4 shell.)
   
   
 <a name="conventions"></a>
@@ -224,7 +210,7 @@ These parameters are used to control which DDR controllers are impemented in the
 
 ### DRAM Content Preservation between AFI Loads
 
-Shell version 1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a v1.4 shell will enable DRAM content preservation by default.
+Shell version F1.X.1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a v1.4 shell will enable DRAM content preservation by default.
 Please refer to the [guide on how to use the DRAM data retention mode to preserve the content of DRAM across AFI loads](./data_retention.md) for more details on utilizing this feature.
 
 <a name="dma"></a>

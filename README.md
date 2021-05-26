@@ -85,10 +85,12 @@ At the end of the development process, combining the Shell and CL creates an Ama
 
 The following table provides the shells currently available to develop your CL with. Each shell provides specific interfaces and features and currently needs to be used with the Dev Kit branch listed in the table.
 
-| Shell Version | Dev Kit Branch | Description|
-| --------|---------|-------|
-| v04261818 | [master](https://github.com/aws/aws-fpga/) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md) including DMA | 
-| v04182104 | [small_shell](https://github.com/aws/aws-fpga/tree/small_shell) | Provides all the [interfaces listed here](https://raw.githubusercontent.com/aws/aws-fpga/small_shell/hdk/docs/AWS_Shell_Interface_Specification.md). This shell does not include DMA engine and provides significant reduction in Shell resource usage. |
+| Shell Name| Shell Version | Dev Kit Branch | Description|
+|--------|--------|---------|-------|
+| F1 XDMA Shell | F1.X.1.4 | [master](https://github.com/aws/aws-fpga/) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md), includes DMA | 
+| F1 Small Shell | F1.S.1.0 | [small_shell](https://github.com/aws/aws-fpga/tree/small_shell) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/small_shell/hdk/docs/AWS_Shell_Interface_Specification.md). This shell does not include DMA engine and provides significant reduction in Shell resource usage. |
+
+For more details, check the [FAQ](./FAQs.md#general-aws-fpga-shell-faqs)
 
 ## Software-defined Development Environment
 

@@ -6,8 +6,8 @@ Workloads that require multiple AFIs to process a data set can take advantage of
 
 For an AFI to support data retention, the following requirements must be met:
 
-1. The AFI must be built with shell version 1.4 or higher.
-2. The AFI must be built with the version of `sh_ddr.sv` shipped with 1.4 or higher.
+1. The AFI must be built with shell version F1.X.1.4 or higher.
+2. The AFI must be built with the version of `sh_ddr.sv` shipped with Dev Kit 1.4.0 or higher.
 3. The AFI must use all four DDR controllers. (All of `DDR_A_PRESENT`, `DDR_B_PRESENT`, `DDR_D_PRESENT` must be set. DDRC is part of the shell and is always present.)
 
 To use data retention across AFI loads, the following conditions must be met:
