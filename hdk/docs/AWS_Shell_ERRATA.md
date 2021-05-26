@@ -1,4 +1,4 @@
-# AWS EC2 FPGA Shell Errata (04182104)
+# AWS EC2 FPGA F1.S.1.0 Small Shell Errata
 
 ## Implementation Restrictions
 * PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
@@ -23,5 +23,4 @@
 
 ## Known Bugs/Issues
 * **sh_cl_ddr_is_ready[2:0]** outputs of sh_ddr.sv are not synchronized to clk_main_a0.  Developers should synchronize these signals to clk_main_a0.
-
 

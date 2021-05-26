@@ -1,15 +1,15 @@
 # Small Shell
-This branch provides a Small Shell which is 30% smaller in size than the 1.4 Shell. Small Shell occupies only 14 Clock Regions worth of real estate in the FPGA: 10 Clock Regions in Middle SLR, and 4 Clock Regions in Bottom SLR. Smaller physical footprint of the Shell increases the available resources to the CL. This feature is available in Shell [v04182104](hdk/common/shell_v04182104) provided in this developer kit.
+This branch provides a Small Shell which is 30% smaller in size than the F1.X.1.4 Shell. Small Shell F1.S.1.0 occupies only 14 Clock Regions worth of real estate in the FPGA: 10 Clock Regions in Middle SLR, and 4 Clock Regions in Bottom SLR. Smaller physical footprint of the Shell F1.S.1.0 increases the available resources to the CL. This feature is available in Shell [F1.S.1.0](./hdk/common/shell_v04182104) provided in this developer kit.
 
 ⚠️ <b>NOTE:</b> Small Shell does not include DMA capability. Customers should implement their own DMA engine in the CL, or use [SDE IP](sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) provided in the Developer Kit.
 
-⚠️ <b>NOTE:</b> CL's with Small Shell require Xilinx 2020.2 tools
+⚠️ <b>NOTE:</b> CL's with Small Shell F1.S.1.0 require Xilinx 2020.2 tools
 
-⚠️ <b>NOTE:</b> Vitis and HLx flows are not supported with Small Shell since DMA engine is not included.
+⚠️ <b>NOTE:</b> Vitis, HLx and IPI flows are not supported with Small Shell since DMA engine is not included.
 
-Following table shows the resources available to CL in comparison with 1.4 Shell:
+Following table shows the resources available to CL in comparison with F1.X.1.4 Shell:
 
-|FPGA Resource Type	|Total Resource in VU9P FPGA	|Available for CL with 1.4 Shell	|Available for CL with Small Shell	|Improvement	|Improvement %	|
+|FPGA Resource Type	|Total Resource in VU9P FPGA	|Available for CL with F1.X.1.4 Shell	|Available for CL with Small Shell F1.S.1.0	|Improvement	|Improvement %	|
 |---	|---	|---	|---	|---	|---	|
 |CLB LUT	|1,181,768	|895,200	|980,272	|85,072	|9.50%	|
 |LUT as Logic	|1,181,768	|895,200	|980,272	|85,072	|9.50%	|
@@ -95,8 +95,8 @@ You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https:/
     > ℹ️ <b>INFO:</b> If you need to follow GUI Development flows, please checkout our [Developer Resources](./developer_resources/README.md) where we provide Step-By-Step guides to setting up a GUI Desktop.
 1. Clone the small_shell branch of [FPGA Developer Kit](https://github.com/aws/aws-fpga) on your instance.  
     ```git clone -b small_shell https://github.com/aws/aws-fpga.git```  
-1. Follow the quickstarts from the next section.
-
+1. Follow the quickstarts from the next section. 
+1. Review the [F1.S.1.0 shell migration guide](./hdk/docs/AWS_Small_Shell_Migration_Guidelines.md) for help with migrating from shell F1.X.1.4 to small shell F1.S.1.0
 ### Quickstarts
 Before you create your own AWS FPGA design, we recommend that you go through one of the step-by-step Quickstart guides:
 
@@ -113,6 +113,7 @@ Documentation is located throughout this developer kit and the table below conso
 | AWS setup | [Setup AWS CLI and S3 Bucket](./docs/Setup_AWS_CLI_and_S3_Bucket.md) | Setup instructions for preparing for AFI creation |
 | Developer Kit | [RELEASE NOTES](./RELEASE_NOTES.md) | Release notes for all developer kit features, excluding the shell  |
 | Developer Kit | [Errata](./ERRATA.md) | Errata for all developer kit features, excluding the shell  |
+| Migration Guidelines | [Migration guide](./hdk/docs/AWS_Small_Shell_Migration_Guidelines.md) | Migration guidelines for moving from XDMA shell F1.X.1.4 to small shell F1.S.1.0 |
 | F1 Shell | [AWS Shell RELEASE NOTES](./hdk/docs/AWS_Shell_RELEASE_NOTES.md) | Release notes for F1 shell |
 | F1 Shell | [AWS Shell ERRATA](./hdk/docs/AWS_Shell_ERRATA.md) | Errata for F1 shell |
 | F1 Shell | [AWS Shell Interface Specification](./hdk/docs/AWS_Shell_Interface_Specification.md) | Shell-CL interface specification for HDK developers building AFI |

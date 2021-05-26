@@ -12,9 +12,9 @@
 
 2017/11/16   -   Updates for v1.3.4
 
-2018/05/10   -   Updates for 1.4
+2018/05/10   -   Updates for F1.X.1.4
 
-2021/05/12   -   Updates for Small Shell 
+2021/05/12   -   Updates for Small Shell F1.S.1.0 
 
 # Table of Contents:
 
@@ -89,7 +89,7 @@ This document specifies the hardware interface and functional behavior between t
 This specification applies to  Xilinx Virtex Ultrascale Plus platform available on EC2 F1, each update of the Shell
  is tagged with a revision number. Note while AWS tries to keep the revision constant, sometimes it is necessary to update the revision due to discovered issues or added functionality. The HDK release includes the latest Shell version under [v04182104](../common/shell_v04182104/)
 
-Starting from 1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.
+Starting from F1.X.1.4, The shell is reconfigurable, allowing, in most cases, developers to select which shell version to create the AFI with.
 
 <a name="conventions"></a>
 ## Conventions
@@ -223,7 +223,7 @@ These parameters are used to control which DDR controllers are impemented in the
 
 ### DRAM Content Preservation between AFI Loads
 
-Shell version 1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a v1.4 shell will enable DRAM content preservation by default.
+Shell version F1.X.1.4 allows the DDR state to be preserved when dynamically changing CL logic. Any AFI generated with a F1.X.1.4 version shell will enable DRAM content preservation by default.
 Please refer to the [guide on how to use the DRAM data retention mode to preserve the content of DRAM across AFI loads](./data_retention.md) for more details on utilizing this feature.
 
 <a name="interfaces_between_shell_and_cl"></a>
