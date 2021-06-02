@@ -73,6 +73,25 @@ The [HDK directory](./hdk/README.md) contains documentation, examples, simulatio
 The HDK can be installed on any on-premises server or an EC2 instance. 
 The developer kit is not required if you plan to use a pre-built AFI shared from another developer.
 
+### AWS Shells
+
+With Amazon EC2 FPGA instances, each FPGA is divided into two partitions:
+
+* Shell (SH) – AWS platform logic implementing the FPGA external peripherals, PCIe, DRAM, and Interrupts.
+
+* Custom Logic (CL) – Custom acceleration logic created by an FPGA Developer.
+
+At the end of the development process, combining the Shell and CL creates an Amazon FPGA Image (AFI) that can be loaded onto the Amazon EC2 FPGA Instances.
+
+The following table provides the shells currently available to develop your CL with. Each shell provides specific interfaces and features and currently needs to be used with the Dev Kit branch listed in the table.
+
+| Shell Name| Shell Version | Dev Kit Branch | Description|
+|--------|--------|---------|-------|
+| F1 XDMA Shell | F1.X.1.4 | [master](https://github.com/aws/aws-fpga/) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md), includes DMA | 
+| F1 Small Shell | F1.S.1.0 | [small_shell](https://github.com/aws/aws-fpga/tree/small_shell) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/small_shell/hdk/docs/AWS_Shell_Interface_Specification.md). This shell does not include DMA engine and provides significant reduction in Shell resource usage. |
+
+For more details, check the [FAQ](./FAQs.md#general-aws-fpga-shell-faqs)
+
 ## Software-defined Development Environment
 
 The software-defined development environment allows customers to compile their C/C++/OpenCL code into the FPGA as kernels, and use OpenCL APIs to pass data to the FPGA. 

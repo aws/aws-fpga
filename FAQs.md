@@ -449,26 +449,81 @@ Refer to [Virtual JTAG readme](./hdk/docs/Virtual_JTAG_XVC.md) for more details.
 
 <a name="shell"></a>
 ## General AWS FPGA Shell FAQs
+
+**Q: What is the AWS Shell?**
+An AWS Shell is in short the AWS platform logic implementing the FPGA external peripherals, PCIe, DRAM, and Interrupts in the FPGA.
+
+
 **Q: Do I need to interface to the AWS Shell?**
 
-Yes. The only way to interface to PCIe and the instance CPU is using the AWS Shell. The AWS Shell is included with every FPGA. There is no option to run the F1 FPGA without a Shell. The Shell takes care of the non-differentiating heavy lifting tasks like PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
+Yes. The only way to interface to PCIe and the instance CPU is using an AWS Shell. 
+An AWS Shell is included with every FPGA. There is no option to run the F1 FPGA without a Shell. 
+The Shell takes care of the non-differentiating heavy lifting tasks like PCIe tuning, FPGA I/O assignment, power, thermal management, and runtime health monitoring.
 
 
 **Q: Is a simulation model of the AWS Shell available?**
 
-Yes. The HDK includes a simulation model for the AWS shell. See the [HDK common tree](./hdk/common/verif) for more information on the Shell simulation model.
+Yes. The HDK includes a simulation model for the AWS shell. 
+See the [HDK common tree](./hdk/common/verif) for more information on the Shell simulation model.
 
 
 **Q: What resources within the FPGA does the AWS Shell consume?**
 
-The Shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
+AWS provides multiple families of shells. 
 
+The F1 XDMA shell F1.X.1.4 shell consumes about 20% of the FPGA resources, and that includes the PCIe Gen3 X16, DMA engine, 
+DRAM controller interface, ChipScope (Virtual JTAG) and other health monitoring and image loading logic. 
+
+No modifications to the Shell or the partition pins between the Shell and the Custom Logic are possible by the FPGA developer.
+
+**Q: What different shells does AWS provide?**
+
+AWS Provides the following families of shells:
+
+| Shell Name| Shell Version | Dev Kit Branch | Description|
+|--------|--------|---------|-------|
+| F1 XDMA Shell | F1.X.1.4 | [master](https://github.com/aws/aws-fpga/) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/master/hdk/docs/AWS_Shell_Interface_Specification.md), includes DMA | 
+| F1 Small Shell | F1.S.1.0 | [small_shell](https://github.com/aws/aws-fpga/tree/small_shell) | Provides all the [interfaces listed here](https://github.com/aws/aws-fpga/blob/small_shell/hdk/docs/AWS_Shell_Interface_Specification.md). This shell does not include DMA engine and provides significant reduction in Shell resource usage. |
+
+**Q: How does AWS change Shell versions?**
+
+Shell version schema is defined below:
+```
+|Platform String| . |Short Shell name string| . |major| . | minor|
+
+Platform String
+    Changes with platform and also with FPGAs used within a platform.
+    
+    F1
+
+Short Shell name string
+    Short string to show the shell family
+    
+    S = Small shell
+    X = XDMA shell
+
+Major
+    Shell major version. 
+    This number increments when the RL interface changes
+    Increments are for RL interface breaking changes
+    
+Minor
+    Shell minor version.
+    This number increments when the RL implementation/interface sees minor changes
+    Increments are for feature additions, non breaking changes
+    
+```
+Examples of shell versions:
+
+F1 XDMA Shell - F1.X.1.3(Deprecated), F1.X.1.4
+Small Shell - F1.S.1.0
 
 <a name="troubleshooting"></a>
 ## Troubleshooting FAQs
 **Q: Why do I see error “vivado not found” while running hdk_setup.sh?**
 
-This is an indication that Xilinx Vivado tool set are not installed. Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.
+This is an indication that Xilinx Vivado tool set are not installed. 
+Try installing the tool if you are working on your own environment, or alternative use AWS FPGA Development AMI available on AWS Marketplace, which comes with pre-installed Vivado toolset and license.
 
 
 **Q: Why did my example job run and die without generating a DCP file?**
