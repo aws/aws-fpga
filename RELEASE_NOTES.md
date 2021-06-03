@@ -1,5 +1,13 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
+## Release 1.4.19 (See [ERRATA](./ERRATA.md) for unsupported features)
+* Bug Fix release
+
+We have identified a bug in the `flop_ccf.sv` module that can potentially impact timing closure of designs.
+The module is instantiated in `sh_ddr.sv` and inadvertently introduces a timing path on the reset logic.
+Although there is no functional impact, it may increase Vivado tool’s effort in timing closure of design.
+There should be no functional impact from this bug if your design has already met timing.
+
 ## Release 1.4.18 (See [ERRATA](./ERRATA.md) for unsupported features)
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2020.2
 

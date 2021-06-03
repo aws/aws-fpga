@@ -1,7 +1,7 @@
-# Shell v1.4 Migration Document
+# Shell F1.X.1.4 Migration Document
 
 
-This document describes the changes required when migrating your design from shell v1.3 to shell v1.4.
+This document describes the changes required when migrating your design from shell F1.X.1.3 to shell F1.X.1.4.
 The HDK build scripts have changed to reflect the new v1.4 shell’s floorplan and newer Vivado tools. It’s strongly recommended users move to these scripts. Users who have already customized v1.3 scripts should diff those with the v1.4 scripts and be sure to include all new parameters that have been added to v1.4 scripts.
 
 1. Upgrade Vivado Tools to version 2019.1 or later. Needs [FPGA DEVELOPER AMI 1.4 or later](../../README.md#fpga-developer-ami)
@@ -9,7 +9,7 @@ The HDK build scripts have changed to reflect the new v1.4 shell’s floorplan a
 2. The hierarchy for CL & SH modules have changed. Now they are instantiated in  "WRAPPER_INST" Module.
      The paths in your Build scripts, constraints &  verification components have to be updated.
 
- | v1.3 Shell | v1.4 Shell |
+ | F1.X.1.3 Shell | F1.X.1.4 Shell |
  |------------|------------|
  | CL/blkA/sublockB/componentC/celld/signalX | WRAPPER_INST/CL/blkA/sublockB/componentC/celld/signalX |
  | SH/blkA/sublockB/componentC/celld/signalX | WRAPPER_INST/SH/blkA/sublockB/componentC/celld/signalX |
@@ -34,13 +34,13 @@ NOTE: Only INCR burst mode is supported on AXI-4 buses between CL/Shell interfac
 7. [ILA cores](../common/shell_v04261818/design/ip/cl_debug_bridge) need to be upgraded for 2017.4 or later
      Please refer to the [cl_dram_dma](../cl/examples/cl_dram_dma/design) example for ILA hookup on PCIS interface.
 
-8. Please use below information to update CL pblock constraints to optimize your design in Shel v1.4.
-      - Shell V1.4 is slightly larger than Shell v1.3. CL floorplan may need to be tweaked to account for the larger Shell V1.4.
+8. Please use below information to update CL pblock constraints to optimize your design in Shell F1.X.1.4.
+      - Shell F1.X.1.4 is slightly larger than Shell F1.X.1.3. CL floorplan may need to be tweaked to account for the larger shell.
         Please review pblock constriants of CL for conflicting regions.
-      - Following are the interface placement changes between Shell v1.3 & v1.4
+      - Following are the interface placement changes between Shell F1.X.1.3 & F1.X.1.4
 
 
-      | INTERFACE | Shell v1.3 SLR | SHELL v1.4 SLR |
+      | INTERFACE | Shell F1.X.1.3 SLR | SHELL F1.X.1.4 SLR |
       |-----------|---------------|---------------|
       | CL_SH_DDR |MID/BOTTOM SLR  | MID SLR |
       | BAR1 | MID SLR  | MID SLR |

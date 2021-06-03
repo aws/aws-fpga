@@ -1,6 +1,6 @@
 # AWS Shell Release Notes
 
-# v04261818
+# F1 XDMA Shell - F1.X.1.4(v04261818)
 * Fixed AXI-L Interface Ordering.  Read requests on the AXI-L interfaces (BAR1, OCL, SDA) will not pass previous write requests.
 * Increased XDMA PCIS interface timeout to 5 seconds
 * Clock group A supports synchronous clocks within the group (default is clocks are synchronous)
