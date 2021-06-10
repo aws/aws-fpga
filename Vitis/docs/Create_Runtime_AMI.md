@@ -13,6 +13,11 @@
 * Launch an F1 instance using [Centos 7](https://aws.amazon.com/marketplace/pp/B00O7WM7QW), Ubuntu or Amazon Linux 2 AMI's.
 
 ## 2. Install Runtime Drivers  
+* Download XRT using one of the methods referred to in Xilinx doc [here](https://www.xilinx.com/html_docs/xilinx2020_2/vitis_doc/acceleration_installation.html).
+```
+for e.g: try git clone https://github.com/Xilinx/XRT
+```
+
 * Build XRT on either your runtime or a similar instance using the [XRT build steps](https://xilinx.github.io/XRT/2019.2/html/build.html).
 * Install the XRT package on your runtime instance
 
