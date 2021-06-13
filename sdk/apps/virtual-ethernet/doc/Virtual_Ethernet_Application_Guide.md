@@ -99,7 +99,7 @@ Testpmd application setup and start phase
 
 ```
 cd <install_dir>/dpdk
-./x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=chained --auto-start --stats-period=3 --forward-mode=spp-eni-addr-swap
+sudo ./x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=chained --auto-start --stats-period=3 --forward-mode=spp-eni-addr-swap
 ```
 
 The `spp-eni-addr-swap` testpmd forwarding mode swaps the Ethernet MAC and IP addresses so the Packet Generator instance can receive the loopback Ethernet frames.
@@ -141,7 +141,7 @@ start 0
 
 ```
 cd <install_dir>/pktgen-dpdk
-./app/x86_64-native-linuxapp-gcc/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -b 00:03.0 -- -T -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena.pkt
+sudo ./app/x86_64-native-linuxapp-gcc/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -b 00:03.0 -- -T -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena.pkt
 ```
 
 Also provided is a sample Packet Generator `pktgen-ena-range.pkt` script.  This script will need to be modified to work with your F1 instances.  `pktgen-ena-range.pkt` varies the source and destination UDP ports but leaves the size at 64B to show PPS performance using multiple UDP flows.

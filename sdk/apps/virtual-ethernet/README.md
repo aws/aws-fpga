@@ -2,6 +2,8 @@
 
 The Virtual Ethernet framework facilitates streaming Ethernet frames from a network interface (or any source) into the FPGA for processing and back out to some destination. Possible use cases for this include deep packet inspection, software defined networking, stream encryption or compression, and more.
 
+⚠️**Note**: Please note that Virtual Ethernet/SDE is not supported by Vitis (XRT)
+
 ## Prerequisites
 
 In order to get the most from this document, readers may want to familiarize themselves with the following:

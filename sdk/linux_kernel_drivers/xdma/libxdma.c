@@ -54,6 +54,21 @@ module_param(desc_blen_max, uint, 0644);
 MODULE_PARM_DESC(desc_blen_max, "per descriptor max. buffer length, default is (1 << 28) - 1");
 
 /*
+ * make sure to wait till the timeout even if
+ * wait_event_interruptible_timeout was interrupted
+ */
+#define xdma_wait_event_timeout(wq, condition, timeout) \
+({ \
+	int __ret = 0;  \
+	unsigned long expire = timeout + jiffies; \
+	do { \
+		__ret = wait_event_interruptible_timeout(wq, condition, \
+						timeout); \
+	} while ((__ret < 0) && (jiffies < expire)); \
+	__ret; \
+})
+
+/*
  * xdma device management
  * maintains a list of the xdma devices
  */
@@ -3177,7 +3192,7 @@ ssize_t xdma_xfer_submit(void *dev_hndl, int channel, bool write, u64 ep_addr,
 			rv = engine_service_poll(engine, desc_count);
 
 		} else {
-			rv = wait_event_interruptible_timeout(xfer->wq,
+			rv = xdma_wait_event_timeout(xfer->wq,
                 	        (xfer->state != TRANSFER_STATE_SUBMITTED),
 				msecs_to_jiffies(timeout_ms));
 		}
@@ -4012,7 +4027,7 @@ static int transfer_monitor_cyclic(struct xdma_engine *engine,
 		if (enable_credit_mp){
 			dbg_tfr("%s: rx_head=%d,rx_tail=%d, wait ...\n",
 				engine->name, engine->rx_head, engine->rx_tail);
-			rc = wait_event_interruptible_timeout( transfer->wq,
+			rc = xdma_wait_event_timeout(transfer->wq,
 					(engine->rx_head!=engine->rx_tail ||
 					 engine->rx_overrun),
 					msecs_to_jiffies(timeout_ms));
@@ -4020,7 +4035,7 @@ static int transfer_monitor_cyclic(struct xdma_engine *engine,
 				 engine->name, rc, engine->rx_head,
 				engine->rx_tail, engine->rx_overrun);
 		} else {
-			rc = wait_event_interruptible_timeout( transfer->wq,
+			rc = xdma_wait_event_timeout(transfer->wq,
 					engine->eop_found,
 					msecs_to_jiffies(timeout_ms));
 			dbg_tfr("%s: wait returns %d, eop_found %d.\n",
@@ -4452,7 +4467,7 @@ static int cyclic_shutdown_interrupt(struct xdma_engine *engine)
 		return -EINVAL;
 	}
 
-	rc = wait_event_interruptible_timeout(engine->shutdown_wq,
+	rc = xdma_wait_event_timeout(engine->shutdown_wq,
 				!engine->running, msecs_to_jiffies(10000));
 	if (engine->running) {
 		pr_info("%s still running?!, %d\n", engine->name, rc);

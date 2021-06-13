@@ -46,7 +46,7 @@ The [`u200`](./u200) and  The [`u200`](./u200) and [`f1`](./f1) directories cont
     sp=vadd_1.out:DDR[1]
     ```
 
-    * The `platform` option specifies which acceleration platform is targeted for the build. Here we are using the U200 shell.
+    * The `platform` option specifies which acceleration platform is targeted for the build. Here we are using the U200 shell. 
     * The `sp` options are used to specify the assignment of kernel arguments to DDR banks. In this case, we are mapping all three kernel arguments to DDR[1], which is the DDR interface located in the shell on Alveo U200.
     
     > Putting all the platform-specific options in one file is not mandatory but it is very convenient and facilitates the porting process. With this approach, the main command line can be reused as is for all platforms. Refer to the [Vitis Documentation](https://www.xilinx.com/html_docs/xilinx2020_1/vitis_doc/kme1569523964461.html) for more information on v++ related commands and options. 
@@ -70,7 +70,8 @@ In order to port the vector-add example from Alveo U200 to AWS F1, the only chan
     sp=vadd_1.out:DDR[0]
     ```
     
-    * The `platform` option is set to target the AWS F1 shell. The string used corresponds to the name of the latest shell which can be found [here](https://github.com/aws/aws-fpga/tree/master/Vitis/aws_platform) on the aws-fpga repo.
+    * The `platform` option is set to target the AWS F1 shell. The string used corresponds to the name of the latest shell which can be found [here](https://github.com/aws/aws-fpga/tree/master/Vitis/aws_platform) on the aws-fpga repo. Point the platform to the xpfm file. For example, 
+    ```platform=$AWS_PLATFORM```
     * The `sp` options are set to connect the kernel arguments to DDR[0], which is the DDR interface located in the AWS F1 shell. Keeping the same settings as the U200 would produce a working design on AWS F1. But in order to produce exactly the same configuration and target the DDR interface located in the AWS F1 shell, the sp options are modified to use DDR[0].
 
     These changes are the only ones needed to port this project from U200 to F1. 
@@ -84,7 +85,7 @@ In order to port the vector-add example from Alveo U200 to AWS F1, the only chan
 
     v++ -c -g -t hw -R 1 -k vadd --config ./options.cfg --profile_kernel data:all:all:all --profile_kernel stall:all:all:all --save-temps --temp_dir ./temp_dir --report_dir ./report_dir --log_dir ./log_dir -I../src ../src/vadd.cpp -o ./vadd.hw.xo
     
-    v++ -l -g -t hw -R 1 --config ./options.cfg --profile_kernel data:all:all:all --profile_kernel stall:all:all:all --temp_dir ./temp_dir --report_dir ./report_dir --log_dir ./log_dir -I../src vadd.hw.xo -o add.hw.xclbin    
+    v++ -l -g -t hw -R 1 --config ./options.cfg --profile_kernel data:all:all:all --profile_kernel stall:all:all:all --temp_dir ./temp_dir --report_dir ./report_dir --log_dir ./log_dir -I../src vadd.hw.xo -o vadd.xclbin    
     ```
     
     *NOTE: The PLATFORM_REPO_PATHS environment variable is used to specify the directory where the AWS platform (xilinx_aws-vu9p-f1_shell-v04261818_201920_2) is installed.*
