@@ -8,6 +8,8 @@
 3. [Software](#Software)
 3. [Metadata](#Metadata)
 
+⚠️**Note**: Please note that Virtual Ethernet/SDE is not supported by Vitis (XRT)
+
 <a name="Overview"></a>
 ## Overview
 The CL_SDE example implements the FPGA custom logic used to generate the AFI to demonstrate the [Virtual Ethernet Application](../../../../sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.md). The CL_SDE demonstrates the following - 
