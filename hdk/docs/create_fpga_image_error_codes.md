@@ -58,5 +58,9 @@ Errors can occurs when calling this API and this document provides the specifica
  
 * `DCP_NOT_ENCRYPTED`
       *The DCP was not encrypted*
-
-
+  
+* `UNKNOWN_BITSTREAM_GENERATE_ERROR`
+      *An error occurred generating the FPGA image bitstream. If an S3 LogsStorageLocation was provided in the CreateFpgaImage request, review the captured bitstream generation logs saved to S3 under the FpgaImageId for this AFI.*
+  * **Note:** This is a catch-all error and could be caused due to a variety of issues, for eg:
+      * We found a combinatorial loop in the CL design. Bitstream generation logs might show errors like `ERROR: [DRC LUTLP-1] Combinatorial Loop Alert: 2 LUT cells form a combinatorial loop.
+      Combinatorial loops are not allowed in CL designs and AFI's are not generated in such a case. 
