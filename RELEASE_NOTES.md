@@ -1,5 +1,9 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
+## Release 1.4.20
+* Bug Fix release to fix XDMA to fix Issue #516
+* Miscellaneous documentation updates
+
 ## Release 1.4.19 (See [ERRATA](./ERRATA.md) for unsupported features)
 * Bug Fix release
 
