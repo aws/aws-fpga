@@ -36,7 +36,7 @@ run:
 	cd $(SIM_DIR) &&  vsim -c -voptargs="+acc" -64 -t ps -sv_seed random $(LIBLISTS_ARGS) -do "run -all; quit -f" tb glbl $(TEST)
 
 $(COMPLIB_DIR):
-	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family  all" > create_libs.tcl
 	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
 	cd $(SIM_ROOT) && rm -rf create_libs.tcl 
 
