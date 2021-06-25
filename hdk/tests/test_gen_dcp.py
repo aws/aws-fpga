@@ -32,6 +32,7 @@ import re
 import subprocess
 import sys
 import traceback
+
 try:
     import aws_fpga_utils
     import aws_fpga_test_utils
@@ -42,6 +43,7 @@ except ImportError as e:
     sys.exit(1)
 
 logger = aws_fpga_utils.get_logger(__name__)
+
 
 class TestGenDcp(AwsFpgaTestBase):
     '''
@@ -71,7 +73,7 @@ class TestGenDcp(AwsFpgaTestBase):
         cls.allowed_warnings = (
             (('.*',), r'^WARNING: \[Constraints 18-838\] Failed to create SRL placer macro for cell SH/SH/MGT_TOP.*'),
             (('.*',), r'^WARNING: \[Shape Builder 18-838\] Failed to create SRL placer macro for cell WRAPPER_INST/SH/SH/MGT_TOP.*'),
-	        (('.*',), r'^WARNING: \[Common 17-576\] \'fanout_opt\' is deprecated.*'),
+            (('.*',), r'^WARNING: \[Common 17-576\] \'fanout_opt\' is deprecated.*'),
             (('.*',), r'^CRITICAL WARNING: \[Place 30-823\] Failed to process clock nets that should have matching clock routes\. Reason: Found incompatible user defined or fixed clock roots for related clocks \'CL/SH_DDR/ddr_cores\.DDR4'),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/u_ila_reset_ctrl/asyncrounous_transfer\.arm_in_transfer_inst/dout_reg0_reg\. '),
             (('.*',), r'^CRITICAL WARNING: \[Constraints 18-850\] Failed to place register with ASYNC_REG property shape that starts with register SH/SH/MGT_TOP/SH_ILA_0/inst/ila_core_inst/capture_qual_ctrl_2_reg\[0\]\. '),
@@ -84,7 +86,8 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'^CRITICAL WARNING: \[Opt 31-430\].*'),
             (('.*',), r'WARNING: \[Vivado 12-3731\].*'),
             (('.*',), r'WARNING: \[Constraints 18-619\] A clock with name \'CLK_300M_DIMM._DP\'.*'),
-	        (('.*',), r'WARNING: \[Constraints 18-5648\] .*'),
+            (('.*',), r'WARNING: \[Constraints 18-5648\] .*'),
+            (('.*',), r'WARNING: \[Constraints 18-4434\] Global Clock Buffer \'static_sh.*'),
             (('.*',), r'WARNING: \[Vivado_Tcl 4-391\] The following IPs are missing output products for Implementation target. These output products could be required for synthesis, please generate the output products using the generate_target or synth_ip command before running synth_design.*'),
             (('.*',), r'WARNING: \[DRC RPBF-3\] IO port buffering.*'),
             (('.*',), r'WARNING: \[Place 46-14\] The placer has determined that this design is highly congested and may have difficulty routing. Run report_design_analysis -congestion for a detailed report\.'),
@@ -98,7 +101,7 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'WARNING: \[Synth 8-7023\] .*'),
             (('.*',), r'CRITICAL WARNING: \[DRC HDPR-113\] Check for INOUT ports in RP: Reconfigurable module WRAPPER_INST/SH contains an INOUT port named .*'),
             (('.*',), r'WARNING: \[Synth 8-7071\] .*'),
-	        (('.*',), r'WARNING: \[Synth 8-7129\] .*'),
+            (('.*',), r'WARNING: \[Synth 8-7129\] .*'),
             (('.*',), r'WARNING: \[Route 35-3387\] .*'),
             (('cl_sde_*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
             (('cl_sde_*',), r'WARNING: \[Vivado 12-1008\] No clocks found for command.*'),
@@ -159,7 +162,7 @@ class TestGenDcp(AwsFpgaTestBase):
 
         cls.allowed_timing_violations = [
             re.compile(r'cl_dram_dma_A1_B2_C0_2_(CONGESTION|BASIC)'),
-            ]
+        ]
 
     def filter_warnings(self, cl, option_tag, warnings):
         option_tag = cl + "_" + option_tag
@@ -192,7 +195,8 @@ class TestGenDcp(AwsFpgaTestBase):
     def assert_non_zero_file(self, filter):
         filenames = glob.glob(filter)
         assert len(filenames) > 0, "No {} file found in {}".format(filter, os.getcwd())
-        assert len(filenames) == 1, "More than 1 {} file found: {}\n{}".format(filter, len(filenames), "\n".join(filenames))
+        assert len(filenames) == 1, "More than 1 {} file found: {}\n{}".format(filter, len(filenames),
+                                                                               "\n".join(filenames))
         filename = filenames[0]
         assert os.stat(filename).st_size != 0, "{} is 0 size".format(filename)
         return filename
@@ -257,11 +261,13 @@ class TestGenDcp(AwsFpgaTestBase):
         logger.info("Saw {} critical warnings in log file".format(num_critical_warnings))
         filtered_critical_warnings = self.filter_warnings(cl, option_tag, critical_warnings)
         num_critical_warnings = len(filtered_critical_warnings)
-        logger.info("Saw {} filtered critical warnings in log file:\n{}".format(num_critical_warnings, "\n".join(filtered_critical_warnings)))
+        logger.info("Saw {} filtered critical warnings in log file:\n{}".format(num_critical_warnings,
+                                                                                "\n".join(filtered_critical_warnings)))
 
         assert not (num_warnings or num_critical_warnings), "Unexpected warnings"
         # Check if there are any setup/hold-time violations
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("grep \"The design did not meet timing requirements.\" last_log", check=False)
+        (rc, stdout_lines, stderr_lines) = self.run_cmd(
+            "grep \"The design did not meet timing requirements.\" last_log", check=False)
         if rc == 0:
             NUM_TIMING_VIOLATIONS = len(stdout_lines) - 1
         else:
@@ -284,12 +290,15 @@ class TestGenDcp(AwsFpgaTestBase):
                 fields = stdout_lines[0].split()
                 act_freq = float(fields[4])
                 exp_freq = float(self.DCP_CLOCK_RECIPES[clock_group]['recipes'][recipe][clock_name])
-                assert act_freq == exp_freq, "{} frequency miscompare: act={} exp={}\n{}".format(clock_name, act_freq, exp_freq, stdout_lines[0])
+                assert act_freq == exp_freq, "{} frequency miscompare: act={} exp={}\n{}".format(clock_name, act_freq,
+                                                                                                 exp_freq,
+                                                                                                 stdout_lines[0])
                 logger.info("{} : {}".format(clock_name, act_freq))
 
         return tarball
 
-    def base_test(self, cl, xilinxVersion, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0', clock_recipe_c='C0', uram_option='2'):
+    def base_test(self, cl, xilinxVersion, build_strategy='DEFAULT', clock_recipe_a='A0', clock_recipe_b='B0',
+                  clock_recipe_c='C0', uram_option='2'):
         assert build_strategy in self.DCP_BUILD_STRATEGIES
         assert clock_recipe_a in self.DCP_CLOCK_RECIPES['A']['recipes']
         assert clock_recipe_b in self.DCP_CLOCK_RECIPES['B']['recipes']
@@ -315,9 +324,11 @@ class TestGenDcp(AwsFpgaTestBase):
         cwd = os.getcwd()
         os.chdir(scripts_dir)
 
-        option_tag = "{}_{}_{}_{}_{}".format(clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option, build_strategy)
-        (rc, stdout_lines, stderr_lines) = self.run_cmd("./aws_build_dcp_from_cl.sh -foreground -strategy {} -clock_recipe_a {} -clock_recipe_b {} -clock_recipe_c {} -uram_option {}".format(
-            build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option))
+        option_tag = "{}_{}_{}_{}_{}".format(clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option,
+                                             build_strategy)
+        (rc, stdout_lines, stderr_lines) = self.run_cmd(
+            "./aws_build_dcp_from_cl.sh -foreground -strategy {} -clock_recipe_a {} -clock_recipe_b {} -clock_recipe_c {} -uram_option {}".format(
+                build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c, uram_option))
         assert rc == 0, "DCP build failed."
         logger.info("DCP Generation Finished")
 
@@ -362,4 +373,3 @@ class TestGenDcp(AwsFpgaTestBase):
     def test_cl_sde(self, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c):
         cl = 'cl_sde'
         self.base_test(cl, xilinxVersion, build_strategy, clock_recipe_a, clock_recipe_b, clock_recipe_c)
-

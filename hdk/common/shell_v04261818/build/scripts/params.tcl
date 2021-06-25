@@ -26,5 +26,4 @@ if {$uram_option != 2} {
 set_param hd.supportClockNetCrossDiffReconfigurablePartitions 1 
 
 # Maintain DONT TOUCH functionality for 2020.2 onwards
-if {[string match *2020.2* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}
-
+if {[string match *2020.2* [version -short]] || [string match *2021.* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}

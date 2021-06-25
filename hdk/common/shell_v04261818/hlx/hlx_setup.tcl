@@ -46,5 +46,5 @@ set aws::make_faas::public::bd_faas_initscript [file join $aws::make_faas::publi
 set ::env(FAAS_HOOK_TCL) $::aws::make_faas::public::bd_faas_initscript
 
 # Maintain DONT TOUCH functionality for 2020.2 onwards
-if {[string match *2020.2* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}
-#
+if {[string match *2020.2* [version -short]] || [string match *2021.* [version -short]]} {set_param project.replaceDontTouchWithKeepHierarchySoft false}
+##

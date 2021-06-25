@@ -83,6 +83,7 @@ if ! exists vivado; then
 fi
 
 # Install any patches as required
+info_msg "Setting up Vivado patches if required."
 setup_patches
 
 #Searching for Vivado version and comparing it with the list of supported versions

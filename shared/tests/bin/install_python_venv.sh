@@ -49,6 +49,7 @@ if [ ! -e /usr/bin/pip2 ]; then
         echo "Error: Install of $yum_python_package failed"
         exit 1
     fi
+    sudo pip install -U 'pip<21'
 fi
 
 # Install virtualenv
@@ -60,14 +61,14 @@ if [ ! -e /usr/bin/virtualenv ]; then
 fi
 
 # Install virtualenvwrapper
-if [ ! -e /usr/bin/virtualenvwrapper.sh ]; then
-    if ! sudo pip install virtualenvwrapper; then
+if [ ! -e ~/.local/bin/virtualenvwrapper.sh ]; then
+    if ! pip install --user virtualenvwrapper; then
         echo "Error: Install of virtualenvwrapper failed"
         exit 1
     fi
 fi
 
-source virtualenvwrapper.sh
+source ~/.local/bin/virtualenvwrapper.sh
 
 # Create virtualenv environments
 for python_version in ${python_versions[@]}; do

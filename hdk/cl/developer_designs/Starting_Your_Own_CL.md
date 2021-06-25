@@ -46,14 +46,18 @@ In both cases, double-check that the `$CL_DIR` is set correctly by calling and c
 <a name="modifyBuildScripts"></a>
 ## 3. Modify the build scripts
 
-The following scripts should be modified before starting the build:
- - `/build/constraints/*`   to set all the timing, clock and placement constraints.
- - `/build/scripts/encrypt.tcl`   CL Encryption is required, AFI creation will fail if your CL source files are not encrypted.  To enable include the source file names.
- - `/build/scripts/create_dcp_from_cl.tcl`   to update the final build scripts with right source files and IP.
-        
-Once your design is ready and you would like to start the build process, please refer to this [checklist](../CHECKLIST_BEFORE_BUILDING_CL.md).
 
-Once you verified the checklist, the detailed walkthrough on how to build and submit the CL to AWS is avaiable [here](../../common/shell_v04261818/new_cl_template/build/README.md)
+The following scripts should be modified before starting the build:
+* `/build/constraints/*`   
+   * This is to set all the timing, clock and placement constraints.
+* `/build/scripts/encrypt.tcl`   
+    * CL Encryption is **NOT** required, but encouraged. To enable encryption, include the source file names.
+* `/build/scripts/create_dcp_from_cl.tcl`
+    * This is to update the final build scripts with right source files and IP.
+    
+Once your design is ready, please refer to this [checklist](../CHECKLIST_BEFORE_BUILDING_CL.md) before starting the build process.
+
+Once you verified the checklist, the detailed walk through on how to build and submit the CL to AWS is available [here](../../common/shell_v04261818/new_cl_template/build/README.md)
 
 
 
