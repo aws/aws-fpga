@@ -168,7 +168,6 @@ Conversely, code which is simply a few lines of basic operations, and has no tas
 * Xilinx web portal for [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html?resultsTablePreSelect=xlnxdocumenttypes:SeeAll#documentation) 
 * [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
 * [Xilinx SDAccel landing page](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html)
-* [Vivado HLS landing page](https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html)
 * [Vivado landing page](https://www.xilinx.com/products/design-tools/vivado.html)
 * [SDAccel Environment User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
 * [SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)

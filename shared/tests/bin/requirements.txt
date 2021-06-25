@@ -1,6 +1,6 @@
 pytest
 pytest-timeout
-pytest-rerunfailures
+pytest-rerunfailures==8.0
 boto3
 markdown
 GitPython
