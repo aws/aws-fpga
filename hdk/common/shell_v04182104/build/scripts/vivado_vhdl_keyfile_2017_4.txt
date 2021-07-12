@@ -17,4 +17,5 @@ MwIDAQAB
 `protect control xilinx_configuration_visible = "false"
 `protect control xilinx_enable_modification = "false"
 `protect control xilinx_enable_probing = "false"
+`protect control xilinx_schematic_visibility = "true"
 `protect end_toolblock=""

@@ -17,4 +17,5 @@ MwIDAQAB
 `pragma protect control xilinx_configuration_visible = "false"
 `pragma protect control xilinx_enable_modification = "false"
 `pragma protect control xilinx_enable_probing = "false"
+`pragma protect control xilinx_schematic_visibility = "true"
 `pragma protect end_toolblock=""

@@ -152,7 +152,19 @@ If you are running on one of the EC2 compute instances with 31GiB DRAM or more, 
 <a name="buildencryption"></a>
 ## About Encryption 
 
-Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
+Developer RTL can encrypted using IEEE 1735 V2 encryption. This level of encryption protects both the raw source files and the implemented design.  
+
+By default, our scripts encrypt all CL RTLs that we provide and we encourage you to do so too. 
+
+We have also included the following pragmas in the encryption keys:
+* Verlog: `pragma protect control xilinx_schematic_visibility = "true"`
+* VHDL: `protect control xilinx_schematic_visibility = "true"`
+
+This allows customers to view netlist hierarchy in encrypted RTL/encrypted DCP, making it easier for debugging timing paths.
+
+**NOTE:** This does NOT expose LUT/FF equations and RTL/DCPs will still be encrypted
+
+If you do not want to allow viewing netlist hierarchy in Vivado, you can remove the above rights from the encryption keys.
 
 <a name="buildadvanced_notes"></a>
 ## Advanced Notes 
