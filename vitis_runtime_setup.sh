@@ -64,19 +64,10 @@ function help {
 }
 
 function check_xdma_driver {
-       
+
     if lsmod | grep -q 'xdma' ; then
         err_msg "Found XDMA Driver running. Please remove xdma driver using below command"
         err_msg " rmmod xdma"
-        return 1
-    fi
-}
-
-function check_edma_driver {
-       
-    if lsmod | grep -q 'edma' ; then
-        err_msg "Found EDMA Driver running. Please remove edma driver using below command"
-        err_msg " rmmod edma"
         return 1
     fi
 }
@@ -85,8 +76,8 @@ function check_xocl_driver {
     if lsmod | grep -q 'xocl' ; then
         info_msg "Found 'xocl Driver is installed and running. ' "
     else
-        err_msg " XOCL Driver not installed. Please install xocl driver using below instructions"
-        err_msg " If using 2019.2 Vitis toolset please source $AWS_FPGA_REPO_DIR/vitis_setup.sh "
+        err_msg "XOCL Driver not installed. Please install xocl driver using below instructions"
+        err_msg "If using Vitis, please source $AWS_FPGA_REPO_DIR/vitis_setup.sh "
         return 1
     fi
 }
@@ -150,13 +141,12 @@ info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
 check_kernel_ver
 check_xdma_driver
-check_edma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020\.1.* || "$VIVADO_TOOL_VERSION" =~ .*2020\.2.* ]]; then
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020\.1.* || "$VIVADO_TOOL_VERSION" =~ .*2020\.2.* || "$VIVADO_TOOL_VERSION" =~ .*2021\.1.* ]]; then
     info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
-    
+
     if [ $override == 1 ]; then
-      info_msg "XRT check overide selected."
+      info_msg "XRT check override selected."
       source /opt/xilinx/xrt/setup.sh
       return 0
     fi
@@ -172,7 +162,7 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020
           info_msg "XRT version $xrt_build_ver is supported."
           info_msg " Now checking XOCL driver..."
           check_xocl_driver
-          if [ -f "/opt/xilinx/xrt/setup.sh" ]; then 
+          if [ -f "/opt/xilinx/xrt/setup.sh" ]; then
              source /opt/xilinx/xrt/setup.sh
           else
              err_msg " Cannot find /opt/xilinx/xrt/setup.sh"
@@ -193,11 +183,10 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020
        return 1
     fi
 else
-   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2, 2020.1 or 2020.2 are supported for Vitis "
+   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2, 2020.1, 2020.2 or 2021.1 are supported for Vitis "
    return 1
 fi
 
-# Setup XRT as we need it for building
 setup_runtime
 
 info_msg "Starting MPD"

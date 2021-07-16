@@ -152,7 +152,9 @@ If you are running on one of the EC2 compute instances with 31GiB DRAM or more, 
 <a name="buildencryption"></a>
 ## About Encryption 
 
-Developer RTL is encrypted using IEEE 1735 V2 encryption.  This level of encryption protects both the raw source files and the implemented design.  
+Developer RTL can encrypted using IEEE 1735 V2 encryption. This level of encryption protects both the raw source files and the implemented design.  
+
+By default, our scripts encrypt all CL RTLs that we provide and we encourage you to do so too.
 
 <a name="buildadvanced_notes"></a>
 ## Advanced Notes 

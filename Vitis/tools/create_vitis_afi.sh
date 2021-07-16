@@ -280,8 +280,9 @@ echo ${timestamp}_agfi_id.txt
 #STEP 6
 #Create .awsxclbin
 
-if [ "$RELEASE_VER" == "2020.2" ]
-then                            
+
+if [[ "$RELEASE_VER" == "2020.2" || "$RELEASE_VER" == "2021.1" ]]
+then
 	/opt/xilinx/xrt/bin/xclbinutil -i $xclbin --remove-section PARTITION_METADATA --replace-section BITSTREAM:RAW:${timestamp}_agfi_id.txt -o ${awsxclbin}.awsxclbin
 else
 	/opt/xilinx/xrt/bin/xclbinutil -i $xclbin --remove-section PARTITION_METADATA --remove-section SYSTEM_METADATA --replace-section BITSTREAM:RAW:${timestamp}_agfi_id.txt -o ${awsxclbin}.awsxclbin

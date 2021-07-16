@@ -50,17 +50,18 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 
 | Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
 |-----------|-----------|------|
+| 1.4.21+ | 2021.1 | v1.11.X (Xilinx Vivado/Vitis 2021.1) |
 | 1.4.18+ | 2020.2 | v1.10.X (Xilinx Vivado/Vitis 2020.2) |
 | 1.4.16+ | 2020.1 | v1.9.0-v1.9.X (Xilinx Vivado/Vitis 2020.1) |
 | 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
 | 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
-| 1.4.8 - 1.4.15a | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
-| 1.4.3 - 1.4.15a | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
-| 1.3.7 - 1.4.15a | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
+| 1.4.8 - 1.4.15b | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
+| 1.4.3 - 1.4.15b | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
+| 1.3.7 - 1.4.15b | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
 
 ⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. 
-While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15a or earlier. 
-Please checkout [the latest v1.4.15a release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
+While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15b or earlier. 
+Please checkout [the latest v1.4.15b release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15b) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
 
 ⚠️ Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life. See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
 

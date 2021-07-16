@@ -116,7 +116,11 @@ function get_vivado_version {
 
 function setup_patches {
     local caller_script="${BASH_SOURCE[1]}"
+
+    info_msg "Checking if patch AR71715 needs to be installed"
     patch_AR71715
+
+    info_msg "Checking if patch AR73068 needs to be installed"
     patch_AR73068 "$caller_script"
 }
 
@@ -145,7 +149,6 @@ function patch_AR71715 {
 
     local base_vivado_version=$(get_base_vivado_version)
     is_patch_valid=false
-    info_msg "Base vivado version is $base_vivado_version. Checking if patch AR71715 needs to be installed"
     for vivado_version in "${valid_vivado_versions[@]}"
     do
         if [ ":$vivado_version" == ":$base_vivado_version" ]; then
@@ -155,7 +158,7 @@ function patch_AR71715 {
 
     if [ "$is_patch_valid" == "true" ]; then
 
-        info_msg " SDX patch $patch_dirname is valid for $base_vivado_version"
+        info_msg "Patch AR71715 is valid for $base_vivado_version"
 
         if [ ! -d $patch_root/$patch_dirname ]; then
 
@@ -283,17 +286,22 @@ function patch_AR73068 {
     fi
 
     if [[ "${base_vivado_version}" =~ "Vivado v2019.2" ]]; then
+      info_msg "Patch $patch_name is valid for Vivado $base_vivado_version."
       patch_AR73068_2019_2 "$fix_patch"
     elif [[ "${base_vivado_version}" =~ "Vivado v2019.1" ]]; then
+      info_msg "Patch $patch_name is valid for Vivado $base_vivado_version."
       patch_AR73068_2019_1
     elif [[ "${base_vivado_version}" =~ "Vivado v2018.3" ]]; then
+      info_msg "Patch $patch_name is valid for Vivado $base_vivado_version."
       patch_AR73068_2018_3
     elif [[ "${base_vivado_version}" =~ "Vivado v2018.2" ]]; then
+      info_msg "Patch $patch_name is valid for Vivado $base_vivado_version."
       patch_AR73068_2018_2
     elif [[ "${base_vivado_version}" =~ "Vivado v2017.4" ]]; then
+      info_msg "Patch $patch_name is valid for Vivado $base_vivado_version."
       patch_AR73068_2017_4
     else
-      info_msg "Xilinx Patch AR73068 not applicable for Vivado version: ${base_vivado_version}."
+      info_msg "Patch AR73068 not applicable for Vivado ${base_vivado_version}."
     fi
 }
 

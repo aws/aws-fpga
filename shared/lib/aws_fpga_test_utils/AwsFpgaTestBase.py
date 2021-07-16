@@ -437,9 +437,9 @@ class AwsFpgaTestBase(object):
             run_cmd = "./{}".format(host_description.get("host_exe", None))
 
         if launch_description[0].get("cmd_args", None):
-            run_cmd += " {}".format(((launch_description[0].get("cmd_args", None).replace(".xclbin",
-                                                                                        ".awsxclbin")).replace(
-                        "PROJECT", ".")).replace("BUILD", "./build_dir.hw.xilinx_aws-vu9p-f1_shell-v04261818_201920_2"))
+            run_cmd += " {}".format(((launch_description[0].get("cmd_args", None).replace(".xclbin", ".awsxclbin")).replace(
+                        "PROJECT", ".")).replace("BUILD", "./build_dir.hw.xilinx_aws-vu9p-f1_shell-v04261818_201920_2")).replace(
+                "REPO_DIR", AwsFpgaTestBase.get_vitis_example_base_dir(xilinxVersion))
 
         assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(
             examplePath)
@@ -477,6 +477,10 @@ class AwsFpgaTestBase(object):
     @staticmethod
     def get_vitis_example_fullpath(examplePath):
         return "{}/{}/".format(AwsFpgaTestBase.WORKSPACE, examplePath)
+
+    @staticmethod
+    def get_vitis_example_base_dir(xilinxVersion):
+        return "{}/Vitis/examples/xilinx_{}/".format(AwsFpgaTestBase.WORKSPACE, xilinxVersion)
 
     @staticmethod
     def fetch_sdaccel_xclbin_folder_from_s3(examplePath, rteName, xilinxVersion):

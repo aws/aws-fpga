@@ -37,8 +37,8 @@ file copy -force $CL_DIR/design/cl_hello_world_defines.vh             $TARGET_DI
 file copy -force $CL_DIR/design/cl_vhdl_wrapper.vhd                   $TARGET_DIR
 file copy -force $CL_DIR/design/cl_id_defines.vh                      $TARGET_DIR
 file copy -force $CL_DIR/design/cl_hello_world_pkg.sv                 $TARGET_DIR
-file copy -force $CL_DIR/design/hello_world.sv                        $TARGET_DIR 
-file copy -force $CL_DIR/design/cl_hello_world.sv                     $TARGET_DIR 
+file copy -force $CL_DIR/design/hello_world.sv                        $TARGET_DIR
+file copy -force $CL_DIR/design/cl_hello_world.sv                     $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_apppf_irq_template.inc  $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_cl_sda_template.inc     $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_ddr_a_b_d_template.inc  $TARGET_DIR
@@ -54,9 +54,9 @@ file copy -force $UNUSED_TEMPLATES_DIR/unused_flr_template.inc        $TARGET_DI
 exec chmod +w {*}[glob $TARGET_DIR/*]
 
 # encrypt .v/.sv/.vh/inc as verilog files
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile_2017_4.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
 
 # encrypt *vhdl files
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile_2017_4.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
 
 

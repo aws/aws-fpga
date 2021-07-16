@@ -87,7 +87,7 @@ The instructions below describe how to run the Vitis SW Emulation flow using the
 ```
     $ cd $VITIS_DIR/examples/xilinx/hello_world          
     $ make clean                                                                 
-    $ make check TARGET=sw_emu DEVICE=$AWS_PLATFORM all     
+    $ make run TARGET=sw_emu DEVICE=$AWS_PLATFORM all     
 ```
 
 For more information on how to debug your application in a SW Emulation environment.
@@ -102,7 +102,7 @@ The instructions below describe how to run the HW Emulation flow using the Makef
 ```
     $ cd $VITIS_DIR/examples/xilinx/hello_world             
     $ make clean                                                                   
-    $ make check TARGET=hw_emu DEVICE=$AWS_PLATFORM all      
+    $ make run TARGET=hw_emu DEVICE=$AWS_PLATFORM all      
 ```
 For more information on how to debug your application in a HW Emulation environment.
 

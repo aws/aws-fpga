@@ -68,7 +68,7 @@ if [ ! -e ~/.local/bin/virtualenvwrapper.sh ]; then
     fi
 fi
 
-source virtualenvwrapper.sh
+source ~/.local/bin/virtualenvwrapper.sh
 
 # Create virtualenv environments
 for python_version in ${python_versions[@]}; do
