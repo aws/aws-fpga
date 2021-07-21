@@ -100,18 +100,22 @@ function setup_runtime {
         export PATH=$PATH:/opt/xilinx/xrt/bin
 
         export LD_LIBRARY_PATH=$XILINX_XRT/lib:$LD_LIBRARY_PATH
-        # copy libstdc++ from $XILINX_VITIS/lib
-        if [[ $(lsb_release -si) == "Ubuntu" ]]; then
-            sudo cp $XILINX_VITIS/lib/lnx64.o/Ubuntu/libstdc++.so* /opt/xilinx/xrt/lib/
-        elif [[ $(lsb_release -si) == "CentOS" ]]; then
-            sudo cp $XILINX_VITIS/lib/lnx64.o/Default/libstdc++.so* /opt/xilinx/xrt/lib/
-        else
-            info_msg "Unsupported OS."
-            return 1
+
+        if [[ $RELEASE_VER =~ .*2019\.2.* ]]; then
+
+          # copy libstdc++ from $XILINX_VITIS/lib
+          if [[ $(lsb_release -si) == "Ubuntu" ]]; then
+              sudo cp $XILINX_VITIS/lib/lnx64.o/Ubuntu/libstdc++.so* /opt/xilinx/xrt/lib/
+          elif [[ $(lsb_release -si) == "CentOS" ]]; then
+              sudo cp $XILINX_VITIS/lib/lnx64.o/Default/libstdc++.so* /opt/xilinx/xrt/lib/
+          elif [[ $(lsb_release -si) == "Amazon" ]]; then
+              sudo cp /lib64/libstdc++.so* /opt/xilinx/xrt/lib/
+          else
+              info_msg "Unsupported OS."
+              return 1
+          fi
         fi
     else # No XRT available
         err_msg "Xilinx XRT runtime not installed - This is required if you are running on an F1 instance."
-        # Placeholder for code to download pre-compiled RPM/DEB package and remove above message
-        # install_xrt_package <Path to RPM/DEB>
     fi
 }

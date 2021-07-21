@@ -165,13 +165,13 @@ fi
 
 info_msg " XILINX_VITIS is set to $XILINX_VITIS"
 # Install patches as required.
-info_msg " Checking & installing required patches"
+info_msg "Setting up Vitis patches if required."
 setup_patches
 
 
 # Update Xilinx Vitis Examples from GitHub
 info_msg "Using Vitis $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ||  $RELEASE_VER =~ .*2020\.2.* ]]; then
+if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ||  $RELEASE_VER =~ .*2020\.2.* ||  $RELEASE_VER =~ .*2021\.1.* ]]; then
     info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
     git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
@@ -183,14 +183,9 @@ if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ||  $RELEASE_
     fi
     ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2019.2, 2020.1 or 2020.2 are supported).\n"
+   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2 or 2021.1 are supported).\n"
    return 2
 fi
-
-# settings64 removal - once we put this in the AMI, we will add a check
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$XILINX_VITIS/lib/lnx64.o
-
-export LD_LIBRARY_PATH=`$XILINX_VITIS/bin/ldlibpath.sh $XILINX_VITIS/lib/lnx64.o`
 
 # Check if internet connection is available
 if ! check_internet; then
@@ -203,14 +198,19 @@ if ! check_icd; then
 fi
 
 # Check correct packages are installed
-if [ -f "/etc/redhat-release" ]; then
+
+if [[ $(lsb_release -si) == "Centos" ]]; then
     if ! check_install_packages_centos; then
         return 1
     fi
-else
+elif [[ $(lsb_release -si) == "Ubuntu" ]]; then
     if ! check_install_packages_ubuntu; then
         return 1
     fi
+#elif [[ $(lsb_release -si) == "Ubuntu" ]]; then
+#    if ! check_install_packages_ubuntu; then
+#        return 1
+#    fi
 fi
 
 function setup_xsa {

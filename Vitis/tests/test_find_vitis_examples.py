@@ -83,6 +83,12 @@ class TestFindVitisExamples(AwsFpgaTestBase):
                             ignore = True
                             logger.info("Ignoring {} as F1 device found in ndevice.".format(root))
                             continue
+
+                    if "platform_blacklist" in description:
+                        if "aws" in description["platform_blacklist"]:
+                            ignore = True
+                            logger.info("Ignoring {} as F1 device found in ndevice.".format(root))
+                            continue
             else:
                 ignore = True
                 logger.warn("Ignoring: {} as no Makefile/description.json exist".format(root))
