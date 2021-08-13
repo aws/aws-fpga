@@ -68,8 +68,8 @@ export VITIS_DIR=$AWS_FPGA_REPO_DIR/Vitis
 # PYTHONPATH
 # Update PYTHONPATH with libraries used for unit testing
 python_lib=$AWS_FPGA_REPO_DIR/shared/lib
-export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
 PYTHONPATH=$python_lib:$PYTHONPATH
+export PYTHONPATH
 
 # PATH Changes
 
