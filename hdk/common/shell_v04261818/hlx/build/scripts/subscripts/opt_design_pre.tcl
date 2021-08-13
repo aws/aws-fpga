@@ -43,9 +43,8 @@ if {$_this_flow_option eq 1} {
 	#close the current design, read in both checkpoints, link & write, then continue with normal (subverted) flow
 	report_property [current_design]
 
-	add_files $::env(HDK_SHELL_DIR)/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
 
-	
+
 	set AWS_RTL_XDC_EXISTS [get_files */cl_synth_aws.xdc -quiet]
 
 	set BD_PATH_EXISTS [get_files */cl.bd -quiet]
@@ -58,9 +57,13 @@ if {$_this_flow_option eq 1} {
 		set BD_MODE ""
 		}
 	} else {
-		set BD_MODE ""	
+		set BD_MODE ""
 	}
-	
+
+	close_design
+
+	add_files $::env(HDK_SHELL_DIR)/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
+
 	#RTL Flow or IPI Flow
 	if {$AWS_RTL_XDC_EXISTS != "" || $BD_MODE  == "None" } {
 	add_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth_inline.dcp
@@ -69,13 +72,14 @@ if {$_this_flow_option eq 1} {
 	add_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth.dcp
 	set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $FAAS_CL_DIR/build/checkpoints/CL.post_synth.dcp]
 	}
-	
+
+
 	read_xdc $::env(HDK_SHELL_DIR)/build/constraints/cl_ddr.xdc
-	
+
 	set PNR_USR_LOC $::env(PNR_USER)
 	read_xdc ${PNR_USR_LOC}
 	set_property PROCESSING_ORDER LATE [get_files $PNR_USR_LOC]
-	set_property USED_IN {implementation} [get_files $PNR_USR_LOC]	
+	set_property USED_IN {implementation} [get_files $PNR_USR_LOC]
 
 	link_design -top $top -part [get_parts -of_objects [current_project]] -reconfig_partitions {WRAPPER_INST/SH WRAPPER_INST/CL}
 	source ${FAAS_CL_DIR}/build/constraints/aws_gen_clk_constraints.tcl
@@ -96,7 +100,7 @@ if {$_this_flow_option eq 1} {
 	}
 
 	source $::env(HDK_SHELL_DIR)/build/scripts/check_uram.tcl
-	
+
 	write_checkpoint -force $FAAS_CL_DIR/build/checkpoints/${timestamp}.SH_CL.post_link_design.dcp
 
 
@@ -106,5 +110,3 @@ if {$_this_flow_option eq 1} {
 	puts "NOT YET IMPLEMENTED!"
 	close design
 }
-
-
