@@ -81,15 +81,13 @@ chmod 544 /opt/aws/bin/change-fpga-perm.sh
 DBDFs=`lspci -Dn |  grep -Ew "1d0f:1042|1d0f:1041" | awk '{print $1}' | sed ':x;N;$!bx;s/\n/ /g'`
 minor=0
 
-  rm -f /tmp/9999-presistent-fpga.rules
-  for d in $DBDFs ; do
-    echo "KERNEL==\"*${d}*\", RUN+=\"/opt/aws/bin/change-fpga-perm.sh '${d}'\"" >> /tmp/9999-presistent-fpga.rules
-  done
-  for d in $DBDFs ; do
-    echo "KERNEL==\"*${d}*\", ACTION==\"add\", RUN+=\"/opt/aws/bin/change-fpga-perm.sh '${d}'\"" >> /tmp/9999-presistent-fpga.rules
-  done
-  echo "Adding udev rule: 9999-presistent-fpga.rules"
-  cp /tmp/9999-presistent-fpga.rules /etc/udev/rules.d/9999-presistent-fpga.rules
+cat >/etc/udev/rules.d/9999-presistent-fpga.rules<<EF
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+EF
+echo "Adding udev rule: 9999-presistent-fpga.rules"
 
 ## Test the rules for any issues
 for d in  $DBDFs ; do
