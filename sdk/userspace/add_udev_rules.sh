@@ -19,6 +19,36 @@ set -x
 source /tmp/sdk_root_env.exp
 set +x
 rm -f /tmp/sdk_root_env.exp
+
+mkdir -p /opt/aws/bin
+
+if [[ $AWS_FPGA_SDK_OTHERS ]]; then
+# Allow all users
+
+# Make a script that will be run to change permissions everytime
+# udev rule for the DBDF is matched
+echo "Installing permission fix script for udev"
+cat >/opt/aws/bin/change-fpga-perm.sh<<EF
+#!/bin/bash
+set -x
+setperm () {
+  chmod g=u \$1
+  chmod a=u \$1
+}
+setfpgaperm () {
+  for f in \$1/*; do
+    setperm \$f;
+  done
+}
+
+devicePath=/sys/bus/pci/devices/\$1
+grep -q "0x058000" \$devicePath/class && setfpgaperm "\$devicePath"
+setperm /sys/bus/pci/rescan all
+EF
+
+else
+# Allow group only
+
 echo "Creating group ${AWS_FPGA_SDK_GROUP}"
 getent group ${AWS_FPGA_SDK_GROUP} >/dev/null 2>&1
 if [[ $? -eq 0 ]] ; then
@@ -49,7 +79,6 @@ fi
 
 # Fail on any unsucessful command
 set -e
-mkdir -p /opt/aws/bin
 # Make a script that will be run to change permissions everytime
 # udev rule for the DBDF is matched
 echo "Installing permission fix script for udev"
@@ -76,6 +105,7 @@ devicePath=/sys/bus/pci/devices/\$1
 grep -q "0x058000" \$devicePath/class && setfpgaperm "\$devicePath"
 setperm /sys/bus/pci/rescan all
 EF
+fi
 chmod 544 /opt/aws/bin/change-fpga-perm.sh
 
 DBDFs=`lspci -Dn |  grep -Ew "1d0f:1042|1d0f:1041" | awk '{print $1}' | sed ':x;N;$!bx;s/\n/ /g'`
