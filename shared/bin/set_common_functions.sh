@@ -308,3 +308,7 @@ function patch_AR73068 {
 function allow_non_root {
        [ ! -z ${AWS_FPGA_ALLOW_NON_ROOT} ]
 }
+
+function allow_others {
+       [ ! -z ${AWS_FPGA_SDK_OTHERS} ]
+}
