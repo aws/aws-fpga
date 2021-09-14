@@ -33,6 +33,7 @@ source $script_dir/shared/bin/set_common_env_vars.sh
 sudo rm -f /tmp/sdk_root_env.exp
 typeset -f allow_non_root > /tmp/sdk_root_env.exp
 echo "export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP}" >> /tmp/sdk_root_env.exp
+echo "export AWS_FPGA_SDK_OTHERS=${AWS_FPGA_SDK_OTHERS}" >> /tmp/sdk_root_env.exp
 echo "export SDK_NON_ROOT_USER=${SDK_NON_ROOT_USER}" >> /tmp/sdk_root_env.exp
 echo "export AWS_FPGA_SDK_OVERRIDE_GROUP=${AWS_FPGA_SDK_OVERRIDE_GROUP}" >> /tmp/sdk_root_env.exp
 sudo chown root:root /tmp/sdk_root_env.exp
