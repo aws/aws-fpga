@@ -43,6 +43,7 @@ import io
 import logging
 import markdown
 import os
+import ssl
 import os.path
 from os.path import dirname, realpath
 import re
@@ -112,7 +113,8 @@ def check_link(url):
         if not urlparse.urlparse(url).netloc:
             return False
 
-        website = urlopen(url)
+        context = ssl._create_unverified_context()
+        website = urlopen(url, context=context)
         html = website.read()
 
         if website.code != 200:

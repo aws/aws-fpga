@@ -29,7 +29,7 @@ NOTE: Only INCR burst mode is supported on AXI-4 buses between CL/Shell interfac
 
 5. Upgrade to latest for [SH_DDR IP](../common/shell_v04261818/design/sh_ddr) .
 
-6. All Xilinx IP  in your CL must to be upgraded to 2017.4 or later version. see [vivado 2017.4 release notes for recommended version](https://www.xilinx.com/support/answers/70386.html)
+6. All Xilinx IP  in your CL must to be upgraded to 2017.4 or later version. see [vivado 2017.4 release notes for recommended version](https://support.xilinx.com/s/article/70386?language=en_US)
 
 7. [ILA cores](../common/shell_v04261818/design/ip/cl_debug_bridge) need to be upgraded for 2017.4 or later
      Please refer to the [cl_dram_dma](../cl/examples/cl_dram_dma/design) example for ILA hookup on PCIS interface.
