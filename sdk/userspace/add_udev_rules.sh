@@ -19,56 +19,28 @@ set -x
 source /tmp/sdk_root_env.exp
 set +x
 rm -f /tmp/sdk_root_env.exp
-echo "Creating group ${AWS_FPGA_SDK_GROUP}"
-getent group ${AWS_FPGA_SDK_GROUP} >/dev/null 2>&1
-if [[ $? -eq 0 ]] ; then
-	if [ -z ${AWS_FPGA_SDK_OVERRIDE_GROUP} ] ; then
-		echo "Group ${AWS_FPGA_SDK_GROUP} already exists. Please export a non existent group name  to AWS_FPGA_SDK_GROUP or export AWS_FPGA_SDK_OVERRIDE_GROUP=y"
-		exit 1
-	fi
-	echo "${AWS_FPGA_SDK_GROUP} already exists, will grant FPGA resource access to this group"
-else
-	groupadd  ${AWS_FPGA_SDK_GROUP}
-	if [[ $? -ne 0 ]] ; then
-		echo "Could not group ${AWS_FPGA_SDK_GROUP}"
-		exit 1
-	fi
-fi
 
-echo "Adding user ${SDK_NON_ROOT_USER} into group ${AWS_FPGA_SDK_GROUP}"
-getent group ${AWS_FPGA_SDK_GROUP} | grep -qw ${SDK_NON_ROOT_USER}
-if [[ $? -eq 0 ]] ; then
-	echo "${SDK_NON_ROOT_USER} is already in group ${AWS_FPGA_SDK_GROUP}"
-else
-	usermod -a -G ${AWS_FPGA_SDK_GROUP} ${SDK_NON_ROOT_USER}
-	if [[ $? -ne 0 ]] ; then
-		echo "Could not add user ${SDK_NON_ROOT_USER} to group ${AWS_FPGA_SDK_GROUP}"
-		exit 1
-	fi
-fi
-
-# Fail on any unsucessful command
-set -e
 mkdir -p /opt/aws/bin
-# Make a script that will be run to change permissions everytime
-# udev rule for the DBDF is matched
-echo "Installing permission fix script for udev"
-cat >/opt/aws/bin/change-fpga-perm.sh<<EF
+
+DBDFs=`lspci -Dn |  grep -Ew "1d0f:1042|1d0f:1041" | awk '{print $1}' | sed ':x;N;$!bx;s/\n/ /g'`
+
+
+if [[ $AWS_FPGA_SDK_OTHERS ]]; then
+# Allow all users
+
+  # Make a script that will be run to change permissions everytime
+  # udev rule for the DBDF is matched
+  echo "Installing permission fix script for udev"
+  cat >/opt/aws/bin/change-fpga-perm.sh<<EF
 #!/bin/bash
 set -x
 setperm () {
   chmod g=u \$1
-	if [[ x\$2 != "x" ]] ; then
-		chmod a=u \$1
-	fi
-}
-setgrp() {
-	chown root:${AWS_FPGA_SDK_GROUP} \$1
+  chmod a=u \$1
 }
 setfpgaperm () {
   for f in \$1/*; do
     setperm \$f;
-		setgrp \$f
   done
 }
 
@@ -76,10 +48,76 @@ devicePath=/sys/bus/pci/devices/\$1
 grep -q "0x058000" \$devicePath/class && setfpgaperm "\$devicePath"
 setperm /sys/bus/pci/rescan all
 EF
-chmod 544 /opt/aws/bin/change-fpga-perm.sh
 
-DBDFs=`lspci -Dn |  grep -Ew "1d0f:1042|1d0f:1041" | awk '{print $1}' | sed ':x;N;$!bx;s/\n/ /g'`
-minor=0
+echo "Adding udev rule: 9999-presistent-fpga.rules"
+cat >/etc/udev/rules.d/9999-presistent-fpga.rules<<EF
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+EF
+
+else
+# Allow group only
+
+  echo "Creating group ${AWS_FPGA_SDK_GROUP}"
+  getent group ${AWS_FPGA_SDK_GROUP} >/dev/null 2>&1
+  if [[ $? -eq 0 ]] ; then
+    if [ -z ${AWS_FPGA_SDK_OVERRIDE_GROUP} ] ; then
+      echo "Group ${AWS_FPGA_SDK_GROUP} already exists. Please export a non existent group name  to AWS_FPGA_SDK_GROUP or export AWS_FPGA_SDK_OVERRIDE_GROUP=y"
+      exit 1
+    fi
+    echo "${AWS_FPGA_SDK_GROUP} already exists, will grant FPGA resource access to this group"
+  else
+    groupadd  ${AWS_FPGA_SDK_GROUP}
+    if [[ $? -ne 0 ]] ; then
+      echo "Could not group ${AWS_FPGA_SDK_GROUP}"
+      exit 1
+    fi
+  fi
+
+  echo "Adding user ${SDK_NON_ROOT_USER} into group ${AWS_FPGA_SDK_GROUP}"
+  getent group ${AWS_FPGA_SDK_GROUP} | grep -qw ${SDK_NON_ROOT_USER}
+  if [[ $? -eq 0 ]] ; then
+    echo "${SDK_NON_ROOT_USER} is already in group ${AWS_FPGA_SDK_GROUP}"
+  else
+    usermod -a -G ${AWS_FPGA_SDK_GROUP} ${SDK_NON_ROOT_USER}
+    if [[ $? -ne 0 ]] ; then
+      echo "Could not add user ${SDK_NON_ROOT_USER} to group ${AWS_FPGA_SDK_GROUP}"
+      exit 1
+    fi
+  fi
+
+  # Fail on any unsucessful command
+  set -e
+  # Make a script that will be run to change permissions everytime
+  # udev rule for the DBDF is matched
+  echo "Installing permission fix script for udev"
+  cat >/opt/aws/bin/change-fpga-perm.sh<<EF
+#!/bin/bash
+set -x
+setperm () {
+  chmod g=u \$1
+  if [[ x\$2 != "x" ]] ; then
+    chmod a=u \$1
+  fi
+}
+setgrp() {
+  chown root:${AWS_FPGA_SDK_GROUP} \$1
+}
+setfpgaperm () {
+  for f in \$1/*; do
+    setperm \$f;
+    setgrp \$f
+  done
+}
+
+devicePath=/sys/bus/pci/devices/\$1
+grep -q "0x058000" \$devicePath/class && setfpgaperm "\$devicePath"
+setperm /sys/bus/pci/rescan all
+EF
+
+echo "Adding udev rule: 9999-presistent-fpga.rules"
 
   rm -f /tmp/9999-presistent-fpga.rules
   for d in $DBDFs ; do
@@ -90,6 +128,9 @@ minor=0
   done
   echo "Adding udev rule: 9999-presistent-fpga.rules"
   cp /tmp/9999-presistent-fpga.rules /etc/udev/rules.d/9999-presistent-fpga.rules
+fi
+
+chmod 544 /opt/aws/bin/change-fpga-perm.sh
 
 ## Test the rules for any issues
 for d in  $DBDFs ; do

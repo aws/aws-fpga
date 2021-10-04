@@ -7,7 +7,7 @@ The Virtual Ethernet framework facilitates streaming Ethernet frames from a netw
 In order to get the most from this document, readers may want to familiarize themselves with the following:
 
 1. The [F1 customer logic flow](../../../hdk/README.md#endtoend); creating and loading AFIs (Amazon FPGA Images)
-2. [DPDK](http://dpdk.org) (Data Plane Development Kit), a framework for creating high performance network traffic handling tools in userspace by limiting context switches, locks, or other blocking logic.
+2. [DPDK](https://dpdk.org) (Data Plane Development Kit), a framework for creating high performance network traffic handling tools in userspace by limiting context switches, locks, or other blocking logic.
 3. [EC2 Networking Concepts](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_Network_and_Security.html)
 
 # Virtual Ethernet Architecture

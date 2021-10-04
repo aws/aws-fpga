@@ -34,8 +34,9 @@ unset HDK_SHELL_DIR
 unset HDK_SHELL_DESIGN_DIR
 
 export -f allow_non_root
+export -f allow_others
 
-if  allow_non_root  ; then
+if  allow_non_root || allow_others ; then
 	export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP:-"fpgauser"}
 	export SDK_NON_ROOT_USER=$(whoami)
   info_msg "Allowing group ${AWS_FPGA_SDK_GROUP} access to FPGA management tools and resources"
@@ -68,8 +69,8 @@ export VITIS_DIR=$AWS_FPGA_REPO_DIR/Vitis
 # PYTHONPATH
 # Update PYTHONPATH with libraries used for unit testing
 python_lib=$AWS_FPGA_REPO_DIR/shared/lib
-export PYTHONPATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+$python_lib\(:\|$\)/:/g; s/^://; s/:$//')
 PYTHONPATH=$python_lib:$PYTHONPATH
+export PYTHONPATH
 
 # PATH Changes
 

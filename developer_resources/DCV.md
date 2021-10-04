@@ -60,12 +60,11 @@ If you experience issues please refer to the [Official DCV documentation](https:
 1. [Install NICE DCV Server](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-server.html)
 
    ```
-   sudo rpm --import https://s3-eu-west-1.amazonaws.com/nice-dcv-publish/NICE-GPG-KEY
-   wget https://d1uj6qtbmh3dt5.cloudfront.net/2019.0/Servers/nice-dcv-2019.0-7318-el7.tgz
-   tar xvf nice-dcv-2019.0-7318-el7.tgz
-   cd nice-dcv-2019.0-7318-el7
-   sudo yum -y install nice-dcv-server-2019.0.7318-1.el7.x86_64.rpm
-   sudo yum -y install nice-xdcv-2019.0.224-1.el7.x86_64.rpm
+   sudo rpm --import https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
+   wget https://d1uj6qtbmh3dt5.cloudfront.net/2021.2/Servers/nice-dcv-2021.2-11048-el7-x86_64.tgz
+   tar -xvzf nice-dcv-2021.2-11048-el7-x86_64.tgz && cd nice-dcv-2021.2-11048-el7-x86_64
+   sudo yum install nice-dcv-server-2021.2.11048-1.el7.x86_64.rpm
+   sudo yum install nice-xdcv-2021.2.406-1.el7.x86_64.rpm
 
    sudo systemctl enable dcvserver
    sudo systemctl start dcvserver
@@ -101,7 +100,7 @@ If you experience issues please refer to the [Official DCV documentation](https:
    **NOTE: You will have to create a new session if you restart your instance.** 
 
    ```
-   dcv create-session --type virtual --user centos centos
+   dcv create-session --type virtual --user centos centos --owner centos
    ```
 
 1. Connect to the DCV Remote Desktop session
