@@ -36,7 +36,7 @@ unset HDK_SHELL_DESIGN_DIR
 export -f allow_non_root
 export -f allow_others
 
-if  allow_non_root && allow_others ; then
+if  allow_non_root || allow_others ; then
 	export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP:-"fpgauser"}
 	export SDK_NON_ROOT_USER=$(whoami)
   info_msg "Allowing group ${AWS_FPGA_SDK_GROUP} access to FPGA management tools and resources"

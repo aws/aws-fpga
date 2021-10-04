@@ -10,7 +10,6 @@
 | High Level Synthesis | [Digital Up-Converter - cl\_hls\_dds\_hlx](../../hdk/cl/examples/cl_hls_dds_hlx) | HLx - C-to-RTL  | Demonstrates an example application written in C that is synthesized to RTL (Verilog) |
 | Custom Hardware with Software Defined Acceleration | [RTL Kernels](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels) | Vitis - RTL (Verilog) + C/C++/OpenCL  | These examples demonstrate developing new hardware designs (RTL) in a Software Defined workflow|
 | Vitis Compression Libraries | [File Compression using GZip](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/gzip_app) | Vitis - C/C++/OpenCL  | This example demonstrates how to use Vitis Libraries to speed up GZIP compression on an FPGA |
-| Vitis BLAS libraries | [Matrix Transposer using BLAS](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/transp) | Vitis - C/C++/OpenCL  | This example shows how to use Vitis BLAS Libraries to create a Matrix Transposer on an FPGA |
 | Vitis Financial libraries | [Monte Carlo European Engine](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/library_examples/MCEuropeanEngine) | Vitis - C/C++/OpenCL  | This example shows how to use Vitis Financial Libraries to accelerate MCEuropean Engine on an FPGA|
 
 ## Application Notes 
