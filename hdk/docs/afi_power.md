@@ -4,7 +4,12 @@ There are 2 power related scenarios that need to be avoided:
 1. Ramping too quickly between low power and high power states
 
 ## Exceeding Maximum FPGA power
-The Xilinx UltraScale+ FPGA devices used on the F1 instances have a maximum power limit that must be maintained.  If a loaded AFI consumes maximum power, the F1 instance will automatically gate the input clocks provided to the AFI in order to prevent errors within the FPGA. This is called an afi-power-violation. Specifically, when power (Vccint) is greater than 85 watts, the CL will have a power warning bit set. Above that level, the CL is in danger of being clock gated due to an afi-power-violation.
+The Xilinx UltraScale+ FPGA devices used on the F1 instances impose a Maximum Power Consumption Limit of 85 Watts. The F1 Instance takes following actions if the AFI causes power consumption to exceed the imposed limit:
+1. The ```afi-power-warning``` is triggered when the AFI running on an F1 instance exceeds the power consumption limit of 85W. The clocks from Shell to the CL are not gated while this warning is set. This is an indication that Customer Logic should reduce power consumption.
+2. If the high power consumption is not mitigated then the Shell asserts ```afi-power-violation``` and gate the clocks to the CL. 
+3. In addition, if the F1 Instance detects high power consumption at the time of AFI load then ```afi-power-violation``` is set, clocks are disabled and any transactions along Shell-CL interface results in timeout.
+
+For all practical purposes, we strongly recommend customer design to act on ```afi-power-warning``` to reduce power consumption.
 
 ## Ramping too Quickly Between Low Power and High Power States
 Even though your design may have a max power which is lower than the previously described limit, you might see issues if you rapidly switch between low power and high power states. A common scenario is upon startup the design goes from a low power reset state to the max power state instantly. In failing cases the host will appear to lose contact with the FPGA card and can only recover with an instance stop/restart. To prevent this from happening care must be taken to sequence the design such that it slowly increases the power requirements to max power instead of instantaneously doing so. 
@@ -27,16 +32,16 @@ Power consumption (Vccint):
 Power consumption may drift slightly over time, and may vary from instance to instance. In order to prevent a power violation, it's important to take into account this natural variation, and design with margin accordingly.
 
 ## Lowering Power Based on High Power Events Reported by the Shell
-In order to help developers avoid these overpower events, the F1 system indicates a afi-power-warning on the CL interface (sh_cl_pwr_state[1:0]) when the FPGA power levels are above 85 watts, and the CL is in danger of having it's clocks disabled. This should allow the CL to self-throttle, or reduce power-hungry optimizations, and avoid having its input clocks disabled.
+In order to help developers avoid these overpower events, the F1 system indicates a ```afi-power-warning``` on the CL interface (```sh_cl_pwr_state[1:0]```) when the FPGA power levels are above 85 watts, and the CL is in danger of having it's clocks disabled. This should allow the CL to self-throttle, or reduce power-hungry optimizations, and avoid having its input clocks disabled.
 
-Power state of the FPGA:  sh_cl_pwr_state[1:0]
-0x0 – OK
-0x1 – UNUSED
-0x2 – afi-power-warning
-0x3 – afi-power-violation
+Power state of the FPGA:  ```sh_cl_pwr_state[1:0]```:
+* 0x0 – OK
+* 0x1 – UNUSED
+* 0x2 – ```afi-power-warning```: Set when AFI exceeds the Power Consumption limit of 85W. Shell-CL clocks are not gated. 
+* 0x3 – ```afi-power-violation```: Set when AFI continues to exceed Power Consumption limit and Shell-CL clocks are shut off. 
 
 ## Detecting power-violation
-The fpga-describe-local-image command will show that the AFI load has failed due to an afi-power-violation
+The fpga-describe-local-image command will show that the AFI load has failed due to an ```afi-power-violation```
 
 ```
     # fpga-describe-local-image -S 0
@@ -44,7 +49,7 @@ The fpga-describe-local-image command will show that the AFI load has failed due
     AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 ```
 
-An afi-power-violation can occur either when the FPGA is first loaded, or while the FPGA is running a particularly power-intense workload. If the afi-power-violation occurs during a fpga-load-local-image, the load local image will itself fail with the afi-power-violation error.  After a afi-power-violation, transactions to CL will trigger [timeouts on all Shell to CL interfaces](./HOWTO_detect_shell_timeout.md). 
+An ```afi-power-violation``` can occur either when the FPGA is first loaded, or while the FPGA is running a particularly power-intense workload. If the ```afi-power-violation``` occurs during a fpga-load-local-image, the load local image will itself fail with the ```afi-power-violation``` error.  After a ```afi-power-violation```, transactions to CL will trigger [timeouts on all Shell to CL interfaces](./HOWTO_detect_shell_timeout.md). 
 
 ## Analyze power reports from Vivado
 Once the AFI power has been identified on F1, we recommend using Vivado to analyze the design to help reduce power.  First, open the DCP (Design check point) in the Vivado GUI.  Then, run the tcl command within Vivado:
@@ -70,7 +75,7 @@ https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug907-vivad
 Using a lower clock frequency from the [supported clock recipe](./clock_recipes.csv) will reduce the power consumed by the AFI.  
 
 ## Recovering from clock gating
-When an afi-power-violation occurs, the FPGA can still be loaded and cleared, but the clocks cannot be re-enabled without reloading the FPGA. Any AFI load or clear will restore full functionality to the FPGA.
+When an ```afi-power-violation``` occurs, the FPGA can still be loaded and cleared, but the clocks cannot be re-enabled without reloading the FPGA. Any AFI load or clear will restore full functionality to the FPGA.
 
 # Power Savings Techniques
 Here are some low power design techniques that can be used to lower the overall power or minimize instantaneous power ramps.
@@ -90,6 +95,3 @@ Power is consumed whenever a node in the design switches high or low. Reducing t
 **Architectural Power Savings**: A global power savings technique is to control power at the top-level Architectural Level. There is typically a block diagram of the overall design. By gating the clocks to top-level blocks and/or creating enables for the sequential elements in the design, these blocks can be put into low power modes when they aren't being used. It's critical to only enable the blocks that are required for the job.
 
 **Reducing Instantaneous Swings in Power**: Care must be taken to ensure there aren't large swings between low power and high power states. Sequencing the enables to the top-level architectural blocks will allow the design to slowly ramp to max power levels.
-
-
-
