@@ -26,10 +26,7 @@ import logging
 dpdk_git = "https://github.com/DPDK/dpdk.git"
 
 # Use a SHA that is "known good" for SPP testing
-dpdk_sha = "a5dce55556286cc56655320d975c67b0dbe08693"
-
-# SPP branch name that we'll apply patches to
-spp_branch = "aws-virtual-ethernet-preview-062518"
+dpdk_ver = "v20.02"
 
 # Patch file directory
 patches_dir = "../patches/spp-dpdk/master"
@@ -99,15 +96,11 @@ def install_dpdk(install_path):
     os.chdir("%s" % (install_path))
 
     # Clone the DPDK repo
-    logger.info("Cloning %s into %s" % (dpdk_git, install_path))
-    cmd_exec("git clone %s" % (dpdk_git))
+    logger.info("Cloning %s version of %s into %s" % (dpdk_ver, dpdk_git, install_path))
+    cmd_exec("git clone -b %s %s" % (dpdk_ver, dpdk_git))
 
     # cd to the dpdk directory 
     os.chdir("dpdk")
-
-    # Checkout the feature branch
-    logger.info("Checking out feature branch %s" % (spp_branch))
-    cmd_exec("git checkout %s -b %s" % (dpdk_sha, spp_branch))
 
     # Check that the patches can be applied
     # for patchfile in patchfiles:

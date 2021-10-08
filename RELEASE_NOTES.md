@@ -2,6 +2,9 @@
 
 **NOTE:** See [ERRATA](./ERRATA.md) for unsupported features
 
+## Release 1.4.22
+* FPGA developer kit update to upgrade Virtual Ethernet to support jumbo frames using newer versions of dpdk/pktgen
+
 ## Release 1.4.21
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2021.1
 
