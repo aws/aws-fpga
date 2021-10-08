@@ -46,7 +46,9 @@ Given the large size of the FPGA used inside AWS F1 Instances, Xilinx tools work
 z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge instance types would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively. 
 Developers who want to save on cost, could start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.
 
-AWS marketplace offers multiple versions of the FPGA Developer AMI. The following compatibility table describes the mapping of currently supported developer kit versions to AMI versions:
+AWS marketplace offers multiple versions of the FPGA Developer AMI. The following section table describes the mapping of currently supported developer kit versions to AMI versions.
+
+## Xilinx tool support
 
 | Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
 |-----------|-----------|------|
@@ -57,16 +59,22 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 | 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
 | 1.4.8 - 1.4.15b | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
 | 1.4.3 - 1.4.15b | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
-| 1.3.7 - 1.4.15b | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) |
+|⚠️ 1.3.7 - 1.4.15b | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) ⚠️|
 
-⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. 
-While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15b or earlier. 
-Please checkout [the latest v1.4.15b release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15b) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
+⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15b or earlier. 
+Please check out [the latest v1.4.15b release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15b) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
 
-⚠️ Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) reached end-of-life. See [AWS forum announcement](https://forums.aws.amazon.com/ann.jspa?annID=6068) for additional details.
+For deprecation notices, please check the [End of life announces](./README.md#end-of-life-announcements)
 
 For software-defined development please look at the runtime compatibility table based on the Xilinx toolset in use:
 [SDAccel](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table) or [Vitis](Vitis/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
+
+### End of life Announcements
+
+| Xilinx Tool version | State | Statement | 
+|-----------|-----------|------|
+| 2017.1 | 🚫 Deprecated on 09/01/2018 | Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) [reached end-of-life](https://forums.aws.amazon.com/ann.jspa?annID=6068). |
+| 2017.4 | ⚠️ Upcoming deprecation on 12/31/2021 | Support for Xilinx 2017.4 toolsets will be deprecated on 12/31/2021. Please check our [forum announcement for more details](https://forums.aws.amazon.com/ann.jspa?annID=8949). |
 
 ## Hardware Development Kit (HDK)
 
