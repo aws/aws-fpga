@@ -17,7 +17,7 @@ Signed-off-by: Robert Johnson <robertmj@amazon.com>
  drivers/net/spp/rte_pmd_spp_version.map |    4 +
  drivers/net/spp/spp.h                   |   51 +
  drivers/net/spp/spp_defs.h              |  117 +++
- drivers/net/spp/spp_ethdev.c            |  428 +++++++++
+ drivers/net/spp/spp_ethdev.c            |  430 +++++++++
  drivers/net/spp/spp_hal.c               | 1553 +++++++++++++++++++++++++++++++
  drivers/net/spp/spp_hal.h               |  183 ++++
  drivers/net/spp/spp_hal_dbg.c           |  455 +++++++++
@@ -26,7 +26,7 @@ Signed-off-by: Robert Johnson <robertmj@amazon.com>
  drivers/net/spp/spp_logs.h              |   48 +
  mk/rte.app.mk                           |    1 +
  usertools/dpdk-devbind.py               |    4 +-
- 15 files changed, 3670 insertions(+), 1 deletion(-)
+ 15 files changed, 3672 insertions(+), 1 deletion(-)
  create mode 100644 drivers/net/spp/Makefile
  create mode 100644 drivers/net/spp/rte_pmd_spp_version.map
  create mode 100644 drivers/net/spp/spp.h
@@ -43,7 +43,7 @@ diff --git a/config/common_base b/config/common_base
 index 6b0d1cb..7d2aa64 100644
 --- a/config/common_base
 +++ b/config/common_base
-@@ -227,6 +227,14 @@ CONFIG_RTE_LIBRTE_ENA_DEBUG_TX_FREE=n
+@@ -268,6 +268,14 @@ CONFIG_RTE_LIBRTE_ENA_DEBUG_TX_FREE=n
  CONFIG_RTE_LIBRTE_ENA_COM_DEBUG=n
  
  #
@@ -58,15 +58,29 @@ index 6b0d1cb..7d2aa64 100644
  # Compile burst-oriented Cisco ENIC PMD driver
  #
  CONFIG_RTE_LIBRTE_ENIC_PMD=y
+diff --git a/config/common_base b/config/common_base
+index 9ff5b628f1..8b0bc60c2f 100644
+--- a/config/common_base
++++ b/config/common_base
+@@ -103,7 +103,7 @@ CONFIG_RTE_LOG_HISTORY=256
+ CONFIG_RTE_BACKTRACE=y
+ CONFIG_RTE_LIBEAL_USE_HPET=n
+ CONFIG_RTE_EAL_ALWAYS_PANIC_ON_ERROR=n
+-CONFIG_RTE_EAL_IGB_UIO=n
++CONFIG_RTE_EAL_IGB_UIO=y
+ CONFIG_RTE_EAL_VFIO=n
+ CONFIG_RTE_MAX_VFIO_GROUPS=64
+ CONFIG_RTE_MAX_VFIO_CONTAINERS=64
 diff --git a/drivers/net/Makefile b/drivers/net/Makefile
 index 9f9da66..c7216fb 100644
 --- a/drivers/net/Makefile
 +++ b/drivers/net/Makefile
-@@ -24,6 +24,7 @@ DIRS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD) += dpaa2
+@@ -25,6 +25,7 @@ DIRS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD) += dpaa2
  endif
  DIRS-$(CONFIG_RTE_LIBRTE_E1000_PMD) += e1000
  DIRS-$(CONFIG_RTE_LIBRTE_ENA_PMD) += ena
 +DIRS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp
+ DIRS-$(CONFIG_RTE_LIBRTE_ENETC_PMD) += enetc
  DIRS-$(CONFIG_RTE_LIBRTE_ENIC_PMD) += enic
  DIRS-$(CONFIG_RTE_LIBRTE_PMD_FAILSAFE) += failsafe
  DIRS-$(CONFIG_RTE_LIBRTE_FM10K_PMD) += fm10k
@@ -172,10 +186,10 @@ index 0000000..4694827
 +	uint8_t __iomem		*reg_mem;
 +	uint8_t __iomem		*wc_mem;
 +
-+	int			dev_index;
-+	char			name[NAME_MAX + 1];
-+	struct ether_addr	ether_addr;
-+	struct spp_dev_cap	dev_cap;
++	int			            dev_index;
++	char			        name[NAME_MAX + 1];
++	struct rte_ether_addr	ether_addr;
++	struct spp_dev_cap	    dev_cap;
 +};
 +
 +#ifdef __cplusplus
@@ -308,10 +322,10 @@ index 0000000..b24da8e
 +#endif
 diff --git a/drivers/net/spp/spp_ethdev.c b/drivers/net/spp/spp_ethdev.c
 new file mode 100644
-index 0000000..f2f5f0f
+index 0000000000..f7d4271848
 --- /dev/null
 +++ b/drivers/net/spp/spp_ethdev.c
-@@ -0,0 +1,428 @@
+@@ -0,0 +1,430 @@
 +/*
 + * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 + *
@@ -406,7 +420,7 @@ index 0000000..f2f5f0f
 +	return 0;
 +}
 +
-+static void
++static int
 +eth_spp_info_get(struct rte_eth_dev		*eth_dev,
 +		 struct rte_eth_dev_info	*dev_info)
 +{
@@ -433,6 +447,7 @@ index 0000000..f2f5f0f
 +	/* TX defaults: uses the TX channel 0 capabilities */
 +	dev_info->default_txportconf.ring_size =
 +		spp_dev->dev_cap.tx_chan_cap[0].num_descs;
++	return 0;
 +}
 +
 +static int
@@ -478,7 +493,7 @@ index 0000000..f2f5f0f
 +	return 0;
 +}
 +
-+static void
++static int
 +eth_spp_stats_reset(__rte_unused struct rte_eth_dev *eth_dev)
 +{
 +	struct spp_dev *spp_dev = eth_dev->data->dev_private;
@@ -495,6 +510,7 @@ index 0000000..f2f5f0f
 +
 +		memset(tx_stats, 0, sizeof(*tx_stats));
 +	}
++	return 0;
 +}
 +
 +static int
@@ -3797,30 +3813,37 @@ diff --git a/mk/rte.app.mk b/mk/rte.app.mk
 index 1e32c83..3569c5f 100644
 --- a/mk/rte.app.mk
 +++ b/mk/rte.app.mk
-@@ -128,6 +128,7 @@ _LDLIBS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD)      += -lrte_pmd_dpaa2
+@@ -175,6 +175,7 @@ _LDLIBS-$(CONFIG_RTE_LIBRTE_DPAA2_PMD)      += -lrte_pmd_dpaa2
  endif
  _LDLIBS-$(CONFIG_RTE_LIBRTE_E1000_PMD)      += -lrte_pmd_e1000
  _LDLIBS-$(CONFIG_RTE_LIBRTE_ENA_PMD)        += -lrte_pmd_ena
 +_LDLIBS-$(CONFIG_RTE_LIBRTE_SPP_PMD)        += -lrte_pmd_spp
+ _LDLIBS-$(CONFIG_RTE_LIBRTE_ENETC_PMD)      += -lrte_pmd_enetc
  _LDLIBS-$(CONFIG_RTE_LIBRTE_ENIC_PMD)       += -lrte_pmd_enic
  _LDLIBS-$(CONFIG_RTE_LIBRTE_FM10K_PMD)      += -lrte_pmd_fm10k
  _LDLIBS-$(CONFIG_RTE_LIBRTE_PMD_FAILSAFE)   += -lrte_pmd_failsafe
 diff --git a/usertools/dpdk-devbind.py b/usertools/dpdk-devbind.py
-index d0c4209..1c225dd 100755
+index b1d1498768..9a49362dc4 100755
 --- a/usertools/dpdk-devbind.py
 +++ b/usertools/dpdk-devbind.py
-@@ -26,8 +26,10 @@
+@@ -33,6 +33,8 @@
                'SVendor': None, 'SDevice': None}
  avp_vnic = {'Class': '05', 'Vendor': '1af4', 'Device': '1110',
                'SVendor': None, 'SDevice': None}
 +aws_fpga_sde = {'Class': '05', 'Vendor': '1d0f', 'Device': 'f002',
 +              'SVendor': None, 'SDevice': None}
  
--network_devices = [network_class, cavium_pkx, avp_vnic]
+ octeontx2_sso = {'Class': '08', 'Vendor': '177d', 'Device': 'a0f9,a0fa',
+               'SVendor': None, 'SDevice': None}
+@@ -48,7 +50,7 @@
+ intel_ntb_skx = {'Class': '06', 'Vendor': '8086', 'Device': '201c',
+               'SVendor': None, 'SDevice': None}
+ 
+-network_devices = [network_class, cavium_pkx, avp_vnic, ifpga_class]
 +network_devices = [network_class, cavium_pkx, avp_vnic, aws_fpga_sde]
+ baseband_devices = [acceleration_class]
  crypto_devices = [encryption_class, intel_processor_class]
- eventdev_devices = [cavium_sso, cavium_tim]
- mempool_devices = [cavium_fpa]
+ eventdev_devices = [cavium_sso, cavium_tim, octeontx2_sso]
 -- 
 1.8.3.1
 

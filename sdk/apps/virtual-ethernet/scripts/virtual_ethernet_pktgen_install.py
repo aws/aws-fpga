@@ -26,18 +26,16 @@ import platform
 
 dpdk_git = "https://github.com/DPDK/dpdk.git"
 pktgen_git = "git://dpdk.org/apps/pktgen-dpdk"
+meson_git = "https://github.com/mesonbuild/meson/releases/download/0.59.2/meson-0.59.2.tar.gz"
+ninja_git = "https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip"
+meson_file = meson_git[meson_git.rfind('/')+1:]
+meson_ver  = meson_file[:meson_file.find('.tar.gz')]
 
-# Use a SHA that is "known good" for use with pktgen 
-dpdk_sha = "a5dce55556286cc56655320d975c67b0dbe08693"
+# Use a version that is "known good" for use with pktgen 
+dpdk_ver = "v20.08"
 
-# Use a SHA that is "known good" for testing
-pktgen_sha = "f05efdb91eefd6c2cb59f2eeac839bf7709f9a48"
-
-# dpdk branch name that we'll use
-dpdk_branch = "dpdk-ena-061418"
-
-# pktgen branch name that we'll apply patches to
-pktgen_branch = "pktgen-dpdk-ena-061418"
+# Use a version that is "known good" for testing
+pktgen_ver = "pktgen-20.09.0"
 
 # Patch file directory
 patches_dir = "../patches/pktgen-dpdk/master"
@@ -69,11 +67,11 @@ def cmd_exec(cmd):
 def install_dpdk_dep():
     distro = platform.linux_distribution()
     if (distro[0] == "Ubuntu"):
-        cmd_exec("apt -y install libnuma-dev")
-        cmd_exec("apt -y install libpcap-dev")
+        cmd_exec("sudo apt -y install libnuma-dev")
+        cmd_exec("sudo apt -y install libpcap-dev")
     else:
-        cmd_exec("yum -y install numactl-devel")
-        cmd_exec("yum -y install libpcap-devel") 
+        cmd_exec("sudo yum -y install numactl-devel")
+        cmd_exec("sudo yum -y install libpcap-devel") 
 
 def install_pktgen_dpdk(install_path):
     logger.debug("install_pktgen_dpdk: install_path=%s" % (install_path))
@@ -98,43 +96,58 @@ def install_pktgen_dpdk(install_path):
     # Construct the path to the git patch files
     patches_path = "%s/%s" % (scripts_path, patches_dir)
     logger.info("Patches will be installed from %s" % (patches_path))
-
-    # Read in the patch filenames
+    # Read in the pktgen patch filenames
     patchfiles = []
     for patchfile in sorted(glob.iglob("%s/000*.patch" % (patches_path))):
-        logger.debug("found patchfile=%s" % patchfile)
+        logger.debug("found patchfile=%s for pktgen" % patchfile)
 	patchfiles.append(os.path.abspath(patchfile))
-
+    # Read in the dpdk patch filenames
+    dpdk_patchfiles = []
+    for dpdk_patchfile in sorted(glob.iglob("%s/dpdk*.patch" % (patches_path))):
+        logger.debug("found patchfile=%s for dpdk" % dpdk_patchfile)
+	dpdk_patchfiles.append(os.path.abspath(dpdk_patchfile))
     # cd to the install_path directory
     os.chdir("%s" % (install_path))
 
+    # meson install
+    logger.info("download and untar meson")
+    cmd_exec("wget %s" % (meson_git))
+    cmd_exec("tar -xf %s" %(meson_file))
+    cmd_exec("rm %s" %(meson_file))
+    # ninja install
+    logger.info("download and unzip ninja")
+    cmd_exec("wget %s" % (ninja_git))
+    cmd_exec("unzip ninja-linux.zip")
+    cmd_exec("rm ninja-linux.zip")
+
     # Clone the DPDK repo
-    logger.info("Cloning %s into %s" % (dpdk_git, install_path))
-    cmd_exec("git clone %s" % (dpdk_git))
+    logger.info("Cloning %s version of %s into %s" % (dpdk_ver, dpdk_git, install_path))
+    cmd_exec("git clone -b %s %s" % (dpdk_ver, dpdk_git))
 
     # cd to the dpdk directory 
     os.chdir("dpdk")
-
-    # Checkout the feature branch
-    logger.info("Checking out dpdk feature branch %s" % (dpdk_branch))
-    cmd_exec("git checkout %s -b %s" % (dpdk_sha, dpdk_branch))
+    for dpdk_patchfile in dpdk_patchfiles:
+        logger.info("Applying patch for patchfile=%s" % dpdk_patchfile)
+        cmd_exec("git apply %s" % (dpdk_patchfile))
 
     # Configure and build DPDK 
-    cmd_exec("make install T=%s" % (make_tgt))
-
+    #cmd_exec("make install T=%s" % (make_tgt))
+    cmd_exec("export PATH=$PATH:%s; ../%s/meson.py build -Denable_kmods=true" % (install_path, meson_ver))
+    builddir="./build"
+    os.chdir("%s" % (builddir))
+    cmd_exec("../../ninja")
+    cmd_exec("sudo ../../ninja install")
+    os.chdir("../")
+    #cmd_exec("make install T=x86_64-native-linuxapp-gcc")
     # cd to the install_path directory
     os.chdir("%s" % (install_path))
 
     # Clone the pktgen-dpdk repo
-    logger.info("Cloning %s into %s" % (pktgen_git, install_path))
-    cmd_exec("git clone %s" % (pktgen_git))
+    logger.info("Cloning %s version of %s into %s" % (pktgen_ver, pktgen_git, install_path))
+    cmd_exec("git clone -b %s %s" % (pktgen_ver, pktgen_git))
 
     # cd to the pktgen-dpdk directory 
     os.chdir("pktgen-dpdk")
-
-    # Checkout the feature branch
-    logger.info("Checking out pktgen feature branch %s" % (pktgen_branch))
-    cmd_exec("git checkout %s -b %s" % (pktgen_sha, pktgen_branch))
 
     # Check that the patches can be applied
     for patchfile in patchfiles:
@@ -144,10 +157,13 @@ def install_pktgen_dpdk(install_path):
     # Apply the patches
     for patchfile in patchfiles:
         logger.info("Applying patch for patchfile=%s" % patchfile)
-        cmd_exec("git am %s" % (patchfile))
+        cmd_exec("git apply %s" % (patchfile))
 
     # Build pktgen-dpdk
-    cmd_exec("export RTE_SDK=%s/dpdk; export RTE_TARGET=%s; make" % (install_path, make_tgt))
+    cmd_exec("ln -s %s/%s/meson.py %s/meson" %(install_path, meson_ver, install_path))
+    # also set pkg_config_path and ld_lib_path which are expected to /usr/local/lib64 as per
+    # https://doc.dpdk.org/guides/prog_guide/build-sdk-meson.html
+    cmd_exec("export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig/; export LD_LIBRARY_PATH=/usr/local/lib64; export PATH=$PATH:%s; export RTE_SDK=%s/dpdk; export RTE_TARGET=%s; make" % (install_path, install_path, make_tgt))
 
     # cd back to the original directory
     os.chdir("%s" % (cwd))
