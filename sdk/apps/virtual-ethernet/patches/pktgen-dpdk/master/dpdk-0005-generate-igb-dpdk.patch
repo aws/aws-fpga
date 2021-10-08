@@ -1,0 +1,13 @@
+diff --git a/config/common_base b/config/common_base
+index fbf0ee70c8..3c1df098c7 100644
+--- a/config/common_base
++++ b/config/common_base
+@@ -104,7 +104,7 @@ CONFIG_RTE_LOG_HISTORY=256
+ CONFIG_RTE_BACKTRACE=y
+ CONFIG_RTE_LIBEAL_USE_HPET=n
+ CONFIG_RTE_EAL_ALWAYS_PANIC_ON_ERROR=n
+-CONFIG_RTE_EAL_IGB_UIO=n
++CONFIG_RTE_EAL_IGB_UIO=y
+ CONFIG_RTE_EAL_VFIO=n
+ CONFIG_RTE_MAX_VFIO_GROUPS=64
+ CONFIG_RTE_MAX_VFIO_CONTAINERS=64

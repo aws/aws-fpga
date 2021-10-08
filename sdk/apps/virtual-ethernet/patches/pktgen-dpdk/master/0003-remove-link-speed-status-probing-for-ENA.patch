@@ -1,0 +1,30 @@
+diff --git a/app/pktgen-stats.c b/app/pktgen-stats.c
+index 0442f56..8c762ba 100644
+--- a/app/pktgen-stats.c
++++ b/app/pktgen-stats.c
+@@ -265,6 +265,16 @@ pktgen_print_static_data(void)
+ void
+ pktgen_get_link_status(port_info_t *info, int pid, int wait)
+ {
++#ifdef RTE_LIBRTE_ENA_PMD
++    RTE_SET_USED(pid);
++    RTE_SET_USED(wait);
++#if RTE_VERSION >= RTE_VERSION_NUM(17, 2, 0, 0)
++    info->link.link_speed = ETH_SPEED_NUM_100G;
++#else
++    info->link.link_speed = 100000;
++#endif
++    info->link.link_duplex = ETH_LINK_FULL_DUPLEX;
++#else
+     int i;
+     uint64_t prev_status = info->link.link_status;
+ 
+@@ -292,6 +302,7 @@ pktgen_get_link_status(port_info_t *info, int pid, int wait)
+     info->link.link_speed = 10000;
+ #endif
+     info->link.link_duplex = ETH_LINK_FULL_DUPLEX;
++#endif /* RTE_LIBRTE_ENA_PMD */
+ }
+ 
+ /**************************************************************************/ /**
+
