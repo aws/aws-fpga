@@ -99,7 +99,7 @@ Testpmd application setup and start phase
 
 ```
 cd <install_dir>/dpdk
-./x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=chained --auto-start --stats-period=3 --forward-mode=spp-eni-addr-swap
+sudo ./x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=chained --auto-start --stats-period=3 --forward-mode=spp-eni-addr-swap
 ```
 
 The `spp-eni-addr-swap` testpmd forwarding mode swaps the Ethernet MAC and IP addresses so the Packet Generator instance can receive the loopback Ethernet frames.
@@ -112,9 +112,12 @@ Software installation and build phase
 
 ```
 cd $(SDK_DIR)/apps/virtual-ethernet/scripts
-sudo ./virtual_ethernet_pktgen_install.py <install_dir>
+./virtual_ethernet_pktgen_install.py <install_dir>
 ```
-
+During installation, meson and ninja tools, which are required to build and install DPDK and pktgen are downloaded, extracted and setup in the <install_dir>. dpdk and pktgen-dpdk are also cloned and installed. The <install_dir> will have
+```
+dpdk  meson  meson-0.59.2  ninja  pktgen-dpdk
+```
 System setup and device bind phase, e.g. on instance boot
 
 ```
@@ -139,12 +142,47 @@ set 0 size 64
 start 0
 ```
 
+Similarly a `pktgen-ena-range.pkt` script is provided for multiflow run with a range of parameters. This needs to be modified with corresponding dest mac address, src and dest ip addresses. 
+
 ```
-cd <install_dir>/pktgen-dpdk
-./app/x86_64-native-linuxapp-gcc/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -b 00:03.0 -- -T -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena.pkt
+cat $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt
+set 0 type ipv4
+range 0 dst mac start 06:06:5c:8b:30:0d     # set this to Virtual Ethernet instance eth1 mac address
+range 0 dst mac min 06:06:5c:8b:30:0d       # set this to Virtual Ethernet instance eth1 mac address
+range 0 dst mac max 06:06:5c:8b:30:0d       # set this to Virtual Ethernet instance eth1 mac address
+range 0 dst mac inc 00:00:00:00:00:00
+range 0 src ip start 172.31.60.245          # set this to the Packet Generator instance eth1 IP address
+range 0 src ip min 172.31.60.245            # set this to the Packet Generator instance eth1 IP address
+range 0 src ip max 172.31.60.245            # set this to the Packet Generator instance eth1 IP address
+range 0 src ip inc 0.0.0.0
+range 0 dst ip start 172.31.59.180          # set this to the Virtual Ethernet instance eth1 IP address
+range 0 dst ip min 172.31.59.180            # set this to the Virtual Ethernet instance eth1 IP address
+range 0 dst ip max 172.31.59.180            # set this to the Virtual Ethernet instance eth1 IP address
+range 0 dst ip inc 0.0.0.0
+range 0 src port start 1000
+range 0 src port min 1000 
+range 0 src port max 1020
+range 0 src port inc 1
+range 0 dst port start 1000
+range 0 dst port min 1000
+range 0 dst port max 1020 
+range 0 dst port inc 1
+range 0 size start 4096
+range 0 size min 4096
+range 0 size max 4096
+range 0 size inc 1
+range 0 proto tcp
+enable 0 range
+start 0
 ```
 
-Also provided is a sample Packet Generator `pktgen-ena-range.pkt` script.  This script will need to be modified to work with your F1 instances.  `pktgen-ena-range.pkt` varies the source and destination UDP ports but leaves the size at 64B to show PPS performance using multiple UDP flows.
+
+When running the below command, with -j option, the packet size can be set to jumbo frames and try the example run with pkt size 4096
+
+```
+cd <install_dir>/pktgen-dpdk
+sudo LD_LIBRARY_PATH=/usr/local/lib64 ./Builddir/app/pktgen -l 0,1 -n 16 --proc-type auto --log-level 7 --socket-mem 4096 --file-prefix pg -b 00:03.0 -- -T -j -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt
+```
 
 <a name="FAQ"></a>
 ## FAQ

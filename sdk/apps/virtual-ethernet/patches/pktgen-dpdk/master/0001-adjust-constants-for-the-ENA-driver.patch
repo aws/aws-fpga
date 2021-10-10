@@ -1,0 +1,25 @@
+diff --git a/app/pktgen-constants.h b/app/pktgen-constants.h
+index 0e4aafb..f58211b 100644
+--- a/app/pktgen-constants.h
++++ b/app/pktgen-constants.h
+@@ -18,7 +18,11 @@ enum {
+ 	DEFAULT_PKT_BURST       = 64,	/* Increasing this number consumes memory very fast */
+ #ifdef RTE_LIBRTE_VMXNET3_PMD
+ 	DEFAULT_RX_DESC         = (DEFAULT_PKT_BURST * 8 * 2),
++#ifdef RTE_LIBRTE_ENA_PMD
++	DEFAULT_TX_DESC         = DEFAULT_RX_DESC,
++#else /* !RTE_LIBRTE_ENA_PMD */
+ 	DEFAULT_TX_DESC         = DEFAULT_RX_DESC * 2,
++#endif /* RTE_LIBRTE_ENA_PMD */
+ #else
+ 	DEFAULT_RX_DESC         = (DEFAULT_PKT_BURST * 8),
+ 	DEFAULT_TX_DESC         = DEFAULT_RX_DESC * 2,
+@@ -30,7 +34,7 @@ enum {
+ 
+ 	DEFAULT_PRIV_SIZE       = 0,
+ 
+-	NUM_Q                   = 16,	/**< Number of cores per port. */
++	NUM_Q                   = 32,	/**< Number of cores per port. */
+ };
+ #define DEFAULT_MBUF_SIZE	(PG_ETHER_MAX_JUMBO_FRAME_LEN + RTE_PKTMBUF_HEADROOM) /* See: http://dpdk.org/dev/patchwork/patch/4479/ */
+

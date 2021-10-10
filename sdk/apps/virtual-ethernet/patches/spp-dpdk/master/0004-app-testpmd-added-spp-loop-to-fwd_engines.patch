@@ -19,14 +19,16 @@ diff --git a/app/test-pmd/Makefile b/app/test-pmd/Makefile
 index a5a827b..886b665 100644
 --- a/app/test-pmd/Makefile
 +++ b/app/test-pmd/Makefile
-@@ -34,6 +34,7 @@ SRCS-y += csumonly.c
+@@ -35,6 +35,7 @@ SRCS-y += csumonly.c
  SRCS-y += icmpecho.c
+ SRCS-y += noisy_vnf.c
  SRCS-$(CONFIG_RTE_LIBRTE_IEEE1588) += ieee1588fwd.c
  SRCS-$(CONFIG_RTE_LIBRTE_BPF) += bpf_cmd.c
+ SRCS-y += util.c
 +SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_loop_fwd.c
  
- ifeq ($(CONFIG_RTE_LIBRTE_PMD_SOFTNIC)$(CONFIG_RTE_LIBRTE_SCHED),yy)
- SRCS-y += tm.c
+ ifeq ($(CONFIG_RTE_LIBRTE_PMD_SOFTNIC), y)
+ SRCS-y += softnicfwd.c
 diff --git a/app/test-pmd/spp_loop_fwd.c b/app/test-pmd/spp_loop_fwd.c
 new file mode 100644
 index 0000000..c06a7df
@@ -486,7 +488,7 @@ diff --git a/app/test-pmd/testpmd.c b/app/test-pmd/testpmd.c
 index ba3d7ac..f124f1e 100644
 --- a/app/test-pmd/testpmd.c
 +++ b/app/test-pmd/testpmd.c
-@@ -162,6 +162,9 @@ struct fwd_engine * fwd_engines[] = {
+@@ -185,6 +185,9 @@ struct fwd_engine * fwd_engines[] = {
  #ifdef RTE_LIBRTE_IEEE1588
  	&ieee1588_fwd_engine,
  #endif
@@ -495,21 +497,22 @@ index ba3d7ac..f124f1e 100644
 +#endif
  	NULL,
  };
- 
+
 diff --git a/app/test-pmd/testpmd.h b/app/test-pmd/testpmd.h
-index 4dea20e..cc98e3c 100644
+index 7a7c73f79b..9b9e35ec59 100644
 --- a/app/test-pmd/testpmd.h
 +++ b/app/test-pmd/testpmd.h
-@@ -278,6 +278,9 @@ struct fwd_engine {
+@@ -272,6 +272,9 @@ extern struct fwd_engine softnic_fwd_engine;
  #ifdef RTE_LIBRTE_IEEE1588
  extern struct fwd_engine ieee1588_fwd_engine;
  #endif
 +#ifdef RTE_LIBRTE_SPP_PMD
 +extern struct fwd_engine spp_loop_fwd_engine;
 +#endif
- 
+
  extern struct fwd_engine * fwd_engines[]; /**< NULL terminated array. */
- 
+ extern cmdline_parse_inst_t cmd_set_raw;
+
 -- 
 1.8.3.1
 
