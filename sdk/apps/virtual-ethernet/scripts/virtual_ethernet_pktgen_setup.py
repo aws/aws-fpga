@@ -107,8 +107,8 @@ def setup_dpdk(install_path, eni_dbdf, eni_ethdev):
     load_uio()
 
     # Remove then load igb_uio.ko
-    cmd_exec("rmmod ./%s/kmod/igb_uio.ko >/dev/null 2>&1" % (make_tgt), False)
-    cmd_exec("insmod ./%s/kmod/igb_uio.ko" % (make_tgt))
+    cmd_exec("rmmod ./build/kernel/linux/igb_uio/igb_uio.ko >/dev/null 2>&1", False)
+    cmd_exec("insmod ./build/kernel/linux/igb_uio/igb_uio.ko")
 
     # Bind the ENI device to to DPDK
     cmd_exec("ifdown %s" % (eni_ethdev))

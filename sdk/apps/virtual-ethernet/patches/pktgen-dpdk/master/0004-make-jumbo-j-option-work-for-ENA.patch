@@ -1,0 +1,25 @@
+diff --git a/app/pktgen-port-cfg.c b/app/pktgen-port-cfg.c
+index a982d0d..284daf4 100644
+--- a/app/pktgen-port-cfg.c
++++ b/app/pktgen-port-cfg.c
+@@ -300,7 +300,6 @@ pktgen_config_ports(void)
+ 		if (pktgen.enable_jumbo > 0) {
+ 			conf.rxmode.max_rx_pkt_len = pktgen.eth_max_pkt;
+ 			conf.rxmode.offloads |= DEV_RX_OFFLOAD_JUMBO_FRAME;
+-			conf.txmode.offloads |= DEV_TX_OFFLOAD_MULTI_SEGS;
+ 		}
+ 		if (info->dev_info.tx_offload_capa & DEV_TX_OFFLOAD_MBUF_FAST_FREE)
+ 			conf.txmode.offloads |= DEV_TX_OFFLOAD_MBUF_FAST_FREE;
+diff --git a/lib/common/pg_compat.h b/lib/common/pg_compat.h
+index 743b985..24dd3a1 100644
+--- a/lib/common/pg_compat.h
++++ b/lib/common/pg_compat.h
+@@ -19,7 +19,7 @@
+ extern "C" {
+ #endif
+ 
+-#define PG_JUMBO_FRAME_LEN	(9600 + RTE_ETHER_CRC_LEN + RTE_ETHER_HDR_LEN)
++#define PG_JUMBO_FRAME_LEN	(9198 + RTE_ETHER_CRC_LEN + RTE_ETHER_HDR_LEN)
+ 
+ #ifndef RTE_JUMBO_ETHER_MTU
+ #define RTE_JUMBO_ETHER_MTU       \

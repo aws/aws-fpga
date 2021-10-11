@@ -21,14 +21,16 @@ diff --git a/app/test-pmd/Makefile b/app/test-pmd/Makefile
 index 886b665..3982374 100644
 --- a/app/test-pmd/Makefile
 +++ b/app/test-pmd/Makefile
-@@ -35,6 +35,7 @@ SRCS-y += icmpecho.c
+@@ -36,6 +36,7 @@ SRCS-y += icmpecho.c
+ SRCS-y += noisy_vnf.c
  SRCS-$(CONFIG_RTE_LIBRTE_IEEE1588) += ieee1588fwd.c
  SRCS-$(CONFIG_RTE_LIBRTE_BPF) += bpf_cmd.c
+ SRCS-y += util.c
  SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_loop_fwd.c
 +SRCS-$(CONFIG_RTE_LIBRTE_SPP_PMD) += spp_eni_addr_swap.c
  
- ifeq ($(CONFIG_RTE_LIBRTE_PMD_SOFTNIC)$(CONFIG_RTE_LIBRTE_SCHED),yy)
- SRCS-y += tm.c
+ ifeq ($(CONFIG_RTE_LIBRTE_PMD_SOFTNIC), y)
+ SRCS-y += softnicfwd.c
 diff --git a/app/test-pmd/spp_eni_addr_swap.c b/app/test-pmd/spp_eni_addr_swap.c
 new file mode 100644
 index 0000000..c3f7b97
@@ -99,7 +101,7 @@ index 0000000..c3f7b97
 + * macaddr[0] != 0, swap addresses).
 + */
 +static inline void
-+ipv4_addr_swap(struct ipv4_hdr *ipv4_hdr)
++ipv4_addr_swap(struct rte_ipv4_hdr *ipv4_hdr)
 +{
 +	uint32_t ipv4_addr_tmp;
 +
@@ -109,7 +111,7 @@ index 0000000..c3f7b97
 +}
 +
 +static inline void
-+ipv6_addr_swap(struct ipv6_hdr *ipv6_hdr)
++ipv6_addr_swap(struct rte_ipv6_hdr *ipv6_hdr)
 +{
 +	uint8_t ipv6_addr_tmp[IPV6_ADDR_SIZE];
 +
@@ -124,8 +126,8 @@ index 0000000..c3f7b97
 +	struct rte_mbuf *pkts_burst[MAX_PKT_BURST];
 +	struct rte_port *txp;
 +	struct rte_mbuf *mb;
-+	struct ether_hdr *eth_hdr;
-+	struct ether_addr addr;
++	struct rte_ether_hdr *eth_hdr;
++	struct rte_ether_addr addr;
 +	uint16_t nb_rx;
 +	uint16_t nb_tx;
 +	uint16_t i;
@@ -138,8 +140,8 @@ index 0000000..c3f7b97
 +	uint64_t end_tsc;
 +	uint64_t core_cycles;
 +#endif
-+	struct ipv4_hdr *ipv4_hdr;
-+	struct ipv6_hdr *ipv6_hdr;
++	struct rte_ipv4_hdr *ipv4_hdr;
++	struct rte_ipv6_hdr *ipv6_hdr;
 +
 +#ifdef RTE_TEST_PMD_RECORD_CORE_CYCLES
 +	start_tsc = rte_rdtsc();
@@ -170,32 +172,32 @@ index 0000000..c3f7b97
 +			rte_prefetch0(rte_pktmbuf_mtod(pkts_burst[i + 1],
 +						       void *));
 +		mb = pkts_burst[i];
-+		eth_hdr = rte_pktmbuf_mtod(mb, struct ether_hdr *);
++		eth_hdr = rte_pktmbuf_mtod(mb, struct rte_ether_hdr *);
 +
 +		/* Do not swap for SPP PMD (default MAC addr==0) */
 +		if (txp->eth_addr.addr_bytes[0] != 0) {
 +			/* Swap dest and src mac addresses. */
-+			ether_addr_copy(&eth_hdr->d_addr, &addr);
-+			ether_addr_copy(&eth_hdr->s_addr, &eth_hdr->d_addr);
-+			ether_addr_copy(&addr, &eth_hdr->s_addr);
++			rte_ether_addr_copy(&eth_hdr->d_addr, &addr);
++			rte_ether_addr_copy(&eth_hdr->s_addr, &eth_hdr->d_addr);
++			rte_ether_addr_copy(&addr, &eth_hdr->s_addr);
 +
 +			if (likely(eth_hdr->ether_type ==
-+				   htons(ETHER_TYPE_IPv4))) {
++				   htons(RTE_ETHER_TYPE_IPV4))) {
 +				/* Swap dest and src IPv4 addresses */
-+				ipv4_hdr = (struct ipv4_hdr *)(eth_hdr + 1);
++				ipv4_hdr = (struct rte_ipv4_hdr *)(eth_hdr + 1);
 +				ipv4_addr_swap(ipv4_hdr);
 +			} else if (eth_hdr->ether_type ==
-+				   htons(ETHER_TYPE_IPv6)) {
++				   htons(RTE_ETHER_TYPE_IPV6)) {
 +				/* Swap dest and src IPv6 addresses */
-+				ipv6_hdr = (struct ipv6_hdr *)(eth_hdr + 1);
++				ipv6_hdr = (struct rte_ipv6_hdr *)(eth_hdr + 1);
 +				ipv6_addr_swap(ipv6_hdr);
 +			}
 +		}
 +
 +		mb->ol_flags &= IND_ATTACHED_MBUF | EXT_ATTACHED_MBUF;
 +		mb->ol_flags |= ol_flags;
-+		mb->l2_len = sizeof(struct ether_hdr);
-+		mb->l3_len = sizeof(struct ipv4_hdr);
++		mb->l2_len = sizeof(struct rte_ether_hdr);
++		mb->l3_len = sizeof(struct rte_ipv4_hdr);
 +		mb->vlan_tci = txp->tx_vlan_id;
 +		mb->vlan_tci_outer = txp->tx_vlan_id_outer;
 +	}
@@ -239,7 +241,7 @@ diff --git a/app/test-pmd/testpmd.c b/app/test-pmd/testpmd.c
 index f124f1e..c22b093 100644
 --- a/app/test-pmd/testpmd.c
 +++ b/app/test-pmd/testpmd.c
-@@ -165,6 +165,9 @@ struct fwd_engine * fwd_engines[] = {
+@@ -188,6 +188,9 @@ struct fwd_engine * fwd_engines[] = {
  #ifdef RTE_LIBRTE_SPP_PMD
  	&spp_loop_fwd_engine,
  #endif
@@ -248,21 +250,21 @@ index f124f1e..c22b093 100644
 +#endif
  	NULL,
  };
- 
+
 diff --git a/app/test-pmd/testpmd.h b/app/test-pmd/testpmd.h
-index cc98e3c..6ce92de 100644
+index 9cf0d50dd6..bf7a62b3ba 100644
 --- a/app/test-pmd/testpmd.h
 +++ b/app/test-pmd/testpmd.h
-@@ -281,6 +281,9 @@ struct fwd_engine {
+@@ -280,6 +280,9 @@ extern struct fwd_engine ieee1588_fwd_engine;
  #ifdef RTE_LIBRTE_SPP_PMD
  extern struct fwd_engine spp_loop_fwd_engine;
  #endif
 +#ifdef RTE_LIBRTE_SPP_PMD
 +extern struct fwd_engine spp_eni_addr_swap_engine;
 +#endif
- 
+
  extern struct fwd_engine * fwd_engines[]; /**< NULL terminated array. */
- 
+ extern cmdline_parse_inst_t cmd_set_raw;
 -- 
 1.8.3.1
 
