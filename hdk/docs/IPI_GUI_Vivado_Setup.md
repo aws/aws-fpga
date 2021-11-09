@@ -4,10 +4,9 @@
 
 1. [Overview](#overview)
 2. [Linux Install](#hlxinst_lin)
-3. [Windows Install](#hlxinst_win)
-4. [Vivado Overview](#vivado)
-5. [Vivado Flows Overview](#projover)
-6. [Summary](#summary)
+3. [Vivado Overview](#vivado)
+4. [Vivado Flows Overview](#projover)
+5. [Summary](#summary)
 
 
 
@@ -42,46 +41,6 @@ In init.tcl or Vivado\_init.tcl, add the following line based upon the $HDK\_SHE
 ### Switching between HDK and HLx flows
 * ~/.Xilinx/Vivado/init.tcl or ~/.Xilinx/Vivado/Vivado_init.tcl scripts are sourced when Vivado starts up. Once you go through the Linux Install setup, IP integrator features will be automatically loaded every time. 
 * If you wish to switch to the HDK flow, Please remove the `source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl` line from your init.tcl or Vivado\_init.tcl file
-
-<a name="hlxinst_win"></a>
-# Windows Install
-
-Download, install, and configure the license for Vivado SDx 2017.4, 2018.2, 2018.3 or 2019.1 for Windows.  More information is provided at:
-
-[On-Premises Licensing Help](../../docs/on_premise_licensing_help.md)
-
-Clone the `https://github.com/aws/aws-fpga` repository either through Github Desktop or Download ZIP and extract to a new folder location on the Windows machine.  This is the install location.
-
-Launch Vivado and determine the path where vivado\_init.tcl or init.tcl is sourced which is found as an INFO message at the top of the Tcl Console.
-
-Open vivado\_init.tcl or init.tcl in a text editor and add the following lines at the top of the file.  Note aws-fpga could have a slightly different name like aws-fpga-master.
-
-`set AWSINSTALL "C:/<replace with install location>/aws-fpga"`
-
-`source $AWSINSTALL/hdk/common/shell_v04261818/hlx/hlx_setup.tcl`
-
-Copy these lines into the TCL console to ensure paths are correct.
-
-An error message will occur either in the TCL console or in a tab about DDR4 models.  Source the following command which only needs to be run once after cloning the github repository.  Note aws-fpga could have a slightly different name like aws-fpga-master.
-
-`source C:/<replace with install location>/aws-fpga/hdk/common/verif/scripts/hdk_initsh.tcl`
-
-Before installing the DDR4 models, another critical warning appeared dealing with the SH\_CL\_BB\_routed.dcp.  Download the DCP into the following install location from a web browser.  Note aws-fpga could have a slightly different name like aws-fpga-master.
-
-`https://s3.amazonaws.com/aws-fpga-hdk-resources/hdk/shell_v04261818/build/checkpoints/from_aws/SH_CL_BB_routed.dcp`
-
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/build/checkpoints/from_aws/`
-
-Download the following executable from a web browser to the following HLx directory.  Note aws-fpga could have a slightly different name like aws-fpga-master.
-
-`http://www.labtestproject.com/files/sha256sum/sha256sum.exe`
-
-`C:/<replace with install location>/aws-fpga/hdk/common/shell_v04261818/hlx/build/scripts`
-
-Close Vivado and launch Vivado, the HLx environment is now setup and will always be sourced and IP integrator features will be automatically loaded.
-
-Amazon CLI for Windows can be used for access to S3 to upload .tar and ingestion flow.
-
 
 <a name="vivado"></a>
 # Vivado Overview
