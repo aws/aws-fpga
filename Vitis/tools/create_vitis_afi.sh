@@ -215,7 +215,7 @@ clock_extra_c0=$(echo `grep -B 2 KERNEL_CLK ${timestamp}_clocks.json | grep -o -
 
 if [[ "$vendor" != "xilinx" && "$board_id" != "aws-vu9p-f1" && "$plat_name" != "shell-v04261818" && "$major" != "201920" && "$minor" != "2" ]]
 then                                 
-    err_msg "Platform ${vendor}_${board_id}_${plat_name}_${major}_${minor} used to create xclbin is not correct, you should be using xilinx_aws-vu9p-f1_shell-v04261818_201920_2"
+    err_msg "Platform ${vendor}_${board_id}_${plat_name}_${major}_${minor} used to create xclbin is not correct, you should be using xilinx_aws-vu9p-f1_shell-v04261818_201920_3"
     exit                                                                                              
 fi                                                                                                    
 
@@ -281,7 +281,7 @@ echo ${timestamp}_agfi_id.txt
 #Create .awsxclbin
 
 
-if [[ "$RELEASE_VER" == "2020.2" || "$RELEASE_VER" == "2021.1" ]]
+if [[ "$RELEASE_VER" == "2020.2" || "$RELEASE_VER" == "2021.1" || "$RELEASE_VER" == "2021.2" ]]
 then
 	/opt/xilinx/xrt/bin/xclbinutil -i $xclbin --remove-section PARTITION_METADATA --replace-section BITSTREAM:RAW:${timestamp}_agfi_id.txt -o ${awsxclbin}.awsxclbin
 else

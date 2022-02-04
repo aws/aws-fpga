@@ -50,16 +50,17 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 
 ## Xilinx tool support
 
-| Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
-|-----------|-----------|------|
-| 1.4.21+ | 2021.1 | v1.11.X (Xilinx Vivado/Vitis 2021.1) |
-| 1.4.18+ | 2020.2 | v1.10.X (Xilinx Vivado/Vitis 2020.2) |
-| 1.4.16+ | 2020.1 | v1.9.0-v1.9.X (Xilinx Vivado/Vitis 2020.1) |
-| 1.4.13+ | 2019.2 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2) |
-| 1.4.11+ | 2019.1 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1) |
-| 1.4.8 - 1.4.15b | 2018.3 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3) |
-| 1.4.3 - 1.4.15b | 2018.2 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2) |
-|⚠️ 1.3.7 - 1.4.15b | 2017.4 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) ⚠️|
+| Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version       |
+|-----------------------|------------------------|---------------------------------------------|
+| 1.4.23+               | 2021.2                 | v1.12.X (Xilinx Vivado/Vitis 2021.2)        |
+| 1.4.21+               | 2021.1                 | v1.11.X (Xilinx Vivado/Vitis 2021.1)        |
+| 1.4.18+               | 2020.2                 | v1.10.X (Xilinx Vivado/Vitis 2020.2)        |
+| 1.4.16+               | 2020.1                 | v1.9.0-v1.9.X (Xilinx Vivado/Vitis 2020.1)  |
+| 1.4.13+               | 2019.2                 | v1.8.0-v1.8.X (Xilinx Vivado/Vitis 2019.2)  |
+| 1.4.11+               | 2019.1                 | v1.7.0-v1.7.X (Xilinx Vivado/SDx 2019.1)    |
+| 1.4.8 - 1.4.15b       | 2018.3                 | v1.6.0-v1.6.X (Xilinx Vivado/SDx 2018.3)    |
+| 1.4.3 - 1.4.15b       | 2018.2                 | v1.5.0-v1.5.X (Xilinx Vivado/SDx 2018.2)    |
+| ⚠️ 1.3.7 - 1.4.15b    | 2017.4                 | v1.4.0-v1.4.X (Xilinx Vivado/SDx 2017.4) ⚠️ |
 
 ⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15b or earlier. 
 Please check out [the latest v1.4.15b release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15b) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
@@ -71,10 +72,10 @@ For software-defined development please look at the runtime compatibility table 
 
 ### End of life Announcements
 
-| Xilinx Tool version | State | Statement | 
-|-----------|-----------|------|
-| 2017.1 | 🚫 Deprecated on 09/01/2018 | Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) [reached end-of-life](https://forums.aws.amazon.com/ann.jspa?annID=6068). |
-| 2017.4 | ⚠️ Upcoming deprecation on 12/31/2021 | Support for Xilinx 2017.4 toolsets will be deprecated on 12/31/2021. Please check our [forum announcement for more details](https://forums.aws.amazon.com/ann.jspa?annID=8949). |
+| Xilinx Tool version | State | Statement                                                                                                                                                                 | 
+|-----------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2017.1 | 🚫 Deprecated on 09/01/2018 | Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) [reached end-of-life](https://forums.aws.amazon.com/ann.jspa?annID=6068).                 |
+| 2017.4 | 🚫 Deprecated on 12/31/2021 | [Support for Xilinx 2017.4 toolsets was deprecated on 12/31/2021](https://forums.aws.amazon.com/ann.jspa?annID=8949). |
 
 ## Hardware Development Kit (HDK)
 
@@ -123,7 +124,7 @@ The [SDK directory](./sdk/README.md) includes the runtime environment required t
 * 1-8 Xilinx UltraScale+ VU9P based FPGA slots
 * Per FPGA Slot, Interfaces available for Custom Logic(CL):
     * One x16 PCIe Gen 3 Interface
-    * Four DDR4 RDIMM interfaces (with ECC)
+    * Four DDR4 RDIMM interfaces (72-bit with ECC, 16 GiB each; 64 GiB total)
     * AXI4 protocol support on all interfaces
 * User-defined clock frequency driving all CL to Shell interfaces
 * Multiple free running auxiliary clocks
@@ -219,8 +220,7 @@ Documentation is located throughout this developer kit and the table below conso
 
 # Developer Support
 
-* The [**Amazon FPGA Development User Forum**](https://forums.aws.amazon.com/forum.jspa?forumID=243&start=0) is the first place to go to post questions, learn from other users and read announcements.
-    * We recommend joining the [AWS forums](https://forums.aws.amazon.com/forum.jspa?forumID=243) to engage with the FPGA developer community, AWS and Xilinx engineers to get help.
+* [**AWS Re:Post**](https://repost.aws/) is the first place to go to post questions, learn from other users, to engage with the FPGA developer community, AWS and Xilinx engineers to get help.
 
-* You could also file a [Github Issue](https://github.com/aws/aws-fpga/issues) for support. We prefer the forums as this helps the entire community learn from issues, feedback and answers.
+* You could also file a [Github Issue](https://github.com/aws/aws-fpga/issues) for support. We prefer AWS Re:Post as this helps the entire community learn from issues, feedback and answers.
     * Click the "Watch" button in GitHub upper right corner to get regular updates.

@@ -103,6 +103,8 @@ class TestGenDcp(AwsFpgaTestBase):
             (('.*',), r'WARNING: \[Synth 8-7071\] .*'),
             (('.*',), r'WARNING: \[Synth 8-7129\] .*'),
             (('.*',), r'WARNING: \[Route 35-3387\] .*'),
+            (('.*',), r'WARNING: \[Synth 8-6779\] .*'),
+            (('.*',), r'WARNING: \[Synth 8-7080\] .*'),
             (('cl_sde_*',), r'WARNING: \[Vivado 12-180\] No cells matched .*'),
             (('cl_sde_*',), r'WARNING: \[Vivado 12-1008\] No clocks found for command.*'),
             (('cl_sde_*',), r'CRITICAL WARNING: \[Designutils 20-1280\] .*'),
@@ -364,7 +366,7 @@ class TestGenDcp(AwsFpgaTestBase):
     def test_cl_uram_example(self, xilinxVersion, uram_option):
         cl = 'cl_uram_example'
         logger.info("uram_option={}".format(uram_option))
-        self.base_test(cl, xilinxVersion, clock_recipe_a='A2', uram_option=uram_option)
+        self.base_test(cl, xilinxVersion, clock_recipe_a='A0', uram_option=uram_option)
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
