@@ -2,7 +2,7 @@
 <sdx:platform sdx:vendor="xilinx"
               sdx:library="aws-vu9p-f1"
               sdx:name="shell-v04261818"
-              sdx:version="201920.2"
+              sdx:version="201920.3"
               sdx:schemaVersion="1.0"
               xmlns:sdx="http://www.xilinx.com/sdx">
   <sdx:description>
@@ -10,11 +10,11 @@
   </sdx:description>
 
   <sdx:hardwarePlatforms>
-    <sdx:hardwarePlatform sdx:path="hw" sdx:name="xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa"/>
+    <sdx:hardwarePlatform sdx:path="hw" sdx:name="xilinx_aws-vu9p-f1_shell-v04261818_201920_3.xsa"/>
   </sdx:hardwarePlatforms>
 
   <sdx:softwarePlatforms>
-    <sdx:softwarePlatform sdx:path="sw" sdx:name="xilinx_aws-vu9p-f1_shell-v04261818_201920_2.spfm"/>
+    <sdx:softwarePlatform sdx:path="sw" sdx:name="xilinx_aws-vu9p-f1_shell-v04261818_201920_3.spfm"/>
   </sdx:softwarePlatforms>
 
 </sdx:platform>

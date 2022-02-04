@@ -65,7 +65,7 @@ vivado_version=${vivado_version//./_}
 if [ $batch == "TRUE" ]; then
 # COMMAND="batch_submit.py -q vcs-lo --jd Cad-centos7_2 --jn github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} --wait --echo -c make"
 # COMMAND="sbatch -c 1 --mem 64GB -p regress -J github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} -L VCSMXRunTime_Net -W -o ${test_name}_${test_type}_${simulator}.stdout.sim.log -e ${test_name}_${test_type}_${simulator}.stderr.sim.log sbatch_wrap.sh make"
-COMMAND="srun -c 1 --mem 64GB --time 160 -p regress -J github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} -L VCSMXRunTime_Net make"
+COMMAND="srun -c 1 --mem 64GB --time 160 -p verif_regress -J github_regress_${test_name}_${test_type}_${vivado_version}_${simulator} -L VCSMXRunTime_Net make"
 
 else
 COMMAND="make"

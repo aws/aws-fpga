@@ -63,7 +63,7 @@ In order to port the vector-add example from Alveo U200 to AWS F1, the only chan
 2.  The `options.cfg` file for AWS F1 contains the following options:
 
     ```
-    platform=xilinx_aws-vu9p-f1_shell-v04261818_201920_2
+    platform=xilinx_aws-vu9p-f1_shell-v04261818_201920_3
     [connectivity]
     sp=vadd_1.in1:DDR[0]
     sp=vadd_1.in2:DDR[0]
@@ -88,7 +88,7 @@ In order to port the vector-add example from Alveo U200 to AWS F1, the only chan
     v++ -l -g -t hw -R 1 --config ./options.cfg --profile_kernel data:all:all:all --profile_kernel stall:all:all:all --temp_dir ./temp_dir --report_dir ./report_dir --log_dir ./log_dir -I../src vadd.hw.xo -o vadd.xclbin    
     ```
     
-    *NOTE: The PLATFORM_REPO_PATHS environment variable is used to specify the directory where the AWS platform (xilinx_aws-vu9p-f1_shell-v04261818_201920_2) is installed.*
+    *NOTE: The PLATFORM_REPO_PATHS environment variable is used to specify the directory where the AWS platform (xilinx_aws-vu9p-f1_shell-v04261818_201920_3) is installed.*
     
 4. When targeting AWS F1, you need to go through the additional step of creating an Amazon FPGA Image (AFI). This is done with the `create_vitis_afi.sh` command provided by AWS. More information about this command is available on the [AWS documentation](https://github.com/aws/aws-fpga/blob/master/Vitis/README.md#2-create-an-amazon-fpga-image-afi).     
 

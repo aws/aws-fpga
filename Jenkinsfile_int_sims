@@ -36,7 +36,7 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2021.1' ]
+def xilinx_versions = [ '2021.2' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
@@ -71,6 +71,12 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs/R-2020.12',
          'questa': 'questa/2020.4',
          'ies': 'incisive/15.20.083'
+     ],
+     '2021.2' : [
+         'vivado': 'xilinx/Vivado/2021.2',
+         'vcs': 'synopsys/vcs/R-2020.12',
+         'questa': 'questa/2020.4',
+         'xcelium': 'xcelium/20.09.006'
      ]
 ]
 
@@ -156,7 +162,7 @@ if (test_sims) {
             def simulators = ['vivado']
             def sim_nodes = [:]
             if(params.internal_simulations) {
-                simulators = ['vcs', 'ies', 'questa', 'vivado']
+                simulators = ['vcs', 'xcelium', 'questa', 'vivado']
             }
 
             for (x in cl_names) {
@@ -165,7 +171,7 @@ if (test_sims) {
                         String xilinx_version = y
                         String cl_name = x
                         String simulator = z
-                        if((cl_name == 'cl_vhdl_hello_world') && (simulator == 'ies')) {
+                        if((cl_name == 'cl_vhdl_hello_world') && (simulator == 'xcelium')) {
                            println ("Skipping Simulator: ${simulator}  CL: ${cl_name}")
                            continue;
                         }
@@ -179,7 +185,7 @@ if (test_sims) {
                         def tool_module_map = simulator_tool_default_map.get(xilinx_version)
                         String vcs_module = tool_module_map.get('vcs')
                         String questa_module = tool_module_map.get('questa')
-                        String ies_module = tool_module_map.get('ies')
+                        String xcelium_module = tool_module_map.get('xcelium')
                         String vivado_module = tool_module_map.get('vivado')
 
                         if(params.internal_simulations) {
@@ -199,7 +205,7 @@ if (test_sims) {
                                         module load ${vivado_module}
                                         module load ${vcs_module}
                                         module load ${questa_module}
-                                        module load ${ies_module}
+                                        module load ${xcelium_module}
                                         source $WORKSPACE/hdk_setup.sh
                                         python2.7 -m pytest -v $WORKSPACE/hdk/tests/simulation_tests/test_sims.py -k \"${key}\" --junit-xml $WORKSPACE/${report_file} --simulator ${simulator} --batch 'TRUE'
                                         """

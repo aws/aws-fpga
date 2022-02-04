@@ -263,7 +263,7 @@ class AwsFpgaTestBase(object):
 
     @staticmethod
     def get_vitis_xclbin_dir(examplePath, target='hw'):
-        return os.path.join(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath=examplePath), "build_dir.{}.xilinx_aws-vu9p-f1_shell-v04261818_201920_2".format(target))
+        return os.path.join(AwsFpgaTestBase.get_sdaccel_example_fullpath(examplePath=examplePath), "build_dir.{}.xilinx_aws-vu9p-f1_shell-v04261818_201920_3".format(target))
 
     @staticmethod
     def get_sdaccel_example_s3_root_tag(examplePath, target, rteName, xilinxVersion):
@@ -438,7 +438,7 @@ class AwsFpgaTestBase(object):
 
         if launch_description[0].get("cmd_args", None):
             run_cmd += " {}".format(((launch_description[0].get("cmd_args", None).replace(".xclbin", ".awsxclbin")).replace(
-                        "PROJECT", ".")).replace("BUILD", "./build_dir.hw.xilinx_aws-vu9p-f1_shell-v04261818_201920_2")).replace(
+                        "PROJECT", ".")).replace("BUILD", "./build_dir.hw.xilinx_aws-vu9p-f1_shell-v04261818_201920_3")).replace(
                 "REPO_DIR", AwsFpgaTestBase.get_vitis_example_base_dir(xilinxVersion))
 
         assert run_cmd is not None, "Could not find run_cmd(em_cmd) or (host_exe) in the example description here {}".format(

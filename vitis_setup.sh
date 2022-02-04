@@ -171,7 +171,7 @@ setup_patches
 
 # Update Xilinx Vitis Examples from GitHub
 info_msg "Using Vitis $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ||  $RELEASE_VER =~ .*2020\.2.* ||  $RELEASE_VER =~ .*2021\.1.* ]]; then
+if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.* ||  $RELEASE_VER =~ .*2021\.* ]]; then
     info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
     git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
@@ -183,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.1.* ||  $RELEASE_
     fi
     ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2 or 2021.1 are supported).\n"
+   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2, 2021.1 or 2021.2 are supported).\n"
    return 2
 fi
 
@@ -275,17 +275,17 @@ function setup_xsa {
     fi
 }
 
-    #-------------------201920_2 Vitis Platform----------------------
-    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_2 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_2
-    info_msg "AWS Platform: 201920_2 Vitis Platform is up-to-date"
-    #-------------------201920_2 Vitis Platform----------------------
+    #-------------------201920_3 Vitis Platform----------------------
+    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_3 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_3
+    info_msg "AWS Platform: 201920_3 Vitis Platform is up-to-date"
+    #-------------------201920_3 Vitis Platform----------------------
 
 
 # Setup XRT as we need it for building
 setup_runtime
 
-export AWS_PLATFORM=$AWS_PLATFORM_201920_2
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_2\" "
+export AWS_PLATFORM=$AWS_PLATFORM_201920_3
+info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_3\" "
 
 info_msg "Vitis Setup PASSED"
 

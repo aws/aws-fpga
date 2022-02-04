@@ -2,7 +2,7 @@
 *It is assumed that the reader has run the instructions found in the [AWS SDAccel README] successfully*
 
 
-This document provides a detailed reference to the [SDAccel Development Environment][SDAccel_landing_page] and its use with AWS F1 FPGA instances. 
+This document provides a detailed reference to the SDAccel Development Environment and its use with AWS F1 FPGA instances. 
 
 The SDAccel environment allows kernels expressed in OpenCL or C/C++ to be accelerated by implementing them in custom FPGA hardware. The flexible SDAccel Development Environment also allows the acceleration to be performed using pre-existing RTL designs. 
 
@@ -18,7 +18,7 @@ In addition, you can review the following useful documents:
 
 SDAccel uses a compiler named `xocc` which can be thought of as similar to the GNU gcc compiler -i.e. it allows you to compile source code to create Xilinx object (.xo) files and then can link said .xo files together to create an executable program; the .xo files contain an RTL representation of the accelerated kernels and the executable program is the design to be programmed onto the AWS F1 FPGA. 
 
-When the source code is OpenCL or C/C++ the [Vivado High-Level Synthesis (HLS)][VHLS_landing_page] tool is used under-the-hood to create the RTL that implements the custom hardware to meet the required performance and then an .xo file is created using the [Vivado toolchain][Vivado_landing_page].
+When the source code is OpenCL or C/C++ the Vivado High-Level Synthesis (HLS) tool is used under-the-hood to create the RTL that implements the custom hardware to meet the required performance and then an .xo file is created using the [Vivado toolchain][Vivado_landing_page].
 
 When the source code is RTL, the Vivado toolchain creates the .xo file directly without using Vivado HLS to generate any RTL description.
 
@@ -165,15 +165,8 @@ Conversely, code which is simply a few lines of basic operations, and has no tas
 # Additional Resources
 
 * The [AWS SDAccel README](../README.md).
-* Xilinx web portal for [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html?resultsTablePreSelect=xlnxdocumenttypes:SeeAll#documentation) 
 * [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
-* [Xilinx SDAccel landing page](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html)
-* [Vivado landing page](https://www.xilinx.com/products/design-tools/vivado.html)
-* [SDAccel Environment User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
-* [SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
-* [SDAccel Environment Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
-* [UltraFast Design Methodology Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug949-vivado-design-methodology.pdf)
-* [Vivado High Level Synthesis User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug902-vivado-high-level-synthesis.pdf)
+* [Xilinx SDAccel landing page](https://www.xilinx.com/products/design-tools/legacy-tools/sdaccel.html)
 * [On Premise Development steps](On_Premises_Development_Steps.md)
 * [SDAccel Power Analysis](SDAccel_Power_Analysis.md)
 * [FAQ](../FAQ.md)
