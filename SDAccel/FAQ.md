@@ -82,25 +82,6 @@ A: We support creating AFI's from CL's that have been built to work at Frequenci
 # Additional Resources
 
 * The [AWS SDAccel README](README.md).
-* Xilinx web portal for [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html?resultsTablePreSelect=xlnxdocumenttypes:SeeAll#documentation) 
+* Xilinx web portal for [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/legacy-tools/sdaccel.html) 
 * [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
-
-* Links pointing to **2017.4** version of the user guides
-   * [UG1023: SDAccel Environment User Guide][UG1023 2017.4]
-   * [UG1021: SDAccel Environment Tutorial: Getting Started Guide (including emulation/build/running on H/W flow)][UG1021 2017.4]
-   * [UG1207: SDAccel Environment Optimization Guide][UG1207 2017.4]
-   * [UG1238: SDx Development Environment Release Notes, Installation, and Licensing Guide][UG1238 2017.4]
-   * [SDAccel_landing_page](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html)
-   * [Vivado HLS landing page](https://www.xilinx.com/products/design-tools/vivado/integration/esl-design.html
-   * [Vivado landing page](https://www.xilinx.com/products/design-tools/vivado.html)
-   * [SDAccel Environment User Guide](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1023-sdaccel-user-guide.pdf)
-   * [SDAccel Intro Tutorial](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1021-sdaccel-intro-tutorial.pdf)
-   * [SDAccel Environment Optimization Guide](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf)
-   * [Vivado Design Methodology](https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug949-vivado-design-methodology.pdf)
-   * [2017.4 SDAccel User Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1023-sdaccel-user-guide.pdf)
-   * [2017.4 SDAccel Intro Tutorial](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1021-sdaccel-intro-tutorial.pdf)
-   * [2017.4 SDAccel Environment Optimization Guide](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug1207-sdaccel-optimization-guide.pdf)
-   * [Xilinx SDAccel documentation](https://www.xilinx.com/products/design-tools/software-zone/sdaccel.html#documentation)
-   * [Xilinx SDAccel GitHub repository](https://github.com/Xilinx/SDAccel_Examples)
-   * [AWS SDAccel Readme](README.md)
-   * [Debug HLS Performance: Limited memory ports](./docs/SDAccel_HLS_Debug.md)
+* [Debug HLS Performance: Limited memory ports](./docs/SDAccel_HLS_Debug.md)

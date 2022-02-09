@@ -14,3 +14,6 @@
 [submodule "Vitis/examples/xilinx_2021.1"]
 	path = Vitis/examples/xilinx_2021.1
 	url = https://github.com/Xilinx/Vitis_Accel_Examples
+[submodule "Vitis/examples/xilinx_2021.2"]
+	path = Vitis/examples/xilinx_2021.2
+	url = https://github.com/Xilinx/Vitis_Accel_Examples

@@ -2,7 +2,7 @@
 <sdx:platform sdx:vendor="xilinx"
               sdx:library="aws-vu9p-f1"
               sdx:name="shell-v04261818"
-              sdx:version="201920.2"
+              sdx:version="201920.3"
               sdx:schemaVersion="1.0"
               xmlns:sdx="http://www.xilinx.com/sdx">
   <sdx:description>

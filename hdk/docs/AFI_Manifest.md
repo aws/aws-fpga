@@ -38,13 +38,14 @@ The manifest file is a text file formatted with key=value pairs. Some keys are m
 * **tool_version=**.....   [Mandatory]
   * use vivado tool version with below table as a reference
      
-| vivado tool version | field value |
-|------------------- | -----------|
-| 2021.1 |  tool_version=v2021.1 |
-| 2020.2 |  tool_version=v2020.2 |
-| 2020.1 |  tool_version=v2020.1 |
-| 2019.2 |  tool_version=v2019.2 |
-| 2019.1 |  tool_version=v2019.1 |
+| vivado tool version | field value          |
+|---------------------|----------------------|
+| 2021.2              | tool_version=v2021.2 |
+| 2021.1              | tool_version=v2021.1 |
+| 2020.2              | tool_version=v2020.2 |
+| 2020.1              | tool_version=v2020.1 |
+| 2019.2              | tool_version=v2019.2 |
+| 2019.1              | tool_version=v2019.1 |
              
 * **date=** YY_MM_DD-HHMMSS         
      *Following same format used in the automatic build reports used by AWS scripts*

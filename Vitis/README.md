@@ -58,8 +58,8 @@ The F1 HW Target compile time is ~50 minutes, therefore, software and hardware e
 
 * Sourcing the *vitis_setup.sh* script:
   * Downloads and sets the correct AWS Platform:
-    * [AWS Vitis Platform](./aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2) that contains the dynamic hardware that enables Vitis kernels to run on AWS F1 instances.
-    * Valid platforms for shell_v04261818: `AWS_PLATFORM_201920_2` (Default) AWS F1 Vitis platform.
+    * AWS Vitis Platform that contains the dynamic hardware that enables Vitis kernels to run on AWS F1 instances.
+    * Valid platforms for shell_v04261818: `AWS_PLATFORM_201920_3` (Default) AWS F1 Vitis platform.
   * Sets up the Xilinx Vitis example submodules.
   * Installs the required libraries and package dependencies.
   * Run environment checks to verify supported tool/lib versions.

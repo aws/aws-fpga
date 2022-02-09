@@ -126,15 +126,16 @@ task_label = [
 ]
 
 // Put the latest version last
-def xilinx_versions = [ '2021.1' ]
-def vitis_versions = ['2021.1' ]
+def xilinx_versions = [ '2021.2' ]
+def vitis_versions = ['2021.2' ]
 
 // We want the default to be the latest.
 def default_xilinx_version = xilinx_versions.last()
 
 def xsa_map = [
     '2020.2' : [ 'DYNAMIC':'dyn'],
-    '2021.1' : [ 'DYNAMIC':'dyn']
+    '2021.1' : [ 'DYNAMIC':'dyn'],
+    '2021.2' : [ 'DYNAMIC':'dyn']
 ]
 
 def vitis_example_default_map = [
@@ -160,6 +161,12 @@ def vitis_example_default_map = [
         'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/cpp_kernels/kernel_global_bandwidth',
         'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug',
         'gemm_blas': 'Vitis/examples/xilinx/library_examples/gemm'
+    ],
+    '2021.2' : [
+        'Hello_World_1ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_helloworld',
+        'Gmem_2Banks_2ddr': 'Vitis/examples/xilinx/ocl_kernels/cl_gmem_2banks',
+        'Kernel_Global_Bw_4ddr': 'Vitis/examples/xilinx/performance/kernel_global_bandwidth',
+        'RTL_Vadd_Debug': 'Vitis/examples/xilinx/rtl_kernels/rtl_vadd_hw_debug'
     ],
 ]
 
@@ -193,6 +200,12 @@ def simulator_tool_default_map = [
          'vcs': 'synopsys/vcs-mx/R-2020.12',
          'questa': 'questa/2020.4',
          'ies': 'incisive/15.20.083'
+     ],
+     '2021.2' : [
+         'vivado': 'xilinx/Vivado/2021.2',
+         'vcs': 'synopsys/vcs-mx/R-2020.12',
+         'questa': 'questa/2020.4',
+         'xcelium': '20.09.006'
      ]
 ]
 

@@ -324,7 +324,7 @@ class TestLoadAfi(AwsFpgaTestBase):
     @pytest.mark.parametrize("uram_option", AwsFpgaTestBase.DCP_URAM_OPTIONS)
     def test_cl_uram_example(self, xilinxVersion, uram_option):
         cl = 'cl_uram_example'
-        self.base_fdf_test(cl, xilinxVersion, clock_recipe_a='A2', uram_option=uram_option, install_xdma_driver=False)
+        self.base_fdf_test(cl, xilinxVersion, clock_recipe_a='A0', uram_option=uram_option, install_xdma_driver=False)
 
     @pytest.mark.parametrize("build_strategy", AwsFpgaTestBase.DCP_BUILD_STRATEGIES)
     @pytest.mark.parametrize("clock_recipe_c", sorted(AwsFpgaTestBase.DCP_CLOCK_RECIPES['C']['recipes'].keys()))
