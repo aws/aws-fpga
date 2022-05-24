@@ -2,7 +2,7 @@
 
 **NOTE:** See [ERRATA](./ERRATA.md) for unsupported features
 
-## Release 1.4.22
+## Release 1.4.23
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2021.2
 
 ## Release 1.4.22
