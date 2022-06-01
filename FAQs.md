@@ -52,6 +52,14 @@ For developers who are new to AWS, there is typically a one to two days ramp on 
 
 Once developers create their DCP, they submit the design through an AWS EC2 API to create the Amazon FPGA Image (aka AFI, this API call can take a few hours to complete, and the status of the process is reported in the S3 log bucket provides by the developers. AWS is working to improve the turn time of AFI generation.
 
+**Q: How can on-premise designs be ported to AWS FPGA instances?**
+
+Customers can seamlessly migrate between Alveo U200 and F1 platforms to enable scaling in AWS cloud. The migration is supported for [Vitis](https://github.com/aws/aws-fpga/blob/master/Vitis/docs/Alveo_to_AWS_F1_Migration.md) flow and Vivado RTL flow.
+AWS provides a shell for Alveo U200 on [github](https://github.com/aws/aws-fpga-f1-u200) and Xilinx Alveo [U200 page](https://www.xilinx.com/products/boards-and-kits/alveo/u200.html#vivado). The F1.A.1.4 shell for Alveo U200 provides a standard shell compatible with F1's F1.X.1.4 shell to provide an easy migration path for on-premise solutions to the cloud, in a Vivado design flow. 
+
+This gives choice to the customers to use either a Vitis flow or a full custom RTL/Vivado design flow and seamlessly migrate designs between Alveo U200 and F1. 
+The F1.A.1.4 shell is fully interface compatible and footprint compatible with AWS F1.X.1.4 shell and no changes to custom logic design are required. Similar to the existing F1 shells, the F1.A.1.4 shell provides all the required communication interfaces to the custom logic. This also helps customers with the effort required to implement PCIe and DDR interfaces and DMA for Alveo U200 platform.
+
 
 **Q: What new skill sets will be required from an FPGA developer in the cloud?**
 

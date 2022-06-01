@@ -1,6 +1,8 @@
 # AWS EC2 FPGA HDK+SDK Release Notes
 
 **NOTE:** See [ERRATA](./ERRATA.md) for unsupported features
+## Release 1.4.24
+* AWS supports [migration](./hdk/docs/U200_to_F1_migration_HDK.md) from U200 Vivado development flow to F1 HDK flow using F1.A.1.4 shell
 
 ## Release 1.4.23
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2021.2
