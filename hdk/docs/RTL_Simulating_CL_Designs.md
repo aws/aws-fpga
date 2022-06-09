@@ -15,7 +15,7 @@ Developers tend to simulate their designs to validate the RTL design and functio
 
 Developers can write their tests in SystemVerilog and/or C languages. If a developer chooses to use the supplied C framework, he/she can use the same C code for simulation and for runtime on your FPGA-enabled instance like F1.
 
-<img src="./ppts/simulation/Slide2.PNG" alt="Testbench Top-Level Diagram">
+<img src="./images/Testbench.PNG" alt="Testbench Top-Level Diagram">
 
 # Quick Start
 
@@ -291,8 +291,6 @@ Your design may share data between host memory and logic within the CL. To verif
 ```
 
 If you are are using C to verify your CL, then use C domain host memory. Allocate a memory buffer in your C code and pass the pointer to the SV domain. The AXI BFM connected to the PCIeM port will use DPI calls to read and write the memory buffer.
-
-<img src="./ppts/simulation/Slide3.PNG" alt="C/SV Host Memory"/>
 
 
 Backdoor access to host memory is provided by two functions:
