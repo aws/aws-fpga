@@ -77,6 +77,7 @@ For software-defined development please look at the runtime compatibility table 
 |-----------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 2017.1 | 🚫 Deprecated on 09/01/2018 | Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) [reached end-of-life](https://forums.aws.amazon.com/ann.jspa?annID=6068).                 |
 | 2017.4 | 🚫 Deprecated on 12/31/2021 | [Support for Xilinx 2017.4 toolsets was deprecated on 12/31/2021](https://forums.aws.amazon.com/ann.jspa?annID=8949). |
+| 2020.1 and below | Discontinued on 02/2022 | Removed the ability for customers to newly subscribe to 2020.1 and below AMI versions to remove exposure to [CVE-2021-44228](https://www.cve.org/CVERecord?id=CVE-2021-44228) as these versions of tools do not have patches from xilinx |
 
 ## Hardware Development Kit (HDK)
 
