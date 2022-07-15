@@ -1,6 +1,7 @@
 # Table of Contents
 
 1. [Overview of AWS EC2 FPGA Development Kit](#overview-of-aws-ec2-fpga-development-kit)
+    - [Developer Support](#developer-support)
     - [Development Flow](#development-flow)
     - [Development environments](#development-environments)
     - [FPGA Developer AMI](#fpga-developer-ami)
@@ -14,7 +15,6 @@
     - [Quickstarts](#quickstarts)
     - [How To's](#how-tos)
 1. [Documentation Overview](#documentation-overview)
-1. [Developer Support](#developer-support)
 
 # Overview of AWS EC2 FPGA Development Kit
 
@@ -22,6 +22,10 @@ AWS EC2 FPGA Development Kit is a set of development and runtime tools to develo
 It is distributed between this github repository and FPGA Developer AMI - [Centos](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)/[AL2](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) provided by AWS with no cost of development tools.
 
 ⚠️ <b>NOTE:</b> The developer kit is supported for Linux operating systems only.
+
+## Developer Support
+
+Opening a [GitHub Issue](https://github.com/aws/aws-fpga/issues) is the preferred method to get support with the AWS FPGA Development Kit. In addition, the [FPGA Development re:Post Tag](https://repost.aws/tags/TAc7ofO5tbQRO57aX1lBYbjA/fpga-development) is available to find FPGA-related discussion topics from the AWS community of customers, AWS customer support, and the AWS FPGA development team.
 
 ## Development Flow
 After creating an FPGA design (also called CL - Custom logic), developers can create an Amazon FPGA Image (AFI) and easily deploy it to an F1 instance. AFIs are reusable, shareable and can be deployed in a scalable and secure way.
@@ -218,11 +222,3 @@ Documentation is located throughout this developer kit and the table below conso
 | AFI - Power | [FPGA Power, recovering from clock gating](./hdk/docs/afi_power.md) | Helps developers with understanding FPGA power usage, preventing power violations on the F1 instance and recovering from a clock gated slot. |
 | On-premise Development | [Tools, Licenses required for on-premise development](./docs/on_premise_licensing_help.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) |
 | Frequently asked questions | [FAQ](./FAQs.md)| Q/A are added based on developer feedback and common AWS forum questions  |
-
-
-# Developer Support
-
-* [**AWS Re:Post**](https://repost.aws/) is the first place to go to post questions, learn from other users, to engage with the FPGA developer community, AWS and Xilinx engineers to get help.
-
-* You could also file a [Github Issue](https://github.com/aws/aws-fpga/issues) for support. We prefer AWS Re:Post as this helps the entire community learn from issues, feedback and answers.
-    * Click the "Watch" button in GitHub upper right corner to get regular updates.
