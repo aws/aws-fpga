@@ -170,6 +170,6 @@ As an alternative to the above, a variable blocksize (or other parameters) may b
 	
 ## FIO is very useful and configurable, how do I learn about the other supported options?
 
-Please see this [link](https://github.com/axboe/fio/blob/master/HOWTO) for the full FIO command set.    
+Please see this [link](https://github.com/axboe/fio/blob/master/HOWTO.rst) for the full FIO command set.    
 
 
