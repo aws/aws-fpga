@@ -55,6 +55,8 @@ ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", RUN+="/opt/aws/bin/change-fpga-p
 ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1041", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
 ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
 ATTR{vendor}=="0x1d0f", ATTR{device}=="0x1042", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0xf001", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
+ATTR{vendor}=="0x1d0f", ATTR{device}=="0xf001", ACTION=="add", RUN+="/opt/aws/bin/change-fpga-perm.sh %k"
 EF
 
 else
