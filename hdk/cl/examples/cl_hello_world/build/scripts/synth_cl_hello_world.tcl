@@ -78,9 +78,20 @@ read_ip [ list \
 
 # Additional IP's that might be needed if using the DDR
 #read_bd [ list \
-# $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci \
-# $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
+#  $HDK_SHELL_DESIGN_DIR/ip/cl_axi_interconnect/cl_axi_interconnect.bd
 #]
+#read_verilog -sv [ list \
+#  $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
+#  $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
+#  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_acc_axl.sv  \
+#  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_gen_axl.sv  \
+#]
+#read_ip [ list \
+#  $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
+#  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci
+#]
+
+
 
 puts "AWS FPGA: Reading AWS constraints";
 
