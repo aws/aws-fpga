@@ -20,12 +20,17 @@ DEPS_FILE := $(HDK_SHELL_DESIGN_DIR)/ip/ddr4_core/ddr4_core.xci
 DEPS_FILE += $(HDK_COMMON_DIR)/verif/scripts/init.tcl
 DEPS_FILE += $(HDK_COMMON_DIR)/verif/scripts/init.sh
 
+CLEAN_TARGETS += $(HDK_COMMON_DIR)/verif/scripts/ddr4_core_ip_report.txt
+CLEAN_TARGETS += $(HDK_COMMON_DIR)/verif/scripts/tmp/
+CLEAN_TARGETS += $(wildcard $(HDK_COMMON_DIR)/verif/scripts/vivado*.jou)
+CLEAN_TARGETS += $(wildcard $(HDK_COMMON_DIR)/verif/scripts/vivado*.log)
+
 all: $(DONE_FILE)
 
 $(DONE_FILE): $(DEPS_FILE)
 	@ echo "INFO: Building in $(shell dirname $@)"
 	@ echo "INFO: This could take 5-10 minutes, please be patient!"
-	@ git clean -fXdq $(shell dirname $@)
+	@ rm -rf $(CLEAN_TARGETS)
 	@ cd $(shell dirname $@)\
 	&& ./init.sh $(MODEL_DIR)\
 	&& echo "INFO: DDR4 model build passed."\
