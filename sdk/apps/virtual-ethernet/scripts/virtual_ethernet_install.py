@@ -97,10 +97,12 @@ def install_dpdk(install_path):
 
     # Clone the DPDK repo
     logger.info("Cloning %s version of %s into %s" % (dpdk_ver, dpdk_git, install_path))
-    cmd_exec("git clone -b %s %s" % (dpdk_ver, dpdk_git))
+    cmd_exec("git clone  %s" % (dpdk_git))
 
-    # cd to the dpdk directory 
+    # cd to the dpdk directory
     os.chdir("dpdk")
+    # checkout tag
+    cmd_exec("git checkout %s" % (dpdk_ver))
 
     # Check that the patches can be applied
     # for patchfile in patchfiles:
