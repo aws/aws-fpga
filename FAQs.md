@@ -350,7 +350,7 @@ The `fpga-load-local-image` call will initiate the loading of the AFI, however a
 
 **Q: What will happen to the FPGA state after my instance stops/terminates/crashes?**
 
-The AWS infrastructure scrubs FPGA state on termination of an F1 instance and any reuse of the FPGA hardware. Scrubbing includes both FPGA internal state and the contents of DRAM attached to the FPGA. Additionally, users can call the `fpga-clear-local-image` command from the FPGA Image Management tools to force a clear of FPGA and DRAM contents while the instance is running.
+The AWS infrastructure scrubs FPGA state on stopping/termination of an F1 instance and any reuse of the FPGA hardware. Scrubbing includes both FPGA internal state and the contents of DRAM attached to the FPGA. Additionally, users can call the `fpga-clear-local-image` command from the FPGA Image Management tools to force a clear of FPGA and DRAM contents while the instance is running.
 
 
 
