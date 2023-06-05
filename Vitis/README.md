@@ -87,7 +87,7 @@ The instructions below describe how to run the Vitis SW Emulation flow using the
 ```
     $ cd $VITIS_DIR/examples/xilinx/hello_world
     $ make clean
-    $ make run TARGET=sw_emu DEVICE=$AWS_PLATFORM all
+    $ make run TARGET=sw_emu PLATFORM=$AWS_PLATFORM all
 ```
 
 For more information on how to debug your application in a SW Emulation environment.
@@ -102,7 +102,7 @@ The instructions below describe how to run the HW Emulation flow using the Makef
 ```
     $ cd $VITIS_DIR/examples/xilinx/hello_world
     $ make clean
-    $ make run TARGET=hw_emu DEVICE=$AWS_PLATFORM all
+    $ make run TARGET=hw_emu PLATFORM=$AWS_PLATFORM all
 ```
 For more information on how to debug your application in a HW Emulation environment.
 
@@ -116,7 +116,7 @@ The instructions below describe how to build the Xilinx FPGA Binary and host app
 ```
     $ cd $VITIS_DIR/examples/xilinx/hello_world
     $ make clean
-    $ make TARGET=hw DEVICE=$AWS_PLATFORM all
+    $ make TARGET=hw PLATFORM=$AWS_PLATFORM all
 ```
 
 NOTE: If you encounter an error with  `No current synthesis run set`, you may have previously run the [HDK IPI examples](../hdk/docs/IPI_GUI_Vivado_Setup.md) and created a `Vivado_init.tcl` file in `~/.Xilinx/Vivado`. This will cause [problems](https://forums.aws.amazon.com/thread.jspa?threadID=268202&tstart=25) with the build process, thus it is recommended to remove it before starting a hardware system build.
