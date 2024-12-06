@@ -1,3 +1,5 @@
+⚠️ <b>Warning:</b> The AWS FPGA developer AMI based on Centos is no longer available to new customers and no longer supported for existing customers due to Centos End-of-Life.  Please use the AWS provided [Amazon Linux 2 FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X)
+
 # Table of Contents
 
 1. [Overview of AWS EC2 FPGA Development Kit](#overview-of-aws-ec2-fpga-development-kit)
@@ -19,7 +21,7 @@
 # Overview of AWS EC2 FPGA Development Kit
 
 AWS EC2 FPGA Development Kit is a set of development and runtime tools to develop, simulate, debug, compile and run hardware accelerated applications on [Amazon EC2 F1 instances](https://aws.amazon.com/ec2/instance-types/f1/).
-It is distributed between this github repository and FPGA Developer AMI - [Centos](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)/[AL2](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) provided by AWS with no cost of development tools.
+It is distributed between this github repository and FPGA Developer AMI - [AL2](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) provided by AWS with no cost of development tools.
 
 ⚠️ <b>NOTE:</b> The developer kit is supported for Linux operating systems only.
 
@@ -45,7 +47,7 @@ After creating an FPGA design (also called CL - Custom logic), developers can cr
 
 ## FPGA Developer AMI
 
-The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1. 
+The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1. 
 
 Given the large size of the FPGA used inside AWS F1 Instances, Xilinx tools work best with 32GiB Memory. 
 z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge instance types would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively. 
@@ -163,7 +165,7 @@ FPGA Image generation and EC2 F1 instances are supported in the us-east-1 (N. Vi
 
 ### Setting up development environment for the first time 
 
-You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premise. 
+You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) or on-premise. 
 
 > ℹ️ <b>INFO:</b> We suggest starting with the FPGA Developer AMI with [build instances](#fpga-developer-ami) on EC2 as it has Xilinx tools and licenses setup for you to be able to quickly get into development.
 
@@ -220,7 +222,7 @@ Documentation is located throughout this developer kit and the table below conso
 | AFI - EC2 CLI | [copy\_fpga\_image](./hdk/docs/copy_fpga_image.md), [delete\_fpga\_image](./hdk/docs/delete_fpga_image.md), [describe\_fpga\_images](./hdk/docs/describe_fpga_images.md), [fpga\_image\_attributes](./hdk/docs/fpga_image_attributes.md) | CLI documentation for administering AFIs |
 | AFI - Creation Error Codes | [create\_fpga\_image\_error\_codes](hdk/docs/create_fpga_image_error_codes.md) | CLI documentation for managing AFIs |
 | AFI - Power | [FPGA Power, recovering from clock gating](./hdk/docs/afi_power.md) | Helps developers with understanding FPGA power usage, preventing power violations on the F1 instance and recovering from a clock gated slot. |
-| On-premise Development | [Tools, Licenses required for on-premise development](./docs/on_premise_licensing_help.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) |
+| On-premise Development | [Tools, Licenses required for on-premise development](./docs/on_premise_licensing_help.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) |
 | PCIe Peer-2-Peer     | [P2P](https://github.com/awslabs/aws-fpga-app-notes/blob/master/Using-PCIe-Peer2Peer/README.md) | Guidance on using PCIe P2P |
 | PCIe write combining | [PCIe write combine](https://github.com/awslabs/aws-fpga-app-notes/blob/master/Using-PCIe-Write-Combining/README.md) | Documentation on PCIe write combining for performance improvement |
 | Frequently asked questions | [FAQ](./FAQs.md)| Q/A are added based on developer feedback and common AWS forum questions  |
