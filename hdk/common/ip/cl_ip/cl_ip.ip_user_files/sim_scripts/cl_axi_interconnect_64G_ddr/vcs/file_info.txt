@@ -1,0 +1,2 @@
+cl_axi_interconnect_64G_ddr.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_axi_interconnect_64G_ddr/sim/cl_axi_interconnect_64G_ddr.v,incdir="../../../ipstatic/hdl"incdir="../../../ipstatic/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

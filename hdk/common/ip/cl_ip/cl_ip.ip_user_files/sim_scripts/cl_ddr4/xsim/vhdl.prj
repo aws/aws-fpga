@@ -1,0 +1,13 @@
+vhdl xil_defaultlib  \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_0/sim/bd_2e02_microblaze_I_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_1/sim/bd_2e02_rst_0_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_2/sim/bd_2e02_ilmb_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_3/sim/bd_2e02_dlmb_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_4/sim/bd_2e02_dlmb_cntlr_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_5/sim/bd_2e02_ilmb_cntlr_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_7/sim/bd_2e02_second_dlmb_cntlr_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_8/sim/bd_2e02_second_ilmb_cntlr_0.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/cl_ddr4/bd_0/ip/ip_10/sim/bd_2e02_iomodule_0_0.vhd" \
+
+# Do not sort compile order
+nosort

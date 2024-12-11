@@ -1,56 +1,49 @@
 
-# AWS EC2 FPGA HDK+SDK Errata
+# F2 Developer Kit Errata
 
 ## Shell Errata
+
 Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 
 ## HDK
-* Multiple SDE instances per CL is not supported in this release. Support is planned for a future release.
-* DRAM Data retention is not supported for CL designs with less than 4 DDRs enabled
-* Combinatorial loops in CL designs are not supported.
-  * We will display a `UNKNOWN_BITSTREAM_GENERATE_ERROR` on detection of a combinatorial loop in the CL design and an AFI will not be generated.
-* Connecting one of the clocks provided from the shell (clk_main_a0, clk_extra_a1, etc...) directly to a BUFG in the CL is not supported by the Xilinx tools and may result in a non-functional clock. To workaround this limitation, it is recommended to use an MMCM to feed the BUFG (clk_from_shell -> MMCM -> BUFG). Please refer to [Xilinx AR# 73360](https://support.xilinx.com/s/article/73360?language=en_US) for further details.
 
-### flop_ccf.sv bug
+1. CL simulation might show the following "error" message if the [CL clock generator](./hdk/docs/AWS_CLK_GEN_spec.md) is contained in the design. By default, the generator blocks all output clocks (except for `o_clk_main_a0`) and asserts all output resets. This behavior violates the built-in reset check in the [AXI SmartConnect IP](https://www.xilinx.com/products/intellectual-property/smartconnect.html#overview). This message can be safely ignored. A Fix for this issue is in progress.
 
-We have identified a bug in the `flop_ccf.sv` module that can potentially impact timing closure of designs. 
-The module is instantiated in `sh_ddr.sv` and inadvertently introduces a timing path on the reset logic. 
-Although there is no functional impact, it may increase Vivado tool’s effort in timing closure of design. 
-There should be no functional impact from this bug if your design has already met timing. 
-This bug is fixed in aws-fpga release v1.4.19
+    ```bash
+    # ** Error: [SmartConnect 500-33] s_sc_aresetn should be asserted for at least 16 cycles of m_sc_aclk. tb.card.fpga.CL.CL_HBM.HBM_PRESENT_EQ_1.AXI_CONVERTER_AXI4_AXI3.cl_axi_sc_1x1_i.smartconnect_0.inst.s00_nodes.s00_aw_node.inst.<protected>.<protected>
+    ```
 
-Q: Which designs does this bug affect?
-A: This bug only affects designs that instantiate the sh_ddr module.
+2. CL simulation might show the following "error" message. This message can be safely ignored. A Fix for this issue is in progress.
 
-Q: How do I fix my design if I am affected by this bug?
-A: Pull aws-fpga release v1.4.19 or later from the aws-fpga github and rebuild your cl design. 
-The flop_ccf.sv files from the latest release that contain the fix are: [sh_ddr/synth/flop_ccf.sv](https://github.com/aws/aws-fpga/blob/master/hdk/common/shell_v04261818/design/sh_ddr/synth/flop_ccf.sv) & 
-[sh_ddr/sim/flop_ccf.sv](https://github.com/aws/aws-fpga/blob/master/hdk/common/shell_v04261818/design/sh_ddr/sim/flop_ccf.sv)
+    ```bash
+    # Initializing memory from data in 'ddr4_ddr_10.mem'.
+    #   Reading data in x8 and bl:8 mode (Change with 'config <4,8,16> <4,8>' in this file).
+    #   'ddr4_ddr_10.mem' set write data width to x4.
+    #   ERROR: Failed to write data burst length to 16. Only <4,8> are valid.
+    ```
 
-### Xilinx Design Advisory for UltraScale/UltraScale+ DDR4/DDR3 IP - Memory IP Timing Exceptions (AR# 73068)
-AWS EC2 F1 customers using the DDR4 IP in customer logic (HDK or SDAccel/Vitis designs) may be impacted by a recent design advisory from Xilinx.
+3. XSIM simulator does not support a cycle-accurate simulation model for the HBM IP. We’re observing significantly longer simulation times compared to VCS and Questa simulators. This is caused by the HBM BFM used in XSIM. Therefore, running HBM simulation using VCS or Questa is strongly recommended.
 
-AWS customers may experience hardware failures including: post calibration data errors and DQS gate tracking issues. The error condition is build dependent and errors would need to be detected on the first write/read access after a successful calibration to prevent further data corruption.
+4. XDMA driver interrupt mode doesn't work currently on instances. Runtime examples have temporarily switched to use the polling mode and the interrupt mode test has been temporarily removed. Refer to the [XDMA driver installation guide](./hdk/docs/XDMA_Install.md) for instructions on how to load XDMA driver using the polling mode.
 
-To detect if your build is impacted by this bug, AWS recommends all EC2 F1 customers utilizing the DDR4 IP in their designs should run a TCL script on the design checkpoint point (DCP) to check to determine if the design is susceptible to this issue. If the check passes, your design is safe to use as the hardware will function properly. 
-If the check fails, the design is susceptible to the issue and will need to be regenerated using the same tool version with the AR 73068 patch. 
-For designs under development, we recommend applying the patch to your on-premises tools or update to developer kit v1.4.15. 
-For additional details, please refer to the [Xilinx Answer Record #73068](https://support.xilinx.com/s/article/73068?language=en_US)
+5. The following hdk tests are not supported in XSIM currently and will report not supported warning if ran:
 
-We recommend using [Developer Kit Release v1.4.15a](https://github.com/aws/aws-fpga/releases/tag/v1.4.15a) or newer to allow for patching and fixing the DDR4 IP timing exception by re-generating the IP.
+   - cl_mem_perf:
+     - test_dram_dma_4k_crossing
+     - test_dram_dma
+     - test_dram_dma_align_addr_4k
+     - test_dram_dma_single_beat_4k
+     - test_dram_dma_rnd
 
-### 2019.1 
-* Vivado `compile_simlib` command fails to generate the following verilog IP libraries for the following simulators.
-* Please refer to the Xilinx Answer record for details.
+   - cl_dram_hbm_dma:
+     - test_dram_dma_4k_crossing
 
-| Library(verilog) | Simulator | Xilinx Answer Record | 
-|---|---|---|
-| `sync_ip` | Cadence IES | [AR72795](https://support.xilinx.com/s/article/72795?language=en_US) |
-| `hdmi_gt_controller_v1_0_0` | Synopsys VCS | [AR72601](https://support.xilinx.com/s/article/72601?language=en_US) |
+6. Simulation of the [HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface) is not supported in this release. The HBM IP always passes initialization and remains in an operating state for all tests. Simulation support for the HBM monitor will be added in a future release.
+
+7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2 instances at this time.
 
 ## SDK
 
-## SDAccel (For additional restrictions see [SDAccel ERRATA](./SDAccel/ERRATA.md))
-* Virtual Ethernet is not supported when using SDAccel
-* DRAM Data retention is not supported for kernels that provision less than 4 DDRs
-* Combinatorial loops in CL designs are not supported. 
+## Software defined Accelerator Development (Vitis)
+
+- Support for 2024.1 and hardware emulation only. Software emulation and F2 instance support is not supported at this time.

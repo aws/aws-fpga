@@ -34,6 +34,7 @@ LDLIBS = -lrt -lpthread
 FPGAAUXLIBS = $(LIB_PATH)/libfpga_pci.a
 FPGAAUXLIBS += $(LIB_PATH)/libutils.a
 FPGAAUXLIBS += $(LIB_PATH)/libfpga_dma.a
+FPGAAUXLIBS += $(LIB_PATH)/libfpga_clkgen.a
 
 all: $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)
 

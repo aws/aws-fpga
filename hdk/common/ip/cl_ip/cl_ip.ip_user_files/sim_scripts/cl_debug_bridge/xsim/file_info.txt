@@ -1,0 +1,5 @@
+bd_a493_xsdbm_0.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_0/sim/bd_a493_xsdbm_0.v,incdir="../../../ipstatic/hdl/verilog"incdir="../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog"incdir="../../../ipstatic/hdl/verilog"
+bd_a493_lut_buffer_0.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_1/sim/bd_a493_lut_buffer_0.v,incdir="../../../ipstatic/hdl/verilog"incdir="../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog"incdir="../../../ipstatic/hdl/verilog"
+bd_a493.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/sim/bd_a493.v,incdir="../../../ipstatic/hdl/verilog"incdir="../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog"incdir="../../../ipstatic/hdl/verilog"
+cl_debug_bridge.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/sim/cl_debug_bridge.v,incdir="../../../ipstatic/hdl/verilog"incdir="../../../../cl_ip.gen/sources_1/ip/cl_debug_bridge/bd_0/ip/ip_0/hdl/verilog"incdir="../../../ipstatic/hdl/verilog"
+glbl.v,Verilog,xil_defaultlib,glbl.v

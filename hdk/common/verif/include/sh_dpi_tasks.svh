@@ -1,6 +1,6 @@
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -15,6 +15,8 @@
 
 `ifndef SV_SH_DPI_TASKS
 `define SV_SH_DPI_TASKS
+
+`include "anp_base_macros.svh"
 
 import tb_type_defines_pkg::*;
 
@@ -36,14 +38,6 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_map_host_memory;
    export "DPI-C" task cl_peek;
    export "DPI-C" task cl_poke;
-   export "DPI-C" task cl_peek_pcis;
-   export "DPI-C" task cl_poke_pcis;
-   export "DPI-C" task cl_peek_sda;
-   export "DPI-C" task cl_poke_sda;
-   export "DPI-C" task cl_peek_ocl;
-   export "DPI-C" task cl_poke_ocl;
-   export "DPI-C" task cl_peek_bar1;
-   export "DPI-C" task cl_poke_bar1;
    export "DPI-C" task sv_int_ack;
    export "DPI-C" task sv_pause;
    export "DPI-C" task sv_fpga_pci_peek;
@@ -52,8 +46,6 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_fpga_start_buffer_to_cl;
    export "DPI-C" task sv_fpga_start_cl_to_buffer;
 `endif
-   export "DPI-C" task init_ddr;
-   export "DPI-C" task deselect_atg_hw;
    
    static int h2c_desc_index = 0;
    static int c2h_desc_index = 0;
@@ -72,38 +64,6 @@ import tb_type_defines_pkg::*;
    
    task cl_poke(input longint unsigned addr, int unsigned data);
       tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
-   endtask
-   
-   task cl_peek_pcis(input longint unsigned addr, output int unsigned data);
-      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_DMA_PCIS));
-   endtask
-   
-   task cl_poke_pcis(input longint unsigned addr, int unsigned data);
-      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_DMA_PCIS));
-   endtask
-
-   task cl_peek_sda(input longint unsigned addr, output int unsigned data);
-      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_SDA));
-   endtask
-   
-   task cl_poke_sda(input longint unsigned addr, int unsigned data);
-      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_SDA));
-   endtask
-
-   task cl_peek_ocl(input longint unsigned addr, output int unsigned data);
-      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
-   endtask
-   
-   task cl_poke_ocl(input longint unsigned addr, int unsigned data);
-      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
-   endtask
-
-   task cl_peek_bar1(input longint unsigned addr, output int unsigned data);
-      tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_BAR1));
-   endtask
-   
-   task cl_poke_bar1(input longint unsigned addr, int unsigned data);
-      tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_BAR1));
    endtask
 
    task sv_int_ack(input int unsigned int_num);
@@ -142,19 +102,20 @@ import tb_type_defines_pkg::*;
 
    function byte hm_get_byte(input longint unsigned addr);
       byte d;
-
-      if (tb.use_c_host_memory)
+      if (tb.use_c_host_memory) begin
          d = host_memory_getc(addr);
-      else begin
+      end else begin
          int unsigned t;
          if (tb.sv_host_memory.exists({addr[63:2], 2'b00})) begin
             t = tb.sv_host_memory[{addr[63:2], 2'b00}];
             t = t >> (addr[1:0] * 8);
             d = t[7:0];
          end
-         else
+         else begin
             d = 'hff;
+	     end
       end
+      
       return d;
    endfunction
 
@@ -237,34 +198,6 @@ end
    function void start_que_to_buffer(input int slot_id = 0, int chan);
       `SLOT_MACRO_TASK(start_dma_to_buffer(chan))
    endfunction
-
-   //DPI task to initialize DDR
-   task init_ddr();
-      power_up(.clk_recipe_a(ClockRecipe::A1),
-                  .clk_recipe_b(ClockRecipe::B0),
-                  .clk_recipe_c(ClockRecipe::C0));
-
-      nsec_delay(1000);
-      poke_stat(.addr(8'h0c), .ddr_idx(0), .data(32'h0000_0000));
-      poke_stat(.addr(8'h0c), .ddr_idx(1), .data(32'h0000_0000));
-      poke_stat(.addr(8'h0c), .ddr_idx(2), .data(32'h0000_0000));
-
-     
-      // allow memory to initialize
-      nsec_delay(27000);
-   endtask // initialize_sh_model
-
-
-   task deselect_atg_hw();
-
-    //de-select the ATG hardware
-
-      poke_ocl(.addr(64'h130), .data(0));
-      poke_ocl(.addr(64'h230), .data(0));
-      poke_ocl(.addr(64'h330), .data(0));
-      poke_ocl(.addr(64'h430), .data(0));
-      nsec_delay(1000);
-   endtask
 
 `ifdef DMA_TEST
    //DPI task to transfer HOST to CL data.
@@ -429,7 +362,6 @@ end
    //         0 = PCIS
    //         1 = SDA
    //         2 = OCL
-   //         3 = BAR1
    //
    //        id - AXI bus ID
    //
@@ -494,7 +426,6 @@ end
    //         0 = PCIS
    //         1 = SDA
    //         2 = OCL
-   //         3 = BAR1
    //
    //        id - AXI bus ID
    //
@@ -642,44 +573,6 @@ end
       data = {32'h0, tmp[31:0]};
    endtask
 
-   //=================================================
-   //
-   // poke_bar1
-   //
-   //   Description: used to write a single 32b of data at addr into the BAR1 interface.
-   //
-   //        id - AXI bus ID
-   //
-   //   Outputs: None
-   //
-   //=================================================
-   task poke_bar1(input int slot_id = 0,
-             logic [63:0] addr, 
-             logic [31:0] data, 
-             logic [5:0] id = 6'h0);
-       `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
-   endtask
-
-   //=================================================
-   //
-   // peek_bar1
-   //
-   //   Description: used to read a single 32b of data at addr from the BAR1 interface.
-   //
-   //        id - AXI bus ID
-   //
-   //   Outputs: Read Data Value
-   //
-   //=================================================
-   task peek_bar1(input int slot_id = 0,
-             logic [63:0] addr, 
-             output logic [63:0] data, 
-             input logic [5:0] id = 6'h0); 
-      logic [63:0] tmp;
-      `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_BAR1)))
-      data = {32'h0, tmp[31:0]};
-   endtask
-
    function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
       `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
    endfunction // is_dma_to_cl_done
@@ -697,9 +590,55 @@ end
    endfunction // is_dma_to_buffer_done
    
    task poke_stat(input int slot_id = 0,
-                  input logic [7:0] addr, logic [1:0] ddr_idx, logic[31:0] data);
-      `SLOT_MACRO_TASK(poke_stat(.addr(addr), .ddr_idx(ddr_idx), .data(data)))
+                  input logic [7:0] addr, string intf, logic[31:0] data);
+      `SLOT_MACRO_TASK(poke_stat(.addr(addr), .intf(intf), .data(data)))
    endtask // poke_stat
+
+   task peek_stat(input int slot_id = 0,
+                  input logic [7:0] addr, string intf, output logic[31:0] data);
+      `SLOT_MACRO_TASK(peek_stat(.addr(addr), .intf(intf), .data(data)))
+   endtask // peek_stat
+
+   task poll_stat(input int slot_id = 0,
+                  input logic [7:0] addr, string intf, logic[31:0] data, logic [31:0] mask, time timeout = 100ns, int interval = 10);
+      fork
+      begin // guard
+         fork
+         begin
+            bit [31:0]  rdata;
+            while ((rdata & mask) != data) begin
+               peek_stat(.slot_id(slot_id), .intf(intf), .addr(addr), .data(rdata));
+               `SLOT_MACRO_TASK(wait_clock(.count(interval)))
+            end
+         end
+         begin
+            #(timeout);
+            `anp_fatal($sformatf(
+               "poll_stat: Timed out intf=%0s, addr=0x%08H, data=0x%08H, mask=0x%08H, timeout=%0t",
+               intf, addr, data, mask, timeout))
+         end
+         join_any
+         disable fork;
+      end // guard
+      join
+   endtask // poll_stat
+
+   //=================================================
+   //
+   // wait_clock
+   //
+   //   Description: Clock wait for the number of core clock
+   //
+   //        count - Number of clock cycles
+   //
+   //=================================================
+   task wait_clock(
+      input int count,
+      int slot_id = 0
+   ); 
+       `SLOT_MACRO_TASK(wait_clock(.count(count)))
+   endtask : wait_clock
+
    //=================================================
    //
    //   set_chk_clk_freq

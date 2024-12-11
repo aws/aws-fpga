@@ -1,0 +1,2 @@
+cl_axi_width_cnv_512_to_256.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_axi_width_cnv_512_to_256/sim/cl_axi_width_cnv_512_to_256.v,incdir="../../../ipstatic/hdl"incdir="../../../ipstatic/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

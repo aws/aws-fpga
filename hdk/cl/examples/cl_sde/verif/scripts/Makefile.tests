@@ -1,0 +1,5 @@
+test_simple_h2c: TEST=test_simple_h2c
+test_simple_h2c: all
+
+test_simple_c2h: TEST=test_simple_c2h
+test_simple_c2h: all

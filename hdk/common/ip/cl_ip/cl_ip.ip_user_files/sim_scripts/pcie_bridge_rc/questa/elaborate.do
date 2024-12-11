@@ -1,0 +1,1 @@
+vopt -64 -l elaborate.log +acc=npr -suppress 10016  -L xil_defaultlib -L xilinx_vip -L xpm -L gtwizard_ultrascale_v1_7_18 -L blk_mem_gen_v8_4_8 -L xdma_v4_1_29 -L xilinx_vip -L unisims_ver -L unimacro_ver -L secureip -work xil_defaultlib xil_defaultlib.pcie_bridge_rc xil_defaultlib.glbl -o pcie_bridge_rc_opt

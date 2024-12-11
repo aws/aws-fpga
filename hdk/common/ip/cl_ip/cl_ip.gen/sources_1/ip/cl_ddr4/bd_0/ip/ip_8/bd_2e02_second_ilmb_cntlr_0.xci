@@ -1,0 +1,363 @@
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "bd_2e02_second_ilmb_cntlr_0",
+    "cell_name": "second_ilmb_cntlr",
+    "component_reference": "xilinx.com:ip:lmb_bram_if_cntlr:4.0",
+    "ip_revision": "24",
+    "gen_directory": ".",
+    "parameters": {
+      "component_parameters": {
+        "C_BASEADDR": [ { "value": "0x0000000000010000", "value_src": "user", "value_permission": "bd", "resolve_type": "user", "format": "bitString", "usage": "all" } ],
+        "C_HIGHADDR": [ { "value": "0x0000000000017FFF", "value_src": "user", "value_permission": "bd", "resolve_type": "user", "format": "bitString", "usage": "all" } ],
+        "C_MASK": [ { "value": "0x0000000080010000", "value_src": "user", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "usage": "all" } ],
+        "C_MASK1": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK2": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK3": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK4": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK5": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK6": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK7": [ { "value": "0x0000000000800000", "value_permission": "bd_and_user", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_NUM_LMB": [ { "value": "1", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_LMB_AWIDTH": [ { "value": "32", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_LMB_DWIDTH": [ { "value": "32", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_LMB_PROTOCOL": [ { "value": "0", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_ARBITRATION": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_INTERCONNECT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_FAULT_INJECT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_CE_FAILING_REGISTERS": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_UE_FAILING_REGISTERS": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_STATUS_REGISTERS": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_ONOFF_REGISTER": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_ONOFF_RESET_VALUE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_CE_COUNTER_WIDTH": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_WRITE_ACCESS": [ { "value": "2", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_S_AXI_CTRL_ACLK_FREQ_HZ": [ { "value": "100000000", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_S_AXI_CTRL_ADDR_WIDTH": [ { "value": "32", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_S_AXI_CTRL_DATA_WIDTH": [ { "value": "32", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_S_AXI_CTRL_PROTOCOL": [ { "value": "AXI4LITE", "resolve_type": "user", "enabled": false, "usage": "all" } ],
+        "Component_Name": [ { "value": "bd_2e02_second_ilmb_cntlr_0", "resolve_type": "user", "usage": "all" } ]
+      },
+      "model_parameters": {
+        "C_FAMILY": [ { "value": "virtexuplusHBM", "resolve_type": "generated", "usage": "all" } ],
+        "C_HIGHADDR": [ { "value": "0x0000000000017FFF", "resolve_type": "generated", "format": "bitString", "usage": "all" } ],
+        "C_BASEADDR": [ { "value": "0x0000000000010000", "resolve_type": "generated", "format": "bitString", "usage": "all" } ],
+        "C_NUM_LMB": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_MASK": [ { "value": "0x0000000080010000", "resolve_type": "generated", "format": "bitString", "usage": "all" } ],
+        "C_MASK1": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK2": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK3": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK4": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK5": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK6": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_MASK7": [ { "value": "0x0000000000800000", "resolve_type": "generated", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "C_LMB_AWIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_LMB_DWIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_LMB_PROTOCOL": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_ARBITRATION": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_ECC": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_INTERCONNECT": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_FAULT_INJECT": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_CE_FAILING_REGISTERS": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_UE_FAILING_REGISTERS": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_STATUS_REGISTERS": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_ONOFF_REGISTER": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_ECC_ONOFF_RESET_VALUE": [ { "value": "1", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_CE_COUNTER_WIDTH": [ { "value": "0", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_WRITE_ACCESS": [ { "value": "2", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_BRAM_AWIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_S_AXI_CTRL_ADDR_WIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ],
+        "C_S_AXI_CTRL_DATA_WIDTH": [ { "value": "32", "resolve_type": "generated", "format": "long", "enabled": false, "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "virtexuplusHBM" } ],
+        "BASE_BOARD_PART": [ { "value": "" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xcvu47p" } ],
+        "NEXTGEN_VERSAL": [ { "value": "0" } ],
+        "PACKAGE": [ { "value": "fsvh2892" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "E" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "24" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "." } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "." } ],
+        "SWVERSION": [ { "value": "2024.1" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "LMB_Clk": [ { "direction": "in", "driver_value": "0x0" } ],
+        "LMB_Rst": [ { "direction": "in", "driver_value": "0x0" } ],
+        "LMB_ABus": [ { "direction": "in", "size_left": "0", "size_right": "31" } ],
+        "LMB_WriteDBus": [ { "direction": "in", "size_left": "0", "size_right": "31", "driver_value": "0" } ],
+        "LMB_AddrStrobe": [ { "direction": "in" } ],
+        "LMB_ReadStrobe": [ { "direction": "in" } ],
+        "LMB_WriteStrobe": [ { "direction": "in", "driver_value": "0" } ],
+        "LMB_BE": [ { "direction": "in", "size_left": "0", "size_right": "3", "driver_value": "0" } ],
+        "Sl_DBus": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "Sl_Ready": [ { "direction": "out" } ],
+        "Sl_Wait": [ { "direction": "out" } ],
+        "Sl_UE": [ { "direction": "out" } ],
+        "Sl_CE": [ { "direction": "out" } ],
+        "BRAM_Rst_A": [ { "direction": "out" } ],
+        "BRAM_Clk_A": [ { "direction": "out" } ],
+        "BRAM_Addr_A": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "BRAM_EN_A": [ { "direction": "out" } ],
+        "BRAM_WEN_A": [ { "direction": "out", "size_left": "0", "size_right": "3" } ],
+        "BRAM_Dout_A": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "BRAM_Din_A": [ { "direction": "in", "size_left": "0", "size_right": "31" } ]
+      },
+      "interfaces": {
+        "SLMB": {
+          "vlnv": "xilinx.com:interface:lmb:1.0",
+          "abstraction_type": "xilinx.com:interface:lmb_rtl:1.0",
+          "mode": "slave",
+          "memory_map_ref": "SLMB",
+          "parameters": {
+            "ADDR_WIDTH": [ { "value": "32", "value_src": "ip_propagated", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "DATA_WIDTH": [ { "value": "32", "value_src": "ip_propagated", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "READ_WRITE_MODE": [ { "value": "READ_WRITE", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "PROTOCOL": [ { "value": "STANDARD", "value_src": "ip_propagated", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "ABUS": [ { "physical_name": "LMB_ABus" } ],
+            "ADDRSTROBE": [ { "physical_name": "LMB_AddrStrobe" } ],
+            "BE": [ { "physical_name": "LMB_BE" } ],
+            "CE": [ { "physical_name": "Sl_CE" } ],
+            "READDBUS": [ { "physical_name": "Sl_DBus" } ],
+            "READSTROBE": [ { "physical_name": "LMB_ReadStrobe" } ],
+            "READY": [ { "physical_name": "Sl_Ready" } ],
+            "UE": [ { "physical_name": "Sl_UE" } ],
+            "WAIT": [ { "physical_name": "Sl_Wait" } ],
+            "WRITEDBUS": [ { "physical_name": "LMB_WriteDBus" } ],
+            "WRITESTROBE": [ { "physical_name": "LMB_WriteStrobe" } ]
+          }
+        },
+        "BRAM_PORT": {
+          "vlnv": "xilinx.com:interface:bram:1.0",
+          "abstraction_type": "xilinx.com:interface:bram_rtl:1.0",
+          "mode": "master",
+          "parameters": {
+            "MEM_SIZE": [ { "value": "32768", "value_src": "propagated", "value_permission": "bd", "resolve_type": "generated", "usage": "all" } ],
+            "MASTER_TYPE": [ { "value": "BRAM_CTRL", "value_src": "constant", "value_permission": "bd", "usage": "all" } ],
+            "MEM_WIDTH": [ { "value": "32", "value_src": "propagated", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "MEM_ECC": [ { "value": "NONE", "value_src": "propagated", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "READ_WRITE_MODE": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "READ_LATENCY": [ { "value": "1", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "MEM_ADDRESS_MODE": [ { "value": "", "value_src": "weak", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "ADDR": [ { "physical_name": "BRAM_Addr_A" } ],
+            "CLK": [ { "physical_name": "BRAM_Clk_A" } ],
+            "DIN": [ { "physical_name": "BRAM_Dout_A" } ],
+            "DOUT": [ { "physical_name": "BRAM_Din_A" } ],
+            "EN": [ { "physical_name": "BRAM_EN_A" } ],
+            "RST": [ { "physical_name": "BRAM_Rst_A" } ],
+            "WE": [ { "physical_name": "BRAM_WEN_A" } ]
+          }
+        },
+        "CLK.LMB_Clk": {
+          "vlnv": "xilinx.com:signal:clock:1.0",
+          "abstraction_type": "xilinx.com:signal:clock_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "ASSOCIATED_BUSIF": [ { "value": "SLMB:SLMB1:SLMB2:SLMB3:SLMB4:SLMB5:SLMB6:SLMB7", "value_src": "constant", "value_permission": "bd", "usage": "all" } ],
+            "ASSOCIATED_RESET": [ { "value": "LMB_Rst", "value_src": "constant", "value_permission": "bd", "usage": "all" } ],
+            "FREQ_HZ": [ { "value": "100000000", "value_src": "user_prop", "value_permission": "bd", "resolve_type": "user", "format": "long", "usage": "all" } ],
+            "FREQ_TOLERANCE_HZ": [ { "value": "0", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "PHASE": [ { "value": "0.0", "value_permission": "bd", "resolve_type": "generated", "format": "float", "is_ips_inferred": true, "is_static_object": false } ],
+            "CLK_DOMAIN": [ { "value": "bd_2e02_Clk", "value_src": "constant_prop", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "ASSOCIATED_PORT": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "CLK": [ { "physical_name": "LMB_Clk" } ]
+          }
+        },
+        "RST.LMB_Rst": {
+          "vlnv": "xilinx.com:signal:reset:1.0",
+          "abstraction_type": "xilinx.com:signal:reset_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "POLARITY": [ { "value": "ACTIVE_HIGH", "value_src": "constant", "value_permission": "bd", "usage": "all" } ],
+            "TYPE": [ { "value": "INTERCONNECT", "value_src": "constant", "value_permission": "bd", "usage": "all" } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "RST": [ { "physical_name": "LMB_Rst" } ]
+          }
+        },
+        "CLK.S_AXI_CTRL_ACLK": {
+          "vlnv": "xilinx.com:signal:clock:1.0",
+          "abstraction_type": "xilinx.com:signal:clock_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "ASSOCIATED_BUSIF": [ { "value": "S_AXI_CTRL", "value_src": "constant", "usage": "all" } ],
+            "ASSOCIATED_RESET": [ { "value": "S_AXI_CTRL_ARESETN", "value_src": "constant", "usage": "all" } ],
+            "FREQ_HZ": [ { "value": "100000000", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "FREQ_TOLERANCE_HZ": [ { "value": "0", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
+            "PHASE": [ { "value": "0.0", "resolve_type": "generated", "format": "float", "is_ips_inferred": true, "is_static_object": false } ],
+            "CLK_DOMAIN": [ { "value": "", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "ASSOCIATED_PORT": [ { "value": "", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          }
+        },
+        "RST.S_AXI_CTRL_ARESETN": {
+          "vlnv": "xilinx.com:signal:reset:1.0",
+          "abstraction_type": "xilinx.com:signal:reset_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "POLARITY": [ { "value": "ACTIVE_LOW", "value_src": "constant", "usage": "all" } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          }
+        }
+      },
+      "memory_maps": {
+        "SLMB": {
+          "description": "SLMB memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB1": {
+          "description": "SLMB1 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB2": {
+          "description": "SLMB2 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB3": {
+          "description": "SLMB3 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB4": {
+          "description": "SLMB4 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB5": {
+          "description": "SLMB5 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB6": {
+          "description": "SLMB6 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "SLMB7": {
+          "description": "SLMB7 memory map",
+          "address_blocks": {
+            "Mem": {
+              "base_address": "0",
+              "range": "8192",
+              "usage": "memory",
+              "access": "read-write",
+              "parameters": {
+                "OFFSET_BASE_PARAM": [ { "value": "C_BASEADDR" } ],
+                "OFFSET_HIGH_PARAM": [ { "value": "C_HIGHADDR" } ]
+              }
+            }
+          }
+        },
+        "S_AXI_CTRL": {
+          "description": "S_AXI_CTRL memory map",
+          "address_blocks": {
+            "Reg": {
+              "base_address": "0",
+              "range": "4096",
+              "display_name": "Reg",
+              "description": "Register Block",
+              "usage": "register",
+              "access": "read-write"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -14,7 +14,7 @@
  */
 
 /** @file
- * Main EC2 F1 CLI processing.
+ * Main EC2 F1 and F2 CLI processing.
  */
 
 #include <assert.h>
@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 #include <fpga_mgmt.h>
+#include <fpga_clkgen.h>
 #include <utils/lcd.h>
 
 #include "fpga_local_cmd.h"
@@ -40,7 +41,7 @@
 /**
  * Globals
  */
-struct ec2_fpga_cmd f1;
+struct ec2_fpga_cmd fpga;
 
 /**
  * Use dmesg as the default logger, stdout is available for debug.
@@ -66,7 +67,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 	fail_on(slot_id >= FPGA_SLOT_MAX, err, "slot_id(%d) >= %d",
 		slot_id, FPGA_SLOT_MAX);
 
-	if (f1.show_headers) {
+	if (fpga.show_headers) {
 		printf("Type  FpgaImageSlot  VendorId    DeviceId    DBDF\n");
 	}
 
@@ -76,7 +77,7 @@ cli_show_slot_app_pfs(int slot_id, struct fpga_slot_spec *spec)
 	for (i = 0; i < FPGA_PF_MAX; i++) {
 		struct fpga_pci_resource_map *app_map = &spec->map[i];
 
-		if (i == FPGA_MGMT_PF && !f1.show_mbox_device) {
+		if (i == FPGA_MGMT_PF && !fpga.show_mbox_device) {
 			/* skip the mbox pf */
 			continue;
 		}
@@ -96,6 +97,169 @@ err:
 }
 
 /**
+ * Helper function for printing metric information.
+ */
+static void
+print_common_interupt_status(uint32_t int_status) {
+	printf("virtual-jtag-slave-timeout=%u\n", (int_status & FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT) ?  1 : 0);
+	printf("ocl-slave-timeout=%u\n", (int_status & FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT) ? 1 : 0);
+	printf("sda-slave-timeout=%u\n", (int_status & FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT) ? 1 : 0);
+	printf("dma-pcis-timeout=%u\n", (int_status & FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT) ? 1 : 0);
+	printf("pcim-range-error=%u\n", (int_status & FPGA_INT_STATUS_PCI_RANGE_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-error=%u\n", (int_status & FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR) ? 1 : 0);
+	printf("dma-range-error=%u\n", (int_status & FPGA_INT_STATUS_DMA_RANGE_ERROR) ? 1 : 0);
+}
+
+static void
+print_pcim_axi_protocol_errors(uint32_t error_status) {
+	printf("pcim-axi-protocol-4K-cross-error=%u\n", (error_status & FPGA_PAP_4K_CROSS_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-bus-master-enable-error=%u\n", (error_status & FPGA_PAP_BM_EN_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-request-size-error=%u\n", (error_status & FPGA_PAP_REQ_SIZE_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-write-incomplete-error=%u\n", (error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-first-byte-enable-error=%u\n", (error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-last-byte-enable-error=%u\n", (error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-bready-error=%u\n", (error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-rready-error=%u\n", (error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ? 1 : 0);
+	printf("pcim-axi-protocol-wchannel-error=%u\n", (error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ? 1 : 0);
+}
+
+static void
+print_clocks(struct fpga_clocks_common clocks[FPGA_MMCM_GROUP_MAX]) {
+	uint64_t i;
+	uint64_t frequency;
+	printf("Clock Group A Frequency (Mhz)\n");
+	for (i = 0; i < CLOCK_COUNT_A; i++) {
+		frequency = clocks[0].frequency[i] / 1000000;
+		printf("%" PRIu64 "  ", frequency);
+	}
+	printf("\nClock Group B Frequency (Mhz)\n");
+	for (i = 0; i < CLOCK_COUNT_B; i++) {
+		frequency = clocks[1].frequency[i] / 1000000;
+		printf("%" PRIu64 "  ", frequency);
+	}
+	printf("\nClock Group C Frequency (Mhz)\n");
+	for (i = 0; i < CLOCK_COUNT_C; i++) {
+		frequency = clocks[2].frequency[i] / 1000000;
+		printf("%" PRIu64 "  ", frequency);
+	}
+	printf("\n");
+}
+
+/**
+ * Display the FPGA metric information.
+ *
+ * @param[in]   fmc the FPGA metrics data to be printed
+ */
+static void
+print_f1_metrics(struct f1_metrics_common *fmc) {
+	uint32_t i;
+
+	printf("sdacl-slave-timeout=%u\n", (fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
+	print_common_interupt_status(fmc->int_status);
+
+	print_pcim_axi_protocol_errors(fmc->pcim_axi_protocol_error_status);
+
+	printf("sdacl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_slave_timeout_addr);
+	printf("sdacl-slave-timeout-count=%u\n", fmc->sdacl_slave_timeout_count);
+
+	printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr);
+	printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count);
+
+	printf("ocl-slave-timeout-addr=0x%" PRIx64 "\n", fmc->ocl_slave_timeout_addr);
+	printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count);
+
+	printf("bar1-slave-timeout-addr=0x%" PRIx64 "\n", fmc->bar1_slave_timeout_addr);
+	printf("bar1-slave-timeout-count=%u\n", fmc->bar1_slave_timeout_count);
+
+	printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr);
+	printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count);
+
+	printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr);
+	printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count);
+
+	printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr);
+	printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count);
+
+	printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count);
+	printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count);
+
+	for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
+		struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];
+
+		printf("DDR%u\n", i);
+		printf("   write-count=%" PRIu64 "\n", ddr_if->write_count);
+		printf("   read-count=%" PRIu64 "\n", ddr_if->read_count);
+	}
+
+	print_clocks(fmc->clocks);
+
+	printf("Power consumption (Vccint):\n");
+	printf("   Last measured: %" PRIu64 " watts\n",fmc->power);
+	printf("   Average: %" PRIu64 " watts\n",fmc->power_mean);
+	printf("   Max measured: %" PRIu64 " watts\n",fmc->power_max);
+	printf("Cached agfis:\n");
+	for (i = 0; i < sizeof_array(fmc->cached_agfis); i++) {
+		if (fmc->cached_agfis[i] == 0) {
+			break;
+		}
+		printf("   agfi-0%016" PRIx64 "\n", fmc->cached_agfis[i]);
+	}
+}
+
+static void
+print_f2_metrics(struct f2_metrics_common *fmc) {
+	uint32_t i;
+
+	print_common_interupt_status(fmc->int_status);
+
+	print_pcim_axi_protocol_errors(fmc->pcim_axi_protocol_error_status);
+
+	printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr);
+	printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count);
+
+	printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr);
+	printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count);
+
+	printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count);
+	printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count);
+
+	printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr);
+	printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count);
+
+	printf("ocl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->ocl_slave_timeout_addr);
+	printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count);
+
+	printf("sda-slave-timeout-addr=0x%" PRIx64 "\n", fmc->sda_slave_timeout_addr);
+	printf("sda-slave-timeout-count=%u\n", fmc->sda_slave_timeout_count);
+
+	printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr);
+	printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count);
+
+	printf("virtual-jtag-slave-write-count=%u\n", fmc->virtual_jtag_write_count);
+	printf("virtual-jtag-slave-read-count=%u\n", fmc->virtual_jtag_read_count);
+
+	for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
+		struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];
+
+		printf("DDR%u\n", i);
+		printf("   write-count=%" PRIu64 "\n", ddr_if->write_count);
+		printf("   read-count=%" PRIu64 "\n", ddr_if->read_count);
+	}
+
+	printf("Power consumption (Vccint):\n");
+	printf("   Last measured: %" PRIu64 " watts\n",fmc->power);
+	printf("   Average: %" PRIu64 " watts\n",fmc->power_mean);
+	printf("   Max measured: %" PRIu64 " watts\n",fmc->power_max);
+	printf("Cached agfis:\n");
+	for (i = 0; i < sizeof_array(fmc->cached_agfis); i++) {
+		if (fmc->cached_agfis[i] == 0) {
+			break;
+		}
+		printf("   agfi-0%016" PRIx64 "\n", fmc->cached_agfis[i]);
+	}
+}
+
+/**
  * Display the FPGA image information.
  *
  * @param[in]   info the fpga info
@@ -110,170 +274,90 @@ cli_show_image_info(struct fpga_mgmt_image_info *info)
 
 	struct fpga_slot_spec slot_spec;
 	int ret = FPGA_ERR_FAIL;
-	uint32_t i;
-	uint64_t frequency;
 
-	if (f1.show_headers) {
+	if (fpga.show_headers) {
 		printf("Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion\n");
 	}
 
 	char *afi_id = (!info->ids.afi_id[0]) ? "none" : info->ids.afi_id;
-	printf(TYPE_FMT "  %2u       %-22s", "AFI", f1.afi_slot, afi_id);
+	printf(TYPE_FMT "  %2u       %-22s", "AFI", fpga.afi_slot, afi_id);
 
 	printf("  %-8s         %2d        %-8s        %2d       0x%08x\n",
 			FPGA_STATUS2STR(info->status), info->status,
 			FPGA_ERR2STR(info->status_q), info->status_q,
 			info->sh_version);
 
-	if (f1.rescan) {
+	if (fpga.rescan) {
 		/** Rescan the application PFs for this slot */
-		ret = fpga_pci_rescan_slot_app_pfs(f1.afi_slot);
+		ret = fpga_pci_rescan_slot_app_pfs(fpga.afi_slot);
 		fail_on(ret != 0, err, "cli_rescan_slot_app_pfs failed");
 	}
 
 	/** Display the application PFs for this slot */
-	ret = fpga_pci_get_slot_spec(f1.afi_slot, &slot_spec);
+	ret = fpga_pci_get_slot_spec(fpga.afi_slot, &slot_spec);
 	fail_on(ret != 0, err, "fpga_pci_get_slot_spec failed");
-	ret = cli_show_slot_app_pfs(f1.afi_slot, &slot_spec);
+	ret = cli_show_slot_app_pfs(fpga.afi_slot, &slot_spec);
 	fail_on(ret != 0, err, "cli_show_slot_app_pfs failed");
 
-	if (f1.get_hw_metrics) {
-		if (f1.show_headers) {
+	if (fpga.get_hw_metrics) {
+		if (fpga.show_headers) {
 			printf("Metrics\n");
 		}
 
-		struct fpga_metrics_common *fmc = &info->metrics;
-		printf("sdacl-slave-timeout=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT) ?  1 : 0);
-
-		printf("virtual-jtag-slave-timeout=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT) ?  1 : 0);
-
-		printf("ocl-slave-timeout=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT) ?
-				1 : 0);
-
-		printf("bar1-slave-timeout=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT) ?
-				1 : 0);
-
-		printf("dma-pcis-timeout=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT) ?
-				1 : 0);
-
-		printf("pcim-range-error=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-error=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR) ?
-				1 : 0);
-
-		printf("dma-range-error=%u\n",
-				(fmc->int_status & FPGA_INT_STATUS_DMA_RANGE_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-4K-cross-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_4K_CROSS_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-bus-master-enable-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BM_EN_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-request-size-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_REQ_SIZE_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-write-incomplete-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WR_INCOMPLETE_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-first-byte-enable-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_FIRST_BYTE_EN_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-last-byte-enable-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_LAST_BYTE_EN_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-bready-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_BREADY_TIMEOUT_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-rready-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_RREADY_TIMEOUT_ERROR) ?
-				1 : 0);
-
-		printf("pcim-axi-protocol-wchannel-error=%u\n",
-				(fmc->pcim_axi_protocol_error_status & FPGA_PAP_WCHANNEL_TIMEOUT_ERROR) ?
-				1 : 0);
-
-		printf("sdacl-slave-timeout-addr=0x%" PRIx32 "\n", fmc->sdacl_slave_timeout_addr);
-		printf("sdacl-slave-timeout-count=%u\n", fmc->sdacl_slave_timeout_count);
-
-		printf("virtual-jtag-slave-timeout-addr=0x%" PRIx32 "\n", fmc->virtual_jtag_slave_timeout_addr);
-		printf("virtual-jtag-slave-timeout-count=%u\n", fmc->virtual_jtag_slave_timeout_count);
-
-		printf("ocl-slave-timeout-addr=0x%" PRIx64 "\n", fmc->ocl_slave_timeout_addr);
-		printf("ocl-slave-timeout-count=%u\n", fmc->ocl_slave_timeout_count);
-
-		printf("bar1-slave-timeout-addr=0x%" PRIx64 "\n", fmc->bar1_slave_timeout_addr);
-		printf("bar1-slave-timeout-count=%u\n", fmc->bar1_slave_timeout_count);
-
-		printf("dma-pcis-timeout-addr=0x%" PRIx64 "\n", fmc->dma_pcis_timeout_addr);
-		printf("dma-pcis-timeout-count=%u\n", fmc->dma_pcis_timeout_count);
-
-		printf("pcim-range-error-addr=0x%" PRIx64 "\n", fmc->pcim_range_error_addr);
-		printf("pcim-range-error-count=%u\n", fmc->pcim_range_error_count);
-
-		printf("pcim-axi-protocol-error-addr=0x%" PRIx64 "\n", fmc->pcim_axi_protocol_error_addr);
-		printf("pcim-axi-protocol-error-count=%u\n", fmc->pcim_axi_protocol_error_count);
-
-		printf("pcim-write-count=%" PRIu64 "\n", fmc->pcim_write_count);
-		printf("pcim-read-count=%" PRIu64 "\n", fmc->pcim_read_count);
-
-		for (i = 0; i < sizeof_array(fmc->ddr_ifs); i++) {
-			struct fpga_ddr_if_metrics_common *ddr_if = &fmc->ddr_ifs[i];
-
-			printf("DDR%u\n", i);
-			printf("   write-count=%" PRIu64 "\n", ddr_if->write_count);
-			printf("   read-count=%" PRIu64 "\n", ddr_if->read_count);
-		}
-
-		printf("Clock Group A Frequency (Mhz)\n");
-		for (i = 0; i < CLOCK_COUNT_A; i++) {
-			frequency = fmc->clocks[0].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency);
-		}
-		printf("\nClock Group B Frequency (Mhz)\n");
-		for (i = 0; i < CLOCK_COUNT_B; i++) {
-			frequency = fmc->clocks[1].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency);
-		}
-		printf("\nClock Group C Frequency (Mhz)\n");
-		for (i = 0; i < CLOCK_COUNT_C; i++) {
-			frequency = fmc->clocks[2].frequency[i] / 1000000;
-			printf("%" PRIu64 "  ", frequency);
-		}
-		printf("\n");
-
-		printf("Power consumption (Vccint):\n");
-		printf("   Last measured: %" PRIu64 " watts\n",fmc->power);
-		printf("   Average: %" PRIu64 " watts\n",fmc->power_mean);
-		printf("   Max measured: %" PRIu64 " watts\n",fmc->power_max);
-		printf("Cached agfis:\n");
-		for (i = 0; i < sizeof_array(fmc->cached_agfis); i++) {
-			if (fmc->cached_agfis[i] == 0) {
-				break;
-			}
-			printf("   agfi-0%016" PRIx64 "\n", fmc->cached_agfis[i]);
+		if (slot_spec.map[FPGA_MGMT_PF].device_id == F1_MBOX_DEVICE_ID) {
+			print_f1_metrics(&info->metrics.f1_metrics);
+		} else {
+			print_f2_metrics(&info->metrics.f2_metrics);
 		}
 	}
 
 	return 0;
 err:
 	return ret;
+}
+
+/**
+ * Display the FPGA clkgen information.
+ *
+ * @param[in]   info the fpga info
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+cli_show_clkgen_info(struct fpga_clkgen_info *info)
+{
+	assert(info);
+
+	printf("Clock Group A Frequency (Mhz)\n");
+	printf("| clk_extra_a1 | clk_extra_a2 | clk_extra_a3 |\n");
+	printf("|--------------|--------------|--------------|\n");
+	printf("|   %8.2f   |   %8.2f   |   %8.2f   |\n\n",
+		info->clock_group_a.clocks[0],
+		info->clock_group_a.clocks[1],
+		info->clock_group_a.clocks[2]);
+
+	printf("Clock Group B Frequency (Mhz)\n");
+	printf("| clk_extra_b0 | clk_extra_b1 |\n");
+	printf("|--------------|--------------|\n");
+	printf("|   %8.2f   |   %8.2f   |\n\n",
+		info->clock_group_b.clocks[0],
+		info->clock_group_b.clocks[1]);
+
+	printf("Clock Group C Frequency (Mhz)\n");
+	printf("| clk_extra_c0 | clk_extra_c1 |\n");
+	printf("|--------------|--------------|\n");
+	printf("|   %8.2f   |   %8.2f   |\n\n",
+		info->clock_group_c.clocks[0],
+		info->clock_group_c.clocks[1]);
+
+	printf("Clock Group HBM Frequency (Mhz)\n");
+	printf("| clk_hbm_axi |\n");
+	printf("|-------------|\n");
+	printf("|   %7.2f   |\n\n",
+		info->clock_group_hbm.clocks[0]);
+
+	return 0;
 }
 
 /**
@@ -287,7 +371,7 @@ cli_attach(void)
 {
 	int ret = FPGA_ERR_FAIL;
 
-	if (f1.opcode == CLI_CMD_DESCRIBE_SLOTS) {
+	if (fpga.opcode == CLI_CMD_DESCRIBE_SLOTS) {
 		/**
 		 * ec2-afi-describe-slots does not use the Mbox logic, local
 		 * information only
@@ -298,8 +382,8 @@ cli_attach(void)
 	ret = fpga_mgmt_init();
 	fail_on(ret != 0, err, "fpga_mgmt_init failed");
 
-	fpga_mgmt_set_cmd_timeout(f1.request_timeout);
-	fpga_mgmt_set_cmd_delay_msec(f1.request_delay_msec);
+	fpga_mgmt_set_cmd_timeout(fpga.request_timeout);
+	fpga_mgmt_set_cmd_delay_msec(fpga.request_delay_msec);
 
 out:
 	return 0;
@@ -332,19 +416,15 @@ static int command_load(void)
 	union fpga_mgmt_load_local_image_options opt;
 
 	uint32_t flags = 0;
-	flags |= (f1.force_shell_reload ) ? FPGA_CMD_FORCE_SHELL_RELOAD  : 0;
-	flags |= (f1.dram_data_retention) ? FPGA_CMD_DRAM_DATA_RETENTION : 0;
-	flags |= (f1.prefetch) ? FPGA_CMD_PREFETCH : 0;
+	flags |= (fpga.force_shell_reload ) ? FPGA_CMD_FORCE_SHELL_RELOAD  : 0;
+	flags |= (fpga.prefetch) ? FPGA_CMD_PREFETCH : 0;
 
  	fpga_mgmt_init_load_local_image_options(&opt);
-        opt.slot_id = f1.afi_slot;
-        opt.afi_id = f1.afi_id;
+        opt.slot_id = fpga.afi_slot;
+        opt.afi_id = fpga.afi_id;
         opt.flags = flags;
-	opt.clock_mains[0] = f1.clock_a0_freq;
-	opt.clock_mains[1] = f1.clock_b0_freq;
-	opt.clock_mains[2] = f1.clock_c0_freq;
 
-	if (f1.async) {
+	if (fpga.async) {
 		ret = fpga_mgmt_load_local_image_with_options(&opt);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image failed");
 	} else {
@@ -352,7 +432,7 @@ static int command_load(void)
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
 		ret = fpga_mgmt_load_local_image_sync_with_options(&opt,
-				f1.sync_timeout, f1.sync_delay_msec, &info);
+				fpga.sync_timeout, fpga.sync_delay_msec, &info);
 		fail_on(ret != 0, err, "fpga_mgmt_load_local_image_sync failed");
 
 		ret = cli_show_image_info(&info);
@@ -373,15 +453,15 @@ command_clear(void)
 {
 	int ret;
 
-	if (f1.async) {
-		ret = fpga_mgmt_clear_local_image(f1.afi_slot);
+	if (fpga.async) {
+		ret = fpga_mgmt_clear_local_image(fpga.afi_slot);
 		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image failed");
 	} else {
 		struct fpga_mgmt_image_info info;
 		memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
-		ret = fpga_mgmt_clear_local_image_sync(f1.afi_slot,
-				f1.sync_timeout, f1.sync_delay_msec, &info);
+		ret = fpga_mgmt_clear_local_image_sync(fpga.afi_slot,
+				fpga.sync_timeout, fpga.sync_delay_msec, &info);
 		fail_on(ret != 0, err, "fpga_mgmt_clear_local_image_sync failed");
 
 		ret = cli_show_image_info(&info);
@@ -407,10 +487,11 @@ command_describe(void)
 	memset(&info, 0, sizeof(struct fpga_mgmt_image_info));
 
 	flags = 0;
-	flags |= (f1.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
-	flags |= (f1.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
+	flags |= (fpga.get_hw_metrics) ? FPGA_CMD_GET_HW_METRICS : 0;
+	flags |= (fpga.clear_hw_metrics) ? FPGA_CMD_CLEAR_HW_METRICS : 0;
+	flags |= (fpga.clear_afi_cache) ? FPGA_CMD_CLEAR_AFI_CACHE : 0;
 
-	ret = fpga_mgmt_describe_local_image(f1.afi_slot, &info, flags);
+	ret = fpga_mgmt_describe_local_image(fpga.afi_slot, &info, flags);
 	fail_on(ret != 0, err, "fpga_mgmt_describe_local_image failed");
 
 	ret = cli_show_image_info(&info);
@@ -462,10 +543,10 @@ static int
 command_start_virtual_jtag(void)
 {
 	printf("Starting Virtual JTAG XVC Server for FPGA slot id %u, listening to TCP port %s.\n",
-			f1.afi_slot, f1.tcp_port);
+			fpga.afi_slot, fpga.tcp_port);
 	printf("Press CTRL-C to stop the service.\n");
 
-	return xvcserver_start(f1.afi_slot, f1.tcp_port);
+	return xvcserver_start(fpga.afi_slot, fpga.tcp_port);
 }
 
 /**
@@ -507,12 +588,12 @@ command_get_virtual_led(void)
 	uint16_t status;
 	int	ret;
 
-	if (ret = fpga_mgmt_get_vLED_status(f1.afi_slot, &status)) {
+	if (ret = fpga_mgmt_get_vLED_status(fpga.afi_slot, &status)) {
 		printf("Error trying to get virtual LED state\n");
 		return ret;
 	}
 
-	printf("FPGA slot id %u have the following Virtual LED:\n", f1.afi_slot);
+	printf("FPGA slot id %u have the following Virtual LED:\n", fpga.afi_slot);
 	return cli_show_virtual_led_dip_status(status);
 }
 
@@ -528,12 +609,12 @@ command_get_virtual_dip(void)
 	uint16_t status;
 	int ret;
 
-	if (ret = fpga_mgmt_get_vDIP_status(f1.afi_slot, &status)) {
+	if (ret = fpga_mgmt_get_vDIP_status(fpga.afi_slot, &status)) {
 		printf("Error: can not get virtual DIP Switch state\n");
 		return ret;
 	}
 
-	printf("FPGA slot id %u has the following Virtual DIP Switches:\n", f1.afi_slot);
+	printf("FPGA slot id %u has the following Virtual DIP Switches:\n", fpga.afi_slot);
 	return cli_show_virtual_led_dip_status(status);
 }
 
@@ -547,9 +628,71 @@ static int
 command_set_virtual_dip(void)
 {
 	int ret;
-	if (ret = fpga_mgmt_set_vDIP(f1.afi_slot, f1.v_dip_switch)) {
+	if (ret = fpga_mgmt_set_vDIP(fpga.afi_slot, fpga.v_dip_switch)) {
 		printf("Error trying to set virtual DIP Switch \n");
 	}
+	return ret;
+}
+
+/**
+ * Generate the describe clkgen command and handle the response.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+command_describe_clkgen(void)
+{
+	int ret = 0;
+	struct fpga_clkgen_info info;
+	memset(&info, 0, sizeof(struct fpga_clkgen_info));
+
+	ret = aws_clkgen_get_dynamic(fpga.afi_slot, &info);
+	fail_on(ret != 0, err, "aws_clkgen_get_dynamic failed");
+
+	ret = cli_show_clkgen_info(&info);
+	fail_on(ret != 0, err, "cli_show_clkgen_info failed");
+
+	return 0;
+err:
+	return ret;
+}
+
+/**
+ * Generate the load clkgen recipe command and handle the response.
+ *
+ * @returns
+ *  0	on success, non-zero on failure
+ */
+static int
+command_load_clkgen_recipe(void)
+{
+	int ret = 0;
+
+	ret = aws_clkgen_set_recipe(fpga.afi_slot, fpga.clock_a_recipe, fpga.clock_b_recipe, fpga.clock_c_recipe, fpga.clock_hbm_recipe, fpga.reset);
+	fail_on(ret != 0, err, "aws_clkgen_set_recipe failed");
+
+	ret = command_describe_clkgen();
+	fail_on(ret != 0, err, "cli_show_clkgen_info failed");
+
+	return 0;
+err:
+	return ret;
+}
+
+static int
+command_load_clkgen_dynamic(void)
+{
+	int ret = 0;
+
+	ret = aws_clkgen_set_dynamic(fpga.afi_slot, fpga.clock_a_freq, fpga.clock_b_freq, fpga.clock_c_freq, fpga.clock_hbm_freq, fpga.reset);
+	fail_on(ret != 0, err, "aws_clkgen_set_dynamic_freq failed");
+
+	ret = command_describe_clkgen();
+	fail_on(ret != 0, err, "cli_show_clkgen_info failed");
+
+	return 0;
+err:
 	return ret;
 }
 
@@ -564,6 +707,9 @@ static const command_func_t command_table[CLI_CMD_END] = {
 	[CLI_CMD_GET_LED] = command_get_virtual_led,
 	[CLI_CMD_GET_DIP] = command_get_virtual_dip,
 	[CLI_CMD_SET_DIP] = command_set_virtual_dip,
+	[CLI_CMD_DESCRIBE_CLKGEN] = command_describe_clkgen,
+	[CLI_CMD_LOAD_CLKGEN_RECIPE] = command_load_clkgen_recipe,
+	[CLI_CMD_LOAD_CLKGEN_DYNAMIC] = command_load_clkgen_dynamic,
 };
 
 /**
@@ -575,32 +721,40 @@ static const command_func_t command_table[CLI_CMD_END] = {
 static int
 cli_main(void)
 {
-	fail_on(f1.opcode >= CLI_CMD_END, err, "Invalid opcode %u", f1.opcode);
-	fail_on_user(command_table[f1.opcode] == NULL, err, "Action not defined for "
-	             "opcode %u", f1.opcode);
+	fail_on(fpga.opcode >= CLI_CMD_END, err, "Invalid opcode %u", fpga.opcode);
+	fail_on_user(command_table[fpga.opcode] == NULL, err, "Action not defined for "
+	             "opcode %u", fpga.opcode);
 
-	return command_table[f1.opcode]();
+	return command_table[fpga.opcode]();
 err:
 	return FPGA_ERR_FAIL;
 }
 
 /**
- * Setup the f1 structure with initial values.
+ * Setup the fpga structure with initial values.
  *
  * @returns
  *  0	on success, non-zero on failure
  */
 static int
-cli_init_f1(void)
+cli_init_fpga(void)
 {
-	memset(&f1, 0, sizeof(f1));
-	f1.opcode = -1;
-	f1.afi_slot = -1;
-	f1.request_timeout = CLI_REQUEST_TIMEOUT_DFLT;
-	f1.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
-	f1.sync_timeout = CLI_SYNC_TIMEOUT_DFLT;
-	f1.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
-	f1.show_mbox_device = false;
+	memset(&fpga, 0, sizeof(fpga));
+	fpga.opcode = -1;
+	fpga.afi_slot = -1;
+	fpga.request_timeout = CLI_REQUEST_TIMEOUT_DFLT;
+	fpga.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
+	fpga.sync_timeout = CLI_SYNC_TIMEOUT_DFLT;
+	fpga.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
+	fpga.show_mbox_device = false;
+	fpga.clock_a_freq = 125;
+	fpga.clock_a_recipe = 1;
+	fpga.clock_b_freq = 450;
+	fpga.clock_b_recipe = 2;
+	fpga.clock_c_freq = 300;
+	fpga.clock_c_recipe = 0;
+	fpga.clock_hbm_freq = 450;
+	fpga.clock_hbm_recipe = 2;
 
 	srand((unsigned)time(NULL));
 
@@ -616,7 +770,7 @@ cli_init_f1(void)
 static int
 cli_create(void)
 {
-	return cli_init_f1();
+	return cli_init_fpga();
 }
 
 /**
@@ -628,7 +782,7 @@ cli_create(void)
 static int
 cli_destroy(void)
 {
-	return cli_init_f1();
+	return cli_init_fpga();
 }
 
 /**
@@ -662,12 +816,12 @@ main(int argc, char *argv[])
 	fail_on(ret != 0, err, "cli_main failed");
 err:
 	/**
-	 * f1.parser_completed may be set by parse_args when it internally
+	 * fpga.parser_completed may be set by parse_args when it internally
 	 * completes the command without error due to help or version output.
 	 * In this case a non-zero error is returned by parse_args and we do not
 	 * want to print the "Error" below.
 	 */
-	if (ret && !f1.parser_completed) {
+	if (ret && !fpga.parser_completed) {
 		printf("Error: (%d) %s\n", ret, fpga_mgmt_strerror(ret));
 		const char *long_help = fpga_mgmt_strerror_long(ret);
 		if (long_help) {

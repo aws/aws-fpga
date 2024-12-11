@@ -13,54 +13,22 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-ifndef VIVADO_TOOL_VERSION
-$(error Environment variable VIVADO_TOOL_VERSION not set. please source hdk_setup.sh)
-else
-$(info VIVADO_TOOL_VERSION = $(VIVADO_TOOL_VERSION))
+ifndef HDK_COMMON_DIR
+  $(error Environment variable HDK_COMMON_DIR not set. Please source hdk_setup.sh)
 endif
 
-export TEST ?= test_null
-export C_TEST ?= test_null
+include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.header.inc
 
-export SCRIPTS_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-export CL_ROOT = $(realpath $(SCRIPTS_DIR)/../..)
-export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
+### Files required to do C cosimulation
+C_FILES = $(C_TEST_NAME) $(C_SDK_USR_UTILS_DIR)/sh_dpi_tasks.c $(C_COMMON_DIR)/src/fpga_pci_sv.c
+C_INCLUDE_DIRS = $(C_SDK_USR_INC_DIR) $(C_SDK_USR_UTILS_DIR) $(C_COMMON_DIR)/include $(C_COMMON_DIR)/src $(C_INC_DIR) $(C_HEADER_INCLUDE_DIR)
 
-export C_COMMON_DIR        = $(HDK_COMMON_DIR)/software
-export C_SDK_USR_INC_DIR   = $(SDK_DIR)/userspace/include
-export C_SDK_USR_UTILS_DIR = $(SDK_DIR)/userspace/utils
-export C_INC_DIR  = $(CL_ROOT)/software/runtime
-export C_SRC_DIR  = $(CL_ROOT)/software/src
+### DEFAULT: Lists each test target under Makefile.tests
+REGRESSION_TEST_LIST = ${DEFAULT_REGRESSION_TEST_LIST_COLLECTION}
+### ALTERNATIVE: Space-delimitted list of test targets
+###   REGRESSION_TEST_LIST = test_simple_h2c test_simple_c2h
 
-export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
-
-ifeq ($(C_TEST),test_null)
-  export C_TEST_NAME = $(HDK_COMMON_DIR)/software/src/$(C_TEST).c
-else
-  export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
-endif
-
-export SIM_ROOT = $(CL_ROOT)/verif/sim/$(SIMULATOR)
-
-ifeq ($(C_TEST),test_null)
-   export SIM_DIR = $(SIM_ROOT)/$(TEST)
-else
-   export SIM_DIR = $(SIM_ROOT)/$(C_TEST)
-endif
-
-export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
-export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
-export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces
-export SH_SH_DIR   = $(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim
-
-SV_TEST_LIST = test_null.sv
-C_FILES      = $(C_TEST_NAME) $(C_SDK_USR_UTILS_DIR)/sh_dpi_tasks.c $(C_COMMON_DIR)/src/fpga_pci_sv.c
-
-ifeq ($(XCHK), 1)
- all:	make_sim_dir compile_chk run
-else
- all:	make_sim_dir compile run
-endif
+### 'regression' sub-targets can be found in $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.common.inc
+regression: run_regression log_regression_results print_regression_results
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.common.inc
-

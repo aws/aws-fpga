@@ -13,11 +13,11 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
-#
+#g
 
-# Build script for the Amazon FPGA Image Management Tools and associated libraries. 
+# Build script for the Amazon FPGA Image Management Tools and associated libraries.
 
-TOP=`pwd` 
+TOP=`pwd`
 
 LOGLEVEL=$1
 if [ -z "$LOGLEVEL" ]; then
@@ -27,7 +27,7 @@ else
 fi
 
 function build_exec {
-	cd $TOP/$BUILD_DIR 
+	cd $TOP/$BUILD_DIR
 	echo "Entering $TOP/$BUILD_DIR"
 	RET=$?
 	if [ $RET -ne 0 ]; then
@@ -48,6 +48,12 @@ BUILD_DIR="utils"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_pci"
+build_exec
+
+BUILD_DIR="fpga_libs/fpga_dma"
+build_exec
+
+BUILD_DIR="fpga_libs/fpga_clkgen"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_mgmt"

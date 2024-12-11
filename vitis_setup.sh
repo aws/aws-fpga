@@ -27,9 +27,27 @@ script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
 current_dir=$(pwd)
 
-source $script_dir/shared/bin/set_common_functions.sh
-source $script_dir/shared/bin/set_common_env_vars.sh
-source $VITIS_DIR/Runtime/xrt_common_functions.sh
+XILINX_VITIS_XRT_DIR="/opt/xilinx/xrt"
+
+dev_xsa_loc="/opt/XSA"
+export PLATFORM_REPO_PATHS=/opt/XSA/xilinx_aws-vu47p-f2_202410_1
+
+if ! source $XILINX_VITIS/settings64.sh; then
+    err_msg "Setup of Xilinx 64-bit settings FAILED"
+    return 1
+fi
+if ! source $script_dir/shared/bin/set_common_functions.sh; then
+    err_msg "Setup of common functions FAILED"
+    return 1
+fi
+if ! source $script_dir/shared/bin/set_common_env_vars.sh; then # Sets VITIS_DIR for the line below
+    err_msg "Setup of common environment variables FAILED"
+    return 1
+fi
+if ! source $VITIS_DIR/runtime/xrt_common_functions.sh; then
+    err_msg "XRT Common Functions initialization FAILED"
+    return 1
+fi
 
 # Source sdk_setup.sh
 info_msg "Sourcing sdk_setup.sh"
@@ -74,7 +92,7 @@ function check_set_xilinx_vitis {
             err_msg "Please set XILINX_VITIS variable to point to your location of your Xilinx installation or add location of vitis exectuable to your PATH variable"
             return $RET
         else
-            export XILINX_VITIS=`which vitis | sed 's:/bin/vitis::'`
+            export XILINX_VITIS=$(which vitis | sed 's:/bin/vitis::')
             info_msg "Setting XILINX_VITIS to $XILINX_VITIS"
         fi
     else
@@ -84,37 +102,26 @@ function check_set_xilinx_vitis {
     RELEASE_VER=$(basename $XILINX_VITIS)
     RELEASE_VER=${RELEASE_VER:0:6}
     export RELEASE_VER=$RELEASE_VER
+    export VIVADO_TOOL_VER=$RELEASE_VER
     echo "RELEASE_VER equals $RELEASE_VER"
 }
 
-function check_install_packages_centos {
-#TODO: Check required packages are installed or install them
-#TODO: Check version of gcc is above 4.8.5 (4.6.3 does not work)
-  for pkg in `cat $VITIS_DIR/packages.txt`; do
-    if yum list installed "$pkg" >/dev/null 2>&1; then
-      true
-    else
-      warn_msg " $pkg not installed - please run: sudo yum install $pkg "
-    fi
-  done
-}
-
 function check_install_packages_ubuntu {
-  for pkg in `cat $VITIS_DIR/packages.txt`; do
-    if apt -qq list "$pkg" >/dev/null 2>&1; then
-      true
-    else
-      warn_msg " $pkg not installed - please run: sudo apt-get install $pkg "
-    fi
-  done
+    for pkg in $(cat $VITIS_DIR/packages.txt); do
+        if apt -qq list "$pkg" >/dev/null 2>&1; then
+            true
+        else
+            warn_msg " $pkg not installed - please run: sudo apt-get install $pkg "
+        fi
+    done
 }
 
 function check_internet {
-    curl --silent --head -m 30 http://www.amazon.com
+    wget http://www.amazon.com --spider --timeout=30 --quiet
     RET=$?
-    if [ $RET != 0 ]; then
-        err_msg "curl cannot connect to the internet using please check your internet connection or proxy settings"
-        err_msg "To check your connection run:   curl --silent --head -m 30 http://www.amazon.com "
+    if [[ $RET != 0 && $RET != 8 ]]; then
+        err_msg "wget cannot connect to the internet using please check your internet connection or proxy settings"
+        err_msg "To check your connection run:   wget http://www.amazon.com --spider --timeout=30 --quiet"
         return $RET
     else
         info_msg "Internet Access OK"
@@ -129,32 +136,33 @@ function check_icd {
         info_msg "/etc/OpenCL/vendors/xilinx.icd does not exist or does not contain lbixilinxopencl.so creating and adding libxilinxopencl.so to it"
         sudo sh -c "echo libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd"
         RET=$?
-    if [ $RET != 0 ]; then
-        err_msg "/etc/OpenCL/vendors/xilinx.icd does not exist and cannot be created, sudo permissions needed to update it."
-        err_msg "Run the following with sudo permissions: sudo sh -c \"echo libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd\" "
-        return $RET
-    else
-        echo "Done with ICD installation"
-    fi
+        if [ $RET != 0 ]; then
+            err_msg "/etc/OpenCL/vendors/xilinx.icd does not exist and cannot be created, sudo permissions needed to update it."
+            err_msg "Run the following with sudo permissions: sudo sh -c \"echo libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd\" "
+            return $RET
+        else
+            echo "Done with ICD installation"
+        fi
     fi
 }
 
 # Process command line args
-args=( "$@" )
-for (( i = 0; i < ${#args[@]}; i++ )); do
+args=("$@")
+for ((i = 0; i < ${#args[@]}; i++)); do
     arg=${args[$i]}
     case $arg in
-        -d|-debug)
-            debug=1
+    -d | -debug)
+        debug=1
         ;;
-        -h|-help)
-            help
-            return 0
+    -h | -help)
+        help
+        return 0
         ;;
-        *)
-            err_msg "Invalid option: $arg\n"
-            usage
-            return 1
+    *)
+        err_msg "Invalid option: $arg\n"
+        usage
+        return 1
+        ;;
     esac
 done
 
@@ -168,23 +176,38 @@ info_msg " XILINX_VITIS is set to $XILINX_VITIS"
 info_msg "Setting up Vitis patches if required."
 setup_patches
 
-
 # Update Xilinx Vitis Examples from GitHub
 info_msg "Using Vitis $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.* ||  $RELEASE_VER =~ .*2021\.* ]]; then
-    info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
-    git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
+if [[ $RELEASE_VER =~ .*2024\.* ]]; then
+
     export VIVADO_TOOL_VER=$RELEASE_VER
-    if [ -e $VITIS_DIR/examples/xilinx ]; then
-        if [ ! -L $VITIS_DIR/examples/xilinx ]; then
-          err_msg "ERROR:  Vitis/examples/xilinx is not a symbolic link.  Backup any data and remove Vitis/examples/xilinx directory.  The setup needs to create a symbolic link from Vitis/examples/xilinx to Vitis/examples/xilinx_$RELEASE_VER"
-          return 1
-        fi
+    vitis_exs_repo_name=Vitis_Accel_Examples
+    vitis_exs_repo_url=https://github.com/Xilinx/Vitis_Accel_Examples.git
+    if [[ ! -d $VITIS_DIR/examples/$vitis_exs_repo_name ]]; then
+        mkdir -p $VITIS_DIR/examples/
+        cd $VITIS_DIR/examples/
+        git clone $vitis_exs_repo_url
+        git submodule init
+        git submodule update
+        cd $vitis_exs_repo_name
+        git checkout $RELEASE_VER
+        cd ..
     fi
-    ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
+
+    if [[ -d $VITIS_DIR/examples/vitis_examples ]]; then
+        if [[ ! -L $VITIS_DIR/examples/vitis_examples ]]; then
+            err_msg "vitis/examples/vitis_examples is not a symbolic link.  Backup any data and remove Vitis/examples/vitis_examples directory.  The setup needs to create a symbolic link from Vitis/examples/vitis_examples to Vitis/examples/vitis_examples_$RELEASE_VER"
+            return 1
+        else
+            info_msg "vitis/examples/vitis_examples symbolic link correctly set up!"
+        fi
+    else
+        ln -sf $VITIS_DIR/examples/$vitis_exs_repo_name $VITIS_DIR/examples/vitis_examples
+    fi
+
 else
-   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2, 2021.1 or 2021.2 are supported).\n"
-   return 2
+    echo " $RELEASE_VER is not supported. Only 2024.1 is supported.\n"
+    return 2
 fi
 
 # Check if internet connection is available
@@ -197,23 +220,36 @@ if ! check_icd; then
     return 1
 fi
 
-# Check correct packages are installed
-
-if [[ $(lsb_release -si) == "Centos" ]]; then
-    if ! check_install_packages_centos; then
+if [[ $(lsb_release -si) == "Ubuntu" ]]; then
+    if [[ ! check_install_packages_ubuntu ]]; then
         return 1
     fi
-elif [[ $(lsb_release -si) == "Ubuntu" ]]; then
-    if ! check_install_packages_ubuntu; then
-        return 1
-    fi
-#elif [[ $(lsb_release -si) == "Ubuntu" ]]; then
-#    if ! check_install_packages_ubuntu; then
-#        return 1
-#    fi
+else
+    echo "Only Ubuntu 20.04 is currently supported for F2 EC2 instances."
 fi
 
+function sha256_check {
+    sha_file=$1
+    xsa_file=$2
+    s3_sha=$(awk '{print $1}' $sha_file)
+    local_sha=$(sha256sum "$2" | awk '{print $1}')
+
+    if [[ "$s3_sha" != "$local_sha" ]]; then
+        err_msg "SHA256 mismatch for $2"
+        info_msg "Moving existing $2 to $2.back"
+        mv $2 $2.back
+        return 1
+    fi
+
+    return 0
+}
+
 function setup_xsa {
+
+    info_msg "Installing supporting libraries"
+    export DEBIAN_FRONTEND=noninteractive
+    sudo DEBIAN_FRONTEND=noninteractive $XILINX_VITIS/scripts/installLibs.sh >>/dev/null
+    rm installLibs.sh_*
 
     if [ "$#" -ne 3 ]; then
         err_msg "Illegal number of parameters sent to the setup_xsa function!"
@@ -224,69 +260,146 @@ function setup_xsa {
     XSA_S3_BASE_DIR=$2
     PLATFORM_ENV_VAR_NAME=$3
 
-    xsa_dir=$VITIS_DIR/aws_platform/$XSA/hw/
+    export SHELL_EMU_VERSION=$XSA
+
+    xsa_dir=$VITIS_DIR/aws_platform/$XSA
     vitis_xsa=$xsa_dir/$XSA.xsa
-    vitis_xsa_s3_bucket=aws-fpga-hdk-resources
-    s3_vitis_xsa=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/$XSA.xsa
+
+    vitis_xsa_s3_url=https://aws-fpga-hdk-resources.s3.amazonaws.com/Vitis/$XSA_S3_BASE_DIR/$XSA
+
+    vitis_xpfm=$XSA.xpfm
+    vitis_xpfm_dir=/opt/Xilinx/Vitis/${RELEASE_VER}/platforms
+    s3_vitis_xpfm=$vitis_xsa_s3_url/$XSA.xpfm
+
+    vitis_hw_dir=$vitis_xpfm_dir/hw
+    vitis_hw_emu_dir=$vitis_xpfm_dir/hw_emu
+    vitis_sw_dir=$vitis_xpfm_dir/sw
+
+    s3_vitis_hw_xsa=$vitis_xsa_s3_url/hw.xsa
+    s3_vitis_hw_emu_xsa=$vitis_xsa_s3_url/hw_emu.xsa
+    s3_vitis_sw_spfm=$vitis_xsa_s3_url/sw.spfm
 
     # set a variable to point to the platform for build and emulation runs
     export "$PLATFORM_ENV_VAR_NAME"=$VITIS_DIR/aws_platform/$XSA/$XSA.xpfm
 
-    # Download the sha256
-    if [ ! -e $xsa_dir ]; then
-        mkdir -p $xsa_dir || { err_msg "Failed to create $xsa_dir"; return 2; }
+    cd $AWS_FPGA_REPO_DIR
+
+    if [ ! -e $vitis_hw_dir ]; then
+        sudo mkdir -p $vitis_hw_dir
     fi
 
-    # Use curl instead of AWS CLI so that credentials aren't required.
-    curl -s https://s3.amazonaws.com/$s3_vitis_xsa.sha256 -o $vitis_xsa.sha256 || { err_msg "Failed to download XSA version from $s3_vitis_xsa.sha256 -o $vitis_xsa.sha256"; return 2; }
-    if grep -q '<?xml version' $vitis_xsa.sha256; then
-        err_msg "Failed to download VITIS XSA version from $s3_vitis_xsa.sha256"
-        cat vitis_xsa.sha256
-        return 2
+    if [ ! -e $vitis_hw_emu_dir ]; then
+        sudo mkdir -p $vitis_hw_emu_dir
     fi
-    exp_sha256=$(cat $vitis_xsa.sha256)
-    debug_msg "  latest   version=$exp_sha256"
-    # If XSA already downloaded check its sha256
-    if [ -e $vitis_xsa ]; then
-        act_sha256=$( sha256sum $vitis_xsa | awk '{ print $1 }' )
-        debug_msg "  existing version=$act_sha256"
-        if [[ $act_sha256 != $exp_sha256 ]]; then
-            info_msg "VITIS XSA version is incorrect"
-            info_msg "  Saving old XSA to $vitis_xsa.back"
-            mv $vitis_xsa $vitis_xsa.back
+
+    if [ ! -e $vitis_sw_dir ]; then
+        sudo mkdir -p $vitis_sw_dir
+    fi
+
+    if [ ! -d $xsa_dir ]; then
+        mkdir -p $xsa_dir
+    fi
+
+    if [ ! -e $xsa_dir/$vitis_xpfm ]; then
+        if ! wget $s3_vitis_xpfm -O $xsa_dir/$vitis_xpfm -q; then
+            err_msg "Download of $s3_vitis_xpfm failed!"
+            return 2
         fi
+        sudo mv $xsa_dir/$vitis_xpfm $vitis_xpfm_dir
     else
-        info_msg "VITIS XSA hasn't been downloaded yet."
+        info_msg "Vitis XSA platform file already downloaded!"
     fi
 
-    if [ ! -e $vitis_xsa ]; then
-        info_msg "Downloading latest VITIS XSA from $s3_vitis_xsa"
-        # Use curl instead of AWS CLI so that credentials aren't required.
-        curl -s https://s3.amazonaws.com/$s3_vitis_xsa -o $vitis_xsa || { err_msg "VITIS XSA download failed"; return 2; }
+    # Grab all XSAs
+    for missing_xsa in "hw.xsa" "hw_emu.xsa" "sw.spfm"; do
+        if [ ! -e $xsa_dir/$missing_xsa ]; then
+            if ! wget $vitis_xsa_s3_url/$missing_xsa -O $xsa_dir/$missing_xsa -q; then
+                err_msg "Download of Vitis XSA file $missing_xsa failed!"
+                return 1
+            fi
+            # Gets the stem of the XSA file
+            destination_dir=$(echo "${missing_xsa%.*}")
+            sudo cp $xsa_dir/$missing_xsa $vitis_xpfm_dir/$destination_dir
+        fi
+    done
+
+    # Grab all XSA SHA256 checksums
+    for missing_sha in "hw.xsa.sha256" "hw_emu.xsa.sha256" "sw.spfm.sha256"; do
+        if [ ! -e $xsa_dir/$missing_sha ]; then
+            if ! wget $vitis_xsa_s3_url/$missing_sha -O $xsa_dir/$missing_sha -q; then
+                err_msg "Download of Vitis XSA SHA256 file $missing_sha failed!"
+                return 1
+            fi
+        fi
+    done
+
+    # Check those sums
+    sha_mismatches=0
+    for xsa_file in "hw.xsa" "hw_emu.xsa" "sw.spfm"; do
+        if ! sha256_check $xsa_dir/$xsa_file.sha256 $xsa_dir/$xsa_file; then
+            sha_mismatches=1
+        fi
+    done
+
+    if [ $sha_mismatches -ne 0 ]; then
+        return 1
     fi
-    # Check sha256
-    act_sha256=$( sha256sum $vitis_xsa | awk '{ print $1 }' )
-    if [[ $act_sha256 != $exp_sha256 ]]; then
-        err_msg "Incorrect VITIS XSA version:"
-        err_msg "  expected version=$exp_sha256"
-        err_msg "  actual   version=$act_sha256"
-        err_msg "  There may be an issue with the uploaded XSA or the download failed."
-        return 2
-    fi
+
 }
 
-    #-------------------201920_3 Vitis Platform----------------------
-    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_3 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_3
-    info_msg "AWS Platform: 201920_3 Vitis Platform is up-to-date"
-    #-------------------201920_3 Vitis Platform----------------------
+function hw_file_check {
+    required_files=("Makefile" "README.rst" "description.json" "details.rst" "makefile_us_alveo.mk" "qor.json" "utils.mk" "xrt.ini")
+    missing_a_file=0
+    for file in ${required_files[@]}; do
+        if [[ ! -e $file ]]; then
+            err_msg "!!! Required file: $file not found in current example directory !!!"
+            missing_a_file=1
+        fi
+    done
+    if [[ missing_a_file -eq 1 ]]; then
+        return 1
+    fi
+    info_msg "All required simulation files are present!"
+}
 
+#-------------------2024.1 Vitis Platform----------------------
+xsa_name=xilinx_aws-vu47p-f2_202410_1
+shell_name=xsa_f2_2024_1
+aws_platform_name=AWS_PLATFORM_202410_0
+if ! setup_xsa $xsa_name $shell_name $aws_platform_name; then
+    err_msg "!!! Vitis Setup FAILED !!!"
+    return 2
+fi
+#-------------------2024.1 Vitis Platform----------------------
 
-# Setup XRT as we need it for building
-setup_runtime
+platform_file_name="$xsa_name.xpfm"
+if [[ ! -e vitis/aws_platform/$xsa_name/$platform_file_name ]]; then
+    info_msg "Locating AWS platform file"
+    if [[ ! -e /opt/Xilinx/Vitis/${RELEASE_VER}/platforms/$platform_file_name ]]; then
+        err_msg "Couldn't locate AWS platform file!"
+        return 1
+    fi
+    if ! sudo cp /opt/Xilinx/Vitis/${RELEASE_VER}/platforms/$platform_file_name vitis/aws_platform/$xsa_name; then
+        err_msg "Couldn't copy platform file to AWS platform directory!"
+        return 1
+    fi
+fi
 
-export AWS_PLATFORM=$AWS_PLATFORM_201920_3
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_3\" "
+# Make the Vitis AFI creation a little easier.
+if [[ -z $(cat ~/.bashrc | grep "create_vitis_afi") ]]; then
+    alias create_vitis_afi='${AWS_FPGA_REPO_DIR}/vitis/tools/create_vitis_afi.sh'
+fi
 
 info_msg "Vitis Setup PASSED"
 
-info_msg "To run a runtime example, start the MPD service by calling: \`systemctl is-active --quiet mpd || sudo systemctl start mpd\`"
+export AWS_PLATFORM=$AWS_PLATFORM_202410_0
+info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_202410_0\" "
+
+echo ""
+info_msg "#-------------------------------------------------------------------------------#"
+info_msg "How to run hardware emulation or synthesis on an example"
+info_msg "cd vitis/examples/vitis_examples/hello_world"
+info_msg "hw_file_check"
+info_msg "#----------------------------- Emulation ---------------------------------------#"
+info_msg "make build TARGET=hw_emu PLATFORM=\$SHELL_EMU_VERSION"
+info_msg "#-------------------------------------------------------------------------------#"

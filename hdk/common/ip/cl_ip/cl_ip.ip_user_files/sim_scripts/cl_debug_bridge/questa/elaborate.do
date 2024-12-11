@@ -1,0 +1,1 @@
+vopt -64 -l elaborate.log +acc=npr -suppress 10016  -L xil_defaultlib -L xilinx_vip -L xpm -L xsdbm_v3_0_2 -L lut_buffer_v2_0_1 -L xilinx_vip -L unisims_ver -L unimacro_ver -L secureip -work xil_defaultlib xil_defaultlib.cl_debug_bridge xil_defaultlib.glbl -o cl_debug_bridge_opt

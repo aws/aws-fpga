@@ -22,9 +22,13 @@
 #include <utils/lcd.h>
 
 #include "fpga_mgmt_internal.h"
+#include "fpga_hal_mbox_regs.h"
+
 
 /** Synchronous API (load/clear) default timeout and delay msecs */
-#define FPGA_MGMT_SYNC_TIMEOUT		30000
+#define FPGA_MGMT_SYNC_TIMEOUT		90000
+#define FPGA_MGMT_RL_RELOAD_DELAY	1000
+#define FPGA_MGMT_RL_RELOAD_RETRIES	15
 #define FPGA_MGMT_SYNC_DELAY_MSEC	2
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {
@@ -91,6 +95,8 @@ err:
 static int fpga_mgmt_describe_cmd(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
+	bool issued_rl_reload = false;
+start: ;
 	int ret;
 	uint32_t len;
 	union afi_cmd cmd;
@@ -110,6 +116,14 @@ static int fpga_mgmt_describe_cmd(int slot_id,
 
 	/* send the command and wait for the response */
 	ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
+
+	/* Wait for some period and retry in case of RL reload process */
+	uint32_t num_retries = 0;
+	while ((ret == FPGA_ERR_AFI_CMD_MALFORMED || ret == -ETIMEDOUT) && num_retries <= FPGA_MGMT_RL_RELOAD_RETRIES) {
+		msleep(FPGA_MGMT_RL_RELOAD_DELAY);
+		ret = fpga_mgmt_process_cmd(slot_id, &cmd, &rsp, &len);
+		num_retries++;
+	}
 	fail_on(ret, out, "fpga_mgmt_process_cmd failed");
 
 	/* extract the relevant data from the response */
@@ -132,8 +146,31 @@ static int fpga_mgmt_describe_cmd(int slot_id,
 	info->sh_version = sh_version;
 
 	/* copy the metrics into the out param */
-	info->metrics = metrics->fmc;
+	struct fpga_pci_resource_map mbox_map;
+	ret = fpga_pci_get_resource_map(slot_id, FPGA_MGMT_PF, &mbox_map);
+	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
+	if (IS_F1((&mbox_map))) {
+		info->metrics.f1_metrics = metrics->fmc.f1mc;
+	} else {
+		info->metrics.f2_metrics = metrics->fmc.f2mc;
+	}
 
+	/* Send the RL reload command as the last step so the shell version can be fetched */
+	if (metrics->status == FPGA_STATUS_LOADING_RL) {
+		/** Send RL reload ready signal */
+		int ret = fpga_mgmt_mbox_attach(slot_id);
+		fail_on(ret, out, "fpga_mgmt_mbox_attach failed");
+
+		pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
+		ret = fpga_pci_poke(handle, FMB_REG_RL_RELOAD, 0x1);
+		fail_on(ret, out, "fpga_pci_poke failed");
+
+		/* Rerun the describe command afterwards to get RL reload status */
+		if (issued_rl_reload == false) {
+			issued_rl_reload = true;
+			goto start;
+		}
+	}
 out:
 	return ret;
 }
@@ -542,13 +579,13 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 		status = (ret == 0) ? tmp_info.status : FPGA_STATUS_END;
 		if (status == FPGA_STATUS_LOADED) {
 			/** Sanity check the afi_id */
-			ret = (strncmp(opt->afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id))) ? 
-				FPGA_ERR_FAIL : 0; 
+			ret = (strncmp(opt->afi_id, tmp_info.ids.afi_id, sizeof(tmp_info.ids.afi_id))) ?
+				FPGA_ERR_FAIL : 0;
 			fail_on(ret, out, "AFI ID mismatch: requested afi_id=%s, loaded afi_id=%s",
 					opt->afi_id, tmp_info.ids.afi_id);
 			done = true;
 		} else if (status == FPGA_STATUS_BUSY) {
-			fail_on(ret = (retries >= timeout_tmp) ? -ETIMEDOUT : 0, out, 
+			fail_on(ret = (retries >= timeout_tmp) ? -ETIMEDOUT : 0, out,
 					"fpga_mgmt_describe_local_image timed out, status=%s(%d), retries=%u",
 					FPGA_STATUS2STR(status), status, retries);
 			retries++;
@@ -613,7 +650,7 @@ int fpga_mgmt_get_vLED_status(int slot_id, uint16_t *status)
 	ret = fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &led_pci_bar);
 	fail_on(ret, out, "fpga_pci_attach failed");
 	
-	ret = fpga_pci_peek(led_pci_bar, F1_VIRTUAL_LED_REG_OFFSET, &read_data);
+	ret = fpga_pci_peek(led_pci_bar, FPGA_VIRTUAL_LED_REG_OFFSET, &read_data);
 	fail_on(ret, out, "fpga_pci_peek failed");
 
 	/* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */
@@ -636,7 +673,7 @@ int fpga_mgmt_set_vDIP(int slot_id, uint16_t value)
 
 	write_data = (uint32_t) value;
 
-	ret = fpga_pci_poke(dip_pci_bar, F1_VIRTUAL_DIP_REG_OFFSET, write_data);
+	ret = fpga_pci_poke(dip_pci_bar, FPGA_VIRTUAL_DIP_REG_OFFSET, write_data);
 	fail_on(ret, out, "fpga_pci_poke failed");
 
 	ret = fpga_pci_detach(dip_pci_bar);
@@ -654,7 +691,7 @@ int fpga_mgmt_get_vDIP_status(int slot_id, uint16_t *value)
 	ret = fpga_pci_attach(slot_id, FPGA_MGMT_PF, MGMT_PF_BAR0, 0, &dip_pci_bar);
 	fail_on(ret, out, "fpga_pci_attach failed");
 
-	ret = fpga_pci_peek(dip_pci_bar, F1_VIRTUAL_DIP_REG_OFFSET, &read_data);
+	ret = fpga_pci_peek(dip_pci_bar, FPGA_VIRTUAL_DIP_REG_OFFSET, &read_data);
 	fail_on(ret, out, "fpga_pci_peek failed");
 
 	/* All this code assumes little endian, it would need rework for supporting non x86/arm platforms */

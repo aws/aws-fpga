@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,21 +18,20 @@
 from __future__ import print_function
 import os
 import sys
-import platform
+import distro
 import glob
 import argparse
 import logging
 
 dpdk_git = "https://github.com/DPDK/dpdk.git"
+dpdk_kmods_git = "git://dpdk.org/dpdk-kmods"
 
 # Use a SHA that is "known good" for SPP testing
-dpdk_ver = "v20.02"
+dpdk_ver = "v24.03"
 
-# Patch file directory
-patches_dir = "../patches/spp-dpdk/master"
-
-# DPDK make config target
-make_tgt = "x86_64-native-linuxapp-gcc"
+# Patch file directories
+dpdk_patches_dir = "../patches/spp-dpdk"
+dpdk_kmods_patches_dir = "../patches/spp-dpdk-kmods"
 
 # Logger
 logger = logging.getLogger('logger')
@@ -44,7 +43,7 @@ def print_success(scripts_path, install_path):
     print("  sudo fpga-load-local-image -S 0 -I <SDE loopback CL AGFI>")
     print("  sudo %s/virtual_ethernet_setup.py %s/dpdk 0" % (scripts_path, install_path))
     print("  cd %s/dpdk" % (install_path))
-    print("  sudo ./%s/app/testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=3" % (make_tgt))
+    print("  sudo ./build/app/dpdk-testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=3")
 
 def cmd_exec(cmd):
     # Execute the cmd, check the return and exit on failures
@@ -54,13 +53,17 @@ def cmd_exec(cmd):
         sys.exit(1)
 
 def install_dpdk_dep():
-    distro = platform.linux_distribution()
-    if (distro[0] == "Ubuntu"):
+    installed_distro = distro.name()
+    if (installed_distro == "Ubuntu"):
         cmd_exec("apt -y install libnuma-dev")
         cmd_exec("apt -y install libpcap-dev")
+        cmd_exec("apt -y install meson")
+        cmd_exec("apt -y install python3-pyelftools")
     else:
         cmd_exec("yum -y install numactl-devel.x86_64")
-        cmd_exec("yum -y install libpcap-devel") 
+        cmd_exec("yum -y install libpcap-devel")
+        cmd_exec("yum -y install meson")
+        cmd_exec("yum -y install python3-pyelftools")
 
 def install_dpdk(install_path):
     logger.debug("install_dpdk: install_path=%s" % (install_path))
@@ -82,38 +85,59 @@ def install_dpdk(install_path):
     # Make the install_path directory
     cmd_exec("mkdir %s" % (install_path))
 
-    # Construct the path to the git patch files
-    patches_path = "%s/%s" % (scripts_path, patches_dir)
-    logger.info("Patches will be installed from %s" % (patches_path))
+    # Construct the path to the dpdk-kmods git patch files
+    dpdk_kmods_patches_path = "%s/%s" % (scripts_path, dpdk_kmods_patches_dir)
+    logger.info("Patches will be installed from %s" % (dpdk_kmods_patches_path))
 
     # Read in the patch filenames
-    patchfiles = []
-    for patchfile in sorted(glob.iglob("%s/000*.patch" % (patches_path))):
+    dpdk_kmods_patchfiles = []
+    for patchfile in sorted(glob.iglob("%s/000*.patch" % (dpdk_kmods_patches_path))):
         logger.debug("found patchfile=%s" % patchfile)
-	patchfiles.append(os.path.abspath(patchfile))
+        dpdk_kmods_patchfiles.append(os.path.abspath(patchfile))
+
+    # Construct the path to the dpdk git patch files
+    dpdk_patches_path = "%s/%s" % (scripts_path, dpdk_patches_dir)
+    logger.info("Patches will be installed from %s" % (dpdk_patches_path))
+
+    # Read in the patch filenames
+    dpdk_patchfiles = []
+    for patchfile in sorted(glob.iglob("%s/000*.patch" % (dpdk_patches_path))):
+        logger.debug("found patchfile=%s" % patchfile)
+        dpdk_patchfiles.append(os.path.abspath(patchfile))
 
     # cd to the install_path directory
     os.chdir("%s" % (install_path))
 
-    # Clone the DPDK repo
-    logger.info("Cloning %s version of %s into %s" % (dpdk_ver, dpdk_git, install_path))
-    cmd_exec("git clone -b %s %s" % (dpdk_ver, dpdk_git))
+    # Clone the DPDK-KMODS repo
+    logger.info("Cloning %s into %s" % (dpdk_kmods_git, install_path))
+    cmd_exec("git clone %s" % (dpdk_kmods_git))
 
-    # cd to the dpdk directory 
-    os.chdir("dpdk")
-
-    # Check that the patches can be applied
-    # for patchfile in patchfiles:
-    #    logger.debug("Checking git apply patch for patchfile=%s" % patchfile)
-    #    cmd_exec("git apply --check %s" % (patchfile))
+    # cd to the dpdk-kmods directory
+    os.chdir("dpdk-kmods")
 
     # Apply the patches
-    for patchfile in patchfiles:
+    for patchfile in dpdk_kmods_patchfiles:
         logger.info("Applying patch for patchfile=%s" % patchfile)
         cmd_exec("git am %s" % (patchfile))
 
+    # Clone the DPDK repo
+    os.chdir("%s" % (install_path))
+    logger.info("Cloning %s version of %s into %s" % (dpdk_ver, dpdk_git, install_path))
+    cmd_exec("git clone -b %s %s" % (dpdk_ver, dpdk_git))
+
+    # cd to the dpdk directory
+    os.chdir("dpdk")
+
+    # Apply the patches
+    for patchfile in dpdk_patchfiles:
+        logger.info("Applying patch for patchfile=%s" % patchfile)
+        cmd_exec("git am %s" % (patchfile))
+
+    cmd_exec("cp -r ../dpdk-kmods/linux ./kernel/")
+
     # Configure the DPDK build
-    cmd_exec("make install T=%s" % (make_tgt) )
+    cmd_exec("meson -Dexamples=all build")
+    cmd_exec("ninja -C build")
 
     # cd back to the original directory
     os.chdir("%s" % (cwd))

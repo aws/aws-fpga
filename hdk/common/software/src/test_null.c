@@ -29,13 +29,13 @@
 
 //For cadence and questa simulators the main has to return some value
 #ifdef INT_MAIN
-   int test_main(uint32_t *exit_code) {
-#else 
-   void test_main(uint32_t *exit_code) {
-#endif 
-
-  // NULL Test
-
-  *exit_code = 0;
+int test_main(uint32_t *exit_code) {
+#else
+void test_main(uint32_t *exit_code) {
+#endif
+    // NULL Test
+    *exit_code = 0;
+#ifdef INT_MAIN
+    return *exit_code;
+#endif
 }
-

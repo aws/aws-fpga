@@ -1,0 +1,79 @@
+From 1e50c7d66a94c9fe251813c0c6ba45bdd772b2db Mon Sep 17 00:00:00 2001
+From: <aws-fpga-support@amazon.com>
+Date: Wed, 13 Nov 2024 01:09:16 +0000
+Subject: [PATCH] Adding meson.build files that allow igb_uio to seemlessly
+ integrate with the dpdk and build in their meson build environment.
+
+---
+ linux/igb_uio/meson.build | 21 +++++++++++++++++++++
+ linux/meson.build         | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
+ create mode 100644 linux/igb_uio/meson.build
+ create mode 100644 linux/meson.build
+
+diff --git a/linux/igb_uio/meson.build b/linux/igb_uio/meson.build
+new file mode 100644
+index 0000000..ab98926
+--- /dev/null
++++ b/linux/igb_uio/meson.build
+@@ -0,0 +1,21 @@
++# PDX-License-Identifier: BSD-3-Clause
++# Copyright(c) 2017 Intel Corporation
++
++mkfile = custom_target('igb_uio_makefile',
++        output: 'Makefile',
++        command: ['touch', '@OUTPUT@'])
++
++custom_target('igb_uio',
++        input: ['igb_uio.c', 'Kbuild'],
++        output: 'igb_uio.ko',
++        command: ['make', '-C', kernel_dir + '/build',
++                'M=' + meson.current_build_dir(),
++                'src=' + meson.current_source_dir(),
++                'EXTRA_CFLAGS=-I' + meson.current_source_dir() +
++                        '/../../../lib/librte_eal/include',
++                'modules'],
++        depends: mkfile,
++        install: true,
++        install_dir: kernel_dir + '/extra/dpdk',
++        build_by_default: get_option('enable_kmods'))
++
+diff --git a/linux/meson.build b/linux/meson.build
+new file mode 100644
+index 0000000..73cc7aa
+--- /dev/null
++++ b/linux/meson.build
+@@ -0,0 +1,30 @@
++# SPDX-License-Identifier: BSD-3-Clause
++# Copyright(c) 2018 Intel Corporation
++
++subdirs = ['igb_uio']
++
++# if we are cross-compiling we need kernel_dir specified
++if get_option('kernel_dir') == '' and meson.is_cross_build()
++	warning('Need "kernel_dir" option for kmod compilation when cross-compiling')
++	subdir_done()
++endif
++
++kernel_dir = get_option('kernel_dir')
++if kernel_dir == ''
++	# use default path for native builds
++	kernel_version = run_command('uname', '-r').stdout().strip()
++	kernel_dir = '/lib/modules/' + kernel_version
++endif
++
++# test running make in kernel directory, using "make kernelversion"
++make_returncode = run_command('make', '-sC', kernel_dir + '/build',
++		'kernelversion').returncode()
++if make_returncode != 0
++	warning('Cannot compile kernel modules as requested - are kernel headers installed?')
++	subdir_done()
++endif
++
++# DO ACTUAL MODULE BUILDING
++foreach d:subdirs
++	subdir(d)
++endforeach
+--
+2.34.1
+

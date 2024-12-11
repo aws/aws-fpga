@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -22,21 +22,34 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define FPGA_SLOT_MAX           8
-#define AFI_ID_STR_MAX			64
-#define FPGA_DDR_IFS_MAX		4
+#define FPGA_SLOT_MAX				8
+#define AFI_ID_STR_MAX				64
+#define F1_DDR_IFS_MAX				4
+#define F2_DDR_IFS_MAX				1
 #define FPGA_CACHED_AGFIS_MAX		16
+
+/** Mailbox PF defines */
+#define FPGA_MBOX_VENDOR_ID			0x1d0f
+#define F1_MBOX_DEVICE_ID			0x1041
+#define F2_MBOX_DEVICE_ID			0x9248
+#define FPGA_MBOX_RESOURCE_NUM		0
+
+/** F1 and F2 compatibility */
+#define IS_F1(mbox_map)								((mbox_map->device_id) == F1_MBOX_DEVICE_ID)
+#define IS_F2(mbox_map)								((mbox_map->device_id) == F2_MBOX_DEVICE_ID)
+#define GET_DEV_NUM_FROM_FPGA_MBOX_MAP(mbox_map)	((mbox_map->dev) - IS_F1(mbox_map))
+#define GET_FUNC_NUM_FROM_FPGA_MBOX_MAP(mbox_map)	(IS_F1(mbox_map) ? (mbox_map->func) : 0)
 
 /**
  * FPGA Mixed Mode Clock Manager (MMCM) config.
  *
  * MMCM Groups A, B, C are 0, 1, 2 respectively
  */
-#define FPGA_MMCM_GROUP_MAX         3
-#define FPGA_MMCM_OUT_CLKS_MAX      7
-#define CLOCK_COUNT_A		4
-#define CLOCK_COUNT_B		2
-#define CLOCK_COUNT_C		2
+#define FPGA_MMCM_GROUP_MAX		3
+#define FPGA_MMCM_OUT_CLKS_MAX	7
+#define CLOCK_COUNT_A			4
+#define CLOCK_COUNT_B			2
+#define CLOCK_COUNT_C			2
 
 /**
  * Common FPGA command flags.
@@ -53,15 +66,15 @@ enum {
 	FPGA_CMD_DRAM_DATA_RETENTION = 1 << 4,
 	FPGA_CMD_EXTENDED_METRICS_SIZE = 1 << 6,
 	FPGA_CMD_PREFETCH = 1 << 7,
-
-
+	FPGA_CMD_CLEAR_AFI_CACHE = 1 << 8,
 
 	FPGA_CMD_ALL_FLAGS = FPGA_CMD_GET_HW_METRICS |
 		FPGA_CMD_CLEAR_HW_METRICS |
 		FPGA_CMD_FORCE_SHELL_RELOAD |
 		FPGA_CMD_DRAM_DATA_RETENTION |
 		FPGA_CMD_EXTENDED_METRICS_SIZE |
-		FPGA_CMD_PREFETCH,
+		FPGA_CMD_PREFETCH |
+		FPGA_CMD_CLEAR_AFI_CACHE,
 };
 
 
@@ -78,10 +91,10 @@ enum {
  */
 
 enum {
-    /** Negative values are compatible with standard errno returns */
+	/** Negative values are compatible with standard errno returns */
 
-    /** No error */
-    FPGA_ERR_OK = 0,
+	/** No error */
+	FPGA_ERR_OK = 0,
 
 	/** Reserved: 1, 2 */
 
@@ -93,28 +106,35 @@ enum {
 	/** Invalid AFI ID */
 	FPGA_ERR_AFI_ID_INVALID = 5,
 
-	/** Reserved: 6-10 */
+	/** Timeout During AFI Load Request */
+	FPGA_ERR_AFI_LOAD_TIMEOUT = 6,
+
+	/** Reserved: 7-10 */
 
 	/** Invalid AFI_CMD_API_VERSION, see afi_cmd_api.h */
 	FPGA_ERR_AFI_CMD_API_VERSION_INVALID = 11,
-	/** CL PCI IDs did not match (e.g. between LF and CL reported values */
+
+	/** CL PCI IDs did not match (e.g. between LF and CL reported values) */
 	FPGA_ERR_CL_ID_MISMATCH = 12,
+
 	/** CL DDR calibration failed */
 	FPGA_ERR_CL_DDR_CALIB_FAILED = 13,
+
 	/** generic/unspecified error */
 	FPGA_ERR_FAIL = 14,
 
+	/** Reserved: 15 */
+
+	/** Used when the SL/RL version does not match what the AFI was built with */
 	FPGA_ERR_SHELL_MISMATCH = 16,
 
+	/** Used to indicate when CL clocks are gated*/
 	FPGA_ERR_POWER_VIOLATION = 17,
 
 	/** In some cases it is possible to detect when data retention is not
 	 *  possible. This prevents the loss of data when retention cannot work. */
 	FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE = 18,
-
 	FPGA_ERR_HARDWARE_BUSY = 19,
-
-	/** Reserved: 19 */
 
 	/** Unable to locate PCI devices/resources */
 	FPGA_ERR_PCI_MISSING = 20,
@@ -136,29 +156,54 @@ enum {
 	/** Cannot communicate with the FPGA */
 	FPGA_ERR_UNRESPONSIVE = 25,
 
+	/**
+	 * Signal to the SDK to bring down the PCI link.
+	 */
+	FPGA_ERR_RL_RELOAD_NEEDED_DROP_PCI_LINK = 26,
+
+	/**
+	 * Incompatible AFI CMD flags such as `FPGA_CMD_FORCE_LOAD_RL` and `FPGA_CMD_PREFETCH`
+	 */
+	FPGA_ERR_INCOMPATIBLE_AFI_CMD_FLAGS = 27,
+
+	/**
+	 * Used to report invalid clkgen API requests
+	 */
+	FPGA_ERR_INVALID_CLKGEN_INPUTS = 28,
+
+	/**
+	 * Used to report when the clkgen API is unreachable
+	 */
+	FPGA_ERR_CLKGEN_NOT_FOUND = 29,
+
 	FPGA_ERR_END
 };
 
 /** Stringify the FPGA_ERR_XXX errors */
 #define FPGA_ERR2STR(error) \
-	((error) == FPGA_ERR_OK) ?							"ok" : \
-	((error) == FPGA_ERR_AFI_CMD_BUSY) ?				"busy" : \
-	((error) == FPGA_ERR_AFI_ID_INVALID) ?				"invalid-afi-id" : \
-	((error) == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) ?	"invalid-afi-cmd-api-version" : \
-	((error) == FPGA_ERR_CL_ID_MISMATCH) ?				"cl-id-mismatch" : \
-	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?			"cl-ddr-calib-failed" : \
-	((error) == FPGA_ERR_FAIL) ?						"unspecified-error" : \
-	((error) == FPGA_ERR_SHELL_MISMATCH) ?			    "shell-version-not-supported" : \
-	((error) == FPGA_ERR_POWER_VIOLATION) ?			    "afi-power-violation" : \
-	((error) == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE) ? "dram-data-retention-not-possible" : \
-	((error) == FPGA_ERR_DRAM_DATA_RETENTION_FAILED) ? "dram-data-retention-failed" : \
-	((error) == FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED) ? "dram-data-retention-setup-failed" : \
-	((error) == FPGA_ERR_PCI_MISSING) ? 				"pci-device-missing" : \
-	((error) == FPGA_ERR_SOFTWARE_PROBLEM) ?			"software-problem": \
-	((error) == FPGA_ERR_UNRESPONSIVE) ?				"unresponsive": \
-	((error) == FPGA_ERR_AFI_CMD_MALFORMED) ?			"afi-command-malformed" : \
-	((error) == FPGA_ERR_HARDWARE_BUSY) ?				"hardware-busy" : \
-														"internal-error"
+	((error) == FPGA_ERR_OK) ?									"ok" : \
+	((error) == FPGA_ERR_AFI_CMD_BUSY) ?						"busy" : \
+	((error) == FPGA_ERR_AFI_ID_INVALID) ?						"invalid-afi-id" : \
+	((error) == FPGA_ERR_AFI_LOAD_TIMEOUT) ?					"afi-load-timeout" : \
+	((error) == FPGA_ERR_AFI_CMD_API_VERSION_INVALID) ?			"invalid-afi-cmd-api-version" : \
+	((error) == FPGA_ERR_CL_ID_MISMATCH) ?						"cl-id-mismatch" : \
+	((error) == FPGA_ERR_CL_DDR_CALIB_FAILED) ?					"cl-ddr-calib-failed" : \
+	((error) == FPGA_ERR_FAIL) ?								"unspecified-error" : \
+	((error) == FPGA_ERR_SHELL_MISMATCH) ?						"shell-version-not-supported" : \
+	((error) == FPGA_ERR_POWER_VIOLATION) ?						"afi-power-violation" : \
+	((error) == FPGA_ERR_DRAM_DATA_RETENTION_NOT_POSSIBLE) ?	"dram-data-retention-not-possible" : \
+	((error) == FPGA_ERR_DRAM_DATA_RETENTION_FAILED) ? 			"dram-data-retention-failed" : \
+	((error) == FPGA_ERR_DRAM_DATA_RETENTION_SETUP_FAILED) ?	"dram-data-retention-setup-failed" : \
+	((error) == FPGA_ERR_PCI_MISSING) ? 						"pci-device-missing" : \
+	((error) == FPGA_ERR_SOFTWARE_PROBLEM) ?					"software-problem": \
+	((error) == FPGA_ERR_UNRESPONSIVE) ?						"unresponsive": \
+	((error) == FPGA_ERR_AFI_CMD_MALFORMED) ?					"afi-command-malformed" : \
+	((error) == FPGA_ERR_HARDWARE_BUSY) ?						"hardware-busy" : \
+	((error) == FPGA_ERR_RL_RELOAD_NEEDED_DROP_PCI_LINK) ?		"err-rl-reload-needed-drop-pci-link" : \
+	((error) == FPGA_ERR_INCOMPATIBLE_AFI_CMD_FLAGS) ?			"err-incompatible-afi-cmd-flags" : \
+	((error) == FPGA_ERR_INVALID_CLKGEN_INPUTS) ?				"invalid-clkgen-input" : \
+	((error) == FPGA_ERR_CLKGEN_NOT_FOUND) ?					"clkgen-ip-not-found" : \
+																"internal-error"
 
 
 /**
@@ -171,14 +216,18 @@ enum {
 	/**< FPGA slot has an AFI loaded */
 	FPGA_STATUS_LOADED = 0,
 	/**< FPGA slot is cleared */
-    FPGA_STATUS_CLEARED = 1,
+	FPGA_STATUS_CLEARED = 1,
 	/**< FPGA slot is busy (e.g. loading an AFI) */
-    FPGA_STATUS_BUSY = 2,
+	FPGA_STATUS_BUSY = 2,
 	/**< FPGA slot is not programmed */
-    FPGA_STATUS_NOT_PROGRAMMED = 3,
-    /* < Load failed, or worked with errors */
-    FPGA_STATUS_LOAD_FAILED = 7,
-    FPGA_STATUS_END,
+	FPGA_STATUS_NOT_PROGRAMMED = 3,
+	/** AFI is being cached */
+	FPGA_STATUS_CACHING_AFI = 4,
+	/** RL Reload needed, drop PCI link */
+	FPGA_STATUS_LOADING_RL = 5,
+	/* < Load failed, or worked with errors */
+	FPGA_STATUS_LOAD_FAILED = 7,
+	FPGA_STATUS_END,
 };
 
 /** Stringify the FPGA status */
@@ -187,6 +236,8 @@ enum {
 	((status) == FPGA_STATUS_CLEARED) ?			"cleared" : \
 	((status) == FPGA_STATUS_BUSY) ?			"busy" : \
 	((status) == FPGA_STATUS_NOT_PROGRAMMED) ?	"not-programmed" : \
+	((status) == FPGA_STATUS_CACHING_AFI) ?		"afi-cache-in-progress" : \
+	((status) == FPGA_STATUS_LOADING_RL) ?		"rl-reload-needed-drop-pci-link" : \
 	((status) == FPGA_STATUS_LOAD_FAILED) ?		"load-failed" : \
 												"internal-error"
 
@@ -207,7 +258,7 @@ enum {
 /* resource number (base address register) definitions */
 enum {
     APP_PF_BAR0 = 0,
-    APP_PF_BAR1 = 1,
+    APP_PF_BAR2 = 2,
     APP_PF_BAR4 = 4,
     APP_PF_BAR_MAX
 };
@@ -283,7 +334,51 @@ struct fpga_clocks_common {
 
 
 /** FPGA metrics */
-struct fpga_metrics_common {
+struct f2_metrics_common {
+	/** See FPGA_INT_STATUS_XYZ below */
+	uint32_t int_status;
+	/** See FPGA_PAP_XYZ below */
+	uint32_t pcim_axi_protocol_error_status;
+	/** FPGA_INT_STATUS_PCI_RANGE_ERROR: address and count */
+	uint64_t pcim_range_error_addr;
+	uint32_t pcim_range_error_count;
+	/** FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR: address and count */
+	uint64_t pcim_axi_protocol_error_addr;
+	uint32_t pcim_axi_protocol_error_count;
+	/** PCI read and write counts */
+	uint64_t pcim_write_count;
+	uint64_t pcim_read_count;
+	/** FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT: address and count */
+	uint64_t dma_pcis_timeout_addr;
+	uint32_t dma_pcis_timeout_count;
+	/** FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT: address and count */
+	uint32_t ocl_slave_timeout_addr;
+	uint32_t ocl_slave_timeout_count;
+	/** FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT: address and count */
+	uint64_t sda_slave_timeout_addr;
+	uint32_t sda_slave_timeout_count;
+	/** FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT (virtual JTAG): address and count */
+	uint32_t virtual_jtag_slave_timeout_addr;
+	uint32_t virtual_jtag_slave_timeout_count;
+	/** VJTAG (chipscope) read and write counts */
+	uint32_t virtual_jtag_write_count;
+	uint32_t virtual_jtag_read_count;
+
+	/** FPGA DDR interface metrics */
+	struct fpga_ddr_if_metrics_common ddr_ifs[F2_DDR_IFS_MAX];
+
+	/** FPGA clock metrics */
+	struct fpga_clocks_common clocks[FPGA_MMCM_GROUP_MAX];
+
+	/** Power data from the microcontroller */
+	uint64_t power_mean;
+	uint64_t power_max;
+	uint64_t power;
+	uint64_t cached_agfis[FPGA_CACHED_AGFIS_MAX];
+	uint64_t flags;
+} __attribute__((packed));
+
+struct f1_metrics_common {
 	/** See FPGA_INT_STATUS_XYZ below */
 	uint32_t int_status;
 	/** See FPGA_PAP_XYZ below */
@@ -316,7 +411,7 @@ struct fpga_metrics_common {
 	uint64_t pcim_read_count;
 
 	/** FPGA DDR interface metrics */
-	struct fpga_ddr_if_metrics_common ddr_ifs[FPGA_DDR_IFS_MAX];
+	struct fpga_ddr_if_metrics_common ddr_ifs[F1_DDR_IFS_MAX];
 
 	/** FPGA clock metrics */
 	struct fpga_clocks_common clocks[FPGA_MMCM_GROUP_MAX];
@@ -331,33 +426,40 @@ struct fpga_metrics_common {
 
 /** Common int_status */
 enum {
-	/** SDACL slave timeout (CL did not respond to cycle from host) */
+	/** SDACL slave timeout (CL did not respond to cycle from host)
+	 * !!! F1 ONLY !!!
+	*/
 	FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT = 1 << 0,
-	/** Virtual JTAG timeout */
-	FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT = 1 << 1,
+	/** Chipscope timeout */
+	FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT = 1 << 1,
 	/** A DMA engine made an out of range access */
 	FPGA_INT_STATUS_DMA_RANGE_ERROR = 1 << 7,
-	/** CL did not respond to DMA cycle from host */
-	FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT = 1 << 17,
+	/** CL did not respond to cycle from host */
+	FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT = 1 << 17,
 	/** PCIe master cycle from CL out of range */
-	FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR = 1 << 18,
+	FPGA_INT_STATUS_PCI_RANGE_ERROR = 1 << 18,
 	/** PCIe master cycle from CL - dw_cnt and len mismatch */
-	FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR = 1 << 19,
+	FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR = 1 << 19,
+	/** CL SDA did not respond to cycle from host */
+	FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT = 1 << 27,
 	/** CL OCL did not respond to cycle from host */
-	FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT = 1 << 28,
-	/** CL BAR1 did not respond to cycle from host */
+	FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT = 1 << 28,
+	/** CL BAR1 did not respond to cycle from host
+	 * !!! F1 ONLY !!!
+	*/
 	FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT = 1 << 29,
 
 	FPGA_INT_STATUS_ALL =
 		FPGA_INT_STATUS_SDACL_SLAVE_TIMEOUT |
-		FPGA_INT_STATUS_VIRTUAL_JTAG_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_CHIPSCOPE_TIMEOUT |
 		FPGA_INT_STATUS_DMA_RANGE_ERROR |
-		FPGA_INT_STATUS_DMA_PCI_SLAVE_TIMEOUT |
-		FPGA_INT_STATUS_PCI_MASTER_RANGE_ERROR |
-		FPGA_INT_STATUS_PCI_MASTER_AXI_PROTOCOL_ERROR |
-		FPGA_INT_STATUS_OCL_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_PCI_SLAVE_TIMEOUT |
+		FPGA_INT_STATUS_PCI_RANGE_ERROR |
+		FPGA_INT_STATUS_PCI_AXI_PROTOCOL_ERROR |
+		FPGA_INT_STATUS_PCI_SLAVE_SDA_TIMEOUT |
+		FPGA_INT_STATUS_PCI_SLAVE_OCL_TIMEOUT |
 		FPGA_INT_STATUS_BAR1_SLAVE_TIMEOUT,
-};
+	};
 
 /** Common pcim_axi_protocol_error_status (PAP) */
 enum {

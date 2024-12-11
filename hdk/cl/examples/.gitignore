@@ -1,11 +1,11 @@
 *.jou
 *.log
+*/build/bitstreams
 */build/bitstreams/*.log
 */build/bitstreams/*.bin
 *.bin
 */build/checkpoints
 */build/checkpoints/*.dcp
-*/build/constraints/cl_clocks_aws.xdc
 */build/reports/*.rpt
 */build/reports/*.txt
 */build/scripts/.Xil
@@ -25,3 +25,8 @@
 */verif/*.setup
 */software/runtime/test_hello_world
 */software/runtime/test_dram_dma
+*/build/scripts/*/
+*/build/scripts/*.txt
+*/build/scripts/*.out
+*/build/scripts/*.ltx
+generated_*

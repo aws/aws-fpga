@@ -1,0 +1,25 @@
+From 079a9d24c072bdb7c34079b0d2a58044c6b92c6e Mon Sep 17 00:00:00 2001
+From: <aws-fpga-support@amazon.com>
+Date: Wed, 13 Nov 2024 01:15:39 +0000
+Subject: [PATCH] Adding a meson.build to allow linux kernel modules such as
+ igb_uio to build in the dpdk build environment.
+
+---
+ kernel/meson.build | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/kernel/meson.build b/kernel/meson.build
+index 417735b010..d20d225fbd 100644
+--- a/kernel/meson.build
++++ b/kernel/meson.build
+@@ -1,6 +1,4 @@
+ # SPDX-License-Identifier: BSD-3-Clause
+ # Copyright(c) 2017 Intel Corporation
++subdir(exec_env)
+
+-if is_freebsd
+-    subdir(exec_env)
+-endif
+--
+2.34.1
+

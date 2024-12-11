@@ -1,0 +1,16 @@
+vhdl xil_defaultlib  \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_conv_funs_pkg.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_proc_common_pkg.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_ipif_pkg.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_family_support.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_family.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_soft_reset.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/proc_common_v3_00_a/hdl/src/vhdl/clk_mmcm_a_pselect_f.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/axi_lite_ipif_v1_01_a/hdl/src/vhdl/clk_mmcm_a_address_decoder.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/axi_lite_ipif_v1_01_a/hdl/src/vhdl/clk_mmcm_a_slave_attachment.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/axi_lite_ipif_v1_01_a/hdl/src/vhdl/clk_mmcm_a_axi_lite_ipif.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/clk_mmcm_a_clk_wiz_drp.vhd" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_a/clk_mmcm_a_axi_clk_config.vhd" \
+
+# Do not sort compile order
+nosort

@@ -1,27 +1,23 @@
-# AWS EC2 FPGA Shell Errata 
+# AWS EC2 F2 Shell Errata
 
-## AWS Shell F1.X.1.4 (04261818)
+## Implementation Restrictions
 
-### Implementation Restrictions
-* PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
-  * All PCIe transactions must adhere to the PCIe Express base spec
-  * 4Kbyte Address boundary for all transactions(PCIe restriction)
-  * Multiple outstanding outbound PCIe Read transactions with same ID not supported
-  * PCIE extended tag not supported, so read-request is limited to 32 outstanding
-  * Address must match DoubleWord(DW) address of the transaction
-  * WSTRB(write strobe) must reflect appropriate valid bytes for AXI write beats
-  * Only Increment burst type is supported
-  * AXI lock, memory type, protection type, Quality of service and Region identifier are not supported
-  * Transactions from the Shell to CL must complete within the timeout period to avoid transaction termination by the Shell
-  * DMA transactions from the Shell to CL must complete within the timeout period to avoid transaction termination and invalid data returned for the DMA transaction
-  * PCIM and DMA-PCIS AXI-4 interfaces do not support AxSIZE other than 3'b110 (64B)
+- PCIE AXI4 interfaces between Custom Logic(CL) and Shell(SH) have following restrictions:
+  - All PCIe transactions must adhere to the PCIe base spec
+  - 4-KByte address boundary for all transactions (PCIe restriction)
+  - Multiple outstanding outbound PCIe read transactions with same ID is not supported
+  - PCIe extended tag not supported. Read-request is limited to 32 outstanding
+  - Address must match DoubleWord(DW) address of the transaction
+  - WSTRB (write strobe) must reflect appropriate valid bytes for AXI write beats
+  - Only increment burst type is supported
+  - AXI lock, memory type, protection type, quality of service (QoS) and region identifier are not supported
+  - Transactions from the Shell to CL must complete within the timeout period to avoid transaction termination by the Shell
+  - DMA transactions from the Shell to CL must complete within the timeout period to avoid transaction termination and invalid data returned for the DMA transaction
+  - PCIM and DMA-PCIS AXI4 interfaces do not support AxSIZE other than 3'b110 (64B)
 
-* AFI must be re-loaded after an instance re-boot.
+## Unsupported Features
 
-### Unsupported Features
-* FPGA to FPGA over serial ring links for F1.16xl and F1.4xl
-* Aurora and Reliable Aurora modules for the FPGA-to-FPGA 
-* Cadence Xcelium simulations tools
+- End-to-End virtual ethernet example with live traffic currently not supported in F2
+- HBM metrics not yet supported
 
-### Known Bugs/Issues
-* **sh_cl_ddr_is_ready[2:0]** outputs of sh_ddr.sv are not synchronized to clk_main_a0.  Developers should synchronize these signals to clk_main_a0.
+## Known Bugs/Issues

@@ -1,0 +1,2241 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:04:02 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'vio_0'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of vio_0 (xilinx.com:ip:vio:3.0) from (Rev. 22) to (Rev. 24)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:04:01 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'src_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of src_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:59 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'pcie_bridge_rc'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of pcie_bridge_rc (xilinx.com:ip:xdma:4.1) from (Rev. 17) to (Rev. 28)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:41 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'pcie_bridge_ep'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of pcie_bridge_ep (xilinx.com:ip:xdma:4.1) from (Rev. 17) to (Rev. 28)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:22 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'ila_vio_counter'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of ila_vio_counter (xilinx.com:ip:ila:6.2) from (Rev. 12) to (Rev. 14)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:17 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'ila_c2c'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of ila_c2c (xilinx.com:ip:ila:6.2) from (Rev. 12) to (Rev. 14)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:13 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'ila_1'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of ila_1 (xilinx.com:ip:ila:6.2) from (Rev. 12) to (Rev. 14)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:08 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'dest_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of dest_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:06 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'clk_mmcm_hbm'
+
+1. Summary
+----------
+
+CAUTION (success, with warnings) in the upgrade of clk_mmcm_hbm (xilinx.com:ip:clk_wiz:6.0) from (Rev. 10) to (Rev. 13)
+
+After upgrade, an IP may have parameter differences compared to the original customization. Please review the parameters within the IP customization GUI to ensure proper functionality.
+
+2. Customization warnings
+-------------------------
+
+An attempt to modify the value of disabled parameter 'CLKOUT2_REQUESTED_OUT_FREQ' from '100.000' to '400' has been ignored for IP 'clk_mmcm_hbm'
+
+An attempt to modify the value of disabled parameter 'CLKOUT3_REQUESTED_OUT_FREQ' from '100.000' to '500' has been ignored for IP 'clk_mmcm_hbm'
+
+
+3. Debug Commands
+-----------------
+
+  The following debug information can be passed to Vivado as Tcl commands,
+in order to validate or debug the output of the upgrade flow.
+  You may consult any warnings from within this upgrade, and alter or remove
+the configuration parameter(s) which caused the warning; then execute the Tcl
+commands, and use the IP Customization GUI to verify the IP configuration.
+
+create_ip -vlnv xilinx.com:ip:clk_wiz:6.0 -user_name clk_mmcm_hbm
+set_property -dict "\
+  CONFIG.AUTO_PRIMITIVE {MMCM} \
+  CONFIG.AXI_DRP {false} \
+  CONFIG.CALC_DONE {empty} \
+  CONFIG.CDDCDONE_PORT {cddcdone} \
+  CONFIG.CDDCREQ_PORT {cddcreq} \
+  CONFIG.CLKFB_IN_N_PORT {clkfb_in_n} \
+  CONFIG.CLKFB_IN_PORT {clkfb_in} \
+  CONFIG.CLKFB_IN_P_PORT {clkfb_in_p} \
+  CONFIG.CLKFB_IN_SIGNALING {SINGLE} \
+  CONFIG.CLKFB_OUT_N_PORT {clkfb_out_n} \
+  CONFIG.CLKFB_OUT_PORT {clkfb_out} \
+  CONFIG.CLKFB_OUT_P_PORT {clkfb_out_p} \
+  CONFIG.CLKFB_STOPPED_PORT {clkfb_stopped} \
+  CONFIG.CLKIN1_JITTER_PS {100.0} \
+  CONFIG.CLKIN1_UI_JITTER {0.010} \
+  CONFIG.CLKIN2_JITTER_PS {100.0} \
+  CONFIG.CLKIN2_UI_JITTER {0.010} \
+  CONFIG.CLKOUT1_DRIVES {Buffer} \
+  CONFIG.CLKOUT1_JITTER {106.361} \
+  CONFIG.CLKOUT1_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT1_PHASE_ERROR {153.873} \
+  CONFIG.CLKOUT1_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {450} \
+  CONFIG.CLKOUT1_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT1_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT1_USED {true} \
+  CONFIG.CLKOUT2_DRIVES {Buffer} \
+  CONFIG.CLKOUT2_JITTER {90.074} \
+  CONFIG.CLKOUT2_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT2_PHASE_ERROR {87.180} \
+  CONFIG.CLKOUT2_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {400} \
+  CONFIG.CLKOUT2_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT2_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT2_USED {false} \
+  CONFIG.CLKOUT3_DRIVES {Buffer} \
+  CONFIG.CLKOUT3_JITTER {72.605} \
+  CONFIG.CLKOUT3_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT3_PHASE_ERROR {76.967} \
+  CONFIG.CLKOUT3_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {500} \
+  CONFIG.CLKOUT3_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT3_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT3_USED {false} \
+  CONFIG.CLKOUT4_DRIVES {Buffer} \
+  CONFIG.CLKOUT4_JITTER {0.0} \
+  CONFIG.CLKOUT4_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT4_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT4_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT4_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT4_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT4_USED {false} \
+  CONFIG.CLKOUT5_DRIVES {Buffer} \
+  CONFIG.CLKOUT5_JITTER {0.0} \
+  CONFIG.CLKOUT5_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT5_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT5_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT5_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT5_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT5_USED {false} \
+  CONFIG.CLKOUT6_DRIVES {Buffer} \
+  CONFIG.CLKOUT6_JITTER {0.0} \
+  CONFIG.CLKOUT6_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT6_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT6_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT6_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT6_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT6_USED {false} \
+  CONFIG.CLKOUT7_DRIVES {Buffer} \
+  CONFIG.CLKOUT7_JITTER {0.0} \
+  CONFIG.CLKOUT7_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT7_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT7_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT7_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT7_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT7_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT7_USED {false} \
+  CONFIG.CLKOUTPHY_REQUESTED_FREQ {600.000} \
+  CONFIG.CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN_SEL_PORT {clk_in_sel} \
+  CONFIG.CLK_OUT1_PORT {clk_out1} \
+  CONFIG.CLK_OUT1_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT2_PORT {clk_out2} \
+  CONFIG.CLK_OUT2_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT3_PORT {clk_out3} \
+  CONFIG.CLK_OUT3_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT4_PORT {clk_out4} \
+  CONFIG.CLK_OUT4_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT5_PORT {clk_out5} \
+  CONFIG.CLK_OUT5_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT6_PORT {clk_out6} \
+  CONFIG.CLK_OUT6_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT7_PORT {clk_out7} \
+  CONFIG.CLK_OUT7_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_VALID_PORT {CLK_VALID} \
+  CONFIG.CLOCK_MGR_TYPE {auto} \
+  CONFIG.Component_Name {clk_mmcm_hbm} \
+  CONFIG.DADDR_PORT {daddr} \
+  CONFIG.DCLK_PORT {dclk} \
+  CONFIG.DEN_PORT {den} \
+  CONFIG.DIFF_CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.DIFF_CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.DIN_PORT {din} \
+  CONFIG.DOUT_PORT {dout} \
+  CONFIG.DRDY_PORT {drdy} \
+  CONFIG.DWE_PORT {dwe} \
+  CONFIG.ENABLE_CDDC {false} \
+  CONFIG.ENABLE_CLKOUTPHY {false} \
+  CONFIG.ENABLE_CLOCK_MONITOR {false} \
+  CONFIG.ENABLE_USER_CLOCK0 {false} \
+  CONFIG.ENABLE_USER_CLOCK1 {false} \
+  CONFIG.ENABLE_USER_CLOCK2 {false} \
+  CONFIG.ENABLE_USER_CLOCK3 {false} \
+  CONFIG.Enable_PLL0 {false} \
+  CONFIG.Enable_PLL1 {false} \
+  CONFIG.FEEDBACK_SOURCE {FDBK_AUTO} \
+  CONFIG.INPUT_CLK_STOPPED_PORT {input_clk_stopped} \
+  CONFIG.INPUT_MODE {frequency} \
+  CONFIG.INTERFACE_SELECTION {Enable_AXI} \
+  CONFIG.IN_FREQ_UNITS {Units_MHz} \
+  CONFIG.IN_JITTER_UNITS {Units_UI} \
+  CONFIG.JITTER_OPTIONS {UI} \
+  CONFIG.JITTER_SEL {No_Jitter} \
+  CONFIG.LOCKED_PORT {locked} \
+  CONFIG.MMCM_BANDWIDTH {OPTIMIZED} \
+  CONFIG.MMCM_CLKFBOUT_MULT_F {23.625} \
+  CONFIG.MMCM_CLKFBOUT_PHASE {0.000} \
+  CONFIG.MMCM_CLKFBOUT_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKIN1_PERIOD {10.000} \
+  CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
+  CONFIG.MMCM_CLKOUT0_DIVIDE_F {2.625} \
+  CONFIG.MMCM_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT0_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT0_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT1_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT1_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT1_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT2_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT2_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT2_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT3_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT3_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT3_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT4_CASCADE {false} \
+  CONFIG.MMCM_CLKOUT4_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT4_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT4_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT5_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT5_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT5_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT6_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT6_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT6_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT6_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLOCK_HOLD {false} \
+  CONFIG.MMCM_COMPENSATION {AUTO} \
+  CONFIG.MMCM_DIVCLK_DIVIDE {2} \
+  CONFIG.MMCM_NOTES {None} \
+  CONFIG.MMCM_REF_JITTER1 {0.010} \
+  CONFIG.MMCM_REF_JITTER2 {0.010} \
+  CONFIG.MMCM_STARTUP_WAIT {false} \
+  CONFIG.NUM_OUT_CLKS {1} \
+  CONFIG.OPTIMIZE_CLOCKING_STRUCTURE_EN {false} \
+  CONFIG.OVERRIDE_MMCM {false} \
+  CONFIG.OVERRIDE_PLL {false} \
+  CONFIG.PHASESHIFT_MODE {LATENCY} \
+  CONFIG.PHASE_DUTY_CONFIG {false} \
+  CONFIG.PLATFORM {UNKNOWN} \
+  CONFIG.PLL_BANDWIDTH {OPTIMIZED} \
+  CONFIG.PLL_CLKFBOUT_MULT {4} \
+  CONFIG.PLL_CLKFBOUT_PHASE {0.000} \
+  CONFIG.PLL_CLKIN_PERIOD {10.000} \
+  CONFIG.PLL_CLKOUT0_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT0_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT1_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT1_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT2_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT2_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT3_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT3_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT4_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT4_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT5_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT5_PHASE {0.000} \
+  CONFIG.PLL_CLK_FEEDBACK {CLKFBOUT} \
+  CONFIG.PLL_COMPENSATION {SYSTEM_SYNCHRONOUS} \
+  CONFIG.PLL_DIVCLK_DIVIDE {1} \
+  CONFIG.PLL_NOTES {None} \
+  CONFIG.PLL_REF_JITTER {0.010} \
+  CONFIG.POWER_DOWN_PORT {power_down} \
+  CONFIG.PRECISION {1} \
+  CONFIG.PRIMARY_PORT {clk_in1} \
+  CONFIG.PRIMITIVE {MMCM} \
+  CONFIG.PRIMTYPE_SEL {mmcm_adv} \
+  CONFIG.PRIM_IN_FREQ {100.000} \
+  CONFIG.PRIM_IN_JITTER {0.010} \
+  CONFIG.PRIM_IN_TIMEPERIOD {10.000} \
+  CONFIG.PRIM_SOURCE {No_buffer} \
+  CONFIG.PSCLK_PORT {psclk} \
+  CONFIG.PSDONE_PORT {psdone} \
+  CONFIG.PSEN_PORT {psen} \
+  CONFIG.PSINCDEC_PORT {psincdec} \
+  CONFIG.REF_CLK_FREQ {100.0} \
+  CONFIG.RELATIVE_INCLK {REL_PRIMARY} \
+  CONFIG.RESET_BOARD_INTERFACE {Custom} \
+  CONFIG.RESET_PORT {reset} \
+  CONFIG.RESET_TYPE {ACTIVE_HIGH} \
+  CONFIG.SECONDARY_IN_FREQ {100.000} \
+  CONFIG.SECONDARY_IN_JITTER {0.010} \
+  CONFIG.SECONDARY_IN_TIMEPERIOD {10.000} \
+  CONFIG.SECONDARY_PORT {clk_in2} \
+  CONFIG.SECONDARY_SOURCE {Single_ended_clock_capable_pin} \
+  CONFIG.SS_MODE {CENTER_HIGH} \
+  CONFIG.SS_MOD_FREQ {250} \
+  CONFIG.SS_MOD_TIME {0.004} \
+  CONFIG.STATUS_PORT {STATUS} \
+  CONFIG.SUMMARY_STRINGS {empty} \
+  CONFIG.USER_CLK_FREQ0 {100.0} \
+  CONFIG.USER_CLK_FREQ1 {100.0} \
+  CONFIG.USER_CLK_FREQ2 {100.0} \
+  CONFIG.USER_CLK_FREQ3 {100.0} \
+  CONFIG.USE_BOARD_FLOW {false} \
+  CONFIG.USE_CLKFB_STOPPED {false} \
+  CONFIG.USE_CLK_VALID {false} \
+  CONFIG.USE_CLOCK_SEQUENCING {false} \
+  CONFIG.USE_DYN_PHASE_SHIFT {false} \
+  CONFIG.USE_DYN_RECONFIG {true} \
+  CONFIG.USE_FREEZE {false} \
+  CONFIG.USE_FREQ_SYNTH {true} \
+  CONFIG.USE_INCLK_STOPPED {false} \
+  CONFIG.USE_INCLK_SWITCHOVER {false} \
+  CONFIG.USE_LOCKED {true} \
+  CONFIG.USE_MAX_I_JITTER {false} \
+  CONFIG.USE_MIN_O_JITTER {false} \
+  CONFIG.USE_MIN_POWER {false} \
+  CONFIG.USE_PHASE_ALIGNMENT {false} \
+  CONFIG.USE_POWER_DOWN {false} \
+  CONFIG.USE_RESET {true} \
+  CONFIG.USE_SAFE_CLOCK_STARTUP {false} \
+  CONFIG.USE_SPREAD_SPECTRUM {false} \
+  CONFIG.USE_STATUS {false} \
+  CONFIG.intr.PortWidth {1} \
+  CONFIG.intr.SENSITIVITY {LEVEL_HIGH} \
+  CONFIG.s_axi_aclk.ASSOCIATED_BUSIF {s_axi_lite} \
+  CONFIG.s_axi_aclk.ASSOCIATED_PORT {} \
+  CONFIG.s_axi_aclk.ASSOCIATED_RESET {s_axi_aresetn} \
+  CONFIG.s_axi_aclk.CLK_DOMAIN {} \
+  CONFIG.s_axi_aclk.FREQ_HZ {100000000} \
+  CONFIG.s_axi_aclk.FREQ_TOLERANCE_HZ {0} \
+  CONFIG.s_axi_aclk.INSERT_VIP {0} \
+  CONFIG.s_axi_aclk.PHASE {0.0} \
+  CONFIG.s_axi_lite.ADDR_WIDTH {11} \
+  CONFIG.s_axi_lite.ARUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.AWUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.BUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.CLK_DOMAIN {} \
+  CONFIG.s_axi_lite.DATA_WIDTH {32} \
+  CONFIG.s_axi_lite.FREQ_HZ {100000000} \
+  CONFIG.s_axi_lite.HAS_BRESP {1} \
+  CONFIG.s_axi_lite.HAS_BURST {0} \
+  CONFIG.s_axi_lite.HAS_CACHE {0} \
+  CONFIG.s_axi_lite.HAS_LOCK {0} \
+  CONFIG.s_axi_lite.HAS_PROT {0} \
+  CONFIG.s_axi_lite.HAS_QOS {0} \
+  CONFIG.s_axi_lite.HAS_REGION {0} \
+  CONFIG.s_axi_lite.HAS_RRESP {1} \
+  CONFIG.s_axi_lite.HAS_WSTRB {1} \
+  CONFIG.s_axi_lite.ID_WIDTH {0} \
+  CONFIG.s_axi_lite.INSERT_VIP {0} \
+  CONFIG.s_axi_lite.MAX_BURST_LENGTH {1} \
+  CONFIG.s_axi_lite.NUM_READ_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_READ_THREADS {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_THREADS {1} \
+  CONFIG.s_axi_lite.PHASE {0.0} \
+  CONFIG.s_axi_lite.PROTOCOL {AXI4LITE} \
+  CONFIG.s_axi_lite.READ_WRITE_MODE {READ_WRITE} \
+  CONFIG.s_axi_lite.RUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.RUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.SUPPORTS_NARROW_BURST {0} \
+  CONFIG.s_axi_lite.WUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.WUSER_WIDTH {0} \
+  CONFIG.s_axi_resetn.ASSOCIATED_RESET {aresetn} \
+  CONFIG.s_axi_resetn.INSERT_VIP {0} \
+  CONFIG.s_axi_resetn.POLARITY {ACTIVE_LOW} " [get_ips clk_mmcm_hbm]
+
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:04 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'clk_mmcm_c'
+
+1. Summary
+----------
+
+CAUTION (success, with warnings) in the upgrade of clk_mmcm_c (xilinx.com:ip:clk_wiz:6.0) from (Rev. 10) to (Rev. 13)
+
+After upgrade, an IP may have parameter differences compared to the original customization. Please review the parameters within the IP customization GUI to ensure proper functionality.
+
+2. Customization warnings
+-------------------------
+
+An attempt to modify the value of disabled parameter 'CLKOUT3_REQUESTED_OUT_FREQ' from '100.000' to '500' has been ignored for IP 'clk_mmcm_c'
+
+
+3. Debug Commands
+-----------------
+
+  The following debug information can be passed to Vivado as Tcl commands,
+in order to validate or debug the output of the upgrade flow.
+  You may consult any warnings from within this upgrade, and alter or remove
+the configuration parameter(s) which caused the warning; then execute the Tcl
+commands, and use the IP Customization GUI to verify the IP configuration.
+
+create_ip -vlnv xilinx.com:ip:clk_wiz:6.0 -user_name clk_mmcm_c
+set_property -dict "\
+  CONFIG.AUTO_PRIMITIVE {MMCM} \
+  CONFIG.AXI_DRP {false} \
+  CONFIG.CALC_DONE {empty} \
+  CONFIG.CDDCDONE_PORT {cddcdone} \
+  CONFIG.CDDCREQ_PORT {cddcreq} \
+  CONFIG.CLKFB_IN_N_PORT {clkfb_in_n} \
+  CONFIG.CLKFB_IN_PORT {clkfb_in} \
+  CONFIG.CLKFB_IN_P_PORT {clkfb_in_p} \
+  CONFIG.CLKFB_IN_SIGNALING {SINGLE} \
+  CONFIG.CLKFB_OUT_N_PORT {clkfb_out_n} \
+  CONFIG.CLKFB_OUT_PORT {clkfb_out} \
+  CONFIG.CLKFB_OUT_P_PORT {clkfb_out_p} \
+  CONFIG.CLKFB_STOPPED_PORT {clkfb_stopped} \
+  CONFIG.CLKIN1_JITTER_PS {100.0} \
+  CONFIG.CLKIN1_UI_JITTER {0.010} \
+  CONFIG.CLKIN2_JITTER_PS {100.0} \
+  CONFIG.CLKIN2_UI_JITTER {0.010} \
+  CONFIG.CLKOUT1_DRIVES {Buffer} \
+  CONFIG.CLKOUT1_JITTER {94.862} \
+  CONFIG.CLKOUT1_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT1_PHASE_ERROR {87.180} \
+  CONFIG.CLKOUT1_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {300} \
+  CONFIG.CLKOUT1_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT1_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT1_USED {true} \
+  CONFIG.CLKOUT2_DRIVES {Buffer} \
+  CONFIG.CLKOUT2_JITTER {90.074} \
+  CONFIG.CLKOUT2_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT2_PHASE_ERROR {87.180} \
+  CONFIG.CLKOUT2_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {400} \
+  CONFIG.CLKOUT2_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT2_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT2_USED {true} \
+  CONFIG.CLKOUT3_DRIVES {Buffer} \
+  CONFIG.CLKOUT3_JITTER {72.605} \
+  CONFIG.CLKOUT3_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT3_PHASE_ERROR {76.967} \
+  CONFIG.CLKOUT3_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {500} \
+  CONFIG.CLKOUT3_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT3_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT3_USED {false} \
+  CONFIG.CLKOUT4_DRIVES {Buffer} \
+  CONFIG.CLKOUT4_JITTER {0.0} \
+  CONFIG.CLKOUT4_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT4_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT4_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT4_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT4_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT4_USED {false} \
+  CONFIG.CLKOUT5_DRIVES {Buffer} \
+  CONFIG.CLKOUT5_JITTER {0.0} \
+  CONFIG.CLKOUT5_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT5_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT5_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT5_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT5_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT5_USED {false} \
+  CONFIG.CLKOUT6_DRIVES {Buffer} \
+  CONFIG.CLKOUT6_JITTER {0.0} \
+  CONFIG.CLKOUT6_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT6_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT6_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT6_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT6_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT6_USED {false} \
+  CONFIG.CLKOUT7_DRIVES {Buffer} \
+  CONFIG.CLKOUT7_JITTER {0.0} \
+  CONFIG.CLKOUT7_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT7_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT7_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT7_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT7_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT7_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT7_USED {false} \
+  CONFIG.CLKOUTPHY_REQUESTED_FREQ {600.000} \
+  CONFIG.CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN_SEL_PORT {clk_in_sel} \
+  CONFIG.CLK_OUT1_PORT {clk_out1} \
+  CONFIG.CLK_OUT1_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT2_PORT {clk_out2} \
+  CONFIG.CLK_OUT2_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT3_PORT {clk_out3} \
+  CONFIG.CLK_OUT3_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT4_PORT {clk_out4} \
+  CONFIG.CLK_OUT4_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT5_PORT {clk_out5} \
+  CONFIG.CLK_OUT5_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT6_PORT {clk_out6} \
+  CONFIG.CLK_OUT6_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT7_PORT {clk_out7} \
+  CONFIG.CLK_OUT7_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_VALID_PORT {CLK_VALID} \
+  CONFIG.CLOCK_MGR_TYPE {auto} \
+  CONFIG.Component_Name {clk_mmcm_c} \
+  CONFIG.DADDR_PORT {daddr} \
+  CONFIG.DCLK_PORT {dclk} \
+  CONFIG.DEN_PORT {den} \
+  CONFIG.DIFF_CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.DIFF_CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.DIN_PORT {din} \
+  CONFIG.DOUT_PORT {dout} \
+  CONFIG.DRDY_PORT {drdy} \
+  CONFIG.DWE_PORT {dwe} \
+  CONFIG.ENABLE_CDDC {false} \
+  CONFIG.ENABLE_CLKOUTPHY {false} \
+  CONFIG.ENABLE_CLOCK_MONITOR {false} \
+  CONFIG.ENABLE_USER_CLOCK0 {false} \
+  CONFIG.ENABLE_USER_CLOCK1 {false} \
+  CONFIG.ENABLE_USER_CLOCK2 {false} \
+  CONFIG.ENABLE_USER_CLOCK3 {false} \
+  CONFIG.Enable_PLL0 {false} \
+  CONFIG.Enable_PLL1 {false} \
+  CONFIG.FEEDBACK_SOURCE {FDBK_AUTO} \
+  CONFIG.INPUT_CLK_STOPPED_PORT {input_clk_stopped} \
+  CONFIG.INPUT_MODE {frequency} \
+  CONFIG.INTERFACE_SELECTION {Enable_AXI} \
+  CONFIG.IN_FREQ_UNITS {Units_MHz} \
+  CONFIG.IN_JITTER_UNITS {Units_UI} \
+  CONFIG.JITTER_OPTIONS {UI} \
+  CONFIG.JITTER_SEL {No_Jitter} \
+  CONFIG.LOCKED_PORT {locked} \
+  CONFIG.MMCM_BANDWIDTH {OPTIMIZED} \
+  CONFIG.MMCM_CLKFBOUT_MULT_F {12.000} \
+  CONFIG.MMCM_CLKFBOUT_PHASE {0.000} \
+  CONFIG.MMCM_CLKFBOUT_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKIN1_PERIOD {10.000} \
+  CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
+  CONFIG.MMCM_CLKOUT0_DIVIDE_F {4.000} \
+  CONFIG.MMCM_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT0_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT0_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT1_DIVIDE {3} \
+  CONFIG.MMCM_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT1_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT1_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT2_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT2_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT2_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT3_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT3_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT3_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT4_CASCADE {false} \
+  CONFIG.MMCM_CLKOUT4_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT4_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT4_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT5_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT5_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT5_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT6_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT6_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT6_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT6_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLOCK_HOLD {false} \
+  CONFIG.MMCM_COMPENSATION {AUTO} \
+  CONFIG.MMCM_DIVCLK_DIVIDE {1} \
+  CONFIG.MMCM_NOTES {None} \
+  CONFIG.MMCM_REF_JITTER1 {0.010} \
+  CONFIG.MMCM_REF_JITTER2 {0.010} \
+  CONFIG.MMCM_STARTUP_WAIT {false} \
+  CONFIG.NUM_OUT_CLKS {2} \
+  CONFIG.OPTIMIZE_CLOCKING_STRUCTURE_EN {false} \
+  CONFIG.OVERRIDE_MMCM {false} \
+  CONFIG.OVERRIDE_PLL {false} \
+  CONFIG.PHASESHIFT_MODE {LATENCY} \
+  CONFIG.PHASE_DUTY_CONFIG {false} \
+  CONFIG.PLATFORM {UNKNOWN} \
+  CONFIG.PLL_BANDWIDTH {OPTIMIZED} \
+  CONFIG.PLL_CLKFBOUT_MULT {4} \
+  CONFIG.PLL_CLKFBOUT_PHASE {0.000} \
+  CONFIG.PLL_CLKIN_PERIOD {10.000} \
+  CONFIG.PLL_CLKOUT0_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT0_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT1_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT1_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT2_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT2_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT3_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT3_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT4_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT4_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT5_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT5_PHASE {0.000} \
+  CONFIG.PLL_CLK_FEEDBACK {CLKFBOUT} \
+  CONFIG.PLL_COMPENSATION {SYSTEM_SYNCHRONOUS} \
+  CONFIG.PLL_DIVCLK_DIVIDE {1} \
+  CONFIG.PLL_NOTES {None} \
+  CONFIG.PLL_REF_JITTER {0.010} \
+  CONFIG.POWER_DOWN_PORT {power_down} \
+  CONFIG.PRECISION {1} \
+  CONFIG.PRIMARY_PORT {clk_in1} \
+  CONFIG.PRIMITIVE {MMCM} \
+  CONFIG.PRIMTYPE_SEL {mmcm_adv} \
+  CONFIG.PRIM_IN_FREQ {100.000} \
+  CONFIG.PRIM_IN_JITTER {0.010} \
+  CONFIG.PRIM_IN_TIMEPERIOD {10.000} \
+  CONFIG.PRIM_SOURCE {No_buffer} \
+  CONFIG.PSCLK_PORT {psclk} \
+  CONFIG.PSDONE_PORT {psdone} \
+  CONFIG.PSEN_PORT {psen} \
+  CONFIG.PSINCDEC_PORT {psincdec} \
+  CONFIG.REF_CLK_FREQ {100.0} \
+  CONFIG.RELATIVE_INCLK {REL_PRIMARY} \
+  CONFIG.RESET_BOARD_INTERFACE {Custom} \
+  CONFIG.RESET_PORT {reset} \
+  CONFIG.RESET_TYPE {ACTIVE_HIGH} \
+  CONFIG.SECONDARY_IN_FREQ {100.000} \
+  CONFIG.SECONDARY_IN_JITTER {0.010} \
+  CONFIG.SECONDARY_IN_TIMEPERIOD {10.000} \
+  CONFIG.SECONDARY_PORT {clk_in2} \
+  CONFIG.SECONDARY_SOURCE {Single_ended_clock_capable_pin} \
+  CONFIG.SS_MODE {CENTER_HIGH} \
+  CONFIG.SS_MOD_FREQ {250} \
+  CONFIG.SS_MOD_TIME {0.004} \
+  CONFIG.STATUS_PORT {STATUS} \
+  CONFIG.SUMMARY_STRINGS {empty} \
+  CONFIG.USER_CLK_FREQ0 {100.0} \
+  CONFIG.USER_CLK_FREQ1 {100.0} \
+  CONFIG.USER_CLK_FREQ2 {100.0} \
+  CONFIG.USER_CLK_FREQ3 {100.0} \
+  CONFIG.USE_BOARD_FLOW {false} \
+  CONFIG.USE_CLKFB_STOPPED {false} \
+  CONFIG.USE_CLK_VALID {false} \
+  CONFIG.USE_CLOCK_SEQUENCING {false} \
+  CONFIG.USE_DYN_PHASE_SHIFT {false} \
+  CONFIG.USE_DYN_RECONFIG {true} \
+  CONFIG.USE_FREEZE {false} \
+  CONFIG.USE_FREQ_SYNTH {true} \
+  CONFIG.USE_INCLK_STOPPED {false} \
+  CONFIG.USE_INCLK_SWITCHOVER {false} \
+  CONFIG.USE_LOCKED {true} \
+  CONFIG.USE_MAX_I_JITTER {false} \
+  CONFIG.USE_MIN_O_JITTER {false} \
+  CONFIG.USE_MIN_POWER {false} \
+  CONFIG.USE_PHASE_ALIGNMENT {false} \
+  CONFIG.USE_POWER_DOWN {false} \
+  CONFIG.USE_RESET {true} \
+  CONFIG.USE_SAFE_CLOCK_STARTUP {false} \
+  CONFIG.USE_SPREAD_SPECTRUM {false} \
+  CONFIG.USE_STATUS {false} \
+  CONFIG.intr.PortWidth {1} \
+  CONFIG.intr.SENSITIVITY {LEVEL_HIGH} \
+  CONFIG.s_axi_aclk.ASSOCIATED_BUSIF {s_axi_lite} \
+  CONFIG.s_axi_aclk.ASSOCIATED_PORT {} \
+  CONFIG.s_axi_aclk.ASSOCIATED_RESET {s_axi_aresetn} \
+  CONFIG.s_axi_aclk.CLK_DOMAIN {} \
+  CONFIG.s_axi_aclk.FREQ_HZ {100000000} \
+  CONFIG.s_axi_aclk.FREQ_TOLERANCE_HZ {0} \
+  CONFIG.s_axi_aclk.INSERT_VIP {0} \
+  CONFIG.s_axi_aclk.PHASE {0.0} \
+  CONFIG.s_axi_lite.ADDR_WIDTH {11} \
+  CONFIG.s_axi_lite.ARUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.AWUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.BUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.CLK_DOMAIN {} \
+  CONFIG.s_axi_lite.DATA_WIDTH {32} \
+  CONFIG.s_axi_lite.FREQ_HZ {100000000} \
+  CONFIG.s_axi_lite.HAS_BRESP {1} \
+  CONFIG.s_axi_lite.HAS_BURST {0} \
+  CONFIG.s_axi_lite.HAS_CACHE {0} \
+  CONFIG.s_axi_lite.HAS_LOCK {0} \
+  CONFIG.s_axi_lite.HAS_PROT {0} \
+  CONFIG.s_axi_lite.HAS_QOS {0} \
+  CONFIG.s_axi_lite.HAS_REGION {0} \
+  CONFIG.s_axi_lite.HAS_RRESP {1} \
+  CONFIG.s_axi_lite.HAS_WSTRB {1} \
+  CONFIG.s_axi_lite.ID_WIDTH {0} \
+  CONFIG.s_axi_lite.INSERT_VIP {0} \
+  CONFIG.s_axi_lite.MAX_BURST_LENGTH {1} \
+  CONFIG.s_axi_lite.NUM_READ_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_READ_THREADS {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_THREADS {1} \
+  CONFIG.s_axi_lite.PHASE {0.0} \
+  CONFIG.s_axi_lite.PROTOCOL {AXI4LITE} \
+  CONFIG.s_axi_lite.READ_WRITE_MODE {READ_WRITE} \
+  CONFIG.s_axi_lite.RUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.RUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.SUPPORTS_NARROW_BURST {0} \
+  CONFIG.s_axi_lite.WUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.WUSER_WIDTH {0} \
+  CONFIG.s_axi_resetn.ASSOCIATED_RESET {aresetn} \
+  CONFIG.s_axi_resetn.INSERT_VIP {0} \
+  CONFIG.s_axi_resetn.POLARITY {ACTIVE_LOW} " [get_ips clk_mmcm_c]
+
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:03:01 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'clk_mmcm_b'
+
+1. Summary
+----------
+
+CAUTION (success, with warnings) in the upgrade of clk_mmcm_b (xilinx.com:ip:clk_wiz:6.0) from (Rev. 10) to (Rev. 13)
+
+After upgrade, an IP may have parameter differences compared to the original customization. Please review the parameters within the IP customization GUI to ensure proper functionality.
+
+2. Customization warnings
+-------------------------
+
+An attempt to modify the value of disabled parameter 'CLKOUT3_REQUESTED_OUT_FREQ' from '100.000' to '500' has been ignored for IP 'clk_mmcm_b'
+
+
+3. Debug Commands
+-----------------
+
+  The following debug information can be passed to Vivado as Tcl commands,
+in order to validate or debug the output of the upgrade flow.
+  You may consult any warnings from within this upgrade, and alter or remove
+the configuration parameter(s) which caused the warning; then execute the Tcl
+commands, and use the IP Customization GUI to verify the IP configuration.
+
+create_ip -vlnv xilinx.com:ip:clk_wiz:6.0 -user_name clk_mmcm_b
+set_property -dict "\
+  CONFIG.AUTO_PRIMITIVE {MMCM} \
+  CONFIG.AXI_DRP {false} \
+  CONFIG.CALC_DONE {empty} \
+  CONFIG.CDDCDONE_PORT {cddcdone} \
+  CONFIG.CDDCREQ_PORT {cddcreq} \
+  CONFIG.CLKFB_IN_N_PORT {clkfb_in_n} \
+  CONFIG.CLKFB_IN_PORT {clkfb_in} \
+  CONFIG.CLKFB_IN_P_PORT {clkfb_in_p} \
+  CONFIG.CLKFB_IN_SIGNALING {SINGLE} \
+  CONFIG.CLKFB_OUT_N_PORT {clkfb_out_n} \
+  CONFIG.CLKFB_OUT_PORT {clkfb_out} \
+  CONFIG.CLKFB_OUT_P_PORT {clkfb_out_p} \
+  CONFIG.CLKFB_STOPPED_PORT {clkfb_stopped} \
+  CONFIG.CLKIN1_JITTER_PS {100.0} \
+  CONFIG.CLKIN1_UI_JITTER {0.010} \
+  CONFIG.CLKIN2_JITTER_PS {100.0} \
+  CONFIG.CLKIN2_UI_JITTER {0.010} \
+  CONFIG.CLKOUT1_DRIVES {Buffer} \
+  CONFIG.CLKOUT1_JITTER {92.284} \
+  CONFIG.CLKOUT1_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT1_PHASE_ERROR {91.100} \
+  CONFIG.CLKOUT1_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {450} \
+  CONFIG.CLKOUT1_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT1_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT1_USED {true} \
+  CONFIG.CLKOUT2_DRIVES {Buffer} \
+  CONFIG.CLKOUT2_JITTER {104.670} \
+  CONFIG.CLKOUT2_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT2_PHASE_ERROR {91.100} \
+  CONFIG.CLKOUT2_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {225} \
+  CONFIG.CLKOUT2_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT2_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT2_USED {true} \
+  CONFIG.CLKOUT3_DRIVES {Buffer} \
+  CONFIG.CLKOUT3_JITTER {72.605} \
+  CONFIG.CLKOUT3_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT3_PHASE_ERROR {76.967} \
+  CONFIG.CLKOUT3_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {500} \
+  CONFIG.CLKOUT3_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT3_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT3_USED {false} \
+  CONFIG.CLKOUT4_DRIVES {Buffer} \
+  CONFIG.CLKOUT4_JITTER {0.0} \
+  CONFIG.CLKOUT4_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT4_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT4_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT4_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT4_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT4_USED {false} \
+  CONFIG.CLKOUT5_DRIVES {Buffer} \
+  CONFIG.CLKOUT5_JITTER {0.0} \
+  CONFIG.CLKOUT5_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT5_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT5_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT5_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT5_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT5_USED {false} \
+  CONFIG.CLKOUT6_DRIVES {Buffer} \
+  CONFIG.CLKOUT6_JITTER {0.0} \
+  CONFIG.CLKOUT6_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT6_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT6_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT6_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT6_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT6_USED {false} \
+  CONFIG.CLKOUT7_DRIVES {Buffer} \
+  CONFIG.CLKOUT7_JITTER {0.0} \
+  CONFIG.CLKOUT7_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT7_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT7_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT7_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT7_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT7_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT7_USED {false} \
+  CONFIG.CLKOUTPHY_REQUESTED_FREQ {600.000} \
+  CONFIG.CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN_SEL_PORT {clk_in_sel} \
+  CONFIG.CLK_OUT1_PORT {clk_out1} \
+  CONFIG.CLK_OUT1_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT2_PORT {clk_out2} \
+  CONFIG.CLK_OUT2_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT3_PORT {clk_out3} \
+  CONFIG.CLK_OUT3_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT4_PORT {clk_out4} \
+  CONFIG.CLK_OUT4_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT5_PORT {clk_out5} \
+  CONFIG.CLK_OUT5_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT6_PORT {clk_out6} \
+  CONFIG.CLK_OUT6_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT7_PORT {clk_out7} \
+  CONFIG.CLK_OUT7_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_VALID_PORT {CLK_VALID} \
+  CONFIG.CLOCK_MGR_TYPE {auto} \
+  CONFIG.Component_Name {clk_mmcm_b} \
+  CONFIG.DADDR_PORT {daddr} \
+  CONFIG.DCLK_PORT {dclk} \
+  CONFIG.DEN_PORT {den} \
+  CONFIG.DIFF_CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.DIFF_CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.DIN_PORT {din} \
+  CONFIG.DOUT_PORT {dout} \
+  CONFIG.DRDY_PORT {drdy} \
+  CONFIG.DWE_PORT {dwe} \
+  CONFIG.ENABLE_CDDC {false} \
+  CONFIG.ENABLE_CLKOUTPHY {false} \
+  CONFIG.ENABLE_CLOCK_MONITOR {false} \
+  CONFIG.ENABLE_USER_CLOCK0 {false} \
+  CONFIG.ENABLE_USER_CLOCK1 {false} \
+  CONFIG.ENABLE_USER_CLOCK2 {false} \
+  CONFIG.ENABLE_USER_CLOCK3 {false} \
+  CONFIG.Enable_PLL0 {false} \
+  CONFIG.Enable_PLL1 {false} \
+  CONFIG.FEEDBACK_SOURCE {FDBK_AUTO} \
+  CONFIG.INPUT_CLK_STOPPED_PORT {input_clk_stopped} \
+  CONFIG.INPUT_MODE {frequency} \
+  CONFIG.INTERFACE_SELECTION {Enable_AXI} \
+  CONFIG.IN_FREQ_UNITS {Units_MHz} \
+  CONFIG.IN_JITTER_UNITS {Units_UI} \
+  CONFIG.JITTER_OPTIONS {UI} \
+  CONFIG.JITTER_SEL {No_Jitter} \
+  CONFIG.LOCKED_PORT {locked} \
+  CONFIG.MMCM_BANDWIDTH {OPTIMIZED} \
+  CONFIG.MMCM_CLKFBOUT_MULT_F {11.250} \
+  CONFIG.MMCM_CLKFBOUT_PHASE {0.000} \
+  CONFIG.MMCM_CLKFBOUT_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKIN1_PERIOD {10.000} \
+  CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
+  CONFIG.MMCM_CLKOUT0_DIVIDE_F {2.500} \
+  CONFIG.MMCM_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT0_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT0_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT1_DIVIDE {5} \
+  CONFIG.MMCM_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT1_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT1_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT2_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT2_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT2_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT3_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT3_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT3_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT4_CASCADE {false} \
+  CONFIG.MMCM_CLKOUT4_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT4_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT4_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT5_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT5_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT5_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT6_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT6_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT6_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT6_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLOCK_HOLD {false} \
+  CONFIG.MMCM_COMPENSATION {AUTO} \
+  CONFIG.MMCM_DIVCLK_DIVIDE {1} \
+  CONFIG.MMCM_NOTES {None} \
+  CONFIG.MMCM_REF_JITTER1 {0.010} \
+  CONFIG.MMCM_REF_JITTER2 {0.010} \
+  CONFIG.MMCM_STARTUP_WAIT {false} \
+  CONFIG.NUM_OUT_CLKS {2} \
+  CONFIG.OPTIMIZE_CLOCKING_STRUCTURE_EN {false} \
+  CONFIG.OVERRIDE_MMCM {false} \
+  CONFIG.OVERRIDE_PLL {false} \
+  CONFIG.PHASESHIFT_MODE {LATENCY} \
+  CONFIG.PHASE_DUTY_CONFIG {false} \
+  CONFIG.PLATFORM {UNKNOWN} \
+  CONFIG.PLL_BANDWIDTH {OPTIMIZED} \
+  CONFIG.PLL_CLKFBOUT_MULT {4} \
+  CONFIG.PLL_CLKFBOUT_PHASE {0.000} \
+  CONFIG.PLL_CLKIN_PERIOD {10.000} \
+  CONFIG.PLL_CLKOUT0_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT0_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT1_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT1_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT2_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT2_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT3_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT3_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT4_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT4_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT5_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT5_PHASE {0.000} \
+  CONFIG.PLL_CLK_FEEDBACK {CLKFBOUT} \
+  CONFIG.PLL_COMPENSATION {SYSTEM_SYNCHRONOUS} \
+  CONFIG.PLL_DIVCLK_DIVIDE {1} \
+  CONFIG.PLL_NOTES {None} \
+  CONFIG.PLL_REF_JITTER {0.010} \
+  CONFIG.POWER_DOWN_PORT {power_down} \
+  CONFIG.PRECISION {1} \
+  CONFIG.PRIMARY_PORT {clk_in1} \
+  CONFIG.PRIMITIVE {MMCM} \
+  CONFIG.PRIMTYPE_SEL {mmcm_adv} \
+  CONFIG.PRIM_IN_FREQ {100.000} \
+  CONFIG.PRIM_IN_JITTER {0.010} \
+  CONFIG.PRIM_IN_TIMEPERIOD {10.000} \
+  CONFIG.PRIM_SOURCE {No_buffer} \
+  CONFIG.PSCLK_PORT {psclk} \
+  CONFIG.PSDONE_PORT {psdone} \
+  CONFIG.PSEN_PORT {psen} \
+  CONFIG.PSINCDEC_PORT {psincdec} \
+  CONFIG.REF_CLK_FREQ {100.0} \
+  CONFIG.RELATIVE_INCLK {REL_PRIMARY} \
+  CONFIG.RESET_BOARD_INTERFACE {Custom} \
+  CONFIG.RESET_PORT {reset} \
+  CONFIG.RESET_TYPE {ACTIVE_HIGH} \
+  CONFIG.SECONDARY_IN_FREQ {100.000} \
+  CONFIG.SECONDARY_IN_JITTER {0.010} \
+  CONFIG.SECONDARY_IN_TIMEPERIOD {10.000} \
+  CONFIG.SECONDARY_PORT {clk_in2} \
+  CONFIG.SECONDARY_SOURCE {Single_ended_clock_capable_pin} \
+  CONFIG.SS_MODE {CENTER_HIGH} \
+  CONFIG.SS_MOD_FREQ {250} \
+  CONFIG.SS_MOD_TIME {0.004} \
+  CONFIG.STATUS_PORT {STATUS} \
+  CONFIG.SUMMARY_STRINGS {empty} \
+  CONFIG.USER_CLK_FREQ0 {100.0} \
+  CONFIG.USER_CLK_FREQ1 {100.0} \
+  CONFIG.USER_CLK_FREQ2 {100.0} \
+  CONFIG.USER_CLK_FREQ3 {100.0} \
+  CONFIG.USE_BOARD_FLOW {false} \
+  CONFIG.USE_CLKFB_STOPPED {false} \
+  CONFIG.USE_CLK_VALID {false} \
+  CONFIG.USE_CLOCK_SEQUENCING {false} \
+  CONFIG.USE_DYN_PHASE_SHIFT {false} \
+  CONFIG.USE_DYN_RECONFIG {true} \
+  CONFIG.USE_FREEZE {false} \
+  CONFIG.USE_FREQ_SYNTH {true} \
+  CONFIG.USE_INCLK_STOPPED {false} \
+  CONFIG.USE_INCLK_SWITCHOVER {false} \
+  CONFIG.USE_LOCKED {true} \
+  CONFIG.USE_MAX_I_JITTER {false} \
+  CONFIG.USE_MIN_O_JITTER {false} \
+  CONFIG.USE_MIN_POWER {false} \
+  CONFIG.USE_PHASE_ALIGNMENT {false} \
+  CONFIG.USE_POWER_DOWN {false} \
+  CONFIG.USE_RESET {true} \
+  CONFIG.USE_SAFE_CLOCK_STARTUP {false} \
+  CONFIG.USE_SPREAD_SPECTRUM {false} \
+  CONFIG.USE_STATUS {false} \
+  CONFIG.intr.PortWidth {1} \
+  CONFIG.intr.SENSITIVITY {LEVEL_HIGH} \
+  CONFIG.s_axi_aclk.ASSOCIATED_BUSIF {s_axi_lite} \
+  CONFIG.s_axi_aclk.ASSOCIATED_PORT {} \
+  CONFIG.s_axi_aclk.ASSOCIATED_RESET {s_axi_aresetn} \
+  CONFIG.s_axi_aclk.CLK_DOMAIN {} \
+  CONFIG.s_axi_aclk.FREQ_HZ {100000000} \
+  CONFIG.s_axi_aclk.FREQ_TOLERANCE_HZ {0} \
+  CONFIG.s_axi_aclk.INSERT_VIP {0} \
+  CONFIG.s_axi_aclk.PHASE {0.0} \
+  CONFIG.s_axi_lite.ADDR_WIDTH {11} \
+  CONFIG.s_axi_lite.ARUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.AWUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.BUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.CLK_DOMAIN {} \
+  CONFIG.s_axi_lite.DATA_WIDTH {32} \
+  CONFIG.s_axi_lite.FREQ_HZ {100000000} \
+  CONFIG.s_axi_lite.HAS_BRESP {1} \
+  CONFIG.s_axi_lite.HAS_BURST {0} \
+  CONFIG.s_axi_lite.HAS_CACHE {0} \
+  CONFIG.s_axi_lite.HAS_LOCK {0} \
+  CONFIG.s_axi_lite.HAS_PROT {0} \
+  CONFIG.s_axi_lite.HAS_QOS {0} \
+  CONFIG.s_axi_lite.HAS_REGION {0} \
+  CONFIG.s_axi_lite.HAS_RRESP {1} \
+  CONFIG.s_axi_lite.HAS_WSTRB {1} \
+  CONFIG.s_axi_lite.ID_WIDTH {0} \
+  CONFIG.s_axi_lite.INSERT_VIP {0} \
+  CONFIG.s_axi_lite.MAX_BURST_LENGTH {1} \
+  CONFIG.s_axi_lite.NUM_READ_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_READ_THREADS {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_OUTSTANDING {1} \
+  CONFIG.s_axi_lite.NUM_WRITE_THREADS {1} \
+  CONFIG.s_axi_lite.PHASE {0.0} \
+  CONFIG.s_axi_lite.PROTOCOL {AXI4LITE} \
+  CONFIG.s_axi_lite.READ_WRITE_MODE {READ_WRITE} \
+  CONFIG.s_axi_lite.RUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.RUSER_WIDTH {0} \
+  CONFIG.s_axi_lite.SUPPORTS_NARROW_BURST {0} \
+  CONFIG.s_axi_lite.WUSER_BITS_PER_BYTE {0} \
+  CONFIG.s_axi_lite.WUSER_WIDTH {0} \
+  CONFIG.s_axi_resetn.ASSOCIATED_RESET {aresetn} \
+  CONFIG.s_axi_resetn.INSERT_VIP {0} \
+  CONFIG.s_axi_resetn.POLARITY {ACTIVE_LOW} " [get_ips clk_mmcm_b]
+
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:59 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'clk_mmcm_a'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of clk_mmcm_a (xilinx.com:ip:clk_wiz:6.0) from (Rev. 10) to (Rev. 13)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:56 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_sda_axil_xbar'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_sda_axil_xbar (xilinx.com:ip:axi_crossbar:2.1) from (Rev. 27) to (Rev. 31)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:55 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_hbm_mmcm'
+
+1. Summary
+----------
+
+CAUTION (success, with warnings) in the upgrade of cl_hbm_mmcm (xilinx.com:ip:clk_wiz:6.0) from (Rev. 10) to (Rev. 13)
+
+After upgrade, an IP may have parameter differences compared to the original customization. Please review the parameters within the IP customization GUI to ensure proper functionality.
+
+2. Customization warnings
+-------------------------
+
+An attempt to modify the value of disabled parameter 'CLKOUT2_REQUESTED_OUT_FREQ' from '100.000' to '450' has been ignored for IP 'cl_hbm_mmcm'
+
+An attempt to modify the value of disabled parameter 'RESET_TYPE' from 'ACTIVE_HIGH' to 'ACTIVE_LOW' has been ignored for IP 'cl_hbm_mmcm'
+
+
+3. Debug Commands
+-----------------
+
+  The following debug information can be passed to Vivado as Tcl commands,
+in order to validate or debug the output of the upgrade flow.
+  You may consult any warnings from within this upgrade, and alter or remove
+the configuration parameter(s) which caused the warning; then execute the Tcl
+commands, and use the IP Customization GUI to verify the IP configuration.
+
+create_ip -vlnv xilinx.com:ip:clk_wiz:6.0 -user_name cl_hbm_mmcm
+set_property -dict "\
+  CONFIG.AUTO_PRIMITIVE {MMCM} \
+  CONFIG.AXI_DRP {false} \
+  CONFIG.CALC_DONE {empty} \
+  CONFIG.CDDCDONE_PORT {cddcdone} \
+  CONFIG.CDDCREQ_PORT {cddcreq} \
+  CONFIG.CLKFB_IN_N_PORT {clkfb_in_n} \
+  CONFIG.CLKFB_IN_PORT {clkfb_in} \
+  CONFIG.CLKFB_IN_P_PORT {clkfb_in_p} \
+  CONFIG.CLKFB_IN_SIGNALING {SINGLE} \
+  CONFIG.CLKFB_OUT_N_PORT {clkfb_out_n} \
+  CONFIG.CLKFB_OUT_PORT {clkfb_out} \
+  CONFIG.CLKFB_OUT_P_PORT {clkfb_out_p} \
+  CONFIG.CLKFB_STOPPED_PORT {clkfb_stopped} \
+  CONFIG.CLKIN1_JITTER_PS {100.0} \
+  CONFIG.CLKIN1_UI_JITTER {0.010} \
+  CONFIG.CLKIN2_JITTER_PS {100.0} \
+  CONFIG.CLKIN2_UI_JITTER {0.010} \
+  CONFIG.CLKOUT1_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT1_JITTER {106.361} \
+  CONFIG.CLKOUT1_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT1_PHASE_ERROR {153.873} \
+  CONFIG.CLKOUT1_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {450} \
+  CONFIG.CLKOUT1_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT1_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT1_USED {true} \
+  CONFIG.CLKOUT2_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT2_JITTER {137.681} \
+  CONFIG.CLKOUT2_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT2_PHASE_ERROR {105.461} \
+  CONFIG.CLKOUT2_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {450} \
+  CONFIG.CLKOUT2_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT2_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT2_USED {false} \
+  CONFIG.CLKOUT3_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT3_JITTER {0.0} \
+  CONFIG.CLKOUT3_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT3_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT3_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT3_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT3_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT3_USED {false} \
+  CONFIG.CLKOUT4_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT4_JITTER {0.0} \
+  CONFIG.CLKOUT4_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT4_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT4_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT4_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT4_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT4_USED {false} \
+  CONFIG.CLKOUT5_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT5_JITTER {0.0} \
+  CONFIG.CLKOUT5_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT5_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT5_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT5_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT5_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT5_USED {false} \
+  CONFIG.CLKOUT6_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT6_JITTER {0.0} \
+  CONFIG.CLKOUT6_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT6_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT6_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT6_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT6_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT6_USED {false} \
+  CONFIG.CLKOUT7_DRIVES {BUFGCE} \
+  CONFIG.CLKOUT7_JITTER {0.0} \
+  CONFIG.CLKOUT7_MATCHED_ROUTING {false} \
+  CONFIG.CLKOUT7_PHASE_ERROR {0.0} \
+  CONFIG.CLKOUT7_REQUESTED_DUTY_CYCLE {50.000} \
+  CONFIG.CLKOUT7_REQUESTED_OUT_FREQ {100.000} \
+  CONFIG.CLKOUT7_REQUESTED_PHASE {0.000} \
+  CONFIG.CLKOUT7_SEQUENCE_NUMBER {1} \
+  CONFIG.CLKOUT7_USED {false} \
+  CONFIG.CLKOUTPHY_REQUESTED_FREQ {600.000} \
+  CONFIG.CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.CLK_IN_SEL_PORT {clk_in_sel} \
+  CONFIG.CLK_OUT1_PORT {clk_out1} \
+  CONFIG.CLK_OUT1_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT2_PORT {clk_out2} \
+  CONFIG.CLK_OUT2_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT3_PORT {clk_out3} \
+  CONFIG.CLK_OUT3_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT4_PORT {clk_out4} \
+  CONFIG.CLK_OUT4_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT5_PORT {clk_out5} \
+  CONFIG.CLK_OUT5_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT6_PORT {clk_out6} \
+  CONFIG.CLK_OUT6_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_OUT7_PORT {clk_out7} \
+  CONFIG.CLK_OUT7_USE_FINE_PS_GUI {false} \
+  CONFIG.CLK_VALID_PORT {CLK_VALID} \
+  CONFIG.CLOCK_MGR_TYPE {auto} \
+  CONFIG.Component_Name {cl_hbm_mmcm} \
+  CONFIG.DADDR_PORT {daddr} \
+  CONFIG.DCLK_PORT {dclk} \
+  CONFIG.DEN_PORT {den} \
+  CONFIG.DIFF_CLK_IN1_BOARD_INTERFACE {Custom} \
+  CONFIG.DIFF_CLK_IN2_BOARD_INTERFACE {Custom} \
+  CONFIG.DIN_PORT {din} \
+  CONFIG.DOUT_PORT {dout} \
+  CONFIG.DRDY_PORT {drdy} \
+  CONFIG.DWE_PORT {dwe} \
+  CONFIG.ENABLE_CDDC {false} \
+  CONFIG.ENABLE_CLKOUTPHY {false} \
+  CONFIG.ENABLE_CLOCK_MONITOR {false} \
+  CONFIG.ENABLE_USER_CLOCK0 {false} \
+  CONFIG.ENABLE_USER_CLOCK1 {false} \
+  CONFIG.ENABLE_USER_CLOCK2 {false} \
+  CONFIG.ENABLE_USER_CLOCK3 {false} \
+  CONFIG.Enable_PLL0 {false} \
+  CONFIG.Enable_PLL1 {false} \
+  CONFIG.FEEDBACK_SOURCE {FDBK_AUTO} \
+  CONFIG.INPUT_CLK_STOPPED_PORT {input_clk_stopped} \
+  CONFIG.INPUT_MODE {frequency} \
+  CONFIG.INTERFACE_SELECTION {Enable_AXI} \
+  CONFIG.IN_FREQ_UNITS {Units_MHz} \
+  CONFIG.IN_JITTER_UNITS {Units_UI} \
+  CONFIG.JITTER_OPTIONS {UI} \
+  CONFIG.JITTER_SEL {No_Jitter} \
+  CONFIG.LOCKED_PORT {locked} \
+  CONFIG.MMCM_BANDWIDTH {OPTIMIZED} \
+  CONFIG.MMCM_CLKFBOUT_MULT_F {23.625} \
+  CONFIG.MMCM_CLKFBOUT_PHASE {0.000} \
+  CONFIG.MMCM_CLKFBOUT_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKIN1_PERIOD {10.000} \
+  CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
+  CONFIG.MMCM_CLKOUT0_DIVIDE_F {2.625} \
+  CONFIG.MMCM_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT0_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT0_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT1_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT1_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT1_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT2_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT2_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT2_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT3_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT3_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT3_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT4_CASCADE {false} \
+  CONFIG.MMCM_CLKOUT4_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT4_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT4_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT5_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT5_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT5_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLKOUT6_DIVIDE {1} \
+  CONFIG.MMCM_CLKOUT6_DUTY_CYCLE {0.500} \
+  CONFIG.MMCM_CLKOUT6_PHASE {0.000} \
+  CONFIG.MMCM_CLKOUT6_USE_FINE_PS {false} \
+  CONFIG.MMCM_CLOCK_HOLD {false} \
+  CONFIG.MMCM_COMPENSATION {AUTO} \
+  CONFIG.MMCM_DIVCLK_DIVIDE {2} \
+  CONFIG.MMCM_NOTES {None} \
+  CONFIG.MMCM_REF_JITTER1 {0.010} \
+  CONFIG.MMCM_REF_JITTER2 {0.010} \
+  CONFIG.MMCM_STARTUP_WAIT {false} \
+  CONFIG.NUM_OUT_CLKS {1} \
+  CONFIG.OPTIMIZE_CLOCKING_STRUCTURE_EN {false} \
+  CONFIG.OVERRIDE_MMCM {false} \
+  CONFIG.OVERRIDE_PLL {false} \
+  CONFIG.PHASESHIFT_MODE {LATENCY} \
+  CONFIG.PHASE_DUTY_CONFIG {false} \
+  CONFIG.PLATFORM {UNKNOWN} \
+  CONFIG.PLL_BANDWIDTH {OPTIMIZED} \
+  CONFIG.PLL_CLKFBOUT_MULT {4} \
+  CONFIG.PLL_CLKFBOUT_PHASE {0.000} \
+  CONFIG.PLL_CLKIN_PERIOD {10.000} \
+  CONFIG.PLL_CLKOUT0_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT0_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT0_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT1_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT1_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT1_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT2_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT2_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT2_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT3_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT3_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT3_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT4_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT4_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT4_PHASE {0.000} \
+  CONFIG.PLL_CLKOUT5_DIVIDE {1} \
+  CONFIG.PLL_CLKOUT5_DUTY_CYCLE {0.500} \
+  CONFIG.PLL_CLKOUT5_PHASE {0.000} \
+  CONFIG.PLL_CLK_FEEDBACK {CLKFBOUT} \
+  CONFIG.PLL_COMPENSATION {SYSTEM_SYNCHRONOUS} \
+  CONFIG.PLL_DIVCLK_DIVIDE {1} \
+  CONFIG.PLL_NOTES {None} \
+  CONFIG.PLL_REF_JITTER {0.010} \
+  CONFIG.POWER_DOWN_PORT {power_down} \
+  CONFIG.PRECISION {1} \
+  CONFIG.PRIMARY_PORT {clk_in1} \
+  CONFIG.PRIMITIVE {MMCM} \
+  CONFIG.PRIMTYPE_SEL {mmcm_adv} \
+  CONFIG.PRIM_IN_FREQ {100} \
+  CONFIG.PRIM_IN_JITTER {0.010} \
+  CONFIG.PRIM_IN_TIMEPERIOD {10.000} \
+  CONFIG.PRIM_SOURCE {No_buffer} \
+  CONFIG.PSCLK_PORT {psclk} \
+  CONFIG.PSDONE_PORT {psdone} \
+  CONFIG.PSEN_PORT {psen} \
+  CONFIG.PSINCDEC_PORT {psincdec} \
+  CONFIG.REF_CLK_FREQ {100.0} \
+  CONFIG.RELATIVE_INCLK {REL_PRIMARY} \
+  CONFIG.RESET_BOARD_INTERFACE {Custom} \
+  CONFIG.RESET_PORT {resetn} \
+  CONFIG.RESET_TYPE {ACTIVE_LOW} \
+  CONFIG.SECONDARY_IN_FREQ {100.000} \
+  CONFIG.SECONDARY_IN_JITTER {0.010} \
+  CONFIG.SECONDARY_IN_TIMEPERIOD {10.000} \
+  CONFIG.SECONDARY_PORT {clk_in2} \
+  CONFIG.SECONDARY_SOURCE {Single_ended_clock_capable_pin} \
+  CONFIG.SS_MODE {CENTER_HIGH} \
+  CONFIG.SS_MOD_FREQ {250} \
+  CONFIG.SS_MOD_TIME {0.004} \
+  CONFIG.STATUS_PORT {STATUS} \
+  CONFIG.SUMMARY_STRINGS {empty} \
+  CONFIG.USER_CLK_FREQ0 {100.0} \
+  CONFIG.USER_CLK_FREQ1 {100.0} \
+  CONFIG.USER_CLK_FREQ2 {100.0} \
+  CONFIG.USER_CLK_FREQ3 {100.0} \
+  CONFIG.USE_BOARD_FLOW {false} \
+  CONFIG.USE_CLKFB_STOPPED {false} \
+  CONFIG.USE_CLK_VALID {false} \
+  CONFIG.USE_CLOCK_SEQUENCING {false} \
+  CONFIG.USE_DYN_PHASE_SHIFT {false} \
+  CONFIG.USE_DYN_RECONFIG {false} \
+  CONFIG.USE_FREEZE {false} \
+  CONFIG.USE_FREQ_SYNTH {true} \
+  CONFIG.USE_INCLK_STOPPED {false} \
+  CONFIG.USE_INCLK_SWITCHOVER {false} \
+  CONFIG.USE_LOCKED {true} \
+  CONFIG.USE_MAX_I_JITTER {false} \
+  CONFIG.USE_MIN_O_JITTER {false} \
+  CONFIG.USE_MIN_POWER {false} \
+  CONFIG.USE_PHASE_ALIGNMENT {false} \
+  CONFIG.USE_POWER_DOWN {false} \
+  CONFIG.USE_RESET {false} \
+  CONFIG.USE_SAFE_CLOCK_STARTUP {true} \
+  CONFIG.USE_SPREAD_SPECTRUM {false} \
+  CONFIG.USE_STATUS {false} " [get_ips cl_hbm_mmcm]
+
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:52 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_hbm'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_hbm (xilinx.com:ip:hbm:1.0) from (Rev. 12) to (Rev. 15)
+
+2. Warnings
+-----------
+
+WARNING: INFO: Setting the HBM Memory Frequency for Stack0(900) as per the HBM Speed for Stack0(1800),Stack0 Line rate(div4)
+
+
+3. Upgrade messages
+-------------------
+
+Set parameter USER_HBM_TCK_0 to value 900 (source 'default')
+WARNING: upgrade cannot get value of parameter USER_SL_PORT_EN : there is no parameter called USER_SL_PORT_EN in hbm_v1_0
+WARNING: upgrade cannot get value of original project option internal_revision : there is no original project option called internal_revision
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:42 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_debug_bridge'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_debug_bridge (xilinx.com:ip:debug_bridge:3.0) from (Rev. 8) to (Rev. 11)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:38 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_ddr4_64g_ap'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_ddr4_64g_ap (xilinx.com:ip:ddr4:2.2) from (Rev. 16) to (Rev. 22)
+
+2. Warnings
+-----------
+
+WARNING: INFO: upgrade from same called
+
+
+3. Upgrade messages
+-------------------
+
+Set parameter C0.DDR4_EN_PARITY to value true (source 'default')
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:02:16 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_ddr4_32g_ap'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_ddr4_32g_ap (xilinx.com:ip:ddr4:2.2) from (Rev. 16) to (Rev. 22)
+
+2. Warnings
+-----------
+
+WARNING: INFO: upgrade from same called
+
+
+3. Upgrade messages
+-------------------
+
+Set parameter C0.DDR4_EN_PARITY to value true (source 'default')
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:01:53 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_ddr4_32g'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_ddr4_32g (xilinx.com:ip:ddr4:2.2) from (Rev. 16) to (Rev. 22)
+
+2. Warnings
+-----------
+
+WARNING: INFO: upgrade from same called
+
+
+3. Upgrade messages
+-------------------
+
+Set parameter C0.DDR4_EN_PARITY to value true (source 'default')
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:01:31 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_ddr4'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_ddr4 (xilinx.com:ip:ddr4:2.2) from (Rev. 16) to (Rev. 22)
+
+2. Warnings
+-----------
+
+WARNING: INFO: upgrade from same called
+
+
+3. Upgrade messages
+-------------------
+
+Set parameter C0.DDR4_EN_PARITY to value true (source 'default')
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:30 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_clk_axil_xbar'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_clk_axil_xbar (xilinx.com:ip:axi_crossbar:2.1) from (Rev. 27) to (Rev. 31)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:28 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_c2c_xbar_128G'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_c2c_xbar_128G (xilinx.com:ip:axi_crossbar:2.1) from (Rev. 27) to (Rev. 31)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:26 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_width_cnv_512_to_256'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_width_cnv_512_to_256 (xilinx.com:ip:axi_dwidth_converter:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:25 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_register_slice_light'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_register_slice_light (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:23 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_register_slice_256'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_register_slice_256 (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:21 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:20 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_interconnect_64G_ddr'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_interconnect_64G_ddr (xilinx.com:ip:axi_crossbar:2.1) from (Rev. 27) to (Rev. 31)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:17 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_interconnect'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_interconnect (xilinx.com:ip:axi_crossbar:2.1) from (Rev. 27) to (Rev. 31)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:15 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_clock_converter_light'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_clock_converter_light (xilinx.com:ip:axi_clock_converter:2.1) from (Rev. 25) to (Rev. 29)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:13 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_clock_converter_256b'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_clock_converter_256b (xilinx.com:ip:axi_clock_converter:2.1) from (Rev. 25) to (Rev. 29)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:12 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi_clock_converter'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi_clock_converter (xilinx.com:ip:axi_clock_converter:2.1) from (Rev. 25) to (Rev. 29)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:10 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi4_to_axi3_conv'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi4_to_axi3_conv (xilinx.com:ip:axi_protocol_converter:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:08 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_axi3_256b_reg_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_axi3_256b_reg_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:06 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_register_slice_light'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_register_slice_light (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:05 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 26) to (Rev. 30)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2.2 (lin64) Build 4126759 Thu Feb  8 23:52:05 MST 2024
+| Date         : Thu Mar 28 19:00:02 2024
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_clock_converter_0'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_clock_converter_0 (xilinx.com:ip:axi_clock_converter:2.1) from (Rev. 25) to (Rev. 29)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:41 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'vio_0'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of vio_0 (xilinx.com:ip:vio:3.0) from (Rev. 17) to (Rev. 22)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:39 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'src_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of src_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 15) to (Rev. 26)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:37 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'ila_vio_counter'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of ila_vio_counter (xilinx.com:ip:ila:6.2) from (Rev. 5) to (Rev. 12)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:34 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'ila_1'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of ila_1 (xilinx.com:ip:ila:6.2) from (Rev. 5) to (Rev. 12)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:31 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'dest_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of dest_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 15) to (Rev. 26)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:29 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'cl_debug_bridge'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of cl_debug_bridge (xilinx.com:ip:debug_bridge:3.0) from (Rev. 1) to (Rev. 8)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:25 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_register_slice_light'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_register_slice_light (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 15) to (Rev. 26)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:23 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_register_slice'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_register_slice (xilinx.com:ip:axi_register_slice:2.1) from (Rev. 15) to (Rev. 26)
+
+
+
+
+
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Fri Sep  2 17:53:22 2022
+| Host         : c7-c5-24xl-1.fpga.annapurna.aws.a2z.com running 64-bit CentOS Linux release 7.9.2009 (Core)
+| Command      : upgrade_ip
+| Device       : xcvu47p-fsvh2892-2-e
+-------------------------------------------------------------------------------------------------------------
+
+Upgrade Log for IP 'axi_clock_converter_0'
+
+1. Summary
+----------
+
+SUCCESS in the upgrade of axi_clock_converter_0 (xilinx.com:ip:axi_clock_converter:2.1) from (Rev. 14) to (Rev. 25)
+

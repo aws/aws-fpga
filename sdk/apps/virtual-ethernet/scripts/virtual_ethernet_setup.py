@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,14 +18,11 @@
 from __future__ import print_function
 import os
 import sys
-import platform
+import distro
 import glob
 import argparse
 import subprocess
 import logging
-
-# DPDK make config target
-make_tgt = "x86_64-native-linuxapp-gcc"
 
 dpdk_devbind = "./usertools/dpdk-devbind.py"
 num_2MB_hugepages = 16384
@@ -38,7 +35,7 @@ def print_success(dpdk_path):
     print("DPDK setup complete!")
     print("A simple loopback test may be run via the following steps:")
     print("  cd %s" % (dpdk_path))
-    print("  sudo ./%s/app/testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=3" % (make_tgt))
+    print("  sudo ./build/app/dpdk-testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=3")
 
 def check_output(args, stderr=None):
     return subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -52,8 +49,8 @@ def cmd_exec(cmd, check_return=True):
         sys.exit(1)
 
 def load_uio():
-    distro = platform.linux_distribution()
-    if (distro[0] == "Ubuntu"):
+    installed_distro = distro.name()
+    if (installed_distro == "Ubuntu"):
         cmd_exec("modprobe uio")
     else:
         cmd_exec("modprobe uio_pci_generic")
@@ -65,16 +62,15 @@ def fpga_slot_str2dbdf(fpga_slot_str):
     # Exec the command first to give an error message
     # if the SDK hasn't been installed.
     cmd_exec("%s >/dev/null 2>&1" % (cmd))
-    fpga_slots = check_output(cmd).splitlines() 
+    fpga_slots = check_output(cmd).splitlines()
     for slot_str in fpga_slots:
         if found == True:
             break
         logger.debug("slot_str=%s" % slot_str)
-        slot_num = ' '.join(slot_str.split()).split(' ')[1] 
+        _,slot_num,_,_,dbdf = slot_str.split()
         if slot_num == fpga_slot_str:
-            dbdf = ' '.join(slot_str.split()).split(' ')[4] 
             found = True
-    return dbdf 
+    return dbdf.decode()
 
 def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     logger.debug("setup_dpdk: dpdk_path=%s, fpga_slot_str=%s" % (dpdk_path, fpga_slot_str))
@@ -115,8 +111,8 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     load_uio()
 
     # Remove then load igb_uio.ko
-    cmd_exec("rmmod ./%s/kmod/igb_uio.ko >/dev/null 2>&1" % (make_tgt), False)
-    cmd_exec("insmod ./%s/kmod/igb_uio.ko" % (make_tgt))
+    cmd_exec("rmmod ./build/kernel/linux/igb_uio/igb_uio.ko >/dev/null 2>&1", False)
+    cmd_exec("insmod ./build/kernel/linux/igb_uio/igb_uio.ko")
 
     # Bind the FPGA to to DPDK
     cmd_exec("%s --bind=igb_uio %s" % (dpdk_devbind, fpga_dbdf))
@@ -144,7 +140,7 @@ def main():
     parser.add_argument('--eni_ethdev', metavar='ENI_ETHDEV', type=str, default="None",
         help = "specify the ENI Ethernet device'. e.g. see ifconfig output for eth1")
     parser.add_argument('--debug', action='store_true', required=False,
-        help='Enable debug messages')
+        help = 'Enable debug messages')
     args = parser.parse_args()
 
     logging_level = logging.INFO

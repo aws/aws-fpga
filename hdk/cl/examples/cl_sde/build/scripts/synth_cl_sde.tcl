@@ -13,120 +13,105 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-#Param needed to avoid clock name collisions
-set_param sta.enableAutoGenClkNamePersistence 0
-set CL_MODULE $CL_MODULE
 
-create_project -in_memory -part [DEVICE_TYPE] -force
+# Common header
+source ${HDK_SHELL_DIR}/build/scripts/synth_cl_header.tcl
 
-########################################
-## Generate clocks based on Recipe 
-########################################
 
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
 
-source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
-
-#############################
-## Read design files
-#############################
-
-#Convenience to set the root of the RTL directory
-set ENC_SRC_DIR $CL_DIR/build/src_post_encryption
-
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Reading developer's Custom Logic files post encryption.";
+###############################################################################
+print "Reading encrypted user source codes"
+###############################################################################
 
 #---- User would replace this section -----
 
-# Reading the .sv and .v files, as proper designs would not require
-# reading .v, .vh, nor .inc files
+# Reading the .sv and .v files, as proper designs would not require reading
+# .vh, nor .inc files
+read_verilog -sv [glob ${src_post_enc_dir}/cl_sde_defines.vh]
+set_property file_type {Verilog Header} [get_files ${src_post_enc_dir}/cl_sde_defines.vh]
+set_property is_global_include true     [get_files ${src_post_enc_dir}/cl_sde_defines.vh]
 
-read_verilog -sv [glob $ENC_SRC_DIR/*.v]
-read_verilog -sv [glob $ENC_SRC_DIR/*.?v]
+read_verilog -sv [glob ${src_post_enc_dir}/*.?v]
 
 #---- End of section replaced by User ----
 
-puts "AWS FPGA: Reading AWS Shell design";
+###############################################################################
+print "Reading CL IP blocks"
+###############################################################################
 
-#Read AWS Design files
-read_verilog [ list \
-  $HDK_SHELL_DESIGN_DIR/lib/lib_pipe.sv \
-  $HDK_SHELL_DESIGN_DIR/lib/bram_2rw.sv \
-  $HDK_SHELL_DESIGN_DIR/lib/flop_fifo.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sync.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/flop_ccf.sv \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/ccf_ctl.v \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_acc_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/mgt_gen_axl.sv  \
-  $HDK_SHELL_DESIGN_DIR/sh_ddr/synth/sh_ddr.sv \
-  $HDK_SHELL_DESIGN_DIR/interfaces/cl_ports.vh 
-]
-
-puts "AWS FPGA: Reading IP blocks";
+#---- User would uncomment the IP's required in their design ----
 
 #Read DDR IP
 read_ip [ list \
-  $HDK_SHELL_DESIGN_DIR/ip/ddr4_core/ddr4_core.xci 
+  ${HDK_IP_SRC_DIR}/cl_ddr4_32g/cl_ddr4_32g.xci
 ]
 
 #Read IP for axi register slices
 read_ip [ list \
-  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
-  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
+  ${HDK_IP_SRC_DIR}/cl_axi_interconnect/cl_axi_interconnect.xci \
+  ${HDK_IP_SRC_DIR}/cl_axi_clock_converter/cl_axi_clock_converter.xci \
+  ${HDK_IP_SRC_DIR}/cl_axi_clock_converter_light/cl_axi_clock_converter_light.xci \
+  ${HDK_IP_SRC_DIR}/src_register_slice/src_register_slice.xci \
+  ${HDK_IP_SRC_DIR}/dest_register_slice/dest_register_slice.xci \
+  ${HDK_IP_SRC_DIR}/axi_clock_converter_0/axi_clock_converter_0.xci \
+  ${HDK_IP_SRC_DIR}/axi_register_slice/axi_register_slice.xci \
+  ${HDK_IP_SRC_DIR}/axi_register_slice_light/axi_register_slice_light.xci \
+  ${HDK_IP_SRC_DIR}/cl_axi_clock_converter_256b/cl_axi_clock_converter_256b.xci \
+  ${HDK_IP_SRC_DIR}/cl_hbm/cl_hbm.xci \
+  ${HDK_IP_SRC_DIR}/cl_axi_width_cnv_512_to_256/cl_axi_width_cnv_512_to_256.xci \
+  ${HDK_IP_SRC_DIR}/cl_hbm_mmcm/cl_hbm_mmcm.xci \
+  ${HDK_IP_SRC_DIR}/cl_axi4_to_axi3_conv/cl_axi4_to_axi3_conv.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO
 read_ip [ list \
-  $HDK_SHELL_DESIGN_DIR/ip/cl_debug_bridge/cl_debug_bridge.xci \
-  $CL_DIR/ip/ila_axi4/ila_axi4.xci \
-  $CL_DIR/ip/ila_axi4_512/ila_axi4_512.xci \
-  $CL_DIR/ip/ila_axis/ila_axis.xci \
-  $CL_DIR/ip/ila_sde_c2h_dm/ila_sde_c2h_dm.xci \
-  $CL_DIR/ip/ila_sde_h2c_dm/ila_sde_h2c_dm.xci \
-  $CL_DIR/ip/ila_sde_c2h_buf/ila_sde_c2h_buf.xci \
-  $CL_DIR/ip/ila_sde_h2c_buf/ila_sde_h2c_buf.xci \
-  $CL_DIR/ip/ila_sde_wb/ila_sde_wb.xci \
-  $CL_DIR/ip/ila_sde_ps/ila_sde_ps.xci
+  ${HDK_IP_SRC_DIR}/cl_debug_bridge/cl_debug_bridge.xci \
+  ${HDK_IP_SRC_DIR}/ila_1/ila_1.xci
 ]
 
-puts "AWS FPGA: Reading AWS constraints";
+#---- End of section uncommented by the User ----
 
-#Read all the constraints
-#
-#  cl_clocks_aws.xdc  - AWS auto-generated clock constraint.   ***DO NOT MODIFY***
-#  cl_ddr.xdc         - AWS provided DDR pin constraints.      ***DO NOT MODIFY***
-#  cl_synth_user.xdc  - Developer synthesis constraints.
+###############################################################################
+print "Reading user constraints"
+###############################################################################
+
+#---- User would replace this section -----
+
 read_xdc [ list \
-   $CL_DIR/build/constraints/cl_clocks_aws.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_ddr.xdc \
-   $HDK_SHELL_DIR/build/constraints/cl_synth_aws.xdc \
-   $CL_DIR/build/constraints/cl_synth_user.xdc
+  ${constraints_dir}/cl_synth_user.xdc \
+  ${constraints_dir}/cl_timing_user.xdc
 ]
 
-#Do not propagate local clock constraints for clocks generated in the SH
-set_property USED_IN {synthesis implementation OUT_OF_CONTEXT} [get_files cl_clocks_aws.xdc]
-set_property PROCESSING_ORDER EARLY  [get_files cl_clocks_aws.xdc]
+set_property PROCESSING_ORDER LATE [get_files cl_synth_user.xdc]
+set_property PROCESSING_ORDER LATE [get_files cl_timing_user.xdc]
 
-########################
-# CL Synthesis
-########################
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Start design synthesis.";
+#---- End of section replaced by User ----
 
+###############################################################################
+print "Starting synthesizing customer design ${CL}"
+###############################################################################
 update_compile_order -fileset sources_1
-puts "\nRunning synth_design for $CL_MODULE $CL_DIR/build/scripts \[[clock format [clock seconds] -format {%a %b %d %H:%M:%S %Y}]\]"
-eval [concat synth_design -top $CL_MODULE -verilog_define XSDB_SLV_DIS -part [DEVICE_TYPE] -mode out_of_context $synth_options -directive $synth_directive]
 
-set failval [catch {exec grep "FAIL" failfast.csv}]
-if { $failval==0 } {
-	puts "AWS FPGA: FATAL ERROR--Resource utilization error; check failfast.csv for details"
-	exit 1
+synth_design -mode out_of_context \
+             -top ${CL} \
+             -verilog_define XSDB_SLV_DIS \
+             -part ${DEVICE_TYPE} \
+             -keep_equivalent_registers
+
+###############################################################################
+print "Connecting debug network"
+###############################################################################
+
+#---- User would replace this section -----
+
+set cl_ila_cells [get_cells [list CL_ILA/CL_DMA_ILA_0 CL_ILA/ddr_A_hookup.CL_DDRA_ILA_0]]
+if {$cl_ila_cells != ""} {
+  connect_debug_cores -master [get_cells [get_debug_cores -filter {NAME=~*CL_DEBUG_BRIDGE*}]] -slaves $cl_ila_cells
 }
 
-puts "AWS FPGA: ([clock format [clock seconds] -format %T]) writing post synth checkpoint.";
-write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
-#write_checkpoint -force $CL_DIR/build/checkpoints/CL.post_synth.dcp
+#---- End of section replaced by User ----
 
 
-close_project
-#Set param back to default value
-set_param sta.enableAutoGenClkNamePersistence 1
+
+# Common footer
+source ${HDK_SHELL_DIR}/build/scripts/synth_cl_footer.tcl

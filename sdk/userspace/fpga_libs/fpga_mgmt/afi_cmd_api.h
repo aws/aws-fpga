@@ -119,7 +119,10 @@ struct afi_cmd_metrics_rsp {
 	int32_t					status;
     /** FPGA status qualifier: see FPGA_ERR_XYZ in fpga_common.h */
 	int32_t					status_q;
-	struct fpga_metrics_common	fmc;
+	union {
+		struct f1_metrics_common	f1mc;
+		struct f2_metrics_common	f2mc;
+	} fmc;
 } __attribute__((packed));
 
 /**< Clear AFI request */

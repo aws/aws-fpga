@@ -48,10 +48,13 @@ class mem_access_t;
 
 endclass // mem_access_t
 
+// Create alias of mailbox since XSIM does not support "Generic (non-parameterized) mailbox"
+typedef mailbox #(mem_access_t) mem_access_t_mailbox;
+
 class access_t;
 
    bit wc;                 //Enable write combining
-   mailbox poke_mb;
+   mem_access_t_mailbox poke_mb;
    bit[63:0] bar;
    bit[63:0] ocl_bar;
    semaphore access_lock;  //Semaphore to make sure read/write are exclusive.  This is required for BFMs that cannot handle multiple
@@ -121,7 +124,7 @@ class access_t;
    endtask // poke_dw
 
    //Allocate a page.  Note in sh_bfm tb don't need to do any allocation because is assoc array
-   virtual function alloc_mem (input[63:0] addr);
+   virtual function void alloc_mem (input[63:0] addr);
 
       //tb.map_host_memory(.addr(addr));
 
@@ -134,13 +137,13 @@ class access_t;
    extern task mem_write_thread ();
 
    //Write DW to the host from the buffer
-   extern virtual function write_host_dw (input[63:0] addr, input[31:0] data);
+   extern virtual function void write_host_dw (input[63:0] addr, input[31:0] data);
 
    //Read DW from the host into buffer
    extern virtual function[31:0] read_host_dw (input[63:0] addr);
 
    //Write byte to the host from the buffer
-   extern virtual function write_host_byte (input[63:0] addr, input[7:0] data);
+   extern virtual function void write_host_byte (input[63:0] addr, input[7:0] data);
 
    //Read byte from the host into buffer
    extern virtual function[7:0] read_host_byte (input[63:0] addr);
@@ -180,7 +183,7 @@ endclass
    endtask // mem_write_thread
 
    //write_host_dw
-   function access_t::write_host_dw (input[63:0] addr, input[31:0] data);
+   function void access_t::write_host_dw (input[63:0] addr, input[31:0] data);
 
       for (int i=0; i<4; i++)
       begin
@@ -199,7 +202,7 @@ endclass
    endfunction
 
    //write_host_byte
-   function access_t::write_host_byte (input[63:0] addr, input[7:0] data);
+   function void access_t::write_host_byte (input[63:0] addr, input[7:0] data);
 
       tb.hm_put_byte(.addr(addr), .d(data));
    endfunction
@@ -274,7 +277,7 @@ class dma_buf_t extends gen_buf_t;
    //Write to memory.
    // Start_offset - byte offset of start
    //  Length - length in bytes
-   function write_buf_host(input[63:0] start_offset=0, input[31:0] length=32'hffffffff);
+   function void write_buf_host(input[63:0] start_offset=0, input[31:0] length=32'hffffffff);
 
 //      bit[31:0] length;
 
@@ -293,7 +296,7 @@ class dma_buf_t extends gen_buf_t;
    endfunction
 
    //Read from memory.  Length is in bytes
-   function read_host_buf(input[63:0] start_offset=0, input[31:0] length=32'hffffffff, input bit verbose=0);
+   function void read_host_buf(input[63:0] start_offset=0, input[31:0] length=32'hffffffff, input bit verbose=0);
       logic [31:0] cur_dw;
 //      int length;
 
@@ -1252,7 +1255,7 @@ endfunction
 
 
 //Clear the WB descriptor
-function clr_wb_desc(dma_buf_t wb_buf, input int wb_ptr);
+function void clr_wb_desc(dma_buf_t wb_buf, input int wb_ptr);
 
    //Clear the WB descriptor
    for (int i=0; i<c2h_wb_desc_size; i++)
@@ -1344,7 +1347,4 @@ task post_c2h_desc_thread(input int max_num_desc=64);
 endtask
 
 endclass
-
-
-
 

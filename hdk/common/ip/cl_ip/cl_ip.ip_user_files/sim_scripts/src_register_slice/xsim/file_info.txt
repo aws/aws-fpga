@@ -1,0 +1,2 @@
+src_register_slice.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/src_register_slice/sim/src_register_slice.v,incdir="../../../ipstatic/hdl"incdir="../../../ipstatic/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

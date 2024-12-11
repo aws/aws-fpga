@@ -61,8 +61,12 @@ if [ $RET != 0 ]; then
     echo "Error: install_fpga_mgmt_tools.sh returned $RET"
     exit $RET
 fi
+
+source $REPO_ROOT/shared/bin/set_common_functions.sh
+
 # Add udev rules if asked for non root access
-if allow_non_root ; then
+allow_non_root
+if [[ $? -eq 0  ]] ; then
 	  sudo $SDK_USERSPACE_DIR/add_udev_rules.sh
 	  RET=$?
 	  if [ $RET != 0 ]; then

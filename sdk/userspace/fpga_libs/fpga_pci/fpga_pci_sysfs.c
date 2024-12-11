@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -363,7 +363,7 @@ fpga_pci_mbox2app(struct fpga_pci_resource_map *mbox_map,
 	/** Construct the app dir name based on the mbox_map */
 	ret = snprintf(app_dir_name, app_dir_name_size, PCI_DEV_FMT,
 			mbox_map->domain, mbox_map->bus,
-			F1_MBOX_DEV2APP_DEV(mbox_map->dev), mbox_map->func);
+			GET_DEV_NUM_FROM_FPGA_MBOX_MAP(mbox_map), GET_FUNC_NUM_FROM_FPGA_MBOX_MAP(mbox_map));
 
 	fail_on_with_code(ret < 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM,
 		"Error building the app_dir_name");
@@ -389,11 +389,11 @@ fpga_pci_mbox2app(struct fpga_pci_resource_map *mbox_map,
 		if (ret == 0) {
 			done = true;
 		} else {
-			fail_on_with_code(retries >= F1_CHECK_APP_PF_MAX_RETRIES, err, ret,
+			fail_on_with_code(retries >= FPGA_CHECK_APP_PF_MAX_RETRIES, err, ret,
 				FPGA_ERR_UNRESPONSIVE,
 				"fpga_pci_get_resource_map_ids failed for app_dir_name=%s",
 				app_dir_name);
-			msleep(F1_CHECK_APP_PF_DELAY_MSEC);
+			msleep(FPGA_CHECK_APP_PF_DELAY_MSEC);
 			retries++;
 		}
 	}
@@ -518,8 +518,8 @@ fpga_pci_mbox_scan(struct fpga_slot_spec spec_array_out[], int size)
 			continue;
 		}
 
-		if (search_map.vendor_id == F1_MBOX_VENDOR_ID &&
-			search_map.device_id == F1_MBOX_DEVICE_ID) {
+		if (search_map.vendor_id == FPGA_MBOX_VENDOR_ID &&
+			(IS_F1((&search_map)) || IS_F2((&search_map)))) {
 			/* mbox resources */
 			ret = fpga_pci_get_resources(entry->d_name, &search_map);
 			fail_on(ret != 0, err_unlock, "Error retrieving resource information");
@@ -762,14 +762,14 @@ fpga_pci_check_app_pf_sysfs(char *dir_name, bool exists)
 		if (!!ret == !exists) {
 			done = true;
 		} else {
-			fail_on_with_code(retries >= F1_CHECK_APP_PF_MAX_RETRIES, err,
+			fail_on_with_code(retries >= FPGA_CHECK_APP_PF_MAX_RETRIES, err,
 				ret, FPGA_ERR_UNRESPONSIVE, "exists=%u, failed for path=%s", exists,
 				sysfs_name);
 			if (exists) {
 				ret = fpga_pci_rescan();
 				fail_on(ret, err, "fpga_pci_rescan failed");
 			}
-			msleep(F1_CHECK_APP_PF_DELAY_MSEC);
+			msleep(FPGA_CHECK_APP_PF_DELAY_MSEC);
 			retries++;
 		}
 	}
@@ -927,7 +927,7 @@ fpga_pci_rescan_slot_app_pfs(int slot_id)
 	 * we may still fail to expose the changed PCI IDs in the rescan step.
    	 */
 	uint32_t delay_msec = (attached) ?
-		F1_REMOVE_APP_PF_LONG_DELAY_MSEC : F1_REMOVE_APP_PF_SHORT_DELAY_MSEC;
+		FPGA_REMOVE_APP_PF_LONG_DELAY_MSEC : FPGA_REMOVE_APP_PF_SHORT_DELAY_MSEC;
 
 	log_info("Driver for " PCI_DEV_FMT " %s attached, waiting %u msec before rescan",
 		app_map->domain, app_map->bus, app_map->dev, app_map->func,

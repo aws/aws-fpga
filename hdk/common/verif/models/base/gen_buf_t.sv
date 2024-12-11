@@ -37,7 +37,7 @@
       endfunction
    
       //Initialization with incrementing data.  Note this assumes empty array (queue), and adds entries to the array
-      virtual function init_inc(input[31:0] first_data, input int length = 4);
+      virtual function void init_inc(input[31:0] first_data, input int length = 4);
          bit[31:0] tmp_data;
    
          tmp_data = first_data;
@@ -50,7 +50,7 @@
       endfunction
 
       //Initialization with constant.  Note this assumes empty array (queue), and adds entries to the array
-      virtual function init_const(input[31:0] first_data, input int length = 4);
+      virtual function void init_const(input[31:0] first_data, input int length = 4);
    
          for (int i=0; i<length; i++)
          begin
@@ -59,7 +59,7 @@
       endfunction
 
       //Initialization with random_data.  Note this assumes empty array (queue), and adds entries to the array
-      virtual function init_rnd(input int length = 4);
+      virtual function void init_rnd(input int length = 4);
   
          for (int i=0; i<length; i++)
          begin
@@ -69,7 +69,7 @@
 
       //Write with incrementing data.  Note this uses existing entries in the queue/array
       // By default write the entire buffer
-      virtual function write_inc(input int start_addr=0, input[31:0] first_data=0, input int length = 32'hffffffff);
+      virtual function void write_inc(input int start_addr=0, input[31:0] first_data=0, input int length = 32'hffffffff);
          bit[31:0] tmp_data;
   
          length = (length==32'hffffffff)? data.size(): length; 
@@ -85,7 +85,7 @@
 
       //Initialization with constant.  Note this uses existing entries int the queue/array. 
       // By default write the entire buffer
-      virtual function write_const(input int start_addr=0, input[31:0] first_data=0, input int length = 32'hffffffff);
+      virtual function void write_const(input int start_addr=0, input[31:0] first_data=0, input int length = 32'hffffffff);
    
          length = (length==32'hffffffff)? data.size(): length; 
          for (int i=0; i<length; i++)
@@ -97,7 +97,7 @@
 
       //Initialization with random_data.  Note this uses existing entries in the queue/array
       // By default write the entire buffer
-      virtual function write_rnd(input int length = 32'hffffffff);
+      virtual function void write_rnd(input int length = 32'hffffffff);
   
          length = (length==32'hffffffff)? data.size(): length; 
          for (int i=0; i<length; i++)
@@ -108,7 +108,7 @@
       endfunction
    
       //Compare buffer
-      virtual function compare(gen_buf_t compare_to, input int length=32'hffffffff);
+      virtual function bit compare(gen_buf_t compare_to, input int length=32'hffffffff);
          bit ret = 0;
          int cmp_length;
 
@@ -178,13 +178,12 @@
                $display($time,,,"    addr[0x%4x]:   0x%8x   0x%8x %s", i*4, tmp_data, tmp_data_to, tmp_s);
             end
          end
-               
-   
-         compare = ret;
+
+	 return ret;
       endfunction
    
       //Compare just a byte array queue (if dis-similar data type)
-      virtual function compare_byte_array(logic[7:0] compare_to [$], input int length=32'hffffffff);
+      virtual function bit compare_byte_array(logic[7:0] compare_to [$], input int length=32'hffffffff);
          bit ret = 0;
          int cmp_length;
          logic[7:0] data_elem;
@@ -219,10 +218,10 @@
             end
          end
  
-         compare_byte_array = ret;
+         return ret;
       endfunction
 
-      virtual function display(input int length=32'hffffffff);
+      virtual function void display(input int length=32'hffffffff);
 
          logic[31:0] tmp_dw;
          int num_dw;

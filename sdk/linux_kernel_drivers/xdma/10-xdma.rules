@@ -1,1 +1,0 @@
-KERNEL=="xdma*",MODE="0666",SYMLINK="%k"

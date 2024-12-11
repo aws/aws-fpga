@@ -1,0 +1,1 @@
+./../../../cl_dram_hbm_dma/verif/tests/test_ddr_peek_bdr_walking_ones.sv

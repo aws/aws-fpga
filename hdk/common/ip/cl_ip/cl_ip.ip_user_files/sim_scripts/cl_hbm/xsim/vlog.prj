@@ -1,0 +1,14 @@
+sv xil_defaultlib --include "$XILINX_VIVADO/data/xilinx_vip/include" --include "../../../../cl_ip.gen/sources_1/ip/cl_hbm/hdl/rtl" --include "../../../ipstatic/verif/model" \
+"../../../../cl_ip.gen/sources_1/ip/cl_hbm/hdl/rtl/hbm_v1_0_16.sv" \
+
+sv hbm_v1_0_16 --include "$XILINX_VIVADO/data/xilinx_vip/include" --include "../../../../cl_ip.gen/sources_1/ip/cl_hbm/hdl/rtl" --include "../../../ipstatic/verif/model" \
+"../../../ipstatic/hdl/hbm_v1_0_vl_rfs.sv" \
+
+sv xil_defaultlib --include "$XILINX_VIVADO/data/xilinx_vip/include" --include "../../../../cl_ip.gen/sources_1/ip/cl_hbm/hdl/rtl" --include "../../../ipstatic/verif/model" \
+"../../../../cl_ip.gen/sources_1/ip/cl_hbm/verif/model/hbm_model.sv" \
+"../../../../cl_ip.gen/sources_1/ip/cl_hbm/sim/cl_hbm.sv" \
+
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

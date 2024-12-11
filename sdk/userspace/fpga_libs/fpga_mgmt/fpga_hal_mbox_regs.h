@@ -60,3 +60,4 @@ enum {
 #define FMB_REG_RD_DATA			FMB_REG(0x34)
 #define FMB_REG_RD_LEN			FMB_REG(0x38)
 
+#define FMB_REG_RL_RELOAD		FMB_REG(0x2000)

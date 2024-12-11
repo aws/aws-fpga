@@ -1,0 +1,72 @@
+test_dram_dma_axi_mstr: TEST=test_dram_dma_axi_mstr
+test_dram_dma_axi_mstr: all
+
+#Not supporting until XSIM related issues fixed 
+test_dram_dma_4k_crossing: TEST=test_dram_dma_4k_crossing
+test_dram_dma_4k_crossing: check_xsim all
+
+test_clk_recipe: TEST=test_clk_recipe
+test_clk_recipe: all
+
+test_ddr: TEST=test_ddr
+test_ddr: all
+
+test_ddr_peek_bdr_walking_ones: TEST=test_ddr_peek_bdr_walking_ones
+test_ddr_peek_bdr_walking_ones: all
+
+test_ddr_peek_poke: TEST=test_ddr_peek_poke
+test_ddr_peek_poke: all
+
+test_hbm: TEST=test_hbm
+test_hbm: VCS=1 	# XSIM does not support HBM in Vivado 2022.1
+test_hbm: all
+
+test_dma_pcim_concurrent: TEST=test_dma_pcim_concurrent
+test_dma_pcim_concurrent: all
+
+test_dma_pcis_concurrent: TEST=test_dma_pcis_concurrent
+test_dma_pcis_concurrent: all
+
+test_dma_sda_concurrent: TEST=test_dma_sda_concurrent
+test_dma_sda_concurrent: all
+
+test_dram_dma: TEST=test_dram_dma
+test_dram_dma: all
+
+test_dram_dma_align_addr_4k: TEST=test_dram_dma_align_addr_4k
+test_dram_dma_align_addr_4k: all
+
+test_dram_dma_single_beat_4k: TEST=test_dram_dma_single_beat_4k
+test_dram_dma_single_beat_4k: all
+
+# test_dram_dma_mem_model_bdr_rd: TEST=test_dram_dma_mem_model_bdr_rd
+# test_dram_dma_mem_model_bdr_rd: DEFAULT_DEFINES += +define+NO_DDR+FAST_SIM_MODE
+# test_dram_dma_mem_model_bdr_rd: all
+
+# test_dram_dma_mem_model_bdr_wr: TEST=test_dram_dma_mem_model_bdr_wr
+# test_dram_dma_mem_model_bdr_wr: DEFAULT_DEFINES += +define+NO_DDR+FAST_SIM_MODE
+# test_dram_dma_mem_model_bdr_wr: all
+
+test_dram_dma_rnd: TEST=test_dram_dma_rnd
+test_dram_dma_rnd: all
+
+test_peek_poke_pcis_axsize: TEST=test_peek_poke_pcis_axsize
+test_peek_poke_pcis_axsize: all
+
+test_int: TEST=test_int
+test_int: all
+
+test_peek_poke: TEST=test_peek_poke
+test_peek_poke: all
+
+test_peek_poke_len: TEST=test_peek_poke_len
+test_peek_poke_len: all
+
+test_peek_poke_rnd_lengths: TEST=test_peek_poke_rnd_lengths
+test_peek_poke_rnd_lengths: all
+
+test_peek_poke_wc: TEST=test_peek_poke_wc
+test_peek_poke_wc: all
+
+test_sda: TEST=test_sda
+test_sda: all

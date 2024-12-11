@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may
  * not use this file except in compliance with the License. A copy of the
@@ -58,11 +58,7 @@ static const struct dma_opts_s xdma_opts = {
 static const struct dma_opts_s *fpga_dma_get_dma_opts(
     enum fpga_dma_driver which_driver)
 {
-    switch (which_driver) {
-        case FPGA_DMA_XDMA: return &xdma_opts;
-        case FPGA_DMA_EDMA: /* edma is no longer supported */
-        default: return NULL;
-    }
+    return which_driver == FPGA_DMA_XDMA ? &xdma_opts : NULL;
 }
 
 int fpga_dma_open_queue(enum fpga_dma_driver which_driver, int slot_id,
@@ -93,11 +89,13 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
     int rc = 0;
     int device_num;
     char read_or_write[16];
-    const struct dma_opts_s *dma_opts = fpga_dma_get_dma_opts(which_driver);
-    fail_on(rc = (dma_opts == NULL) ? -EINVAL : 0, out, "invalid DMA driver");
+    
+    const struct dma_opts_s* dma_opts = fpga_dma_get_dma_opts(which_driver);
+    rc = (dma_opts == NULL) * -EINVAL;
+    fail_on(rc, out, "invalid DMA driver selected");
 
-    fail_on(rc = (channel >= dma_opts->n_channels || channel < 0) ? -EINVAL : 0,
-        out, "invalid channel specification");
+    rc = (channel >= dma_opts->n_channels || channel < 0) * -EINVAL;
+    fail_on(rc, out, "invalid channel specification");
 
     if (is_read) {
         rc = snprintf(read_or_write, sizeof(read_or_write), "%s",
@@ -108,6 +106,7 @@ int fpga_dma_device_id(enum fpga_dma_driver which_driver, int slot_id,
     }
 
     if (rc < 1) {
+	printf("There was an FPGA_ERR_SOFTWARE_PROBLEM!");
         return FPGA_ERR_SOFTWARE_PROBLEM;
     }
 
@@ -133,8 +132,8 @@ int fpga_dma_burst_read(int fd, uint8_t *buffer, size_t xfer_sz,
 {
     int rc;
     size_t read_offset = 0;
-    fail_on(rc = (fd < 0) ? -EINVAL : 0, out,
-        "Invalid file descriptor passed to function.");
+    rc = (fd < 0) * -EINVAL;
+    fail_on(rc, out, "Invalid file descriptor passed to function.");
 
     while (read_offset < xfer_sz) {
         rc = pread(fd,
@@ -157,8 +156,9 @@ int fpga_dma_burst_write(int fd, uint8_t *buffer, size_t xfer_sz,
 {
     int rc;
     size_t write_offset = 0;
-    fail_on(rc = (fd < 0) ? -EINVAL : 0, out,
-        "Invalid file descriptor passed to function.");
+
+    rc = (fd < 0) * -EINVAL;
+    fail_on(rc, out, "Invalid file descriptor passed to function.");
 
     while (write_offset < xfer_sz) {
         rc = pwrite(fd,
@@ -190,13 +190,14 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
 
     const struct dma_opts_s *dma_opts = fpga_dma_get_dma_opts(which_driver);
     fail_on_with_code(!dma_opts, err, rc, -EINVAL, "invalid DMA driver");
+    
     rc = snprintf(path, sizeof(path), "/sys/class/%s", dma_opts->drv_name);
-    fail_on_with_code(rc < 1, err, rc, FPGA_ERR_SOFTWARE_PROBLEM,
-        "snprintf failed");
+    fail_on_with_code(rc < 1, err, rc, FPGA_ERR_SOFTWARE_PROBLEM, "snprintf failed");
 
     /* This call must be before the lock, because the call holds the lock. */
     rc = fpga_pci_get_resource_map(slot_id, FPGA_APP_PF, &resource);
     fail_on(rc, err, "Could not get resource map");
+    
     rc = snprintf(dbdf,
                   sizeof(dbdf),
                   PCI_DEV_FMT,
@@ -252,10 +253,12 @@ int fpga_pci_get_dma_device_num(enum fpga_dma_driver which_driver,
             "%s/%s/device", path, entry->d_name);
         fail_on_with_code(rc < 2, err_unlock, rc, FPGA_ERR_SOFTWARE_PROBLEM,
             "snprintf failed to build sysfs path");
+
         possible_dbdf = realpath(sysfs_path_instance, real_path);
         if (possible_dbdf == NULL) {
             continue;
         }
+
         possible_dbdf = basename(real_path);
         if (strncmp(possible_dbdf, dbdf, 12) == 0) {
             break; /* found device */

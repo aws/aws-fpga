@@ -1,0 +1,1 @@
+./../../../cl_dram_hbm_dma/verif/tests/test_dram_dma_single_beat_4k.sv

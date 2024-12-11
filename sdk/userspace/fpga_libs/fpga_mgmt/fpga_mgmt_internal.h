@@ -37,11 +37,6 @@
 /** Max retries for draining presumed stale AFI CMD responses */
 #define AFI_MAX_RETRIES		1
 
-/** F1 Mailbox PF defines */
-#define F1_MBOX_VENDOR_ID		0x1d0f
-#define F1_MBOX_DEVICE_ID		0x1041
-#define F1_MBOX_RESOURCE_NUM	0
-
 extern struct fgpa_mgmt_state_s {
 	struct {
 		pci_bar_handle_t handle;
@@ -51,9 +46,8 @@ extern struct fgpa_mgmt_state_s {
 	bool initialized;
 } fpga_mgmt_state;
 
-// FIXME
-#define	F1_VIRTUAL_LED_REG_OFFSET	0xD0UL
-#define F1_VIRTUAL_DIP_REG_OFFSET       0xD4UL
+#define	FPGA_VIRTUAL_LED_REG_OFFSET		0xD0UL
+#define FPGA_VIRTUAL_DIP_REG_OFFSET		0xD4UL
 
 /** */
 int fpga_mgmt_process_cmd(int slot_id,

@@ -34,6 +34,10 @@ module  cl_sde
 
 `include "cl_id_defines.vh"
 
+   // Tie off to prevent protocol errors
+//   assign cl_ocl_rvalid = 1'b0;
+//   assign cl_ocl_bresp = 2'b00;
+
    assign cl_sh_id0 = `CL_SH_ID0;
    assign cl_sh_id1 = `CL_SH_ID1;
 
@@ -215,10 +219,8 @@ module  cl_sde
    logic [9:0]  float_rid ;
 
 `include "unused_flr_template.inc"
-`include "unused_ddr_a_b_d_template.inc"
-`include "unused_ddr_c_template.inc"
+`include "unused_ddr_template.inc"
 `include "unused_cl_sda_template.inc"
-`include "unused_sh_bar1_template.inc"
 `include "unused_apppf_irq_template.inc"
 
 //-------------------------------------------------
@@ -248,24 +250,24 @@ always @(posedge clk_main_a0)
  axi_register_slice_light AXIL_OCL_REG_SLC_BOT_SLR (
    .aclk          (clk_main_a0),
    .aresetn       (rst_main_n_sync_bot_slr),
-   .s_axi_awaddr  (sh_ocl_awaddr),
+   .s_axi_awaddr  (ocl_cl_awaddr),
    .s_axi_awprot   (2'h0),
-   .s_axi_awvalid (sh_ocl_awvalid),
-   .s_axi_awready (ocl_sh_awready),
-   .s_axi_wdata   (sh_ocl_wdata),
-   .s_axi_wstrb   (sh_ocl_wstrb),
-   .s_axi_wvalid  (sh_ocl_wvalid),
-   .s_axi_wready  (ocl_sh_wready),
-   .s_axi_bresp   (ocl_sh_bresp),
-   .s_axi_bvalid  (ocl_sh_bvalid),
-   .s_axi_bready  (sh_ocl_bready),
-   .s_axi_araddr  (sh_ocl_araddr),
-   .s_axi_arvalid (sh_ocl_arvalid),
-   .s_axi_arready (ocl_sh_arready),
-   .s_axi_rdata   (ocl_sh_rdata),
-   .s_axi_rresp   (ocl_sh_rresp),
-   .s_axi_rvalid  (ocl_sh_rvalid),
-   .s_axi_rready  (sh_ocl_rready),
+   .s_axi_awvalid (ocl_cl_awvalid),
+   .s_axi_awready (cl_ocl_awready),
+   .s_axi_wdata   (ocl_cl_wdata),
+   .s_axi_wstrb   (ocl_cl_wstrb),
+   .s_axi_wvalid  (ocl_cl_wvalid),
+   .s_axi_wready  (cl_ocl_wready),
+   .s_axi_bresp   (cl_ocl_bresp),
+   .s_axi_bvalid  (cl_ocl_bvalid),
+   .s_axi_bready  (ocl_cl_bready),
+   .s_axi_araddr  (ocl_cl_araddr),
+   .s_axi_arvalid (ocl_cl_arvalid),
+   .s_axi_arready (cl_ocl_arready),
+   .s_axi_rdata   (cl_ocl_rdata),
+   .s_axi_rresp   (cl_ocl_rresp),
+   .s_axi_rvalid  (cl_ocl_rvalid),
+   .s_axi_rready  (ocl_cl_rready),
    .m_axi_awaddr  (sh_ocl_awaddr_q),
    .m_axi_awprot  (),
    .m_axi_awvalid (sh_ocl_awvalid_q),

@@ -1,0 +1,39 @@
+From a102692d6df57e0b95de2e832c5962cfe4a15758 Mon Sep 17 00:00:00 2001
+From: <aws-fpga-support@amazon.com>
+Date: Thu, 5 Dec 2024 00:56:48 +0000
+Subject: [PATCH] app/testpmd: tuned for single mbuf seg jumbo frames
+
+---
+ app/test-pmd/testpmd.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/app/test-pmd/testpmd.h b/app/test-pmd/testpmd.h
+index 0afae7d771..d8f4dcee0a 100644
+--- a/app/test-pmd/testpmd.h
++++ b/app/test-pmd/testpmd.h
+@@ -46,7 +46,13 @@ extern volatile uint8_t f_quit;
+  * Default size of the mbuf data buffer to receive standard 1518-byte
+  * Ethernet frames in a mono-segment memory buffer.
+  */
++#if 0 /* AWS_TUNING */
+ #define DEFAULT_MBUF_DATA_SIZE RTE_MBUF_DEFAULT_BUF_SIZE
++#else
++/* 9.5KB + headroom */
++#define DEFAULT_MBUF_DATA_SIZE (0x2600 + RTE_PKTMBUF_HEADROOM)
++#endif
++
+ /**< Default size of mbuf data buffer. */
+
+ /*
+@@ -626,7 +632,11 @@ extern uint8_t multi_rx_mempool; /**< Enables multi-rx-mempool feature. */
+ /*
+  * Configuration of packet segments used by the "txonly" processing engine.
+  */
++#if 0 /* AWS_TUNING */
+ #define TXONLY_DEF_PACKET_LEN 64
++#else
++#define TXONLY_DEF_PACKET_LEN 8192
++#endif
+ extern uint16_t tx_pkt_length; /**< Length of TXONLY packet */
+ extern uint16_t tx_pkt_seg_lengths[RTE_MAX_SEGS_PER_PKT]; /**< Seg. lengths */
+ extern uint8_t  tx_pkt_nb_segs; /**< Number of segments in TX packets */

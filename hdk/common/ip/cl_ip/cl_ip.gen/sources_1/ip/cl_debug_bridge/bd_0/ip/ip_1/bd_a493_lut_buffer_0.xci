@@ -1,0 +1,111 @@
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "bd_a493_lut_buffer_0",
+    "cell_name": "lut_buffer",
+    "component_reference": "xilinx.com:ip:lut_buffer:2.0",
+    "ip_revision": "1",
+    "gen_directory": ".",
+    "parameters": {
+      "component_parameters": {
+        "Component_Name": [ { "value": "bd_a493_lut_buffer_0", "resolve_type": "user", "usage": "all" } ],
+        "C_EN_BSCANID_VEC": [ { "value": "false", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ]
+      },
+      "model_parameters": {
+        "C_EN_BSCANID_VEC": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "virtexuplusHBM" } ],
+        "BASE_BOARD_PART": [ { "value": "" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xcvu47p" } ],
+        "NEXTGEN_VERSAL": [ { "value": "0" } ],
+        "PACKAGE": [ { "value": "fsvh2892" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "E" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "1" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "." } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "." } ],
+        "SWVERSION": [ { "value": "2024.1" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "tdi_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tms_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tck_i": [ { "direction": "in", "driver_value": "0" } ],
+        "drck_i": [ { "direction": "in", "driver_value": "0" } ],
+        "sel_i": [ { "direction": "in", "driver_value": "0" } ],
+        "shift_i": [ { "direction": "in", "driver_value": "0" } ],
+        "update_i": [ { "direction": "in", "driver_value": "0" } ],
+        "capture_i": [ { "direction": "in", "driver_value": "0" } ],
+        "runtest_i": [ { "direction": "in", "driver_value": "0" } ],
+        "reset_i": [ { "direction": "in", "driver_value": "0" } ],
+        "bscanid_en_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tdo_o": [ { "direction": "out" } ],
+        "tdi_o": [ { "direction": "out" } ],
+        "tms_o": [ { "direction": "out" } ],
+        "tck_o": [ { "direction": "out" } ],
+        "drck_o": [ { "direction": "out" } ],
+        "sel_o": [ { "direction": "out" } ],
+        "shift_o": [ { "direction": "out" } ],
+        "update_o": [ { "direction": "out" } ],
+        "capture_o": [ { "direction": "out" } ],
+        "runtest_o": [ { "direction": "out" } ],
+        "reset_o": [ { "direction": "out" } ],
+        "bscanid_en_o": [ { "direction": "out" } ],
+        "tdo_i": [ { "direction": "in", "driver_value": "0" } ]
+      },
+      "interfaces": {
+        "s_bscan": {
+          "vlnv": "xilinx.com:interface:bscan:1.0",
+          "abstraction_type": "xilinx.com:interface:bscan_rtl:1.0",
+          "mode": "slave",
+          "port_maps": {
+            "BSCANID_EN": [ { "physical_name": "bscanid_en_i" } ],
+            "CAPTURE": [ { "physical_name": "capture_i" } ],
+            "DRCK": [ { "physical_name": "drck_i" } ],
+            "RESET": [ { "physical_name": "reset_i" } ],
+            "RUNTEST": [ { "physical_name": "runtest_i" } ],
+            "SEL": [ { "physical_name": "sel_i" } ],
+            "SHIFT": [ { "physical_name": "shift_i" } ],
+            "TCK": [ { "physical_name": "tck_i" } ],
+            "TDI": [ { "physical_name": "tdi_i" } ],
+            "TDO": [ { "physical_name": "tdo_o" } ],
+            "TMS": [ { "physical_name": "tms_i" } ],
+            "UPDATE": [ { "physical_name": "update_i" } ]
+          }
+        },
+        "m_bscan": {
+          "vlnv": "xilinx.com:interface:bscan:1.0",
+          "abstraction_type": "xilinx.com:interface:bscan_rtl:1.0",
+          "mode": "master",
+          "port_maps": {
+            "BSCANID_EN": [ { "physical_name": "bscanid_en_o" } ],
+            "CAPTURE": [ { "physical_name": "capture_o" } ],
+            "DRCK": [ { "physical_name": "drck_o" } ],
+            "RESET": [ { "physical_name": "reset_o" } ],
+            "RUNTEST": [ { "physical_name": "runtest_o" } ],
+            "SEL": [ { "physical_name": "sel_o" } ],
+            "SHIFT": [ { "physical_name": "shift_o" } ],
+            "TCK": [ { "physical_name": "tck_o" } ],
+            "TDI": [ { "physical_name": "tdi_o" } ],
+            "TDO": [ { "physical_name": "tdo_i" } ],
+            "TMS": [ { "physical_name": "tms_o" } ],
+            "UPDATE": [ { "physical_name": "update_o" } ]
+          }
+        }
+      }
+    }
+  }
+}

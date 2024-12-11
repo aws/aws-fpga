@@ -1,0 +1,50 @@
+#-------------------------------------------------------------------------------
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+#-------------------------------------------------------------------------------
+
+#
+# Command wrapper API source
+#
+ifndef SIMSCR
+SIMSCR = source $(HDK_COMMON_DIR)/verif/tb/scripts/simapi.sh
+endif
+
+#-------------------------------------------------------------------------------
+# Xilinx's IP generate
+#-------------------------------------------------------------------------------
+override XILINX_IP_DIRS += $(realpath $(HDK_COMMON_DIR))
+
+#
+# Main target that launches all IP generations
+#
+ip-gen: $(XILINX_IP_DIRS:=/ip/.done) $(HDK_COMMON_DIR)/verif/scripts/.done
+
+#
+# Target specific to each IP group's ip_setup.tcl. This is automatic target that
+# will be launched to all list of $XILINX_IP_DIRS
+#
+%/ip/.done: %/ip/*.xci %/ip/ip_setup.tcl
+	@ $(SIMSCR); pre_ip_gen $(shell dirname $@)
+	@ cd $(shell dirname $@) && vivado -mode batch -source ip_setup.tcl
+	@ $(SIMSCR); post_ip_gen $(shell dirname $@)
+	@ touch $@
+
+ip-clean:
+	#
+	#- Cleaning the generated files
+	#
+	@ for i in $(XILINX_IP_DIRS); do git clean -fXd $$i/ip; done
+	@ git clean -fXd $(HDK_COMMON_DIR)/verif/scripts

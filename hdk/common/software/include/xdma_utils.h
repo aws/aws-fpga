@@ -14,6 +14,9 @@
 // limitations under the License.
 
 
+#include <stddef.h>
+#include <stdint.h>
+
 // XDMA Target IDs
 #define H2C_TGT 0x0
 #define C2H_TGT 0x1

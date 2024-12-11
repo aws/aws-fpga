@@ -1,0 +1,6 @@
+# Only the / files are checked into git.  All the other IP files are generated.
+
+common_ip/
+post_gen.sh
+.done
+.Xil/

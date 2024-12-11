@@ -1,0 +1,2 @@
+ila_vio_counter.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/ila_vio_counter/sim/ila_vio_counter.v,incdir="../../../../cl_ip.gen/sources_1/ip/ila_vio_counter/hdl/verilog"
+glbl.v,Verilog,xil_defaultlib,glbl.v

@@ -1,0 +1,156 @@
+{
+  "design": {
+    "design_info": {
+      "boundary_crc": "0x1F6A4C70D60ADED4",
+      "design_src": "SBD",
+      "device": "xcvu47p-fsvh2892-2-e",
+      "name": "bd_a493",
+      "rev_ctrl_bd_flag": "RevCtrlBdOff",
+      "scoped": "true",
+      "synth_flow_mode": "None",
+      "tool_version": "2024.1",
+      "validated": "true"
+    },
+    "design_tree": {
+      "xsdbm": "",
+      "lut_buffer": ""
+    },
+    "interface_ports": {
+      "S_BSCAN": {
+        "mode": "Slave",
+        "vlnv_bus_definition": "xilinx.com:interface:bscan:1.0",
+        "vlnv": "xilinx.com:interface:bscan_rtl:1.0"
+      }
+    },
+    "ports": {
+      "clk": {
+        "type": "clk",
+        "direction": "I",
+        "parameters": {
+          "CLK_DOMAIN": {
+            "value": "bd_a493_clk",
+            "value_src": "constant"
+          },
+          "FREQ_HZ": {
+            "value": "100000000",
+            "value_src": "default"
+          },
+          "FREQ_TOLERANCE_HZ": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "PHASE": {
+            "value": "0.0",
+            "value_src": "default"
+          }
+        }
+      }
+    },
+    "components": {
+      "xsdbm": {
+        "vlnv": "xilinx.com:ip:xsdbm:3.0",
+        "ip_revision": "2",
+        "xci_name": "bd_a493_xsdbm_0",
+        "xci_path": "ip/ip_0/bd_a493_xsdbm_0.xci",
+        "inst_hier_path": "xsdbm",
+        "parameters": {
+          "C_BUILD_REVISION": {
+            "value": "0"
+          },
+          "C_CLK_INPUT_FREQ_HZ": {
+            "value": "300000000"
+          },
+          "C_CORE_MAJOR_VER": {
+            "value": "1"
+          },
+          "C_CORE_MINOR_ALPHA_VER": {
+            "value": "97"
+          },
+          "C_CORE_MINOR_VER": {
+            "value": "0"
+          },
+          "C_CORE_TYPE": {
+            "value": "1"
+          },
+          "C_DCLK_HAS_RESET": {
+            "value": "0"
+          },
+          "C_ENABLE_CLK_DIVIDER": {
+            "value": "false"
+          },
+          "C_EN_BSCANID_VEC": {
+            "value": "false"
+          },
+          "C_EN_INT_SIM": {
+            "value": "1"
+          },
+          "C_FIFO_STYLE": {
+            "value": "SUBCORE"
+          },
+          "C_MAJOR_VERSION": {
+            "value": "14"
+          },
+          "C_MINOR_VERSION": {
+            "value": "1"
+          },
+          "C_TWO_PRIM_MODE": {
+            "value": "false"
+          },
+          "C_USER_SCAN_CHAIN": {
+            "value": "1"
+          },
+          "C_USE_BUFR": {
+            "value": "0"
+          },
+          "C_USE_EXT_BSCAN": {
+            "value": "true"
+          },
+          "C_USE_STARTUP_CLK": {
+            "value": "false"
+          },
+          "C_XSDB_NUM_SLAVES": {
+            "value": "0"
+          }
+        }
+      },
+      "lut_buffer": {
+        "vlnv": "xilinx.com:ip:lut_buffer:2.0",
+        "ip_revision": "1",
+        "xci_name": "bd_a493_lut_buffer_0",
+        "xci_path": "ip/ip_1/bd_a493_lut_buffer_0.xci",
+        "inst_hier_path": "lut_buffer",
+        "parameters": {
+          "C_EN_BSCANID_VEC": {
+            "value": "false"
+          }
+        }
+      }
+    },
+    "interface_nets": {
+      "S_BSCAN_1": {
+        "interface_ports": [
+          "S_BSCAN",
+          "lut_buffer/s_bscan"
+        ]
+      },
+      "lut_buffer_m_bscan": {
+        "interface_ports": [
+          "lut_buffer/m_bscan",
+          "xsdbm/s_bscan"
+        ]
+      }
+    },
+    "nets": {
+      "clk_1": {
+        "ports": [
+          "clk",
+          "xsdbm/clk"
+        ]
+      }
+    }
+  }
+}

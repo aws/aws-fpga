@@ -17,7 +17,7 @@ export TEST ?= test_sde_loopback
 
 SLOT_NUM = 0
 APP_SCRIPTS_DIR = $(SDK_DIR)/apps/virtual-ethernet/scripts
-APP_INSTALL_DIR = veth_app
+APP_INSTALL_DIR = $(HDK_DIR)/cl/examples/cl_sde/software/runtime/veth_app
 DPDK_DIR = $(APP_INSTALL_DIR)/dpdk
 RMDIR = sudo rm -rf
 STATS_PERIOD = 0
@@ -31,7 +31,7 @@ install: check_env
 	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_setup.py $(DPDK_DIR) $(SLOT_NUM)
 
 run: check_env
-	sudo $(DPDK_DIR)/x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=$(STATS_PERIOD) & \
+	sudo $(DPDK_DIR)/build/app/dpdk-testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=$(STATS_PERIOD) \
 
 clean:
 	$(RMDIR) $(APP_INSTALL_DIR)
@@ -40,4 +40,3 @@ check_env:
 ifndef SDK_DIR
     $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
 endif
-

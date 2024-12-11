@@ -1,0 +1,9 @@
+verilog xil_defaultlib --include "$XILINX_VIVADO/data/xilinx_vip/include" --include "../../../ipstatic" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_hbm/clk_mmcm_hbm_mmcm_pll_drp.v" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_hbm/clk_mmcm_hbm_clk_wiz.v" \
+"../../../../cl_ip.gen/sources_1/ip/clk_mmcm_hbm/clk_mmcm_hbm.v" \
+
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

@@ -1,0 +1,2 @@
+axi_register_slice.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/axi_register_slice/sim/axi_register_slice.v,incdir="../../../../cl_ip.gen/sources_1/ip/axi_register_slice/hdl"incdir="../../../../cl_ip.gen/sources_1/ip/cl_axi_register_slice/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

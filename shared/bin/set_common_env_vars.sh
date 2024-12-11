@@ -1,6 +1,6 @@
 # Amazon FPGA Hardware Development Kit
 #
-# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
@@ -32,16 +32,9 @@ unset HDK_DIR
 unset HDK_COMMON_DIR
 unset HDK_SHELL_DIR
 unset HDK_SHELL_DESIGN_DIR
-
-export -f allow_non_root
-export -f allow_others
-
-if  allow_non_root || allow_others ; then
-	export AWS_FPGA_SDK_GROUP=${AWS_FPGA_SDK_GROUP:-"fpgauser"}
-	export SDK_NON_ROOT_USER=$(whoami)
-  info_msg "Allowing group ${AWS_FPGA_SDK_GROUP} access to FPGA management tools and resources"
-fi
-
+unset HDK_IP_SRC_DIR
+unset HDK_BD_SRC_DIR
+unset HDK_BD_GEN_DIR
 
 export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
 
@@ -49,22 +42,22 @@ export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
 export HDK_COMMON_DIR=$HDK_DIR/common
 
 # Point to the latest version of AWS shell
-export HDK_SHELL_DIR=$(readlink -f $HDK_COMMON_DIR/shell_stable)
+export HDK_SHELL_DIR=$(realpath -s $HDK_COMMON_DIR/shell_stable)
 
 # Set the common shell design dir
 export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
+
+# Set CL IP directories
+export HDK_IP_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/ip)
+export HDK_BD_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/bd)
+export HDK_BD_GEN_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.gen/sources_1/bd)
 
 # SDK
 unset SDK_DIR
 
 export SDK_DIR=$AWS_FPGA_REPO_DIR/sdk
-
-# SDACCEL
-# Setup Location of SDACCEL_DIR
-export SDACCEL_DIR=$AWS_FPGA_REPO_DIR/SDAccel
-#  Vitis
-# Setup Location of VITIS_DIR
-export VITIS_DIR=$AWS_FPGA_REPO_DIR/Vitis
+#Vitis
+export VITIS_DIR=$AWS_FPGA_REPO_DIR/vitis
 
 # PYTHONPATH
 # Update PYTHONPATH with libraries used for unit testing
@@ -76,6 +69,3 @@ export PYTHONPATH
 
 export PATH=$(echo $PATH | sed -e 's/\(^\|:\)[^:]\+\/shared\/bin\/scripts\(:\|$\)/:/g; s/^://; s/:$//')
 PATH=$AWS_FPGA_REPO_DIR/shared/bin/scripts:$PATH
-
-# Enable xilinx licensing
-export XILINX_ENABLE_AWS_WHITELIST=095707098027

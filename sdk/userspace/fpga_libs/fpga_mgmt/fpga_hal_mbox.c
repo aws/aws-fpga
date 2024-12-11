@@ -163,7 +163,7 @@ fpga_hal_mbox_read_async(pci_bar_handle_t handle, void *msg, uint32_t *len)
 
 	ret = FPGA_ERR_AFI_CMD_MALFORMED;
 	fail_on(mb_rd_len > FPGA_MBOX_MSG_DATA_LEN / sizeof(uint32_t), err_rx_ack,
-		"mb_rd_len is too large");
+		"mb_rd_len (%d) is too large (max length '%ld')", mb_rd_len, FPGA_MBOX_MSG_DATA_LEN / sizeof(uint32_t));
 	ret = fpga_hal_mbox_check_len(mb_rd_len << 2);
 	fail_on(ret != 0, err_rx_ack, "fpga_hal_mbox_check_len failed");
 

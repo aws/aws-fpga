@@ -13,6 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+`include "common_base_test.svh"
 
 `define SRM_PATH tb.card.fpga.CL.CL_SDE_SRM
 `define CL_PATH tb.card.fpga.CL
@@ -819,10 +820,8 @@ end
 task end_sim;
 begin
    $display($time,,,"END_SIM: c2h_pkts=%0d (%0d errored), h2c_pkts=%0d (%0d errored)", c2h_pkts_checked, c2h_err_cnt, h2c_pkts_checked, h2c_err_cnt);
-   if ((h2c_err_cnt==0) && (c2h_err_cnt==0))
-      $display("!!! TEST PASSED !!!");
-   else
-      $display("*** TEST FAILED ***");
+
+   report_pass_fail_status((h2c_err_cnt==0) && (c2h_err_cnt==0));
 
    $finish;
 end

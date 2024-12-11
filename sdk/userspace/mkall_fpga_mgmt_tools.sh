@@ -17,7 +17,9 @@
 
 # Build script for the Amazon FPGA Image Management Tools and libraries.
 
-TOP=`pwd` 
+TOP=`pwd`
+
+source $REPO_ROOT/shared/bin/set_common_functions.sh
 
 LOGLEVEL=$1
 if [ -z "$LOGLEVEL" ]; then
@@ -42,15 +44,13 @@ FPGA_PCI_BARS_DFLT=64
 FPGA_PCI_BARS_MAX=$2
 if [ -z "$FPGA_PCI_BARS_MAX" ]; then
 	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_DFLT
-else
-	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_MAX
 fi
 
 # get the HDK/SDK version number
-source $TOP/../../hdk/hdk_version.txt
+source $TOP/../../release_version.txt
 
 function build_exec {
-	cd $TOP/$BUILD_DIR 
+	cd $TOP/$BUILD_DIR
 	echo "Entering $TOP/$BUILD_DIR"
 	RET=$?
 	if [ $RET -ne 0 ]; then
@@ -63,7 +63,7 @@ function build_exec {
 		echo "make clean failed"
 		exit 1
 	fi
-	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX" -DCLI_VERSION='\"$HDK_VERSION\"'"
+	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX" -DCLI_VERSION='\"$RELEASE_VERSION\"'"
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "make failed"
@@ -80,6 +80,9 @@ BUILD_DIR="fpga_libs/fpga_pci"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_dma"
+build_exec
+
+BUILD_DIR="fpga_libs/fpga_clkgen"
 build_exec
 
 BUILD_DIR="fpga_libs/fpga_mgmt"

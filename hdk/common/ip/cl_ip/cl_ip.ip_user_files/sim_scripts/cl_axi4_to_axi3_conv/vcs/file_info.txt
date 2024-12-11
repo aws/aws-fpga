@@ -1,0 +1,2 @@
+cl_axi4_to_axi3_conv.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_axi4_to_axi3_conv/sim/cl_axi4_to_axi3_conv.v,incdir="../../../ipstatic/hdl"incdir="../../../ipstatic/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

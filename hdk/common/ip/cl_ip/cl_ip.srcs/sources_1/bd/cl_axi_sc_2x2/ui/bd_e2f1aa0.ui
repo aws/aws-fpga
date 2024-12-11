@@ -1,0 +1,25 @@
+{
+   "ActiveEmotionalView":"Default View",
+   "Default View_ScaleFactor":"1.0",
+   "Default View_TopLeft":"-780,-334",
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.7.1 2023-07-26 3bc4126617 VDI=43 GEI=38 GUI=JA:21.0 TLS
+#  -string -flagsOSRD
+preplace port ATG -pg 1 -lvl 0 -x 0 -y 80 -defaultsOSRD
+preplace port DDRA -pg 1 -lvl 2 -x 320 -y 80 -defaultsOSRD
+preplace port DDRB -pg 1 -lvl 2 -x 320 -y 100 -defaultsOSRD
+preplace port XDMA -pg 1 -lvl 0 -x 0 -y 60 -defaultsOSRD
+preplace port port-id_aclk_250 -pg 1 -lvl 0 -x 0 -y 100 -defaultsOSRD
+preplace port port-id_aresetn_250 -pg 1 -lvl 0 -x 0 -y 120 -defaultsOSRD
+preplace inst smartconnect_0 -pg 1 -lvl 1 -x 160 -y 90 -defaultsOSRD
+preplace netloc aclk_0_1 1 0 1 NJ 100
+preplace netloc aresetn_0_1 1 0 1 NJ 120
+preplace netloc ATG_1 1 0 1 NJ 80
+preplace netloc XDMA_1 1 0 1 NJ 60
+preplace netloc smartconnect_0_M00_AXI 1 1 1 NJ 80
+preplace netloc smartconnect_0_M01_AXI 1 1 1 NJ 100
+levelinfo -pg 1 0 160 320
+pagesize -pg 1 -db -bbox -sgen -140 0 410 180
+"
+}
+

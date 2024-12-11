@@ -61,7 +61,7 @@ afi_cmd_hdr_get_flags(const union afi_cmd *cmd)
  * @param[in]  len		the payload length to set
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 static int
@@ -84,7 +84,7 @@ afi_cmd_hdr_set_len(union afi_cmd *cmd, size_t len)
  * @param[in]  flags	the flags to set
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 static int
@@ -123,10 +123,10 @@ afi_get_next_id(void)
 /**
  * Generate the AFI_CMD_LOAD.
  *
- * @param[in]		cmd		cmd buffer 
+ * @param[in]		cmd		cmd buffer
  * @param[in,out]	len		cmd len
  */
-void 
+void
 fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, union fpga_mgmt_load_local_image_options *opt)
 {
 	int i;
@@ -143,8 +143,8 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, union fpga_mgmt_load_
 	afi_cmd_hdr_set_flags(cmd, 0);
 
 	/** Fill in cmd body */
-	strncpy(req->ids.afi_id, opt->afi_id, sizeof(req->ids.afi_id)); 
-	req->ids.afi_id[sizeof(req->ids.afi_id) - 1] = 0; 
+	strncpy(req->ids.afi_id, opt->afi_id, sizeof(req->ids.afi_id));
+	req->ids.afi_id[sizeof(req->ids.afi_id) - 1] = 0;
 
 	req->fpga_cmd_flags = opt->flags;
 	for (i = 0; i<FPGA_MMCM_GROUP_MAX; i++){
@@ -157,7 +157,7 @@ fpga_mgmt_cmd_init_load(union afi_cmd *cmd, uint32_t *len, union fpga_mgmt_load_
 /**
  * Generate the AFI_CMD_METRICS.
  *
- * @param[in]		cmd		cmd buffer 
+ * @param[in]		cmd		cmd buffer
  * @param[in,out]	len		cmd len
  */
 void
@@ -178,7 +178,7 @@ fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len, uint32_t flags)
 
 	/** Fill in cmd body; only allow specific flags to be set */
 	req->fpga_cmd_flags = FPGA_CMD_EXTENDED_METRICS_SIZE | flags &
-		(FPGA_CMD_GET_HW_METRICS | FPGA_CMD_CLEAR_HW_METRICS);
+		(FPGA_CMD_GET_HW_METRICS | FPGA_CMD_CLEAR_HW_METRICS | FPGA_CMD_CLEAR_AFI_CACHE);
 
 	*len = sizeof(struct afi_cmd_hdr) + payload_len;
 }
@@ -186,10 +186,10 @@ fpga_mgmt_cmd_init_metrics(union afi_cmd *cmd, uint32_t *len, uint32_t flags)
 /**
  * Generate the AFI_CMD_CLEAR.
  *
- * @param[in]		cmd		cmd buffer 
+ * @param[in]		cmd		cmd buffer
  * @param[in,out]	len		cmd len
  */
-void 
+void
 fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len)
 {
 	assert(cmd);
@@ -214,22 +214,22 @@ fpga_mgmt_cmd_init_clear(union afi_cmd *cmd, uint32_t *len)
 /**
  * Handle the AFI_CMD_METRICS response.
  *
- * @param[in]	cmd		cmd buffer 
- * @param[in]	rsp		rsp buffer 
+ * @param[in]	cmd		cmd buffer
+ * @param[in]	rsp		rsp buffer
  * @param[in]	len		rsp len
  *
  * @returns
- *  0	on success 
+ *  0	on success
  * -1	on failure
  */
 int
 fpga_mgmt_cmd_handle_metrics(const union afi_cmd *rsp, uint32_t len,
 	struct afi_cmd_metrics_rsp **metrics)
 {
-	uint32_t tmp_len = 
+	uint32_t tmp_len =
 		sizeof(struct afi_cmd_hdr) + sizeof(struct afi_cmd_metrics_rsp);
 
-	fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)", 
+	fail_on(len < tmp_len, err, "total_rsp_len(%u) < calculated_len(%u)",
 			len, tmp_len);
 
 	/* We've already validated the header; copy the response into the out
@@ -242,7 +242,7 @@ err:
 }
 
 
-int 
+int
 fpga_mgmt_mbox_attach(int slot_id)
 {
 	/* slot_id not validated on internal function */
@@ -252,7 +252,7 @@ fpga_mgmt_mbox_attach(int slot_id)
 	if (fpga_mgmt_state.slots[slot_id].handle == PCI_BAR_HANDLE_INIT) {
 		ret = fpga_pci_attach(slot_id,
 		                      FPGA_MGMT_PF,
-		                      F1_MBOX_RESOURCE_NUM,
+		                      FPGA_MBOX_RESOURCE_NUM,
 		                      0 /* flags */,
 		                      &handle);
 		fail_on(ret != 0, err, "Unable to attach to mbox bar");
@@ -278,7 +278,7 @@ err:
 	return ret;
 }
 
-int 
+int
 fpga_mgmt_mbox_detach(int slot_id)
 {
 	if (fpga_mgmt_state.slots[slot_id].handle != PCI_BAR_HANDLE_INIT) {
@@ -301,7 +301,7 @@ fpga_mgmt_mbox_detach(int slot_id)
 	return 0;
 }
 
-int 
+int
 fpga_mgmt_detach_all(void)
 {
 	int ret = 0;
@@ -375,12 +375,12 @@ fpga_mgmt_afi_validate_header(const union afi_cmd *cmd,
 			cmd->hdr.version, rsp->hdr.version, cmd->hdr.id);
 
 	/** Opcode */
-	fail_on(cmd->hdr.op != rsp->hdr.op, op_err, 
+	fail_on(cmd->hdr.op != rsp->hdr.op, op_err,
 			"cmd_op(%u) != rsp_op(%u), cmd_id=0x%08x",
 			cmd->hdr.op, rsp->hdr.op, cmd->hdr.id);
 
 	/** Id */
-	fail_on(cmd->hdr.id != rsp->hdr.id, id_err, 
+	fail_on(cmd->hdr.id != rsp->hdr.id, id_err,
 			"cmd_id(0x%08x) != rsp_id(0x%08x)",
 			cmd->hdr.id, rsp->hdr.id);
 
@@ -434,7 +434,7 @@ fpga_mgmt_send_cmd(int slot_id,
 		if (ret == 0) {
 			done = true;
 		} else {
-			fail_on(ret != -EAGAIN, err_code, 
+			fail_on(ret != -EAGAIN, err_code,
 				"fpga_mgmt_afi_validate_header failed");
 			fail_on(retries >= AFI_MAX_RETRIES, timeout_err, "retries=%u, exceeded",
 				retries);

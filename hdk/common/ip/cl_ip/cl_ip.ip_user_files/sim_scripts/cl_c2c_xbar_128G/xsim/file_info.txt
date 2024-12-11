@@ -1,0 +1,2 @@
+cl_c2c_xbar_128G.v,verilog,xil_defaultlib,../../../../cl_ip.gen/sources_1/ip/cl_c2c_xbar_128G/sim/cl_c2c_xbar_128G.v,incdir="../../../ipstatic/hdl"incdir="../../../ipstatic/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

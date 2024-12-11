@@ -1,6 +1,6 @@
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -14,7 +14,6 @@
 // limitations under the License.
 `define MAXWAITS 100000
 package tb_type_defines_pkg;
-
 //                      clk_main_a0	clk_extra_a1	clk_extra_a2	clk_extra_a3
 // Recipe A0 (Default)       125        62.5            187.5           250
 // Recipe A1	             250        125	        375             500

@@ -23,10 +23,12 @@ waves.shm
 *.mod.c
 *.order
 *.symvers
+.vscode/
 
 *~
 .\#*
 \#*
+*._*
 
 *.swp
 *.o
@@ -46,7 +48,7 @@ nohup.out
 *.nohup.out
 
 # Shell DCP files are stored in S3 and downloaded by hdk_setup.sh
-hdk/common/shell_*/build/checkpoints/from_aws/SH_CL_BB_routed.dcp*
+hdk/common/shell_*/build/checkpoints/from_aws/*.dcp
 
 # HDK generated files
 hdk/cl/examples/*/build/create-afi/
@@ -59,6 +61,7 @@ hdk/cl/examples/cl_uram_example/software/runtime/test_uram_example
 hdk/cl_uram_example/software/runtime/test_uram_example
 hdk/common/shell_*/build/debug_probes/
 hdk/common/verif/models/sh_bfm/cl_ports_sh_bfm.vh
+hdk/cl/examples/**/src_post_encryption/*
 
 # SDAccel generated files
 SDAccel/**/*.d
@@ -76,6 +79,18 @@ sdk/linux_kernel_drivers/xdma/.*.o.cmd
 sdk/linux_kernel_drivers/xdma/.*.ko.cmd
 sdk/linux_kernel_drivers/xdma/.tmp_versions
 sdk/userspace/lib/
+
+# Vitis adjacent files
+ vitis/aws_platform/
+ vitis/examples/vitis_examples_2024.*/*/*build*
+ vitis/examples/vitis_examples_2024.*/*/.run
+ vitis/examples/vitis_examples_2024.*/*/_x*
+ vitis/examples/vitis_examples_2024.*/*/emconfig.json
+ vitis/examples/vitis_examples_2024.*/*/native_trace.csv
+ vitis/examples/vitis_examples_2024.*/*/summary.csv
+ vitis/examples/vitis_examples_2024.*/*/v++_vadd*
+ vitis/examples/vitis_examples_2024.*/*/*.log
+ vitis/examples/vitis_examples_2024.*/*/xrt.run_summary
 
 # Generated checkpoints
 checkpoints
@@ -106,8 +121,19 @@ vivado*.log
 # Patches
 patches/*
 
-# Temporary files
-.batch
-.temp
+# Host utils
+sdk/userspace/tools/*
+sdk/userspace/scripts/*
+# Host utils packer script
+pack.sh
 
-.python-version
+# IP output
+*.xci.bak
+.tmp_log
+compile.log
+
+# Slurm log
+slurm*.out
+
+# RTD Builds
+docs-rtd/build/*

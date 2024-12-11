@@ -1,1 +1,0 @@
-../../lib/check_src_headers.py

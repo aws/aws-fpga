@@ -14,7 +14,7 @@
  */
 
 /** @file
- * EC2 F1 CLI parsing and associated help text.
+ * EC2 F1 and F2 CLI parsing and associated help text.
  */
 
 #include <assert.h>
@@ -89,13 +89,16 @@ static const char *describe_afi_usage[] = {
 	"      -S, --fpga-image-slot",
 	"          The logical slot number for the FPGA image.",
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
-	"      -M  --metrics",
+	"      -M, --metrics",
 	"          Return FPGA image hardware metrics.",
 	"          Examples: FPGA PCI and DDR metrics.",
-	"      -C  --clear-metrics",
+	"      -C, --clear-metrics",
 	"          Return FPGA image hardware metrics (clear on read).",
 	"          Examples: FPGA PCI and DDR metrics.",
-	"      -R  --rescan",
+	"      -L, --clear-cache",
+	"          Return FPGA image hardware metrics (clear afi cache on read).",
+	"          Examples: agfi-<number>",
+	"      -R, --rescan",
 	"          Rescan the AFIDEVICE to update the per-AFI PCI VendorId and",
 	"          DeviceId that may be dynamically modified due to a",
 	"          fpga-load-local-image or fpga-clear-local-image command.",
@@ -162,20 +165,6 @@ static const char *load_afi_usage[] = {
 	"      -F, --force-shell-reload",
 	"          Reload the FPGA shell on AFI load, even if the next AFI",
 	"          doesn't require it.",
-	"      -a, --clock-a0-freq",
-	"          Request the clock a0 frequency be set to this value in Mhz or less,",
-	"          setting other frequencies in clock group a much slower.",
-	"      -b, --clock-b0-freq",
-	"          Request the clock b0 frequency be set to this value in Mhz or less,",
-	"          setting other frequencies in clock group b much slower.",
-	"      -c, --clock-c0-freq",
-	"          Request the clock c0 frequency be set to this value in Mhz or less,",
-	"          setting other frequencies in clock group c much slower.",
-	"      -D, --dram-data-retention",
-	"          Request that dram data retention be performed for this afi load.",
-	"          This will try to detect if retention is possible and reject the",
-	"          load if it is not. To use, call load with another afi already",
-	"          loaded.",
 	"      -P, --prefetch-image",
 	"          Prefetch the indicated AFI and store it in the cache for faster loading.",
 	"          Fastest load times can be achieved by using cached AFIs and enabling data retention (-D).",
@@ -320,7 +309,7 @@ static const char *set_virtual_dip_usage[] = {
 	"          Constraints: Positive integer from 0 to the total slots minus 1.",
 	"      -D, --virtual-dip",
 	"          A 16 digit bitmap representation of the desired setting for Virtual DIP Switches",
-	"          This argument is mandatory and must be 16 digits made of any combinations of ",
+	"          This argument is mandatory and must be 16 digits made of any combinations of",
 	"          zeros or ones.",
 	"      -h, --help",
 	"          Display this help.",
@@ -328,6 +317,102 @@ static const char *set_virtual_dip_usage[] = {
 	"          Display column headers.",
 	"      -V, --version",
 	"          Display version number of this program.",
+};
+
+static const char *describe_clkgen_usage[] = {
+	"  SYNOPSIS",
+	"      fpga-describe-clkgen",
+	"      Example: fpga-describe-clkgen -S 0",
+	"  DESCRIPTION",
+	"      Returns the currently loaded frequencies for each clock in each MMCM"
+	"  GENERAL OPTIONS",
+	"      -S, --fpga-image-slot",
+	"          The logical slot number for the FPGA image",
+	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -h, --help",
+	"          Display this help.",
+	"      -V, --version",
+	"          Display version number of this program.",
+};
+
+static const char *load_clkgen_recipe_usage[] = {
+	"  SYNOPSIS",
+	"      fpga-load-clkgen-recipe",
+	"      Example: fpga-load-clkgen-recipe -S 0 -a 0 -b 1 -c 2 -m 3",
+	"      Loads recipe A0 to MMCM_A, B1 to MMCM_B, C1 to MMCM_C and H3 to MMCM_HBM",
+	"  DESCRIPTION",
+	"      Loads a clock recipe into the specified MMCMs.",
+	"      MMCMs that are not specified will be set to the default recipes.",
+	"      Frquencies are listed in MHz. * - default recipe",
+	"      A Recipe Number      clk_extra_a1    clk_extra_a2    clk_extra_a3",
+	"      A0                   62.5            187.5           250",
+	"      A1 *                 125             375             500",
+	"      A2                   62.5            187.5           250",
+	"      B Recipe Number      clk_extra_b0    clk_extra_b1",
+	"      B0                   250             125",
+	"      B1                   125             62.5",
+	"      B2 *                 450             225",
+	"      B3                   250             62.5",
+	"      B4                   300             75",
+	"      B5                   400             100",
+	"      C Recipe Number      clk_extra_c0    clk_extra_c1",
+	"      C0 *                 300             400",
+	"      C1                   150             200",
+	"      C2                   75              100",
+	"      C3                   200             266.67",
+	"      HBM Recipe Number    clk_hbm_axi",
+	"      H0                   250",
+	"      H1                   125",
+	"      H2 *                 450",
+	"      H3                   300",
+	"      H4                   400",
+	"      Returns the currently loaded clkgen clock configuration in MHz",
+	"  GENERAL OPTIONS",
+	"      -S, --fpga-image-slot",
+	"          The logical slot number for the FPGA image",
+	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -h, --help",
+	"          Display this help.",
+	"      -V, --version",
+	"          Display version number of this program.",
+	"      -a, --clock-a-recipe",
+	"          Request the clock group A set with the specified recipe",
+	"      -b, --clock-b-recipe",
+	"          Request the clock group B set with the specified recipe",
+	"      -c, --clock-c-recipe",
+	"          Request the clock group C set with the specified recipe",
+	"      -m, --clock-hbm-recipe",
+	"          Request the clock group HBM set with the specified recipe",
+};
+
+static const char *load_clkgen_dynamic_usage[] = {
+	"  SYNOPSIS",
+	"      fpga-load-clkgen-dynamic",
+	"      Example: fpga-load-clkgen-dynamic -S 0 -a 125 -b ",
+	"  DESCRIPTION",
+	"      Loads a frequency into the first clock of each specified MMCMs.",
+	"      MMCMs not specified will be set to the default frequency.",
+	"      clk_extra_a1 - Max Frequency 125 MHz, Default 125 MHz",
+	"      clk_extra_b0 - Max Frequency 450 MHz, Default 450 MHz",
+	"      clk_extra_c0 - Max Frequency 300 MHz, Default 300 MHz",
+	"      clk_hbm_axi - Max Frequency 450 MHz, Default 450 MHz",
+	"      Returns the currently loaded clkgen clock configuration",
+	"  GENERAL OPTIONS",
+	"      -S, --fpga-image-slot",
+	"          The logical slot number for the FPGA image",
+	"          Constraints: Positive integer from 0 to the total slots minus 1.",
+	"      -h, --help",
+	"          Display this help.",
+	"      -V, --version",
+	"          Display version number of this program.",
+	"      -a, --clock-a1-freq",
+	"          Request clk_extra_a1 frequency be set to this value in Mhz or less",
+	"      -b, --clock-b0-freq",
+	"          Request clk_extra_b0 frequency be set to this value in Mhz or less",
+	"      -c, --clock-c0-freq",
+	"          Request clk_extra_c0 frequency be set to this value in Mhz or less",
+	"      -m, --clock-hbm-freq",
+	"          Request clk_hbm_axi frequency be set to this value in Mhz or less",
 };
 
 /**
@@ -358,7 +443,7 @@ print_version(void)
 }
 
 /**
- * Check the given option and set the f1.parser_completed flag.
+ * Check the given option and set the fpga.parser_completed flag.
  *
  * -parser_completed is set when the parser will complete the option
  *  (help or version output) and no further command processing is necessary,
@@ -373,7 +458,7 @@ static void
 get_parser_completed(char opt)
 {
 	if ((opt == 'h') || (opt == 'V')) {
-		f1.parser_completed = true;
+		fpga.parser_completed = true;
 	}
 }
 
@@ -405,11 +490,11 @@ config_request_timeout(uint32_t timeout)
 		timeout_tmp = (uint32_t)-1;
 	}
 
-	f1.request_timeout = timeout_tmp;
-	f1.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
+	fpga.request_timeout = timeout_tmp;
+	fpga.request_delay_msec = CLI_REQUEST_DELAY_MSEC_DFLT;
 
 	log_debug("Setting timeout to %u secs, request_timeout=%u, request_delay_msec=%u",
-			timeout, f1.request_timeout, f1.request_delay_msec);
+			timeout, fpga.request_timeout, fpga.request_delay_msec);
 	return 0;
 err:
 	return -EINVAL;
@@ -443,11 +528,11 @@ config_sync_timeout(uint32_t timeout)
 		timeout_tmp = (uint32_t)-1;
 	}
 
-	f1.sync_timeout = timeout_tmp;
-	f1.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
+	fpga.sync_timeout = timeout_tmp;
+	fpga.sync_delay_msec = CLI_SYNC_DELAY_MSEC_DFLT;
 
 	log_debug("Setting timeout to %u secs, sync_timeout=%u, sync_delay_msec=%u",
-			timeout, f1.sync_timeout, f1.sync_delay_msec);
+			timeout, fpga.sync_timeout, fpga.sync_delay_msec);
 	return 0;
 err:
 	return -EINVAL;
@@ -467,28 +552,24 @@ parse_args_load_afi(int argc, char *argv[])
 	static struct option long_options[] = {
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"fpga-image-id",		required_argument,	0,	'I'	},
-		{"clock-a0-freq",		required_argument,	0,	'a'	},
-		{"clock-b0-freq",		required_argument,	0,	'b'	},
-		{"clock-c0-freq",		required_argument,	0,	'c'	},
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"sync-timeout",		required_argument,	0,	's'	},
 		{"async",				no_argument,		0,	'A'	},
 		{"headers",				no_argument,		0,	'H'	},
 		{"help",				no_argument,		0,	'h'	},
 		{"version",				no_argument,		0,	'V'	},
-		{"force-shell-reload",				no_argument,		0,	'F'	},
-		{"dram-data-retention",	no_argument,		0,	'D'	},
-		{"prefetch-image",	no_argument,		0,	'P'	},
+		{"force-shell-reload",	no_argument,		0,	'F'	},
+		{"prefetch-image",		no_argument,		0,	'P'	},
 		{0,						0,					0,	0	},
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:I:r:s:a:b:c:AH?hVFDP",
+	while ((opt = getopt_long(argc, argv, "S:I:r:s:AH?hVFDP",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
 					FPGA_SLOT_MAX);
 			break;
 		}
@@ -496,23 +577,8 @@ parse_args_load_afi(int argc, char *argv[])
 		    fail_on_user(strnlen(optarg, AFI_ID_STR_MAX) == AFI_ID_STR_MAX, err,
 					"fpga-image-id must be less than %u bytes", AFI_ID_STR_MAX);
 
-			strncpy(f1.afi_id, optarg, sizeof(f1.afi_id));
-			f1.afi_id[sizeof(f1.afi_id) - 1] = 0;
-			break;
-		}
-		case 'a': {
-			string_to_uint(&f1.clock_a0_freq, optarg);
-			fail_on_user(f1.clock_a0_freq == 0, err, "Requested frequency must be positive");
-			break;
-		}
-		case 'b': {
-			string_to_uint(&f1.clock_b0_freq, optarg);
-			fail_on_user(f1.clock_b0_freq == 0, err, "Requested frequency must be positive");
-			break;
-		}
-		case 'c': {
-			string_to_uint(&f1.clock_c0_freq, optarg);
-			fail_on_user(f1.clock_c0_freq == 0, err, "Requested frequency must be positive");
+			strncpy(fpga.afi_id, optarg, sizeof(fpga.afi_id));
+			fpga.afi_id[sizeof(fpga.afi_id) - 1] = 0;
 			break;
 		}
 		case 'r': {
@@ -530,15 +596,15 @@ parse_args_load_afi(int argc, char *argv[])
 			break;
 		}
 		case 'A': {
-			f1.async = true;
+			fpga.async = true;
 			break;
 		}
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'F': {
-			f1.force_shell_reload = true;
+			fpga.force_shell_reload = true;
 			break;
 		}
 		case 'V': {
@@ -546,13 +612,9 @@ parse_args_load_afi(int argc, char *argv[])
 			get_parser_completed(opt);
 			goto out_ver;
 		}
-		case 'D': {
-			f1.dram_data_retention = true;
-			break;
-		}
 		case 'P': {
-			f1.prefetch = true;
-			f1.async = true;
+			fpga.prefetch = true;
+			fpga.async = true;
 			break;
 		}
 		default: {
@@ -562,8 +624,8 @@ parse_args_load_afi(int argc, char *argv[])
 		}
 	}
 
-	if ((f1.afi_slot == (uint32_t) -1) ||
-		(f1.afi_id[0] == 0)) {
+	if ((fpga.afi_slot == (uint32_t) -1) ||
+		(fpga.afi_id[0] == 0)) {
 		goto err;
 	}
 
@@ -601,8 +663,8 @@ parse_args_clear_afi(int argc, char *argv[])
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err, "fpga-image-slot must be less than %u",
 					FPGA_SLOT_MAX);
 			break;
 		}
@@ -621,11 +683,11 @@ parse_args_clear_afi(int argc, char *argv[])
 			break;
 		}
 		case 'A': {
-			f1.async = true;
+			fpga.async = true;
 			break;
 		}
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -640,7 +702,7 @@ parse_args_clear_afi(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		goto err;
 	}
 
@@ -666,6 +728,7 @@ parse_args_describe_afi(int argc, char *argv[])
 		{"fpga-image-slot",		required_argument,	0,	'S'	},
 		{"metrics",				no_argument,		0,	'M' },
 		{"clear-metrics",		no_argument,		0,	'C' },
+		{"clear-cache",			no_argument,		0,	'L' },
 		{"request-timeout",		required_argument,	0,	'r'	},
 		{"rescan",				no_argument,		0,	'R'	},
 		{"headers",				no_argument,		0,	'H'	},
@@ -675,22 +738,27 @@ parse_args_describe_afi(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "S:MCr:RH?hV",
+	while ((opt = getopt_long(argc, argv, "S:MCLr:RH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
 		case 'M': {
-			f1.get_hw_metrics = true;
+			fpga.get_hw_metrics = true;
 			break;
 		}
 		case 'C': {
-			f1.get_hw_metrics = true;
-			f1.clear_hw_metrics = true;
+			fpga.get_hw_metrics = true;
+			fpga.clear_hw_metrics = true;
+			break;
+		}
+		case 'L': {
+			fpga.get_hw_metrics = true;
+			fpga.clear_afi_cache = true;
 			break;
 		}
 		case 'r': {
@@ -701,11 +769,11 @@ parse_args_describe_afi(int argc, char *argv[])
 			break;
 		}
 		case 'R': {
-			f1.rescan = true;
+			fpga.rescan = true;
 			break;
 		}
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -720,7 +788,7 @@ parse_args_describe_afi(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		goto err;
 	}
 
@@ -764,7 +832,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			break;
 		}
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -773,7 +841,7 @@ parse_args_describe_afi_slots(int argc, char *argv[])
 			goto out_ver;
 		}
 		case 'M': {
-			f1.show_mbox_device = true;
+			fpga.show_mbox_device = true;
 			break;
 		}
 		default: {
@@ -816,14 +884,14 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 	};
 
 	int long_index = 0;
-	f1.tcp_port=(char*) default_tcp_port;
+	fpga.tcp_port=(char*) default_tcp_port;
 
 	while ((opt = getopt_long(argc, argv, "S:P:RH?hV",
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -834,11 +902,11 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
                                         "tcp-port must be less than %u", 64*1024-1);
 			fail_on_user(temp_int <= (1024), err,
                                         "tcp-port must be larger than %u",1024);
-			f1.tcp_port = optarg;
+			fpga.tcp_port = optarg;
 			break;
 		}
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -853,7 +921,7 @@ parse_args_start_virtual_jtag(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -890,14 +958,14 @@ parse_args_get_virtual_led(int argc, char *argv[])
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
 
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -912,7 +980,7 @@ parse_args_get_virtual_led(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -947,14 +1015,14 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
 
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -969,7 +1037,7 @@ parse_args_get_virtual_dip(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -1009,8 +1077,8 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 			long_options, &long_index)) != -1) {
 		switch (opt) {
 		case 'S': {
-			string_to_uint(&f1.afi_slot, optarg);
-			fail_on_user(f1.afi_slot >= FPGA_SLOT_MAX, err,
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
 					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
 			break;
 		}
@@ -1029,12 +1097,12 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 					status = status << 1;
 			}
 			vdip_arg_found=1;
-			f1.v_dip_switch=status;
+			fpga.v_dip_switch=status;
 			break;
 		}
 
 		case 'H': {
-			f1.show_headers = true;
+			fpga.show_headers = true;
 			break;
 		}
 		case 'V': {
@@ -1050,7 +1118,7 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 		}
 	}
 
-	if (f1.afi_slot == (uint32_t) -1) {
+	if (fpga.afi_slot == (uint32_t) -1) {
 		printf("Error: Invalid Slot Id !");
 		goto err;
 	}
@@ -1062,6 +1130,193 @@ parse_args_set_virtual_dip(int argc, char *argv[])
 	return 0;
 err:
         print_usage(argv[0], set_virtual_dip_usage, sizeof_array(set_virtual_dip_usage));
+out_ver:
+	return -EINVAL;
+}
+
+/**
+ * Parse describe_clkgen command line arguments.
+ *
+ * @param[in]   argc    Argument count.
+ * @param[in]   argv    Argument string vector.
+ */
+static int
+parse_args_describe_clkgen(int argc, char *argv[])
+{
+	int opt = 0;
+
+	static struct option long_options[] = {
+		{"fpga-image-slot",		required_argument,	0,	'S'	},
+		{"help",				no_argument,		0,	'h'	},
+		{"version",				no_argument,		0,	'V'	},
+		{0,						0,					0,	0	},
+	};
+
+	int long_index = 0;
+	while ((opt = getopt_long(argc, argv, "S:hV?",
+			long_options, &long_index)) != -1) {
+		switch (opt) {
+		case 'S': {
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
+					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
+			break;
+		}
+		case 'V': {
+			print_version();
+			get_parser_completed(opt);
+			goto out_ver;
+		}
+		default: {
+			get_parser_completed(opt);
+			goto err;
+		}
+		}
+	}
+
+	if (fpga.afi_slot == (uint32_t) -1) {
+		goto err;
+	}
+
+	return 0;
+err:
+        print_usage(argv[0], describe_clkgen_usage, sizeof_array(describe_clkgen_usage));
+out_ver:
+	return -EINVAL;
+}
+
+/**
+ * Parse load_clkgen command line arguments.
+ *
+ * @param[in]   argc    Argument count.
+ * @param[in]   argv    Argument string vector.
+ */
+static int
+parse_args_load_clkgen_recipe(int argc, char *argv[])
+{
+	int opt = 0;
+
+	static struct option long_options[] = {
+		{"fpga-image-slot",		required_argument,	0,	'S'	},
+		{"help",				no_argument,		0,	'h'	},
+		{"version",				no_argument,		0,	'V'	},
+		{"clock-a-recipe",      required_argument,  0,  'a' },
+		{"clock-b-recipe",      required_argument,  0,  'b' },
+		{"clock-c-recipe",      required_argument,  0,  'c' },
+		{"clock-hbm-recipe",    required_argument,  0,  'm' },
+		{0,						0,					0,	0	},
+	};
+
+	int long_index = 0;
+	while ((opt = getopt_long(argc, argv, "S:hV?a:b:c:m:",
+			long_options, &long_index)) != -1) {
+		switch (opt) {
+		case 'S': {
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
+					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
+			break;
+		}
+		case 'a': {
+			string_to_uint(&fpga.clock_a_recipe, optarg);
+			break;
+		}
+		case 'b': {
+			string_to_uint(&fpga.clock_b_recipe, optarg);
+			break;
+		}
+		case 'c': {
+			string_to_uint(&fpga.clock_c_recipe, optarg);
+			break;
+		}
+		case 'm': {
+			string_to_uint(&fpga.clock_hbm_recipe, optarg);
+			break;
+		}
+		case 'V': {
+			print_version();
+			get_parser_completed(opt);
+			goto out_ver;
+		}
+		default: {
+			get_parser_completed(opt);
+			goto err;
+		}
+		}
+	}
+
+	if (fpga.afi_slot == (uint32_t) -1) {
+		goto err;
+	}
+
+	return 0;
+err:
+        print_usage(argv[0], load_clkgen_recipe_usage, sizeof_array(load_clkgen_recipe_usage));
+out_ver:
+	return -EINVAL;
+}
+
+static int
+parse_args_load_clkgen_dynamic(int argc, char *argv[])
+{
+	int opt = 0;
+
+	static struct option long_options[] = {
+		{"fpga-image-slot",		required_argument,	0,	'S'	},
+		{"help",				no_argument,		0,	'h'	},
+		{"version",				no_argument,		0,	'V'	},
+		{"clock-a0-freq",       required_argument,  0,  'a' },
+		{"clock-b0-freq",       required_argument,  0,  'b' },
+		{"clock-c0-freq",       required_argument,  0,  'c' },
+		{"clock-hbm-freq",      required_argument,  0,  'm' },
+		{0,						0,					0,	0	},
+	};
+
+	int long_index = 0;
+	while ((opt = getopt_long(argc, argv, "S:hV?a:b:c:m:",
+			long_options, &long_index)) != -1) {
+		switch (opt) {
+		case 'S': {
+			string_to_uint(&fpga.afi_slot, optarg);
+			fail_on_user(fpga.afi_slot >= FPGA_SLOT_MAX, err,
+					"fpga-image-slot must be less than %u", FPGA_SLOT_MAX);
+			break;
+		}
+		case 'a': {
+			string_to_uint(&fpga.clock_a_freq, optarg);
+			break;
+		}
+		case 'b': {
+			string_to_uint(&fpga.clock_b_freq, optarg);
+			break;
+		}
+		case 'c': {
+			string_to_uint(&fpga.clock_c_freq, optarg);
+			break;
+		}
+		case 'm': {
+			string_to_uint(&fpga.clock_hbm_freq, optarg);
+			break;
+		}
+		case 'V': {
+			print_version();
+			get_parser_completed(opt);
+			goto out_ver;
+		}
+		default: {
+			get_parser_completed(opt);
+			goto err;
+		}
+		}
+	}
+
+	if (fpga.afi_slot == (uint32_t) -1) {
+		goto err;
+	}
+
+	return 0;
+err:
+        print_usage(argv[0], load_clkgen_dynamic_usage, sizeof_array(load_clkgen_dynamic_usage));
 out_ver:
 	return -EINVAL;
 }
@@ -1088,15 +1343,17 @@ parse_args(int argc, char *argv[])
 			"Error: program name or opcode string is NULL");
 
 	static struct parse_args_str2func str2func[] = {
-		{"LoadFpgaImage",			CLI_CMD_LOAD,			parse_args_load_afi},
-		{"ClearFpgaImage",			CLI_CMD_CLEAR,			parse_args_clear_afi},
-		{"DescribeFpgaImageSlots",	CLI_CMD_DESCRIBE_SLOTS,	parse_args_describe_afi_slots},
-		{"DescribeFpgaImage",		CLI_CMD_DESCRIBE,		parse_args_describe_afi},
-		{"StartVirtualJtag",		CLI_CMD_START_VJTAG,	parse_args_start_virtual_jtag},
-		{"GetVirtualLED",			CLI_CMD_GET_LED,		parse_args_get_virtual_led},
-		{"GetVirtualDIP",			CLI_CMD_GET_DIP,		parse_args_get_virtual_dip},
-		{"SetVirtualDIP",			CLI_CMD_SET_DIP,		parse_args_set_virtual_dip},
-
+		{"LoadFpgaImage",			CLI_CMD_LOAD,					parse_args_load_afi},
+		{"ClearFpgaImage",			CLI_CMD_CLEAR,					parse_args_clear_afi},
+		{"DescribeFpgaImageSlots",	CLI_CMD_DESCRIBE_SLOTS,			parse_args_describe_afi_slots},
+		{"DescribeFpgaImage",		CLI_CMD_DESCRIBE,				parse_args_describe_afi},
+		{"StartVirtualJtag",		CLI_CMD_START_VJTAG,			parse_args_start_virtual_jtag},
+		{"GetVirtualLED",			CLI_CMD_GET_LED,				parse_args_get_virtual_led},
+		{"GetVirtualDIP",			CLI_CMD_GET_DIP,				parse_args_get_virtual_dip},
+		{"SetVirtualDIP",			CLI_CMD_SET_DIP,				parse_args_set_virtual_dip},
+		{"DescribeClkGen",			CLI_CMD_DESCRIBE_CLKGEN,		parse_args_describe_clkgen},
+		{"LoadClkGenRecipe",		CLI_CMD_LOAD_CLKGEN_RECIPE,		parse_args_load_clkgen_recipe},
+		{"LoadClkGenDynamic",		CLI_CMD_LOAD_CLKGEN_DYNAMIC,	parse_args_load_clkgen_dynamic},
 	};
 
 	char *opcode_str = argv[1];
@@ -1106,13 +1363,13 @@ parse_args(int argc, char *argv[])
 		struct parse_args_str2func *entry = &str2func[i];
 
 		if (!strncmp(entry->str, opcode_str, strlen(entry->str))) {
-			f1.opcode = entry->opcode;
+			fpga.opcode = entry->opcode;
 			ret = entry->func(argc, argv);
 			break;
 		}
 	}
 
-	if (f1.opcode == (uint32_t)-1) {
+	if (fpga.opcode == (uint32_t)-1) {
 		goto err;
 	}
 

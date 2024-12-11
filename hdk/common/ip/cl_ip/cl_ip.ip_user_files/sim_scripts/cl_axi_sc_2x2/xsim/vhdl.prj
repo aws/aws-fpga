@@ -1,0 +1,5 @@
+vhdl xil_defaultlib  \
+"../../../bd/cl_axi_sc_2x2/ip/cl_axi_sc_2x2_smartconnect_0_0/bd_0/ip/ip_1/sim/bd_1096_psr_aclk_0.vhd" \
+
+# Do not sort compile order
+nosort

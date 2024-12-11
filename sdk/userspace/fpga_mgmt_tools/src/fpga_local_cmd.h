@@ -14,7 +14,7 @@
  */
 
 /** @file
- * EC2_CMD_F1
+ * EC2_CMD_FPGA
  */
 
 #pragma once
@@ -22,7 +22,7 @@
 #ifndef CLI_VERSION
 #define CLI_VERSION "unknown"
 #endif
- 
+
 /**
  * CLI cmds
  */
@@ -35,10 +35,13 @@ enum {
 	CLI_CMD_GET_LED,
 	CLI_CMD_GET_DIP,
 	CLI_CMD_SET_DIP,
+	CLI_CMD_DESCRIBE_CLKGEN,
+	CLI_CMD_LOAD_CLKGEN_RECIPE,
+	CLI_CMD_LOAD_CLKGEN_DYNAMIC,
 	CLI_CMD_END
 };
 
-/** 
+/**
  * This should be used for the sanitized first level errors to be
  * displayed for the user.
  */
@@ -58,7 +61,7 @@ enum {
 /**
  * Default synchronous API timeout:
  * e.g. load + describe multi-AFI command sequences.
- *  timeout * delay_msec 
+ *  timeout * delay_msec
  */
 #define CLI_SYNC_TIMEOUT_DFLT		30000
 #define CLI_SYNC_DELAY_MSEC_DFLT	2
@@ -67,7 +70,7 @@ enum {
  * Request timeout: timeout * delay_msec
  */
 #define CLI_REQUEST_TIMEOUT_DFLT   	500
-#define CLI_REQUEST_DELAY_MSEC_DFLT	20	
+#define CLI_REQUEST_DELAY_MSEC_DFLT	40
 
 /**
  * ec2_fpga_cmd:
@@ -77,15 +80,21 @@ struct ec2_fpga_cmd {
 	uint32_t opcode;
 	/** The AFI slot */
 	uint32_t afi_slot;
+	/** Requested clock recipes for each clock group */
+	uint32_t clock_a_recipe;
+	uint32_t clock_b_recipe;
+	uint32_t clock_c_recipe;
+	uint32_t clock_hbm_recipe;
 	/** Requested clock frequencies for each clock group */
-	uint32_t clock_a0_freq;
-	uint32_t clock_b0_freq;
-	uint32_t clock_c0_freq;
+	uint32_t clock_a_freq;
+	uint32_t clock_b_freq;
+	uint32_t clock_c_freq;
+	uint32_t clock_hbm_freq;
 	/** The AFI ID */
 	char	 afi_id[AFI_ID_STR_MAX];
-	/** 
-	 * Synchronous API timeout (e.g. load + describe AFI command sequence): 
-	 *  timeout * delay_msec 
+	/**
+	 * Synchronous API timeout (e.g. load + describe AFI command sequence):
+	 *  timeout * delay_msec
 	 */
 	uint32_t sync_timeout;
 	uint32_t sync_delay_msec;
@@ -93,7 +102,7 @@ struct ec2_fpga_cmd {
 	uint32_t request_timeout;
 	uint32_t request_delay_msec;
 	/** Indicates if the parser itself fully completed the command */
-	bool	 parser_completed;	
+	bool	 parser_completed;
 	/** Asynchronous operations */
 	bool	 async;
 	/** Show headers option */
@@ -101,23 +110,24 @@ struct ec2_fpga_cmd {
 	/** Metrics options */
 	bool	 get_hw_metrics;
 	bool	 clear_hw_metrics;
+	bool     clear_afi_cache;
 	/** Rescan option */
 	bool	 rescan;
 	/** Show mailbox device option */
 	bool     show_mbox_device;
 	/** Reload the shell even if not required for AFI */
 	bool     force_shell_reload;
-	/** Attempt dram data retention on load */
-	bool	 dram_data_retention;
 	/** Don't actually load the FPGA, just cache the files for a later load */
 	bool	 prefetch;
+	/** Reset option for clkgen*/
+	bool	 reset;
 	/** Virtual DIP switch */
 	uint16_t v_dip_switch;
 	/** Virtual JTAG TCP port */
 	char*    tcp_port;
 };
 
-extern struct ec2_fpga_cmd f1;
+extern struct ec2_fpga_cmd fpga;
 
 /**
  * Parse command line arguments.
@@ -125,5 +135,5 @@ extern struct ec2_fpga_cmd f1;
  * @param[in]   argc    Argument count.
  * @param[in]   argv    Argument string vector.
  */
-int 
+int
 parse_args(int argc, char *argv[]);

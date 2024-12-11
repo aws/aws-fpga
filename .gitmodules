@@ -1,19 +1,4 @@
-[submodule "SDAccel/examples/xilinx_2019.1"]
-	path = SDAccel/examples/xilinx_2019.1
-	url = https://github.com/Xilinx/SDAccel_Examples.git
-[submodule "Vitis/examples/xilinx_2019.2"]
-	path = Vitis/examples/xilinx_2019.2
-	branch = master
-	url = https://github.com/Xilinx/Vitis_Accel_Examples
-[submodule "Vitis/examples/xilinx_2020.1"]
-	path = Vitis/examples/xilinx_2020.1
-	url = https://github.com/Xilinx/Vitis_Accel_Examples
-[submodule "Vitis/examples/xilinx_2020.2"]
-	path = Vitis/examples/xilinx_2020.2
-	url = https://github.com/Xilinx/Vitis_Accel_Examples
-[submodule "Vitis/examples/xilinx_2021.1"]
-	path = Vitis/examples/xilinx_2021.1
-	url = https://github.com/Xilinx/Vitis_Accel_Examples
-[submodule "Vitis/examples/xilinx_2021.2"]
-	path = Vitis/examples/xilinx_2021.2
-	url = https://github.com/Xilinx/Vitis_Accel_Examples
+[submodule "vitis/examples/Vitis_Accel_Examples"]
+    path = vitis/examples/Vitis_Accel_Examples
+    url = https://github.com/Xilinx/Vitis_Accel_Examples.git
+    branch = 2024.1
