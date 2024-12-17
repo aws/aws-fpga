@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_cal_top.sv
+//  /   /         Filename           : ddr4_v2_2_23_cal_top.sv
 // /___/   /\     Date Last Modified : $Date: 2015/04/21 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,7 +59,7 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                    ddr4_v2_2_3_cal_top module
+//                    ddr4_v2_2_23_cal_top module
 // Reference        :
 // Revision History :
 //*****************************************************************************
@@ -66,7 +67,7 @@
 `timescale 1ns/100ps
 `define RECONFIG_INIT_RESET_1
 
-module ddr4_v2_2_3_cal_top #
+module ddr4_v2_2_23_cal_top #
  (
     parameter         PING_PONG_PHY  = 1
    ,parameter integer ABITS          = 14
@@ -99,6 +100,7 @@ module ddr4_v2_2_3_cal_top #
    ,parameter         ODTNOP         = 16'h0000
    ,parameter         SELF_REFRESH   = 1'b0
    ,parameter         SAVE_RESTORE   = 1'b0
+   ,parameter         RESTORE_CRC    = 1'b0
 
    ,parameter         MR0            = 13'bxxxxxxxxxxxx
    ,parameter         MR1            = 13'bxxxxxxxxxxxx
@@ -127,6 +129,7 @@ module ddr4_v2_2_3_cal_top #
    ,parameter         DDR4_DB_HIF_VREF     = 8'b0000_0000 // DDR4 Data Buffer Host I/F VRef
    ,parameter         DDR4_DB_DIF_VREF     = 8'b0000_0000 // DDR4 Data Buffer DRAM I/F VRef
 
+   ,parameter         EN_PP_4R_MIR   = 0
    ,parameter         DDR4_CLAMSHELL = "OFF" // Clamshell architecture of DRAM parts on PCB
    ,parameter         CA_MIRROR      = "OFF" // Address mirroring enable
    ,parameter         DDR4_REG_PARITY_ENABLE = "OFF"
@@ -168,6 +171,7 @@ module ddr4_v2_2_3_cal_top #
    ,parameter         EARLY_WR_DATA  = "OFF"
    ,parameter         DRAM_WIDTH     = 8
    ,parameter         RANKS          = 1
+   ,parameter         RNK_BITS       = (RANKS <= 4) ? 2 : 3
    ,parameter         nCK_PER_CLK    = 4
    ,parameter         RTL_VERSION    = 7
    ,parameter         MEM_CODE       = 0
@@ -237,7 +241,7 @@ module ddr4_v2_2_3_cal_top #
    ,input            [PING_PONG_PHY-1:0]      winRmw 
    ,input                  gt_data_ready 
    ,input       [PING_PONG_PHY*DBAW-1:0] winBuf 
-   ,input            [PING_PONG_PHY*2-1:0] winRank 
+   ,input            [PING_PONG_PHY*RNK_BITS-1:0] winRank 
 
    ,output reg [DBYTES*8*8-1:0] rdData
    ,output           [PING_PONG_PHY*DBAW-1:0] rdDataAddr 
@@ -307,7 +311,7 @@ module ddr4_v2_2_3_cal_top #
    ,output        [DBYTES*7-1:0] ch1_mcal_clb2phy_odt_low
 
    ,output        [DBYTES*7-1:0] mcal_rd_vref_value
-
+   ,output reg    sample_gts
 
    ,input   [DBYTES*8-1:0] mcal_DMIn_n
    ,input [DBYTES*8*8-1:0] mcal_DQIn
@@ -346,6 +350,7 @@ module ddr4_v2_2_3_cal_top #
    ,output wire [7:0]  cal_error_bit
    ,output wire [7:0]  cal_error_nibble
    ,output wire [3:0]  cal_error_code
+   ,output             cal_crc_error
    
    ,input                     traffic_wr_done
    ,input                     traffic_status_err_bit_valid
@@ -503,10 +508,22 @@ casez (cl)
 endcase
 endfunction
 
+function [4:0] mr5topl4;
+    input [2:0] mr5;
+case (mr5)
+   3'b000:  mr5topl4  = 0;
+   3'b001:  mr5topl4  = 4;
+   3'b010:  mr5topl4  = 5;
+   3'b011:  mr5topl4  = 6;
+   3'b100:  mr5topl4  = 8;
+   default: mr5topl4  = 0;
+endcase
+endfunction
+
 localparam AL = MR1[4:3];
 localparam CLSELECT = ( MEM == "DDR4" ) ? { MR0[12], MR0[6:4], MR0[2] } : { MR0[6:4], MR0[2] };
 
-
+localparam PL   = mr5topl4(MR5[2:0]);
 localparam TCL3 = cl2tcl3(CLSELECT);
 localparam TCL4 = cl2tcl4_3ds(CLSELECT);
 localparam TCL  = (MEM == "DDR4") ? TCL4 : TCL3;
@@ -515,7 +532,7 @@ localparam RL_DDR   = (AL==2'b01 & S_HEIGHT < 2) ? TCL  + TCL - 1 :
                   (AL==2'b11 & S_HEIGHT > 1) ? TCL  + TCL - 3 : 
                                                TCL;
 
-localparam RL = (LRDIMM_MODE == "ON") ? (RL_DDR + 1) : RL_DDR; // To compensate the propagation delay through Data buffer
+localparam RL = ((LRDIMM_MODE == "ON") ? (RL_DDR + 1) : RL_DDR) + ((MEM == "DDR4") ? PL : 0); // To compensate the propagation delay through Data buffer
 
 localparam TCWL3 = mr2totcwl3(MR2[5:3]);
 localparam TCWL4 = mr2totcwl4(MR2[5:3]);
@@ -526,13 +543,15 @@ localparam WL_DDR    = (AL==2'b01 & S_HEIGHT < 2) ? TCWL + TCL - 1 :
                    (AL==2'b11 & S_HEIGHT > 1) ? TCWL + TCL - 3 :
                                                 TCWL;
 
-localparam WL = (LRDIMM_MODE == "ON") ? (WL_DDR - 1) : WL_DDR; // To compensate the propagation delay through Data buffer
+localparam WL = ((LRDIMM_MODE == "ON") ? (WL_DDR - 1) : WL_DDR) + ((MEM == "DDR4") ? PL : 0); // To compensate the propagation delay through Data buffer
 
 // Assign output
 assign      tCWL = (BYPASS_CAL=="TRUE") ? WL : WL + 1;
 
 localparam CH0_DBYTES_PI = (NUM_CHANNELS == 1) ? DBYTES : CH0_DBYTES;
 localparam CH1_DBYTES_PI = CH1_DBYTES;
+
+localparam EN_PP_4R_MIR_WID = 1 + (((EN_PP_4R_MIR == 1) && (RANKS == 1)) ? 1 : 0) ;
 
 wire       cal_dbi_wr;
 wire       cal_dbi_rd;
@@ -547,7 +566,7 @@ wire [1:0] calRank;
 wire [DBYTES-1:0] cal_oe_dis_low;
 wire [DBYTES-1:0] cal_oe_dis_upp;
 
-reg [PING_PONG_PHY*2-1:0] mcalRank;
+reg [PING_PONG_PHY*RNK_BITS-1:0] mcalRank;
 reg [PING_PONG_PHY-1:0]      mcalRdCAS;
 reg [PING_PONG_PHY-1:0]      mcalWrCAS;
 reg [PING_PONG_PHY*2-1:0] mcalCasSlot;
@@ -570,7 +589,7 @@ wire   [BABITS*8-1:0] cal_BA;
 wire   [BGBITS*8-1:0] cal_BG;
 wire [LR_WIDTH*8-1:0] cal_C;
 wire  [CKEBITS*8-1:0] cal_CKE;
-wire   [CSBITS*8-1:0] cal_CS_n;
+wire   [EN_PP_4R_MIR_WID*CSBITS*8-1:0] cal_CS_n;
 wire   [DBYTES*8-1:0] cal_DMOut_n;
 wire [DBYTES*8*8-1:0] cal_DQOut;
 wire  [ODTBITS*8-1:0] cal_ODT;
@@ -850,8 +869,14 @@ generate
    always@(*) begin
       for (i=0; i<PING_PONG_PHY; i=i+1) begin
 	 ppp_cal_CKE[i*CKEBITS*8+:CKEBITS*8] = {cal_CKE, cal_CKE};
-	 ppp_cal_CS_n[i*CSBITS*8+:CSBITS*8]  = {cal_CS_n, cal_CS_n};      
 	 ppp_cal_ODT[i*ODTBITS*8+:ODTBITS*8] = {cal_ODT, cal_ODT};
+      end
+      if ((EN_PP_4R_MIR == 1) && (RANKS == 1)) begin
+        ppp_cal_CS_n = cal_CS_n;      
+      end else begin
+        for (i=0; i<PING_PONG_PHY; i=i+1) begin
+          ppp_cal_CS_n[i*CSBITS*8+:CSBITS*8]  = {cal_CS_n, cal_CS_n};      
+        end
       end
    end
 endgenerate
@@ -861,7 +886,10 @@ always @(posedge clk) if (calDone) begin
    mcal_WE_n_dly[0]  <= #TCQ mc_WE_nMod;
    mcal_CAS_n_dly[0] <= #TCQ mc_CAS_nMod;
    mcal_RAS_n_dly[0] <= #TCQ mc_RAS_nMod;
-   mcal_PAR_dly[0]   <= #TCQ {mc_PARMod_int[5:0], mc_PARMod_int7, mc_PARMod_int6};
+   if (REG_CTRL == "OFF")
+     mcal_PAR_dly[0] <= #TCQ mc_PARMod_int;
+   else
+     mcal_PAR_dly[0] <= #TCQ {mc_PARMod_int[5:0], mc_PARMod_int7, mc_PARMod_int6};
    for (i = 0; i < ABITS; i=i+1) mcal_ADR_dly[0][i*8+:8]   <= #TCQ mc_ADRMod[i*8+:8];
    for (i = 0; i < BABITS; i=i+1) mcal_BA_dly[0][i*8+:8]   <= #TCQ mc_BAMod[i*8+:8];
    for (i = 0; i < BGBITS; i=i+1) mcal_BG_dly[0][i*8+:8]   <= #TCQ mc_BGMod[i*8+:8];
@@ -870,11 +898,14 @@ always @(posedge clk) if (calDone) begin
    for (i = 0; i < CSBITS*PING_PONG_PHY; i=i+1) mcal_CS_n_dly[0][i*8+:8] <= #TCQ mc_CS_nMod[i*8+:8];
    for (i = 0; i < ODTBITS*PING_PONG_PHY; i=i+1) mcal_ODT_dly[0][i*8+:8] <= #TCQ mc_ODTMod[i*8+:8];
 end else begin
-   mcal_PAR_dly[0]   <= #TCQ {cal_PAR_int[5:0], cal_PAR_int7, cal_PAR_int6};
    mcal_ACT_n_dly[0] <= #TCQ cal_ACT_n;
    mcal_CAS_n_dly[0] <= #TCQ cal_CAS_n;
    mcal_RAS_n_dly[0] <= #TCQ cal_RAS_n;
    mcal_WE_n_dly[0]  <= #TCQ cal_WE_n;
+   if (REG_CTRL == "OFF")
+     mcal_PAR_dly[0]   <= #TCQ cal_PAR_int;
+   else
+     mcal_PAR_dly[0]   <= #TCQ {cal_PAR_int[5:0], cal_PAR_int7, cal_PAR_int6};
    for (i = 0; i < ABITS; i=i+1) mcal_ADR_dly[0][i*8+:8]   <= #TCQ cal_ADR[i*8+:8];
    for (i = 0; i < BABITS; i=i+1) mcal_BA_dly[0][i*8+:8]   <= #TCQ cal_BA[i*8+:8];
    for (i = 0; i < BGBITS; i=i+1) mcal_BG_dly[0][i*8+:8]   <= #TCQ cal_BG[i*8+:8];
@@ -966,14 +997,14 @@ reg io_addr_strobe_lvl_r2;
     io_addr_strobe  <= #TCQ io_addr_strobe_lvl_r1 ^ io_addr_strobe_lvl_r2;
   end
 
-ddr4_v2_2_3_cal #
+ddr4_v2_2_23_cal #
 (
     .ABITS              (ABITS)
    ,.BABITS             (BABITS)
    ,.BGBITS             (BGBITS)
    ,.CKEBITS            (CKEBITS)
    ,.CKBITS             (CKBITS)
-   ,.CSBITS             (CSBITS)
+   ,.CSBITS             (EN_PP_4R_MIR_WID*CSBITS)
    ,.S_HEIGHT           (S_HEIGHT)
    ,.LR_WIDTH           (LR_WIDTH)
    ,.ODTBITS            (ODTBITS)
@@ -993,10 +1024,13 @@ ddr4_v2_2_3_cal #
    ,.DBYTES             (DBYTES)
    ,.SAVE_RESTORE       (SAVE_RESTORE)
    ,.SELF_REFRESH       (SELF_REFRESH)
+   ,.RESTORE_CRC        (RESTORE_CRC)
+   ,.EN_PP_4R_MIR       (EN_PP_4R_MIR)
 
    ,.MEMORY_CONFIGURATION (MEMORY_CONFIGURATION)
    ,.DRAM_WIDTH         (DRAM_WIDTH)
    ,.RANKS              (RANKS)
+   ,.RNK_BITS           (RNK_BITS)
    ,.nCK_PER_CLK        (nCK_PER_CLK)
    ,.RTL_VERSION        (RTL_VERSION)
    ,.MEM_CODE           (MEM_CODE)
@@ -1059,6 +1093,7 @@ ddr4_v2_2_3_cal #
    ,.EXTRA_CMD_DELAY    (EXTRA_CMD_DELAY)
    ,.WL                 (WL)
    ,.RL                 (RL)
+   ,.PL                 (PL)
    ,.NIBBLE_CNT_WIDTH   (NIBBLE_CNT_WIDTH)
    ,.CPLX_PAT_LENGTH    (CPLX_PAT_LENGTH)
    ,.DM_DBI             (DM_DBI)
@@ -1124,7 +1159,7 @@ ddr4_v2_2_3_cal #
    ,.cal_BG                 (cal_BG)
    ,.cal_C                  (cal_C)
    ,.cal_CKE                (cal_CKE[CKEBITS*8-1:0])
-   ,.cal_CS_n               (cal_CS_n[CSBITS*8-1:0])
+   ,.cal_CS_n               (cal_CS_n)
    ,.cal_DMOut_n            (cal_DMOut_n)
    ,.cal_DQOut              (cal_DQOut)
    ,.cal_ODT                (cal_ODT[ODTBITS*8-1:0])
@@ -1192,6 +1227,7 @@ ddr4_v2_2_3_cal #
    ,.cal_warning            (cal_warning)
    ,.cal_warning_nibble     (cal_warning_nibble)
    ,.cal_warning_code       (cal_warning_code)
+   ,.cal_crc_error          (cal_crc_error)
 
    ,.sl_iport0              (sl_iport0)
    ,.sl_oport0              (sl_oport0)
@@ -1538,7 +1574,31 @@ generate
    endcase
 endgenerate
 
-ddr4_v2_2_3_cal_pi # (
+  wire phy_rden_or  = |mcal_clb2phy_rden_upp[3:0];
+  wire phy_rden_and = &mcal_clb2phy_rden_upp[3:0];
+
+  reg [11:0] phy_rden_or_stg;
+  reg [11:0] phy_rden_and_stg;
+    
+  always @ (posedge clk) begin
+     phy_rden_or_stg <= {phy_rden_or_stg, phy_rden_or};
+     phy_rden_and_stg <= {phy_rden_and_stg, phy_rden_and};
+  end
+
+  wire [11:0] vio_phy_rden_or_stg = 12'b1111_0000_0111;
+  wire [11:0] vio_phy_rden_and_stg = 12'b0000_1111_1000;
+
+  wire [11:0] phy_rden_or_stg_gt = phy_rden_or_stg & ~vio_phy_rden_or_stg;
+  wire [11:0] phy_rden_and_stg_gt = phy_rden_and_stg | ~vio_phy_rden_and_stg;
+
+  wire phy_rden_no_rd = ~(|phy_rden_or_stg_gt);
+  wire phy_rden_all_rd = &phy_rden_and_stg_gt;
+
+  always @ (posedge clk) begin
+    sample_gts <= phy_rden_no_rd | phy_rden_all_rd;
+  end
+
+ddr4_v2_2_23_cal_pi # (
     .DBAW             (DBAW)
    ,.DBYTES           (DBYTES)
    ,.DBYTES_PI        (CH0_DBYTES_PI)
@@ -1649,7 +1709,7 @@ if (NUM_CHANNELS == 1) begin
 end
 else begin
 
-ddr4_v2_2_3_cal_pi # (
+ddr4_v2_2_23_cal_pi # (
    .DBAW             (DBAW)
    ,.DBYTES           (DBYTES)
    ,.DBYTES_PI        (CH1_DBYTES_PI)
@@ -1722,9 +1782,9 @@ ddr4_v2_2_3_cal_pi # (
    ,.winInjTxn            (winInjTxn[1]) 
    ,.winRmw               (winRmw[1]) 
    ,.winBuf               (winBuf[PING_PONG_PHY*DBAW-1:DBAW]) 
-   ,.winRank              (mcalRank[3:2]) 
+   ,.winRank              (mcalRank[RNK_BITS+1:RNK_BITS]) 
    ,.calRank              (calRank)
-   ,.mcwinRank            (winRank[3:2]) 
+   ,.mcwinRank            (winRank[RNK_BITS+1:RNK_BITS]) 
    ,.wrCAS                (mcalWrCAS[1]) 
    ,.calwrCAS             (calWrCAS)
    ,.mcwrCAS              (mcWrCAS[1]) 
@@ -1754,7 +1814,7 @@ always @(posedge clk) if (~rst_r1) assert property (~a_mc_cal_tCWL_ovf);
 
 //synthesis translate_on
 
-`include "ddr4_v2_2_3_cal_assert.vh"
+`include "ddr4_v2_2_23_cal_assert.vh"
 //synthesis translate_off 
 `ifdef DIS_GT_ASSERT
 

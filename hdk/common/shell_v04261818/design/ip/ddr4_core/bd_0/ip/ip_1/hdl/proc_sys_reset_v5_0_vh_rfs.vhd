@@ -1,47 +1,48 @@
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--- upcnt_n - entity/architecture pair
--------------------------------------------------------------------------------
+-- (c) Copyright 2010, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
--- ************************************************************************
--- ** DISCLAIMER OF LIABILITY                                            **
--- **                                                                    **
--- ** This file contains proprietary and confidential information of     **
--- ** Xilinx, Inc. ("Xilinx"), that is distributed under a license       **
--- ** from Xilinx, and may be used, copied and/or disclosed only         **
--- ** pursuant to the terms of a valid license agreement with Xilinx.    **
--- **                                                                    **
--- ** XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION              **
--- ** ("MATERIALS") "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER         **
--- ** EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING WITHOUT                **
--- ** LIMITATION, ANY WARRANTY WITH RESPECT TO NONINFRINGEMENT,          **
--- ** MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE. Xilinx      **
--- ** does not warrant that functions included in the Materials will     **
--- ** meet the requirements of Licensee, or that the operation of the    **
--- ** Materials will be uninterrupted or error-free, or that defects     **
--- ** in the Materials will be corrected. Furthermore, Xilinx does       **
--- ** not warrant or make any representations regarding use, or the      **
--- ** results of the use, of the Materials in terms of correctness,      **
--- ** accuracy, reliability or otherwise.                                **
--- **                                                                    **
--- ** Xilinx products are not designed or intended to be fail-safe,      **
--- ** or for use in any application requiring fail-safe performance,     **
--- ** such as life-support or safety devices or systems, Class III       **
--- ** medical devices, nuclear facilities, applications related to       **
--- ** the deployment of airbags, or any other applications that could    **
--- ** lead to death, personal injury or severe property or               **
--- ** environmental damage (individually and collectively, "critical     **
--- ** applications"). Customer assumes the sole risk and liability       **
--- ** of any use of Xilinx products in critical applications,            **
--- ** subject only to applicable laws and regulations governing          **
--- ** limitations on product liability.                                  **
--- **                                                                    **
--- ** Copyright 2010 Xilinx, Inc.                                        **
--- ** All rights reserved.                                               **
--- **                                                                    **
--- ** This disclaimer and copyright notice must be retained as part      **
--- ** of this file at all times.                                         **
--- ************************************************************************
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 -- Filename:        upcnt_n.vhd
@@ -153,49 +154,51 @@ end imp;
 
 
 
--------------------------------------------------------------------------------
--- sequence - entity/architecture pair
--------------------------------------------------------------------------------
+-- (c) Copyright 2012, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
--- ************************************************************************
--- ** DISCLAIMER OF LIABILITY                                            **
--- **                                                                    **
--- ** This file contains proprietary and confidential information of     **
--- ** Xilinx, Inc. ("Xilinx"), that is distributed under a license       **
--- ** from Xilinx, and may be used, copied and/or disclosed only         **
--- ** pursuant to the terms of a valid license agreement with Xilinx.    **
--- **                                                                    **
--- ** XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION              **
--- ** ("MATERIALS") "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER         **
--- ** EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING WITHOUT                **
--- ** LIMITATION, ANY WARRANTY WITH RESPECT TO NONINFRINGEMENT,          **
--- ** MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE. Xilinx      **
--- ** does not warrant that functions included in the Materials will     **
--- ** meet the requirements of Licensee, or that the operation of the    **
--- ** Materials will be uninterrupted or error-free, or that defects     **
--- ** in the Materials will be corrected. Furthermore, Xilinx does       **
--- ** not warrant or make any representations regarding use, or the      **
--- ** results of the use, of the Materials in terms of correctness,      **
--- ** accuracy, reliability or otherwise.                                **
--- **                                                                    **
--- ** Xilinx products are not designed or intended to be fail-safe,      **
--- ** or for use in any application requiring fail-safe performance,     **
--- ** such as life-support or safety devices or systems, Class III       **
--- ** medical devices, nuclear facilities, applications related to       **
--- ** the deployment of airbags, or any other applications that could    **
--- ** lead to death, personal injury or severe property or               **
--- ** environmental damage (individually and collectively, "critical     **
--- ** applications"). Customer assumes the sole risk and liability       **
--- ** of any use of Xilinx products in critical applications,            **
--- ** subject only to applicable laws and regulations governing          **
--- ** limitations on product liability.                                  **
--- **                                                                    **
--- ** Copyright 2012 Xilinx, Inc.                                        **
--- ** All rights reserved.                                               **
--- **                                                                    **
--- ** This disclaimer and copyright notice must be retained as part      **
--- ** of this file at all times.                                         **
--- ************************************************************************
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 -- Filename:        proc_sys_reset.vhd
@@ -263,7 +266,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
-library proc_sys_reset_v5_0_12;
+library proc_sys_reset_v5_0_15;
 
 -------------------------------------------------------------------------------
 -- Port Declaration
@@ -370,7 +373,7 @@ begin
 -------------------------------------------------------------------------------
 -- This instantiates a counter to control the sequencing
 -------------------------------------------------------------------------------
-   SEQ_COUNTER : entity proc_sys_reset_v5_0_12.UPCNT_N
+   SEQ_COUNTER : entity proc_sys_reset_v5_0_15.UPCNT_N
    generic map (C_SIZE => 6)
    port map(
      Data     => "000000",
@@ -676,49 +679,51 @@ end architecture imp;
 
 
 
--------------------------------------------------------------------------------
--- lpf - entity/architecture pair
--------------------------------------------------------------------------------
+-- (c) Copyright 2012, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
--- ************************************************************************
--- ** DISCLAIMER OF LIABILITY                                            **
--- **                                                                    **
--- ** This file contains proprietary and confidential information of     **
--- ** Xilinx, Inc. ("Xilinx"), that is distributed under a license       **
--- ** from Xilinx, and may be used, copied and/or disclosed only         **
--- ** pursuant to the terms of a valid license agreement with Xilinx.    **
--- **                                                                    **
--- ** XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION              **
--- ** ("MATERIALS") "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER         **
--- ** EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING WITHOUT                **
--- ** LIMITATION, ANY WARRANTY WITH RESPECT TO NONINFRINGEMENT,          **
--- ** MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE. Xilinx      **
--- ** does not warrant that functions included in the Materials will     **
--- ** meet the requirements of Licensee, or that the operation of the    **
--- ** Materials will be uninterrupted or error-free, or that defects     **
--- ** in the Materials will be corrected. Furthermore, Xilinx does       **
--- ** not warrant or make any representations regarding use, or the      **
--- ** results of the use, of the Materials in terms of correctness,      **
--- ** accuracy, reliability or otherwise.                                **
--- **                                                                    **
--- ** Xilinx products are not designed or intended to be fail-safe,      **
--- ** or for use in any application requiring fail-safe performance,     **
--- ** such as life-support or safety devices or systems, Class III       **
--- ** medical devices, nuclear facilities, applications related to       **
--- ** the deployment of airbags, or any other applications that could    **
--- ** lead to death, personal injury or severe property or               **
--- ** environmental damage (individually and collectively, "critical     **
--- ** applications"). Customer assumes the sole risk and liability       **
--- ** of any use of Xilinx products in critical applications,            **
--- ** subject only to applicable laws and regulations governing          **
--- ** limitations on product liability.                                  **
--- **                                                                    **
--- ** Copyright 2012 Xilinx, Inc.                                        **
--- ** All rights reserved.                                               **
--- **                                                                    **
--- ** This disclaimer and copyright notice must be retained as part      **
--- ** of this file at all times.                                         **
--- ************************************************************************
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 -- Filename:        lpf.vhd
@@ -773,8 +778,8 @@ end architecture imp;
 library IEEE;
     use IEEE.std_logic_1164.all;
     use IEEE.std_logic_arith.all;
-library lib_cdc_v1_0_2;
---use lib_cdc_v1_0_2.all;
+library lib_cdc_v1_0_3;
+--use lib_cdc_v1_0_3.all;
 library Unisim; 
     use Unisim.all; 
 -------------------------------------------------------------------------------
@@ -936,7 +941,7 @@ begin
    -----------------------------------
 exr_d1 <= External_System_Reset or MB_Debug_Sys_Rst;
 
-ACT_HI_EXT: entity lib_cdc_v1_0_2.cdc_sync
+ACT_HI_EXT: entity lib_cdc_v1_0_3.cdc_sync
   generic map (
     C_CDC_TYPE           => 1,
     C_RESET_STATE        => 0,
@@ -967,7 +972,7 @@ begin
 exr_d1 <= not External_System_Reset or MB_Debug_Sys_Rst;
    -------------------------------------
 
-ACT_LO_EXT: entity lib_cdc_v1_0_2.cdc_sync
+ACT_LO_EXT: entity lib_cdc_v1_0_3.cdc_sync
   generic map (
     C_CDC_TYPE           => 1,
     C_RESET_STATE        => 0,
@@ -998,7 +1003,7 @@ begin
 asr_d1 <= Auxiliary_System_Reset;
 -------------------------------------
 
-ACT_HI_AUX: entity lib_cdc_v1_0_2.cdc_sync
+ACT_HI_AUX: entity lib_cdc_v1_0_3.cdc_sync
   generic map (
     C_CDC_TYPE           => 1,
     C_RESET_STATE        => 0,
@@ -1028,7 +1033,7 @@ begin
    -------------------------------------
 asr_d1 <= not Auxiliary_System_Reset;
 
-ACT_LO_AUX: entity lib_cdc_v1_0_2.cdc_sync
+ACT_LO_AUX: entity lib_cdc_v1_0_3.cdc_sync
   generic map (
     C_CDC_TYPE           => 1,
     C_RESET_STATE        => 0,
@@ -1122,49 +1127,51 @@ end imp;
 
 
 
--------------------------------------------------------------------------------
--- proc_sys_reset - entity/architecture pair
--------------------------------------------------------------------------------
+-- (c) Copyright 2012, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
--- ************************************************************************
--- ** DISCLAIMER OF LIABILITY                                            **
--- **                                                                    **
--- ** This file contains proprietary and confidential information of     **
--- ** Xilinx, Inc. ("Xilinx"), that is distributed under a license       **
--- ** from Xilinx, and may be used, copied and/or disclosed only         **
--- ** pursuant to the terms of a valid license agreement with Xilinx.    **
--- **                                                                    **
--- ** XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION              **
--- ** ("MATERIALS") "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER         **
--- ** EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING WITHOUT                **
--- ** LIMITATION, ANY WARRANTY WITH RESPECT TO NONINFRINGEMENT,          **
--- ** MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE. Xilinx      **
--- ** does not warrant that functions included in the Materials will     **
--- ** meet the requirements of Licensee, or that the operation of the    **
--- ** Materials will be uninterrupted or error-free, or that defects     **
--- ** in the Materials will be corrected. Furthermore, Xilinx does       **
--- ** not warrant or make any representations regarding use, or the      **
--- ** results of the use, of the Materials in terms of correctness,      **
--- ** accuracy, reliability or otherwise.                                **
--- **                                                                    **
--- ** Xilinx products are not designed or intended to be fail-safe,      **
--- ** or for use in any application requiring fail-safe performance,     **
--- ** such as life-support or safety devices or systems, Class III       **
--- ** medical devices, nuclear facilities, applications related to       **
--- ** the deployment of airbags, or any other applications that could    **
--- ** lead to death, personal injury or severe property or               **
--- ** environmental damage (individually and collectively, "critical     **
--- ** applications"). Customer assumes the sole risk and liability       **
--- ** of any use of Xilinx products in critical applications,            **
--- ** subject only to applicable laws and regulations governing          **
--- ** limitations on product liability.                                  **
--- **                                                                    **
--- ** Copyright 2012 Xilinx, Inc.                                        **
--- ** All rights reserved.                                               **
--- **                                                                    **
--- ** This disclaimer and copyright notice must be retained as part      **
--- ** of this file at all times.                                         **
--- ************************************************************************
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 -- Filename:        proc_sys_reset.vhd
@@ -1228,8 +1235,8 @@ library ieee;
     use ieee.std_logic_1164.all;
 library unisim;
     use unisim.vcomponents.all;
-library proc_sys_reset_v5_0_12;
-    use proc_sys_reset_v5_0_12.all;
+library proc_sys_reset_v5_0_15;
+    use proc_sys_reset_v5_0_15.all;
 
 -------------------------------------------------------------------------------
 -- Port Declaration
@@ -1365,12 +1372,12 @@ signal bsr_outn : std_logic;
 -- Attributes to synthesis
 -------------------------------------------------------------------------------
 
-attribute equivalent_register_removal: string;
-attribute equivalent_register_removal of bus_struct_reset : signal is "no";
-attribute equivalent_register_removal of peripheral_reset : signal is "no";
+--attribute equivalent_register_removal: string;
+--attribute equivalent_register_removal of bus_struct_reset : signal is "no";
+--attribute equivalent_register_removal of peripheral_reset : signal is "no";
 
-attribute equivalent_register_removal of interconnect_aresetn : signal is "no";
-attribute equivalent_register_removal of peripheral_aresetn : signal is "no";
+--attribute equivalent_register_removal of interconnect_aresetn : signal is "no";
+--attribute equivalent_register_removal of peripheral_aresetn : signal is "no";
 
 begin
 -------------------------------------------------------------------------------
@@ -1549,7 +1556,7 @@ begin
 -- ** -- -- This instantiates a counter to ensure the Core_Reset_Req_* will genereate a
 -- ** -- -- RstcPPCresetcore_* that is a mimimum of 15 clocks
 -- ** -- -------------------------------------------------------------------------------
--- ** --   CORE_RESET_0 : entity proc_sys_reset_v5_0_12.UPCNT_N
+-- ** --   CORE_RESET_0 : entity proc_sys_reset_v5_0_15.UPCNT_N
 -- ** --   generic map (C_SIZE => 4)
 -- ** --   port map(
 -- ** --     Data     => "0000",                    -- in  STD_LOGIC_VECTOR (C_SIZE-1 downto 0);
@@ -1560,7 +1567,7 @@ begin
 -- ** --     Qout     => core_cnt_0                 -- out STD_LOGIC_VECTOR (C_SIZE-1 downto 0) 
 -- ** --   );
 -- ** -- 
--- ** --   CORE_RESET_1 : entity proc_sys_reset_v5_0_12.UPCNT_N
+-- ** --   CORE_RESET_1 : entity proc_sys_reset_v5_0_15.UPCNT_N
 -- ** --   generic map (C_SIZE => 4)
 -- ** --   port map(
 -- ** --     Data     => "0000",                    -- in  STD_LOGIC_VECTOR (C_SIZE-1 downto 0);
@@ -1598,7 +1605,7 @@ begin
 -- This instantiates a low pass filter to filter both External and Auxiliary
 -- Reset Inputs.
 -------------------------------------------------------------------------------
-  EXT_LPF : entity proc_sys_reset_v5_0_12.LPF
+  EXT_LPF : entity proc_sys_reset_v5_0_15.LPF
   generic map (
     C_EXT_RST_WIDTH  => C_EXT_RST_WIDTH,
     C_AUX_RST_WIDTH  => C_AUX_RST_WIDTH,
@@ -1623,7 +1630,7 @@ begin
 
   -- Chip_Reset_Req   <= Chip_Reset_Req_0 or Chip_Reset_Req_1;
 
-  SEQ : entity proc_sys_reset_v5_0_12.SEQUENCE_PSR
+  SEQ : entity proc_sys_reset_v5_0_15.SEQUENCE_PSR
   --generic map (
   --  C_EXT_RESET_HIGH_1 => C_EXT_RESET_HIGH
   --)

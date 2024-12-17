@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc_arb_c.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_arb_c.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,15 +59,17 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_arb_c module
+//                   ddr4_v2_2_23_mc_arb_c module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_arb_c #(parameter
+module ddr4_v2_2_23_mc_arb_c #(parameter
     TCQ = 0.1   
+   ,RKBITS = 2
+   ,RANK_SLAB = 4
    ,S_HEIGHT = 1
    ,LR_WIDTH = 1
    ,ORDERING  = "NORM"
@@ -81,7 +84,7 @@ module ddr4_v2_2_3_mc_arb_c #(parameter
    ,output reg [1:0] win_bank_cas
    ,output reg [1:0] win_group_cas
    ,output     [LR_WIDTH-1:0] win_l_rank_cas
-   ,output reg [1:0] win_rank_cas
+   ,output reg [RKBITS-1:0] win_rank_cas
 
    ,input  [3:0] cmdRmw
    ,input  [3:0] read
@@ -94,9 +97,9 @@ module ddr4_v2_2_3_mc_arb_c #(parameter
    ,input  [7:0] cmd_bank_cas
    ,input  [7:0] cmd_group_cas
    ,input  [4*LR_WIDTH-1:0] cmd_l_rank_cas
-   ,input  [7:0] cmd_rank_cas
-   ,input  [7:0] cmdRank
-   ,input  [7:0] cmdRankP
+   ,input  [RKBITS*4-1:0] cmd_rank_cas
+   ,input  [RKBITS*4-1:0] cmdRank
+   ,input  [RKBITS*4-1:0] cmdRankP
    ,input  [3:0] preReqM
 );
 
@@ -187,26 +190,26 @@ end
 
 always @(*) begin
    preMask = 4'b0000; // ranks
-   if (preReqM[0]) preMask[cmdRankP[1:0]] = 1'b1;
-   if (preReqM[1]) preMask[cmdRankP[3:2]] = 1'b1;
-   if (preReqM[2]) preMask[cmdRankP[5:4]] = 1'b1;
-   if (preReqM[3]) preMask[cmdRankP[7:6]] = 1'b1;
+   if (preReqM[0]) preMask[cmdRankP[RKBITS*1-1:RKBITS*0]] = 1'b1;
+   if (preReqM[1]) preMask[cmdRankP[RKBITS*2-1:RKBITS*1]] = 1'b1;
+   if (preReqM[2]) preMask[cmdRankP[RKBITS*3-1:RKBITS*2]] = 1'b1;
+   if (preReqM[3]) preMask[cmdRankP[RKBITS*4-1:RKBITS*3]] = 1'b1;
 end
 
 always @(*) begin
    readM = read;
-   if (preMask[cmdRank[1:0]]) readM[0] = 1'b0;
-   if (preMask[cmdRank[3:2]]) readM[1] = 1'b0;
-   if (preMask[cmdRank[5:4]]) readM[2] = 1'b0;
-   if (preMask[cmdRank[7:6]]) readM[3] = 1'b0;
+   if (preMask[cmdRank[RKBITS*1-1:RKBITS*0]]) readM[0] = 1'b0;
+   if (preMask[cmdRank[RKBITS*2-1:RKBITS*1]]) readM[1] = 1'b0;
+   if (preMask[cmdRank[RKBITS*3-1:RKBITS*2]]) readM[2] = 1'b0;
+   if (preMask[cmdRank[RKBITS*4-1:RKBITS*3]]) readM[3] = 1'b0;
 end
 
 always @(*) begin
    wrteM = wrte;
-   if (preMask[cmdRank[1:0]]) wrteM[0] = 1'b0;
-   if (preMask[cmdRank[3:2]]) wrteM[1] = 1'b0;
-   if (preMask[cmdRank[5:4]]) wrteM[2] = 1'b0;
-   if (preMask[cmdRank[7:6]]) wrteM[3] = 1'b0;
+   if (preMask[cmdRank[RKBITS*1-1:RKBITS*0]]) wrteM[0] = 1'b0;
+   if (preMask[cmdRank[RKBITS*2-1:RKBITS*1]]) wrteM[1] = 1'b0;
+   if (preMask[cmdRank[RKBITS*3-1:RKBITS*2]]) wrteM[2] = 1'b0;
+   if (preMask[cmdRank[RKBITS*4-1:RKBITS*3]]) wrteM[3] = 1'b0;
 end
 
 always @(*) begin
@@ -250,7 +253,7 @@ always @(posedge clk) if (rst) begin
    win_bank_cas  <= #TCQ 2'b0;
    win_group_cas <= #TCQ 2'b0;
    win_l_rank_cas_int <= #TCQ '0;
-   win_rank_cas  <= #TCQ 2'b0;
+   win_rank_cas  <= #TCQ {RKBITS{1'b0}};
 end else begin:arbing
    reg       nRdSlot;
    reg [7:0] nSlotCnt;
@@ -266,7 +269,7 @@ end else begin:arbing
          win_bank_cas        <= #TCQ cmd_bank_cas[1:0];
          win_group_cas       <= #TCQ cmd_group_cas[1:0];
          win_l_rank_cas_int  <= #TCQ cmd_l_rank_cas[0*LR_WIDTH+:LR_WIDTH];
-         win_rank_cas        <= #TCQ cmd_rank_cas[1:0];
+         win_rank_cas        <= #TCQ cmd_rank_cas[RKBITS*1-1:RKBITS*0];
       end
       4'bzz1z: begin
          last <= #TCQ 1'b0;
@@ -277,7 +280,7 @@ end else begin:arbing
          win_bank_cas        <= #TCQ cmd_bank_cas[3:2];
          win_group_cas       <= #TCQ cmd_group_cas[3:2];
          win_l_rank_cas_int  <= #TCQ cmd_l_rank_cas[1*LR_WIDTH+:LR_WIDTH];
-         win_rank_cas        <= #TCQ cmd_rank_cas[3:2];
+         win_rank_cas        <= #TCQ cmd_rank_cas[RKBITS*2-1:RKBITS*1];
       end
       4'bz1zz: begin
          last <= #TCQ 1'b1;
@@ -288,7 +291,7 @@ end else begin:arbing
          win_bank_cas        <= #TCQ cmd_bank_cas[5:4];
          win_group_cas       <= #TCQ cmd_group_cas[5:4];
          win_l_rank_cas_int  <= #TCQ cmd_l_rank_cas[2*LR_WIDTH+:LR_WIDTH];
-         win_rank_cas        <= #TCQ cmd_rank_cas[5:4];
+         win_rank_cas        <= #TCQ cmd_rank_cas[RKBITS*3-1:RKBITS*2];
       end
       4'b1zzz: begin
          last <= #TCQ 1'b1;
@@ -299,7 +302,7 @@ end else begin:arbing
          win_bank_cas        <= #TCQ cmd_bank_cas[7:6];
          win_group_cas       <= #TCQ cmd_group_cas[7:6];
          win_l_rank_cas_int  <= #TCQ cmd_l_rank_cas[3*LR_WIDTH+:LR_WIDTH];
-         win_rank_cas        <= #TCQ cmd_rank_cas[7:6];
+         win_rank_cas        <= #TCQ cmd_rank_cas[RKBITS*4-1:RKBITS*3];
       end
       default:begin
          winPortEnc <= #TCQ 2'd0;
@@ -308,7 +311,7 @@ end else begin:arbing
          win_bank_cas        <= #TCQ 2'b0;
          win_group_cas       <= #TCQ 2'b0;
          win_l_rank_cas_int  <= #TCQ '0;
-         win_rank_cas        <= #TCQ 2'b0;
+         win_rank_cas        <= #TCQ {RKBITS{1'b0}};
       end
    endcase
    rdSlot <= #TCQ nRdSlot;

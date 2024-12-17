@@ -62,7 +62,6 @@
 
 #list of all the clock needed for Labtools XSDB Master core
 
-        
-	create_clock -name XSDB_CLK -period 3.333 [get_ports clk]
+	create_clock -name TCK_CLK -period 50 [get_ports tck]
 
 ################################################################################

@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,14 +59,14 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_arb_mux_p module
+//                   ddr4_v2_2_23_mc_arb_mux_p module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_arb_mux_p #(parameter
+module ddr4_v2_2_23_mc_arb_mux_p #(parameter
     MEM = "DDR4"
    ,ABITS = 18
    ,S_HEIGHT = 1
@@ -73,6 +74,8 @@ module ddr4_v2_2_3_mc_arb_mux_p #(parameter
    ,LR_WIDTH = 1
    ,TCQ = 0.1
    ,XTP_MODE = "RANK_GROUP_BANK"
+   ,RKBITS = 2
+   ,RANK_SLAB = 4
    ,tRAS = 33
    ,tRTP = 6
    ,tWR = 12
@@ -84,7 +87,7 @@ module ddr4_v2_2_3_mc_arb_mux_p #(parameter
    ,output [1:0] winGroupP
    ,output [LR_WIDTH-1:0] winLRankP
    ,output [3:0] winPortP
-   ,output [1:0] winRankP
+   ,output [RKBITS-1:0] winRankP
    ,output [3:0] tWTPF
    ,output [1:0] tRTPF
    ,output [3:0] tRASF
@@ -92,13 +95,13 @@ module ddr4_v2_2_3_mc_arb_mux_p #(parameter
    ,input [7:0] cmdBankP
    ,input [7:0] cmdGroupP
    ,input [4*LR_WIDTH-1:0] cmdLRankP
-   ,input [7:0] cmdRankP
+   ,input [RKBITS*4-1:0] cmdRankP
    ,input [3:0] preReq
    ,input [5:0] tCWL
    ,input [1:0] winBankC
    ,input [1:0] winGroupC
    ,input [LR_WIDTH-1:0] winLRankC
-   ,input [1:0] winRankC
+   ,input [RKBITS-1:0] winRankC
    ,input       winRead
    ,input       winWrite
    ,input       rdCAS
@@ -106,7 +109,7 @@ module ddr4_v2_2_3_mc_arb_mux_p #(parameter
    ,input [1:0] winBankA
    ,input [1:0] winGroupA
    ,input [LR_WIDTH-1:0] winLRankA
-   ,input [1:0] winRankA
+   ,input [RKBITS-1:0] winRankA
    ,input       winAct
 
    ,output reg [3:0] preReqM
@@ -141,10 +144,10 @@ generate
   end
 endgenerate
 
-reg [3:0] timerWTP[0:3][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
-reg [1:0] timerRTP[0:3][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
-reg [3:0] timerRAS[0:3][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
-reg       pre_safe[0:3][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
+reg [3:0] timerWTP[0:RANK_SLAB-1][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
+reg [1:0] timerRTP[0:RANK_SLAB-1][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
+reg [3:0] timerRAS[0:RANK_SLAB-1][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
+reg       pre_safe[0:RANK_SLAB-1][S_HEIGHT_ALIASED-1:0][0:3][0:3]; // rank, l_rank, group and bank
 
 generate
 if (XTP_MODE == "RANK_GROUP_BANK") begin
@@ -154,7 +157,7 @@ if (XTP_MODE == "RANK_GROUP_BANK") begin
 // the most precharge scheduling freedom after a CAS command.
 // ======================================================================
    always @(posedge clk) if (rst) begin
-      for (i = 0; i <= 3; i = i + 1)
+      for (i = 0; i <= RANK_SLAB-1; i = i + 1)
          for (j = 0; j <= S_HEIGHT_ALIASED-1; j = j + 1)
             for (k = 0; k <= 3; k = k + 1)
                for (l = 0; l <= 3; l = l + 1) begin
@@ -164,7 +167,7 @@ if (XTP_MODE == "RANK_GROUP_BANK") begin
                   pre_safe[i][j][k][l] <= #TCQ 1'b0;
             end
    end else begin
-      for (i = 0; i <= 3; i = i + 1)
+      for (i = 0; i <= RANK_SLAB-1; i = i + 1)
          for (j = 0; j <= S_HEIGHT_ALIASED-1; j = j + 1)
             for (k = 0; k <= 3; k = k + 1)
                for (l = 0; l <= 3; l = l + 1) begin
@@ -182,10 +185,10 @@ if (XTP_MODE == "RANK_GROUP_BANK") begin
       if (winAct)   timerRAS[winRankA][winLRankA_3ds][winGroupA][winBankA] <= #TCQ tRASF;
    end
    always @(*) begin
-      preReqM[0] = preReq[0] & pre_safe[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]];
-      preReqM[1] = preReq[1] & pre_safe[cmdRankP[3:2]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]];
-      preReqM[2] = preReq[2] & pre_safe[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]];
-      preReqM[3] = preReq[3] & pre_safe[cmdRankP[7:6]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]];
+      preReqM[0] = preReq[0] & pre_safe[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]];
+      preReqM[1] = preReq[1] & pre_safe[cmdRankP[RKBITS*2-1:RKBITS*1]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]];
+      preReqM[2] = preReq[2] & pre_safe[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]];
+      preReqM[3] = preReq[3] & pre_safe[cmdRankP[RKBITS*4-1:RKBITS*3]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]];
    end
 end else begin
 // ======================================================================
@@ -195,15 +198,15 @@ end else begin
 // that rank.  The output of this block is also used in the arb_c block
 // to prevent a CAS and Precharge from being issued on consecutive cycles.
 // ======================================================================
-   reg [3:0] timerWR[0:3]; // rank
-   reg [3:0] rank_timerRTP[0:3]; // rank
+   reg [3:0] timerWR[0:RANK_SLAB-1]; // rank
+   reg [3:0] rank_timerRTP[0:RANK_SLAB-1]; // rank
    always @(posedge clk) if (rst) begin
-      for (i = 0; i <= 3; i = i + 1) begin
+      for (i = 0; i <= RANK_SLAB-1; i = i + 1) begin
          timerWR[i] <= 'b0;
          rank_timerRTP[i] <= 'b0;
       end
    end else begin
-      for (i = 0; i <= 3; i = i + 1) begin
+      for (i = 0; i <= RANK_SLAB-1; i = i + 1) begin
          if (timerWR[i]) timerWR[i] <= #TCQ timerWR[i] - 1'b1;
          if (rank_timerRTP[i]) rank_timerRTP[i] <= #TCQ rank_timerRTP[i] - 1'b1;
       end
@@ -212,22 +215,22 @@ end else begin
    end
    always @(*) begin
       preReqM[0] =    preReq[0]
-                   && (timerWR[cmdRankP[1:0]] == 0) && !wrCAS
-                   && (rank_timerRTP[cmdRankP[1:0]] == 0) && !rdCAS;
+                   && (timerWR[cmdRankP[RKBITS*1-1:RKBITS*0]] == 0) && !wrCAS
+                   && (rank_timerRTP[cmdRankP[RKBITS*1-1:RKBITS*0]] == 0) && !rdCAS;
       preReqM[1] =    preReq[1]
-                   && (timerWR[cmdRankP[3:2]] == 0) && !wrCAS
-                   && (rank_timerRTP[cmdRankP[3:2]] == 0) && !rdCAS;
+                   && (timerWR[cmdRankP[RKBITS*2-1:RKBITS*1]] == 0) && !wrCAS
+                   && (rank_timerRTP[cmdRankP[RKBITS*2-1:RKBITS*1]] == 0) && !rdCAS;
       preReqM[2] =    preReq[2]
-                   && (timerWR[cmdRankP[5:4]] == 0) && !wrCAS
-                   && (rank_timerRTP[cmdRankP[5:4]] == 0) && !rdCAS;
+                   && (timerWR[cmdRankP[RKBITS*3-1:RKBITS*2]] == 0) && !wrCAS
+                   && (rank_timerRTP[cmdRankP[RKBITS*3-1:RKBITS*2]] == 0) && !rdCAS;
       preReqM[3] =    preReq[3]
-                   && (timerWR[cmdRankP[7:6]] == 0) && !wrCAS
-                   && (rank_timerRTP[cmdRankP[7:6]] == 0) && !rdCAS;
+                   && (timerWR[cmdRankP[RKBITS*4-1:RKBITS*3]] == 0) && !wrCAS
+                   && (rank_timerRTP[cmdRankP[RKBITS*4-1:RKBITS*3]] == 0) && !rdCAS;
    end
 end
 endgenerate
 
-ddr4_v2_2_3_mc_arb_p #(
+ddr4_v2_2_23_mc_arb_p #(
    .TCQ (TCQ)
 )u_ddr_mc_arb_p(
     .clk     (clk)
@@ -240,9 +243,11 @@ ddr4_v2_2_3_mc_arb_p #(
 
 wire [ABITS-1:0] winRow;
 
-ddr4_v2_2_3_mc_cmd_mux_ap #(
+ddr4_v2_2_23_mc_cmd_mux_ap #(
    .ABITS (ABITS)
   ,.LR_WIDTH (LR_WIDTH)
+  ,.RKBITS     (RKBITS)
+  ,.RANK_SLAB  (RANK_SLAB)
 )u_ddr_mc_cmd_mux_p(
     .winBank  (winBankP)
    ,.winGroup (winGroupP)
@@ -275,39 +280,39 @@ wire   e_mc_arb_mux_p_001_req = & preReqM;
 always @(posedge clk) mc_arb_mux_p_001: if (~rst) cover property (e_mc_arb_mux_p_001_req);
 
 // Group 0 precharge blocked by wtp
-wire   e_mc_arb_mux_p_002_wtp = preReq[0] & ~( timerWTP[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 )
-                                          &  ( timerRTP[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 2'd0 )
-                                          &  ( timerRAS[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 );
+wire   e_mc_arb_mux_p_002_wtp = preReq[0] & ~( timerWTP[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 )
+                                          &  ( timerRTP[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 2'd0 )
+                                          &  ( timerRAS[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_002: if (~rst) cover property (e_mc_arb_mux_p_002_wtp);
 
 // Group 1 precharge blocked by rtp
-wire   e_mc_arb_mux_p_003_rtp = preReq[1] &  ( timerWTP[cmdRankP[3:2]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 4'd0 )
-                                          & ~( timerRTP[cmdRankP[3:2]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 2'd0 )
-                                          &  ( timerRAS[cmdRankP[3:2]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 4'd0 );
+wire   e_mc_arb_mux_p_003_rtp = preReq[1] &  ( timerWTP[cmdRankP[RKBITS*2-1:RKBITS*1]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 4'd0 )
+                                          & ~( timerRTP[cmdRankP[RKBITS*2-1:RKBITS*1]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 2'd0 )
+                                          &  ( timerRAS[cmdRankP[RKBITS*2-1:RKBITS*1]][cmdLRankP_3ds[1*LR_WIDTH+:LR_WIDTH]][cmdGroupP[3:2]][cmdBankP[3:2]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_003: if (~rst) cover property (e_mc_arb_mux_p_003_rtp);
 
 // Group 2 precharge blocked by ras
-wire   e_mc_arb_mux_p_004_ras = preReq[2] &  ( timerWTP[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 )
-                                          &  ( timerRTP[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 2'd0 )
-                                          & ~( timerRAS[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 );
+wire   e_mc_arb_mux_p_004_ras = preReq[2] &  ( timerWTP[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 )
+                                          &  ( timerRTP[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 2'd0 )
+                                          & ~( timerRAS[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_004: if (~rst) cover property (e_mc_arb_mux_p_004_ras);
 
 // Group 3 precharge blocked by wtp and ras
-wire   e_mc_arb_mux_p_005_ras = preReq[3] & ~( timerWTP[cmdRankP[7:6]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 4'd0 )
-                                          &  ( timerRTP[cmdRankP[7:6]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 2'd0 )
-                                          & ~( timerRAS[cmdRankP[7:6]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 4'd0 );
+wire   e_mc_arb_mux_p_005_ras = preReq[3] & ~( timerWTP[cmdRankP[RKBITS*4-1:RKBITS*3]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 4'd0 )
+                                          &  ( timerRTP[cmdRankP[RKBITS*4-1:RKBITS*3]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 2'd0 )
+                                          & ~( timerRAS[cmdRankP[RKBITS*4-1:RKBITS*3]][cmdLRankP_3ds[3*LR_WIDTH+:LR_WIDTH]][cmdGroupP[7:6]][cmdBankP[7:6]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_005: if (~rst) cover property (e_mc_arb_mux_p_005_ras);
 
 // Group 0 precharge blocked by rtp and ras
-wire   e_mc_arb_mux_p_006_ras = preReq[0] &  ( timerWTP[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 )
-                                          & ~( timerRTP[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 2'd0 )
-                                          & ~( timerRAS[cmdRankP[1:0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 );
+wire   e_mc_arb_mux_p_006_ras = preReq[0] &  ( timerWTP[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 )
+                                          & ~( timerRTP[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 2'd0 )
+                                          & ~( timerRAS[cmdRankP[RKBITS*1-1:RKBITS*0]][cmdLRankP_3ds[0*LR_WIDTH+:LR_WIDTH]][cmdGroupP[1:0]][cmdBankP[1:0]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_006: if (~rst) cover property (e_mc_arb_mux_p_006_ras);
 
 // Group 2 precharge blocked by wtp and rtp and ras
-wire   e_mc_arb_mux_p_007_ras = preReq[2] & ~( timerWTP[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 )
-                                          & ~( timerRTP[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 2'd0 )
-                                          & ~( timerRAS[cmdRankP[5:4]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 );
+wire   e_mc_arb_mux_p_007_ras = preReq[2] & ~( timerWTP[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 )
+                                          & ~( timerRTP[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 2'd0 )
+                                          & ~( timerRAS[cmdRankP[RKBITS*3-1:RKBITS*2]][cmdLRankP_3ds[2*LR_WIDTH+:LR_WIDTH]][cmdGroupP[5:4]][cmdBankP[5:4]] <= 4'd0 );
 always @(posedge clk) mc_arb_mux_p_007: if (~rst) cover property (e_mc_arb_mux_p_007_ras);
 
 // Load wtp counter when write was not issued

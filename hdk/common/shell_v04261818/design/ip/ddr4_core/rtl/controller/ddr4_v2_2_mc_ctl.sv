@@ -1,22 +1,21 @@
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +24,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,7 +37,7 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
@@ -47,10 +46,10 @@
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc_ctl.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_ctl.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,16 +57,18 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_ctl module
+//                   ddr4_v2_2_23_mc_ctl module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_ctl #(parameter
+module ddr4_v2_2_23_mc_ctl #(parameter
     RANKS = 1			   
    ,RANK_SLOT = 1
+   ,RKBITS = 2
+   ,RANK_SLAB = 4
    ,ABITS = 18
    ,BABITS = 2
    ,BGBITS = 2
@@ -117,6 +118,7 @@ module ddr4_v2_2_3_mc_ctl #(parameter
 
    ,output reg        casSlot2
    ,output reg        tranSentC
+   ,output reg        prevCmdAP
 
    ,input         [1:0] winBankAT
    ,input         [1:0] win_bank_cas
@@ -129,9 +131,9 @@ module ddr4_v2_2_3_mc_ctl #(parameter
    ,input               winAct
    ,input         [3:0] winPortC
    ,input         [3:0] winPortP
-   ,input         [1:0] winRankA
-   ,input         [1:0] win_rank_cas
-   ,input         [1:0] winRankP
+   ,input  [RKBITS-1:0] winRankA
+   ,input  [RKBITS-1:0] win_rank_cas
+   ,input  [RKBITS-1:0] winRankP
    ,input [LR_WIDTH-1:0] winLRankAT
    ,input [LR_WIDTH-1:0] win_l_rank_cas
    ,input [LR_WIDTH-1:0] winLRankPT
@@ -143,7 +145,7 @@ module ddr4_v2_2_3_mc_ctl #(parameter
    ,input               refIss
    ,input               zqIss
    ,input               zqIssAll
-   ,input         [1:0] refRank
+   ,input  [RKBITS-1:0] refRank
    ,input [LR_WIDTH-1:0] refLRank
    ,input               per_cas_block_req
 
@@ -290,14 +292,15 @@ always @(*) begin
 end
 
 reg       d_prevCAS;
-reg [1:0] d_prevRank;
+reg [RKBITS-1:0] d_prevRank;
 reg [BGBITS-1:0] d_prevGroup;
 reg [LR_WIDTH-1:0] d_prevLRank;
 reg       d_prevSlot2;
+reg       d_prevCmdAP;
 
 reg       prevCAS;
 reg       prev2CAS;
-reg [1:0] prevRank;
+reg [RKBITS-1:0] prevRank;
 reg [BGBITS-1:0] prevGroup;
 reg [LR_WIDTH-1:0] prevLRank;
 reg       prevSlot2;
@@ -305,10 +308,11 @@ reg       prevSlot2;
 always @(posedge clk) if (rst) begin
    prevCAS <= #TCQ 1'b0;
    prev2CAS <= #TCQ 1'b0;
-   prevRank <= #TCQ 2'b0;
+   prevRank <= #TCQ {RKBITS{1'b0}};
    prevGroup <= #TCQ '0;
    prevLRank <= #TCQ '0;
    prevSlot2 <= #TCQ 1'b0;
+   prevCmdAP <= #TCQ 1'b0;
 end else begin
    prevCAS <= #TCQ d_prevCAS;
    prev2CAS <= #TCQ prevCAS;
@@ -316,6 +320,7 @@ end else begin
    prevGroup <= #TCQ d_prevGroup;
    prevLRank <= #TCQ d_prevLRank;
    prevSlot2 <= #TCQ d_prevSlot2;
+   prevCmdAP <= #TCQ d_prevCmdAP;
 end
 
 localparam RRI = ((RANK_SLOT == 4) && (REG_CTRL == "ON")) ? 0 : 1 ;  // Refresh Rank Index
@@ -333,6 +338,7 @@ always @(*) begin : blk
    d_prevGroup = prevGroup;
    d_prevLRank = prevLRank;
    d_prevSlot2 = prevSlot2;
+   d_prevCmdAP = prevCmdAP;
    d_mc_ADRR[17]  = NOP_ADD_LOW ? '0 : 8'b11111111;
    for (i = 14; i < 17; i++)     d_mc_ADRR[i]  = 8'b11111111;
    for (i =  0; i < 14; i++)     d_mc_ADRR[i]  = NOP_ADD_LOW ? '0 : 8'b11111111;
@@ -378,6 +384,7 @@ always @(*) begin : blk
                                                 : {6'b111111, 2'b00};
             d_prevCAS = 1'b1;
             d_prevSlot2 = casSlot2;
+            d_prevCmdAP = winAP;
          end
       end
       default:  // default covers case 2'b00.  case 2'b11 will never happen.
@@ -520,7 +527,7 @@ always @(*) begin
    endcase
 end
 
-ddr4_v2_2_3_cal_mc_odt #( // MAN - name change
+ddr4_v2_2_23_cal_mc_odt #( // MAN - name change
     .ODTWR     (ODTWR)
    ,.ODTWRDEL  (ODTWRDEL)
    ,.ODTWRDUR  (ODTWRDUR)
@@ -533,6 +540,8 @@ ddr4_v2_2_3_cal_mc_odt #( // MAN - name change
    ,.ODTRDODEL (ODTRDODEL)
    ,.ODTRDODUR (ODTRDODUR)
 
+   ,.RANKS     (RANKS)
+   ,.RNK_BITS  (RKBITS)
    ,.ODTNOP    (ODTNOP)
    ,.ODTBITS   (ODTBITS)
    ,.TCQ       (TCQ)
@@ -569,14 +578,14 @@ wire   e_mc_ctl_001_rtw = winWrite & tranSentC & ~casSlot2 & e_read_previous_cyc
 always @(posedge clk) mc_ctl_001: if (~rst) cover property (e_mc_ctl_001_rtw);
 
 // Read one cycle after read to different rank
-reg [1:0] e_cas_rank_previous_cycle;
+reg [RKBITS-1:0] e_cas_rank_previous_cycle;
 always    @(posedge clk) e_cas_rank_previous_cycle  <= #TCQ ( win_rank_cas );
 wire      e_mc_ctl_002_rtr = winRead & tranSentC & e_read_previous_cycle & ~( win_rank_cas == e_cas_rank_previous_cycle );
 always    @(posedge clk) mc_ctl_002: if (~rst) cover property (e_mc_ctl_002_rtr);
 
 // Write two cycles after write to different rank
 reg       e_write_previous_cycle_dly;
-reg [1:0] e_cas_rank_previous_cycle_dly;
+reg [RKBITS-1:0] e_cas_rank_previous_cycle_dly;
 always    @(posedge clk) e_write_previous_cycle_dly <= #TCQ ( e_write_previous_cycle );
 always    @(posedge clk) e_cas_rank_previous_cycle_dly  <= #TCQ ( e_cas_rank_previous_cycle );
 wire      e_mc_ctl_003_wtw = winWrite & tranSentC & e_write_previous_cycle_dly & ~( win_rank_cas == e_cas_rank_previous_cycle_dly );
@@ -711,7 +720,7 @@ always @(posedge clk) if (~rst) assert property (~a_mc_ctl_003_4ccd);
 
 // Illegal write after write - write to write to different ranks with less than 8tCK spacing.
 reg       a_write_sent_previous_cycle;
-reg [1:0] a_rank_previous_cycle;
+reg [RKBITS-1:0] a_rank_previous_cycle;
 always    @(posedge clk)  a_write_sent_previous_cycle <= #TCQ ( winWrite & tranSentC );
 always    @(posedge clk)  a_rank_previous_cycle <= #TCQ ( win_rank_cas );
 wire      a_mc_ctl_004_wtw = winWrite & tranSentC & a_write_sent_previous_cycle & ~( win_rank_cas == a_rank_previous_cycle );

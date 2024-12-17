@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_w_upsizer.sv
+//  /   /         Filename           : ddr4_v2_2_23_w_upsizer.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -69,7 +70,7 @@
 `timescale 1ps/1ps
 
 
-module ddr4_v2_2_3_w_upsizer #
+module ddr4_v2_2_23_w_upsizer #
   (
    parameter         C_FAMILY                         = "rtl", 
                        // FPGA Family. Current version: virtex6 or spartan6.
@@ -345,7 +346,7 @@ module ddr4_v2_2_3_w_upsizer #
       
       // Optimize next word address wrap branch of expression.
       //
-      ddr4_v2_2_3_comparator_sel_static #
+      ddr4_v2_2_23_comparator_sel_static #
         (
          .C_FAMILY(C_FAMILY),
          .C_VALUE({C_M_AXI_BYTES_LOG{1'b0}}),
@@ -361,7 +362,7 @@ module ddr4_v2_2_3_w_upsizer #
          
       assign sel_word_complete_next_wrap = ~cmd_fix & ~cmd_complete_wrap;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_inst
@@ -373,7 +374,7 @@ module ddr4_v2_2_3_w_upsizer #
          
       assign sel_word_complete_next_wrap_qual = cmd_valid & ~store_in_wrap_buffer_enabled;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_valid_inst
@@ -383,7 +384,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(word_complete_next_wrap_qual)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_qual_inst
@@ -393,7 +394,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(word_complete_next_wrap_valid)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_pop_inst
@@ -405,7 +406,7 @@ module ddr4_v2_2_3_w_upsizer #
          
       assign sel_word_complete_next_wrap_stall = ~M_AXI_WREADY_I;
       
-      ddr4_v2_2_3_carry_latch_and #
+      ddr4_v2_2_23_carry_latch_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_stall_inst
@@ -415,7 +416,7 @@ module ddr4_v2_2_3_w_upsizer #
          .O(word_complete_next_wrap_stall)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_last_inst
@@ -429,7 +430,7 @@ module ddr4_v2_2_3_w_upsizer #
       //
       assign sel_last_word = ~cmd_fix;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) last_word_inst_2
@@ -441,7 +442,7 @@ module ddr4_v2_2_3_w_upsizer #
       
       assign sel_word_complete_rest = cmd_fix | ~cmd_modified;
       
-      ddr4_v2_2_3_carry_or #
+      ddr4_v2_2_23_carry_or #
         (
          .C_FAMILY(C_FAMILY)
          ) pop_si_data_inst
@@ -453,7 +454,7 @@ module ddr4_v2_2_3_w_upsizer #
       
       assign sel_word_complete_rest_qual = cmd_valid & ~store_in_wrap_buffer_enabled;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_rest_valid_inst
@@ -463,7 +464,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(word_complete_rest_qual)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_rest_qual_inst
@@ -473,7 +474,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(word_complete_rest_valid)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_rest_pop_inst
@@ -485,7 +486,7 @@ module ddr4_v2_2_3_w_upsizer #
          
       assign sel_word_complete_rest_stall = ~M_AXI_WREADY_I;
       
-      ddr4_v2_2_3_carry_latch_and #
+      ddr4_v2_2_23_carry_latch_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_rest_stall_inst
@@ -495,7 +496,7 @@ module ddr4_v2_2_3_w_upsizer #
          .O(word_complete_rest_stall)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_rest_last_inst
@@ -911,7 +912,7 @@ module ddr4_v2_2_3_w_upsizer #
     end else begin : USE_FPGA_LAST_WORD
       wire last_beat_curr_word;
       
-      ddr4_v2_2_3_comparator_sel_static #
+      ddr4_v2_2_23_comparator_sel_static #
         (
          .C_FAMILY(C_FAMILY),
          .C_VALUE(8'b0),
@@ -925,7 +926,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(last_beat)
          );
       
-      ddr4_v2_2_3_comparator_sel #
+      ddr4_v2_2_23_comparator_sel #
         (
          .C_FAMILY(C_FAMILY),
          .C_DATA_WIDTH(C_M_AXI_BYTES_LOG)
@@ -939,7 +940,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(last_beat_curr_word)
          );
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) last_word_inst
@@ -979,7 +980,7 @@ module ddr4_v2_2_3_w_upsizer #
     end else begin : USE_FPGA_USE_WRAP
       wire last_word_carry;  
     
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) last_word_inst2
@@ -989,7 +990,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(last_word_carry)
          );
 
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) last_word_inst3
@@ -999,7 +1000,7 @@ module ddr4_v2_2_3_w_upsizer #
          .COUT(last_word_extra_carry)
          );
 
-      ddr4_v2_2_3_carry_latch_and #
+      ddr4_v2_2_23_carry_latch_and #
         (
          .C_FAMILY(C_FAMILY)
          ) word_complete_next_wrap_stall_inst

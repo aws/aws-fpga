@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_cal_addr_decode.sv
+//  /   /         Filename           : ddr4_v2_2_23_cal_addr_decode.sv
 // /___/   /\     Date Last Modified : $Date: 2015/04/30 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,7 +59,7 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_cal_addr_decode module
+//                   ddr4_v2_2_23_cal_addr_decode module
 // Reference        :
 // Revision History :
 //*****************************************************************************
@@ -76,7 +77,7 @@
     `ifndef CALIB_SIM
        `define SIMULATION
      `endif
-`elsif _vcp
+`elsif _VCP 
     `ifndef CALIB_SIM
        `define SIMULATION
      `endif
@@ -86,7 +87,7 @@
      `endif
 `endif
 
-module ddr4_v2_2_3_cal_addr_decode  #
+module ddr4_v2_2_23_cal_addr_decode  #
   (
    parameter MEMORY_CONFIGURATION       = "COMPONENT", //COMPONENT/UDIMM/SODIMM/RDIMM
    parameter DRAM_WIDTH   = 8,
@@ -98,6 +99,7 @@ module ddr4_v2_2_3_cal_addr_decode  #
    parameter CKBITS = 1,
    parameter CSBITS =2,
    parameter RANKS =2,
+   parameter RNK_BITS = 1,
    parameter S_HEIGHT = 1,
    parameter LR_WIDTH = 1,
    parameter ODTBITS = 4,
@@ -251,16 +253,16 @@ module ddr4_v2_2_3_cal_addr_decode  #
    output reg                     cal_inv,
 
    //RANK selection
-   output reg [DBYTES*4-1:0]       clb2phy_wrcs0_upp = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_wrcs1_upp = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_wrcs0_low = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_wrcs1_low = 'b0,
+   output reg [DBYTES*4-1:0]       clb2phy_wrcs0_upp,
+   output reg [DBYTES*4-1:0]       clb2phy_wrcs1_upp,
+   output reg [DBYTES*4-1:0]       clb2phy_wrcs0_low,
+   output reg [DBYTES*4-1:0]       clb2phy_wrcs1_low,
 
    //RANK selection
-   output reg [DBYTES*4-1:0]       clb2phy_rdcs0_upp = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_rdcs1_upp = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_rdcs0_low = 'b0,
-   output reg [DBYTES*4-1:0]       clb2phy_rdcs1_low = 'b0,
+   output reg [DBYTES*4-1:0]       clb2phy_rdcs0_upp,
+   output reg [DBYTES*4-1:0]       clb2phy_rdcs1_upp,
+   output reg [DBYTES*4-1:0]       clb2phy_rdcs0_low,
+   output reg [DBYTES*4-1:0]       clb2phy_rdcs1_low,
 
    //CS position
    output reg [1:0]               casSlot = 'b0,
@@ -299,6 +301,7 @@ module ddr4_v2_2_3_cal_addr_decode  #
    output reg [7:0]               cal_error_bit,
    output reg [7:0]               cal_error_nibble,
    output reg [3:0]               cal_error_code,
+   output reg                     cal_crc_error,
 
    output reg                    cal_warning,
    output reg [8:0]              cal_warning_nibble,
@@ -473,8 +476,9 @@ module ddr4_v2_2_3_cal_addr_decode  #
   localparam CPLX_CFG_STATUS     = 28'b ????_0??1_????_????_1?01_????_????;  //10_0900
   localparam CPLX_ERR_LOG        = 28'b ????_0??1_????_????_1?10_????_????;  //10_0A00
   localparam PERIODIC_RD_STATUS  = 28'b ????_0??1_????_????_1?11_????_????;  //10_0B00
-  localparam CAL_LRDIMM_CONFIG   = 28'b ????_0??1_????_????_11??_????_???0;  //10_0C00
-  localparam CAL_LRDIMM_CMP_EN   = 28'b ????_0??1_????_????_11??_????_???1;  //10_0C01
+  localparam CAL_LRDIMM_CONFIG   = 28'b ????_0??1_????_????_11?0_????_???0;  //10_0C00
+  localparam CAL_LRDIMM_CMP_EN   = 28'b ????_0??1_????_????_11?0_????_???1;  //10_0C01
+  localparam CAL_CRC_ERROR       = 28'b ????_0??1_????_????_11?1_????_???0;  //10_0D00
 
   localparam DDR_RST_CKE_ODT_PAR = 28'b ????_??1?_????_????_????_?1??_???1;  //41
   localparam DDR_AC_CMD_A        = 28'b ????_??1?_????_????_????_?1??_??1?;  //42
@@ -772,8 +776,8 @@ module ddr4_v2_2_3_cal_addr_decode  #
   reg                         lrdimm_cmp_clr;
   wire [8*8-1:0]              mcal_dq_cmp_lrdimm;
   wire [31:0]                 cal_ADR_A_ext;
-  reg [1:0]                   lrdimm_cal_rank;
-  wire [1:0]                  cal_mem_rank;
+  reg [RNK_BITS-1:0]                   lrdimm_cal_rank;
+  wire [RNK_BITS-1:0]                  cal_mem_rank;
   integer                     rnk;
 
   //Debug output
@@ -1142,6 +1146,7 @@ module ddr4_v2_2_3_cal_addr_decode  #
 	  cal_error_code   <= #TCQ 'b0;
       cal_error        <= #TCQ 'b0;
       cal_inv        <= #TCQ 'b0;
+      cal_crc_error  <= #TCQ 1'b0;
        stop_gate_tracking_ack    <= #TCQ 'b0;
 	  max_rd_lat  <= #TCQ 'b0;
        margin_status <= #TCQ 'b0;
@@ -1158,7 +1163,15 @@ module ddr4_v2_2_3_cal_addr_decode  #
        traffic_instr_rw_mode_r1     <= #TCQ 'b0;
        traffic_instr_rw_submode_r1  <= #TCQ 'b0;
        traffic_instr_num_of_iter_r1 <= #TCQ 'b0;
-	   traffic_instr_nxt_instr_r1   <= #TCQ 'b0;
+       traffic_instr_nxt_instr_r1   <= #TCQ 'b0;
+       clb2phy_wrcs0_low <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_wrcs1_low <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_rdcs0_low <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_rdcs1_low <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_wrcs0_upp <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_wrcs1_upp <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_rdcs0_upp <= #TCQ {4*DBYTES{1'b0}};
+       clb2phy_rdcs1_upp <= #TCQ {4*DBYTES{1'b0}};
     end else if(io_addr_strobe & io_write_strobe) begin  //write
       casez(io_address)
         //MB_READY
@@ -1226,6 +1239,9 @@ module ddr4_v2_2_3_cal_addr_decode  #
         CAL_CMP_EN: begin
           cal_cmp_en <= #TCQ mb_to_addr_dec_data[7:0]; // DQ_CMP_EN
         end
+	CAL_CRC_ERROR: begin
+	  cal_crc_error <= #TCQ mb_to_addr_dec_data[0];
+	end
 	CAL_CS_POS: begin
 	  cal_cs_pos <= #TCQ mb_to_addr_dec_data[1:0];
 	end
@@ -1300,12 +1316,16 @@ module ddr4_v2_2_3_cal_addr_decode  #
         DDR_AC_CS_A: begin
 	  if (CLAMSHELL == "ON")
             cal_CS_A <= #TCQ {mb_to_addr_dec_data[15:8],mb_to_addr_dec_data[15:8],mb_to_addr_dec_data[7:0],mb_to_addr_dec_data[7:0]};
+	  else if (RANKS == 8)
+            cal_CS_A[dq_index[0]*32 +:32] <= #TCQ mb_to_addr_dec_data[31:0];
 	  else
             cal_CS_A <= #TCQ mb_to_addr_dec_data[CSBITS*8-1:0];
         end
         DDR_AC_CS_B: begin
 	  if (CLAMSHELL == "ON")
             cal_CS_B <= #TCQ {mb_to_addr_dec_data[15:8],mb_to_addr_dec_data[15:8],mb_to_addr_dec_data[7:0],mb_to_addr_dec_data[7:0]};
+	  else if (RANKS == 8)
+            cal_CS_B[dq_index[0]*32 +:32] <= #TCQ mb_to_addr_dec_data[31:0];
 	  else
             cal_CS_B <= #TCQ mb_to_addr_dec_data[CSBITS*8-1:0];
         end
@@ -1550,9 +1570,15 @@ module ddr4_v2_2_3_cal_addr_decode  #
 		  addr_dec_to_mb_data <= #TCQ {24'b0, phy2clb_rd_dq_bits};
 		end
         DDR_AC_CS_A: begin
+          if (RANKS == 8)
+            addr_dec_to_mb_data <= #TCQ cal_CS_A[dq_index[0]*32 +:32];
+	  else
             addr_dec_to_mb_data <= #TCQ cal_CS_A;
         end
         DDR_AC_CS_B: begin
+          if (RANKS == 8)
+            addr_dec_to_mb_data <= #TCQ cal_CS_B[dq_index[0]*32 +:32];
+	  else
             addr_dec_to_mb_data <= #TCQ cal_CS_B;
         end
 		CAL_RIU2CLB_VALID: begin
@@ -2224,7 +2250,7 @@ generate
    wire                     cplx_DQIn_valid = mc_clb2phy_fifo_rden_nxt;
    wire [DBYTES*8*8-1:0]    cplx_DQIn       = mcal_DQIn_r;
 
-ddr4_v2_2_3_cal_cplx # (
+ddr4_v2_2_23_cal_cplx # (
     .DBYTES      (DBYTES),
     .ABITS      (ABITS),
     .BABITS     (BABITS),
@@ -2284,7 +2310,7 @@ wire casSlot2  = casSlot == 2'd2; // Only slot0 and slot2 are supported
 wire tranSentC = rdCAS | wrCAS;
 
 always @(*) begin
-  lrdimm_cal_rank = 2'b0;
+  lrdimm_cal_rank = {RNK_BITS{1'b0}};
   for (rnk = 0; rnk < RANKS; rnk = rnk + 1) begin
     if (CLAMSHELL == "OFF") begin
       if(&cal_CS_n[rnk*8+:8] == 1'b0)
@@ -2298,7 +2324,7 @@ end
 
 assign cal_mem_rank = LRDIMM_EN ? lrdimm_cal_rank : calRank;
 
-ddr4_v2_2_3_cal_mc_odt #(
+ddr4_v2_2_23_cal_mc_odt #(
     .ODTWR     (ODTWR)
    ,.ODTWRDEL  (ODTWRDEL)
    ,.ODTWRDUR  (ODTWRDUR)
@@ -2311,6 +2337,8 @@ ddr4_v2_2_3_cal_mc_odt #(
    ,.ODTRDODEL (ODTRDODEL)
    ,.ODTRDODUR (ODTRDODUR)
 
+   ,.RANKS     (RANKS)
+   ,.RNK_BITS  (RNK_BITS)
    ,.ODTNOP    (ODTNOP)
    ,.ODTBITS   (ODTBITS)
    ,.TCQ       (0.1)      // hardcode delay due to different timescale in this submodule

@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_axi_ar_channel.sv
+//  /   /         Filename           : ddr4_v2_2_23_axi_ar_channel.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -64,7 +65,7 @@
 `timescale 1ps/1ps
 `default_nettype none
 
-module ddr4_v2_2_3_axi_ar_channel #
+module ddr4_v2_2_23_axi_ar_channel #
 (
 ///////////////////////////////////////////////////////////////////////////////
 // Parameter Definitions
@@ -110,6 +111,7 @@ module ddr4_v2_2_3_axi_ar_channel #
   input  wire [3:0]                           arcache         , 
   input  wire [2:0]                           arprot          , 
   input  wire [3:0]                           arqos           , 
+  input  wire								  aruser           , 
   input  wire                                 arvalid         , 
   output wire                                 arready         , 
 
@@ -129,6 +131,7 @@ module ddr4_v2_2_3_axi_ar_channel #
   output wire                                 r_ignore_begin   ,
   output wire                                 r_ignore_end     ,
   output wire                                 arvalid_int      ,
+  output wire		                           aruser_int ,       
   output wire [3:0]                           arqos_int        
 
 );
@@ -149,6 +152,7 @@ reg  [C_ID_WIDTH-1:0]       axid         ;
 reg  [C_AXI_ADDR_WIDTH-1:0] axaddr       ;
 reg  [7:0]                  axlen        ;
 reg  [3:0]                  axqos        ;
+reg			                  axuser       ;
 reg  [1:0]                  axburst      ;
 reg                         axvalid      ;
 
@@ -156,6 +160,7 @@ wire [C_ID_WIDTH-1:0]       axid_int     ;
 wire [C_AXI_ADDR_WIDTH-1:0] axaddr_int   ;
 wire [7:0]                  axlen_int    ;
 wire [3:0]                  axqos_int    ;
+wire	                  axuser_int    ;
 wire [1:0]                  axburst_int  ;
 wire                        axvalid_int  ;
 
@@ -164,10 +169,12 @@ wire                        axvalid_int  ;
 ////////////////////////////////////////////////////////////////////////////////
 assign arvalid_int = axvalid_int;
 assign arqos_int = axqos_int;
+assign aruser_int = axuser_int;
 
 assign axid_int    = arready ? arid : axid;
 assign axlen_int   = arready ? arlen : axlen;
 assign axqos_int   = arready ? arqos : axqos;
+assign axuser_int   = arready ? aruser : axuser;
 assign axaddr_int  = arready ? araddr : axaddr;
 assign axburst_int = arready ? arburst : axburst;
 assign axvalid_int = arready ? arvalid : axvalid;
@@ -183,12 +190,13 @@ always @(posedge clk) begin
   axid <= axid_int;
   axlen <= axlen_int;
   axqos <= axqos_int;
+  axuser <= axuser_int;
   axaddr <= axaddr_int;
   axburst <= axburst_int;
 end
 
 // Translate the AXI transaction to the MC transaction(s)
-ddr4_v2_2_3_axi_cmd_translator #
+ddr4_v2_2_23_axi_cmd_translator #
 (
   .C_AXI_ADDR_WIDTH ( C_AXI_ADDR_WIDTH ) ,
   .C_MC_ADDR_WIDTH  ( C_MC_ADDR_WIDTH  ) ,
@@ -215,7 +223,7 @@ axi_mc_cmd_translator_0
   .next_pending  ( next_pending          ) 
 );
 
-ddr4_v2_2_3_axi_cmd_fsm #
+ddr4_v2_2_23_axi_cmd_fsm #
 (
  .C_MC_BURST_LEN   (C_MC_BURST_LEN   ),
  .C_MC_RD_INST     (1                )

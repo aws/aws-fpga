@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_axi.sv
+//  /   /         Filename           : ddr4_v2_2_23_axi.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -80,7 +81,7 @@
 `timescale 1ps/1ps
 `default_nettype none
 
-module ddr4_v2_2_3_axi #
+module ddr4_v2_2_23_axi #
 (
 ///////////////////////////////////////////////////////////////////////////////
 // Parameter Definitions
@@ -164,6 +165,8 @@ module ddr4_v2_2_3_axi #
   // Slave Interface System Signals           
   input  wire                               aclk              , 
   input  wire                               aresetn           , 
+  input  wire                               s_axi_awuser           , 
+  input  wire                               s_axi_aruser           , 
   // Slave Interface Write Address Ports
   input  wire [C_S_AXI_ID_WIDTH-1:0]        s_axi_awid        , 
   input  wire [C_S_AXI_ADDR_WIDTH-1:0]      s_axi_awaddr      , 
@@ -281,7 +284,7 @@ localparam integer P_D3_REG_CONFIG_R  = 0;
 
 
 localparam integer P_UPSIZER_PACKING_LEVEL = 2;
-localparam integer P_SUPPORTS_USER_SIGNALS = 0;
+localparam integer P_SUPPORTS_USER_SIGNALS = 1;
 // Set this parameter to 1 if data can be returned out of order
 localparam integer P_SINGLE_THREAD = 0;
    
@@ -305,6 +308,12 @@ localparam integer C_MC_BURST_LEN = (C_MC_nCK_PER_CLK == 4)  ? 1:
 // BEGIN RTL
 ///////////////////////////////////////////////////////////////////////////////
 
+   wire                               awuser_d1; 
+   wire                               aruser_d1;     
+   wire                               awuser_d2; 
+   wire                               aruser_d2;     
+   wire                               awuser_d3; 
+   wire                               aruser_d3;     
 // First reg slice slave side output/inputs
 wire  [C_S_AXI_ID_WIDTH-1:0]   awid_d1          ;
 wire  [C_S_AXI_ADDR_WIDTH-1:0] awaddr_d1        ;
@@ -451,7 +460,7 @@ always @(posedge aclk)
 always @(posedge aclk)
   mc_init_complete_r <= mc_init_complete ;
 
-ddr4_v2_2_3_axi_register_slice #
+ddr4_v2_2_23_axi_register_slice #
 (
   .C_FAMILY                    ( C_FAMILY                ) ,
   .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -483,7 +492,7 @@ axi_register_slice_d1
   .S_AXI_AWPROT  ( s_axi_awprot  ) ,
   .S_AXI_AWREGION( 4'b0          ) ,
   .S_AXI_AWQOS   ( s_axi_awqos   ) ,
-  .S_AXI_AWUSER  ( 1'b0          ) ,
+  .S_AXI_AWUSER  ( s_axi_awuser      ) ,
   .S_AXI_AWVALID ( s_axi_awvalid ) ,
   .S_AXI_AWREADY ( s_axi_awready ) ,
   .S_AXI_WDATA   ( s_axi_wdata   ) ,
@@ -508,7 +517,7 @@ axi_register_slice_d1
   .S_AXI_ARPROT  ( s_axi_arprot  ) ,
   .S_AXI_ARREGION( 4'b0          ) ,
   .S_AXI_ARQOS   ( s_axi_arqos   ) ,
-  .S_AXI_ARUSER  ( 1'b0          ) ,
+  .S_AXI_ARUSER  ( s_axi_aruser     ) ,
   .S_AXI_ARVALID ( s_axi_arvalid ) ,
   .S_AXI_ARREADY ( s_axi_arready ) ,
   .S_AXI_RID     ( s_axi_rid     ) ,
@@ -528,7 +537,7 @@ axi_register_slice_d1
   .M_AXI_AWREGION(               ) ,
   .M_AXI_AWPROT  ( awprot_d1     ) ,
   .M_AXI_AWQOS   ( awqos_d1      ) ,
-  .M_AXI_AWUSER  (               ) ,
+  .M_AXI_AWUSER  (  awuser_d1             ) ,
   .M_AXI_AWVALID ( awvalid_d1    ) ,
   .M_AXI_AWREADY ( awready_d1    ) ,
   .M_AXI_WID     (               ) ,
@@ -553,7 +562,7 @@ axi_register_slice_d1
   .M_AXI_ARPROT  ( arprot_d1     ) ,
   .M_AXI_ARREGION(               ) ,
   .M_AXI_ARQOS   ( arqos_d1      ) ,
-  .M_AXI_ARUSER  (               ) ,
+  .M_AXI_ARUSER  ( aruser_d1              ) ,
   .M_AXI_ARVALID ( arvalid_d1    ) ,
   .M_AXI_ARREADY ( arready_d1    ) ,
   .M_AXI_RID     ( rid_d1        ) ,
@@ -567,7 +576,7 @@ axi_register_slice_d1
 
 generate 
   if (P_USE_UPSIZER) begin : USE_UPSIZER
-    ddr4_v2_2_3_axi_upsizer #
+    ddr4_v2_2_23_axi_upsizer #
       (
       .C_FAMILY                    ( C_FAMILY                ) ,
       .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -604,7 +613,7 @@ generate
       .S_AXI_AWPROT  ( awprot_d1     ) ,
       .S_AXI_AWREGION( 4'b0          ) ,
       .S_AXI_AWQOS   ( awqos_d1      ) ,
-      .S_AXI_AWUSER  ( 1'b0          ) ,
+      .S_AXI_AWUSER  ( awuser_d1          ) ,
       .S_AXI_AWVALID ( awvalid_d1    ) ,
       .S_AXI_AWREADY ( awready_d1    ) ,
       .S_AXI_WDATA   ( wdata_d1      ) ,
@@ -628,7 +637,7 @@ generate
       .S_AXI_ARPROT  ( arprot_d1     ) ,
       .S_AXI_ARREGION( 4'b0          ) ,
       .S_AXI_ARQOS   ( arqos_d1      ) ,
-      .S_AXI_ARUSER  ( 1'b0          ) ,
+      .S_AXI_ARUSER  ( aruser_d1        ) ,
       .S_AXI_ARVALID ( arvalid_d1    ) ,
       .S_AXI_ARREADY ( arready_d1    ) ,
       .S_AXI_RID     ( rid_d1        ) ,
@@ -648,7 +657,7 @@ generate
       .M_AXI_AWPROT  ( awprot_d2     ) ,
       .M_AXI_AWREGION(               ) ,
       .M_AXI_AWQOS   ( awqos_d2      ) ,
-      .M_AXI_AWUSER  (               ) ,
+      .M_AXI_AWUSER  (  awuser_d2                     ) ,
       .M_AXI_AWVALID ( awvalid_d2    ) ,
       .M_AXI_AWREADY ( awready_d2    ) ,
       .M_AXI_WDATA   ( wdata_d2      ) ,
@@ -672,7 +681,7 @@ generate
       .M_AXI_ARPROT  ( arprot_d2     ) ,
       .M_AXI_ARREGION(               ) ,
       .M_AXI_ARQOS   ( arqos_d2      ) ,
-      .M_AXI_ARUSER  (               ) ,
+      .M_AXI_ARUSER  (  aruser_d2                                  ) ,
       .M_AXI_ARVALID ( arvalid_d2    ) ,
       .M_AXI_ARREADY ( arready_d2    ) ,
       .M_AXI_RID     ( rid_d2        ) ,
@@ -722,10 +731,12 @@ generate
       assign rlast_d1   = rlast_d2   ; 
       assign rvalid_d1  = rvalid_d2  ; 
       assign rready_d2  = rready_d1  ; 
+      assign awuser_d2  = awuser_d1  ; 
+      assign aruser_d2  = aruser_d1  ; 
   end
 endgenerate
 
-ddr4_v2_2_3_axi_register_slice #
+ddr4_v2_2_23_axi_register_slice #
 (
   .C_FAMILY                    ( C_FAMILY                ) ,
   .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -757,7 +768,7 @@ axi_register_slice_d3
   .S_AXI_AWPROT  ( awprot_d2     ) ,
   .S_AXI_AWREGION( 4'b0          ) ,
   .S_AXI_AWQOS   ( awqos_d2      ) ,
-  .S_AXI_AWUSER  ( 1'b0          ) ,
+  .S_AXI_AWUSER  ( awuser_d2          ) ,
   .S_AXI_AWVALID ( awvalid_d2    ) ,
   .S_AXI_AWREADY ( awready_d2    ) ,
   .S_AXI_WID     ( {C_S_AXI_ID_WIDTH{1'b0}} ) ,
@@ -782,7 +793,7 @@ axi_register_slice_d3
   .S_AXI_ARPROT  ( arprot_d2     ) ,
   .S_AXI_ARREGION( 4'b0          ) ,
   .S_AXI_ARQOS   ( arqos_d2      ) ,
-  .S_AXI_ARUSER  ( 1'b0          ) ,
+  .S_AXI_ARUSER  ( aruser_d2          ) ,
   .S_AXI_ARVALID ( arvalid_d2    ) ,
   .S_AXI_ARREADY ( arready_d2    ) ,
   .S_AXI_RID     ( rid_d2        ) ,
@@ -804,7 +815,7 @@ axi_register_slice_d3
   .M_AXI_AWPROT  ( awprot_d3     ) ,
   .M_AXI_AWREGION(               ) ,
   .M_AXI_AWQOS   ( awqos_d3      ) ,
-  .M_AXI_AWUSER  (               ) ,
+  .M_AXI_AWUSER  (  awuser_d3            ) ,
   .M_AXI_AWVALID ( awvalid_d3    ) ,
   .M_AXI_AWREADY ( awready_d3    ) ,
   .M_AXI_WID     (               ) ,
@@ -831,7 +842,7 @@ axi_register_slice_d3
   .M_AXI_ARPROT  ( arprot_d3     ) ,
   .M_AXI_ARREGION(               ) ,
   .M_AXI_ARQOS   ( arqos_d3      ) ,
-  .M_AXI_ARUSER  (               ) ,
+  .M_AXI_ARUSER  (  aruser_d3             ) ,
   .M_AXI_ARVALID ( arvalid_d3    ) ,
   .M_AXI_ARREADY ( arready_d3    ) ,
   .M_AXI_RID     ( rid_d3        ) ,
@@ -850,12 +861,14 @@ wire                                w_ignore_end;
 wire                                w_cmd_rdy;    
 wire                                awvalid_int;    
 wire  [3:0]                         awqos_int     ;
+wire                           awuser_int     ;
+wire                           aruser_int     ;
 wire                                w_data_rdy  ;
 wire                                b_push;
 wire [C_S_AXI_ID_WIDTH-1:0]         b_awid;
 wire                                b_full;
    
-ddr4_v2_2_3_axi_aw_channel #
+ddr4_v2_2_23_axi_aw_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ),
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -879,6 +892,7 @@ axi_aw_channel_0
   .awcache                          ( awcache_d3        ) ,
   .awprot                           ( awprot_d3         ) ,
   .awqos                            ( awqos_d3          ) ,
+  .awuser                            ( awuser_d3          ) ,
   .awvalid                          ( awvalid_d3        ) ,
   .awready                          ( awready_d3        ) ,
   .cmd_en                           ( wr_cmd_en         ) ,
@@ -891,6 +905,7 @@ axi_aw_channel_0
   .w_cmd_rdy                        ( w_cmd_rdy         ) ,
   .awvalid_int                      ( awvalid_int       ) ,
   .awqos_int                        ( awqos_int         ) ,
+  .awuser_int                        ( awuser_int         ) ,
   .w_data_rdy                       ( w_data_rdy        ) ,
   .cmd_wr_bytes                     ( cmd_wr_bytes      ) ,
   .b_push                           ( b_push            ) ,
@@ -898,7 +913,7 @@ axi_aw_channel_0
   .b_full                           ( b_full            )
 );
 
-ddr4_v2_2_3_axi_w_channel #
+ddr4_v2_2_23_axi_w_channel #
 (
   .C_DATA_WIDTH                     ( C_MC_DATA_WIDTH    ), 
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -926,7 +941,7 @@ axi_w_channel_0
   .w_data_rdy                       ( w_data_rdy      )
 );
 
-ddr4_v2_2_3_axi_b_channel #
+ddr4_v2_2_23_axi_b_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   )
 )
@@ -960,7 +975,7 @@ wire  [3:0]                         arqos_int     ;
  
 
 
-ddr4_v2_2_3_axi_ar_channel #
+ddr4_v2_2_23_axi_ar_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ),
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -984,6 +999,7 @@ axi_ar_channel_0
   .arcache                          ( arcache_d3        ) ,
   .arprot                           ( arprot_d3         ) ,
   .arqos                            ( arqos_d3          ) ,
+  .aruser                            ( aruser_d3          ) ,
   .arvalid                          ( arvalid_d3        ) ,
   .arready                          ( arready_d3        ) ,
   .cmd_en                           ( rd_cmd_en         ) ,
@@ -998,10 +1014,11 @@ axi_ar_channel_0
   .r_ignore_begin                   ( r_ignore_begin    ) ,
   .r_ignore_end                     ( r_ignore_end      ) ,
   .arvalid_int                      ( arvalid_int       ) ,
+  .aruser_int                        ( aruser_int         ) ,
   .arqos_int                        ( arqos_int         ) 
 );
 
-ddr4_v2_2_3_axi_r_channel #
+ddr4_v2_2_23_axi_r_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ), 
   .C_DATA_WIDTH                     ( C_MC_DATA_WIDTH    ),
@@ -1032,7 +1049,7 @@ axi_r_channel_0
 );
 
 // Arbiter    
-ddr4_v2_2_3_axi_cmd_arbiter #
+ddr4_v2_2_23_axi_cmd_arbiter #
 (
   .C_MC_ADDR_WIDTH           ( C_MC_ADDR_WIDTH  ) ,
   .C_MC_BURST_LEN            ( C_MC_BURST_LEN   ) ,
@@ -1057,8 +1074,10 @@ axi_cmd_arbiter_0
   // Next Command info
   .arvalid                   ( arvalid_int       ) ,
   .arqos                     ( arqos_int         ) ,
+  .aruser                     ( aruser_int         ) ,
   .awvalid                   ( awvalid_int       ) ,
   .awqos                     ( awqos_int         ) ,
+  .awuser                     ( awuser_int         ) ,
   // To MC
   .mc_app_en                 ( mc_app_en         ) ,
   .mc_app_cmd                ( mc_app_cmd        ) ,
@@ -1069,6 +1088,54 @@ axi_cmd_arbiter_0
   .mc_app_rdy                ( mc_app_rdy       ) 
 );
 
+
+////synthesis translate_off
+//
+//wire [C_MC_ADDR_WIDTH-1:0]               addr_step;
+//assign addr_step = 'd8;
+//wire [C_MC_ADDR_WIDTH-1:0]               w_mc_app_addr_diff;
+//reg [C_MC_ADDR_WIDTH-1:0]               r_mc_app_addr_diff;
+//reg [C_MC_ADDR_WIDTH-1:0]               r_mc_app_addr_prev;
+//reg [C_MC_ADDR_WIDTH-1:0]               r_mc_app_addr_prev_1;
+//reg                                                                                                   r_first_check = 0;
+//reg                                                                                                   r_check_en = 0;
+//reg                                                                                                   r_auto_precharge = 0;
+//reg                                                                                                   r_auto_precharge_1 = 0;
+//reg                         r_mc_app_autoprecharge;
+//reg                                                                                                 r_mc_app_autoprecharge_prev;
+//assign w_mc_app_addr_diff =  ( mc_app_addr > r_mc_app_addr_prev ) ? mc_app_addr - r_mc_app_addr_prev :  ( r_mc_app_addr_prev - mc_app_addr );
+//
+//always @ ( posedge aclk ) 
+//begin
+//               r_auto_precharge_1       <=                r_auto_precharge; 
+//               r_mc_app_addr_prev_1 <=   r_mc_app_addr_prev; 
+//               r_mc_app_addr_diff       <= mc_app_addr - r_mc_app_addr_prev ;
+//               if(mc_app_en & mc_app_rdy )
+//               begin
+//                              r_mc_app_addr_prev                                             <= mc_app_addr; 
+//                             r_mc_app_autoprecharge_prev               <= mc_app_autoprecharge;
+//                              r_first_check                                                   <= 1'b1;
+//               end
+//               
+//               
+//               if( mc_app_rdy & r_first_check & mc_app_en && ( w_mc_app_addr_diff > addr_step ))
+//               begin
+//                              r_auto_precharge               <= r_mc_app_autoprecharge_prev ? 1'b0: 1'b1; 
+//                              r_check_en         <= 1'b1;
+//               end
+//               else
+//               begin
+//                              r_auto_precharge               <=          1'b0; 
+//                              r_check_en         <= 1'b0;
+//               end
+//
+//               if (( r_auto_precharge_1 == 0) && ( r_auto_precharge == 1 ))
+//               begin
+//                              $display("ERROR: B2B Auto Precharge not present %t", $time);
+//               end
+//end
+//
+////synthesis translate_on
 endmodule
 
 `default_nettype wire

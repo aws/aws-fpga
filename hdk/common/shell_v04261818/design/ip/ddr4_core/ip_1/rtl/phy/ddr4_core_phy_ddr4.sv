@@ -1,22 +1,21 @@
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +24,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,20 +37,21 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.0
 //  \   \         Application        : MIG
 //  /   /         Filename           : ddr4_core_phy_ddr4.sv
-// /___/   /\     Date Last Modified : $Date: 2017/09/06 $
+// /___/   /\     Date Last Modified : $Date: 2024/02/21 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
 //
@@ -81,6 +81,10 @@
     `ifndef CALIB_SIM
        `define SIMULATION
      `endif
+`elsif _VCP
+    `ifndef CALIB_SIM
+       `define SIMULATION
+     `endif
 `endif
 
 module ddr4_core_phy_ddr4 #
@@ -96,6 +100,7 @@ module ddr4_core_phy_ddr4 #
    ,parameter integer CS_WIDTH             = 1
    ,parameter integer ODT_WIDTH            = 1
    ,parameter         DRAM_TYPE            = "DDR4"
+   ,parameter         EN_LVAUX             = "FALSE"
    ,parameter integer DQ_WIDTH             = 72
    ,parameter integer DQS_WIDTH            = 18
    ,parameter integer DM_WIDTH             = 9
@@ -478,6 +483,7 @@ wire [BYTES*1-1:0]           riu_bytes;                      //riu_bytes cal fro
 
   //Generate one hot riu_nibble_sel;
 integer n;
+reg extend_nibble_sel_riu_addr_0;
 generate
     always @ (posedge riu_clk)
     begin
@@ -488,13 +494,24 @@ generate
           clb2riu_wr_en[n]          <= #TCQ 1'b0;
         end else begin
           // valid only comes with a write. If wr_en is low then do not wait for valid for nibble_sel
-          clb2riu_nibble_sel_low[n] <= #TCQ (2*n == riu_nibble) & io_addr_strobe_clb2riu_riuclk;
-          clb2riu_nibble_sel_upp[n] <= #TCQ (2*n+1 == riu_nibble)& io_addr_strobe_clb2riu_riuclk;
+          clb2riu_nibble_sel_low[n] <= #TCQ ((2*n == riu_nibble) & (io_addr_strobe_clb2riu_riuclk | extend_nibble_sel_riu_addr_0));
+          clb2riu_nibble_sel_upp[n] <= #TCQ ((2*n+1 == riu_nibble)& (io_addr_strobe_clb2riu_riuclk | extend_nibble_sel_riu_addr_0));
+          //clb2riu_nibble_sel_low[n] <= #TCQ (2*n == riu_nibble) & io_addr_strobe_clb2riu_riuclk;
+          //clb2riu_nibble_sel_upp[n] <= #TCQ (2*n+1 == riu_nibble)& io_addr_strobe_clb2riu_riuclk;
           clb2riu_wr_en[n] <= #TCQ ((2*n == riu_nibble) | (2*n+1 == riu_nibble) ) & io_addr_strobe_clb2riu_riuclk & io_write_strobe_riuclk;
         end
       end
     end
 endgenerate
+
+ always @ (posedge riu_clk) begin
+       if(riu_clk_rst_r1)
+         extend_nibble_sel_riu_addr_0 <= 1'b0;
+       else if (io_addr_strobe_clb2riu_riuclk & ~io_write_strobe_riuclk & (riu_addr_cal == 0))
+         extend_nibble_sel_riu_addr_0 <= 1'b1;
+       else if (io_addr_strobe_clb2riu_riuclk)
+         extend_nibble_sel_riu_addr_0 <= 1'b0;
+    end
 
   assign riu_bytes = riu_nibble[NIBBLE_CNT_WIDTH-1:1];
   assign riu_nibble_8 = {{riu_nibble[NIBBLE_CNT_WIDTH+1:NIBBLE_CNT_WIDTH]},{{6-NIBBLE_CNT_WIDTH}{1'b0}},riu_nibble[NIBBLE_CNT_WIDTH-1:0]};
@@ -572,7 +589,7 @@ endgenerate
 
   assign sys_clk_i = 1'b0;
 
-  ddr4_phy_v2_2_0_pll #
+  ddr4_phy_v2_2_4_pll #
     (
      .SYSCLK_TYPE           (SYSCLK_TYPE),
      .BACKBONE_ROUTE        (BACKBONE_ROUTE),
@@ -599,10 +616,11 @@ endgenerate
      .mmcm_clk_in     (mmcm_clk_in)
      );
 
-ddr4_phy_v2_2_0_iob # (
+ddr4_phy_v2_2_4_iob # (
     .BYTES          (BYTES)
    ,.IOBTYPE        (IOBTYPE)
    ,.DRAM_TYPE      (DRAM_TYPE)
+   ,.EN_LVAUX       (EN_LVAUX)
    ,.DQS_BIAS       (DQS_BIAS)
    ,.BANK_TYPE      (BANK_TYPE)
    ,.USE_DYNAMIC_DCI(USE_DYNAMIC_DCI)
@@ -724,7 +742,7 @@ endgenerate
 
 generate
 if (SIM_MODE == "BFM")  begin : generate_block1
-  ddr4_phy_v2_2_0_xiphy_behav # (
+  ddr4_phy_v2_2_4_xiphy_behav # (
     .tCK                 (tCK)
    ,.BYTES               (BYTES)
    ,.DBYTES              (DBYTES)
@@ -849,7 +867,7 @@ if (SIM_MODE == "BFM")  begin : generate_block1
 );
 
 end else begin : generate_block1
-ddr4_phy_v2_2_0_xiphy # (
+ddr4_phy_v2_2_4_xiphy # (
     .BYTES               (BYTES)
    ,.DBYTES              (DBYTES)
    ,.TBYTE_CTL           (TBYTE_CTL)
