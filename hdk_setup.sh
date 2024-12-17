@@ -88,7 +88,7 @@ setup_patches
 
 #Searching for Vivado version and comparing it with the list of supported versions
 
-export VIVADO_VER=`vivado -version | grep Vivado | head -1`
+export VIVADO_VER=`vivado -version | grep -i vivado | head -1`
 
 info_msg "Using $VIVADO_VER"
 
@@ -102,7 +102,7 @@ else
     return 1
 fi
 
-VIVADO_TOOL_VERSION=`vivado -version | grep Vivado | head -1 | sed 's:Vivado *::' | sed 's: .*$::'`
+VIVADO_TOOL_VERSION=`vivado -version | grep -i vivado | head -1 | sed 's:vivado *::' | sed 's: .*$::'`
 export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:7}
 echo "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
