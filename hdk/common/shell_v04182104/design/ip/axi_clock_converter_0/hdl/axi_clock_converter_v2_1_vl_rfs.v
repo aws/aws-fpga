@@ -1,49 +1,48 @@
-// -- (c) Copyright 2011 - 2012 Xilinx, Inc. All rights reserved.
-// --
-// -- This file contains confidential and proprietary information
-// -- of Xilinx, Inc. and is protected under U.S. and 
-// -- international copyright and other intellectual property
-// -- laws.
-// --
-// -- DISCLAIMER
-// -- This disclaimer is not a license and does not grant any
-// -- rights to the materials distributed herewith. Except as
-// -- otherwise provided in a valid license issued to you by
-// -- Xilinx, and to the maximum extent permitted by applicable
-// -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// -- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// -- (2) Xilinx shall not be liable (whether in contract or tort,
-// -- including negligence, or under any other theory of
-// -- liability) for any loss or damage of any kind or nature
-// -- related to, arising under or in connection with these
-// -- materials, including for any direct, or any indirect,
-// -- special, incidental, or consequential loss or damage
-// -- (including loss of data, profits, goodwill, or any type of
-// -- loss or damage suffered as a result of any action brought
-// -- by a third party) even if such damage or loss was
-// -- reasonably foreseeable or Xilinx had been advised of the
-// -- possibility of the same.
-// --
-// -- CRITICAL APPLICATIONS
-// -- Xilinx products are not designed or intended to be fail-
-// -- safe, or for use in any application requiring fail-safe
-// -- performance, such as life-support or safety devices or
-// -- systems, Class III medical devices, nuclear facilities,
-// -- applications related to the deployment of airbags, or any
-// -- other applications that could lead to death, personal
-// -- injury, or severe property or environmental damage
-// -- (individually and collectively, "Critical
-// -- Applications"). Customer assumes the sole risk and
-// -- liability of any use of Xilinx products in Critical
-// -- Applications, subject only to applicable laws and
-// -- regulations governing limitations on product liability.
-// --
-// -- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// -- PART OF THIS FILE AT ALL TIMES.
-//-----------------------------------------------------------------------------
+// (c) Copyright 2011-2012, 2023 Advanced Micro Devices, Inc. All rights reserved.
+//
+// This file contains confidential and proprietary information
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
+//
+// DISCLAIMER
+// This disclaimer is not a license and does not grant any
+// rights to the materials distributed herewith. Except as
+// otherwise provided in a valid license issued to you by
+// AMD, and to the maximum extent permitted by applicable
+// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+// (2) AMD shall not be liable (whether in contract or tort,
+// including negligence, or under any other theory of
+// liability) for any loss or damage of any kind or nature
+// related to, arising under or in connection with these
+// materials, including for any direct, or any indirect,
+// special, incidental, or consequential loss or damage
+// (including loss of data, profits, goodwill, or any type of
+// loss or damage suffered as a result of any action brought
+// by a third party) even if such damage or loss was
+// reasonably foreseeable or AMD had been advised of the
+// possibility of the same.
+//
+// CRITICAL APPLICATIONS
+// AMD products are not designed or intended to be fail-
+// safe, or for use in any application requiring fail-safe
+// performance, such as life-support or safety devices or
+// systems, Class III medical devices, nuclear facilities,
+// applications related to the deployment of airbags, or any
+// other applications that could lead to death, personal
+// injury, or severe property or environmental damage
+// (individually and collectively, "Critical
+// Applications"). Customer assumes the sole risk and
+// liability of any use of AMD products in Critical
+// Applications, subject only to applicable laws and
+// regulations governing limitations on product liability.
+//
+// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+// PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 //
 // Register Slice
 //   Generic single-channel AXI pipeline register on forward and/or reverse signal path
@@ -60,7 +59,7 @@
 `default_nettype none
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_clock_converter_v2_1_14_axic_sync_clock_converter # (
+module axi_clock_converter_v2_1_30_axic_sync_clock_converter # (
 ///////////////////////////////////////////////////////////////////////////////
 // Parameter Definitions
 ///////////////////////////////////////////////////////////////////////////////
@@ -294,52 +293,51 @@ endmodule
 
 
 
-// -- (c) Copyright 2011 - 2012 Xilinx, Inc. All rights reserved.
-// --
-// -- This file contains confidential and proprietary information
-// -- of Xilinx, Inc. and is protected under U.S. and 
-// -- international copyright and other intellectual property
-// -- laws.
-// --
-// -- DISCLAIMER
-// -- This disclaimer is not a license and does not grant any
-// -- rights to the materials distributed herewith. Except as
-// -- otherwise provided in a valid license issued to you by
-// -- Xilinx, and to the maximum extent permitted by applicable
-// -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// -- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// -- (2) Xilinx shall not be liable (whether in contract or tort,
-// -- including negligence, or under any other theory of
-// -- liability) for any loss or damage of any kind or nature
-// -- related to, arising under or in connection with these
-// -- materials, including for any direct, or any indirect,
-// -- special, incidental, or consequential loss or damage
-// -- (including loss of data, profits, goodwill, or any type of
-// -- loss or damage suffered as a result of any action brought
-// -- by a third party) even if such damage or loss was
-// -- reasonably foreseeable or Xilinx had been advised of the
-// -- possibility of the same.
-// --
-// -- CRITICAL APPLICATIONS
-// -- Xilinx products are not designed or intended to be fail-
-// -- safe, or for use in any application requiring fail-safe
-// -- performance, such as life-support or safety devices or
-// -- systems, Class III medical devices, nuclear facilities,
-// -- applications related to the deployment of airbags, or any
-// -- other applications that could lead to death, personal
-// -- injury, or severe property or environmental damage
-// -- (individually and collectively, "Critical
-// -- Applications"). Customer assumes the sole risk and
-// -- liability of any use of Xilinx products in Critical
-// -- Applications, subject only to applicable laws and
-// -- regulations governing limitations on product liability.
-// --
-// -- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// -- PART OF THIS FILE AT ALL TIMES.
-//-----------------------------------------------------------------------------
+// (c) Copyright 2011-2012, 2023 Advanced Micro Devices, Inc. All rights reserved.
+//
+// This file contains confidential and proprietary information
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
+//
+// DISCLAIMER
+// This disclaimer is not a license and does not grant any
+// rights to the materials distributed herewith. Except as
+// otherwise provided in a valid license issued to you by
+// AMD, and to the maximum extent permitted by applicable
+// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+// (2) AMD shall not be liable (whether in contract or tort,
+// including negligence, or under any other theory of
+// liability) for any loss or damage of any kind or nature
+// related to, arising under or in connection with these
+// materials, including for any direct, or any indirect,
+// special, incidental, or consequential loss or damage
+// (including loss of data, profits, goodwill, or any type of
+// loss or damage suffered as a result of any action brought
+// by a third party) even if such damage or loss was
+// reasonably foreseeable or AMD had been advised of the
+// possibility of the same.
+//
+// CRITICAL APPLICATIONS
+// AMD products are not designed or intended to be fail-
+// safe, or for use in any application requiring fail-safe
+// performance, such as life-support or safety devices or
+// systems, Class III medical devices, nuclear facilities,
+// applications related to the deployment of airbags, or any
+// other applications that could lead to death, personal
+// injury, or severe property or environmental damage
+// (individually and collectively, "Critical
+// Applications"). Customer assumes the sole risk and
+// liability of any use of AMD products in Critical
+// Applications, subject only to applicable laws and
+// regulations governing limitations on product liability.
+//
+// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+// PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 //
 // Register Slice
 //   Generic single-channel AXI pipeline register on forward and/or reverse signal path
@@ -356,7 +354,7 @@ endmodule
 `default_nettype none
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_clock_converter_v2_1_14_axic_sample_cycle_ratio # (
+module axi_clock_converter_v2_1_30_axic_sample_cycle_ratio # (
 ///////////////////////////////////////////////////////////////////////////////
 // Parameter Definitions
 ///////////////////////////////////////////////////////////////////////////////
@@ -445,52 +443,51 @@ endmodule // axisc_sample_cycle_ratio
 
 
 
-// -- (c) Copyright 2010 - 2016 Xilinx, Inc. All rights reserved.
-// --
-// -- This file contains confidential and proprietary information
-// -- of Xilinx, Inc. and is protected under U.S. and
-// -- international copyright and other intellectual property
-// -- laws.
-// --
-// -- DISCLAIMER
-// -- This disclaimer is not a license and does not grant any
-// -- rights to the materials distributed herewith. Except as
-// -- otherwise provided in a valid license issued to you by
-// -- Xilinx, and to the maximum extent permitted by applicable
-// -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// -- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// -- (2) Xilinx shall not be liable (whether in contract or tort,
-// -- including negligence, or under any other theory of
-// -- liability) for any loss or damage of any kind or nature
-// -- related to, arising under or in connection with these
-// -- materials, including for any direct, or any indirect,
-// -- special, incidental, or consequential loss or damage
-// -- (including loss of data, profits, goodwill, or any type of
-// -- loss or damage suffered as a result of any action brought
-// -- by a third party) even if such damage or loss was
-// -- reasonably foreseeable or Xilinx had been advised of the
-// -- possibility of the same.
-// --
-// -- CRITICAL APPLICATIONS
-// -- Xilinx products are not designed or intended to be fail-
-// -- safe, or for use in any application requiring fail-safe
-// -- performance, such as life-support or safety devices or
-// -- systems, Class III medical devices, nuclear facilities,
-// -- applications related to the deployment of airbags, or any
-// -- other applications that could lead to death, personal
-// -- injury, or severe property or environmental damage
-// -- (individually and collectively, "Critical
-// -- Applications"). Customer assumes the sole risk and
-// -- liability of any use of Xilinx products in Critical
-// -- Applications, subject only to applicable laws and
-// -- regulations governing limitations on product liability.
-// --
-// -- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// -- PART OF THIS FILE AT ALL TIMES.
-//-----------------------------------------------------------------------------
+// (c) Copyright 2010-2016, 2023 Advanced Micro Devices, Inc. All rights reserved.
+//
+// This file contains confidential and proprietary information
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
+//
+// DISCLAIMER
+// This disclaimer is not a license and does not grant any
+// rights to the materials distributed herewith. Except as
+// otherwise provided in a valid license issued to you by
+// AMD, and to the maximum extent permitted by applicable
+// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+// (2) AMD shall not be liable (whether in contract or tort,
+// including negligence, or under any other theory of
+// liability) for any loss or damage of any kind or nature
+// related to, arising under or in connection with these
+// materials, including for any direct, or any indirect,
+// special, incidental, or consequential loss or damage
+// (including loss of data, profits, goodwill, or any type of
+// loss or damage suffered as a result of any action brought
+// by a third party) even if such damage or loss was
+// reasonably foreseeable or AMD had been advised of the
+// possibility of the same.
+//
+// CRITICAL APPLICATIONS
+// AMD products are not designed or intended to be fail-
+// safe, or for use in any application requiring fail-safe
+// performance, such as life-support or safety devices or
+// systems, Class III medical devices, nuclear facilities,
+// applications related to the deployment of airbags, or any
+// other applications that could lead to death, personal
+// injury, or severe property or environmental damage
+// (individually and collectively, "Critical
+// Applications"). Customer assumes the sole risk and
+// liability of any use of AMD products in Critical
+// Applications, subject only to applicable laws and
+// regulations governing limitations on product liability.
+//
+// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+// PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 //
 // Clock converter module
 //   Asynchronous clock converter when asynchronous M:N conversion
@@ -514,9 +511,9 @@ endmodule // axisc_sample_cycle_ratio
 
 `timescale 1ps/1ps
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_clock_converter_v2_1_14_lite_async #(
-  parameter integer C_DEST_SYNC_FF = 2,
-  parameter integer C_SRC_SYNC_FF  = 2,
+module axi_clock_converter_v2_1_30_lite_async #(
+  parameter integer C_DEST_SYNC_FF = 3,
+  parameter integer C_SRC_SYNC_FF  = 3,
   parameter integer C_WIDTH        = 1
 ) (
   input wire                s_aclk,
@@ -531,6 +528,8 @@ module axi_clock_converter_v2_1_14_lite_async #(
   output wire [C_WIDTH-1:0] m_payld
 );
 
+reg [C_SRC_SYNC_FF:0] s_areset_dly = {C_SRC_SYNC_FF+1{1'b0}};
+reg [C_DEST_SYNC_FF:0] m_areset_dly = {C_DEST_SYNC_FF+1{1'b0}};
 reg                s_ready_i = 1'b0;
 reg                m_valid_i = 1'b0;
 reg   src_send = 1'b0;
@@ -547,7 +546,8 @@ localparam SRC_WAIT_RCV_DONE  = 2'b10;
 reg [1:0] src_state = SRC_IDLE;
 
 always @(posedge s_aclk) begin
-  if (s_aresetn == 1'b0) begin
+  s_areset_dly <= {C_SRC_SYNC_FF+1{~s_aresetn}} | (s_areset_dly<<1);
+  if (s_areset_dly[C_SRC_SYNC_FF]) begin
     s_ready_i <= 1'b0;
     src_send <= 1'b0;
     src_state <= SRC_IDLE;
@@ -590,7 +590,8 @@ localparam DEST_DRV_ACK        = 2'b10;
 reg [1:0] dest_state = DEST_IDLE;
 
 always @(posedge m_aclk) begin
-  if (m_aresetn == 1'b0) begin
+  m_areset_dly <= {C_DEST_SYNC_FF+1{~m_aresetn}} | (m_areset_dly<<1);
+  if (m_areset_dly[C_DEST_SYNC_FF]) begin
     m_valid_i <= 1'b0;
     dest_ack <= 1'b0;
     dest_state <= DEST_IDLE;
@@ -647,7 +648,7 @@ endmodule
 
 
 (* DowngradeIPIdentifiedWarnings="yes" *) 
-module axi_clock_converter_v2_1_14_axi_clock_converter #
+module axi_clock_converter_v2_1_30_axi_clock_converter #
   (parameter         C_FAMILY = "virtex7",
    parameter integer C_AXI_ID_WIDTH = 5,                    // Width of all ID signals on SI and MI side.
                                                             // Range: >= 1.
@@ -1181,7 +1182,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
       
       if ((C_AXI_IS_ACLK_ASYNC) && (C_AXI_PROTOCOL!=P_AXILITE)) begin : gen_async_conv
         
-        fifo_generator_v13_2_1 #(
+        fifo_generator_v13_2_10 #(
           .C_EN_SAFETY_CKT(0),
           .C_SELECT_XPM(0),
           .C_INTERFACE_TYPE(2),
@@ -1686,11 +1687,11 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
           .s_rpayload      ( s_rpayload  ) 
         );
 
-        axi_clock_converter_v2_1_14_lite_async #(
-          .C_DEST_SYNC_FF (2),
-          .C_SRC_SYNC_FF  (2),
+        axi_clock_converter_v2_1_30_lite_async #(
+          .C_DEST_SYNC_FF (C_SYNCHRONIZER_STAGE),
+          .C_SRC_SYNC_FF  (C_SYNCHRONIZER_STAGE),
           .C_WIDTH        (G_AXI_AWPAYLOAD_WIDTH)
-        ) aw_handshake (
+        ) clock_conv_lite_fwd_aw (
           .s_aclk   (s_axi_aclk),
           .m_aclk   (m_axi_aclk),
           .s_aresetn(s_axi_aresetn),
@@ -1703,11 +1704,11 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
           .m_payld  (m_awpayload)
         );
 
-        axi_clock_converter_v2_1_14_lite_async #(
-          .C_DEST_SYNC_FF (2),
-          .C_SRC_SYNC_FF  (2),
+        axi_clock_converter_v2_1_30_lite_async #(
+          .C_DEST_SYNC_FF (C_SYNCHRONIZER_STAGE),
+          .C_SRC_SYNC_FF  (C_SYNCHRONIZER_STAGE),
           .C_WIDTH        (G_AXI_ARPAYLOAD_WIDTH)
-        ) ar_handshake (
+        ) clock_conv_lite_fwd_ar (
           .s_aclk   (s_axi_aclk),
           .m_aclk   (m_axi_aclk),
           .s_aresetn(s_axi_aresetn),
@@ -1720,11 +1721,11 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
           .m_payld  (m_arpayload)
         );
 
-        axi_clock_converter_v2_1_14_lite_async #(
-          .C_DEST_SYNC_FF (2),
-          .C_SRC_SYNC_FF  (2),
+        axi_clock_converter_v2_1_30_lite_async #(
+          .C_DEST_SYNC_FF (C_SYNCHRONIZER_STAGE),
+          .C_SRC_SYNC_FF  (C_SYNCHRONIZER_STAGE),
           .C_WIDTH        (G_AXI_WPAYLOAD_WIDTH)
-        ) w_handshake (
+        ) clock_conv_lite_fwd_w (
           .s_aclk   (s_axi_aclk),
           .m_aclk   (m_axi_aclk),
           .s_aresetn(s_axi_aresetn),
@@ -1737,11 +1738,11 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
           .m_payld  (m_wpayload)
         );
 
-        axi_clock_converter_v2_1_14_lite_async #(
-          .C_DEST_SYNC_FF (2),
-          .C_SRC_SYNC_FF  (2),
+        axi_clock_converter_v2_1_30_lite_async #(
+          .C_DEST_SYNC_FF (C_SYNCHRONIZER_STAGE),
+          .C_SRC_SYNC_FF  (C_SYNCHRONIZER_STAGE),
           .C_WIDTH        (G_AXI_BPAYLOAD_WIDTH)
-        ) b_handshake (
+        ) clock_conv_lite_resp_b (
           .s_aclk   (m_axi_aclk),
           .m_aclk   (s_axi_aclk),
           .s_aresetn(m_axi_aresetn),
@@ -1754,11 +1755,11 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
           .m_payld  (s_bpayload)
         );
 
-        axi_clock_converter_v2_1_14_lite_async #(
-          .C_DEST_SYNC_FF (2),
-          .C_SRC_SYNC_FF  (2),
+        axi_clock_converter_v2_1_30_lite_async #(
+          .C_DEST_SYNC_FF (C_SYNCHRONIZER_STAGE),
+          .C_SRC_SYNC_FF  (C_SYNCHRONIZER_STAGE),
           .C_WIDTH        (G_AXI_RPAYLOAD_WIDTH)
-        ) r_handshake (
+        ) clock_conv_lite_resp_r (
           .s_aclk   (m_axi_aclk),
           .m_aclk   (s_axi_aclk),
           .s_aresetn(m_axi_aresetn),
@@ -1838,7 +1839,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
     
         // Sample cycle used to determine when to assert a signal on a fast clock
         // to be flopped onto a slow clock.
-        axi_clock_converter_v2_1_14_axic_sample_cycle_ratio #(
+        axi_clock_converter_v2_1_30_axic_sample_cycle_ratio #(
           .C_RATIO ( P_ACLK_RATIO )
         )
         axic_sample_cycle_inst (
@@ -1896,7 +1897,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
             assign cc_mi_awuser = m_aw_mesg[C_AWUSER_RIGHT+:C_AWUSER_WIDTH];
           end
     
-          axi_clock_converter_v2_1_14_axic_sync_clock_converter #(
+          axi_clock_converter_v2_1_30_axic_sync_clock_converter #(
             .C_FAMILY         ( C_FAMILY ) ,
             .C_PAYLOAD_WIDTH ( C_AW_WIDTH ) ,
             .C_S_ACLK_RATIO   ( P_SI_LT_MI ? 1 : P_ACLK_RATIO ) ,
@@ -1937,7 +1938,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
             assign cc_mi_wuser = m_w_mesg[C_WUSER_RIGHT+:C_WUSER_WIDTH];
           end
     
-          axi_clock_converter_v2_1_14_axic_sync_clock_converter #(
+          axi_clock_converter_v2_1_30_axic_sync_clock_converter #(
             .C_FAMILY         ( C_FAMILY ) ,
             .C_PAYLOAD_WIDTH  ( C_W_WIDTH ) ,
             .C_S_ACLK_RATIO   ( P_SI_LT_MI ? 1 : P_ACLK_RATIO ) ,
@@ -1971,7 +1972,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
             assign si_cc_buser  = s_b_mesg[C_BUSER_RIGHT+:C_BUSER_WIDTH];
           end
     
-          axi_clock_converter_v2_1_14_axic_sync_clock_converter #(
+          axi_clock_converter_v2_1_30_axic_sync_clock_converter #(
             .C_FAMILY         ( C_FAMILY ) ,
             .C_PAYLOAD_WIDTH ( C_B_WIDTH ) ,
             .C_M_ACLK_RATIO   ( P_SI_LT_MI ? 1 : P_ACLK_RATIO ) ,
@@ -2076,7 +2077,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
             assign cc_mi_aruser = m_ar_mesg[C_ARUSER_RIGHT+:C_ARUSER_WIDTH];
           end
     
-          axi_clock_converter_v2_1_14_axic_sync_clock_converter #(
+          axi_clock_converter_v2_1_30_axic_sync_clock_converter #(
             .C_FAMILY         ( C_FAMILY ) ,
             .C_PAYLOAD_WIDTH ( C_AR_WIDTH ) ,
             .C_S_ACLK_RATIO   ( P_SI_LT_MI ? 1 : P_ACLK_RATIO ) ,
@@ -2114,7 +2115,7 @@ module axi_clock_converter_v2_1_14_axi_clock_converter #
             assign si_cc_ruser  = s_r_mesg[C_RUSER_RIGHT+:C_RUSER_WIDTH];
           end
     
-          axi_clock_converter_v2_1_14_axic_sync_clock_converter #(
+          axi_clock_converter_v2_1_30_axic_sync_clock_converter #(
             .C_FAMILY         ( C_FAMILY ) ,
             .C_PAYLOAD_WIDTH ( C_R_WIDTH ) ,
             .C_M_ACLK_RATIO   ( P_SI_LT_MI ? 1 : P_ACLK_RATIO ) ,

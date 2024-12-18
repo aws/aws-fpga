@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_10_axi.sv
+//  /   /         Filename           : ddr4_v2_2_23_axi.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -80,7 +81,7 @@
 `timescale 1ps/1ps
 `default_nettype none
 
-module ddr4_v2_2_10_axi #
+module ddr4_v2_2_23_axi #
 (
 ///////////////////////////////////////////////////////////////////////////////
 // Parameter Definitions
@@ -459,7 +460,7 @@ always @(posedge aclk)
 always @(posedge aclk)
   mc_init_complete_r <= mc_init_complete ;
 
-ddr4_v2_2_10_axi_register_slice #
+ddr4_v2_2_23_axi_register_slice #
 (
   .C_FAMILY                    ( C_FAMILY                ) ,
   .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -575,7 +576,7 @@ axi_register_slice_d1
 
 generate 
   if (P_USE_UPSIZER) begin : USE_UPSIZER
-    ddr4_v2_2_10_axi_upsizer #
+    ddr4_v2_2_23_axi_upsizer #
       (
       .C_FAMILY                    ( C_FAMILY                ) ,
       .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -735,7 +736,7 @@ generate
   end
 endgenerate
 
-ddr4_v2_2_10_axi_register_slice #
+ddr4_v2_2_23_axi_register_slice #
 (
   .C_FAMILY                    ( C_FAMILY                ) ,
   .C_AXI_ID_WIDTH              ( C_S_AXI_ID_WIDTH        ) ,
@@ -867,7 +868,7 @@ wire                                b_push;
 wire [C_S_AXI_ID_WIDTH-1:0]         b_awid;
 wire                                b_full;
    
-ddr4_v2_2_10_axi_aw_channel #
+ddr4_v2_2_23_axi_aw_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ),
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -912,7 +913,7 @@ axi_aw_channel_0
   .b_full                           ( b_full            )
 );
 
-ddr4_v2_2_10_axi_w_channel #
+ddr4_v2_2_23_axi_w_channel #
 (
   .C_DATA_WIDTH                     ( C_MC_DATA_WIDTH    ), 
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -940,7 +941,7 @@ axi_w_channel_0
   .w_data_rdy                       ( w_data_rdy      )
 );
 
-ddr4_v2_2_10_axi_b_channel #
+ddr4_v2_2_23_axi_b_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   )
 )
@@ -974,7 +975,7 @@ wire  [3:0]                         arqos_int     ;
  
 
 
-ddr4_v2_2_10_axi_ar_channel #
+ddr4_v2_2_23_axi_ar_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ),
   .C_AXI_ADDR_WIDTH                 ( C_S_AXI_ADDR_WIDTH ),
@@ -1017,7 +1018,7 @@ axi_ar_channel_0
   .arqos_int                        ( arqos_int         ) 
 );
 
-ddr4_v2_2_10_axi_r_channel #
+ddr4_v2_2_23_axi_r_channel #
 (
   .C_ID_WIDTH                       ( C_S_AXI_ID_WIDTH   ), 
   .C_DATA_WIDTH                     ( C_MC_DATA_WIDTH    ),
@@ -1048,7 +1049,7 @@ axi_r_channel_0
 );
 
 // Arbiter    
-ddr4_v2_2_10_axi_cmd_arbiter #
+ddr4_v2_2_23_axi_cmd_arbiter #
 (
   .C_MC_ADDR_WIDTH           ( C_MC_ADDR_WIDTH  ) ,
   .C_MC_BURST_LEN            ( C_MC_BURST_LEN   ) ,

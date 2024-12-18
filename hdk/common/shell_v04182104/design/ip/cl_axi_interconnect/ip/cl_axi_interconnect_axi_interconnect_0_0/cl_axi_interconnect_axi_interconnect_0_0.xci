@@ -1,366 +1,353 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<spirit:design xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <spirit:vendor>xilinx.com</spirit:vendor>
-  <spirit:library>xci</spirit:library>
-  <spirit:name>unknown</spirit:name>
-  <spirit:version>1.0</spirit:version>
-  <spirit:componentInstances>
-    <spirit:componentInstance>
-      <spirit:instanceName>cl_axi_interconnect_axi_interconnect_0_0</spirit:instanceName>
-      <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="axi_interconnect" spirit:version="2.1"/>
-      <spirit:configurableElementValues>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">cl_axi_interconnect_axi_interconnect_0_0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_PROTOCOL_CHECKERS">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M00_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M01_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M02_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M03_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M04_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M05_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M06_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M07_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M08_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M09_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M10_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M11_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M12_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M13_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M14_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M15_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M16_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M16_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M16_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M16_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M17_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M17_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M17_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M17_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M18_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M18_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M18_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M18_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M19_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M19_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M19_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M19_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M20_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M20_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M20_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M20_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M21_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M21_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M21_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M21_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M22_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M22_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M22_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M22_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M23_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M23_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M23_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M23_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M24_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M24_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M24_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M24_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M25_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M25_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M25_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M25_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M26_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M26_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M26_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M26_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M27_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M27_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M27_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M27_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M28_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M28_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M28_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M28_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M29_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M29_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M29_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M29_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M30_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M30_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M30_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M30_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M31_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M31_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M31_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M31_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M32_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M32_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M32_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M32_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M33_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M33_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M33_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M33_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M34_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M34_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M34_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M34_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M35_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M35_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M35_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M35_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M36_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M36_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M36_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M36_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M37_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M37_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M37_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M37_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M38_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M38_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M38_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M38_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M39_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M39_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M39_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M39_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M40_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M40_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M40_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M40_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M41_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M41_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M41_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M41_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M42_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M42_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M42_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M42_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M43_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M43_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M43_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M43_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M44_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M44_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M44_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M44_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M45_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M45_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M45_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M45_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M46_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M46_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M46_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M46_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M47_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M47_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M47_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M47_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M48_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M48_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M48_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M48_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M49_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M49_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M49_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M49_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M50_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M50_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M50_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M50_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M51_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M51_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M51_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M51_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M52_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M52_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M52_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M52_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M53_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M53_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M53_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M53_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M54_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M54_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M54_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M54_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M55_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M55_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M55_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M55_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M56_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M56_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M56_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M56_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M57_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M57_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M57_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M57_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M58_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M58_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M58_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M58_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M59_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M59_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M59_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M59_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M60_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M60_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M60_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M60_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M61_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M61_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M61_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M61_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M62_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M62_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M62_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M62_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M63_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M63_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M63_ISSUANCE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.M63_SECURE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.NUM_MI">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.NUM_SI">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PCHK_MAX_RD_BURSTS">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PCHK_MAX_WR_BURSTS">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PCHK_WAITS">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S00_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S00_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S00_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S01_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S01_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S01_HAS_REGSLICE">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S02_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S02_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S02_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S03_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S03_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S03_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S04_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S04_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S04_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S05_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S05_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S05_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S06_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S06_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S06_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S07_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S07_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S07_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S08_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S08_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S08_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S09_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S09_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S09_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S10_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S10_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S10_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S11_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S11_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S11_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S12_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S12_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S12_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S13_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S13_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S13_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S14_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S14_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S14_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S15_ARB_PRIORITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S15_HAS_DATA_FIFO">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.S15_HAS_REGSLICE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.STRATEGY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SYNCHRONIZATION_STAGES">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.XBAR_DATA_WIDTH">512</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">virtexuplus</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BOARD"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.DEVICE">xcvu9p</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PACKAGE">flgb2104</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PREFHDL">VERILOG</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SILICON_REVISION"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SIMULATOR_LANGUAGE">MIXED</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SPEEDGRADE">-2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.TEMPERATURE_GRADE">I</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_CUSTOMIZATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_GENERATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPCONTEXT">IP_Integrator_AppCore</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPREVISION">16</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.MANAGED">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.OUTPUTDIR">.</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SELECTEDSIMMODEL"/>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SHAREDDIR">../../ipshared</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SWVERSION">2017.4.op</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SYNTHESISFLOW">GLOBAL</spirit:configurableElementValue>
-      </spirit:configurableElementValues>
-      <spirit:vendorExtensions>
-        <xilinx:componentInstanceExtensions>
-          <xilinx:configElementInfos>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M01_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M02_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M03_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_MI" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_SI" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S00_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S01_HAS_REGSLICE" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SYNCHRONIZATION_STAGES" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.XBAR_DATA_WIDTH" xilinx:valueSource="user"/>
-          </xilinx:configElementInfos>
-        </xilinx:componentInstanceExtensions>
-      </spirit:vendorExtensions>
-    </spirit:componentInstance>
-  </spirit:componentInstances>
-</spirit:design>
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "cl_axi_interconnect_axi_interconnect_0_0",
+    "cell_name": "axi_interconnect_0",
+    "component_reference": "xilinx.com:ip:axi_interconnect:2.1",
+    "ip_revision": "32",
+    "gen_directory": ".",
+    "parameters": {
+      "component_parameters": {
+        "NUM_SI": [ { "value": "2", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "NUM_MI": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "STRATEGY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "ENABLE_ADVANCED_OPTIONS": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "ENABLE_PROTOCOL_CHECKERS": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "XBAR_DATA_WIDTH": [ { "value": "512", "value_src": "user", "value_permission": "bd_and_user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PCHK_WAITS": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PCHK_MAX_RD_BURSTS": [ { "value": "2", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PCHK_MAX_WR_BURSTS": [ { "value": "2", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "SYNCHRONIZATION_STAGES": [ { "value": "2", "value_src": "user", "value_permission": "bd_and_user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M00_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M01_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M02_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M03_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M04_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M05_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M06_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M07_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M08_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M09_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M10_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M11_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M12_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M13_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M14_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M15_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M16_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M17_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M18_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M19_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M20_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M21_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M22_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M23_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M24_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M25_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M26_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M27_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M28_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M29_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M30_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M31_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M32_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M33_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M34_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M35_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M36_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M37_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M38_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M39_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M40_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M41_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M42_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M43_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M44_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M45_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M46_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M47_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M48_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M49_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M50_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M51_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M52_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M53_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M54_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M55_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M56_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M57_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M58_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M59_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M60_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M61_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M62_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M63_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M00_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M01_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M02_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M03_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M04_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M05_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M06_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M07_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M08_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M09_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M10_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M11_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M12_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M13_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M14_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M15_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M16_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M17_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M18_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M19_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M20_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M21_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M22_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M23_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M24_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M25_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M26_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M27_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M28_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M29_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M30_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M31_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M32_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M33_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M34_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M35_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M36_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M37_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M38_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M39_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M40_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M41_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M42_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M43_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M44_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M45_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M46_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M47_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M48_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M49_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M50_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M51_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M52_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M53_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M54_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M55_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M56_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M57_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M58_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M59_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M60_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M61_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M62_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M63_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S00_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S01_HAS_REGSLICE": [ { "value": "4", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S02_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S03_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S04_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S05_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S06_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S07_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S08_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S09_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S10_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S11_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S12_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S13_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S14_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S15_HAS_REGSLICE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S00_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S01_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S02_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S03_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S04_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S05_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S06_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S07_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S08_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S09_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S10_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S11_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S12_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S13_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S14_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S15_HAS_DATA_FIFO": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M00_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M01_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M02_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M03_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M04_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M05_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M06_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M07_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M08_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M09_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M10_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M11_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M12_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M13_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M14_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M15_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M16_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M17_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M18_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M19_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M20_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M21_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M22_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M23_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M24_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M25_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M26_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M27_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M28_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M29_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M30_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M31_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M32_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M33_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M34_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M35_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M36_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M37_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M38_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M39_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M40_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M41_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M42_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M43_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M44_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M45_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M46_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M47_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M48_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M49_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M50_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M51_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M52_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M53_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M54_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M55_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M56_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M57_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M58_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M59_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M60_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M61_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M62_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M63_ISSUANCE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M00_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M01_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M02_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M03_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M04_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M05_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M06_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M07_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M08_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M09_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M10_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M11_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M12_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M13_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M14_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M15_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M16_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M17_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M18_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M19_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M20_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M21_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M22_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M23_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M24_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M25_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M26_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M27_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M28_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M29_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M30_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M31_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M32_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M33_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M34_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M35_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M36_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M37_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M38_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M39_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M40_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M41_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M42_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M43_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M44_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M45_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M46_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M47_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M48_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M49_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M50_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M51_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M52_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M53_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M54_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M55_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M56_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M57_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M58_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M59_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M60_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M61_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M62_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "M63_SECURE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S00_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S01_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S02_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S03_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S04_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S05_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S06_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S07_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S08_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S09_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S10_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S11_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S12_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S13_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S14_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "S15_ARB_PRIORITY": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "Component_Name": [ { "value": "cl_axi_interconnect_axi_interconnect_0_0", "resolve_type": "user", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "virtexuplus" } ],
+        "BASE_BOARD_PART": [ { "value": "" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xcvu9p" } ],
+        "NEXTGEN_VERSAL": [ { "value": "0" } ],
+        "PACKAGE": [ { "value": "flgb2104" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "I" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator_AppCore" } ],
+        "IPREVISION": [ { "value": "32" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "." } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "../../ipshared" } ],
+        "SWVERSION": [ { "value": "2024.1" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    }
+  }
+}

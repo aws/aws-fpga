@@ -1,8 +1,53 @@
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
+//
+// This file contains confidential and proprietary information
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
+//
+// DISCLAIMER
+// This disclaimer is not a license and does not grant any
+// rights to the materials distributed herewith. Except as
+// otherwise provided in a valid license issued to you by
+// AMD, and to the maximum extent permitted by applicable
+// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+// (2) AMD shall not be liable (whether in contract or tort,
+// including negligence, or under any other theory of
+// liability) for any loss or damage of any kind or nature
+// related to, arising under or in connection with these
+// materials, including for any direct, or any indirect,
+// special, incidental, or consequential loss or damage
+// (including loss of data, profits, goodwill, or any type of
+// loss or damage suffered as a result of any action brought
+// by a third party) even if such damage or loss was
+// reasonably foreseeable or AMD had been advised of the
+// possibility of the same.
+//
+// CRITICAL APPLICATIONS
+// AMD products are not designed or intended to be fail-
+// safe, or for use in any application requiring fail-safe
+// performance, such as life-support or safety devices or
+// systems, Class III medical devices, nuclear facilities,
+// applications related to the deployment of airbags, or any
+// other applications that could lead to death, personal
+// injury, or severe property or environmental damage
+// (individually and collectively, "Critical
+// Applications"). Customer assumes the sole risk and
+// liability of any use of AMD products in Critical
+// Applications, subject only to applicable laws and
+// regulations governing limitations on product liability.
+//
+// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+// PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 /******************************************************************************
--- (c) Copyright 2006 - 2013 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2006 - 2013 AMD, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
+-- of AMD, Inc. and is protected under U.S. and
 -- international copyright and other intellectual property
 -- laws.
 --
@@ -10,13 +55,13 @@
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -25,11 +70,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -38,7 +83,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -47,14 +92,14 @@
 --
  *****************************************************************************
  *
- * Filename: blk_mem_gen_v8_4_4.v
+ * Filename: blk_mem_gen_v8_4_8.v
  *
  * Description:
  *   This file is the Verilog behvarial model for the
  *       Block Memory Generator Core.
  *
  *****************************************************************************
- * Author: Xilinx
+ * Author: AMD
  *
  * History: Jan 11, 2006 Initial revision
  *          Jun 11, 2007 Added independent register stages for 
@@ -1557,10 +1602,10 @@ module blk_mem_axi_regs_fwd_v8_4
 // Output Register Stage module
 //
 // This module builds the output register stages of the memory. This module is 
-// instantiated in the main memory module (blk_mem_gen_v8_4_4) which is
+// instantiated in the main memory module (blk_mem_gen_v8_4_8) which is
 // declared/implemented further down in this file.
 //*****************************************************************************
-module blk_mem_gen_v8_4_4_output_stage
+module blk_mem_gen_v8_4_8_output_stage
   #(parameter C_FAMILY              = "virtex7",
     parameter C_XDEVICEFAMILY       = "virtex7",
     parameter C_RST_TYPE            = "SYNC",
@@ -1856,7 +1901,7 @@ module blk_mem_gen_v8_4_4_output_stage
   endgenerate
 endmodule
 
-module blk_mem_gen_v8_4_4_softecc_output_reg_stage
+module blk_mem_gen_v8_4_8_softecc_output_reg_stage
   #(parameter C_DATA_WIDTH          = 32,
     parameter C_ADDRB_WIDTH         = 10,
     parameter C_HAS_SOFTECC_OUTPUT_REGS_B= 0,
@@ -1948,8 +1993,8 @@ endmodule
 //
 // This module is the top-level behavioral model and this implements the RAM 
 //*****************************************************************************
-module blk_mem_gen_v8_4_4_mem_module
-  #(parameter C_CORENAME                = "blk_mem_gen_v8_4_4",
+module blk_mem_gen_v8_4_8_mem_module
+  #(parameter C_CORENAME                = "blk_mem_gen_v8_4_8",
     parameter C_FAMILY                  = "virtex7",
     parameter C_XDEVICEFAMILY           = "virtex7",
     parameter C_MEM_TYPE                = 2,
@@ -2164,9 +2209,9 @@ module blk_mem_gen_v8_4_4_mem_module
   //////////////////////////////////////////////////////////////////////////
 
 
-// Note: C_CORENAME parameter is hard-coded to "blk_mem_gen_v8_4_4" and it is
+// Note: C_CORENAME parameter is hard-coded to "blk_mem_gen_v8_4_8" and it is
 // only used by this module to print warning messages. It is neither passed 
-// down from blk_mem_gen_v8_4_4_xst.v nor present in the instantiation template
+// down from blk_mem_gen_v8_4_8_xst.v nor present in the instantiation template
 // coregen generates
   
   //***************************************************************************
@@ -3176,7 +3221,7 @@ module blk_mem_gen_v8_4_4_mem_module
   
   assign rsta_outp_stage = RSTA & (~SLEEP);
 
-  blk_mem_gen_v8_4_4_output_stage
+  blk_mem_gen_v8_4_8_output_stage
     #(.C_FAMILY                 (C_FAMILY),
       .C_XDEVICEFAMILY          (C_XDEVICEFAMILY),
       .C_RST_TYPE               ("SYNC"),
@@ -3213,7 +3258,7 @@ module blk_mem_gen_v8_4_4_mem_module
   assign rstb_outp_stage = RSTB & (~SLEEP);
 
   // Port B 
-  blk_mem_gen_v8_4_4_output_stage
+  blk_mem_gen_v8_4_8_output_stage
     #(.C_FAMILY                 (C_FAMILY),
       .C_XDEVICEFAMILY          (C_XDEVICEFAMILY),
       .C_RST_TYPE               ("SYNC"),
@@ -3250,7 +3295,7 @@ module blk_mem_gen_v8_4_4_mem_module
   //***************************************************************
   //  Instantiate the Input and Output register stages
   //***************************************************************
-blk_mem_gen_v8_4_4_softecc_output_reg_stage
+blk_mem_gen_v8_4_8_softecc_output_reg_stage
     #(.C_DATA_WIDTH                 (C_READ_WIDTH_B),
       .C_ADDRB_WIDTH                (C_ADDRB_WIDTH),
       .C_HAS_SOFTECC_OUTPUT_REGS_B  (C_HAS_SOFTECC_OUTPUT_REGS_B),
@@ -3409,8 +3454,8 @@ endmodule
 // This module is the top-level behavioral model and this implements the memory 
 // module and the input registers
 //*****************************************************************************
-module blk_mem_gen_v8_4_4
-  #(parameter C_CORENAME                = "blk_mem_gen_v8_4_4",
+module blk_mem_gen_v8_4_8
+  #(parameter C_CORENAME                = "blk_mem_gen_v8_4_8",
     parameter C_FAMILY                  = "virtex7",
     parameter C_XDEVICEFAMILY           = "virtex7",
     parameter C_ELABORATION_DIR         = "",
@@ -4092,7 +4137,7 @@ module blk_mem_gen_v8_4_4
   endgenerate
 
   generate if ((C_INTERFACE_TYPE == 0) && (C_ENABLE_32BIT_ADDRESS == 0)) begin : native_mem_module
-blk_mem_gen_v8_4_4_mem_module
+blk_mem_gen_v8_4_8_mem_module
   #(.C_CORENAME                        (C_CORENAME),
     .C_FAMILY                          (C_FAMILY),
     .C_XDEVICEFAMILY                   (C_XDEVICEFAMILY),
@@ -4151,7 +4196,7 @@ blk_mem_gen_v8_4_4_mem_module
     .C_DISABLE_WARN_BHV_COLL           (C_DISABLE_WARN_BHV_COLL),
  .C_EN_ECC_PIPE                     (C_EN_ECC_PIPE),
     .C_DISABLE_WARN_BHV_RANGE          (C_DISABLE_WARN_BHV_RANGE))
-    blk_mem_gen_v8_4_4_inst
+    blk_mem_gen_v8_4_8_inst
    (.CLKA            (CLKA),
    .RSTA             (RSTA_I_SAFE),//(rsta_in),
    .ENA              (ENA_I_SAFE),//(ena_in),
@@ -4214,7 +4259,7 @@ blk_mem_gen_v8_4_4_mem_module
   assign lsb_zero_i = 0;
   assign RDADDRECC  = {msb_zero_i,rdaddrecc_i,lsb_zero_i};
 
-blk_mem_gen_v8_4_4_mem_module
+blk_mem_gen_v8_4_8_mem_module
   #(.C_CORENAME                        (C_CORENAME),
     .C_FAMILY                          (C_FAMILY),
     .C_XDEVICEFAMILY                   (C_XDEVICEFAMILY),
@@ -4273,7 +4318,7 @@ blk_mem_gen_v8_4_4_mem_module
     .C_DISABLE_WARN_BHV_COLL           (C_DISABLE_WARN_BHV_COLL),
  .C_EN_ECC_PIPE                     (C_EN_ECC_PIPE),
     .C_DISABLE_WARN_BHV_RANGE          (C_DISABLE_WARN_BHV_RANGE))
-    blk_mem_gen_v8_4_4_inst
+    blk_mem_gen_v8_4_8_inst
    (.CLKA            (CLKA),
    .RSTA             (RSTA_I_SAFE),//(rsta_in),
    .ENA              (ENA_I_SAFE),//(ena_in),
@@ -4430,7 +4475,7 @@ assign s_axi_arlen_c = (C_AXI_TYPE == 1)?S_AXI_ARLEN:8'h0;
     .S_AXI_RD_EN                  (s_axi_rd_en_c)
   );
 
-blk_mem_gen_v8_4_4_mem_module
+blk_mem_gen_v8_4_8_mem_module
   #(.C_CORENAME                        (C_CORENAME),
     .C_FAMILY                          (C_FAMILY),
     .C_XDEVICEFAMILY                   (C_XDEVICEFAMILY),
@@ -4489,7 +4534,7 @@ blk_mem_gen_v8_4_4_mem_module
     .C_DISABLE_WARN_BHV_COLL           (C_DISABLE_WARN_BHV_COLL),
 	.C_EN_ECC_PIPE                     (0),
     .C_DISABLE_WARN_BHV_RANGE          (C_DISABLE_WARN_BHV_RANGE))
-    blk_mem_gen_v8_4_4_inst
+    blk_mem_gen_v8_4_8_inst
    (.CLKA            (S_ACLK),
    .RSTA             (s_aresetn_a_c),
    .ENA              (s_axi_wr_en_c),

@@ -1,14 +1,14 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xBCE55F3980178BC9",
+      "boundary_crc": "0xBCE55F3902882078",
       "design_src": "SBD",
       "device": "xcvu9p-flgb2104-2-i",
       "name": "bd_bf3f",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "scoped": "true",
       "synth_flow_mode": "None",
-      "tool_version": "2020.2",
+      "tool_version": "2024.1",
       "validated": "true"
     },
     "design_tree": {
@@ -27,10 +27,12 @@
     "interface_ports": {
       "IO": {
         "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:mcsio_bus:1.0",
         "vlnv": "xilinx.com:interface:mcsio_bus_rtl:1.0"
       },
       "TRACE": {
         "mode": "Master",
+        "vlnv_bus_definition": "xilinx.com:interface:mbtrace:2.0",
         "vlnv": "xilinx.com:interface:mbtrace_rtl:2.0"
       }
     },
@@ -58,7 +60,7 @@
             "value_src": "default"
           },
           "PHASE": {
-            "value": "0.000",
+            "value": "0.0",
             "value_src": "default"
           }
         }
@@ -80,6 +82,7 @@
     "components": {
       "microblaze_I": {
         "vlnv": "xilinx.com:ip:microblaze:11.0",
+        "ip_revision": "13",
         "xci_name": "bd_bf3f_microblaze_I_0",
         "xci_path": "ip/ip_0/bd_bf3f_microblaze_I_0.xci",
         "inst_hier_path": "microblaze_I",
@@ -124,20 +127,9 @@
             "value": "0"
           }
         },
-        "addressing": {
-          "address_spaces": {
-            "Data": {
-              "range": "4G",
-              "width": "32"
-            },
-            "Instruction": {
-              "range": "4G",
-              "width": "32"
-            }
-          }
-        },
         "interface_ports": {
           "DLMB": {
+            "vlnv": "xilinx.com:interface:lmb_rtl:1.0",
             "mode": "Master",
             "address_space_ref": "Data",
             "base_address": {
@@ -147,11 +139,24 @@
             }
           },
           "ILMB": {
+            "vlnv": "xilinx.com:interface:lmb_rtl:1.0",
             "mode": "Master",
             "address_space_ref": "Instruction",
             "base_address": {
               "minimum": "0x00000000",
               "maximum": "0xFFFFFFFF",
+              "width": "32"
+            }
+          }
+        },
+        "addressing": {
+          "address_spaces": {
+            "Data": {
+              "range": "4G",
+              "width": "32"
+            },
+            "Instruction": {
+              "range": "4G",
               "width": "32"
             }
           }
@@ -169,12 +174,14 @@
       },
       "rst_0": {
         "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
+        "ip_revision": "15",
         "xci_name": "bd_bf3f_rst_0_0",
         "xci_path": "ip/ip_1/bd_bf3f_rst_0_0.xci",
         "inst_hier_path": "rst_0"
       },
       "ilmb": {
         "vlnv": "xilinx.com:ip:lmb_v10:3.0",
+        "ip_revision": "14",
         "xci_name": "bd_bf3f_ilmb_0",
         "xci_path": "ip/ip_2/bd_bf3f_ilmb_0.xci",
         "inst_hier_path": "ilmb",
@@ -185,6 +192,7 @@
         },
         "interface_ports": {
           "LMB_M": {
+            "vlnv": "xilinx.com:interface:lmb_rtl:1.0",
             "mode": "MirroredMaster",
             "bridges": [
               "LMB_Sl_0",
@@ -195,6 +203,7 @@
       },
       "dlmb": {
         "vlnv": "xilinx.com:ip:lmb_v10:3.0",
+        "ip_revision": "14",
         "xci_name": "bd_bf3f_dlmb_0",
         "xci_path": "ip/ip_3/bd_bf3f_dlmb_0.xci",
         "inst_hier_path": "dlmb",
@@ -205,6 +214,7 @@
         },
         "interface_ports": {
           "LMB_M": {
+            "vlnv": "xilinx.com:interface:lmb_rtl:1.0",
             "mode": "MirroredMaster",
             "bridges": [
               "LMB_Sl_0",
@@ -216,6 +226,7 @@
       },
       "dlmb_cntlr": {
         "vlnv": "xilinx.com:ip:lmb_bram_if_cntlr:4.0",
+        "ip_revision": "24",
         "xci_name": "bd_bf3f_dlmb_cntlr_0",
         "xci_path": "ip/ip_4/bd_bf3f_dlmb_cntlr_0.xci",
         "inst_hier_path": "dlmb_cntlr",
@@ -243,6 +254,7 @@
       },
       "ilmb_cntlr": {
         "vlnv": "xilinx.com:ip:lmb_bram_if_cntlr:4.0",
+        "ip_revision": "24",
         "xci_name": "bd_bf3f_ilmb_cntlr_0",
         "xci_path": "ip/ip_5/bd_bf3f_ilmb_cntlr_0.xci",
         "inst_hier_path": "ilmb_cntlr",
@@ -260,6 +272,7 @@
       },
       "lmb_bram_I": {
         "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
+        "ip_revision": "8",
         "xci_name": "bd_bf3f_lmb_bram_I_0",
         "xci_path": "ip/ip_6/bd_bf3f_lmb_bram_I_0.xci",
         "inst_hier_path": "lmb_bram_I",
@@ -271,6 +284,7 @@
       },
       "second_dlmb_cntlr": {
         "vlnv": "xilinx.com:ip:lmb_bram_if_cntlr:4.0",
+        "ip_revision": "24",
         "xci_name": "bd_bf3f_second_dlmb_cntlr_0",
         "xci_path": "ip/ip_7/bd_bf3f_second_dlmb_cntlr_0.xci",
         "inst_hier_path": "second_dlmb_cntlr",
@@ -294,6 +308,7 @@
       },
       "second_ilmb_cntlr": {
         "vlnv": "xilinx.com:ip:lmb_bram_if_cntlr:4.0",
+        "ip_revision": "24",
         "xci_name": "bd_bf3f_second_ilmb_cntlr_0",
         "xci_path": "ip/ip_8/bd_bf3f_second_ilmb_cntlr_0.xci",
         "inst_hier_path": "second_ilmb_cntlr",
@@ -311,6 +326,7 @@
       },
       "second_lmb_bram_I": {
         "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
+        "ip_revision": "8",
         "xci_name": "bd_bf3f_second_lmb_bram_I_0",
         "xci_path": "ip/ip_9/bd_bf3f_second_lmb_bram_I_0.xci",
         "inst_hier_path": "second_lmb_bram_I",
@@ -322,6 +338,7 @@
       },
       "iomodule_0": {
         "vlnv": "xilinx.com:ip:iomodule:3.1",
+        "ip_revision": "10",
         "xci_name": "bd_bf3f_iomodule_0_0",
         "xci_path": "ip/ip_10/bd_bf3f_iomodule_0_0.xci",
         "inst_hier_path": "iomodule_0",
@@ -363,22 +380,22 @@
       }
     },
     "interface_nets": {
-      "ilmb": {
-        "interface_ports": [
-          "microblaze_I/ILMB",
-          "ilmb/LMB_M"
-        ]
-      },
       "dlmb": {
         "interface_ports": [
           "microblaze_I/DLMB",
           "dlmb/LMB_M"
         ]
       },
-      "ilmb_sl_0": {
+      "dlmb_port": {
         "interface_ports": [
-          "ilmb/LMB_Sl_0",
-          "ilmb_cntlr/SLMB"
+          "dlmb_cntlr/BRAM_PORT",
+          "lmb_bram_I/BRAM_PORTA"
+        ]
+      },
+      "dlmb_port_2": {
+        "interface_ports": [
+          "second_dlmb_cntlr/BRAM_PORT",
+          "second_lmb_bram_I/BRAM_PORTA"
         ]
       },
       "dlmb_sl_0": {
@@ -393,28 +410,22 @@
           "iomodule_0/SLMB"
         ]
       },
-      "ilmb_port": {
-        "interface_ports": [
-          "ilmb_cntlr/BRAM_PORT",
-          "lmb_bram_I/BRAM_PORTB"
-        ]
-      },
-      "dlmb_port": {
-        "interface_ports": [
-          "dlmb_cntlr/BRAM_PORT",
-          "lmb_bram_I/BRAM_PORTA"
-        ]
-      },
-      "ilmb_sl_1": {
-        "interface_ports": [
-          "ilmb/LMB_Sl_1",
-          "second_ilmb_cntlr/SLMB"
-        ]
-      },
       "dlmb_sl_2": {
         "interface_ports": [
           "dlmb/LMB_Sl_2",
           "second_dlmb_cntlr/SLMB"
+        ]
+      },
+      "ilmb": {
+        "interface_ports": [
+          "microblaze_I/ILMB",
+          "ilmb/LMB_M"
+        ]
+      },
+      "ilmb_port": {
+        "interface_ports": [
+          "ilmb_cntlr/BRAM_PORT",
+          "lmb_bram_I/BRAM_PORTB"
         ]
       },
       "ilmb_port_2": {
@@ -423,22 +434,28 @@
           "second_lmb_bram_I/BRAM_PORTB"
         ]
       },
-      "dlmb_port_2": {
+      "ilmb_sl_0": {
         "interface_ports": [
-          "second_dlmb_cntlr/BRAM_PORT",
-          "second_lmb_bram_I/BRAM_PORTA"
+          "ilmb/LMB_Sl_0",
+          "ilmb_cntlr/SLMB"
         ]
       },
-      "microblaze_I_Trace": {
+      "ilmb_sl_1": {
         "interface_ports": [
-          "TRACE",
-          "microblaze_I/TRACE"
+          "ilmb/LMB_Sl_1",
+          "second_ilmb_cntlr/SLMB"
         ]
       },
       "iomodule_0_IO": {
         "interface_ports": [
-          "IO",
-          "iomodule_0/IO_BUS"
+          "iomodule_0/IO_BUS",
+          "IO"
+        ]
+      },
+      "microblaze_I_Trace": {
+        "interface_ports": [
+          "microblaze_I/TRACE",
+          "TRACE"
         ]
       }
     },
@@ -457,16 +474,10 @@
           "rst_0/slowest_sync_clk"
         ]
       },
-      "Reset": {
+      "IO_Rst": {
         "ports": [
-          "Reset",
-          "rst_0/ext_reset_in"
-        ]
-      },
-      "MB_Reset": {
-        "ports": [
-          "rst_0/mb_reset",
-          "microblaze_I/Reset"
+          "rst_0/peripheral_reset",
+          "iomodule_0/Rst"
         ]
       },
       "LMB_Rst2": {
@@ -480,10 +491,16 @@
           "second_dlmb_cntlr/LMB_Rst"
         ]
       },
-      "IO_Rst": {
+      "MB_Reset": {
         "ports": [
-          "rst_0/peripheral_reset",
-          "iomodule_0/Rst"
+          "rst_0/mb_reset",
+          "microblaze_I/Reset"
+        ]
+      },
+      "Reset": {
+        "ports": [
+          "Reset",
+          "rst_0/ext_reset_in"
         ]
       }
     },
@@ -495,22 +512,27 @@
               "SEG_dlmb_cntlr_Mem": {
                 "address_block": "/dlmb_cntlr/SLMB/Mem",
                 "offset": "0x00000000",
-                "range": "64K"
+                "range": "64K",
+                "offset_high_param": "C_HIGHADDR"
               },
               "SEG_iomodule_0_IO": {
                 "address_block": "/iomodule_0/SLMB/IO",
                 "offset": "0xC0000000",
-                "range": "1G"
+                "range": "1G",
+                "offset_base_param": "C_IO_BASEADDR",
+                "offset_high_param": "C_IO_HIGHADDR"
               },
               "SEG_iomodule_0_Reg": {
                 "address_block": "/iomodule_0/SLMB/Reg",
                 "offset": "0x80000000",
-                "range": "64K"
+                "range": "64K",
+                "offset_high_param": "C_HIGHADDR"
               },
               "SEG_second_dlmb_cntlr_Mem": {
                 "address_block": "/second_dlmb_cntlr/SLMB/Mem",
                 "offset": "0x00010000",
-                "range": "32K"
+                "range": "32K",
+                "offset_high_param": "C_HIGHADDR"
               }
             }
           },
@@ -519,12 +541,14 @@
               "SEG_ilmb_cntlr_Mem": {
                 "address_block": "/ilmb_cntlr/SLMB/Mem",
                 "offset": "0x00000000",
-                "range": "64K"
+                "range": "64K",
+                "offset_high_param": "C_HIGHADDR"
               },
               "SEG_second_ilmb_cntlr_Mem": {
                 "address_block": "/second_ilmb_cntlr/SLMB/Mem",
                 "offset": "0x00010000",
-                "range": "32K"
+                "range": "32K",
+                "offset_high_param": "C_HIGHADDR"
               }
             }
           }

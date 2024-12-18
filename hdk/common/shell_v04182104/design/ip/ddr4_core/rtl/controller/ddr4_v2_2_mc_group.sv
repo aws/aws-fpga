@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_10_mc_group.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_group.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,14 +59,14 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_10_mc_group module
+//                   ddr4_v2_2_23_mc_group module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_10_mc_group # (parameter
+module ddr4_v2_2_23_mc_group # (parameter
     ABITS = 18
    ,COLBITS = 10
    ,DBAW = 5
@@ -371,6 +372,7 @@ localparam
    ,tRCDFLVALUE      = tRCDFLVALUE_TEMP > 0 ? tRCDFLVALUE_TEMP : 0
    ,tRPF_TEMP        = (tRP  + 5)/4 - 3             // +5 tCK allows for rounding down and 2 tCK of Pre slot3 to Act slot1 spacing
    ,tRPF             = tRPF_TEMP > 0  ? tRPF_TEMP  : 0
+   ,tRPF_AP          = tRPF + 3
 ;
 
 
@@ -795,12 +797,12 @@ wire [4:0] trp_cntr_nxt  = ( grSt == grPREWAIT ) ? tRPF  :                      
 wire trp_cntr_is_zero_nxt  = ~( | trp_cntr_nxt );
 
 // Generate CAS to Activate timer load value.  Include remainder of tRAS time for current Rank and Bank.
-wire [4:0] tWTPF_extend     = { 1'b0, tWTPF }     + 5'b1;
-wire [4:0] tRTPF_extend     = { 3'b0, tRTPF }     + 5'b1;
+wire [4:0] tWTPF_extend     = { 1'b0, tWTPF }     + 5'd1 + 5'd2 ;
+wire [4:0] tRTPF_extend     = { 3'b0, tRTPF }     + 5'd1 + 5'd2 ;
 wire [4:0] tras_cntr_extend = { 1'b0, tras_cntr_rb[cmd_rank_cas][cmd_l_rank_cas_3ds][cmd_bank_cas] };
 wire [4:0] wr_ap_load_value = ( tras_cntr_extend >  tWTPF_extend ) ? tras_cntr_extend : tWTPF_extend;
 wire [4:0] rd_ap_load_value = ( tras_cntr_extend >  tRTPF_extend ) ? tras_cntr_extend : tRTPF_extend;
-wire [4:0] ap_load_value_nxt = wrReqR ? ( wr_ap_load_value + { 1'b0, tRPF } ) : ( rd_ap_load_value + { 1'b0, tRPF } );
+wire [4:0] ap_load_value_nxt = (wrReqR ? (wr_ap_load_value + { 1'b0, tRPF_AP }) : (rd_ap_load_value + { 1'b0, tRPF_AP })) - 3;
 
 // Track page open and CAS with autoprecharge to Activate time on a per Rank per Bank basis
 always @(*) begin
@@ -810,7 +812,7 @@ always @(*) begin
 
         // Track tRAS for each rankbank
         tras_cntr_rb_nxt        [rank_index][lr_index][bank_index] = ( grSt==grACTWAIT & rank_index==cmdRank & lr_index==cmdLRank_3ds & bank_index==cmdBank )         // spyglass disable W164a
-                                                           ? tRASF
+                                                           ? (tRASF - (tRCD/4) + 1)
                                                                      : ( tras_cntr_rb[rank_index][lr_index][bank_index] - { 3'b0, | tras_cntr_rb[rank_index][lr_index][bank_index] } );
 
         // Track tRCD for each rankbank

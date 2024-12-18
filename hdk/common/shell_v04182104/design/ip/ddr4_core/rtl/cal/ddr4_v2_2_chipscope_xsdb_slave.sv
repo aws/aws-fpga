@@ -1,10 +1,9 @@
 /*----------------------------------------------------------------------------
- * Copyright (c) 2008 Xilinx, Inc.
- * This design is confidential and proprietary of Xilinx, All Rights Reserved.
+ * (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
  *-----------------------------------------------------------------------------
  *   ____  ____
  *  /   /\/   /
- * /___/  \  /   Vendor: Xilinx
+ * /___/  \  /   Vendor: AMD
  * \   \   \/    Date Created: 2008/08/18
  *  \   \        
  *  /   /        
@@ -22,11 +21,11 @@
  *----------------------------------------------------------------------------*/
 `timescale 1ps / 1ps
 
-`include "ddr4_v2_2_10_cs_ver_inc.vh"
-`include "ddr4_v2_2_10_chipscope_icon2xsdb_mstrbr_ver_inc.vh"
+`include "ddr4_v2_2_23_cs_ver_inc.vh"
+`include "ddr4_v2_2_23_chipscope_icon2xsdb_mstrbr_ver_inc.vh"
 
 (* dont_touch = "true" *)
-module ddr4_v2_2_10_chipscope_xsdb_slave
+module ddr4_v2_2_23_chipscope_xsdb_slave
   #(
     parameter C_XDEVICEFAMILY        = `FAMILY_KINTEXU,
     parameter [15:0]                        C_MAJOR_VERSION        = 11,  // ise major version

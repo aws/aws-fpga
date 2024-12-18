@@ -1,3 +1,144 @@
+2024.1:
+ * Version 3.0 (Rev. 25)
+ * General: IP packaging adjustments to address warnings from IP Packager integrity check
+ * Revision change in one or more subcores
+
+2023.2.2:
+ * Version 3.0 (Rev. 24)
+ * No changes
+
+2023.2.1:
+ * Version 3.0 (Rev. 24)
+ * No changes
+
+2023.2:
+ * Version 3.0 (Rev. 24)
+ * Revision change in one or more subcores
+
+2023.1.2:
+ * Version 3.0 (Rev. 23)
+ * No changes
+
+2023.1.1:
+ * Version 3.0 (Rev. 23)
+ * No changes
+
+2023.1:
+ * Version 3.0 (Rev. 23)
+ * No changes
+
+2022.2.2:
+ * Version 3.0 (Rev. 23)
+ * No changes
+
+2022.2.1:
+ * Version 3.0 (Rev. 23)
+ * No changes
+
+2022.2:
+ * Version 3.0 (Rev. 23)
+ * General: Fixed output initial configuration for probes greater than 64
+
+2022.1.2:
+ * Version 3.0 (Rev. 22)
+ * No changes
+
+2022.1.1:
+ * Version 3.0 (Rev. 22)
+ * No changes
+
+2022.1:
+ * Version 3.0 (Rev. 22)
+ * No changes
+
+2021.2.2:
+ * Version 3.0 (Rev. 22)
+ * No changes
+
+2021.2.1:
+ * Version 3.0 (Rev. 22)
+ * No changes
+
+2021.2:
+ * Version 3.0 (Rev. 22)
+ * General: updated device support
+
+2021.1.1:
+ * Version 3.0 (Rev. 21)
+ * General: Added CDC waivers
+
+2021.1:
+ * Version 3.0 (Rev. 20)
+ * General: Updated the MMCM configuration for example design
+
+2020.3:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2020.2.2:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2020.2.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2020.2:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2020.1.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2020.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.2.2:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.2.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.2:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.1.3:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.1.2:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.1.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2019.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2018.3.1:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2018.3:
+ * Version 3.0 (Rev. 19)
+ * No changes
+
+2018.2:
+ * Version 3.0 (Rev. 19)
+ * General: virtexuplus58g device support added
+
+2018.1:
+ * Version 3.0 (Rev. 18)
+ * General: Internal subcore reference changes
+
 2017.4:
  * Version 3.0 (Rev. 17)
  * No changes
@@ -107,24 +248,23 @@
  * Native Vivado Release
  * There have been no functional or interface changes to this IP.  The version number has changed to support unique versioning in Vivado starting with 2013.1.
 
-(c) Copyright 2000 - 2018 Xilinx, Inc. All rights reserved.
+(c) Copyright 2000 - 2024 Advanced Micro Devices, Inc. All rights reserved.
 
 This file contains confidential and proprietary information
-of Xilinx, Inc. and is protected under U.S. and
-international copyright and other intellectual property
-laws.
+of AMD and is protected under U.S. and international copyright
+and other intellectual property laws.
 
 DISCLAIMER
 This disclaimer is not a license and does not grant any
 rights to the materials distributed herewith. Except as
 otherwise provided in a valid license issued to you by
-Xilinx, and to the maximum extent permitted by applicable
+AMD, and to the maximum extent permitted by applicable
 law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-(2) Xilinx shall not be liable (whether in contract or tort,
+(2) AMD shall not be liable (whether in contract or tort,
 including negligence, or under any other theory of
 liability) for any loss or damage of any kind or nature
 related to, arising under or in connection with these
@@ -133,11 +273,11 @@ special, incidental, or consequential loss or damage
 (including loss of data, profits, goodwill, or any type of
 loss or damage suffered as a result of any action brought
 by a third party) even if such damage or loss was
-reasonably foreseeable or Xilinx had been advised of the
+reasonably foreseeable or AMD had been advised of the
 possibility of the same.
 
 CRITICAL APPLICATIONS
-Xilinx products are not designed or intended to be fail-
+AMD products are not designed or intended to be fail-
 safe, or for use in any application requiring fail-safe
 performance, such as life-support or safety devices or
 systems, Class III medical devices, nuclear facilities,
@@ -146,7 +286,7 @@ other applications that could lead to death, personal
 injury, or severe property or environmental damage
 (individually and collectively, "Critical
 Applications"). Customer assumes the sole risk and
-liability of any use of Xilinx products in Critical
+liability of any use of AMD products in Critical
 Applications, subject only to applicable laws and
 regulations governing limitations on product liability.
 
