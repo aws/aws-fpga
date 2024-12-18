@@ -12,6 +12,10 @@ The F2 FPGA Development Kit is a hardware-software development kit that enables 
 
 For full documentation, including a user guide, code snippets, and tutorials, see the [AWS EC2 FPGA Development Kit User Guide](./User_Guide_AWS_EC2_FPGA_Development_Kit.md)
 
+## F2 FPGA ReadTheDocs (Beta)
+
+We are currently migrating our F2 documentation to comply with the ReadTheDocs standard. To familiarize yourself with the new layout, please [click here](https://awsdocs-fpga.readthedocs-hosted.com).
+
 ## Support
 
 To raise an issue or receive support, please [open an issue on the official GitHub page](https://github.com/aws/aws-fpga/issues).

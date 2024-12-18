@@ -1,8 +1,6 @@
 // =============================================================================
 // Copyright 2016 Amazon.com, Inc. or its affiliates.
 // All Rights Reserved Worldwide.
-// Amazon Confidential information
-// Restricted NDA Material
 // =============================================================================
 
 
@@ -111,4 +109,3 @@ endmodule // axi4_flop_fifo
 
                            
    
-

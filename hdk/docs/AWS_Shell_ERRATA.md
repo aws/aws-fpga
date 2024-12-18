@@ -17,7 +17,6 @@
 
 ## Unsupported Features
 
-- End-to-End virtual ethernet example with live traffic currently not supported in F2
 - HBM metrics not yet supported
 
 ## Known Bugs/Issues

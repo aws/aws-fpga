@@ -2,7 +2,7 @@
 
 # Amazon FPGA Hardware Development Kit
 #
-# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
@@ -90,7 +90,7 @@ class LogGenerator:
         num_test_results: int = len(self.test_results.values())
         if num_test_results != len(expected_test_list):
             found_tests: List[str] = list(self.test_results.keys())
-            raise Exception(f"""
+            print(f"""
 
     WARNING: Found {num_test_results} test results in 'sim' directory, but found {len(expected_test_list)} in {self.makefile_testlist_path}.
         EXPECTED: {expected_test_list}

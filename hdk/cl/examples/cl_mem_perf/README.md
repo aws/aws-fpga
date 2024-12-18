@@ -4,26 +4,37 @@
 
 ## Table of Content
 
-1. [Introduction](#ancIntroduction)
-2. [Architecture Overview](#ancArchitectureOverview)
-     1. [Clocks and Reset](#ancClocksAndResets)
-     2. [OCL](#ancOCL)
-     3. [PCIM](#ancPCIM)
-     4. [PCIS](#ancPCIS)
-     5. [DDR](#ancDDR)
-     6. [HBM](#ancHBM)
-     7. [SDA](#ancSDA)
-     8. [Interrupts](#ancInterrupts)
-     9. [Virtual JTAG](#ancVirtualJtag)
-3. [Address Space](#ancAddressSpace)
-     1. [OCL Address Space](#ancOCLRegisterAddressSpace)
-     2. [PCIS Memory Address Space](#ancPCISAddressSpace)
-     3. [HBM Memory Address Space](#ancHBMMemoryAddressSpace)
-     4. [CL_HBM_AXI4 Register Address Space](#ancHBMAxi4RegisterAddrSpace)
-     5. [SDA Memory Address Space](#ancSDAAddressSpace)
-4. [Simulations](#ancSimulations)
-5. [Software](#ancSoftware)
-6. [HBM Performance Tests](#ancHBMPerformanceTests)
+- [CL\_MEM\_PERF Custom Logic Example](#cl_mem_perf-custom-logic-example)
+  - [Table of Content](#table-of-content)
+- [Introduction](#introduction)
+- [Architecture Overview](#architecture-overview)
+  - [Clocks and Reset](#clocks-and-reset)
+  - [OCL](#ocl)
+  - [PCIM](#pcim)
+  - [PCIS](#pcis)
+  - [DDR](#ddr)
+  - [HBM](#hbm)
+  - [SDA](#sda)
+  - [Interrupts](#interrupts)
+  - [Virtual JTAG](#virtual-jtag)
+- [Address Space](#address-space)
+  - [OCL Address Space](#ocl-address-space)
+  - [PCIS Memory Address Space](#pcis-memory-address-space)
+  - [HBM Memory Address Space](#hbm-memory-address-space)
+  - [CL\_HBM\_AXI4 Register Address Space](#cl_hbm_axi4-register-address-space)
+  - [SDA Memory Address Space](#sda-memory-address-space)
+- [Simulations](#simulations)
+- [Software](#software)
+      - [test\_hbm\_perf32.c](#test_hbm_perf32c)
+      - [test\_dram\_hbm\_dma.c](#test_dram_hbm_dmac)
+      - [test\_hbm\_perf32.c](#test_hbm_perf32c-1)
+      - [test\_aws\_clk\_gen.c](#test_aws_clk_genc)
+      - [test\_clk\_freq.c](#test_clk_freqc)
+    - [Compile and run instructions](#compile-and-run-instructions)
+      - [test\_dram\_hbm\_dma\_hwsw\_cosim.c](#test_dram_hbm_dma_hwsw_cosimc)
+    - [Compile and run instructions](#compile-and-run-instructions-1)
+- [HBM Performance Tests](#hbm-performance-tests)
+  - [Instructions to run HBM Performance Test](#instructions-to-run-hbm-performance-test)
 
 <a name="ancIntroduction"></a>
 # Introduction
@@ -91,9 +102,7 @@ There are two MUXes - one along the datapath to DDR, and another MUX along datap
 <a name="ancDDR"></a>
 ## DDR
 
-AWS provides [SH_DDR](../../../common/shell_stable/design/sh_ddr/synth/sh_ddr.sv) that houses the DDR4 Controller specifically configured to the DDR DIMM on the FPGA Card.  The SH_DDR is also connected to the Shell's sh_cl_ddr_stat_* ports to enable Shell to manage DDR calibration upon CL AFI loads. The SH_DDR exposes an AXI4 512-bit interface for the CL logic to perform Read/Write data tranfsers into DDR.
-
-**NOTE**: Currently SH_DDR supports both 32GB and 64GB dual rank DIMMs. Please refer to [Supported_DDR_Modes.md](./../../../docs/Supported_DDR_Modes.md) for details on supported DDR configurations in `sh_ddr.sv`.
+AWS provides [SH_DDR](../../../common/shell_stable/design/sh_ddr/synth/sh_ddr.sv) that houses the DDR4 Controller specifically configured to the DDR DIMM on the FPGA Card.  The SH_DDR is also connected to the Shell's sh_cl_ddr_stat_* ports to enable Shell to manage DDR calibration upon CL AFI loads. The SH_DDR exposes an AXI4 512-bit interface for the CL logic to perform Read/Write data tranfsers into DDR. Please refer to [Supported_DDR_Modes.md](./../../../docs/Supported_DDR_Modes.md) for details on supported DDR configurations in `sh_ddr.sv`.
 
 <a name="ancHBM"></a>
 ## HBM
@@ -172,7 +181,6 @@ The OCL AXI-L is decoded into following address ranges for various design blocks
 | HBM           | 0x10_0000_0000 | 0x13_FFFF_FFFF | 16 GB |
 
 **NOTE**: Accessing memory beyond DDR and HBM’s range can potentially corrupt the data in either of the memories.
-**NOTE**: Please refer to [Supported_DDR_Modes.md](./../../../docs/Supported_DDR_Modes.md) for details on supported DDR configurations in `sh_ddr.sv`.
 
 <a name="ancHBMMemoryAddressSpace"></a>
 ## HBM Memory Address Space

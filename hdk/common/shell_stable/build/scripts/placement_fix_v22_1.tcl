@@ -1,8 +1,6 @@
 # =============================================================================
-# Copyright 2021 Amazon.com, Inc. or its affiliates.
+# Copyright 2024 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved Worldwide.
-# Amazon Confidential information
-# Restricted NDA Material
 # =============================================================================
 
 # This is a workaround for Vivado 2022.1 placement hang issue

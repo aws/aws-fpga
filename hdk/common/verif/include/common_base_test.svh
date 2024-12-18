@@ -1,6 +1,6 @@
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -63,4 +63,3 @@ task compare_data(logic [511:0] act_data, exp_data, logic [63:0] addr);
       $display("[%t]: Data Matched Addr: %0h. Actual Data:%0h <==> Expected Data: %0h", $realtime, addr, act_data, exp_data);
    end
 endtask
-

@@ -1,9 +1,9 @@
 # Supported DDR configurations in [sh_ddr.sv](./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv)
 
-## Table of Content
+## Table of Contents
 
 - [Supported DDR configurations in sh\_ddr.sv](#supported-ddr-configurations-in-sh_ddrsv)
-  - [Table of Content](#table-of-content)
+  - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Required RTL Modifications](#required-rtl-modifications)
   - [Required Verification Modifications](#required-verification-modifications)
