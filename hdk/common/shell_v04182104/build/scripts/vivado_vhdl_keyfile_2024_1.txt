@@ -1,0 +1,20 @@
+`protect version = 2
+`protect encrypt_agent = "XILINX"
+`protect encrypt_agent_info = "Xilinx Encryption Tool 2024.1"
+`protect begin_commonblock
+`protect control error_handling="delegated"
+`protect end_commonblock
+`protect begin_toolblock
+`protect rights_digest_method="sha256"
+`protect key_keyowner = "Xilinx", key_keyname= "xilinxt_2023_11", key_method = "rsa", key_public_key
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbeeTaMZ0gu2W7fMRETy
+MrgPbp8C5xFxQoCtSb9sgTuMWN1Vrf5m0x0bvuv315qZjHNpuw6DRvgdXmQX0H5Z
+5mN3CnLx2Irfms+SBomYUT6X/K+DueUYE8CIdjTTy9s5f7UIPfQY9N1dYtvdtYoM
+j5joaC6KMUJNUH8j0ized+CGEklc9227qcwAFlfjUUqKvlo/iUVd5VB0uEND8I29
+BkgdWDAFACid/GFnDh5SxhC4biOo85GvPig2kH3xCXg2Oibp5VHdSSU8HJpAYWj0
+DpHuKFYp0SrfJsEJnwHSCFSTlI6VJCq6QulEOmJqk+tZsOWMkW/HLscAX3onvfXO
+cwIDAQAB
+`protect control xilinx_configuration_visible = "false"
+`protect control xilinx_enable_modification = "false"
+`protect control xilinx_enable_probing = "false"
+`protect end_toolblock=""
