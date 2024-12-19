@@ -43,12 +43,12 @@ ${TEST_NAME}
 ${SH_LIB_DIR}/bram_2rw.sv
 ${SH_LIB_DIR}/flop_fifo.sv
 
-${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/9909/hdl/axi_data_fifo_v2_1_vl_rfs.v
-${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/c631/hdl/axi_crossbar_v2_1_vl_rfs.v
+${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/9692/hdl/axi_data_fifo_v2_1_vl_rfs.v
+${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/e9d8/hdl/axi_crossbar_v2_1_vl_rfs.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_xbar_0/sim/cl_axi_interconnect_xbar_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_s00_regslice_0/sim/cl_axi_interconnect_s00_regslice_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_s01_regslice_0/sim/cl_axi_interconnect_s01_regslice_0.v
-${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m00_regslice_0/sim/cl_axi_interconnect_m00_regslice_0.v
+${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m00_regslice_1/sim/cl_axi_interconnect_m00_regslice_1.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m01_regslice_0/sim/cl_axi_interconnect_m01_regslice_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m02_regslice_0/sim/cl_axi_interconnect_m02_regslice_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ip/cl_axi_interconnect_m03_regslice_0/sim/cl_axi_interconnect_m03_regslice_0.v
@@ -80,5 +80,3 @@ ${CL_ROOT}/design/cl_ocl_slv.sv
 ${CL_ROOT}/design/cl_sda_slv.sv
 ${CL_ROOT}/design/cl_dram_dma_axi_mstr.sv
 ${CL_ROOT}/design/cl_dram_dma.sv
-
-
