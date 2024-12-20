@@ -667,16 +667,16 @@ index 0000000000..f7d4271848
 +
 +	static int num_spp_devs;
 +
-+	memset(spp_dev, 0, sizeof(struct spp_dev));
-+
 +	eth_dev->dev_ops = &eth_spp_ops;
 +	eth_dev->rx_pkt_burst = &spp_rx_pkt_burst;
 +	eth_dev->tx_pkt_burst = &spp_tx_pkt_burst;
-+	spp_dev->rte_eth_dev_data = eth_dev->data;
-+	spp_dev->rte_eth_dev = eth_dev;
-+
 +	if (rte_eal_process_type() != RTE_PROC_PRIMARY)
 +		return 0;
++
++	memset(spp_dev, 0, sizeof(struct spp_dev));
++
++	spp_dev->rte_eth_dev_data = eth_dev->data;
++	spp_dev->rte_eth_dev = eth_dev;
 +
 +	pci_dev = RTE_ETH_DEV_TO_PCI(eth_dev);
 +	spp_dev->pci_dev = pci_dev;
