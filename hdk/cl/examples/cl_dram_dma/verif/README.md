@@ -8,27 +8,24 @@ The system verilog simulation tests can be run from the [verif/scripts](scripts)
     $ make TEST=test_dram_dma (Runs with XSIM by default)
     $ make TEST=test_dram_dma VCS=1
     $ make TEST=test_dram_dma QUESTA=1
-    $ make TEST=test_dram_dma IES=1
-    
+
     //To Run Simulations in AXI_MEMORY_MODEL mode
-    
+
     $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 (Runs with XSIM by default in AXI_MEMORY_MODEL mode)
-    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 VCS=1 
-    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 QUESTA=1 
-    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 IES=1
-    
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 VCS=1
+    $ make TEST=test_dram_dma AXI_MEMORY_MODEL=1 QUESTA=1
+
     //To Run DDR backdoor loading tests
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 (Runs with XSIM by default)
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 VCS=1
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 QUESTA=1
-    $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 IES=1
-    
-    //Backdoor loading test list. Description can be found in the sections below.    
-    test_dram_dma_dram_bdr_wr  
+
+    //Backdoor loading test list. Description can be found in the sections below.
+    test_dram_dma_dram_bdr_wr
     test_dram_dma_dram_bdr_walking_ones
     test_dram_dma_dram_bdr_row_col_combo
-    test_ddr_peek_bdr_walking_ones  
-    
+    test_ddr_peek_bdr_walking_ones
+
 ```
 
 The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) directory with all supported simulators:
@@ -37,20 +34,18 @@ The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) direc
     $ make C_TEST=test_dram_dma_hwsw_cosim (Runs with XSIM by default)
     $ make C_TEST=test_dram_dma_hwsw_cosim VCS=1
     $ make C_TEST=test_dram_dma_hwsw_cosim QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim IES=1
-    
+
     //To Run in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR.
-    
+
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 (Runs with XSIM by default)
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 IES=1         
-    
+
 ```
 
 Note that the appropriate simulators must be installed.
 
-# Dump Waves 
+# Dump Waves
 
 For information about how to dump waves with XSIM, please refer to [debugging-custom-logic-using-the-aws-hdk](../../../../docs/RTL_Simulating_CL_Designs.md#debugging-custom-logic-using-the-aws-hdk)
 
@@ -62,7 +57,7 @@ The system verilog tests are located at [verif/tests](tests). Information about 
 This test programs valid clock recipes defined in and verifies the corresponding clock frequencies.
 
 ## test_ddr_peek_poke.sv
-This does a walking ones test through the DDR address range. Also checks if any of the bits are stuck at '0'. 
+This does a walking ones test through the DDR address range. Also checks if any of the bits are stuck at '0'.
 
 ## test_ddr.sv
 This test programs ATG to generate traffic to access all three DDRs in CL and one DDR in SH.
@@ -124,8 +119,8 @@ The tests below use backdoor loading to populate DDR memory. The description of 
 ## test_ddr_peek_bdr_walking_ones
 DDR test which uses backdoor loading to populate DDR memory. The test writes data(walking ones) for different addresses. The test backdoor loads DDR memory and reads through frontdoor and checks that the data matches.
 
-## test_dram_dma_dram_bdr_wr    
-DMA test backdoor loads one address in DRAM memory and reads through frontdoor. 
+## test_dram_dma_dram_bdr_wr
+DMA test backdoor loads one address in DRAM memory and reads through frontdoor.
 
 ## test_dram_dma_dram_bdr_row_col_combo
 DMA test which covers all row column combinations in each memory model.
@@ -143,7 +138,3 @@ The software test with HW/SW co-simulation support [test_dram_dma_hwsw_cosim.c](
 # Using IPI to run simulations in cl_dram_dma example
 
 Xilinx IPI can also be used to simulate cl_dram_dma. For information about how to use IPI to simulate cl_dram_dma example, please refer to [IPI_GUI_cl_dram_dma_example](../../cl_dram_dma_hlx/README.md)
-
-
-
-

@@ -1,21 +1,24 @@
 # AWS FPGA Hardware Development Kit (HDK)
 
 ## Table of Contents
-1. [HDK Overview](#overview)
-2. [Getting Started](#gettingstarted)
-    - [AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)](#iss)
-    - [Install the HDK and setup environment](#setup)
-    - [Review examples](#examples)
-3. [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](#endtoend)
-    - [Fast path to running CL Examples on FPGA Instance](#fastpath)
-    - [Step 1. Pick one of the examples and move to its directory](#step1)  
-    - [Step 2. Build the CL](#step2)
-    - [Step 3. Submit the Design Checkpoint to AWS to Create the AFI](#step3)
-    - [Step 4. Setup AWS FPGA Management tools](#step4)
-    - [Step 5. Load the AFI](#step5)
-    - [Step 6. Validating using the CL Example Software](#step6)
-4. [Simulate Custom Logic (CL) RTL Design](#simcl)
-5. [Start your own Custom Logic design (RTL flow, using Verilog or VHDL)](#buildcl)
+- [AWS FPGA Hardware Development Kit (HDK)](#aws-fpga-hardware-development-kit-hdk)
+  - [Table of Contents](#table-of-contents)
+  - [HDK Overview](#hdk-overview)
+  - [Getting Started](#getting-started)
+      - [AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)](#aws-account-f1ec2-instances-on-premises-aws-iam-permissions-aws-cli-and-s3-setup-one-time-setup)
+      - [Install the HDK and setup environment](#install-the-hdk-and-setup-environment)
+      - [Review examples](#review-examples)
+  - [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](#how-to-create-an-amazon-fpga-image-afi-from-one-of-the-cl-examples-step-by-step-guide)
+      - [Fast path to running CL Examples on FPGA Instance](#fast-path-to-running-cl-examples-on-fpga-instance)
+      - [Step 1. Pick one of the examples and start in the example directory](#step-1-pick-one-of-the-examples-and-start-in-the-example-directory)
+      - [Step 2. Build the CL](#step-2-build-the-cl)
+      - [Step 3. Submit the Design Checkpoint to AWS to Create the AFI](#step-3-submit-the-design-checkpoint-to-aws-to-create-the-afi)
+      - [Step by step guide how to load and test a registered AFI from within an F1 instance](#step-by-step-guide-how-to-load-and-test-a-registered-afi-from-within-an-f1-instance)
+      - [Step 4. Setup AWS FPGA Management tools](#step-4-setup-aws-fpga-management-tools)
+      - [Step 5. Load the AFI](#step-5-load-the-afi)
+      - [Step 6. Validating using the CL Example Software](#step-6-validating-using-the-cl-example-software)
+  - [Simulate your Custom Logic design (RTL Simulation)](#simulate-your-custom-logic-design-rtl-simulation)
+  - [Start your own Custom Logic design (RTL flow, using Verilog or VHDL)](#start-your-own-custom-logic-design-rtl-flow-using-verilog-or-vhdl)
 
 <a name="overview"></a>
 ## HDK Overview
@@ -25,11 +28,11 @@
   * RTL (Verilog or VHDL) development
   * Synthesis tools and the iterative process of identifying timing critical paths and optimizing hardware to meet timing
   * Familiarity with concepts related to designing for FPGAs, DMA, DDR, AXI protocol and linux drivers
-  * RTL simulation 
+  * RTL simulation
   * Experience with simulation debug or FPGA runtime waveform viewer debug methods
-* Developers not familiar with these areas should start with [software defined acceleration](../Vitis/README.md)    
+* Developers not familiar with these areas should start with [software defined acceleration](../Vitis/README.md)
 * Developers with existing RTL IP that are not familiar with the areas listed above should start with RTL Kernel development using [software defined acceleration](../Vitis/README.md).
-* Developers looking for a faster HDK development path, should start with RTL Kernel development using [software defined acceleration](../Vitis/README.md) 
+* Developers looking for a faster HDK development path, should start with RTL Kernel development using [software defined acceleration](../Vitis/README.md)
 
 * The [documents directory](./docs) provides the specification for the AWS Shell (SH) to Custom Logic (CL) interface:
   * [Shell Interface](./docs/AWS_Shell_Interface_Specification.md)
@@ -39,7 +42,7 @@
   * [Simulating RTL Design using testbenches and shell simulation model](./docs/RTL_Simulating_CL_Designs.md)
   * [Analyzing Power](./docs/afi_power.md)
   * [Detecting a shell timeout](./docs/HOWTO_detect_shell_timeout.md)
-  
+
 * The [common directory](./common) includes common environment setup scripts, common build scripts and constraints files and IP libraries like the DRAM controller. This directory includes a production shell which is reference under `shell_stable` directory.  The AWS Shell Design Checkpoint (DCP) will be downloaded into the common directory from S3 during hdk setup.
   * Developers should not need to change any file under the `/common` directory
   * `shell_stable` directory contains the files needed by developers to build a CL using a current production shell.
@@ -54,7 +57,7 @@ For more details on the examples, see the [examples table](./cl/examples/cl_exam
 #### AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
 * Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](../docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
-* The compatibility table describes the mapping of developer kit version to [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:  
+* The compatibility table describes the mapping of developer kit version to [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA Developer AMI Version     |
 |-----------|-----------|------|
@@ -67,6 +70,7 @@ For more details on the examples, see the [examples table](./cl/examples/cl_exam
 | 1.4.11-1.4.x | 2019.2 | v1.8.x (Xilinx Vivado 2019.2) |
 | 1.4.16-1.4.x | 2020.1 | v1.9.x (Xilinx Vivado 2020.1) |
 | 1.4.18-1.4.x | 2020.2 | v1.10.x (Xilinx Vivado 2020.2) |
+| 1.4.25-1.4.x | 2024.1 | v1.16.x (Xilinx Vivado 2024.1) |
 
 
 * The FPGA Developer Kit version is listed in [hdk_version.txt](./hdk_version.txt)
@@ -88,9 +92,9 @@ Use the aws-cli [region](http://docs.aws.amazon.com/cli/latest/userguide/cli-com
 
 The AWS FPGA HDK can be cloned to your instance by executing:
 
-> When using the FPGA Developer AMI, add:  
+> When using the FPGA Developer AMI, add:
 > `AWS_FPGA_REPO_DIR=/home/centos/src/project_data/aws-fpga`
-    
+
 ```bash
     $ git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
     $ cd $AWS_FPGA_REPO_DIR
@@ -98,13 +102,13 @@ The AWS FPGA HDK can be cloned to your instance by executing:
 ```
 
 Sourcing `hdk_setup.sh` does the following:
-* It sets required environment variables that are used throughout the examples in the HDK.  
-* Downloads DDR simulation models and DCP(s) from S3.  
+* It sets required environment variables that are used throughout the examples in the HDK.
+* Downloads DDR simulation models and DCP(s) from S3.
 
-New terminals or xterm require `hdk_setup.sh` to be rerun so that the correct environment variables are set.  
+New terminals or xterm require `hdk_setup.sh` to be rerun so that the correct environment variables are set.
 
 <a name="examples"></a>
-#### Review examples 
+#### Review examples
 
 The [Examples readme](./cl/examples/cl_examples_list.md) provides an overview of all examples available to developers.
 
@@ -114,7 +118,7 @@ The [Examples readme](./cl/examples/cl_examples_list.md) provides an overview of
 <a name="fastpath"></a>
 #### Fast path to running CL Examples on FPGA Instance
 
-For developers that want to skip the development flow and start running the examples on the FPGA instance.  You can skip steps 1 through 3 if you are not interested in the development process.  Step 4 through 6 will show you how to use one of the pre-designed AFI examples. 
+For developers that want to skip the development flow and start running the examples on the FPGA instance.  You can skip steps 1 through 3 if you are not interested in the development process.  Step 4 through 6 will show you how to use one of the pre-designed AFI examples.
 By using the public AFIs, developers can skip the build flow steps and jump to step 4. [Public AFIs are available for each example and can be found in the example/README](cl/examples/cl_hello_world/README.md#metadata).
 
 <a name="step1"></a>
@@ -144,7 +148,7 @@ Executing the `aws_build_dcp_from_cl.sh` script will perform the entire implemen
 The output is a tarball file comprising the DCP file, and other log/manifest files, formatted as `YY_MM_DD-hhmm.Developer_CL.tar`.
 This file would be submitted to AWS to create an AFI. By default the build script will use Clock Group A Recipe A0 which uses a main clock of 125 MHz.
 
-```    
+```
     $ cd $CL_DIR/build/scripts
     $ ./aws_build_dcp_from_cl.sh
 ```
@@ -204,16 +208,16 @@ Create a bucket and folder for your tarball, then copy to S3
 
      NOTE: The trailing '/' is required after <dcp-folder-name>
 ```
-Create a folder for your log files        
-```    
+Create a folder for your log files
+```
     $ aws s3 mb s3://<bucket-name>/<logs-folder-name>/  # Create a folder to keep your logs
     $ touch LOGS_FILES_GO_HERE.txt                     # Create a temp file
     $ aws s3 cp LOGS_FILES_GO_HERE.txt s3://<bucket-name>/<logs-folder-name>/  #Which creates the folder on S3
-    
-    NOTE: The trailing '/' is required after <logs-folder-name>
-```             
 
-Start AFI creation. 
+    NOTE: The trailing '/' is required after <logs-folder-name>
+```
+
+Start AFI creation.
 ```
     $ aws ec2 create-fpga-image \
         --region <region> \
@@ -223,7 +227,7 @@ Start AFI creation.
         --logs-storage-location Bucket=<logs-bucket-name>,Key=<path-to-logs> \
 	[ --client-token <value> ] \
 	[ --dry-run | --no-dry-run ]
-	
+
     NOTE: <path-to-tarball> is <dcp-folder-name>/<tar-file-name>
           <path-to-logs> is <logs-folder-name>
 ```
@@ -246,7 +250,7 @@ You must provide the **FPGA Image Identifier** returned by `create-fpga-image`:
 You can use the [wait_for_afi.py](./docs/wait_for_afi.md) script to wait for the AFI creation to complete and then optionally
 send an email with the results.
 
-The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`: 
+The AFI can only be loaded to an instance once the AFI generation completes and the AFI state is set to `available`:
 ```
     {
         "FpgaImages": [
@@ -330,13 +334,13 @@ Now, you can verify that the AFI was loaded properly.  The output shows the FPGA
     Type  FpgaImageSlot  VendorId    DeviceId    DBDF
     AFIDEVICE    0       0x1d0f      0xf000      0000:00:1d.0
 ```
-    
+
 <a name="step6"></a>
 #### Step 6. Validating using the CL Example Software
 
 Developers using AMI 1.5.0 or Later Instances that come with pre-installed Xilinx Runtime Environment (XRT) should [refer to this note](../sdk/linux_kernel_drivers/xdma/xdma_install.md#xdmainstallfail) before installing XDMA driver.
 
-Each CL Example comes with a runtime software under `$CL_DIR/software/runtime/` subdirectory. You will need to build the runtime application that matches your loaded AFI.   
+Each CL Example comes with a runtime software under `$CL_DIR/software/runtime/` subdirectory. You will need to build the runtime application that matches your loaded AFI.
 
 ```
     $ cd $CL_DIR/software/runtime/
@@ -349,7 +353,7 @@ For additional information per example, review the README.md located in the $CL_
 <a name="simcl"></a>
 ## Simulate your Custom Logic design (RTL Simulation)
 
-You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys' VCS, Mentor's Questa, or Cadence Incisive).
+You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys' VCS or Mentor's Questa).
 Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.md#introduction) to run these simulations
 
 <a name="buildcl"></a>
@@ -358,6 +362,3 @@ Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.m
 * Before starting your new design review the specification for the AWS Shell (SH) to Custom Logic (CL) [interface](./docs/AWS_Shell_Interface_Specification.md).
 * Try the [debug flow](docs/Virtual_JTAG_XVC.md) and understand the [shell timeout behavior](docs/HOWTO_detect_shell_timeout.md).
 * When you are ready, copy an example to [start your own CL design](./cl/developer_designs/Starting_Your_Own_CL.md) and make a simple modification to get familiar with customizing the hardware developer kit for your development needs.
-
-
-
