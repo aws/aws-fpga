@@ -6,7 +6,6 @@ The test can be run from the [verif/scripts](scripts) directory with all support
 
 ```
     $ make TEST=test_hello_world (Runs with XSIM by default)
-    $ make TEST=test_hello_world IES=1
     $ make TEST=test_hello_world VCS=1
     $ make TEST=test_hello_world QUESTA=1
 ```
@@ -17,7 +16,6 @@ The HW/SW co-simulation test can be run from the [verif/scripts](scripts) direct
     $ make C_TEST=test_hello_world (Runs with XSIM by default)
     $ make C_TEST=test_hello_world VCS=1
     $ make C_TEST=test_hello_world QUESTA=1
-    $ make C_TEST=test_hello_world IES=1
 ```
 
 Note that the appropriate simulators must be installed.

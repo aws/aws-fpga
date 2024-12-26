@@ -1,3 +1,5 @@
+⚠️ <b>NOTE:</b> The AWS FPGA Developer AMI based on CentOS or Amazon Linux 2 (AL2) is no longer supported. Please use the AWS-provided [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
+
 # Small Shell
 This branch provides a Small Shell which is 30% smaller in size than the F1.X.1.4 Shell. Small Shell F1.S.1.0 occupies only 14 Clock Regions worth of real estate in the FPGA: 10 Clock Regions in Middle SLR, and 4 Clock Regions in Bottom SLR. Smaller physical footprint of the Shell F1.S.1.0 increases the available resources to the CL. This feature is available in Shell [F1.S.1.0](./hdk/common/shell_v04182104) provided in this developer kit.
 
@@ -28,18 +30,23 @@ Following table shows the resources available to CL in comparison with F1.X.1.4 
 3. AWS recommends customers to place their DMA Engine in Bottom SLR because the PCIM interface between Shell<->CL is now moved to Bottom SLR.
 
 # Table of Contents
-1. [Overview of AWS EC2 FPGA Development Kit](#overview-of-aws-ec2-fpga-development-kit)
-1. [Getting Started](#getting-started)
-    - [Getting Familiar with AWS](#getting-familiar-with-aws)
-    - [First time setup](#setting-up-development-environment-for-the-first-time)
+- [Small Shell](#small-shell)
+- [Table of Contents](#table-of-contents)
+- [Overview of AWS EC2 FPGA Development Kit](#overview-of-aws-ec2-fpga-development-kit)
+  - [Development Flow](#development-flow)
+  - [Development Environments](#development-environments)
+  - [FPGA Developer AMI](#fpga-developer-ami)
+- [Getting Started](#getting-started)
+    - [Getting familiar with AWS](#getting-familiar-with-aws)
+    - [Setting up development environment for the first time](#setting-up-development-environment-for-the-first-time)
     - [Quickstarts](#quickstarts)
-1. [Documentation Overview](#documentation-overview)
-1. [Developer Support](#developer-support)
+- [Documentation Overview](#documentation-overview)
+- [Developer Support](#developer-support)
 
 # Overview of AWS EC2 FPGA Development Kit
 
 AWS EC2 FPGA Development Kit is a set of development and runtime tools to develop, simulate, debug, compile and run hardware accelerated applications on [Amazon EC2 F1 instances](https://aws.amazon.com/ec2/instance-types/f1/).
-It is distributed between this github repository and FPGA Developer AMI - [Centos](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) / [AL2](https://aws.amazon.com/marketplace/pp/B08NTMMZ7X) provided by AWS with no cost of development tools.
+It is distributed between this github repository and FPGA Developer AMI [(Ubuntu)](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) provided by AWS with no cost of development tools.
 
 ⚠️ <b>NOTE:</b> The developer kit is supported for Linux operating systems only.
 
@@ -58,7 +65,7 @@ After creating an FPGA design (also called CL - Custom logic), developers can cr
 
 ## FPGA Developer AMI
 
-The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1.
+The [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) is available on the AWS marketplace without a software charge and includes tools needed for developing FPGA Designs to run on AWS F1.
 
 Given the large size of the FPGA used inside AWS F1 Instances, Xilinx tools work best with 32GiB Memory.
 z1d.xlarge/c5.4xlarge and z1d.2xlarge/c5.8xlarge instance types would provide the fastest execution time with 30GiB+ and 60GiB+ of memory respectively.
@@ -68,7 +75,7 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 
 | Developer Kit Version | Tool Version Supported | Compatible FPGA Developer AMI Version |
 |-----------|-----------|------|
-| 1.4.18+ | 2020.2 | v1.10.X (Xilinx Vivado/Vitis 2020.2) |
+| 1.6.1+ | 2024.1 | v1.16.X (Xilinx Vivado/Vitis 2024.1) |
 
 # Getting Started
 
@@ -83,7 +90,7 @@ FPGA Image generation and EC2 F1 instances are supported in the us-east-1 (N. Vi
 
 ### Setting up development environment for the first time
 
-You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) or on-premise.
+You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) or on-premise.
 
 > ℹ️ <b>INFO:</b> We suggest starting with the FPGA Developer AMI with [build instances](#fpga-developer-ami) on EC2 as it has Xilinx tools and licenses setup for you to be able to quickly get into development.
 
@@ -93,9 +100,9 @@ You have the choice to develop on AWS EC2 using the [FPGA Developer AMI](https:/
     > 💡 <b>TIP:</b> This instance does not have to be an F1 instance. You only require an F1 instance to run your AFI's(Amazon FPGA Image) once you have gone through your design build and AFI creation steps.
 
     > ℹ️ <b>INFO:</b> If you need to follow GUI Development flows, please checkout our [Developer Resources](./developer_resources/README.md) where we provide Step-By-Step guides to setting up a GUI Desktop.
-1. Clone the small_shell branch of [FPGA Developer Kit](https://github.com/aws/aws-fpga) on your instance.  
-    ```git clone -b small_shell https://github.com/aws/aws-fpga.git```  
-1. Follow the quickstarts from the next section. 
+1. Clone the small_shell branch of [FPGA Developer Kit](https://github.com/aws/aws-fpga) on your instance.
+    ```git clone -b small_shell https://github.com/aws/aws-fpga.git```
+1. Follow the quickstarts from the next section.
 1. Review the [F1.S.1.0 shell migration guide](./hdk/docs/AWS_Small_Shell_Migration_Guidelines.md) for help with migrating from shell F1.X.1.4 to small shell F1.S.1.0
 ### Quickstarts
 Before you create your own AWS FPGA design, we recommend that you go through one of the step-by-step Quickstart guides:
@@ -126,7 +133,7 @@ Documentation is located throughout this developer kit and the table below conso
 | AFI - EC2 CLI | [copy\_fpga\_image](./hdk/docs/copy_fpga_image.md), [delete\_fpga\_image](./hdk/docs/delete_fpga_image.md), [describe\_fpga\_images](./hdk/docs/describe_fpga_images.md), [fpga\_image\_attributes](./hdk/docs/fpga_image_attributes.md) | CLI documentation for administering AFIs |
 | AFI - Creation Error Codes | [create\_fpga\_image\_error\_codes](hdk/docs/create_fpga_image_error_codes.md) | CLI documentation for managing AFIs |
 | AFI - Power | [FPGA Power, recovering from clock gating](./hdk/docs/afi_power.md) | Helps developers with understanding FPGA power usage, preventing power violations on the F1 instance and recovering from a clock gated slot. |
-| On-premise Development | [Tools, Licenses required for on-premise development](./docs/on_premise_licensing_help.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) |
+| On-premise Development | [Tools, Licenses required for on-premise development](./docs/on_premise_licensing_help.md) | Guidance for developer wanting to develop AFIs from on-premises instead of using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) |
 | Frequently asked questions | [FAQ](./FAQs.md)| Q/A are added based on developer feedback and common AWS forum questions  |
 
 
