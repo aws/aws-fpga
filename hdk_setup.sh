@@ -102,7 +102,7 @@ else
     return 1
 fi
 
-VIVADO_TOOL_VERSION=`vivado -version | grep -i vivado | head -1 | sed 's:vivado *::' | sed 's: .*$::'`
+VIVADO_TOOL_VERSION=`vivado -version | grep -i vivado | head -1 | sed 's:vivado *::I' | sed 's: .*$::I'`
 export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:7}
 echo "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
