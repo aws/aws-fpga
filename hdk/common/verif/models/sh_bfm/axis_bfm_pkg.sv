@@ -1,7 +1,7 @@
-//------------------------------------------------------------------------------
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -13,7 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-//------------------------------------------------------------------------------
+// ============================================================================
+
 
 `include "anp_base_macros.svh"
 
@@ -47,11 +48,11 @@ package axis_bfm_pkg;
 
    //---------------------------------------------------------------------------
    // Function: read_stim
-   // Common function to read the stimulus file that matched the AXIS packet 
+   // Common function to read the stimulus file that matched the AXIS packet
    // stimulus format
    //---------------------------------------------------------------------------
    task automatic read_stim(
-      axis_mbx_t  mbx_h, 
+      axis_mbx_t  mbx_h,
       int         fp,
       string      msg_id
    );
@@ -60,11 +61,11 @@ package axis_bfm_pkg;
       int         delay;
 
       _eof = 0;
-      
+
       while (!_eof) begin
          string      _line;
          int         _line_ret;
-         
+
          _line_ret = $fgets(_line, fp);
          _eof = $feof(fp);
 
@@ -102,7 +103,7 @@ package axis_bfm_pkg;
                   else if (first != "SOP" && first != "IDLE") begin
                      int str_len;
                      str_len = first.len();
-                     
+
                      if (str_len % 2) begin
                         `anp_fatal({
                            "read_stim: Detected HEX data length which is not aligned with format. ",
@@ -114,7 +115,7 @@ package axis_bfm_pkg;
                         int data_value;
                         data_value = first.substr(b, b+1).atohex();
                         data_tmp.push_back(data_value);
-                        `anp_debug($sformatf("read_stim: Pushed 0x%02H into data_tmp. data_tmp.size=%0d", 
+                        `anp_debug($sformatf("read_stim: Pushed 0x%02H into data_tmp. data_tmp.size=%0d",
                            data_value, data_tmp.size()), msg_id)
                      end
 
@@ -221,7 +222,7 @@ package axis_bfm_pkg;
             end
             else begin
                `anp_info($sformatf(
-                  "compare: (%0s) Passed! PacketLength=%0d", 
+                  "compare: (%0s) Passed! PacketLength=%0d",
                   message, rhs_size))
             end
             return result;
@@ -239,4 +240,3 @@ package axis_bfm_pkg;
    endclass : axis_bfm_pkt
 
 endpackage : axis_bfm_pkg
-

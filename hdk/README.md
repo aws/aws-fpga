@@ -8,7 +8,7 @@
   - [Getting Started](#getting-started)
     - [Build Accelerator AFI using HDK Design Flow](#build-accelerator-afi-using-hdk-design-flow)
       - [Step 1. Setup Development Environment](#step-1-setup-development-environment)
-      - [Step 2. Clone Developer Dit Repository](#step-2-clone-developer-dit-repository)
+      - [Step 2. Clone Developer Kit Repository](#step-2-clone-developer-kit-repository)
       - [Step 3. Setup Environment for HDK Design Flow](#step-3-setup-environment-for-hdk-design-flow)
       - [Step 4. Build CL Design Check Point (DCP)](#step-4-build-cl-design-check-point-dcp)
       - [Step 5. Explore Build Artifacts](#step-5-explore-build-artifacts)
@@ -20,7 +20,7 @@
     - [cl\_dram\_hbm\_dma](#cl_dram_hbm_dma)
     - [cl\_mem\_perf](#cl_mem_perf)
     - [CL\_TEMPLATE - Create your own design](#cl_template---create-your-own-design)
-  - [CL Example Heirarchy](#cl-example-heirarchy)
+  - [CL Example Hierarchy](#cl-example-hierarchy)
     - [Design](#design)
     - [Verification](#verification)
     - [Software](#software)
@@ -30,23 +30,23 @@
     - [/verif](#verif)
     - [/ip](#ip)
     - [/lib](#lib)
-  - [Next Steps](#next-steps)
+  - [Getting Started](#getting-started-1)
 
 ## HDK Overview
 
-The HDK flow enables developers to create RTL based accelerator designs targeted for F2 systems using AMD Vivado. Small Shell allows developers to preserve resources in the top SLR by removing the DMA functionality and relying on the basic peek/poke access from Host to FPGA.
+The HDK design flow enables developers to create RTL-based accelerator designs for F2 instances using AMD Vivado. HDK designs must be integrated with Small Shell, which does not include a built-in Direct Memory Access (DMA) engine and offers full resources in the top Super Logic Region (SLR) of the FPGA to developers.
 
 ## Getting Started
 
 ### Build Accelerator AFI using HDK Design Flow
 
-This section provides a step-by-step guide to build an F2 AFI using the HDK design flow. The flow starts with an existing CL example design. Steps 1 through 3 demonstrate how to set up the HDK development environment. Steps 4 through 5 show the commands used to generate the CL DCP files and the expected build artifacts. Steps 6 and 7 show developers how to submit the DCP file to generate an AFI for use on F2 instances.
+This section provides a step-by-step guide to build an F2 AFI using the HDK design flow. The flow starts with an existing Customer Logic (CL) example design. Steps 1 through 3 demonstrate how to set up the HDK development environment. Steps 4 through 5 show the commands used to generate CL Design Checkpoint (DCP) files and other build artifacts. Steps 6 and 7 demonstrate how to submit the DCP file to generate an AFI for use on F2 instances.
 
 #### Step 1. Setup Development Environment
 
 Developers can either use the AWS-provided developer AMI for F2 or their on-premise development environment for this demo.
 
-#### Step 2. Clone Developer Dit Repository
+#### Step 2. Clone Developer Kit Repository
 
 ```bash
 git clone https://github.com/aws/aws-fpga.git
@@ -70,7 +70,7 @@ After the setup is done successfully, you should see `AWS HDK setup PASSED`. Sou
 
 #### Step 4. Build CL Design Check Point (DCP)
 
-After the HDK design environment is set up, you are ready to build a design example. Run the following commands to build CL DCP files in Vivado. This tutorial uses [cl_sde](./cl/examples/cl_sde/), but the same steps can be used for other [CL examples](./cl/examples).
+After the HDK design environment is set up, you are ready to build a design example. Run the following commands to build CL DCP files in Vivado. This tutorial uses the [cl_sde](./cl/examples/cl_sde/) example. The same steps can be used for any other [CL examples](./cl/examples).
 
 ```bash
 cd hdk/cl/examples/cl_sde
@@ -79,12 +79,22 @@ cd build/scripts
 ./aws_build_dcp_from_cl.py -c cl_sde
 ```
 
-A few notes on [./aws_build_dcp_from_cl.py](./common/shell_stable/build/scripts/aws_build_dcp_from_cl.py):
+The Shell supplies two base clocks to the CL: a 250MHz `clk_main_a0` clock and a 100MHz `clk_hbm_ref` clock. However, the CL can run at higher frequencies using locally generated clocks. F2 Developer Kit offers an [AWS Clock Generation (AWS_CLK_GEN) IP](./hdk/docs/AWS_CLK_GEN_spec.md) that you can leverage in your design to generate CL clocks with frequencies specified in the [Clock Recipes User Guide](./docs/Clock_Recipes_User_Guide.md).
+
+Run the command below to build a DCP with desired clock recipes:
+
+```bash
+./aws_build_dcp_from_cl.sh -c cl_mem_perf --aws_clk_gen --clock_recipe_a A1 --clock_recipe_b B2 --clock_recipe_c C0 --clock_recipe_hbm H2
+```
+
+**NOTE**: The [cl_sde](./cl/examples/cl_sde/) example does not contain the AWS_CLK_GEN component. This command uses the [cl_mem_perf](./cl/examples/cl_mem_perf/) example to demonstrate the AWS_CLK_GEN usage.
+
+A few more notes on [aws_build_dcp_from_cl.py](https://github.com/aws/aws-fpga/blob/-/hdk/common/shell_stable/build/scripts/aws_build_dcp_from_cl.py):
 
 - Use `--mode small_shell` option to build CL designs with Small Shell.
 - Use `--cl <CL name>` option to build a different CL design. This is default to `cl_dram_hbm_dma`.
-- Use `--aws_clk_gen` option to annotate the use of [AWS clock generation block](./hdk/docs/AWS_CLK_GEN_spec.md) and [customer clock recipes](./hdk/docs/Clock_Recipes_User_Guide.md).
-- The script also allows developers to pass different directives supported by the Vivado tool as shown below:
+- Use `--aws_clk_gen` option to annotate the use of [AWS clock generation block](./hdk/docs/AWS_CLK_GEN_spec.md) and [customer clock recipes](./docs/Clock_Recipes_User_Guide.md).
+- The script also allows developers to pass different Vivado directives as shown below:
   - `--place <directive>`: Default to `SSI_SpreadLogic_high` placement strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Available-Directives) for supported directives.
   - `--phy_opt <directive>` : Default to `AggressiveExplore` physical optimization strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=9xJiGeSV35ApxUsX7pAVDg) for supported directives
   - `--route <directive>` : Default to `AggressiveExplore` routing strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=dV9wYjuIP6n9oUJhkoHuRg) for supported directives.
@@ -92,7 +102,7 @@ A few notes on [./aws_build_dcp_from_cl.py](./common/shell_stable/build/scripts/
 
 #### Step 5. Explore Build Artifacts
 
-While Vivado is running, a build log file `YYYYY_MM_DD-HHMMSS.vivado.log` will be created in `$CL_DIR/build/scripts` to track the build’s progress. DCP build times will vary, based on the design size and complexity. The examples in the development kit take between 30 to 90 minutes to build. After the design is finished building, the following information will be shown at the bottom of the log file:
+While Vivado is running, a build log file `YYYYY_MM_DD-HHMMSS.vivado.log` will be created in `$CL_DIR/build/scripts` to track the build’s progress. DCP build times will vary based on the design size and complexity. The examples in the development kit take between 30 to 90 minutes to build. After the design is finished building, the following information will be shown at the bottom of the log file:
 
 ```bash
 tail <YYYYY_MM_DD-HHMMSS.vivado.log>
@@ -105,7 +115,7 @@ tail <YYYYY_MM_DD-HHMMSS.vivado.log>
 
 Generated post-route DCP and design manifest files are archived into a tarball file `<YYYY_MM_DD-HHMMSS>.Developer_CL.tar` and saved in the `$CL_DIR/build/checkpoints/` directory. All design timing reports are saved in the `$CL_DIR/build/reports/` directory.
 
-:warning: If Vivado cannot achieve timing closure for thed design, the post-route DCP file name will be marked with `.VIOLATED` as an indicator. Developers need to refer to the DCPs and timing reports for detailed timing failures.
+:warning: If Vivado cannot achieve timing closure for the design, the post-route DCP file name will be marked with `.VIOLATED` as an indicator. Developers need to refer to the DCPs and timing reports for detailed timing failures.
 
 :warning: The build process will generate a DCP tarball file regardless of the design’s timing closure state. However, in case of a DCP with timing failures, the design’s functionality is no longer guaranteed. Therefore, the AFI created using this DCP should be used for testing purpose ONLY. The following warning is shown in this case:
 
@@ -115,7 +125,7 @@ Generated post-route DCP and design manifest files are archived into a tarball f
 
 #### Step 6. Submit Generated DCP for AFI Creation
 
-To submit the DCP, create an S3 bucket for submitting the design and upload the DCP tarball file to the bucket. DCP submission requires the following information:
+To submit the DCP, create an S3 bucket and upload the DCP tarball file to the bucket. DCP submission requires the following information:
 
 - Name of the design (Optional).
 - Generic description of the logic design (Optional).
@@ -208,7 +218,7 @@ aws ec2 describe-fpga-images --fpga-image-ids afi-09953582f46c45b17 --region us-
 
 #### Step 7. Load Accelerator AFI on F2 Instance
 
-Now that your AFI is available, it can be tested on an F2 instance. The instance can be launched using any prefered AMI, private or public, from the AWS Marketplace catalog. AWS recommends using AMIs with Ubuntu 20.04 and kernel version 5.15.
+Now that your AFI is available, it can be tested on an F2 instance. The instance can be launched using any preferred AMI, private or public, from the AWS Marketplace catalog. AWS recommends using AMIs with Ubuntu 20.04 and kernel version 5.15.
 
 Now you need to install the FPGA Management tools by sourcing the `sdk_setup.sh` script:
 
@@ -320,7 +330,7 @@ All examples have the following features:
 ### [cl_sde](./cl/examples/cl_sde)
 
 The cl_sde example implements the Streaming Data Engine (SDE) IP block
-into FPGA custom logic to demonstrate the Virtual Ethernet Application.
+into FPGA custom logic to demonstrate the [Virtual Ethernet Application](../sdk/apps/virtual-ethernet/README.md).
 
 See [cl_sde](./cl/examples/cl_sde) for more information
 
@@ -332,7 +342,7 @@ See [cl_dram_hbm_dma](./cl/examples/cl_dram_hbm_dma) for more information
 
 ### [cl_mem_perf](./cl/examples/cl_mem_perf)
 
-The cl_mem_perf is a customer reference design for F2 where the objective is to demonstrate fine tuned data paths to HBM and DDR to achieve maximum throughput to the memories. The example also demonstrates datapath connectivity between Host, AWS Shell, Custom Logic (CL) region in the FPGA, HBM and DDR DIMM on the FPGA card.
+The cl_mem_perf is a reference design for F2 where the objective is to demonstrate fine tuned data paths to HBM and DDR to achieve maximum throughput to the memories. The example also demonstrates datapath connectivity between Host, AWS Shell, Custom Logic (CL) region in the FPGA, HBM and DDR DIMM on the FPGA card.
 
 See [cl_mem_perf](./cl/examples/cl_mem_perf) for more information
 
@@ -352,7 +362,7 @@ cd hdk/cl/examples
 ./create_new_cl.py --new_cl_name ${NEW_CL_NAME}
 ```
 
-## CL Example Heirarchy
+## CL Example Hierarchy
 
 The following sections describe common functionality across all CL examples. [CL_TEMPLATE](./CL_TEMPLATE) can be used as a reference for what features are available in all CL examples; as well as what's required to verify, test, and build.
 
@@ -428,7 +438,7 @@ The [shell_stable](./common/shell_stable) contains all the IPs, constraints and 
 
 ### [/verif](./hdk/verif)
 
-The [verif directory](./common/verif) includes reference verification modules to be used as Bus Functional Models (BFM) as the external interface to simulate the Custom Logic (CL). The verification related files common to all the CL examples are located in this directory. It has models, include, scripts, tb directories.
+The [verif directory](./common/verif) includes reference verification modules to be used as Bus Functional Models (BFM) as the external interface to simulate the CL. The verification related files common to all the CL examples are located in this directory. It has models, include, scripts, tb directories.
 
 The [verif models directory](./common/verif/models) includes simple models of the DRAM interface around the FPGA, shell, and card. You can also find Xilinx protocol checkers in this directory.
 
@@ -476,9 +486,9 @@ The [lib directory](./common/lib) includes basic "library" elements that may be 
 - sync.v - Synchronizer
 - xpm_fifo.sv - Synchronous clock FIFO
 
-## Next Steps
+## Getting Started
 
-- Review the [cl_sde](./cl/examples/cl_sde) example
-- [Run RTL Simulations](./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) on the example designs
-- Dive deep into [Shell interface specifications](./docs/AWS_Shell_Interface_Specification.md) and [PCIe Memory map](./docs/AWS_Fpga_Pcie_Memory_Map.md)
-- Create your own designs or port an existing F1 design to F2 system
+* Review the [cl_dram_hbm_dma](./cl/examples/cl_dram_hbm_dma/README.md) and [cl_sde](./cl/examples/cl_sde) examples
+* [Run RTL Simulations](./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) on the example designs
+* Dive deep into [Shell interface specifications](./docs/AWS_Shell_Interface_Specification.md) and [PCIe Memory map](./docs/AWS_Fpga_Pcie_Memory_Map.md)
+* Create your own designs/Port F1 designs to F2 systems.

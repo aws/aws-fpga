@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,13 +13,15 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
-module axil_bfm 
+
+module axil_bfm
    (
     input               axil_clk,
     input               axil_rst_n,
     output logic        axil_awvalid,
-    output logic [31:0] axil_awaddr, 
+    output logic [31:0] axil_awaddr,
     input               axil_awready,
 
     //Write data
@@ -26,34 +29,34 @@ module axil_bfm
     output logic [31:0] axil_wdata,
     output logic [3:0]  axil_wstrb,
     input               axil_wready,
-    
+
     //Write response
     input               axil_bvalid,
     input [1:0]         axil_bresp,
     output logic        axil_bready,
-    
+
     //Read address
     output logic        axil_arvalid,
     output logic [31:0] axil_araddr,
     input               axil_arready,
-    
+
     //Read data/response
     input               axil_rvalid,
     input [31:0]        axil_rdata,
     input [1:0]         axil_rresp,
-    
+
     output logic        axil_rready
 
    );
 
 `include "axi_bfm_defines.svh"
-   
+
    AXI_Command axil_wr_cmds[$];
    AXI_Data    axil_wr_data[$];
    AXI_Command axil_rd_cmds[$];
    AXI_Data    axil_rd_data[$];
    AXI_Command axil_b_resps[$];
-   
+
    bit           debug;
 
    initial begin
@@ -82,10 +85,10 @@ module axil_bfm
       if (axil_wr_cmds.size() != 0) begin
 
          axil_awaddr  <= axil_wr_cmds[0].addr[31:0];
-         
+
          axil_awvalid <= !axil_awvalid ? 1'b1 :
                                !axil_awready ? 1'b1 : 1'b0;
-         
+
          if (axil_awready && axil_awvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, axil_wr_cmds.size());
@@ -109,17 +112,17 @@ module axil_bfm
 
          axil_wdata <= axil_wr_data[0].data[31:0];
          axil_wstrb <= axil_wr_data[0].strb[3:0];
-         
+
          axil_wvalid <= !axil_wvalid ? 1'b1 :
                               !axil_wready ? 1'b1 : 1'b0;
-         
+
          if (axil_wready && axil_wvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping wr data fifo - %d", $realtime, axil_wr_data.size());
             end
             axil_wr_data.pop_front();
          end
-         
+
       end
       else
          axil_wvalid <= 1'b0;
@@ -152,10 +155,10 @@ module axil_bfm
       if (axil_rd_cmds.size() != 0) begin
 
          axil_araddr  <= axil_rd_cmds[0].addr[31:0];
-         
+
          axil_arvalid <= !axil_arvalid ? 1'b1 :
                                !axil_arready ? 1'b1 : 1'b0;
-         
+
          if (axil_arready && axil_arvalid) begin
             if (debug) begin
                $display("[%t] : DEBUG popping cmd fifo - %d", $realtime, axil_rd_cmds.size());
@@ -186,19 +189,19 @@ module axil_bfm
                $display("[%t] - DEBUG read data [%2d]: 0x%08h", $realtime, i, axil_rdata[(i*32)+:32]);
             end
          end
-         
+
          axil_rd_data.push_back(data);
       end
 
    end
 
 
-   
+
    task poke(input logic [31:0] addr, logic [31:0] data, int size = 2);
       AXI_Command axi_cmd;
       AXI_Data    axi_data;
 
-      logic [1:0] resp;      
+      logic [1:0] resp;
       logic [63:0] strb;
 
       axi_cmd.addr[31:0] = addr;
@@ -222,19 +225,19 @@ module axil_bfm
       axi_data.last = 1'b1;
 
       #20ns axil_wr_data.push_back(axi_data);
-      
+
       while (axil_b_resps.size() == 0)
         #20ns;
-      
+
       resp = axil_b_resps[0].resp;
       axil_b_resps.pop_front();
-      
+
    endtask // poke
 
    task peek(input logic [31:0] addr, output logic [31:0] data, input int size = 2);
       AXI_Command axi_cmd;
       logic [31:0] mask;
-      
+
       axi_cmd.addr[31:0] = addr;
       axi_cmd.len  = 0;
 
@@ -257,7 +260,7 @@ module axil_bfm
       data &= mask;
 
       axil_rd_data.pop_front();
-      
+
    endtask // peek
 
 

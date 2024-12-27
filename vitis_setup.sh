@@ -347,6 +347,113 @@ function setup_xsa {
 
 }
 
+function xrt_install_check {
+    
+    xrt_path=/opt/xilinx/xrt
+    if [[ -n $(lsmod | grep "xocl") ]]; then
+        info_msg "###############################################################################"
+        info_msg "#                              XRT install detected!                          #"
+        info_msg "# If XRT was installed using the devkit, run 'source /opt/xilinx/xrt/setup.sh #"
+        info_msg "#        Otherwise, please source your XRT setup script, 'setup.sh'           #"
+        info_msg "#                     To reinstall, run 'install_xrt -f'!                     #"
+        info_msg "###############################################################################"
+        return 2
+    fi
+    info_msg "###########################################################################"
+    info_msg "#                       No XRT install detected!                          #"
+    info_msg "#     To install the XRT for Vitis runtime support, run 'install_xrt'     #"
+    info_msg "###########################################################################"
+    return 0
+}
+
+function install_xrt {
+    xrt_path=/opt/xilinx/xrt
+    xrt_dpkg_install_path=$xrt_path/XRT/build/Release
+
+    xrt_repo_name=XRT
+    xrt_repo_url=https://github.com/Xilinx/XRT.git
+    xrt_branch=2024.1
+    xrt_2024_1_working_commit_hash=ea9e7d2d88719e08575dca15d2ca2c1ce624e800
+    xrt_deps_script_path=src/runtime_src/tools/scripts/xrtdeps.sh
+    xrt_build_script_run="build/build.sh -noert"
+    xrt_build_release_dir="build/Release"
+    xrt_setup_script_path=$xrt_path/setup.sh
+
+    if [[ -z $AWS_FPGA_REPO_DIR ]]; then
+        err_msg "\$AWS_FPGA_REPO_DIR not defined when trying to install XRT!"
+        cd $AWS_FPGA_REPO_DIR && return 1
+    fi
+
+    xrt_install_check
+    if [[ $? -eq 0 || $1 == "-f" || $1 == "--force" ]]; then
+        if [[ -n $(echo $PATH | grep "cmake-3.3.2") ]]; then
+            export PATH="/usr/bin:$PATH"
+        fi
+
+        cd $HOME
+        if [[ ! -d $xrt_repo_name ]]; then
+            info_msg "Cloning XRT repo into home directory: $HOME"
+            info_msg "This directory may be moved to any destination, once the XRT install is complete!"
+            if ! git clone $xrt_repo_url --recurse-submodules; then
+                err_msg "Couldn't clone XRT repository!"
+                cd $AWS_FPGA_REPO_DIR && return 1
+            fi
+        else
+            info_msg "XRT repo found in $HOME"
+        fi
+
+        cd $xrt_repo_name
+        if ! git fetch; then
+            err_msg "Couldn't fetch updated references for XRT repo!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        if ! git checkout $xrt_branch; then
+            err_msg "Couldn't checkout branch: $xrt_branch!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        if ! git checkout $xrt_2024_1_working_commit_hash; then
+            err_msg "Couldn't checkout compatible commit: $xrt_2024_1_working_commit_hash!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        if ! sudo ./$xrt_deps_script_path; then
+            err_msg "Couldn't install XRT dependencies!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        if ! ./$xrt_build_script_run; then
+            err_msg "Couldn't build XRT dpkgs!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        cd $xrt_build_release_dir
+
+        # Base XRT install first
+        for file in $(ls *amd64-xrt.deb); do
+            sudo dpkg -i $file
+        done
+
+        # AWS extension install
+        for file in $(ls *amd64-aws.deb); do
+            sudo dpkg -i $file
+        done
+
+        if ! source $xrt_setup_script_path; then
+            err_msg "Couldn't setup XRT after install!"
+            cd $AWS_FPGA_REPO_DIR && return 1
+        fi
+
+        info_msg "XRT installation complete!"
+        cd $AWS_FPGA_REPO_DIR
+        return 0
+    fi
+    info_msg "XRT already installed!"
+    info_msg "Nothing to do!"
+    return 0
+}
+
 function hw_file_check {
     required_files=("Makefile" "README.rst" "description.json" "details.rst" "makefile_us_alveo.mk" "qor.json" "utils.mk" "xrt.ini")
     missing_a_file=0
@@ -385,9 +492,10 @@ if [[ ! -e vitis/aws_platform/$xsa_name/$platform_file_name ]]; then
     fi
 fi
 
-# Make the Vitis AFI creation a little easier.
-if [[ -z $(cat ~/.bashrc | grep "create_vitis_afi") ]]; then
-    alias create_vitis_afi='${AWS_FPGA_REPO_DIR}/vitis/tools/create_vitis_afi.sh'
+xrt_install_check
+if [[ $? -eq 1 ]]; then
+    err_msg "!!! Vitis Setup FAILED !!!"
+    return $?
 fi
 
 info_msg "Vitis Setup PASSED"

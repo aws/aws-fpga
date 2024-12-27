@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 #include "xdma_utils.h"
 
@@ -27,9 +30,9 @@ void que_buffer_to_cl(int chan, uint8_t *buf, size_t len) {
   // setup descriptor table if this is first call
   if (h2c_desc_index == 0) {
     h2c_desc_table = (XDMA_DESC *)memalign(4096, 4096);  // allocate 4k aligned to a 4k boundary
-    
+
     sv_map_host_memory(h2c_desc_table);
-  
+
   }
 
   h2c_desc_table[h2c_desc_index].header.word = 0; // make sure reserved bits and unused bits are 0

@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 module axi_prot_chk #(parameter ID_WIDTH=16,
@@ -27,12 +29,12 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
    input                       cfg_chk_wr,
    input                       cfg_chk_rd,
    input [31:0]                cfg_chk_wdata,
-  
+
    output logic                chk_cfg_ack,
    output logic [31:0]         chk_cfg_rdata,
 
    output logic                wr_last_error,
-   
+
    input [ID_WIDTH-1:0]        awid,
    input [ADDR_WIDTH-1:0]      awaddr,
    input [LEN_WIDTH-1:0]       awlen,
@@ -88,7 +90,7 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
    logic                             cfg_chk_rd_q;
    logic                             cfg_chk_wr_re;
    logic                             cfg_chk_rd_re;
-   
+
    // Write registers
    always @(posedge clk) begin
       cfg_chk_wr_q <= cfg_chk_wr;
@@ -99,13 +101,13 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
 
    assign clr_wr_last_incomplete = cfg_chk_wr_re & (cfg_chk_addr == 12'h0) & cfg_chk_wdata[1];
    assign clr_wr_last_early = cfg_chk_wr_re & (cfg_chk_addr == 12'h0) & cfg_chk_wdata[0];
-   
+
    // Read data & Ack
    always @(posedge clk) begin
       chk_cfg_ack <= (cfg_chk_wr || cfg_chk_rd);
-      chk_cfg_rdata <= (cfg_chk_addr == 12'h0) ? {wr_last_incomplete, wr_last_early} : 
+      chk_cfg_rdata <= (cfg_chk_addr == 12'h0) ? {wr_last_incomplete, wr_last_early} :
                        (cfg_chk_addr == 12'h4) ? err_addr[31:0] :
-                       (cfg_chk_addr == 12'h8) ? err_addr[63:32] : 
+                       (cfg_chk_addr == 12'h8) ? err_addr[63:32] :
                        err_id;
    end
 
@@ -126,7 +128,7 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
       );
    assign aw_fifo_pop = aw_fifo_valid & wr_fifo_valid & wr_fifo_out_wlast;
    assign {aw_fifo_out_id, aw_fifo_out_len, aw_fifo_out_addr} = aw_fifo_pop_data;
-   
+
    // Push W Channel into a FIFO
    ram_fifo_ft #(.WIDTH(1),
                  .PIPELINE(0)) WR_FIFO
@@ -142,12 +144,12 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
       .wmark (wr_fifo_full)
 
       );
-   assign wr_fifo_pop = wr_fifo_valid;   
+   assign wr_fifo_pop = wr_fifo_valid;
    assign wr_fifo_out_wlast = wr_fifo_pop_data;
 
    assign set_wr_last_incomplete = ~(wr_last_incomplete || wr_last_early) & wr_fifo_valid & aw_fifo_valid & (aw_fifo_out_len == wr_beat) & ~wr_fifo_out_wlast;
    assign set_wr_last_early = ~(wr_last_incomplete || wr_last_early) & wr_fifo_valid & aw_fifo_valid & (aw_fifo_out_len != wr_beat) & wr_fifo_out_wlast;
-   
+
    // Check number of wr beats
    always @(posedge clk)
      if (!rst_n) begin
@@ -160,29 +162,22 @@ module axi_prot_chk #(parameter ID_WIDTH=16,
     end
      else begin
         wr_beat <= wr_fifo_out_wlast & wr_fifo_valid & aw_fifo_valid ? 0 :
-                   wr_fifo_valid & aw_fifo_valid ? wr_beat + 1 : 
+                   wr_fifo_valid & aw_fifo_valid ? wr_beat + 1 :
                    wr_beat;
-        
+
         wr_last_incomplete <= set_wr_last_incomplete ? 1'b1 :
                               clr_wr_last_incomplete ? 1'b0 :
                               wr_last_incomplete;
-        
+
         wr_last_early <= set_wr_last_early ? 1'b1 :
                          clr_wr_last_early ? 1'b0 :
                          wr_last_early;
-        
+
         err_addr <= (set_wr_last_incomplete || set_wr_last_early) ? aw_fifo_out_addr : err_addr;
         err_id <= (set_wr_last_incomplete || set_wr_last_early) ? aw_fifo_out_id : err_id;
 
         wr_last_error <= wr_last_incomplete || wr_last_early;
-        
+
      end // else: !if(!rst_n)
-   
+
 endmodule // axi_prot_chk
-
-
-
-
-
-   
-                     

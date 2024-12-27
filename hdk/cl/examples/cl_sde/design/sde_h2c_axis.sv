@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 // H2C AXI-Stream Interface
 
@@ -20,7 +22,7 @@ module sde_h2c_axis #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                       parameter PCIM_DATA_WIDTH = 512,
 
                       parameter AXIS_DATA_WIDTH = 512,
-                      
+
                       parameter USER_BIT_WIDTH = DESC_TYPE ? 1 : 64
                       )
 
@@ -38,7 +40,7 @@ module sde_h2c_axis #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [USER_BIT_WIDTH-1:0]       h2c_axis_user,
     output logic                            h2c_axis_last,
     input                                   h2c_axis_ready,
-    
+
     // AXI-S Interface to Buf
     input                                   buf_axis_valid,
     input [PCIM_DATA_WIDTH-1:0]             buf_axis_data,
@@ -50,10 +52,10 @@ module sde_h2c_axis #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     // AXI-S Interface to Write Back block for packet Count Update
     output logic                            axis_wb_pkt_cnt_req,
     output logic [31:0]                     axis_wb_pkt_cnt
-    
-    
+
+
     );
-   
+
    // Do any width conversoin necessary
 
 
@@ -75,14 +77,12 @@ module sde_h2c_axis #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
      end
      else begin
         axis_wb_pkt_cnt_req <= h2c_axis_valid & h2c_axis_ready & h2c_axis_last;
-        axis_pkt_cnt <= cfg_axis_clr_pkt_cnt ? 0 : 
+        axis_pkt_cnt <= cfg_axis_clr_pkt_cnt ? 0 :
                         h2c_axis_valid & h2c_axis_ready & h2c_axis_last ? axis_pkt_cnt + 1 :
                         axis_pkt_cnt;
      end
-   
+
    assign axis_wb_pkt_cnt = axis_pkt_cnt;
    assign axis_cfg_pkt_cnt = axis_pkt_cnt;
 
 endmodule // sde_h2c_axis
-
-

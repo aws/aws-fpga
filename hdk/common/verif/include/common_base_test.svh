@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,7 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+// ============================================================================
 
 `define DDR_CHANNEL 0
 `define HBM_CHANNEL 1
@@ -25,15 +26,7 @@
 `define _64_GB 64'h0010_0000_0000
 
 
-`ifdef USE_32GB_DDR_DIMM
-    `define AWS_SIM_32GB_DDR
-`elsif USE_AP_32GB_DDR_DIMM
-    `define AWS_SIM_32GB_DDR
-`elsif USE_64GB_DDR_DIMM
-    `define AWS_SIM_64GB_DDR
-`elsif USE_AP_64GB_DDR_DIMM
-    `define AWS_SIM_64GB_DDR
-`endif
+`define AWS_SIM_64GB_DDR
 
 
 int error_count = 0;
@@ -63,4 +56,3 @@ task compare_data(logic [511:0] act_data, exp_data, logic [63:0] addr);
       $display("[%t]: Data Matched Addr: %0h. Actual Data:%0h <==> Expected Data: %0h", $realtime, addr, act_data, exp_data);
    end
 endtask
-

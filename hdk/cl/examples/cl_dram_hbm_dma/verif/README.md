@@ -1,8 +1,45 @@
-This readme provides information about the simulation environment for the cl_dram_hbm_dma example. For more details about overall HDK simulation environment and CL bringup in simulation please refer to the [RTL Simulation Guide for HDK Design Flow](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md)
+# CL_DRAM_HBM_DMA Example Simulation
 
-# DRAM HBM DMA CL example simulation
+## Table of Contents
 
-The system verilog simulation tests can be run from the [$CL_DIR/verif/scripts](./scripts) directory with all supported simulators (HBM is only supported in VCS & QUESTA). You can run tests by calling the make target for that test located in [$CL_DIR/verif/scripts/Makefile.tests](./scripts/Makefile.tests):
+- [CL\_DRAM\_HBM\_DMA Example Simulation](#cl_dram_hbm_dma-example-simulation)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Dump Waves](#dump-waves)
+  - [SystemVerliog Tests](#systemverliog-tests)
+    - [test\_clk\_recipe.sv](#test_clk_recipesv)
+    - [test\_ddr\_peek\_poke.sv](#test_ddr_peek_pokesv)
+    - [test\_ddr.sv](#test_ddrsv)
+    - [test\_hbm.sv](#test_hbmsv)
+    - [test\_dram\_dma.sv](#test_dram_dmasv)
+    - [test\_dram\_dma\_rnd.sv](#test_dram_dma_rndsv)
+    - [test\_dma\_pcim\_concurrent.sv](#test_dma_pcim_concurrentsv)
+    - [test\_dma\_pcis\_concurrent.sv](#test_dma_pcis_concurrentsv)
+    - [test\_dma\_sda\_concurrent.sv](#test_dma_sda_concurrentsv)
+    - [test\_dram\_dma\_4k\_crossing.sv](#test_dram_dma_4k_crossingsv)
+    - [test\_dram\_dma\_allgn\_addr\_4k.sv](#test_dram_dma_allgn_addr_4ksv)
+    - [test\_dram\_dma\_single\_beat\_4k.sv](#test_dram_dma_single_beat_4ksv)
+    - [test\_dram\_dma\_axi\_mstr.sv](#test_dram_dma_axi_mstrsv)
+    - [test\_int.sv](#test_intsv)
+    - [test\_peek\_poke.sv](#test_peek_pokesv)
+    - [test\_peek\_poke\_wc.sv](#test_peek_poke_wcsv)
+    - [test\_peek\_poke\_len.sv](#test_peek_poke_lensv)
+    - [test\_peek\_poke\_rnd\_lengths.sv](#test_peek_poke_rnd_lengthssv)
+    - [test\_peek\_poke\_pcis\_axsize.sv](#test_peek_poke_pcis_axsizesv)
+    - [test\_ddr\_peek\_bdr\_walking\_ones](#test_ddr_peek_bdr_walking_ones)
+    - [test\_sda.sv](#test_sdasv)
+    - [test\_null.sv](#test_nullsv)
+  - [AXI\_MEMORY\_MODEL Mode Simulations](#axi_memory_model-mode-simulations)
+    - [test\_dram\_dma\_mem\_model\_bdr\_wr](#test_dram_dma_mem_model_bdr_wr)
+    - [test\_dram\_dma\_mem\_model\_bdr\_rd](#test_dram_dma_mem_model_bdr_rd)
+  - [DDR Backdoor Loading](#ddr-backdoor-loading)
+  - [HW/SW Co-Simulation Test](#hwsw-co-simulation-test)
+
+## Overview
+
+This readme provides information about the simulation environment for the `cl_dram_hbm_dma` example. For more details about overall HDK simulation environment and CL bringup in simulation please refer to the [RTL Simulation Guide for HDK Design Flow](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md)
+
+SystemVerilog (SV) simulations can be run from the `$CL_DIR/verif/scripts/` directory with all supported simulators (HBM simulation using VCS & QUESTA is strongly recommended). You can run tests by calling the make target for that test located in `$CL_DIR/verif/scripts/Makefile.tests`:
 
 ```bash
 make test_ddr # Runs with XSIM by default
@@ -12,21 +49,15 @@ make test_ddr QUESTA=1
 make test_hbm # Runs with VCS by default
 ```
 
-Alternatively, you can run each test by setting TEST=<test name> followed by the environment variables required to run that test.
-
-**NOTE: CL_DRAM_HBM_DMA does not currently have a datapath to all 64 GB of DDR. Only the first 32GB is accessible.**
-
+Alternatively, you can run each test by setting `TEST=\<Test Name\>` followed by the environment variables required to run that test.
 
 ```bash
 make TEST=test_dram_dma # Runs with XSIM by default
 make TEST=test_dram_dma VCS=1
 make TEST=test_dram_dma QUESTA=1
 
-# To Run simulations with a 32 GB DDR DIMM (without user-controlled auto-precharge mode)
-make TEST=test_dram_dma USE_32GB_DDR_DIMM=1
-
-# To Run simulations with a 32 GB DDR DIMM (with user-controlled auto-precharge mode)
-make TEST=test_dram_dma USE_AP_32GB_DDR_DIMM=1
+# To Run simulations with a 64 GB DDR DIMM (with user-controlled auto-precharge mode)
+make TEST=test_dram_dma USE_AP_64GB_DDR_DIMM=1
 
 # To Run Simulations in AXI_MEMORY_MODEL mode
 make TEST=test_dram_dma AXI_MEMORY_MODEL=1 # Runs with XSIM by default in AXI_MEMORY_MODEL mode
@@ -46,7 +77,7 @@ test_ddr_peek_bdr_walking_ones
 
 **NOTE**: Please refer to [Supported_DDR_Modes.md](./../../../../docs/Supported_DDR_Modes.md) for details on supported DDR configurations.
 
-The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) directory with all supported simulators:
+The HW/SW co-simulation tests can be run from the `verif/scripts/` directory with all supported simulators:
 
 ```bash
 make C_TEST=test_dram_dma_hwsw_cosim # Runs with XSIM by default
@@ -66,9 +97,9 @@ Note that the appropriate simulators must be installed.
 
 For information about how to dump waves with XSIM or VCS, please refer to [debugging-custom-logic-using-the-aws-hdk](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md#)
 
-## System Verliog Tests
+## SystemVerliog Tests
 
-The system verilog tests are located at [verif/tests](tests). Most tests include `base_test_utils.svh` which includes common signals and tasks used across tests. Please refer to this file for the DPI-C tasks used. Information about each test can be found below.
+The SystemVerilog test cases are located at `verif/tests/`. Most tests include `base_test_utils.svh` which includes common signals and tasks used across tests. Please refer to this file for the DPI-C tasks used. Information about each test can be found below.
 
 ### test_clk_recipe.sv
 This test programs valid clock recipes defined within and verifies the corresponding clock frequencies.
@@ -127,18 +158,6 @@ This test programs tester block to do PCIM reads and writes with random lengths 
 ### test_peek_poke_pcis_axsize.sv
 This test does PCIS peek and poke with different sizes. Although shell model allows different size transfers on PCIS interface, Shell only supports transfer of size 6 on PCIS interface.
 
-## _AXI_MEMORY_MODEL mode simulations_
-AXI_MEMORY_MODEL mode can be used for better simulation perfornmance. AXI_MEMORY_MODEL mode enables a test to run with AXI memory models instead of DDR memory. The documentation can be found in AXI memory model section at [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md). Any test that accesses DDR memory can be run in AXI_MEMORY_MODEL mode. Below are some example tests for ECC and backdoor loading support features of AXI memory model.
-
-### test_dram_dma_mem_model_bdr_wr
-This test backdoor writes AXI memory model, reads through frontdoor and checks that the data matches.
-
-### test_dram_dma_mem_model_bdr_rd
-This test backdoor reads AXI memory model, writes through frontdoor and checks that the data matches.
-
-## _DDR backdoor loading_
-The tests below use backdoor loading to populate DDR memory. The description of DDR backdoor loading can be found in DDR backdoor loading support section at [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md).
-
 ### test_ddr_peek_bdr_walking_ones
 DDR test which uses backdoor loading to populate DDR memory. The test writes data(walking ones) for different addresses. The test backdoor loads DDR memory and reads through frontdoor and checks that the data matches.
 
@@ -146,22 +165,22 @@ DDR test which uses backdoor loading to populate DDR memory. The test writes dat
 This test does transfers to different addresses on SDA AXIL interface.
 
 ### test_null.sv
-test_null is not an actual test. This is a base system verilog file needed for HW/SW co-simulation
+test_null is not an actual test. This is a base SV file needed for HW/SW co-simulation
 
-## HW/SW co-simulation Test
+## AXI_MEMORY_MODEL Mode Simulations
 
-The software test with HW/SW co-simulation support [test_dram_dma_hwsw_cosim.c](../software/runtime/test_dram_dma_hwsw_cosim.c) can be found at [software/runtime](../software/runtime). For Information about how HW/SW co-simulation support can be added to a software test please refer to "Code changes to enable HW/SW co-simulation" section in [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md).
+AXI_MEMORY_MODEL mode can be used for better simulation performance. AXI_MEMORY_MODEL mode enables a test to run with AXI memory models instead of DDR memory. The documentation can be found in AXI memory model section at [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md). Any test that accesses DDR memory can be run in AXI_MEMORY_MODEL mode. Below are some example tests for ECC and backdoor loading support features of AXI memory model.
 
-## Regressions
+### test_dram_dma_mem_model_bdr_wr
+This test backdoor writes AXI memory model, reads through frontdoor and checks that the data matches.
 
-A regression with full coverage can be run with the following commands
+### test_dram_dma_mem_model_bdr_rd
+This test backdoor reads AXI memory model, writes through frontdoor and checks that the data matches.
 
-```bash
-make regression <SIMULATOR>=1
-make regression AXI_MEMORY_MODEL=1 <SIMULATOR>=1
-make regression ECC_DIRECT=1 <SIMULATOR>=1
-make regression ECC_RAND=1 <SIMULATOR>=1
-make regression DDR_BKDR=1 <SIMULATOR>=1
-make regression AXI_MEMORY_MODEL=1 ECC_DIRECT=1 <SIMULATOR>=1
-make regression AXI_MEMORY_MODEL=1 ECC_RAND=1 <SIMULATOR>=1
-```
+## DDR Backdoor Loading
+
+The description of DDR backdoor loading can be found in DDR backdoor loading support section at [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md).
+
+## HW/SW Co-Simulation Test
+
+The software test with HW/SW co-simulation support [test_dram_dma_hwsw_cosim.c](../software/runtime/test_dram_dma_hwsw_cosim.c) can be found at `software/runtime/`. For Information about how HW/SW co-simulation support can be added to a software test please refer to "Code changes to enable HW/SW co-simulation" section in [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md).

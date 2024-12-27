@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,12 +13,14 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 // Data Engine PCIS Interface
 
 module sde_ps #(parameter bit C2H_ONLY = 0,
                 parameter bit H2C_ONLY = 0,
-                
+
                 parameter PCIS_DATA_WIDTH = 512,
                 parameter PCIS_ID_WIDTH = 5,
                 parameter PCIS_LEN_WIDTH = 8,
@@ -25,9 +28,9 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 
                 parameter bit C2H_DESC_TYPE = 0,
                 parameter C2H_DESC_WIDTH = C2H_DESC_TYPE ? 128 : 256,
-                
+
                 parameter PCIS_VALID_ADDR_WIDTH = 14, // This represents the address bits required for the 16KB window
-                
+
                 parameter C2H_PCIS_DESC_APERTURE = 14'h1000,
                 parameter H2C_PCIS_DESC_APERTURE = 14'h1000,
                 parameter H2C_PCIS_PKT_APERTURE = 14'h1000,
@@ -36,11 +39,11 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
                 parameter PM_PCIS_CFG_APERTURE = 14'h0200,
                 parameter C2H_PCIS_CFG_APERTURE = 14'h0600,
                 parameter H2C_PCIS_CFG_APERTURE = 14'h0600,
-                
+
                 parameter bit H2C_DESC_TYPE = 0,
                 parameter H2C_DESC_WIDTH = H2C_DESC_TYPE ? 128 : 256,
-                
-                
+
+
                 parameter H2C_PKT_SIZE_BYTES = 64,
                 parameter H2C_PKT_WIDTH = H2C_PKT_SIZE_BYTES*8,
 
@@ -84,22 +87,22 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
     output logic                       c2h_sync_rst_n,
     output logic                       h2c_sync_rst_n,
     output logic                       pm_sync_rst_n,
-    
+
     // PCIS to C2H Descriptor
     output logic                       c2h_ps_desc_wr_req,
     output logic [C2H_DESC_WIDTH-1:0]  c2h_ps_desc_wdata,
     input                              c2h_ps_desc_ack,
-    
+
     // PCIS to H2C Descriptor
     output logic                       h2c_ps_desc_wr_req,
     output logic [H2C_DESC_WIDTH-1:0]  h2c_ps_desc_wdata,
     input                              h2c_ps_desc_ack,
-    
+
     // PCIS to H2C Small Pkt Buffer
     output logic                       h2c_ps_pkt_wr_req,
     output logic [H2C_PKT_WIDTH-1:0]   h2c_ps_pkt_wdata,
     input                              h2c_ps_pkt_ack,
-    
+
     // PCIS to PM Config Interface
     output logic                       pm_ps_cfg_wr_req,
     output logic                       pm_ps_cfg_rd_req,
@@ -107,7 +110,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
     output logic [31:0]                pm_ps_cfg_wdata,
     input                              pm_ps_cfg_ack,
     input [31:0]                       pm_ps_cfg_rdata,
-    
+
 
     // PCIS to C2H Config Interface
     output logic                       c2h_ps_cfg_wr_req,
@@ -120,7 +123,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
     output logic                       c2h_desc_ooo_error,
     output logic                       c2h_desc_unalin_error,
 
-    
+
     // PCIS to H2C Config Interface
     output logic                       h2c_ps_cfg_wr_req,
     output logic                       h2c_ps_cfg_rd_req,
@@ -128,11 +131,11 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
     output logic [31:0]                h2c_ps_cfg_wdata,
     input                              h2c_ps_cfg_ack,
     input [31:0]                       h2c_ps_cfg_rdata,
-    
+
     output logic                       h2c_desc_ooo_error,
     output logic                       h2c_desc_unalin_error
 
-    
+
     );
 
    // Remove these flops to save area (but timing will be tight)
@@ -142,7 +145,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
    logic                               pcis_wlast_q;
    logic                               pcis_wvalid_q;
    logic                               pcis_wready_q;
-   
+
    // PCIS FSM
    typedef enum logic [3:0] {
                              PCIS_REQ_IDLE     = 4'd0,
@@ -172,11 +175,11 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
    logic                     pcis_req_h2c_cfg;
    logic                     pcis_req_rd_dummy;
    logic                     pcis_req_wr_dummy;
-   
+
    logic                      c2h_pcis_desc_wready;
    logic                      h2c_pcis_desc_wready;
    logic                      h2c_pcis_pkt_wready;
-   
+
    logic                      pm_pcis_cfg_wready;
    logic                      pm_pcis_cfg_rvalid;
    logic [31:0]               pm_pcis_cfg_rdata;
@@ -192,14 +195,14 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
    logic                      h2c_pcis_cfg_wready;
    logic                      h2c_pcis_cfg_rvalid;
    logic [31:0]               h2c_pcis_cfg_rdata;
-   
+
    logic                      ps_ps_cfg_wr_req;
    logic                      ps_ps_cfg_rd_req;
    logic [15:0]               ps_ps_cfg_addr;
    logic [31:0]               ps_ps_cfg_wdata;
    logic                      ps_ps_cfg_ack;
    logic [31:0]               ps_ps_cfg_rdata;
-   
+
    localparam WR_CH_IN_FIFO_WIDTH = PCIS_DATA_WIDTH + 1 + (PCIS_DATA_WIDTH>>3);
    localparam WR_CH_IN_FIFO_DEPTH_MINUS1 = WR_CH_IN_FIFO_DEPTH - 1;
    logic [WR_CH_IN_FIFO_WIDTH-1:0] wr_ch_in_ff_pop_data;
@@ -227,35 +230,35 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 //                                 .watermark   (wr_ch_in_ff_full),
 //                                 .data_valid  (wr_ch_in_ff_valid)
 //                                 );
-// 
+//
 //    assign wr_ch_in_ff_pop = wr_ch_in_ff_valid & pcis_wready_q;
 //    assign {pcis_wlast_q, pcis_wstrb_q, pcis_wdata_q} = wr_ch_in_ff_pop_data;
 //    assign pcis_wvalid_q = wr_ch_in_ff_valid;
 //    assign pcis_wready = ~wr_ch_in_ff_full;
 
    assign {pcis_wvalid_q, pcis_wlast_q, pcis_wstrb_q, pcis_wdata_q} = {pcis_wvalid, pcis_wlast, pcis_wstrb, pcis_wdata};
-   assign pcis_wready = pcis_wready_q;   
-                       
+   assign pcis_wready = pcis_wready_q;
+
    always @(posedge clk)
      if (!rst_n)
        pcis_req_state <= PCIS_REQ_IDLE;
-     else 
+     else
        pcis_req_state <= pcis_req_state_next;
 
    always_comb
      begin
         pcis_req_state_next = pcis_req_state;
         case (pcis_req_state)
-          
+
           PCIS_REQ_IDLE:
             if (pcis_awvalid || pcis_arvalid)
               pcis_req_state_next = PCIS_REQ_AW_AR;
             else
               pcis_req_state_next = PCIS_REQ_IDLE;
-          
+
           PCIS_REQ_AW_AR:
             pcis_req_state_next = PCIS_REQ_DEC;
-               
+
           PCIS_REQ_DEC:
             if (pcis_req_c2h_wr_desc || pcis_req_h2c_wr_desc)
               pcis_req_state_next = PCIS_REQ_WR_DESC;
@@ -265,9 +268,9 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
               pcis_req_state_next = PCIS_REQ_CFG;
             else if (pcis_req_rd_n_wr)
               pcis_req_state_next = PCIS_REQ_RESP;
-            else 
+            else
               pcis_req_state_next = PCIS_REQ_WR_DUMMY;
-          
+
           PCIS_REQ_CFG:
             if ((pcis_req_pm_cfg & ((pcis_req_rd_n_wr  & pm_pcis_cfg_rvalid ) || (~pcis_req_rd_n_wr & pm_pcis_cfg_wready ))) ||
                 (pcis_req_ps_cfg & ((pcis_req_rd_n_wr  & ps_pcis_cfg_rvalid ) || (~pcis_req_rd_n_wr & ps_pcis_cfg_wready ))) ||
@@ -284,13 +287,13 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
               pcis_req_state_next = PCIS_REQ_RESP;
             else
               pcis_req_state_next = PCIS_REQ_WR_DESC;
-          
+
           PCIS_REQ_WR_PKT:
             if (pcis_wvalid_q & pcis_wlast_q & pcis_req_h2c_wr_pkt & h2c_pcis_pkt_wready)
               pcis_req_state_next = PCIS_REQ_RESP;
             else
               pcis_req_state_next = PCIS_REQ_WR_PKT;
-          
+
           PCIS_REQ_WR_DUMMY:
            if (pcis_wvalid_q & pcis_wlast_q)
              pcis_req_state_next = PCIS_REQ_RESP;
@@ -307,17 +310,17 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
               pcis_req_state_next = PCIS_REQ_IDLE;
             else
               pcis_req_state_next = PCIS_REQ_RESP;
-          
+
           default:
             pcis_req_state_next = pcis_req_state;
-          
+
         endcase // case pcis_req_state
 
      end // else: !if(!rst_n)
 
    // Save request info
    always @(posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
        {pcis_req_id, pcis_req_size, pcis_req_len, pcis_req_addr, pcis_req_rd_n_wr} <= '{default:'0};
      else begin
         if ((pcis_req_state == PCIS_REQ_IDLE) && pcis_awvalid)
@@ -346,16 +349,16 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 
    localparam PS_PCIS_CFG_ADDR_START = H2C_PCIS_PKT_ADDR_END;
    localparam PS_PCIS_CFG_ADDR_END = PS_PCIS_CFG_ADDR_START + PS_PCIS_CFG_APERTURE;
-   
+
    localparam PM_PCIS_CFG_ADDR_START = PS_PCIS_CFG_ADDR_END;
    localparam PM_PCIS_CFG_ADDR_END = PM_PCIS_CFG_ADDR_START + PM_PCIS_CFG_APERTURE;
-   
+
    localparam C2H_PCIS_CFG_ADDR_START = PM_PCIS_CFG_ADDR_END;
    localparam C2H_PCIS_CFG_ADDR_END = C2H_PCIS_CFG_ADDR_START + C2H_PCIS_CFG_APERTURE;
-   
+
    localparam H2C_PCIS_CFG_ADDR_START = C2H_PCIS_CFG_ADDR_END;
    localparam H2C_PCIS_CFG_ADDR_END = H2C_PCIS_CFG_ADDR_START + H2C_PCIS_CFG_APERTURE;
-   
+
    // Decode addresses
    always @(posedge clk)
      if (!rst_n) begin
@@ -371,24 +374,24 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
      end
      else begin
         if (pcis_req_state == PCIS_REQ_AW_AR) begin
-           pcis_req_c2h_wr_desc <= ~pcis_req_rd_n_wr && 
+           pcis_req_c2h_wr_desc <= ~pcis_req_rd_n_wr &&
                                    (pcis_req_addr >= C2H_PCIS_DESC_ADDR_START) && (pcis_req_addr < C2H_PCIS_DESC_ADDR_END);
-           
-           pcis_req_h2c_wr_desc <= ~pcis_req_rd_n_wr && 
+
+           pcis_req_h2c_wr_desc <= ~pcis_req_rd_n_wr &&
                                    (pcis_req_addr >= H2C_PCIS_DESC_ADDR_START) && (pcis_req_addr < H2C_PCIS_DESC_ADDR_END);
 
-           pcis_req_h2c_wr_pkt    <= ~pcis_req_rd_n_wr && 
+           pcis_req_h2c_wr_pkt    <= ~pcis_req_rd_n_wr &&
                                  ((pcis_req_addr >= H2C_PCIS_PKT_ADDR_START) && (pcis_req_addr < H2C_PCIS_PKT_ADDR_END));
 
            pcis_req_ps_cfg  <= (pcis_req_addr >= PS_PCIS_CFG_ADDR_START ) && (pcis_req_addr < PS_PCIS_CFG_ADDR_END );
            pcis_req_pm_cfg  <= (pcis_req_addr >= PM_PCIS_CFG_ADDR_START ) && (pcis_req_addr < PM_PCIS_CFG_ADDR_END );
            pcis_req_c2h_cfg <= (pcis_req_addr >= C2H_PCIS_CFG_ADDR_START) && (pcis_req_addr < C2H_PCIS_CFG_ADDR_END);
            pcis_req_h2c_cfg <= (pcis_req_addr >= H2C_PCIS_CFG_ADDR_START) && (pcis_req_addr < H2C_PCIS_CFG_ADDR_END);
-           
-           pcis_req_rd_dummy <= pcis_req_rd_n_wr && 
+
+           pcis_req_rd_dummy <= pcis_req_rd_n_wr &&
                                 ((pcis_req_addr <  C2H_PCIS_DESC_ADDR_START) || (pcis_req_addr >= H2C_PCIS_CFG_ADDR_END) ||
                                  ((pcis_req_addr >= C2H_PCIS_DESC_ADDR_START) && (pcis_req_addr <  H2C_PCIS_PKT_ADDR_END)));
-           
+
            pcis_req_wr_dummy <= ~pcis_req_rd_n_wr && ((pcis_req_addr <  C2H_PCIS_DESC_ADDR_START) || (pcis_req_addr >= H2C_PCIS_CFG_ADDR_END));
 
         end // if (pcis_req_state == PCIS_REQ_AW_AR)
@@ -403,9 +406,9 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
            pcis_req_rd_dummy    <= pcis_req_rd_dummy ;
            pcis_req_wr_dummy    <= pcis_req_wr_dummy ;
         end // else: !if(pcis_req_state == PCIS_REQ_AW_AR)
-        
+
      end // else: !if(!rst_n)
-   
+
    // AW & AR Channel
    always @(posedge clk)
       if (!rst_n) begin
@@ -417,7 +420,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          pcis_arready <=  pcis_req_rd_n_wr & (pcis_req_state == PCIS_REQ_AW_AR);
       end
 
-   assign pcis_wready_q = (pcis_req_c2h_wr_desc & c2h_pcis_desc_wready) || 
+   assign pcis_wready_q = (pcis_req_c2h_wr_desc & c2h_pcis_desc_wready) ||
                           (pcis_req_h2c_wr_desc & h2c_pcis_desc_wready) ||
                           (pcis_req_h2c_wr_pkt  & h2c_pcis_pkt_wready)  ||
                           (pcis_req_ps_cfg      & ps_pcis_cfg_wready )  ||
@@ -425,7 +428,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
                           (pcis_req_c2h_cfg     & c2h_pcis_cfg_wready)  ||
                           (pcis_req_h2c_cfg     & h2c_pcis_cfg_wready)  ||
                           pcis_req_wr_dummy;
-   
+
    // B Channel
    always @(posedge clk)
      if (!rst_n) begin
@@ -438,14 +441,14 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
      end
    assign pcis_bid = pcis_req_id;
    assign pcis_bresp = 2'b00;
-   
+
    // R Channel
    logic [PCIS_LEN_WIDTH-1:0] pcis_req_read_len;
    logic [31:0]               cfg_pcis_rdata;
-   
-   assign cfg_pcis_rdata = pcis_req_ps_cfg  ? ps_pcis_cfg_rdata : 
-                           pcis_req_pm_cfg  ? pm_pcis_cfg_rdata : 
-                           pcis_req_c2h_cfg ? c2h_pcis_cfg_rdata : 
+
+   assign cfg_pcis_rdata = pcis_req_ps_cfg  ? ps_pcis_cfg_rdata :
+                           pcis_req_pm_cfg  ? pm_pcis_cfg_rdata :
+                           pcis_req_c2h_cfg ? c2h_pcis_cfg_rdata :
                            pcis_req_h2c_cfg ? h2c_pcis_cfg_rdata : 32'hbaad_0000;
    always @(posedge clk)
      if (!rst_n) begin
@@ -456,19 +459,19 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
         pcis_req_read_len <= 0;
      end
      else begin
-        pcis_rvalid <= pcis_rvalid && pcis_rready && (pcis_req_read_len == 0) ? 1'b0 : 
-                       (pcis_req_state == PCIS_REQ_RESP) && pcis_req_rd_n_wr ? 1'b1 : 
+        pcis_rvalid <= pcis_rvalid && pcis_rready && (pcis_req_read_len == 0) ? 1'b0 :
+                       (pcis_req_state == PCIS_REQ_RESP) && pcis_req_rd_n_wr ? 1'b1 :
                        pcis_rvalid;
         pcis_rdata <= cfg_pcis_rdata << {pcis_req_addr[5:2], 5'd0};
         pcis_rlast <= (pcis_req_state == PCIS_REQ_RESP) && pcis_req_rd_n_wr && (pcis_req_read_len == 0);
-        
+
         pcis_req_read_len <= pcis_arvalid & pcis_arready ? pcis_arlen :
                              pcis_rvalid & pcis_rready ? pcis_req_read_len - 1 :
                              pcis_req_read_len;
      end // else: !if(!rst_n)
    assign pcis_rid = pcis_req_id;
    assign pcis_rresp = 2'b00;
-   
+
    // W Channel to C2H Descriptor
    logic c2h_pcis_req_wr_desc;
    assign c2h_pcis_req_wr_desc =  pcis_req_active & pcis_req_c2h_wr_desc;
@@ -493,7 +496,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
       .acc_wdata     (c2h_ps_desc_wdata),
       .acc_ack       (c2h_ps_desc_ack)
       );
-   
+
    // W Channel to H2C Descriptor
    logic h2c_pcis_req_wr_desc;
    assign h2c_pcis_req_wr_desc = pcis_req_active & pcis_req_h2c_wr_desc;
@@ -518,7 +521,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
       .acc_wdata     (h2c_ps_desc_wdata),
       .acc_ack       (h2c_ps_desc_ack)
       );
-   
+
 //    // W Channel to H2C Pkt Buffer
 //    logic h2c_pcis_req_wr_pkt;
 //    assign h2c_pcis_req_wr_pkt = pcis_req_active & pcis_req_h2c_wr_pkt;
@@ -541,11 +544,11 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 //       .acc_wdata     (h2c_ps_pkt_wdata),
 //       .acc_ack       (h2c_ps_pkt_ack)
 //       );
-//    
+//
    assign h2c_pcis_pkt_wready = 0;
    assign h2c_ps_pkt_wr_req = 0;
    assign h2c_ps_pkt_wdata = ({H2C_PKT_WIDTH{1'b0}});
-   
+
    // W Channel to PM Cfg
    // R Channel from PM Cfg
    always @(posedge clk)
@@ -554,7 +557,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          pm_ps_cfg_rd_req <= 0;
          pm_ps_cfg_addr <= '{default:'0};
          pm_ps_cfg_wdata  <= '{default:'0};
-         pm_pcis_cfg_wready <= 0; 
+         pm_pcis_cfg_wready <= 0;
          pm_pcis_cfg_rvalid <= 0;
          pm_pcis_cfg_rdata  <= '{default:'0};
       end
@@ -570,7 +573,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          pm_ps_cfg_addr <= ~(pm_ps_cfg_wr_req || pm_ps_cfg_rd_req) ? pcis_req_addr - PM_PCIS_CFG_ADDR_START : pm_ps_cfg_addr;
 
          pm_ps_cfg_wdata <= ~(pm_ps_cfg_wr_req || pm_ps_cfg_rd_req) ? (pcis_wdata_q >> {pcis_req_addr[5:2], 5'd0}) : pm_ps_cfg_wdata;
-         
+
          pm_pcis_cfg_wready <= pm_ps_cfg_wr_req & pm_ps_cfg_ack;
 
          pm_pcis_cfg_rvalid <= pm_ps_cfg_rd_req & pm_ps_cfg_ack;
@@ -578,7 +581,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          pm_pcis_cfg_rdata <= pm_ps_cfg_rd_req & pm_ps_cfg_ack ? pm_ps_cfg_rdata : pm_pcis_cfg_rdata;
 
       end // else: !if(!rst_n)
-   
+
    // W Channel to PS Cfg
    // R Channel from PS Cfg
    always @(posedge clk)
@@ -587,7 +590,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          ps_ps_cfg_rd_req <= 0;
          ps_ps_cfg_addr <= '{default:'0};
          ps_ps_cfg_wdata  <= '{default:'0};
-         ps_pcis_cfg_wready <= 0; 
+         ps_pcis_cfg_wready <= 0;
          ps_pcis_cfg_rvalid <= 0;
          ps_pcis_cfg_rdata  <= '{default:'0};
       end
@@ -603,7 +606,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          ps_ps_cfg_addr <= ~(ps_ps_cfg_wr_req || ps_ps_cfg_rd_req) ? pcis_req_addr - PS_PCIS_CFG_ADDR_START : ps_ps_cfg_addr;
 
          ps_ps_cfg_wdata <= ~(ps_ps_cfg_wr_req || ps_ps_cfg_rd_req) ? (pcis_wdata_q >> {pcis_req_addr[5:2], 5'd0}) : ps_ps_cfg_wdata;
-         
+
          ps_pcis_cfg_wready <= ps_ps_cfg_wr_req & ps_ps_cfg_ack;
 
          ps_pcis_cfg_rvalid <= ps_ps_cfg_rd_req & ps_ps_cfg_ack;
@@ -620,7 +623,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          c2h_ps_cfg_rd_req <= 0;
          c2h_ps_cfg_addr <= '{default:'0};
          c2h_ps_cfg_wdata  <= '{default:'0};
-         c2h_pcis_cfg_wready <= 0; 
+         c2h_pcis_cfg_wready <= 0;
          c2h_pcis_cfg_rvalid <= 0;
          c2h_pcis_cfg_rdata  <= '{default:'0};
       end
@@ -636,7 +639,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          c2h_ps_cfg_addr <= ~(c2h_ps_cfg_wr_req || c2h_ps_cfg_rd_req) ? pcis_req_addr - C2H_PCIS_CFG_ADDR_START : c2h_ps_cfg_addr;
 
          c2h_ps_cfg_wdata <= ~(c2h_ps_cfg_wr_req || c2h_ps_cfg_rd_req) ? (pcis_wdata_q >> {pcis_req_addr[5:2], 5'd0}) : c2h_ps_cfg_wdata;
-         
+
          c2h_pcis_cfg_wready <= c2h_ps_cfg_wr_req & c2h_ps_cfg_ack;
 
          c2h_pcis_cfg_rvalid <= c2h_ps_cfg_rd_req & c2h_ps_cfg_ack;
@@ -644,7 +647,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          c2h_pcis_cfg_rdata <= c2h_ps_cfg_rd_req & c2h_ps_cfg_ack ? c2h_ps_cfg_rdata : c2h_pcis_cfg_rdata;
 
       end // else: !if(!rst_n)
-   
+
    // W Channel to H2C Cfg
    // R Channel from H2C Cfg
    always @(posedge clk)
@@ -653,7 +656,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          h2c_ps_cfg_rd_req <= 0;
          h2c_ps_cfg_addr <= '{default:'0};
          h2c_ps_cfg_wdata  <= '{default:'0};
-         h2c_pcis_cfg_wready <= 0; 
+         h2c_pcis_cfg_wready <= 0;
          h2c_pcis_cfg_rvalid <= 0;
          h2c_pcis_cfg_rdata  <= '{default:'0};
       end
@@ -669,7 +672,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
          h2c_ps_cfg_addr <= ~(h2c_ps_cfg_wr_req || h2c_ps_cfg_rd_req) ? pcis_req_addr - H2C_PCIS_CFG_ADDR_START : h2c_ps_cfg_addr;
 
          h2c_ps_cfg_wdata <= ~(h2c_ps_cfg_wr_req || h2c_ps_cfg_rd_req) ? (pcis_wdata_q >> {pcis_req_addr[5:2], 5'd0}) : h2c_ps_cfg_wdata;
-         
+
          h2c_pcis_cfg_wready <= h2c_ps_cfg_wr_req & h2c_ps_cfg_ack;
 
          h2c_pcis_cfg_rvalid <= h2c_ps_cfg_rd_req & h2c_ps_cfg_ack;
@@ -681,11 +684,11 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
    // Local Config Registers
    // TODO:
    // Temporarily no registers
-   
+
    logic ps_ps_cfg_rd_ack;
    logic ps_ps_cfg_wr_ack;
    logic cfg_ps_reset;
-   
+
    assign ps_ps_cfg_ack = ps_ps_cfg_wr_req ? ps_ps_cfg_wr_ack : ps_ps_cfg_rd_ack;
 
    /////////////////////////////////////////////////
@@ -701,7 +704,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
    //  15:1  - RSVD
    //    16  - H2C Present
    // 31:17  - RSVD
-   
+
    // Register Writes
    always @(posedge clk)
      if (!rst_n) begin
@@ -709,7 +712,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
         cfg_ps_reset <= 0;
      end
      else if (ps_ps_cfg_wr_req) begin
-        case (c2h_ps_cfg_addr[8:0]) 
+        case (c2h_ps_cfg_addr[8:0])
           9'h000 : begin
              ps_ps_cfg_wr_ack <= 1;
              cfg_ps_reset <= ps_ps_cfg_wdata;
@@ -719,7 +722,7 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
           end
         endcase // case (c2h_ps_cfg_addr[8:0])
      end // if (ps_ps_cfg_wr_req)
-   
+
    logic [15:0] cfg_c2h_present;
    logic [15:0] cfg_h2c_present;
    logic        h2c_only;
@@ -727,10 +730,10 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 
    assign h2c_only = H2C_ONLY;
    assign c2h_only = C2H_ONLY;
-   
+
    assign cfg_c2h_present = {15'd0, ~h2c_only};
    assign cfg_h2c_present = {15'd0, ~c2h_only};
-   
+
    // Signals based on writes
    always @(posedge clk)
       if (!rst_n) begin
@@ -765,10 +768,10 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
         h2c_sync_rst_n <= ~cfg_ps_reset;
         pm_sync_rst_n  <= ~cfg_ps_reset;
      end // else: !if(!rst_n)
-   
-      
+
+
 // `ifndef NO_SDE_DEBUG_ILA
-// 
+//
 //    ila_sde_ps SDE_PS_ILA (.clk     (clk),
 //                           .probe0  (c2h_ps_desc_wr_req   ),
 //                           .probe1  (c2h_ps_desc_wdata    ),
@@ -816,11 +819,10 @@ module sde_ps #(parameter bit C2H_ONLY = 0,
 //                           .probe43 (pcis_req_wr_dummy    ),
 //                           .probe44 (c2h_pcis_req_wr_desc ),
 //                           .probe45 (h2c_pcis_req_wr_desc ),
-//                           .probe46 (h2c_pcis_req_wr_pkt  )                          
+//                           .probe46 (h2c_pcis_req_wr_pkt  )
 //                           );
-//      
+//
 // `endif //  `ifndef NO_SDE_DEBUG_ILA
-   
-   
-endmodule // sde_ps
 
+
+endmodule // sde_ps
