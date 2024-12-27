@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,13 +13,15 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
-//=============================================================================
+
+// ============================================================================
 // CL_HBM_AXI4
 // --------
 // - Convert 512b 250MHz AXI4 to 450MHz AXI3 bus to feed into HBM
 // - Instantiate HBM Wrapper
-//=============================================================================
+// ============================================================================
 
 module cl_hbm_axi4
 #(

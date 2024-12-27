@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 `ifndef _MACROS_SVH_
 `define _MACROS_SVH_
@@ -596,7 +599,7 @@
    ``master``user = ``slave``user;        \
                                                  \
    ``slave``ack = ``master``ack;          \
-   ``slave``rdata = ``master``rdata;      
+   ``slave``rdata = ``master``rdata;
 
 //bus_name is the port on the instace, if_name is the interface name to connect to
 `define EXP_CONNECT_AXI_BUS(port_name, if_name)  \

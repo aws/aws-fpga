@@ -1,7 +1,25 @@
+# =============================================================================
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
+# =============================================================================
+
+
 test_dram_dma_axi_mstr: TEST=test_dram_dma_axi_mstr
 test_dram_dma_axi_mstr: all
 
-#Not supporting until XSIM related issues fixed 
+#Not supporting until XSIM related issues fixed
 test_dram_dma_4k_crossing: TEST=test_dram_dma_4k_crossing
 test_dram_dma_4k_crossing: check_xsim all
 
@@ -41,15 +59,15 @@ test_dma_pcis_concurrent: all
 test_dma_sda_concurrent: TEST=test_dma_sda_concurrent
 test_dma_sda_concurrent: all
 
-#Not supporting until XSIM related issues fixed 
+#Not supporting until XSIM related issues fixed
 test_dram_dma: TEST=test_dram_dma
 test_dram_dma: check_xsim all
 
-#Not supporting until XSIM related issues fixed 
+#Not supporting until XSIM related issues fixed
 test_dram_dma_align_addr_4k: TEST=test_dram_dma_align_addr_4k
 test_dram_dma_align_addr_4k: check_xsim all
 
-#Not supporting until XSIM related issues fixed 
+#Not supporting until XSIM related issues fixed
 test_dram_dma_single_beat_4k: TEST=test_dram_dma_single_beat_4k
 test_dram_dma_single_beat_4k: check_xsim all
 
@@ -61,7 +79,7 @@ test_dram_dma_single_beat_4k: check_xsim all
 # test_dram_dma_mem_model_bdr_wr: DEFAULT_DEFINES += +define+NO_DDR+FAST_SIM_MODE
 # test_dram_dma_mem_model_bdr_wr: all
 
-#Not supporting until XSIM related issues fixed 
+#Not supporting until XSIM related issues fixed
 test_dram_dma_rnd: TEST=test_dram_dma_rnd
 test_dram_dma_rnd: check_xsim all
 

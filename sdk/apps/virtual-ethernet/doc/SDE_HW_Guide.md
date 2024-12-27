@@ -40,16 +40,16 @@
 <a name="Overview"></a>
 # Overview
 
-The Streaming Data Engine (SDE) provides high-performance packet streaming connectivity between the Custom Logic (CL) and the host application. The SDE provides a streaming interface to the CL and uses the shell's PCIM AXI4 interface to move packets between the CL and the host application. The SDE is a parametrizable, soft IP block that is intended to be instanciated within the CL. Each instance of the SDE provides two AXI streaming compliant interfaces viz. one Card-to-Host (C2H) and one Host-to-Card (H2C) channel.
+The Streaming Data Engine (SDE) provides high-performance packet streaming connectivity between the Custom Logic (CL) and the host application. The SDE provides a streaming interface to the CL and uses the shell's PCIM AXI4 interface to move packets between the CL and the host application. The SDE is a parameterizable, soft IP block that is intended to be instantiated within the CL. Each instance of the SDE provides two AXI streaming compliant interfaces viz. one Card-to-Host (C2H) and one Host-to-Card (H2C) channel.
 
 <a name="FeatureList"></a>
 # Feature List
 1. High Performance PPS for C2H and H2C.
 2. 12GB/s Bandwidth per channel for C2H and H2C (4KB packet at 250MHz).
 3. AXI Stream compliant on the CL facing side.
-4. AXI Stream supports parametrizable data widths 64, 128, 256 and 512 bits (Current version supports 512 bits only).
+4. AXI Stream supports parameterizable data widths 64, 128, 256 and 512 bits (Current version supports 512 bits only).
 5. AXI4 complaint on the shell facing side.
-6. AXI4 supports parametrizable data widths 64, 128, 256 and 512 bits (Current version supports 512 bits only).
+6. AXI4 supports parameterizable data widths 64, 128, 256 and 512 bits (Current version supports 512 bits only).
 7. User bits on the RX and TX streaming interfaces.
 8. Multiple descriptor types (Normal and Compact).
 9. Multiple descriptors per packet.
@@ -1288,7 +1288,7 @@ Design parameters C2H_ONLY and H2C_ONLY can be used to get what is required and 
 With the current version of the SDE, if more than 1 full duplex channel is needed, multiple SDEs have to be instanced and AXI crossbars have to be used to connect the PCIS and PCIM buses to/from the corresponding SDEs. Similarly, if more than 1 C2H or more than 1 H2C channel is required, multiple SDEs have to be used.
 
 ### Q. Is there a maximum number of SDEs that can be instanced in a CL?
-There is no theoritecal maximum. There is a practical limitation based on the number of resources in the CL.
+There is no theoretical maximum. There is a practical limitation based on the number of resources in the CL.
 
 ### Q. What kind of software/Driver is required to use the SDE.
 A userspace or kernel poll-mode driver is required to use the SDE.
@@ -1322,7 +1322,7 @@ The maximum throughput for H2C is 12 GB/s and the maximum throughput for C2h is 
 4KB is the minimum packet size required for maximum throughput.
 
 ### Q. My application uses PCIS and PCIM interfaces for other purposes in the CL. Can I still use the SDE?
-Yes, the SDE can still be used. However, appropriate AXI Crossbars/Fabric needs to be used in the CL in order to provide connectivity for PCIS and PCIM buses to the SDE. Additionally, address and ARID/AWIDs should be appropriately configured/parametrized in the software and the SDE respectively.
+Yes, the SDE can still be used. However, appropriate AXI Crossbars/Fabric needs to be used in the CL in order to provide connectivity for PCIS and PCIM buses to the SDE. Additionally, address and ARID/AWIDs should be appropriately configured/parameterized in the software and the SDE respectively.
 
 ### Q. My accelerator/CL cannot transmit/receive data at 512bits per clock. Can SDE transmit/receive less than 512 bits per clock on the H2C/C2H Streaming Interfaces?
 The current version of the SDE can only transmit/receive data at 512 bits per clock. The CL developer can use Xilinx AXI-S width converters to achieve width conversion from any bit width to 512 bits.
@@ -1339,6 +1339,3 @@ AWS only supports SDE implemented at a maximum of 250MHz.
 
 ### Q. Should the SDE be constrained to a single SLR?
 AWS recommends that the all the logic in the SDE be constrained to a single SLR. Additionally, AWS recommends adding pipelining on the PCIM and PCIS interfaces from the shell leading up to the SDE.
-
-
-

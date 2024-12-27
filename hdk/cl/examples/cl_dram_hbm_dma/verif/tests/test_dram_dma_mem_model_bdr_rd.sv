@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,9 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
+
 // This test bypasses Micron DDR models and uses AXI memory model.
 // Please refer to readme for more information about AXI memoryy model.
 // This test frontdoor writes and backdoor reads AXI memory model.
@@ -30,7 +34,7 @@ module test_dram_dma_mem_model_bdr_rd();
    int         len2 = 6000;
    //transfer4 - length between 256 and 512 bytes.
    int         len3 = 300;
-      
+
    initial begin
 
       logic [63:0] ddr_addr_0, ddr_addr_1, ddr_addr_2, ddr_addr_3;
@@ -40,9 +44,9 @@ module test_dram_dma_mem_model_bdr_rd();
                   .clk_recipe_c(ClockRecipe::C0));
 	  initialize_ddr();
       deselect_cl_tst_hw();
-	   
+
 	  #10000ns;
- 
+
       $display("[%t] : Initializing DDR buffers", $realtime);
 	  load_host_memory(.chan(`DDR_CHANNEL), .host_addr(64'h0000), .cl_addr(`DDR_BASE_ADDR), .data_pattern(8'hAA), .num_bytes(len0));
 	  load_host_memory(.chan(`DDR_CHANNEL), .host_addr(64'h3000), .cl_addr(`DDR_BASE_ADDR + `DDR_LEVEL_1), .data_pattern(8'hBB), .num_bytes(len1));
@@ -53,7 +57,7 @@ module test_dram_dma_mem_model_bdr_rd();
       tb.start_que_to_cl(.chan(`DDR_CHANNEL));
 	  wait_for_dma_transfer_from_buffer_to_cl(.chan(`DDR_CHANNEL));
       #1us;
-      
+
       $display("Back door read memory from DDR Base Address \n");
       ddr_addr_0 = `DDR_BASE_ADDR;
       for (int i = 0 ; i < len0 ; i++) begin
@@ -87,7 +91,7 @@ module test_dram_dma_mem_model_bdr_rd();
          end
          ddr_addr_2++;
       end
-      
+
       $display("Back door read memory from DDR Offset 24 GB \n");
       ddr_addr_3 = `DDR_BASE_ADDR + `DDR_LEVEL_3;
       for (int i = 0 ; i < len3 ; i++) begin
@@ -108,4 +112,3 @@ module test_dram_dma_mem_model_bdr_rd();
    end // initial begin
 
 endmodule // test_dram_dma_mem_model_bdr_rd
-

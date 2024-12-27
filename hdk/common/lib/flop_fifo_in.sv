@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 // flop_fifo_in : Flops the input data right away
@@ -61,13 +63,13 @@ module flop_fifo_in #(// --------------------------------------------------
    localparam LESS_RST_LOCAL = 1;
 `else
    localparam LESS_RST_LOCAL = LESS_RST;
-`endif   
-                               
+`endif
+
    // For every push, keep pushing data into the ff_fifo array
    // For pop's there is no change
    generate
       if (LESS_RST_LOCAL == 1) begin
-         
+
          always @(posedge clk) begin
             for (int i = 0; i < DEPTH; i++) begin
                if (push) begin
@@ -81,9 +83,9 @@ module flop_fifo_in #(// --------------------------------------------------
             end // for (int i = 0; i < DEPTH; i++)
          end // always @ (posedge clk)
       end // if (LESS_RST_LOCAL == 1)
-      
+
       else begin
-         
+
          always @(posedge clk or negedge rst_n)
            if (!rst_n) begin
               ff_fifo <= '{default:'0};
@@ -103,18 +105,18 @@ module flop_fifo_in #(// --------------------------------------------------
                    ff_fifo[i] <= ff_fifo[i];
               end // for (int i = 0; i < DEPTH; i++)
            end // else: !if(!rst_n)
-         
+
       end // if !(LESS_RST_LOCAL == 1)
 
    endgenerate
-   
+
    // For push & ~pop, valid[0] gets 1. every thing else shifts.
    // For ~push & pop, the most significant valid gets invalidated
    // For push & pop, valid array stays the same
    generate
-      
+
       if (LESS_RST_LOCAL == 1) begin
-         
+
          always @(posedge clk)
            if (!rst_n || !sync_rst_n) begin
               ff_valid <= '{default:'0};
@@ -139,9 +141,9 @@ module flop_fifo_in #(// --------------------------------------------------
            end // else: !if(!rst_n)
 
       end // if (LESS_RST_LOCAL == 1)
-      
+
       else begin
-      
+
          always @(posedge clk or negedge rst_n)
            if (!rst_n) begin
               ff_valid <= '{default:'0};
@@ -171,16 +173,16 @@ module flop_fifo_in #(// --------------------------------------------------
       end // else: !if(LESS_RST_LOCAL == 1)
 
    endgenerate
-   
+
    // Output data is the most significant data (oldest data)
    always_comb begin
       ss_pop_data = ({WIDTH{1'b0}});
       for (int i = 0; i < DEPTH; i++) begin
-         if (ff_valid[i]) 
+         if (ff_valid[i])
            ss_pop_data = ff_fifo[i];
       end
    end
-   
+
    // Data is valid as long as entry 0 is valid
    assign ss_data_valid = ff_valid[0];
 
@@ -198,7 +200,7 @@ module flop_fifo_in #(// --------------------------------------------------
                end
                ff_pop_data <= ss_pop_data;
             end
-            
+
          end // if (LESS_RST_LOCAL == 1)
 
          else begin
@@ -232,5 +234,3 @@ module flop_fifo_in #(// --------------------------------------------------
    assign watermark = ff_valid[cfg_watermark];
 
 endmodule // epipe_flop_fifo
-
-   

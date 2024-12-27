@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 `include "common_base_test.svh"
 
@@ -102,11 +105,11 @@ int cfg_err_cnt_finish = 1;      //How many errors before kill simulatino
 bit cfg_perf_mon;
 
 logic [5:0] cfg_wc_cnt = 6'd0;
-logic cfg_md_wr_ptr_wc_en = 1; 
-logic cfg_pkt_cnt_wc_en = 1; 
-logic cfg_desc_cnt_wc_en = 1; 
-logic cfg_desc_cdt_wc_en = 1; 
-logic [3:0] cfg_wc_to_cnt = 4'd0; 
+logic cfg_md_wr_ptr_wc_en = 1;
+logic cfg_pkt_cnt_wc_en = 1;
+logic cfg_desc_cnt_wc_en = 1;
+logic cfg_desc_cdt_wc_en = 1;
+logic [3:0] cfg_wc_to_cnt = 4'd0;
 logic [19:0] cfg_wc_to_rsln = 20'd0;
 
 logic [3:0] cfg_wc_cnt_min = 6'd0;
@@ -165,14 +168,14 @@ begin
       if (exp_c2h_pkt_q.size()==0)
       begin
          $display($time,,,"TB_C2H_AutoCheck: ***FATAL*** Got a C2H packet in host, but expect queue is empty");
-      end 
+      end
       else
       begin
          cur_c2h_stream_pkt = exp_c2h_pkt_q.pop_front();
          cur_c2h_stream_pkt_user = exp_c2h_pkt_user_q.pop_front();
          $display($time,,,"C2H Auto Check, RXPkt:Length=0x%0x, Data=0x%0x, ExpQ:Length=0x%0x, ExpQ:Data=0x%0x, ExpQ:User=0x%x", cur_c2h_host_pkt.data.size(), {cur_c2h_host_pkt.data[3], cur_c2h_host_pkt.data[2], cur_c2h_host_pkt.data[1], cur_c2h_host_pkt.data[0]},
                                                                                                             cur_c2h_stream_pkt.data.size(), {cur_c2h_stream_pkt.data[3], cur_c2h_stream_pkt.data[2], cur_c2h_stream_pkt.data[1], cur_c2h_stream_pkt.data[0]}, cur_c2h_host_pkt_user);
-         c2h_err_cnt += cur_c2h_host_pkt.compare(cur_c2h_stream_pkt); 
+         c2h_err_cnt += cur_c2h_host_pkt.compare(cur_c2h_stream_pkt);
 
          if ((cfg_desc_type==0) && (cur_c2h_stream_pkt_user != cur_c2h_host_pkt_user))
          begin
@@ -183,7 +186,7 @@ begin
          //begin
          //   $display($time,,,"C2H Auto Check: user OK.  Expected=0x%x, Actual=0x%x", cur_c2h_stream_pkt_user, cur_c2h_host_pkt_user);
          //end
-            
+
       end
    end
 end
@@ -196,7 +199,7 @@ end
 //---------------------------------
 
 //Auto checking of H2C packets
-always 
+always
 begin:h2c_auto_check
    logic[31:0] rdata;
    automatic logic[15:0] srm_inp_wr_ptr = 0;
@@ -213,7 +216,7 @@ begin:h2c_auto_check
 
    logic[63:0] exp_rx_user;
 
-      
+
 
    logic[(1 + 64 + 64 + 512)-1:0] ins_fifo_data;
 
@@ -309,15 +312,15 @@ begin:h2c_auto_check
                srm_inp_rd_ptr = (srm_inp_rd_ptr + 1) & ((1 << `SRM_PATH.INP_PTR_WIDTH) - 1);
             end
          end
-      end      
+      end
    end
 end
 
 // End H2C self checking
 //----------------------------
-         
+
 //-----------------------------------------------------------------------------------------------
-// Random descriptor class, this will randomize offset/length of descriptor based on 
+// Random descriptor class, this will randomize offset/length of descriptor based on
 // test setup.
 //-----------------------------------------------------------------------------------------------
 class rnd_desc;
@@ -329,13 +332,13 @@ class rnd_desc;
    int max_offset;
    int min_length;
    int max_length;
-   
+
    int page_size;
    int pkt_length;
 
    int accum_length;
 
-   constraint default_c { 
+   constraint default_c {
                            offset + length <= page_size;
                            offset + length <= pkt_length - accum_length;
                            offset >= min_offset;
@@ -348,7 +351,7 @@ class rnd_desc;
 
                            eop == ((accum_length + length) == pkt_length);
                         }
-                        
+
 
    function new (int min_offset=cfg_desc_offset_min, int max_offset=cfg_desc_offset_max, int min_length=cfg_desc_length_min, int max_length=cfg_desc_length_max, int page_size=cfg_page_size, int pkt_length=0, int accum_length=0);
 
@@ -368,7 +371,7 @@ class rnd_desc;
 endclass
 
 //----------------------------------------
-// Thread to send H2C packets 
+// Thread to send H2C packets
 //----------------------------------------
 task post_h2c_desc_thread;
 
@@ -437,7 +440,7 @@ begin
       end
 
       $display($time,,,"TX_PKT[%0d]: Length=0x%0x (%0d), User=0x%x", pkt_count, cur_pkt_length, cur_pkt_length, cur_pkt_user);
-    
+
       desc_count = 0;
       accum_length = 0;
 
@@ -445,7 +448,7 @@ begin
       rd.accum_length = accum_length;
 
       //Create descriptors for the packet.  Accum length of the descriptors until satisfy packet length
-      while (accum_length<cur_pkt_length) 
+      while (accum_length<cur_pkt_length)
       begin
          //See if we have descriptor credits
          credit_diff = desc_limit - desc_cons;
@@ -472,7 +475,7 @@ begin
          end
 
          //Randomize descritpor paramters (offset/length)
-         rd.randomize(); 
+         rd.randomize();
          if (verbose)
             rd.display();
 
@@ -526,7 +529,7 @@ begin
 
       pkt_count++;
 
-       
+
       //Random delay between packets
       tmp = $urandom_range(cfg_pkt_dly_max, cfg_pkt_dly_min);
       #(tmp * 1ns);
@@ -547,12 +550,12 @@ endtask
 initial
 begin
    gl_to_count = 0;
-      
+
    while (gl_to_count < global_timeout)
    begin
       @(posedge tb_clk);
       gl_to_count++;
-      
+
       if (global_timeout_en == 0)
       begin
          while (global_timeout_en == 0)
@@ -572,8 +575,8 @@ begin
    while (wdog_count < watchdog_timeout)
    begin
       @(posedge `CL_PATH.clk_main_a0);
-      if (  (`CL_PATH.cl_sh_pcim_awvalid & `CL_PATH.sh_cl_pcim_arready) || 
-            (`CL_PATH.cl_sh_pcim_arvalid & `CL_PATH.sh_cl_pcim_arready) || 
+      if (  (`CL_PATH.cl_sh_pcim_awvalid & `CL_PATH.sh_cl_pcim_arready) ||
+            (`CL_PATH.cl_sh_pcim_arvalid & `CL_PATH.sh_cl_pcim_arready) ||
             (`CL_PATH.sh_cl_dma_pcis_awvalid & `CL_PATH.cl_sh_dma_pcis_awready) ||
             (`CL_PATH.sh_cl_dma_pcis_arvalid & `CL_PATH.cl_sh_dma_pcis_arready) ||
             (`CL_PATH.c2h_axis_valid & `CL_PATH.c2h_axis_ready) ||
@@ -596,7 +599,7 @@ begin
    $display($time,,,"test_base: ***ERROR*** WDOG Timeout wdog_timeout=%0d clocks, c2h_pkts_checked=%0d, h2c_pkts_checked=%0d, cfg_num_pkts=%0d", watchdog_timeout, c2h_pkts_checked, h2c_pkts_checked, cfg_num_pkts);
    $finish;
 end
-   
+
 // End global timeout
 //----------------------------
 
@@ -649,78 +652,78 @@ begin
    //Note this is the size of the descriptor structure (either 32B or 16B)
    if (!$value$plusargs("cfg_desc_type=%d", cfg_desc_type))
    begin
-      cfg_desc_type = 0; 
+      cfg_desc_type = 0;
    end
 
    if (!$value$plusargs("cfg_page_size=%d", cfg_page_size))
    begin
-      cfg_page_size = 4096; 
+      cfg_page_size = 4096;
    end
 
    if (!$value$plusargs("cfg_max_num_desc=%d", cfg_max_num_desc))
    begin
-      cfg_max_num_desc = 64; 
+      cfg_max_num_desc = 64;
    end
 
 
    if (!$value$plusargs("cfg_pkt_length_min=%d", cfg_pkt_length_min))
    begin
-      cfg_pkt_length_min = 256; 
+      cfg_pkt_length_min = 256;
    end
-   
+
    if (!$value$plusargs("cfg_pkt_length_max=%d", cfg_pkt_length_max))
    begin
-      cfg_pkt_length_max = 256; 
+      cfg_pkt_length_max = 256;
    end
 
    if (!$value$plusargs("cfg_desc_offset_min=%d", cfg_desc_offset_min))
    begin
-      cfg_desc_offset_min = 0; 
+      cfg_desc_offset_min = 0;
    end
-   
+
    if (!$value$plusargs("cfg_desc_offset_max=%d", cfg_desc_offset_max))
    begin
-      cfg_desc_offset_max = 256; 
+      cfg_desc_offset_max = 256;
    end
 
    if (!$value$plusargs("cfg_desc_length_min=%d", cfg_desc_length_min))
    begin
-      cfg_desc_length_min = 64; 
+      cfg_desc_length_min = 64;
    end
-   
+
    if (!$value$plusargs("cfg_desc_length_max=%d", cfg_desc_length_max))
    begin
-      cfg_desc_length_max = cfg_page_size; 
+      cfg_desc_length_max = cfg_page_size;
    end
 
    if (!$value$plusargs("cfg_pkt_dly_min=%d", cfg_pkt_dly_min))
    begin
-      cfg_pkt_dly_min = 1; 
+      cfg_pkt_dly_min = 1;
    end
-   
+
    if (!$value$plusargs("cfg_pkt_dly_max=%d", cfg_pkt_dly_max))
    begin
-      cfg_pkt_dly_max = 1; 
+      cfg_pkt_dly_max = 1;
    end
 
    if (!$value$plusargs("cfg_desc_dly_min=%d", cfg_desc_dly_min))
    begin
-      cfg_desc_dly_min = 1; 
+      cfg_desc_dly_min = 1;
    end
-   
+
    if (!$value$plusargs("cfg_desc_dly_max=%d", cfg_desc_dly_max))
    begin
-      cfg_desc_dly_max = 1; 
+      cfg_desc_dly_max = 1;
    end
 
    if (!$value$plusargs("cfg_desc_before_db_min=%d", cfg_desc_before_db_min))
    begin
-      cfg_desc_before_db_min = 1; 
+      cfg_desc_before_db_min = 1;
    end
-   
+
    if (!$value$plusargs("cfg_desc_before_db_max=%d", cfg_desc_before_db_max))
    begin
-      cfg_desc_before_db_max = 16; 
+      cfg_desc_before_db_max = 16;
    end
 
    if (!$value$plusargs("cfg_desc_wc=%d", cfg_desc_wc))
@@ -810,7 +813,7 @@ begin
                   cfg_num_pkts, cfg_desc_type, cfg_pkt_length_min, cfg_pkt_length_max, cfg_desc_offset_min, cfg_desc_offset_max, cfg_desc_length_min, cfg_desc_length_max, cfg_pkt_dly_min, cfg_pkt_dly_max, cfg_max_num_desc,
                   cfg_desc_dly_min, cfg_desc_dly_max);
 
-   
+
    //$srandom(seed);
 end
 
@@ -825,7 +828,7 @@ begin
 
    $finish;
 end
-endtask 
+endtask
 
 //-----------------------------
 // Monitor error counts
@@ -840,4 +843,3 @@ begin
       $finish;
    end
 end
-

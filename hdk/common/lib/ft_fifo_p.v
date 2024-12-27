@@ -1,28 +1,24 @@
-//----------------------------------------------------------------------------------
-//Copyright (c) 2014
+// ============================================================================
+// Amazon FPGA Hardware Development Kit
 //
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
 //
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
-//----------------------------------------------------------------------------------
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+// ============================================================================
+
 
 //------------------------------------------------------------------------------
-//   Description : 
-//   
+//   Description :
+//
 // This is a flow-through FIFO that converts a RAM-based FIFO (2 clock
 // latency on the RAM) to what looks like a flop based FIFO.  There is
 // no delay between pop and getting the next data.  This sometimes simplifies
@@ -52,7 +48,7 @@ module ft_fifo_p (
 
 parameter FIFO_WIDTH = 32;
 parameter LESS_RST = 0;
-   
+
 input clk;                             //Global clock
 input rst_n;                           //Global reset
 
@@ -98,40 +94,40 @@ always @(negedge rst_n or posedge clk)
       endcase
    end
 
-   generate 
+   generate
       if (LESS_RST == 1)
         begin
            always @(posedge clk)
              begin
-                ram_pop_q <= ram_pop; 
+                ram_pop_q <= ram_pop;
                 ram_pop_qq <= ram_pop_q;
              end
         end // if (LESS_RST)
-      
+
       else begin
-         
+
          always @(negedge rst_n or posedge clk)
            if (!rst_n)
              begin
-                ram_pop_q <= 0;   
+                ram_pop_q <= 0;
                 ram_pop_qq <= 0;
              end
            else
              begin
-                ram_pop_q <= ram_pop; 
+                ram_pop_q <= ram_pop;
                 ram_pop_qq <= ram_pop_q;
              end
-         
+
       end // else: !if(LESS_RST)
 
 endgenerate
-   
+
 assign nxt_ft0 = (ram_pop_qq && !ft0_valid)? {1'b1, ram_fifo_data}: ft0;
 assign nxt_ft1 = (ram_pop_qq && ft0_valid && !ft1_valid )? {1'b1, ram_fifo_data}: ft1;
 assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}: ft2;
 
    generate
-      
+
       if (LESS_RST == 1)
         begin
 
@@ -139,8 +135,8 @@ assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}
              if (!rst_n)
                begin
                   ft0[FIFO_WIDTH] <= 'h0;
-                  ft1[FIFO_WIDTH] <= 'h0;   
-                  ft2[FIFO_WIDTH] <= 'h0;   
+                  ft1[FIFO_WIDTH] <= 'h0;
+                  ft2[FIFO_WIDTH] <= 'h0;
                end
              else if (!sync_rst_n)
                begin
@@ -155,12 +151,12 @@ assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}
                   ft2[FIFO_WIDTH] <= 'h0;
                end
              else
-               begin 
+               begin
                   ft0[FIFO_WIDTH] <= nxt_ft0[FIFO_WIDTH];
                   ft1[FIFO_WIDTH] <= nxt_ft1[FIFO_WIDTH];
                   ft2[FIFO_WIDTH] <= nxt_ft2[FIFO_WIDTH];
                end
-           
+
            always @(posedge clk)
              if (qual_ft_pop)
                begin
@@ -169,22 +165,22 @@ assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}
                   ft2[FIFO_WIDTH-1:0] <= ft2[FIFO_WIDTH-1:0];
                end
              else
-               begin 
+               begin
                   ft0[FIFO_WIDTH-1:0] <= nxt_ft0[FIFO_WIDTH-1:0];
                   ft1[FIFO_WIDTH-1:0] <= nxt_ft1[FIFO_WIDTH-1:0];
                   ft2[FIFO_WIDTH-1:0] <= nxt_ft2[FIFO_WIDTH-1:0];
                end
 
         end // if (LESS_RST)
-      
+
       else begin
 
          always @(negedge rst_n or posedge clk)
            if (!rst_n)
              begin
                 ft0 <= 0;
-                ft1 <= 0;   
-                ft2 <= 0;   
+                ft1 <= 0;
+                ft2 <= 0;
              end
            else if (!sync_rst_n)
              begin
@@ -199,7 +195,7 @@ assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}
                 ft2 <= 0;
              end
            else
-             begin 
+             begin
                 ft0 <= nxt_ft0;
                 ft1 <= nxt_ft1;
                 ft2 <= nxt_ft2;
@@ -208,7 +204,7 @@ assign nxt_ft2 = (ram_pop_qq && ft1_valid && !ft2_valid )? {1'b1, ram_fifo_data}
       end // else: !if(LESS_RST)
 
    endgenerate
-   
+
 assign {ft_valid, ft_data} = ft0;
 
 
@@ -220,7 +216,7 @@ assign {ft_valid, ft_data} = ft0;
 `ifdef DESIGN_ERROR
 `include "design_error.inc"
 reg[1:0] num_valid_q;
- 
+
 always @(posedge clk)
 begin
    if (!ft0_valid && ft_pop) begin
@@ -241,4 +237,3 @@ end
 //synopsys translate_on
 
 endmodule
-

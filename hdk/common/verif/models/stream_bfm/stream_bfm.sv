@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 //Note KEEP_WIDTH is same as number of bytes in data bus
 module stream_bfm #(parameter DATA_WIDTH=512, parameter KEEP_WIDTH=DATA_WIDTH/8, parameter USER_WIDTH=64)(
@@ -24,13 +27,13 @@ module stream_bfm #(parameter DATA_WIDTH=512, parameter KEEP_WIDTH=DATA_WIDTH/8,
    input ins_last,
    input[USER_WIDTH-1:0] ins_user,
    output logic ins_ready,
-   
+
    output logic[DATA_WIDTH-1:0] ots_data,
    output logic[KEEP_WIDTH-1:0] ots_keep,
    output logic[USER_WIDTH-1:0] ots_user,
    output logic ots_valid,
    output logic ots_last,
-   input ots_ready 
+   input ots_ready
    );
 
 gen_buf_t tx_pkt_q[$];
@@ -86,14 +89,14 @@ endfunction
 // Get RX Packet Queue size
 //----------------------------------
 function int get_rx_pkt_q_size();
-   get_rx_pkt_q_size = rx_pkt_q.size(); 
+   get_rx_pkt_q_size = rx_pkt_q.size();
 endfunction
 
 //----------------------------------
 // Get TX Packet Queue size
 //----------------------------------
 function int get_tx_pkt_q_size();
-   get_tx_pkt_q_size = tx_pkt_q.size(); 
+   get_tx_pkt_q_size = tx_pkt_q.size();
 endfunction
 
 //---------------------------------------
@@ -121,7 +124,7 @@ endfunction
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-// BFM functionality 
+// BFM functionality
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
 
@@ -150,7 +153,7 @@ task tx_pkt_thread;
       for (int i=0; i<4; i++)
          if (cur_pkt.data.size() > i)
             data[8*i+:8] = cur_pkt.data[i];
-      
+
       num_phases = cur_pkt.data.size()/(KEEP_WIDTH);
       if ((cur_pkt.data.size() % KEEP_WIDTH) != 0)
       begin
@@ -208,7 +211,7 @@ task rx_pkt_thread;
 
    gen_buf_t cur_pkt;
 
-   bit pkt_inp; 
+   bit pkt_inp;
 
    logic[31:0] tmp_data;
 
@@ -222,7 +225,7 @@ task rx_pkt_thread;
       //If not currently receiving a packet create a new packet
       if (!pkt_inp)
       begin
-         cur_pkt = new();  
+         cur_pkt = new();
          pkt_inp = 1;
       end
 
@@ -238,10 +241,10 @@ task rx_pkt_thread;
             rx_pkt_q.push_back(cur_pkt);
             rx_pkt_user_q.push_back(ins_user);
          end
-            
+
          pkt_inp = 0;
-  
-         //Get first DW of data for display 
+
+         //Get first DW of data for display
          tmp_data = 0;
          for (int i=0; i<4; i++)
             if (cur_pkt.data.size() > i)
@@ -265,7 +268,7 @@ task ins_bp_thread;
 
    int dly;
 
-   forever 
+   forever
    begin
       while (!ins_bp_en)
          @(posedge clk);
@@ -284,7 +287,7 @@ task ins_bp_thread;
    end
 endtask
 
-      
+
 //--------------------------------------------------------------------------
 // Reaset thread
 //--------------------------------------------------------------------------
@@ -305,7 +308,7 @@ endtask
 
 initial
 begin
-   fork 
+   fork
       rst_thread;
       tx_pkt_thread;
       rx_pkt_thread;
@@ -314,4 +317,3 @@ begin
 end
 
 endmodule
-

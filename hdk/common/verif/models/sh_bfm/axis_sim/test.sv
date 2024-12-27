@@ -1,3 +1,21 @@
+// ============================================================================
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Amazon Software License (the "License"). You may not use
+// this file except in compliance with the License. A copy of the License is
+// located at
+//
+//    http://aws.amazon.com/asl/
+//
+// or in the "license" file accompanying this file. This file is distributed on
+// an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+// implied. See the License for the specific language governing permissions and
+// limitations under the License.
+// ============================================================================
+
+
 module test();
 
    import axis_bfm_pkg::*;
@@ -9,12 +27,12 @@ module test();
    logic                   axis_clk;
    logic                   axis_rst_n;
    wire                    axis_valid;
-   wire  [DATA_WIDTH-1:0]  axis_data; 
+   wire  [DATA_WIDTH-1:0]  axis_data;
    wire                    axis_last;
    wire  [KEEP_WIDTH-1:0]  axis_keep;
    wire  [USER_WIDTH-1:0]  axis_user;
    wire                    axis_ready;
-   
+
    axis_bfm #(
       .FILE_NAME  ("master"),
       .DATA_WIDTH (DATA_WIDTH),
@@ -70,7 +88,7 @@ module test();
                for (int i = 0; i < size; i++) begin
                   if (i < size) data[i] = tmp_data[8*i[1:0]+:8];
                   if (i[1:0] == 2'b11) tmp_data++;
-               end   
+               end
                c.data = data;
                master.drive_packet(c.data);
             end
@@ -91,4 +109,3 @@ module test();
    final anp_base_pkg::end_of_test();
 
 endmodule : test
-

@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,9 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
+
 // This test bypasses Micron DDR models and uses AXI memory model.
 // Please refer to readme for more information about AXI memoryy model.
 // This test backdoor writes and front door reads AXI memory model.
@@ -30,7 +34,7 @@ module test_dram_dma_mem_model_bdr_wr();
    int         len2 = 6000;
    //transfer4 - length between 256 and 512 bytes.
    int         len3 = 300;
-   
+
    initial begin
       logic [63:0] ddr_addr_0, ddr_addr_1, ddr_addr_2, ddr_addr_3;
 
@@ -39,9 +43,9 @@ module test_dram_dma_mem_model_bdr_wr();
                   .clk_recipe_c(ClockRecipe::C0));
 	  initialize_ddr();
       deselect_cl_tst_hw();
-	   
+
 	  #10000ns;
-     
+
       $display("[%t] Back door load memory to DDR Base Address \n", $realtime);
       ddr_addr_0 = `DDR_BASE_ADDR;
       for (int i = 0 ; i < len0 ; i++) begin
@@ -73,7 +77,7 @@ module test_dram_dma_mem_model_bdr_wr();
          tb.card.fpga.CL.SH_DDR.u_mem_model.axi_mem_bdr_write(.addr(ddr_addr_3), .d(8'hDD));
          ddr_addr_3++;
       end
-      
+
       $display("[%t] : starting C2H DMA channels ", $realtime);
       `define DDR_HOST_MEM_BUFFER_ADDR_0 64'h0_0001_0800
       `define DDR_HOST_MEM_BUFFER_ADDR_1 64'h0_0002_1800
@@ -101,7 +105,7 @@ module test_dram_dma_mem_model_bdr_wr();
 
       $display("[%t] : Comparing DMA buffer from DDR sequence 3 with expected pattern", $realtime);
       check_host_memory(.addr(`DDR_HOST_MEM_BUFFER_ADDR_3), .expected_data_pattern(8'hDD), .num_bytes(len3));
-      
+
       #500ns;
       tb.power_down();
 
@@ -111,4 +115,3 @@ module test_dram_dma_mem_model_bdr_wr();
    end // initial begin
 
 endmodule // test_dram_dma_mem_model_bdr_wr
-

@@ -1,7 +1,7 @@
-//-------------------------------------------------------------------------------------------------------------------------------
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -13,9 +13,10 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-// Restricted NDA Material
-//-------------------------------------------------------------------------------------------------------------------------------
-//===============================================================================================================================
+// ============================================================================
+
+
+// ============================================================================
 // HBM Wrapper
 // - Wraper for HBM IP
 // - Implements an MMCM to generate 100MHz and 450MHz clock for the HBM IP.
@@ -26,7 +27,6 @@
 //   by setting parameter AXI4_INTERFACE=1
 // - Unused HBM ports are automatically tied off.
 // - Stats interface to reset the HBM, status check for HBM initialization.
-//
 //------------------------------------------
 // HBM Stats Interface Reset Routine:
 // // Issue HBM soft reset
@@ -34,9 +34,7 @@
 // write 0x0 @ addr 0x00
 // // Poll for lock
 // poll bits[3:1] = 3'b111 @ addr 0x00
-//
-//
-//===============================================================================================================================
+// ============================================================================
 
 module cl_hbm_wrapper
   #(

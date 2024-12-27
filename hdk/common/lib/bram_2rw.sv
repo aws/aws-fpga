@@ -1,23 +1,25 @@
-//---------------------------------------------------------------------------------------
-// Amazon FGPA Hardware Development Kit
-// 
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// 
+// ============================================================================
+// Amazon FPGA Hardware Development Kit
+//
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+//
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
 // located at
-// 
+//
 //    http://aws.amazon.com/asl/
-// 
+//
 // or in the "license" file accompanying this file. This file is distributed on
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-//---------------------------------------------------------------------------------------
+// ============================================================================
+
+
 //----------------------------------------------------
 // This is a dual ported BRAM
 //----------------------------------------------------
-module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16, parameter PIPELINE=0, parameter MEMORY_TYPE = "auto") 
+module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16, parameter PIPELINE=0, parameter MEMORY_TYPE = "auto")
 (
    input clk,
    input wea,
@@ -35,7 +37,7 @@ module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16
 
    );
 
-`ifndef NO_XILINX_XPM_RAM 
+`ifndef NO_XILINX_XPM_RAM
 
    xpm_memory_tdpram # (
    // Common module parameters
@@ -98,10 +100,10 @@ module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16
 `else
 
    logic[WIDTH-1:0] ram[DEPTH-1:0];
-   
+
    logic[WIDTH-1:0] rddata_a, rddata_a_q;
    logic[WIDTH-1:0] rddata_b, rddata_b_q;
-   
+
    always @(posedge clk)
       if (ena)
       begin
@@ -110,10 +112,10 @@ module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16
          else
             rddata_a <= ram[addra];
       end
-   
+
    always @(posedge clk)
       rddata_a_q <= rddata_a;
-   
+
    always @(posedge clk)
       if (enb)
       begin
@@ -122,15 +124,15 @@ module bram_2rw #(parameter WIDTH=32, parameter ADDR_WIDTH=4, parameter DEPTH=16
          else
             rddata_b <= ram[addrb];
       end
-   
+
    always @(posedge clk)
       rddata_b_q <= rddata_b;
-   
+
    assign qa = (PIPELINE)? rddata_a_q: rddata_a;
    assign qb = (PIPELINE)? rddata_b_q: rddata_b;
-   
+
 `endif
 
 
-   
-endmodule  
+
+endmodule

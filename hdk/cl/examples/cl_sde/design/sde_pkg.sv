@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,7 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-
+// ============================================================================
 
 
 package sde_pkg;
@@ -45,7 +46,7 @@ package sde_pkg;
       logic [31:0] len;
    } c2h_reg_desc_t;
 
-   // C2H Compact Mode Descriptor 
+   // C2H Compact Mode Descriptor
    typedef struct packed {
       logic [47:0] rsvd;
       logic [47:0] dest_addr;
@@ -64,7 +65,7 @@ package sde_pkg;
       logic [31:0] len;
       logic        desc_type;
    } c2h_if_desc_t;
-   
+
    // C2H Intermediate Format Descriptor Definition - Used in Descritor Engine
    typedef struct packed {
       logic [63:0] dest_addr;
@@ -101,7 +102,7 @@ package sde_pkg;
 
       out_desc.h2c = 0;
       out_desc.desc_type = 1;
-      
+
       out_desc.dest_addr = in_desc.dest_addr;
       out_desc.len = in_desc.len;
 
@@ -111,27 +112,27 @@ package sde_pkg;
 //    function c2h_reg_desc_t c2h_cnv_desc_comm2reg(comm_desc_t in_desc);
 //       c2h_reg_desc_t out_desc;
 //       out_desc = '{default:'0};
-// 
+//
 //       out_desc.desc_type = in_desc.desc_type;
 //       out_desc.dest_addr = in_desc.dest_addr;
 //       out_desc.wb_addr = in_desc.wb_addr;
 //       out_desc.len = in_desc.len;
-// 
+//
 //       c2h_cnv_desc_comm2reg = out_desc;
 //    endfunction // c2h_cnv_desc_comm2reg
-//    
+//
 //    function c2h_comp_desc_t c2h_cnv_desc_comm2comp(comm_desc_t in_desc);
 //       c2h_comp_desc_t out_desc;
 //       out_desc = '{default:'0};
-// 
+//
 //       out_desc.desc_type = in_desc.desc_type;
 //       out_desc.dest_addr = in_desc.dest_addr;
 //       out_desc.wb_addr = in_desc.wb_addr;
 //       out_desc.len = in_desc.len;
-// 
+//
 //       c2h_cnv_desc_comm2comp = out_desc;
 //    endfunction // c2h_cnv_desc_comm2comp
-   
+
    function c2h_if_desc_t c2h_cnv_desc_comm2if(comm_desc_t in_desc);
       c2h_if_desc_t out_desc;
       out_desc = '{default:'0};
@@ -142,8 +143,8 @@ package sde_pkg;
 
       c2h_cnv_desc_comm2if = out_desc;
    endfunction // c2h_cnv_desc_reg2comm
-   
-   
+
+
 ///////////////////////////////////////////////////////////////
 // H2C Descriptors
 ///////////////////////////////////////////////////////////////
@@ -179,7 +180,7 @@ package sde_pkg;
       logic [31:0] len;
    } h2c_reg_desc_t;
 
-   // H2C Compact Mode Descriptor 
+   // H2C Compact Mode Descriptor
    typedef struct packed {
       logic [45:0] rsvd;
       logic        spb;
@@ -207,7 +208,7 @@ package sde_pkg;
       logic [31:0] len;
    } h2c_reg_sav_desc_t;
 
-   // H2C Compact Mode Descriptor 
+   // H2C Compact Mode Descriptor
    typedef struct packed {
       logic        spb;
       logic        eop;
@@ -236,7 +237,7 @@ package sde_pkg;
 
       out_desc.h2c = 1;
       out_desc.desc_type = 1;
-      
+
       out_desc.src_addr = in_desc.src_addr;
       out_desc.len = in_desc.len;
       out_desc.eop = in_desc.eop;
@@ -281,7 +282,7 @@ package sde_pkg;
 //------------------------|-----------|-----------|-----------|-----------|-----------|-----------|
 // Total Bits             |   128     |           |           |    64     |           |           |
 //------------------------|-----------|-----------|-----------|-----------|-----------|-----------|
-   
+
    // C2H Reg Mode Write-Back Metadata Definition (Including RSVD bits)
    typedef struct packed {
       logic [63:0] user;
@@ -291,7 +292,7 @@ package sde_pkg;
       logic [31:0] len;
    } c2h_reg_wb_t;
 
-   // C2H Compact Mode Descriptor 
+   // C2H Compact Mode Descriptor
    typedef struct packed {
       logic [29:0] rsvd;
       logic        eop;
@@ -316,8 +317,8 @@ package sde_pkg;
    virtual class RR_ARB #(parameter WINNER_WIDTH=2,
                           parameter REQ_WIDTH = 32'h1 << WINNER_WIDTH
                           );
-      
-      static function logic [WINNER_WIDTH-1:0] do_arb (logic [REQ_WIDTH-1:0] req, 
+
+      static function logic [WINNER_WIDTH-1:0] do_arb (logic [REQ_WIDTH-1:0] req,
                                                        logic [WINNER_WIDTH-1:0] curr_winner);
 
          logic [WINNER_WIDTH-1:0]  start_idx;
@@ -327,7 +328,7 @@ package sde_pkg;
          logic [WINNER_WIDTH-1:0]  winner;
 
          start_idx = (curr_winner >= (REQ_WIDTH-1)) ? 0 : curr_winner + 1;
-         
+
          req_req = {2{req}};
          req_shifted = req_req >> start_idx;
 
@@ -348,8 +349,6 @@ package sde_pkg;
       endfunction // do_arb
 
    endclass // RR_ARB
-   
-   
+
+
 endpackage // sde_pkg
-   
-   
