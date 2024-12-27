@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 `ifndef SV_SH_DPI_TASKS
 `define SV_SH_DPI_TASKS
@@ -33,7 +36,7 @@ import tb_type_defines_pkg::*;
     `endif
 `endif
 
-      
+
    export "DPI-C" task sv_printf;
    export "DPI-C" task sv_map_host_memory;
    export "DPI-C" task cl_peek;
@@ -46,10 +49,10 @@ import tb_type_defines_pkg::*;
    export "DPI-C" task sv_fpga_start_buffer_to_cl;
    export "DPI-C" task sv_fpga_start_cl_to_buffer;
 `endif
-   
+
    static int h2c_desc_index = 0;
    static int c2h_desc_index = 0;
-   
+
    task sv_printf(input string msg);
       $display("%S", msg);
    endtask
@@ -61,7 +64,7 @@ import tb_type_defines_pkg::*;
    task cl_peek(input longint unsigned addr, output int unsigned data);
       tb.card.fpga.sh.peek(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
    endtask
-   
+
    task cl_poke(input longint unsigned addr, int unsigned data);
       tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
    endtask
@@ -69,7 +72,7 @@ import tb_type_defines_pkg::*;
    task sv_int_ack(input int unsigned int_num);
       tb.card.fpga.sh.set_ack_bit(int_num);
    endtask
-   
+
    task sv_pause(input int x);
       repeat (x) #1us;
    endtask
@@ -77,11 +80,11 @@ import tb_type_defines_pkg::*;
    task sv_fpga_pci_peek(input int handle, input longint unsigned offset, output int unsigned value);
       tb.card.fpga.sh.peek(.addr(offset), .data(value), .intf(AxiPort::PORT_OCL));
    endtask
-   
+
    task sv_fpga_pci_poke(input int handle, input longint unsigned addr, int unsigned data);
       tb.card.fpga.sh.poke(.addr(addr), .data(data), .intf(AxiPort::PORT_OCL));
-   endtask 
-   
+   endtask
+
    function void hm_put_byte(input longint unsigned addr, byte d);
       if (tb.use_c_host_memory)
          host_memory_putc(addr, d);
@@ -93,7 +96,7 @@ import tb_type_defines_pkg::*;
          end
          else
             t = 32'hffff_ffff;
-         
+
          t = t & ~(32'h0000_00ff  << (addr[1:0] * 8) );
          t = t | ({24'h000000, d} << (addr[1:0] * 8) );
          tb.sv_host_memory[{addr[63:2], 2'b00}] = t;
@@ -115,7 +118,7 @@ import tb_type_defines_pkg::*;
             d = 'hff;
 	     end
       end
-      
+
       return d;
    endfunction
 
@@ -222,7 +225,7 @@ end
       for (int i = 0 ; i < buf_size ; i++) begin
          tb.hm_put_byte(.addr(host_memory_buffer_address), .d(tb.host_memory_getc(host_memory_ptr)));
          if(debug) begin
-            $display("[%t] : host_memory_address = %0x wr_buffer[%d] = %0x", $realtime, host_memory_buffer_address, i, tb.host_memory_getc(host_memory_ptr)); 
+            $display("[%t] : host_memory_address = %0x wr_buffer[%d] = %0x", $realtime, host_memory_buffer_address, i, tb.host_memory_getc(host_memory_ptr));
          end
          host_memory_ptr++ ;
          host_memory_buffer_address++;
@@ -235,13 +238,13 @@ end
          #10ns;
          timeout_count++;
       end while ((status[chan] != 1) && (timeout_count < 4000)); // UNMATCHED !!
-      
+
       if (timeout_count >= 4000) begin
          $display("[%t] : *** ERROR *** Timeout waiting for dma transfers to cl", $realtime);
          error_count++;
       end
    endtask // sv_fpga_start_buffer_to_cl
-   
+
    //DPI task to transfer CL to HOST data.
    task sv_fpga_start_cl_to_buffer(input int slot_id = 0, input int chan, input int buf_size, input longint unsigned rd_buffer_addr, input longint unsigned cl_addr);
       int timeout_count, status, error_count;
@@ -260,7 +263,7 @@ end
       for (int i = 0 ; i < buf_size ; i++) begin
          tb.hm_put_byte(.addr(host_memory_buffer_address + i), .d(tb.host_memory_getc(host_memory_ptr)));
          if(debug) begin
-            $display("[%t] : host_memory_address = %0x rd_buffer[%d] = %0x", $realtime, host_memory_buffer_address + i, i, tb.host_memory_getc(host_memory_ptr)); 
+            $display("[%t] : host_memory_address = %0x rd_buffer[%d] = %0x", $realtime, host_memory_buffer_address + i, i, tb.host_memory_getc(host_memory_ptr));
          end
          host_memory_ptr++ ;
       end
@@ -274,7 +277,7 @@ end
          #10ns;
          timeout_count++;
       end while ((status[chan] != 1) && (timeout_count < 4000)); // UNMATCHED !!
-      
+
       if (timeout_count >= 4000) begin
          $display("[%t] : *** ERROR *** Timeout waiting for dma transfers from cl", $realtime);
          error_count++;
@@ -284,15 +287,15 @@ end
      for (int i = 0 ; i < buf_size ; i++) begin
          tb.host_memory_putc(host_memory_ptr, tb.hm_get_byte(host_memory_buffer_address + i));
          if(debug) begin
-            $display("[%t] : host_memory_address = %0x rd_buffer[%d] = %0x", $realtime, host_memory_buffer_address + i, i, tb.hm_get_byte(host_memory_buffer_address + i)); 
+            $display("[%t] : host_memory_address = %0x rd_buffer[%d] = %0x", $realtime, host_memory_buffer_address + i, i, tb.hm_get_byte(host_memory_buffer_address + i));
          end
          host_memory_ptr++ ;
       end
 
    endtask // sv_fpga_start_cl_to_buffer
 `endif
-   
-   task power_up(input int slot_id = 0, 
+
+   task power_up(input int slot_id = 0,
                        ClockRecipe::A_RECIPE clk_recipe_a = ClockRecipe::A0,
                        ClockRecipe::B_RECIPE clk_recipe_b = ClockRecipe::B0,
                        ClockRecipe::C_RECIPE clk_recipe_c = ClockRecipe::C0);
@@ -372,11 +375,11 @@ end
    //
    //=================================================
    task poke(input int slot_id = 0,
-             logic [63:0] addr, 
-             logic [511:0] data, 
-             logic [5:0] id = 6'h0, 
-             DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+             logic [63:0] addr,
+             logic [511:0] data,
+             logic [5:0] id = 6'h0,
+             DataSize::DATA_SIZE size = DataSize::UINT32,
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS);
        `SLOT_MACRO_TASK(poke(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
    endtask
 
@@ -389,10 +392,10 @@ end
    //
    //=================================================
    task poke_pcis(input int slot_id = 0,
-                  logic [63:0] addr,     
-                  logic [511:0] data,     
-                  logic [63:0] strb,     
-             logic [5:0] id = 6'h0); 
+                  logic [63:0] addr,
+                  logic [511:0] data,
+                  logic [63:0] strb,
+             logic [5:0] id = 6'h0);
        `SLOT_MACRO_TASK(poke_pcis(.addr(addr), .data(data), .id(id), .strb(strb)))
    endtask
 
@@ -409,8 +412,8 @@ end
    //
    //==========================================================================
    task poke_pcis_wc(input int slot_id = 0,
-                     input logic [63:0] addr, 
-                     logic [31:0] data [$], 
+                     input logic [63:0] addr,
+                     logic [31:0] data [$],
                      logic [5:0]  id = 6'h0,
                      logic [2:0]  size = 3'd6
                      );
@@ -436,11 +439,11 @@ end
    //
    //=================================================
    task peek(input int slot_id = 0,
-             logic [63:0] addr, 
-             output logic [511:0] data, 
-             input logic [5:0] id = 6'h0, 
-             DataSize::DATA_SIZE size = DataSize::UINT32, 
-             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS); 
+             logic [63:0] addr,
+             output logic [511:0] data,
+             input logic [5:0] id = 6'h0,
+             DataSize::DATA_SIZE size = DataSize::UINT32,
+             AxiPort::AXI_PORT intf = AxiPort::PORT_DMA_PCIS);
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(data), .id(id), .size(size), .intf(intf)))
    endtask
 
@@ -453,8 +456,8 @@ end
    //
    //=================================================
    task peek_pcis(input int slot_id = 0,
-             logic [63:0] addr, 
-             output logic [511:0] data, 
+             logic [63:0] addr,
+             output logic [511:0] data,
              input logic [5:0] id = 6'h0);
        `SLOT_MACRO_TASK(peek_pcis(.addr(addr), .data(data), .id(id)))
    endtask
@@ -508,9 +511,9 @@ end
    //
    //=================================================
    task poke_ocl(input int slot_id = 0,
-             logic [63:0] addr, 
-             logic [31:0] data, 
-             logic [5:0] id = 6'h0); 
+             logic [63:0] addr,
+             logic [31:0] data,
+             logic [5:0] id = 6'h0);
        `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
    endtask
 
@@ -526,9 +529,9 @@ end
    //
    //=================================================
    task peek_ocl(input int slot_id = 0,
-             logic [63:0] addr, 
-             output logic [63:0] data, 
-             input logic [5:0] id = 6'h0); 
+             logic [63:0] addr,
+             output logic [63:0] data,
+             input logic [5:0] id = 6'h0);
        logic [63:0] tmp;
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_OCL)))
       data = {32'h0, tmp[31:0]};
@@ -546,8 +549,8 @@ end
    //
    //=================================================
    task poke_sda(input int slot_id = 0,
-             logic [63:0] addr, 
-             logic [31:0] data, 
+             logic [63:0] addr,
+             logic [31:0] data,
              logic [5:0] id = 6'h00);
        `SLOT_MACRO_TASK(poke(.addr(addr), .data({32'h0, data}), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
    endtask
@@ -564,9 +567,9 @@ end
    //
    //=================================================
    task peek_sda(input int slot_id = 0,
-             logic [63:0] addr, 
-             output logic [63:0] data, 
-             input logic [5:0] id = 6'h0); 
+             logic [63:0] addr,
+             output logic [63:0] data,
+             input logic [5:0] id = 6'h0);
        logic [63:0] tmp;
 
        `SLOT_MACRO_TASK(peek(.addr(addr), .data(tmp), .id(id), .size(DataSize::UINT32), .intf(AxiPort::PORT_SDA)))
@@ -574,13 +577,13 @@ end
    endtask
 
    function bit is_dma_to_cl_done(input int slot_id = 0, input int chan);
-      `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))   
+      `SLOT_MACRO_FUNC(is_dma_to_cl_done(chan))
    endfunction // is_dma_to_cl_done
 
    function int get_ecc_err_cnt(input int slot_id = 0);
-      `SLOT_MACRO_FUNC(get_ecc_err_cnt())   
+      `SLOT_MACRO_FUNC(get_ecc_err_cnt())
    endfunction // is_dma_to_cl_done
-   
+
    function bit is_dma_to_buffer_done(input int slot_id = 0, input int chan);
       `SLOT_MACRO_FUNC(is_dma_to_buffer_done(chan))
    endfunction // is_dma_to_buffer_done
@@ -588,7 +591,7 @@ end
    function bit is_ddr_ready(input int slot_id = 0);
       `SLOT_MACRO_TASK(is_ddr_ready())
    endfunction // is_dma_to_buffer_done
-   
+
    task poke_stat(input int slot_id = 0,
                   input logic [7:0] addr, string intf, logic[31:0] data);
       `SLOT_MACRO_TASK(poke_stat(.addr(addr), .intf(intf), .data(data)))
@@ -635,7 +638,7 @@ end
    task wait_clock(
       input int count,
       int slot_id = 0
-   ); 
+   );
        `SLOT_MACRO_TASK(wait_clock(.count(count)))
    endtask : wait_clock
 
@@ -650,7 +653,7 @@ end
    function void set_chk_clk_freq(input int slot_id = 0, logic chk_freq = 1'b1);
      `SLOT_MACRO_TASK(set_chk_clk_freq(chk_freq))
    endfunction // chk_clk_freq
-   
+
    //=================================================
    //
    //   chk_prot_err_stat
@@ -674,7 +677,7 @@ end
    function logic chk_clk_err_cnt(input int slot_id = 0);
      `SLOT_MACRO_FUNC(chk_clk_err_cnt());
    endfunction // chk_clk_err_cnt
-   
+
    //=================================================
    //
    //   get_global_counter_0
@@ -698,5 +701,5 @@ end
    function logic [63:0] get_global_counter_1(input int slot_id = 0);
      `SLOT_MACRO_FUNC(get_global_counter_1());
    endfunction // get_global_counter_1
-   
+
 `endif

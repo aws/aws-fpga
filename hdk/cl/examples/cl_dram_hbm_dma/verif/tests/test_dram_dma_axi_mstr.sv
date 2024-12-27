@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 module test_dram_dma_axi_mstr();
 
@@ -62,7 +65,7 @@ module test_dram_dma_axi_mstr();
          // Set AXI Master Command Registers
          // addr = 0x1_a021f700, Write
          $display("[%t] : Setting DDR Base Address Command Registers ", $realtime);// addr = 0x1_a021f700
-         tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_BASE_HI_ADDR));  // Set High Address -- 
+         tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_BASE_HI_ADDR));  // Set High Address --
          tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_BASE_LO_ADDR + i));  // Set Low  Address
          tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_BASE_DATA | i));     // Set Write Data
          tb.poke_ocl(.addr(AXI_MSTR_CCR_ADDR),  .data(32'h0000_0001)); // Issue Write Command
@@ -82,7 +85,7 @@ module test_dram_dma_axi_mstr();
 	end // for (int i = 0; i <= 12; i=i+4) //}
 
 for (int i = 0; i <= 12; i=i+4) begin //{
-        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_BASE_HI_ADDR));  // Set High Address -- 
+        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_BASE_HI_ADDR));  // Set High Address --
         tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_BASE_LO_ADDR + i));  // Set Low  Address
         tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_BASE_DATA | i));     // Set Write Data
 
@@ -190,7 +193,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
        // Set AXI Master Command Registers
        // addr = 0x1_a021f700, Write
        $display("[%t] : Setting DDR Base Address Command Registers ", $realtime);// addr = 0x1_a021f700
-       tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_HI_ADDR));  // Set High Address -- 
+       tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_HI_ADDR));  // Set High Address --
        tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_LO_ADDR + i));  // Set Low  Address
        tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_DATA | i));     // Set Write Data
        tb.poke_ocl(.addr(AXI_MSTR_CCR_ADDR),  .data(32'h0000_0001)); // Issue Write Command
@@ -210,7 +213,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
 end // for (int i = 0; i <= 12; i=i+4) //}
 
 for (int i = 0; i <= 12; i=i+4) begin //{
-        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_HI_ADDR));  // Set High Address -- 
+        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_HI_ADDR));  // Set High Address --
         tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_LO_ADDR + i));  // Set Low  Address
         tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_2_DATA | i));     // Set Write Data
 
@@ -255,7 +258,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
        // Set AXI Master Command Registers
        // addr = 0x1_a021f700, Write
        $display("[%t] : Setting DDR Base Address Command Registers ", $realtime);// addr = 0x1_a021f700
-       tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_HI_ADDR));  // Set High Address -- 
+       tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_HI_ADDR));  // Set High Address --
        tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_LO_ADDR + i));  // Set Low  Address
        tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_DATA | i));     // Set Write Data
        tb.poke_ocl(.addr(AXI_MSTR_CCR_ADDR),  .data(32'h0000_0001)); // Issue Write Command
@@ -275,7 +278,7 @@ for (int i = 0; i <= 12; i=i+4) begin //{
 end // for (int i = 0; i <= 12; i=i+4) //}
 
 for (int i = 0; i <= 12; i=i+4) begin //{
-        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_HI_ADDR));  // Set High Address -- 
+        tb.poke_ocl(.addr(AXI_MSTR_CAHR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_HI_ADDR));  // Set High Address --
         tb.poke_ocl(.addr(AXI_MSTR_CALR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_LO_ADDR + i));  // Set Low  Address
         tb.poke_ocl(.addr(AXI_MSTR_CWDR_ADDR), .data(DDR_OFFSET_DDR_LEVEL_3_DATA | i));     // Set Write Data
 
@@ -321,4 +324,3 @@ end //}
        $finish;
     end // initial begin
 endmodule // test_dram_dma_axi_mstr
-

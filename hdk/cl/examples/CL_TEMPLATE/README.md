@@ -87,7 +87,7 @@ The build flow is identical to all other examples:
 1. Populate the [constraint files](./build/constraints) as needed
 2. Update [synth_CL_TEMPLATE.tcl](./build/scripts/synth_CL_TEMPLATE.tcl) with relevant IP's, constraints, etc.
 3. Run [aws_build_dcp_from_cl.py](../../../common/shell_stable/build/scripts/aws_build_dcp_from_cl.py)
-   - For a full guide on aws_build_dcp_from_cl.py please refer to [Setup the Development Environment and SDK Design Flow](./../../../../README.md#setup-the-development-environment-and-sdk-design-flow) on the main page.
+   - Run ``aws_build_dcp_from_cl.py --help`` for more details.
 
 See the following `tcl` scripts for more details on the build flow (they are sourced in [synth_CL_TEMPLATE.tcl](./build/scripts/synth_CL_TEMPLATE.tcl)):
 
@@ -115,7 +115,7 @@ For more information on how to populate the constraint files and build scripts, 
 
 ## CL_TEMPLATE Quick Start Guide
 
-The top level [Quick Start Guide](./../../../../README.md#quick-start) on the main page will provide an introduction to this guide.
+The top level [Quick Start Guide](./../../../README.md#getting-started) on the main page will provide an introduction to this guide.
 
 ### STEP 1: Create a New CL
 
@@ -170,15 +170,16 @@ Or specify an [available simulator](./../../../../README.md#supported-tools-vers
 make CL_TEMPLATE_base_test <SIMULATOR>=1
 ```
 
-This will first generate and compile the simulation libraries required for the requested SIMULATOR. Test results will be stored in the `$CL_DIR/verif/sim/<SIMULATOR>` directory (created upon first simulation run). After adding new IP's to [`$AWS_FPGA_REPO_DIR/hdk/common/ip`](./../../../common/ip) the simulation libraries need to be recompiled: `make regenerate_sim_libs <SIMULATOR>=1`. For more information, see [`$AWS_FPGA_REPO_DIR/hdk/README.md`](./../../../).
+This will first generate and compile the simulation libraries required for the requested SIMULATOR. Test results will be stored in the `$CL_DIR/verif/sim/<SIMULATOR>` directory (created upon first simulation run). After adding new IP's to [`$AWS_FPGA_REPO_DIR/hdk/common/ip`](./../../../common/ip) the simulation libraries need to be recompiled: `make regenerate_sim_libs <SIMULATOR>=1`.
 
 #### File List Generation
 
-The Makefile includes [$AWS_FPGA_REPO_DIR/hdk/common/verif/tb/scripts/Makefile.common.inc](./../../../../../common/verif/tb/scripts/Makefile.common.inc) which runs a Python script to automatically update each `top.<SIMULATOR>.f` file list with all SystemVerilog files found under the [$CL_DIR/design](./design) directory.
-* To disable the generation, run `export DONT_GENERATE_FILE_LIST=1`.
-* To re-enable the generation, run `unset DONT_GENERATE_FILE_LIST`.
-* To generate the file list by itself, run `make generate_sim_file_list <SIMULATOR>=1`.
-* To add additional files, add them outside of the auto generation section:
+The Makefile includes [$AWS_FPGA_REPO_DIR/hdk/common/verif/tb/scripts/Makefile.common.inc](./../../../common/verif/tb/scripts/Makefile.common.inc) which runs a Python script to automatically update each `top.<SIMULATOR>.f` file list with all SystemVerilog files found under the [$CL_DIR/design](./design) directory.
+
+- To disable the generation, run `export DONT_GENERATE_FILE_LIST=1`.
+- To re-enable the generation, run `unset DONT_GENERATE_FILE_LIST`.
+- To generate the file list by itself, run `make generate_sim_file_list <SIMULATOR>=1`.
+- To add additional files, add them outside of the auto generation section:
 
 ```text
 # Add code up here or below the comment block to persist between simulations
@@ -194,7 +195,7 @@ $CL_DIR/design/CL_TEMPLATE.sv
 ##############################
 ```
 
-#### Xilinx IP Discovery and Compilation
+#### Xilinx/AMD IP Discovery and Compilation
 
 When running your first test, all Xilinx IP's under [$AWS_FPGA_REPO_DIR/hdk/common/ip/cl_ip](./../../../common/ip/cl_ip) are automatically compiled
 
@@ -207,17 +208,17 @@ If a design adds new IP's, make sure to add the new simulation libraries to `COM
 Simulation library names can be found under:
 
 - [$AWS_FPGA_REPO_DIR/hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts](./../../../common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts)
-followed by `"IP_NAME"/"SIMULATOR"/"IP_NAME".sh`
+followed by `<IP_NAME>/<SIMULATOR>/<IP_NAME>.sh`
 
 All verification work is located under the [verif](./verif) directory. Please see the [Verification](#verification) section for the CL_TEMPLATE verification details.
 
 ### STEP 4: Develop Software Tests (OPTIONAL)
 
-CL_TEMPLATE does not yet support stand alone software tests. Please refer to other examples such as [CL_DRAM_HBM_DMA](./../cl_dram_hbm_dma#software)
+CL_TEMPLATE does not yet support standalone software tests. Please refer to other examples such as [CL_DRAM_HBM_DMA](./../cl_dram_hbm_dma/README.md#software)
 
 ### STEP 5: Build and Deploy the Design
 
-Once design files have been added and tested, constraint and build script updates need to be made. The build flow creates a bitstream that is used to create an AFI to deploy on hardware. The build and deployment flows can be found in the [Quick Start Guide](./../../../../README.md#setup-the-development-environment-and-sdk-design-flow). Examples for all constraint files and build scripts can be found in other examples such as [CL_DRAM_HBM_DMA](./../cl_dram_hbm_dma/build).
+Once design files have been added and tested, constraint and build script updates need to be made. The build flow creates a bitstream that is used to create an AFI to deploy on hardware. The build and deployment flows can be found in the [Quick Start Guide](./../../../../User_Guide_AWS_EC2_FPGA_Development_Kit.md#getting-started). Examples for all constraint files and build scripts can be found in other examples such as [CL_DRAM_HBM_DMA](./../cl_dram_hbm_dma/build).
 
 1. Populate existing and/or add new constraint files to [./build/constraints](./build/constraints)
    - AWS has provided basic constraints required in example designs in [$AWS_FPGA_REPO_DIR/hdk/common/shell_stable/build/constraints](./../../../common/shell_stable/build/constraints)

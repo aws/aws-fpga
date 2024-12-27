@@ -1,6 +1,7 @@
+# =============================================================================
 # Amazon FPGA Hardware Development Kit
 #
-# Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
@@ -12,15 +13,16 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
+# =============================================================================
 
 
 ##################################################################
 ## Makefile For VCS compiles and simulations
 ## Step to run :
-## 1. make create_libs VCS=1  -> To generate xilinx compile 
+## 1. make create_libs VCS=1  -> To generate xilinx compile
 ##    libraries. This is a one time step
 ## 2. make all VCS=1  -> Runs the test
-## +define+MODEL_DEBUG_MEMORY +define+MODEL_DEBUG_CMDS 
+## +define+MODEL_DEBUG_MEMORY +define+MODEL_DEBUG_CMDS
 ##################################################################
 
 FILTER_OUT_HBM_META_INJECTIONS = grep -v "\*\*\*Meta" | sed '/^$$/d'
@@ -33,7 +35,7 @@ compile: $(COMPLIB_DIR)
 	cd $(SIM_DIR) && vlogan -g -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog +systemverilogext+.sv +libext+.sv +libext+.v -full64 -lca -v2005 +v2k -l compile.vlogan.log -debug_all -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f +define+VCS +define+DMA_TEST $(DEFAULT_DEFINES) +lint=TFIPC-L
 	cd $(SIM_DIR) && touch bd_2e02_lmb_bram_I_0.mem bd_2e02_second_lmb_bram_I_0.mem
 	cd $(SIM_DIR) && vcs tb $(TEST) $(C_FILES) +error+9999 glbl -debug_region=cell+encrypt +warn=noFCDCI,noFCICIO +note=noFCICIO -CFLAGS "-I$(C_SDK_USR_INC_DIR)" -CFLAGS "-I$(C_SDK_USR_UTILS_DIR) -std=gnu99" -CFLAGS "-I$(C_COMMON_DIR)/include" -CFLAGS "-I$(C_COMMON_DIR)/src" -CFLAGS "-DSV_TEST" -CFLAGS "-DSCOPE" -CFLAGS "-I$(C_INC_DIR)" "-I$(C_SRC_DIR)" -debug_all -M +lint=TFIPC-L -debug_all -debug_pp glbl -ntb_opts tb_timescale=1ps/1ps -timescale=1ps/1ps -sverilog -full64 +memcbk -licqueue -lca -v2005 -l compile.vcs.log +plusarg_save +timeout=1ms
- 
+
  run:
  ifeq ($(TEST),test_null)
    ifneq ($(C_TEST),test_null)

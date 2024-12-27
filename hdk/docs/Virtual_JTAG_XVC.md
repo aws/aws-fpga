@@ -18,7 +18,7 @@ Amazon EC2 F2 instances offer debugging capabilities through Virtual JTAG. This 
 
 The Virtual JTAG solution consists of three main elements:
 
-- [A] Debug cores and a debug bridge that must be implemented and connected properly in the CL design. Refer to the [cl_dram_hbm_dma](../cl/examples/cl_dram_hbm_dma) example design for details.
+- [A] Debug cores and a debug bridge that must be implemented and connected properly in the CL design. Refer to the [cl_dram_hbm_dma](../cl/examples/cl_dram_hbm_dma/README.md) example design for details.
 - [B] A Virtual-JTAG service acting as an XVC server that runs on the target F2 instance.
 - [C] A local or remote Vivado application for interactive debugging.
 
@@ -117,7 +117,7 @@ To begin debugging a CL design, the developer must first install the XVC driver 
 
 ## Connect to target FPGA via Virtual JTAG
 
-With a XVC server up and running, a Virutal JTAG cable connection to the target FPGA is ready to be built in Vivado.
+With a XVC server up and running, a Virtual JTAG cable connection to the target FPGA is ready to be built in Vivado.
 
 - Prior to executing Vivado, verify that the `.LTX` probe file from the CL design DCP tarball is saved on the instance.
 
@@ -146,11 +146,11 @@ With a XVC server up and running, a Virutal JTAG cable connection to the target 
 
 ![vjtag_4](./images/VJTAG_images/vjtag_4.jpg)
 
-- The debug bridge in the target design should be detected and listed in "Hardware Targets". Click "Next" and "Finish" to finish setting up the Virutal JTAG connection.
+- The debug bridge in the target design should be detected and listed in "Hardware Targets". Click "Next" and "Finish" to finish setting up the Virtual JTAG connection.
 
 ![vjtag_5](./images/VJTAG_images/vjtag_5.jpg)
 
-- All the debug cores embedded in the CL design should be now listed under `debug_bridge_0`. Highlight `debug_bridge_0` and add the CL design `.LTX` probe file to "Probes file" in the "Hardware Device Properties" window. After the probe file gets loaded, the waveform and configuration windows will be avaliable for each debug core in Vivado. The CL design at this point is ready to be debugged.
+- All the debug cores embedded in the CL design should be now listed under `debug_bridge_0`. Highlight `debug_bridge_0` and add the CL design `.LTX` probe file to "Probes file" in the "Hardware Device Properties" window. After the probe file gets loaded, the waveform and configuration windows will be available for each debug core in Vivado. The CL design at this point is ready to be debugged.
 
 ![vjtag_6](./images/VJTAG_images/vjtag_6.jpg)
 
@@ -184,7 +184,7 @@ The [CL_Debug_Bridge](./../common/ip/cl_ip/cl_ip.srcs/sources_1/ip/cl_debug_brid
     );
 ```
 
-All debug cores within the Compute Logic (CL) must be connected to the `CL_Debug_Bridge`. These connections can be automatically inserted during the design synthesis process. For an example implementation, please refer to the [synth_cl_dram_hbm_dma.tcl script](./../cl/examples/cl_dram_hbm_dma/build/scripts/synth_cl_dram_hbm_dma.tcl) in the cl_dram_hbm_dma example.
+All debug cores within the CL must be connected to the `CL_Debug_Bridge`. These connections can be automatically inserted during the design synthesis process. For an example implementation, please refer to the [synth_cl_dram_hbm_dma.tcl script](./../cl/examples/cl_dram_hbm_dma/build/scripts/synth_cl_dram_hbm_dma.tcl) in the cl_dram_hbm_dma example.
 
 ``` bash
 AWS FPGA: (12:35:47): Connecting debug network
@@ -206,7 +206,7 @@ connect_debug_cores: Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB)
 
 **Q: Do I need full Vivado installation to run Virtual JTAG debug on a F2 instance?**
 
-A: No. If you are utilizing the AWS FPGA developler AMI, you can leverge the built-in Vivado. If you using a different runtime AMI, you can download the standalone Vivado Lab Solutions from [AMD website](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html) and use that for free.
+A: No. If you are utilizing the AWS FPGA developer AMI, you can leverage the built-in Vivado. If you using a different runtime AMI, you can download the standalone Vivado Lab Solutions from [AMD website](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html) and use that for free.
 
 **Q: Do I need a Vivado license to use Virtual JTAG and Xilinx VIO/LIA debug capabilities?**
 

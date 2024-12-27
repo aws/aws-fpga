@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 module cl_ila #( parameter DDR_A_PRESENT = 1) (
 
@@ -35,9 +38,9 @@ module cl_ila #( parameter DDR_A_PRESENT = 1) (
 
 );
 
-//---------------------------- 
+//----------------------------
 // Debug bridge
-//---------------------------- 
+//----------------------------
  cl_debug_bridge CL_DEBUG_BRIDGE (
       .clk(aclk),
       .S_BSCAN_drck(drck),
@@ -55,9 +58,9 @@ module cl_ila #( parameter DDR_A_PRESENT = 1) (
    );
 
 
-//---------------------------- 
-// Debug Core ILA for dmm pcis AXI4 interface 
-//---------------------------- 
+//----------------------------
+// Debug Core ILA for dmm pcis AXI4 interface
+//----------------------------
    ila_1 CL_DMA_ILA_0 (
                    .clk    (aclk),
                    .probe0 (sh_cl_dma_pcis_q.awvalid),
@@ -83,7 +86,7 @@ module cl_ila #( parameter DDR_A_PRESENT = 1) (
                    .probe20 (sh_cl_dma_pcis_q.arid),
                    .probe21 (sh_cl_dma_pcis_q.awlen),
                    .probe22 (sh_cl_dma_pcis_q.rlast),
-                   .probe23 (3'b0), 
+                   .probe23 (3'b0),
                    .probe24 (sh_cl_dma_pcis_q.rresp),
                    .probe25 (sh_cl_dma_pcis_q.rid),
                    .probe26 (sh_cl_dma_pcis_q.rvalid),
@@ -109,9 +112,9 @@ generate
 begin:ddr_A_hookup
  if (DDR_A_PRESENT == 1) begin
 
-//---------------------------- 
-// Debug Core ILA for DDRA AXI4 interface monitoring 
-//---------------------------- 
+//----------------------------
+// Debug Core ILA for DDRA AXI4 interface monitoring
+//----------------------------
 ila_1 CL_DDRA_ILA_0 (
                    .clk    (aclk),
                    .probe0 (lcl_cl_sh_ddra.awvalid),
@@ -137,7 +140,7 @@ ila_1 CL_DDRA_ILA_0 (
                    .probe20 (lcl_cl_sh_ddra.arid[4:0]),
                    .probe21 (lcl_cl_sh_ddra.awlen),
                    .probe22 (lcl_cl_sh_ddra.rlast),
-                   .probe23 (3'b0), 
+                   .probe23 (3'b0),
                    .probe24 (lcl_cl_sh_ddra.rresp),
                    .probe25 (lcl_cl_sh_ddra.rid[4:0]),
                    .probe26 (lcl_cl_sh_ddra.rvalid),
@@ -164,4 +167,3 @@ end //if(DDR_A_PRESET)
 end //label
 endgenerate
 endmodule
-

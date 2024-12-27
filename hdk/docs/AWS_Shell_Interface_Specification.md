@@ -16,19 +16,19 @@
     - [DDR4 AXI](#ddr4-axi)
     - [DMA](#dma)
   - [Interfaces between Shell and CL](#interfaces-between-shell-and-cl)
-    - [CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)](#clshell-axi-interfaces-axi-4-and-axi-lite)
+    - [CL/Shell AXI Interfaces](#clshell-axi-interfaces)
     - [Clocks and Reset](#clocks-and-reset)
       - [Clocks](#clocks)
       - [Reset](#reset)
-    - [PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Requester, CL is Completer, 512-bit)](#pcis-interface----axi-4-for-inbound-pcie-transactions-shell-is-requester-cl-is-completer-512-bit)
+    - [PCIS Interface](#pcis-interface)
       - [PCIS Interface Timeout Details](#pcis-interface-timeout-details)
-    - [PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Requester, Shell is Completer, 512-bit)](#pcim-interface----axi-4-for-outbound-pcie-transactions-cl-is-requester-shell-is-completer-512-bit)
+    - [PCIM interface](#pcim-interface)
     - [Outbound PCIe AXI-4 Interface Restrictions](#outbound-pcie-axi-4-interface-restrictions)
     - [Byte Enable Rules](#byte-enable-rules)
     - [AXI4 Error Handling for CL outbound Transactions](#axi4-error-handling-for-cl-outbound-transactions)
-    - [AXI-Lite Interfaces for Register Access -- (SDA, OCL)](#axi-lite-interfaces-for-register-access----sda-ocl)
-      - [AXI Completer (AXI-Lite/PCIS) CL Error Reporting](#axi-completer-axi-litepcis-cl-error-reporting)
-    - [Accessing Aligned/Unaligned Addresses from PCIe (Shell is Requester, CL is Completer)](#accessing-alignedunaligned-addresses-from-pcie-shell-is-requester-cl-is-completer)
+    - [SDA/OCL AXI-Lite Interfaces for Register Access](#sdaocl-axi-lite-interfaces-for-register-access)
+      - [CL AXI Completer Error Reporting](#cl-axi-completer-error-reporting)
+    - [Accessing Aligned/Unaligned Addresses from PCIe](#accessing-alignedunaligned-addresses-from-pcie)
     - [Interrupts](#interrupts)
     - [HBM Monitor Interface](#hbm-monitor-interface)
     - [Miscellaneous Signals](#miscellaneous-signals)
@@ -88,8 +88,8 @@ The following diagram and table summarize the various interfaces between the She
 | OCL | The OCL Interface is an AXI-Lite interface associated with AppPF and BAR0. Please refer to the [AXI-Lite Interfaces](#axi-lite-interfaces-for-register-access----sda-ocl) for more information. |
 | Miscellaneous | There are various generic signals, such as ID's, status, counters, etc., between the Shell and CL that are described in the [Miscellaneous Signals](#miscellaneous-signals) section.     |
 | SDA |  The SDA Interface is an AXI-Lite interface associated with MgmtPF and BAR4. Please refer to the [AXI-Lite Interfaces](#axi-lite-interfaces-for-register-access----sda-ocl) for more information. |
-| HBM MON APB | The HBM monitor interfaces. Customers using HBM IP are required to connect these interfacse to the HBM IP. Refer to the [HBM monitor interface](#hbm-monitor-interface) for more information|
-| DDR4 Stats  | This is the control interface from the Shell to the DDR4 Controller in the CL. Shell uses this interface to calibrate the DDR core. Refer to the [DDR4 DRAM](#ddr4-dram) section for more information. Refer to [HBM Monitor Interface](#hbm-monitor-interface) section for more information. |
+| HBM MON APB | The HBM monitor interfaces. Customers using HBM IP are required to connect these interfaces to the HBM IP. Refer to the [HBM monitor interface](#hbm-monitor-interface) for more information.|
+| DDR4 Stats  | This is the control interface from the Shell to the DDR4 Controller in the CL. Shell uses this interface to calibrate the DDR core. Refer to the [DDR4 DRAM](#ddr4-dram) section for more information.|
 | Interrupts | There are 16 user interrupts available. Refer to the [Interrupts](#interrupts) section for more information. |
 
 ## External FPGA Interfaces
@@ -146,9 +146,9 @@ The Developer can write drivers for the AppPF or leverage the reference driver p
 
 The PCIe interface connecting the FPGA to the instance is in the Shell, and the CL can access it through two AXI-4 interfaces:
 
-- [PCI Completer (PCIS)](#pcis-interface----axi-4-for-inbound-pcie-transactions-shell-is-requester-cl-is-completer-512-bit)
+- [PCI Completer (PCIS)](#pcis-interface)
 
-- [PCI Requester (PCIM)](#pcim-interface----axi-4-for-outbound-pcie-transactions-cl-is-requester-shell-is-completer-512-bit)
+- [PCI Requester (PCIM)](#pcim-interface)
 
 ### DDR4 DRAM
 
@@ -179,9 +179,9 @@ There is an integrated DMA controller inside the XDMA Shell (Xilinx DMA, not sup
 
 ## Interfaces between Shell and CL
 
-### CL/Shell AXI Interfaces (AXI-4 and AXI-Lite)
+### CL/Shell AXI Interfaces
 
-All interfaces use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can access lower speed control interfaces that use the AXI-Lite protocol.
+All AXI interfaces use the AXI-4 or AXI-Lite protocol.  The AXI-L buses are for register access use cases, and can access lower speed control interfaces that use the AXI-Lite protocol.
 
 For bulk data transfer, wide AXI-4 buses are used. AXI-4 on the CL/Shell interfaces have the following restrictions:
 
@@ -211,22 +211,21 @@ The Shell provides 250MHz `clk_main_a0` and 100MHz `hbm_ref_clk` from shell-to-C
 
 Please note that the extensive list of clocks and resets, as compared to F1 shell, are removed from Shell-CL interface. This improves overall routability for the CL designs that do not require all those multiple clocks from the Shell. However, AWS offers [AWS_CLK_GEN](./AWS_CLK_GEN_spec.md) IP that supports multiple clocks, resets and clock recipes similar to F1. The AWS_CLK_GEN IP can be optionally instantiated in the CL for an easier migration of designs from F1 involving multiple clocks. [CL_MEM_PERF](./../cl/examples/cl_mem_perf/design/cl_mem_perf.sv) demonstrates integration of [AWS_CLK_GEN IP](../common/lib/aws_clk_gen.sv) into CL design.
 
-Please refer to [Clock_Recipes_User_Guide.md](./Clock_Recipes_User_Guide.md) for details on supported clock recipes in F2, dynamic clock reconfiguration and specifying clock recipes during the build time.
+Please refer to the [Clock_Recipes_User_Guide.md](./Clock_Recipes_User_Guide.md) for details on supported clock recipes in F2, dynamic clock reconfiguration and specifying clock recipes during the build time.
 
-Similar to F1, the `clk_main_a0` in F2 also supports multiple clock recipes and the frequency can be scaled using SW APIs at the time of AFI loads.
+Similar to F1, the `clk_main_a0` in F2 also supports multiple clock recipes and the frequency can be scaled using SW APIs at the time of AFI loads (this feature is currently not available and will be added in a future
+release).
 
 #### Reset
 
 The shell provides an active-low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
 
-### PCIS Interface -- AXI-4 for Inbound PCIe Transactions (Shell is Requester, CL is Completer, 512-bit)
+### PCIS Interface
 
-This AXI-4 bus is used for:
+This an 512-bit wide AXI-4 interface for Inbound PCIe Transactions (Shell is Requester, CL is Completer). It is used for:
 
 - PCIe transactions initiated by the instance and targeting AppPF BAR4 (PCIS)
 - DMA transactions (if enabled) (XDMA)
-
-It is a 512-bit wide AXI-4 interface.
 
 A read or write request on this AXI-4 bus that is not acknowledged by the CL within a certain time window, will be internally terminated by the Shell. If the time-out error happens on a read, the Shell will return `0xFFFFFFFF` data back to the instance. This error is reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.
 
@@ -247,15 +246,16 @@ The PCIS interface multiplexes the XDMA requests and PCIS requests.  Each type o
 
 Transactions on the PCIS interface must complete before the associated timeout time or the SH will timeout the transactions and complete the transactions on behalf of the CL (BVALID/RVALID).  Each "issued" transaction has an independent timeout counter.  For example if 4 transactions are issued from the PCIS interface "simultaneously" (i.e. back-to-back cycles), then all 4 must complete within 8us.  A transaction is considered "issued" when the AxVALID is asserted for the transaction by the Timeout Detection block.  AxREADY does not have to be asserted for the transaction to be considered "issued".  Note there is a 16 deep clock crossing FIFO between the Timeout Detection block and the CL logic.  So if the CL is asserting backpressure (de-asserting AxVALID) there can still be 16 transactions issued by the Timeout Detection block.  The SH supports a maximum of 32 transactions outstanding for each type (read/write).  It is advisable for the CL to implement enough buffering for 32 transactions per type so that it is aware of all issued transactions.
 
-Once a transaction is issued, it must fully be completed within the timeout time (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data (0xffffffff) will be returned for reads.
+Once a transaction is issued, it must fully be completed within the timeout time (Address, Data, Ready).  Any transaction that does not completed in time will be terminated by the shell.  This means write data will be accepted and thrown away, and default data `0xFFFFFFFF` will be returned for reads.
 
 If a timeout occurs, the Shell will timeout all further transactions in 16ns for a moderation time (4ms).
 
-**WARNING**: If a timeout happens the DMA/PCIS interface may no longer be functional and the AFI/Shell must be re-loaded.  This can be done by adding the "-F" option to fpga-load-local-image.
+**WARNING**: If a timeout happens, the DMA/PCIS interface may no longer be functional and the AFI/Shell must be re-loaded.  This can be done by adding the "-F" option to `fpga-load-local-image`.
 
-### PCIM interface -- AXI-4 for Outbound PCIe Transactions (CL is Requester, Shell is Completer, 512-bit)
+### PCIM interface
 
-This is a 512-bit wide AXI-4 interface for the CL to initiate cycles to the PCIe bus. This can be used, for example, to push data from the CL to instance memory, or read from the instance memory.
+This is an 512-bit wide AXI-4 interface for Outbound PCIe Transactions (CL is
+Requester, Shell is Completer). It is used by the CL to initiate cycles to the PCIe bus, for example, to push data from the CL to instance memory, or read from the instance memory.
 
 :warning: **The CL must use physical addresses, and developers must be careful not to use userspace/virtual addresses.**
 
@@ -313,50 +313,51 @@ Transactions on AXI4 interface will be terminated and reported as SLVERR on the 
 
 :warning: **If a timeout occurs, the PCIM bus will no longer be functional. This can be cleared by clearing/re-loading the AFI.**
 
-### AXI-Lite Interfaces for Register Access -- (SDA, OCL)
+### SDA/OCL AXI-Lite Interfaces for Register Access
 
-There are three AXI-L requester interfaces (Shell is requester) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this into multiple interfaces allows for different software entities to have a control interface into the CL:
+There are two AXI-L requester interfaces (Shell is Requester) that can be used for register access interfaces.  Each interface is sourced from a different PCIe PF/BAR.  Breaking this into multiple interfaces allows for different software entities to have a control interface into the CL:
 
-- SDA AXI-L: Associated with MgmtPF, BAR4.  If the developer is using AWS OpenCL runtime Lib (as in SDAccel case), this interface will be used for performance monitors etc.
-- OCL AXI-L: Associated with AppPF, BAR0. If the developer is using AWS OpenCL runtime lib(as in SDAccel case), this interface will be used for openCL Kernel access
+- OCL AXI-L: Associated with AppPF, BAR0. If the developer is using AWS OpenCL runtime lib(as in SDAccel case), this interface will be used for OpenCL Kernel access
 
-Please refer to [PCI Address map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
+- SDA AXI-L: Associated with MgmtPF, BAR4.  If the developer is using AWS OpenCL runtime Lib (as in SDAccel case), this interface will be used for performance monitors etc.  This interface is also used for accessing the [AWS_CLK_GEN IP](./AWS_CLK_GEN_spec.md) for CL clock management.
 
-#### AXI Completer (AXI-Lite/PCIS) CL Error Reporting
+Please refer to [PCI Address Map](./AWS_Fpga_Pcie_Memory_Map.md) for a more detailed view of the address map.
 
-Each AXI (AXI-4/AXI-L) transaction is terminated with a response (BRESP/RRESP).  The AXI responses may signal an error such as Completer Error, or Decode Error.  PCIe also has error reporting for non-posted requests (Unsupported Requests/Completer Abort).  The shell does not propagate the AXI-4 error responses to the PCIe bus.  All PCIe cycles are terminated with non-errored responses.  The AXI-4 errors are reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.
+#### CL AXI Completer Error Reporting
 
-### Accessing Aligned/Unaligned Addresses from PCIe (Shell is Requester, CL is Completer)
+Each AXI (AXI-4/AXI-L) transaction is terminated with a response (BRESP/RRESP).  The AXI responses may signal an error such as Completer Error, or Decode Error.  PCIe also has error reporting for non-posted requests (Unsupported Requests/Completer Abort).  The shell does not propagate the AXI-4 error responses to the PCIe bus.  All PCIe cycles are terminated with non-error responses.  The AXI-4 errors are reported through the Management PF and can be retrieved by the AFI Management Tools metric reporting APIs.
 
-The Shell supports DW aligned and unaligned transfers from PCIe (address is aligned/not aligned to DW-4byte boundary)
+### Accessing Aligned/Unaligned Addresses from PCIe
 
-Following are a few examples of how aligned and Unaligned access from PCIe to CL on PCIS interface work:
+The Shell (Requester) supports DW aligned and unaligned transfers from PCIe (address is aligned/unaligned to DW-4byte boundary)
+
+Following are a few examples of how aligned and unaligned access from PCIe to CL on PCIS interface work:
 
  1) Writing 8 bytes to DW aligned address through PCIe on AXI4 Interface(PCIS 512-bit interface):
 
     If the transaction on the PCIe is as follows:
-    Addr      : 0x0000002000000000
-    dw_cnt    : 2
-    first_be  : 4’b1111
-    last_be   : 4’b1111
+    - Addr      : 0x0000002000000000
+    - dw_cnt    : 2
+    - first_be  : 4’b1111
+    - last_be   : 4’b1111
 
     Then the transaction on the AXI4 interface will have the following AXI attributes:
-    awaddr     64’h0000_0000_0000_0000
-    awlen     = 0
-    wstrb     = 64’h0000_0000_0000_00ff
+    - awaddr     64’h0000_0000_0000_0000
+    - awlen     = 0
+    - wstrb     = 64’h0000_0000_0000_00ff
 
- 2) Writing 8 bytes to DW un-aligned address on AXI4 Interface(PCIS 512-bit interface):
+ 2) Writing 8 bytes to DW unaligned address on AXI4 Interface(PCIS 512-bit interface):
 
     If the transaction on the PCIe is as follows:
-    Addr      : 0x0000002000000001
-    dw_cnt    : 3
-    first_be  : 4’b1110
-    last_be   : 4’b0001
+    - Addr      : 0x0000002000000001
+    - dw_cnt    : 3
+    - first_be  : 4’b1110
+    - last_be   : 4’b0001
 
     Then the transaction on the AXI4 interface will have the following AXI attributes:
-    awddr    = 64’h0000_0000_0000_0001
-    awlen    = 0
-    wstrb    = 64’h0000_0000_0000_01fe
+    - awaddr   = 64’h0000_0000_0000_0001
+    - awlen    = 0
+    - wstrb    = 64’h0000_0000_0000_01fe
 
 The addresses for the Read transactions will work similar to writes.
 
@@ -364,9 +365,9 @@ The addresses for the Read transactions will work similar to writes.
 If a transaction from PCIe is initiated on AXI-Lite (SDA/OCL) interfaces with dw_cnt greater than 1, i.e. >32bits,
 the transaction is split into multiple 32-bit transactions by the Shell.
 
-Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL/BAR1 AXI-Lite interfaces work:
+Following are a few examples of how aligned and Unaligned access from PCIe to CL on SDA/OCL AXI-Lite interfaces work:
 
-1. Writing 8 bytes to DW aligned address on AXI Lite interface (SDA/OCL/BAR1 32-bit interface):
+1. Writing 8 bytes to DW aligned address on AXI Lite interface (SDA/OCL 32-bit interface):
 
     If the transaction on the PCIe is as follows:
     Addr      : 0x0000000002000000
@@ -377,31 +378,36 @@ Following are a few examples of how aligned and Unaligned access from PCIe to CL
     Then the transaction on the AXI-Lite interface will be split and will have the following AXI attributes:
     Transaction is split into 2 transfers.
 
-    1st transfer awaddr = 32’h0000_0000
-    wstrb = 4’hf
+    1st transfer
+    - awaddr = 32’h0000_0000
+    - wstrb = 4’hf
 
-    2nd  transfer awaddr = 32’h0000_0004
-    wstrb = 4’hf
+    2nd transfer
+    - awaddr = 32’h0000_0004
+    - wstrb = 4’hf
 
-2. Writing 64 bits to DW un aligned address on AXI Lite interface (SDA/OCL/BAR1 32-bit interface):
+1. Writing 64 bits to DW unaligned address on AXI Lite interface (SDA/OCL 32-bit interface):
 
-     If the transaction on the PCIe is as follows:
-      Addr      : 0x0000000002000001
-      dw_cnt    : 3
-      first_be  : 4’b1110
-      last_be   : 4’b0001
+    If the transaction on the PCIe is as follows:
+    -Addr      : 0x0000000002000001
+    -dw_cnt    : 3
+    -first_be  : 4’b1110
+    -last_be   : 4’b0001
 
      Transaction on AXI-Lite interface will be split and will have the following AXI attributes:
      Transaction is split into 3 transfers.
 
-     1st transfer awaddr = 32’h0000_0001
-     wstrb = 4’he
+     1st transfer
+     - awaddr = 32’h0000_0001
+     - wstrb = 4’he
 
-     2nd  transfer awaddr = 32’h0000_0004
-     wstrb = 4’hf
+     2nd  transfer
+     - awaddr = 32’h0000_0004
+     - wstrb = 4’hf
 
-     3rd  transfer awaddr = 32’h0000_0008
-     wstrb = 4’h1
+     3rd  transfer
+     - awaddr = 32’h0000_0008
+     - wstrb = 4’h1
 
  The transaction splitting and addresses for the Read transactions will work similar to writes.
 
@@ -424,7 +430,7 @@ When the interfaces are connected to the HBM IP properly, the shell monitors the
 
 The active-low `hbm_apb_preset` signal connected to each HBM rack remains at logic-high during power-on and normal operation. This allows the HBM to initialize and communicate with the rest of the CL logic. If an HBM access violation (i.e., an APB transaction to an undefined address space) occurs, the shell will pull the `hbm_apb_preset` signal low to force a reset of the HBM rack. Subsequent usage of this rack is blocked. The customer must reload the AFI to get it recovered from this blocked state.
 
-These steps must be followed to properly conect the monitor interfaces to HBM:
+These steps must be followed to properly connect the monitor interfaces to HBM:
 
 1. Expose the HBM monitor I/Os on the HBM IP by running the following Tcl commands in the Vivado IP management project:
 
@@ -434,9 +440,9 @@ These steps must be followed to properly conect the monitor interfaces to HBM:
     true
     ```
 
-    **NOTE:** This step can be skipped if the customer uses the `CL_HBM` IP from the [CL examples](./../README.md#cl-examples). This IP has the `MON_APB` interface enabled and is ready to be integrated to a customer design as-is.
+    **NOTE:** This step can be skipped if the customer uses the `CL_HBM` IP from the [CL examples](./../../hdk/common/ip/cl_ip/). This IP has the `MON_APB` interface enabled and is ready to be integrated to a customer design as-is.
 
-2. Connect the HBM monitor interface from the shell to the HBM IP. The customer can leave the interface floating if the corresponding HBM rack is not used. For example, the `hbm_apb_p<xx>_1` signals can be left unconnected if HBM 1 is unused.
+2. Connect the HBM monitor interface from the shell to the HBM IP. The customer can leave the interface floating if the corresponding HBM rack is not used. For example, the `hbm_apb_p<xx>_1` signals can be left unconnected if HBM rack 1 is unused.
 
 3. All the HBM monitor interfaces are synchronized to the 100MHz `clk_hbm_ref` clock.
 
@@ -529,45 +535,46 @@ It is ideal to place logic that interfaces to the shell in the same SLR as the S
 - MID SLR:
   - PCIM
   - OCL
-  - BAR1
   - SDA
 - MID/BOTTOM
-  - HBM Mon APB
+  - HBM MON APB
 
-Please see [shell_floorplan.md](./shell_floorplan.md) for additional details on Shell-CL interface placements in SMALL_SHELL.
+Please see the [Shell Floorplan](./shell_floorplan.md) for additional details on Shell-CL interface placements in SMALL_SHELL.
 
 For the interfaces that are in both the MID/BOTTOM the recommendation is to use flops for pipelining, but don’t constrain to an SLR.  You can constrain logic to a particular SLR by creating PBLOCKs (one per SLR), and assigning logic to the PBLOCKs (refer to cl_dram_hbm_dma example [small_shell_cl_pnr_user.xdc](../cl/examples/cl_dram_hbm_dma/build/constraints/small_shell_cl_pnr_user.xdc)).
 Dataflow should be mapped so that SLR crossing is minimized (for example a pipeline should be organized such that successive stages are mostly in the same SLR).
 
-Here’s an example post on the Xilinx forum which points to some documentation related to solving this:
-<https://forums.xilinx.com/t5/UltraScale-Architecture/Ultrascale-SLR-crossing/td-p/798435>
-
-There are some good timing closure tips in this methodology doc pointed to by the Xilinx forum post:
-<https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf>
+There are some good timing closure tips in this [UltraFast Design Methodology Guide](https://docs.amd.com/r/2024.1-English/ug949-vivado-design-methodology/Introduction)
 
 ### Logic Levels
 
 You can report all paths that are greater than a certain number of logic levels.  This can be used to iterate on timing in synthesis rather than waiting for place and route.  For example at 250MHz a general rule of thumb is try to keep logic levels to around 10.  The following commands report on all paths that have more than 10 logic levels:
 
-- report_design_analysis -logic_level_distribution -of [get_timing_paths -max_paths 10000 -filter {LOGIC_LEVELS > **10**}]
-- foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS > **10**}] {puts "[get_property STARTPOINT_PIN $gtp] [get_property ENDPOINT_PIN $gtp] [get_property SLACK $gtp] [get_propert LOGIC_LEVELS $gtp]"}
+``` Tcl
+report_design_analysis -logic_level_distribution -of [get_timing_paths -max_paths 10000 -filter {LOGIC_LEVELS > **10**}]
+
+foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS > **10**}] {
+    puts "[get_property STARTPOINT_PIN $gtp]
+    [get_property ENDPOINT_PIN $gtp] [get_property SLACK $gtp]
+    [get_propert LOGIC_LEVELS $gtp]"
+```
 
 ### Reset
 
 Reset fanout can be minimized in an FPGA. This helps with routing congestion. Flops can be initialized in their declaration and generally do not require resets:
 
 ```verilog
-    logic[3:0] my_flops = 4’ha;
+    logic[3:0] my_flops = 4'ha;
 ```
 
 If logic must have a reset, use synchronous resets rather than asynchronous resets:
 
 ```verilog
 always @(posedge clk)
-   if (reset)
-      my_flop <= 4’ha;
-   else
-      my_flop <= nxt_my_flop;
+    if (reset)
+        my_flop <= 4'ha;
+    else
+        my_flop <= nxt_my_flop;
 ```
 
 If there is still significant fanout of reset, it should be replicated and pipelined.  For example each major block could have its own pipelined version of reset.
@@ -591,4 +598,4 @@ Vivado has some nice analysis capabilities:
 - physical implementation analysis (placement, routing)
 - linked timing/schematic/physical views
 
-<https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_4/ug906-vivado-design-analysis.pdf>
+Refer to [Vivado Design Suite User Guide](https://docs.amd.com/r/en-US/ug906-vivado-design-analysis/Routing-Analysis) for more information.

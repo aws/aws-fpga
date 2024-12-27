@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 module cl_vio (
    input clk_extra_a1
@@ -19,7 +22,7 @@ module cl_vio (
 );
 
    // Counter running at 125MHz
-   
+
    logic      vo_cnt_enable;
    logic      vo_cnt_load;
    logic      vo_cnt_clear;
@@ -40,7 +43,7 @@ module cl_vio (
    logic        vi_cnt_ge_watermark;
    logic [7:0]  vi_tick_cnt = 0;
    logic [15:0] vi_cnt = 0;
-   
+
    // Tick counter and main counter
    always @(posedge clk_extra_a1) begin
 
@@ -66,9 +69,9 @@ module cl_vio (
       vi_tick = (vi_tick_cnt >= vo_tick_value_q);
 
       vi_cnt_ge_watermark = (vi_cnt >= vo_cnt_watermark_q);
-      
+
    end // always @ (posedge clk_extra_a1)
-   
+
 
    vio_0 CL_VIO_0 (
                    .clk    (clk_extra_a1),
@@ -84,7 +87,7 @@ module cl_vio (
                    .probe_out5 (vo_cnt_load_value),
                    .probe_out6 (vo_cnt_watermark)
                    );
-   
+
    ila_vio_counter CL_VIO_ILA (
                    .clk     (clk_extra_a1),
                    .probe0  (vi_tick),
@@ -102,4 +105,3 @@ module cl_vio (
 
 
 endmodule
-

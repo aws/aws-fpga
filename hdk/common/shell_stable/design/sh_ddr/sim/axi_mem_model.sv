@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,12 +13,15 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
+
 module axi_mem_model #( parameter NUM_MEM = 3, parameter ECC_EN = 0, parameter ECC_ADDR_HI = 'h410, parameter ECC_ADDR_LO = 'h400, parameter RND_ECC_EN = 0, parameter RND_ECC_WEIGHT = 100)
    (
 
    input clk_core,
    input rst_n,
-    
+
    input[15:0] cl_sh_ddr_awid[NUM_MEM-1:0],
    input[63:0] cl_sh_ddr_awaddr[NUM_MEM-1:0],
    input[7:0] cl_sh_ddr_awlen[NUM_MEM-1:0],
@@ -79,7 +83,7 @@ module axi_mem_model #( parameter NUM_MEM = 3, parameter ECC_EN = 0, parameter E
                .cl_sh_ddr_wlast(cl_sh_ddr_wlast[gi]),
                .cl_sh_ddr_wvalid(cl_sh_ddr_wvalid[gi]),
                .sh_cl_ddr_wready(sh_cl_ddr_wready[gi]),
-               
+
                .sh_cl_ddr_bid(sh_cl_ddr_bid[gi]),
                .sh_cl_ddr_bresp(sh_cl_ddr_bresp[gi]),
                .sh_cl_ddr_bvalid(sh_cl_ddr_bvalid[gi]),

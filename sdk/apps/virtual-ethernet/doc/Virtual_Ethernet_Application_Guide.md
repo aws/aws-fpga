@@ -143,13 +143,13 @@ The number of supported TX and RX descriptors per SPP queue pair is parameterize
 
 The SDE may be built with regular or compact descriptor types (see the C2H_DESC_TYPE and H2C_DESC_TYPE in the Design Parameters section [here](./SDE_HW_Guide.md)).  The SPP PMD also supports regular or compact descriptor types at compile time via the SPP_USE_COMPACT_DESCS define within spp_defs.h.  The default descriptor type for the SDE and SPP is `regular` to support the full 64-bit DMA addressing.  If there is a mismatch between the SDE and SPP descriptor type build options, the SPP driver will log an error similar to the following:
 
-Mismatched build options: SDE descriptor type is `regular`, SPP PMD decriptor type is `compact`.
+Mismatched build options: SDE descriptor type is `regular`, SPP PMD descriptor type is `compact`.
 
 ```
 PMD: spp_dev_cap_get(): SDE C2H Desc Info(0x00400000), type=regular, is not supported
 ```
 
-Mismatched build options: SDE descriptor type is `compact`, SPP PMD decriptor type is `regular`.
+Mismatched build options: SDE descriptor type is `compact`, SPP PMD descriptor type is `regular`.
 
 ```
 PMD: spp_dev_cap_get(): SDE C2H Desc Info(0x00800001), type=compact, is not supported

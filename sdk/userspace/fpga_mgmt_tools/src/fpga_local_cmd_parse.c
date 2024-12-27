@@ -97,7 +97,7 @@ static const char *describe_afi_usage[] = {
 	"          Examples: FPGA PCI and DDR metrics.",
 	"      -L, --clear-cache",
 	"          Return FPGA image hardware metrics (clear afi cache on read).",
-	"          Examples: agfi-<number>",
+	"          Examples: FPGA status bits and DDR metrics.",
 	"      -R, --rescan",
 	"          Rescan the AFIDEVICE to update the per-AFI PCI VendorId and",
 	"          DeviceId that may be dynamically modified due to a",

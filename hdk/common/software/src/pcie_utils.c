@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -132,7 +135,7 @@ pcie_find_all(char *ids[], int max)
             }
         }
     }
-    closedir(d); 
+    closedir(d);
     return count;
 }
 
@@ -158,7 +161,7 @@ pcie_find_first(void)
             return de.d_name;
         }
     }
-    closedir(d); 
+    closedir(d);
     return NULL;
 }
 
@@ -173,7 +176,7 @@ pcie_mmap(char *id, bool verify)
     if (fd < 0) {
         return false;
     }
-    
+
     lseek(fd, 0x10, SEEK_SET);
     read(fd, &t_bar0, sizeof(t_bar0));
     if (t_bar0 == 0) {
@@ -195,7 +198,7 @@ pcie_mmap(char *id, bool verify)
         perror("/dev/mem");
         return false;
     }
-    
+
     t_base = (uintptr_t) mmap(0, MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, t_bar0);
     if (t_base == (uintptr_t) MAP_FAILED) {
         perror("mmap");

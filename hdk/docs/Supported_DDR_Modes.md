@@ -1,9 +1,9 @@
 # Supported DDR configurations in [sh_ddr.sv](./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv)
 
-## Table of Content
+## Table of Contents
 
 - [Supported DDR configurations in sh\_ddr.sv](#supported-ddr-configurations-in-sh_ddrsv)
-  - [Table of Content](#table-of-content)
+  - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Required RTL Modifications](#required-rtl-modifications)
   - [Required Verification Modifications](#required-verification-modifications)
@@ -14,7 +14,7 @@
 The [sh_ddr.sv](./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv) now supports following configurations for DDR Controller IPs:
 
 - DDR Core for 64 GB DIMM.
-- DDR Core for 64 GB DIMM with user-controlled Auto-Precharge mode. This feature allows user designs to issue DDR Auto-Precharge command by asserting `cl_sh_ddr_axi_awuser=1` or `cl_sh_ddr_axi_aruser=1` alongside their corresponding valid control signals. Please refer to [PG150-User Guide](https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/ultrascale_memory_ip/v1_4/pg150-ultrascale-memory-ip.pdf) for details on user-controlled (app_autoprecharge) Auto-Precharge mode.
+- DDR Core for 64 GB DIMM with user-controlled Auto-Precharge mode. This feature allows user designs to issue DDR Auto-Precharge command by asserting `cl_sh_ddr_axi_awuser=1` or `cl_sh_ddr_axi_aruser=1` alongside their corresponding valid control signals. Please refer to [PG150-User Guide](https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/ultrascale_memory_ip/v1_4/pg150-ultrascale-memory-ip.pdf) for details on user-controlled (app_auto-precharge) Auto-Precharge mode.
 - If DDR core is not required in the CL design, then users still have to instantiate `sh_ddr.sv` in top level CL, with parameter tied off to `.DDR_PRESENT(0)`. Failing to do so may result in errors during synthesis/implementation.
 
 ## Required RTL Modifications

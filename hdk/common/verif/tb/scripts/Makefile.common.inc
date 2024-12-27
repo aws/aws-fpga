@@ -1,7 +1,7 @@
-#-------------------------------------------------------------------------------
+# =============================================================================
 # Amazon FPGA Hardware Development Kit
 #
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
@@ -13,9 +13,10 @@
 # an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
-#-------------------------------------------------------------------------------
+# =============================================================================
 
-all: change_simulated_dimm_size make_sim_dir compile run
+
+all: make_sim_dir compile run
 
 define \n
 
@@ -39,9 +40,7 @@ help: ## Display this help
 	$(info $(\t)QUESTA         - Set this to use the Modelsim Questa simulator)
 	$(info )
 	$(info SH_DDR Configuration: "make <TEST TARGET> USE_64GB_DDR_DIMM=1")
-	$(info $(\t)USE_32GB_DDR_DIMM (DEFAULT) - Set this to use a 32GB DDR DIMM for simulations)
-	$(info $(\t)USE_64GB_DDR_DIMM           - Set this to use a 64GB DDR DIMM for simulations)
-	$(info $(\t)USE_AP_32GB_DDR_DIMM        - Set this to use a 32GB DDR DIMM with user-controlled Auto Precharge for simulations)
+	$(info $(\t)USE_64GB_DDR_DIMM (DEFAULT) - Set this to use a 64GB DDR DIMM for simulations)
 	$(info $(\t)USE_AP_64GB_DDR_DIMM        - Set this to use a 64GB DDR DIMM with user-controlled Auto Precharge for simulations)
 	$(info $(\n))
 
@@ -89,27 +88,11 @@ PLUSARGS += +plusarg_save +timeout=1ms
 DDR4_RDIMM_WRAPPER = $(HDK_COMMON_DIR)/verif/models/ddr4_rdimm_wrapper/ddr4_rdimm_wrapper.sv
 DIMM_REPLACEMENT = "NONE"
 
-ifeq ($(USE_64GB_DDR_DIMM), 1)
-   DEFAULT_DEFINES += $(call define, USE_64GB_DDR_DIMM=1)
-   DIMM_REPLACEMENT = sed -i s/_8G/_16G/g $(DDR4_RDIMM_WRAPPER)
+ifeq ($(USE_AP_64GB_DDR_DIMM), 1)
+   DEFAULT_DEFINES += $(call define, USE_AP_64GB_DDR_DIMM=1)
 else
-   ifeq ($(USE_AP_64GB_DDR_DIMM), 1)
-      DEFAULT_DEFINES += $(call define, USE_AP_64GB_DDR_DIMM=1)
-      DIMM_REPLACEMENT = sed -i s/_8G/_16G/g $(DDR4_RDIMM_WRAPPER)
-   else
-      ifeq ($(USE_AP_32GB_DDR_DIMM), 1)
-         DEFAULT_DEFINES += $(call define, USE_AP_32GB_DDR_DIMM=1)
-         DIMM_REPLACEMENT = sed -i s/_16G/_8G/g $(DDR4_RDIMM_WRAPPER)
-      else
-         DEFAULT_DEFINES += $(call define, USE_32GB_DDR_DIMM=1)
-         DIMM_REPLACEMENT = sed -i s/_16G/_8G/g $(DDR4_RDIMM_WRAPPER)
-      endif
-   endif
+   DEFAULT_DEFINES += $(call define, USE_64GB_DDR_DIMM=1)
 endif
-
-change_simulated_dimm_size:
-	$(DIMM_REPLACEMENT)
-	echo "Updating simulated DIMM configuration: $(DIMM_REPLACEMENT)"
 
 
 # Simulation variables and directory name changes
