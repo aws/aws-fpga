@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,12 +13,14 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 // SDE Top Level
 
 module sde #(parameter bit C2H_ONLY = 0,
              parameter bit H2C_ONLY = 0,
-             
+
              parameter H2C_PCIM_MAX_RD_SIZE = 0, // 0 - 512B, 1 - 1KB, 2 - 2KB, 3 - 4KB
              parameter C2H_PCIM_MAX_WR_SIZE = 3, // 0 - 512B, 1 - 1KB, 2 - 2KB, 3 - 4KB
 
@@ -27,36 +30,36 @@ module sde #(parameter bit C2H_ONLY = 0,
              parameter PCIM_ADDR_WIDTH = 64,
 
              parameter PCIM_NUM_OT_RD = 64,
-             
+
              parameter PCIS_DATA_WIDTH = 512,
              parameter PCIS_ID_WIDTH = 16,
              parameter PCIS_LEN_WIDTH = 8,
              parameter PCIS_ADDR_WIDTH = 64,
-             
+
              parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
-             
+
              parameter C2H_DESC_RAM_DEPTH = 64,
-             
+
              parameter C2H_AXIS_DATA_WIDTH = 512,
              parameter C2H_USER_BIT_WIDTH = C2H_DESC_TYPE ? 1 : 64,
-             
+
              parameter C2H_BUF_DEPTH = 512,
-             
+
              parameter bit H2C_DESC_TYPE = 0,
              parameter H2C_DESC_RAM_DEPTH = 64,
-             
+
              parameter H2C_AXIS_DATA_WIDTH = 512,
              parameter H2C_USER_BIT_WIDTH = H2C_DESC_TYPE ? 1 : 64,
-             
+
              parameter H2C_BUF_DEPTH = 512,
-             
+
              parameter H2C_PKT_SIZE_BYTES = 64,
-             
-             
+
+
              parameter C2H_PCIM_DM_AWID = 0,   // This is the AWID used for write accesses from C2H Data Mover
              parameter C2H_PCIM_WB_AWID = 1,   // This is the AWID used for write accesses from C2H Write Back Block
              parameter H2C_PCIM_WB_AWID = 2,   // This is the AWID used for write accesses from H2C Write Back Block
-             
+
              parameter C2H_PCIM_DESC_ARID = 0, // This is the ARID used for read access from the C2H Desc Block
              parameter H2C_PCIM_DESC_ARID = 1, // This is the ARID used for read access from the H2C Desc Block
              parameter H2C_PCIM_DM_ARID = 2    // This is the ARID used for write accesses from H2C Data Mover
@@ -64,7 +67,7 @@ module sde #(parameter bit C2H_ONLY = 0,
   (
     input                                       clk,
     input                                       rst_n,
-   
+
    // PCIS Interface
     input [PCIS_ID_WIDTH-1:0]                   pcis_awid,
     input [PCIS_ADDR_WIDTH-1:0]                 pcis_awaddr,
@@ -93,7 +96,7 @@ module sde #(parameter bit C2H_ONLY = 0,
     output logic                                pcis_rlast,
     output logic                                pcis_rvalid,
     input                                       pcis_rready,
-   
+
    // PCIM Interface
     output logic                                pcim_awvalid,
     output logic [PCIM_ID_WIDTH-1:0]            pcim_awid,
@@ -130,7 +133,7 @@ module sde #(parameter bit C2H_ONLY = 0,
     input [C2H_USER_BIT_WIDTH-1:0]              c2h_axis_user,
     input                                       c2h_axis_last,
     output logic                                c2h_axis_ready,
-    
+
    // H2C AXI-Stream Interface
     output logic                                h2c_axis_valid,
     output logic [H2C_AXIS_DATA_WIDTH-1:0]      h2c_axis_data,
@@ -149,33 +152,33 @@ module sde #(parameter bit C2H_ONLY = 0,
    logic                                        c2h_sync_rst_n;
    logic                                        h2c_sync_rst_n;
    logic                                        pm_sync_rst_n;
-   
+
    logic                                        c2h_ps_desc_wr_req;
    logic [C2H_DESC_WIDTH-1:0]                   c2h_ps_desc_wdata;
    logic                                        c2h_ps_desc_ack;
-   
+
    logic                                        h2c_ps_desc_wr_req;
    logic [H2C_DESC_WIDTH-1:0]                   h2c_ps_desc_wdata;
    logic                                        h2c_ps_desc_ack;
-   
+
    logic                                        h2c_ps_pkt_wr_req;
    logic [H2C_PKT_WIDTH-1:0]                    h2c_ps_pkt_wdata;
    logic                                        h2c_ps_pkt_ack;
-   
+
    logic                                        pm_ps_cfg_wr_req;
    logic                                        pm_ps_cfg_rd_req;
    logic [15:0]                                 pm_ps_cfg_addr;
    logic [31:0]                                 pm_ps_cfg_wdata;
    logic                                        pm_ps_cfg_ack;
    logic [31:0]                                 pm_ps_cfg_rdata;
-   
+
    logic                                        c2h_ps_cfg_wr_req;
    logic                                        c2h_ps_cfg_rd_req;
    logic [15:0]                                 c2h_ps_cfg_addr;
    logic [31:0]                                 c2h_ps_cfg_wdata;
    logic                                        c2h_ps_cfg_ack;
    logic [31:0]                                 c2h_ps_cfg_rdata;
-   
+
    logic                                        c2h_desc_ooo_error;
    logic                                        c2h_desc_unalin_error;
 
@@ -205,7 +208,7 @@ module sde #(parameter bit C2H_ONLY = 0,
    logic [PCIM_LEN_WIDTH-1:0]                   c2h_dm_pm_awlen;
    logic [PCIM_ID_WIDTH-1:0]                    c2h_dm_pm_awid;
    logic                                        c2h_pm_dm_awready;
-   
+
    logic                                        c2h_dm_pm_wvalid;
    logic [PCIM_DATA_WIDTH-1:0]                  c2h_dm_pm_wdata;
    logic [(PCIM_DATA_WIDTH>>3)-1:0]             c2h_dm_pm_wstrb;
@@ -221,7 +224,7 @@ module sde #(parameter bit C2H_ONLY = 0,
    logic [PCIM_LEN_WIDTH-1:0]                   c2h_wb_pm_awlen;
    logic [PCIM_ID_WIDTH-1:0]                    c2h_wb_pm_awid;
    logic                                        c2h_pm_wb_awready;
-   
+
    logic                                        c2h_wb_pm_wvalid;
    logic [PCIM_DATA_WIDTH-1:0]                  c2h_wb_pm_wdata;
    logic [(PCIM_DATA_WIDTH>>3)-1:0]             c2h_wb_pm_wstrb;
@@ -242,7 +245,7 @@ module sde #(parameter bit C2H_ONLY = 0,
    logic [PCIM_DATA_WIDTH-1:0]                  h2c_pm_desc_rdata;
    logic                                        h2c_pm_desc_rlast;
    logic                                        h2c_desc_pm_rready;
-   
+
    logic                                        h2c_dm_pm_arvalid;
    logic [PCIM_ADDR_WIDTH-1:0]                  h2c_dm_pm_araddr;
    logic [PCIM_LEN_WIDTH-1:0]                   h2c_dm_pm_arlen;
@@ -260,7 +263,7 @@ module sde #(parameter bit C2H_ONLY = 0,
    logic [PCIM_LEN_WIDTH-1:0]                   h2c_wb_pm_awlen;
    logic [PCIM_ID_WIDTH-1:0]                    h2c_wb_pm_awid;
    logic                                        h2c_pm_wb_awready;
-   
+
    logic                                        h2c_wb_pm_wvalid;
    logic [PCIM_DATA_WIDTH-1:0]                  h2c_wb_pm_wdata;
    logic [(PCIM_DATA_WIDTH>>3)-1:0]             h2c_wb_pm_wstrb;
@@ -274,8 +277,8 @@ module sde #(parameter bit C2H_ONLY = 0,
    // Generate local copy of Reset
    always @(posedge clk)
         sync_rst_n <= rst_n;
-   
-   // PCIS Interface 
+
+   // PCIS Interface
    sde_ps #(.PCIS_DATA_WIDTH (PCIS_DATA_WIDTH),
             .PCIS_ID_WIDTH   (PCIS_ID_WIDTH),
             .PCIS_LEN_WIDTH  (PCIS_LEN_WIDTH),
@@ -326,29 +329,29 @@ module sde #(parameter bit C2H_ONLY = 0,
       .c2h_ps_desc_wr_req (c2h_ps_desc_wr_req),
       .c2h_ps_desc_wdata  (c2h_ps_desc_wdata ),
       .c2h_ps_desc_ack    (c2h_ps_desc_ack   ),
-      
+
       .h2c_ps_desc_wr_req (h2c_ps_desc_wr_req),
       .h2c_ps_desc_wdata  (h2c_ps_desc_wdata ),
       .h2c_ps_desc_ack    (h2c_ps_desc_ack   ),
-      
+
       .h2c_ps_pkt_wr_req  (h2c_ps_pkt_wr_req),
       .h2c_ps_pkt_wdata   (h2c_ps_pkt_wdata ),
       .h2c_ps_pkt_ack     (h2c_ps_pkt_ack   ),
-      
+
       .pm_ps_cfg_wr_req   (pm_ps_cfg_wr_req),
       .pm_ps_cfg_rd_req   (pm_ps_cfg_rd_req),
       .pm_ps_cfg_addr     (pm_ps_cfg_addr  ),
       .pm_ps_cfg_wdata    (pm_ps_cfg_wdata ),
       .pm_ps_cfg_ack      (pm_ps_cfg_ack   ),
       .pm_ps_cfg_rdata    (pm_ps_cfg_rdata ),
-      
+
       .c2h_ps_cfg_wr_req  (c2h_ps_cfg_wr_req),
       .c2h_ps_cfg_rd_req  (c2h_ps_cfg_rd_req),
       .c2h_ps_cfg_addr    (c2h_ps_cfg_addr  ),
       .c2h_ps_cfg_wdata   (c2h_ps_cfg_wdata ),
       .c2h_ps_cfg_ack     (c2h_ps_cfg_ack   ),
       .c2h_ps_cfg_rdata   (c2h_ps_cfg_rdata ),
-      
+
       .c2h_desc_ooo_error    (c2h_desc_ooo_error),
       .c2h_desc_unalin_error (c2h_desc_unalin_error),
 
@@ -363,7 +366,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .h2c_desc_unalin_error (h2c_desc_unalin_error)
 
       );
-   
+
    // PCIM Interface
    sde_pm #(.PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
             .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
@@ -373,7 +376,7 @@ module sde #(parameter bit C2H_ONLY = 0,
             .C2H_PCIM_DM_AWID (C2H_PCIM_DM_AWID),
             .C2H_PCIM_WB_AWID (C2H_PCIM_WB_AWID),
             .H2C_PCIM_WB_AWID (H2C_PCIM_WB_AWID),
-            
+
             .C2H_PCIM_DESC_ARID(C2H_PCIM_DESC_ARID),
             .H2C_PCIM_DESC_ARID(H2C_PCIM_DESC_ARID),
             .H2C_PCIM_DM_ARID  (H2C_PCIM_DM_ARID  )
@@ -382,14 +385,14 @@ module sde #(parameter bit C2H_ONLY = 0,
    SDE_PCI_MSTR
      (.clk                 (clk),
       .rst_n               (pm_sync_rst_n),
-      
+
       .pm_ps_cfg_wr_req    (pm_ps_cfg_wr_req),
       .pm_ps_cfg_rd_req    (pm_ps_cfg_rd_req),
       .pm_ps_cfg_addr      (pm_ps_cfg_addr  ),
       .pm_ps_cfg_wdata     (pm_ps_cfg_wdata ),
       .pm_ps_cfg_ack       (pm_ps_cfg_ack   ),
       .pm_ps_cfg_rdata     (pm_ps_cfg_rdata ),
-      
+
       .pcim_awvalid        (pcim_awvalid ),
       .pcim_awid           (pcim_awid    ),
       .pcim_awaddr         (pcim_awaddr  ),
@@ -442,7 +445,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .c2h_pm_dm_bresp     (c2h_pm_dm_bresp  ),
       .c2h_dm_pm_bready    (c2h_dm_pm_bready ),
 
-      
+
       .c2h_wb_pm_awvalid   (c2h_wb_pm_awvalid),
       .c2h_wb_pm_awaddr    (c2h_wb_pm_awaddr ),
       .c2h_wb_pm_awlen     (c2h_wb_pm_awlen  ),
@@ -456,7 +459,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .c2h_pm_wb_bvalid    (c2h_pm_wb_bvalid ),
       .c2h_pm_wb_bresp     (c2h_pm_wb_bresp  ),
       .c2h_wb_pm_bready    (c2h_wb_pm_bready ),
-      
+
       .h2c_desc_pm_arvalid (h2c_desc_pm_arvalid),
       .h2c_desc_pm_araddr  (h2c_desc_pm_araddr ),
       .h2c_desc_pm_arlen   (h2c_desc_pm_arlen  ),
@@ -466,7 +469,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .h2c_pm_desc_rdata   (h2c_pm_desc_rdata ),
       .h2c_pm_desc_rlast   (h2c_pm_desc_rlast ),
       .h2c_desc_pm_rready  (h2c_desc_pm_rready),
-      
+
       .h2c_dm_pm_arvalid   (h2c_dm_pm_arvalid),
       .h2c_dm_pm_araddr    (h2c_dm_pm_araddr ),
       .h2c_dm_pm_arlen     (h2c_dm_pm_arlen  ),
@@ -476,7 +479,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .h2c_pm_dm_rdata     (h2c_pm_dm_rdata ),
       .h2c_pm_dm_rlast     (h2c_pm_dm_rlast ),
       .h2c_dm_pm_rready    (h2c_dm_pm_rready),
-      
+
       .h2c_wb_pm_awvalid   (h2c_wb_pm_awvalid),
       .h2c_wb_pm_awaddr    (h2c_wb_pm_awaddr ),
       .h2c_wb_pm_awlen     (h2c_wb_pm_awlen  ),
@@ -492,26 +495,26 @@ module sde #(parameter bit C2H_ONLY = 0,
       .h2c_wb_pm_bready    (h2c_wb_pm_bready )
 
       );
-   
+
    // C2H
    if (H2C_ONLY == 0)
      begin
-        sde_c2h 
+        sde_c2h
           #(.C2H_DESC_TYPE      (C2H_DESC_TYPE),
             .C2H_DESC_WIDTH     (C2H_DESC_WIDTH),
-            
+
             .C2H_DESC_RAM_DEPTH (C2H_DESC_RAM_DEPTH),
             .C2H_PCIM_DM_AWID   (C2H_PCIM_DM_AWID),
             .C2H_PCIM_WB_AWID   (C2H_PCIM_WB_AWID),
             .C2H_PCIM_DESC_ARID (C2H_PCIM_DESC_ARID),
-            
+
             .C2H_PCIM_MAX_WR_SIZE (C2H_PCIM_MAX_WR_SIZE),
 
             .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
             .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
             .PCIM_LEN_WIDTH  (PCIM_LEN_WIDTH  ),
             .PCIM_ADDR_WIDTH (PCIM_ADDR_WIDTH ),
-           
+
             .C2H_AXIS_DATA_WIDTH (C2H_AXIS_DATA_WIDTH),
             .C2H_USER_BIT_WIDTH  (C2H_USER_BIT_WIDTH),
             .C2H_BUF_DEPTH       (C2H_BUF_DEPTH)
@@ -523,14 +526,14 @@ module sde #(parameter bit C2H_ONLY = 0,
            .c2h_ps_desc_wr_req  (c2h_ps_desc_wr_req),
            .c2h_ps_desc_wdata   (c2h_ps_desc_wdata ),
            .c2h_ps_desc_ack     (c2h_ps_desc_ack   ),
-           
+
            .c2h_ps_cfg_wr_req   (c2h_ps_cfg_wr_req),
            .c2h_ps_cfg_rd_req   (c2h_ps_cfg_rd_req),
            .c2h_ps_cfg_addr     (c2h_ps_cfg_addr  ),
            .c2h_ps_cfg_wdata    (c2h_ps_cfg_wdata ),
            .c2h_ps_cfg_ack      (c2h_ps_cfg_ack   ),
            .c2h_ps_cfg_rdata    (c2h_ps_cfg_rdata ),
-           
+
            .c2h_desc_ooo_error    (c2h_desc_ooo_error),
            .c2h_desc_unalin_error (c2h_desc_unalin_error),
 
@@ -558,7 +561,7 @@ module sde #(parameter bit C2H_ONLY = 0,
            .c2h_pm_dm_bresp     (c2h_pm_dm_bresp  ),
            .c2h_dm_pm_bready    (c2h_dm_pm_bready ),
 
-           
+
            .c2h_wb_pm_awvalid   (c2h_wb_pm_awvalid),
            .c2h_wb_pm_awaddr    (c2h_wb_pm_awaddr ),
            .c2h_wb_pm_awlen     (c2h_wb_pm_awlen  ),
@@ -574,16 +577,16 @@ module sde #(parameter bit C2H_ONLY = 0,
            .c2h_wb_pm_bready    (c2h_wb_pm_bready ),
 
            .c2h_axis_valid      (c2h_axis_valid ),
-           .c2h_axis_data       (c2h_axis_data  ), 
-           .c2h_axis_keep       (c2h_axis_keep  ), 
-           .c2h_axis_user       (c2h_axis_user  ), 
-           .c2h_axis_last       (c2h_axis_last  ),  
+           .c2h_axis_data       (c2h_axis_data  ),
+           .c2h_axis_keep       (c2h_axis_keep  ),
+           .c2h_axis_user       (c2h_axis_user  ),
+           .c2h_axis_last       (c2h_axis_last  ),
            .c2h_axis_ready      (c2h_axis_ready )
 
            );
      end // if (H2C_ONLY == 0)
    else begin
-      assign 
+      assign
         c2h_ps_desc_ack = 1'b1,
         c2h_ps_cfg_ack = 1'b1,
         c2h_ps_cfg_rdata = 32'd00,
@@ -594,10 +597,10 @@ module sde #(parameter bit C2H_ONLY = 0,
         c2h_dm_pm_bready = 1'b1,
         c2h_axis_ready = 1'b0;
    end // else: !if(H2C_ONLY == 0)
-   
+
    // H2C
    if (C2H_ONLY == 0) begin
-      sde_h2c 
+      sde_h2c
         #(.H2C_DESC_TYPE      (H2C_DESC_TYPE),
           .H2C_DESC_RAM_DEPTH (H2C_DESC_RAM_DEPTH),
           .H2C_PCIM_DM_ARID   (H2C_PCIM_DM_ARID),
@@ -606,12 +609,12 @@ module sde #(parameter bit C2H_ONLY = 0,
 
           .PCIM_NUM_OT_RD  (PCIM_NUM_OT_RD  ),
           .H2C_PCIM_MAX_RD_SIZE (H2C_PCIM_MAX_RD_SIZE),
-          
+
           .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
           .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
           .PCIM_LEN_WIDTH  (PCIM_LEN_WIDTH  ),
           .PCIM_ADDR_WIDTH (PCIM_ADDR_WIDTH ),
-         
+
           .H2C_AXIS_DATA_WIDTH (H2C_AXIS_DATA_WIDTH),
           .H2C_USER_BIT_WIDTH  (H2C_USER_BIT_WIDTH),
           .H2C_BUF_DEPTH       (H2C_BUF_DEPTH)
@@ -623,14 +626,14 @@ module sde #(parameter bit C2H_ONLY = 0,
          .h2c_ps_desc_wr_req  (h2c_ps_desc_wr_req),
          .h2c_ps_desc_wdata   (h2c_ps_desc_wdata ),
          .h2c_ps_desc_ack     (h2c_ps_desc_ack   ),
-         
+
          .h2c_ps_cfg_wr_req   (h2c_ps_cfg_wr_req),
          .h2c_ps_cfg_rd_req   (h2c_ps_cfg_rd_req),
          .h2c_ps_cfg_addr     (h2c_ps_cfg_addr  ),
          .h2c_ps_cfg_wdata    (h2c_ps_cfg_wdata ),
          .h2c_ps_cfg_ack      (h2c_ps_cfg_ack   ),
          .h2c_ps_cfg_rdata    (h2c_ps_cfg_rdata ),
-         
+
          .h2c_desc_ooo_error    (h2c_desc_ooo_error),
          .h2c_desc_unalin_error (h2c_desc_unalin_error),
 
@@ -654,7 +657,7 @@ module sde #(parameter bit C2H_ONLY = 0,
          .h2c_pm_dm_rdata     (h2c_pm_dm_rdata  ),
          .h2c_pm_dm_rlast     (h2c_pm_dm_rlast  ),
          .h2c_dm_pm_rready    (h2c_dm_pm_rready ),
-         
+
          .h2c_wb_pm_awvalid   (h2c_wb_pm_awvalid),
          .h2c_wb_pm_awaddr    (h2c_wb_pm_awaddr ),
          .h2c_wb_pm_awlen     (h2c_wb_pm_awlen  ),
@@ -670,16 +673,16 @@ module sde #(parameter bit C2H_ONLY = 0,
          .h2c_wb_pm_bready    (h2c_wb_pm_bready ),
 
          .h2c_axis_valid      (h2c_axis_valid),
-         .h2c_axis_data       (h2c_axis_data ), 
-         .h2c_axis_keep       (h2c_axis_keep ), 
-         .h2c_axis_user       (h2c_axis_user ), 
-         .h2c_axis_last       (h2c_axis_last ), 
+         .h2c_axis_data       (h2c_axis_data ),
+         .h2c_axis_keep       (h2c_axis_keep ),
+         .h2c_axis_user       (h2c_axis_user ),
+         .h2c_axis_last       (h2c_axis_last ),
          .h2c_axis_ready      (h2c_axis_ready)
 
          );
    end // if (C2H_ONLY == 0)
    else begin
-      assign 
+      assign
         h2c_ps_desc_ack = 1'b1,
         h2c_ps_cfg_ack = 1'b1,
         h2c_ps_cfg_rdata = 32'd0,
@@ -689,7 +692,7 @@ module sde #(parameter bit C2H_ONLY = 0,
         h2c_dm_pm_rready = 1'b1,
         h2c_axis_valid = 1'b0;
    end // else: !if(C2H_ONLY == 0)
-   
+
 `ifndef NO_SDE_DEBUG_ILA
 
 //    ila_axi4_wrapper #(.AXI_DATA_WIDTH(32)) PCIS_AXI4_ILA
@@ -723,7 +726,7 @@ module sde #(parameter bit C2H_ONLY = 0,
 //       .ila_rresp    (pcis_rresp  ),
 //       .ila_rlast    (pcis_rlast  )
 //       );
-// 
+//
 //    ila_axi4_wrapper #(.AXI_DATA_WIDTH(32)) PCIM_AXI4_ILA
 //      (.aclk         (clk),
 //       .trig_disable (1'b0),
@@ -754,7 +757,7 @@ module sde #(parameter bit C2H_ONLY = 0,
 //       .ila_rdata    (pcim_rdata  ),
 //       .ila_rresp    (pcim_rresp  ),
 //       .ila_rlast    (pcim_rlast  )
-//       );   
+//       );
 
    ila_axis C2H_AXIS_ILA
      (.clk (clk),
@@ -765,7 +768,7 @@ module sde #(parameter bit C2H_ONLY = 0,
       .probe4 (c2h_axis_user),
       .probe5 (c2h_axis_ready)
       );
-   
+
    ila_axis H2C_AXIS_ILA
      (.clk (clk),
       .probe0 (h2c_axis_valid),
@@ -775,13 +778,9 @@ module sde #(parameter bit C2H_ONLY = 0,
       .probe4 (h2c_axis_user),
       .probe5 (h2c_axis_ready)
       );
-   
+
 `endif //  `ifndef NO_SDE_DEBUG_ILA
-   
-   
-      
+
+
+
 endmodule // sde
-
-   
-
-   

@@ -76,7 +76,7 @@ module ddr4_rdimm_wrapper #(
 			    parameter MC_REG_CTRL = "ON", // Implement "ON" or "OFF" the RCD in rdimm wrapper
 			    parameter DIMM_MODEL = "LRDIMM",          
 			    parameter RDIMM_SLOTS = 1,
-          parameter UTYPE_density CONFIGURED_DENSITY = _8G          
+          parameter UTYPE_density CONFIGURED_DENSITY = _16G          
 			    )
   (
    input 		     ddr4_act_n,

@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 // C2H Data Mover
 
@@ -105,16 +108,16 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    localparam PCIM_MAX_WR_SIZE_BYTES_USER = PCIM_MAX_WR_SIZE == 0 ? 512 :
                                             PCIM_MAX_WR_SIZE == 1 ? 1024 :
                                             PCIM_MAX_WR_SIZE == 2 ? 2048 : 4096;
-   
+
    localparam PCIM_MAX_WR_SIZE_BYTES_DATA_WIDTH = PCIM_DATA_WIDTH_BYTES == 64 ? 4096 :
                                                   PCIM_DATA_WIDTH_BYTES == 32 ? 4096 :
                                                   PCIM_DATA_WIDTH_BYTES == 16 ? 4096 :
                                                   PCIM_DATA_WIDTH_BYTES ==  8 ? 2048 :
                                                   PCIM_DATA_WIDTH_BYTES ==  4 ? 1024 :
                                                   PCIM_DATA_WIDTH_BYTES ==  2 ?  512 : 256;
-   
+
    localparam PCIM_MAX_WR_SIZE_BYTES = PCIM_MAX_WR_SIZE_BYTES_DATA_WIDTH > PCIM_MAX_WR_SIZE_BYTES_USER ? PCIM_MAX_WR_SIZE_BYTES_USER : PCIM_MAX_WR_SIZE_BYTES_DATA_WIDTH;
-   
+
    // Request FSM
    typedef enum logic [2:0] {REQ_IDLE         = 0,
                              REQ_GET_DESC     = 1,
@@ -171,7 +174,7 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    logic dp_wb_ff_full;
    logic bresp_prealloc_avail;
-   
+
    logic [BUF_ADDR_WIDTH:0] buf_dm_num_bytes_q;
    logic                    buf_dm_aux_valid_q;
    logic [BUF_AUX_WIDTH-1:0] buf_dm_aux_data_q ;
@@ -282,11 +285,11 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
         //Optimize//   curr_desc_dest_addr <= curr_desc_dest_addr;
         curr_desc_dest_addr <= curr_desc_dest_addr_d;
         // curr_desc_max_minus_dest_addr <=  13'h1000 - curr_desc_dest_addr_d[11:0];
-        curr_desc_max_minus_dest_addr <= (PCIM_MAX_WR_SIZE_BYTES == 4096) ? 13'h1000 - curr_desc_dest_addr_d[11:0] : 
-                                         (PCIM_MAX_WR_SIZE_BYTES == 2048) ? 13'h0800 - curr_desc_dest_addr_d[10:0] : 
-                                         (PCIM_MAX_WR_SIZE_BYTES == 1024) ? 13'h0400 - curr_desc_dest_addr_d[ 9:0] : 
+        curr_desc_max_minus_dest_addr <= (PCIM_MAX_WR_SIZE_BYTES == 4096) ? 13'h1000 - curr_desc_dest_addr_d[11:0] :
+                                         (PCIM_MAX_WR_SIZE_BYTES == 2048) ? 13'h0800 - curr_desc_dest_addr_d[10:0] :
+                                         (PCIM_MAX_WR_SIZE_BYTES == 1024) ? 13'h0400 - curr_desc_dest_addr_d[ 9:0] :
                                          (PCIM_MAX_WR_SIZE_BYTES ==  512) ? 13'h0200 - curr_desc_dest_addr_d[ 8:0] : 13'h0100 - curr_desc_dest_addr_d[ 7:0];
-        
+
         // Length and Decrement after every Txn
         if ((req_state == REQ_IDLE) && desc_dm_desc_valid)
           curr_desc_len <= desc_dm_desc_in.len;
@@ -689,7 +692,7 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    // Case 1 - For all beats - Save (A - R) Bytes from 3
    // Number of Bytes
-   assign stg4_dp_num_bytes_case1 = pl3_dp_first & pl3_dp_last ? (pl3_dp_num_bytes - curr_txn_num_bytes_fo) : 
+   assign stg4_dp_num_bytes_case1 = pl3_dp_first & pl3_dp_last ? (pl3_dp_num_bytes - curr_txn_num_bytes_fo) :
                                     pl3_dp_first ? min_bytes_2(pl3_dp_num_bytes, curr_txn_num_bytes_sav) :
                                     pl3_dp_num_bytes - curr_txn_num_bytes_dw_minus_sav;
 
@@ -1164,16 +1167,16 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic bresp_prealloc_avail_cnt_inc;
    logic bresp_prealloc_avail_cnt_dec;
    logic [7:0] bresp_prealloc_avail_cnt;
-   
+
    assign bresp_prealloc_avail_cnt_dec = (req_state == REQ_ADDR) & (req_state_next != REQ_ADDR);
    assign bresp_prealloc_avail_cnt_inc = dp_bresp_ff_pop;
-   
+
    always @(posedge clk)
      if (!rst_n)
        bresp_prealloc_avail_cnt <= DP_DATA_BRESP_FIFO_DEPTH;
      else
-       bresp_prealloc_avail_cnt <= bresp_prealloc_avail_cnt_inc & ~bresp_prealloc_avail_cnt_dec ? bresp_prealloc_avail_cnt + 1 : 
-                                   ~bresp_prealloc_avail_cnt_inc & bresp_prealloc_avail_cnt_dec ? bresp_prealloc_avail_cnt - 1 : 
+       bresp_prealloc_avail_cnt <= bresp_prealloc_avail_cnt_inc & ~bresp_prealloc_avail_cnt_dec ? bresp_prealloc_avail_cnt + 1 :
+                                   ~bresp_prealloc_avail_cnt_inc & bresp_prealloc_avail_cnt_dec ? bresp_prealloc_avail_cnt - 1 :
                                    bresp_prealloc_avail_cnt;
 
    assign bresp_prealloc_avail = (bresp_prealloc_avail_cnt > 0);
@@ -1315,4 +1318,3 @@ module sde_c2h_data #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
 
 endmodule // sde_c2h_data
-

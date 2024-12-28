@@ -7,7 +7,7 @@ This quick start guide will utilize a simple `hello_world` Vitis example to get 
 1. [Overview](#1-overview)
 2. [Prerequisites](#2-prerequisites)
    * 2.1 [AWS Account and F2/EC2 Instances](#21-aws-account-and-f2ec2-instances)
-   * 2.2 [Github and Environment Setup](#22-github-and-environment-setup)
+   * 2.2 [GitHub and Environment Setup](#22-github-and-environment-setup)
 3. [Design Emulation and Synthesis](#3-emulating-your-code)
     * 3.1 [Emulate the code](#31-emulation)
         * 3.1.1 [Hardware Emulation](#311-hardware-hw-emulation)
@@ -30,7 +30,7 @@ This quick start guide will utilize a simple `hello_world` Vitis example to get 
 * FPGA developer AMI (2024.1) - available for on-cloud F2 development with AMD tools pre-installed and free to use on AWS EC2 for F2 development. Customers can use this AMI to design, simulate, and build their designs. Given the large size of the FPGA used for F2, AMD tools work best with at least 4 vCPU's and 32GiB Memory. We recommend Compute Optimized and Memory Optimized instance types to successfully run the synthesis of acceleration code. Developers may start coding and run simulations on low-cost General Purpose instances types. Launch an instance using a pre-installed with Vitis and required licenses.
 
 <a name="gitsetenv"></a>
-## 2.2 Github and Environment Setup
+## 2.2 GitHub and Environment Setup
 * Clone this github repository, export your AWS IAM credentials, and source the *vitis_setup.sh* script:
 ```
     cd aws-fpga
@@ -62,7 +62,7 @@ INFO: Vitis Setup PASSED.
 <a name="build"></a>
 # 3. Emulating Your Code
 
-This section will walk you through creating, emulating, and compiling your host application and FPGA binary. FPGA binaries are used to create an AFI (Amazon FPGA Image) for use alongside the XRT.
+Vitis hardware emulation is a cycle-accurate emulation of your accelerator design. This section will walk you through the emulation process.
 
 <a name="emu"></a>
 ## 3.1 Emulation
@@ -88,7 +88,7 @@ Prior to starting a hardware emulation run, run the `hw_file_check` command to i
 
 The most critical file in each example directory is the `Makefile`. Some examples will have sub-examples, whose `Makefiles` are located in the associated subdirectory.
 
-Note the presence of the `Makefile` in this subdirectory. Some examples will hav sub-examples, whose `Makefiles` are located in the associated subdirectory.
+Note the presence of the `Makefile` in this subdirectory. Some examples will have sub-examples, whose `Makefiles` are located in the associated subdirectory.
 
 > [!WARNING]
 > A Makefile is required in order to run hardware emulation for all designs/examples

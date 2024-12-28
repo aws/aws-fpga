@@ -1,7 +1,7 @@
-//------------------------------------------------------------------------------
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -13,16 +13,17 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-//------------------------------------------------------------------------------
+// ============================================================================
+
 
 `include "anp_base_macros.svh"
 
 //------------------------------------------------------------------------------
 // Module: axis_bfm
 // Main AXIS BFM module. Both of Master and Slave mode are implemented.
-// Shall set the IS_MASTER parameter as below to selet the mode during 
+// Shall set the IS_MASTER parameter as below to selet the mode during
 // instantiation.
-// Master mode -> IS_MASTER=1 
+// Master mode -> IS_MASTER=1
 // Slave mode  -> IS_MASTER=0
 //------------------------------------------------------------------------------
 module axis_bfm #(
@@ -36,7 +37,7 @@ module axis_bfm #(
    input  wire                   axis_clk,
    input  wire                   axis_rst_n,
    inout  wire                   axis_valid,
-   inout  wire  [DATA_WIDTH-1:0] axis_data, 
+   inout  wire  [DATA_WIDTH-1:0] axis_data,
    inout  wire                   axis_last,
    inout  wire  [KEEP_WIDTH-1:0] axis_keep,
    inout  wire  [USER_WIDTH-1:0] axis_user,
@@ -49,7 +50,7 @@ module axis_bfm #(
    // Local variables
    //---------------------------------------------------------------------------
    logic                   m_axis_valid;
-   logic [DATA_WIDTH-1:0]  m_axis_data; 
+   logic [DATA_WIDTH-1:0]  m_axis_data;
    logic                   m_axis_last;
    logic [KEEP_WIDTH-1:0]  m_axis_keep;
    logic [USER_WIDTH-1:0]  m_axis_user;
@@ -123,7 +124,7 @@ module axis_bfm #(
    //---------------------------------------------------------------------------
    // Drive Output signals
    //---------------------------------------------------------------------------
-   generate 
+   generate
    if (IS_MASTER == 1)
    begin : MASTER_MODE
       assign axis_valid = m_axis_valid;
@@ -146,13 +147,13 @@ module axis_bfm #(
 
    generate if (IS_MASTER)
    begin : MASTER
-   
-      initial 
+
+      initial
       begin : READ_TEXT_STIMULUS
          string fname;
-   
+
          wait (mbx_created_e.triggered);
-   
+
          if (FILE_NAME == "") begin
             fname = {hdl_path, ".in"};
          end
@@ -164,7 +165,7 @@ module axis_bfm #(
          if (fp_i != 0) begin : OPENED
             read_file = 1;
             `anp_info(
-               {"read_stim: Driving master packet using stimulus file ", fname}, 
+               {"read_stim: Driving master packet using stimulus file ", fname},
                MSG_ID)
 
             axis_bfm_pkg::read_stim(
@@ -173,17 +174,17 @@ module axis_bfm #(
                .msg_id  (MSG_ID));
 
          end : OPENED
-   
+
          stim_done = 1;
          `anp_info("drive_stim: Done", MSG_ID)
       end : READ_TEXT_STIMULUS
-   
-      initial 
+
+      initial
       begin : DRIVE_TEXT_STIMULUS
          string fname;
-   
+
          wait_out_of_reset($sformatf("drive_stim(%0d)", `__LINE__));
-   
+
          forever begin
             axis_bfm_pkt pkt;
             stim_mbx.get(pkt);
@@ -191,7 +192,7 @@ module axis_bfm #(
             wait_clock(pkt.delay);
             drive_packet(pkt.data);
          end
-   
+
       end : DRIVE_TEXT_STIMULUS
 
    end : MASTER
@@ -313,10 +314,10 @@ module axis_bfm #(
             delay++;
          end
 
-         `anp_debug($sformatf("monitor_packet: Looking for next packet#%0d", 
+         `anp_debug($sformatf("monitor_packet: Looking for next packet#%0d",
             packets), MSG_ID)
 
-         while ((axis_valid & axis_ready & axis_last) !== 1'b1) 
+         while ((axis_valid & axis_ready & axis_last) !== 1'b1)
          begin : SAMPLE
             if ((axis_valid & axis_ready) === 1'b1) begin
                sampling <= 1;
@@ -325,7 +326,7 @@ module axis_bfm #(
                      pkt.data.push_back(axis_data[i*8+:8]);
                   end
                end
-               `anp_debug($sformatf("monitor_packet: Sampling packet#%0d", 
+               `anp_debug($sformatf("monitor_packet: Sampling packet#%0d",
                   packets), MSG_ID)
                @ (posedge axis_clk);
                #1ns;
@@ -355,7 +356,7 @@ module axis_bfm #(
             pkt.dump(fp_o, delay);
          end
 
-         `anp_info($sformatf("monitor_packet: Complete Sampling packet#%0d. %0s", 
+         `anp_info($sformatf("monitor_packet: Complete Sampling packet#%0d. %0s",
             packets, pkt.print), MSG_ID)
 
          packets++;
@@ -394,7 +395,7 @@ module axis_bfm #(
             drive_mbx  .get(exp);
             monitor_mbx.get(act);
             void'(exp.compare(
-               .rhs     (act), 
+               .rhs     (act),
                .message ($sformatf("%0s-SELF-CHECK Pkt-%0d", MSG_ID, packets))));
             packets++;
          end
@@ -402,4 +403,3 @@ module axis_bfm #(
    end
 
 endmodule : axis_bfm
-

@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 `include "common_base_test.svh"
@@ -23,9 +25,4 @@
 `define DDR_LEVEL_3 `_24_GB
 `define HBM_BASE_ADDR `_32_GB
 
-`ifdef AWS_SIM_64GB_DDR
-    $fatal(1, "CL_DRAM_HBM_DMA does not yet support 64GB DDR simulations");
-`endif
-
 `include "cl_dram_hbm_dma_utils.svh"
-

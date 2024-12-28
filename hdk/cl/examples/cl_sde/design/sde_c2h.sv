@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,15 +13,16 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 // C2H Top level
 
 module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                  parameter C2H_DESC_WIDTH = 128,
-                 
+
                  parameter C2H_DESC_RAM_DEPTH = 64,
-                 
+
                  parameter C2H_PCIM_DM_AWID = 0, // This is the AWID used for write accesses from Data Mover
                  parameter C2H_PCIM_WB_AWID = 1, // This is the AWID used for write accesses from Write Back Block
                  parameter C2H_PCIM_DESC_ARID = 2, // This is the ARID used for read access from the C2H Desc Block
@@ -34,7 +36,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
                  parameter C2H_AXIS_DATA_WIDTH = 512,
                  parameter C2H_USER_BIT_WIDTH = C2H_DESC_TYPE ? 1 : 64,
-                 
+
                  parameter C2H_BUF_DEPTH = 512
 
                  )
@@ -48,7 +50,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     input                                   c2h_ps_desc_wr_req,
     input [C2H_DESC_WIDTH-1:0]              c2h_ps_desc_wdata,
     output logic                            c2h_ps_desc_ack,
-    
+
     // PCIS to C2H CSR
     input                                   c2h_ps_cfg_wr_req,
     input                                   c2h_ps_cfg_rd_req,
@@ -81,7 +83,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [PCIM_LEN_WIDTH-1:0]       c2h_dm_pm_awlen,
     output logic [PCIM_ID_WIDTH-1:0]        c2h_dm_pm_awid,
     input                                   c2h_pm_dm_awready,
-    
+
      // Write Data to PCIM
     output logic                            c2h_dm_pm_wvalid,
     output logic [PCIM_DATA_WIDTH-1:0]      c2h_dm_pm_wdata,
@@ -101,7 +103,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [PCIM_LEN_WIDTH-1:0]       c2h_wb_pm_awlen,
     output logic [PCIM_ID_WIDTH-1:0]        c2h_wb_pm_awid,
     input                                   c2h_pm_wb_awready,
-    
+
     // Write Data to PCIM
     output logic                            c2h_wb_pm_wvalid,
     output logic [PCIM_DATA_WIDTH-1:0]      c2h_wb_pm_wdata,
@@ -120,7 +122,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     input [(C2H_AXIS_DATA_WIDTH>>3)-1:0]    c2h_axis_keep,
     input [C2H_USER_BIT_WIDTH-1:0]          c2h_axis_user,
     input                                   c2h_axis_last,
-    output logic                            c2h_axis_ready    
+    output logic                            c2h_axis_ready
 
     );
 
@@ -128,7 +130,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    localparam BUF_ADDR_RAM_IDX_WIDTH = $clog2(C2H_BUF_DEPTH);
    localparam BUF_ADDR_WIDTH = PCIM_ADDR_BYTE_IDX_WIDTH + BUF_ADDR_RAM_IDX_WIDTH;
    localparam BUF_AUX_WIDTH = BUF_ADDR_WIDTH + C2H_USER_BIT_WIDTH;
-   
+
 
    // Signals
    logic                                    desc_dm_empty;
@@ -137,7 +139,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                                    desc_dm_desc_valid;
 
    logic                                    dm_desc_cnt_inc;
-   
+
    // Descriptor to Write Back Block
    logic                                    desc_wb_limit_req;
    logic [31:0]                             desc_wb_limit;
@@ -147,16 +149,16 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                                    dm_wb_md_req;
    sde_pkg::c2h_reg_wb_t                    dm_wb_md;
    logic                                    wb_dm_md_grant;
-   
-   // Data Mover to Buffer 
+
+   // Data Mover to Buffer
    logic                                    buf_dm_aux_valid;
    logic [BUF_AUX_WIDTH-1:0]                buf_dm_aux_data;
    logic                                    dm_buf_aux_pop;
-   
+
    logic [BUF_ADDR_WIDTH-1:0]               dm_buf_rd_byte_addr;
 
    logic [BUF_ADDR_WIDTH:0]                 buf_dm_num_bytes; // Difference in pointers + plus num of bytes in last beat
-   
+
    logic                                    dm_buf_rd;
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0]       dm_buf_addr;
    logic [PCIM_DATA_WIDTH-1:0]              buf_dm_data;
@@ -167,7 +169,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [C2H_USER_BIT_WIDTH-1:0]           axis_buf_user;
    logic                                    axis_buf_last;
    logic                                    buf_axis_ready;
-    
+
    logic                                    axis_wb_pkt_cnt_req;
    logic [31:0]                             axis_wb_pkt_cnt;
 
@@ -188,10 +190,10 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [C2H_DESC_WIDTH-1:0]               cfg_desc_ram_wdata ;
    logic                                    desc_cfg_ram_ack   ;
    logic [C2H_DESC_WIDTH-1:0]               desc_cfg_ram_rdata ;
-      
+
    logic                                    dm_cfg_bresp_err;
    logic                                    dm_cfg_desc_len_err;
-   
+
    logic                                    cfg_wb_desc_cdt_en;
    logic                                    cfg_wb_desc_cnt_en;
    logic                                    cfg_wb_pkt_cnt_en;
@@ -202,12 +204,12 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [15:0]                             cfg_wb_md_rd_ptr;
    logic [15:0]                             wb_cfg_md_wr_ptr;
    logic                                    cfg_wb_clr_wr_ptr;
-   
-   logic                                    cfg_wb_desc_error; 
-   logic                                    cfg_wb_dm_error  ; 
+
+   logic                                    cfg_wb_desc_error;
+   logic                                    cfg_wb_dm_error  ;
    logic                                    cfg_wb_wb_error  ;
    logic [31:0]                             wb_cfg_status_dw ;
-   
+
    logic                                    cfg_desc_cdt_wc_en;
    logic                                    cfg_desc_cnt_wc_en;
    logic                                    cfg_pkt_cnt_wc_en;
@@ -215,10 +217,10 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [19:0]                             cfg_wc_tick_cnt;
    logic [3:0]                              cfg_wc_to_cnt;
    logic [5:0]                              cfg_wc_cnt_minus1;
-         
+
    logic                                    cfg_axis_clr_pkt_cnt;
    logic [31:0]                             axis_cfg_pkt_cnt;
-  
+
    logic                                    dm_num_beats_err;
 
    logic                                    desc_cfg_oflow;
@@ -228,7 +230,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    logic                                    wb_cfg_md_bresp_err ;
    logic                                    wb_cfg_sts_bresp_err;
-   
+
    logic                                    buf_cfg_buf_oflow;
    logic                                    buf_cfg_buf_uflow;
    logic                                    buf_cfg_buf_full;
@@ -237,24 +239,24 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [15:0]                             buf_cfg_buf_rd_addr;
    logic                                    buf_cfg_aux_fifo_oflow;
    logic                                    buf_cfg_aux_fifo_uflow;
-   logic                                    buf_cfg_aux_fifo_full ; 
+   logic                                    buf_cfg_aux_fifo_full ;
    logic                                    buf_cfg_aux_fifo_empty;
    logic [15:0]                             buf_cfg_aux_ram_wr_ptr;
-   logic [15:0]                             buf_cfg_aux_ram_rd_ptr; 
+   logic [15:0]                             buf_cfg_aux_ram_rd_ptr;
    logic [15:0]                             buf_cfg_num_bytes;
    logic [31:0]                             buf_cfg_in_pkt_cnt;
    logic [31:0]                             buf_cfg_out_pkt_cnt;
    logic                                    cfg_buf_clr_in_pkt_cnt;
    logic                                    cfg_buf_clr_out_pkt_cnt;
-   
+
    // Generate local copy of Reset
    logic                                    sync_rst_n;
    always @(posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
        sync_rst_n <= 0;
      else
        sync_rst_n <= rst_n;
-   
+
    // C2H CSR Block
    sde_c2h_cfg #(
        .DESC_TYPE       (C2H_DESC_TYPE),
@@ -264,7 +266,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    SDE_C2H_CFG
      (.clk                (clk),
       .rst_n              (sync_rst_n),
-      
+
       .c2h_ps_cfg_wr_req  (c2h_ps_cfg_wr_req),
       .c2h_ps_cfg_rd_req  (c2h_ps_cfg_rd_req),
       .c2h_ps_cfg_addr    (c2h_ps_cfg_addr  ),
@@ -278,20 +280,20 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .cfg_desc_clr_desc_cnt     (cfg_desc_clr_desc_cnt    ),
       .cfg_desc_clr_cdt_limit    (cfg_desc_clr_cdt_limit   ),
       .cfg_desc_clr_cdt_consumed (cfg_desc_clr_cdt_consumed),
-      
+
       .desc_cfg_cdt_consumed (desc_cfg_cdt_consumed),
       .desc_cfg_cdt_limit    (desc_cfg_cdt_limit   ),
       .desc_cfg_desc_cnt     (desc_cfg_desc_cnt    ),
       .desc_cfg_wr_ptr       (desc_cfg_wr_ptr      ),
       .desc_cfg_rd_ptr       (desc_cfg_rd_ptr      ),
-      
+
       .cfg_desc_ram_wr_req   (cfg_desc_ram_wr_req),
       .cfg_desc_ram_rd_req   (cfg_desc_ram_rd_req),
       .cfg_desc_ram_addr     (cfg_desc_ram_addr  ),
       .cfg_desc_ram_wdata    (cfg_desc_ram_wdata ),
       .desc_cfg_ram_ack      (desc_cfg_ram_ack   ),
       .desc_cfg_ram_rdata    (desc_cfg_ram_rdata ),
-      
+
       .desc_cfg_oflow        (desc_cfg_oflow),
       .desc_cfg_uflow        (desc_cfg_uflow),
       .desc_cfg_full         (desc_cfg_full ),
@@ -310,7 +312,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .cfg_wb_md_rd_ptr      (cfg_wb_md_rd_ptr   ),
       .wb_cfg_md_wr_ptr      (wb_cfg_md_wr_ptr   ),
       .cfg_wb_clr_wr_ptr     (cfg_wb_clr_wr_ptr  ),
-      
+
       .cfg_desc_cdt_wc_en    (cfg_desc_cdt_wc_en ),
       .cfg_desc_cnt_wc_en    (cfg_desc_cnt_wc_en ),
       .cfg_pkt_cnt_wc_en     (cfg_pkt_cnt_wc_en  ),
@@ -320,13 +322,13 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .cfg_wc_cnt_minus1     (cfg_wc_cnt_minus1  ),
 
       .wb_cfg_md_bresp_err   (wb_cfg_md_bresp_err),
-      .wb_cfg_sts_bresp_err  (wb_cfg_sts_bresp_err), 
+      .wb_cfg_sts_bresp_err  (wb_cfg_sts_bresp_err),
 
-      .cfg_wb_desc_error     (cfg_wb_desc_error), 
-      .cfg_wb_dm_error       (cfg_wb_dm_error  ), 
+      .cfg_wb_desc_error     (cfg_wb_desc_error),
+      .cfg_wb_dm_error       (cfg_wb_dm_error  ),
       .cfg_wb_wb_error       (cfg_wb_wb_error  ),
       .wb_cfg_status_dw      (wb_cfg_status_dw ),
-      
+
       .buf_cfg_buf_oflow       (buf_cfg_buf_oflow      ),
       .buf_cfg_buf_uflow       (buf_cfg_buf_uflow      ),
       .buf_cfg_buf_full        (buf_cfg_buf_full       ),
@@ -335,56 +337,56 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .buf_cfg_buf_rd_addr     (buf_cfg_buf_rd_addr    ),
       .buf_cfg_aux_fifo_oflow  (buf_cfg_aux_fifo_oflow ),
       .buf_cfg_aux_fifo_uflow  (buf_cfg_aux_fifo_uflow ),
-      .buf_cfg_aux_fifo_full   (buf_cfg_aux_fifo_full  ), 
+      .buf_cfg_aux_fifo_full   (buf_cfg_aux_fifo_full  ),
       .buf_cfg_aux_fifo_empty  (buf_cfg_aux_fifo_empty ),
       .buf_cfg_aux_ram_wr_ptr  (buf_cfg_aux_ram_wr_ptr ),
-      .buf_cfg_aux_ram_rd_ptr  (buf_cfg_aux_ram_rd_ptr ), 
+      .buf_cfg_aux_ram_rd_ptr  (buf_cfg_aux_ram_rd_ptr ),
       .buf_cfg_num_bytes       (buf_cfg_num_bytes      ),
       .buf_cfg_in_pkt_cnt      (buf_cfg_in_pkt_cnt     ),
       .buf_cfg_out_pkt_cnt     (buf_cfg_out_pkt_cnt    ),
       .cfg_buf_clr_in_pkt_cnt  (cfg_buf_clr_in_pkt_cnt ),
       .cfg_buf_clr_out_pkt_cnt (cfg_buf_clr_out_pkt_cnt),
-         
+
       .cfg_axis_clr_pkt_cnt  (cfg_axis_clr_pkt_cnt),
       .axis_cfg_pkt_cnt      (axis_cfg_pkt_cnt    )
 
       );
-      
+
 
    // C2H Descriptor
-   sde_desc 
+   sde_desc
      #(.H2C_N_C2H       (0),
-       
+
        .DESC_TYPE       (C2H_DESC_TYPE),
-       .DESC_WIDTH      (C2H_DESC_WIDTH), 
+       .DESC_WIDTH      (C2H_DESC_WIDTH),
        .DESC_RAM_DEPTH  (C2H_DESC_RAM_DEPTH),
-       
+
        .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
        .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
        .PCIM_LEN_WIDTH  (PCIM_LEN_WIDTH  ),
        .PCIM_ADDR_WIDTH (PCIM_ADDR_WIDTH ),
 
        .PCIM_DESC_ARID  (C2H_PCIM_DESC_ARID)
-       ) 
-   SDE_C2H_DESC 
+       )
+   SDE_C2H_DESC
      (.clk                (clk),
       .rst_n              (sync_rst_n),
-      
+
       .ps_desc_wr_req     (c2h_ps_desc_wr_req),
       .ps_desc_wdata      (c2h_ps_desc_wdata),
       .ps_desc_ack        (c2h_ps_desc_ack),
-      
+
       .cfg_desc_ram_wr_req       (cfg_desc_ram_wr_req),
       .cfg_desc_ram_rd_req       (cfg_desc_ram_rd_req),
       .cfg_desc_ram_addr         (cfg_desc_ram_addr  ),
       .cfg_desc_ram_wdata        (cfg_desc_ram_wdata ),
       .desc_cfg_ram_ack          (desc_cfg_ram_ack   ),
       .desc_cfg_ram_rdata        (desc_cfg_ram_rdata ),
-      
+
       .cfg_desc_clr_desc_cnt     (cfg_desc_clr_desc_cnt    ),
       .cfg_desc_clr_cdt_limit    (cfg_desc_clr_cdt_limit   ),
       .cfg_desc_clr_cdt_consumed (cfg_desc_clr_cdt_consumed),
-      
+
       .desc_cfg_cdt_consumed (desc_cfg_cdt_consumed),
       .desc_cfg_cdt_limit    (desc_cfg_cdt_limit   ),
       .desc_cfg_desc_cnt     (desc_cfg_desc_cnt    ),
@@ -402,8 +404,8 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .desc_dm_desc_valid (desc_dm_desc_valid),
 
       .dm_desc_cnt_inc    (dm_desc_cnt_inc),
-      
-      .desc_wb_limit_req  (desc_wb_limit_req), 
+
+      .desc_wb_limit_req  (desc_wb_limit_req),
       .desc_wb_limit      (desc_wb_limit),
       .desc_wb_cnt_req    (desc_wb_cnt_req),
       .desc_wb_cnt        (desc_wb_cnt),
@@ -412,7 +414,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .desc_pm_araddr     (c2h_desc_pm_araddr ),
       .desc_pm_arlen      (c2h_desc_pm_arlen  ),
       .pm_desc_arready    (c2h_pm_desc_arready),
-      
+
       .pm_desc_rvalid     (c2h_pm_desc_rvalid),
       .pm_desc_rresp      (c2h_pm_desc_rresp ),
       .pm_desc_rdata      (c2h_pm_desc_rdata ),
@@ -420,25 +422,25 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .desc_pm_rready     (c2h_desc_pm_rready)
 
       );
-   
+
    // C2H Data Mover
-   sde_c2h_data 
+   sde_c2h_data
      #(.DESC_TYPE       (C2H_DESC_TYPE),
-       
+
        .PCIM_DM_AWID    (C2H_PCIM_DM_AWID),
-       
+
        .PCIM_MAX_WR_SIZE (C2H_PCIM_MAX_WR_SIZE),
-       
+
        .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
        .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
        .PCIM_LEN_WIDTH  (PCIM_LEN_WIDTH  ),
        .PCIM_ADDR_WIDTH (PCIM_ADDR_WIDTH ),
-       
+
        .BUF_DEPTH       (C2H_BUF_DEPTH),
-       
+
        .USER_BIT_WIDTH  (C2H_USER_BIT_WIDTH)
        )
-   SDE_C2H_DATA 
+   SDE_C2H_DATA
      (.clk                   (clk),
       .rst_n                (sync_rst_n),
 
@@ -446,14 +448,14 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .dm_cfg_bresp_err     (dm_cfg_bresp_err),
       .dm_cfg_desc_len_err  (dm_cfg_desc_len_err),
       .dm_num_beats_err     (dm_num_beats_err),
-      
+
       .desc_dm_empty        (desc_dm_empty),
       .dm_desc_pop          (dm_desc_pop),
       .desc_dm_desc         (desc_dm_desc),
       .desc_dm_desc_valid   (desc_dm_desc_valid),
 
       .dm_desc_cnt_inc      (dm_desc_cnt_inc),
-      
+
       .dm_pm_awvalid        (c2h_dm_pm_awvalid),
       .dm_pm_awaddr         (c2h_dm_pm_awaddr ),
       .dm_pm_awlen          (c2h_dm_pm_awlen  ),
@@ -483,7 +485,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .dm_buf_addr          (dm_buf_addr),
       .buf_dm_data          (buf_dm_data)
       );
-      
+
    // C2H Write-Back
    sde_wb
      #(.H2C_N_C2H       (0),
@@ -491,7 +493,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
        .DESC_RAM_DEPTH  (C2H_DESC_RAM_DEPTH),
        .PCIM_WB_AWID    (C2H_PCIM_WB_AWID),
-       
+
        .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
        .PCIM_ID_WIDTH   (PCIM_ID_WIDTH   ),
        .PCIM_LEN_WIDTH  (PCIM_LEN_WIDTH  ),
@@ -511,7 +513,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .cfg_wb_md_rd_ptr      (cfg_wb_md_rd_ptr   ),
       .wb_cfg_md_wr_ptr      (wb_cfg_md_wr_ptr   ),
       .cfg_wb_clr_wr_ptr     (cfg_wb_clr_wr_ptr  ),
-      
+
       .cfg_desc_cdt_wc_en    (cfg_desc_cdt_wc_en ),
       .cfg_desc_cnt_wc_en    (cfg_desc_cnt_wc_en ),
       .cfg_pkt_cnt_wc_en     (cfg_pkt_cnt_wc_en  ),
@@ -519,20 +521,20 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .cfg_wc_tick_cnt       (cfg_wc_tick_cnt    ),
       .cfg_wc_to_cnt         (cfg_wc_to_cnt      ),
       .cfg_wc_cnt_minus1     (cfg_wc_cnt_minus1  ),
-         
-      .cfg_wb_desc_error     (cfg_wb_desc_error), 
-      .cfg_wb_dm_error       (cfg_wb_dm_error  ), 
+
+      .cfg_wb_desc_error     (cfg_wb_desc_error),
+      .cfg_wb_dm_error       (cfg_wb_dm_error  ),
       .cfg_wb_wb_error       (cfg_wb_wb_error  ),
       .wb_cfg_status_dw      (wb_cfg_status_dw ),
 
       .wb_cfg_md_bresp_err   (wb_cfg_md_bresp_err),
-      .wb_cfg_sts_bresp_err  (wb_cfg_sts_bresp_err), 
+      .wb_cfg_sts_bresp_err  (wb_cfg_sts_bresp_err),
 
       .cfg_desc_clr_desc_cnt  (cfg_desc_clr_desc_cnt ),
       .cfg_desc_clr_cdt_limit (cfg_desc_clr_cdt_limit),
       .cfg_axis_clr_pkt_cnt   (cfg_axis_clr_pkt_cnt),
-      
-      .desc_wb_limit_req     (desc_wb_limit_req), 
+
+      .desc_wb_limit_req     (desc_wb_limit_req),
       .desc_wb_limit         (desc_wb_limit),
 
       .desc_wb_cnt_req       (desc_wb_cnt_req),
@@ -544,7 +546,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
       .axis_wb_pkt_cnt_req   (axis_wb_pkt_cnt_req),
       .axis_wb_pkt_cnt       (axis_wb_pkt_cnt),
-      
+
       .wb_pm_awvalid         (c2h_wb_pm_awvalid),
       .wb_pm_awaddr          (c2h_wb_pm_awaddr ),
       .wb_pm_awlen           (c2h_wb_pm_awlen  ),
@@ -560,13 +562,13 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .wb_pm_bready          (c2h_wb_pm_bready )
 
       );
-       
+
    // C2H Buffer
    sde_c2h_buf
      #(.DESC_TYPE       (C2H_DESC_TYPE),
 
        .PCIM_DATA_WIDTH (PCIM_DATA_WIDTH ),
-       
+
        .BUF_DEPTH       (C2H_BUF_DEPTH),
        .USER_BIT_WIDTH  (C2H_USER_BIT_WIDTH)
 
@@ -584,21 +586,21 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .buf_cfg_buf_rd_addr     (buf_cfg_buf_rd_addr    ),
       .buf_cfg_aux_fifo_oflow  (buf_cfg_aux_fifo_oflow ),
       .buf_cfg_aux_fifo_uflow  (buf_cfg_aux_fifo_uflow ),
-      .buf_cfg_aux_fifo_full   (buf_cfg_aux_fifo_full  ), 
+      .buf_cfg_aux_fifo_full   (buf_cfg_aux_fifo_full  ),
       .buf_cfg_aux_fifo_empty  (buf_cfg_aux_fifo_empty ),
       .buf_cfg_aux_ram_wr_ptr  (buf_cfg_aux_ram_wr_ptr ),
-      .buf_cfg_aux_ram_rd_ptr  (buf_cfg_aux_ram_rd_ptr ), 
+      .buf_cfg_aux_ram_rd_ptr  (buf_cfg_aux_ram_rd_ptr ),
       .buf_cfg_num_bytes       (buf_cfg_num_bytes      ),
       .buf_cfg_in_pkt_cnt      (buf_cfg_in_pkt_cnt     ),
       .buf_cfg_out_pkt_cnt     (buf_cfg_out_pkt_cnt    ),
       .cfg_buf_clr_in_pkt_cnt  (cfg_buf_clr_in_pkt_cnt ),
       .cfg_buf_clr_out_pkt_cnt (cfg_buf_clr_out_pkt_cnt),
-               
-      .axis_buf_valid      (axis_buf_valid ), 
-      .axis_buf_data       (axis_buf_data  ),  
-      .axis_buf_keep       (axis_buf_keep  ),  
-      .axis_buf_user       (axis_buf_user  ),  
-      .axis_buf_last       (axis_buf_last  ),   
+
+      .axis_buf_valid      (axis_buf_valid ),
+      .axis_buf_data       (axis_buf_data  ),
+      .axis_buf_keep       (axis_buf_keep  ),
+      .axis_buf_user       (axis_buf_user  ),
+      .axis_buf_last       (axis_buf_last  ),
       .buf_axis_ready      (buf_axis_ready ),
 
       .buf_dm_aux_valid    (buf_dm_aux_valid),
@@ -612,7 +614,7 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       .dm_buf_addr         (dm_buf_addr),
       .buf_dm_data         (buf_dm_data)
       );
-      
+
    // C2H AXI-Stream Interface
    sde_c2h_axis
      #(.DESC_TYPE       (C2H_DESC_TYPE),
@@ -625,34 +627,28 @@ module sde_c2h #(parameter bit C2H_DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    SDE_C2H_AXIS
      (.clk                 (clk),
       .rst_n               (sync_rst_n),
-                           
+
       .cfg_axis_clr_pkt_cnt (cfg_axis_clr_pkt_cnt),
       .axis_cfg_pkt_cnt     (axis_cfg_pkt_cnt),
-                 
+
       .c2h_axis_valid      (c2h_axis_valid ),
-      .c2h_axis_data       (c2h_axis_data  ), 
-      .c2h_axis_keep       (c2h_axis_keep  ), 
-      .c2h_axis_user       (c2h_axis_user  ), 
-      .c2h_axis_last       (c2h_axis_last  ),  
+      .c2h_axis_data       (c2h_axis_data  ),
+      .c2h_axis_keep       (c2h_axis_keep  ),
+      .c2h_axis_user       (c2h_axis_user  ),
+      .c2h_axis_last       (c2h_axis_last  ),
       .c2h_axis_ready      (c2h_axis_ready ),
-                           
-      .axis_buf_valid      (axis_buf_valid ), 
-      .axis_buf_data       (axis_buf_data  ),  
-      .axis_buf_keep       (axis_buf_keep  ),  
-      .axis_buf_user       (axis_buf_user  ),  
-      .axis_buf_last       (axis_buf_last  ),   
+
+      .axis_buf_valid      (axis_buf_valid ),
+      .axis_buf_data       (axis_buf_data  ),
+      .axis_buf_keep       (axis_buf_keep  ),
+      .axis_buf_user       (axis_buf_user  ),
+      .axis_buf_last       (axis_buf_last  ),
       .buf_axis_ready      (buf_axis_ready ),
 
       .axis_wb_pkt_cnt_req (axis_wb_pkt_cnt_req),
       .axis_wb_pkt_cnt     (axis_wb_pkt_cnt)
-      
+
       );
-   
+
 
 endmodule // sde_c2h
-
-
-
-
-    
-    

@@ -1,6 +1,6 @@
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +12,9 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
+
 // This test shows example of backdoor loading DRAM micron memory and frontdoor reading through DMA.
 // The test covers valid rows, bank groups, banks and columns
 // The test also covers some row, bank group, bank and column combinations.
@@ -23,6 +26,8 @@ module test_ddr_peek_bdr_walking_ones();
 
    int      fp;
    string   file_name;
+
+   logic [63:0] addr = 64'h0;
 
    initial begin
       `define BYTE_COUNT 64
@@ -47,32 +52,44 @@ module test_ddr_peek_bdr_walking_ones();
       //Write 8*64 bits of data starting at address 'h0
       //Covers different columns
       $fdisplay(fp, "%0h %0h", 64'h0, `BACKDOOR_DATA);
+      addr = 64'h0;
+      tb.poke(.addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
 
       //Write 8*64 bits of data starting at address 'h100
       //Covers different columns
       $fdisplay(fp, "%0h %0h", 64'h100, `BACKDOOR_DATA);
+      addr = 64'h100;
+      tb.poke(.addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
 
       //Write 8*64 bits of data starting at address 'h300
       //Covers different columns
       $fdisplay(fp, "%0h %0h", 64'h300, `BACKDOOR_DATA);
+      addr = 64'h300;
+      tb.poke(.addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
 
       //Write 8*64 bits of data starting at address 'h1000
       //Covers different columns
       $fdisplay(fp, "%0h %0h", 64'h1000, `BACKDOOR_DATA);
+      addr = 64'h1000;
+      tb.poke(.addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
 
       //Covers rows
       for ( int i=0; i<4; i++) begin
          $fdisplay(fp, "%0h %0h", 64'h2_0000 << i, `BACKDOOR_DATA);
+         addr = 64'h2_0000 << i;
+         tb.poke(.addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
       end
 
       //Covers some row, bank group, bank and column combinations
       for ( int i=0; i<4; i++) begin
          $fdisplay(fp, "%0h %0h", 64'h2_0040 << i, `BACKDOOR_DATA);
+         addr = 64'h2_0040 << i;
+         tb.poke(.slot_id(0), .addr(addr), .data(`BACKDOOR_DATA), .size(DataSize::UINT512));
       end
 
       $fclose(fp);
 
-      tb.card.ddr_bdr_ld(file_name);
+      // Not using backdoor load (Errata #8)
       tb.nsec_delay(500);
 
       ddr_peeks(64'h0, 1, `BACKDOOR_DATA);
@@ -105,8 +122,5 @@ module test_ddr_peek_bdr_walking_ones();
          end
       end
    endtask // ddr_peeks
-   
+
 endmodule // test_ddr_peek_bdr_walking_ones
-
-
-

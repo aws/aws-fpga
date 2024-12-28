@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,11 +13,13 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 // H2C Buffer
 
 module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
-                     
+
                      parameter PCIM_DATA_WIDTH = 512,
                      parameter PCIM_ADDR_BYTE_IDX_WIDTH = $clog2(PCIM_DATA_WIDTH>>3),
 
@@ -28,7 +31,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                      parameter BUF_AUX_RAM_ADDR_WIDTH = $clog2(BUF_AUX_DEPTH),
 
                      parameter USER_BIT_WIDTH = DESC_TYPE ? 1 : 64,
-                     
+
                       // These are internal FIFOs - Dont change unless absolutely required
                      parameter OP_OUTPUT_FIFO_DEPTH = 3
 
@@ -47,10 +50,10 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [15:0]                      buf_cfg_buf_rd_ptr,
     output logic                             buf_cfg_aux_fifo_oflow,
     output logic                             buf_cfg_aux_fifo_uflow,
-    output logic                             buf_cfg_aux_fifo_full , 
+    output logic                             buf_cfg_aux_fifo_full ,
     output logic                             buf_cfg_aux_fifo_empty,
     output logic [15:0]                      buf_cfg_aux_ram_wr_ptr,
-    output logic [15:0]                      buf_cfg_aux_ram_rd_ptr, 
+    output logic [15:0]                      buf_cfg_aux_ram_rd_ptr,
     output logic [15:0]                      buf_cfg_dm_wr_ptr,
     output logic [15:0]                      buf_cfg_dm_aux_wr_ptr,
     output logic [15:0]                      buf_cfg_num_free_slots,
@@ -58,7 +61,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [31:0]                      buf_cfg_out_pkt_cnt,
     input                                    cfg_buf_clr_in_pkt_cnt,
     input                                    cfg_buf_clr_out_pkt_cnt,
-    
+
     // AXI-S Interface to Buf
     output logic                             buf_axis_valid,
     output logic [PCIM_DATA_WIDTH-1:0]       buf_axis_data,
@@ -66,8 +69,8 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
     output logic [USER_BIT_WIDTH-1:0]        buf_axis_user,
     output logic                             buf_axis_last,
     input                                    axis_buf_ready,
-    
-    
+
+
     // Buf to Data Mover
 //    input logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] dm_buf_wr_ptr,
     input logic [BUF_ADDR_WIDTH-1:0]         dm_buf_wr_byte_addr,
@@ -91,7 +94,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    localparam BUF_SIZE_BYTES = BUF_DEPTH * (PCIM_DATA_WIDTH>>3);
    localparam BUF_DEPTH_MINUS1 = BUF_DEPTH - 1;
    localparam BUF_RAM_ADDR_WIDTH = BUF_ADDR_RAM_IDX_WIDTH;
-   
+
    logic                                     buf_wr_en;
    logic                                     buf_rd_en;
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0]        buf_wr_ptr;
@@ -106,18 +109,18 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                                     buf_full;
    logic                                     buf_uflow;
    logic                                     buf_oflow;
-   
+
    assign buf_wr_en = dm_buf_wr;
-   
+
    // Manage read and write addresses
-   assign buf_wr_ptr_next = (buf_wr_ptr == BUF_DEPTH_MINUS1) ? ({BUF_ADDR_RAM_IDX_WIDTH{1'b0}}) : 
+   assign buf_wr_ptr_next = (buf_wr_ptr == BUF_DEPTH_MINUS1) ? ({BUF_ADDR_RAM_IDX_WIDTH{1'b0}}) :
                             buf_wr_ptr + 1;
    assign buf_wr_ptr_msb_next = (buf_wr_ptr == BUF_DEPTH_MINUS1) ? ~buf_wr_ptr_msb : buf_wr_ptr_msb;
-   
-   assign buf_rd_ptr_next = (buf_rd_ptr == BUF_DEPTH_MINUS1) ? ({BUF_ADDR_RAM_IDX_WIDTH{1'b0}}) : 
+
+   assign buf_rd_ptr_next = (buf_rd_ptr == BUF_DEPTH_MINUS1) ? ({BUF_ADDR_RAM_IDX_WIDTH{1'b0}}) :
                             buf_rd_ptr + 1;
    assign buf_rd_ptr_msb_next = (buf_rd_ptr == BUF_DEPTH_MINUS1) ? ~buf_rd_ptr_msb : buf_rd_ptr_msb;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         buf_wr_ptr <= 0;
@@ -160,7 +163,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                              buf_ram_rd;
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] buf_ram_raddr;
    logic [PCIM_DATA_WIDTH-1:0]        buf_ram_rdata;
-   
+
    // Buffer BRAM
    assign buf_ram_wr    = buf_wr_en;
    assign buf_ram_waddr = buf_wr_ptr;
@@ -168,9 +171,9 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    assign buf_ram_rd    = buf_rd_en;
    assign buf_ram_raddr = buf_rd_ptr;
-   
+
    // Desc RAM - Using 2 port RAM (1w1r)
-   bram_1w1r #(.WIDTH(PCIM_DATA_WIDTH), 
+   bram_1w1r #(.WIDTH(PCIM_DATA_WIDTH),
                .ADDR_WIDTH(BUF_RAM_ADDR_WIDTH),
                .DEPTH(BUF_DEPTH)
                ) BUF_RAM (.clk      (clk),
@@ -201,7 +204,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                               aux_ram_pop;
    logic                               aux_ram_oflow;
    logic                               aux_fifo_uflow;
-   
+
    logic                               aux_ft_ff_pop;
    logic                               aux_ft_ff_valid;
    logic [BUF_AUX_RAM_WIDTH-1:0]       aux_ft_ff_data;
@@ -217,18 +220,18 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0]  aux_out_eop_wr_ptr;
    logic [PCIM_ADDR_BYTE_IDX_WIDTH-1:0] aux_out_num_bytes_minus1;
    logic                                aux_out_valid;
-   
+
    logic                                op_stall;
-   
-   // AUX FT FIFO 
+
+   // AUX FT FIFO
    assign aux_ram_wr = buf_wr_en & dm_buf_eop;
    assign aux_ram_waddr = aux_ram_wr_ptr;
-   assign aux_ram_wdata = DESC_TYPE ? {buf_wr_ptr, dm_buf_num_bytes_minus1} : 
+   assign aux_ram_wdata = DESC_TYPE ? {buf_wr_ptr, dm_buf_num_bytes_minus1} :
                           {dm_buf_user, buf_wr_ptr, dm_buf_num_bytes_minus1};
 
    assign aux_ram_rd = aux_ram_pop;
    assign aux_ram_raddr = aux_ram_rd_ptr;
-   
+
    // AUX RAM
    bram_1w1r #(.WIDTH(BUF_AUX_RAM_WIDTH),
                .ADDR_WIDTH(BUF_AUX_RAM_ADDR_WIDTH),
@@ -238,13 +241,13 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                           .ena      (aux_ram_wr),
                           .addra    (aux_ram_waddr),
                           .da       (aux_ram_wdata),
-                          
+
                           .enb      (aux_ram_rd),
                           .addrb    (aux_ram_raddr),
                           .qb       (aux_ram_rdata)
                           );
 
-   // Flow-through FIFO 
+   // Flow-through FIFO
    ft_fifo #(.FIFO_WIDTH(BUF_AUX_RAM_WIDTH)
              ) AUX_FT_FIFO (.clk         (clk),
                              .rst_n       (1'b1),
@@ -252,7 +255,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                              .ram_fifo_empty (aux_ram_empty),
                              .ram_fifo_data  (aux_ram_rdata),
                              .ram_pop        (aux_ram_pop),
-                             
+
                              .ft_pop   (aux_ft_ff_pop),
                              .ft_valid (aux_ft_ff_valid),
                              .ft_data  (aux_ft_ff_data)
@@ -261,11 +264,11 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    assign aux_ram_wr_ptr_next = (aux_ram_wr_ptr == BUF_AUX_RAM_DEPTH_MINUS1) ? ({BUF_AUX_RAM_ADDR_WIDTH{1'b0}}) :
                                 aux_ram_wr_ptr + 1;
    assign aux_ram_wr_ptr_msb_next = (aux_ram_wr_ptr == BUF_AUX_RAM_DEPTH_MINUS1) ? ~aux_ram_wr_ptr_msb : aux_ram_wr_ptr_msb;
-   
+
    assign aux_ram_rd_ptr_next = (aux_ram_rd_ptr == BUF_AUX_RAM_DEPTH_MINUS1) ? ({BUF_AUX_RAM_ADDR_WIDTH{1'b0}}) :
                                 aux_ram_rd_ptr + 1;
    assign aux_ram_rd_ptr_msb_next = (aux_ram_rd_ptr == BUF_AUX_RAM_DEPTH_MINUS1) ? ~aux_ram_rd_ptr_msb : aux_ram_rd_ptr_msb;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         aux_ram_wr_ptr <= 0;
@@ -286,7 +289,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
         aux_ram_full <= ~aux_ram_wr &&  aux_ram_pop ? 1'b0 :
                         aux_ram_wr  && ~aux_ram_pop ? (aux_ram_wr_ptr_msb_next != aux_ram_rd_ptr_msb) && (aux_ram_wr_ptr_next == aux_ram_rd_ptr) :
                         aux_ram_full;
-        
+
         aux_ram_oflow <= aux_ram_full & aux_ram_wr;
         aux_fifo_uflow <= ~aux_ft_ff_valid & aux_ft_ff_pop;
      end // else: !if(!rst_n)
@@ -300,7 +303,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       buf_cfg_aux_ram_wr_ptr = 0;
       buf_cfg_aux_ram_wr_ptr = aux_ram_wr_ptr;
       buf_cfg_aux_ram_wr_ptr[15] = aux_ram_wr_ptr_msb;
-   
+
       buf_cfg_aux_ram_rd_ptr = 0;
       buf_cfg_aux_ram_rd_ptr = aux_ram_rd_ptr;
       buf_cfg_aux_ram_rd_ptr[15] = aux_ram_rd_ptr_msb;
@@ -310,7 +313,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
            aux_out_eop_wr_ptr,
            aux_out_num_bytes_minus1} = aux_ft_ff_data;
    assign aux_out_valid = aux_ft_ff_valid;
-   
+
    // Output Pipeline
    // Stage 0
    // Read data from Buffer when buffer is not empty and no output stall
@@ -320,7 +323,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] stg0_op_buf_rd_addr;
    logic pl0_op_valid;
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] pl0_op_buf_rd_addr;
-   
+
    assign stg0_op_valid = buf_rd_en;
    assign stg0_op_buf_rd_addr = buf_rd_ptr;
 
@@ -348,7 +351,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic                              pl1_op_ovf;
    logic [PCIM_DATA_WIDTH-1:0]        pl1_op_ovf_data;
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] pl1_op_ovf_buf_rd_addr;
-   
+
    assign stg1_op_valid = pl0_op_valid || pl1_op_ovf;
    assign stg1_op_data = pl1_op_ovf ? pl1_op_ovf_data : buf_ram_rdata;
    assign stg1_op_buf_rd_addr = pl1_op_ovf ? pl1_op_ovf_buf_rd_addr : pl0_op_buf_rd_addr;
@@ -357,7 +360,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
                         ~op_stall ? 1'b0 : pl1_op_ovf;
    assign stg1_op_ovf_data = pl0_op_valid & op_stall ? buf_ram_rdata : pl1_op_ovf_data;
    assign stg1_op_ovf_buf_rd_addr = pl0_op_valid & op_stall ? pl0_op_buf_rd_addr : pl1_op_ovf_buf_rd_addr;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         pl1_op_valid <= 0;
@@ -403,7 +406,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
           stg2_op_keep_last[byte_idx]  = 1;
    end
    assign stg2_op_keep = stg2_op_eop ? stg2_op_keep_last : ({PCIM_DATA_WIDTH_BYTES{1'b1}});
-   
+
    assign aux_ft_ff_pop = aux_ft_ff_valid & stg2_op_valid & stg2_op_eop & ~op_stall;
 
    always @(posedge clk)
@@ -423,21 +426,21 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
      end // else: !if(!rst_n)
 
    // Output FIFO
-   localparam OP_OUTPUT_FIFO_WIDTH = DESC_TYPE ? PCIM_DATA_WIDTH + 1 + PCIM_DATA_WIDTH_BYTES : 
+   localparam OP_OUTPUT_FIFO_WIDTH = DESC_TYPE ? PCIM_DATA_WIDTH + 1 + PCIM_DATA_WIDTH_BYTES :
                                      PCIM_DATA_WIDTH + 1 + PCIM_DATA_WIDTH_BYTES + USER_BIT_WIDTH;
    localparam OP_OUTPUT_FIFO_DEPTH_MINUS1 = OP_OUTPUT_FIFO_DEPTH - 1;
-   
+
    logic op_out_ff_push;
    logic [OP_OUTPUT_FIFO_WIDTH-1:0] op_out_ff_push_data;
    logic                            op_out_ff_pop;
    logic [OP_OUTPUT_FIFO_WIDTH-1:0] op_out_ff_pop_data;
    logic                            op_out_ff_full;
    logic                            op_out_ff_valid;
-   
+
    assign op_out_ff_push = pl2_op_valid & ~op_stall;
    assign op_out_ff_push_data = DESC_TYPE ? {pl2_op_data, pl2_op_eop, pl2_op_keep} :
                                 {pl2_op_user, pl2_op_data, pl2_op_eop, pl2_op_keep};
-   
+
    flop_fifo #(.WIDTH(OP_OUTPUT_FIFO_WIDTH),
                .DEPTH(OP_OUTPUT_FIFO_DEPTH)
                ) OP_OUTPUT_FIFO (.clk         (clk),
@@ -463,7 +466,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
        {buf_axis_data, buf_axis_last, buf_axis_keep} = op_out_ff_pop_data;
      else
        {buf_axis_user, buf_axis_data, buf_axis_last, buf_axis_keep} = op_out_ff_pop_data;
-   
+
    // Logic to compute num_bytes for dm
    // Difference between dm_buf_wr_byte_addr and buf_rd_ptr
    logic [BUF_ADDR_RAM_IDX_WIDTH-1:0] buf_wr_ptr_in;
@@ -488,15 +491,15 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
 
    assign buf_ptr_eq = (buf_wr_ptr_in == buf_rd_ptr);
    assign buf_ptr_msb_eq = (buf_wr_ptr_msb_in == buf_rd_ptr_msb);
-   
-   // When pointers are not equal, for example - 
+
+   // When pointers are not equal, for example -
    // For case where rd_ptr is greater than wr_ptr, the actual ptr difference is
    // ptr_diff = rd_ptr - wr_ptr.
    // But the wr_ptr will not move even if the data mover writes less than 0x40 bytes.
    // Say, if the wr_byte_addr is at 0x10, the number of free bytes is equal to 0x30.
    // But the logic will report 0x40 with above logic. Therefore, subtracting by 1 to be safe.
    // ptr_diff = rd_ptr - wr_ptr - 1
-   // When this is done, if the wr_byte_addr is 0x10, the number of free bytes reported will be 0x0   
+   // When this is done, if the wr_byte_addr is 0x10, the number of free bytes reported will be 0x0
    assign buf_free_slots = buf_ptr_eq & buf_ptr_msb_eq ? BUF_DEPTH_MINUS1 :
                            buf_ptr_eq & ~buf_ptr_msb_eq ? 0 :
                            buf_ptr_diff - 1;
@@ -507,7 +510,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    logic [BUF_ADDR_WIDTH-1:0]         buf_rd_byte_addr;
    logic [BUF_ADDR_WIDTH:0]           buf_rd_byte_addr_plus_depth;
    logic [BUF_ADDR_WIDTH:0]           buf_byte_addr_diff;
-   
+
    assign buf_wr_byte_addr = dm_buf_wr_byte_addr;
    assign buf_rd_byte_addr = {buf_rd_ptr, {PCIM_ADDR_BYTE_IDX_WIDTH{1'b0}}};
    assign buf_rd_byte_addr_plus_depth = {buf_rd_ptr_plus_depth, {PCIM_ADDR_BYTE_IDX_WIDTH{1'b0}}};
@@ -516,7 +519,7 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
    assign buf_dm_num_bytes = (buf_wr_byte_addr == buf_rd_byte_addr) & buf_ptr_msb_eq ? BUF_SIZE_BYTES :
                              (buf_wr_byte_addr == buf_rd_byte_addr) & ~buf_ptr_msb_eq ? 0 :
                              buf_byte_addr_diff;
-   
+
 
    // Logic to compute aux fifo full
    assign buf_dm_aux_full = (dm_buf_aux_wr_ptr == aux_ram_rd_ptr) && (dm_buf_aux_wr_ptr_msb != aux_ram_rd_ptr_msb);
@@ -540,22 +543,22 @@ module sde_h2c_buf #(parameter bit DESC_TYPE = 0,  // 0 - Regular, 1 - Compact
       buf_cfg_num_free_slots = 0;
       buf_cfg_num_free_slots = buf_free_slots_q;
    end // always_comb
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         buf_cfg_in_pkt_cnt <= 0;
         buf_cfg_out_pkt_cnt <= 0;
      end
      else begin
-        buf_cfg_in_pkt_cnt <= cfg_buf_clr_in_pkt_cnt ? 0 : 
+        buf_cfg_in_pkt_cnt <= cfg_buf_clr_in_pkt_cnt ? 0 :
                               dm_buf_wr & dm_buf_eop ? buf_cfg_in_pkt_cnt + 1 : buf_cfg_in_pkt_cnt;
         buf_cfg_out_pkt_cnt <= cfg_buf_clr_out_pkt_cnt ? 0 :
                                buf_axis_valid & buf_axis_last & axis_buf_ready ? buf_cfg_out_pkt_cnt + 1 : buf_cfg_out_pkt_cnt;
      end // else: !if(!rst_n)
 
  `ifndef NO_SDE_DEBUG_ILA
- 
-   
+
+
 ila_sde_h2c_buf ILA_SDE_H2C_BUF
   (
    .clk (clk),
@@ -590,7 +593,7 @@ ila_sde_h2c_buf ILA_SDE_H2C_BUF
    .probe22(aux_ram_rd_ptr_msb),
    .probe23(op_out_ff_full),
 
-   // 24 - 31   
+   // 24 - 31
    .probe24(op_out_ff_valid),
    .probe25(buf_wr_ptr_in_plus_depth),
    .probe26(buf_rd_ptr_plus_depth),
@@ -600,5 +603,5 @@ ila_sde_h2c_buf ILA_SDE_H2C_BUF
    );
 
  `endif //  `ifndef NO_SDE_DEBUG_ILA
-   
+
 endmodule // sde_h2c_buf

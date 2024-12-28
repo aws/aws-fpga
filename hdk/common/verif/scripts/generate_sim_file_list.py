@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 
 # =============================================================================
-# Copyright 2023 Amazon.com, Inc. or its affiliates.
-# All Rights Reserved Worldwide.
-# Amazon Confidential information
-# Restricted NDA Material
+# Amazon FPGA Hardware Development Kit
+#
+# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use
+# this file except in compliance with the License. A copy of the License is
+# located at
+#
+#    http://aws.amazon.com/asl/
+#
+# or in the "license" file accompanying this file. This file is distributed on
+# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
+# implied. See the License for the specific language governing permissions and
+# limitations under the License.
 # =============================================================================
-
 
 import os
 import fileinput
@@ -29,7 +38,7 @@ def get_generated_file_list(cl_dir, simulator):
     all_file_objects: list[str] = glob(f'{cl_dir}/design/**', recursive=True)
     all_file_paths = [obj for obj in all_file_objects if os.path.isfile(obj)]
     all_dir_paths = [obj for obj in all_file_objects if os.path.isdir(obj)]
-    
+
     generated_file_list = ['']
     for dir_path in all_dir_paths:
         generated_file_list.append(INCLUDE_SYNTAX[simulator.lower()] + dir_path.replace(cl_dir, '$CL_DIR'))
@@ -51,7 +60,7 @@ def update_sim_file_list(cl_dir, simulator, generated_file_list):
             print(line, end='')
             for generated_line in generated_file_list:
                 print(generated_line, end='\n')
-        
+
         if IN_GENERATE_BLOCK and "END AUTO-GENERATE" in line:
             IN_GENERATE_BLOCK = False
 

@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 // Module is common for H2C and C2H
@@ -61,7 +63,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
     output logic                       desc_cfg_uflow,
     output logic                       desc_cfg_full,
     output logic                       desc_cfg_empty,
-    
+
     // Descriptor to Data Mover
     output logic                       desc_dm_empty,
     input                              dm_desc_pop,
@@ -69,7 +71,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
     output logic                       desc_dm_desc_valid,
 
     input                              dm_desc_cnt_inc,
-    
+
     // Descriptor to Write Back Block
     output logic                       desc_wb_limit_req,
     output logic [31:0]                desc_wb_limit,
@@ -82,21 +84,21 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
     output logic [PCIM_ADDR_WIDTH-1:0] desc_pm_araddr,
     output logic [PCIM_LEN_WIDTH-1:0]  desc_pm_arlen,
     input                              pm_desc_arready,
-    
+
      // Read Data from PCIM
     input                              pm_desc_rvalid,
     input [1:0]                        pm_desc_rresp,
     input [PCIM_DATA_WIDTH-1:0]        pm_desc_rdata,
     input                              pm_desc_rlast,
     output logic                       desc_pm_rready
-    
+
     );
 
    localparam DESC_RAM_WIDTH = ~DESC_TYPE & H2C_N_C2H ? $bits(sde_pkg::h2c_reg_sav_desc_t) :
                                DESC_TYPE  & H2C_N_C2H ? $bits(sde_pkg::h2c_comp_sav_desc_t) :
                                ~DESC_TYPE & ~H2C_N_C2H ? $bits(sde_pkg::c2h_reg_sav_desc_t) :
                                $bits(sde_pkg::c2h_comp_sav_desc_t);
-   
+
    logic                             ps_desc_wr_req_q = 0;
    logic [DESC_RAM_WIDTH-1:0]        ps_desc_wdata_q = 0;
    logic                             cfg_desc_ram_wr_req_q = 0;
@@ -106,14 +108,14 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    logic                             cfg_desc_ram_rd_req_winner_q = 0;
    logic                             cfg_desc_ram_wr_req_winner;
    logic                             cfg_desc_ram_rd_req_winner;
-   
+
    logic                             desc_ram_wr;
    logic [DESC_RAM_WIDTH-1:0]        desc_ram_wdata;
    logic [DESC_ADDR_WIDTH-1:0]       desc_ram_waddr;
    logic                             desc_ram_rd;
    logic [DESC_RAM_WIDTH-1:0]        desc_ram_rdata;
    logic [DESC_ADDR_WIDTH-1:0]       desc_ram_raddr;
-   
+
    logic [DESC_ADDR_WIDTH-1:0]       desc_ram_wr_ptr;
    logic                             desc_ram_wr_ptr_msb;
    logic [DESC_ADDR_WIDTH-1:0]       desc_ram_rd_ptr;
@@ -125,13 +127,13 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    logic                             desc_ram_pop;
    logic                             desc_ram_empty;
    logic                             desc_ram_full;
-   
+
    logic                             desc_ram_oflow;
    logic                             desc_fifo_uflow;
-   
+
    logic [DESC_RAM_WIDTH-1:0]        desc_dm_desc_ff_out;
    logic [DESC_WIDTH-1:0]            desc_dm_desc_ff_out_from_sav;
-   
+
    // Pipeline the data into the descriptor RAM
    always @(posedge clk)
      if (!rst_n) begin
@@ -151,10 +153,10 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
         else
           ps_desc_wdata_q  <= ps_desc_wdata;
      end
-   
+
    // PCIS has highest priority for write path
    assign ps_desc_ack = 1;
-   
+
    // CSR Path to the Desc RAM
    always @(posedge clk)
      if (!rst_n) begin
@@ -164,19 +166,19 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
         cfg_desc_ram_wdata_q  <= 0;
         cfg_desc_ram_rd_req_winner_q <= 0;
         desc_cfg_ram_ack <= 0;
-        
+
      end
      else begin
-        cfg_desc_ram_wr_req_q <= ~cfg_desc_ram_wr_req_q & cfg_desc_ram_wr_req ? 1'b1 : 
+        cfg_desc_ram_wr_req_q <= ~cfg_desc_ram_wr_req_q & cfg_desc_ram_wr_req ? 1'b1 :
                         cfg_desc_ram_wr_req_q & cfg_desc_ram_wr_req_winner ? 1'b0 :
                         cfg_desc_ram_wr_req_q;
-        
-        cfg_desc_ram_rd_req_q <= ~cfg_desc_ram_rd_req_q & cfg_desc_ram_rd_req ? 1'b1 : 
+
+        cfg_desc_ram_rd_req_q <= ~cfg_desc_ram_rd_req_q & cfg_desc_ram_rd_req ? 1'b1 :
                         cfg_desc_ram_rd_req_q & cfg_desc_ram_rd_req_winner ? 1'b0 :
                         cfg_desc_ram_rd_req_q;
 
         cfg_desc_ram_addr_q  <= cfg_desc_ram_addr;
-        
+
         // cfg_desc_ram_wdata_q <= cfg_desc_ram_wdata;
         if (~DESC_TYPE & H2C_N_C2H)
           cfg_desc_ram_wdata_q <= h2c_cnv_desc_reg2sav(cfg_desc_ram_wdata);
@@ -186,11 +188,11 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
           cfg_desc_ram_wdata_q <= c2h_cnv_desc_reg2sav(cfg_desc_ram_wdata);
         else if (DESC_TYPE & ~H2C_N_C2H)
           cfg_desc_ram_wdata_q <= c2h_cnv_desc_comp2sav(cfg_desc_ram_wdata);
-        else 
+        else
           cfg_desc_ram_wdata_q <= cfg_desc_ram_wdata;
-        
+
         cfg_desc_ram_rd_req_winner_q <= cfg_desc_ram_rd_req_winner;
-        
+
         desc_cfg_ram_ack <= cfg_desc_ram_wr_req_q ? cfg_desc_ram_wr_req_winner :
                             cfg_desc_ram_rd_req_winner_q;
 
@@ -214,15 +216,15 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    assign desc_ram_wdata = ps_desc_wr_req_q ? ps_desc_wdata_q :
                            cfg_desc_ram_wdata_q;
    assign cfg_desc_ram_wr_req_winner = cfg_desc_ram_wr_req_q & ~ps_desc_wr_req_q;
-   
+
    // Arbitrate between cfg read access and pcis reads
    assign desc_ram_rd = desc_ram_pop || cfg_desc_ram_rd_req_q;
-   assign desc_ram_raddr = cfg_desc_ram_rd_req_winner ? cfg_desc_ram_addr_q : 
+   assign desc_ram_raddr = cfg_desc_ram_rd_req_winner ? cfg_desc_ram_addr_q :
                            desc_ram_rd_ptr;
    assign cfg_desc_ram_rd_req_winner = cfg_desc_ram_rd_req_q & ~desc_ram_pop;
-   
+
    // Desc RAM - Using 2 port RAM (1w1r)
-   bram_1w1r #(.WIDTH(DESC_RAM_WIDTH), 
+   bram_1w1r #(.WIDTH(DESC_RAM_WIDTH),
                .ADDR_WIDTH(DESC_ADDR_WIDTH),
                .DEPTH (DESC_RAM_DEPTH)
                ) DESC_RAM (.clk      (clk),
@@ -238,7 +240,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
 
    // FLow-through FIFO logic - need to read 1 desc per clock
    localparam DESC_RAM_DEPTH_MINUS1 = DESC_RAM_DEPTH - 1;
-   
+
    ft_fifo #(.FIFO_WIDTH(DESC_RAM_WIDTH)
              ) DESC_FT_FIFO (.clk         (clk),
                              .rst_n       (1'b1),
@@ -246,7 +248,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
                              .ram_fifo_empty (desc_ram_empty),
                              .ram_fifo_data  (desc_ram_rdata),
                              .ram_pop        (desc_ram_pop),
-                             
+
                              .ft_pop   (dm_desc_pop),
                              .ft_valid (desc_dm_desc_valid),
                              .ft_data  (desc_dm_desc_ff_out)
@@ -257,19 +259,19 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
                                          (~DESC_TYPE & ~H2C_N_C2H) ? c2h_cnv_desc_sav2reg(desc_dm_desc_ff_out) :
                                          ( DESC_TYPE & ~H2C_N_C2H) ? c2h_cnv_desc_sav2comp(desc_dm_desc_ff_out) :
                                          desc_dm_desc_ff_out;
-                                     
-   assign desc_dm_desc = (~DESC_TYPE & H2C_N_C2H)  ? sde_pkg::h2c_cnv_desc_reg2comm (desc_dm_desc_ff_out_from_sav) : 
-                         ( DESC_TYPE & H2C_N_C2H)  ? sde_pkg::h2c_cnv_desc_comp2comm(desc_dm_desc_ff_out_from_sav) : 
+
+   assign desc_dm_desc = (~DESC_TYPE & H2C_N_C2H)  ? sde_pkg::h2c_cnv_desc_reg2comm (desc_dm_desc_ff_out_from_sav) :
+                         ( DESC_TYPE & H2C_N_C2H)  ? sde_pkg::h2c_cnv_desc_comp2comm(desc_dm_desc_ff_out_from_sav) :
                          (~DESC_TYPE & ~H2C_N_C2H) ? sde_pkg::c2h_cnv_desc_reg2comm (desc_dm_desc_ff_out_from_sav) : sde_pkg::c2h_cnv_desc_comp2comm (desc_dm_desc_ff_out_from_sav);
-   
-   assign desc_ram_wr_ptr_next = (desc_ram_wr_ptr == DESC_RAM_DEPTH_MINUS1) ? ({DESC_ADDR_WIDTH{1'b0}}) : 
+
+   assign desc_ram_wr_ptr_next = (desc_ram_wr_ptr == DESC_RAM_DEPTH_MINUS1) ? ({DESC_ADDR_WIDTH{1'b0}}) :
                                   desc_ram_wr_ptr + 1;
    assign desc_ram_wr_ptr_msb_next = (desc_ram_wr_ptr == DESC_RAM_DEPTH_MINUS1) ? ~desc_ram_wr_ptr_msb : desc_ram_wr_ptr_msb;
-   
+
    assign desc_ram_rd_ptr_next = (desc_ram_rd_ptr == DESC_RAM_DEPTH_MINUS1) ? ({DESC_ADDR_WIDTH{1'b0}}) :
                                   desc_ram_rd_ptr + 1;
    assign desc_ram_rd_ptr_msb_next = (desc_ram_rd_ptr == DESC_RAM_DEPTH_MINUS1) ? ~desc_ram_rd_ptr_msb : desc_ram_rd_ptr_msb;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         desc_ram_wr_ptr <= 0;
@@ -286,7 +288,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
         desc_ram_empty <= ps_desc_wr_req_q  && ~desc_ram_pop ? 1'b0 :
                           ~ps_desc_wr_req_q &&  desc_ram_pop ? ({desc_ram_wr_ptr_msb, desc_ram_wr_ptr} == {desc_ram_rd_ptr_msb_next, desc_ram_rd_ptr_next}) :
                           desc_ram_empty;
-        desc_ram_full <= ps_desc_wr_req_q  && ~desc_ram_pop ? (desc_ram_wr_ptr_msb_next != desc_ram_rd_ptr_msb) && (desc_ram_wr_ptr_next == desc_ram_rd_ptr) : 
+        desc_ram_full <= ps_desc_wr_req_q  && ~desc_ram_pop ? (desc_ram_wr_ptr_msb_next != desc_ram_rd_ptr_msb) && (desc_ram_wr_ptr_next == desc_ram_rd_ptr) :
                          ~ps_desc_wr_req_q &&  desc_ram_pop ? 1'b0 : desc_ram_full;
         desc_ram_oflow <= desc_ram_full & ps_desc_wr_req_q;
         desc_fifo_uflow <= ~desc_dm_desc_valid & dm_desc_pop;
@@ -295,7 +297,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    assign desc_cfg_uflow = desc_fifo_uflow;
    assign desc_cfg_empty = ~desc_dm_desc_valid;
    assign desc_cfg_full = desc_ram_full;
-   
+
    always_comb begin
       desc_cfg_wr_ptr = 0;
       desc_cfg_wr_ptr = desc_ram_wr_ptr;
@@ -304,12 +306,12 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
       desc_cfg_rd_ptr = desc_ram_rd_ptr;
       desc_cfg_rd_ptr[15] = desc_ram_rd_ptr_msb;
    end
-   
+
    logic [31:0] cdt_consumed = 0;
    logic [31:0] cdt_limit = 0;
-   
+
    // Credit Management
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         cdt_consumed <= 0;
@@ -318,18 +320,18 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
      else begin
         // Consumed
         // Will be incremented on every write from PCIS
-        cdt_consumed <= cfg_desc_clr_cdt_consumed ? 0 : 
+        cdt_consumed <= cfg_desc_clr_cdt_consumed ? 0 :
                         ps_desc_wr_req_q ? cdt_consumed + 1 : cdt_consumed;
-        
+
         // Limit
         // Will be incremented on every pop of the descriptor from PCIS
-        cdt_limit <= cfg_desc_clr_cdt_limit ? DESC_RAM_DEPTH : 
+        cdt_limit <= cfg_desc_clr_cdt_limit ? DESC_RAM_DEPTH :
                      dm_desc_pop ? cdt_limit + 1 : cdt_limit;
-        
+
      end // else: !if(!rst_n)
    assign desc_cfg_cdt_consumed = cdt_consumed;
    assign desc_cfg_cdt_limit = cdt_limit;
-   
+
    logic [31:0] num_compl_desc;
    // Credit counters
    always @(posedge clk)
@@ -389,13 +391,13 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
       out_desc.dest_addr = in_desc_reg.dest_addr;
       out_desc.len = in_desc_reg.len;
 
-      c2h_cnv_desc_reg2sav = out_desc;   
+      c2h_cnv_desc_reg2sav = out_desc;
    endfunction // c2h_cnv_desc_reg2sav
-        
+
    function logic [DESC_WIDTH-1:0] h2c_cnv_desc_sav2reg (input [DESC_RAM_WIDTH-1:0] in_desc);
       sde_pkg::h2c_reg_desc_t out_desc;
       sde_pkg::h2c_reg_sav_desc_t in_desc_sav;
-      
+
       out_desc = '{default:'0};
       in_desc_sav = '{default:'0};
 
@@ -413,7 +415,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    function logic [DESC_WIDTH-1:0] c2h_cnv_desc_sav2reg (input [DESC_RAM_WIDTH-1:0] in_desc);
       sde_pkg::c2h_reg_desc_t out_desc;
       sde_pkg::c2h_reg_sav_desc_t in_desc_sav;
-      
+
       out_desc = '{default:'0};
       in_desc_sav = '{default:'0};
 
@@ -454,13 +456,13 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
       out_desc.dest_addr = in_desc_comp.dest_addr;
       out_desc.len = in_desc_comp.len;
 
-      c2h_cnv_desc_comp2sav = out_desc;   
+      c2h_cnv_desc_comp2sav = out_desc;
    endfunction // c2h_cnv_desc_comp2sav
-        
+
    function logic [DESC_WIDTH-1:0] h2c_cnv_desc_sav2comp (input [DESC_RAM_WIDTH-1:0] in_desc);
       sde_pkg::h2c_comp_desc_t out_desc;
       sde_pkg::h2c_comp_sav_desc_t in_desc_sav;
-      
+
       out_desc = '{default:'0};
       in_desc_sav = '{default:'0};
 
@@ -477,7 +479,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
    function logic [DESC_WIDTH-1:0] c2h_cnv_desc_sav2comp (input [DESC_RAM_WIDTH-1:0] in_desc);
       sde_pkg::c2h_comp_desc_t out_desc;
       sde_pkg::c2h_comp_sav_desc_t in_desc_sav;
-      
+
       out_desc = '{default:'0};
       in_desc_sav = '{default:'0};
 
@@ -489,17 +491,7 @@ module sde_desc #(parameter bit H2C_N_C2H = 0, // 1 - H2C, 0 - C2H
       c2h_cnv_desc_sav2comp = out_desc;
    endfunction // c2h_cnv_desc_sav2comp
 
-   
-      
+
+
 
 endmodule // sde_desc
-
-
-
-
-    
-    
-    
-    
-    
-

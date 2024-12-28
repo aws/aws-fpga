@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,7 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
 
 
 //--------------------------------------------------------------------------------------------
@@ -35,7 +37,7 @@ module ram_fifo_ft #(parameter WIDTH=32, parameter PTR_WIDTH=7, parameter WATERM
    output logic oflow,
 
    output logic empty                  //Because of ft_fifo empty is different than !valid.  Should only be used
-                                       // to see if FIFO is not 
+                                       // to see if FIFO is not
    );
 
 parameter[31:0] NUM_LOC = 1'b1 << PTR_WIDTH;
@@ -48,7 +50,7 @@ logic[PTR_WIDTH:0] wptr = 0;
 logic[PTR_WIDTH:0] rptr = 0;
 
 logic[PTR_WIDTH:0] num_entries;        //Tracks entries in the combined RAM/FT FIFOs
-logic[PTR_WIDTH:0] num_entries_nxt; 
+logic[PTR_WIDTH:0] num_entries_nxt;
 
 wire[PTR_WIDTH:0] ptr_diff = wptr - rptr;
 
@@ -74,7 +76,7 @@ always_comb
 begin
    if (!rst_n)
       num_entries_nxt = 0;
-   else  
+   else
       num_entries_nxt = num_entries + (push & !fifo_full) - (pop & valid);
 end
 
@@ -111,7 +113,7 @@ ft_fifo_p #(.FIFO_WIDTH(WIDTH), .LESS_RST(LESS_RST)) FT_FIFO (
    .ft_pop(pop),
 
    .ram_pop(ram_pop),
-   
+
    .ft_valid(valid),
    .ft_data(pop_data)
    );
@@ -128,11 +130,11 @@ ft_fifo #(.FIFO_WIDTH(WIDTH), .LESS_RST(LESS_RST)) FT_FIFO (
    .ft_pop(pop),
 
    .ram_pop(ram_pop),
-   
+
    .ft_valid(valid),
    .ft_data(pop_data)
    );
-  
+
 always @(negedge rst_n or posedge clk)
    if (!rst_n)
       oflow <= 0;
@@ -140,5 +142,3 @@ always @(negedge rst_n or posedge clk)
       oflow <= 1;
 
 endmodule
-
-   

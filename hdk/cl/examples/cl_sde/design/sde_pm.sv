@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,6 +13,8 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 // PCIM Interface
 
@@ -20,7 +23,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
                 parameter PCIM_LEN_WIDTH = 8,
                 parameter PCIM_ADDR_WIDTH = 64,
                 parameter PCIM_ADDR_BYTE_IDX_WIDTH = $clog2(PCIM_DATA_WIDTH>>3),
-                
+
                 // IDs for Write Channels
                 parameter C2H_PCIM_DM_AWID = 0,
                 parameter C2H_PCIM_WB_AWID = 1,
@@ -32,10 +35,10 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
                 parameter H2C_PCIM_DM_ARID = 2,
 
                 // These are internal FIFOs - Dont change unless absolutely required
-                parameter PM_WR_WINNER_FIFO_DEPTH = 32                
-                
+                parameter PM_WR_WINNER_FIFO_DEPTH = 32
+
                 )
-   ( 
+   (
      input                                   clk,
      input                                   rst_n,
 
@@ -46,7 +49,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      input [31:0]                            pm_ps_cfg_wdata,
      output                                  pm_ps_cfg_ack,
      output [31:0]                           pm_ps_cfg_rdata,
-    
+
 
      // PCIM Interface
      output logic                            pcim_awvalid,
@@ -55,25 +58,25 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      output logic [PCIM_LEN_WIDTH-1:0]       pcim_awlen,
      output logic [2:0]                      pcim_awsize,
      input                                   pcim_awready,
-   
+
      output logic                            pcim_wvalid,
      output logic [PCIM_DATA_WIDTH-1:0]      pcim_wdata,
      output logic [(PCIM_DATA_WIDTH>>3)-1:0] pcim_wstrb,
      output logic                            pcim_wlast,
      input                                   pcim_wready,
-   
+
      input logic                             pcim_bvalid,
      input logic [PCIM_ID_WIDTH-1:0]         pcim_bid,
      input logic [1:0]                       pcim_bresp,
      output logic                            pcim_bready,
-  
+
      output logic                            pcim_arvalid,
      output logic [PCIM_ID_WIDTH-1:0]        pcim_arid,
      output logic [PCIM_ADDR_WIDTH-1:0]      pcim_araddr,
      output logic [PCIM_LEN_WIDTH-1:0]       pcim_arlen,
      output logic [2:0]                      pcim_arsize,
      input                                   pcim_arready,
-   
+
      input                                   pcim_rvalid,
      input [PCIM_ID_WIDTH-1:0]               pcim_rid,
      input [PCIM_DATA_WIDTH-1:0]             pcim_rdata,
@@ -105,7 +108,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      input [PCIM_LEN_WIDTH-1:0]              c2h_dm_pm_awlen,
      input [PCIM_ID_WIDTH-1:0]               c2h_dm_pm_awid,
      output logic                            c2h_pm_dm_awready,
-    
+
      // Write Data to PCIM
      input                                   c2h_dm_pm_wvalid,
      input [PCIM_DATA_WIDTH-1:0]             c2h_dm_pm_wdata,
@@ -125,7 +128,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      input [PCIM_LEN_WIDTH-1:0]              c2h_wb_pm_awlen,
      input [PCIM_ID_WIDTH-1:0]               c2h_wb_pm_awid,
      output logic                            c2h_pm_wb_awready,
-    
+
     // Write Data to PCIM
      input                                   c2h_wb_pm_wvalid,
      input [PCIM_DATA_WIDTH-1:0]             c2h_wb_pm_wdata,
@@ -152,7 +155,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      output logic [PCIM_DATA_WIDTH-1:0]      h2c_pm_desc_rdata,
      output logic                            h2c_pm_desc_rlast,
      input                                   h2c_desc_pm_rready,
-     
+
      // H2C Data Mover to PCIM Interface
      // Read Address to PCIM
      input                                   h2c_dm_pm_arvalid,
@@ -167,7 +170,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      output logic                            h2c_pm_dm_rlast,
      input                                   h2c_dm_pm_rready,
 
-     
+
      // H2C Write-Back Block to PCIM Interface
      // Write Address to PCIM
      input                                   h2c_wb_pm_awvalid,
@@ -175,7 +178,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      input [PCIM_LEN_WIDTH-1:0]              h2c_wb_pm_awlen,
      input [PCIM_ID_WIDTH-1:0]               h2c_wb_pm_awid,
      output logic                            h2c_pm_wb_awready,
-    
+
     // Write Data to PCIM
      input                                   h2c_wb_pm_wvalid,
      input [PCIM_DATA_WIDTH-1:0]             h2c_wb_pm_wdata,
@@ -187,12 +190,12 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      output logic                            h2c_pm_wb_bvalid,
      output logic [1:0]                      h2c_pm_wb_bresp,
      input                                   h2c_wb_pm_bready
-     
+
      );
 
    localparam PCIM_AXSIZE = PCIM_ADDR_BYTE_IDX_WIDTH;
    localparam WR_WINNER_WIDTH = 2;
-   
+
 
    logic [WR_WINNER_WIDTH-1:0]               wr_arb_out;
    logic                                     wr_do_arb;
@@ -213,16 +216,16 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //   assign wr_arb_out = sde_pkg::RR_ARB#(.WINNER_WIDTH(WR_WINNER_WIDTH),
 //                                        .REQ_WIDTH(3))::do_arb({h2c_wb_pm_awvalid, c2h_wb_pm_awvalid, c2h_dm_pm_awvalid},
 //                                                               wr_winner);
-                                        
+
    // Save the winner
    always @(posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
        wr_winner <= 0;
      else
        wr_winner <= ~aw_pipe_stall ? wr_arb_out : wr_winner;
 
    assign aw_pipe_stall = pcim_awvalid & ~pcim_awready & ~pm_wr_winner_ff_full;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         pcim_awvalid <= 0;
@@ -248,14 +251,14 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
         end // else: !if(~aw_pipe_stall)
      end // else: !if(!rst_n)
    assign pcim_awsize = PCIM_AXSIZE;
-   
+
    assign c2h_pm_dm_awready = (wr_arb_out == 0) & ~aw_pipe_stall;
    assign c2h_pm_wb_awready = (wr_arb_out == 1) & ~aw_pipe_stall;
    assign h2c_pm_wb_awready = (wr_arb_out == 2) & ~aw_pipe_stall;
 
    assign wr_do_arb = (h2c_wb_pm_awvalid | c2h_wb_pm_awvalid | c2h_dm_pm_awvalid) & ~aw_pipe_stall;
-   
-   
+
+
    localparam PM_WR_WINNER_FIFO_DEPTH_MINUS1 = PM_WR_WINNER_FIFO_DEPTH - 1;
    localparam PM_WR_WINNER_FIFO_WIDTH = WR_WINNER_WIDTH;
 
@@ -268,8 +271,8 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
    logic requester_wvalid;
    logic requester_wlast;
    logic requester_wready;
-   
-   
+
+
    flop_fifo #(.WIDTH(PM_WR_WINNER_FIFO_WIDTH),
                .DEPTH(PM_WR_WINNER_FIFO_DEPTH)
                ) PM_WR_WINNER_FIFO (.clk         (clk),
@@ -283,16 +286,16 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
                                     .half_full   (),
                                     .watermark   (pm_wr_winner_ff_full),
                                     .data_valid  (pm_wr_winner_ff_valid)
-                                    
+
                                     );
 
    assign pm_wr_winner_ff_push = pcim_awvalid & pcim_awready & ~pm_wr_winner_ff_full;
    assign pm_wr_winner_ff_pop = requester_wvalid & requester_wlast & ~wdata_pipe_stall & pm_wr_winner_ff_valid;
-      
+
    // Write Data Channel Pipeline
-   
+
    assign wdata_pipe_stall = pcim_wvalid & ~pcim_wready;
-   
+
    // Pop Winner from FIFO and Send Write Data
    // FIFO output is valid, means that there is write data to be sent
    always @(posedge clk)
@@ -320,13 +323,13 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
      end // else: !if(!rst_n)
 
    assign requester_wvalid = pm_wr_winner_ff_valid & ((pm_wr_winner_ff_pop_data == 0) ? c2h_dm_pm_wvalid :
-                                                      (pm_wr_winner_ff_pop_data == 1) ? c2h_wb_pm_wvalid : 
+                                                      (pm_wr_winner_ff_pop_data == 1) ? c2h_wb_pm_wvalid :
                                                       h2c_wb_pm_wvalid);
    assign requester_wlast = pm_wr_winner_ff_valid & ((pm_wr_winner_ff_pop_data == 0) ? c2h_dm_pm_wlast :
-                                                     (pm_wr_winner_ff_pop_data == 1) ? c2h_wb_pm_wlast : 
+                                                     (pm_wr_winner_ff_pop_data == 1) ? c2h_wb_pm_wlast :
                                                      h2c_wb_pm_wlast);
    assign requester_wready = ~wdata_pipe_stall;
-   
+
    assign c2h_pm_dm_wready = pm_wr_winner_ff_valid & (pm_wr_winner_ff_pop_data == 0) & requester_wready;
    assign c2h_pm_wb_wready = pm_wr_winner_ff_valid & (pm_wr_winner_ff_pop_data == 1) & requester_wready;
    assign h2c_pm_wb_wready = pm_wr_winner_ff_valid & (pm_wr_winner_ff_pop_data == 2) & requester_wready;
@@ -336,7 +339,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
    logic c2h_wb_bresp_pipe_stall;
    logic h2c_wb_bresp_pipe_stall;
    logic [1:0] pcim_bresp_q;
-   
+
    // C2H DM BRESP Pipe
    assign c2h_dm_bresp_pipe_stall = c2h_pm_dm_bvalid & ~c2h_dm_pm_bready;
    always @(posedge clk)
@@ -354,7 +357,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //           c2h_pm_dm_bresp <= c2h_pm_dm_bresp;
         end
      end // else: !if(!rst_n)
-                               
+
    // C2H WB BRESP Pipe
    assign c2h_wb_bresp_pipe_stall = c2h_pm_wb_bvalid & ~c2h_wb_pm_bready;
    always @(posedge clk)
@@ -390,16 +393,16 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //           h2c_pm_wb_bresp <= h2c_pm_wb_bresp;
         end
      end // else: !if(!rst_n)
-                
+
    always @(posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
         pcim_bresp_q <= 0;
      else
        if (((pcim_bid == C2H_PCIM_DM_AWID) & ~c2h_dm_bresp_pipe_stall) ||
            ((pcim_bid == C2H_PCIM_WB_AWID) & ~c2h_wb_bresp_pipe_stall) ||
            ((pcim_bid == H2C_PCIM_WB_AWID) & ~h2c_wb_bresp_pipe_stall))
          pcim_bresp_q <= pcim_bresp;
-   
+
    assign c2h_pm_dm_bresp = pcim_bresp_q;
    assign c2h_pm_wb_bresp = pcim_bresp_q;
    assign h2c_pm_wb_bresp = pcim_bresp_q;
@@ -411,8 +414,8 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
    assign pcim_bready = (pcim_bid == C2H_PCIM_DM_AWID) ? ~c2h_dm_bresp_pipe_stall :
                         (pcim_bid == C2H_PCIM_WB_AWID) ? ~c2h_wb_bresp_pipe_stall :
                         (pcim_bid == H2C_PCIM_WB_AWID) ? ~h2c_wb_bresp_pipe_stall : 1'b0;
-   
-   
+
+
    // Do Round Robin among those requesting read on AR Channel
    // Round Robin arbiter
    localparam RD_WINNER_WIDTH = 2;
@@ -427,21 +430,21 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
                                                    );
    logic [RD_WINNER_WIDTH-1:0] rd_winner;
    logic                       ar_pipe_stall;
-//   
+//
 //   assign rd_arb_out = sde_pkg::RR_ARB#(.WINNER_WIDTH(RD_WINNER_WIDTH),
 //                                        .REQ_WIDTH(3))::do_arb({c2h_desc_pm_arvalid, h2c_desc_pm_arvalid, h2c_dm_pm_arvalid},
 //                                                               rd_winner);
-                                        
-   
+
+
    // Save the winner
    always @(posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
        rd_winner <= 0;
      else
        rd_winner <= ~ar_pipe_stall ? rd_arb_out : rd_winner;
 
    assign ar_pipe_stall = pcim_arvalid & ~pcim_arready;
-   
+
    always @(posedge clk)
      if (!rst_n) begin
         pcim_arvalid <= 0;
@@ -473,7 +476,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
    assign c2h_pm_desc_arready = (rd_arb_out == 2) & ~ar_pipe_stall;
 
    assign rd_do_arb = (c2h_desc_pm_arvalid | h2c_desc_pm_arvalid | h2c_dm_pm_arvalid) & ~ar_pipe_stall;
-   
+
 
    // For the read data, look at ID and send to appropriate requester
    logic c2h_desc_rresp_pipe_stall;
@@ -482,7 +485,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
    logic [1:0] pcim_rresp_q;
    logic [PCIM_DATA_WIDTH-1:0] pcim_rdata_q;
    logic                       pcim_rlast_q;
-   
+
    // C2H DM RRESP Pipe
    assign c2h_desc_rresp_pipe_stall = c2h_pm_desc_rvalid & ~c2h_desc_pm_rready;
    always @(posedge clk)
@@ -506,7 +509,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //            c2h_dm_desc_rlast <= c2h_dm_desc_rlast;
         end
      end // else: !if(!rst_n)
-                               
+
    // C2H WB RRESP Pipe
    assign h2c_desc_rresp_pipe_stall = h2c_pm_desc_rvalid & ~h2c_desc_pm_rready;
    always @(posedge clk)
@@ -554,7 +557,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //            h2c_dm_dm_rlast <= h2c_dm_dm_rlast;
         end
      end // else: !if(!rst_n)
-                     
+
    always @(posedge clk)
      if (!rst_n) begin
         pcim_rresp_q <= 0;
@@ -569,7 +572,7 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
           pcim_rdata_q <=pcim_rdata;
           pcim_rlast_q <= pcim_rlast;
        end
-   
+
    assign c2h_pm_desc_rresp = pcim_rresp_q;
    assign h2c_pm_desc_rresp = pcim_rresp_q;
    assign h2c_pm_dm_rresp = pcim_rresp_q;
@@ -585,19 +588,16 @@ module sde_pm #(parameter PCIM_DATA_WIDTH = 512,
 //    assign c2h_pm_desc_rid = C2H_PCIM_DESC_ARID;
 //    assign h2c_pm_desc_rid = H2C_PCIM_DESC_ARID;
 //    assign h2c_pm_dm_rid = H2C_PCIM_DM_ARID;
-          
+
    assign pcim_rready = (pcim_rid == C2H_PCIM_DESC_ARID) ? ~c2h_desc_rresp_pipe_stall :
                         (pcim_rid == H2C_PCIM_DESC_ARID) ? ~h2c_desc_rresp_pipe_stall :
                         (pcim_rid == H2C_PCIM_DM_ARID)   ? ~h2c_dm_rresp_pipe_stall : 1'b0;
-   
+
 
    // Local Config Registers
    // TODO:
    // Temporarily no registers
    assign pm_ps_cfg_ack = 1;
    assign pm_ps_cfg_rdata = 32'hbaad_1000;
-   
+
 endmodule // sde_pm
-
-
-   

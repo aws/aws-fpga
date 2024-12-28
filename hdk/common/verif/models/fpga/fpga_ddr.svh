@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,7 +13,9 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
-        
+// ============================================================================
+
+
    //---------------------------------------------------------------------------
    // DIMM Interface from CL
    //---------------------------------------------------------------------------
@@ -52,7 +55,7 @@
 
    int               fp[17:0];
    string            ddr_name[17:0];
-          
+
    //---------------------------------------------------------------------------
    // DDR Clocks source clock to the CL_DDR4 controller.
    // CL_DDR4 generates the actual DDR clocks (M_CLK_DP, M_CLK_DN) based on
@@ -61,13 +64,13 @@
    logic             ddr_clk;
    initial begin
       ddr_clk = 0;
-      forever #5ns ddr_clk = ~ddr_clk;               
+      forever #5ns ddr_clk = ~ddr_clk;
    end
    assign CLK_DIMM_DP =  ddr_clk;
    assign CLK_DIMM_DN = ~ddr_clk;
 
 `define EOF -1
-	
+
    //===========================================================================
    // Memory Model instantiation
    //===========================================================================
@@ -92,11 +95,11 @@
       .MEM_PART_WIDTH      ("x4"),
       .MC_CA_MIRROR        ("ON"),
    // .SDRAM               ("DDR4"),
-`ifdef SAMSUNG          
+`ifdef SAMSUNG
       .DDR_SIM_MODEL       ("SAMSUNG"),
-`else                   
+`else
       .DDR_SIM_MODEL       ("MICRON"),
-`endif                  
+`endif
       .DM_DBI              ("NONE"),
       .MC_REG_CTRL         ("ON"),
       .DIMM_MODEL          ("RDIMM"),
@@ -173,7 +176,7 @@
      logic [1:0]   bank_group_a, bank_group_b;
      logic [63:0]  data_fp[17:0];
      logic [511:0] data_t;
-             
+
      row_a = axi_addr[33:17];
      col_a = {axi_addr[16:11], axi_addr[8], axi_addr[5:3]};
      bank_a = {axi_addr[10:9]};
@@ -189,14 +192,14 @@
         //Each device is 32-bits wide. 64-bit data is loaded as below.
         for (int j=0; j<8; j++) begin
            data_fp[i][(j*4+3) -: 4] = data_t[3:0]; //3-0
-           
+
            data_t = data >> 4;
            data_fp[i+1][(j*4+3) -: 4] = data_t[3:0];//7-4
 
            data_t = data >> 8;
            data = data_t;
         end // for (int j=0; j<8; j++)
-        
+
         $fdisplay(fp[i],   "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i]  [31:0]);
         $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, data_fp[i+1][31:0]);
 
@@ -204,14 +207,14 @@
         $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
      end
 
-     //ECC 
+     //ECC
      $fdisplay(fp[14], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, 'h0);
      $fdisplay(fp[15], "%0h %0h %0h %0h %h", bank_group_a, bank_a, row_a, col_a, 'h0);
 
      //ECC
      $fdisplay(fp[14], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, 'h0);
      $fdisplay(fp[15], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, 'h0);
-     
+
      for (int i=16; i<18; i=i+2) begin
         data_t = data;
         //Each device is 32-bits wide. 64-bit data is loaded as below.
@@ -230,13 +233,13 @@
         $fdisplay(fp[i],   "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i]  [31:0]);
         $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
      end // for (int i=16; i<18; i=i+2)
-     
+
      for (int i=8; i<13; i=i+2) begin
         data_t = data;
         //Each device is 32-bits wide. 64-bit data is loaded as below.
         for (int j=0; j<8; j++) begin
            data_fp[i][(j*4+3) -: 4] = data_t[3:0];
-           
+
            data_t = data >> 4;
            data_fp[i+1][(j*4+3) -: 4] = data_t[3:0];
 
@@ -249,13 +252,13 @@
         $fdisplay(fp[i],   "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i]  [31:0]);
         $fdisplay(fp[i+1], "%0h %0h %0h %0h %h", bank_group_b, bank_b, row_b, col_b, data_fp[i+1][31:0]);
      end // for (int i=8; i<13; i=i+2)
-     
+
   endtask // write_bdr_ld_data_to_file
 
   task write_bdr_ld_raw_data_to_file(int ddr_file, logic [16:0] row_a, logic [1:0]  bank_a, logic [9:0]  col_a, logic [1:0] bank_group_a, logic [31:0] data);
      $fdisplay(ddr_file, "%0d %0d %0d %0d %h", bank_group_a, bank_a, row_a, col_a, data);
   endtask // write_bdr_ld_raw_data_to_file
-  
+
   task ddr_bdr_ld(string file_name);
      logic [63:0]  addr;
      logic [511:0] data;
@@ -265,9 +268,9 @@
      // Line buffer
      reg [12*100:1] line;
      int           c;
-     
+
      axi_fp = $fopen(file_name, "r");
-     
+
      for (int i=0; i<18; i++) begin
         ddr_name[i] = $sformatf("ddr4_ddr_%0d.mem", i);
         $display("ddr_name is %0s \n", ddr_name[i]);
@@ -276,7 +279,7 @@
            $display("Could not open file %s", ddr_name[i]);
         end
      end
-     //Config information for memory. 
+     //Config information for memory.
      for (int i=0; i<18; i++) begin
         write_cfg_info_to_file(fp[i]);
      end
@@ -297,7 +300,7 @@
      end
      device_bdr_ld();
   endtask // ddr_bdr_ld
-   
+
   task device_bdr_ld();
      for (int i=0; i<18; i++) begin
         ddr_name[i] = $sformatf("ddr4_ddr_%0d.mem", i);
@@ -326,4 +329,3 @@
   endtask // device_bdr_ld
 
 `endif//NO_DDR
-

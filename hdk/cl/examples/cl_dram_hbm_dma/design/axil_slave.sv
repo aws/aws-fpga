@@ -1,6 +1,7 @@
+// ============================================================================
 // Amazon FPGA Hardware Development Kit
 //
-// Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Amazon Software License (the "License"). You may not use
 // this file except in compliance with the License. A copy of the License is
@@ -12,43 +13,45 @@
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
+// ============================================================================
+
 
 module axil_slave (
    input clk,
    input rst_n,
 
-   input awvalid,                                                                    
-   input[63:0] awaddr,                                                               
-   output logic awready,                                                                           
-   
-   //Write data                                                                                    
-   input wvalid,                                                                     
-   input[31:0] wdata,                                                                
-   input[3:0] wstrb,                                                                 
-   output logic wready,                                                                            
- 
-   //Write response                                                                                
-   output logic bvalid,                                                                            
+   input awvalid,
+   input[63:0] awaddr,
+   output logic awready,
+
+   //Write data
+   input wvalid,
+   input[31:0] wdata,
+   input[3:0] wstrb,
+   output logic wready,
+
+   //Write response
+   output logic bvalid,
    output logic[1:0] bresp,
    input bready,
-                                                                                                   
+
    //Read address
-   input arvalid,                                                                    
-   input[63:0] araddr,                                                               
+   input arvalid,
+   input[63:0] araddr,
    output logic arready,
-                                                                                                   
+
    //Read data/response
-   output logic rvalid,                                                                            
+   output logic rvalid,
    output logic[31:0] rdata,
    output logic[1:0] rresp,
-                                                                                                   
+
    input rready
 );
 
 logic[63:0] awaddr_q;
 logic arvalid_q;
 
-// Does not work when awvalid and wvalid are asserted at the same time   
+// Does not work when awvalid and wvalid are asserted at the same time
 //assign awready = !wvalid;
 //assign wready = !arvalid;
 //
@@ -57,7 +60,7 @@ logic arvalid_q;
 //      awaddr_q <= 0;
 //   else if (awvalid && awready)
 //      awaddr_q <= awaddr;
-//                    
+//
 //always_ff @(negedge rst_n or posedge clk)
 //   if (!rst_n)
 //   begin
@@ -73,7 +76,7 @@ logic arvalid_q;
 
    logic wr_active;
    logic [63:0] wr_addr;
-   
+
    always_ff @(negedge rst_n or posedge clk)
      if (!rst_n) begin
         wr_active <= 0;
@@ -88,18 +91,18 @@ logic arvalid_q;
 
    assign awready = ~wr_active;
    assign wready = wr_active && wvalid;
-   
+
    always_ff @(negedge rst_n or posedge clk)
-     if (!rst_n) 
+     if (!rst_n)
        bvalid <= 0;
      else
-       bvalid <= bvalid && bready ? 1'b0 : 
+       bvalid <= bvalid && bready ? 1'b0 :
                  ~bvalid && wready ? 1'b1 :
                  bvalid;
    assign bresp = 0;
-   
+
 assign arready = !arvalid_q && !rvalid;
-   
+
 always_ff @(negedge rst_n or posedge clk)
    if (!rst_n)
       arvalid_q <= 0;
@@ -121,7 +124,7 @@ always_ff @(negedge rst_n or posedge clk)
       rdata <= 0;
       rresp <= 0;
    end
-   else if (arvalid_q) 
+   else if (arvalid_q)
    begin
       rvalid <= 1;
       rdata <= ram_rdata;
@@ -149,5 +152,3 @@ bram_2rw #(.WIDTH(32), .ADDR_WIDTH(8), .DEPTH(256) ) AXIL_RAM (
    );
 
 endmodule
-
-   
