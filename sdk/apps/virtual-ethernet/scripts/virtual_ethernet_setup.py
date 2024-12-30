@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,7 +18,7 @@
 from __future__ import print_function
 import os
 import sys
-import platform
+import distro
 import glob
 import argparse
 import subprocess
@@ -52,8 +52,8 @@ def cmd_exec(cmd, check_return=True):
         sys.exit(1)
 
 def load_uio():
-    distro = platform.linux_distribution()
-    if (distro[0] == "Ubuntu"):
+    installed_distro = distro.name()
+    if (installed_distro == "Ubuntu"):
         cmd_exec("modprobe uio")
     else:
         cmd_exec("modprobe uio_pci_generic")
@@ -70,11 +70,10 @@ def fpga_slot_str2dbdf(fpga_slot_str):
         if found == True:
             break
         logger.debug("slot_str=%s" % slot_str)
-        slot_num = ' '.join(slot_str.split()).split(' ')[1] 
+        _,slot_num,_,_,dbdf = slot_str.split()
         if slot_num == fpga_slot_str:
-            dbdf = ' '.join(slot_str.split()).split(' ')[4] 
             found = True
-    return dbdf 
+    return dbdf.decode()
 
 def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     logger.debug("setup_dpdk: dpdk_path=%s, fpga_slot_str=%s" % (dpdk_path, fpga_slot_str))
@@ -84,6 +83,7 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
         logger.error("Please specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting")
         sys.exit(1)
 
+    print("fpga_slot_str {fpga_slot_str}")
     fpga_dbdf = fpga_slot_str2dbdf(fpga_slot_str)
     if fpga_dbdf == "None":
         logger.error("Could not get DBDF for fpga_slot_str=%s" % fpga_slot_str)
@@ -119,12 +119,12 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     cmd_exec("insmod ./%s/kmod/igb_uio.ko" % (make_tgt))
 
     # Bind the FPGA to to DPDK
-    cmd_exec("%s --bind=igb_uio %s" % (dpdk_devbind, fpga_dbdf))
+    cmd_exec("python3 %s --bind=igb_uio %s" % (dpdk_devbind, fpga_dbdf))
 
     # Bind the ENI device to to DPDK (optional)
     if eni_dbdf != "None" and eni_ethdev != "None":
         cmd_exec("ifdown %s" % (eni_ethdev))
-        cmd_exec("%s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
+        cmd_exec("python3 %s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
 
     # cd back to the original directory
     os.chdir("%s" % (cwd))
