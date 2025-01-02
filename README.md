@@ -5,7 +5,7 @@ This branch provides a Small Shell which is 30% smaller in size than the F1.X.1.
 
 ⚠️ <b>NOTE:</b> Small Shell does not include DMA capability. Customers should implement their own DMA engine in the CL, or use [SDE IP](sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) provided in the Developer Kit.
 
-⚠️ <b>NOTE:</b> CL's with Small Shell F1.S.1.0 require Xilinx 2020.2 tools
+⚠️ <b>NOTE:</b> CL's with Small Shell F1.S.1.0 require Xilinx 2024.1 or 2020.2 tools
 
 ⚠️ <b>NOTE:</b> Vitis, HLx and IPI flows are not supported with Small Shell since DMA engine is not included.
 

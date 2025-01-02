@@ -6,7 +6,7 @@ This document describes the changes required when migrating your design from XDM
 | Small Shell -  F1.S.1.0	                                        |                                   XDMA Shell  F1.X.1.4
 |-----------------------------------------------------------|------------------------------------------------------------------------------------|
 |Customers implement DMA in CL (if required) or can also use [SDE](../cl/examples/cl_sde/README.md) or peek and poke to achieve data transfer between host and FPGA                         | DMA is part of the shell                                                         |
-|Supports only vivado 2020.2	                              | Supports a variety of tool versions as mentioned in [README](../../README.md) page of aws-fpga repo |
+|Supports only vivado 2024.1 and 2020.2	                  | Supports a variety of tool versions as mentioned in [README](../../README.md) page of aws-fpga repo |
 |Occupies 14 Clock Regions	                              | Occupies 20 Clock Regions                                              |
 |Supports 64 Outstanding Transactions on PCIM Reads, resulting in 5-20% improvement in FPGA<->Host performance |	Supports only 16 Outstanding Transactions on PCIM Reads |
 |Supports 32 outstanding transactions on PCIM writes        | Supports 8 outstanding transactions on PCIM writes |
