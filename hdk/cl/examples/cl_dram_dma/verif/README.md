@@ -21,7 +21,6 @@ The system verilog simulation tests can be run from the [verif/scripts](scripts)
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 QUESTA=1
 
     //Backdoor loading test list. Description can be found in the sections below.
-    test_dram_dma_dram_bdr_wr
     test_dram_dma_dram_bdr_walking_ones
     test_dram_dma_dram_bdr_row_col_combo
     test_ddr_peek_bdr_walking_ones
@@ -118,9 +117,6 @@ The tests below use backdoor loading to populate DDR memory. The description of 
 
 ## test_ddr_peek_bdr_walking_ones
 DDR test which uses backdoor loading to populate DDR memory. The test writes data(walking ones) for different addresses. The test backdoor loads DDR memory and reads through frontdoor and checks that the data matches.
-
-## test_dram_dma_dram_bdr_wr
-DMA test backdoor loads one address in DRAM memory and reads through frontdoor.
 
 ## test_dram_dma_dram_bdr_row_col_combo
 DMA test which covers all row column combinations in each memory model.

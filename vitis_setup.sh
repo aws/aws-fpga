@@ -171,9 +171,9 @@ setup_patches
 
 # Update Xilinx Vitis Examples from GitHub
 info_msg "Using Vitis $RELEASE_VER"
-if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.* ||  $RELEASE_VER =~ .*2021\.* ]]; then
+if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.* || $RELEASE_VER =~ .*2021\.* || $RELEASE_VER =~ .*2024\.1* ]]; then
     info_msg "Updating Xilinx Vitis Examples $RELEASE_VER"
-    git submodule update --init -- Vitis/examples/xilinx_$RELEASE_VER
+    git submodule update --init --remote -- Vitis/examples/xilinx_$RELEASE_VER
     export VIVADO_TOOL_VER=$RELEASE_VER
     if [ -e $VITIS_DIR/examples/xilinx ]; then
         if [ ! -L $VITIS_DIR/examples/xilinx ]; then
@@ -183,7 +183,7 @@ if [[ $RELEASE_VER =~ .*2019\.2.*  ||  $RELEASE_VER =~ .*2020\.* ||  $RELEASE_VE
     fi
     ln -sf $VITIS_DIR/examples/xilinx_$RELEASE_VER $VITIS_DIR/examples/xilinx
 else
-   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2, 2021.1 or 2021.2 are supported).\n"
+   echo " $RELEASE_VER is not supported (2019.2, 2020.1, 2020.2, 2021.1 2021.2 or 2024.1 are supported).\n"
    return 2
 fi
 
@@ -224,17 +224,31 @@ function setup_xsa {
     XSA_S3_BASE_DIR=$2
     PLATFORM_ENV_VAR_NAME=$3
 
-    xsa_dir=$VITIS_DIR/aws_platform/$XSA/hw/
-    vitis_xsa=$xsa_dir/$XSA.xsa
+    xsa_dir=$VITIS_DIR/aws_platform/$XSA/
+    xsa_hw_dir=$xsa_dir/hw/
+    xsa_sw_dir=$xsa_dir/sw/
+    xpfm_dir=$VITIS_DIR/aws_platform/$XSA/
+
     vitis_xsa_s3_bucket=aws-fpga-hdk-resources
-    s3_vitis_xsa=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/$XSA.xsa
+
+    vitis_xsa=$xsa_hw_dir/$XSA.xsa
+    vitis_spfm=$xsa_sw_dir/$XSA.spfm
+    vitis_xpfm=$xpfm_dir/$XSA.xpfm
+
+    s3_vitis_xsa=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/hw/$XSA.xsa
+    s3_vitis_spfm=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/sw/$XSA.spfm
+    s3_vitis_xpfm=$vitis_xsa_s3_bucket/Vitis/$XSA_S3_BASE_DIR/$XSA/$XSA.xpfm
 
     # set a variable to point to the platform for build and emulation runs
     export "$PLATFORM_ENV_VAR_NAME"=$VITIS_DIR/aws_platform/$XSA/$XSA.xpfm
 
     # Download the sha256
-    if [ ! -e $xsa_dir ]; then
-        mkdir -p $xsa_dir || { err_msg "Failed to create $xsa_dir"; return 2; }
+    if [ ! -e $xsa_hw_dir ]; then
+        mkdir -p $xsa_hw_dir || { err_msg "Failed to create $xsa_hw_dir"; return 2; }
+    fi
+
+    if [ ! -e $xsa_sw_dir ]; then
+        mkdir -p $xsa_sw_dir || { err_msg "Failed to create $xsa_sw_dir"; return 2; }
     fi
 
     # Use curl instead of AWS CLI so that credentials aren't required.
@@ -264,6 +278,19 @@ function setup_xsa {
         # Use curl instead of AWS CLI so that credentials aren't required.
         curl -s https://s3.amazonaws.com/$s3_vitis_xsa -o $vitis_xsa || { err_msg "VITIS XSA download failed"; return 2; }
     fi
+
+    if [ ! -e $vitis_xpfm ]; then
+        info_msg "Downloading latest Vitis XPFM from $s3_vitis_xpfm"
+        # Use curl instead of AWS CLI so that credentials aren't required.
+        curl -s https://s3.amazonaws.com/$s3_vitis_xpfm -o $vitis_xpfm || { err_msg "VITIS XPFM download failed"; return 2; }
+    fi
+
+    if [ ! -e $vitis_spfm ]; then
+        info_msg "Downloading latest Vitis XPFM from $s3_vitis_spfm"
+        # Use curl instead of AWS CLI so that credentials aren't required.
+        curl -s https://s3.amazonaws.com/$s3_vitis_spfm -o $vitis_spfm || { err_msg "VITIS SPFM download failed"; return 2; }
+    fi
+
     # Check sha256
     act_sha256=$( sha256sum $vitis_xsa | awk '{ print $1 }' )
     if [[ $act_sha256 != $exp_sha256 ]]; then
@@ -276,16 +303,16 @@ function setup_xsa {
 }
 
     #-------------------201920_3 Vitis Platform----------------------
-    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_3 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_3
-    info_msg "AWS Platform: 201920_3 Vitis Platform is up-to-date"
+    setup_xsa xilinx_aws-vu9p-f1_shell-v04261818_201920_4 xsa_v121319_shell_v04261818 AWS_PLATFORM_201920_4
+    info_msg "AWS Platform: 201920_4 Vitis Platform is up-to-date"
     #-------------------201920_3 Vitis Platform----------------------
 
 
 # Setup XRT as we need it for building
 setup_runtime
 
-export AWS_PLATFORM=$AWS_PLATFORM_201920_3
-info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_3\" "
+export AWS_PLATFORM=$AWS_PLATFORM_201920_4
+info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=\$AWS_PLATFORM_201920_4\" "
 
 info_msg "Vitis Setup PASSED"
 

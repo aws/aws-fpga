@@ -1,11 +1,12 @@
 # Xilinx Runtime (XRT) and Vitis Tool versions
 
-* Xilinx Runtime versions match with the tool that you created your Vitis AFI with. 
-* We provide pre-built RPM's for Centos/RHEL/AL2 and instructions for building XRT 
+* Xilinx Runtime versions match with the tool that you created your Vitis AFI with.
+* We provide pre-built RPM's for Centos/RHEL/AL2 and instructions for building XRT
 * Use the below table as reference to install and use the correct XRT version for your applications.
 
 | Xilinx Vitis Tool Version | XRT Release Tag | SHA | `xrt` or `xrt-aws` RPM's (Centos/RHEL) |`xrt` or`xrt-aws` RPM's (AL2) |
 |---|---|---|---|---|
+|2024.1| [202410.2.17.319](https://github.com/Xilinx/XRT/releases/tag/202410.2.17.319) | a75e9843c875bac0f52d34a1763e39e16fb3c9a7 | N/A | N/A |
 |2021.2| [202120.2.12.427](https://github.com/Xilinx/XRT/releases/tag/202120.2.12.427) | 2719b6027e185000fc49783171631db03fc0ef79 | [xrt_202120.2.12.0_7.9.2009-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.12.0/Patches/XRT_2021_2/xrt_202120.2.12.0_7.9.2009-x86_64-aws.rpm) [xrt_202120.2.12.0_7.9.2009-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.12.0/Patches/XRT_2021_2/xrt_202120.2.12.0_7.9.2009-x86_64-xrt.rpm) | [xrt_202210.2.13.0_2-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.12.0/Patches/XRT_2021_2/xrt_202210.2.13.0_2-x86_64-aws.rpm) [xrt_202210.2.13.0_2-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.12.0/Patches/XRT_2021_2/xrt_202210.2.13.0_2-x86_64-xrt.rpm)|
 |2021.1| [202110.2.11.634](https://github.com/Xilinx/XRT/releases/tag/202110.2.11.634) | 5ad5998d67080f00bca5bf15b3838cf35e0a7b26 | [xrt_202110.2.11.0_7.9.2009-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.11.0/Patches/XRT_2021_1/xrt_202110.2.11.0_7.9.2009-x86_64-xrt.rpm) [xrt_202110.2.11.0_7.9.2009-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.11.0/Patches/XRT_2021_1/xrt_202110.2.11.0_7.9.2009-x86_64-aws.rpm) | [xrt_202110.2.11.0_2-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.11.0/Patches/XRT_2021_1/xrt_202110.2.11.0_2-x86_64-xrt.rpm) [xrt_202110.2.11.0_2-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.11.0/Patches/XRT_2021_1/xrt_202110.2.11.0_2-x86_64-aws.rpm)|
 |2020.2| [202020.2.8.743](https://github.com/Xilinx/XRT/releases/tag/202020.2.8.743) | 77d5484b5c4daa691a7f78235053fb036829b1e9 | [xrt_202020.2.8.0_7.9.2009-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.10.0/Patches/XRT_2020_2/xrt_202020.2.8.0_7.9.2009-x86_64-xrt.rpm) [xrt_202020.2.8.0_7.9.2009-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.10.0/Patches/XRT_2020_2/xrt_202020.2.8.0_7.9.2009-x86_64-aws.rpm) | [xrt_202020.2.8.0_2-x86_64-xrt.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.10.0/Patches/XRT_2020_2/xrt_202020.2.8.0_2-x86_64-xrt.rpm) [xrt_202020.2.8.0_2-x86_64-aws.rpm](https://aws-fpga-developer-ami.s3.amazonaws.com/1.10.0/Patches/XRT_2020_2/xrt_202020.2.8.0_2-x86_64-aws.rpm)|
@@ -29,7 +30,7 @@ Therefore, to be able to run your host application again after clearing a slot m
             ```sudo systemctl restart mpd```
 
 **Note that MPD service starts asynchronously, so you might have to wait till all the slots are loaded with the Default AFI before your application can run.**
- 
+
 ## Custom Runtime AMI usecase
 On your custom Runtime AMI, MPD will be enabled by default once you install Xilinx XRT.
 On startup, MPD will check if the instance has FPGA's and will load the Default AFI's.
@@ -41,34 +42,10 @@ Therefore, to be able to run your host application again after clearing a slot m
 ## Default AFI details
 The Default AFI loaded is a regular `Hello World` AFI that provides the Device ID 0xF010.
 
-# Centos/RHEL build and install steps
+# Ubuntu build and install steps
 
 ```bash
-XRT_RELEASE_TAG=2019.2.0.3 # Substitute XRT_RELEASE_TAG=<TAG from above table>
-
-git clone https://github.com/aws/aws-fpga.git
-
-cd aws-fpga
-source vitis_setup.sh
-cd $VITIS_DIR/Runtime
-export XRT_PATH="${VITIS_DIR}/Runtime/${XRT_RELEASE_TAG}"
-git clone http://www.github.com/Xilinx/XRT.git -b ${XRT_RELEASE_TAG} ${XRT_PATH}
-
-cd ${XRT_PATH}
-sudo ./src/runtime_src/tools/scripts/xrtdeps.sh
-
-cd build
-scl enable devtoolset-6 bash
-./build.sh
-
-cd Release
-sudo yum reinstall xrt_*.rpm -y
-```
-
-# AL2 build and install steps
-
-```bash
-XRT_RELEASE_TAG=202010.2.6.AWS # Substitute XRT_RELEASE_TAG=<TAG from above table>
+XRT_RELEASE_TAG=202410.2.17.319 # Substitute XRT_RELEASE_TAG=<TAG from above table>
 
 git clone https://github.com/aws/aws-fpga.git
 
@@ -85,17 +62,9 @@ cd build
 ./build.sh
 
 cd Release
-sudo yum reinstall xrt_*.rpm -y
+sudo apt reinstall ./xrt_*.rpm -y
 ```
 
-# Centos/RHEL/AL2 pre-built RPM install steps
-
-
-```bash
-curl -s <xrt rpm link from above table> -o xrt.rpm
-curl -s <xrt-aws rpm link from above table> -o xrt-aws.rpm
-sudo yum reinstall xrt*.rpm -y
-```
 
 # FAQ
 
@@ -137,7 +106,7 @@ Build Date:   2020-01-30 02:56:41
 XOCL:         2.3.0,42da4cceb02e0386e0daeaea230bdc86ea40d19a
 XCLMGMT:      unknown
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- [0] 0000:00:1d.0 xilinx_aws-vu9p-f1_dynamic_5_0(ts=0xabcd) user(inst=128) 
+ [0] 0000:00:1d.0 xilinx_aws-vu9p-f1_dynamic_5_0(ts=0xabcd) user(inst=128)
 ```
 
 An unusable device will show up like this:
