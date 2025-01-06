@@ -75,7 +75,6 @@ else
   endif
 endif
 endif
-endif
 
 COMMON_LIBLISTS =\
    unisims_ver\

@@ -62,7 +62,7 @@ cd build
 ./build.sh
 
 cd Release
-sudo apt reinstall ./xrt_*.rpm -y
+sudo apt install ./xrt_*.deb
 ```
 
 
