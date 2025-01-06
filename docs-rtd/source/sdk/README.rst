@@ -4,14 +4,14 @@ AWS EC2 FPGA Software Development Kit
 This directory includes the drivers and runtime environment required by
 any EC2 FPGA Instance.
 
-The `SDK userspace directory <./userspace>`__ contains the `Amazon FPGA
-Image (AFI) Management Tools <./userspace/fpga_mgmt_tools/README.md>`__,
+The `SDK userspace directory <https://github.com/aws/aws-fpga/tree/f2/sdk/userspace>`__ contains the `Amazon FPGA
+Image (AFI) Management Tools <./userspace/fpga_mgmt_tools/README.html>`__,
 which includes both the source code to the AFI Management Tools as well
 as detailed descriptions of the commands to use on an FPGA instance.
 
 The SDK is **NOT** used to build or register AFI, rather it is only used
 for managing and deploying pre-built AFIs. For building and registering
-AFIs, please refer to the `HDK <../hdk/README.md>`__.
+AFIs, please refer to the `HDK <../hdk/README.html>`__.
 
 **NOTE:** This SDK is designed and tested for Linux environments only.
 
@@ -35,7 +35,7 @@ the above HDK setup.
        source sdk_setup.sh
 
 **NOTE:** The ``sdk_setup.sh`` would install the `FPGA management
-tools <./userspace/fpga_mgmt_tools/README.md>`__ if they are not already
+tools <./userspace/fpga_mgmt_tools/README.html>`__ if they are not already
 available in ``/usr/bin``. The ``sdk_setup.sh`` requires having ``gcc``
 installed. if it is not installed, try running the next command to
 install it on Amazon Linux, Centos or Redhat distributions:

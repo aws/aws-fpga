@@ -1,7 +1,7 @@
 .. _supported-ddr-configurations-in-sh_ddrsv:
 
-Supported DDR configurations in `sh_ddr.sv <./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
-=====================================================================================================
+Supported DDR configurations in `sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
+============================================================================================================================================
 
 Table of Contents
 -----------------
@@ -21,7 +21,7 @@ Overview
 --------
 
 The
-`sh_ddr.sv <./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
+`sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
 now supports following configurations for DDR Controller IPs:
 
 - DDR Core for 64 GB DIMM.
@@ -41,7 +41,7 @@ now supports following configurations for DDR Controller IPs:
 Required RTL Modifications
 --------------------------
 
-`sh_ddr.sv <./../common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
+`sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
 defaults to using 64 GB DDR core along with 64 GB DIMM model, and
 without user-controlled Auto-Precharge mode. Users are allowed to define
 one of the following macros in the top level of CL where ``sh_ddr.sv``
@@ -53,7 +53,7 @@ controller inside ``sh_ddr.sv``. Supported macros are shown below:
   with user-controlled Auto Precharge
 
 For example, please refer to
-`cl_mem_perf <./../cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
+`cl_mem_perf <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
 which has :literal:`\`define USE_AP_64GB_DDR_DIMM` macro to override
 sh_ddr.sv to use 64GB DDR core with user controlled Auto-Precharge mode.
 
@@ -81,7 +81,7 @@ Required Build Script Modifications
 -----------------------------------
 
 AWS provides following DDR Core IPs as part of Vivado
-`cl_ip.xpr <./../common/ip/cl_ip/cl_ip.xpr>`__ project. Users are
+`cl_ip.xpr <https://github.com/aws/aws-fpga/tree/f2/hdk/common/ip/cl_ip/cl_ip.xpr>`__ project. Users are
 required to enlist one of the following XCI files in the synthesis
 scripts, depending on the desired DDR configuration and macros defined:
 
@@ -103,7 +103,7 @@ Alternately, users may choose to enlist all four DDR XCI files in their
 synthesis script. The Vivado tool automatically elaborates the correct
 DDR core based on the macro defined in top level CL file. For example,
 `CL_MEM_PERF synthesis
-script <./../cl/examples/cl_mem_perf/build/scripts/synth_cl_mem_perf.tcl>`__
+script <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/build/scripts/synth_cl_mem_perf.tcl>`__
 reads in all four XCI files but elaborates the desired DDR core at the
 time of synthesis based on macro defined in
-`cl_mem_perf.sv <./../cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
+`cl_mem_perf.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__

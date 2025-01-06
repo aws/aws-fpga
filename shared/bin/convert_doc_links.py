@@ -29,6 +29,28 @@ from termcolor import colored
 from time import sleep
 from typing import Dict, List, Match
 
+
+def replace_old_links(files_links_dict: Dict[str, List[List[str]]]) -> None:
+    for rst_f, list_of_links in files_links_dict.items():
+        with open(rst_f, "r") as f:
+            rst = f.read()
+        for link in list_of_links:
+            new_link_worked = link[3] == "0"
+            if not new_link_worked:
+                continue
+            link_text = link[0]
+            new_link_body = link[1]
+            old_link_body = link[2]
+            
+            old_link = f"`{link_text} <{old_link_body}>`__"
+            new_link = f"`{link_text} <{new_link_body}>`__"
+            print(f"Replacing:\n\t{old_link}\n\twith\n\t{new_link}\n")
+            rst = rst.replace(old_link, new_link)
+        with open(rst_f, "w") as f:
+            f.write(rst)
+
+    pass
+
 def get_repo_root_dir() -> str:
     repo_root_dir = subprocess.run("git rev-parse --show-toplevel".split(), capture_output=True, cwd=os.path.dirname(__file__), check=True).stdout.decode("utf-8").strip()
     return repo_root_dir
@@ -40,23 +62,6 @@ def get_link_to_self_html(rst_f: str) -> str:
     rst_to_html = rst_to_html.replace("docs-rtd/source/", "")
     rst_to_html = rst_to_html.replace(f"{repo_root_dir}", ".")
     return rst_to_html
-
-
-def construct_relative_link(rst_f: str, link_body: str) -> str:
-    # Start by going to the location of the file that contains the relative link
-    os.chdir(os.path.dirname(rst_f))
-    
-    # Follow the relative link
-    back_pos = link_body.find("../")
-    while back_pos != -1:
-        os.chdir("..")
-        link_body = link_body[:back_pos] + link_body[back_pos + 3:]
-        back_pos = link_body.find("../")
-    start = os.getcwd().replace(get_repo_root_dir(), "").replace("/docs-rtd/source/", "")
-    start = f"{start}/{link_body.replace('../', '').replace('./', '')}"# should grab 
-    if start[-1] == "/":
-        start = start[:-1]
-    return start
 
 
 def perform_request(link_body: str, rst_f: str, preamble: str) -> int:
@@ -74,26 +79,19 @@ def perform_request(link_body: str, rst_f: str, preamble: str) -> int:
         elif is_internal_section_link:
             link_to_self = get_link_to_self_html(rst_f)
             internal_link = f"{link_to_self}{link_body}"
-            response = requests.head(f"{default_request}/{internal_link}", timeout=1)
-        elif "html" in link_body:
-            response = requests.head(f"{default_request}/{link_body}")
-            if response.status_code != 200:
-                relative_link = construct_relative_link(rst_f, link_body)
-                response = requests.head(f"{default_request}/{relative_link}")
-                if response.status_code != 200:
-                    requests.RequestException(response)
+            response = requests.head(f"{default_request}/{internal_link}")
         else:
             file_or_directory_link = f"{default_request}/{link_body}"
-            response = requests.head(file_or_directory_link, timeout=1)
+            response = requests.head(file_or_directory_link)
 
         return_code = response.status_code
         if return_code != 200:
             raise requests.RequestException(response)
-        print(preamble + ": " + colored(f" OK, {return_code}", "green"))
+        print(preamble + colored(f" OK, {return_code}", "green"))
         return 0
     except requests.RequestException as re:
         return_code = 404
-        print(preamble + ": " + colored(f"ERROR, {return_code}", "red"))
+        print(preamble + colored(f"ERROR, {return_code}", "red"))
         return 1
 
 
@@ -105,6 +103,7 @@ def navigate_to_rtd_build_html_dir() -> None:
 
 def check_links(files_links_dict: Dict[str, List[List[str]]]) -> None:
     navigate_to_rtd_build_html_dir()
+    print(os.getcwd())
     link_server = subprocess.Popen(
         [sys.executable, "-m", "http.server", "3000"],
         stdout=subprocess.PIPE,
@@ -125,8 +124,10 @@ def check_links(files_links_dict: Dict[str, List[List[str]]]) -> None:
                 ])
                 if skip_link:
                     continue
-                preamble = f"\t{link_text}, {link_body}"
-                total_links_in_error += perform_request(link_body, rst_f, preamble)
+                preamble = f"\t{link_text}, {link_body}: "
+                result = perform_request(link_body, rst_f, preamble)
+                link.append(str(result))
+                total_links_in_error += result
             print()
     finally:
         link_server.send_signal(signal.SIGTERM)
@@ -140,6 +141,14 @@ def get_link_text_and_link(link_match: Match[str]) -> List[str]:
     link_body = "".join([word if word != "|" else "" for word in link_match.group(2).split()])
     link_text_link_body = [link_text, link_body]
     return link_text_link_body
+
+
+def is_at_ancestor_dir(ancestor_dir_path: str) -> bool:
+    return any([
+        ancestor_dir_path.split("/")[-1] == "hdk",
+        ancestor_dir_path.split("/")[-1] == "sdk",
+        ancestor_dir_path.split("/")[-1] == "vitis",
+    ])
 
 
 def process_file(rst_f: str, files_links_dict: Dict[str, List[List[str]]]) -> None:
@@ -162,9 +171,41 @@ def process_file(rst_f: str, files_links_dict: Dict[str, List[List[str]]]) -> No
         file_contents = f.read()
 
     for link_match in compiled_link_pattern.finditer(file_contents):
-        files_links_dict[rst_f].append(
-            get_link_text_and_link(link_match)
-        )
+        link_info = get_link_text_and_link(link_match)
+        the_link = link_info[1]
+        the_text = link_info[0]
+        
+        # We only want to re-work relative links to non-HTML files
+        is_relative_link = ".." in the_link or "./" in the_link
+        is_not_section_link = "#" not in the_link
+        is_not_html_link = ".html" not in the_link
+        is_not_md_link = ".md" not in the_link
+        is_link_we_want_to_replace = all([
+            is_relative_link,
+            is_not_section_link,
+            is_not_html_link,
+            is_not_md_link
+        ])
+        if is_link_we_want_to_replace:
+            # Replace relative components
+            the_link = the_link.replace("../", "")
+            the_link = the_link.replace("./", "")
+            
+            # Locate all files of the same name
+            os.chdir(get_repo_root_dir())
+            found_file_paths = glob.glob(os.getcwd() + f"/**/*{the_link.split('/')[-1]}", recursive=True)
+            
+            # Home in on the actual file we're trying to find
+            found_file_path = ""
+            for p in found_file_paths:
+                if the_link in p:
+                    found_file_path = p
+                    break
+            
+            the_link = found_file_path.replace(f"{get_repo_root_dir()}/", "")
+            the_link = f"https://github.com/aws/aws-fpga/tree/f2/{the_link}"
+            
+            files_links_dict[rst_f].append([the_text, the_link, link_info[1]])
 
 
 def get_links_from_files(rst_files: List[str]) -> Dict[str, List[List[str]]]:
@@ -191,6 +232,7 @@ def main():
     rst_files = gather_file_names()
     files_links_dict = get_links_from_files(rst_files)
     check_links(files_links_dict)
+    replace_old_links(files_links_dict)
 
 if __name__ == "__main__":
     main()

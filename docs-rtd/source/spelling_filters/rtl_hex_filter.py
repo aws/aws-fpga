@@ -1,4 +1,3 @@
-import enchant
 import re
 from enchant.tokenize import Filter
 

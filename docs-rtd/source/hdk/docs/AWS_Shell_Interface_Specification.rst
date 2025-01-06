@@ -93,7 +93,7 @@ available on EC2 F2. Each update of the Shell is tagged with a revision
 number. Note while AWS tries to keep the revision constant, sometimes it
 is necessary to update the revision due to discovered issues or added
 functionality. The HDK release includes the latest Shell version under
-`shell_stable <./../common/shell_stable/>`__
+`shell_stable <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/shell_version.txt>`__
 
 The Shell is reconfigurable, allowing developers to select which Shell
 version to create the AFI with. However, an AFI is tied to the specific
@@ -123,7 +123,7 @@ Shell Interfaces
 
 The following diagram and table summarize the various interfaces between
 the Shell and CL as defined in
-`cl_ports.vh <../common/shell_stable/design/interfaces/cl_ports.vh>`__.
+`cl_ports.vh <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/interfaces/cl_ports.vh>`__.
 
 |F2_Shell_interface|
 
@@ -258,7 +258,7 @@ DDR4 DRAM
 FPGA card provides one DDR DIMM that can be interfaced with the CL
 design. AWS offers the DDR Controller IP readily configured to suit the
 DDR DIMM's configuration in the
-`sh_ddr.sv <../common/shell_stable/design/sh_ddr/synth/sh_ddr.sv>`__
+`sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/synth/sh_ddr.sv>`__
 file which should be instantiated in the CL. The ``sh_ddr_stat_bus*``
 ports in ``sh_ddr.sv`` should be connected to the respective
 ``sh_cl_ddr_stat*`` ports in the ``cl_ports.vh`` along with the DDR I/O
@@ -346,7 +346,8 @@ constant values should be used:
 .. list-table::
   :header-rows: 1
   :class: user-guide-dev-envs-table
-  :widths: 20 60
+  :widths: 20 40
+  
   * - Signal
     - Value
   * - AxBURST[1:0]
@@ -373,7 +374,7 @@ from shell-to-CL. Customers can use these clocks in their designs
 directly or instantiate MMCMs to generate clock frequencies of interest
 for their designs. All the interfaces between the CL and SH, as listed
 in
-`cl_ports.vh <../common/shell_stable/design/interfaces/cl_ports.vh>`__
+`cl_ports.vh <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/interfaces/cl_ports.vh>`__
 are synchronous to ``clk_main_a0``. The CL design must perform the
 required clock domain crossing when interfacing logic in another clock
 domain with Shell-CL interface ports.
@@ -386,9 +387,9 @@ clocks from the Shell. However, AWS offers
 clocks, resets and clock recipes similar to F1. The AWS_CLK_GEN IP can
 be optionally instantiated in the CL for an easier migration of designs
 from F1 involving multiple clocks.
-`CL_MEM_PERF <./../cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
+`CL_MEM_PERF <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
 demonstrates integration of `AWS_CLK_GEN
-IP <../common/lib/aws_clk_gen.sv>`__ into CL design.
+IP <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ into CL design.
 
 Please refer to the
 `Clock Recipes User Guide <./Clock_Recipes_User_Guide.html>`__ for
@@ -593,7 +594,7 @@ Please refer to `PCI Address Map <./AWS_Fpga_Pcie_Memory_Map.html>`__ for
 a more detailed view of the address map.
 
 CL AXI Completer Error Reporting
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Each AXI (AXI-4/AXI-L) transaction is terminated with a response
 (BRESP/RRESP). The AXI responses may signal an error such as Completer
@@ -605,7 +606,7 @@ through the Management PF and can be retrieved by the AFI Management
 Tools metric reporting APIs.
 
 Accessing Aligned/Unaligned Addresses from PCIe
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Shell (Requester) supports DW aligned and unaligned transfers from PCIe (address
 is aligned/unaligned to DW-4byte boundary)
@@ -613,35 +614,43 @@ is aligned/unaligned to DW-4byte boundary)
 Following are a few examples of how aligned and unaligned access from
 PCIe to CL on PCIS interface work:
 
-1. Writing 8 bytes to DW aligned address through PCIe on AXI4
-   Interface (PCIS 512-bit interface):
+Writing 8 bytes to DW aligned address through PCIe on AXI4 Interface (PCIS 512-bit interface):
 
-   If the transaction on the PCIe is as follows:
-     - Addr : 0x0000002000000000
-     - dw_cnt : 2
-     - first_be : 4’b1111
-     - last_be : 4’b1111
+If the transaction on the PCIe is as follows:
 
-   Then the transaction on the AXI4 interface will have the following
-   AXI attributes:
-    - awaddr = 64’h0000_0000_0000_0000
-    - awlen = 0
-    - wstrb = 64’h0000_0000_0000_00ff
+.. code-block:: Verilog
 
-2. Writing 8 bytes to DW unaligned address on AXI4 Interface(PCIS
-   512-bit interface):
+  Addr : 0x0000002000000000
+  dw_cnt : 2
+  first_be : 4'b1111
+  last_be : 4'b1111
 
-   If the transaction on the PCIe is as follows:
-     - Addr : 0x0000002000000001
-     - dw_cnt : 3
-     - first_be : 4’b1110
-     - last_be : 4’b0001
+Then the transaction on the AXI4 interface will have the following AXI attributes:
 
-   Then the transaction on the AXI4 interface will have the following
-   AXI attributes:
-     - awaddr = 64’h0000_0000_0000_0001
-     - awlen = 0
-     - wstrb = 64’h0000_0000_0000_01fe
+.. code-block:: Verilog
+
+  awaddr = 64'h0000_0000_0000_0000
+  awlen = 0
+  wstrb = 64'h0000_0000_0000_00ff
+
+Writing 8 bytes to DW unaligned address on AXI4 Interface(PCIS 512-bit interface):
+
+If the transaction on the PCIe is as follows:
+
+.. code-block:: Verilog
+
+  Addr : 0x0000002000000001
+  dw_cnt : 3
+  first_be : 4'b1110
+  last_be : 4'b0001
+
+Then the transaction on the AXI4 interface will have the following AXI attributes:
+
+.. code-block:: Verilog
+
+  awaddr = 64'h0000_0000_0000_0001
+  awlen = 0
+  wstrb = 64'h0000_0000_0000_01fe
 
 The addresses for the Read transactions will work similar to writes.
 
@@ -758,7 +767,7 @@ to HBM:
     true
 
   **NOTE:** This step can be skipped if the customer uses the
-  ``CL_HBM`` IP from the `CL examples <./../../hdk/common/ip/cl_ip/>`__.
+  ``CL_HBM`` IP from the `CL examples <https://github.com/aws/aws-fpga/tree/f2/hdk/common/ip/cl_ip/cl_ip.runs>`__.
   This IP has the ``MON_APB`` interface enabled and is ready to be
   integrated to a customer design as-is.
 
@@ -924,7 +933,7 @@ For the interfaces that are in both the MID/BOTTOM the recommendation is
 to use flops for pipelining, but don’t constrain to an SLR. You can
 constrain logic to a particular SLR by creating PBLOCKs (one per SLR),
 and assigning logic to the PBLOCKs (refer to cl_dram_hbm_dma example
-`small_shell_cl_pnr_user.xdc <../cl/examples/cl_dram_hbm_dma/build/constraints/small_shell_cl_pnr_user.xdc>`__).
+`small_shell_cl_pnr_user.xdc <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/build/constraints/small_shell_cl_pnr_user.xdc>`__).
 Dataflow should be mapped so that SLR crossing is minimized (for example
 a pipeline should be organized such that successive stages are mostly in
 the same SLR).

@@ -3,17 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to F2's documentation!
-==============================
+Welcome to AWS EC2 F2's documentation!
+======================================
 
 Contents:
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
 
-   ERRATA
-   README
-   RELEASE_NOTES
    User_Guide_AWS_EC2_FPGA_Development_Kit.rst
 
    developer_resources/DCV
@@ -45,6 +42,9 @@ Contents:
    sdk/userspace/fpga_mgmt_tools/README
 
    vitis/README
+
+   ERRATA
+   RELEASE_NOTES
 
 
 Indices and tables

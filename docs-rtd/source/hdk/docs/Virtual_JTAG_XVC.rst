@@ -178,8 +178,7 @@ target FPGA is ready to be built in Vivado.
 
 |vjtag_2|
 
-4. For hardware server setting, connect to "Local server" and click
-  "Next"
+4. For hardware server setting, connect to "Local server" and click "Next"
 
 |vjtag_3|
 
@@ -213,7 +212,7 @@ Embedded Debug Bridge in CL
 ---------------------------
 
 The `CL_Debug_Bridge
-<./../common/ip/cl_ip/cl_ip.srcs/sources_1/ip/cl_debug_bridge/cl_debug_bridge.xci>`__
+<https://github.com/aws/aws-fpga/tree/f2/hdk/common/ip/cl_ip/cl_ip.srcs/sources_1/ip/cl_debug_bridge/cl_debug_bridge.xci>`__
 IP must be embedded in the CL design to enable the use of debug cores like ILA
 and VIO. According to the `AMD user guide
 <https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging/Debug-Cores-Clocking-Guidelines>`__
@@ -253,7 +252,7 @@ All debug cores within the CL must be connected to the ``CL_Debug_Bridge``.
 These connections can be automatically inserted during the design synthesis
 process. For an example implementation, please refer to the
 `synth_cl_dram_hbm_dma.tcl script
-<./../cl/examples/cl_dram_hbm_dma/build/scripts/synth_cl_dram_hbm_dma.tcl>`__
+<https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/build/scripts/synth_cl_dram_hbm_dma.tcl>`__
 in the cl_dram_hbm_dma example.
 
 .. code:: bash

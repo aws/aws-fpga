@@ -15,7 +15,7 @@ Table of Contents:
 Overview
 --------
 
-The Virtual Ethernet architecture (`here <../README.md>`__) supports
+The Virtual Ethernet architecture (`here <../README.html>`__) supports
 your development phases with sample applications that include loopback
 paths for bringup and debug of the Virtual Ethernet application and
 custom CL, all the way to end-to-end application integration with live
@@ -87,7 +87,7 @@ addition, the packets per second throughput is calculated and updated.
      Tx-pps:      4798711          Tx-bps:   2456940424
      ############################################################################
 
-Please refer to `DPDK testpmd <#testpmd>`__ for a quick reference guide
+Please refer to `Q: Where can I find DPDK testpmd feature documentation?`_ for a quick reference guide
 on the supported testpmd features and the link to the full testpmd
 documentation.
 
@@ -100,7 +100,7 @@ Q: What is the AGFI ID for the SDE loopback CL?
 The AGFI ID for the SDE loopback CL is found in the
 ``CL_SDE Example Metadata`` section at the bottom of the
 ``CL_SDE README``
-`here <../../../../hdk/cl/examples/cl_sde/README.md>`__.
+`here <../../../../hdk/cl/examples/cl_sde/README.html>`__.
 
 Q: Where can I find DPDK testpmd feature documentation?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,7 +142,7 @@ SPP RX packet burst API. If the ENI TX backpressure condition persists,
 the application may stop calling the SPP RX packet burst API. At this
 point, SPP will stop processing RX descriptors, the C2H buffer in the
 SDE will become full (see the SDE HW Guide
-`here <./SDE_HW_Guide.md>`__), and this will backpressure the AXI-Stream
+`here <./SDE_HW_Guide.html>`__), and this will backpressure the AXI-Stream
 interface (e.g. the SDE will de-assert the ‘ready’ signal on the C2H
 AXI-Stream interface). This may then backpressure the SPP TX side, which
 is again under application control. If the SPP TX side backpressure
@@ -224,7 +224,7 @@ Q: How many TX and RX descriptors are supported?
 The number of supported TX and RX descriptors per SPP queue pair is
 parameterized within the SDE block and reported by the SDE to SPP via
 registers within the SDE block (see the SDE H2C and C2H channels
-`here <./SDE_HW_Guide.md>`__). SPP defines a minimum and the maximum
+`here <./SDE_HW_Guide.html>`__). SPP defines a minimum and the maximum
 number of descriptors between 64 and 32K. The number of TX and RX
 descriptors implemented in the SDE and requested by the DPDK application
 in the SPP queue setup phase must be equal, and a power of 2.
@@ -234,7 +234,7 @@ Q: How do I configure SPP to use SDE regular or compact descriptors?
 
 The SDE may be built with regular or compact descriptor types (see the
 C2H_DESC_TYPE and H2C_DESC_TYPE in the Design Parameters section
-`here <./SDE_HW_Guide.md>`__). The SPP PMD also supports regular or
+`here <./SDE_HW_Guide.html>`__). The SPP PMD also supports regular or
 compact descriptor types at compile time via the SPP_USE_COMPACT_DESCS
 define within spp_defs.h. The default descriptor type for the SDE and
 SPP is ``regular`` to support the full 64-bit DMA addressing. If there

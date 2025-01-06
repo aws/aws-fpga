@@ -42,7 +42,7 @@ Image (AFI) management while running on an FPGA-enabled EC2 instance
   - Starts a Virtual JTAG XVC server, to debug tools like Vivado Lab
     Edition Hardware Manager to access debug cores inside the AFI.
     Please refer to `Virtual JTAG
-    userguide <../../../hdk/docs/Virtual_JTAG_XVC.md>`__.
+    userguide <../../../hdk/docs/Virtual_JTAG_XVC.html>`__.
 
 - **``fpga-get-virtual-led``**
 
@@ -404,8 +404,8 @@ FAQ
     the FPGA. If an AFI consumes more than this amount of power, the F2
     system will disable the input clocks to the AFI. For more
     information on preventing, detecting, and recovering from this
-    state, see `AFI power guide (COMING
-    SOON) <../../../hdk/docs/afi_power.md>`__
+    state, see AFI power guide (COMING
+    SOON)
 
 - **Q: How can I reset the AFI?**
 

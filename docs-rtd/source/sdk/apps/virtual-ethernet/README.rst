@@ -17,7 +17,7 @@ In order to get the most from this document, readers may want to
 familiarize themselves with the following:
 
 1. The `F2 customer logic
-   flow <../../../hdk/README.md#build-accelerator-afi-using-hdk-design-flow>`__;
+   flow <../../../hdk/README.html#build-accelerator-afi-using-hdk-design-flow>`__;
    creating and loading AFIs (Amazon FPGA Images)
 2. `DPDK <https://dpdk.org>`__ (Data Plane Development Kit), a framework
    for creating high performance network traffic handling tools in
@@ -92,12 +92,12 @@ debug of the Virtual Ethernet application and custom CL, all the way to
 end-to-end application integration with live traffic.
 
 Please refer to the `Application
-Guide <./doc/Virtual_Ethernet_Application_Guide.md>`__ for details.
+Guide <./doc/Virtual_Ethernet_Application_Guide.html>`__ for details.
 
 Hardware Guide
 ==============
 
 More details about the Streaming Data Engine itself are covered in the
-`Hardware Guide <./doc/SDE_HW_Guide.md>`__.
+`Hardware Guide <./doc/SDE_HW_Guide.html>`__.
 
-.. |alt tag| image:: ./images/Virtual_Ethernet_Arch.jpg
+.. |alt tag| image:: ../../../_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Arch.jpg

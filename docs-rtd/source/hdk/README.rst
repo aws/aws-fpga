@@ -33,11 +33,10 @@ Table of Contents
 
   - `CL Examples <#cl-examples>`__
 
-    - `cl_sde <#cl_sde>`__
-    - `cl_dram_hbm_dma <#cl_dram_hbm_dma>`__
-    - `cl_mem_perf <#cl_mem_perf>`__
-    - `CL_TEMPLATE - Create your own
-      design <#cl_template---create-your-own-design>`__
+    - `cl_sde <#cl-sde>`__
+    - `cl_dram_hbm_dma <#cl-dram-hbm-dma>`__
+    - `cl_mem_perf <#cl-mem-perf>`__
+    - `CL_TEMPLATE - Create Your Own Design <#cl-template-create-your-own-design>`__
 
   - `CL Example Hierarchy <#cl-example-hierarchy>`__
 
@@ -46,10 +45,10 @@ Table of Contents
     - `Software <#software>`__
     - `Build <#build>`__
 
-  - `HDK Common Library <#hdk-common-library>`__
+  - `Common Libraries <#common-libraries>`__
 
-    - `/shell_stable <#shell_stable>`__
-    - `/verif <#verif>`__
+    - `shell_stable/ <#shell-stable>`__
+    - `verif/ <#verif>`__
     - `/ip <#ip>`__
     - `/lib <#lib>`__
 
@@ -93,20 +92,20 @@ Step 2. Clone Developer Kit Repository
 
 .. code:: bash
 
-   git clone https://github.com/aws/aws-fpga.git
+  git clone https://github.com/aws/aws-fpga.git
 
 .. _step-3-setup-environment-for-hdk-design-flow:
 
 Step 3. Setup Environment for HDK Design Flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The `hdk_setup.sh <../hdk_setup.sh>`__ script needs to be sourced for
+The `hdk_setup.sh <https://github.com/aws/aws-fpga/tree/f2/hdk_setup.sh>`__ script needs to be sourced for
 each terminal and takes ~2 minutes to complete when first run.
 
 .. code:: bash
 
-   cd aws-fpga
-   source hdk_setup.sh
+  cd aws-fpga
+  source hdk_setup.sh
 
 After the setup is done successfully, you should see
 ``AWS HDK setup PASSED``. Sourcing ``hdk_setup.sh`` does the following:
@@ -123,16 +122,16 @@ Step 4. Build CL Design Check Point (DCP)
 
 After the HDK design environment is set up, you are ready to build a
 design example. Run the following commands to build CL DCP files in
-Vivado. This tutorial uses the `cl_sde <./cl/examples/cl_sde/>`__
+Vivado. This tutorial uses the `cl_sde <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde>`__
 example. The same steps can be used for any other `CL
-examples <./cl/examples>`__.
+examples <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples>`__.
 
 .. code:: bash
 
-   cd hdk/cl/examples/cl_sde
-   export CL_DIR=$(pwd)
-   cd build/scripts
-   ./aws_build_dcp_from_cl.py -c cl_sde
+  cd hdk/cl/examples/cl_sde
+  export CL_DIR=$(pwd)
+  cd build/scripts
+  ./aws_build_dcp_from_cl.py -c cl_sde
 
 The Shell supplies two base clocks to the CL: a 250MHz ``clk_main_a0`` clock and
 a 100MHz ``clk_hbm_ref`` clock. However, the CL can run at higher frequencies
@@ -147,8 +146,8 @@ Run the command below to build a DCP with desired clock recipes:
 
   ./aws_build_dcp_from_cl.sh -c cl_mem_perf --aws_clk_gen --clock_recipe_a A1 --clock_recipe_b B2 --clock_recipe_c C0 --clock_recipe_hbm H2
 
-**NOTE**: The `cl_sde <./cl/examples/cl_sde/README.html/>`__ example does not contain
-the AWS_CLK_GEN component. This command uses the `cl_mem_perf <./cl/examples/cl_mem_perf/README.html/>`__
+**NOTE**: The `cl_sde <./cl/examples/cl_sde/README.html>`__ example does not contain
+the AWS_CLK_GEN component. This command uses the `cl_mem_perf <./cl/examples/cl_mem_perf/README.html>`__
 example to demonstrate the AWS_CLK_GEN usage.
 
 A few more notes on
@@ -158,9 +157,7 @@ A few more notes on
   Shell.
 - Use ``--cl <CL name>`` option to build a different CL design. This is
   default to ``cl_dram_hbm_dma``.
-- Use ``--aws_clk_gen`` option to annotate the use of `AWS clock
-  generation block <./hdk/docs/AWS_CLK_GEN_spec.md>`__ and `customer
-  clock recipes <./hdk/docs/Clock_Recipes_User_Guide.md>`__.
+- Use ``--aws_clk_gen`` option to annotate the use of the `AWS_CLK_GEN IP <./docs/AWS_CLK_GEN_spec.html>`__ and the `Clock Recipes User Guide <./docs/Clock_Recipes_User_Guide.html>`__.
 - The script also allows developers to pass different Vivado directives
   as shown below:
 
@@ -187,7 +184,7 @@ Step 5. Explore Build Artifacts
 
 While Vivado is running, a build log file
 ``YYYYY_MM_DD-HHMMSS.vivado.log`` will be created in
-``$CL_DIR/build/scripts`` to track the build’s progress. DCP build times
+``$CL_DIR/build/scripts`` to track the build's progress. DCP build times
 will vary based on the design size and complexity. The examples in the
 development kit take between 30 to 90 minutes to build. After the design
 is finished building, the following information will be shown at the
@@ -213,8 +210,8 @@ indicator. Developers need to refer to the DCPs and timing reports for
 detailed timing failures.
 
 ⚠️ The build process will generate a DCP tarball file regardless of the
-design’s timing closure state. However, in case of a DCP with timing
-failures, the design’s functionality is no longer guaranteed. Therefore,
+design's timing closure state. However, in case of a DCP with timing
+failures, the design's functionality is no longer guaranteed. Therefore,
 the AFI created using this DCP should be used for testing purpose ONLY.
 The following warning is shown in this case:
 
@@ -234,32 +231,31 @@ to the bucket. DCP submission requires the following information:
 - Generic description of the logic design (Optional).
 - Destination location of the tarball file object in your S3 bucket.
 - Destination location of an S3 directory where AWS can save the logs
-  for your AFI’s creation.
+  for your AFI's creation.
 
-To upload your tarball file to S3, you can use any of `the tools
-supported by
-S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html>`__.
+To upload your tarball file to S3, you can use any of the
+`tools supported by S3
+<https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html>`__.
 
 For example, you can use the AWS CLI as follows:
 
 Create a bucket and folder for your tarball, then copy to S3.
 
-Currently, ``us-east-1`` and ``eu-west-2`` are available as ``REGION``
-options.
+Currently, ``us-east-1`` and ``eu-west-2`` are available as ``REGION`` options.
 
 .. code:: bash
 
-   export DCP_BUCKET_NAME='<DCP bucket name>'
-   export DCP_FOLDER_NAME='<DCP folder name>'
-   export REGION='us-east-1'
-   export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/to_aws/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
+  export DCP_BUCKET_NAME='<DCP bucket name>'
+  export DCP_FOLDER_NAME='<DCP folder name>'
+  export REGION='us-east-1'
+  export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/to_aws/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
 
-   # Create an S3 bucket (choose a unique bucket name)
-   aws s3 mb s3://${DCP_BUCKET_NAME} --region ${REGION}
-   # Create folder for your tarball files
-   aws s3 mb s3://${DCP_BUCKET_NAME}/${DCP_FOLDER_NAME}/
-   # Upload the file to S3
-   aws s3 cp ${DCP_TARBALL_TO_INGEST} s3://${DCP_BUCKET_NAME}/${DCP_FOLDER_NAME}/
+  # Create an S3 bucket (choose a unique bucket name)
+  aws s3 mb s3://${DCP_BUCKET_NAME} --region ${REGION}
+  # Create folder for your tarball files
+  aws s3 mb s3://${DCP_BUCKET_NAME}/${DCP_FOLDER_NAME}/
+  # Upload the file to S3
+  aws s3 cp ${DCP_TARBALL_TO_INGEST} s3://${DCP_BUCKET_NAME}/${DCP_FOLDER_NAME}/
 
 **NOTE**: The trailing '/' is required after ``${DCP_FOLDER_NAME}``
 
@@ -267,15 +263,15 @@ Create a folder for your log files
 
 .. code:: bash
 
-   export LOGS_BUCKET_NAME='<logs bucket name>'
-   export LOGS_FOLDER_NAME='<logs folder name>'
+  export LOGS_BUCKET_NAME='<logs bucket name>'
+  export LOGS_FOLDER_NAME='<logs folder name>'
 
-   # Create a folder to keep your logs
-   aws s3 mb s3://${LOGS_BUCKET_NAME}/${LOGS_FOLDER_NAME}/ --region ${REGION}
-   # Create a temp file
-   touch LOGS_FILES_GO_HERE.txt
-   # Create the folder on S3
-   aws s3 cp LOGS_FILES_GO_HERE.txt s3://${LOGS_BUCKET_NAME}/${LOGS_FOLDER_NAME}/
+  # Create a folder to keep your logs
+  aws s3 mb s3://${LOGS_BUCKET_NAME}/${LOGS_FOLDER_NAME}/ --region ${REGION}
+  # Create a temp file
+  touch LOGS_FILES_GO_HERE.txt
+  # Create the folder on S3
+  aws s3 cp LOGS_FILES_GO_HERE.txt s3://${LOGS_BUCKET_NAME}/${LOGS_FOLDER_NAME}/
 
 **NOTE**: The trailing '/' is required after ``${LOGS_FOLDER_NAME}``
 
@@ -283,20 +279,20 @@ The output of this command includes two identifiers for your AFI:
 
 .. code:: bash
 
-   export DCP_TARBALL_NAME=$(basename ${DCP_TARBALL_TO_INGEST})
-   export CL_DESIGN_NAME='<cl_design_name>'
-   export CL_DESIGN_DESCRIPTION='Description of ${CL_DESIGN_NAME}'
+  export DCP_TARBALL_NAME=$(basename ${DCP_TARBALL_TO_INGEST})
+  export CL_DESIGN_NAME='<cl_design_name>'
+  export CL_DESIGN_DESCRIPTION='Description of ${CL_DESIGN_NAME}'
 
-   # Call AWS CLI ingestion command
-   aws ec2 create-fpga-image --name ${CL_DESIGN_NAME} --description "${CL_DESIGN_DESCRIPTION}" --input-storage-location Bucket=${DCP_BUCKET_NAME},Key=${DCP_FOLDER_NAME}/${DCP_TARBALL_NAME} --logs-storage-location Bucket=${LOGS_BUCKET_NAME},Key=${LOGS_FOLDER_NAME}/ --region ${REGION}
+  # Call AWS CLI ingestion command
+  aws ec2 create-fpga-image --name ${CL_DESIGN_NAME} --description "${CL_DESIGN_DESCRIPTION}" --input-storage-location Bucket=${DCP_BUCKET_NAME},Key=${DCP_FOLDER_NAME}/${DCP_TARBALL_NAME} --logs-storage-location Bucket=${LOGS_BUCKET_NAME},Key=${LOGS_FOLDER_NAME}/ --region ${REGION}
 
-   {
-       "FpgaImageId": "afi-09953582f46c45b17",
-       "FpgaImageGlobalId": "agfi-0925b211f5a81b071"
-   }
+  {
+      "FpgaImageId": "afi-09953582f46c45b17",
+      "FpgaImageGlobalId": "agfi-0925b211f5a81b071"
+  }
 
 - ``FpgaImageId`` or AFI ID: This is the main ID used to manage
-  developer’s AFI through the AWS EC2 CLI and AWS SDK APIs. This ID is
+  developer's AFI through the AWS EC2 CLI and AWS SDK APIs. This ID is
   regional, i.e., if an AFI is copied across multiple regions, it will
   have a different, unique AFI ID in each region.
 
@@ -308,32 +304,32 @@ The output of this command includes two identifiers for your AFI:
   any extra setup.
 
 The ``describe-fpga-images`` command allows developers to check the
-AFI’s state while the AFI creation process runs in the background. The
+AFI's state while the AFI creation process runs in the background. The
 AFI ID returned by the ``create-fpga-image`` command must be provided.
 The AFI is ready to be deployed once the creation completes and the
 state code returned is ``available``.
 
 .. code:: bash
 
-   aws ec2 describe-fpga-images --fpga-image-ids afi-09953582f46c45b17 --region us-east-1
+  aws ec2 describe-fpga-images --fpga-image-ids afi-09953582f46c45b17 --region us-east-1
 
-       ...
+      ...
 
-       {
-           "FpgaImages": [
-               {
-                   "FpgaImageId": "afi-09953582f46c45b17",
-                   "FpgaImageGlobalId": "agfi-0925b211f5a81b071",
-                   "Name": "cl_sde_0x10212415",
-                   "Description": "Latest devkit build of cl_sde with 0x10212415 small shell release",
-                   ...
-                   "State": {
-                       "Code": "available"
-                   },
-                   ...
-               }
-           ]
-       }
+      {
+          "FpgaImages": [
+              {
+                  "FpgaImageId": "afi-09953582f46c45b17",
+                  "FpgaImageGlobalId": "agfi-0925b211f5a81b071",
+                  "Name": "cl_sde_0x10212415",
+                  "Description": "Latest devkit build of cl_sde with 0x10212415 small shell release",
+                  ...
+                  "State": {
+                      "Code": "available"
+                  },
+                  ...
+              }
+          ]
+      }
 
 .. _step-7-load-accelerator-afi-on-f2-instance:
 
@@ -350,8 +346,8 @@ Now you need to install the FPGA Management tools by sourcing the
 
 .. code:: bash
 
-   cd aws-fpga
-   source sdk_setup.sh
+  cd aws-fpga
+  source sdk_setup.sh
 
 Once the tools are installed, you can load the AFI onto a slot on the F2
 instance. It is a good practice to clear any previously loaded AFI from
@@ -359,9 +355,9 @@ that slot:
 
 .. code:: bash
 
-   $ sudo fpga-clear-local-image  -S 0
-   AFI          0       No AFI                  cleared           1        ok               0       0x10212415
-   AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
+  $ sudo fpga-clear-local-image  -S 0
+  AFI          0       No AFI                  cleared           1        ok               0       0x10212415
+  AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
 
 You can also invoke the ``fpga-describe-local-image`` command to learn
 which AFI, if any, is loaded onto a particular slot. For example, if the
@@ -370,23 +366,23 @@ similar to the following:
 
 .. code:: bash
 
-   $ sudo fpga-describe-local-image -S 0 -H
-   Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-   AFI          0       No AFI                  cleared           1        ok               0       0x10212415
-   Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-   AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
+  $ sudo fpga-describe-local-image -S 0 -H
+  Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+  AFI          0       No AFI                  cleared           1        ok               0       0x10212415
+  Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+  AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
 
 If ``fpga-describe-local-image`` API call returns a status ``busy``, the
 FPGA is still performing the previous operation in the background.
 Please wait until the status is ``cleared`` as above.
 
-Now, let’s load your AFI onto the FPGA on ``slot 0``:
+Now, let's load your AFI onto the FPGA on ``slot 0``:
 
 .. code:: bash
 
-   $ sudo fpga-load-local-image -S 0 -I agfi-0925b211f5a81b071
-   AFI          0       agfi-0925b211f5a81b071  loaded            0        ok               0       0x10212415
-   AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
+  $ sudo fpga-load-local-image -S 0 -I agfi-0925b211f5a81b071
+  AFI          0       agfi-0925b211f5a81b071  loaded            0        ok               0       0x10212415
+  AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
 
 **NOTE**: *The FPGA Management tools use the AGFI ID (not the AFI ID).*
 
@@ -397,10 +393,10 @@ expose the unique AFI Vendor and Device Id.
 
 .. code:: bash
 
-   Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-   AFI          0       agfi-0925b211f5a81b071  loaded            0        ok               0       0x10212415
-   Type  FpgaImageSlot  VendorId    DeviceId    DBDF
-   AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
+  Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
+  AFI          0       agfi-0925b211f5a81b071  loaded            0        ok               0       0x10212415
+  Type  FpgaImageSlot  VendorId    DeviceId    DBDF
+  AFIDEVICE    0       0x1d0f      0x9048      0000:00:1e.0
 
 .. _step-8-validate-your-afi-using-example-runtime-software:
 
@@ -414,53 +410,53 @@ demonstrates runtime software execution using the ``CL_SDE`` example.
 
 .. code:: bash
 
-   # Ensure the $CL_DIR is pointing to the CL_SDE example directory
-   $ cd $CL_DIR/software/runtime/
-   $ make
+  # Ensure the $CL_DIR is pointing to the CL_SDE example directory
+  $ cd $CL_DIR/software/runtime/
+  $ make
 
-   ...
+  ...
 
-   Logical Core 1 (socket 0) forwards packets on 1 streams:
-     RX P=0/Q=0 (socket 0) -> TX P=0/Q=0 (socket 0) peer=02:00:00:00:00:00
+  Logical Core 1 (socket 0) forwards packets on 1 streams:
+    RX P=0/Q=0 (socket 0) -> TX P=0/Q=0 (socket 0) peer=02:00:00:00:00:00
 
-     io packet forwarding packets/burst=32
-     nb forwarding cores=1 - nb forwarding ports=1
-     port 0: RX queue number: 1 Tx queue number: 1
-       Rx offloads=0x0 Tx offloads=0x0
-       RX queue: 0
-         RX desc=0 - RX free threshold=0
-         RX threshold registers: pthresh=0 hthresh=0  wthresh=0
-         RX Offloads=0x0
-       TX queue: 0
-         TX desc=0 - TX free threshold=0
-         TX threshold registers: pthresh=0 hthresh=0  wthresh=0
-         TX offloads=0x0 - TX RS bit threshold=0
-   Press enter to exit
+    io packet forwarding packets/burst=32
+    nb forwarding cores=1 - nb forwarding ports=1
+    port 0: RX queue number: 1 Tx queue number: 1
+      Rx offloads=0x0 Tx offloads=0x0
+      RX queue: 0
+        RX desc=0 - RX free threshold=0
+        RX threshold registers: pthresh=0 hthresh=0  wthresh=0
+        RX Offloads=0x0
+      TX queue: 0
+        TX desc=0 - TX free threshold=0
+        TX threshold registers: pthresh=0 hthresh=0  wthresh=0
+        TX offloads=0x0 - TX RS bit threshold=0
+  Press enter to exit
 
-   Telling cores to stop...
-   Waiting for lcores to finish...
+  Telling cores to stop...
+  Waiting for lcores to finish...
 
-     ---------------------- Forward statistics for port 0  ----------------------
-     RX-packets: 10771136       RX-dropped: 0             RX-total: 10771136
-     TX-packets: 8160479        TX-dropped: 2610689       TX-total: 10771168
-     ----------------------------------------------------------------------------
+    ---------------------- Forward statistics for port 0  ----------------------
+    RX-packets: 10771136       RX-dropped: 0             RX-total: 10771136
+    TX-packets: 8160479        TX-dropped: 2610689       TX-total: 10771168
+    ----------------------------------------------------------------------------
 
-     +++++++++++++++ Accumulated forward statistics for all ports+++++++++++++++
-     RX-packets: 10771136       RX-dropped: 0             RX-total: 10771136
-     TX-packets: 8160479        TX-dropped: 2610689       TX-total: 10771168
-     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++++++ Accumulated forward statistics for all ports+++++++++++++++
+    RX-packets: 10771136       RX-dropped: 0             RX-total: 10771136
+    TX-packets: 8160479        TX-dropped: 2610689       TX-total: 10771168
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-   Done.
+  Done.
 
-   Stopping port 0...
-   Stopping ports...
-   Done
+  Stopping port 0...
+  Stopping ports...
+  Done
 
-   Shutting down port 0...
-   Closing ports...
-   Done
+  Shutting down port 0...
+  Closing ports...
+  Done
 
-   Bye...
+  Bye...
 
 CL Examples
 -----------
@@ -470,17 +466,20 @@ All examples have the following features:
 - Simulation model, tests, and scripts
 - Xilinx Vivado implementation scripts for generating bitstream
 
-`cl_sde <./cl/examples/cl_sde>`__
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cl_sde
+~~~~~~
 
 The cl_sde example implements the Streaming Data Engine (SDE) IP block
-into FPGA custom logic to demonstrate the `Virtual Ethernet
-Application <../sdk/apps/virtual-ethernet/README.md>`__.
+into FPGA custom logic to demonstrate the `Virtual Ethernet Application
+<../sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.html>`__.
 
-See `cl_sde <./cl/examples/cl_sde>`__ for more information
+See `cl_sde <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde>`__
+for more information
 
-`cl_dram_hbm_dma <./cl/examples/cl_dram_hbm_dma>`__
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cl_dram_hbm_dma
+~~~~~~~~~~~~~~~
 
 The cl_dram_hbm_dma example demonstrates the use and connectivity for
 many of the Shell/CL interfaces and functionality. The OCL (AXI-Lite)
@@ -489,11 +488,13 @@ is used for data traffic from the host to DDR and HBM DRAM channels in
 the CL (initiated by the host), and the PCIM (AXI4) interface is used
 for data traffic between the host and the CL (initiated by the CL).
 
-See `cl_dram_hbm_dma <./cl/examples/cl_dram_hbm_dma>`__ for more
-information
+See `cl_dram_hbm_dma
+<https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma>`__
+for more information
 
-`cl_mem_perf <./cl/examples/cl_mem_perf>`__
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cl_mem_perf
+~~~~~~~~~~~
 
 The cl_mem_perf is a reference design for F2 where the objective is to
 demonstrate fine tuned data paths to HBM and DDR to achieve maximum
@@ -501,12 +502,15 @@ throughput to the memories. The example also demonstrates datapath
 connectivity between Host, AWS Shell, Custom Logic (CL) region in the
 FPGA, HBM and DDR DIMM on the FPGA card.
 
-See `cl_mem_perf <./cl/examples/cl_mem_perf>`__ for more information
+See `cl_mem_perf
+<https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf>`__
+for more information
 
-`CL_TEMPLATE <./cl/examples/CL_TEMPLATE>`__ - Create your own design
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-CL_TEMPLATE is targeted to help customers create a new CustomLogic
+CL_TEMPLATE - Create Your Own Design
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CL_TEMPLATE is targeted to help customers create a new CL
 example. Users can update the design, verification, and build flow to
 meet their needs without having to tear down a separate example. We
 recommend going through other CL examples before creating a new CL.
@@ -517,7 +521,7 @@ design files, add new verification tests, and add new build directives
 to meet their needs.
 
 A full guide on creating your own CL design can be found in
-`CL_TEMPLATE <./cl/examples/CL_TEMPLATE>`__
+`CL_TEMPLATE <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE>`__
 
 To create a new CL example:
 
@@ -527,167 +531,177 @@ To create a new CL example:
    cd hdk/cl/examples
    ./create_new_cl.py --new_cl_name ${NEW_CL_NAME}
 
+
 CL Example Hierarchy
 --------------------
 
 The following sections describe common functionality across all CL
-examples. `CL_TEMPLATE <./CL_TEMPLATE>`__ can be used as a reference for
-what features are available in all CL examples; as well as what's
-required to verify, test, and build.
+examples. `CL_TEMPLATE
+<https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE>`__ can be
+used as a reference for what features are available in all CL examples; as well
+as what's required to verify, test, and build.
 
 Design
 ~~~~~~
 
-- All CL examples store the design files under
-  ``/hdk/cl/examples/$CL_DIR/design/``
+- All CL examples store the design files under ``/hdk/cl/examples/$CL_DIR/design/``
 
   - For example:
-    `/hdk/cl/examples/CL_TEMPLATE/design/ <./cl/examples/CL_TEMPLATE/design/>`__
+    `hdk/cl/examples/CL_TEMPLATE/design/
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/design/>`__
 
-- All IP designs available by default are stored in
-  `/hdk/common/ip/cl_ip <./common/ip/>`__
+- All IP designs available by default are stored under ``/hdk/common/ip/cl_ip/``
 
   - More can be added from the Xilinx Vivado IP catalog
 
 Verification
 ~~~~~~~~~~~~
 
-- All CL examples utilize infrastructure found under
-  `/hdk/common/verif/ <./common/verif>`__
-- Simulation libraries are generated under
-  ``/hdk/common/verif/ip_simulation_libraries/``
-- All examples should list out the
-  ``/hdk/cl/examples/$CL_DIR/verif/tests/`` and ``Makefile.tests``
+- All CL examples utilize infrastructure found under ``/hdk/common/verif/``
 
-  - For example
-    `/hdk/cl/examples/CL_TEMPLATE/verif/tests/ <./cl/examples/CL_TEMPLATE/verif/tests/>`__
-  - and ` <./cl/examples/CL_TEMPLATE/verif/scripts/Makefile.tests>`__
+- Simulation libraries are generated under
+  ``hdk/common/verif/ip_simulation_libraries/``
+
+- All examples should list out the
+  ``hdk/cl/examples/$CL_DIR/verif/tests/`` and ``Makefile.tests``
+
+  - For example, `hdk/cl/examples/CL_TEMPLATE/verif/tests/ <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/verif/tests/>`__ and
+  - `hdk/cl/examples/CL_TEMPLATE/verif/scripts/Makefile.tests <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/verif/scripts/Makefile.tests>`__
 
 - All HDK examples support a SH_DDR with 64GB access with an optional
   user controlled auto-precharge mode. Users can select the DDR access
   modes as follows:
 
-.. code:: bash
+  .. code:: bash
 
-   export TEST_NAME=test_ddr
+    export TEST_NAME=test_ddr
 
-   # To Run simulations with a 64 GB DDR DIMM
-   make TEST=${TEST_NAME} USE_64GB_DDR_DIMM=1
+    # To Run simulations with a 64 GB DDR DIMM
+    make TEST=${TEST_NAME} USE_64GB_DDR_DIMM=1
 
-   # To Run simulations with a 64 GB DDR DIMM and DDR core with user controlled auto-precharge mode
-   make TEST=${TEST_NAME} USE_AP_64GB_DDR_DIMM=1
+    # To Run simulations with a 64 GB DDR DIMM and DDR core with user controlled auto-precharge mode
+    make TEST=${TEST_NAME} USE_AP_64GB_DDR_DIMM=1
 
-**NOTE**: Please refer to
-`Supported_DDR_Modes.md <./docs/Supported_DDR_Modes.md>`__ for details
-on supported DDR configurations.
+  **NOTE**: Please refer to the `Supported DDR Modes
+  <./docs/Supported_DDR_Modes.html>`__ for details on supported DDR
+  configurations.
 
-After adding new design IPs, make sure to add the new simulation
-``COMMON_LIBLISTS`` in
-`$AWS-FPGA/hdk/common/verif/tb/scripts/Makefile.common.inc <./common/verif/tb/scripts/Makefile.common.inc>`__
+- After adding new design IPs, make sure to add the new simulation libraries to
+  ``COMMON_LIBLISTS`` in `hdk/common/verif/tb/scripts/Makefile.common.inc
+  <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/tb/scripts/Makefile.common.inc>`__
 
-⚠️ **Required for XSIM and Questa simulations**
+  **NOTE**: This step is required for XSIM and Questa simulators
 
-- Make sure to add the new simulation libraries to ``COMMON_LIBLISTS``
-  in
-  `$AWS_FPGA_REPO_DIR/hdk/common/verif/tb/scripts/Makefile.common.inc <./common/verif/tb/scripts/Makefile.common.inc>`__
-
-  - This is required for XSIM and Questa simulations
-  - These libraries can be found in
-    `$AWS_FPGA_REPO_DIR/hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts <./common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts>`__
+  - Simulation libraries can be found in
+    `hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts>`__
     followed by ``"IP_NAME"/"SIMULATOR"/"IP_NAME".sh``
 
-- After adding new IP's to
-  `$AWS_FPGA_REPO_DIR/hdk/common/ip <./common/ip>`__ the simulation
-  libraries need to be recompiled
+- Adding new IPs requires to recompile the simulation libraries
 
-  - Run ``make regenerate_sim_libs <XSIM/VCS/QUESTA>=1``
+  .. code:: bash
+
+    make regenerate_sim_libs <XSIM/VCS/QUESTA>=1
+
 
 Software
 ~~~~~~~~
 
-All software runtime code can be found under the ``software`` directory.
+All software runtime code can be found under ``/hdk/cl/examples/$CL_DIR/software/``
+
 
 Build
 ~~~~~
 
 - All CL examples utilize infrastructure found under
-  `$AWS_FPGA_REPO_DIR/hdk/common/shell_stable/build <./common/shell_stable/build>`__
+  `hdk/common/shell_stable/build
+  <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/build>`__
+
 - Users can modify the following files to meet their build requirements:
 
-  - `synth_CL_NAME.tcl <./cl/examples/CL_TEMPLATE/build/scripts/synth_CL_TEMPLATE.tcl>`__
-    - top level script that reads design, IP, and constraint files
-  - `cl_synth_user.xdc <./cl/examples/CL_TEMPLATE/build/constraints/cl_synth_user.xdc>`__
-    - synthesis build constraints specific to that example
-  - `cl_timing_user.xdc <./cl/examples/CL_TEMPLATE/build/constraints/cl_timing_user.xdc>`__
-    - timing build constraints specific to that example
-  - `small_shell_cl_pnr_user.xdc <./cl/examples/CL_TEMPLATE/build/constraints/small_shell_cl_pnr_user.xdc>`__
-    - place and route constraints specific to that example's small shell
-    build
+  - `synth_<CL_NAME>.tcl
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/scripts/synth_CL_TEMPLATE.tcl>`__
+    - Example's top level script to read design's source code, IPs, and constraint files and run the design synthesis
+    - Make sure to add new IP's ``.xci`` files to this script
 
-For more information on
-`synth_CL_NAME.tcl <./cl/examples/CL_TEMPLATE/build/scripts/synth_CL_TEMPLATE.tcl>`__
-see:
+  - `cl_synth_user.xdc
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/constraints/cl_synth_user.xdc>`__
+    - Example's synthesis constraints
 
-- `synth_cl_header.tcl <./common/shell_stable/build/scripts/synth_cl_header.tcl>`__
-- `synth_cl_footer.tcl <./common/shell_stable/build/scripts/synth_cl_footer.tcl>`__
+  - `cl_timing_user.xdc
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/constraints/cl_timing_user.xdc>`__
+    - Example's timing constraints
 
-After adding new design IPs:
+  - `small_shell_cl_pnr_user.xdc
+    <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/constraints/small_shell_cl_pnr_user.xdc>`__
+    - Example's place-and-route constraints specific to the Small Shell
 
-- Make sure to add the new ``.xci`` files to your `synthesis TCL
-  script <./cl/examples/CL_TEMPLATE/build/scripts/synth_CL_TEMPLATE.tcl>`__
+For synthesis settings that are common among all CL examples, refer to:
 
-HDK Common Library
+- `synth_cl_header.tcl <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/build/scripts/synth_cl_header.tcl>`__
+- `synth_cl_footer.tcl <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/build/scripts/synth_cl_footer.tcl>`__
+
+
+Common Libraries
 ------------------
 
-This directory includes the shell versions, scripts, timing constraints
-and compile settings required during the AFI generation process.
+The `hdk/common/ <https://github.com/aws/aws-fpga/tree/f2/hdk/common/>`
+directory includes the shell artifacts, versions, scripts, constraints and
+compile settings required during the AFI generation process. Developers should
+not modify or remove any files in this directory unless directed above.
 
-Developers should not modify or remove these files.
+shell_stable/
+~~~~~~~~~~~~~
 
-`/shell_stable <./common/shell_stable>`__
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The `shell_stable/
+<https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable>`__ directory
+contains all the IPs, constraints and scripts for each shell release.
 
-The `shell_stable <./common/shell_stable>`__ contains all the IPs,
-constraints and scripts for each shell release.
+verif/
+~~~~~~
 
-`/verif <./hdk/verif>`__
-~~~~~~~~~~~~~~~~~~~~~~~~
+The `verif/ <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif>`__
+directory includes the Bus Functional Models (BFMs) used as the external
+interfaces to send stimulus to the CL in simulations. Additionally, the common
+verification files among all CL examples are located in this directory and
+categorized under four subdirectories:
 
-The `verif directory <./common/verif>`__ includes reference verification
-modules to be used as Bus Functional Models (BFM) as the external
-interface to simulate the CL. The verification related files common to
-all the CL examples are located in this directory. It has models,
-include, scripts, tb directories.
+- The `models/
+  <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/models>`__
+  directory includes simple models of the DRAM interface around the FPGA,
+  shell, and card. You can also find Xilinx protocol checkers in this directory.
 
-The `verif models directory <./common/verif/models>`__ includes simple
-models of the DRAM interface around the FPGA, shell, and card. You can
-also find Xilinx protocol checkers in this directory.
+- The `scripts/
+  <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/scripts>`__
+  directory includes scripts needed to generate DDR models and other necessary
+  HDK setups.
 
-The `verif scripts directory <./common/verif/scripts>`__ includes
-scripts needed to generate DDR models and other scripts needed for HDK
-setup.
+- The `verif/
+  <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/include>`__
+  directory includes sh_dpi_tasks.vh needed for DPI-C.
+  - The ``verif/ip_simulation_libraries`` directory will be created during
+  runtime. It includes the simulation libraries and CL IP compilation for all
+  supported simulators.
 
-The `verif include directory <./common/verif/include>`__ includes
-sh_dpi_tasks.vh needed for DPI-C.
+- The `tb/ <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/tb>`__
+  directory includes the top-level testbench related files common among all CL
+  examples.
 
-The `verif tb directory <./common/verif/tb>`__ includes top level test
-bench related files common for all the CL examples.
+- The `packages/ <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/tb>`__
+  directory includes the common functions, types and macros used in simulations.
 
-The verif ip_simulation_libraries directory is created during runtime
-and includes the simulation libraries and CL IP compilation for all
-supported simulators.
 
-`/ip <./common/ip>`__
-~~~~~~~~~~~~~~~~~~~~~
+ip/
+~~~
 
-The `ip directory <./common/ip>`__ includes basic IP that is used by
-CL's.
+The `ip/ <https://github.com/aws/aws-fpga/tree/f2/hdk/common/ip>`__ directory
+includes all CL IPs .
 
-`/lib <./common/lib>`__
-~~~~~~~~~~~~~~~~~~~~~~~
+lib/
+~~~~
 
-The `lib directory <./common/lib>`__ includes basic "library" elements
-that may be used by CL's.
+The `lib <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib>`__ directory
+includes all sub-modules instantiated in CL examples.
 
 - aws_clk_gen.sv - Generate clocks and resets to the CL design
 - aws_clk_regs.sv - Houses all the Control/Status Regs for AWS_CLK_GEN
@@ -720,18 +734,14 @@ that may be used by CL's.
 - sync.v - Synchronizer
 - xpm_fifo.sv - Synchronous clock FIFO
 
-.. _getting-started-1:
 
-Getting Started
+Next Steps
 ---------------
 
-- Review the
-  `cl_dram_hbm_dma <./cl/examples/cl_dram_hbm_dma/README.md>`__ and
-  `cl_sde <./cl/examples/cl_sde>`__ examples
-- `Run RTL
-  Simulations <./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__ on
-  the example designs
-- Dive deep into `Shell interface
-  specifications <./docs/AWS_Shell_Interface_Specification.md>`__ and
-  `PCIe Memory map <./docs/AWS_Fpga_Pcie_Memory_Map.md>`__
-- Create your own designs/Port F1 designs to F2 systems.
+- Familiarize the `cl_sde <./cl/examples/cl_sde/README.html>`__ example
+- `Run RTL simulations <./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__
+  on the example designs
+- Dive deep into the `Shell Interface Specification
+  <./docs/AWS_Shell_Interface_Specification.html>`__ and `PCIe Memory Map
+  <./docs/AWS_Fpga_Pcie_Memory_Map.html>`__
+- Create your own CL designs or port F1 designs over to F2 systems

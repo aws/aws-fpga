@@ -76,7 +76,7 @@ Feature List
 Architecture
 ============
 
-|alt tag|
+|SDE_Block_Diagram|
 
 The SDE uses shell's PCIM AXI4 interface to move packets between the AXI
 Streaming interface and the host. It implements a store and forward
@@ -468,8 +468,6 @@ aligned. The following table describes address mapping within SDE.
 CSR Description and Address Mapping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
---------------
-
 The CSR address space starts at the CSR base address and is organized as
 shown below
 
@@ -563,40 +561,40 @@ C2H CSRs
 
 **C2H CSR Address Mapping**
 
-+----------------+----------------+----------------+----------------+
-| **Address      | **Size         | **Name**       | *              |
-| Range**        | (Bytes)**      |                | *Description** |
-+================+================+================+================+
-| 0x3400 –       | 256            | C2H Global     | C2H Global     |
-| 0x34FC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3500 –       | 256            | C2H Descriptor | C2H Descriptor |
-| 0x35FC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3600 –       | 256            | C2H Data Mover | C2H Data Mover |
-| 0x36FC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3700 –       | 256            | C2H Write-back | C2H Write-Back |
-| 0x37FC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3800 –       | 256            | C2H Buffer     | C2H Buffer     |
-| 0x38FC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3900 –       | 256            | C2H AXIS CSRs  | C2H AXI-Stream |
-| 0x39FC         |                |                | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
++----------------+----------------+----------------+-----------------+
+| **Address      | **Size         | **Name**       | **Description** |
+| Range**        | (Bytes)**      |                |                 |
++================+================+================+=================+
+| 0x3400 –       | 256            | C2H Global     | C2H Global      |
+| 0x34FC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3500 –       | 256            | C2H Descriptor | C2H Descriptor  |
+| 0x35FC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3600 –       | 256            | C2H Data Mover | C2H Data Mover  |
+| 0x36FC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3700 –       | 256            | C2H Write-back | C2H Write-Back  |
+| 0x37FC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3800 –       | 256            | C2H Buffer     | C2H Buffer      |
+| 0x38FC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3900 –       | 256            | C2H AXIS CSRs  | C2H AXI-Stream  |
+| 0x39FC         |                |                | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
 
 C2H Global CSRs
 ---------------
@@ -748,8 +746,8 @@ C2H Descriptor CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| DESC_       | 31:0        | RW       | 0x0         | Descriptor  |
-| RAM_DATA_DW |             |          |             | RAM Data.   |
+| DESC        | 31:0        | RW       | 0x0         | Descriptor  |
+| _RAM_DATA_DW|             |          |             | RAM Data.   |
 |             |             |          |             | When        |
 |             |             |          |             | writing the |
 |             |             |          |             | descriptor  |
@@ -1075,8 +1073,8 @@ C2H Write-Back CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| WC_         | 19:0        | RW       | 0x0         | Write-Back  |
-| TO_TICK_CNT |             |          |             | Coalesce    |
+| WC          | 19:0        | RW       | 0x0         | Write-Back  |
+| _TO_TICK_CNT|             |          |             | Coalesce    |
 |             |             |          |             | Timeout     |
 |             |             |          |             | Tick Count  |
 +-------------+-------------+----------+-------------+-------------+
@@ -1234,13 +1232,13 @@ C2H Write-Back CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| WB_STS_     | 0           | RW1C     | 0x0         | Write Back  |
-| BRESP_ERROR |             |          |             | BRESP Error |
+| WB_STS      | 0           | RW1C     | 0x0         | Write Back  |
+| _BRESP_ERROR|             |          |             | BRESP Error |
 |             |             |          |             | for Status  |
 |             |             |          |             | Write-Back  |
 +-------------+-------------+----------+-------------+-------------+
-| WB_MD_      | 1           | RW1C     | 0x0         | Write Back  |
-| BRESP_ERROR |             |          |             | BRESP Error |
+| WB_MD       | 1           | RW1C     | 0x0         | Write Back  |
+| _BRESP_ERROR|             |          |             | BRESP Error |
 |             |             |          |             | for         |
 |             |             |          |             | Metadata    |
 |             |             |          |             | Write-Back  |
@@ -1449,40 +1447,40 @@ H2C CSRs
 H2C CSR Address Mapping
 -----------------------
 
-+----------------+----------------+----------------+----------------+
-| **Range**      | **Size         | **Name**       | *              |
-|                | (Bytes)**      |                | *Description** |
-+================+================+================+================+
-| 0x3A00 –       | 256            | H2C Global     | H2C Global     |
-| 0x3AFC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3B00 –       | 256            | H2C Descriptor | H2C Descriptor |
-| 0x3BFC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3C00 –       | 256            | H2C Data Mover | H2C Data Mover |
-| 0x3CFC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3D00 –       | 256            | H2C Write-back | H2C Write-Back |
-| 0x3DFC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3E00 –       | 256            | H2C Buffer     | H2C Buffer     |
-| 0x3EFC         |                | CSRs           | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
-| 0x3F00 –       | 256            | H2C AXIS CSRs  | H2C AXI-Stream |
-| 0x3FFC         |                |                | Config and     |
-|                |                |                | Status         |
-|                |                |                | Registers      |
-+----------------+----------------+----------------+----------------+
++----------------+----------------+----------------+-----------------+
+| **Range**      | **Size         | **Name**       | **Description** |
+|                | (Bytes)**      |                |                 |
++================+================+================+=================+
+| 0x3A00 –       | 256            | H2C Global     | H2C Global      |
+| 0x3AFC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3B00 –       | 256            | H2C Descriptor | H2C Descriptor  |
+| 0x3BFC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3C00 –       | 256            | H2C Data Mover | H2C Data Mover  |
+| 0x3CFC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3D00 –       | 256            | H2C Write-back | H2C Write-Back  |
+| 0x3DFC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3E00 –       | 256            | H2C Buffer     | H2C Buffer      |
+| 0x3EFC         |                | CSRs           | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
+| 0x3F00 –       | 256            | H2C AXIS CSRs  | H2C AXI-Stream  |
+| 0x3FFC         |                |                | Config and      |
+|                |                |                | Status          |
+|                |                |                | Registers       |
++----------------+----------------+----------------+-----------------+
 
 H2C Global CSRs
 ---------------
@@ -1634,8 +1632,8 @@ H2C Descriptor CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| DESC_       | 31:0        | RW       | 0x0         | Descriptor  |
-| RAM_DATA_DW |             |          |             | RAM Data.   |
+| DESC        | 31:0        | RW       | 0x0         | Descriptor  |
+| _RAM_DATA_DW|             |          |             | RAM Data.   |
 |             |             |          |             | When        |
 |             |             |          |             | writing the |
 |             |             |          |             | descriptor  |
@@ -1934,8 +1932,8 @@ H2C Write-Back CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| WC_         | 19:0        | RW       | 0x0         | Write-Back  |
-| TO_TICK_CNT |             |          |             | Coalesce    |
+| WC          | 19:0        | RW       | 0x0         | Write-Back  |
+| _TO_TICK_CNT|             |          |             | Coalesce    |
 |             |             |          |             | Timeout     |
 |             |             |          |             | Tick Count  |
 +-------------+-------------+----------+-------------+-------------+
@@ -1959,8 +1957,8 @@ H2C Write-Back CSRs
 | **Field     | **Bit       | **Type** | **Default   | **De        |
 | Name**      | Range**     |          | Value**     | scription** |
 +=============+=============+==========+=============+=============+
-| WB_STS_     | 0           | RW1C     | 0x0         | Write Back  |
-| BRESP_ERROR |             |          |             | BRESP Error |
+| WB_STS      | 0           | RW1C     | 0x0         | Write Back  |
+| _BRESP_ERROR|             |          |             | BRESP Error |
 |             |             |          |             | for Status  |
 |             |             |          |             | Write-Back  |
 +-------------+-------------+----------+-------------+-------------+
@@ -2209,27 +2207,30 @@ C2H Descriptor and Metadata
 C2H Descriptor
 ^^^^^^^^^^^^^^
 
+
+
 +---------+---------+---------+---------+---------+---------+---------+
-| **      |         | *       |         |         | **      |         |
-| Field** |         | *Normal |         |         | Compact |         |
-|         |         | Type**  |         |         | Type**  |         |
+| **      |         | **Normal|         |         | **      |         |
+| Field** |         | Type**  |         |         | Compact |         |
+|         |         |         |         |         | Type**  |         |
 +=========+=========+=========+=========+=========+=========+=========+
 |         | **Bit-  | **High  | **Low   | **Bit-  | **High  | **Low   |
 |         | Width** | Bit     | Bit     | Width** | Bit     | Bit     |
 |         |         | Index** | Index** |         | Index** | Index** |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 32      | 31      | 0       | 32      | 31      | 0       |
-| *Length |         |         |         |         |         |         |
+| **      | 32      | 31      | 0       | 32      | 31      | 0       |
+| Length  |         |         |         |         |         |         |
 | (B      |         |         |         |         |         |         |
-| ytes)** |         |         |         |         |         |         |
+| ytes)   |         |         |         |         |         |         |
+| **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **P     | 64      | 95      | 32      | 48      | 79      | 32      |
 | hysical |         |         |         |         |         |         |
 | Ad      |         |         |         |         |         |         |
 | dress** |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 32      | 127     | 96      | 48      | 127     | 80      |
-| *RSVD** |         |         |         |         |         |         |
+| **      | 32      | 127     | 96      | 48      | 127     | 80      |
+| RSVD**  |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 128     |         | 128     |         |         |         |
 | Total** |         |         |         |         |         |         |
@@ -2250,26 +2251,27 @@ C2H Write-Back Metadata
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 +---------+---------+---------+---------+---------+---------+---------+
-| **      |         | *       |         |         | **      |         |
-| Field** |         | *Normal |         |         | Compact |         |
+| **      |         | **      |         |         | **      |         |
+| Field** |         | Normal  |         |         | Compact |         |
 |         |         | Type**  |         |         | Type**  |         |
 +=========+=========+=========+=========+=========+=========+=========+
 |         | **Bit-  | **High  | **Low   | **Bit-  | **High  | **Low   |
 |         | Width** | Bit     | Bit     | Width** | Bit     | Bit     |
 |         |         | Index** | Index** |         | Index** | Index** |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 32      | 31      | 0       | 32      | 31      | 0       |
-| *Length |         |         |         |         |         |         |
+| **      | 32      | 31      | 0       | 32      | 31      | 0       |
+| Length  |         |         |         |         |         |         |
 | (B      |         |         |         |         |         |         |
-| ytes)** |         |         |         |         |         |         |
+| ytes)   |         |         |         |         |         |         |
+| **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 1       | 32      | 32      | 1       | 32      | 32      |
 | Valid** |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **EOP** | 1       | 33      | 33      | 1       | 33      | 33      |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 30      | 63      | 34      | 30      | 63      | 34      |
-| *RSVD** |         |         |         |         |         |         |
+| **      | 30      | 63      | 34      | 30      | 63      | 34      |
+| RSVD**  |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **User  | 64      | 127     | 64      | NA      | NA      | NA      |
 | Bits**  |         |         |         |         |         |         |
@@ -2297,18 +2299,19 @@ H2C Descriptor
 ~~~~~~~~~~~~~~
 
 +---------+---------+---------+---------+---------+---------+---------+
-| **      |         | *       |         |         | **      |         |
-| Field** |         | *Normal |         |         | Compact |         |
+| **      |         | **      |         |         | **      |         |
+| Field** |         | Normal  |         |         | Compact |         |
 |         |         | Type**  |         |         | Type**  |         |
 +=========+=========+=========+=========+=========+=========+=========+
 |         | **Bit-  | **High  | **Low   | **Bit-  | **High  | **Low   |
 |         | Width** | Bit     | Bit     | Width** | Bit     | Bit     |
 |         |         | Index** | Index** |         | Index** | Index** |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 32      | 31      | 0       | 32      | 31      | 0       |
-| *Length |         |         |         |         |         |         |
+| **      | 32      | 31      | 0       | 32      | 31      | 0       |
+| Length  |         |         |         |         |         |         |
 | (B      |         |         |         |         |         |         |
-| ytes)** |         |         |         |         |         |         |
+| ytes)   |         |         |         |         |         |         |
+| **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **P     | 64      | 95      | 32      | 48      | 79      | 32      |
 | hysical |         |         |         |         |         |         |
@@ -2319,8 +2322,8 @@ H2C Descriptor
 +---------+---------+---------+---------+---------+---------+---------+
 | **SPB** | 1       | NA      | 97      | 1       | NA      | 81      |
 +---------+---------+---------+---------+---------+---------+---------+
-| *       | 94      | 191     | 98      | 46      | 127     | 82      |
-| *RSVD** |         |         |         |         |         |         |
+| **      | 94      | 191     | 98      | 46      | 127     | 82      |
+| RSVD**  |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **User  | 64      | 255     | 192     | NA      | NA      | NA      |
 | Bits**  |         |         |         |         |         |         |
@@ -2633,7 +2636,7 @@ Example Design
 
 AWS provides an example CL called CL_SDE. CL_SDE instances the SDE and
 some utility and test blocks to demonstrate the functionality of the
-SDE. See `CL_SDE <../../../../hdk/cl/examples/cl_sde/>`__ for details.
+SDE. See `CL_SDE <../../../../hdk/cl/examples/cl_sde/README.html>`__ for details.
 
 FAQ
 ---
@@ -2685,7 +2688,7 @@ Q. Does AWS have any example Driver/Application?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 AWS provides DPDK based Virtual Ethernet application described
-`here <./Virtual_Ethernet_Application_Guide.md>`__.
+`here <./Virtual_Ethernet_Application_Guide.html>`__.
 
 .. _q-does-sde-supports-interrupts:
 
@@ -2823,4 +2826,4 @@ AWS recommends that the all the logic in the SDE be constrained to a
 single SLR. Additionally, AWS recommends adding pipelining on the PCIM
 and PCIS interfaces from the shell leading up to the SDE.
 
-.. |alt tag| image:: ../images/SDE_Block_Diagram.jpg
+.. |SDE_Block_Diagram| image:: ../../../../_static/sdk/apps/virtual-ethernet/SDE_Block_Diagram.jpg
