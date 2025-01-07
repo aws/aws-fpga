@@ -36,13 +36,13 @@ The ``clk_hbm_ref`` is a fixed frequency 100MHz clock required for the
 HBM IP to clock the APB interface.
 
 F2 Developer Kit provides a clocking IP
-`AWS_CLK_GEN <./AWS_CLK_GEN_spec.md>`__ for customers who desire to have
+`AWS_CLK_GEN <./AWS_CLK_GEN_spec.html>`__ for customers who desire to have
 same clocks and clock recipe support as F1.
-`Tables <./Clock_Recipes_User_Guide.md#f2-clock-recipe-table>`__
+`Tables <./Clock_Recipes_User_Guide.html#f2-clock-recipe-table>`__
 below shows the clock recipes supported in F2.
 
 F2 Clock Recipe Tables
----------------------
+----------------------
 
 .. list-table::
   :header-rows: 2
@@ -256,8 +256,8 @@ F2 Clock Recipe Tables
 requiring AWS_CLK_GEN IP instantiated in the CL design. All other clocks
 and their respective clock recipes require AWS_CLK_GEN IP instantiated
 in the CL design and interfaced to the SDA interface from the Shell.
-`CL_MEM_PERF <./../cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
-demonstrates how `AWS_CLK_GEN <./../common/lib/aws_clk_gen.sv>`__ is
+`CL_MEM_PERF <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
+demonstrates how `AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ is
 integrated into CL design.
 
 How to Specify Clock Recipe During Build Time
@@ -310,10 +310,10 @@ Clock Consideration When Porting CL Designs from F1 into F2
    design to meet the clocking requirement.
 
    b. Alternately, customers can instantiate
-   `AWS_CLK_GEN <./../common/lib/aws_clk_gen.sv>`__ IP in their CL which
+   `AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ IP in their CL which
    offers same set of clocks from F1, in addition to ``clk_hbm_axi`` for
    HBM clocking. AWS provides `SW
-   APIs <./../../sdk/userspace/fpga_libs/fpga_clkgen/fpga_clkgen_utils.c>`__
+   APIs <https://github.com/aws/aws-fpga/tree/f2/sdk/userspace/fpga_libs/fpga_clkgen/fpga_clkgen_utils.c>`__
    to simplify clock configuration for the user application.
 
 3. F2 supports same clock recipe build switches as F1 to simplify

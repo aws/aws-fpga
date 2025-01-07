@@ -19,9 +19,8 @@
 test_dram_dma_axi_mstr: TEST=test_dram_dma_axi_mstr
 test_dram_dma_axi_mstr: all
 
-#Not supporting until XSIM related issues fixed
 test_dram_dma_4k_crossing: TEST=test_dram_dma_4k_crossing
-test_dram_dma_4k_crossing: check_xsim all
+test_dram_dma_4k_crossing: all
 
 test_clk_recipe: TEST=test_clk_recipe
 test_clk_recipe: all

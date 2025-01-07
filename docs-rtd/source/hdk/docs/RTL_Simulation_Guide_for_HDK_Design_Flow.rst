@@ -54,8 +54,8 @@ One easy way is to use the F2 Developer AMI that will be shared
 privately with the customers. This developer AMI comes with
 pre-installed Vivado tools and license.
 
-Please refer to the `release notes <../../RELEASE_NOTES.md>`__ or the
-`supported Vivado version <../../supported_vivado_versions.txt>`__ for
+Please refer to the `release notes <../../RELEASE_NOTES.html>`__ or the
+`supported Vivado version <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__ for
 the exact version of Vivado tools, and the required license components.
 
 Install the HDK and Setup Environment
@@ -257,7 +257,7 @@ the actual AWS Shell logic. If you choose to control CL signaling via
 another method, proper operation with Shell logic is not guaranteed.
 
 The AWS Shell Interface specification can be found
-`here <./AWS_Shell_Interface_Specification.md>`__
+`here <./AWS_Shell_Interface_Specification.html>`__
 
 Accessing Host Memory During Simulation
 ---------------------------------------
@@ -321,7 +321,7 @@ interfaces, then the protocol checker will fire an error as below.
    tb.card.fpga.sh.axl_pc_ocl_slv_inst.REP   : BIT(         35) :   ERROR : Invalid state x
 
 Please refer to the `protocol
-checker <./../common/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v>`__
+checker <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/models/xilinx_axi_pc/axi_protocol_checker_v1_1_vl_rfs.v>`__
 for mapping between bit positions and the protocol errors.
 
 Re-Run Simulation to Dump Waves
@@ -1415,4 +1415,4 @@ Argument Description
 slot_id  Slot ID
 ======== ===========
 
-.. |alt tag| image:: ./images/cl-sim-testbench.png
+.. |alt tag| image:: ../../_static/hdk/docs/cl-sim-testbench.png

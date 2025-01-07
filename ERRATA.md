@@ -26,24 +26,12 @@ Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 
 4. XSIM simulator does not support a cycle-accurate simulation model for the HBM IP. We’re observing significantly longer simulation times compared to VCS and Questa simulators. This is caused by the HBM BFM used in XSIM. Therefore, running HBM simulation using VCS or Questa is strongly recommended.
 
-5. The following HDK tests are currently not supported in XSIM and will report not supported warning if ran:
+5. Simulation of the [HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface) is not supported in this release. The HBM IP always passes initialization and remains in an operating state for all tests. Simulation support for the HBM monitor will be added in a future release.
 
-   - cl_mem_perf:
-     - test_dram_dma_4k_crossing
-     - test_dram_dma
-     - test_dram_dma_align_addr_4k
-     - test_dram_dma_single_beat_4k
-     - test_dram_dma_rnd
-
-   - cl_dram_hbm_dma:
-     - test_dram_dma_4k_crossing
-
-6. Simulation of the [HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface) is not supported in this release. The HBM IP always passes initialization and remains in an operating state for all tests. Simulation support for the HBM monitor will be added in a future release.
-
-7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2
+6. AFIs created based on HDK XDMA shell or Vitis are not supported on F2
    instances at this time.
 
-8. The following ddr simulation backdoor test is not working with 64GB memory:
+7. The following ddr simulation backdoor test is not working with 64GB memory:
    - test_ddr_peek_bdr_walking_ones
 
 ## SDK

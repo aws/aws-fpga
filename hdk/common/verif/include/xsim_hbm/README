@@ -1,0 +1,2 @@
+These files are needed for Xilinx HBM sim models.
+DBI (Data Bus Inversion) is turned off for proper simulation with the XSIM only

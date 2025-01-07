@@ -1,6 +1,12 @@
 F2 Developer Kit Release Notes
 ==============================
 
+.. _v202:
+
+v2.0.2
+------
+Updates for initial release of ReadTheDocs documentation and to re-enable tests for XSIM.
+
 .. _v201:
 
 v2.0.1

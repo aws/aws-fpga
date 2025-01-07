@@ -5,7 +5,7 @@ This quick start guide will utilize a simple ``hello_world`` Vitis
 example to get you started.
 
 Table of Contents
-=================
+-----------------
 
 1. `Overview <#1-overview>`__
 2. `Prerequisites <#2-prerequisites>`__
@@ -32,7 +32,7 @@ Table of Contents
 .. _1-overview:
 
 1. Overview
-===========
+-----------
 
 - Vitis is a complete development environment for applications
   accelerated using AWS EC2 F2 (FPGA) instances
@@ -44,12 +44,12 @@ Table of Contents
 .. _2-prerequisites:
 
 2. Prerequisites
-================
+----------------
 
 .. _21-aws-account-and-f2ec2-instances:
 
 2.1 AWS Account and F2/EC2 Instances
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Getting Familiar with AWS - If you have never used AWS before, we
   recommend you start with AWS getting started training, and focus on
@@ -71,17 +71,17 @@ Table of Contents
 .. _22-github-and-environment-setup:
 
 2.2 GitHub and Environment Setup
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Clone this github repository, export your AWS IAM credentials, and
   source the *vitis_setup.sh* script:
 
-::
+.. code:: bash
 
        cd aws-fpga
        source vitis_setup.sh
 
-- Sourcing the `vitis_setup.sh <../vitis_setup.sh>`__ script does the
+- Sourcing the `vitis_setup.sh <https://github.com/aws/aws-fpga/tree/f2/vitis_setup.sh>`__ script does the
   following:
 
   - Downloads and sets the correct AWS Platforms:
@@ -113,8 +113,8 @@ environment, you will see the following message:
 
 .. _3-emulating-your-code:
 
-3. Emulating Your Code
-======================
+1. Emulating Your Code
+----------------------
 
 Vitis hardware emulation is a cycle-accurate emulation of your
 accelerator design. This section will walk you through the
@@ -123,7 +123,7 @@ emulation process.
 .. _31-emulation:
 
 3.1 Emulation
--------------
+~~~~~~~~~~~~~
 
 The main goal of hardware emulation is to insure functional correctness
 and determine how to partition the application between the host CPU and
@@ -224,7 +224,7 @@ Hardware emulation:
 .. _4-next-steps:
 
 4. Next Steps
-=============
+-------------
 
 .. _41-examining-run-data:
 
@@ -258,7 +258,7 @@ can be found in the example directory.
 .. _5-additional-vitis-information:
 
 5. Additional Vitis Information
-===============================
+-------------------------------
 
 - `Vitis Documentation
   Hub <https://docs.amd.com/r/en-US/Vitis-Tutorials-Getting-Started>`__

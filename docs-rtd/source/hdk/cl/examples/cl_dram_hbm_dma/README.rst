@@ -55,11 +55,11 @@ The CL also provides access to the on-chip HBM available in the FPGA.
 The HBM IP is configured for dual stack 16GB capacity which exposes 32
 AXI3 (not AXI4) channels running on 450MHz clock. However, only one HBM
 channel is being used in this example design to demonstrate datapath
-connection to the HBM. The `cl_hbm_axi4.sv <./design/cl_hbm_axi4.sv>`__
+connection to the HBM. The `cl_hbm_axi4.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_hbm_axi4.sv>`__
 does the AXI4-to-AXI3 conversion, crosses clock domain between
 the 250 MHz ``clk_main_a0`` and HBM's up to 450 MHz ``axi_clk`` for the datapath and feeds
 the ``cl_hbm_wrapper.sv``. The
-`cl_hbm_wrapper.sv <./design/cl_hbm_wrapper.sv>`__ instantiates the HBM
+`cl_hbm_wrapper.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_hbm_wrapper.sv>`__ instantiates the HBM
 IP, houses MMCM to generate 450MHz interface clock, and connects the
 datapath to Channel#0 of the HBM IP core.
 
@@ -73,8 +73,8 @@ Design Changes
 
 Individual controllers (DDR, HBM) can be enabled and disabled by simply
 updating the appropriate defines in the
-`cl_dram_hbm_dma_defines.vh <design/cl_dram_dma_defines.vh>`__ file. The
-`sh_ddr.sv <../../../common/shell_stable/design/sh_ddr/sim/sh_ddr.sv>`__
+`cl_dram_hbm_dma_defines.vh <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_dram_dma_defines.vh>`__ file. The
+`sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/sim/sh_ddr.sv>`__
 file contains the necessary logic to remove and tie-off appropriate
 interfaces when the DDR controller is disabled.
 
@@ -126,7 +126,7 @@ ocl\_ AXI-Lite
 --------------
 
 The cl_ocl\_ AXI-Lite bus is connected to
-`cl_ocl_slv.sv <design/cl_ocl_slv.sv>`__ module, and is used for
+`cl_ocl_slv.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_ocl_slv.sv>`__ module, and is used for
 register access to the Automatic Test Generator (ATG) etc.
 
 The valid address map is as shown below:
@@ -167,7 +167,7 @@ sda\_ AXI-Lite
 --------------
 
 The sh_cl_sda\_ AXI-Lite bus is connected to
-`cl_sda_slv.sv <design/cl_sda_slv.sv>`__ module, which provides 1KiB of
+`cl_sda_slv.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_sda_slv.sv>`__ module, which provides 1KiB of
 scratch RAM.
 
 Address bits [9:0] will be used to access the location of the RAM, but
@@ -177,13 +177,13 @@ pcim\_ AXI4
 -----------
 
 The cl_sh_pcim\_ AXI4 bus is driven by Automatic Test Generator (ATG)
-and connected to `cl_pcim_mstr.sv <design/cl_pcim_mstr.sv>`__. It can be
+and connected to `cl_pcim_mstr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_pcim_mstr.sv>`__. It can be
 used to read/write from the host memory.
 
 irq/ack
 -------
 
-`cl_int_slv.sv <design/cl_int_slv.sv>`__ provides an example for
+`cl_int_slv.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_int_slv.sv>`__ provides an example for
 generating the IRQ requests and checks if ACK has been received.
 
 Virtual JTAG
@@ -192,14 +192,14 @@ Virtual JTAG
 3 ILA cores are integrated, one to monitoring the sh_c_dma_pcis bus, one
 to monitor the AXI4 signals on DDR and the third to monitor the AXI4
 signals on HBM. An example usage is provided in
-`cl_ila.sv <design/cl_ila.sv>`__. An example usage for Xilinx VIO is
-provided in `cl_vio.sv <design/cl_vio.sv>`__
+`cl_ila.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_ila.sv>`__. An example usage for Xilinx VIO is
+provided in `cl_vio.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_vio.sv>`__
 
 Clocks
 ------
 
 CL_DRAM_HBM_DMA uses the main ``clk_main_a0``. It's frequency is set in
-`cl_clocks_aws.xdc <./build/constraints/cl_clocks_aws.xdc>`__
+`cl_timing_user.xdc <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/build/constraints/cl_timing_user.xdc>`__
 
 Software
 --------
@@ -208,8 +208,7 @@ DMA accesses rely on the `XDMA
 driver <https://github.com/Xilinx/dma_ip_drivers>`__
 
 The DRAM_HBM DMA example includes runtime software to demonstrate
-working DMA accesses. The runtime example is located `in the runtime
-directory <software/runtime/test_dram_dma.c>`__
+working DMA accesses. The runtime example is located `in the runtime directory <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_hbm_dma.c>`__
 
 There are three example tests in cl_dram_hbm_dma example.
 

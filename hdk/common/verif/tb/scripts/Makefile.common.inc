@@ -275,11 +275,15 @@ make_sim_dir: $(HDK_COMMON_DIR)/verif/models/sh_bfm/cl_ports_sh_bfm.vh
 	#
 	#- CREATE SIM_ROOT ----------
 	#
-	@ if [ ! -d $(SIM_DIR) ]; then \
-      mkdir -p $(SIM_DIR);\
-      cp $(HDK_COMMON_DIR)/verif/include/xpm_internal_config* $(SIM_DIR) 2>/dev/null; \
-      touch $(SIM_DIR)/bd_2e02_lmb_bram_I_0.mem $(SIM_DIR)/bd_2e02_second_lmb_bram_I_0.mem; \
-   fi
+	@ mkdir -p $(SIM_DIR);\
+      if [ "$(SIMULATOR)" = "xsim" ]; then \
+        echo "Copying XSIM hbm model config files"; \
+        cp $(HDK_COMMON_DIR)/verif/include/xsim_hbm/xpm_internal_config* $(SIM_DIR) 2>/dev/null; \
+      else \
+        echo "Copying hbm model config files "; \
+        cp $(HDK_COMMON_DIR)/verif/include/xpm_internal_config* $(SIM_DIR) 2>/dev/null; \
+      fi; \
+      touch $(SIM_DIR)/bd_2e02_lmb_bram_I_0.mem $(SIM_DIR)/bd_2e02_second_lmb_bram_I_0.mem;
 
 #
 # Command wrapper API source
@@ -308,8 +312,3 @@ print_regression_results:
 	echo "" ; \
 	echo "*** SEE RESULTS IN '$(REGRESSION_RESULTS_LOG)'" ; \
 	cat $(REGRESSION_RESULTS_LOG) ; \
-
-check_xsim:
-ifeq ("$(SIMULATOR)","xsim")
-   $(info "$n **** WARNING CHECK_XSIM This test is not supported for XSIM simulator **** $n")
-endif

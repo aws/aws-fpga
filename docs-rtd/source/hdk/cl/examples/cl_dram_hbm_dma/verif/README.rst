@@ -52,7 +52,7 @@ This readme provides information about the simulation environment for
 the ``cl_dram_hbm_dma`` example. For more details about overall HDK
 simulation environment and CL bringup in simulation please refer to the
 `RTL Simulation Guide for HDK Design
-Flow <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__
+Flow <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__
 
 SystemVerilog (SV) simulations can be run from the
 ``$CL_DIR/verif/scripts/`` directory with all supported simulators (HBM
@@ -96,7 +96,7 @@ followed by the environment variables required to run that test.
    test_ddr_peek_bdr_walking_ones
 
 **NOTE**: Please refer to
-`Supported_DDR_Modes.md <./../../../../docs/Supported_DDR_Modes.md>`__
+`Supported_DDR_Modes <./../../../../docs/Supported_DDR_Modes.html>`__
 for details on supported DDR configurations.
 
 The HW/SW co-simulation tests can be run from the ``verif/scripts/``
@@ -121,7 +121,7 @@ Dump Waves
 
 For information about how to dump waves with XSIM or VCS, please refer
 to
-`debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md#>`__
+`debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__
 
 SystemVerliog Tests
 -------------------
@@ -312,7 +312,7 @@ AXI_MEMORY_MODEL mode can be used for better simulation performance.
 AXI_MEMORY_MODEL mode enables a test to run with AXI memory models
 instead of DDR memory. The documentation can be found in AXI memory
 model section at `RTL simulation
-guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__.
+guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__.
 Any test that accesses DDR memory can be run in AXI_MEMORY_MODEL mode.
 Below are some example tests for ECC and backdoor loading support
 features of AXI memory model.
@@ -334,14 +334,14 @@ DDR Backdoor Loading
 
 The description of DDR backdoor loading can be found in DDR backdoor loading
 support section at `RTL simulation
-guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__.
+guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__.
 
 HW/SW Co-Simulation Test
 ------------------------
 
 The software test with HW/SW co-simulation support
-`test_dram_dma_hwsw_cosim.c <../software/runtime/test_dram_dma_hwsw_cosim.c>`__
+`test_dram_dma_hwsw_cosim.c <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_dma_hwsw_cosim.c>`__
 can be found at ``software/runtime/``. For Information about how HW/SW
 co-simulation support can be added to a software test please refer to
 "Code changes to enable HW/SW co-simulation" section in `RTL simulation
-guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__.
+guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__.

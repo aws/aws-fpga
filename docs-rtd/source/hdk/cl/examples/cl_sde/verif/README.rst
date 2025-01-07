@@ -17,7 +17,7 @@ This readme provides information about the simulation environment for
 the ``cl_sde`` example. For more details about overall HDK simulation
 environment and CL bringup in simulation please refer to `RTL Simulation
 Guide for HDK Design
-Flow <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md>`__.
+Flow <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__.
 
 The system verilog simulation tests can be run from the
 ``$CL_DIR/verif/scripts/`` directory with all supported simulators. You
@@ -49,4 +49,4 @@ Dump Waves
 
 For information about how to dump waves with XSIM or VCS, please refer
 to
-`debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md#debugging-custom-logic-using-the-aws-hdk>`__
+`debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html#debugging-custom-logic-using-the-aws-hdk>`__

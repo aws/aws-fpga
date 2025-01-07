@@ -1,4 +1,3 @@
-import enchant
 from enchant.tokenize import Filter
 
 class HexFilter(Filter):

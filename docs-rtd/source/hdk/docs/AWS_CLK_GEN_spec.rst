@@ -224,7 +224,7 @@ The AXI-Lite address space is decoded as shown in the table below:
 **NOTES**:
 
 1. Refer to the ``_clkgen`` CLIs in `FPGA Management
-   Tools <./../../sdk/userspace/fpga_mgmt_tools/README.md>`__ for
+   Tools <./../../sdk/userspace/fpga_mgmt_tools/README.html>`__ for
    setting the output clock frequencies of AWS_CLK_GEN IP.
 
 2. Write access to undefined address space is ignored. Reading from
@@ -335,9 +335,9 @@ described in `Address Space <#ancAddressSpace>`__
     - RW
     - 0x0
     - Write 0xFFFF_FFFF to globally reset the AWS_CLK_GEN IP. Following blocks
-      are affected:
-        - Assert reset to all MMCMs.
-        - Assert reset to SYS_RST and its output to CL.
+      are affected: 
+      Assert reset to all MMCMs. 
+      Assert reset to SYS_RST and its output to CL
       Write 0x0000_0000 to de-assert global resets
   * - 0x14
     - SYS_RST_REG

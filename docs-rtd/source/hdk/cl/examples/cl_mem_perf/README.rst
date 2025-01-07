@@ -36,19 +36,19 @@ Table of Content
 - `Simulations <#simulations>`__
 - `Software <#software>`__
 
-  - `test_hbm_perf32.c <#test_hbm_perf32c>`__
-  - `test_dram_hbm_dma.c <#test_dram_hbm_dmac>`__
-  - `test_hbm_perf32.c <#test_hbm_perf32c-1>`__
-  - `test_aws_clk_gen.c <#test_aws_clk_genc>`__
-  - `test_clk_freq.c <#test_clk_freqc>`__
+  - `test_hbm_perf32.c <#test-hbm-perf32c-mem-1>`__
+  - `test_dram_hbm_dma.c <#test-dram-hbm-dmac-mem-1>`__
+  - `test_hbm_perf32.c <#test-hbm-perf32c-mem-2>`__
+  - `test_aws_clk_gen.c <#test-aws-clk-genc>`__
+  - `test_clk_freq.c <#test-clk-freqc>`__
 
-  - `Compile and run instructions <#compile-and-run-instructions>`__
+  - `Compile and run instructions <#compile-and-run-instructions-mem-1>`__
 
-    - `test_dram_hbm_dma_hwsw_cosim.c <#test_dram_hbm_dma_hwsw_cosimc>`__
+    - `test_dram_hbm_dma_hwsw_cosim.c <#test-dram-hbm-dma-hwsw-cosimc-mem-1>`__
 
-  - `Compile and run instructions <#compile-and-run-instructions-1>`__
+  - `Compile and run instructions <#compile-and-run-instructions-mem-2>`__
 
-- `HBM Performance Tests <#hbm-performance-tests>`__
+- `HBM Performance Tests <#hbm-performance-tests-mem-1>`__
 
   - `Instructions to run HBM Performance
     Test <#instructions-to-run-hbm-performance-test>`__
@@ -141,7 +141,7 @@ Clocks and Reset
 - rst_main_n from Shell sync'd to clk_main_a0.
 - clk_hbm_ref (100 MHz) from Shell as reference clock for HBM IP.
 - HBM AXI3 interface is clocked by the 450MHz clock generated from the
-  `AWS_CLK_GEN <./../../../common/lib/aws_clk_gen.sv>`__ IP. This IP also
+  `AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ IP. This IP also
   generates several other clocks to match with the clock recipes supported in
   F1. Please refer to the `AWS_CLK_GEN specifiction
   <./../../../docs/AWS_CLK_GEN_spec.html>`__ for details on this block. The
@@ -156,7 +156,7 @@ Clocks and Reset
 OCL
 ---
 
-The `CL_MEM_OCL_DEC <design/cl_mem_ocl_dec.sv>`__ module converts OCL
+The `CL_MEM_OCL_DEC <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_ocl_dec.sv>`__ module converts OCL
 32-bit AXI-L Interface to simple config bus interface. It consists of an
 address decoder to access register space of various blocks. See `OCL
 Address Space <#ocl-address-space>`__ for available ranges.
@@ -164,7 +164,7 @@ Address Space <#ocl-address-space>`__ for available ranges.
 PCIM
 ----
 
-The `CL_PCIM_MSTR <../cl_dram_hbm_dma/design/cl_pcim_mstr.sv>`__ module
+The `CL_PCIM_MSTR <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_pcim_mstr.sv>`__ module
 is connected to the 512-bit AXI4 PCIM interface. It consists of AXI4
 Traffic Generator capable of issuing Read/Write requests to the Host
 over the PCIe link. This block can also be used to test the peak PCIe
@@ -184,7 +184,7 @@ datapaths to the DDR and HBM memories in the FPGA. The address range to
 access DDR and HBM memories is described in `PCIS Memory Address
 Space <#pcis-memory-address-space>`__.
 
-The `CL_AXI_MSTR <../cl_dram_hbm_dma/design/cl_dram_dma_axi_mstr.sv>`__
+The `CL_AXI_MSTR <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_dram_dma_axi_mstr.sv>`__
 module is another simple AXI4 traffic generator whose traffic pattern
 and access length can be configured using the registers. The AXI4
 interface from CL_AXI_MSTR and PCIS feed to CL_AXI_INTERCONNECT which
@@ -200,7 +200,7 @@ DDR
 ---
 
 AWS provides
-`SH_DDR <../../../common/shell_stable/design/sh_ddr/synth/sh_ddr.sv>`__
+`SH_DDR <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/synth/sh_ddr.sv>`__
 that houses the DDR4 Controller specifically configured to the DDR DIMM
 on the FPGA Card. The SH_DDR is also connected to the Shell's
 sh_cl_ddr_stat\_\* ports to enable Shell to manage DDR calibration upon
@@ -220,7 +220,7 @@ possible performance out of HBM. HBM offers theoretical max bandwidth of
 460GB/s when traffic is active across all the 32 Channels with 450MHz
 clock.
 
-The `CL_HBM_AXI4 <design/cl_mem_hbm_axi4.sv>`__ module demonstrates an
+The `CL_HBM_AXI4 <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_hbm_axi4.sv>`__ module demonstrates an
 use case for HBM traffic as shown in the block diagram below:
 
 |cl_hbm_kernel|
@@ -294,9 +294,9 @@ SDA
 
 The SDA interface is shared between two modules:
 
-1. The `CL_SDA_SLV <../cl_dram_hbm_dma/design/cl_sda_slv.sv>`__ module
+1. The `CL_SDA_SLV <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_sda_slv.sv>`__ module
    provides access to a 1KB BRAM through SDA 32-bit AXI-L Interface.
-2. The `AWS_CLK_GEN <./../../../common/lib/aws_clk_gen.sv>`__ module
+2. The `AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ module
    generates all the required clocks for the design. Please refer to the
    `AWS_CLK_GEN specifiction <./../../../docs/AWS_CLK_GEN_spec.html>`__ for
    details on this block. The `Clock Recipes User
@@ -308,18 +308,18 @@ The SDA interface is shared between two modules:
 Interrupts
 ----------
 
-The `CL_INT_SLV <../cl_dram_hbm_dma/design/cl_int_tst.sv>`__ module
+The `CL_INT_SLV <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_int_tst.sv>`__ module
 implements simple mechanism to trigger MSIX interrupts to the host over
 sh_cl_apppf_irq_req/ack interface. SW can check the status of the
 interrupt triggers and also configure the interrupt masks. The
 ``interrupt_example()`` routine in
-`test_dram_hbm_dma.c <./software/runtime/test_dram_hbm_dma.c>`__
+`test_dram_hbm_dma.c <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_hbm_dma.c>`__
 demonstrates interrupts functionality.
 
 Virtual JTAG
 ------------
 
-The `CL_ILA <../cl_dram_hbm_dma/design/cl_ila.sv>`__ instantiates the
+The `CL_ILA <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_ila.sv>`__ instantiates the
 Debug Bridge IP required to support Virtual JTAG and the two example
 ILAs. One ILA snoops the PCIS bus, whereas second ILA snoops DDR-AXI4
 bus.
@@ -636,7 +636,7 @@ Simulations
 ===========
 
 Please see more details on running simulations in this
-`README <verif/README.md>`__
+`README <./verif/README.html>`__
 
 Software
 ========
@@ -645,12 +645,11 @@ DMA accesses rely on the `XDMA
 driver <https://github.com/Xilinx/dma_ip_drivers>`__
 
 The CL_MEM_PERF example includes runtime software to demonstrate working
-DMA accesses. The runtime example is located `in the runtime
-directory <software/runtime/test_dram_hbm_dma.c>`__
+DMA accesses. The runtime example is located `in the runtime directory <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_hbm_dma.c>`__
 
 Following runtime tests are provided in the cl_mem_perf example:
 
-.. _test_hbm_perf32c:
+.. _test-hbm-perf32c-mem-1:
 
 test_hbm_perf32.c
 -----------------
@@ -658,7 +657,7 @@ test_hbm_perf32.c
 This test runs traffic and measure HBM performance aggregated across all
 32 HBM Channels.
 
-.. _test_dram_hbm_dmac:
+.. _test-dram-hbm-dmac-mem-1:
 
 test_dram_hbm_dma.c
 -------------------
@@ -666,7 +665,7 @@ test_dram_hbm_dma.c
 This test runs a software test with data transfer with both DDR and HBM
 enabled
 
-.. _test_hbm_perf32c-1:
+.. _test-hbm-perf32c-mem-2:
 
 test_hbm_perf32.c
 -----------------
@@ -674,22 +673,24 @@ test_hbm_perf32.c
 This test exercises all 32 HBM Channels using data transfers from
 HBM_PERF_KERNEL. Achieves 400+ GB/s of writes and read performance.
 
-.. _test_aws_clk_genc:
+.. _test-aws-clk-genc:
 
 test_aws_clk_gen.c
 ------------------
 
-This test uses `CL_CLK_FREQ <design/cl_clk_freq.sv>`__ to measure the
+This test uses `CL_CLK_FREQ <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_clk_freq.sv>`__ to measure the
 clock frequencies from
-`AWS_CLK_GEN <./../../../common/lib/aws_clk_gen.sv>`__ block
+`AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ block
 
-.. _test_clk_freqc:
+.. _test-clk-freqc:
 
 test_clk_freq.c
 ---------------
 
 This test uses AWS APIs to configure clock frequencies into
-`AWS_CLK_GEN <./../../../common/lib/aws_clk_gen.sv>`__ block
+`AWS_CLK_GEN <https://github.com/aws/aws-fpga/tree/f2/hdk/common/lib/aws_clk_gen.sv>`__ block
+
+.. _compile-and-run-instructions-mem-1:
 
 Compile and run instructions
 ----------------------------
@@ -700,7 +701,7 @@ Compile and run instructions
   make all
   sudo ./test_dram_hbm_dma
 
-.. _test_dram_hbm_dma_hwsw_cosimc:
+.. _test-dram-hbm-dma-hwsw-cosimc-mem-1:
 
 test_dram_hbm_dma_hwsw_cosim.c
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -708,7 +709,7 @@ test_dram_hbm_dma_hwsw_cosim.c
 This test runs a software test with HW/SW co-simulation enabled with
 both DDR and HBM enabled.
 
-.. _compile-and-run-instructions-1:
+.. _compile-and-run-instructions-mem-2:
 
 Compile and run instructions
 ----------------------------
@@ -726,14 +727,16 @@ The test can be simulated with XSIM as follows.
   cd $CL_DIR/verif/scripts
   make C_TEST=test_dram_hbm_dma_hwsw_cosim
 
+.. _hbm-performance-tests-mem-1:
+
 HBM Performance Tests
 =====================
 
 A runtime test is provided to measure HBM performance aggregated across
 all 32 HBM Channels. The runtime test should be run on a real machine
 consisting of F2 FPGA loaded with CL_MEM_PERF bitstreams. The runtime
-test `test_hbm_perf32.c <software/runtime/test_hbm_perf32.c>`__
-exercises `CL_HBM_PERF_KERNEL <design/cl_hbm_perf_kernel.sv>`__ module
+test `test_hbm_perf32.c <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_hbm_perf32.c>`__
+exercises `CL_HBM_PERF_KERNEL <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_hbm_perf_kernel.sv>`__ module
 to generate data across all 32 channels of the HBM running at 450MHz
 speeds. The test configures to run traffic across all 32 channels. There
 are config registers in CL_HBM_PERF_KERNEL that keep track of the number
