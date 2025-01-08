@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,7 +18,7 @@
 from __future__ import print_function
 import os
 import sys
-import distro
+import platform
 import glob
 import argparse
 import logging
@@ -65,8 +65,8 @@ def cmd_exec(cmd):
         sys.exit(1)
 
 def install_dpdk_dep():
-    installed_distro = distro.name()
-    if (installed_distro == "Ubuntu"):
+    distro = platform.linux_distribution()
+    if (distro[0] == "Ubuntu"):
         cmd_exec("sudo apt -y install libnuma-dev")
         cmd_exec("sudo apt -y install libpcap-dev")
     else:
@@ -100,12 +100,12 @@ def install_pktgen_dpdk(install_path):
     patchfiles = []
     for patchfile in sorted(glob.iglob("%s/000*.patch" % (patches_path))):
         logger.debug("found patchfile=%s for pktgen" % patchfile)
-        patchfiles.append(os.path.abspath(patchfile))
+	patchfiles.append(os.path.abspath(patchfile))
     # Read in the dpdk patch filenames
     dpdk_patchfiles = []
     for dpdk_patchfile in sorted(glob.iglob("%s/dpdk*.patch" % (patches_path))):
         logger.debug("found patchfile=%s for dpdk" % dpdk_patchfile)
-        dpdk_patchfiles.append(os.path.abspath(dpdk_patchfile))
+	dpdk_patchfiles.append(os.path.abspath(dpdk_patchfile))
     # cd to the install_path directory
     os.chdir("%s" % (install_path))
 
