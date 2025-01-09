@@ -44,7 +44,7 @@ def print_success(scripts_path, install_path):
     print("DPDK setup complete!")
     print("pktgen-dpdk may be run via the following steps:")
     print("  cd %s/pktgen-dpdk" % (install_path))
-    print("  sudo ./app/%s/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -b 00:03.0 -- -T -P -m [1].0 -f %s/pktgen-ena.pkt" % (make_tgt, scripts_path))
+    print("  sudo ./app/%s/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -- -T -P -m [1].0 -f %s/pktgen-ena.pkt" % (make_tgt, scripts_path))
 
 def check_output(args, stderr=None):
     return subprocess.Popen(args, stdout=subprocess.PIPE,

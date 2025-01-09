@@ -7,9 +7,9 @@
 * [Example Workflows](#ExampleWorkflows)
 
    * ["Hello World" Loopback](#HelloWorldLoopback)
-   
+
    * ["End-to-End" PacketGen Traffic](#EndToEndPktGen)
-   
+
 * [FAQ](#FAQ)
 
 
@@ -21,7 +21,7 @@ The Virtual Ethernet architecture ([here](../README.md)) supports your developme
 ## Virtual Ethernet Application Setup and Use
 The distinct phases of Virtual Ethernet Application setup and use are:
 
-* Software installation and build 
+* Software installation and build
 * System setup and device binding (e.g. FPGA and ENI)
 * Application setup and start
 
@@ -73,10 +73,10 @@ In the below diagram, the `red` line shows the Ethernet frame path from the **Pa
 
 * **Traffic Generator Instance**
     * The Traffic Generator instance uses pktgen-dpdk to send max PPS towards the Virtual Ethernet instance. This example was tested using an `m5.2xlarge` and an `f1.2xlarge`.
-    
+
 * **Network Interface Setup**
     * This example workflow places the PacketGen traffic on `eth1`, and reserves `eth0` for your SSH sessions and other control plane traffic.
-    * An additional network interface can be attached via the EC2 "Attach Network Interface" workflow.  Your new `eth1` network interface is automatically initialized if you are using Amazon Linux.  If you are using CentOS, please refer to these additional [steps](#CentosEthCfg).  The ENI `DBDF` (e.g. the PCI Domain:Bus:Device.Function) for your new ENI interface is retrieved using this [command](#EniDbdf). 
+    * An additional network interface can be attached via the EC2 "Attach Network Interface" workflow.  Your new `eth1` network interface is automatically initialized if you are using Amazon Linux.  If you are using CentOS, please refer to these additional [steps](#CentosEthCfg).  The ENI `DBDF` (e.g. the PCI Domain:Bus:Device.Function) for your new ENI interface is retrieved using this [command](#EniDbdf).
 
 #### Virtual Ethernet instance
 
@@ -130,7 +130,7 @@ Packet Generator setup and start phase:
 A sample Packet Generator `pktgen-ena.pkt` script is provided.   You will need to modify it to work with your F1 instances.
 
 ```
-cat $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena.pkt 
+cat $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena.pkt
 set 0 dst mac 12:DD:AB:C2:D3:B8  # set this to Virtual Ethernet instance eth1 mac address
 set 0 src ip 172.31.63.86/24     # set this to the Packet Generator instance eth1 IP address
 set 0 dst ip 172.31.58.142       # set this to the Virtual Ethernet instance eth1 IP address
@@ -142,7 +142,7 @@ set 0 size 64
 start 0
 ```
 
-Similarly a `pktgen-ena-range.pkt` script is provided for multiflow run with a range of parameters. This needs to be modified with corresponding dest mac address, src and dest ip addresses. 
+Similarly a `pktgen-ena-range.pkt` script is provided for multiflow run with a range of parameters. This needs to be modified with corresponding dest mac address, src and dest ip addresses.
 
 ```
 cat $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt
@@ -160,12 +160,12 @@ range 0 dst ip min 172.31.59.180            # set this to the Virtual Ethernet i
 range 0 dst ip max 172.31.59.180            # set this to the Virtual Ethernet instance eth1 IP address
 range 0 dst ip inc 0.0.0.0
 range 0 src port start 1000
-range 0 src port min 1000 
+range 0 src port min 1000
 range 0 src port max 1020
 range 0 src port inc 1
 range 0 dst port start 1000
 range 0 dst port min 1000
-range 0 dst port max 1020 
+range 0 dst port max 1020
 range 0 dst port inc 1
 range 0 size start 4096
 range 0 size min 4096
@@ -181,7 +181,7 @@ When running the below command, with -j option, the packet size can be set to ju
 
 ```
 cd <install_dir>/pktgen-dpdk
-sudo LD_LIBRARY_PATH=/usr/local/lib64 ./Builddir/app/pktgen -l 0,1 -n 16 --proc-type auto --log-level 7 --socket-mem 4096 --file-prefix pg -b 00:03.0 -- -T -j -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt
+sudo LD_LIBRARY_PATH=/usr/local/lib64 ./Builddir/app/pktgen -l 0,1 -n 16 --proc-type auto --log-level 7 --socket-mem 4096 --file-prefix pg -- -T -j -P -m [1].0 -f $(SDK_DIR)/apps/virtual-ethernet/scripts/pktgen-ena-range.pkt
 ```
 
 <a name="FAQ"></a>
@@ -196,7 +196,7 @@ The AGFI ID for the SDE loopback CL is found in the `CL_SDE Example Metadata` se
 
 The full documentation for DPDK testpmd features is found [here](http://dpdk.org/doc/guides/testpmd_app_ug/index.html).
 
-Note that not all of the DPDK testpmd features are supported by the SPP and ENI PMDs.  SPP supports a limited subset of the DPDK Ethernet upper API (e.g. DPDK eth_dev_ops) to the DPDK application(s) (e.g. testpmd) for purposes of passing through streaming packets to/from the SDE. 
+Note that not all of the DPDK testpmd features are supported by the SPP and ENI PMDs.  SPP supports a limited subset of the DPDK Ethernet upper API (e.g. DPDK eth_dev_ops) to the DPDK application(s) (e.g. testpmd) for purposes of passing through streaming packets to/from the SDE.
 
 The application examples use testpmd auto-start mode.  testpmd also supports an interactive mode that may be used during debug and test sessions.  Interactive mode is especially useful when running testpmd within the `gdb` debugger.  Below is a quick reference guide for some of the supported testpmd interactive mode commands that may be used with the application examples.
 
@@ -210,7 +210,7 @@ Change the command line as follows:
 
 ./x86_64-native-linuxapp-gcc/app/testpmd -l 0-1  -- --port-topology=loop -i
 
-You should now be in interactive mode with a `testpmd>` prompt.  
+You should now be in interactive mode with a `testpmd>` prompt.
 
 * show port info all
     * Shows the port info for all of the active DPDK ports (e.g. shows DPDK port `0` to driver name `net_spp` mapping)
@@ -235,9 +235,9 @@ The simple ["End-to-End" PacketGen Traffic](#EndToEndPktGen) example uses a one-
 
 The goal of SPP on F1 is to sustain line rate network bandwidth for all network configurations supported on the AWS FPGA instances.
 
-### Q: How does packet drop and flow control work? 
+### Q: How does packet drop and flow control work?
 
-Packet drop and flow control characteristics are application specific, since you are free to use the DPDK drivers and environment in the best way that suits your specific application.  
+Packet drop and flow control characteristics are application specific, since you are free to use the DPDK drivers and environment in the best way that suits your specific application.
 
 As an example, let’s assume we have a packet forwarding topology that directly connects an ENI to an SPP that does not drop any remaining TX packets after partial TX packet burst has been submitted to ENI.  Since the application is in control of the packet processing, it can flow off the SPP RX side by asking for fewer RX packets in the next call to the SPP RX packet burst API.  If the ENI TX backpressure condition persists, the application may stop calling the SPP RX packet burst API.  At this point, SPP will stop processing RX descriptors, the C2H buffer in the SDE will become full (see the SDE HW Guide [here](./SDE_HW_Guide.md)), and this will backpressure the AXI-Stream interface (e.g. the SDE will de-assert the ‘ready’ signal on the C2H AXI-Stream interface).  This may then backpressure the SPP TX side, which is again under application control.  If the SPP TX side backpressure condition persists, the application may stop processing ENI RX packets and this will eventually cause packet drops on the ENI RX side facing the network.
 
@@ -261,19 +261,19 @@ Your application should periodically check to see if the TX/RX sde_error stat is
 
 At this point, the DPDK SPP driver and SDE may be re-initialized as normal.  The SDE is reset during the SPP PCI device probe initialization step, and the TX/RX queues are re-initialized during the TX/RX queue setup phase.
 
-### Q: What is the minimal packet size supported by AWS FPGA virtual ethernet IP? 
+### Q: What is the minimal packet size supported by AWS FPGA virtual ethernet IP?
 
 FPGA CL must generate packets with 64Byte or more to meet the Ethernet minimum frame size requirement.
 
-### Q: What is the maximal packet size? 
+### Q: What is the maximal packet size?
 
 It is the maximal packet size offered by ENI on your instance (including the 4-byte CRC).
 
-### Q: Should I calculate the Ethernet frame CRC32? 
+### Q: Should I calculate the Ethernet frame CRC32?
 
 No, SPP relies on the ENI to check CRC on receive and calculate it on transmit.
 
-### Q: What MAC address should I use for SPP? 
+### Q: What MAC address should I use for SPP?
 
 The SPP MAC address is normally unused for testpmd port based forwarding and defaults to all zeroes.  The default SPP MAC address may be changed if needed using the testpmd ‘mac_addr set’ command when using the testpmd application, or by your custom application using the DPDK APIs.
 
@@ -312,7 +312,7 @@ Add the `GATEWAYDEV=eth0` to the `/etc/sysconfig/network` file.
 
 ```
 cd /etc/sysconfig
-echo "GATEWAYDEV=eth0" >> network 
+echo "GATEWAYDEV=eth0" >> network
 ```
 
 Use the `ifconfig` command to show the `eth1` MAC address (e.g. the `ether 12:1e:7e:0b:70:2e` in the below example).
@@ -388,7 +388,7 @@ aws_fpga_sde = {'Class': '05', 'Vendor': '1d0f', 'Device': 'f002',
               'SVendor': None, 'SDevice': None}
 <your tag> = {'Class': '05', 'Vendor': '<Your Vendor ID>', 'Device': '<Your Device ID>',
               'SVendor': None, 'SDevice': None}
-              
+
 network_devices = [network_class, cavium_pkx, avp_vnic, aws_fpga_sde, <your tag>]
 ```
 
