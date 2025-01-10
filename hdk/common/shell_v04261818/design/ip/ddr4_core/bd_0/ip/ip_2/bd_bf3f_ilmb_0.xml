@@ -57,7 +57,7 @@
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
               <spirit:left spirit:format="long">0</spirit:left>
-              <spirit:right spirit:format="long">31</spirit:right>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) - 1)">31</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -158,6 +158,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_0.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -218,8 +227,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">32</spirit:left>
-              <spirit:right spirit:format="long">63</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 1)">32</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 2 - 1)">63</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -320,6 +329,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_1.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -380,8 +398,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">64</spirit:left>
-              <spirit:right spirit:format="long">95</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 2)">64</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 3 - 1)">95</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -482,6 +500,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_2.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -542,8 +569,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">96</spirit:left>
-              <spirit:right spirit:format="long">127</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 3)">96</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 4 - 1)">127</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -644,6 +671,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_3.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -704,8 +740,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">128</spirit:left>
-              <spirit:right spirit:format="long">159</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 4)">128</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 5 - 1)">159</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -806,6 +842,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_4.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -866,8 +911,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">160</spirit:left>
-              <spirit:right spirit:format="long">191</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 5)">160</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 6 - 1)">191</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -968,6 +1013,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_5.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1028,8 +1082,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">192</spirit:left>
-              <spirit:right spirit:format="long">223</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 6)">192</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 7 - 1)">223</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1130,6 +1184,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_6.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1190,8 +1253,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">224</spirit:left>
-              <spirit:right spirit:format="long">255</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 7)">224</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 8 - 1)">255</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1292,6 +1355,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_7.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1352,8 +1424,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">256</spirit:left>
-              <spirit:right spirit:format="long">287</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 8)">256</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 9 - 1)">287</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1454,6 +1526,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_8.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1514,8 +1595,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">288</spirit:left>
-              <spirit:right spirit:format="long">319</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 9)">288</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 10 - 1)">319</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1616,6 +1697,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_9.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1676,8 +1766,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">320</spirit:left>
-              <spirit:right spirit:format="long">351</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 10)">320</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 11 - 1)">351</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1778,6 +1868,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_10.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -1838,8 +1937,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">352</spirit:left>
-              <spirit:right spirit:format="long">383</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 11)">352</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 12 - 1)">383</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -1940,6 +2039,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_11.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -2000,8 +2108,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">384</spirit:left>
-              <spirit:right spirit:format="long">415</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 12)">384</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 13 - 1)">415</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -2102,6 +2210,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_12.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -2162,8 +2279,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">416</spirit:left>
-              <spirit:right spirit:format="long">447</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 13)">416</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 14 - 1)">447</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -2264,6 +2381,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_13.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -2324,8 +2450,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">448</spirit:left>
-              <spirit:right spirit:format="long">479</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 14)">448</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 15 - 1)">479</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -2426,6 +2552,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_14.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
@@ -2486,8 +2621,8 @@
           <spirit:physicalPort>
             <spirit:name>Sl_DBus</spirit:name>
             <spirit:vector>
-              <spirit:left spirit:format="long">480</spirit:left>
-              <spirit:right spirit:format="long">511</spirit:right>
+              <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 15)">480</spirit:left>
+              <spirit:right spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_LMB_DWIDTH&apos;)) * 16 - 1)">511</spirit:right>
             </spirit:vector>
           </spirit:physicalPort>
         </spirit:portMap>
@@ -2582,6 +2717,15 @@
         <spirit:parameter>
           <spirit:name>READ_WRITE_MODE</spirit:name>
           <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_15.READ_WRITE_MODE">READ_WRITE</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_SL_15.PROTOCOL">STANDARD</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -2730,6 +2874,15 @@
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>PROTOCOL</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.LMB_M.PROTOCOL">STANDARD</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
     <spirit:busInterface>
@@ -2765,8 +2918,17 @@
           <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.FREQ_HZ">100000000</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
+          <spirit:name>FREQ_TOLERANCE_HZ</spirit:name>
+          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.FREQ_TOLERANCE_HZ">0</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
           <spirit:name>PHASE</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.PHASE">0.000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.PHASE">0.0</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -2775,10 +2937,28 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
-          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.CLK_DOMAIN"/>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.CLK_DOMAIN">bd_bf3f_Clk</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>ASSOCIATED_PORT</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.ASSOCIATED_PORT"/>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>INSERT_VIP</spirit:name>
+          <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="BUSIFPARAM_VALUE.CLK.LMB_CLK.INSERT_VIP">0</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>simulation.rtl</xilinx:parameterUsage>
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
@@ -2810,6 +2990,15 @@
           <spirit:name>TYPE</spirit:name>
           <spirit:value spirit:id="BUSIFPARAM_VALUE.RST.SYS_RST.TYPE">INTERCONNECT</spirit:value>
         </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>INSERT_VIP</spirit:name>
+          <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="BUSIFPARAM_VALUE.RST.SYS_RST.INSERT_VIP">0</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>simulation.rtl</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
   </spirit:busInterfaces>
@@ -2838,51 +3027,13 @@
   <spirit:model>
     <spirit:views>
       <spirit:view>
-        <spirit:name>xilinx_vhdlsynthesis</spirit:name>
-        <spirit:displayName>VHDL Synthesis</spirit:displayName>
-        <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
-        <spirit:language>vhdl</spirit:language>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_vhdlsynthesis_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:56 UTC 2018</spirit:value>
-          </spirit:parameter>
-          <spirit:parameter>
-            <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:3eb324bc</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
         <spirit:name>xilinx_synthesisconstraints</spirit:name>
         <spirit:displayName>Synthesis Constraints</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:synthesis.constraints</spirit:envIdentifier>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:3eb324bc</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_vhdlsynthesiswrapper</spirit:name>
-        <spirit:displayName>VHDL Synthesis Wrapper</spirit:displayName>
-        <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis.wrapper</spirit:envIdentifier>
-        <spirit:language>vhdl</spirit:language>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_vhdlsynthesiswrapper_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:56 UTC 2018</spirit:value>
-          </spirit:parameter>
-          <spirit:parameter>
-            <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:3eb324bc</spirit:value>
+            <spirit:value>9:02cf5359</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2891,17 +3042,18 @@
         <spirit:displayName>VHDL Simulation</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
+        <spirit:modelName>lmb_v10</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlbehavioralsimulation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:56 UTC 2018</spirit:value>
+            <spirit:value>Fri Aug 02 14:59:38 UTC 2024</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:e36aaf6a</spirit:value>
+            <spirit:value>9:6024c1ad</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2910,17 +3062,58 @@
         <spirit:displayName>VHDL Simulation Wrapper</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:simulation.wrapper</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
+        <spirit:modelName>bd_bf3f_ilmb_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlsimulationwrapper_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:56 UTC 2018</spirit:value>
+            <spirit:value>Fri Aug 02 14:59:38 UTC 2024</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:e36aaf6a</spirit:value>
+            <spirit:value>9:6024c1ad</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_vhdlsynthesis</spirit:name>
+        <spirit:displayName>VHDL Synthesis</spirit:displayName>
+        <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
+        <spirit:language>vhdl</spirit:language>
+        <spirit:modelName>lmb_v10</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_vhdlsynthesis_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Fri Aug 02 14:59:38 UTC 2024</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
+            <spirit:name>outputProductCRC</spirit:name>
+            <spirit:value>9:02cf5359</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_vhdlsynthesiswrapper</spirit:name>
+        <spirit:displayName>VHDL Synthesis Wrapper</spirit:displayName>
+        <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis.wrapper</spirit:envIdentifier>
+        <spirit:language>vhdl</spirit:language>
+        <spirit:modelName>bd_bf3f_ilmb_0</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_vhdlsynthesiswrapper_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Fri Aug 02 14:59:38 UTC 2024</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
+            <spirit:name>outputProductCRC</spirit:name>
+            <spirit:value>9:02cf5359</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3326,13 +3519,18 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_LMB_DWIDTH</spirit:name>
-        <spirit:displayName>C Lmb Dwidth</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_LMB_DWIDTH" spirit:choiceRef="choice_list_6fc15197">32</spirit:value>
+        <spirit:displayName>LMB Data Bus Width</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_LMB_DWIDTH" spirit:choiceRef="choice_list_99ba8646">32</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_LMB_AWIDTH</spirit:name>
-        <spirit:displayName>C Lmb Awidth</spirit:displayName>
+        <spirit:displayName>LMB Address Bus Width</spirit:displayName>
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_LMB_AWIDTH" spirit:minimum="32" spirit:maximum="64" spirit:rangeType="long">32</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>C_LMB_PROTOCOL</spirit:name>
+        <spirit:displayName>LMB Protocol</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_LMB_PROTOCOL" spirit:choiceRef="choice_pairs_0873e75e">0</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_EXT_RESET_HIGH</spirit:name>
@@ -3343,8 +3541,14 @@
   </spirit:model>
   <spirit:choices>
     <spirit:choice>
-      <spirit:name>choice_list_6fc15197</spirit:name>
+      <spirit:name>choice_list_99ba8646</spirit:name>
       <spirit:enumeration>32</spirit:enumeration>
+      <spirit:enumeration>64</spirit:enumeration>
+    </spirit:choice>
+    <spirit:choice>
+      <spirit:name>choice_pairs_0873e75e</spirit:name>
+      <spirit:enumeration spirit:text="STANDARD">0</spirit:enumeration>
+      <spirit:enumeration spirit:text="FREQUENCY">1</spirit:enumeration>
     </spirit:choice>
     <spirit:choice>
       <spirit:name>choice_pairs_4873554b</spirit:name>
@@ -3354,32 +3558,12 @@
   </spirit:choices>
   <spirit:fileSets>
     <spirit:fileSet>
-      <spirit:name>xilinx_vhdlsynthesis_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>bd_bf3f_ilmb_0.xdc</spirit:name>
-        <spirit:userFileType>xdc</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/lmb_v10_v3_0_vh_rfs.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>lmb_v10_v3_0_9</spirit:logicalName>
-      </spirit:file>
-    </spirit:fileSet>
-    <spirit:fileSet>
-      <spirit:name>xilinx_vhdlsynthesiswrapper_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>synth/bd_bf3f_ilmb_0.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
-      </spirit:file>
-    </spirit:fileSet>
-    <spirit:fileSet>
       <spirit:name>xilinx_vhdlbehavioralsimulation_view_fileset</spirit:name>
       <spirit:file>
         <spirit:name>hdl/lmb_v10_v3_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>lmb_v10_v3_0_9</spirit:logicalName>
+        <spirit:logicalName>lmb_v10_v3_0_14</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -3390,17 +3574,37 @@
         <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_vhdlsynthesis_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>bd_bf3f_ilmb_0.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/lmb_v10_v3_0_vh_rfs.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>lmb_v10_v3_0_14</spirit:logicalName>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_vhdlsynthesiswrapper_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>synth/bd_bf3f_ilmb_0.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+    </spirit:fileSet>
   </spirit:fileSets>
   <spirit:description>The LMB is a fast, local bus for connecting MicroBlaze I and D ports to peripherals and BRAM</spirit:description>
   <spirit:parameters>
     <spirit:parameter>
       <spirit:name>C_LMB_DWIDTH</spirit:name>
       <spirit:displayName>C Lmb Dwidth</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_DWIDTH" spirit:choiceRef="choice_list_6fc15197" spirit:order="1200" spirit:configGroups="1 LMB">32</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_DWIDTH" spirit:choiceRef="choice_list_99ba8646" spirit:order="2" spirit:configGroups="1 LMB">32</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PARAM_ENABLEMENT.C_LMB_DWIDTH">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_LMB_DWIDTH">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
@@ -3408,23 +3612,28 @@
     <spirit:parameter>
       <spirit:name>C_LMB_AWIDTH</spirit:name>
       <spirit:displayName>C Lmb Awidth</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_AWIDTH" spirit:order="1300" spirit:configGroups="1 LMB" spirit:minimum="32" spirit:maximum="64" spirit:rangeType="long">32</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_AWIDTH" spirit:order="3" spirit:configGroups="1 LMB" spirit:minimum="32" spirit:maximum="64" spirit:rangeType="long">32</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PARAM_ENABLEMENT.C_LMB_AWIDTH">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_LMB_AWIDTH">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
     </spirit:parameter>
     <spirit:parameter>
+      <spirit:name>C_LMB_PROTOCOL</spirit:name>
+      <spirit:displayName>LMB Protocol</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_PROTOCOL" spirit:choiceRef="choice_pairs_0873e75e" spirit:order="4" spirit:configGroups="1 Parameters">0</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
       <spirit:name>C_EXT_RESET_HIGH</spirit:name>
       <spirit:displayName>C Ext Reset High</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EXT_RESET_HIGH" spirit:choiceRef="choice_pairs_4873554b" spirit:order="1100" spirit:configGroups="1 LMB">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EXT_RESET_HIGH" spirit:choiceRef="choice_pairs_4873554b" spirit:order="5" spirit:configGroups="1 LMB">1</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PARAM_ENABLEMENT.C_EXT_RESET_HIGH">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_EXT_RESET_HIGH">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
@@ -3432,45 +3641,60 @@
     <spirit:parameter>
       <spirit:name>C_LMB_NUM_SLAVES</spirit:name>
       <spirit:displayName>LMB Number of Slaves</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_NUM_SLAVES" spirit:order="1000" spirit:configGroups="1 LMB" spirit:minimum="1" spirit:maximum="16" spirit:rangeType="long">2</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_LMB_NUM_SLAVES" spirit:order="6" spirit:configGroups="1 LMB" spirit:minimum="1" spirit:maximum="16" spirit:rangeType="long">2</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PARAM_ENABLEMENT.C_LMB_NUM_SLAVES">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_LMB_NUM_SLAVES">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:parameterInfo>
       </spirit:vendorExtensions>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">bd_bf3f_ilmb_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="7">bd_bf3f_ilmb_0</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
       <xilinx:displayName>Local Memory Bus (LMB) 1.0</xilinx:displayName>
-      <xilinx:coreRevision>9</xilinx:coreRevision>
+      <xilinx:coreRevision>14</xilinx:coreRevision>
       <xilinx:configElementInfos>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.ASSOCIATED_BUSIF" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.ASSOCIATED_PORT" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.ASSOCIATED_RESET" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.CLK_DOMAIN" xilinx:valueSource="constant_prop" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.FREQ_HZ" xilinx:valueSource="user_prop" xilinx:valuePermission="bd"/>
-        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_M.DATA_WIDTH" xilinx:valueSource="constant_prop" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.FREQ_TOLERANCE_HZ" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.LMB_CLK.PHASE" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_M.ADDR_WIDTH" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_M.DATA_WIDTH" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_M.PROTOCOL" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_M.READ_WRITE_MODE" xilinx:valueSource="constant_prop" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_0.ADDR_WIDTH" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_0.DATA_WIDTH" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_0.PROTOCOL" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_0.READ_WRITE_MODE" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_1.ADDR_WIDTH" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_1.DATA_WIDTH" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_1.PROTOCOL" xilinx:valueSource="propagated" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.LMB_SL_1.READ_WRITE_MODE" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.RST.SYS_RST.POLARITY" xilinx:valuePermission="bd"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.RST.SYS_RST.TYPE" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_LMB_AWIDTH" xilinx:valueSource="propagated"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_LMB_DWIDTH" xilinx:valueSource="propagated"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_LMB_NUM_SLAVES" xilinx:valueSource="user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_LMB_PROTOCOL" xilinx:valueSource="propagated"/>
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="dc44e9b7"/>
+      <xilinx:xilinxVersion>2024.1</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="def5116a"/>
       <xilinx:checksum xilinx:scope="channels" xilinx:value="7bb81c1f"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="c4c4312b"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="edc0bdf6"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="f1995a09"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="ff84d2b9"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="e33d80b9"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="c6e46f45"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="f8adac45"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

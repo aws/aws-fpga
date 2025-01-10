@@ -133,7 +133,7 @@ if ! exists vivado; then
    fi
 else
     info_msg "You are using instance with installed vivado tools. determining VIVADO version for runtime setup..."
-    VIVADO_TOOL_VERSION=`vivado -version | grep Vivado | head -1 | sed 's:Vivado *::' | sed 's: .*$::' | sed 's:v::'`
+    VIVADO_TOOL_VERSION=`vivado -version | grep -i vivado | head -1 | sed 's:vivado *::I' | sed 's: .*$::I' | sed 's:v::I'`
     export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:6}
 fi
 info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
@@ -142,7 +142,7 @@ info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 check_kernel_ver
 check_xdma_driver
 
-if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020\.* || "$VIVADO_TOOL_VERSION" =~ .*2021\.*  ]]; then
+if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020\.* || "$VIVADO_TOOL_VERSION" =~ .*2021\.* || $VIVADO_TOOL_VERSION =~ .*2024\.1.* ]]; then
     info_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION"
 
     if [ $override == 1 ]; then
@@ -183,7 +183,7 @@ if [[ "$VIVADO_TOOL_VERSION" =~ .*2019\.2.*  || "$VIVADO_TOOL_VERSION" =~ .*2020
        return 1
     fi
 else
-   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2, 2020.1, 2020.2, 2021.1 or 2021.2 are supported for Vitis "
+   err_msg "Xilinx Vivado version is $VIVADO_TOOL_VERSION , only 2019.2, 2020.1, 2020.2, 2021.1, 2021.2 or 2024.1 are supported for Vitis "
    return 1
 fi
 

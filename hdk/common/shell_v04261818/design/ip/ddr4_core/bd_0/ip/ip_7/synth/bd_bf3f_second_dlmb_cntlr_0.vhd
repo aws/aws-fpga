@@ -1,21 +1,21 @@
--- (c) Copyright 1995-2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-- (c) Copyright 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 -- 
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -24,11 +24,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 -- 
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -37,7 +37,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 -- 
@@ -47,14 +47,14 @@
 -- DO NOT MODIFY THIS FILE.
 
 -- IP VLNV: xilinx.com:ip:lmb_bram_if_cntlr:4.0
--- IP Revision: 14
+-- IP Revision: 24
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-LIBRARY lmb_bram_if_cntlr_v4_0_14;
-USE lmb_bram_if_cntlr_v4_0_14.lmb_bram_if_cntlr;
+LIBRARY lmb_bram_if_cntlr_v4_0_24;
+USE lmb_bram_if_cntlr_v4_0_24.lmb_bram_if_cntlr;
 
 ENTITY bd_bf3f_second_dlmb_cntlr_0 IS
   PORT (
@@ -94,8 +94,14 @@ ARCHITECTURE bd_bf3f_second_dlmb_cntlr_0_arch OF bd_bf3f_second_dlmb_cntlr_0 IS
       C_MASK1 : STD_LOGIC_VECTOR;
       C_MASK2 : STD_LOGIC_VECTOR;
       C_MASK3 : STD_LOGIC_VECTOR;
+      C_MASK4 : STD_LOGIC_VECTOR;
+      C_MASK5 : STD_LOGIC_VECTOR;
+      C_MASK6 : STD_LOGIC_VECTOR;
+      C_MASK7 : STD_LOGIC_VECTOR;
       C_LMB_AWIDTH : INTEGER;
       C_LMB_DWIDTH : INTEGER;
+      C_LMB_PROTOCOL : INTEGER;
+      C_ARBITRATION : INTEGER;
       C_ECC : INTEGER;
       C_INTERCONNECT : INTEGER;
       C_FAULT_INJECT : INTEGER;
@@ -157,6 +163,50 @@ ARCHITECTURE bd_bf3f_second_dlmb_cntlr_0_arch OF bd_bf3f_second_dlmb_cntlr_0 IS
       Sl3_Wait : OUT STD_LOGIC;
       Sl3_UE : OUT STD_LOGIC;
       Sl3_CE : OUT STD_LOGIC;
+      LMB4_ABus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB4_WriteDBus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB4_AddrStrobe : IN STD_LOGIC;
+      LMB4_ReadStrobe : IN STD_LOGIC;
+      LMB4_WriteStrobe : IN STD_LOGIC;
+      LMB4_BE : IN STD_LOGIC_VECTOR(0 TO 3);
+      Sl4_DBus : OUT STD_LOGIC_VECTOR(0 TO 31);
+      Sl4_Ready : OUT STD_LOGIC;
+      Sl4_Wait : OUT STD_LOGIC;
+      Sl4_UE : OUT STD_LOGIC;
+      Sl4_CE : OUT STD_LOGIC;
+      LMB5_ABus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB5_WriteDBus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB5_AddrStrobe : IN STD_LOGIC;
+      LMB5_ReadStrobe : IN STD_LOGIC;
+      LMB5_WriteStrobe : IN STD_LOGIC;
+      LMB5_BE : IN STD_LOGIC_VECTOR(0 TO 3);
+      Sl5_DBus : OUT STD_LOGIC_VECTOR(0 TO 31);
+      Sl5_Ready : OUT STD_LOGIC;
+      Sl5_Wait : OUT STD_LOGIC;
+      Sl5_UE : OUT STD_LOGIC;
+      Sl5_CE : OUT STD_LOGIC;
+      LMB6_ABus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB6_WriteDBus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB6_AddrStrobe : IN STD_LOGIC;
+      LMB6_ReadStrobe : IN STD_LOGIC;
+      LMB6_WriteStrobe : IN STD_LOGIC;
+      LMB6_BE : IN STD_LOGIC_VECTOR(0 TO 3);
+      Sl6_DBus : OUT STD_LOGIC_VECTOR(0 TO 31);
+      Sl6_Ready : OUT STD_LOGIC;
+      Sl6_Wait : OUT STD_LOGIC;
+      Sl6_UE : OUT STD_LOGIC;
+      Sl6_CE : OUT STD_LOGIC;
+      LMB7_ABus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB7_WriteDBus : IN STD_LOGIC_VECTOR(0 TO 31);
+      LMB7_AddrStrobe : IN STD_LOGIC;
+      LMB7_ReadStrobe : IN STD_LOGIC;
+      LMB7_WriteStrobe : IN STD_LOGIC;
+      LMB7_BE : IN STD_LOGIC_VECTOR(0 TO 3);
+      Sl7_DBus : OUT STD_LOGIC_VECTOR(0 TO 31);
+      Sl7_Ready : OUT STD_LOGIC;
+      Sl7_Wait : OUT STD_LOGIC;
+      Sl7_UE : OUT STD_LOGIC;
+      Sl7_CE : OUT STD_LOGIC;
       BRAM_Rst_A : OUT STD_LOGIC;
       BRAM_Clk_A : OUT STD_LOGIC;
       BRAM_Addr_A : OUT STD_LOGIC_VECTOR(0 TO 31);
@@ -189,38 +239,38 @@ ARCHITECTURE bd_bf3f_second_dlmb_cntlr_0_arch OF bd_bf3f_second_dlmb_cntlr_0 IS
     );
   END COMPONENT lmb_bram_if_cntlr;
   ATTRIBUTE X_CORE_INFO : STRING;
-  ATTRIBUTE X_CORE_INFO OF bd_bf3f_second_dlmb_cntlr_0_arch: ARCHITECTURE IS "lmb_bram_if_cntlr,Vivado 2017.4.op";
+  ATTRIBUTE X_CORE_INFO OF bd_bf3f_second_dlmb_cntlr_0_arch: ARCHITECTURE IS "lmb_bram_if_cntlr,Vivado 2024.1";
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF bd_bf3f_second_dlmb_cntlr_0_arch : ARCHITECTURE IS "bd_bf3f_second_dlmb_cntlr_0,lmb_bram_if_cntlr,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF bd_bf3f_second_dlmb_cntlr_0_arch: ARCHITECTURE IS "bd_bf3f_second_dlmb_cntlr_0,lmb_bram_if_cntlr,{x_ipProduct=Vivado 2017.4.op,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=lmb_bram_if_cntlr,x_ipVersion=4.0,x_ipCoreRevision=14,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_HIGHADDR=0x0000000000017FFF,C_BASEADDR=0x0000000000010000,C_NUM_LMB=1,C_MASK=0x00000000C0010000,C_MASK1=0x0000000000800000,C_MASK2=0x0000000000800000,C_MASK3=0x0000000000800000,C_LMB_AWIDTH=32,C_LMB_DWIDTH=32,C_ECC=0,C_INTERCONNECT=0,C_FAULT_INJECT=0,C_CE_FA" & 
-"ILING_REGISTERS=0,C_UE_FAILING_REGISTERS=0,C_ECC_STATUS_REGISTERS=0,C_ECC_ONOFF_REGISTER=0,C_ECC_ONOFF_RESET_VALUE=1,C_CE_COUNTER_WIDTH=0,C_WRITE_ACCESS=2,C_BRAM_AWIDTH=32,C_S_AXI_CTRL_ADDR_WIDTH=32,C_S_AXI_CTRL_DATA_WIDTH=32}";
+  ATTRIBUTE CORE_GENERATION_INFO OF bd_bf3f_second_dlmb_cntlr_0_arch: ARCHITECTURE IS "bd_bf3f_second_dlmb_cntlr_0,lmb_bram_if_cntlr,{x_ipProduct=Vivado 2024.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=lmb_bram_if_cntlr,x_ipVersion=4.0,x_ipCoreRevision=24,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=virtexuplus,C_HIGHADDR=0x0000000000017FFF,C_BASEADDR=0x0000000000010000,C_NUM_LMB=1,C_MASK=0x00000000C0010000,C_MASK1=0x0000000000800000,C_MASK2=0x0000000000800000,C_MASK3=0x0000000000800000,C_MASK4=0x0000000000800000,C_MASK5=0x0000000000800000,C_MASK6=0x0000000000800000,C_M" & 
+"ASK7=0x0000000000800000,C_LMB_AWIDTH=32,C_LMB_DWIDTH=32,C_LMB_PROTOCOL=0,C_ARBITRATION=0,C_ECC=0,C_INTERCONNECT=0,C_FAULT_INJECT=0,C_CE_FAILING_REGISTERS=0,C_UE_FAILING_REGISTERS=0,C_ECC_STATUS_REGISTERS=0,C_ECC_ONOFF_REGISTER=0,C_ECC_ONOFF_RESET_VALUE=1,C_CE_COUNTER_WIDTH=0,C_WRITE_ACCESS=2,C_BRAM_AWIDTH=32,C_S_AXI_CTRL_ADDR_WIDTH=32,C_S_AXI_CTRL_DATA_WIDTH=32}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
-  ATTRIBUTE X_INTERFACE_INFO OF BRAM_Din_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT DOUT";
-  ATTRIBUTE X_INTERFACE_INFO OF BRAM_Dout_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT DIN";
-  ATTRIBUTE X_INTERFACE_INFO OF BRAM_WEN_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT WE";
-  ATTRIBUTE X_INTERFACE_INFO OF BRAM_EN_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT EN";
   ATTRIBUTE X_INTERFACE_INFO OF BRAM_Addr_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT ADDR";
   ATTRIBUTE X_INTERFACE_INFO OF BRAM_Clk_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT CLK";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF BRAM_Rst_A: SIGNAL IS "XIL_INTERFACENAME BRAM_PORT, MEM_SIZE 32768, MASTER_TYPE BRAM_CTRL, MEM_WIDTH 32, MEM_ECC NONE, READ_WRITE_MODE READ_WRITE";
+  ATTRIBUTE X_INTERFACE_INFO OF BRAM_Din_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT DOUT";
+  ATTRIBUTE X_INTERFACE_INFO OF BRAM_Dout_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT DIN";
+  ATTRIBUTE X_INTERFACE_INFO OF BRAM_EN_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT EN";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF BRAM_Rst_A: SIGNAL IS "XIL_INTERFACENAME BRAM_PORT, MEM_SIZE 32768, MASTER_TYPE BRAM_CTRL, MEM_WIDTH 32, MEM_ECC NONE, READ_LATENCY 1";
   ATTRIBUTE X_INTERFACE_INFO OF BRAM_Rst_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT RST";
+  ATTRIBUTE X_INTERFACE_INFO OF BRAM_WEN_A: SIGNAL IS "xilinx.com:interface:bram:1.0 BRAM_PORT WE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_ABus: SIGNAL IS "XIL_INTERFACENAME SLMB, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE, PROTOCOL STANDARD";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB ABUS";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB ADDRSTROBE";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_BE: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB BE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Clk: SIGNAL IS "XIL_INTERFACENAME CLK.LMB_Clk, ASSOCIATED_BUSIF SLMB:SLMB1:SLMB2:SLMB3:SLMB4:SLMB5:SLMB6:SLMB7, ASSOCIATED_RESET LMB_Rst, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN bd_bf3f_Clk, INSERT_VIP 0";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.LMB_Clk CLK";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READSTROBE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Rst: SIGNAL IS "XIL_INTERFACENAME RST.LMB_Rst, POLARITY ACTIVE_HIGH, TYPE INTERCONNECT, INSERT_VIP 0";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_Rst: SIGNAL IS "xilinx.com:signal:reset:1.0 RST.LMB_Rst RST";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteDBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB WRITEDBUS";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB WRITESTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF Sl_CE: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB CE";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_DBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READDBUS";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READY";
   ATTRIBUTE X_INTERFACE_INFO OF Sl_UE: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB UE";
   ATTRIBUTE X_INTERFACE_INFO OF Sl_Wait: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB WAIT";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READY";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_DBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READDBUS";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_BE: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB BE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB WRITESTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB READSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB ADDRSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteDBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB WRITEDBUS";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_ABus: SIGNAL IS "XIL_INTERFACENAME SLMB, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 SLMB ABUS";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Rst: SIGNAL IS "XIL_INTERFACENAME RST.LMB_Rst, POLARITY ACTIVE_HIGH, TYPE INTERCONNECT";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_Rst: SIGNAL IS "xilinx.com:signal:reset:1.0 RST.LMB_Rst RST";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Clk: SIGNAL IS "XIL_INTERFACENAME CLK.LMB_Clk, ASSOCIATED_BUSIF SLMB:SLMB1:SLMB2:SLMB3, ASSOCIATED_RESET LMB_Rst, FREQ_HZ 100000000, PHASE 0.000";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.LMB_Clk CLK";
 BEGIN
   U0 : lmb_bram_if_cntlr
     GENERIC MAP (
@@ -232,8 +282,14 @@ BEGIN
       C_MASK1 => X"0000000000800000",
       C_MASK2 => X"0000000000800000",
       C_MASK3 => X"0000000000800000",
+      C_MASK4 => X"0000000000800000",
+      C_MASK5 => X"0000000000800000",
+      C_MASK6 => X"0000000000800000",
+      C_MASK7 => X"0000000000800000",
       C_LMB_AWIDTH => 32,
       C_LMB_DWIDTH => 32,
+      C_LMB_PROTOCOL => 0,
+      C_ARBITRATION => 0,
       C_ECC => 0,
       C_INTERCONNECT => 0,
       C_FAULT_INJECT => 0,
@@ -280,6 +336,30 @@ BEGIN
       LMB3_ReadStrobe => '0',
       LMB3_WriteStrobe => '0',
       LMB3_BE => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 4)),
+      LMB4_ABus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB4_WriteDBus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB4_AddrStrobe => '0',
+      LMB4_ReadStrobe => '0',
+      LMB4_WriteStrobe => '0',
+      LMB4_BE => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 4)),
+      LMB5_ABus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB5_WriteDBus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB5_AddrStrobe => '0',
+      LMB5_ReadStrobe => '0',
+      LMB5_WriteStrobe => '0',
+      LMB5_BE => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 4)),
+      LMB6_ABus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB6_WriteDBus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB6_AddrStrobe => '0',
+      LMB6_ReadStrobe => '0',
+      LMB6_WriteStrobe => '0',
+      LMB6_BE => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 4)),
+      LMB7_ABus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB7_WriteDBus => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      LMB7_AddrStrobe => '0',
+      LMB7_ReadStrobe => '0',
+      LMB7_WriteStrobe => '0',
+      LMB7_BE => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 4)),
       BRAM_Rst_A => BRAM_Rst_A,
       BRAM_Clk_A => BRAM_Clk_A,
       BRAM_Addr_A => BRAM_Addr_A,

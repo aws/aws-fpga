@@ -2,24 +2,23 @@
 -- iomodule_vote_pkg.vhd - Package specification
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2015-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2015-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -28,11 +27,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -41,7 +40,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -114,7 +113,7 @@ package IOModule_Vote_Pkg is
   subtype  FIT4_Pos         is natural range FIT3_Pos'high + C_FIT_VOTE_SIZE downto FIT3_Pos'high + 1;
 
   -- UART Baudrate Counter
-  subtype  UART_BAUD_FIT_Pos  is natural range FIT4_Pos'high + C_MAX_FIT_SIZE + 2 downto FIT4_Pos'high + 1;
+  subtype  UART_BAUD_FIT_Pos  is natural range C_MAX_FIT_SIZE + 2 downto 0;
   subtype  UART_BAUD_REG_Pos  is natural range UART_BAUD_FIT_Pos'high + C_UART_PROG_CNT_SIZE downto
                                                UART_BAUD_FIT_Pos'high + 1;
   subtype  UART_BAUD_CNT_Pos  is natural range UART_BAUD_REG_Pos'high + C_UART_PROG_CNT_SIZE downto
@@ -167,10 +166,47 @@ package IOModule_Vote_Pkg is
 
   subtype  UART_RECEIVE_Pos               is natural range UART_TRANSMIT_Pos'high + 1 + UART_RX_DATA_Pos'high downto
                                                            UART_TRANSMIT_Pos'high + 1;
+  -- UART Core at UART level 
+  constant UART_CORE_low   : natural := 0;
+  constant UART_CORE_high  : natural := UART_RECEIVE_Pos'high;
+  subtype UART_CORE_Pos   is natural range UART_CORE_high downto UART_CORE_low;
 
+  -- Pulse Sync
+  constant PULSE_SYNC           : natural := 2;
+  constant PULSE_SYNC_KEEP_Pos  : natural := 0;
+  constant PULSE_SYNC_PULSE_Pos : natural := 1;
+  subtype PULSE_SYNC_Pos       is natural range PULSE_SYNC_PULSE_Pos downto PULSE_SYNC_KEEP_Pos;
+
+  -- UART Async fields
+  constant TMR_DISABLE_UART_CLK_Pos   : natural := UART_CORE_high+1;
+  subtype  WRITE_TX_DATA_Pos         is natural range TMR_DISABLE_UART_CLK_Pos+PULSE_SYNC downto TMR_DISABLE_UART_CLK_Pos+1;
+  subtype  WRITE_DATA_Pos            is natural range WRITE_TX_DATA_Pos'high+8 downto WRITE_TX_DATA_Pos'high+1;
+  subtype  WRITE_BAUD_Pos            is natural range WRITE_DATA_Pos'high+PULSE_SYNC downto WRITE_DATA_Pos'high+1;
+  subtype  BAUD_DATA_Pos             is natural range WRITE_BAUD_Pos'high+C_UART_PROG_CNT_SIZE downto WRITE_BAUD_Pos'high+1;
+  subtype  RX_DATA_RECEIVED_Pos      is natural range BAUD_DATA_Pos'high+PULSE_SYNC downto BAUD_DATA_Pos'high+1;
+  subtype  RX_DATA_Pos               is natural range RX_DATA_RECEIVED_Pos'high+8 downto RX_DATA_RECEIVED_Pos'high+1;
+  subtype  READ_RX_DATA_Pos          is natural range RX_DATA_Pos'high+PULSE_SYNC downto RX_DATA_Pos'high+1;
+  constant READ_RX_PULSE_Pos          : natural := READ_RX_DATA_Pos'high+1;
+  subtype  UART_STATUS_READ_Pos      is natural range READ_RX_PULSE_Pos+PULSE_SYNC downto READ_RX_PULSE_Pos+1;
+  subtype  UART_STATUS_Pos           is natural range UART_STATUS_READ_Pos'high+8 downto UART_STATUS_READ_Pos'high+1;
+  constant UART_STATUS_READ_PULSE_Pos : natural := UART_STATUS_Pos'high+1;
+  subtype  UART_RX_INTERRUPT_Pos     is natural range UART_STATUS_READ_PULSE_Pos+PULSE_SYNC downto UART_STATUS_READ_PULSE_Pos+1;
+  subtype  UART_TX_INTERRUPT_Pos     is natural range UART_RX_INTERRUPT_Pos'high+PULSE_SYNC downto UART_RX_INTERRUPT_Pos'high+1;
+  subtype  UART_ERROR_INTERRUPT_Pos  is natural range UART_TX_INTERRUPT_Pos'high+PULSE_SYNC downto UART_TX_INTERRUPT_Pos'high+1;
+
+  -- Async UART at UART level
+  constant UART_ASYNC_low   : natural := UART_CORE_high+1;
+  constant UART_ASYNC_high  : natural := UART_ERROR_INTERRUPT_Pos'high;
+  subtype  UART_ASYNC_Pos   is natural range UART_ASYNC_high downto UART_ASYNC_low;
+                                                
+  -- All UART fields at iomodule level
+  constant UART_low   : natural := FIT4_Pos'high + 1;
+  constant UART_high  : natural := UART_ASYNC_high + FIT4_Pos'high + 1;
+  subtype UART_Pos   is natural range UART_high downto UART_low;
+  
   -- GPO
-  subtype  GPO1_Pos                       is natural range UART_RECEIVE_Pos'high + C_MAX_GPO_SIZE downto
-                                                           UART_RECEIVE_Pos'high + 1;
+  subtype  GPO1_Pos                       is natural range UART_high+ C_MAX_GPO_SIZE downto
+                                                           UART_high + 1;
   subtype  GPO2_Pos                       is natural range GPO1_Pos'high + C_MAX_GPO_SIZE downto GPO1_Pos'high + 1;
   subtype  GPO3_Pos                       is natural range GPO2_Pos'high + C_MAX_GPO_SIZE downto GPO2_Pos'high + 1;
   subtype  GPO4_Pos                       is natural range GPO3_Pos'high + C_MAX_GPO_SIZE downto GPO3_Pos'high + 1;
@@ -219,24 +255,23 @@ end package IOModule_Vote_Pkg;
 -- iomodule_vote_pkg_body.vhd - Package body
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2015-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2015-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -245,11 +280,11 @@ end package IOModule_Vote_Pkg;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -258,7 +293,7 @@ end package IOModule_Vote_Pkg;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -412,24 +447,23 @@ end package body IOModule_Vote_Pkg;
 -- iomodule_funcs.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2001-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2001-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -438,11 +472,11 @@ end package body IOModule_Vote_Pkg;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -451,7 +485,7 @@ end package body IOModule_Vote_Pkg;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -577,24 +611,23 @@ end package body iomodule_funcs;
 -- xilinx_primitives.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -603,11 +636,11 @@ end package body iomodule_funcs;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -616,7 +649,7 @@ end package body iomodule_funcs;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -658,10 +691,33 @@ end package body iomodule_funcs;
 --      processes:                              "*_PROCESS" 
 --      component instantiations:               "<ENTITY_>I_<#|FUNC>
 -------------------------------------------------------------------------------
+
+-- XIL_Scan_Reset_Control
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+
+entity xil_scan_reset_control is
+  port (
+    Scan_En          : in  std_logic;
+    Scan_Reset_Sel   : in  std_logic;
+    Scan_Reset       : in  std_logic;
+    Functional_Reset : in  std_logic;
+    Reset            : out std_logic);
+end entity xil_scan_reset_control;
+
+architecture IMP of xil_scan_reset_control is
+
+begin
+  Reset <= '0'               when Scan_En = '1' else
+            Functional_Reset when Scan_Reset_Sel = '0' else
+            Scan_Reset;
+end architecture IMP;
+
+----- entity XIL_SRL16E -----
+library IEEE;
+use IEEE.std_logic_1164.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity XIL_SRL16E is
   generic(
@@ -722,13 +778,15 @@ begin  -- architecture IMP
     begin
       Q <= shift_reg(to_integer(unsigned(to_stdLogicVector(A3 & A2 & A1 & A0))));
 
-      process(CLK, Config_Reset)
+      process(CLK)
       begin
-        if (Config_Reset = '1') then
-          shift_reg <= shift_reg_const;
-        elsif (rising_edge(CLK)) then
-          if CE = '1' then
-            shift_reg <= shift_reg(14 downto 0) & D;
+        if (rising_edge(CLK)) then
+          if (Config_Reset = '1') then
+            shift_reg <= shift_reg_const;
+          else
+            if CE = '1' then
+              shift_reg <= shift_reg(14 downto 0) & D;
+            end if;
           end if;
         end if;
       end process;
@@ -739,10 +797,11 @@ begin  -- architecture IMP
 
 end architecture IMP;
 
+----- entity XIL_SRLC16E -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity XIL_SRLC16E is
   generic(
@@ -789,7 +848,8 @@ begin  -- architecture IMP
   end generate Use_unisim;
 
   Use_RTL : if (C_USE_SRL16 = "no" or C_TARGET = RTL) generate
-    signal shift_reg        : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
+    signal shift_reg         : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
+    constant shift_reg_const : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
     attribute shreg_extract : string;
     attribute shreg_extract of SHIFT_REG : signal is C_USE_SRL16;
   begin
@@ -797,13 +857,15 @@ begin  -- architecture IMP
     Q   <= shift_reg(to_integer(unsigned(to_stdLogicVector(A3 & A2 & A1 & A0))));
     Q15 <= shift_reg(15);
 
-    process(CLK, Config_Reset)
+    process(CLK)
     begin
-      if (Config_Reset = '1') then
-        shift_reg <= (others => '0');
-      elsif (rising_edge(CLK)) then
-        if CE = '1' then
-          shift_reg <= shift_reg(14 downto 0) & D;
+      if (rising_edge(CLK)) then
+        if (Config_Reset = '1') then
+          shift_reg <= shift_reg_const;
+        else
+          if CE = '1' then
+            shift_reg <= shift_reg(14 downto 0) & D;
+          end if;
         end if;
       end if;
     end process;
@@ -815,8 +877,8 @@ end architecture IMP;
 ----- entity MUXCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXCY is
   generic (
@@ -857,8 +919,8 @@ end architecture IMP;
 ----- entity XORCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_XORCY is
   generic (
@@ -897,8 +959,8 @@ end architecture IMP;
 ----- entity MUXCY with XORCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXCY_XORCY is
   generic (
@@ -947,8 +1009,8 @@ end architecture IMP;
 ----- entity FDR -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDR is
   generic (
@@ -1012,8 +1074,8 @@ end architecture IMP;
 ----- entity FDRE -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDRE is
   generic (
@@ -1079,8 +1141,8 @@ end architecture IMP;
 ----- entity FDSE -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDSE is
   generic (
@@ -1146,8 +1208,8 @@ end architecture IMP;
 ----- entity MULT_AND -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MULT_AND is
   generic (
@@ -1188,8 +1250,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_LUT3 is
   generic (
@@ -1245,8 +1307,8 @@ end architecture IMP;
 ----- entity MUXF5 -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXF5 is
   generic (
@@ -1287,8 +1349,8 @@ end architecture IMP;
 ----- entity MUXF6 -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXF6 is
   generic (
@@ -1333,24 +1395,23 @@ end architecture IMP;
 -- synchronizers.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2014,2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2014,2017,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -1359,11 +1420,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -1372,7 +1433,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -1430,14 +1491,27 @@ entity mb_sync_bit is
   port(
     Clk            : in  std_logic;
     Rst            : in  std_logic;
+    Scan_En        : in  std_logic;
     Scan_Reset_Sel : in  std_logic;
     Scan_Reset     : in  std_logic;
     Raw            : in  std_logic;
     Synced         : out std_logic);
 end mb_sync_bit;
 
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.xil_scan_reset_control;
+
 architecture IMP of mb_sync_bit is
 
+  component xil_scan_reset_control is
+  port (
+    Scan_En          : in  std_logic;
+    Scan_Reset_Sel   : in  std_logic;
+    Scan_Reset       : in  std_logic;
+    Functional_Reset : in  std_logic;
+    Reset            : out std_logic);
+  end component xil_scan_reset_control;
+  
   -- Downgrade Synth 8-3332 warnings
   attribute DowngradeIPIdentifiedWarnings: string;
   attribute DowngradeIPIdentifiedWarnings of IMP : architecture is "yes";
@@ -1482,8 +1556,13 @@ begin
     begin
 
       -- Make sure asynchronous reset can be controlled during scan test
-      async_reset <= reset when Scan_Reset_Sel = '0' else
-                     Scan_Reset;
+      scan_reset_control_i: xil_scan_reset_control
+        port map (
+          Scan_En          => Scan_En,
+          Scan_Reset_Sel   => Scan_Reset_Sel,
+          Scan_Reset       => Scan_Reset,
+          Functional_Reset => reset,
+          Reset            => async_reset);
       
       Async_Rst_DFFs : process(Clk, async_reset)
       begin
@@ -1536,8 +1615,13 @@ begin
     begin
 
       -- Make sure asynchronous reset can be controlled from during scan test
-      async_reset <= reset when Scan_Reset_Sel = '0' else
-                     Scan_Reset;
+      scan_reset_control_i: xil_scan_reset_control
+      port map (
+        Scan_En          => Scan_En,
+        Scan_Reset_Sel   => Scan_Reset_Sel,
+        Scan_Reset       => Scan_Reset,
+        Functional_Reset => reset,
+        Reset            => async_reset);
       
       Async_Rst_DFFs : process(Clk, async_reset)
       begin
@@ -1563,8 +1647,8 @@ begin
 end architecture IMP;  -- mb_sync_bit
 
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.mb_sync_bit;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.mb_sync_bit;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -1579,6 +1663,7 @@ entity mb_sync_vec is
   port(
     Clk            : in  std_logic;
     Rst            : in  std_logic := '0';
+    Scan_En        : in  std_logic;
     Scan_Reset_Sel : in  std_logic := '0';
     Scan_Reset     : in  std_logic := '0';
     Raw            : in  std_logic_vector(0 to C_WIDTH-1);
@@ -1596,6 +1681,7 @@ architecture IMP of mb_sync_vec is
   port(
     Clk            : in  std_logic;
     Rst            : in  std_logic;
+    Scan_En        : in  std_logic;
     Scan_Reset_Sel : in  std_logic;
     Scan_Reset     : in  std_logic;
     Raw            : in  std_logic;
@@ -1616,6 +1702,7 @@ begin
       port map (
         Clk            => Clk,
         Rst            => Rst,
+        Scan_En        => Scan_En,
         Scan_Reset_Sel => Scan_Reset_Sel,
         Scan_Reset     => Scan_Reset,
         Raw            => Raw(I),
@@ -1636,13 +1723,26 @@ entity mb_sync_reset is
     C_RESET_ACTIVE_HIGH : boolean := true);
   port(
     Clk            : in  std_logic;
+    Scan_En        : in  std_logic;
     Scan_Reset_Sel : in  std_logic;
     Scan_Reset     : in  std_logic;
     Raw            : in  std_logic;
     Synced         : out std_logic);
 end mb_sync_reset;
 
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.xil_scan_reset_control;
+
 architecture IMP of mb_sync_reset is
+
+  component xil_scan_reset_control is
+  port (
+    Scan_En          : in  std_logic;
+    Scan_Reset_Sel   : in  std_logic;
+    Scan_Reset       : in  std_logic;
+    Functional_Reset : in  std_logic;
+    Reset            : out std_logic);
+  end component xil_scan_reset_control;
 
   signal preset       : std_logic;
   signal async_preset : std_logic;
@@ -1658,8 +1758,13 @@ begin
             not Raw;
 
   -- Make sure asynchronous preset can be controlled during scan test
-  async_preset <= preset when Scan_Reset_Sel = '0' else
-                  Scan_Reset;
+  scan_reset_control_i: xil_scan_reset_control
+    port map (
+      Scan_En          => Scan_En,
+      Scan_Reset_Sel   => Scan_Reset_Sel,
+      Scan_Reset       => Scan_Reset,
+      Functional_Reset => preset,
+      Reset            => async_preset);
 
   -- Generate synchronizer DFFs
   Synchronize : if C_LEVELS > 1 generate
@@ -1709,28 +1814,255 @@ begin
 end architecture IMP;  -- mb_sync_reset
 
 
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.mb_sync_bit;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity pulse_sync is
+  generic(
+    C_LEVELS          : natural := 2;
+    C_TMR             : natural := 0;
+    C_LATE_ACK        : natural := 0);
+  port(
+    FromAVote       : in  std_logic_vector(PULSE_SYNC_Pos);
+    FromBVote       : in  std_logic_vector(PULSE_SYNC_Pos);
+    ToVote          : out std_logic_vector(PULSE_SYNC_Pos);
+    Clk_Src         : in  std_logic;
+    Clk_Dst         : in  std_logic;
+    Rst_Src         : in  std_logic;
+    Rst_Dst         : in  std_logic;
+    Pulse_Src       : in  std_logic;
+    Pulse_Keep_Src  : out std_logic;
+    Pulse_Ack_Src   : out std_logic;
+    Pulse_Dst       : out std_logic);
+end pulse_sync;
+
+architecture IMP of pulse_sync is
+
+  component mb_sync_bit
+  generic(
+    C_LEVELS            : natural;
+    C_RESET_VALUE       : std_logic;
+    C_RESET_SYNCHRONOUS : boolean;
+    C_RESET_ACTIVE_HIGH : boolean);
+  port(
+    Clk            : in  std_logic;
+    Rst            : in  std_logic;
+    Scan_En        : in  std_logic;
+    Scan_Reset_Sel : in  std_logic;
+    Scan_Reset     : in  std_logic;
+    Raw            : in  std_logic;
+    Synced         : out std_logic);
+  end component;
+
+  signal pulseQ_src            : std_logic;
+  signal pulse_ack_src_I       : std_logic;
+  signal pulse_keep_src_I      : std_logic;
+  signal pulse_keepD_src       : std_logic;
+  signal pulse_keepD_src_voted : std_logic;
+  signal pulse_ack_dst         : std_logic;
+  signal pulse_keep_dst        : std_logic; 
+  signal pulse_keepQ_dst       : std_logic; 
+  signal pulse_keepQQ_dst      : std_logic; 
+  signal pulseD_dst            : std_logic;
+  signal pulseD_dst_voted      : std_logic;
+  
+begin
+
+  ---------------------------------------------------------------------------------------
+  -- Edge detect means that pulse need to be transferred from Src to
+  -- Dst clk region regardless of clock ratio between Clk_Src and Clk_Dst
+  ---------------------------------------------------------------------------------------
+  --  
+  --             Clk_Src                  |             Clk_Dst
+  --                                      |                         ____
+  -- Pulse------------                    |             ---------->|    |    ____
+  --       |   ____   |     ____          |            |           |    |   |    |
+  --       |  |    |   --->|    |   ____  |   ______   |  ____Vote>|Edge|-->| FF |-> Pulse
+  --        ->| FF |------>|Edge|  |    | |  |      |  | |    |    |    |   |_/\_| 
+  --          |_/\_| Vote->|Keep|->| FF |--->| Sync |--->| FF |--->|    |
+  --                 ----->|____|  |_/\_| |  |______| |  |_/\_|  | |____|
+  --                |                     |           |          | 
+  --                |  ______             |           |   ____   |  
+  --                | |      |            |           |  |    |  |
+  -- Pulse Ack <------| Sync |<---------------C_LATE_ACK-| FF |<- 
+  --                  |______|            |              |_/\_|
+  --                                      |
+  --                                      
+  --------------------------------------------------------------------------------------
+
+  -- Clock once to enable rising edge detect
+  Pulse_Src_DFF : process (Clk_Src) is
+  begin
+    if Clk_Src'event and Clk_Src = '1' then
+      if Rst_Src = '1' then
+        pulseQ_src <= '0';
+      else
+        pulseQ_src <= Pulse_Src;
+      end if;
+    end if;
+  end process Pulse_Src_DFF;
+
+  -- Detect rising Edge on Src and Ack (synced) from Dst
+  Pulse_Keep_Logic : process (pulseQ_src, Pulse_Src, pulse_ack_src_I, pulse_keep_src_I) is
+  begin
+    if Pulse_Src = '0' and pulse_ack_src_I = '1' then
+      pulse_keepD_src <= '0'; -- Pulse not active in Clk_Src and Ack from Clk_Dst region, done
+    elsif pulseQ_src = '0' and Pulse_Src = '1' then 
+      pulse_keepD_src <= '1'; -- Rising edge, set keep
+    else
+      pulse_keepD_src <= pulse_keep_src_I; -- else keep value
+    end if;
+  end process Pulse_Keep_Logic;
+
+  TMR_Yes : if (C_TMR /= 0) generate
+  begin
+
+    ToVote(PULSE_SYNC_PULSE_Pos) <= pulseD_dst;
+    ToVote(PULSE_SYNC_KEEP_Pos)  <= pulse_keepD_src;
+
+    pulse_keepD_src_voted <= vote(pulse_keepD_src,
+                                  FromAVote(PULSE_SYNC_KEEP_Pos),
+                                  FromBVote(PULSE_SYNC_KEEP_Pos), false);
+
+    pulseD_dst_voted <= vote(pulseD_dst,
+                             FromAVote(PULSE_SYNC_PULSE_Pos),
+                             FromBVote(PULSE_SYNC_PULSE_Pos), false);
+
+  end generate TMR_Yes; 
+
+  TMR_No : if (C_TMR = 0) generate
+    ToVote <= (others => '0');
+
+    pulse_keepD_src_voted <= pulse_keepD_src;
+    pulseD_dst_voted      <= pulseD_dst;
+  end generate TMR_No; 
+  
+  -- Keep DFF
+  Pulse_Src_Keep_DFF : process (Clk_Src) is
+  begin
+    if Clk_Src'event and Clk_Src = '1' then
+      if Rst_Src = '1' then
+        pulse_keep_src_I <= '0';
+      else
+        pulse_keep_src_I <= pulse_keepD_src_voted;
+      end if;
+    end if;
+  end process Pulse_Src_Keep_DFF;
+
+  Pulse_Keep_Src <= pulse_keep_src_I;
+  
+  -- Sync keep to Clk_Dst region
+  Pulse_Keep_Keep_Sync_I: mb_sync_bit
+  generic map(
+    C_LEVELS            => C_LEVELS,
+    C_RESET_VALUE       => '0',
+    C_RESET_SYNCHRONOUS => true,
+    C_RESET_ACTIVE_HIGH => true)
+  port map(
+    Clk            => Clk_Dst,
+    Rst            => Rst_Dst,
+    Scan_En        => '0',
+    Scan_Reset_Sel => '0',
+    Scan_Reset     => '0',
+    Raw            => pulse_keep_src_I,
+    Synced         => pulse_keep_dst);
+
+  -- Clock once to enable rising edge detect
+  Pulse_Dst_Ack_DFF : process (Clk_Dst) is
+  begin
+    if Clk_Dst'event and Clk_Dst = '1' then
+      if Rst_Dst = '1' then
+        pulse_keepQ_dst <= '0';
+        pulse_keepQQ_dst <= '0';
+      else
+        pulse_keepQQ_dst <= pulse_keepQ_dst;
+        pulse_keepQ_dst <= pulse_keep_dst;
+      end if;
+    end if;
+  end process Pulse_Dst_Ack_DFF;
+
+  -- Detect Edge
+  Pulse_Dst_Edge_Logic : process (pulse_keepQ_dst, pulse_keep_dst) is
+  begin
+    if pulse_keepQ_dst = '0' and pulse_keep_dst = '1' then
+      pulseD_dst <= '1'; -- Rising edge
+    else
+      pulseD_dst <= '0';
+    end if;  
+  end process Pulse_Dst_Edge_Logic;
+    
+  -- Clock output 
+  Pulse_Dst_DFF : process (Clk_Dst) is
+  begin
+    if Clk_Dst'event and Clk_Dst = '1' then
+      if Rst_Dst = '1' then
+        Pulse_Dst <= '0';
+      else
+        Pulse_Dst <= pulseD_dst_voted;
+      end if;
+    end if;
+  end process Pulse_Dst_DFF;
+
+  Early_Ack : if C_LATE_ACK = 0 generate
+  begin
+    pulse_ack_dst <= pulse_keepQ_dst;
+  end generate Early_Ack;
+
+  Late_Ack : if C_LATE_ACK = 1 generate
+  begin
+    pulse_ack_dst <= pulse_keepQQ_dst;
+  end generate Late_Ack;
+  
+  -- Sync ack back to Clk_Src region to remove keep
+  -- Synced signal need to be voted for TMR
+  Pulse_Ack_Sync_I: mb_sync_bit
+  generic map(
+    C_LEVELS            => C_LEVELS,
+    C_RESET_VALUE       => '0',
+    C_RESET_SYNCHRONOUS => true,
+    C_RESET_ACTIVE_HIGH => true)
+  port map(
+    Clk            => Clk_Src,
+    Rst            => Rst_Src,
+    Scan_En        => '0',
+    Scan_Reset_Sel => '0',
+    Scan_Reset     => '0',
+    -- ToDo generic for delayed ack
+    Raw            => pulse_ack_dst,
+    Synced         => pulse_ack_src_I);
+
+   Pulse_Ack_Src <= pulse_ack_src_I;
+  
+end architecture IMP;   -- irq_sync
+
+
+
+
 -------------------------------------------------------------------------------
 -- divide_part.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -1739,11 +2071,11 @@ end architecture IMP;  -- mb_sync_reset
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -1752,7 +2084,7 @@ end architecture IMP;  -- mb_sync_reset
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -1796,8 +2128,8 @@ end architecture IMP;  -- mb_sync_reset
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity Divide_part is
   generic (
@@ -2071,24 +2403,23 @@ end architecture VHDL_RTL;
 -- fit_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2012,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2097,11 +2428,11 @@ end architecture VHDL_RTL;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2110,7 +2441,7 @@ end architecture VHDL_RTL;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -2156,8 +2487,8 @@ end architecture VHDL_RTL;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity FIT_Module is
   generic (
@@ -2183,9 +2514,9 @@ entity FIT_Module is
     Interrupt    : out std_logic);
 end entity FIT_Module;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.all;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture VHDL_RTL of FIT_Module is
 
@@ -2372,6 +2703,8 @@ begin  -- architecture VHDL_RTL
     signal Interrupt_i : std_logic := '0';
     signal rst_i       : std_logic;
     signal toggle_i    : std_logic;
+    signal toVote_0    : std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    signal toVote_1    : std_logic_vector(C_VOTE_SIZE-1 downto 0);
 
   begin
 
@@ -2417,7 +2750,7 @@ begin  -- architecture VHDL_RTL
 
       Interrupt_i <= Clk_En_I(Divide_Factors.Nr_Of_Factors);
 
-      ToVote <= (others => '0');
+      toVote_0 <= (others => '0');
     end generate Using_SRL16s;
 
     -----------------------------------------------------------------------------
@@ -2479,8 +2812,8 @@ begin  -- architecture VHDL_RTL
           end if;
         end process Counter;
 
-        ToVote(FIT_COUNT_Pos)     <= (others => '0');
-        ToVote(FIT_INTERRUPT_Pos) <= '0';
+        toVote_1(FIT_COUNT_Pos)     <= (others => '0');
+        toVote_1(FIT_INTERRUPT_Pos) <= '0';
 
       end generate TMR_No;
 
@@ -2503,10 +2836,10 @@ begin  -- architecture VHDL_RTL
           end if;
         end process Counter_Logic;
 
-        ToVote(FIT_COUNT_Pos'low + Count_d'length - 1 downto FIT_COUNT_Pos'low) <= Count_d;
-        ToVote(FIT_COUNT_Pos'high downto FIT_COUNT_POs'low + Count_d'length )   <= (others => '0');
+        toVote_1(FIT_COUNT_Pos'low + Count_d'length - 1 downto FIT_COUNT_Pos'low) <= Count_d;
+        toVote_1(FIT_COUNT_Pos'high downto FIT_COUNT_POs'low + Count_d'length )   <= (others => '0');
 
-        ToVote(FIT_INTERRUPT_Pos) <= Interrupt_i_d;
+        toVote_1(FIT_INTERRUPT_Pos) <= Interrupt_i_d;
 
         Counter_DFF : process (Clk) is
         begin
@@ -2540,7 +2873,7 @@ begin  -- architecture VHDL_RTL
         end if;
       end process Toggle_Handler;
 
-      ToVote(FIT_TOGGLE_Pos) <= '0';
+      toVote_1(FIT_TOGGLE_Pos) <= '0';
 
     end generate TMR_No_Toggle;
 
@@ -2569,11 +2902,15 @@ begin  -- architecture VHDL_RTL
         end if;
       end process Toggle_DFF;
 
-      ToVote(FIT_TOGGLE_Pos) <= toggle_i_d;
+      toVote_1(FIT_TOGGLE_Pos) <= toggle_i_d;
 
     end generate TMR_Yes_Toggle;
 
     Toggle <= toggle_i;
+
+    ToVote <= toVote_0 when (Divide_Factors.Good_Divide) and
+                            (Divide_Factors.Nr_Of_SRL16s <= Nr_Of_Bits) and (C_TMR = 0) else
+              toVote_1;
 
   end generate Implement_FIT;
 
@@ -2591,24 +2928,23 @@ end architecture VHDL_RTL;
 -- gpi_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2013 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2013,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2617,11 +2953,11 @@ end architecture VHDL_RTL;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2630,7 +2966,7 @@ end architecture VHDL_RTL;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -2684,6 +3020,7 @@ entity GPI_Module is
   port (
     Clk           : in  std_logic;
     Reset         : in  boolean;
+    Config_Reset  : in  std_logic;
     GPI_Read      : in  std_logic;
     GPI           : in  std_logic_vector(C_GPI_SIZE-1 downto 0);
     GPI_In        : out std_logic_vector(C_GPI_SIZE-1 downto 0);
@@ -2706,12 +3043,16 @@ begin  -- architecture IMP
     GPI_Sampling : process (Clk) is
     begin  -- process GPI_Sampling
       if Clk'event and Clk = '1' then  -- rising clock edge
-        if (GPI_Read = '0') then       -- synchronous reset (active high)
+        if (GPI_Read = '0' or Config_Reset = '1') then       -- synchronous reset (active high)
           GPI_In <= (others => '0');
         else
           GPI_In <= GPI;
         end if;
-        GPI_Sampled <= GPI;
+        if Config_Reset = '1' then
+          GPI_Sampled <= (others => '0');
+        else
+          GPI_Sampled <= GPI;
+        end if;
       end if;
     end process GPI_Sampling;
 
@@ -2759,24 +3100,23 @@ end architecture IMP;
 -- gpo_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2785,11 +3125,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2798,7 +3138,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -2864,8 +3204,8 @@ entity GPO_Module is
     GPO         : out std_logic_vector(C_GPO_SIZE-1 downto 0));    
 end entity GPO_Module;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of GPO_Module is
 
@@ -2935,24 +3275,23 @@ end architecture IMP;
 -- intr_ctrl.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2012,2016,2018,2021,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2961,11 +3300,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2974,7 +3313,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -3020,8 +3359,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity intr_ctrl is
 
@@ -3031,41 +3370,43 @@ entity intr_ctrl is
     C_USE_TMR_DISABLE   : integer := 0;
     C_VOTE_SIZE         : integer := 0;
     C_USE_COMB_MUX      : integer := 0;
+    C_ADDR_WIDTH        : integer range 32 to 64 := 32;
     C_INTC_ENABLED      : std_logic_vector(31 downto 0);
     C_INTC_LEVEL_EDGE   : std_logic_vector(31 downto 0);
     C_INTC_POSITIVE     : std_logic_vector(31 downto 0);
     C_INTC_ASYNC_INTR   : std_logic_vector(31 downto 0);
     C_INTC_HAS_FAST     : integer range 0 to 1  := 0;
-    C_INTC_ADDR_WIDTH   : integer range 5 to 32 := 32;
+    C_INTC_ADDR_WIDTH   : integer range 5 to 64 := 32;
     C_INTC_NUM_SYNC_FF  : integer range 0 to 7  := 2;
-    C_INTC_BASE_VECTORS : std_logic_vector(31 downto 0);
+    C_INTC_BASE_VECTORS : std_logic_vector(63 downto 0);
     C_USE_LUTRAM        : string);
   port (
-    Clk              : in  std_logic;
-    Reset            : in  boolean;
-    TMR_Disable      : in  std_logic;
-    FromAVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-    FromBVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-    ToVote           : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
-    INTR             : in  std_logic_vector(31 downto 0);
-    INTR_ACK         : in  std_logic_vector(1 downto 0);
-    INTR_ADDR        : out std_logic_vector(31 downto 0);
-    INTC_WRITE_CIAR  : in  std_logic;
-    INTC_WRITE_CIER  : in  std_logic;
-    INTC_WRITE_CIMR  : in  std_logic;
-    INTC_WRITE_CIVAR : in  std_logic;
-    INTC_CIVAR_ADDR  : in  std_logic_vector(4 downto 0);
-    Write_Data       : in  std_logic_vector(31 downto 0);
-    INTC_READ_CISR   : in  std_logic;
-    INTC_READ_CIPR   : in  std_logic;
-    INTC_IRQ         : out std_logic;
-    INTC_CISR        : out std_logic_vector(31 downto 0);
-    INTC_CIPR        : out std_logic_vector(31 downto 0));
+    Clk               : in  std_logic;
+    Reset             : in  boolean;
+    TMR_Disable       : in  std_logic;
+    FromAVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    FromBVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    ToVote            : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    INTR              : in  std_logic_vector(31 downto 0);
+    INTR_ACK          : in  std_logic_vector(1 downto 0);
+    INTR_ADDR         : out std_logic_vector(C_ADDR_WIDTH-1 downto 0);
+    INTC_WRITE_CIAR   : in  std_logic;
+    INTC_WRITE_CIER   : in  std_logic;
+    INTC_WRITE_CIMR   : in  std_logic;
+    INTC_WRITE_CIVAR  : in  std_logic;
+    INTC_WRITE_CIVEAR : in  std_logic;
+    INTC_CIVAR_ADDR   : in  std_logic_vector(4 downto 0);
+    Write_Data        : in  std_logic_vector(31 downto 0);
+    INTC_READ_CISR    : in  std_logic;
+    INTC_READ_CIPR    : in  std_logic;
+    INTC_IRQ          : out std_logic;
+    INTC_CISR         : out std_logic_vector(31 downto 0);
+    INTC_CIPR         : out std_logic_vector(31 downto 0));
 end entity intr_ctrl;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
-use iomodule_v3_1_3.mb_sync_bit;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
+use iomodule_v3_1_10.mb_sync_bit;
 
 architecture IMP of intr_ctrl is
 
@@ -3089,18 +3430,35 @@ architecture IMP of intr_ctrl is
   port(
     Clk            : in  std_logic;
     Rst            : in  std_logic;
+    Scan_En        : in  std_logic;
     Scan_Reset_Sel : in  std_logic;
     Scan_Reset     : in  std_logic;
     Raw            : in  std_logic;
     Synced         : out std_logic);
   end component mb_sync_bit;
 
+  subtype intr_pos_type is natural range 31 downto 0;
+  subtype intr_type     is std_logic_vector(intr_pos_type);
+
+  function value(vector : intr_type; index : intr_pos_type) return std_logic is
+  begin
+    return vector(index);
+  end function value;
+
   constant C_ENABLED_NONE : boolean := (C_INTC_ENABLED = (31 downto 0  => '0'));
   constant C_ENABLED_MSH  : boolean := (C_INTC_ENABLED(31 downto 16) /= X"0000");
   constant C_CIVAR_WIDTH  : integer := Boolean'Pos(C_ENABLED_MSH) + 4;
   constant C_CIVAR_SIZE   : integer := 2 ** C_CIVAR_WIDTH;
 
+  constant C_BASE_VECTORS : std_logic_vector(63 downto 0) :=
+    (C_INTC_BASE_VECTORS and X"FFFFFFFFFFFFFF80") or X"0000000000000010";
+  constant C_DEFAULT_ADDR : std_logic_vector(C_ADDR_WIDTH - 1 downto 0) :=
+    C_BASE_VECTORS(C_ADDR_WIDTH - 1 downto 0);
+
   constant USE_LUTRAM : boolean := C_USE_LUTRAM = "yes";
+
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
 
   signal interrupt    : std_logic_vector(31 downto 0);
   signal intr_present : std_logic_vector(31 downto 0);
@@ -3117,23 +3475,27 @@ architecture IMP of intr_ctrl is
 
 begin
 
-  tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1 and C_TMR = 1;
+  tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1 and C_TMR_ONLY = 1;
 
   All_INTR_Bits : for I in 31 downto 0 generate
+    constant C_INTC_ENABLED_I    : std_logic := value(C_INTC_ENABLED, I);
+    constant C_INTC_ASYNC_INTR_I : std_logic := value(C_INTC_ASYNC_INTR, I);
+    constant C_RESET_VALUE       : std_logic := not value(C_INTC_POSITIVE, I);
+    constant C_INTC_LEVEL_EDGE_I : std_logic := value(C_INTC_LEVEL_EDGE, I);
+    constant C_INTC_POSITIVE_I   : std_logic := value(C_INTC_POSITIVE, I);
   begin
 
-    Using_Intr : if (C_INTC_ENABLED(I) = '1') generate
+    Using_Intr : if (C_INTC_ENABLED_I = '1') generate
     begin
 
       -- Clean the interrupt signals
       -- All internal sources are considered clean and only external needs to be registred once
       Ext_Intr : if (I > 15) generate
-        constant C_RESET_VALUE : std_logic :=  not C_INTC_POSITIVE(I);
         signal synced_intr : std_logic;
       begin
 
         -- Synchronize the interrupt signals
-        Async_Gen : if C_INTC_ASYNC_INTR(I) = '1' generate
+        Async_Gen : if C_INTC_ASYNC_INTR_I = '1' generate
           signal reset_std : std_logic;
         begin
 
@@ -3148,6 +3510,7 @@ begin
           port map(
             Clk            => Clk,
             Rst            => reset_std,
+            Scan_En        => '0',
             Scan_Reset_Sel => '0',
             Scan_Reset     => '0',
             Raw            => INTR(I),
@@ -3155,19 +3518,19 @@ begin
           
         end generate Async_Gen;
 
-        Sync_Gen: if C_INTC_ASYNC_INTR(I) = '0' generate
+        Sync_Gen: if C_INTC_ASYNC_INTR_I = '0' generate
         begin
           synced_intr <= INTR(i);
         end generate Sync_Gen;
 
-        Clean_TMR_No : if (C_TMR = 0) generate
+        Clean_TMR_No : if (C_TMR_or_LOCKSTEP = 0 or C_INTC_ASYNC_INTR_I = '0') generate
         begin
 
           Clean_Signal : process (Clk) is
           begin  -- process Clean_Signal
             if Clk'event and Clk = '1' then  -- rising clock edge
               if Reset then                  -- synchronous reset (active high)
-                interrupt(I) <= not C_INTC_POSITIVE(I);
+                interrupt(I) <= C_RESET_VALUE;
               else
                 interrupt(I) <= synced_intr;
               end if;
@@ -3178,14 +3541,14 @@ begin
 
         end generate Clean_TMR_No;
 
-        Clean_TMR_Yes : if (C_TMR /= 0) generate
+        Clean_TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0 and C_INTC_ASYNC_INTR_I = '1') generate
           signal interrupt_d : std_logic;
         begin
 
           Clean_Signal : process (Reset,synced_intr) is
           begin
             if Reset then
-              interrupt_d <= not C_INTC_POSITIVE(I);
+              interrupt_d <= C_RESET_VALUE;
             else
               interrupt_d <= synced_intr;
             end if;
@@ -3198,22 +3561,22 @@ begin
             if Clk'event and Clk = '1' then
               interrupt(I) <= vote(interrupt_d,
                                    FromAVote(IRQ_INTERRUPT_Pos'low+I),
-                                   FromBVote(IRQ_INTERRUPT_Pos'low+I), tmr_disable_b);
+                                   FromBVote(IRQ_INTERRUPT_Pos'low+I), false); -- always enabled do keep async interface aligned
             end if;
           end process Clean_Signal_DFF;
 
         end generate Clean_TMR_Yes;
 
         -- Detect External Interrupt
-        Level : if (C_INTC_LEVEL_EDGE(I) = '0') generate
+        Level : if (C_INTC_LEVEL_EDGE_I = '0') generate
         begin
-          intr_present(I) <= interrupt(I) xnor C_INTC_POSITIVE(I);
+          intr_present(I) <= interrupt(I) xnor C_INTC_POSITIVE_I;
         end generate Level;
 
-        Edge_TMR_No : if (C_TMR = 0) generate
+        Edge_TMR_No : if (C_TMR_ONLY = 0) generate
         begin
 
-          Edge : if (C_INTC_LEVEL_EDGE(I) = '1') generate
+          Edge : if (C_INTC_LEVEL_EDGE_I = '1') generate
           begin
             Reg_INTR : process (Clk) is
               variable s1 : std_logic;
@@ -3221,13 +3584,13 @@ begin
               if Clk'event and Clk = '1' then  -- rising clock edge
                 if Reset then                  -- synchronous reset (active high)
                   intr_present(I) <= '0';
-                  s1              := not C_INTC_POSITIVE(I);
+                  s1              := C_RESET_VALUE;
                 else
                   intr_present(I) <= '0';
-                  if (C_INTC_POSITIVE(I) = '0') and (s1 = '1') and (interrupt(I) = '0') then
+                  if (C_INTC_POSITIVE_I = '0') and (s1 = '1') and (interrupt(I) = '0') then
                     intr_present(I) <= '1';
                   end if;
-                  if (C_INTC_POSITIVE(I) = '1') and (s1 = '0') and (interrupt(I) = '1') then
+                  if (C_INTC_POSITIVE_I = '1') and (s1 = '0') and (interrupt(I) = '1') then
                     intr_present(I) <= '1';
                   end if;
                   s1 := interrupt(I);
@@ -3240,10 +3603,10 @@ begin
 
         end generate Edge_TMR_No;
 
-        Edge_TMR_Yes : if (C_TMR /= 0) generate
+        Edge_TMR_Yes : if (C_TMR_ONLY /= 0) generate
         begin
 
-          Edge : if (C_INTC_LEVEL_EDGE(I) = '1') generate
+          Edge : if (C_INTC_LEVEL_EDGE_I = '1') generate
             signal intr_present_d : std_logic;
             signal s1   : std_logic;
           begin
@@ -3253,8 +3616,8 @@ begin
               if Reset then
                 intr_present_d <= '0';
               else
-                if ((C_INTC_POSITIVE(I) = '0') and (s1 = '1') and (interrupt(I) = '0')) or
-                   ((C_INTC_POSITIVE(I) = '1') and (s1 = '0') and (interrupt(I) = '1')) then
+                if ((C_INTC_POSITIVE_I = '0') and (s1 = '1') and (interrupt(I) = '0')) or
+                   ((C_INTC_POSITIVE_I = '1') and (s1 = '0') and (interrupt(I) = '1')) then
                   intr_present_d <= '1';
                 else
                   intr_present_d <= '0';
@@ -3268,7 +3631,7 @@ begin
             begin  -- process Reg_INTR
               if Clk'event and Clk = '1' then  -- rising clock edge
                 if (Reset) then
-                  s1 <= not C_INTC_POSITIVE(I);
+                  s1 <= C_RESET_VALUE;
                 else
                   s1 <= interrupt(I);   -- no need to vote s1 as it follows interrupt which is voted
                 end if;
@@ -3280,7 +3643,7 @@ begin
 
           end generate Edge;
 
-          Level : if (C_INTC_LEVEL_EDGE(I) = '0') generate
+          Level : if (C_INTC_LEVEL_EDGE_I = '0') generate
           begin
             ToVote(IRQ_INTR_PRESENT_Pos'low + I) <= '0';
           end generate Level;
@@ -3298,7 +3661,7 @@ begin
         ToVote(IRQ_INTERRUPT_Pos'low + I)     <= '0'; -- no need to vote as it is not used
       end generate Internal_Intr;
 
-      CISR_CIER_TMR_No : if (C_TMR = 0) generate
+      CISR_CIER_TMR_No : if (C_TMR_ONLY = 0) generate
       begin
 
         CISR_Reg : process (Clk) is
@@ -3332,7 +3695,7 @@ begin
 
       end generate CISR_CIER_TMR_No;
 
-      CISR_CIER_TMR_Yes : if (C_TMR /= 0) generate
+      CISR_CIER_TMR_Yes : if (C_TMR_ONLY /= 0) generate
         signal cisr_d : std_logic;
         signal cier_d : std_logic;
       begin
@@ -3387,7 +3750,7 @@ begin
 
     end generate Using_Intr;
 
-    Not_Using_Intr : if (C_INTC_ENABLED(I) = '0') generate
+    Not_Using_Intr : if (C_INTC_ENABLED_I = '0') generate
     begin
       interrupt(I)                         <= '0';
       intr_present(I)                      <= '0';
@@ -3400,10 +3763,10 @@ begin
       ToVote(IRQ_CIER_Pos'low         + I) <= '0';
     end generate Not_Using_Intr;
 
-    Using_CIMR : if (C_INTC_ENABLED(I) = '1') and (C_INTC_HAS_FAST = 1) generate
+    Using_CIMR : if (C_INTC_ENABLED_I = '1') and (C_INTC_HAS_FAST = 1) generate
     begin
 
-      CIMR_TMR_No : if (C_TMR = 0) generate
+      CIMR_TMR_No : if (C_TMR_ONLY = 0) generate
       begin
 
         CIMR_Reg : process (Clk) is
@@ -3421,7 +3784,7 @@ begin
 
       end generate CIMR_TMR_No;
 
-      CIMR_TMR_Yes: if (C_TMR /= 0) generate
+      CIMR_TMR_Yes: if (C_TMR_ONLY /= 0) generate
         signal cimr_d : std_logic;
       begin
 
@@ -3449,7 +3812,7 @@ begin
 
     end generate Using_CIMR;
 
-    Not_Using_CIMR : if (C_INTC_ENABLED(I) = '0') or (C_INTC_HAS_FAST = 0) generate
+    Not_Using_CIMR : if (C_INTC_ENABLED_I = '0') or (C_INTC_HAS_FAST = 0) generate
     begin
       cimr(I) <= '0';
       ToVote(IRQ_CIMR_Pos'low + I) <= '0';
@@ -3471,15 +3834,12 @@ begin
     constant Handling     : std_logic_vector(1 downto 0) := "10";
     constant Acknowledge  : std_logic_vector(1 downto 0) := "11";
 
-    constant C_DEFAULT_ADDR : std_logic_vector(31 downto 0) := (C_INTC_BASE_VECTORS and X"FFFFFF80") or X"00000010";
-
     signal byte_zeros       : std_logic_vector(3 downto 0);
     signal byte_res         : byte_res_array;
     signal mux_res          : mux_res_array;
     signal fast_state       : std_logic_vector(1 downto 0);
     signal do_fast_ack      : std_logic;
     signal civar            : civar_type := (others => C_DEFAULT_ADDR(C_INTC_ADDR_WIDTH - 1 downto 2));
-    signal write_data_i     : std_logic_vector(C_INTC_ADDR_WIDTH - 3 downto 0);
     signal civar_read_addr  : std_logic_vector(C_CIVAR_WIDTH - 1 downto 0);
     signal civar_write_addr : std_logic_vector(C_CIVAR_WIDTH - 1 downto 0);
     signal intr_addr_i      : std_logic_vector(C_INTC_ADDR_WIDTH - 3 downto 0);
@@ -3522,7 +3882,7 @@ begin
                     std_logic_vector(to_unsigned(I,2)) & byte_res(I);
     end generate Mux_the_Results;
 
-    Fast_FSM_TMR_No : if (C_TMR = 0) generate
+    Fast_FSM_TMR_No : if (C_TMR_ONLY = 0) generate
     begin
 
       -- Handle interrupt occurrence and acknowledge
@@ -3578,7 +3938,7 @@ begin
 
     end generate Fast_FSM_TMR_No;
 
-    Fast_FSM_TMR_Yes : if (C_TMR /= 0) generate
+    Fast_FSM_TMR_Yes : if (C_TMR_ONLY /= 0) generate
       signal fast_state_d  : std_logic_vector(1 downto 0);
       signal INTC_IRQ_d    : std_logic;
       signal civr_d        : std_logic_vector(4 downto 0);
@@ -3671,45 +4031,100 @@ begin
     has_fast  <= cimr(to_integer(unsigned(civr)));
 
     -- Vector address registers implemented as a LUTRAM
-    write_data_i     <= Write_Data(C_INTC_ADDR_WIDTH - 1 downto 2);
     civar_write_addr <= INTC_CIVAR_ADDR(C_CIVAR_WIDTH - 1 downto 0);
     civar_read_addr  <= civr(C_CIVAR_WIDTH - 1 downto 0);
 
-    Using_LUTRAM: if USE_LUTRAM generate
+    Using_EA: if C_INTC_ADDR_WIDTH > 32 generate
+      signal write_data_hi : std_logic_vector(C_INTC_ADDR_WIDTH - 1 downto 32);
+      signal write_data_lo : std_logic_vector(31 downto 2);
     begin
+      write_data_hi  <= Write_Data(C_INTC_ADDR_WIDTH - 33 downto 0);
+      write_data_lo  <= Write_Data(31 downto 2);
 
-      civar_reg : process(Clk)
+      Using_LUTRAM: if USE_LUTRAM generate
       begin
-        if Clk'event and Clk = '1' then
-          if (INTC_WRITE_CIVAR = '1') then
-            civar(to_integer(unsigned(civar_write_addr))) <= write_data_i;
-            intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
-          else
+
+        civar_reg : process(Clk)
+        begin
+          if Clk'event and Clk = '1' then
+            if (INTC_WRITE_CIVAR = '1') then
+              civar(to_integer(unsigned(civar_write_addr)))(29 downto 0) <= write_data_lo;
+            end if;
+            if (INTC_WRITE_CIVEAR = '1') then
+              civar(to_integer(unsigned(civar_write_addr)))(C_INTC_ADDR_WIDTH - 3 downto 30) <= write_data_hi;
+            end if;
             intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
           end if;
-        end if;
-      end process civar_reg;
+        end process civar_reg;
 
-    end generate Using_LUTRAM;
+      end generate Using_LUTRAM;
 
-    Not_Using_LUTRAM: if not USE_LUTRAM generate
-    begin
-
-      civar_reg : process(Clk)
+      Not_Using_LUTRAM: if not USE_LUTRAM generate
       begin
-        if Clk'event and Clk = '1' then
-          if (Reset) then
-            civar <= (others => C_DEFAULT_ADDR(C_INTC_ADDR_WIDTH - 1 downto 2));
-          elsif (INTC_WRITE_CIVAR = '1') then
-            civar(to_integer(unsigned(civar_write_addr))) <= write_data_i;
-            intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
-          else
-            intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
-          end if;
-        end if;
-      end process civar_reg;
 
-    end generate Not_Using_LUTRAM;
+        civar_reg : process(Clk)
+        begin
+          if Clk'event and Clk = '1' then
+            if (Reset) then
+              civar       <= (others => C_DEFAULT_ADDR(C_INTC_ADDR_WIDTH - 1 downto 2));
+              intr_addr_i <= (others => '0');
+            else
+              if (INTC_WRITE_CIVAR = '1') then
+                civar(to_integer(unsigned(civar_write_addr)))(29 downto 0) <= write_data_lo;
+              end if;
+              if (INTC_WRITE_CIVEAR = '1') then
+                civar(to_integer(unsigned(civar_write_addr)))(C_INTC_ADDR_WIDTH - 3 downto 30) <= write_data_hi;
+              end if;
+              intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
+            end if;
+          end if;
+        end process civar_reg;
+
+      end generate Not_Using_LUTRAM;
+    end generate Using_EA;
+
+    Not_Using_EA: if C_INTC_ADDR_WIDTH <= 32 generate
+      signal write_data_i : std_logic_vector(C_INTC_ADDR_WIDTH - 3 downto 0);
+    begin
+      write_data_i <= Write_Data(C_INTC_ADDR_WIDTH - 1 downto 2);
+
+      Using_LUTRAM: if USE_LUTRAM generate
+      begin
+
+        civar_reg : process(Clk)
+        begin
+          if Clk'event and Clk = '1' then
+            if (INTC_WRITE_CIVAR = '1') then
+              civar(to_integer(unsigned(civar_write_addr))) <= write_data_i;
+              intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
+            else
+              intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
+            end if;
+          end if;
+        end process civar_reg;
+
+      end generate Using_LUTRAM;
+
+      Not_Using_LUTRAM: if not USE_LUTRAM generate
+      begin
+
+        civar_reg : process(Clk)
+        begin
+          if Clk'event and Clk = '1' then
+            if (Reset) then
+              civar       <= (others => C_DEFAULT_ADDR(C_INTC_ADDR_WIDTH - 1 downto 2));
+              intr_addr_i <= (others => '0');
+            elsif (INTC_WRITE_CIVAR = '1') then
+              civar(to_integer(unsigned(civar_write_addr))) <= write_data_i;
+              intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
+            else
+              intr_addr_i <= civar(to_integer(unsigned(civar_read_addr)));
+            end if;
+          end if;
+        end process civar_reg;
+
+      end generate Not_Using_LUTRAM;
+    end generate Not_Using_EA;
 
     INTR_ADDR_Assign : process(intr_addr_i)
     begin
@@ -3723,7 +4138,7 @@ begin
   begin
     civr                        <= (others => '0');
     fast_ack                    <= (others => '0');
-    INTR_ADDR                   <= X"00000010";
+    INTR_ADDR                   <= C_DEFAULT_ADDR;
     INTC_IRQ                    <= '1' when cipr /= X"00000000" else '0';
     ToVote(IRQ_FAST_STATE_Pos)  <= (others => '0');
     ToVote(IRQ_INTC_IRQ_Pos)    <= '0';
@@ -3734,7 +4149,7 @@ begin
   cisr_rd_dff : process (Clk) is
   begin  -- process cisr_rd_dff
     if Clk'event and Clk = '1' then   -- rising clock edge
-      if (INTC_READ_CISR = '0') then  -- synchronous reset (active high)
+      if (INTC_READ_CISR = '0' or Reset) then  -- synchronous reset (active high)
         INTC_CISR <= (others => '0');
       else
         INTC_CISR <= cisr;
@@ -3748,7 +4163,7 @@ begin
 
   rst_cipr_rd_voted <= vote(rst_cipr_rd,
                             FromAVote(IRQ_RST_CIPR_RD_Pos),
-                            FromBVote(IRQ_RST_CIPR_RD_Pos), tmr_disable_b, C_TMR);
+                            FromBVote(IRQ_RST_CIPR_RD_Pos), tmr_disable_b, C_TMR_ONLY);
 
   cipr_rd_dff_all : for I in 0 to 31 generate
   begin
@@ -3769,24 +4184,23 @@ end architecture IMP;
 -- pit_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016-2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016-2017,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -3795,11 +4209,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -3808,7 +4222,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -3853,8 +4267,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity PIT_Module is
   generic (
@@ -3869,6 +4283,7 @@ entity PIT_Module is
   port (
     Clk               : in  std_logic;
     Reset             : in  boolean;
+    Config_Reset      : in  std_logic;
     TMR_Disable       : in std_logic;
     FromAVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
     FromBVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
@@ -3883,8 +4298,8 @@ entity PIT_Module is
     PIT_Interrupt     : out std_logic);
 end entity PIT_Module;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of PIT_Module is
 
@@ -4288,7 +4703,7 @@ begin  -- architecture IMP
       PIT_Read_Handler : process (Clk) is
       begin  -- process PIT_Read_Handler
         if Clk'event and Clk = '1' then  -- rising clock edge
-          if PIT_Read = '0' then
+          if PIT_Read = '0' or Config_Reset = '1' then
             PIT_Data <= (others => '0');
           else
             PIT_Data                        <= (others => '0');
@@ -4321,24 +4736,23 @@ end architecture IMP;
 -- uart_control_status.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -4347,11 +4761,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -4360,7 +4774,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -4406,8 +4820,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 entity Uart_Control_Status is
   generic (
@@ -4423,6 +4837,7 @@ entity Uart_Control_Status is
   port (
     CLK   : in std_logic;
     Reset : in boolean;
+    Config_Reset        : in std_logic;
 
     TMR_Disable         : in std_logic;
     FromAVote           : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
@@ -4463,7 +4878,7 @@ begin  -- architecture IMP
   UART_Status_DFF: process (Clk) is
   begin  -- process UART_Status_DFF
     if Clk'event and Clk = '1' then     -- rising clock edge
-      if (UART_Status_Read = '0') then  -- synchronous reset (active high)
+      if (UART_Status_Read = '0' or Config_Reset = '1') then  -- synchronous reset (active high)
         UART_Status <= (others => '0');
       else
         if ((C_USE_UART_RX = 0) or (C_UART_USE_PARITY = 0)) then
@@ -4630,24 +5045,23 @@ end architecture IMP;
 -- uart_receive.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -4656,11 +5070,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -4669,7 +5083,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -4713,8 +5127,8 @@ end architecture IMP;
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity UART_Receive is
   generic (
@@ -4749,8 +5163,8 @@ entity UART_Receive is
 
 end entity UART_Receive;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of UART_Receive is
 
@@ -4821,6 +5235,8 @@ architecture IMP of UART_Receive is
   signal new_rx_data        : std_logic_vector(0 to SERIAL_TO_PAR_LENGTH);
   signal serial_to_parallel : std_logic_vector(1 to SERIAL_TO_PAR_LENGTH);
   signal rx_data_exists_i   : std_logic;
+  signal rx_frame_error_i   : std_logic;
+  signal rx_parity_error_i  : std_logic;
 
   signal rx_1 : std_logic;
   signal rx_2 : std_logic;
@@ -4829,8 +5245,8 @@ architecture IMP of UART_Receive is
 
   -- Preserve signals after synthesis for simulation UART support
   attribute KEEP : string;
-  attribute KEEP of RX_Frame_Error    : signal is "TRUE";
-  attribute KEEP of RX_Parity_Error   : signal is "TRUE";
+  attribute KEEP of rx_frame_error_i  : signal is "TRUE";
+  attribute KEEP of rx_parity_error_i : signal is "TRUE";
   attribute KEEP of new_rx_data_write : signal is "TRUE";
   attribute KEEP of new_rx_data       : signal is "TRUE";
 
@@ -4839,6 +5255,7 @@ begin  -- architecture IMP
   TMR_No : if (C_TMR = 0) generate
     signal start_Edge_Detected : boolean;
     signal running             : boolean;
+    signal mid_Start_Bit_or_Config_Reset : std_logic;
   begin
 
     ToVote <= (others => '0');
@@ -4931,6 +5348,8 @@ begin  -- architecture IMP
         A3           => '0',                      -- [in  std_logic]
         Q            => mid_Start_Bit);           -- [out std_logic]
 
+    mid_Start_Bit_or_Config_Reset <= mid_Start_Bit or Config_Reset;
+
     -- Keep regenerating new values into the 16 clock delay
     -- Starting with the first mid_Start_Bit and for every new sample_points
     -- until stop_Bit_Position is reached
@@ -4993,7 +5412,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => calc_Parity,            -- [in  std_logic]
-            S  => mid_Start_Bit);         -- [in std_logic]
+            S  => mid_Start_Bit_or_Config_Reset); -- [in std_logic]
       end generate Using_Odd_Parity;
 
       Using_Even_Parity : if (C_ODD_PARITY = 0) generate
@@ -5007,20 +5426,20 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => calc_Parity,            -- [in  std_logic]
-            R  => mid_Start_Bit);         -- [in std_logic]
+            R  => mid_Start_Bit_or_Config_Reset);  -- [in std_logic]
       end generate Using_Even_Parity;
 
       calc_Parity <= parity when (stop_Bit_Position or not sample_Point) = '1'
                      else parity xor rx_2;
 
-      RX_Parity_Error <= (EN_16x_Baud and sample_Point) and (new_rx_data(CALC_PAR_POS)) and
-                         not stop_Bit_Position
-                         when running and (rx_2 /= Parity) else '0';
+      rx_parity_error_i <= (EN_16x_Baud and sample_Point) and (new_rx_data(CALC_PAR_POS)) and
+                           not stop_Bit_Position
+                           when running and (rx_2 /= Parity) else '0';
     end generate Using_Parity;
 
     Not_Using_Parity : if (C_USE_PARITY = 0) generate
     begin
-      RX_Parity_Error <= '0';
+      rx_parity_error_i <= '0';
     end generate Not_Using_Parity;
 
 
@@ -5047,7 +5466,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => serial_to_parallel(I),  -- [in  std_logic]
-            S  => mid_Start_Bit);         -- [in std_logic]
+            S  => mid_Start_Bit_or_Config_Reset); -- [in std_logic]
       end generate First_Bit;
 
       Rest_Bits : if (I /= 1) generate
@@ -5061,7 +5480,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => serial_to_parallel(I),  -- [in  std_logic]
-            R  => mid_Start_Bit);         -- [in std_logic]
+            R  => mid_Start_Bit_or_Config_Reset); -- [in std_logic]
       end generate Rest_Bits;
 
     end generate Convert_Serial_To_Parallel;
@@ -5111,7 +5530,7 @@ begin  -- architecture IMP
     UART_Read: process (Clk) is
     begin
       if Clk'event and Clk = '1' then
-        if Read_RX_Data = '0' then
+        if Read_RX_Data = '0' or Config_Reset = '1' then
           RX_Data <= (others => '0');
         else
           RX_Data <= rx_data_i;
@@ -5122,7 +5541,7 @@ begin  -- architecture IMP
   end generate TMR_No;
 
   RX_Data_Received <= new_rx_data_write;
-  RX_Frame_Error   <= stop_Bit_Position and sample_Point and EN_16x_Baud and not rx_2;
+  rx_frame_error_i <= stop_Bit_Position and sample_Point and EN_16x_Baud and not rx_2;
   RX_Overrun_Error <= rx_data_exists_i and new_rx_data_write;
   RX_Data_Exists   <= rx_data_exists_i;
 
@@ -5139,6 +5558,7 @@ begin  -- architecture IMP
     signal recycle_voted             : std_logic;
     signal stop_Bit_Position_d       : std_logic;
     signal mid_Start_Bit_voted       : std_logic;
+    signal mid_Start_Bit_voted_or_Config_Reset : std_logic;
     signal serial_to_parallel_voted  : std_logic_vector(1 to SERIAL_TO_PAR_LENGTH);
     signal new_rx_data_write_d       : std_logic;
     signal rx_data_exists_i_d        : std_logic;
@@ -5277,6 +5697,8 @@ begin  -- architecture IMP
                                 FromAVote(UART_RX_MID_START_BIT_Pos),
                                 FromBVote(UART_RX_MID_START_BIT_Pos), tmr_disable_b);
 
+    mid_Start_Bit_voted_or_Config_Reset <= mid_Start_Bit_voted or Config_Reset;
+
     -- Keep regenerating new values into the 16 clock delay
     -- Starting with the first mid_Start_Bit and for every new sample_points
     -- until stop_Bit_Position is reached
@@ -5357,7 +5779,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => calc_Parity_Voted,      -- [in  std_logic]
-            S  => mid_Start_Bit_Voted);   -- [in std_logic]
+            S  => mid_Start_Bit_Voted_or_Config_Reset);   -- [in std_logic]
       end generate Using_Odd_Parity;
 
       Using_Even_Parity : if (C_ODD_PARITY = 0) generate
@@ -5371,7 +5793,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => EN_16x_Baud,            -- [in  std_logic]
             D  => calc_Parity_Voted,      -- [in  std_logic]
-            R  => mid_Start_Bit_Voted);   -- [in std_logic]
+            R  => mid_Start_Bit_Voted_or_Config_Reset);   -- [in std_logic]
       end generate Using_Even_Parity;
 
       calc_Parity <= parity when (stop_Bit_Position or not sample_Point) = '1'
@@ -5383,16 +5805,16 @@ begin  -- architecture IMP
                                 FromAVote(UART_RX_CALC_PARITY_Pos),
                                 FromBVote(UART_RX_CALC_PARITY_Pos), tmr_disable_b);
 
-      RX_Parity_Error <= (EN_16x_Baud and sample_Point) and (new_rx_data(CALC_PAR_POS)) and
-                         not stop_Bit_Position
-                         when running and (rx_2 /= Parity) else '0';
+      rx_parity_error_i <= (EN_16x_Baud and sample_Point) and (new_rx_data(CALC_PAR_POS)) and
+                           not stop_Bit_Position
+                           when running and (rx_2 /= Parity) else '0';
 
 
     end generate Using_Parity;
 
     Not_Using_Parity : if (C_USE_PARITY = 0) generate
     begin
-      RX_Parity_Error <= '0';
+      rx_parity_error_i <= '0';
       ToVote(UART_RX_CALC_PARITY_Pos) <= '0';
     end generate Not_Using_Parity;
 
@@ -5432,7 +5854,7 @@ begin  -- architecture IMP
             C  => Clk,                          -- [in  std_logic]
             CE => EN_16x_Baud,                  -- [in  std_logic]
             D  => serial_to_parallel_voted(I),  -- [in  std_logic]
-            S  => mid_Start_Bit_Voted);         -- [in std_logic]
+            S  => mid_Start_Bit_Voted_or_Config_Reset);  -- [in std_logic]
       end generate First_Bit;
 
       Rest_Bits : if (I /= 1) generate
@@ -5446,7 +5868,7 @@ begin  -- architecture IMP
             C  => Clk,                          -- [in  std_logic]
             CE => EN_16x_Baud,                  -- [in  std_logic]
             D  => serial_to_parallel_voted(I),  -- [in  std_logic]
-            R  => mid_Start_Bit_Voted);         -- [in std_logic]
+            R  => mid_Start_Bit_Voted_or_Config_Reset);  -- [in std_logic]
       end generate Rest_Bits;
 
     end generate Convert_Serial_To_Parallel;
@@ -5530,9 +5952,9 @@ begin  -- architecture IMP
       end if;
     end process Receive_Register_DFF;
 
-    UART_Read_Logic: process (Read_RX_Data, rx_data_i) is
+    UART_Read_Logic: process (Read_RX_Data, rx_data_i, Config_Reset) is
     begin
-      if Read_RX_Data = '0' then
+      if Read_RX_Data = '0' or Config_Reset = '1' then
         RX_Data_d <= (others => '0');
       else
         RX_Data_d <= rx_data_i;
@@ -5559,6 +5981,9 @@ begin  -- architecture IMP
 
   end generate TMR_Yes;
 
+  RX_Frame_Error  <= rx_frame_error_i;
+  RX_Parity_Error <= rx_parity_error_i;
+
 end architecture IMP;
 
 
@@ -5566,24 +5991,23 @@ end architecture IMP;
 -- uart_transmit.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011, 2016, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -5592,11 +6016,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -5605,7 +6029,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -5649,8 +6073,8 @@ end architecture IMP;
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity UART_Transmit is
   generic (
@@ -5684,8 +6108,8 @@ end entity UART_Transmit;
 
 library ieee;
 use ieee.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of UART_Transmit is
 
@@ -5803,16 +6227,19 @@ architecture IMP of UART_Transmit is
 
   signal data_is_sent      : std_logic;
   signal tx_buffer_empty_i : std_logic;
+  signal tx_i              : std_logic;
   signal fifo_DOut         : std_logic_vector(0 to C_DATA_BITS-1);
 
   -- Preserve signals after synthesis for simulation UART support
   attribute KEEP : string;
   attribute KEEP of tx_buffer_empty_i : signal is "TRUE";
-  attribute KEEP of TX                : signal is "TRUE";
+  attribute KEEP of tx_i              : signal is "TRUE";
 
 begin  -- architecture IMP
 
   TMR_No : if (C_TMR = 0) generate
+    signal tx_Data_Enable_or_Config_Reset : std_logic;
+    signal tx_Start_or_Config_Reset       : std_logic;
   begin
 
     ToVote <= (others => '0');
@@ -5845,9 +6272,10 @@ begin  -- architecture IMP
         C  => Clk,                        -- [in  std_logic]
         CE => EN_16x_Baud,                -- [in  std_logic]
         D  => div16,                      -- [in  std_logic]
-        R  => tx_Data_Enable);            -- [in std_logic]
+        R  => tx_Data_Enable_or_Config_Reset);  -- [in std_logic]
 
-
+    tx_Data_Enable_or_Config_Reset <= tx_Data_Enable or Config_Reset;
+    
     -----------------------------------------------------------------------------
     -- tx_start is '1' for the start bit in a transmission
     -----------------------------------------------------------------------------
@@ -5862,6 +6290,8 @@ begin  -- architecture IMP
       end if;
     end process TX_Start_DFF;
 
+    tx_Start_or_Config_Reset <= tx_Start or Config_Reset;
+    
     -----------------------------------------------------------------------------
     -- tx_DataBits is '1' during all databits transmission
     -----------------------------------------------------------------------------
@@ -6027,9 +6457,9 @@ begin  -- architecture IMP
     begin  -- process Serial_Out_DFF
       if Clk'event and Clk = '1' then  -- rising clock edge
         if Reset then                 -- asynchronous reset (active high)
-          TX <= '1';
+          tx_i <= '1';
         else
-          TX <= (not(tx_run) or serial_Data) and not(tx_Start);
+          tx_i <= (not(tx_run) or serial_Data) and not(tx_Start);
         end if;
       end if;
     end process Serial_Out_DFF;
@@ -6051,7 +6481,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => tx_Data_Enable,         -- [in  std_logic]
             D  => calc_Parity,            -- [in  std_logic]
-            S  => tx_Start);              -- [in std_logic]
+            S  => tx_Start_or_Config_Reset);  -- [in std_logic]
       end generate Using_Odd_Parity;
 
       Using_Even_Parity : if (C_ODD_PARITY = 0) generate
@@ -6065,7 +6495,7 @@ begin  -- architecture IMP
             C  => Clk,                    -- [in  std_logic]
             CE => tx_Data_Enable,         -- [in  std_logic]
             D  => calc_Parity,            -- [in  std_logic]
-            R  => tx_Start);              -- [in std_logic]
+            R  => tx_Start_or_Config_Reset);  -- [in std_logic]
       end generate Using_Even_Parity;
 
       calc_Parity <= parity xor serial_data;
@@ -6143,6 +6573,7 @@ begin  -- architecture IMP
     signal tmr_disable_b        : boolean;
     signal div16_voted          : std_logic;
     signal tx_Data_Enable_voted : std_logic;
+    signal tx_Data_Enable_voted_or_Config_Reset : std_logic;
     signal tx_Start_d           : std_logic;
     signal tx_DataBits_d        : std_logic;
     signal mux_sel_d            : std_logic_vector(0 to 2);
@@ -6188,13 +6619,15 @@ begin  -- architecture IMP
         C  => Clk,                        -- [in  std_logic]
         CE => EN_16x_Baud,                -- [in  std_logic]
         D  => div16_voted,                -- [in  std_logic]
-        R  => tx_Data_Enable_voted);      -- [in std_logic]
+        R  => tx_Data_Enable_voted_or_Config_Reset); -- [in std_logic]
 
     ToVote(UART_TX_DATA_ENABLE_Pos) <= tx_Data_Enable;
 
     tx_Data_Enable_voted <= vote(tx_Data_Enable,
                                  FromAVote(UART_TX_DATA_ENABLE_Pos),
                                  FromBVote(UART_TX_DATA_ENABLE_Pos), tmr_disable_b);
+
+    tx_Data_Enable_voted_or_Config_Reset <= tx_Data_Enable_voted or Config_Reset;
 
     -----------------------------------------------------------------------------
     -- tx_start is '1' for the start bit in a transmission
@@ -6428,14 +6861,14 @@ begin  -- architecture IMP
     Serial_Out_DFF : process (Clk) is
     begin
       if Clk'event and Clk = '1' then
-        TX <= vote(TX_d, FromAVote(UART_TX_Pos), FromBVote(UART_TX_Pos), tmr_disable_b);
+        tx_i <= vote(TX_d, FromAVote(UART_TX_Pos), FromBVote(UART_TX_Pos), tmr_disable_b);
       end if;
     end process Serial_Out_DFF;
 
     -----------------------------------------------------------------------------
     -- Parity handling
     -----------------------------------------------------------------------------
-    Using_Parity : if (C_USE_PARITY = 1) generate
+    Using_Parity : if (C_USE_PARITY /= 0) generate
       signal calc_Parity_voted    : std_logic;
       signal tx_Run1_d            : std_logic;
       signal serial_Data_d        : std_logic;
@@ -6599,31 +7032,32 @@ begin  -- architecture IMP
 
   end generate TMR_Yes;
 
+  TX <= tx_i;
+
 end architecture IMP;
 
 
 -------------------------------------------------------------------------------
--- iomodule_core.vhd - Entity and architecture
+-- uart_core.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -6632,11 +7066,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -6645,7 +7079,1377 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+--
+-------------------------------------------------------------------------------
+-- Filename:        uart_core.vhd
+--
+-- Description:
+--
+-- VHDL-Standard:   VHDL'93/02
+-------------------------------------------------------------------------------
+-- Structure:
+--            uart
+--              uart_core
+--
+-------------------------------------------------------------------------------
+-- Author:          roland
+--
+-- History:
+--   roland  2019-12-01    First Version
+--
+-------------------------------------------------------------------------------
+-- Naming Conventions:
+--      active low signals:                     "*_n"
+--      clock signals:                          "clk", "clk_div#", "clk_#x"
+--      reset signals:                          "rst", "rst_n"
+--      generics:                               "C_*"
+--      user defined types:                     "*_TYPE"
+--      state machine next state:               "*_ns"
+--      state machine current state:            "*_cs"
+--      combinatorial signals:                  "*_com"
+--      pipelined or register delay signals:    "*_d#"
+--      counter signals:                        "*cnt*"
+--      clock enable signals:                   "*_ce"
+--      internal version of output port         "*_i"
+--      device pins:                            "*_pin"
+--      ports:                                  - Names begin with Uppercase
+--      processes:                              "*_PROCESS"
+--      component instantiations:               "<ENTITY_>I_<#|FUNC>
+-------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
+
+entity UART_Core is
+  generic (
+    C_TARGET             : TARGET_FAMILY_TYPE;
+    C_FREQ               : integer              := 100000000;
+    C_TMR                : integer              := 0;
+    C_USE_TMR_DISABLE    : integer              := 0;
+    C_VOTE_SIZE          : integer              := 0;
+    C_USE_SRL16          : string;
+    C_UART_PROG_BAUDRATE : integer              := 0;
+    C_UART_BAUDRATE      : integer              := 9600;
+    C_USE_UART_RX        : integer              := 1;
+    C_USE_UART_TX        : integer              := 1;
+    C_UART_DATA_BITS     : integer range 5 to 8 := 8;
+    C_UART_USE_PARITY    : integer              := 0;
+    C_UART_ODD_PARITY    : integer              := 0);
+  port (
+    Clk                  : in  std_logic;
+    Reset                : in  boolean;
+    Config_Reset         : in  std_logic;
+
+    TMR_Disable          : in  std_logic;
+    FromAVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    FromBVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    ToVote               : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+
+    TX                   : out std_logic;
+    Write_TX_Data        : in  std_logic;
+    Write_Data           : in  std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    Write_Baud           : in  std_logic;
+    Write_Baud_Data      : in  std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+
+    RX                   : in  std_logic;
+    Read_RX_Data         : in  std_logic;
+    RX_Data_Received     : out std_logic;
+    RX_Data              : out std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+
+    UART_Status_Read     : in  std_logic;
+    UART_Status          : out std_logic_vector(7 downto 0);
+    UART_Interrupt       : out std_logic;
+    UART_Rx_Interrupt    : out std_logic;
+    UART_Tx_Interrupt    : out std_logic;
+    UART_Error_Interrupt : out std_logic);
+end entity UART_Core;
+
+architecture IMP of UART_Core is
+
+  component FIT_Module is
+    generic (
+      C_TARGET          : TARGET_FAMILY_TYPE;
+      C_TMR             : integer := 0;
+      C_USE_TMR_DISABLE : integer := 0;
+      C_VOTE_SIZE       : integer := 0;
+      C_USE_SRL16       : string;
+      C_USE_FIT         : integer;
+      C_NO_CLOCKS       : integer;      -- The number of clocks between each interrupt
+      C_INACCURACY      : integer);     -- The maximum inaccuracy of the number
+    port (
+      Config_Reset : in  std_logic;
+      Clk          : in  std_logic;
+      Reset        : in  boolean;
+      TMR_Disable  : in  std_logic;
+      FromAVote    : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      FromBVote    : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      ToVote       : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      Toggle       : out std_logic;
+      Interrupt    : out std_logic);
+  end component FIT_Module;
+
+  component UART_Transmit is
+    generic (
+      C_TARGET          : TARGET_FAMILY_TYPE;
+      C_TMR             : integer := 0;
+      C_USE_TMR_DISABLE : integer := 0;
+      C_VOTE_SIZE       : integer := 0;
+      C_USE_SRL16       : string;
+      C_DATA_BITS       : integer range 5 to 8;
+      C_USE_PARITY      : integer;
+      C_ODD_PARITY      : integer);
+    port (
+      Config_Reset : in std_logic;
+      Clk          : in std_logic;
+      Reset        : in boolean;
+      EN_16x_Baud  : in std_logic;
+
+      TMR_Disable         : in  std_logic;
+      FromAVote           : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      FromBVote           : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      ToVote              : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      TX                  : out std_logic;
+      Write_TX_Data       : in  std_logic;
+      TX_Data             : in  std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+      TX_Data_Transmitted : out std_logic;
+      TX_Buffer_Empty     : out std_logic);
+  end component UART_Transmit;
+
+  component UART_Receive is
+    generic (
+      C_TMR             : integer := 0;
+      C_USE_TMR_DISABLE : integer := 0;
+      C_VOTE_SIZE       : integer := 0;
+      C_TARGET          : TARGET_FAMILY_TYPE;
+      C_USE_SRL16       : string;
+      C_DATA_BITS       : integer range 5 to 8;
+      C_USE_PARITY      : integer;
+      C_ODD_PARITY      : integer);
+    port (
+      Config_Reset : in std_logic;
+      Clk          : in std_logic;
+      Reset        : in boolean;
+      EN_16x_Baud  : in std_logic;
+
+      RX               : in  std_logic;
+      Read_RX_Data     : in  std_logic;
+      TMR_Disable      : in  std_logic;
+      FromAVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      FromBVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      ToVote           : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      RX_Data          : out std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+      RX_Data_Received : out std_logic;
+      RX_Data_Exists   : out std_logic;
+      RX_Frame_Error   : out std_logic;
+      RX_Overrun_Error : out std_logic;
+      RX_Parity_Error  : out std_logic);
+  end component UART_Receive;
+
+  component Uart_Control_Status is
+    generic (
+      C_TMR             : integer := 0;
+      C_USE_TMR_DISABLE : integer := 0;
+      C_VOTE_SIZE       : integer := 0;
+      C_USE_UART_RX     : integer;
+      C_USE_UART_TX     : integer;
+      C_UART_DATA_BITS  : integer range 5 to 8;
+      C_UART_USE_PARITY : integer;
+      C_UART_ODD_PARITY : integer);
+    port (
+      CLK   : in std_logic;
+      Reset : in boolean;
+      Config_Reset : in std_logic;      
+
+      TMR_Disable : in  std_logic;
+      FromAVote   : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      FromBVote   : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      ToVote      : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+
+      TX_Data_Transmitted : in std_logic;
+      TX_Buffer_Empty     : in std_logic;
+      RX_Data_Received    : in std_logic;
+      RX_Data_Exists      : in std_logic;
+      RX_Frame_Error      : in std_logic;
+      RX_Overrun_Error    : in std_logic;
+      RX_Parity_Error     : in std_logic;
+
+      UART_Status_Read     : in  std_logic;
+      UART_Status          : out std_logic_vector(7 downto 0);
+      UART_Interrupt       : out std_logic;
+      UART_Rx_Interrupt    : out std_logic;
+      UART_Tx_Interrupt    : out std_logic;
+      UART_Error_Interrupt : out std_logic);
+  end component Uart_Control_Status;
+
+  --------------------------------------------------------------------------------------------------
+  -- Calculate FIT period for generating 16*C_UART_BAUDRATE
+  --------------------------------------------------------------------------------------------------
+  function FIT_PERIOD (FREQ : integer; BAUDRATE : integer ) return natural is
+    constant C_BAUDRATE_16_BY_2 : integer := (16 * BAUDRATE) / 2;
+    constant C_REMAINDER        : integer := FREQ rem (16 * BAUDRATE);
+    constant C_RATIO            : integer := FREQ / (16 * BAUDRATE);
+  begin
+    if (C_BAUDRATE_16_BY_2 < C_REMAINDER) then
+      return (C_RATIO + 1);
+    else
+      return C_RATIO;
+    end if;
+  end function FIT_PERIOD;
+
+  -- Enable for Divide by 16 UART clock
+  signal en_16x_baud          : std_logic;
+
+  -- TX Control
+  signal tx_data_transmitted  : std_logic;
+  signal tx_buffer_empty      : std_logic;
+
+  -- RX Control
+  signal rx_data_received_i   : std_logic;
+  signal rx_data_exists       : std_logic;
+  signal rx_frame_error       : std_logic;
+  signal rx_overrun_error     : std_logic;
+  signal rx_parity_error      : std_logic;
+
+begin  -- architecture IMP
+
+  Using_UART_TX : if (C_USE_UART_TX /= 0) generate
+  begin
+
+    UART_TX_I1 : UART_Transmit
+      generic map (
+        C_TARGET          => C_TARGET,
+        C_TMR             => C_TMR,
+        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
+        C_VOTE_SIZE       => UART_TRANSMIT_Pos'high-UART_TRANSMIT_Pos'low+1,
+        C_USE_SRL16       => C_USE_SRL16,
+        C_DATA_BITS       => C_UART_DATA_BITS,
+        C_USE_PARITY      => C_UART_USE_PARITY,
+        C_ODD_PARITY      => C_UART_ODD_PARITY)
+      port map (
+        Config_Reset => Config_Reset,
+        Clk          => Clk,
+        Reset        => Reset,
+        EN_16x_Baud  => en_16x_baud,
+
+        TMR_Disable         => TMR_Disable,
+        FromAVote           => FromAVote(UART_TRANSMIT_Pos),
+        FromBVote           => FromBVote(UART_TRANSMIT_Pos),
+        ToVote              => ToVote(UART_TRANSMIT_Pos),
+        TX                  => Tx,
+        Write_TX_Data       => Write_TX_Data,
+        TX_Data             => Write_Data(C_UART_DATA_BITS-1 downto 0),
+        TX_Data_Transmitted => tx_data_transmitted,
+        TX_Buffer_Empty     => tx_buffer_empty);
+  end generate Using_UART_TX;
+
+  No_UART_TX : if (C_USE_UART_TX = 0) generate
+  begin
+    tx_buffer_empty           <= '0';
+    tx_data_transmitted       <= '0';
+    Tx                        <= '0';
+    ToVote(UART_TRANSMIT_Pos) <= (others => '0');
+  end generate No_UART_TX;
+
+  Using_UART_RX : if (C_USE_UART_RX /= 0) generate
+  begin
+
+    UART_RX_I1 : UART_Receive
+      generic map (
+        C_TARGET          => C_TARGET,
+        C_TMR             => C_TMR,
+        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
+        C_VOTE_SIZE       => UART_RECEIVE_Pos'high-UART_RECEIVE_Pos'low+1,
+        C_USE_SRL16       => C_USE_SRL16,
+        C_DATA_BITS       => C_UART_DATA_BITS,
+        C_USE_PARITY      => C_UART_USE_PARITY,
+        C_ODD_PARITY      => C_UART_ODD_PARITY)
+      port map (
+        Config_Reset => Config_Reset,
+        Clk          => Clk,
+        Reset        => Reset,
+        EN_16x_Baud  => en_16x_baud,
+
+        RX               => RX,
+        Read_RX_Data     => Read_RX_Data,
+        TMR_Disable      => TMR_Disable,
+        FromAVote        => FromAVote(UART_RECEIVE_Pos),
+        FromBVote        => FromBVote(UART_RECEIVE_Pos),
+        ToVote           => ToVote(UART_RECEIVE_Pos),
+        RX_Data          => RX_Data,
+        RX_Data_Received => rx_data_received_i,
+        RX_Data_Exists   => rx_data_exists,
+        RX_Frame_Error   => rx_frame_error,
+        RX_Overrun_Error => rx_overrun_error,
+        RX_Parity_Error  => rx_parity_error);
+  end generate Using_UART_RX;
+
+  No_UART_RX : if (C_USE_UART_RX = 0) generate
+  begin
+    RX_Data                  <= (others => '0');
+    rx_data_received_i       <= '0';
+    rx_data_exists           <= '0';
+    rx_frame_error           <= '0';
+    rx_overrun_error         <= '0';
+    rx_parity_error          <= '0';
+    ToVote(UART_RECEIVE_Pos) <= (others => '0');
+  end generate No_UART_RX;
+
+  RX_Data_Received <= rx_data_received_i;
+  
+  Using_UART : if ((C_USE_UART_RX /= 0) or (C_USE_UART_TX /= 0)) generate
+  begin
+
+    No_Dynamic_BaudRate: if C_UART_PROG_BAUDRATE = 0 generate
+    begin
+      UART_FIT_I : FIT_Module
+        generic map (
+          C_TARGET          => C_TARGET,
+          C_TMR             => C_TMR,
+          C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
+          C_VOTE_SIZE       => UART_BAUD_FIT_Pos'high-UART_BAUD_FIT_Pos'low+1,
+          C_USE_SRL16       => C_USE_SRL16,
+          C_USE_FIT         => 1,
+          C_NO_CLOCKS       => FIT_PERIOD(C_FREQ, C_UART_BAUDRATE),
+          C_INACCURACY      => 0)
+        port map (
+          Config_Reset => Config_Reset,
+          Clk          => Clk,
+          Reset        => Reset,
+          TMR_Disable  => TMR_Disable,
+          FromAVote    => FromAVote(UART_BAUD_FIT_Pos),
+          FromBVote    => FromBVote(UART_BAUD_FIT_Pos),
+          ToVote       => ToVote(UART_BAUD_FIT_Pos),
+          Toggle       => open,
+          Interrupt    => en_16x_baud);
+
+      ToVote(UART_BAUD_REG_Pos)  <= (others => '0');
+      ToVote(UART_BAUD_CNT_Pos)  <= (others => '0');
+      ToVote(UART_BAUD_EN16_Pos) <= '0';
+
+    end generate No_Dynamic_BaudRate;
+
+    Programmable_BaudRate_TMR_No: if C_UART_PROG_BAUDRATE /= 0 and C_TMR = 0 generate
+      signal baudrate_cnt : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+      signal baudrate_reg : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+    begin
+
+      ToVote(UART_BAUD_FIT_Pos) <= (others => '0');
+
+      BaudRate_Counter : process (Clk)
+      begin  -- process BaudRate_Counter
+        if Clk'event and Clk = '1' then  -- rising clock edge
+          if Reset then                  -- synchronous reset (active high)
+            baudrate_reg <=
+              std_logic_vector(to_unsigned(FIT_PERIOD(C_FREQ, C_UART_BAUDRATE) - 1, baudrate_reg'length));
+            baudrate_cnt <= (others => '0');
+            en_16x_baud  <= '0';
+          else
+            en_16x_baud <= '0';
+            if baudrate_cnt = "00000000000000000000" then
+              baudrate_cnt <= baudrate_reg;
+              en_16x_baud  <= '1';
+            else
+              baudrate_cnt <= std_logic_vector(unsigned(baudrate_cnt) - 1);
+            end if;
+            if Write_Baud = '1' then
+              baudrate_reg <= Write_Baud_Data;
+              baudrate_cnt <= (others => '0');
+            end if;
+          end if;
+        end if;
+      end process BaudRate_Counter;
+
+      ToVote(UART_BAUD_REG_Pos)  <= (others => '0');
+      ToVote(UART_BAUD_CNT_Pos)  <= (others => '0');
+      ToVote(UART_BAUD_EN16_Pos) <= '0';
+
+    end generate Programmable_BaudRate_TMR_No;
+
+    Programmable_BaudRate_TMR_Yes: if C_UART_PROG_BAUDRATE /= 0 and C_TMR = 1 generate
+      signal baudrate_cnt   : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+      signal baudrate_reg   : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+      signal baudrate_cnt_d : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+      signal baudrate_reg_d : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+      signal en_16x_baud_d  : std_logic;
+      signal tmr_disable_b  : boolean;
+    begin
+
+      ToVote(UART_BAUD_FIT_Pos) <= (others => '0');
+
+      tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1;
+
+      BaudRate_Counter_Logic : process (Reset, baudrate_reg, baudrate_cnt, Write_Baud, Write_Baud_Data)
+      begin
+        if Reset then
+          baudrate_reg_d <=
+            std_logic_vector(to_unsigned(FIT_PERIOD(C_FREQ, C_UART_BAUDRATE) - 1, baudrate_reg'length));
+          baudrate_cnt_d <= (others => '0');
+          en_16x_baud_d  <= '0';
+        else
+          if baudrate_cnt = "00000000000000000000" then
+            baudrate_cnt_d <= baudrate_reg;
+            en_16x_baud_d  <= '1';
+          else
+            baudrate_cnt_d <= std_logic_vector(unsigned(baudrate_cnt) - 1);
+            en_16x_baud_d  <= '0';
+          end if;
+          if Write_Baud = '1' then
+            baudrate_reg_d <= Write_Baud_Data;
+            baudrate_cnt_d <= (others => '0');
+          else
+            baudrate_reg_d <= baudrate_reg;
+          end if;
+        end if;
+      end process BaudRate_Counter_Logic;
+
+      ToVote(UART_BAUD_REG_Pos)  <= baudrate_reg_d;
+      ToVote(UART_BAUD_CNT_Pos)  <= baudrate_cnt_d;
+      ToVote(UART_BAUD_EN16_Pos) <= en_16x_baud_d;
+
+      BaudRate_Counter_DFF : process (Clk)
+      begin
+        if Clk'event and Clk = '1' then
+          baudrate_reg <= vote(baudrate_reg_d,
+                               FromAVote(UART_BAUD_REG_Pos),
+                               FromBVote(UART_BAUD_REG_Pos), tmr_disable_b);
+          baudrate_cnt <= vote(baudrate_cnt_d,
+                               FromAVote(UART_BAUD_CNT_Pos),
+                               FromBVote(UART_BAUD_CNT_Pos), tmr_disable_b);
+          en_16x_baud  <= vote(en_16x_baud_d,
+                               FromAVote(UART_BAUD_EN16_Pos),
+                               FromBVote(UART_BAUD_EN16_Pos), tmr_disable_b);
+        end if;
+      end process BaudRate_Counter_DFF;
+
+    end generate Programmable_BaudRate_TMR_Yes;
+
+    Uart_Control_Status_I1 : Uart_Control_Status
+      generic map (
+        C_TMR             => C_TMR,
+        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
+        C_VOTE_SIZE       => UART_CONTROL_Pos'high-UART_CONTROL_Pos'low+1,
+        C_USE_UART_RX     => C_USE_UART_RX,
+        C_USE_UART_TX     => C_USE_UART_TX,
+        C_UART_DATA_BITS  => C_UART_DATA_BITS,
+        C_UART_USE_PARITY => C_UART_USE_PARITY,
+        C_UART_ODD_PARITY => C_UART_ODD_PARITY)
+      port map (
+        CLK                  => CLK,
+        Reset                => Reset,
+        Config_Reset         => Config_Reset,
+        TMR_Disable          => TMR_Disable,
+        FromAVote            => FromAVote(UART_CONTROL_Pos),
+        FromBVote            => FromBVote(UART_CONTROL_Pos),
+        ToVote               => ToVote(UART_CONTROL_Pos),
+        TX_Data_Transmitted  => tx_data_transmitted,
+        TX_Buffer_Empty      => tx_buffer_empty,
+        RX_Data_Received     => rx_data_received_i,
+        RX_Data_Exists       => rx_data_exists,
+        RX_Frame_Error       => rx_frame_error,
+        RX_Overrun_Error     => rx_overrun_error,
+        RX_Parity_Error      => rx_parity_error,
+        UART_Status_Read     => UART_Status_Read,
+        UART_Status          => uart_status,
+        UART_Interrupt       => UART_Interrupt,
+        UART_Rx_Interrupt    => UART_RX_Interrupt,
+        UART_Tx_Interrupt    => UART_TX_Interrupt,
+        UART_Error_Interrupt => UART_Error_Interrupt);
+  end generate Using_UART;
+
+  No_UART : if ((C_USE_UART_RX = 0) and (C_USE_UART_TX = 0)) generate
+  begin
+    uart_status                <= (others => '0');
+    UART_Interrupt             <= '0';
+    uart_rx_interrupt          <= '0';
+    uart_tx_interrupt          <= '0';
+    uart_error_interrupt       <= '0';
+    ToVote(UART_BAUD_FIT_Pos)  <= (others => '0');
+    ToVote(UART_BAUD_REG_Pos)  <= (others => '0');
+    ToVote(UART_BAUD_CNT_Pos)  <= (others => '0');
+    ToVote(UART_BAUD_EN16_Pos) <= '0';
+    ToVote(UART_CONTROL_Pos)   <= (others => '0');
+  end generate No_UART;
+
+end architecture IMP;
+
+
+-------------------------------------------------------------------------------
+-- uart.vhd - Entity and architecture
+-------------------------------------------------------------------------------
+--
+-- (c) Copyright 2011,2016,2021,2023 Advanced Micro Devices, Inc. All rights reserved.
+--
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
+-- Applications, subject only to applicable laws and
+-- regulations governing limitations on product liability.
+--
+-- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+-- PART OF THIS FILE AT ALL TIMES.
+--
+-------------------------------------------------------------------------------
+-- Filename:        uart.vhd
+--
+-- Description:
+--
+-- VHDL-Standard:   VHDL'93/02
+-------------------------------------------------------------------------------
+-- Structure:
+--              uart.vhd
+--
+-------------------------------------------------------------------------------
+-- Author:          roland
+--
+-- History:
+--   roland  2019-12-01    First Version
+--
+-------------------------------------------------------------------------------
+-- Naming Conventions:
+--      active low signals:                     "*_n"
+--      clock signals:                          "clk", "clk_div#", "clk_#x"
+--      reset signals:                          "rst", "rst_n"
+--      generics:                               "C_*"
+--      user defined types:                     "*_TYPE"
+--      state machine next state:               "*_ns"
+--      state machine current state:            "*_cs"
+--      combinatorial signals:                  "*_com"
+--      pipelined or register delay signals:    "*_d#"
+--      counter signals:                        "*cnt*"
+--      clock enable signals:                   "*_ce"
+--      internal version of output port         "*_i"
+--      device pins:                            "*_pin"
+--      ports:                                  - Names begin with Uppercase
+--      processes:                              "*_PROCESS"
+--      component instantiations:               "<ENTITY_>I_<#|FUNC>
+-------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
+
+entity UART is
+  generic (
+    C_TARGET             : TARGET_FAMILY_TYPE;
+    C_FREQ               : integer              := 100000000;
+    C_UART_FREQ          : integer              := 100000000;
+    C_TMR                : integer              := 0;
+    C_USE_TMR_DISABLE    : integer              := 0;
+    C_VOTE_SIZE          : integer              := 0;
+    C_USE_SRL16          : string;
+    C_UART_PROG_BAUDRATE : integer              := 0;
+    C_UART_ASYNC         : integer              := 0;
+    C_UART_NUM_SYNC_FF   : integer              := 2;
+    C_UART_BAUDRATE      : integer              := 9600;
+    C_USE_UART_RX        : integer              := 1;
+    C_USE_UART_TX        : integer              := 1;
+    C_UART_DATA_BITS     : integer range 5 to 8 := 8;
+    C_UART_USE_PARITY    : integer              := 0;
+    C_UART_ODD_PARITY    : integer              := 0);
+  port (
+    Clk                  : in std_logic;
+    UART_Clk             : in std_logic;
+    Reset                : in std_logic;
+    Config_Reset         : in std_logic;
+    Reset_UART_Clk       : in std_logic;
+    
+    TMR_Disable          : in  std_logic;
+    FromAVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    FromBVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    ToVote               : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+
+    TX                   : out std_logic;
+    Write_TX_Data        : in  std_logic;
+    Write_Baud           : in  std_logic;
+    Write_Data           : in  std_logic_vector(31 downto 0);
+
+    RX                   : in  std_logic;
+    Read_RX_Data         : in  std_logic;
+    Read_RX_Wait         : out std_logic;
+    Read_RX_Ready        : out  std_logic;
+    RX_Data              : out std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+
+    UART_Status_Read     : in  std_logic;
+    UART_Status_Wait     : out std_logic;
+    UART_Status_Ready    : out std_logic;
+    UART_Status          : out std_logic_vector(7 downto 0);
+    UART_Interrupt       : out std_logic;
+    UART_Rx_Interrupt    : out std_logic;
+    UART_Tx_Interrupt    : out std_logic;
+    UART_Error_Interrupt : out std_logic);
+end entity UART;
+
+architecture IMP of Uart is
+
+  component UART_Core is
+  generic (
+    C_TARGET             : TARGET_FAMILY_TYPE;
+    C_FREQ               : integer              := 100000000;
+    C_TMR                : integer              := 0;
+    C_USE_TMR_DISABLE    : integer              := 0;
+    C_VOTE_SIZE          : integer              := 0;
+    C_USE_SRL16          : string;
+    C_UART_PROG_BAUDRATE : integer              := 0;
+    C_UART_BAUDRATE      : integer              := 9600;
+    C_USE_UART_RX        : integer              := 1;
+    C_USE_UART_TX        : integer              := 1;
+    C_UART_DATA_BITS     : integer range 5 to 8 := 8;
+    C_UART_USE_PARITY    : integer              := 0;
+    C_UART_ODD_PARITY    : integer              := 0);
+  port (
+    Clk                  : in std_logic;
+    Reset                : in boolean;
+    Config_Reset         : in std_logic;
+
+    TMR_Disable          : in  std_logic;
+    FromAVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    FromBVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    ToVote               : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+
+    TX                   : out std_logic;
+    Write_TX_Data        : in  std_logic;
+    Write_Data           : in  std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    Write_Baud           : in  std_logic;
+    Write_Baud_Data      : in  std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+
+    RX                   : in  std_logic;
+    Read_RX_Data         : in  std_logic;
+    RX_Data_Received     : out std_logic;
+    RX_Data              : out std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+
+    UART_Status_Read     : in  std_logic;
+    UART_Status          : out std_logic_vector(7 downto 0);
+    UART_Interrupt       : out std_logic;
+    UART_Rx_Interrupt    : out std_logic;
+    UART_Tx_Interrupt    : out std_logic;
+    UART_Error_Interrupt : out std_logic);
+  end component UART_Core;
+
+  component mb_sync_bit is
+  generic(
+    C_LEVELS            : natural   := 2;
+    C_RESET_VALUE       : std_logic := '0';
+    C_RESET_SYNCHRONOUS : boolean   := true;
+    C_RESET_ACTIVE_HIGH : boolean   := true);
+  port(
+    Clk            : in  std_logic;
+    Rst            : in  std_logic;
+    Scan_En        : in  std_logic;
+    Scan_Reset_Sel : in  std_logic;
+    Scan_Reset     : in  std_logic;
+    Raw            : in  std_logic;
+    Synced         : out std_logic);
+  end component mb_sync_bit;
+
+  component mb_sync_vec is
+  generic(
+    C_LEVELS            : natural   := 2;
+    C_RESET_VALUE       : std_logic := '0';
+    C_RESET_SYNCHRONOUS : boolean   := true;
+    C_RESET_ACTIVE_HIGH : boolean   := true;
+    C_WIDTH             : natural);
+  port(
+    Clk            : in  std_logic;
+    Rst            : in  std_logic := '0';
+    Scan_En        : in  std_logic;
+    Scan_Reset_Sel : in  std_logic := '0';
+    Scan_Reset     : in  std_logic := '0';
+    Raw            : in  std_logic_vector(0 to C_WIDTH-1);
+    Synced         : out std_logic_vector(0 to C_WIDTH-1));
+  end component mb_sync_vec;
+
+  component pulse_sync is
+  generic(
+    C_LEVELS          : natural := 2;
+    C_TMR             : natural := 0;
+    C_LATE_ACK        : natural := 0);
+  port(
+    FromAVote       : in  std_logic_vector(PULSE_SYNC_Pos);
+    FromBVote       : in  std_logic_vector(PULSE_SYNC_Pos);
+    ToVote          : out std_logic_vector(PULSE_SYNC_Pos);
+
+    Clk_Src         : in  std_logic;
+    Clk_Dst         : in  std_logic;
+    Rst_Src         : in  std_logic;
+    Rst_Dst         : in  std_logic;
+    Pulse_Src       : in  std_logic;
+    Pulse_Keep_Src  : out std_logic;
+    Pulse_Ack_Src   : out std_logic;
+    Pulse_Dst       : out std_logic);
+  end component pulse_sync;
+
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
+
+  signal reset_b  : boolean;
+  signal ToVote_i : std_logic_vector(C_VOTE_SIZE-1 downto 0);
+ 
+begin  -- architecture IMP
+
+  reset_b <= Reset = '1';
+
+  No_Async_UART: if C_UART_ASYNC = 0 generate
+  begin  
+
+    -- Not used
+    ToVote_i(UART_ASYNC_Pos) <= (others => '0');
+    UART_Status_Wait         <= '0';
+    UART_Status_Ready        <= '0';
+    Read_RX_Wait             <= '0';
+    Read_RX_Ready            <= '0';
+    
+    UART_Core_I : UART_Core
+      generic map (
+        C_TARGET             => C_TARGET,
+        C_FREQ               => C_FREQ,
+        C_TMR                => C_TMR_ONLY,
+        C_USE_TMR_DISABLE    => C_USE_TMR_DISABLE,
+        C_VOTE_SIZE          => UART_CORE_Pos'high-UART_CORE_Pos'low+1,
+        C_USE_SRL16          => C_USE_SRL16,
+        C_UART_PROG_BAUDRATE => C_UART_PROG_BAUDRATE,
+        C_UART_BAUDRATE      => C_UART_BAUDRATE,
+        C_USE_UART_RX        => C_USE_UART_RX,
+        C_USE_UART_TX        => C_USE_UART_TX,
+        C_UART_DATA_BITS     => C_UART_DATA_BITS,
+        C_UART_USE_PARITY    => C_UART_USE_PARITY,
+        C_UART_ODD_PARITY    => C_UART_ODD_PARITY)
+      port map (
+        Config_Reset         => Config_Reset,
+        Clk                  => Clk,
+        Reset                => reset_b,
+
+        TMR_Disable          => TMR_Disable,
+        FromAVote            => FromAVote(UART_CORE_Pos),
+        FromBVote            => FromBVote(UART_CORE_Pos),
+        ToVote               => ToVote_i(UART_CORE_Pos),
+
+        TX                   => TX,
+        Write_TX_Data        => Write_TX_Data,
+        Write_Data           => Write_Data(C_UART_DATA_BITS-1 downto 0),
+        Write_Baud           => Write_Baud,
+        Write_Baud_Data      => Write_Data(C_UART_PROG_CNT_SIZE-1 downto 0),
+        
+        RX                   => RX,
+        Read_RX_Data         => Read_RX_Data,
+        RX_Data_Received     => open,
+        RX_Data              => RX_Data,
+        
+        UART_Status_Read     => UART_Status_Read,
+        UART_Status          => UART_Status,
+        UART_Interrupt       => UART_Interrupt,
+        UART_Rx_Interrupt    => UART_Rx_Interrupt,
+        UART_Tx_Interrupt    => UART_Tx_Interrupt,
+        UART_Error_Interrupt => UART_Error_Interrupt);
+
+  end generate No_Async_UART;
+
+  Async_UART: if C_UART_ASYNC = 1 generate
+    signal reset_std                         : std_logic;
+    signal reset_uart_clk_b                  : boolean;
+    signal tmr_disable_b                     : boolean;
+    signal tmr_disable_i                     : std_logic;
+    signal tmr_disable_raw_uart_clk          : std_logic;
+    signal tmr_disable_uart_clk              : std_logic;
+    signal write_tx_data_uart_clk            : std_logic;
+    signal write_data_clk                    : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    signal write_data_clkD                   : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    signal write_baud_uart_clk               : std_logic;
+    signal baud_data_clk                     : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+    signal baud_data_clkD                    : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
+    signal read_rx_uart_clk                  : std_logic;
+    signal read_rx_uart_clkQ                 : std_logic;
+    signal read_rx_ack_clk                   : std_logic;
+    signal read_rx_ack_clkQ                  : std_logic;
+    signal read_rx_keep                      : std_logic;
+    signal read_rx_pulse_tovote_clk          : std_logic;
+    signal read_rx_pulse_voted_clk           : std_logic;
+    signal rx_data_tovote_uart_clk           : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    signal rx_data_voted_uart_clk            : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    signal rx_data_uart_clk                  : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
+    signal rx_data_received_uart_clk         : std_logic;
+    signal rx_data_received_clk              : std_logic;
+    signal uart_status_read_uart_clk         : std_logic; -- 1 cycle read pulse in UART_Clk region
+    signal uart_status_read_uart_clkQ        : std_logic; -- 1 cycle read pulse in UART_Clk region
+    signal uart_status_read_tovote_uart_clk  : std_logic; -- 1 cycle read pulse in UART_Clk region
+    signal uart_status_read_voted_uart_clk   : std_logic; -- 1 cycle read pulse in UART_Clk region
+    signal uart_status_read_ack_clk          : std_logic;
+    signal uart_status_read_ack_clkQ         : std_logic;
+    signal uart_status_read_keep             : std_logic;
+    signal uart_status_read_pulse_tovote_clk : std_logic;
+    signal uart_status_read_pulse_voted_clk  : std_logic;
+    signal uart_status_uart_clk              : std_logic_vector(7 downto 0);
+    signal uart_status_tovote_uart_clk       : std_logic_vector(7 downto 0);
+    signal uart_status_voted_uart_clk        : std_logic_vector(7 downto 0);
+    signal uart_rx_interrupt_uart_clk        : std_logic;
+    signal uart_rx_interrupt_clk             : std_logic;
+    signal uart_tx_interrupt_uart_clk        : std_logic;
+    signal uart_tx_interrupt_clk             : std_logic;
+    signal uart_error_interrupt_uart_clk     : std_logic;
+    signal uart_error_interrupt_clk          : std_logic;
+  begin
+
+    TMR_Yes : if (C_TMR_ONLY /= 0) generate
+
+      Use_TMR_Disable: if C_USE_TMR_DISABLE = 1 generate
+      begin
+        
+        TMR_Disable_Sync_I: mb_sync_bit
+        generic map(
+          C_LEVELS            => C_UART_NUM_SYNC_FF,
+          C_RESET_VALUE       => '1',
+          C_RESET_SYNCHRONOUS => true,
+          C_RESET_ACTIVE_HIGH => true)
+        port map(
+          Clk            => UART_Clk,
+          Rst            => Reset_UART_Clk,
+          Scan_En        => '0',
+          Scan_Reset_Sel => '0',
+          Scan_Reset     => '0',
+          Raw            => TMR_Disable,
+          Synced         => tmr_disable_raw_uart_clk);
+
+        TMR_Disable_UART_Clk_DFF : process (UART_Clk) is
+        begin
+          if UART_Clk'event and UART_Clk = '1' then
+            tmr_disable_uart_clk <= vote(tmr_disable_raw_uart_clk,
+                                         FromAVote(TMR_DISABLE_UART_CLK_Pos),
+                                         FromBVote(TMR_DISABLE_UART_CLK_Pos),
+                                         false);
+          end if;
+        end process TMR_Disable_UART_Clk_DFF;
+
+        ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= tmr_disable_raw_uart_clk;
+        
+        tmr_disable_i <= TMR_Disable;
+        
+      end generate Use_TMR_Disable;
+
+      No_Use_TMR_Disable: if C_USE_TMR_DISABLE = 0 generate
+      begin
+        tmr_disable_raw_uart_clk           <= '0';
+        tmr_disable_uart_clk               <= '0';
+        tmr_disable_i                      <= '0';
+        ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= '0';
+      end generate No_Use_TMR_Disable;
+
+    end generate TMR_Yes; 
+
+    TMR_No : if (C_TMR_ONLY = 0) generate
+    begin
+      tmr_disable_raw_uart_clk           <= '0';
+      tmr_disable_uart_clk               <= '0';
+      tmr_disable_i                      <= '0';
+      ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= '0';
+    end generate TMR_No; 
+
+    tmr_disable_b    <= tmr_disable_i  = '1';
+    reset_uart_clk_b <= Reset_UART_Clk = '1';
+
+    UART_Core_I : UART_Core
+      generic map (
+        C_TARGET             => C_TARGET,
+        C_FREQ               => C_UART_FREQ,
+        C_TMR                => C_TMR_ONLY,
+        C_USE_TMR_DISABLE    => C_USE_TMR_DISABLE,
+        C_VOTE_SIZE          => UART_CORE_Pos'high-UART_CORE_Pos'low+1,
+        C_USE_SRL16          => C_USE_SRL16,
+        C_UART_PROG_BAUDRATE => C_UART_PROG_BAUDRATE,
+        C_UART_BAUDRATE      => C_UART_BAUDRATE,
+        C_USE_UART_RX        => C_USE_UART_RX,
+        C_USE_UART_TX        => C_USE_UART_TX,
+        C_UART_DATA_BITS     => C_UART_DATA_BITS,
+        C_UART_USE_PARITY    => C_UART_USE_PARITY,
+        C_UART_ODD_PARITY    => C_UART_ODD_PARITY)
+      port map (
+        Config_Reset         => Reset_UART_Clk,
+        Clk                  => UART_Clk,
+        Reset                => reset_uart_clk_b,
+
+        TMR_Disable          => tmr_disable_uart_clk,
+        FromAVote            => FromAVote(UART_CORE_Pos),
+        FromBVote            => FromBVote(UART_CORE_Pos),
+        ToVote               => ToVote_i(UART_CORE_Pos),
+
+        TX                   => TX,   -- In UART_Clk domain
+        Write_TX_Data        => write_tx_data_uart_clk,
+        Write_Data           => write_data_clk, -- Stable when write_tx_data_uart_clk is asserted
+        Write_Baud           => write_baud_uart_clk,
+        Write_Baud_Data      => baud_data_clk, -- Stable when write_baud_uart_clk is asserted
+
+        RX                   => RX,   -- In UART_Clk domain
+        Read_RX_Data         => read_rx_uart_clk,
+        RX_Data_Received     => rx_data_received_uart_clk,
+        RX_Data              => rx_data_uart_clk,
+        
+        UART_Status_Read     => uart_status_read_uart_clk,
+        UART_Status          => uart_status_uart_clk,
+        UART_Interrupt       => open,
+        UART_Rx_Interrupt    => uart_rx_interrupt_uart_clk,
+        UART_Tx_Interrupt    => uart_tx_interrupt_uart_clk,
+        UART_Error_Interrupt => uart_error_interrupt_uart_clk);
+
+    Write_TX_Data_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+    port map(
+      FromAVote       => FromAVote(WRITE_TX_DATA_POS),
+      FromBVote       => FromBVote(WRITE_TX_DATA_POS),
+      ToVote          => ToVote_i(WRITE_TX_DATA_POS),
+      Clk_Src         => Clk,
+      Clk_Dst         => UART_Clk,
+      Rst_Src         => Reset,
+      Rst_Dst         => Reset_UART_Clk,
+      Pulse_Src       => Write_TX_Data,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => write_tx_data_uart_clk);
+
+    Write_Data_P : process(Reset, Write_TX_Data, Write_Data, write_data_clk) is
+    begin
+      if Reset = '1' then
+        write_data_clkD <= (others => '0');
+      elsif Write_TX_Data = '1' then
+        write_data_clkD <= Write_Data(C_UART_DATA_BITS-1 downto 0);
+      else
+        write_data_clkD <= write_data_clk;
+      end if;
+    end process Write_Data_P;
+
+    ToVote_i(WRITE_DATA_Pos'low+write_data_clkD'length-1 downto WRITE_DATA_Pos'low) <= write_data_clkD;
+
+    -- Work around spyglass bug report on null range to the left but not to the right
+    spy1_g: if C_UART_DATA_BITS < 8 generate
+    begin
+      ToVote_i(WRITE_DATA_Pos'high downto WRITE_DATA_Pos'low+write_data_clkD'length)  <= (others => '0');
+    end generate spy1_g;
+    
+    Write_Data_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        write_data_clk <= vote(write_data_clkD,
+                               FromAVote(WRITE_DATA_Pos),
+                               FromBVote(WRITE_DATA_Pos),
+                               tmr_disable_b, C_TMR_ONLY);
+      end if;
+    end process Write_Data_DFF;
+    
+    Write_Baud_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+    port map(
+      FromAVote       => FromAVote(WRITE_BAUD_Pos),
+      FromBVote       => FromBVote(WRITE_BAUD_Pos),
+      ToVote          => ToVote_i(WRITE_BAUD_Pos),
+      Clk_Src         => Clk,
+      Clk_Dst         => UART_Clk,
+      Rst_Src         => Reset,
+      Rst_Dst         => Reset_UART_Clk,
+      Pulse_Src       => Write_Baud,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => write_baud_uart_clk);
+
+    Baud_Data_P : process(Reset, Write_Baud, Write_Data, baud_data_clk) is
+    begin
+      if Reset = '1' then
+        baud_data_clkD <= (others => '0');
+      elsif Write_Baud = '1' then
+        baud_data_clkD <= Write_Data(C_UART_PROG_CNT_SIZE-1 downto 0);
+      else
+        baud_data_clkD <= baud_data_clk;
+      end if;
+    end process Baud_Data_P;
+
+    ToVote_i(BAUD_DATA_Pos) <= baud_data_clkD;
+    
+    TX_Baud_Data_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        baud_data_clk <= vote(baud_data_clkD,
+                              FromAVote(BAUD_DATA_Pos),
+                              FromBVote(BAUD_DATA_Pos),
+                              tmr_disable_b, C_TMR_ONLY);
+      end if;
+    end process TX_Baud_Data_DFF;
+    
+    RX_Data_Received_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+    port map(
+      FromAVote       => FromAVote(RX_DATA_RECEIVED_Pos),
+      FromBVote       => FromBVote(RX_DATA_RECEIVED_Pos),
+      ToVote          => ToVote_i(RX_DATA_RECEIVED_Pos),
+      Clk_Src         => UART_Clk,
+      Clk_Dst         => Clk,
+      Rst_Src         => Reset_UART_Clk,
+      Rst_Dst         => Reset,
+      Pulse_Src       => rx_data_received_uart_clk,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => rx_data_received_clk);
+
+    Read_RX_Data_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 1)
+    port map(
+      FromAVote       => FromAVote(READ_RX_DATA_Pos),
+      FromBVote       => FromBVote(READ_RX_DATA_Pos),
+      ToVote          => ToVote_i(READ_RX_DATA_Pos),
+      Clk_Src         => Clk,
+      Clk_Dst         => UART_Clk,
+      Rst_Src         => Reset,
+      Rst_Dst         => Reset_UART_Clk,
+      Pulse_Src       => Read_RX_Data,
+      Pulse_Keep_Src  => read_rx_keep,
+      Pulse_Ack_Src   => read_rx_ack_clk,  -- synced voted before used below
+      Pulse_Dst       => read_rx_uart_clk);
+
+    -- Create Read RX Data pulse on returning acknowledged read
+    Read_RX_Ack_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        if Reset = '1' then
+          read_rx_ack_clkQ <= '0';
+        else
+          read_rx_ack_clkQ <= read_rx_ack_clk;
+        end if;
+      end if;
+    end process Read_RX_Ack_DFF;
+
+    -- Vote to handle any misalignment when synchronizing in the different TMR instances
+    read_rx_pulse_tovote_clk <= '1' when read_rx_ack_clk  = '0' and
+                                         read_rx_ack_clkQ = '1' else
+                                         '0';
+    
+    ToVote_i(READ_RX_PULSE_Pos) <= read_rx_pulse_tovote_clk;
+
+    Read_RX_Pulse_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        if Reset = '1' then
+          read_rx_pulse_voted_clk <= '0';
+        else
+          read_rx_pulse_voted_clk <= vote(read_rx_pulse_tovote_clk,
+                                          FromAVote(READ_RX_PULSE_Pos),
+                                          FromBVote(READ_RX_PULSE_Pos),
+                                          false, C_TMR_or_LOCKSTEP);
+        end if;
+      end if;
+    end process Read_RX_Pulse_DFF;
+
+    Read_RX_DFF : process (UART_Clk)
+    begin
+      if UART_Clk'event and UART_Clk = '1' then
+        if Reset_UART_Clk = '1' then
+          read_rx_uart_clkQ <= '0';
+        else
+          read_rx_uart_clkQ <= read_rx_uart_clk;
+        end if;
+      end if;
+    end process Read_RX_DFF;
+    
+    RX_Data_Logic : process (Reset_UART_Clk, read_rx_uart_clkQ, rx_data_uart_clk, rx_data_voted_uart_clk)
+    begin
+      if Reset_UART_Clk = '1' then
+        rx_data_tovote_uart_clk <= (others => '0');
+      elsif read_rx_uart_clkQ = '1' then
+        rx_data_tovote_uart_clk <= rx_data_uart_clk;
+      else
+        rx_data_tovote_uart_clk <= rx_data_voted_uart_clk;
+      end if;
+    end process RX_Data_Logic;
+    
+   ToVote_i(RX_DATA_Pos'low+rx_data_tovote_uart_clk'length-1 downto RX_DATA_Pos'low) <= rx_data_tovote_uart_clk;
+
+    -- Work around spyglass bug report on null range to the left but not to the right
+    spy2_g: if C_UART_DATA_BITS < 8 generate
+    begin
+      ToVote_i(RX_DATA_Pos'high downto RX_DATA_Pos'low+rx_data_tovote_uart_clk'length)  <= (others => '0');
+    end generate spy2_g;
+    
+    RX_Data_DFF : process (UART_Clk)
+    begin
+      if UART_Clk'event and UART_Clk = '1' then
+        -- Stable in Clk region due to system events (sync of UART Status Read)
+        rx_data_voted_uart_clk <= vote(rx_data_tovote_uart_clk,
+                                       FromAVote(RX_DATA_Pos),
+                                       FromBVote(RX_DATA_Pos),
+                                       tmr_disable_b, C_TMR_ONLY);
+      end if;
+    end process RX_Data_DFF;
+
+    RX_Data <= rx_data_voted_uart_clk when read_rx_pulse_voted_clk = '1' else
+               (others => '0');
+
+    Read_RX_Wait  <= read_rx_keep or read_rx_ack_clkQ;
+    Read_RX_Ready <= read_rx_pulse_voted_clk;
+
+    UART_Status_Read_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 1)
+    port map(
+      FromAVote       => FromAVote(UART_STATUS_READ_Pos),
+      FromBVote       => FromBVote(UART_STATUS_READ_Pos),
+      ToVote          => ToVote_i(UART_STATUS_READ_Pos),
+      Clk_Src         => Clk,
+      Clk_Dst         => UART_Clk,
+      Rst_Src         => Reset,
+      Rst_Dst         => Reset_UART_Clk,
+      Pulse_Src       => UART_Status_Read,
+      Pulse_Keep_Src  => uart_status_read_keep,
+      Pulse_Ack_Src   => uart_status_read_ack_clk, -- synced voted before used below
+      Pulse_Dst       => uart_status_read_uart_clk);
+
+    -- Create Read UART Status pulse on returning acknowledged read
+    UART_Status_Read_Ack_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        if Reset = '1' then
+          uart_status_read_ack_clkQ <= '0';
+        else
+          uart_status_read_ack_clkQ <= uart_status_read_ack_clk;
+        end if;
+      end if;
+    end process UART_Status_Read_Ack_DFF;
+      
+    -- Vote to handle any misalignment when synchronizing in the different TMR instances
+    uart_status_read_pulse_tovote_clk <= '1' when uart_status_read_ack_clk  = '0' and
+                                                  uart_status_read_ack_clkQ = '1' else
+                                         '0';
+
+    ToVote_i(UART_STATUS_READ_PULSE_Pos) <= uart_status_read_pulse_tovote_clk;
+    
+    UART_Status_Read_Pulse_DFF : process (Clk)
+    begin
+      if Clk'event and Clk = '1' then
+        if Reset = '1' then
+          uart_status_read_pulse_voted_clk <= '0';
+        else
+          uart_status_read_pulse_voted_clk <= vote(uart_status_read_pulse_tovote_clk,
+                                                   FromAVote(UART_STATUS_READ_PULSE_Pos),
+                                                   FromBVote(UART_STATUS_READ_PULSE_Pos),
+                                                   false, C_TMR_or_LOCKSTEP);
+        end if;
+      end if;
+    end process UART_Status_Read_Pulse_DFF;
+
+    UART_Status_Read_DFF : process (UART_Clk)
+    begin
+      if UART_Clk'event and UART_Clk = '1' then
+        if Reset_UART_Clk = '1' then
+          uart_status_read_uart_clkQ <= '0';
+        else
+          uart_status_read_uart_clkQ <= uart_status_read_uart_clk;
+        end if;
+      end if;
+    end process UART_Status_Read_DFF;
+
+    UART_Status_Logic : process (Reset_UART_Clk, uart_status_read_uart_clkQ, uart_status_uart_clk, uart_status_voted_uart_clk)
+    begin
+      if Reset_UART_Clk = '1' then
+        uart_status_tovote_uart_clk <= (others => '0');
+      elsif uart_status_read_uart_clkQ = '1' then
+        uart_status_tovote_uart_clk <= uart_status_uart_clk;
+      else
+        uart_status_tovote_uart_clk <= uart_status_voted_uart_clk;
+      end if;
+    end process UART_Status_Logic;
+
+    ToVote_i(UART_STATUS_Pos) <= uart_status_tovote_uart_clk;
+    
+    UART_Status_DFF : process (UART_Clk)
+    begin
+      if UART_Clk'event and UART_Clk = '1' then
+        -- Stable in Clk region due to system events (sync of UART Status Read)
+        uart_status_voted_uart_clk <= vote(uart_status_tovote_uart_clk,
+                                           FromAVote(UART_STATUS_Pos),
+                                           FromBVote(UART_STATUS_Pos),
+                                           tmr_disable_b, C_TMR_ONLY);
+      end if;
+    end process UART_Status_DFF;
+
+    UART_Status <= uart_status_voted_uart_clk when uart_status_read_pulse_voted_clk = '1' else
+                   (others => '0');
+
+    UART_Status_Wait  <= uart_status_read_keep or uart_status_read_ack_clkQ;
+    UART_Status_Ready <= uart_status_read_pulse_voted_clk;
+    
+    UART_RX_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+    port map(
+      FromAVote       => FromAVote(UART_RX_INTERRUPT_Pos),
+      FromBVote       => FromBVote(UART_RX_INTERRUPT_Pos),
+      ToVote          => ToVote_i(UART_RX_INTERRUPT_Pos),
+      Clk_Src         => UART_Clk,
+      Clk_Dst         => Clk,
+      Rst_Src         => Reset_UART_Clk,
+      Rst_Dst         => Reset,
+      Pulse_Src       => uart_rx_interrupt_uart_clk,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => uart_rx_interrupt_clk);
+
+    UART_TX_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+   port map(
+      FromAVote       => FromAVote(UART_TX_INTERRUPT_Pos),
+      FromBVote       => FromBVote(UART_TX_INTERRUPT_Pos),
+      ToVote          => ToVote_i(UART_TX_INTERRUPT_Pos),
+      Clk_Src         => UART_Clk,
+      Clk_Dst         => Clk,
+      Rst_Src         => Reset_UART_Clk,
+      Rst_Dst         => Reset,
+      Pulse_Src       => uart_tx_interrupt_uart_clk,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => uart_tx_interrupt_clk);
+
+    Error_Sync: pulse_sync
+    generic map(
+      C_LEVELS          => C_UART_NUM_SYNC_FF,
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+    port map(
+      FromAVote       => FromAVote(UART_ERROR_INTERRUPT_Pos),
+      FromBVote       => FromBVote(UART_ERROR_INTERRUPT_Pos),
+      ToVote          => ToVote_i(UART_ERROR_INTERRUPT_Pos),
+      Clk_Src         => UART_Clk,
+      Clk_Dst         => Clk,
+      Rst_Src         => Reset_UART_Clk,
+      Rst_Dst         => Reset,
+      Pulse_Src       => uart_error_interrupt_uart_clk,
+      Pulse_Keep_Src  => open,
+      Pulse_Ack_Src   => open,
+      Pulse_Dst       => uart_error_interrupt_clk);
+
+   UART_Rx_Interrupt    <= uart_rx_interrupt_clk;
+   UART_Tx_Interrupt    <= uart_tx_interrupt_clk;
+   UART_Error_Interrupt <= uart_error_interrupt_clk;
+    
+   UART_Interrupt  <= uart_rx_interrupt_clk or uart_tx_interrupt_clk or uart_error_interrupt_clk;
+
+  end generate Async_UART;
+
+  
+  TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0) generate
+    ToVote <= ToVote_i;
+  end generate TMR_Yes; 
+
+  TMR_No : if (C_TMR_or_LOCKSTEP = 0) generate
+    ToVote <= (others => '0');
+  end generate TMR_No; 
+
+end architecture IMP;
+
+
+-------------------------------------------------------------------------------
+-- iomodule_core.vhd - Entity and architecture
+-------------------------------------------------------------------------------
+--
+-- (c) Copyright 2011-2012,2016,2018,2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+--
+-- This file contains confidential and proprietary information
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
+-- DISCLAIMER
+-- This disclaimer is not a license and does not grant any
+-- rights to the materials distributed herewith. Except as
+-- otherwise provided in a valid license issued to you by
+-- AMD, and to the maximum extent permitted by applicable
+-- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+-- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+-- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+-- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+-- (2) AMD shall not be liable (whether in contract or tort,
+-- including negligence, or under any other theory of
+-- liability) for any loss or damage of any kind or nature
+-- related to, arising under or in connection with these
+-- materials, including for any direct, or any indirect,
+-- special, incidental, or consequential loss or damage
+-- (including loss of data, profits, goodwill, or any type of
+-- loss or damage suffered as a result of any action brought
+-- by a third party) even if such damage or loss was
+-- reasonably foreseeable or AMD had been advised of the
+-- possibility of the same.
+--
+-- CRITICAL APPLICATIONS
+-- AMD products are not designed or intended to be fail-
+-- safe, or for use in any application requiring fail-safe
+-- performance, such as life-support or safety devices or
+-- systems, Class III medical devices, nuclear facilities,
+-- applications related to the deployment of airbags, or any
+-- other applications that could lead to death, personal
+-- injury, or severe property or environmental damage
+-- (individually and collectively, "Critical
+-- Applications"). Customer assumes the sole risk and
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -6692,8 +8496,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity Iomodule_core is
 
@@ -6716,6 +8520,9 @@ entity Iomodule_core is
     C_UART_TX_INTERRUPT    : integer               := 0;
     C_UART_ERROR_INTERRUPT : integer               := 0;
     C_UART_PROG_BAUDRATE   : integer               := 0;
+    C_UART_FREQ            : integer               := 100000000;
+    C_UART_ASYNC           : integer               := 0;
+    C_UART_NUM_SYNC_FF     : integer               := 2;
 
     -- FIT generics
     C_USE_FIT1             : integer               := 0;
@@ -6782,13 +8589,14 @@ entity Iomodule_core is
     C_GPI4_INTERRUPT : integer               := 0;
 
     -- Interrupt Handler Generics
+    C_ADDR_WIDTH        : integer range 32 to 64    := 32;
     C_INTC_USE_EXT_INTR : integer                   := 0;
     C_INTC_INTR_SIZE    : integer range 1 to 16     := 1;
     C_INTC_LEVEL_EDGE   : std_logic_vector(15 downto 0) := X"0000";
     C_INTC_POSITIVE     : std_logic_vector(15 downto 0) := X"0000";
     C_INTC_HAS_FAST     : integer range 0 to 1      := 0;
-    C_INTC_ADDR_WIDTH   : integer range 5 to 32     := 32;
-    C_INTC_BASE_VECTORS : std_logic_vector(31 downto 0) := X"00000000";
+    C_INTC_ADDR_WIDTH   : integer range 5 to 64     := 32;
+    C_INTC_BASE_VECTORS : std_logic_vector(63 downto 0) := X"0000000000000000";
     C_INTC_ASYNC_INTR   : std_logic_vector(15 downto 0) := X"FFFF";
     C_INTC_NUM_SYNC_FF  : integer range 0 to 7      := 2
     );
@@ -6806,6 +8614,8 @@ entity Iomodule_core is
     FromBVote    : in  std_logic_vector(1023 downto 0);
 
     -- UART I/O
+    UART_Clk       : in std_logic;
+    UART_Rst       : in std_logic;
     UART_Rx        : in  std_logic;
     UART_Tx        : out std_logic;
     UART_Interrupt : out std_logic;
@@ -6854,7 +8664,7 @@ entity Iomodule_core is
     INTC_Interrupt         : in  std_logic_vector(C_INTC_INTR_SIZE-1 downto 0);
     INTC_IRQ               : out std_logic;
     INTC_Processor_Ack     : in  std_logic_vector(1 downto 0);
-    INTC_Interrupt_Address : out std_logic_vector(31 downto 0);
+    INTC_Interrupt_Address : out std_logic_vector(C_ADDR_WIDTH-1 downto 0);
 
     -- Register access
     PIT1_Read          : in  std_logic;
@@ -6880,11 +8690,16 @@ entity Iomodule_core is
     GPO3_Write         : in  std_logic;
     GPO4_Write         : in  std_logic;
     UART_Status_Read   : in  std_logic;
+    UART_Status_Wait   : out std_logic;
+    UART_Status_Ready  : out std_logic;
     UART_Rx_Read       : in  std_logic;
+    UART_Rx_Wait       : out std_logic;
+    UART_Rx_Ready      : out std_logic;
     INTC_WRITE_CIAR    : in  std_logic;
     INTC_WRITE_CIER    : in  std_logic;
     INTC_WRITE_CIMR    : in  std_logic;
     INTC_WRITE_CIVAR   : in  std_logic;
+    INTC_WRITE_CIVEAR  : in  std_logic;
     INTC_CIVAR_ADDR    : in  std_logic_vector(4 downto 0);
     INTC_READ_CISR     : in  std_logic;
     INTC_READ_CIPR     : in  std_logic;
@@ -6894,103 +8709,62 @@ entity Iomodule_core is
 
 end entity Iomodule_core;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.all;
-use iomodule_v3_1_3.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of iomodule_core is
 
-  component UART_Transmit is
-    generic (
-      C_TARGET          : TARGET_FAMILY_TYPE;
-      C_TMR             : integer := 0;
-      C_USE_TMR_DISABLE : integer := 0;
-      C_VOTE_SIZE       : integer := 0;
-      C_USE_SRL16       : string;
-      C_DATA_BITS       : integer range 5 to 8;
-      C_USE_PARITY      : integer;
-      C_ODD_PARITY      : integer);
-    port (
-      Config_Reset : in std_logic;
-      Clk          : in std_logic;
-      Reset        : in boolean;
-      EN_16x_Baud  : in std_logic;
+  component UART is
+  generic (
+    C_TARGET             : TARGET_FAMILY_TYPE;
+    C_FREQ               : integer              := 100000000;
+    C_UART_FREQ          : integer              := 100000000;
+    C_TMR                : integer              := 0;
+    C_USE_TMR_DISABLE    : integer              := 0;
+    C_VOTE_SIZE          : integer              := 0;
+    C_USE_SRL16          : string;
+    C_UART_PROG_BAUDRATE : integer              := 0;
+    C_UART_ASYNC         : integer              := 0;
+    C_UART_NUM_SYNC_FF   : integer              := 2;
+    C_UART_BAUDRATE      : integer              := 9600;
+    C_USE_UART_RX        : integer              := 1;
+    C_USE_UART_TX        : integer              := 1;
+    C_UART_DATA_BITS     : integer range 5 to 8 := 8;
+    C_UART_USE_PARITY    : integer              := 0;
+    C_UART_ODD_PARITY    : integer              := 0);
+  port (
+    Clk                  : in std_logic;
+    UART_Clk             : in std_logic;
+    Reset                : in std_logic;
+    Config_Reset         : in std_logic;
+    Reset_UART_Clk       : in std_logic;
 
-      TMR_Disable         : in std_logic;
-      FromAVote           : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      FromBVote           : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      ToVote              : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      TX                  : out std_logic;
-      Write_TX_Data       : in  std_logic;
-      TX_Data             : in  std_logic_vector(C_DATA_BITS-1 downto 0);
-      TX_Data_Transmitted : out std_logic;
-      TX_Buffer_Empty     : out std_logic);
-  end component UART_Transmit;
+    TMR_Disable          : in std_logic;
+    FromAVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    FromBVote            : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    ToVote               : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
 
-  component UART_Receive is
-    generic (
-      C_TMR             : integer := 0;
-      C_USE_TMR_DISABLE : integer := 0;
-      C_VOTE_SIZE       : integer := 0;
-      C_TARGET          : TARGET_FAMILY_TYPE;
-      C_USE_SRL16       : string;
-      C_DATA_BITS       : integer range 5 to 8;
-      C_USE_PARITY      : integer;
-      C_ODD_PARITY      : integer);
-    port (
-      Config_Reset : in std_logic;
-      Clk          : in std_logic;
-      Reset        : in boolean;
-      EN_16x_Baud  : in std_logic;
+    TX                   : out std_logic;
+    Write_TX_Data        : in  std_logic;
+    Write_Baud           : in  std_logic;
+    Write_Data           : in  std_logic_vector(31 downto 0);
 
-      RX               : in  std_logic;
-      Read_RX_Data     : in  std_logic;
-      TMR_Disable      : in std_logic;
-      FromAVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      FromBVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      ToVote           : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      RX_Data          : out std_logic_vector(C_DATA_BITS-1 downto 0);
-      RX_Data_Received : out std_logic;
-      RX_Data_Exists   : out std_logic;
-      RX_Frame_Error   : out std_logic;
-      RX_Overrun_Error : out std_logic;
-      RX_Parity_Error  : out std_logic);
-  end component UART_Receive;
+    RX                   : in  std_logic;
+    Read_RX_Data         : in  std_logic;
+    Read_RX_Wait         : out std_logic;
+    Read_RX_Ready        : out std_logic;
+    RX_Data              : out std_logic_vector(C_UART_DATA_BITS-1 downto 0);
 
-  component Uart_Control_Status is
-    generic (
-      C_TMR             : integer := 0;
-      C_USE_TMR_DISABLE : integer := 0;
-      C_VOTE_SIZE       : integer := 0;
-      C_USE_UART_RX     : integer;
-      C_USE_UART_TX     : integer;
-      C_UART_DATA_BITS  : integer range 5 to 8;
-      C_UART_USE_PARITY : integer;
-      C_UART_ODD_PARITY : integer);
-    port (
-      CLK   : in std_logic;
-      Reset : in boolean;
-
-      TMR_Disable : in std_logic;
-      FromAVote   : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      FromBVote   : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      ToVote      : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
-
-      TX_Data_Transmitted : in std_logic;
-      TX_Buffer_Empty     : in std_logic;
-      RX_Data_Received    : in std_logic;
-      RX_Data_Exists      : in std_logic;
-      RX_Frame_Error      : in std_logic;
-      RX_Overrun_Error    : in std_logic;
-      RX_Parity_Error     : in std_logic;
-
-      UART_Status_Read     : in  std_logic;
-      UART_Status          : out std_logic_vector(7 downto 0);
-      UART_Interrupt       : out std_logic;
-      UART_Rx_Interrupt    : out std_logic;
-      UART_Tx_Interrupt    : out std_logic;
-      UART_Error_Interrupt : out std_logic);
-  end component Uart_Control_Status;
+    UART_Status_Read     : in  std_logic;
+    UART_Status_Wait     : out std_logic;
+    UART_Status_Ready    : out std_logic;
+    UART_Status          : out std_logic_vector(7 downto 0);
+    UART_Interrupt       : out std_logic;
+    UART_Rx_Interrupt    : out std_logic;
+    UART_Tx_Interrupt    : out std_logic;
+    UART_Error_Interrupt : out std_logic);
+  end component UART;
 
   component FIT_Module is
     generic (
@@ -7026,6 +8800,7 @@ architecture IMP of iomodule_core is
     port (
       Clk               : in  std_logic;
       Reset             : in  boolean;
+      Config_Reset      : in  std_logic;
       TMR_Disable       : in std_logic;
       FromAVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
       FromBVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
@@ -7068,6 +8843,7 @@ architecture IMP of iomodule_core is
     port (
       Clk           : in  std_logic;
       Reset         : in  boolean;
+      Config_Reset  : in  std_logic;
       GPI_Read      : in  std_logic;
       GPI           : in  std_logic_vector(C_GPI_SIZE-1 downto 0);
       GPI_In        : out std_logic_vector(C_GPI_SIZE-1 downto 0);
@@ -7080,36 +8856,38 @@ architecture IMP of iomodule_core is
       C_TMR               : integer := 0;
       C_USE_TMR_DISABLE   : integer := 0;
       C_VOTE_SIZE         : integer := 0;
+      C_ADDR_WIDTH        : integer range 32 to 64 := 32;
       C_INTC_ENABLED      : std_logic_vector(31 downto 0);
       C_INTC_LEVEL_EDGE   : std_logic_vector(31 downto 0);
       C_INTC_POSITIVE     : std_logic_vector(31 downto 0);
       C_INTC_ASYNC_INTR   : std_logic_vector(31 downto 0);
       C_INTC_HAS_FAST     : integer range 0 to 1;
-      C_INTC_ADDR_WIDTH   : integer range 5 to 32;
+      C_INTC_ADDR_WIDTH   : integer range 5 to 64;
       C_INTC_NUM_SYNC_FF  : integer range 0 to 7;
-      C_INTC_BASE_VECTORS : std_logic_vector(31 downto 0);
+      C_INTC_BASE_VECTORS : std_logic_vector(63 downto 0);
       C_USE_LUTRAM        : string);
     port (
-      Clk              : in  std_logic;
-      Reset            : in  boolean;
-      TMR_Disable      : in  std_logic;
-      FromAVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      FromBVote        : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      ToVote           : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
-      INTR             : in  std_logic_vector(31 downto 0);
-      INTR_ACK         : in  std_logic_vector(1 downto 0);
-      INTR_ADDR        : out std_logic_vector(31 downto 0);
-      INTC_WRITE_CIAR  : in  std_logic;
-      INTC_WRITE_CIER  : in  std_logic;
-      INTC_WRITE_CIMR  : in  std_logic;
-      INTC_WRITE_CIVAR : in  std_logic;
-      INTC_CIVAR_ADDR  : in  std_logic_vector(4 downto 0);
-      Write_Data       : in  std_logic_vector(31 downto 0);
-      INTC_READ_CISR   : in  std_logic;
-      INTC_READ_CIPR   : in  std_logic;
-      INTC_IRQ         : out std_logic;
-      INTC_CISR        : out std_logic_vector(31 downto 0);
-      INTC_CIPR        : out std_logic_vector(31 downto 0));
+      Clk               : in  std_logic;
+      Reset             : in  boolean;
+      TMR_Disable       : in  std_logic;
+      FromAVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      FromBVote         : in  std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      ToVote            : out std_logic_vector(C_VOTE_SIZE-1 downto 0);
+      INTR              : in  std_logic_vector(31 downto 0);
+      INTR_ACK          : in  std_logic_vector(1 downto 0);
+      INTR_ADDR         : out std_logic_vector(C_ADDR_WIDTH-1 downto 0);
+      INTC_WRITE_CIAR   : in  std_logic;
+      INTC_WRITE_CIER   : in  std_logic;
+      INTC_WRITE_CIMR   : in  std_logic;
+      INTC_WRITE_CIVAR  : in  std_logic;
+      INTC_WRITE_CIVEAR : in  std_logic;
+      INTC_CIVAR_ADDR   : in  std_logic_vector(4 downto 0);
+      Write_Data        : in  std_logic_vector(31 downto 0);
+      INTC_READ_CISR    : in  std_logic;
+      INTC_READ_CIPR    : in  std_logic;
+      INTC_IRQ          : out std_logic;
+      INTC_CISR         : out std_logic_vector(31 downto 0);
+      INTC_CIPR         : out std_logic_vector(31 downto 0));
   end component intr_ctrl;
 
   --------------------------------------------------------------------------------------------------
@@ -7164,8 +8942,10 @@ architecture IMP of iomodule_core is
     end if;
   end function bool_to_string;
 
-  constant C_USE_SRL16  : string := bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 2)) and (C_TARGET /= RTL));
-  constant C_USE_LUTRAM : string := bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 1)) and (C_TARGET /= RTL));
+  constant C_USE_SRL16  : string :=
+    bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 2)) and (C_TARGET /= RTL) and (C_TMR /= 2));
+  constant C_USE_LUTRAM : string :=
+    bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 1)) and (C_TARGET /= RTL));
 
   signal reset   : boolean;
   --------------------------------------------------------------------------------------------------
@@ -7181,32 +8961,9 @@ architecture IMP of iomodule_core is
   signal gpi4_interrupt_i : std_logic;
 
   --------------------------------------------------------------------------------------------------
-  -- Calculate FIT period for generating 16*C_UART_BAUDRATE
-  --------------------------------------------------------------------------------------------------
-  function FIT_PERIOD (FREQ : integer; BAUDRATE : integer ) return natural is
-    constant C_BAUDRATE_16_BY_2 : integer := (16 * BAUDRATE) / 2;
-    constant C_REMAINDER        : integer := FREQ rem (16 * BAUDRATE);
-    constant C_RATIO            : integer := FREQ / (16 * BAUDRATE);
-  begin
-    if (C_BAUDRATE_16_BY_2 < C_REMAINDER) then
-      return (C_RATIO + 1);
-    else
-      return C_RATIO;
-    end if;
-  end function FIT_PERIOD;
-
-  --------------------------------------------------------------------------------------------------
   -- UART signals
   --------------------------------------------------------------------------------------------------
-  signal en_16x_baud          : std_logic;
-  signal tx_data_transmitted  : std_logic;
-  signal tx_buffer_empty      : std_logic;
   signal uart_rx_data         : std_logic_vector(C_UART_DATA_BITS-1 downto 0);
-  signal rx_data_received     : std_logic;
-  signal rx_data_exists       : std_logic;
-  signal rx_frame_error       : std_logic;
-  signal rx_overrun_error     : std_logic;
-  signal rx_parity_error      : std_logic;
   signal uart_status          : std_logic_vector(7 downto 0);
   signal uart_rx_interrupt    : std_logic;
   signal uart_tx_interrupt    : std_logic;
@@ -7249,13 +9006,16 @@ architecture IMP of iomodule_core is
   --------------------------------------------------------------------------------------------------
   -- TMR
   --------------------------------------------------------------------------------------------------
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
+
   signal ToVote_i      : std_logic_vector(VOTE_SIZE-1 downto 0);
   signal FromAVote_i   : std_logic_vector(VOTE_SIZE-1 downto 0);
   signal FromBVote_i   : std_logic_vector(VOTE_SIZE-1 downto 0);
 
 begin  -- architecture IMP
 
-  TMR_Yes : if (C_TMR /= 0) generate
+  TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0) generate
   begin
     ToVote(ToVote_i'range)                     <= ToVote_i;
     ToVote(ToVote'high downto ToVote_i'high+1) <= (others => '0');
@@ -7263,7 +9023,7 @@ begin  -- architecture IMP
     FromBVote_i                                <= FromBVote(FromBVote_i'range);
   end generate TMR_Yes;
 
-  TMR_No : if (C_TMR = 0) generate
+  TMR_No : if (C_TMR_or_LOCKSTEP = 0) generate
   begin
     ToVote      <= (others => '0');
     FromAVote_i <= (others => '0');
@@ -7272,265 +9032,62 @@ begin  -- architecture IMP
 
   Reset <= (Rst = '1');
 
-  config_reset_i <= Config_Reset when C_USE_CONFIG_RESET /= 0 else '0';
+  config_reset_i <= Rst          when C_TMR = 2               else
+                    Config_Reset when C_USE_CONFIG_RESET /= 0 else
+                    '0';
 
   --------------------------------------------------------------------------------------------------
   -- UART Section
   --------------------------------------------------------------------------------------------------
-  Using_UART_TX : if (C_USE_UART_TX /= 0) generate
-  begin
+  UART_I1 : UART
+    generic map (
+      C_TARGET             => C_TARGET,
+      C_FREQ               => C_FREQ,
+      C_UART_FREQ          => C_UART_FREQ,
+      C_TMR                => C_TMR,
+      C_USE_TMR_DISABLE    => C_USE_TMR_DISABLE,
+      C_VOTE_SIZE          => UART_high-UART_low+1,
+      C_USE_SRL16          => C_USE_SRL16,
+      C_UART_PROG_BAUDRATE => C_UART_PROG_BAUDRATE,
+      C_UART_ASYNC         => C_UART_ASYNC,
+      C_UART_NUM_SYNC_FF   => C_UART_NUM_SYNC_FF,
+      C_UART_BAUDRATE      => C_UART_BAUDRATE,
+      C_USE_UART_RX        => C_USE_UART_RX,
+      C_USE_UART_TX        => C_USE_UART_TX,
+      C_UART_DATA_BITS     => C_UART_DATA_BITS,
+      C_UART_USE_PARITY    => C_UART_USE_PARITY,
+      C_UART_ODD_PARITY    => C_UART_ODD_PARITY)
+    port map (
+      Clk                  => Clk,
+      UART_Clk             => UART_Clk,
+      Reset                => Rst,
+      Config_Reset         => config_reset_i,
+      Reset_UART_Clk       => UART_Rst,
+        
+      TMR_Disable          => TMR_Disable,
+      FromAVote            => FromAVote_i(UART_Pos),
+      FromBVote            => FromBVote_i(UART_Pos),
+      ToVote               => ToVote_i(UART_Pos),
 
-    UART_TX_I1 : UART_Transmit
-      generic map (
-        C_TARGET          => C_TARGET,
-        C_TMR             => C_TMR,
-        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
-        C_VOTE_SIZE       => UART_TRANSMIT_Pos'high-UART_TRANSMIT_Pos'low+1,
-        C_USE_SRL16       => C_USE_SRL16,
-        C_DATA_BITS       => C_UART_DATA_BITS,
-        C_USE_PARITY      => C_UART_USE_PARITY,
-        C_ODD_PARITY      => C_UART_ODD_PARITY)
-      port map (
-        Config_Reset => config_reset_i,
-        Clk          => Clk,
-        Reset        => Reset,
-        EN_16x_Baud  => en_16x_baud,
+      TX                   => UART_Tx,
+      Write_TX_Data        => UART_TX_Write,
+      Write_Baud           => UART_Baud_Write,
+      Write_Data           => Write_Data,
 
-        TMR_Disable         => TMR_Disable,
-        FromAVote           => FromAVote_i(UART_TRANSMIT_Pos),
-        FromBVote           => FromBVote_i(UART_TRANSMIT_Pos),
-        ToVote              => ToVote_i(UART_TRANSMIT_Pos),
-        TX                  => UART_Tx,
-        Write_TX_Data       => UART_TX_Write,
-        TX_Data             => Write_Data(C_UART_DATA_BITS-1 downto 0),
-        TX_Data_Transmitted => tx_data_transmitted,
-        TX_Buffer_Empty     => tx_buffer_empty);
-  end generate Using_UART_TX;
-
-  No_UART_TX : if (C_USE_UART_TX = 0) generate
-  begin
-    tx_buffer_empty             <= '0';
-    tx_data_transmitted         <= '0';
-    UART_Tx                     <= '0';
-    ToVote_i(UART_TRANSMIT_Pos) <= (others => '0');
-  end generate No_UART_TX;
-
-  Using_UART_RX : if (C_USE_UART_RX /= 0) generate
-  begin
-
-    UART_RX_I1 : UART_Receive
-      generic map (
-        C_TARGET          => C_TARGET,
-        C_TMR             => C_TMR,
-        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
-        C_VOTE_SIZE       => UART_RECEIVE_Pos'high-UART_RECEIVE_Pos'low+1,
-        C_USE_SRL16       => C_USE_SRL16,
-        C_DATA_BITS       => C_UART_DATA_BITS,
-        C_USE_PARITY      => C_UART_USE_PARITY,
-        C_ODD_PARITY      => C_UART_ODD_PARITY)
-      port map (
-        Config_Reset => config_reset_i,
-        Clk          => Clk,
-        Reset        => Reset,
-        EN_16x_Baud  => en_16x_baud,
-
-        RX               => UART_RX,
-        Read_RX_Data     => UART_Rx_Read,
-        TMR_Disable      => TMR_Disable,
-        FromAVote        => FromAVote_i(UART_RECEIVE_Pos),
-        FromBVote        => FromBVote_i(UART_RECEIVE_Pos),
-        ToVote           => ToVote_i(UART_RECEIVE_Pos),
-        RX_Data          => uart_rx_data,
-        RX_Data_Received => rx_data_received,
-        RX_Data_Exists   => rx_data_exists,
-        RX_Frame_Error   => rx_frame_error,
-        RX_Overrun_Error => rx_overrun_error,
-        RX_Parity_Error  => rx_parity_error);
-  end generate Using_UART_RX;
-
-  No_UART_RX : if (C_USE_UART_RX = 0) generate
-  begin
-    uart_rx_data               <= (others => '0');
-    rx_data_received           <= '0';
-    rx_data_exists             <= '0';
-    rx_frame_error             <= '0';
-    rx_overrun_error           <= '0';
-    rx_parity_error            <= '0';
-    ToVote_i(UART_RECEIVE_Pos) <= (others => '0');
-  end generate No_UART_RX;
-
-  Using_UART : if ((C_USE_UART_RX /= 0) or (C_USE_UART_TX /= 0)) generate
-  begin
-
-    No_Dynamic_BaudRate: if C_UART_PROG_BAUDRATE = 0 generate
-    begin
-      UART_FIT_I : FIT_Module
-        generic map (
-          C_TARGET          => C_TARGET,
-          C_TMR             => C_TMR,
-          C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
-          C_VOTE_SIZE       => UART_BAUD_FIT_Pos'high-UART_BAUD_FIT_Pos'low+1,
-          C_USE_SRL16       => C_USE_SRL16,
-          C_USE_FIT         => 1,
-          C_NO_CLOCKS       => FIT_PERIOD(C_FREQ, C_UART_BAUDRATE),
-          C_INACCURACY      => 0)
-        port map (
-          Config_Reset => config_reset_i,
-          Clk          => Clk,
-          Reset        => Reset,
-          TMR_Disable  => TMR_Disable,
-          FromAVote    => FromAVote_i(UART_BAUD_FIT_Pos),
-          FromBVote    => FromBVote_i(UART_BAUD_FIT_Pos),
-          ToVote       => ToVote_i(UART_BAUD_FIT_Pos),
-          Toggle       => open,
-          Interrupt    => en_16x_baud);
-
-      ToVote_i(UART_BAUD_REG_Pos)  <= (others => '0');
-      ToVote_i(UART_BAUD_CNT_Pos)  <= (others => '0');
-      ToVote_i(UART_BAUD_EN16_Pos) <= '0';
-
-    end generate No_Dynamic_BaudRate;
-
-    Programmable_BaudRate_TMR_No: if C_UART_PROG_BAUDRATE /= 0 and C_TMR = 0 generate
-      signal baudrate_cnt : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-      signal baudrate_reg : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-    begin
-
-      ToVote_i(UART_BAUD_FIT_Pos) <= (others => '0');
-
-      BaudRate_Counter : process (Clk)
-      begin  -- process BaudRate_Counter
-        if Clk'event and Clk = '1' then  -- rising clock edge
-          if Reset then                  -- synchronous reset (active high)
-            baudrate_reg <=
-              std_logic_vector(to_unsigned(FIT_PERIOD(C_FREQ, C_UART_BAUDRATE) - 1, baudrate_reg'length));
-            baudrate_cnt <= (others => '0');
-            en_16x_baud  <= '0';
-          else
-            en_16x_baud <= '0';
-            if baudrate_cnt = "00000000000000000000" then
-              baudrate_cnt <= baudrate_reg;
-              en_16x_baud  <= '1';
-            else
-              baudrate_cnt <= std_logic_vector(unsigned(baudrate_cnt) - 1);
-            end if;
-            if UART_Baud_Write = '1' then
-              baudrate_reg <= Write_Data(baudrate_reg'range);
-              baudrate_cnt <= (others => '0');
-            end if;
-          end if;
-        end if;
-      end process BaudRate_Counter;
-
-      ToVote_i(UART_BAUD_REG_Pos)  <= (others => '0');
-      ToVote_i(UART_BAUD_CNT_Pos)  <= (others => '0');
-      ToVote_i(UART_BAUD_EN16_Pos) <= '0';
-
-    end generate Programmable_BaudRate_TMR_No;
-
-    Programmable_BaudRate_TMR_Yes: if C_UART_PROG_BAUDRATE /= 0 and C_TMR = 1 generate
-      signal baudrate_cnt   : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-      signal baudrate_reg   : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-      signal baudrate_cnt_d : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-      signal baudrate_reg_d : std_logic_vector(C_UART_PROG_CNT_SIZE-1 downto 0);
-      signal en_16x_baud_d  : std_logic;
-      signal tmr_disable_b  : boolean;
-    begin
-
-      ToVote_i(UART_BAUD_FIT_Pos) <= (others => '0');
-
-      tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1;
-
-      BaudRate_Counter_Logic : process (Reset, baudrate_reg, baudrate_cnt, UART_Baud_Write, Write_Data)
-      begin
-        if Reset then
-          baudrate_reg_d <=
-            std_logic_vector(to_unsigned(FIT_PERIOD(C_FREQ, C_UART_BAUDRATE) - 1, baudrate_reg'length));
-          baudrate_cnt_d <= (others => '0');
-          en_16x_baud_d  <= '0';
-        else
-          if baudrate_cnt = "00000000000000000000" then
-            baudrate_cnt_d <= baudrate_reg;
-            en_16x_baud_d  <= '1';
-          else
-            baudrate_cnt_d <= std_logic_vector(unsigned(baudrate_cnt) - 1);
-            en_16x_baud_d  <= '0';
-          end if;
-          if UART_Baud_Write = '1' then
-            baudrate_reg_d <= Write_Data(baudrate_reg'range);
-            baudrate_cnt_d <= (others => '0');
-          else
-            baudrate_reg_d <= baudrate_reg;
-          end if;
-        end if;
-      end process BaudRate_Counter_Logic;
-
-      ToVote_i(UART_BAUD_REG_Pos)  <= baudrate_reg_d;
-      ToVote_i(UART_BAUD_CNT_Pos)  <= baudrate_cnt_d;
-      ToVote_i(UART_BAUD_EN16_Pos) <= en_16x_baud_d;
-
-      BaudRate_Counter_DFF : process (Clk)
-      begin
-        if Clk'event and Clk = '1' then
-          baudrate_reg <= vote(baudrate_reg_d,
-                               FromAVote_i(UART_BAUD_REG_Pos),
-                               FromBVote_i(UART_BAUD_REG_Pos), tmr_disable_b);
-          baudrate_cnt <= vote(baudrate_cnt_d,
-                               FromAVote_i(UART_BAUD_CNT_Pos),
-                               FromBVote_i(UART_BAUD_CNT_Pos), tmr_disable_b);
-          en_16x_baud  <= vote(en_16x_baud_d,
-                               FromAVote_i(UART_BAUD_EN16_Pos),
-                               FromBVote_i(UART_BAUD_EN16_Pos), tmr_disable_b);
-        end if;
-      end process BaudRate_Counter_DFF;
-
-    end generate Programmable_BaudRate_TMR_Yes;
-
-    Uart_Control_Status_I1 : Uart_Control_Status
-      generic map (
-        C_TMR             => C_TMR,
-        C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
-        C_VOTE_SIZE       => UART_CONTROL_Pos'high-UART_CONTROL_Pos'low+1,
-        C_USE_UART_RX     => C_USE_UART_RX,
-        C_USE_UART_TX     => C_USE_UART_TX,
-        C_UART_DATA_BITS  => C_UART_DATA_BITS,
-        C_UART_USE_PARITY => C_UART_USE_PARITY,
-        C_UART_ODD_PARITY => C_UART_ODD_PARITY)
-      port map (
-        CLK                  => CLK,
-        Reset                => Reset,
-        TMR_Disable          => TMR_Disable,
-        FromAVote            => FromAVote_i(UART_CONTROL_Pos),
-        FromBVote            => FromBVote_i(UART_CONTROL_Pos),
-        ToVote               => ToVote_i(UART_CONTROL_Pos),
-        TX_Data_Transmitted  => tx_data_transmitted,
-        TX_Buffer_Empty      => tx_buffer_empty,
-        RX_Data_Received     => rx_data_received,
-        RX_Data_Exists       => rx_data_exists,
-        RX_Frame_Error       => rx_frame_error,
-        RX_Overrun_Error     => rx_overrun_error,
-        RX_Parity_Error      => rx_parity_error,
-        UART_Status_Read     => UART_Status_Read,
-        UART_Status          => uart_status,
-        UART_Interrupt       => UART_Interrupt,
-        UART_Rx_Interrupt    => uart_rx_interrupt,
-        UART_Tx_Interrupt    => uart_tx_interrupt,
-        UART_Error_Interrupt => uart_error_interrupt);
-  end generate Using_UART;
-
-  No_UART : if ((C_USE_UART_RX = 0) and (C_USE_UART_TX = 0)) generate
-  begin
-    uart_status                  <= (others => '0');
-    UART_Interrupt               <= '0';
-    uart_rx_interrupt            <= '0';
-    uart_tx_interrupt            <= '0';
-    uart_error_interrupt         <= '0';
-    ToVote_i(UART_BAUD_FIT_Pos)  <= (others => '0');
-    ToVote_i(UART_BAUD_REG_Pos)  <= (others => '0');
-    ToVote_i(UART_BAUD_CNT_Pos)  <= (others => '0');
-    ToVote_i(UART_BAUD_EN16_Pos) <= '0';
-    ToVote_i(UART_CONTROL_Pos)   <= (others => '0');
-  end generate No_UART;
+      RX                   => UART_RX,
+      Read_RX_Data         => UART_Rx_Read,
+      Read_RX_Wait         => UART_Rx_Wait,
+      Read_RX_Ready        => UART_Rx_Ready,
+      RX_Data              => uart_rx_data,
+        
+      UART_Status_Read     => UART_Status_Read,
+      UART_Status_Wait     => UART_Status_Wait,
+      UART_Status_Ready    => UART_Status_Ready,
+      UART_Status          => uart_status,
+      UART_Interrupt       => UART_Interrupt,
+      UART_Rx_Interrupt    => uart_rx_interrupt,
+      UART_Tx_Interrupt    => uart_tx_interrupt,
+      UART_Error_Interrupt => uart_error_interrupt);
 
   --------------------------------------------------------------------------------------------------
   -- FIT Section
@@ -7538,7 +9095,7 @@ begin  -- architecture IMP
   FIT_I1 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT1_Pos'high-FIT1_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -7561,7 +9118,7 @@ begin  -- architecture IMP
   FIT_I2 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT2_Pos'high-FIT2_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -7584,7 +9141,7 @@ begin  -- architecture IMP
   FIT_I3 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT3_Pos'high-FIT3_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -7607,7 +9164,7 @@ begin  -- architecture IMP
   FIT_I4 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT4_Pos'high-FIT4_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -7645,7 +9202,7 @@ begin  -- architecture IMP
   PIT_I1 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT1_Pos'high-PIT1_Pos'low+1,
       C_USE_PIT         => C_USE_PIT1,
@@ -7654,6 +9211,7 @@ begin  -- architecture IMP
     port map (
       Clk               => Clk,
       Reset             => Reset,
+      Config_Reset      => config_reset_i,
       TMR_Disable       => TMR_Disable,
       FromAVote         => FromAVote_i(PIT1_Pos),
       FromBVote         => FromBVote_i(PIT1_Pos),
@@ -7683,7 +9241,7 @@ begin  -- architecture IMP
   PIT_I2 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT2_Pos'high-PIT2_Pos'low+1,
       C_USE_PIT         => C_USE_PIT2,
@@ -7692,6 +9250,7 @@ begin  -- architecture IMP
     port map (
       Clk               => Clk,
       Reset             => Reset,
+      Config_Reset      => config_reset_i,
       TMR_Disable       => TMR_Disable,
       FromAVote         => FromAVote_i(PIT2_Pos),
       FromBVote         => FromBVote_i(PIT2_Pos),
@@ -7721,7 +9280,7 @@ begin  -- architecture IMP
   PIT_I3 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT3_Pos'high-PIT3_Pos'low+1,
       C_USE_PIT         => C_USE_PIT3,
@@ -7730,6 +9289,7 @@ begin  -- architecture IMP
     port map (
       Clk               => Clk,
       Reset             => Reset,
+      Config_Reset      => config_reset_i,
       TMR_Disable       => TMR_Disable,
       FromAVote         => FromAVote_i(PIT3_Pos),
       FromBVote         => FromBVote_i(PIT3_Pos),
@@ -7759,7 +9319,7 @@ begin  -- architecture IMP
   PIT_I4 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT4_Pos'high-PIT4_Pos'low+1,
       C_USE_PIT         => C_USE_PIT4,
@@ -7768,6 +9328,7 @@ begin  -- architecture IMP
     port map (
       Clk               => Clk,
       Reset             => Reset,
+      Config_Reset      => config_reset_i,
       TMR_Disable       => TMR_Disable,
       FromAVote         => FromAVote_i(PIT4_Pos),
       FromBVote         => FromBVote_i(PIT4_Pos),
@@ -7785,7 +9346,7 @@ begin  -- architecture IMP
 
   GPO_I1 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO1_Pos'high-GPO1_Pos'low+1,
       C_USE_GPO         => C_USE_GPO1,
@@ -7804,7 +9365,7 @@ begin  -- architecture IMP
 
   GPO_I2 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO2_Pos'high-GPO2_Pos'low+1,
       C_USE_GPO         => C_USE_GPO2,
@@ -7823,7 +9384,7 @@ begin  -- architecture IMP
 
   GPO_I3 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO3_Pos'high-GPO3_Pos'low+1,
       C_USE_GPO         => C_USE_GPO3,
@@ -7842,7 +9403,7 @@ begin  -- architecture IMP
 
   GPO_I4 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO4_Pos'high-GPO4_Pos'low+1,
       C_USE_GPO         => C_USE_GPO4,
@@ -7870,6 +9431,7 @@ begin  -- architecture IMP
     port map (
       Clk           => Clk,
       Reset         => Reset,
+      Config_Reset  => config_reset_i,
       GPI_Read      => GPI1_Read,
       GPI           => GPI1,
       gpi_in        => gpi1_in,
@@ -7885,6 +9447,7 @@ begin  -- architecture IMP
     port map (
       Clk           => Clk,
       Reset         => Reset,
+      Config_Reset  => config_reset_i,
       GPI_Read      => GPI2_Read,
       GPI           => GPI2,
       gpi_in        => gpi2_in,
@@ -7900,6 +9463,7 @@ begin  -- architecture IMP
     port map (
       Clk           => Clk,
       Reset         => Reset,
+      Config_Reset  => config_reset_i,
       GPI_Read      => GPI3_Read,
       GPI           => GPI3,
       gpi_in        => gpi3_in,
@@ -7915,6 +9479,7 @@ begin  -- architecture IMP
     port map (
       Clk           => Clk,
       Reset         => Reset,
+      Config_Reset  => config_reset_i,
       GPI_Read      => GPI4_Read,
       GPI           => GPI4,
       gpi_in        => gpi4_in,
@@ -7954,6 +9519,7 @@ begin  -- architecture IMP
       C_TMR               => C_TMR,
       C_USE_TMR_DISABLE   => C_USE_TMR_DISABLE,
       C_VOTE_SIZE         => IRQ_Pos'high-IRQ_Pos'low+1,
+      C_ADDR_WIDTH        => C_ADDR_WIDTH,
       C_INTC_LEVEL_EDGE   => C_INTC_LEVEL_EDGE & X"FFFF",
       C_INTC_POSITIVE     => C_INTC_POSITIVE & X"FFFF",
       C_INTC_ASYNC_INTR   => C_INTC_ASYNC_INTR & X"0000",
@@ -7964,26 +9530,27 @@ begin  -- architecture IMP
       C_INTC_BASE_VECTORS => C_INTC_BASE_VECTORS,
       C_USE_LUTRAM        => C_USE_LUTRAM)
     port map (
-      Clk              => Clk,
-      Reset            => Reset,
-      TMR_Disable      => TMR_Disable,
-      FromAVote        => FromAVote_i(IRQ_Pos),
-      FromBVote        => FromBVote_i(IRQ_Pos),
-      ToVote           => ToVote_i(IRQ_Pos),
-      INTR             => intr,
-      INTR_ACK         => INTC_Processor_Ack,
-      INTR_ADDR        => INTC_Interrupt_Address,
-      INTC_WRITE_CIAR  => INTC_WRITE_CIAR,
-      INTC_WRITE_CIER  => INTC_WRITE_CIER,
-      INTC_WRITE_CIMR  => INTC_WRITE_CIMR,
-      INTC_WRITE_CIVAR => INTC_WRITE_CIVAR,
-      INTC_CIVAR_ADDR  => INTC_CIVAR_ADDR,
-      Write_Data       => Write_Data,
-      INTC_READ_CISR   => INTC_READ_CISR,
-      INTC_READ_CIPR   => INTC_READ_CIPR,
-      INTC_IRQ         => INTC_IRQ,
-      INTC_CISR        => intc_cisr,
-      INTC_CIPR        => intc_cipr);
+      Clk               => Clk,
+      Reset             => Reset,
+      TMR_Disable       => TMR_Disable,
+      FromAVote         => FromAVote_i(IRQ_Pos),
+      FromBVote         => FromBVote_i(IRQ_Pos),
+      ToVote            => ToVote_i(IRQ_Pos),
+      INTR              => intr,
+      INTR_ACK          => INTC_Processor_Ack,
+      INTR_ADDR         => INTC_Interrupt_Address,
+      INTC_WRITE_CIAR   => INTC_WRITE_CIAR,
+      INTC_WRITE_CIER   => INTC_WRITE_CIER,
+      INTC_WRITE_CIMR   => INTC_WRITE_CIMR,
+      INTC_WRITE_CIVAR  => INTC_WRITE_CIVAR,
+      INTC_WRITE_CIVEAR => INTC_WRITE_CIVEAR,
+      INTC_CIVAR_ADDR   => INTC_CIVAR_ADDR,
+      Write_Data        => Write_Data,
+      INTC_READ_CISR    => INTC_READ_CISR,
+      INTC_READ_CIPR    => INTC_READ_CIPR,
+      INTC_IRQ          => INTC_IRQ,
+      INTC_CISR         => intc_cisr,
+      INTC_CIPR         => intc_cipr);
 
   --------------------------------------------------------------------------------------------------
   -- Read MUX section
@@ -8063,24 +9630,23 @@ end architecture IMP;
 -- pselect_mask.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2015 Xilinx, Inc. All rights reserved.
--- 
+-- (c) Copyright 2011,2015,2023 Advanced Micro Devices, Inc. All rights reserved.
+--
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
--- 
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -8089,11 +9655,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
--- 
+--
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -8102,12 +9668,12 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
--- 
+--
 -- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
--- PART OF THIS FILE AT ALL TIMES
+-- PART OF THIS FILE AT ALL TIMES.
 --
 ------------------------------------------------------------------------------
 -- Filename:        pselect_mask.vhd
@@ -8222,24 +9788,23 @@ end imp;
 -- iomodule.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2015 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2015,2018,2021-2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -8248,11 +9813,11 @@ end imp;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -8261,7 +9826,7 @@ end imp;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -8284,6 +9849,7 @@ end imp;
 -- History:
 --   goran   2008-01-08    First Version
 --   stefana 2012-03-20    Added GPI interrupt
+--   rolandp 2021-12-02    Added optional UE and CE signals
 --
 -------------------------------------------------------------------------------
 -- Naming Conventions:
@@ -8308,9 +9874,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_core;
-use iomodule_v3_1_3.pselect_mask;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_core;
+use iomodule_v3_1_10.pselect_mask;
 
 entity iomodule is
   generic (
@@ -8331,6 +9897,7 @@ entity iomodule is
     C_IO_MASK                  : std_logic_vector(0 to 63) := X"FFFFFFFFFFFFFFFF";
     C_LMB_AWIDTH               : integer                   := 32;
     C_LMB_DWIDTH               : integer                   := 32;
+    C_LMB_PROTOCOL             : integer                   := 0;
 
     -- IO Bus
     C_USE_IO_BUS           : integer               := 0;
@@ -8346,6 +9913,9 @@ entity iomodule is
     C_UART_TX_INTERRUPT    : integer               := 0;
     C_UART_ERROR_INTERRUPT : integer               := 0;
     C_UART_PROG_BAUDRATE   : integer               := 0;
+    C_UART_FREQ            : integer               := 100000000;
+    C_UART_ASYNC           : integer               := 0;
+    C_UART_NUM_SYNC_FF     : integer               := 2;
     
     -- FIT generics
     C_USE_FIT1        : integer               := 0;
@@ -8417,8 +9987,8 @@ entity iomodule is
     C_INTC_LEVEL_EDGE   : std_logic_vector(15 downto 0) := X"0000";
     C_INTC_POSITIVE     : std_logic_vector(15 downto 0) := X"FFFF";
     C_INTC_HAS_FAST     : integer range 0 to 1          := 0;
-    C_INTC_ADDR_WIDTH   : integer range 5 to 32         := 32;
-    C_INTC_BASE_VECTORS : std_logic_vector(31 downto 0) := X"00000000";
+    C_INTC_ADDR_WIDTH   : integer range 5 to 64         := 32;
+    C_INTC_BASE_VECTORS : std_logic_vector(63 downto 0) := X"0000000000000000";
     C_INTC_ASYNC_INTR   : std_logic_vector(15 downto 0) := X"FFFF";
     C_INTC_NUM_SYNC_FF  : integer range 0 to 7          := 2
     );
@@ -8442,9 +10012,13 @@ entity iomodule is
     IO_Byte_Enable  : out std_logic_vector((C_LMB_DWIDTH/8 - 1) downto 0);
     IO_Write_Data   : out std_logic_vector(C_LMB_DWIDTH-1 downto 0);
     IO_Read_Data    : in  std_logic_vector(C_LMB_DWIDTH-1 downto 0);
+    IO_UE           : in  std_logic := '0';
+    IO_CE           : in  std_logic := '0';
     IO_Ready        : in  std_logic;
 
     -- UART I/O
+    UART_Clk       : in  std_logic;
+    UART_Rst       : in  std_logic;
     UART_Rx        : in  std_logic;
     UART_Tx        : out std_logic;
     UART_Interrupt : out std_logic;
@@ -8493,7 +10067,7 @@ entity iomodule is
     INTC_Interrupt         : in  std_logic_vector(C_INTC_INTR_SIZE-1 downto 0);
     INTC_IRQ               : out std_logic;
     INTC_Processor_Ack     : in  std_logic_vector(1 downto 0);
-    INTC_Interrupt_Address : out std_logic_vector(31 downto 0);
+    INTC_Interrupt_Address : out std_logic_vector(((C_INTC_ADDR_WIDTH+31) / 64) * (C_INTC_ADDR_WIDTH-32) + 31 downto 0);
     INTC_IRQ_OUT           : out std_logic;
 
     -- Local Memory Bus, LMB
@@ -8512,8 +10086,8 @@ entity iomodule is
 
 end entity iomodule;
 
-library iomodule_v3_1_3;
-use iomodule_v3_1_3.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 architecture IMP of iomodule is
 
@@ -8537,6 +10111,9 @@ architecture IMP of iomodule is
       C_UART_TX_INTERRUPT    : integer;
       C_UART_ERROR_INTERRUPT : integer;
       C_UART_PROG_BAUDRATE   : integer;
+      C_UART_FREQ            : integer;
+      C_UART_ASYNC           : integer;
+      C_UART_NUM_SYNC_FF     : integer;
 
       -- FIT generics
       C_USE_FIT1       : integer;
@@ -8603,13 +10180,14 @@ architecture IMP of iomodule is
       C_GPI4_INTERRUPT : integer               := 0;
 
       -- Interrupt Handler Generics
+      C_ADDR_WIDTH        : integer range 32 to 64;
       C_INTC_USE_EXT_INTR : integer;
       C_INTC_INTR_SIZE    : integer range 1 to 16;
       C_INTC_LEVEL_EDGE   : std_logic_vector(15 downto 0);
       C_INTC_POSITIVE     : std_logic_vector(15 downto 0);
       C_INTC_HAS_FAST     : integer range 0 to 1;
-      C_INTC_ADDR_WIDTH   : integer range 5 to 32;
-      C_INTC_BASE_VECTORS : std_logic_vector(31 downto 0);
+      C_INTC_ADDR_WIDTH   : integer range 5 to 64;
+      C_INTC_BASE_VECTORS : std_logic_vector(63 downto 0);
       C_INTC_ASYNC_INTR   : std_logic_vector(15 downto 0) := X"FFFF";
       C_INTC_NUM_SYNC_FF  : integer range 0 to 7);
     port (
@@ -8625,6 +10203,8 @@ architecture IMP of iomodule is
       FromBVote    : in  std_logic_vector(1023 downto 0);
 
       -- UART I/O
+      UART_Clk       : in std_logic;
+      UART_Rst       : in std_logic;
       UART_Rx        : in  std_logic;
       UART_Tx        : out std_logic;
       UART_Interrupt : out std_logic;
@@ -8673,7 +10253,7 @@ architecture IMP of iomodule is
       INTC_Interrupt         : in  std_logic_vector(C_INTC_INTR_SIZE-1 downto 0);
       INTC_IRQ               : out std_logic;
       INTC_Processor_Ack     : in  std_logic_vector(1 downto 0);
-      INTC_Interrupt_Address : out std_logic_vector(31 downto 0);
+      INTC_Interrupt_Address : out std_logic_vector(C_ADDR_WIDTH-1 downto 0);
 
       -- Register access
       PIT1_Read          : in  std_logic;
@@ -8699,11 +10279,16 @@ architecture IMP of iomodule is
       GPO3_Write         : in  std_logic;
       GPO4_Write         : in  std_logic;
       UART_Status_Read   : in  std_logic;
+      UART_Status_Wait   : out std_logic;
+      UART_Status_Ready  : out std_logic;
       UART_Rx_Read       : in  std_logic;
+      UART_Rx_Wait       : out std_logic;
+      UART_Rx_Ready      : out std_logic;
       INTC_WRITE_CIAR    : in  std_logic;
       INTC_WRITE_CIER    : in  std_logic;
       INTC_WRITE_CIMR    : in  std_logic;
       INTC_WRITE_CIVAR   : in  std_logic;
+      INTC_WRITE_CIVEAR  : in  std_logic;
       INTC_CIVAR_ADDR    : in  std_logic_vector(4 downto 0);
       INTC_READ_CISR     : in  std_logic;
       INTC_READ_CIPR     : in  std_logic;
@@ -8730,6 +10315,10 @@ architecture IMP of iomodule is
       return 1;
     end if;
   end function c_use;
+
+  -- Interrupt controller extended address
+  constant C_INTC_HAS_AE : integer := Boolean'Pos(C_INTC_ADDR_WIDTH > 32);
+  constant C_ADDR_WIDTH  : natural := ((C_INTC_ADDR_WIDTH + 31) / 64) * (C_INTC_ADDR_WIDTH - 32) + 32;
 
   -- Target
   constant C_TARGET : TARGET_FAMILY_TYPE := String_To_Family(C_FAMILY, false);
@@ -8771,12 +10360,14 @@ architecture IMP of iomodule is
   signal lmb_reg_select     : std_logic;
   signal lmb_io_select      : std_logic;
   signal lmb_io_select_keep : std_logic;
-  signal lmb_abus_Q         : std_logic_vector(1 - C_INTC_HAS_FAST to 5);
+  signal lmb_abus_Q         : std_logic_vector(2 - C_INTC_HAS_FAST - C_INTC_HAS_AE to 6);
   signal lmb_reg_read       : std_logic;
   signal lmb_reg_read_Q     : std_logic;
   signal lmb_reg_write      : std_logic;
   signal io_ready_Q         : std_logic;
   signal io_bus_read_data   : std_logic_vector(C_LMB_DWIDTH-1 downto 0);
+  signal io_bus_ue          : std_logic;
+  signal io_bus_ce          : std_logic;
   
   -- Register access
   signal wen                : std_logic;
@@ -8803,12 +10394,17 @@ architecture IMP of iomodule is
   signal gpo3_write         : std_logic;
   signal gpo4_write         : std_logic;
   signal uart_status_read   : std_logic;
+  signal uart_status_wait   : std_logic;
+  signal uart_status_ready  : std_logic;
   signal uart_rx_read       : std_logic;
+  signal uart_rx_wait       : std_logic;
+  signal uart_rx_ready      : std_logic;
   signal uart_baud_write    : std_logic;
   signal intc_write_ciar    : std_logic;
   signal intc_write_cier    : std_logic;
   signal intc_write_cimr    : std_logic;
   signal intc_write_civar   : std_logic;
+  signal intc_write_civear  : std_logic;
   signal intc_read_cisr     : std_logic;
   signal intc_read_cipr     : std_logic;
   signal write_data         : std_logic_vector(31 downto 0);
@@ -8832,7 +10428,13 @@ architecture IMP of iomodule is
   attribute KEEP of uart_tx_write : signal is "TRUE";
   attribute KEEP of write_data    : signal is "TRUE";
 
+  signal config_reset_i : std_logic;
+
 begin  -- architecture IMP
+
+  config_reset_i <= Rst          when C_TMR = 2               else
+                    Config_Reset when C_USE_CONFIG_RESET /= 0 else
+                    '0';
 
   -----------------------------------------------------------------------------
   -- Do the LMB address decoding
@@ -8853,13 +10455,27 @@ begin  -- architecture IMP
   AccessReg : process(Clk) is
   begin
     if (Clk'event and Clk = '1') then
-      lmb_abus_Q <= LMB_ABus(LMB_ABus'high-LMB_ABus_Q'length+1-2 to LMB_ABus'high-2);
+      if config_reset_i = '1' then
+        lmb_abus_Q <= (others => '0');
 
-      lmb_reg_read_Q <= lmb_reg_read;
-      lmb_reg_read   <= LMB_ReadStrobe  and lmb_reg_select and LMB_AddrStrobe;
-      lmb_reg_write  <= LMB_WriteStrobe and lmb_reg_select and LMB_AddrStrobe;
+        lmb_reg_read_Q <= '0';
+        lmb_reg_read   <= '0';
+        lmb_reg_write  <= '0';
 
-      Write_Data(31 downto 0) <= LMB_WriteDBus(0 to 31);  -- Data to write to IO module
+        Write_Data(31 downto 0) <= (others => '0');
+      else
+        lmb_abus_Q <= LMB_ABus(LMB_ABus'high-LMB_ABus_Q'length+1-2 to LMB_ABus'high-2);
+
+        if (uart_status_read = '1' or uart_rx_read = '1') and C_UART_ASYNC = 1 then
+          lmb_reg_read_Q <= '0';
+        else
+          lmb_reg_read_Q <= lmb_reg_read;
+        end if;
+        lmb_reg_read   <= LMB_ReadStrobe  and lmb_reg_select and LMB_AddrStrobe;
+        lmb_reg_write  <= LMB_WriteStrobe and lmb_reg_select and LMB_AddrStrobe;
+
+        Write_Data(31 downto 0) <= LMB_WriteDBus(0 to 31);  -- Data to write to IO module
+      end if;
     end if;
   end process AccessReg;
 
@@ -8916,17 +10532,31 @@ begin  -- architecture IMP
     ReadyReg : process(Clk) is
     begin
       if (Clk'event and Clk = '1') then
-        io_ready_Q <= lmb_io_select_keep and IO_Ready;
+        if config_reset_i = '1' then
+          io_ready_Q <= '0';
+        else
+          io_ready_Q <= lmb_io_select_keep and IO_Ready;
+        end if;
       end if;
     end process ReadyReg;
 
     ReadDataReg : process(Clk) is
     begin
       if (Clk'event and Clk = '1') then
-        if IO_Ready = '1' and io_read_keep = '1' then
-          io_bus_read_data <= IO_Read_Data;
-        else
+        if config_reset_i = '1' then
           io_bus_read_data <= (others => '0');
+          io_bus_ue        <= '0';
+          io_bus_ce        <= '0';
+        else
+          if IO_Ready = '1' and io_read_keep = '1' then
+            io_bus_read_data <= IO_Read_Data;
+            io_bus_ue        <= IO_UE;
+            io_bus_ce        <= IO_CE;
+          else
+            io_bus_read_data <= (others => '0');
+            io_bus_ue        <= '0';
+            io_bus_ce        <= '0';
+          end if;
         end if;
       end if;
     end process ReadDataReg;
@@ -8936,6 +10566,8 @@ begin  -- architecture IMP
   Not_Using_IO_Bus : if (C_USE_IO_BUS = 0) generate
     io_ready_Q         <= '0';
     io_bus_read_data   <= (others => '0');
+    io_bus_ue          <= '0';
+    io_bus_ce          <= '0';
     lmb_io_select      <= '0';
     lmb_io_select_keep <= '0';
     IO_Addr_Strobe     <= '0';
@@ -8947,14 +10579,45 @@ begin  -- architecture IMP
   end generate Not_Using_IO_Bus;
   
   -- Data read from IO module
-  Sl_DBus(0 to 31) <= io_reg_read_data(31 downto 0) or io_bus_read_data(31 downto 0);
 
-  Sl_Wait <= lmb_reg_read or lmb_io_select_keep;
+  -- Standard LMB protocol with RAM data read combinatorial through LMB controller 
+  Sl_DBus_LMB_Protocol_0 : if (C_LMB_PROTOCOL = 0) generate
+  begin
+    Sl_DBus(0 to 31) <= io_reg_read_data(31 downto 0) or io_bus_read_data(31 downto 0);
+    Sl_UE            <= io_bus_ue;
+    Sl_CE            <= io_bus_ce;
+  end generate Sl_DBus_LMB_Protocol_0;
 
-  Sl_UE   <= '0'; -- No Uncorrectable Errors
-  Sl_CE   <= '0'; -- No Correctable Errors
+  -- Timing optimized LMB protocol with RAM data read clocked in LMB controller
+  -- Sl_DBus needs to be clocked once to match clocked timing of RAM data read clocked
+  -- Only works with MicroBlaze 8-stage pipe and C_LMB_PROTOCOL set to 1 on MicroBlaze
+  Sl_DBus_LMB_Protocol_1 : if (C_LMB_PROTOCOL = 1) generate
+  begin
+    Sl_DBus_DFF : process(Clk) is
+    begin
+      if (Clk'event and Clk = '1') then
+        if config_reset_i = '1' then
+          Sl_DBus <= (others => '0');
+          Sl_UE            <= '0';
+          Sl_CE            <= '0';
+        else        
+          Sl_DBus(0 to 31) <= io_reg_read_data(31 downto 0) or io_bus_read_data(31 downto 0);
+          Sl_UE            <= io_bus_ue;
+          Sl_CE            <= io_bus_ce;
+        end if;
+      end if;
+    end process Sl_DBus_DFF;
+  end generate Sl_DBus_LMB_Protocol_1;
+  
+  Sl_Wait <= '1' when lmb_reg_read = '1' or
+                      lmb_io_select_keep = '1' or
+                      ((uart_status_wait = '1' or uart_rx_wait= '1') and C_UART_ASYNC = 1) else
+             '0';
 
-  Sl_Ready <= '1' when lmb_reg_write  = '1' or lmb_reg_read_Q = '1' or io_ready_Q = '1' else
+  Sl_Ready <= '1' when lmb_reg_write  = '1' or
+                       lmb_reg_read_Q = '1' or
+                       io_ready_Q = '1' or
+                       ((uart_status_ready = '1' or uart_rx_ready = '1') and C_UART_ASYNC = 1) else
               '0';
 
   uart_rx_read       <= '1' when regaddr = C_UART_RX      and lmb_reg_read  = '1' else '0'; 
@@ -8987,18 +10650,30 @@ begin  -- architecture IMP
   pit4_write_preload <= wen when regaddr = C_PIT4_PRELOAD and lmb_reg_write = '1' else '0';
   pit4_write_ctrl    <= wen when regaddr = C_PIT4_CONTROL and lmb_reg_write = '1' else '0';
 
-  regaddr <= lmb_abus_Q(1 to 5);
-
-  Using_Fast : if C_INTC_HAS_FAST = 1 generate
+  Using_Fast : if C_INTC_HAS_FAST = 1 and C_INTC_HAS_AE = 0 generate
   begin
-    intc_write_civar <= '1' when lmb_abus_Q(0) = '1'      and lmb_reg_write = '1' else '0';
-    wen <= not lmb_abus_Q(0);
+    intc_write_civar  <= lmb_reg_write when lmb_abus_Q(1) = '1' else '0';
+    intc_write_civear <= '0';
+    wen <= not lmb_abus_Q(1);
+    regaddr <= lmb_abus_Q(2 to 6);
   end generate Using_Fast;
+
+  Using_Fast_AE : if C_INTC_HAS_FAST = 1 and C_INTC_HAS_AE = 1 generate
+  begin
+    intc_write_civar  <= lmb_reg_write when (lmb_abus_Q(0) = '0' and lmb_abus_Q(1) = '1') or
+                                            (lmb_abus_Q(0) = '1' and lmb_abus_Q(6) = '0') else '0';
+    intc_write_civear <= lmb_reg_write when (lmb_abus_Q(0) = '1' and lmb_abus_Q(6) = '1') else '0';
+    wen <= not (lmb_abus_Q(0) or lmb_abus_Q(1));
+    regaddr <= lmb_abus_Q(2 to 6) when lmb_abus_Q(0) = '0' else
+               lmb_abus_Q(1 to 5);
+  end generate Using_Fast_AE;
 
   Not_Using_Fast : if C_INTC_HAS_FAST = 0 generate
   begin
-    intc_write_civar <= '0';
+    intc_write_civar  <= '0';
+    intc_write_civear <= '0';
     wen <= '1';
+    regaddr <= lmb_abus_Q(2 to 6);
   end generate Not_Using_Fast;
 
 
@@ -9022,6 +10697,9 @@ begin  -- architecture IMP
       C_UART_TX_INTERRUPT    => C_UART_TX_INTERRUPT,     -- [integer]
       C_UART_ERROR_INTERRUPT => C_UART_ERROR_INTERRUPT,  -- [integer]
       C_UART_PROG_BAUDRATE   => C_UART_PROG_BAUDRATE,    -- [integer]
+      C_UART_FREQ            => C_UART_FREQ,             -- [integer]
+      C_UART_ASYNC           => C_UART_ASYNC,            -- [integer]
+      C_UART_NUM_SYNC_FF     => C_UART_NUM_SYNC_FF,      -- [integer]
 
       -- FIT generics
       C_USE_FIT1        => C_USE_FIT1,         -- [integer]
@@ -9088,6 +10766,7 @@ begin  -- architecture IMP
       C_GPI4_INTERRUPT => C_GPI4_INTERRUPT,
 
       -- Interrupt Handler Generics
+      C_ADDR_WIDTH        => C_ADDR_WIDTH,
       C_INTC_USE_EXT_INTR => C_INTC_USE_EXT_INTR,
       C_INTC_INTR_SIZE    => C_INTC_INTR_SIZE,
       C_INTC_LEVEL_EDGE   => C_INTC_LEVEL_EDGE,
@@ -9111,6 +10790,8 @@ begin  -- architecture IMP
       FromBVote    => FromBVote,
 
       -- UART I/O
+      UART_Clk       => UART_Clk,
+      UART_Rst       => UART_Rst,
       UART_Rx        => UART_Rx,
       UART_Tx        => UART_Tx,
       UART_Interrupt => UART_Interrupt,
@@ -9185,11 +10866,16 @@ begin  -- architecture IMP
       GPO3_Write         => gpo3_write,
       GPO4_Write         => gpo4_write,
       UART_Status_Read   => uart_status_read,
+      UART_Status_Wait   => uart_status_wait,
+      UART_Status_Ready  => uart_status_ready,
       UART_Rx_Read       => uart_rx_read,
+      UART_Rx_Wait       => uart_rx_wait,
+      UART_Rx_Ready      => uart_rx_ready,
       INTC_WRITE_CIAR    => intc_write_ciar,
       INTC_WRITE_CIER    => intc_write_cier,
       INTC_WRITE_CIMR    => intc_write_cimr,
       INTC_WRITE_CIVAR   => intc_write_civar,
+      INTC_WRITE_CIVEAR  => intc_write_civear,
       INTC_CIVAR_ADDR    => regaddr,
       INTC_READ_CISR     => intc_read_cisr,
       INTC_READ_CIPR     => intc_read_cipr,

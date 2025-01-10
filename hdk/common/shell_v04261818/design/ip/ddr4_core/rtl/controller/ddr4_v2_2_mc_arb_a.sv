@@ -1,22 +1,21 @@
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +24,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,7 +37,7 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
@@ -47,10 +46,10 @@
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc_arb_a.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_arb_a.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,25 +57,27 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_arb_a module
+//                   ddr4_v2_2_23_mc_arb_a module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_arb_a #(parameter
+module ddr4_v2_2_23_mc_arb_a #(parameter
     TCQ        = 0.1   
+   ,RKBITS     = 2
+   ,RANK_SLAB  = 4
 )(
     input        clk
    ,input        rst
 
    ,output reg       winAct
    ,output reg [3:0] winPort
-   ,output reg [3:0] act_rank_update
+   ,output reg [RANK_SLAB-1:0] act_rank_update
    ,output     [3:0] act_winPort_nxt
 
-   ,input  [7:0] cmdRank
+   ,input  [RKBITS*4-1:0] cmdRank
    ,input  [3:0] req
 );
 
@@ -114,10 +115,10 @@ always @(*) begin
 end
 
 wire winAct_nxt = | req[3:0];
-wire [1:0] act_rank_encode =   ( { 2 { win3210[3] } } & cmdRank[7:6] )
-                             | ( { 2 { win3210[2] } } & cmdRank[5:4] )
-                             | ( { 2 { win3210[1] } } & cmdRank[3:2] )
-                             | ( { 2 { win3210[0] } } & cmdRank[1:0] );
+wire [RKBITS-1:0] act_rank_encode =   ( { RKBITS { win3210[3] } } & cmdRank[RKBITS*4-1:RKBITS*3] )
+                                    | ( { RKBITS { win3210[2] } } & cmdRank[RKBITS*3-1:RKBITS*2] )
+                                    | ( { RKBITS { win3210[1] } } & cmdRank[RKBITS*2-1:RKBITS*1] )
+                                    | ( { RKBITS { win3210[0] } } & cmdRank[RKBITS*1-1:RKBITS*0] );
 always @(*) begin
   act_rank_update = '0;
   act_rank_update[act_rank_encode] = winAct_nxt;
@@ -171,11 +172,11 @@ integer rank_index;
 // All groups issue activate
 reg  [3:0] e_act_group;        // Track activates by group
 reg  [3:0] e_act_group_nxt;
-reg  [3:0] e_act_group_rank[3:0];     // Track activates by group and rank
-reg  [3:0] e_act_group_rank_nxt[3:0];
-reg  [1:0] e_act_rank_encode;
-reg  [4:0] e_act_all_group_rank;     // Count activates by group and rank
-reg  [4:0] e_act_all_group_rank_nxt;
+reg  [3:0] e_act_group_rank[RANK_SLAB-1:0];     // Track activates by group and rank
+reg  [3:0] e_act_group_rank_nxt[RANK_SLAB-1:0];
+reg  [RKBITS-1:0] e_act_rank_encode;
+reg  [RANK_SLAB:0] e_act_all_group_rank;     // Count activates by group and rank
+reg  [RANK_SLAB:0] e_act_all_group_rank_nxt;
 always @(*) begin
   e_act_all_group_rank_nxt = '0;
   for (group_index = 0; group_index < 4; group_index = group_index + 1) begin
@@ -190,7 +191,7 @@ always @(*) begin
 end
 always @(posedge clk) if (rst) begin
   for (group_index = 0; group_index < 4; group_index = group_index + 1) begin
-    for (rank_index = 0; rank_index < 4; rank_index = rank_index + 1) begin
+    for (rank_index = 0; rank_index < RANK_SLAB; rank_index = rank_index + 1) begin
       e_act_group_rank[rank_index][group_index]      <= #TCQ '0;
     end
   end
@@ -199,7 +200,7 @@ always @(posedge clk) if (rst) begin
   e_act_all_group_rank  <= #TCQ '0;
 end else begin
   for (group_index = 0; group_index < 4; group_index = group_index + 1) begin
-    for (rank_index = 0; rank_index < 4; rank_index = rank_index + 1) begin
+    for (rank_index = 0; rank_index < RANK_SLAB; rank_index = rank_index + 1) begin
       e_act_group_rank[rank_index][group_index]      <= #TCQ e_act_group_rank_nxt[rank_index][group_index];
     end
   end

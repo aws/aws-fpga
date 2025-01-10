@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,7 +18,7 @@
 from __future__ import print_function
 import os
 import sys
-import platform
+import distro
 import glob
 import argparse
 import subprocess
@@ -44,7 +44,7 @@ def print_success(scripts_path, install_path):
     print("DPDK setup complete!")
     print("pktgen-dpdk may be run via the following steps:")
     print("  cd %s/pktgen-dpdk" % (install_path))
-    print("  sudo ./app/%s/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -b 00:03.0 -- -T -P -m [1].0 -f %s/pktgen-ena.pkt" % (make_tgt, scripts_path))
+    print("  sudo ./app/%s/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 --socket-mem 2048 --file-prefix pg -- -T -P -m [1].0 -f %s/pktgen-ena.pkt" % (make_tgt, scripts_path))
 
 def check_output(args, stderr=None):
     return subprocess.Popen(args, stdout=subprocess.PIPE,
@@ -58,8 +58,8 @@ def cmd_exec(cmd, check_return=True):
         sys.exit(1)
 
 def load_uio():
-    distro = platform.linux_distribution()
-    if (distro[0] == "Ubuntu"):
+    installed_distro = distro.name()
+    if (installed_distro == "Ubuntu"):
         cmd_exec("modprobe uio")
     else:
         cmd_exec("modprobe uio_pci_generic")
@@ -111,8 +111,8 @@ def setup_dpdk(install_path, eni_dbdf, eni_ethdev):
     cmd_exec("insmod ./build/kernel/linux/igb_uio/igb_uio.ko")
 
     # Bind the ENI device to to DPDK
-    cmd_exec("ifdown %s" % (eni_ethdev))
-    cmd_exec("%s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
+    cmd_exec("ip link set %s down" % (eni_ethdev))
+    cmd_exec("python3 %s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
 
     # cd back to the original directory
     os.chdir("%s" % (cwd))

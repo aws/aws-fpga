@@ -1,4 +1,4 @@
-# "Hello World" example 
+# "Hello World" example
 
 This lab covers the basics of using F1 instances and running a _hello world_ demo provided by Amazon. The development and simulation of the code can be done on a different type of EC2 instance (for example from the [M5 family or the C5 family](https://aws.amazon.com/ec2/instance-types/)). This would be ideal to limit costs. For simplicity, we have undergone the whole lab on a F1 FPGA-equipped instance.
 
@@ -25,7 +25,7 @@ Go on your AWS console. Choose “EC2” within the list of services:
 ![](https://aws-fpga-hdk-resources.s3.amazonaws.com/artifacts/images/quickstarts/hello_world/labfpga04.png)
 Click on “Launch Instance”:
 ![](https://aws-fpga-hdk-resources.s3.amazonaws.com/artifacts/images/quickstarts/hello_world/labfpga05.png)
-The next step is to choose the Amazon Machine Image (AMI) that you’d like to install on this EC2 instance. The one that we are interested in is the **FPGA Developer AMI.** You can search for it manually or access it through the AWS MarketPlace: [https://aws.amazon.com/marketplace/pp/Amazon-Web-Services-FPGA-Developer-AMI/B06VVYBLZZ](https://aws.amazon.com/marketplace/pp/Amazon-Web-Services-FPGA-Developer-AMI/B06VVYBLZZ)
+The next step is to choose the Amazon Machine Image (AMI) that you’d like to install on this EC2 instance. The one that we are interested in is the **FPGA Developer AMI.** You can search for it manually or access it through the [AWS MarketPlace](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 
 ![](https://aws-fpga-hdk-resources.s3.amazonaws.com/artifacts/images/quickstarts/hello_world/labfpga06.png)
 
@@ -96,7 +96,7 @@ The “vivado –mode batch” command allows you to make sure that Vivado is in
 
 Next run the Vivado synthesis :
 ![](https://aws-fpga-hdk-resources.s3.amazonaws.com/artifacts/images/quickstarts/hello_world/labfpga20.png)
-Note that by default, the build runs in the background. It can be useful, especially because the build can take long (a few hours), to see the notification messages in the foreground. This can be done by adding to the .sh script the following : 
+Note that by default, the build runs in the background. It can be useful, especially because the build can take long (a few hours), to see the notification messages in the foreground. This can be done by adding to the .sh script the following :
 
     -notify –foreground
 

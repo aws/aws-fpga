@@ -1,23 +1,20 @@
-
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -26,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -39,19 +36,23 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_axi_upsizer.sv
+//  /   /         Filename           : ddr4_v2_2_23_axi_upsizer.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -82,7 +83,7 @@
 `timescale 1ps/1ps
 `default_nettype none
 
-module ddr4_v2_2_3_axi_upsizer #
+module ddr4_v2_2_23_axi_upsizer #
   (
    parameter         C_FAMILY                         = "rtl", 
                        // FPGA Family. Current version: virtex6 or spartan6.
@@ -338,7 +339,7 @@ module ddr4_v2_2_3_axi_upsizer #
   assign M_AXI_WUSER   = {C_AXI_WUSER_WIDTH{1'b0}};
   assign S_AXI_RUSER   = {C_AXI_RUSER_WIDTH{1'b0}};
 
-    ddr4_v2_2_3_axi_register_slice #
+    ddr4_v2_2_23_axi_register_slice #
       (
         .C_FAMILY                         (C_FAMILY),
         .C_AXI_ID_WIDTH                   (C_AXI_ID_WIDTH),
@@ -446,7 +447,7 @@ module ddr4_v2_2_3_axi_upsizer #
         .M_AXI_RREADY                     (  )
       );
   
-    ddr4_v2_2_3_axi_register_slice #
+    ddr4_v2_2_23_axi_register_slice #
       (
         .C_FAMILY                         (C_FAMILY),
         .C_AXI_ID_WIDTH                   (C_AXI_ID_WIDTH),
@@ -582,7 +583,7 @@ module ddr4_v2_2_3_axi_upsizer #
       wire                              wr_cmd_ready;
       
       // Write Address Channel.
-      ddr4_v2_2_3_a_upsizer #
+      ddr4_v2_2_23_a_upsizer #
       (
        //.C_FAMILY                    (C_FAMILY),
        .C_AXI_ID_WIDTH              (C_AXI_ID_WIDTH),
@@ -651,7 +652,7 @@ module ddr4_v2_2_3_axi_upsizer #
        );
        
       // Write Data channel.
-      ddr4_v2_2_3_w_upsizer #
+      ddr4_v2_2_23_w_upsizer #
       (
        //.C_FAMILY                    (C_FAMILY),
        .C_S_AXI_DATA_WIDTH          (C_S_AXI_DATA_WIDTH),
@@ -761,7 +762,7 @@ module ddr4_v2_2_3_axi_upsizer #
       wire                              rd_cmd_ready;
       
       // Write Address Channel.
-      ddr4_v2_2_3_a_upsizer #
+      ddr4_v2_2_23_a_upsizer #
       (
        //.C_FAMILY                    (C_FAMILY),
        .C_AXI_ID_WIDTH              (C_AXI_ID_WIDTH),
@@ -830,7 +831,7 @@ module ddr4_v2_2_3_axi_upsizer #
        );
        
       // Read Data channel.
-      ddr4_v2_2_3_r_upsizer #
+      ddr4_v2_2_23_r_upsizer #
       (
        //.C_FAMILY                    (C_FAMILY),
        .C_AXI_ID_WIDTH              (C_AXI_ID_WIDTH),

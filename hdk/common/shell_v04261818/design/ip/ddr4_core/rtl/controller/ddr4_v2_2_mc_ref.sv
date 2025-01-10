@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc_ref.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_ref.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,17 +59,19 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_ref module
+//                   ddr4_v2_2_23_mc_ref module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_ref #(parameter
+module ddr4_v2_2_23_mc_ref #(parameter
     NUMREF = 1
    ,RANKS  = 1
    ,RANK_SLOT = 1
+   ,RKBITS = 2
+   ,RANK_SLAB = 4
    ,LR_WIDTH = 3
    ,S_HEIGHT = 8
    ,tREFI  = 1300
@@ -89,11 +92,12 @@ module ddr4_v2_2_3_mc_ref #(parameter
    ,output           refIss
    ,output           zqIss
    ,output           zqIssAll
-   ,output     [1:0] refRank
+   ,output [RKBITS-1:0] refRank
    ,output [LR_WIDTH-1:0] refLRank
    ,output           refReq
    ,output           ref_ack
    ,output           zq_ack
+   ,input            prevCmdAP
 
    ,input       calDone
    ,input [3:0] refOK
@@ -108,8 +112,8 @@ module ddr4_v2_2_3_mc_ref #(parameter
    ,input [3:0] txn_fifo_empty
    ,input [3:0] cas_fifo_empty
    ,output      mc_block_req
-   ,output reg  int_sreIss
-   ,output reg  [RANKS-1:0] int_sreCkeDis
+   ,output      sreIss
+   ,output      [RANKS-1:0] sreCkeDis
    ,input       stop_gate_tracking_ack
    ,output      stop_gate_tracking_req
    ,input       srx_cke0_release
@@ -122,8 +126,8 @@ module ddr4_v2_2_3_mc_ref #(parameter
    ,output reg  [7:0] mcCKc
 );
 
-function [1:0] nextRank;
-   input [1:0] rank;
+function [RKBITS-1:0] nextRank;
+   input [RKBITS-1:0] rank;
    nextRank = ((rank + 1) == RANKS) ? 0 : (rank + 1'b1);
 endfunction
 
@@ -132,6 +136,12 @@ function [LR_WIDTH-1:0] nextLRank;
    nextLRank = ((l_rank + 1) == S_HEIGHT) ? 0 : (l_rank + 1'b1);
 endfunction
 
+reg  int_sreIss;
+reg  um_sreIss;
+reg  um_sreIss_nxt;
+reg  [RANKS-1:0] int_sreCkeDis;
+reg  [RANKS-1:0] um_sreCkeDis;
+reg  [RANKS-1:0] um_sreCkeDis_nxt;
 reg  [9:0] cntr;
 reg  [3:0] refs;
 reg  [3:0] refSt;
@@ -141,19 +151,19 @@ reg        int_refReq;
 reg        int_preIss;
 reg        int_refIss;
 reg        int_zqIss;
-reg  [1:0] int_refRank;
+reg  [RKBITS-1:0] int_refRank;
 reg  [LR_WIDTH-1:0] int_refLRank;
 
 // ZQCS signals
-reg  [1:0]       zq_rank;
+reg  [RKBITS-1:0] zq_rank;
 reg  [15:0]      zq_intvl_count;
 reg  [RANKS-1:0] zq_pending;
 
 // USER_MODE signals
 reg        ref_req_ff;
 reg        zq_req_ff;
-reg  [3:0] user_fsm;
-reg  [3:0] user_fsm_nxt;
+reg  [4:0] user_fsm;
+reg  [4:0] user_fsm_nxt;
 reg  [9:0] um_wait_cntr;
 reg  [9:0] um_wait_cntr_init;
 reg        um_wait_cntr_start;
@@ -166,7 +176,7 @@ reg        um_ref_iss_nxt;
 reg        um_ref_iss;
 reg        init_um_rank_cntr;
 reg        inc_um_rank_cntr;
-reg [1:0]  um_rank_cntr;
+reg [RKBITS-1:0] um_rank_cntr;
 reg        init_um_l_rank_cntr;
 reg        inc_um_l_rank_cntr;
 reg [LR_WIDTH-1:0]  um_l_rank_cntr;
@@ -211,21 +221,24 @@ localparam
 ;
 
 localparam
-   UM_IDLE       = 4'd0
-  ,UM_ACK_WAIT   = 4'd1
-  ,UM_WR_WAIT    = 4'd2
-  ,UM_PRE        = 4'd3
-  ,UM_PRE_CHECK  = 4'd4
-  ,UM_PRE_WAIT   = 4'd5
-  ,UM_REF        = 4'd6
-  ,UM_REF_CHECK  = 4'd7
-  ,UM_STAG_WAIT  = 4'd8
-  ,UM_TRFC_WAIT  = 4'd9
-  ,UM_ZQ         = 4'd10
-  ,UM_ZQ_CHECK   = 4'd11
-  ,UM_ZQ_WAIT    = 4'd12
-  ,UM_ZQ_ALL     = 4'd13
-  ,UM_TZQCS_WAIT = 4'd14
+   UM_IDLE       = 5'd0
+  ,UM_ACK_WAIT   = 5'd1
+  ,UM_WR_WAIT    = 5'd2
+  ,UM_PRE        = 5'd3
+  ,UM_PRE_CHECK  = 5'd4
+  ,UM_PRE_WAIT   = 5'd5
+  ,UM_REF        = 5'd6
+  ,UM_REF_CHECK  = 5'd7
+  ,UM_STAG_WAIT  = 5'd8
+  ,UM_TRFC_WAIT  = 5'd9
+  ,UM_ZQ         = 5'd10
+  ,UM_ZQ_CHECK   = 5'd11
+  ,UM_ZQ_WAIT    = 5'd12
+  ,UM_ZQ_ALL     = 5'd13
+  ,UM_TZQCS_WAIT = 5'd14
+  ,UM_SRE_WAIT   = 5'd15
+  ,UM_SRE        = 5'd16
+  ,UM_SR         = 5'd17
 ;
 
 // Per rank pending refresh counter
@@ -238,9 +251,14 @@ localparam tRPWAIT_TEMP  = ( tRP + 3 ) / 4;
 localparam tRPWAIT       = ( ( tRPWAIT_TEMP - 2 ) > 0 ) ? ( tRPWAIT_TEMP - 2 ) : 0;
 wire [6:0] tWRWAIT_temp  = ( tCWL + 6'd4 + tWR[5:0] + 6'd3) / 4;
 wire [9:0] tWRWAIT       = ( ( tWRWAIT_temp - 7'd4 ) > '0 ) ? { 3'b0, ( tWRWAIT_temp - 7'd4 ) } : '0;
+wire [6:0] tAPWAIT_temp  = ( tCWL + 6'd4 + tWR[5:0] + tRP + 2 /*+ 6'd3*/) / 4;  // Removed to consider the slots
+wire [9:0] tAPWAIT       = ( ( tAPWAIT_temp - 7'd4 ) > '0 ) ? { 3'b0, ( tAPWAIT_temp - 7'd4 ) } : '0;
 wire [9:0] tZQCSF        = ( tZQCS + 3 ) / 4;  // spyglass disable W164c
 
 integer i;
+
+assign sreIss = int_sreIss | um_sreIss;
+assign sreCkeDis = int_sreCkeDis | um_sreCkeDis;
 
 // ==================================================================
 // Clock stopped power down mode for RCD
@@ -280,9 +298,9 @@ end
 assign sre_tckev_ok = (tckev_timer == 0) ? sre_tckoff_ok_r : 0 ;
 
 // Driving sre_ack and memory clocks
-assign sre_ack = ((REG_CTRL == "ON") && (PARTIAL_RECONFIG == "Enable")) ? sre_tckev_ok : sre_issued ;
+assign sre_ack = (REG_CTRL == "ON") ? sre_tckev_ok : sre_issued ;
 always @(posedge clk) begin
-  if (sre_tckoff_ok && (PARTIAL_RECONFIG == "Enable")) begin
+  if (sre_tckoff_ok && (REG_CTRL == "ON")) begin
     mcCKt <= #TCQ 8'b0;
     mcCKc <= #TCQ 8'b0;
   end else begin
@@ -333,8 +351,9 @@ end
    wire arc_SRE_SM_REQ_VT_STOP     = stop_gate_tracking_ack;
    wire arc_SRE_SM_VT_STOP_MC_CHK  = ~mc_busy;
    wire arc_SRE_SM_MC_CHK_REF_REQ  = & ui_mc_idle_cnt;
-   wire arc_SRE_SM_REF_REQ_ISS     = (refSt == stREQ);
-   wire arc_SRE_SM_ISS_WAIT        = (refSt == stSR);
+   wire arc_SRE_SM_REF_REQ_ISS     = ((refSt == stREQ) && ~USER_MODE) || 
+                                     ((user_fsm == UM_IDLE) && USER_MODE);
+   wire arc_SRE_SM_ISS_WAIT        = (refSt == stSR) || (user_fsm == UM_SR);
    wire arc_SRE_SM_WAIT_DONE       = & sre_wait_cnt;
    wire arc_SRE_SM_DONE_IDLE       = srx_req | srx_cke0_release;
    
@@ -520,8 +539,8 @@ wire [15:0] zq_intvl_count_nxt  = zq_intvl_load                      // spyglass
 
 // ZQCS rank pointer:
 // Increment the ZQCS rank pointer each time a ZQCS issues.
-wire       wrap_zq_rank = ( zq_rank == (RANKS-1) ) & int_zqIss;
-wire [1:0] zq_rank_nxt  = wrap_zq_rank ? '0 : ( zq_rank + { 1'b0, int_zqIss } ); // spyglass disable W164a
+wire              wrap_zq_rank = ( zq_rank == (RANKS-1) ) & int_zqIss;
+wire [RKBITS-1:0] zq_rank_nxt  = wrap_zq_rank ? '0 : ( zq_rank + { 1'b0, int_zqIss } ); // spyglass disable W164a
 
 // Pending ZQCS pending tracker:
 // Set the ZQCS pending flag for the current ZQCS rank pointer
@@ -552,7 +571,7 @@ always @(posedge clk) if (rst) begin
    int_sreCkeDis <= 4'b0;
    int_srxIss <= 1'b0;
    int_zqIss  <= 1'b0;
-   int_refRank <= 2'b00;
+   int_refRank <= {RKBITS{1'b0}};
    int_refLRank <= '0;
    int_refReq <= 1'b0;
    retSt <= 4'bxxxx;
@@ -578,7 +597,10 @@ end else begin
          refSt <= #TCQ stWAIT;
       end
       stWAIT: begin
-         cntr <= #TCQ tWRWAIT;
+         if (prevCmdAP == 1)
+           cntr <= #TCQ tAPWAIT;
+         else
+           cntr <= #TCQ tWRWAIT;
          retSt <= #TCQ stPRE;
          if (refOK == 4'b1111) refSt <= #TCQ stTWDL;
       end
@@ -683,14 +705,14 @@ end
 
 // USER_MODE Input signal capture
 // Clear with ack signal when user flow completes
-wire ref_req_nxt = ~um_ref_ack_nxt & ( ref_req_ff | ref_req );
+wire ref_req_nxt = ~um_ref_ack_nxt & ( ref_req_ff | ref_req | (arc_SRE_SM_REF_REQ_ISS & (sre_sm_ps == SRE_SM_REF_REQ) & USER_MODE) );
 wire zq_req_nxt  = ~um_zq_ack_nxt  & ( zq_req_ff  | zq_req );
 
 // USER_MODE NI block signal
 wire um_ref_req_nxt = ~clear_um_ref_req & ( um_ref_req | set_um_ref_req );
 
 // USER_MODE rank counter.  Used for both refresh and ZQCS.
-wire [1:0] um_rank_cntr_nxt = init_um_rank_cntr ? '0 : ( um_rank_cntr + { 1'b0, inc_um_rank_cntr } ); // spyglass disable W164a
+wire [RKBITS-1:0] um_rank_cntr_nxt = init_um_rank_cntr ? '0 : ( um_rank_cntr + { 1'b0, inc_um_rank_cntr } ); // spyglass disable W164a
 
 // USER_MODE logical rank counter. Used for refresh
 wire [LR_WIDTH-1:0] um_l_rank_cntr_nxt = init_um_l_rank_cntr ? '0 : ( um_l_rank_cntr + { 1'b0, inc_um_l_rank_cntr } ); 
@@ -715,6 +737,8 @@ always @(*) begin
   um_zq_iss_nxt    = 1'b0;
   um_zq_iss_all_nxt    = 1'b0;
   clear_um_ref_req = 1'b0;
+  um_sreIss_nxt = 0;
+  um_sreCkeDis_nxt = {RANKS{1'b0}};
 
   casez (user_fsm)
     UM_IDLE: begin
@@ -777,7 +801,7 @@ always @(*) begin
     UM_REF_CHECK: begin
       if (um_rank_cntr == (RANKS-1) & um_l_rank_cntr == (S_HEIGHT-1)) begin
         um_wait_cntr_start = 1'b1;
-        um_wait_cntr_init  = (tRFC + 3) / 4; // spyglass disable W164c
+        um_wait_cntr_init  = tRFCWAIT;         // spyglass disable W164c
         user_fsm_nxt       = UM_TRFC_WAIT;
       end else if (um_l_rank_cntr == (S_HEIGHT-1)) begin
         inc_um_rank_cntr   = 1'b1;
@@ -799,8 +823,13 @@ always @(*) begin
     end
     UM_TRFC_WAIT: begin
       if ( ~( | um_wait_cntr ) & ~zq_req_ff ) begin
-        user_fsm_nxt = UM_IDLE;
-        um_ref_ack_nxt = 1'b1;
+	if (sre_sm_ps == SRE_SM_ISS) begin
+          user_fsm_nxt = UM_SRE_WAIT;
+          init_um_rank_cntr = 1'b1;
+	end else begin
+          user_fsm_nxt = UM_IDLE;
+          um_ref_ack_nxt = 1'b1;
+        end
         clear_um_ref_req = 1'b1;
       end else if ( ~( | um_wait_cntr ) & zq_req_ff & ~ALL_RANKS ) begin
         user_fsm_nxt = UM_ZQ;
@@ -840,10 +869,39 @@ always @(*) begin
       user_fsm_nxt       = UM_TZQCS_WAIT;
     end
     UM_TZQCS_WAIT: begin
-      if ( ~ ( | um_wait_cntr ) ) begin
-        user_fsm_nxt = UM_IDLE;
+      if ( ~( |um_wait_cntr ) ) begin
+	if (sre_sm_ps == SRE_SM_ISS) begin
+          user_fsm_nxt = UM_SRE_WAIT;
+          init_um_rank_cntr = 1'b1;
+	end else begin
+          user_fsm_nxt = UM_IDLE;
+          um_zq_ack_nxt = 1'b1;
+        end
         clear_um_ref_req = 1'b1;
-        um_zq_ack_nxt = 1'b1;
+      end
+    end
+    UM_SRE_WAIT: begin
+      user_fsm_nxt     = UM_SRE;
+      um_sreIss_nxt    = 1;
+      um_sreCkeDis_nxt = um_sreCkeDis;
+    end
+    UM_SRE: begin
+      if ((RANK_SLOT == 4) && (REG_CTRL == "ON")) begin
+        um_sreCkeDis_nxt = um_sreCkeDis | (1'b1 << um_rank_cntr) | (1'b1 << (um_rank_cntr+2'b10));
+        user_fsm_nxt     = & (um_sreCkeDis | (1'b1 << um_rank_cntr) | (1'b1 << (um_rank_cntr+2'b10))) ? UM_SR : UM_SRE_WAIT;
+      end else begin
+        um_sreCkeDis_nxt = um_sreCkeDis | (1'b1 << um_rank_cntr);
+        user_fsm_nxt     = & (um_sreCkeDis | (1'b1 << um_rank_cntr) ) ? UM_SR : UM_SRE_WAIT;
+      end
+      inc_um_rank_cntr   = 1'b1;
+    end
+    UM_SR: begin
+      if (calDone) begin
+        user_fsm_nxt     = (srx_req | srx_cke0_release) ? UM_IDLE : UM_SR;
+        um_sreCkeDis_nxt = (srx_req | srx_cke0_release) ? {RANKS{1'b0}} : um_sreCkeDis;
+      end else begin
+        user_fsm_nxt     = UM_IDLE;
+        um_sreCkeDis_nxt = {RANKS{1'b0}};
       end
     end
     default: begin
@@ -890,6 +948,8 @@ always @(posedge clk) begin
     um_zq_iss_all <= #TCQ um_zq_iss_all_nxt;
     um_ref_ack <= #TCQ um_ref_ack_nxt;
     um_zq_ack <= #TCQ um_zq_ack_nxt;
+    um_sreIss <= #TCQ um_sreIss_nxt;
+    um_sreCkeDis <= #TCQ um_sreCkeDis_nxt;
 end
 
 //synopsys translate_off

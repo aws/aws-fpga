@@ -1,54 +1,53 @@
 
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
-//
-// This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
-//
-// DISCLAIMER
-// This disclaimer is not a license and does not grant any
-// rights to the materials distributed herewith. Except as
-// otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
-// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
-// including negligence, or under any other theory of
-// liability) for any loss or damage of any kind or nature
-// related to, arising under or in connection with these
-// materials, including for any direct, or any indirect,
-// special, incidental, or consequential loss or damage
-// (including loss of data, profits, goodwill, or any type of
-// loss or damage suffered as a result of any action brought
-// by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
-// possibility of the same.
-//
-// CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
-// safe, or for use in any application requiring fail-safe
-// performance, such as life-support or safety devices or
-// systems, Class III medical devices, nuclear facilities,
-// applications related to the deployment of airbags, or any
-// other applications that could lead to death, personal
-// injury, or severe property or environmental damage
-// (individually and collectively, "Critical
-// Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
-// Applications, subject only to applicable laws and
-// regulations governing limitations on product liability.
-//
-// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// PART OF THIS FILE AT ALL TIMES.
+# (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
+#
+# This file contains confidential and proprietary information
+# of AMD and is protected under U.S. and international copyright
+# and other intellectual property laws.
+#
+# DISCLAIMER
+# This disclaimer is not a license and does not grant any
+# rights to the materials distributed herewith. Except as
+# otherwise provided in a valid license issued to you by
+# AMD, and to the maximum extent permitted by applicable
+# law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+# WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+# AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+# BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+# INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+# (2) AMD shall not be liable (whether in contract or tort,
+# including negligence, or under any other theory of
+# liability) for any loss or damage of any kind or nature
+# related to, arising under or in connection with these
+# materials, including for any direct, or any indirect,
+# special, incidental, or consequential loss or damage
+# (including loss of data, profits, goodwill, or any type of
+# loss or damage suffered as a result of any action brought
+# by a third party) even if such damage or loss was
+# reasonably foreseeable or AMD had been advised of the
+# possibility of the same.
+#
+# CRITICAL APPLICATIONS
+# AMD products are not designed or intended to be fail-
+# safe, or for use in any application requiring fail-safe
+# performance, such as life-support or safety devices or
+# systems, Class III medical devices, nuclear facilities,
+# applications related to the deployment of airbags, or any
+# other applications that could lead to death, personal
+# injury, or severe property or environmental damage
+# (individually and collectively, "Critical
+# Applications"). Customer assumes the sole risk and
+# liability of any use of AMD products in Critical
+# Applications, subject only to applicable laws and
+# regulations governing limitations on product liability.
+#
+# THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+# PART OF THIS FILE AT ALL TIMES.
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.0
 //  \   \         Application        : MIG
 //  /   /         Filename           : ddr4_cal_riu.sv
@@ -79,6 +78,10 @@
     `ifndef CALIB_SIM
        `define SIMULATION
      `endif
+`elsif _VCP
+    `ifndef CALIB_SIM
+       `define SIMULATION
+     `endif
 `endif
 `timescale 1ps/1ps
 
@@ -92,6 +95,7 @@ module  ddr4_core_ddr4_cal_riu #
    ,input                          riu_clk_rst
 
    ,input   [15:0] riu2clb_vld_read_data
+   ,input sample_gts
    ,input   [7:0] riu_nibble_8
    ,input [5:0]                    riu_addr_cal
 
@@ -267,6 +271,21 @@ always @(posedge riu_clk) begin
      any_clb2riu_wr_wait <= 0;
 end
 
+  reg sample_gts_riu;
+  reg sample_gts_flag;
+  always @ (posedge riu_clk) begin
+      sample_gts_riu <= sample_gts;
+  end
+
+   always @ (posedge riu_clk) begin
+      if (reset_ub_riuclk) begin
+        sample_gts_flag <= 1'b0;
+      end else if(riu_rd_val_r2 & (riu_addr_cal[5:0] == 0)) begin
+        sample_gts_flag <= 1'b1;
+      end else if(sample_gts_riu) begin
+        sample_gts_flag <= 1'b0;
+      end
+    end
 
   always @ (posedge riu_clk) begin
     if (ub_rst_adr_hit) // Microblaze reset access
@@ -274,7 +293,7 @@ end
     else if (riu_access && any_clb2riu_wr_wait) // RIU Write
       io_ready_ub <= #TCQ &riu2clb_valid_riuclk;
     else if (riu_access) // RIU Read
-      io_ready_ub <= #TCQ riu_rd_val_r2;
+      io_ready_ub <= #TCQ (riu_addr_cal[5:0] == 0) ? (sample_gts_flag & sample_gts_riu) : riu_rd_val_r2;
     else
       io_ready_ub <= #TCQ io_ready_riuclk;
   end

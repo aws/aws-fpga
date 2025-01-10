@@ -35,8 +35,8 @@ if {[llength [glob -nocomplain -dir $TARGET_DIR *]] != 0} {
 file copy -force $CL_DIR/design/cl_uram_example_defines.vh             $TARGET_DIR
 file copy -force $CL_DIR/design/ctrl_uram.vhd                         $TARGET_DIR
 file copy -force $CL_DIR/design/cl_id_defines.vh                      $TARGET_DIR
-file copy -force $CL_DIR/design/cl_uram_example.sv                     $TARGET_DIR 
-file copy -force $CL_DIR/../common/design/cl_common_defines.vh        $TARGET_DIR 
+file copy -force $CL_DIR/design/cl_uram_example.sv                     $TARGET_DIR
+file copy -force $CL_DIR/../common/design/cl_common_defines.vh        $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_apppf_irq_template.inc  $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_cl_sda_template.inc     $TARGET_DIR
 file copy -force $UNUSED_TEMPLATES_DIR/unused_ddr_a_b_d_template.inc  $TARGET_DIR
@@ -57,7 +57,7 @@ puts "AWS FPGA: VIVADO_TOOL_VERSION $TOOL_VERSION"
 puts "vivado_version $vivado_version"
 
 # encrypt .v/.sv/.vh/inc as verilog files
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile_2017_4.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_keyfile_2024_1.txt -lang verilog  [glob -nocomplain -- $TARGET_DIR/*.{v,sv}] [glob -nocomplain -- $TARGET_DIR/*.vh] [glob -nocomplain -- $TARGET_DIR/*.inc]
 
 # encrypt *vhdl files
-encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile_2017_4.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]
+encrypt -k $HDK_SHELL_DIR/build/scripts/vivado_vhdl_keyfile_2024_1.txt -lang vhdl -quiet [ glob -nocomplain -- $TARGET_DIR/*.vhd? ]

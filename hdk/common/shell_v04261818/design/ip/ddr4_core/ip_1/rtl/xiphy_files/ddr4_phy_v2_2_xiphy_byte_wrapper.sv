@@ -1,22 +1,20 @@
-//*****************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2013-2014, 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,20 +36,21 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 //
 //*****************************************************************************
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_phy_v2_2_0_xiphy_byte_wrapper.sv
+//  /   /         Filename           : ddr4_phy_v2_2_4_xiphy_byte_wrapper.sv
 // /___/   /\     Date Last Modified : $Date: 2015/04/23 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -59,14 +58,14 @@
 // Device           : UltraScale
 // Design Name      : DDR3 SDRAM & DDR4 SDRAM
 // Purpose          :
-//                   ddr4_phy_v2_2_0_xiphy_byte_wrapper top level module
+//                   ddr4_phy_v2_2_4_xiphy_byte_wrapper top level module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ps/1ps
 
-module ddr4_phy_v2_2_0_xiphy_byte_wrapper #(
+module ddr4_phy_v2_2_4_xiphy_byte_wrapper #(
 
   //COMMON
   parameter          ENABLE_PRE_EMPHASIS = "FALSE",                                                        // Pre-emphasis output
@@ -717,7 +716,7 @@ localparam [25:0] RDATA_TYPE = {1'b0, RX_DATA_TYPE[14], 1'b0, RX_DATA_TYPE[13], 
 //OR Gate For RIU Data and Control Outputs
 //*****************************************
 
- ddr4_phy_v2_2_0_xiphy_riuor_wrapper #(
+ ddr4_phy_v2_2_4_xiphy_riuor_wrapper #(
    .SIM_DEVICE  (SIM_DEVICE)
  ) u_xiphy_riuor (
 `ifndef SYN
@@ -746,7 +745,7 @@ generate for (i_low=0; i_low<=5; i_low=i_low+1)
 
    if (RXTX_BITSLICE_EN[i_low]) begin: GEN_RXTX_BITSLICE_EN
 
-   ddr4_phy_v2_2_0_xiphy_bitslice_wrapper #(
+   ddr4_phy_v2_2_4_xiphy_bitslice_wrapper #(
       .FIFO_SYNC_MODE       ((FIFO_SYNC_MODE[i_low] == 1'b1) ? "TRUE" : "FALSE"),
       .ENABLE_PRE_EMPHASIS  (ENABLE_PRE_EMPHASIS),
       .RX_DATA_WIDTH	    (DATA_WIDTH),
@@ -828,7 +827,7 @@ generate for (i_upp=0; i_upp<=6; i_upp=i_upp+1)
 
    if (RXTX_BITSLICE_EN[6+i_upp]) begin : GEN_RXTX_BITSLICE_EN
 
-   ddr4_phy_v2_2_0_xiphy_bitslice_wrapper #(
+   ddr4_phy_v2_2_4_xiphy_bitslice_wrapper #(
       .FIFO_SYNC_MODE     ((FIFO_SYNC_MODE[6+i_upp] == 1'b1) ? "TRUE" : "FALSE"),
       .ENABLE_PRE_EMPHASIS (ENABLE_PRE_EMPHASIS),
       .RX_DATA_WIDTH	  (DATA_WIDTH),
@@ -909,7 +908,7 @@ generate for (i_tri=0; i_tri<=1; i_tri=i_tri+1) begin: I_TRISTATE
 
  if (|RXTX_BITSLICE_EN[((i_tri+1)*6-1+i_tri):i_tri*6]) begin: GEN_TRISTATE
 
-   ddr4_phy_v2_2_0_xiphy_tristate_wrapper #(
+   ddr4_phy_v2_2_4_xiphy_tristate_wrapper #(
        .DATA_WIDTH            (DATA_WIDTH),
        .INIT                  (INIT[13+i_tri]),
        .DELAY_TYPE            (DELAY_TYPE),
@@ -976,7 +975,7 @@ genvar i_ctrl;
 generate for (i_ctrl=0; i_ctrl<=1; i_ctrl=i_ctrl+1) begin: I_CONTROL
 
  if (|RXTX_BITSLICE_EN[((i_ctrl+1)*6-1+i_ctrl):i_ctrl*6]) begin: GEN_I_CONTROL
-   ddr4_phy_v2_2_0_xiphy_control_wrapper #(
+   ddr4_phy_v2_2_4_xiphy_control_wrapper #(
        .EN_OTHER_PCLK	       ((EN_OTHER_PCLK[i_ctrl] == 1'b1) ? "TRUE" : "FALSE"),
        .EN_OTHER_NCLK	       ((EN_OTHER_NCLK[i_ctrl] == 1'b1) ? "TRUE" : "FALSE"),
        .EN_DYN_ODLY_MODE       ((EN_DYN_ODLY_MODE[i_ctrl] == 1'b1) ? "TRUE" : "FALSE"),

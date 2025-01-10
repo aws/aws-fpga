@@ -31,8 +31,17 @@
           </spirit:vendorExtensions>
         </spirit:parameter>
         <spirit:parameter>
+          <spirit:name>FREQ_TOLERANCE_HZ</spirit:name>
+          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.FREQ_TOLERANCE_HZ">0</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
           <spirit:name>PHASE</spirit:name>
-          <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.PHASE">0.000</spirit:value>
+          <spirit:value spirit:format="float" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.PHASE">0.0</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -41,7 +50,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>CLK_DOMAIN</spirit:name>
-          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.CLK_DOMAIN"/>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.CLK_DOMAIN">bd_a493_clk</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -58,11 +67,29 @@
           </spirit:vendorExtensions>
         </spirit:parameter>
         <spirit:parameter>
+          <spirit:name>ASSOCIATED_PORT</spirit:name>
+          <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.ASSOCIATED_PORT"/>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
           <spirit:name>ASSOCIATED_RESET</spirit:name>
           <spirit:value spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.ASSOCIATED_RESET"/>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
+            </xilinx:parameterInfo>
+          </spirit:vendorExtensions>
+        </spirit:parameter>
+        <spirit:parameter>
+          <spirit:name>INSERT_VIP</spirit:name>
+          <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="BUSIFPARAM_VALUE.SIGNAL_CLOCK.INSERT_VIP">0</spirit:value>
+          <spirit:vendorExtensions>
+            <xilinx:parameterInfo>
+              <xilinx:parameterUsage>simulation.rtl</xilinx:parameterUsage>
             </xilinx:parameterInfo>
           </spirit:vendorExtensions>
         </spirit:parameter>
@@ -2074,7 +2101,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_0</spirit:name>
@@ -2185,7 +2212,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_1</spirit:name>
@@ -2296,7 +2323,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_2</spirit:name>
@@ -2407,7 +2434,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_3</spirit:name>
@@ -2518,7 +2545,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_4</spirit:name>
@@ -2629,7 +2656,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_5</spirit:name>
@@ -2740,7 +2767,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_6</spirit:name>
@@ -2851,7 +2878,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_7</spirit:name>
@@ -2962,7 +2989,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_8</spirit:name>
@@ -3073,7 +3100,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_9</spirit:name>
@@ -3184,7 +3211,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_10</spirit:name>
@@ -3295,7 +3322,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_11</spirit:name>
@@ -3406,7 +3433,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_12</spirit:name>
@@ -3517,7 +3544,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_13</spirit:name>
@@ -3628,7 +3655,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_14</spirit:name>
@@ -3739,7 +3766,7 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>BSCANID_en</spirit:name>
+            <spirit:name>BSCANID_EN</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>bscanid_en_15</spirit:name>
@@ -3846,10 +3873,62 @@
   <spirit:model>
     <spirit:views>
       <spirit:view>
+        <spirit:name>xilinx_synthesisconstraints</spirit:name>
+        <spirit:displayName>Synthesis Constraints</spirit:displayName>
+        <spirit:envIdentifier>:vivado.xilinx.com:synthesis.constraints</spirit:envIdentifier>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>outputProductCRC</spirit:name>
+            <spirit:value>9:5b51e686</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_verilogbehavioralsimulation</spirit:name>
+        <spirit:displayName>Verilog Simulation</spirit:displayName>
+        <spirit:envIdentifier>verilogSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
+        <spirit:language>verilog</spirit:language>
+        <spirit:modelName>xsdbm_v3_0_2_xsdbm</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_verilogbehavioralsimulation_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Fri Jul 26 18:10:11 UTC 2024</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
+            <spirit:name>outputProductCRC</spirit:name>
+            <spirit:value>9:f378765f</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
+        <spirit:name>xilinx_verilogsimulationwrapper</spirit:name>
+        <spirit:displayName>Verilog Simulation Wrapper</spirit:displayName>
+        <spirit:envIdentifier>verilogSource:vivado.xilinx.com:simulation.wrapper</spirit:envIdentifier>
+        <spirit:language>verilog</spirit:language>
+        <spirit:modelName>bd_a493_xsdbm_0</spirit:modelName>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_verilogsimulationwrapper_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
+        <spirit:parameters>
+          <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Fri Jul 26 18:10:11 UTC 2024</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
+            <spirit:name>outputProductCRC</spirit:name>
+            <spirit:value>9:f378765f</spirit:value>
+          </spirit:parameter>
+        </spirit:parameters>
+      </spirit:view>
+      <spirit:view>
         <spirit:name>xilinx_verilogsynthesis</spirit:name>
         <spirit:displayName>Verilog Synthesis</spirit:displayName>
         <spirit:envIdentifier>verilogSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>verilog</spirit:language>
+        <spirit:modelName>xsdbm_v3_0_2_xsdbm</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_verilogsynthesis_xilinx_com_ip_blk_mem_gen_8_3__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -3865,11 +3944,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:33 UTC 2018</spirit:value>
+            <spirit:value>Fri Jul 26 18:10:11 UTC 2024</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:bfcbeac5</spirit:value>
+            <spirit:value>9:5b51e686</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3878,55 +3957,18 @@
         <spirit:displayName>Verilog Synthesis Wrapper</spirit:displayName>
         <spirit:envIdentifier>verilogSource:vivado.xilinx.com:synthesis.wrapper</spirit:envIdentifier>
         <spirit:language>verilog</spirit:language>
+        <spirit:modelName>bd_a493_xsdbm_0</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_verilogsynthesiswrapper_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:33 UTC 2018</spirit:value>
+            <spirit:value>Fri Jul 26 18:10:11 UTC 2024</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:bfcbeac5</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_verilogbehavioralsimulation</spirit:name>
-        <spirit:displayName>Verilog Simulation</spirit:displayName>
-        <spirit:envIdentifier>verilogSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
-        <spirit:language>verilog</spirit:language>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_verilogbehavioralsimulation_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:33 UTC 2018</spirit:value>
-          </spirit:parameter>
-          <spirit:parameter>
-            <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:4dacca24</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_verilogsimulationwrapper</spirit:name>
-        <spirit:displayName>Verilog Simulation Wrapper</spirit:displayName>
-        <spirit:envIdentifier>verilogSource:vivado.xilinx.com:simulation.wrapper</spirit:envIdentifier>
-        <spirit:language>verilog</spirit:language>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_verilogsimulationwrapper_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Feb 21 19:24:34 UTC 2018</spirit:value>
-          </spirit:parameter>
-          <spirit:parameter>
-            <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>7:4dacca24</spirit:value>
+            <spirit:value>9:5b51e686</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -21780,15 +21822,167 @@
   </spirit:model>
   <spirit:fileSets>
     <spirit:fileSet>
+      <spirit:name>xilinx_verilogbehavioralsimulation_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_i2x.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_in.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_icn.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_ext.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core_ext.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_ports.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bsid_ports.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bsid_vec_ports.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_vec.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core_vec.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_sl_prt_map.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_id_map.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_id_vec_map.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/xsdbm_v3_0_vl_rfs.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>constraints/xsdbm_cc_early.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>early</spirit:value>
+        </spirit:define>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>constraints/xsdbm_cc_late.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>late</spirit:value>
+        </spirit:define>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>constraints/xsdbm_gc_late.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>late</spirit:value>
+        </spirit:define>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
+      <spirit:name>xilinx_verilogsimulationwrapper_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>sim/bd_a493_xsdbm_0.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
+    </spirit:fileSet>
+    <spirit:fileSet>
       <spirit:name>xilinx_verilogsynthesis_xilinx_com_ip_blk_mem_gen_8_3__ref_view_fileset</spirit:name>
       <spirit:file>
         <spirit:name>hdl/blk_mem_gen_v8_3_vhsyn_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>blk_mem_gen_v8_3_6</spirit:logicalName>
+        <spirit:logicalName>blk_mem_gen_v8_3_7</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="blk_mem_gen" xilinx:version="8.3" xilinx:isGenerated="true" xilinx:checksum="bac26536">
+          <xilinx:componentRef xsi:type="xilinx:componentRefType" xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="blk_mem_gen" xilinx:version="8.3" xilinx:isGenerated="true" xilinx:checksum="91b98859">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -21799,11 +21993,11 @@
       <spirit:file>
         <spirit:name>hdl/fifo_generator_v13_1_vhsyn_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>fifo_generator_v13_1_4</spirit:logicalName>
+        <spirit:logicalName>fifo_generator_v13_1_5</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="fifo_generator" xilinx:version="13.1" xilinx:isGenerated="true" xilinx:checksum="87023ed4">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="fifo_generator" xilinx:version="13.1" xilinx:isGenerated="true" xilinx:checksum="b3aa68ac">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -21812,25 +22006,25 @@
     <spirit:fileSet>
       <spirit:name>xilinx_verilogsynthesis_xilinx_com_ip_ltlib_1_0__ref_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>hdl/verilog/ltlib_v1_0_0_ver.vh</spirit:name>
+        <spirit:name>hdl/verilog/ltlib_v1_0_2_ver.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>ltlib_v1_0_0</spirit:logicalName>
+        <spirit:logicalName>ltlib_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/ltlib_v1_0_0_lib_fn.vh</spirit:name>
+        <spirit:name>hdl/verilog/ltlib_v1_0_2_lib_fn.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>ltlib_v1_0_0</spirit:logicalName>
+        <spirit:logicalName>ltlib_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/ltlib_v1_0_vl_rfs.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:logicalName>ltlib_v1_0_0</spirit:logicalName>
+        <spirit:logicalName>ltlib_v1_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="ltlib" xilinx:version="1.0" xilinx:isGenerated="true" xilinx:checksum="3e53df98">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="ltlib" xilinx:version="1.0" xilinx:isGenerated="true" xilinx:checksum="3f46f371">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -21839,94 +22033,129 @@
     <spirit:fileSet>
       <spirit:name>xilinx_verilogsynthesis_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_i2x.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_i2x.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_in.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_in.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_icn.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_icn.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_core.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_ext.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_ports.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bsid_ports.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core_ext.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bsid_vec_ports.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_vec.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bsid_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_core_vec.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bsid_vec_ports.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_sl_prt_map.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_vec.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_id_map.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_bs_core_vec.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_id_vec_map.vh</spirit:name>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_sl_prt_map.vh</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_id_map.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/xsdbm_v3_0_2_id_vec_map.vh</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:isIncludeFile>true</spirit:isIncludeFile>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/xsdbm_v3_0_vl_rfs.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
+        <spirit:logicalName>xsdbm_v3_0_2</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>constraints/xsdbm.xdc</spirit:name>
+        <spirit:name>constraints/xsdbm_cc_early.xdc</spirit:name>
         <spirit:userFileType>xdc</spirit:userFileType>
         <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
-        <spirit:userFileType>USED_IN_out_of_context</spirit:userFileType>
         <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>early</spirit:value>
+        </spirit:define>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>constraints/xsdbm_cc_late.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>late</spirit:value>
+        </spirit:define>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>constraints/xsdbm_gc_late.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
+        <spirit:define>
+          <spirit:name>processing_order</spirit:name>
+          <spirit:value>late</spirit:value>
+        </spirit:define>
       </spirit:file>
       <spirit:file>
         <spirit:name>bd_a493_xsdbm_0_ooc.xdc</spirit:name>
@@ -21944,262 +22173,147 @@
         <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
-    <spirit:fileSet>
-      <spirit:name>xilinx_verilogbehavioralsimulation_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_i2x.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_in.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_icn.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_core.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_ports.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bsid_ports.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bsid_vec_ports.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_vec.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_bs_core_vec.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_sl_prt_map.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_id_map.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/verilog/xsdbm_v3_0_0_id_vec_map.vh</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:isIncludeFile>true</spirit:isIncludeFile>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>hdl/xsdbm_v3_0_vl_rfs.v</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>xsdbm_v3_0_0</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>constraints/xsdbm.xdc</spirit:name>
-        <spirit:userFileType>xdc</spirit:userFileType>
-        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
-        <spirit:userFileType>USED_IN_out_of_context</spirit:userFileType>
-        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
-      </spirit:file>
-    </spirit:fileSet>
-    <spirit:fileSet>
-      <spirit:name>xilinx_verilogsimulationwrapper_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>sim/bd_a493_xsdbm_0.v</spirit:name>
-        <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
-      </spirit:file>
-    </spirit:fileSet>
   </spirit:fileSets>
   <spirit:description>Xilinx System Debug Bus (XSDB) core is a customizable system debug bus core that can be used to establish a bridge between all debug IP cores and host machine for runtime interaction. XSDB core include features like External Bscan, Soft Bscan and 256 XSDB compliant slave instances. As XSDB core is a bridge between host machine and debug IP cores, it has to be active on configuration, so the clock connected to this IP should be a free running.</spirit:description>
   <spirit:parameters>
     <spirit:parameter>
       <spirit:name>C_EN_BSCANID_VEC</spirit:name>
       <spirit:displayName>C En BSCANID VEC</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EN_BSCANID_VEC" spirit:order="400">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EN_BSCANID_VEC" spirit:order="2">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_TWO_PRIM_MODE</spirit:name>
       <spirit:displayName>C Two Prim Mode</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_TWO_PRIM_MODE" spirit:order="500">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_TWO_PRIM_MODE" spirit:order="3">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_BSCAN_MODE_WITH_CORE</spirit:name>
       <spirit:displayName>C BSCAN Mode With Core</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCAN_MODE_WITH_CORE" spirit:order="600">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCAN_MODE_WITH_CORE" spirit:order="4">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_NUM_BSCAN_MASTER_PORTS</spirit:name>
       <spirit:displayName>C Num BSCAN Master Ports</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_NUM_BSCAN_MASTER_PORTS" spirit:order="700" spirit:minimum="0" spirit:maximum="256" spirit:rangeType="long">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_NUM_BSCAN_MASTER_PORTS" spirit:order="5" spirit:minimum="0" spirit:maximum="256" spirit:rangeType="long">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_BSCANID</spirit:name>
       <spirit:displayName>C Bscanid</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCANID" spirit:order="800" spirit:configGroups="0 UnGrouped spinBox">76546592</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCANID" spirit:order="6" spirit:configGroups="0 UnGrouped spinBox">76546592</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_BSCAN_MODE</spirit:name>
       <spirit:displayName>C Bscan Mode</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCAN_MODE" spirit:order="900">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BSCAN_MODE" spirit:order="7">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_USE_EXT_BSCAN</spirit:name>
       <spirit:displayName>C Use Ext Bscan</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_EXT_BSCAN" spirit:order="1000">true</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_EXT_BSCAN" spirit:order="8">true</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_USE_STARTUP_CLK</spirit:name>
       <spirit:displayName>C Use Startup Clk</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_STARTUP_CLK" spirit:order="1100">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_STARTUP_CLK" spirit:order="9">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_ENABLE_CLK_DIVIDER</spirit:name>
       <spirit:displayName>C Enable Clk Divider</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_ENABLE_CLK_DIVIDER" spirit:order="1200">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_ENABLE_CLK_DIVIDER" spirit:order="10">false</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_USER_SCAN_CHAIN1</spirit:name>
       <spirit:displayName>C User Scan Chain1</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USER_SCAN_CHAIN1" spirit:order="100">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USER_SCAN_CHAIN1" spirit:order="11">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_USER_SCAN_CHAIN</spirit:name>
       <spirit:displayName>C User Scan Chain</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USER_SCAN_CHAIN" spirit:order="1400">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USER_SCAN_CHAIN" spirit:order="12">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CORE_TYPE</spirit:name>
       <spirit:displayName>C Core Type</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_TYPE" spirit:order="1500">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_TYPE" spirit:order="13">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_EN_INT_SIM</spirit:name>
       <spirit:displayName>C En Int Sim</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EN_INT_SIM" spirit:order="1600">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_EN_INT_SIM" spirit:order="14">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_DCLK_HAS_RESET</spirit:name>
       <spirit:displayName>C Dclk Has Reset</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_DCLK_HAS_RESET" spirit:order="1700">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_DCLK_HAS_RESET" spirit:order="15">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_USE_BUFR</spirit:name>
       <spirit:displayName>C Use Bufr</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_BUFR" spirit:order="1800">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_BUFR" spirit:order="16">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_XSDB_PERIOD_FRC</spirit:name>
       <spirit:displayName>C Xsdb Period Frc</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_PERIOD_FRC" spirit:order="1900">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_PERIOD_FRC" spirit:order="17">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_XSDB_PERIOD_INT</spirit:name>
       <spirit:displayName>C Xsdb Period Int</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_PERIOD_INT" spirit:order="2000">10</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_PERIOD_INT" spirit:order="18">10</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_XSDB_NUM_SLAVES</spirit:name>
       <spirit:displayName>C Xsdb Num Slaves</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_NUM_SLAVES" spirit:order="2100" spirit:minimum="0" spirit:maximum="256" spirit:rangeType="long">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_XSDB_NUM_SLAVES" spirit:order="19" spirit:minimum="0" spirit:maximum="256" spirit:rangeType="long">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CORE_MINOR_ALPHA_VER</spirit:name>
       <spirit:displayName>C Core Minor Alpha Ver</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MINOR_ALPHA_VER" spirit:order="2200">97</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MINOR_ALPHA_VER" spirit:order="20">97</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CORE_MINOR_VER</spirit:name>
       <spirit:displayName>C Core Minor Ver</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MINOR_VER" spirit:order="2300">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MINOR_VER" spirit:order="21">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CORE_MAJOR_VER</spirit:name>
       <spirit:displayName>C Core Major Ver</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MAJOR_VER" spirit:order="2400">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CORE_MAJOR_VER" spirit:order="22">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_BUILD_REVISION</spirit:name>
       <spirit:displayName>C Build Revision</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BUILD_REVISION" spirit:order="2500">0</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BUILD_REVISION" spirit:order="23">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_MINOR_VERSION</spirit:name>
       <spirit:displayName>C Minor Version</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_MINOR_VERSION" spirit:order="2600">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_MINOR_VERSION" spirit:order="24">1</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_MAJOR_VERSION</spirit:name>
       <spirit:displayName>C Major Version</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_MAJOR_VERSION" spirit:order="2700">14</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_MAJOR_VERSION" spirit:order="25">14</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_FIFO_STYLE</spirit:name>
       <spirit:displayName>C Fifo Style</spirit:displayName>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FIFO_STYLE" spirit:order="2800">SUBCORE</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FIFO_STYLE" spirit:order="26">SUBCORE</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">bd_a493_xsdbm_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="27">bd_a493_xsdbm_0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CLK_INPUT_FREQ_HZ</spirit:name>
       <spirit:displayName>C Clk Input Freq Hz</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLK_INPUT_FREQ_HZ" spirit:order="1100" spirit:configGroups="0 UnGrouped spinBox" spirit:minimum="25000000" spirit:maximum="650000000" spirit:rangeType="long">300000000</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLK_INPUT_FREQ_HZ" spirit:order="28" spirit:configGroups="0 UnGrouped spinBox" spirit:minimum="25000000" spirit:maximum="650000000" spirit:rangeType="long">300000000</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_CLKOUT0_DIVIDE_F</spirit:name>
       <spirit:displayName>C Clkout0 Divide F</spirit:displayName>
-      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLKOUT0_DIVIDE_F" spirit:order="1100">12.000</spirit:value>
+      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLKOUT0_DIVIDE_F" spirit:order="29">12.000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -22211,7 +22325,7 @@
     <spirit:parameter>
       <spirit:name>C_DIVCLK_DIVIDE</spirit:name>
       <spirit:displayName>C Divclk Divide</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_DIVCLK_DIVIDE" spirit:order="1200">1</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_DIVCLK_DIVIDE" spirit:order="30">1</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -22223,7 +22337,7 @@
     <spirit:parameter>
       <spirit:name>C_CLKFBOUT_MULT_F</spirit:name>
       <spirit:displayName>C Clkfbout Mult F</spirit:displayName>
-      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLKFBOUT_MULT_F" spirit:order="1300">4.000</spirit:value>
+      <spirit:value spirit:format="float" spirit:resolve="user" spirit:id="PARAM_VALUE.C_CLKFBOUT_MULT_F" spirit:order="31">4.000</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -22240,8 +22354,15 @@
         <xilinx:xpmLibrary>XPM_MEMORY</xilinx:xpmLibrary>
         <xilinx:xpmLibrary>XPM_CDC</xilinx:xpmLibrary>
       </xilinx:xpmLibraries>
-      <xilinx:coreRevision>0</xilinx:coreRevision>
+      <xilinx:coreRevision>2</xilinx:coreRevision>
       <xilinx:configElementInfos>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.ASSOCIATED_BUSIF" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.ASSOCIATED_PORT" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.ASSOCIATED_RESET" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.CLK_DOMAIN" xilinx:valueSource="constant_prop" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.FREQ_HZ" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.FREQ_TOLERANCE_HZ" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.PHASE" xilinx:valuePermission="bd_and_user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_BUILD_REVISION" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_CLK_INPUT_FREQ_HZ" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_CORE_MAJOR_VER" xilinx:valueSource="user"/>
@@ -22264,12 +22385,12 @@
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="b56320dc"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="3d882629"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="c141bc3b"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="cdc8e04b"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="5a3c6862"/>
+      <xilinx:xilinxVersion>2024.1</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="afead7af"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="3194cb53"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="843e7f00"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="84caa65d"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="1903b31b"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

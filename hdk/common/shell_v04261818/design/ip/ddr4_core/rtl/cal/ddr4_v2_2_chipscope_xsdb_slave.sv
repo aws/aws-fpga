@@ -1,10 +1,9 @@
 /*----------------------------------------------------------------------------
- * Copyright (c) 2008 Xilinx, Inc.
- * This design is confidential and proprietary of Xilinx, All Rights Reserved.
+ * (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
  *-----------------------------------------------------------------------------
  *   ____  ____
  *  /   /\/   /
- * /___/  \  /   Vendor: Xilinx
+ * /___/  \  /   Vendor: AMD
  * \   \   \/    Date Created: 2008/08/18
  *  \   \        
  *  /   /        
@@ -22,11 +21,11 @@
  *----------------------------------------------------------------------------*/
 `timescale 1ps / 1ps
 
-`include "ddr4_v2_2_3_cs_ver_inc.vh"
-`include "ddr4_v2_2_3_chipscope_icon2xsdb_mstrbr_ver_inc.vh"
+`include "ddr4_v2_2_23_cs_ver_inc.vh"
+`include "ddr4_v2_2_23_chipscope_icon2xsdb_mstrbr_ver_inc.vh"
 
 (* dont_touch = "true" *)
-module ddr4_v2_2_3_chipscope_xsdb_slave
+module ddr4_v2_2_23_chipscope_xsdb_slave
   #(
     parameter C_XDEVICEFAMILY        = `FAMILY_KINTEXU,
     parameter [15:0]                        C_MAJOR_VERSION        = 11,  // ise major version
@@ -83,6 +82,7 @@ module ddr4_v2_2_3_chipscope_xsdb_slave
   reg [`GC_XSDB_S_DATA_WIDTH-1:0] reg_test = 'h0;
   reg [`GC_XSDB_S_DATA_WIDTH-1:0] reg_do   = 'h0;
   reg reg_drdy  = 1'b0;
+  (* UUID *)(* DONT_TOUCH = "TRUE" *)reg [(8*`GC_XSDB_S_DATA_WIDTH)-1:0]uuid_stamp;
   wire status_addr_range;
 
   wire rst   ;
@@ -101,6 +101,11 @@ module ddr4_v2_2_3_chipscope_xsdb_slave
   assign dwe    = sl_iport_i[`GC_IPORT_DWE_IDX];
   assign daddr  = sl_iport_i[`GC_IPORT_DADDR_IDX+`GC_XSDB_S_ADDR_WIDTH-1:`GC_IPORT_DADDR_IDX];
   assign di     = sl_iport_i[`GC_IPORT_DI_IDX+`GC_XSDB_S_DATA_WIDTH-1:`GC_IPORT_DI_IDX];
+
+  always @ (posedge dclk)
+  begin
+    uuid_stamp <= uuid_stamp;
+  end
   
   // Compress internal signals to OPORT
   assign sl_oport_o = {do_i, drdy};
@@ -130,14 +135,14 @@ module ddr4_v2_2_3_chipscope_xsdb_slave
   always @(posedge dclk)
   begin
     case (daddr[7:0])
-      8'h00 : reg_do <= C_CORE_INFO1[0*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h01 : reg_do <= C_CORE_INFO1[1*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h02 : reg_do <= C_CORE_INFO1[2*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h03 : reg_do <= C_CORE_INFO1[3*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h04 : reg_do <= C_CORE_INFO1[4*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h05 : reg_do <= C_CORE_INFO1[5*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h06 : reg_do <= C_CORE_INFO1[6*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
-      8'h07 : reg_do <= C_CORE_INFO1[7*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h00 : reg_do <= uuid_stamp[0*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h01 : reg_do <= uuid_stamp[1*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h02 : reg_do <= uuid_stamp[2*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h03 : reg_do <= uuid_stamp[3*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h04 : reg_do <= uuid_stamp[4*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h05 : reg_do <= uuid_stamp[5*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h06 : reg_do <= uuid_stamp[6*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
+      8'h07 : reg_do <= uuid_stamp[7*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
       8'h08 : reg_do <= C_CORE_INFO2[0*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
       8'h09 : reg_do <= C_CORE_INFO2[1*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];
       8'h0A : reg_do <= C_CORE_INFO2[2*`GC_XSDB_S_DATA_WIDTH+:`GC_XSDB_S_DATA_WIDTH];

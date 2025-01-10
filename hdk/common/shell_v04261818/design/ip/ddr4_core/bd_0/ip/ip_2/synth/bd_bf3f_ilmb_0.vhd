@@ -1,21 +1,21 @@
--- (c) Copyright 1995-2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-- (c) Copyright 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 -- 
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -24,11 +24,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 -- 
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -37,7 +37,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 -- 
@@ -47,14 +47,14 @@
 -- DO NOT MODIFY THIS FILE.
 
 -- IP VLNV: xilinx.com:ip:lmb_v10:3.0
--- IP Revision: 9
+-- IP Revision: 14
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-LIBRARY lmb_v10_v3_0_9;
-USE lmb_v10_v3_0_9.lmb_v10;
+LIBRARY lmb_v10_v3_0_14;
+USE lmb_v10_v3_0_14.lmb_v10;
 
 ENTITY bd_bf3f_ilmb_0 IS
   PORT (
@@ -94,6 +94,7 @@ ARCHITECTURE bd_bf3f_ilmb_0_arch OF bd_bf3f_ilmb_0 IS
       C_LMB_NUM_SLAVES : INTEGER;
       C_LMB_DWIDTH : INTEGER;
       C_LMB_AWIDTH : INTEGER;
+      C_LMB_PROTOCOL : INTEGER;
       C_EXT_RESET_HIGH : INTEGER
     );
     PORT (
@@ -125,47 +126,48 @@ ARCHITECTURE bd_bf3f_ilmb_0_arch OF bd_bf3f_ilmb_0 IS
     );
   END COMPONENT lmb_v10;
   ATTRIBUTE X_CORE_INFO : STRING;
-  ATTRIBUTE X_CORE_INFO OF bd_bf3f_ilmb_0_arch: ARCHITECTURE IS "lmb_v10,Vivado 2017.4.op";
+  ATTRIBUTE X_CORE_INFO OF bd_bf3f_ilmb_0_arch: ARCHITECTURE IS "lmb_v10,Vivado 2024.1";
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF bd_bf3f_ilmb_0_arch : ARCHITECTURE IS "bd_bf3f_ilmb_0,lmb_v10,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF bd_bf3f_ilmb_0_arch: ARCHITECTURE IS "bd_bf3f_ilmb_0,lmb_v10,{x_ipProduct=Vivado 2017.4.op,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=lmb_v10,x_ipVersion=3.0,x_ipCoreRevision=9,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_LMB_NUM_SLAVES=2,C_LMB_DWIDTH=32,C_LMB_AWIDTH=32,C_EXT_RESET_HIGH=1}";
+  ATTRIBUTE CORE_GENERATION_INFO OF bd_bf3f_ilmb_0_arch: ARCHITECTURE IS "bd_bf3f_ilmb_0,lmb_v10,{x_ipProduct=Vivado 2024.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=lmb_v10,x_ipVersion=3.0,x_ipCoreRevision=14,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_LMB_NUM_SLAVES=2,C_LMB_DWIDTH=32,C_LMB_AWIDTH=32,C_LMB_PROTOCOL=0,C_EXT_RESET_HIGH=1}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 ABUS, xilinx.com:interface:lmb:1.0 LMB_Sl_1 ABUS";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 ADDRSTROBE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 ADDRSTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_BE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 BE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 BE";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_CE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M CE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Clk: SIGNAL IS "XIL_INTERFACENAME CLK.LMB_Clk, ASSOCIATED_BUSIF LMB_Sl_0:LMB_Sl_1:LMB_Sl_2:LMB_Sl_3:LMB_Sl_4:LMB_Sl_5:LMB_Sl_6:LMB_Sl_7:LMB_Sl_8:LMB_Sl_9:LMB_Sl_10:LMB_Sl_11:LMB_Sl_12:LMB_Sl_13:LMB_Sl_14:LMB_Sl_15:LMB_M, ASSOCIATED_RESET SYS_Rst, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN bd_bf3f_Clk, INSERT_VIP 0";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.LMB_Clk CLK";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadDBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M READDBUS";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READSTROBE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 READSTROBE";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M READY";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Rst: SIGNAL IS "XIL_INTERFACENAME LMB_Sl_0, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE, PROTOCOL STANDARD, XIL_INTERFACENAME LMB_Sl_1, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE, PROTOCOL STANDARD, XIL_INTERFACENAME LMB_M, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_ONLY, PROTOCOL STANDARD";
+  ATTRIBUTE X_INTERFACE_INFO OF LMB_Rst: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M RST, xilinx.com:interface:lmb:1.0 LMB_Sl_0 RST, xilinx.com:interface:lmb:1.0 LMB_Sl_1 RST";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_UE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M UE";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_Wait: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M WAIT";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M READY";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteDBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 WRITEDBUS, xilinx.com:interface:lmb:1.0 LMB_Sl_1 WRITEDBUS";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadDBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M READDBUS";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 ADDRSTROBE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 ADDRSTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF LMB_WriteStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 WRITESTROBE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 WRITESTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_ReadStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READSTROBE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 READSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 ABUS, xilinx.com:interface:lmb:1.0 LMB_Sl_1 ABUS";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_CE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 CE [0:0] [0:0], xilinx.com:interface:lmb:1.0 LMB_Sl_1 CE [0:0] [1:1]";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_UE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 UE [0:0] [0:0], xilinx.com:interface:lmb:1.0 LMB_Sl_1 UE [0:0] [1:1]";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_Wait: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 WAIT [0:0] [0:0], xilinx.com:interface:lmb:1.0 LMB_Sl_1 WAIT [0:0] [1:1]";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READY [0:0] [0:0], xilinx.com:interface:lmb:1.0 LMB_Sl_1 READY [0:0] [1:1]";
-  ATTRIBUTE X_INTERFACE_INFO OF Sl_DBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READDBUS [0:31] [0:31], xilinx.com:interface:lmb:1.0 LMB_Sl_1 READDBUS [0:31] [32:63]";
+  ATTRIBUTE X_INTERFACE_INFO OF M_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M ABUS";
+  ATTRIBUTE X_INTERFACE_INFO OF M_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M ADDRSTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF M_BE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M BE";
   ATTRIBUTE X_INTERFACE_INFO OF M_DBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M WRITEDBUS";
-  ATTRIBUTE X_INTERFACE_INFO OF M_AddrStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M ADDRSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF M_WriteStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M WRITESTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF M_ReadStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M READSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF M_ABus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M ABUS";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Rst: SIGNAL IS "XIL_INTERFACENAME LMB_Sl_0, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE, XIL_INTERFACENAME LMB_Sl_1, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE, XIL_INTERFACENAME LMB_M, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_ONLY";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_Rst: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 RST, xilinx.com:interface:lmb:1.0 LMB_Sl_1 RST, xilinx.com:interface:lmb:1.0 LMB_M RST";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF SYS_Rst: SIGNAL IS "XIL_INTERFACENAME RST.SYS_Rst, POLARITY ACTIVE_HIGH, TYPE INTERCONNECT";
+  ATTRIBUTE X_INTERFACE_INFO OF M_WriteStrobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_M WRITESTROBE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF SYS_Rst: SIGNAL IS "XIL_INTERFACENAME RST.SYS_Rst, POLARITY ACTIVE_HIGH, TYPE INTERCONNECT, INSERT_VIP 0";
   ATTRIBUTE X_INTERFACE_INFO OF SYS_Rst: SIGNAL IS "xilinx.com:signal:reset:1.0 RST.SYS_Rst RST";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF LMB_Clk: SIGNAL IS "XIL_INTERFACENAME CLK.LMB_Clk, ASSOCIATED_BUSIF LMB_Sl_0:LMB_Sl_1:LMB_Sl_2:LMB_Sl_3:LMB_Sl_4:LMB_Sl_5:LMB_Sl_6:LMB_Sl_7:LMB_Sl_8:LMB_Sl_9:LMB_Sl_10:LMB_Sl_11:LMB_Sl_12:LMB_Sl_13:LMB_Sl_14:LMB_Sl_15:LMB_M, ASSOCIATED_RESET SYS_Rst, FREQ_HZ 100000000, PHASE 0.000";
-  ATTRIBUTE X_INTERFACE_INFO OF LMB_Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.LMB_Clk CLK";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_CE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 CE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 CE";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_DBus: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READDBUS, xilinx.com:interface:lmb:1.0 LMB_Sl_1 READDBUS";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_Ready: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 READY, xilinx.com:interface:lmb:1.0 LMB_Sl_1 READY";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_UE: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 UE, xilinx.com:interface:lmb:1.0 LMB_Sl_1 UE";
+  ATTRIBUTE X_INTERFACE_INFO OF Sl_Wait: SIGNAL IS "xilinx.com:interface:lmb:1.0 LMB_Sl_0 WAIT, xilinx.com:interface:lmb:1.0 LMB_Sl_1 WAIT";
 BEGIN
   U0 : lmb_v10
     GENERIC MAP (
       C_LMB_NUM_SLAVES => 2,
       C_LMB_DWIDTH => 32,
       C_LMB_AWIDTH => 32,
+      C_LMB_PROTOCOL => 0,
       C_EXT_RESET_HIGH => 1
     )
     PORT MAP (

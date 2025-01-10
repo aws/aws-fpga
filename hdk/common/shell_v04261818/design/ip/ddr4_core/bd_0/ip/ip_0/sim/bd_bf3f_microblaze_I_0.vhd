@@ -1,21 +1,21 @@
--- (c) Copyright 1995-2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-- (c) Copyright 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 -- 
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -24,11 +24,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 -- 
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -37,7 +37,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 -- 
@@ -46,15 +46,15 @@
 -- 
 -- DO NOT MODIFY THIS FILE.
 
--- IP VLNV: xilinx.com:ip:microblaze:10.0
--- IP Revision: 5
+-- IP VLNV: xilinx.com:ip:microblaze:11.0
+-- IP Revision: 13
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-LIBRARY microblaze_v10_0_5;
-USE microblaze_v10_0_5.MicroBlaze;
+LIBRARY microblaze_v11_0_13;
+USE microblaze_v11_0_13.MicroBlaze;
 
 ENTITY bd_bf3f_microblaze_I_0 IS
   PORT (
@@ -132,9 +132,12 @@ ARCHITECTURE bd_bf3f_microblaze_I_0_arch OF bd_bf3f_microblaze_I_0 IS
       C_ECC_USE_CE_EXCEPTION : INTEGER;
       C_LOCKSTEP_SLAVE : INTEGER;
       C_LOCKSTEP_MASTER : INTEGER;
+      C_TEMPORAL_DEPTH : INTEGER;
       C_ENDIANNESS : INTEGER;
       C_FAMILY : STRING;
+      C_PART : STRING;
       C_DATA_SIZE : INTEGER;
+      C_LMB_DATA_SIZE : INTEGER;
       C_INSTR_SIZE : INTEGER;
       C_IADDR_SIZE : INTEGER;
       C_PIADDR_SIZE : INTEGER;
@@ -155,9 +158,12 @@ ARCHITECTURE bd_bf3f_microblaze_I_0_arch OF bd_bf3f_microblaze_I_0 IS
       C_M_AXI_IP_ADDR_WIDTH : INTEGER;
       C_M_AXI_I_BUS_EXCEPTION : INTEGER;
       C_D_LMB : INTEGER;
+      C_D_LMB_PROTOCOL : INTEGER;
       C_D_AXI : INTEGER;
       C_I_LMB : INTEGER;
+      C_I_LMB_PROTOCOL : INTEGER;
       C_I_AXI : INTEGER;
+      G_TEMPLATE_LIST : INTEGER;
       C_USE_MSR_INSTR : INTEGER;
       C_USE_PCMP_INSTR : INTEGER;
       C_USE_BARREL : INTEGER;
@@ -292,9 +298,17 @@ ARCHITECTURE bd_bf3f_microblaze_I_0_arch OF bd_bf3f_microblaze_I_0 IS
       Config_Reset : IN STD_LOGIC;
       Scan_Reset : IN STD_LOGIC;
       Scan_Reset_Sel : IN STD_LOGIC;
-      RAM_Static : IN STD_LOGIC_VECTOR(1023 DOWNTO 0);
-      RAM_To : IN STD_LOGIC_VECTOR(16383 DOWNTO 0);
-      RAM_From : OUT STD_LOGIC_VECTOR(16383 DOWNTO 0);
+      Scan_En : IN STD_LOGIC;
+      RAM_To : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_From : OUT STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_DCache_Tag_To : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_DCache_Tag_From : OUT STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_DCache_Data_To : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_DCache_Data_From : OUT STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_ICache_Tag_To : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_ICache_Tag_From : OUT STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_ICache_Data_To : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+      RAM_ICache_Data_From : OUT STD_LOGIC_VECTOR(255 DOWNTO 0);
       Interrupt : IN STD_LOGIC;
       Interrupt_Address : IN STD_LOGIC_VECTOR(0 TO 31);
       Interrupt_Ack : OUT STD_LOGIC_VECTOR(0 TO 1);
@@ -731,65 +745,66 @@ ARCHITECTURE bd_bf3f_microblaze_I_0_arch OF bd_bf3f_microblaze_I_0 IS
   END COMPONENT MicroBlaze;
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Jump_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE JUMP_HIT";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_MB_Halted: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MB_HALTED";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_MEM_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MEM_PIPERUN";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_EX_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EX_PIPERUN";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_OF_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE OF_PIPERUN";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Rdy: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_RDY";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_HIT";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Req: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_REQ";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Read: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_READ";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Rdy: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_RDY";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_HIT";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Req: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_REQ";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Write: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_WRITE";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Read: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_READ";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Access: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_ACCESS";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Byte_Enable: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_BYTE_ENABLE";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Write_Value: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_WRITE_VALUE";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Address: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_ADDRESS";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Delay_Slot: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DELAY_SLOT";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Jump_Taken: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE JUMP_TAKEN";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Exception_Kind: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EXCEPTION_KIND";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Exception_Taken: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EXCEPTION_TAKEN";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_New_Reg_Value: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE NEW_REG_VALUE";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_PID_Reg: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE PID_REG";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_MSR_Reg: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MSR_REG";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Reg_Addr: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE REG_ADDR";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Reg_Write: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE REG_WRITE";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_PC: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE PC";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Valid_Instr: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE VALID_INSTR";
-  ATTRIBUTE X_INTERFACE_INFO OF Trace_Instruction: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE INSTRUCTION";
   ATTRIBUTE X_INTERFACE_INFO OF Byte_Enable: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB BE";
-  ATTRIBUTE X_INTERFACE_INFO OF DUE: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB UE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF Clk: SIGNAL IS "XIL_INTERFACENAME CLK.CLK, ASSOCIATED_BUSIF M0_AXIS:S0_AXIS:M1_AXIS:S1_AXIS:M2_AXIS:S2_AXIS:M3_AXIS:S3_AXIS:M4_AXIS:S4_AXIS:M5_AXIS:S5_AXIS:M6_AXIS:S6_AXIS:M7_AXIS:S7_AXIS:M8_AXIS:S8_AXIS:M9_AXIS:S9_AXIS:M10_AXIS:S10_AXIS:M11_AXIS:S11_AXIS:M12_AXIS:S12_AXIS:M13_AXIS:S13_AXIS:M14_AXIS:S14_AXIS:M15_AXIS:S15_AXIS:DLMB:ILMB:M_AXI_DP:M_AXI_IP:M_AXI_DC:M_AXI_IC:M_ACE_DC:M_ACE_IC:MON_DLMB:MON_ILMB:MON_AXI_DP:MON_AXI_IP:MON_AXI_DC:MON_AXI_IC:MON_ACE_DC:MON_ACE_IC, ASSOCIATED_RESET Reset, FREQ_HZ 1000000" & 
+"00, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN bd_bf3f_Clk, INSERT_VIP 0";
+  ATTRIBUTE X_INTERFACE_INFO OF Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.CLK CLK";
   ATTRIBUTE X_INTERFACE_INFO OF DCE: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB CE";
-  ATTRIBUTE X_INTERFACE_INFO OF DWait: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WAIT";
   ATTRIBUTE X_INTERFACE_INFO OF DReady: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB READY";
-  ATTRIBUTE X_INTERFACE_INFO OF Write_Strobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WRITESTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF Read_Strobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB READSTROBE";
+  ATTRIBUTE X_INTERFACE_INFO OF DUE: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB UE";
+  ATTRIBUTE X_INTERFACE_INFO OF DWait: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WAIT";
   ATTRIBUTE X_INTERFACE_INFO OF D_AS: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB ADDRSTROBE";
-  ATTRIBUTE X_INTERFACE_INFO OF Data_Write: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WRITEDBUS";
-  ATTRIBUTE X_INTERFACE_INFO OF Data_Read: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB READDBUS";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF Data_Addr: SIGNAL IS "XIL_INTERFACENAME DLMB, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_WRITE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF Data_Addr: SIGNAL IS "XIL_INTERFACENAME DLMB, ADDR_WIDTH 32, DATA_WIDTH 32, PROTOCOL STANDARD, READ_WRITE_MODE READ_WRITE";
   ATTRIBUTE X_INTERFACE_INFO OF Data_Addr: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB ABUS";
-  ATTRIBUTE X_INTERFACE_INFO OF IUE: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB UE";
+  ATTRIBUTE X_INTERFACE_INFO OF Data_Read: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB READDBUS";
+  ATTRIBUTE X_INTERFACE_INFO OF Data_Write: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WRITEDBUS";
   ATTRIBUTE X_INTERFACE_INFO OF ICE: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB CE";
-  ATTRIBUTE X_INTERFACE_INFO OF IWAIT: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB WAIT";
-  ATTRIBUTE X_INTERFACE_INFO OF IReady: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB READY";
-  ATTRIBUTE X_INTERFACE_INFO OF I_AS: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB ADDRSTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF IFetch: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB READSTROBE";
+  ATTRIBUTE X_INTERFACE_INFO OF IReady: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB READY";
+  ATTRIBUTE X_INTERFACE_INFO OF IUE: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB UE";
+  ATTRIBUTE X_INTERFACE_INFO OF IWAIT: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB WAIT";
+  ATTRIBUTE X_INTERFACE_INFO OF I_AS: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB ADDRSTROBE";
   ATTRIBUTE X_INTERFACE_INFO OF Instr: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB READDBUS";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF Instr_Addr: SIGNAL IS "XIL_INTERFACENAME ILMB, ADDR_WIDTH 32, DATA_WIDTH 32, READ_WRITE_MODE READ_ONLY";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF Instr_Addr: SIGNAL IS "XIL_INTERFACENAME ILMB, ADDR_WIDTH 32, DATA_WIDTH 32, PROTOCOL STANDARD, READ_WRITE_MODE READ_ONLY";
   ATTRIBUTE X_INTERFACE_INFO OF Instr_Addr: SIGNAL IS "xilinx.com:interface:lmb:1.0 ILMB ABUS";
-  ATTRIBUTE X_INTERFACE_INFO OF Interrupt_Ack: SIGNAL IS "xilinx.com:interface:mbinterrupt:1.0 INTERRUPT ACK";
-  ATTRIBUTE X_INTERFACE_INFO OF Interrupt_Address: SIGNAL IS "xilinx.com:interface:mbinterrupt:1.0 INTERRUPT ADDRESS";
   ATTRIBUTE X_INTERFACE_PARAMETER OF Interrupt: SIGNAL IS "XIL_INTERFACENAME INTERRUPT, SENSITIVITY LEVEL_HIGH, LOW_LATENCY 0";
   ATTRIBUTE X_INTERFACE_INFO OF Interrupt: SIGNAL IS "xilinx.com:interface:mbinterrupt:1.0 INTERRUPT INTERRUPT";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF Reset: SIGNAL IS "XIL_INTERFACENAME RST.RESET, POLARITY ACTIVE_HIGH, TYPE PROCESSOR";
+  ATTRIBUTE X_INTERFACE_INFO OF Interrupt_Ack: SIGNAL IS "xilinx.com:interface:mbinterrupt:1.0 INTERRUPT ACK";
+  ATTRIBUTE X_INTERFACE_INFO OF Interrupt_Address: SIGNAL IS "xilinx.com:interface:mbinterrupt:1.0 INTERRUPT ADDRESS";
+  ATTRIBUTE X_INTERFACE_INFO OF Read_Strobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB READSTROBE";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF Reset: SIGNAL IS "XIL_INTERFACENAME RST.RESET, POLARITY ACTIVE_HIGH, TYPE PROCESSOR, INSERT_VIP 0";
   ATTRIBUTE X_INTERFACE_INFO OF Reset: SIGNAL IS "xilinx.com:signal:reset:1.0 RST.RESET RST";
-  ATTRIBUTE X_INTERFACE_PARAMETER OF Clk: SIGNAL IS "XIL_INTERFACENAME CLK.CLK, ASSOCIATED_BUSIF M0_AXIS:S0_AXIS:M1_AXIS:S1_AXIS:M2_AXIS:S2_AXIS:M3_AXIS:S3_AXIS:M4_AXIS:S4_AXIS:M5_AXIS:S5_AXIS:M6_AXIS:S6_AXIS:M7_AXIS:S7_AXIS:M8_AXIS:S8_AXIS:M9_AXIS:S9_AXIS:M10_AXIS:S10_AXIS:M11_AXIS:S11_AXIS:M12_AXIS:S12_AXIS:M13_AXIS:S13_AXIS:M14_AXIS:S14_AXIS:M15_AXIS:S15_AXIS:DLMB:ILMB:M_AXI_DP:M_AXI_IP:M_AXI_DC:M_AXI_IC:M_ACE_DC:M_ACE_IC:MON_DLMB:MON_ILMB:MON_AXI_DP:MON_AXI_IP:MON_AXI_DC:MON_AXI_IC:MON_ACE_DC:MON_ACE_IC, ASSOCIATED_RESET Reset, FREQ_HZ 100000000, PHASE 0.000";
-  ATTRIBUTE X_INTERFACE_INFO OF Clk: SIGNAL IS "xilinx.com:signal:clock:1.0 CLK.CLK CLK";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_HIT";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Rdy: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_RDY";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Read: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_READ";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_DCache_Req: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DCACHE_REQ";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Access: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_ACCESS";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Address: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_ADDRESS";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Byte_Enable: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_BYTE_ENABLE";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Read: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_READ";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Write: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_WRITE";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Data_Write_Value: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DATA_WRITE_VALUE";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Delay_Slot: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE DELAY_SLOT";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_EX_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EX_PIPERUN";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Exception_Kind: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EXCEPTION_KIND";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Exception_Taken: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE EXCEPTION_TAKEN";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_HIT";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Rdy: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_RDY";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_ICache_Req: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE ICACHE_REQ";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Instruction: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE INSTRUCTION";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Jump_Hit: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE JUMP_HIT";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Jump_Taken: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE JUMP_TAKEN";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_MB_Halted: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MB_HALTED";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_MEM_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MEM_PIPERUN";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_MSR_Reg: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE MSR_REG";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_New_Reg_Value: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE NEW_REG_VALUE";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_OF_PipeRun: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE OF_PIPERUN";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_PC: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE PC";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_PID_Reg: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE PID_REG";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Reg_Addr: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE REG_ADDR";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Reg_Write: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE REG_WRITE";
+  ATTRIBUTE X_INTERFACE_INFO OF Trace_Valid_Instr: SIGNAL IS "xilinx.com:interface:mbtrace:2.0 TRACE VALID_INSTR";
+  ATTRIBUTE X_INTERFACE_INFO OF Write_Strobe: SIGNAL IS "xilinx.com:interface:lmb:1.0 DLMB WRITESTROBE";
 BEGIN
   U0 : MicroBlaze
     GENERIC MAP (
@@ -805,9 +820,12 @@ BEGIN
       C_ECC_USE_CE_EXCEPTION => 0,
       C_LOCKSTEP_SLAVE => 0,
       C_LOCKSTEP_MASTER => 0,
+      C_TEMPORAL_DEPTH => 0,
       C_ENDIANNESS => 1,
       C_FAMILY => "virtexuplus",
+      C_PART => "xcvu9p-flgb2104-2-i",
       C_DATA_SIZE => 32,
+      C_LMB_DATA_SIZE => 32,
       C_INSTR_SIZE => 32,
       C_IADDR_SIZE => 32,
       C_PIADDR_SIZE => 32,
@@ -828,9 +846,12 @@ BEGIN
       C_M_AXI_IP_ADDR_WIDTH => 32,
       C_M_AXI_I_BUS_EXCEPTION => 0,
       C_D_LMB => 1,
+      C_D_LMB_PROTOCOL => 0,
       C_D_AXI => 0,
       C_I_LMB => 1,
+      C_I_LMB_PROTOCOL => 0,
       C_I_AXI => 0,
+      G_TEMPLATE_LIST => 0,
       C_USE_MSR_INSTR => 0,
       C_USE_PCMP_INSTR => 1,
       C_USE_BARREL => 1,
@@ -915,13 +936,13 @@ BEGIN
       C_M15_AXIS_DATA_WIDTH => 32,
       C_S15_AXIS_DATA_WIDTH => 32,
       C_ICACHE_BASEADDR => X"0000000000000000",
-      C_ICACHE_HIGHADDR => X"000000003FFFFFFF",
+      C_ICACHE_HIGHADDR => X"000000003fffffff",
       C_USE_ICACHE => 0,
       C_ALLOW_ICACHE_WR => 1,
-      C_ADDR_TAG_BITS => 17,
+      C_ADDR_TAG_BITS => 0,
       C_CACHE_BYTE_SIZE => 8192,
       C_ICACHE_LINE_LEN => 4,
-      C_ICACHE_ALWAYS_USED => 0,
+      C_ICACHE_ALWAYS_USED => 1,
       C_ICACHE_STREAMS => 0,
       C_ICACHE_VICTIMS => 0,
       C_ICACHE_FORCE_TAG_LUTRAM => 0,
@@ -936,13 +957,13 @@ BEGIN
       C_M_AXI_IC_RUSER_WIDTH => 1,
       C_M_AXI_IC_BUSER_WIDTH => 1,
       C_DCACHE_BASEADDR => X"0000000000000000",
-      C_DCACHE_HIGHADDR => X"000000003FFFFFFF",
+      C_DCACHE_HIGHADDR => X"000000003fffffff",
       C_USE_DCACHE => 0,
       C_ALLOW_DCACHE_WR => 1,
-      C_DCACHE_ADDR_TAG => 17,
+      C_DCACHE_ADDR_TAG => 0,
       C_DCACHE_BYTE_SIZE => 8192,
       C_DCACHE_LINE_LEN => 4,
-      C_DCACHE_ALWAYS_USED => 0,
+      C_DCACHE_ALWAYS_USED => 1,
       C_DCACHE_USE_WRITEBACK => 0,
       C_DCACHE_VICTIMS => 0,
       C_DCACHE_FORCE_TAG_LUTRAM => 0,
@@ -965,8 +986,12 @@ BEGIN
       Config_Reset => '0',
       Scan_Reset => '0',
       Scan_Reset_Sel => '0',
-      RAM_Static => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 1024)),
-      RAM_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 16384)),
+      Scan_En => '0',
+      RAM_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 256)),
+      RAM_DCache_Tag_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 256)),
+      RAM_DCache_Data_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 256)),
+      RAM_ICache_Tag_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 256)),
+      RAM_ICache_Data_To => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 256)),
       Interrupt => Interrupt,
       Interrupt_Address => Interrupt_Address,
       Interrupt_Ack => Interrupt_Ack,

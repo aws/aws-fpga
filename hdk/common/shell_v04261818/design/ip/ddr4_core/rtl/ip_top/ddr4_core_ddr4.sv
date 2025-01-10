@@ -1,54 +1,53 @@
 
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
-//
-// This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
-//
-// DISCLAIMER
-// This disclaimer is not a license and does not grant any
-// rights to the materials distributed herewith. Except as
-// otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
-// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
-// including negligence, or under any other theory of
-// liability) for any loss or damage of any kind or nature
-// related to, arising under or in connection with these
-// materials, including for any direct, or any indirect,
-// special, incidental, or consequential loss or damage
-// (including loss of data, profits, goodwill, or any type of
-// loss or damage suffered as a result of any action brought
-// by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
-// possibility of the same.
-//
-// CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
-// safe, or for use in any application requiring fail-safe
-// performance, such as life-support or safety devices or
-// systems, Class III medical devices, nuclear facilities,
-// applications related to the deployment of airbags, or any
-// other applications that could lead to death, personal
-// injury, or severe property or environmental damage
-// (individually and collectively, "Critical
-// Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
-// Applications, subject only to applicable laws and
-// regulations governing limitations on product liability.
-//
-// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// PART OF THIS FILE AT ALL TIMES.
+# (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
+#
+# This file contains confidential and proprietary information
+# of AMD and is protected under U.S. and international copyright
+# and other intellectual property laws.
+#
+# DISCLAIMER
+# This disclaimer is not a license and does not grant any
+# rights to the materials distributed herewith. Except as
+# otherwise provided in a valid license issued to you by
+# AMD, and to the maximum extent permitted by applicable
+# law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+# WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+# AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+# BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+# INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+# (2) AMD shall not be liable (whether in contract or tort,
+# including negligence, or under any other theory of
+# liability) for any loss or damage of any kind or nature
+# related to, arising under or in connection with these
+# materials, including for any direct, or any indirect,
+# special, incidental, or consequential loss or damage
+# (including loss of data, profits, goodwill, or any type of
+# loss or damage suffered as a result of any action brought
+# by a third party) even if such damage or loss was
+# reasonably foreseeable or AMD had been advised of the
+# possibility of the same.
+#
+# CRITICAL APPLICATIONS
+# AMD products are not designed or intended to be fail-
+# safe, or for use in any application requiring fail-safe
+# performance, such as life-support or safety devices or
+# systems, Class III medical devices, nuclear facilities,
+# applications related to the deployment of airbags, or any
+# other applications that could lead to death, personal
+# injury, or severe property or environmental damage
+# (individually and collectively, "Critical
+# Applications"). Customer assumes the sole risk and
+# liability of any use of AMD products in Critical
+# Applications, subject only to applicable laws and
+# regulations governing limitations on product liability.
+#
+# THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+# PART OF THIS FILE AT ALL TIMES.
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.0
 //  \   \         Application        : DDR4
 //  /   /         Filename           : ddr4_core_ddr4.sv
@@ -68,6 +67,7 @@
 
 
 
+
 `timescale 1ps/1ps
 `ifdef MODEL_TECH
     `ifndef CALIB_SIM
@@ -82,6 +82,10 @@
        `define SIMULATION
      `endif
 `elsif XILINX_SIMULATOR
+    `ifndef CALIB_SIM
+       `define SIMULATION
+     `endif
+`elsif _VCP
     `ifndef CALIB_SIM
        `define SIMULATION
      `endif
@@ -113,7 +117,7 @@
   
   PhyIP_SELF_REFRESH = "true",
   PhyIP_SAVE_RESTORE = "true",
-  
+  PhyIP_Enable_LVAUX = "false", 
   PhyIP_CLKFBOUT_MULT = "8",
   PhyIP_DIVCLK_DIVIDE = "3",
   PhyIP_CLKOUT0_DIVIDE = "3",
@@ -126,6 +130,7 @@
   PhyIP_IS_FROM_PHY = "1",
   PhyIP_CA_MIRROR = "0",
 
+  PhyIP_EN_PARITY = "true",
   PhyIP_System_Clock = "Differential",
   PhyIP_Simulation_Mode = "BFM",
   PhyIP_Phy_Only = "Complete_Memory_Controller",
@@ -155,8 +160,8 @@
   PhyIP_DM_WIDTH = 18
 
 *)
-module ddr4_core_ddr4 #
-  (
+(* dont_touch = "true" *) module ddr4_core_ddr4 #
+ (
     parameter integer ADDR_WIDTH              = 17,
     parameter integer ROW_WIDTH               = 17,
     parameter integer BANK_WIDTH              = 2,
@@ -313,7 +318,7 @@ module ddr4_core_ddr4 #
     parameter AL                                = "0",
     parameter SELF_REFRESH                      = "true",
     parameter SAVE_RESTORE                      = "true",
-
+    parameter RESTORE_CRC                       = "false",
     parameter IS_CKE_SHARED                     = "false",
     parameter MEMORY_PART                       = "MTA18ASF2G72PZ-2G3",
     parameter integer COMPONENT_WIDTH           = 72,
@@ -434,7 +439,7 @@ module ddr4_core_ddr4 #
     parameter         t200us                    = 53362, // In fabric clock cycles
     parameter         t500us                    = 133405 // In fabric clock cycles
   `endif
-    )
+    ) 
    (
    input  sys_rst,
 
@@ -552,7 +557,6 @@ module ddr4_core_ddr4 #
    output [1:0]                       c0_ddr4_s_axi_rresp,
    output                             c0_ddr4_s_axi_rlast,
    output                             c0_ddr4_s_axi_rvalid,
-
    // Debug Port
    output wire [511:0]             dbg_bus
    );
@@ -646,7 +650,7 @@ module ddr4_core_ddr4 #
   assign c0_ddr4_ui_clk_sync_rst = div_clk_rst_r1;
 
 
-  ddr4_v2_2_3_infrastructure #
+  ddr4_v2_2_23_infrastructure #
     (
      .CLKIN_PERIOD_MMCM   (CLKIN_PERIOD_MMCM),
      .CLKFBOUT_MULT_MMCM  (CLKFBOUT_MULT_MMCM),
@@ -699,6 +703,7 @@ ddr4_core_ddr4_mem_intfc #
      .DEVICE                (DEVICE),
      .SAVE_RESTORE          (1'b1),
      .SELF_REFRESH          (1'b1),
+     .RESTORE_CRC           (1'b0),
      .NUM_SLOT              (NUM_SLOT),
      .RANK_SLOT             (RANK_SLOT),
      .DQS_WIDTH             (DQS_WIDTH),
@@ -938,7 +943,7 @@ u_ddr4_mem_intfc
    .xsdb_rd_data          (c0_ddr4_app_xsdb_rd_data),
    .xsdb_rdy              (c0_ddr4_app_xsdb_rdy),
    .dbg_out               (c0_ddr4_app_dbg_out),
-
+   .restore_crc_error     (),
    .traffic_wr_done               (1'b0),
    .traffic_status_err_bit_valid  (1'b0),
    .traffic_status_err_type_valid (1'b0),
@@ -984,7 +989,7 @@ u_ddr4_mem_intfc
    .dbg_phy2clb_phy_rdy_upp   (),
    .cal_r0_status             ()
    );
-ddr4_v2_2_3_axi #
+ddr4_v2_2_23_axi #
   (
    .C_ECC                         (ECC),
    .C_S_AXI_ID_WIDTH              (C_S_AXI_ID_WIDTH),
@@ -1046,7 +1051,9 @@ ddr4_v2_2_3_axi #
      .s_axi_rlast                            (c0_ddr4_s_axi_rlast),
      .s_axi_rvalid                           (c0_ddr4_s_axi_rvalid),
      .s_axi_rready                           (c0_ddr4_s_axi_rready),
-
+     //AxUSER ports
+     .s_axi_aruser                           (1'b0),
+     .s_axi_awuser                           (1'b0),
      // MC Master Interface
      //CMD PORT
      .mc_app_en                              (c0_ddr4_app_en),
@@ -1078,7 +1085,7 @@ ddr4_v2_2_3_axi #
     c0_ddr4_rd_data_phy2mc_r2 <= #TCQ c0_ddr4_rd_data_phy2mc_r1;
   end
 
-  ddr4_v2_2_3_axi_ctrl_top # (
+  ddr4_v2_2_23_axi_ctrl_top # (
     .C_S_AXI_CTRL_ADDR_WIDTH (C_S_AXI_CTRL_ADDR_WIDTH) ,
     .C_S_AXI_CTRL_DATA_WIDTH (C_S_AXI_CTRL_DATA_WIDTH) ,
     .C_S_AXI_ADDR_WIDTH      (C_S_AXI_ADDR_WIDTH) ,

@@ -1,22 +1,21 @@
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +24,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,7 +37,7 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
@@ -47,10 +46,10 @@
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_mc_rd_wr.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc_rd_wr.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 18 2013
 //  \___\/\___\
@@ -58,19 +57,21 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_3_mc_rd_wr module
+//                   ddr4_v2_2_23_mc_rd_wr module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_rd_wr #(parameter
+module ddr4_v2_2_23_mc_rd_wr #(parameter
     RDSLOT = 256
    ,WRSLOT = 128
    ,tWTR_L = 9
    ,tWTR_S = 3
    ,tRTW   = 4 // (RL + BL/2 - WL + 2CK + 3) / 4
+   ,RKBITS = 2
+   ,RANK_SLAB = 4
    ,S_HEIGHT = 1
    ,LR_WIDTH = 1
    ,STARVATION_EN = 1'b1
@@ -87,13 +88,13 @@ module ddr4_v2_2_3_mc_rd_wr #(parameter
 
    ,input [7:0] cmdGroup
    ,input [4*LR_WIDTH-1:0] cmdLRank
-   ,input [7:0] cmdRank
+   ,input [RKBITS*4-1:0] cmdRank
    ,input       rdCAS
    ,input [3:0] rdReq
    ,input [1:0] winGroup
    ,input [LR_WIDTH-1:0] winLRank
    ,input [3:0] winPort
-   ,input [1:0] winRank
+   ,input [RKBITS-1:0] winRank
    ,input       wrCAS
    ,input       casSlot2
    ,input [3:0] wrReq
@@ -153,15 +154,15 @@ wire [3:0] write_req_nxt = wrReq & ~{ 4 { block_reads & block_writes } };
 
 
 
-wire [3:0] wtr_okl; // per rank
-wire [3:0] wtr_oks; // per rank
-wire [1:0] prevGrW[0:3];
-wire [LR_WIDTH-1:0] prevLRW[0:3];
+wire [RANK_SLAB-1:0] wtr_okl; // per rank
+wire [RANK_SLAB-1:0] wtr_oks; // per rank
+wire [1:0] prevGrW[0:RANK_SLAB-1];
+wire [LR_WIDTH-1:0] prevLRW[0:RANK_SLAB-1];
 
 genvar wtr;
 generate
-   for (wtr = 0; wtr <= 3; wtr = wtr + 1) begin:wtrs
-      ddr4_v2_2_3_mc_wtr #(
+   for (wtr = 0; wtr <= RANK_SLAB-1; wtr = wtr + 1) begin:wtrs
+      ddr4_v2_2_23_mc_wtr #(
           .tWTR_L (tWTR_L)
          ,.tWTR_S (tWTR_S)
          ,.LR_WIDTH(LR_WIDTH)
@@ -189,15 +190,15 @@ always @(*) begin
   for (i = 0; i <= 3; i = i + 1) begin 
     if (rdReq_starve[i]) begin:chkR
       if (S_HEIGHT > 1) begin
-        if (prevGrW[cmdRank[i*2+:2]] == cmdGroup[i*2+:2] & prevLRW[cmdRank[i*2+:2]] == cmdLRank[i*LR_WIDTH+:LR_WIDTH])
-          rdReqT[i] = wtr_okl[cmdRank[i*2+:2]];
+        if (prevGrW[cmdRank[i*RKBITS+:RKBITS]] == cmdGroup[i*2+:2] & prevLRW[cmdRank[i*RKBITS+:RKBITS]] == cmdLRank[i*LR_WIDTH+:LR_WIDTH])
+          rdReqT[i] = wtr_okl[cmdRank[i*RKBITS+:RKBITS]];
         else 
-          rdReqT[i] = wtr_oks[cmdRank[i*2+:2]];
+          rdReqT[i] = wtr_oks[cmdRank[i*RKBITS+:RKBITS]];
       end else begin
-        if (prevGrW[cmdRank[i*2+:2]] == cmdGroup[i*2+:2])
-          rdReqT[i] = wtr_okl[cmdRank[i*2+:2]];
+        if (prevGrW[cmdRank[i*RKBITS+:RKBITS]] == cmdGroup[i*2+:2])
+          rdReqT[i] = wtr_okl[cmdRank[i*RKBITS+:RKBITS]];
         else 
-          rdReqT[i] = wtr_oks[cmdRank[i*2+:2]];
+          rdReqT[i] = wtr_oks[cmdRank[i*RKBITS+:RKBITS]];
       end
     end else 
       rdReqT[i] = 1'b0;
@@ -260,47 +261,47 @@ end
 // Read from group 0 one cycle after write to rank0 blocked by wtr_s
 reg    e_wrcas_previous_cycle_rank0;
 always @(posedge clk) e_wrcas_previous_cycle_rank0 <= #TCQ (wrCAS & (winRank == 2'b0));
-wire   e_mc_rd_wr_000_wtr_s = rdReq[0] & (cmdRank[0*2+:2] == 2'b0) & (S_HEIGHT < 2)           // current read group 0 rank 0
-                              & ~(prevGrW[ cmdRank[0*2+:2] ] == cmdGroup[0*2+:2])             // previous group in rank 0 different
-                              & ~wtr_oks[ cmdRank[0*2+:2] ] & e_wrcas_previous_cycle_rank0;   // wtr_s not safe and write in previous cycle
+wire   e_mc_rd_wr_000_wtr_s = rdReq[0] & (cmdRank[0*RKBITS+:RKBITS] == 2'b0) & (S_HEIGHT < 2)           // current read group 0 rank 0
+                              & ~(prevGrW[ cmdRank[0*RKBITS+:RKBITS] ] == cmdGroup[0*2+:2])             // previous group in rank 0 different
+                              & ~wtr_oks[ cmdRank[0*RKBITS+:RKBITS] ] & e_wrcas_previous_cycle_rank0;   // wtr_s not safe and write in previous cycle
 always @(posedge clk) mc_rd_wr_000: if (~rst) cover property (e_mc_rd_wr_000_wtr_s);
 
 // Read from group 3 one cycle after write to rank3 blocked by wtr_l
 reg    e_wrcas_previous_cycle_rank3;
 always @(posedge clk) e_wrcas_previous_cycle_rank3 <= #TCQ (wrCAS & (winRank == 2'b11));
-wire   e_mc_rd_wr_001_wtr_l = rdReq[3] & (cmdRank[3*2+:2] == 2'b11) & (S_HEIGHT < 2)          // current read group 3 rank 3
-                              &  (prevGrW[ cmdRank[3*2+:2] ] == cmdGroup[3*2+:2])             // previous group in rank 3 same
-                              & ~wtr_okl[ cmdRank[3*2+:2] ] & e_wrcas_previous_cycle_rank3;   // wtr_l not safe and write in previous cycle
+wire   e_mc_rd_wr_001_wtr_l = rdReq[3] & (cmdRank[3*RKBITS+:RKBITS] == 2'b11) & (S_HEIGHT < 2)          // current read group 3 rank 3
+                              &  (prevGrW[ cmdRank[3*RKBITS+:RKBITS] ] == cmdGroup[3*2+:2])             // previous group in rank 3 same
+                              & ~wtr_okl[ cmdRank[3*RKBITS+:RKBITS] ] & e_wrcas_previous_cycle_rank3;   // wtr_l not safe and write in previous cycle
 always @(posedge clk) mc_rd_wr_001: if (~rst) cover property (e_mc_rd_wr_001_wtr_l);
 
 // Read after write with minimum wtr_s timing in group 1
 reg       e_rdreq_blocked_previous_cycle_group1;
 reg [1:0] e_rdreq_blocked_previous_cycle_group1_rank;
 always @(posedge clk) e_rdreq_blocked_previous_cycle_group1      <= #TCQ ( rdReq[1] & ~rdReqT[1] );
-always @(posedge clk) e_rdreq_blocked_previous_cycle_group1_rank <= #TCQ ( cmdRank[1*2+:2] );
+always @(posedge clk) e_rdreq_blocked_previous_cycle_group1_rank <= #TCQ ( cmdRank[1*RKBITS+:RKBITS] );
 wire   e_mc_rd_wr_002_wtr_s = rdReq[1] & rdReqT[1] & (S_HEIGHT < 2)                                 // current read safe
                               & e_rdreq_blocked_previous_cycle_group1                               // read blocked previous cycle
-                              & ~(prevGrW[ cmdRank[1*2+:2] ] == cmdGroup[1*2+:2])                   // previous write group different
-                              & ( cmdRank[1*2+:2] == e_rdreq_blocked_previous_cycle_group1_rank );  // current and previous read to same rank
+                              & ~(prevGrW[ cmdRank[1*RKBITS+:RKBITS] ] == cmdGroup[1*2+:2])                   // previous write group different
+                              & ( cmdRank[1*RKBITS+:RKBITS] == e_rdreq_blocked_previous_cycle_group1_rank );  // current and previous read to same rank
 always @(posedge clk) mc_rd_wr_002: if (~rst) cover property (e_mc_rd_wr_002_wtr_s);
 
 // Read after write with minimum wtr_l timing in group 2
 reg       e_rdreq_blocked_previous_cycle_group2;
 reg [1:0] e_rdreq_blocked_previous_cycle_group2_rank;
 always @(posedge clk) e_rdreq_blocked_previous_cycle_group2      <= #TCQ ( rdReq[2] & ~rdReqT[2] );
-always @(posedge clk) e_rdreq_blocked_previous_cycle_group2_rank <= #TCQ ( cmdRank[2*2+:2] );
+always @(posedge clk) e_rdreq_blocked_previous_cycle_group2_rank <= #TCQ ( cmdRank[2*RKBITS+:RKBITS] );
 wire   e_mc_rd_wr_003_wtr_l = rdReq[2] & rdReqT[2] & (S_HEIGHT < 2)                                 // current read safe
                               & e_rdreq_blocked_previous_cycle_group2                               // read blocked previous cycle
-                              &  (prevGrW[ cmdRank[2*2+:2] ] == cmdGroup[2*2+:2])                   // previous write group same
-                              & ( cmdRank[2*2+:2] == e_rdreq_blocked_previous_cycle_group2_rank );  // current and previous read to same rank
+                              &  (prevGrW[ cmdRank[2*RKBITS+:RKBITS] ] == cmdGroup[2*2+:2])                   // previous write group same
+                              & ( cmdRank[2*RKBITS+:RKBITS] == e_rdreq_blocked_previous_cycle_group2_rank );  // current and previous read to same rank
 always @(posedge clk) mc_rd_wr_003: if (~rst) cover property (e_mc_rd_wr_003_wtr_l);
 
 // Read after write with minimum wtr to different ranks
 wire   e_mc_rd_wr_004_wtr = wrCAS
-                            & (   ( rdReqT[0] & ~(winRank == cmdRank[0*2+:2]) )
-                                | ( rdReqT[1] & ~(winRank == cmdRank[1*2+:2]) )
-                                | ( rdReqT[2] & ~(winRank == cmdRank[2*2+:2]) )
-                                | ( rdReqT[3] & ~(winRank == cmdRank[3*2+:2]) ) );
+                            & (   ( rdReqT[0] & ~(winRank == cmdRank[0*RKBITS+:RKBITS]) )
+                                | ( rdReqT[1] & ~(winRank == cmdRank[1*RKBITS+:RKBITS]) )
+                                | ( rdReqT[2] & ~(winRank == cmdRank[2*RKBITS+:RKBITS]) )
+                                | ( rdReqT[3] & ~(winRank == cmdRank[3*RKBITS+:RKBITS]) ) );
 always @(posedge clk) mc_rd_wr_004: if (~rst) cover property (e_mc_rd_wr_004_wtr);
 
 // Write one cycle after read blocked by rdCAS
@@ -321,26 +322,26 @@ always @(posedge clk) mc_rd_wr_007: if (~rst) cover property (e_mc_rd_wr_007_rtw
 
 // Read after write to different LR's in 3ds blocked by wtr_oks
 wire   e_mc_rd_wr_008_wtr = wrCAS & (S_HEIGHT > 1)
-                            & (   ( rdReqT[0] & (winRank == cmdRank[0*2+:2]) & ~(winLRank == cmdLRank[0*LR_WIDTH+:LR_WIDTH]) )
-                                | ( rdReqT[1] & (winRank == cmdRank[1*2+:2]) & ~(winLRank == cmdLRank[1*LR_WIDTH+:LR_WIDTH]) )
-                                | ( rdReqT[2] & (winRank == cmdRank[2*2+:2]) & ~(winLRank == cmdLRank[2*LR_WIDTH+:LR_WIDTH]) )
-                                | ( rdReqT[3] & (winRank == cmdRank[3*2+:2]) & ~(winLRank == cmdLRank[3*LR_WIDTH+:LR_WIDTH]) ));
+                            & (   ( rdReqT[0] & (winRank == cmdRank[0*RKBITS+:RKBITS]) & ~(winLRank == cmdLRank[0*LR_WIDTH+:LR_WIDTH]) )
+                                | ( rdReqT[1] & (winRank == cmdRank[1*RKBITS+:RKBITS]) & ~(winLRank == cmdLRank[1*LR_WIDTH+:LR_WIDTH]) )
+                                | ( rdReqT[2] & (winRank == cmdRank[2*RKBITS+:RKBITS]) & ~(winLRank == cmdLRank[2*LR_WIDTH+:LR_WIDTH]) )
+                                | ( rdReqT[3] & (winRank == cmdRank[3*RKBITS+:RKBITS]) & ~(winLRank == cmdLRank[3*LR_WIDTH+:LR_WIDTH]) ));
 always @(posedge clk) mc_rd_wr_008: if (~rst) cover property (e_mc_rd_wr_008_wtr);
 
 // Read from group 3 one cycle after write to rank3 blocked by wtr_l in 3ds
-wire   e_mc_rd_wr_009_wtr_l = rdReq[3] & (cmdRank[3*2+:2] == 2'b11) & (S_HEIGHT > 1)          // current read group 3 rank 3
-                              &  (prevGrW[cmdRank[3*2+:2]] == cmdGroup[3*2+:2])               // previous group in rank 3 same
-                              &  (prevLRW[cmdRank[3*2+:2]] == cmdLRank[3*LR_WIDTH+:LR_WIDTH]) // previous LR in rank 3 same 
-                              & ~wtr_okl[cmdRank[3*2+:2]] & e_wrcas_previous_cycle_rank3;     // wtr_l not safe and write in previous cycle
+wire   e_mc_rd_wr_009_wtr_l = rdReq[3] & (cmdRank[3*RKBITS+:RKBITS] == 2'b11) & (S_HEIGHT > 1)          // current read group 3 rank 3
+                              &  (prevGrW[cmdRank[3*RKBITS+:RKBITS]] == cmdGroup[3*2+:2])               // previous group in rank 3 same
+                              &  (prevLRW[cmdRank[3*RKBITS+:RKBITS]] == cmdLRank[3*LR_WIDTH+:LR_WIDTH]) // previous LR in rank 3 same 
+                              & ~wtr_okl[cmdRank[3*RKBITS+:RKBITS]] & e_wrcas_previous_cycle_rank3;     // wtr_l not safe and write in previous cycle
 always @(posedge clk) mc_rd_wr_009: if (~rst) cover property (e_mc_rd_wr_009_wtr_l);
 
 // Read after write in group 1 blocked by wtr_l in 3ds
 reg [1:0] e_wrcas_previous_win_rank;
 always @(posedge clk) e_wrcas_previous_win_rank <= #TCQ (wrCAS) ? winRank : e_wrcas_previous_win_rank;
-wire   e_mc_rd_wr_010_wtr_l = rdReq[1] & (cmdRank[1*2+:2] == e_wrcas_previous_win_rank) & (S_HEIGHT > 1)   // current read group 1 rank
-                              &  (prevGrW[cmdRank[1*2+:2]] == cmdGroup[1*2+:2])                            // previous group is 1 for selected rank
-                              &  (prevLRW[cmdRank[1*2+:2]] == cmdLRank[3*LR_WIDTH+:LR_WIDTH])              // previous LR is same for selected rank for group 1
-                              & ~wtr_okl[cmdRank[1*2+:2]] & e_wrcas_previous_win_rank == cmdRank[1*2+:2];  // wtr_l not safe and write in previous cycle
+wire   e_mc_rd_wr_010_wtr_l = rdReq[1] & (cmdRank[1*RKBITS+:RKBITS] == e_wrcas_previous_win_rank) & (S_HEIGHT > 1)   // current read group 1 rank
+                              &  (prevGrW[cmdRank[1*RKBITS+:RKBITS]] == cmdGroup[1*2+:2])                            // previous group is 1 for selected rank
+                              &  (prevLRW[cmdRank[1*RKBITS+:RKBITS]] == cmdLRank[3*LR_WIDTH+:LR_WIDTH])              // previous LR is same for selected rank for group 1
+                              & ~wtr_okl[cmdRank[1*RKBITS+:RKBITS]] & e_wrcas_previous_win_rank == cmdRank[1*RKBITS+:RKBITS];  // wtr_l not safe and write in previous cycle
 always @(posedge clk) mc_rd_wr_010: if (~rst) cover property (e_mc_rd_wr_010_wtr_l);
 
 // Asserts - When asserted high, an illegal condition has been detected and the test has failed.
@@ -348,10 +349,10 @@ always @(posedge clk) mc_rd_wr_010: if (~rst) cover property (e_mc_rd_wr_010_wtr
 
 // Read one cycle after write to same rank
 wire   a_mc_rd_wr_000_wtr = wrCAS
-                            & (   ( rdReqT[0] & (winRank == cmdRank[0*2+:2]) )
-                                | ( rdReqT[1] & (winRank == cmdRank[1*2+:2]) )
-                                | ( rdReqT[2] & (winRank == cmdRank[2*2+:2]) )
-                                | ( rdReqT[3] & (winRank == cmdRank[3*2+:2]) ) );
+                            & (   ( rdReqT[0] & (winRank == cmdRank[0*RKBITS+:RKBITS]) )
+                                | ( rdReqT[1] & (winRank == cmdRank[1*RKBITS+:RKBITS]) )
+                                | ( rdReqT[2] & (winRank == cmdRank[2*RKBITS+:RKBITS]) )
+                                | ( rdReqT[3] & (winRank == cmdRank[3*RKBITS+:RKBITS]) ) );
 always @(posedge clk) if (~rst) assert property (~a_mc_rd_wr_000_wtr);
 
 // Write one cycle after read

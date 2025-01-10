@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_axi_register_slice.sv
+//  /   /         Filename           : ddr4_v2_2_23_axi_register_slice.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -75,7 +76,7 @@
 
 `timescale 1ps/1ps
 
-module ddr4_v2_2_3_axi_register_slice #
+module ddr4_v2_2_23_axi_register_slice #
   (
    parameter C_FAMILY                            = "virtex6",
    parameter integer C_AXI_ID_WIDTH              = 4,
@@ -360,7 +361,7 @@ module ddr4_v2_2_3_axi_register_slice #
     assign M_AXI_AWREGION = m_aw_data[C_AWREGION_RIGHT+:C_AWREGION_LEN];
     assign M_AXI_AWQOS    = m_aw_data[C_AWQOS_RIGHT+:C_AWQOS_LEN];
     
-    ddr4_v2_2_3_axic_register_slice #
+    ddr4_v2_2_23_axic_register_slice #
       (
        .C_FAMILY(C_FAMILY),
        .C_DATA_WIDTH(C_AW_SIZE),
@@ -403,7 +404,7 @@ module ddr4_v2_2_3_axi_register_slice #
     assign M_AXI_WSTRB    = m_w_data[C_WSTRB_RIGHT+:C_WSTRB_LEN];
     assign M_AXI_WLAST    = m_w_data[C_WLAST_RIGHT+:C_WLAST_LEN];
 
-    ddr4_v2_2_3_axic_register_slice #
+    ddr4_v2_2_23_axic_register_slice #
       (
        .C_FAMILY(C_FAMILY),
        .C_DATA_WIDTH(C_W_SIZE),
@@ -444,7 +445,7 @@ module ddr4_v2_2_3_axi_register_slice #
     assign S_AXI_BID      = s_b_data[C_BID_RIGHT+:C_BID_LEN];
     assign S_AXI_BRESP    = s_b_data[C_BRESP_RIGHT+:C_BRESP_LEN];
 
-    ddr4_v2_2_3_axic_register_slice #
+    ddr4_v2_2_23_axic_register_slice #
       (
        .C_FAMILY(C_FAMILY),
        .C_DATA_WIDTH(C_B_SIZE),
@@ -498,7 +499,7 @@ module ddr4_v2_2_3_axi_register_slice #
     assign M_AXI_ARREGION = m_ar_data[C_ARREGION_RIGHT+:C_ARREGION_LEN];
     assign M_AXI_ARQOS    = m_ar_data[C_ARQOS_RIGHT+:C_ARQOS_LEN];
 
-    ddr4_v2_2_3_axic_register_slice #
+    ddr4_v2_2_23_axic_register_slice #
       (
        .C_FAMILY(C_FAMILY),
        .C_DATA_WIDTH(C_AR_SIZE),
@@ -541,7 +542,7 @@ module ddr4_v2_2_3_axi_register_slice #
     assign S_AXI_RRESP    = s_r_data[C_RRESP_RIGHT+:C_RRESP_LEN];
     assign S_AXI_RLAST    = s_r_data[C_RLAST_RIGHT+:C_RLAST_LEN];
 
-    ddr4_v2_2_3_axic_register_slice #
+    ddr4_v2_2_23_axic_register_slice #
       (
        .C_FAMILY(C_FAMILY),
        .C_DATA_WIDTH(C_R_SIZE),

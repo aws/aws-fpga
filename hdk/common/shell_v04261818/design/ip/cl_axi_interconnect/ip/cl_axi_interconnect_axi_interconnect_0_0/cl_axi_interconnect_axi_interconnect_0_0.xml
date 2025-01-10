@@ -1628,7 +1628,7 @@
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
       <xilinx:displayName>AXI Interconnect</xilinx:displayName>
-      <xilinx:coreRevision>16</xilinx:coreRevision>
+      <xilinx:coreRevision>32</xilinx:coreRevision>
       <xilinx:configElementInfos>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.ENABLE_ADVANCED_OPTIONS" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.M00_HAS_REGSLICE" xilinx:valueSource="user"/>
@@ -1639,13 +1639,13 @@
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.NUM_SI" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S00_HAS_REGSLICE" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.S01_HAS_REGSLICE" xilinx:valueSource="user"/>
-        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SYNCHRONIZATION_STAGES" xilinx:valueSource="user"/>
-        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.XBAR_DATA_WIDTH" xilinx:valueSource="user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SYNCHRONIZATION_STAGES" xilinx:valueSource="user" xilinx:valuePermission="bd_and_user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.XBAR_DATA_WIDTH" xilinx:valueSource="user" xilinx:valuePermission="bd_and_user"/>
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="2192f355"/>
+      <xilinx:xilinxVersion>2024.1</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="c88194a6"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="e3c1d15b"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>

@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_3_a_upsizer.sv
+//  /   /         Filename           : ddr4_v2_2_23_a_upsizer.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Thu Apr 17 2014
 //  \___\/\___\
@@ -72,7 +73,7 @@
 `timescale 1ps/1ps
 
 
-module ddr4_v2_2_3_a_upsizer #
+module ddr4_v2_2_23_a_upsizer #
   (
    parameter         C_FAMILY                         = "rtl", 
                        // FPGA Family. Current version: virtex6 or spartan6.
@@ -661,7 +662,7 @@ module ddr4_v2_2_3_a_upsizer #
          .LI(last_word_for_mask_sel[bit_cnt])
         );
         
-        ddr4_v2_2_3_carry_latch_and #
+        ddr4_v2_2_23_carry_latch_and #
           (
            .C_FAMILY(C_FAMILY)
            ) last_mask_inst
@@ -696,7 +697,7 @@ module ddr4_v2_2_3_a_upsizer #
       
       assign sel_access_need_extra_word = access_is_incr & cmd_modified_i;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) access_need_extra_word_inst
@@ -792,7 +793,7 @@ module ddr4_v2_2_3_a_upsizer #
       
       assign sel_s_axi_avalid = S_AXI_AVALID & ~ARESET;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) avalid_inst
@@ -879,7 +880,7 @@ module ddr4_v2_2_3_a_upsizer #
       wire sel_cmd_id_check;
       wire sel_cmd_push;
       
-      ddr4_v2_2_3_comparator #
+      ddr4_v2_2_23_comparator #
         (
          .C_FAMILY(C_FAMILY),
          .C_DATA_WIDTH(C_AXI_ID_WIDTH)
@@ -893,7 +894,7 @@ module ddr4_v2_2_3_a_upsizer #
          
       assign sel_cmd_id_check = ~cmd_empty;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) cmd_id_check_inst_1
@@ -903,7 +904,7 @@ module ddr4_v2_2_3_a_upsizer #
          .COUT(cmd_id_check_i)
          );
 
-      ddr4_v2_2_3_carry_or #
+      ddr4_v2_2_23_carry_or #
         (
          .C_FAMILY(C_FAMILY)
          ) cmd_id_check_inst_2
@@ -913,7 +914,7 @@ module ddr4_v2_2_3_a_upsizer #
          .COUT(cmd_id_check)
          );
          
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) allow_new_cmd_inst_1
@@ -923,7 +924,7 @@ module ddr4_v2_2_3_a_upsizer #
          .COUT(allow_new_cmd_i)
          );
 
-      ddr4_v2_2_3_carry_or #
+      ddr4_v2_2_23_carry_or #
         (
          .C_FAMILY(C_FAMILY)
          ) allow_new_cmd_inst_2
@@ -935,7 +936,7 @@ module ddr4_v2_2_3_a_upsizer #
          
       assign sel_cmd_push = ~cmd_push_block;
       
-      ddr4_v2_2_3_carry_and #
+      ddr4_v2_2_23_carry_and #
         (
          .C_FAMILY(C_FAMILY)
          ) cmd_push_inst
@@ -999,7 +1000,7 @@ module ddr4_v2_2_3_a_upsizer #
   // Instantiated queue.
   generate
     if (C_SUPPORT_BURSTS == 1) begin : USE_BURSTS
-      ddr4_v2_2_3_command_fifo #
+      ddr4_v2_2_23_command_fifo #
       (
        .C_FAMILY                    (C_FAMILY),
        .C_ENABLE_S_VALID_CARRY      (1),
@@ -1026,7 +1027,7 @@ module ddr4_v2_2_3_a_upsizer #
     
       wire [C_M_AXI_BYTES_LOG-1:0]        cmd_first_word_out;
   
-      ddr4_v2_2_3_command_fifo #
+      ddr4_v2_2_23_command_fifo #
       (
        .C_FAMILY                    (C_FAMILY),
        .C_ENABLE_S_VALID_CARRY      (1),

@@ -9,58 +9,58 @@ The manifest file is a text file formatted with key=value pairs. Some keys are m
 
 ## Manifest file specification: Version 2
 
-* **manifest_format_version=** 2 [Mandatory]  
+* **manifest_format_version=** 2 [Mandatory]
 
-* **pci_vendor_id=** [Mandatory]  
+* **pci_vendor_id=** [Mandatory]
       *0x1D0F is the detault value that is pre-assigned by Amazon*
 
-* **pci_device_id=** [Mandatory]  
+* **pci_device_id=** [Mandatory]
       *0xF000 is the detault value that is pre-assigned by Amazon*
 
-* **pci_subsystem_id=** [Mandatory]  
+* **pci_subsystem_id=** [Mandatory]
       *Must be non-zero*
-            
-* **pci_subsystem_vendor_id=** [Mandatory]  
-      *Must be non-zero* 
 
-* **dcp_hash=**.....   [Mandatory]         
+* **pci_subsystem_vendor_id=** [Mandatory]
+      *Must be non-zero*
+
+* **dcp_hash=**.....   [Mandatory]
       *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
 
-* **shell_version**=.....   [Mandatory]  
+* **shell_version**=.....   [Mandatory]
       *Taken from aws-fpga/hdk/common/[shell directory]/build/checkpoints/from_aws*
 
-* **dcp_file_name=**.....   [Mandatory]  
+* **dcp_file_name=**.....   [Mandatory]
       *The .dcp file name including the file type suffix*
 
-* **hdk_version=**.....         
-     *Taken from aws-fpga/hdk/hdk_version.txt* 
+* **hdk_version=**.....
+     *Taken from aws-fpga/hdk/hdk_version.txt*
 
 * **tool_version=**.....   [Mandatory]
   * use vivado tool version with below table as a reference
-     
+
 | vivado tool version | field value          |
 |---------------------|----------------------|
+| 2024.1              | tool_version=v2024.1 |
 | 2021.2              | tool_version=v2021.2 |
 | 2021.1              | tool_version=v2021.1 |
 | 2020.2              | tool_version=v2020.2 |
 | 2020.1              | tool_version=v2020.1 |
 | 2019.2              | tool_version=v2019.2 |
 | 2019.1              | tool_version=v2019.1 |
-             
-* **date=** YY_MM_DD-HHMMSS         
+
+* **date=** YY_MM_DD-HHMMSS
      *Following same format used in the automatic build reports used by AWS scripts*
 
-* **clock_recipe_a**=....   [Mandatory]  
-    *A clock recipe ID in the form Ax, indicating which clock settings will be used in clock group A in this CL*  
+* **clock_recipe_a**=....   [Mandatory]
+    *A clock recipe ID in the form Ax, indicating which clock settings will be used in clock group A in this CL*
     *Supported clock recipes are listed in Clock Group A of [supported clock recipes](./clock_recipes.csv)*
-     
-* **clock_recipe_b**=....  
-    *A clock recipe ID in the form Bx, indicating which clock settings will be used in clock group B in this CL*  
-    *Supported clock recipes are listed in Clock Group B of [supported clock recipes](./clock_recipes.csv)*  
-    *If this field is missing, recipe B0 will be used*
-        
-* **clock_recipe_c**=....   
-      *A clock recipe ID in the form Cx, indicating which clock settings will be used in clock group C in this CL*  
-      *Supported clock recipes are listed in Clock Group C of [supported clock recipes](./clock_recipes.csv)*  
-      *If this field is missing, recipe C0 will be used*
 
+* **clock_recipe_b**=....
+    *A clock recipe ID in the form Bx, indicating which clock settings will be used in clock group B in this CL*
+    *Supported clock recipes are listed in Clock Group B of [supported clock recipes](./clock_recipes.csv)*
+    *If this field is missing, recipe B0 will be used*
+
+* **clock_recipe_c**=....
+      *A clock recipe ID in the form Cx, indicating which clock settings will be used in clock group C in this CL*
+      *Supported clock recipes are listed in Clock Group C of [supported clock recipes](./clock_recipes.csv)*
+      *If this field is missing, recipe C0 will be used*

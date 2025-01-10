@@ -1,0 +1,106 @@
+From 9f7c52afa7c948adea4fe931e735310dae248e53 Mon Sep 17 00:00:00 2001
+From: root <root@ip-172-31-83-219.ec2.internal>
+Date: Mon, 30 Dec 2024 17:55:54 +0000
+Subject: [PATCH] Fixing fallthroughs
+
+---
+ kernel/linux/igb_uio/igb_uio.c | 41 ++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 19 deletions(-)
+
+diff --git a/kernel/linux/igb_uio/igb_uio.c b/kernel/linux/igb_uio/igb_uio.c
+index 039f5a5f63..01bc261555 100644
+--- a/kernel/linux/igb_uio/igb_uio.c
++++ b/kernel/linux/igb_uio/igb_uio.c
+@@ -213,67 +213,70 @@ igbuio_pci_enable_interrupts(struct rte_uio_pci_dev *udev)
+ #ifndef HAVE_ALLOC_IRQ_VECTORS
+ 	struct msix_entry msix_entry;
+ #endif
+-
+-	switch (igbuio_intr_mode_preferred) {
+-	case RTE_INTR_MODE_MSIX:
+-		/* Only 1 msi-x vector needed */
++	int found_intr_mode = 0;
++	if (igbuio_intr_mode_preferred == RTE_INTR_MODE_MSIX) {
++	/* Only 1 msi-x vector needed */
+ #ifndef HAVE_ALLOC_IRQ_VECTORS
+ 		msix_entry.entry = 0;
+ 		if (pci_enable_msix(udev->pdev, &msix_entry, 1) == 0) {
++			found_intr_mode = 1;
+ 			dev_dbg(&udev->pdev->dev, "using MSI-X");
+ 			udev->info.irq_flags = IRQF_NO_THREAD;
+ 			udev->info.irq = msix_entry.vector;
+ 			udev->mode = RTE_INTR_MODE_MSIX;
+-			break;
+ 		}
+ #else
+ 		if (pci_alloc_irq_vectors(udev->pdev, 1, 1, PCI_IRQ_MSIX) == 1) {
++			found_intr_mode = 1;
+ 			dev_dbg(&udev->pdev->dev, "using MSI-X");
+ 			udev->info.irq_flags = IRQF_NO_THREAD;
+ 			udev->info.irq = pci_irq_vector(udev->pdev, 0);
+ 			udev->mode = RTE_INTR_MODE_MSIX;
+-			break;
+ 		}
+ #endif
++	}
+ 
+-	/* falls through - to MSI */
+-	case RTE_INTR_MODE_MSI:
++        if (found_intr_mode == 0 && (igbuio_intr_mode_preferred == RTE_INTR_MODE_MSIX || igbuio_intr_mode_preferred == RTE_INTR_MODE_MSI)) {
+ #ifndef HAVE_ALLOC_IRQ_VECTORS
+ 		if (pci_enable_msi(udev->pdev) == 0) {
++			found_intr_mode = 1;
+ 			dev_dbg(&udev->pdev->dev, "using MSI");
+ 			udev->info.irq_flags = IRQF_NO_THREAD;
+ 			udev->info.irq = udev->pdev->irq;
+ 			udev->mode = RTE_INTR_MODE_MSI;
+-			break;
+ 		}
+ #else
+ 		if (pci_alloc_irq_vectors(udev->pdev, 1, 1, PCI_IRQ_MSI) == 1) {
++			found_intr_mode = 1;
+ 			dev_dbg(&udev->pdev->dev, "using MSI");
+ 			udev->info.irq_flags = IRQF_NO_THREAD;
+ 			udev->info.irq = pci_irq_vector(udev->pdev, 0);
+ 			udev->mode = RTE_INTR_MODE_MSI;
+-			break;
+ 		}
+ #endif
+-	/* falls through - to INTX */
+-	case RTE_INTR_MODE_LEGACY:
++	}
++
++	if (found_intr_mode == 0 && (igbuio_intr_mode_preferred == RTE_INTR_MODE_MSIX || igbuio_intr_mode_preferred == RTE_INTR_MODE_MSI || igbuio_intr_mode_preferred == RTE_INTR_MODE_LEGACY)) {
+ 		if (pci_intx_mask_supported(udev->pdev)) {
++			found_intr_mode = 1;
+ 			dev_dbg(&udev->pdev->dev, "using INTX");
+ 			udev->info.irq_flags = IRQF_SHARED | IRQF_NO_THREAD;
+ 			udev->info.irq = udev->pdev->irq;
+ 			udev->mode = RTE_INTR_MODE_LEGACY;
+-			break;
++		} else {
++			dev_notice(&udev->pdev->dev, "PCI INTX mask not supported\n");
+ 		}
+-		dev_notice(&udev->pdev->dev, "PCI INTX mask not supported\n");
+-	/* falls through - to no IRQ */
+-	case RTE_INTR_MODE_NONE:
++	}
++
++	if (found_intr_mode == 0 && (igbuio_intr_mode_preferred == RTE_INTR_MODE_MSIX || igbuio_intr_mode_preferred == RTE_INTR_MODE_MSI || igbuio_intr_mode_preferred == RTE_INTR_MODE_LEGACY || igbuio_intr_mode_preferred == RTE_INTR_MODE_NONE)) {
++		found_intr_mode = 1;
+ 		udev->mode = RTE_INTR_MODE_NONE;
+ 		udev->info.irq = UIO_IRQ_NONE;
+-		break;
++	}
+ 
+-	default:
++	if (found_intr_mode == 0) {
+ 		dev_err(&udev->pdev->dev, "invalid IRQ mode %u",
+-			igbuio_intr_mode_preferred);
++		igbuio_intr_mode_preferred);
+ 		udev->info.irq = UIO_IRQ_NONE;
+ 		err = -EINVAL;
+ 	}
+-- 
+2.25.1
+

@@ -291,14 +291,6 @@ set_property IOSTANDARD POD12_DCI [ get_ports "c0_ddr4_dq[64]" ]
 set_property IOSTANDARD POD12_DCI [ get_ports "c0_ddr4_dq[65]" ]
 
 
-## This signal is static signals. Once asserted it will stay HIGH.
-
-## The multi cycle path constraint is added to improve the timing.
-
-set_multicycle_path -setup 8 -from [get_pins */u_ddr_cal_top/calDone*/C]
-set_multicycle_path -end -hold 7 -from [get_pins */u_ddr_cal_top/calDone*/C]
-
-
 ## These signals once asserted, stays asserted for multiple clock cycles.
 
 ## False path constraint is added to improve the HOLD timing.
@@ -349,6 +341,11 @@ set_false_path -from [get_pins  */input_rst_design_reg/C] -to [get_pins */rst_mb
 set_false_path -from [get_pins  */rst_async_riu_div_reg/C] -to [get_pins */rst_div_sync_r_reg[0]/D]
 set_false_path -from [get_pins  */rst_async_mb_reg/C]      -to [get_pins */rst_mb_sync_r_reg[0]/D]
 set_false_path -from [get_pins  */rst_async_riu_div_reg/C] -to [get_pins */rst_riu_sync_r_reg[0]/D]
+create_waiver -internal -user DDR4 -tags "1010162" -scope -type METHODOLOGY -id CLKC-55 -description "Clocking Primitives will be Auto-Placed" -objects [get_cells -hierarchical "*gen_mmcme*.u_mmcme_adv_inst*" -filter {NAME =~ *inst/u_ddr4_infrastructure*}]
+create_waiver -internal -user DDR4 -tags "1010162" -scope -type METHODOLOGY -id CLKC-56 -description "Clocking Primitives will be Auto-Placed" -objects [get_cells -hierarchical "*gen_mmcme*.u_mmcme_adv_inst*" -filter {NAME =~ *inst/u_ddr4_infrastructure*}]
+create_waiver -internal -user DDR4 -tags "1010162" -scope -type METHODOLOGY -id CLKC-57 -description "Clocking Primitives will be Auto-Placed" -objects [get_cells -hierarchical "*plle_loop[*].gen_plle*.PLLE*_BASE_INST_OTHER*" -filter {NAME =~ *inst/u_ddr4_phy_pll*}]
+create_waiver -internal -user DDR4 -tags "1010162" -scope -type METHODOLOGY -id CLKC-58 -description "Clocking Primitives will be Auto-Placed" -objects [get_cells -hierarchical "*plle_loop[*].gen_plle*.PLLE*_BASE_INST_OTHER*" -filter {NAME =~ *inst/u_ddr4_phy_pll*}]
+create_waiver -internal -user DDR4 -tags "1010162" -scope -type METHODOLOGY -id CLKC-40 -description "MMCM is driven through a BUFGCE" -objects [get_cells -hierarchical "*gen_mmcme*.u_mmcme_adv_inst*" -filter {NAME =~ *inst/u_ddr4_infrastructure*}]
 ## These below commands are used to create Interface ports for controller.
 
 create_interface -quiet interface_ddr4_core

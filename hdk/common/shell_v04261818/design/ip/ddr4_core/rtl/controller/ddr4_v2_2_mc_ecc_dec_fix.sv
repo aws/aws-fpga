@@ -1,22 +1,20 @@
-//*****************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2013-2014, 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,20 +36,21 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
 //
 //*****************************************************************************
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor                : Xilinx
+// /___/  \  /    Vendor                : AMD
 // \   \   \/     Version               : 1.1
 //  \   \         Application           : MIG
-//  /   /         Filename              : ddr4_v2_2_3_mc_ecc_dec_fix.sv
+//  /   /         Filename              : ddr4_v2_2_23_mc_ecc_dec_fix.sv
 // /___/   /\     Date Last Modified    : $Date$
 // \   \  /  \    Date Created          : Tue May 13 2014
 //  \___\/\___\
@@ -59,15 +58,16 @@
 //Device            : UltraScale
 //Design Name       : DDR4 SDRAM & DDR3 SDRAM
 //Purpose           :
-//                   ddr4_v2_2_3_mc_ecc_dec_fix module
+//                   ddr4_v2_2_23_mc_ecc_dec_fix module
 //Reference         :
 //Revision History  :
 //*****************************************************************************
 `timescale 1ns/100ps
 
-module ddr4_v2_2_3_mc_ecc_dec_fix
+module ddr4_v2_2_23_mc_ecc_dec_fix
   #(
     parameter TCQ = 100,
+    parameter RKBITS             = 2,
     parameter PAYLOAD_WIDTH      = 64,
     parameter CODE_WIDTH         = 72,
     parameter DATA_WIDTH         = 64,
@@ -200,7 +200,7 @@ input                            ecc_status_valid_nxt;
 input      [1:0]                 winPortEncC;
 input                            non_per_rd_cas;
 input      [3:0]                 cmdRmw;
-input      [7:0]                 cmdRank;
+input      [RKBITS*4-1:0]        cmdRank;
 input      [4*LR_WIDTH-1:0]      cmdLRank;
 input      [4*ABITS-1:0]         cmdRow;
 input      [4*COLBITS-1:0]       cmdCol;
@@ -233,7 +233,7 @@ generate
                                         ( COLBITS == 11 ) ? { 4'b0,                                       cmdCol[winPortEncC*COLBITS+10], 1'b0, cmdCol[winPortEncC*COLBITS+:10] } :
                                                             { { ( 16 - COLBITS ) { 1'b0 } },                                                    cmdCol[winPortEncC*COLBITS+:10] } ;
 endgenerate
-assign addr_fifo_load_value[ 7: 4]  = cmdRank   [winPortEncC*2+:2];
+assign addr_fifo_load_value[ 7: 4]  = cmdRank   [winPortEncC*RKBITS+:RKBITS];
 assign addr_fifo_load_value[ 3: 0]  = ( MEM == "DDR4" ) ? { cmdGroup[winPortEncC*2+:2], cmdBank[winPortEncC*2+:2] }
                                                         : { cmdGroup[winPortEncC*2+:1], cmdBank[winPortEncC*2+:2] };
 
