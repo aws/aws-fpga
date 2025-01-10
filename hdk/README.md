@@ -1,21 +1,25 @@
 # AWS FPGA Hardware Development Kit (HDK)
 
 ## Table of Contents
-1. [HDK Overview](#overview)
-2. [Getting Started](#gettingstarted)
-    - [AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)](#iss)
-    - [Install the HDK and setup environment](#setup)
-    - [Review examples](#examples)
-3. [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](#endtoend)
-    - [Fast path to running CL Examples on FPGA Instance](#fastpath)
-    - [Step 1. Pick one of the examples and move to its directory](#step1)
-    - [Step 2. Build the CL](#step2)
-    - [Step 3. Submit the Design Checkpoint to AWS to Create the AFI](#step3)
-    - [Step 4. Setup AWS FPGA Management tools](#step4)
-    - [Step 5. Load the AFI](#step5)
-    - [Step 6. Validating using the CL Example Software](#step6)
-4. [Simulate Custom Logic (CL) RTL Design](#simcl)
-5. [Start your own Custom Logic design (RTL flow, using Verilog or VHDL)](#buildcl)
+- [AWS FPGA Hardware Development Kit (HDK)](#aws-fpga-hardware-development-kit-hdk)
+  - [Table of Contents](#table-of-contents)
+  - [HDK Overview](#hdk-overview)
+  - [Getting Started](#getting-started)
+      - [AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)](#aws-account-f1ec2-instances-on-premises-aws-iam-permissions-aws-cli-and-s3-setup-one-time-setup)
+      - [Install the HDK and setup environment](#install-the-hdk-and-setup-environment)
+      - [Review examples](#review-examples)
+  - [How To Create an Amazon FPGA Image (AFI) From One of The CL Examples: Step-by-Step Guide](#how-to-create-an-amazon-fpga-image-afi-from-one-of-the-cl-examples-step-by-step-guide)
+      - [Fast path to running CL Examples on FPGA Instance](#fast-path-to-running-cl-examples-on-fpga-instance)
+      - [Step 1. Pick one of the examples and start in the example directory](#step-1-pick-one-of-the-examples-and-start-in-the-example-directory)
+      - [Step 2. Build the CL](#step-2-build-the-cl)
+      - [Step 3. Submit the Design Checkpoint to AWS to Create the AFI](#step-3-submit-the-design-checkpoint-to-aws-to-create-the-afi)
+      - [Step by step guide how to load and test a registered AFI from within an F1 instance](#step-by-step-guide-how-to-load-and-test-a-registered-afi-from-within-an-f1-instance)
+      - [Step 4. Setup AWS FPGA Management tools](#step-4-setup-aws-fpga-management-tools)
+      - [Step 5. Load the AFI](#step-5-load-the-afi)
+      - [Step 6. Validating using the CL Example Software](#step-6-validating-using-the-cl-example-software)
+  - [Hello World Example Metadata](#hello-world-example-metadata)
+  - [Simulate your Custom Logic design (RTL Simulation)](#simulate-your-custom-logic-design-rtl-simulation)
+  - [Start your own Custom Logic design (RTL flow, using Verilog or VHDL)](#start-your-own-custom-logic-design-rtl-flow-using-verilog-or-vhdl)
 
 <a name="overview"></a>
 ## HDK Overview
@@ -50,12 +54,13 @@ For more details on the examples, see the [examples table](./cl/examples/cl_exam
 <a name="iss"></a>
 #### AWS Account, F1/EC2 Instances, On-Premises, AWS IAM Permissions, AWS CLI and S3 Setup (One-time Setup)
 * [Setup an AWS Account](https://aws.amazon.com/free/)
-* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](../docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
-* The compatibility table describes the mapping of developer kit version to [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) version:
+* Launch an instance using the [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) which comes pre-installed with Vivado and required licenses.  Given the large size of the FPGA used inside the AWS FPGA instances, the implementation tools require 32GiB Memory (ex: c4.4xlarge, m4.2xlarge, r4.xlarge, t2.2xlarge). c4.4xlarge and c4.8xlarge would provide the fastest execution time with 30 and 60GiB of memory respectively. Developers who want to save on cost, would start coding and run simulations on low-cost instances, like t2.2xlarge, and move to the aforementioned larger instances to run the synthesis of their acceleration code.  Follow the [On-Premises Instructions](../docs/on_premise_licensing_help.md) to purchase and install a license from Xilinx.
+* The compatibility table describes the mapping of developer kit version to [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) version:
 
 | Developer Kit Version   | Tool Version Supported     |  Compatible FPGA Developer AMI Version     |
 |-----------|-----------|------|
-| 1.6.x | 2020.2 | v1.10.x (Xilinx Vivado 2020.2) |
+| 1.6.0-1.6.x | 2020.2 | v1.10.x (Xilinx Vivado 2020.2) (Deprecated) |
+| 1.6.1-1.6.x | 2024.1 | v1.16.x (Xilinx Vivado 2024.1) |
 
 * The FPGA Developer Kit version is listed in [hdk_version.txt](./hdk_version.txt)
 
@@ -354,7 +359,7 @@ Alternatively, you can directly use a pre-generated AFI for this CL.
 <a name="simcl"></a>
 ## Simulate your Custom Logic design (RTL Simulation)
 
-You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys' VCS, Mentor's Questa, or Cadence Incisive).
+You can use Vivado XSIM simulator, or bring your own simulator (like Synopsys' VCS or Mentor's Questa).
 Follow the [RTL simulation environment setup](./docs/RTL_Simulating_CL_Designs.md#introduction) to run these simulations
 
 <a name="buildcl"></a>

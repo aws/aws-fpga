@@ -1,44 +1,111 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<spirit:design xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <spirit:vendor>xilinx.com</spirit:vendor>
-  <spirit:library>xci</spirit:library>
-  <spirit:name>unknown</spirit:name>
-  <spirit:version>1.0</spirit:version>
-  <spirit:componentInstances>
-    <spirit:componentInstance>
-      <spirit:instanceName>bd_a493_lut_buffer_0</spirit:instanceName>
-      <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="lut_buffer" spirit:version="2.0"/>
-      <spirit:configurableElementValues>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_EN_BSCANID_VEC">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_EN_BSCANID_VEC">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">bd_a493_lut_buffer_0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">virtexuplus</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BOARD"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.DEVICE">xcvu9p</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PACKAGE">flgb2104</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PREFHDL">VERILOG</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SILICON_REVISION"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SIMULATOR_LANGUAGE">MIXED</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SPEEDGRADE">-2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.TEMPERATURE_GRADE">I</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_CUSTOMIZATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_GENERATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPCONTEXT">IP_Integrator</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPREVISION">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.MANAGED">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.OUTPUTDIR">.</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SELECTEDSIMMODEL"/>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SHAREDDIR">.</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SWVERSION">2017.4.op</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SYNTHESISFLOW">GLOBAL</spirit:configurableElementValue>
-      </spirit:configurableElementValues>
-      <spirit:vendorExtensions>
-        <xilinx:componentInstanceExtensions>
-          <xilinx:configElementInfos>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_EN_BSCANID_VEC" xilinx:valueSource="user"/>
-          </xilinx:configElementInfos>
-        </xilinx:componentInstanceExtensions>
-      </spirit:vendorExtensions>
-    </spirit:componentInstance>
-  </spirit:componentInstances>
-</spirit:design>
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "bd_a493_lut_buffer_0",
+    "cell_name": "lut_buffer",
+    "component_reference": "xilinx.com:ip:lut_buffer:2.0",
+    "ip_revision": "1",
+    "gen_directory": ".",
+    "parameters": {
+      "component_parameters": {
+        "Component_Name": [ { "value": "bd_a493_lut_buffer_0", "resolve_type": "user", "usage": "all" } ],
+        "C_EN_BSCANID_VEC": [ { "value": "false", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ]
+      },
+      "model_parameters": {
+        "C_EN_BSCANID_VEC": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "virtexuplus" } ],
+        "BASE_BOARD_PART": [ { "value": "" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xcvu9p" } ],
+        "NEXTGEN_VERSAL": [ { "value": "0" } ],
+        "PACKAGE": [ { "value": "flgb2104" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "I" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "1" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "." } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "." } ],
+        "SWVERSION": [ { "value": "2024.1" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "tdi_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tms_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tck_i": [ { "direction": "in", "driver_value": "0" } ],
+        "drck_i": [ { "direction": "in", "driver_value": "0" } ],
+        "sel_i": [ { "direction": "in", "driver_value": "0" } ],
+        "shift_i": [ { "direction": "in", "driver_value": "0" } ],
+        "update_i": [ { "direction": "in", "driver_value": "0" } ],
+        "capture_i": [ { "direction": "in", "driver_value": "0" } ],
+        "runtest_i": [ { "direction": "in", "driver_value": "0" } ],
+        "reset_i": [ { "direction": "in", "driver_value": "0" } ],
+        "bscanid_en_i": [ { "direction": "in", "driver_value": "0" } ],
+        "tdo_o": [ { "direction": "out" } ],
+        "tdi_o": [ { "direction": "out" } ],
+        "tms_o": [ { "direction": "out" } ],
+        "tck_o": [ { "direction": "out" } ],
+        "drck_o": [ { "direction": "out" } ],
+        "sel_o": [ { "direction": "out" } ],
+        "shift_o": [ { "direction": "out" } ],
+        "update_o": [ { "direction": "out" } ],
+        "capture_o": [ { "direction": "out" } ],
+        "runtest_o": [ { "direction": "out" } ],
+        "reset_o": [ { "direction": "out" } ],
+        "bscanid_en_o": [ { "direction": "out" } ],
+        "tdo_i": [ { "direction": "in", "driver_value": "0" } ]
+      },
+      "interfaces": {
+        "s_bscan": {
+          "vlnv": "xilinx.com:interface:bscan:1.0",
+          "abstraction_type": "xilinx.com:interface:bscan_rtl:1.0",
+          "mode": "slave",
+          "port_maps": {
+            "BSCANID_EN": [ { "physical_name": "bscanid_en_i" } ],
+            "CAPTURE": [ { "physical_name": "capture_i" } ],
+            "DRCK": [ { "physical_name": "drck_i" } ],
+            "RESET": [ { "physical_name": "reset_i" } ],
+            "RUNTEST": [ { "physical_name": "runtest_i" } ],
+            "SEL": [ { "physical_name": "sel_i" } ],
+            "SHIFT": [ { "physical_name": "shift_i" } ],
+            "TCK": [ { "physical_name": "tck_i" } ],
+            "TDI": [ { "physical_name": "tdi_i" } ],
+            "TDO": [ { "physical_name": "tdo_o" } ],
+            "TMS": [ { "physical_name": "tms_i" } ],
+            "UPDATE": [ { "physical_name": "update_i" } ]
+          }
+        },
+        "m_bscan": {
+          "vlnv": "xilinx.com:interface:bscan:1.0",
+          "abstraction_type": "xilinx.com:interface:bscan_rtl:1.0",
+          "mode": "master",
+          "port_maps": {
+            "BSCANID_EN": [ { "physical_name": "bscanid_en_o" } ],
+            "CAPTURE": [ { "physical_name": "capture_o" } ],
+            "DRCK": [ { "physical_name": "drck_o" } ],
+            "RESET": [ { "physical_name": "reset_o" } ],
+            "RUNTEST": [ { "physical_name": "runtest_o" } ],
+            "SEL": [ { "physical_name": "sel_o" } ],
+            "SHIFT": [ { "physical_name": "shift_o" } ],
+            "TCK": [ { "physical_name": "tck_o" } ],
+            "TDI": [ { "physical_name": "tdi_o" } ],
+            "TDO": [ { "physical_name": "tdo_i" } ],
+            "TMS": [ { "physical_name": "tms_o" } ],
+            "UPDATE": [ { "physical_name": "update_o" } ]
+          }
+        }
+      }
+    }
+  }
+}

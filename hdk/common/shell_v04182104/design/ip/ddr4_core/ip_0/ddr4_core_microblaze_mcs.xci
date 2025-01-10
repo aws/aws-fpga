@@ -1,172 +1,263 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<spirit:design xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <spirit:vendor>xilinx.com</spirit:vendor>
-  <spirit:library>xci</spirit:library>
-  <spirit:name>unknown</spirit:name>
-  <spirit:version>1.0</spirit:version>
-  <spirit:componentInstances>
-    <spirit:componentInstance>
-      <spirit:instanceName>ddr4_core_microblaze_mcs</spirit:instanceName>
-      <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="microblaze_mcs" spirit:version="3.0"/>
-      <spirit:configurableElementValues>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.ASSOCIATED_ASYNC_RESET">Reset</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.ASSOCIATED_BUSIF"/>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.ASSOCIATED_RESET"/>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.BOARD.ASSOCIATED_PARAM">CLK_BOARD_INTERFACE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.CLK_DOMAIN">bd_bf3f_Clk</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.FREQ_HZ">100000000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.FREQ_TOLERANCE_HZ">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.INSERT_VIP">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLK.CLK.PHASE">0.000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.RST.RESET.BOARD.ASSOCIATED_PARAM">RESET_BOARD_INTERFACE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.RST.RESET.INSERT_VIP">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.RST.RESET.POLARITY">ACTIVE_HIGH</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.AVOID_PRIMITIVES">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BSCANID">76547328</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">ddr4_core_microblaze_mcs</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DEBUG_ENABLED">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ECC">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT1_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT1_No_CLOCKS">6216</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT2_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT2_No_CLOCKS">6216</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT3_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT3_No_CLOCKS">6216</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT4_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FIT4_No_CLOCKS">6216</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FREQ">100.0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI1_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI1_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI2_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI2_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI3_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI3_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI4_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPI4_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPIO1_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPIO2_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPIO3_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPIO4_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO1_INIT">0x00000000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO1_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO2_INIT">0x00000000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO2_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO3_INIT">0x00000000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO3_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO4_INIT">0x00000000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GPO4_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_ASYNC_INTR">0xFFFF</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_INTR_SIZE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_LEVEL_EDGE">0x0000</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_NUM_SYNC_FF">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_POSITIVE">0xFFFF</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTC_USE_EXT_INTR">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.JTAG_CHAIN">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.MEMSIZE">98304</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.MEMTYPE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.MICROBLAZE_INSTANCE">microblaze_0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.OPTIMIZATION">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PATH">mcs_0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT1_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT1_PRESCALER">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT1_READABLE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT1_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT2_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT2_PRESCALER">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT2_READABLE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT2_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT3_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT3_PRESCALER">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT3_READABLE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT3_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT4_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT4_PRESCALER">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT4_READABLE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.PIT4_SIZE">32</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RESET_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.TRACE">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_BAUDRATE">9600</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_BOARD_INTERFACE">Custom</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_DATA_BITS">8</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_ERROR_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_ODD_PARITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_PROG_BAUDRATE">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_RX_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_TX_INTERRUPT">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.UART_USE_PARITY">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_BOARD_FLOW">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_BSCAN">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_FIT1">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_FIT2">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_FIT3">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_FIT4">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPI1">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPI2">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPI3">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPI4">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPO1">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPO2">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPO3">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_GPO4">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_IO_BUS">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_PIT1">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_PIT2">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_PIT3">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_PIT4">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_UART_RX">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_UART_TX">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">virtexuplus</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BASE_BOARD_PART"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BOARD_CONNECTIONS"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.DEVICE">xcvu9p</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PACKAGE">flgb2104</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.PREFHDL">VERILOG</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SILICON_REVISION"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SIMULATOR_LANGUAGE">MIXED</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.SPEEDGRADE">-2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.STATIC_POWER"/>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.TEMPERATURE_GRADE">I</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_CUSTOMIZATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.USE_RDI_GENERATION">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPCONTEXT">IP_Flow</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.IPREVISION">14</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.MANAGED">TRUE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.OUTPUTDIR">.</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SELECTEDSIMMODEL"/>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SHAREDDIR">.</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SWVERSION">2020.2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="RUNTIME_PARAM.SYNTHESISFLOW">GLOBAL</spirit:configurableElementValue>
-      </spirit:configurableElementValues>
-      <spirit:vendorExtensions>
-        <xilinx:componentInstanceExtensions>
-          <xilinx:configElementInfos>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.CLK.ASSOCIATED_ASYNC_RESET" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.CLK.BOARD.ASSOCIATED_PARAM" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.CLK.CLK_DOMAIN" xilinx:valueSource="constant"/>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.CLK.CLK.FREQ_HZ" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.RST.RESET.BOARD.ASSOCIATED_PARAM" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.RST.RESET.POLARITY" xilinx:valueSource="user"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.MEMSIZE" xilinx:valueSource="propagated"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.OPTIMIZATION" xilinx:valueSource="propagated"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.TRACE" xilinx:valueSource="propagated"/>
-            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.USE_IO_BUS" xilinx:valueSource="propagated"/>
-          </xilinx:configElementInfos>
-          <xilinx:boundaryDescriptionInfo>
-            <xilinx:boundaryDescription xilinx:boundaryDescriptionJSON="{&quot;ip_boundary&quot;:{&quot;ports&quot;:{&quot;Clk&quot;:{&quot;direction&quot;:&quot;in&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;Reset&quot;:{&quot;direction&quot;:&quot;in&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_data_access&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_data_address&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;},&quot;TRACE_data_byte_enable&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;3&quot;},&quot;TRACE_data_read&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_data_write&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_data_write_value&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;},&quot;TRACE_dcache_hit&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_dcache_rdy&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_dcache_read&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_dcache_req&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_delay_slot&quot;:{&quot;di
-rection&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_ex_piperun&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_exception_kind&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;4&quot;},&quot;TRACE_exception_taken&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_icache_hit&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_icache_rdy&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_icache_req&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_instruction&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;},&quot;TRACE_jump_hit&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_jump_taken&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_mb_halted&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_mem_piperun&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_msr_reg&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0
-&quot;,&quot;physical_right&quot;:&quot;14&quot;},&quot;TRACE_new_reg_value&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;},&quot;TRACE_of_piperun&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_pc&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;},&quot;TRACE_pid_reg&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;7&quot;},&quot;TRACE_reg_addr&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;4&quot;},&quot;TRACE_reg_write&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;TRACE_valid_instr&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_addr_strobe&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_address&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_byte_enable&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;3&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_read_data&quot;:{&quot;direction&quot;:&quot;in&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_read_strobe&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_ready&quot;:{&quot;direction&quot;:&quot;in&quot;,&quot;physica
-l_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_write_data&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;},&quot;IO_write_strobe&quot;:{&quot;direction&quot;:&quot;out&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;}},&quot;interfaces&quot;:{&quot;CLK.Clk&quot;:{&quot;vlnv&quot;:&quot;xilinx.com:signal:clock:1.0&quot;,&quot;abstraction_type&quot;:&quot;xilinx.com:signal:clock_rtl:1.0&quot;,&quot;mode&quot;:&quot;slave&quot;,&quot;parameters&quot;:{&quot;FREQ_HZ&quot;:[{&quot;value&quot;:&quot;100000000&quot;},{&quot;value_src&quot;:&quot;user&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;FREQ_TOLERANCE_HZ&quot;:[{&quot;value&quot;:&quot;0&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;PHASE&quot;:[{&quot;value&quot;:&quot;0.000&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;CLK_DOMAIN&quot;:[{&quot;value&quot;:&quot;bd_bf3f_Clk&quot;},{&quot;value_src&quot;:&quot;constant&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;ASSOCIATED_BUSIF&quot;:[{&quot;value&quot;:&quot;&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;ASSOCIATED_RESET&quot;:[{&quot;value&quot;:&quot;&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;re
-solve_type&quot;:&quot;generated&quot;}],&quot;INSERT_VIP&quot;:[{&quot;value&quot;:&quot;0&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;user&quot;}],&quot;ASSOCIATED_ASYNC_RESET&quot;:[{&quot;value&quot;:&quot;Reset&quot;},{&quot;value_src&quot;:&quot;user&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;BOARD.ASSOCIATED_PARAM&quot;:[{&quot;value&quot;:&quot;CLK_BOARD_INTERFACE&quot;},{&quot;value_src&quot;:&quot;user&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}]},&quot;port_maps&quot;:{&quot;CLK&quot;:{&quot;physical_name&quot;:&quot;Clk&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;}}},&quot;RST.Reset&quot;:{&quot;vlnv&quot;:&quot;xilinx.com:signal:reset:1.0&quot;,&quot;abstraction_type&quot;:&quot;xilinx.com:signal:reset_rtl:1.0&quot;,&quot;mode&quot;:&quot;slave&quot;,&quot;parameters&quot;:{&quot;POLARITY&quot;:[{&quot;value&quot;:&quot;ACTIVE_HIGH&quot;},{&quot;value_src&quot;:&quot;user&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;generated&quot;}],&quot;INSERT_VIP&quot;:[{&quot;value&quot;:&quot;0&quot;},{&quot;value_src&quot;:&quot;default&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;user&quot;}],&quot;BOARD.ASSOCIATED_PARAM&quot;:[{&quot;value&quot;:&quot;RESET_BOARD_INTERFACE&quot;},{&quot;value_src&quot;:&quot;user&quot;},{&quot;value_permission&quot;:&quot;user&quot;},{&quot;resolve_type&quot;:&quot;gene
-rated&quot;}]},&quot;port_maps&quot;:{&quot;RST&quot;:{&quot;physical_name&quot;:&quot;Reset&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;}}},&quot;IO&quot;:{&quot;vlnv&quot;:&quot;xilinx.com:interface:mcsio_bus:1.0&quot;,&quot;abstraction_type&quot;:&quot;xilinx.com:interface:mcsio_bus_rtl:1.0&quot;,&quot;mode&quot;:&quot;master&quot;,&quot;parameters&quot;:{},&quot;port_maps&quot;:{&quot;ADDR_STROBE&quot;:{&quot;physical_name&quot;:&quot;IO_addr_strobe&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;ADDRESS&quot;:{&quot;physical_name&quot;:&quot;IO_address&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;31&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;BYTE_ENABLE&quot;:{&quot;physical_name&quot;:&quot;IO_byte_enable&quot;,&quot;physical_left&quot;:&quot;3&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;3&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;READ_DATA&quot;:{&quot;physical_name&quot;:&quot;IO_read_data&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;31&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;READ_STROBE&quot;:{&quot;physical_name&quot;:&quot;IO_read_strobe&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;READY&quot;:{&quot;physical_name&quot;:&quot;IO_ready&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_righ
-t&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;WRITE_DATA&quot;:{&quot;physical_name&quot;:&quot;IO_write_data&quot;,&quot;physical_left&quot;:&quot;31&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;31&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;WRITE_STROBE&quot;:{&quot;physical_name&quot;:&quot;IO_write_strobe&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;}}},&quot;TRACE&quot;:{&quot;vlnv&quot;:&quot;xilinx.com:interface:mbtrace:2.0&quot;,&quot;abstraction_type&quot;:&quot;xilinx.com:interface:mbtrace_rtl:2.0&quot;,&quot;mode&quot;:&quot;master&quot;,&quot;parameters&quot;:{},&quot;port_maps&quot;:{&quot;DATA_ACCESS&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_access&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DATA_ADDRESS&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_address&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;31&quot;},&quot;DATA_BYTE_ENABLE&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_byte_enable&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;3&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;3&quot;},&quot;DATA_READ&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_read&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;
-},&quot;DATA_WRITE&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_write&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DATA_WRITE_VALUE&quot;:{&quot;physical_name&quot;:&quot;TRACE_data_write_value&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;31&quot;},&quot;DCACHE_HIT&quot;:{&quot;physical_name&quot;:&quot;TRACE_dcache_hit&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DCACHE_RDY&quot;:{&quot;physical_name&quot;:&quot;TRACE_dcache_rdy&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DCACHE_READ&quot;:{&quot;physical_name&quot;:&quot;TRACE_dcache_read&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DCACHE_REQ&quot;:{&quot;physical_name&quot;:&quot;TRACE_dcache_req&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;DELAY_SLOT&quot;:{&quot;physical_name&quot;:&quot;TRACE_delay_slot&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;EX_PIPERUN&quot;:{&quot;physical_name&quot;:&quot;TRACE_ex_piperun&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;p
-hysical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;EXCEPTION_KIND&quot;:{&quot;physical_name&quot;:&quot;TRACE_exception_kind&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;4&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;4&quot;},&quot;EXCEPTION_TAKEN&quot;:{&quot;physical_name&quot;:&quot;TRACE_exception_taken&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;ICACHE_HIT&quot;:{&quot;physical_name&quot;:&quot;TRACE_icache_hit&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;ICACHE_RDY&quot;:{&quot;physical_name&quot;:&quot;TRACE_icache_rdy&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;ICACHE_REQ&quot;:{&quot;physical_name&quot;:&quot;TRACE_icache_req&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;INSTRUCTION&quot;:{&quot;physical_name&quot;:&quot;TRACE_instruction&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;31&quot;},&quot;JUMP_HIT&quot;:{&quot;physical_name&quot;:&quot;TRACE_jump_hit&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;JUMP_TAKEN&quot;
-:{&quot;physical_name&quot;:&quot;TRACE_jump_taken&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;MB_HALTED&quot;:{&quot;physical_name&quot;:&quot;TRACE_mb_halted&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;MEM_PIPERUN&quot;:{&quot;physical_name&quot;:&quot;TRACE_mem_piperun&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;MSR_REG&quot;:{&quot;physical_name&quot;:&quot;TRACE_msr_reg&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;14&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;14&quot;},&quot;NEW_REG_VALUE&quot;:{&quot;physical_name&quot;:&quot;TRACE_new_reg_value&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;31&quot;},&quot;OF_PIPERUN&quot;:{&quot;physical_name&quot;:&quot;TRACE_of_piperun&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;PC&quot;:{&quot;physical_name&quot;:&quot;TRACE_pc&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;31&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;31&quot;},&quot;PID_REG&quot;:{&quot;physical_name&quot;:&quot;TRACE_pid_reg&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;7&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical
-_right&quot;:&quot;7&quot;},&quot;REG_ADDR&quot;:{&quot;physical_name&quot;:&quot;TRACE_reg_addr&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;4&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;4&quot;},&quot;REG_WRITE&quot;:{&quot;physical_name&quot;:&quot;TRACE_reg_write&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;},&quot;VALID_INSTR&quot;:{&quot;physical_name&quot;:&quot;TRACE_valid_instr&quot;,&quot;physical_left&quot;:&quot;0&quot;,&quot;physical_right&quot;:&quot;0&quot;,&quot;logical_left&quot;:&quot;0&quot;,&quot;logical_right&quot;:&quot;0&quot;}}}}}}"/>
-          </xilinx:boundaryDescriptionInfo>
-        </xilinx:componentInstanceExtensions>
-      </spirit:vendorExtensions>
-    </spirit:componentInstance>
-  </spirit:componentInstances>
-</spirit:design>
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "ddr4_core_microblaze_mcs",
+    "component_reference": "xilinx.com:ip:microblaze_mcs:3.0",
+    "ip_revision": "23",
+    "gen_directory": ".",
+    "parameters": {
+      "component_parameters": {
+        "JTAG_CHAIN": [ { "value": "2", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "MICROBLAZE_INSTANCE": [ { "value": "microblaze_0", "resolve_type": "user", "usage": "all" } ],
+        "AVOID_PRIMITIVES": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PATH": [ { "value": "mcs_0", "resolve_type": "user", "usage": "all" } ],
+        "FREQ": [ { "value": "100.0", "resolve_type": "user", "format": "float", "usage": "all" } ],
+        "OPTIMIZATION": [ { "value": "1", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "DEBUG_ENABLED": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "USE_BSCAN": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "BSCANID": [ { "value": "76547328", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "TRACE": [ { "value": "1", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "ECC": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "MEMSIZE": [ { "value": "98304", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "MEMTYPE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "USE_IO_BUS": [ { "value": "1", "value_src": "propagated", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "USE_UART_RX": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "USE_UART_TX": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "UART_BAUDRATE": [ { "value": "9600", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_PROG_BAUDRATE": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_DATA_BITS": [ { "value": "8", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_USE_PARITY": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_ODD_PARITY": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_RX_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_TX_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "UART_ERROR_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_FIT1": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "FIT1_No_CLOCKS": [ { "value": "6216", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "FIT1_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_FIT2": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "FIT2_No_CLOCKS": [ { "value": "6216", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "FIT2_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_FIT3": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "FIT3_No_CLOCKS": [ { "value": "6216", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "FIT3_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_FIT4": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "FIT4_No_CLOCKS": [ { "value": "6216", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "FIT4_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_PIT1": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PIT1_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT1_READABLE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT1_PRESCALER": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT1_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_PIT2": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PIT2_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT2_READABLE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT2_PRESCALER": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT2_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_PIT3": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PIT3_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT3_READABLE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT3_PRESCALER": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT3_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_PIT4": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "PIT4_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT4_READABLE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT4_PRESCALER": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "PIT4_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_GPO1": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPO1_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPO1_INIT": [ { "value": "0x00000000", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "USE_GPO2": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPO2_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPO2_INIT": [ { "value": "0x00000000", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "USE_GPO3": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPO3_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPO3_INIT": [ { "value": "0x00000000", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "USE_GPO4": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPO4_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPO4_INIT": [ { "value": "0x00000000", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "USE_GPI1": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPI1_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPI1_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_GPI2": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPI2_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPI2_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_GPI3": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPI3_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPI3_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "USE_GPI4": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "GPI4_SIZE": [ { "value": "32", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "GPI4_INTERRUPT": [ { "value": "0", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "INTC_USE_EXT_INTR": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "INTC_INTR_SIZE": [ { "value": "1", "resolve_type": "user", "format": "long", "enabled": false, "usage": "all" } ],
+        "INTC_LEVEL_EDGE": [ { "value": "0x0000", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "INTC_POSITIVE": [ { "value": "0xFFFF", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "INTC_ASYNC_INTR": [ { "value": "0xFFFF", "resolve_type": "user", "format": "bitString", "enabled": false, "usage": "all" } ],
+        "INTC_NUM_SYNC_FF": [ { "value": "2", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "Component_Name": [ { "value": "ddr4_core_microblaze_mcs", "resolve_type": "user", "usage": "all" } ],
+        "USE_BOARD_FLOW": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
+        "CLK_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "RESET_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "GPIO1_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "GPIO2_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "GPIO3_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "GPIO4_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ],
+        "UART_BOARD_INTERFACE": [ { "value": "Custom", "resolve_type": "user", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "virtexuplus" } ],
+        "BASE_BOARD_PART": [ { "value": "" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xcvu9p" } ],
+        "NEXTGEN_VERSAL": [ { "value": "0" } ],
+        "PACKAGE": [ { "value": "flgb2104" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "I" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Flow" } ],
+        "IPREVISION": [ { "value": "23" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "." } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "." } ],
+        "SWVERSION": [ { "value": "2024.1" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "Clk": [ { "direction": "in" } ],
+        "Reset": [ { "direction": "in" } ],
+        "TRACE_data_access": [ { "direction": "out" } ],
+        "TRACE_data_address": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "TRACE_data_byte_enable": [ { "direction": "out", "size_left": "0", "size_right": "3" } ],
+        "TRACE_data_read": [ { "direction": "out" } ],
+        "TRACE_data_write": [ { "direction": "out" } ],
+        "TRACE_data_write_value": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "TRACE_dcache_hit": [ { "direction": "out" } ],
+        "TRACE_dcache_rdy": [ { "direction": "out" } ],
+        "TRACE_dcache_read": [ { "direction": "out" } ],
+        "TRACE_dcache_req": [ { "direction": "out" } ],
+        "TRACE_delay_slot": [ { "direction": "out" } ],
+        "TRACE_ex_piperun": [ { "direction": "out" } ],
+        "TRACE_exception_kind": [ { "direction": "out", "size_left": "0", "size_right": "4" } ],
+        "TRACE_exception_taken": [ { "direction": "out" } ],
+        "TRACE_icache_hit": [ { "direction": "out" } ],
+        "TRACE_icache_rdy": [ { "direction": "out" } ],
+        "TRACE_icache_req": [ { "direction": "out" } ],
+        "TRACE_instruction": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "TRACE_jump_hit": [ { "direction": "out" } ],
+        "TRACE_jump_taken": [ { "direction": "out" } ],
+        "TRACE_mb_halted": [ { "direction": "out" } ],
+        "TRACE_mem_piperun": [ { "direction": "out" } ],
+        "TRACE_msr_reg": [ { "direction": "out", "size_left": "0", "size_right": "14" } ],
+        "TRACE_new_reg_value": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "TRACE_of_piperun": [ { "direction": "out" } ],
+        "TRACE_pc": [ { "direction": "out", "size_left": "0", "size_right": "31" } ],
+        "TRACE_pid_reg": [ { "direction": "out", "size_left": "0", "size_right": "7" } ],
+        "TRACE_reg_addr": [ { "direction": "out", "size_left": "0", "size_right": "4" } ],
+        "TRACE_reg_write": [ { "direction": "out" } ],
+        "TRACE_valid_instr": [ { "direction": "out" } ],
+        "IO_addr_strobe": [ { "direction": "out" } ],
+        "IO_address": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "IO_byte_enable": [ { "direction": "out", "size_left": "3", "size_right": "0" } ],
+        "IO_read_data": [ { "direction": "in", "size_left": "31", "size_right": "0", "driver_value": "0" } ],
+        "IO_read_strobe": [ { "direction": "out" } ],
+        "IO_ready": [ { "direction": "in", "driver_value": "0" } ],
+        "IO_write_data": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "IO_write_strobe": [ { "direction": "out" } ]
+      },
+      "interfaces": {
+        "CLK.Clk": {
+          "vlnv": "xilinx.com:signal:clock:1.0",
+          "abstraction_type": "xilinx.com:signal:clock_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "FREQ_HZ": [ { "value": "100000000", "value_src": "user", "resolve_type": "generated", "format": "long", "is_static_object": false } ],
+            "FREQ_TOLERANCE_HZ": [ { "value": "0", "resolve_type": "generated", "format": "long", "is_static_object": false } ],
+            "PHASE": [ { "value": "0.0", "resolve_type": "generated", "format": "float", "is_static_object": false } ],
+            "CLK_DOMAIN": [ { "value": "bd_bf3f_Clk", "value_src": "constant", "resolve_type": "generated", "is_static_object": false } ],
+            "ASSOCIATED_BUSIF": [ { "value": "", "resolve_type": "generated", "is_static_object": false } ],
+            "ASSOCIATED_PORT": [ { "value": "", "resolve_type": "generated", "is_static_object": false } ],
+            "ASSOCIATED_RESET": [ { "value": "", "resolve_type": "generated", "is_static_object": false } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_static_object": false } ],
+            "ASSOCIATED_ASYNC_RESET": [ { "value": "Reset", "value_src": "user", "resolve_type": "generated", "is_static_object": false } ],
+            "BOARD.ASSOCIATED_PARAM": [ { "value": "CLK_BOARD_INTERFACE", "value_src": "user", "resolve_type": "generated", "is_static_object": false } ]
+          },
+          "port_maps": {
+            "CLK": [ { "physical_name": "Clk" } ]
+          }
+        },
+        "RST.Reset": {
+          "vlnv": "xilinx.com:signal:reset:1.0",
+          "abstraction_type": "xilinx.com:signal:reset_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "POLARITY": [ { "value": "ACTIVE_HIGH", "value_src": "user", "resolve_type": "generated", "is_static_object": false } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_static_object": false } ],
+            "BOARD.ASSOCIATED_PARAM": [ { "value": "RESET_BOARD_INTERFACE", "value_src": "user", "resolve_type": "generated", "is_static_object": false } ]
+          },
+          "port_maps": {
+            "RST": [ { "physical_name": "Reset" } ]
+          }
+        },
+        "IO": {
+          "vlnv": "xilinx.com:interface:mcsio_bus:1.0",
+          "abstraction_type": "xilinx.com:interface:mcsio_bus_rtl:1.0",
+          "mode": "master",
+          "port_maps": {
+            "ADDR_STROBE": [ { "physical_name": "IO_addr_strobe" } ],
+            "ADDRESS": [ { "physical_name": "IO_address" } ],
+            "BYTE_ENABLE": [ { "physical_name": "IO_byte_enable" } ],
+            "READ_DATA": [ { "physical_name": "IO_read_data" } ],
+            "READ_STROBE": [ { "physical_name": "IO_read_strobe" } ],
+            "READY": [ { "physical_name": "IO_ready" } ],
+            "WRITE_DATA": [ { "physical_name": "IO_write_data" } ],
+            "WRITE_STROBE": [ { "physical_name": "IO_write_strobe" } ]
+          }
+        },
+        "TRACE": {
+          "vlnv": "xilinx.com:interface:mbtrace:2.0",
+          "abstraction_type": "xilinx.com:interface:mbtrace_rtl:2.0",
+          "mode": "master",
+          "port_maps": {
+            "DATA_ACCESS": [ { "physical_name": "TRACE_data_access" } ],
+            "DATA_ADDRESS": [ { "physical_name": "TRACE_data_address" } ],
+            "DATA_BYTE_ENABLE": [ { "physical_name": "TRACE_data_byte_enable" } ],
+            "DATA_READ": [ { "physical_name": "TRACE_data_read" } ],
+            "DATA_WRITE": [ { "physical_name": "TRACE_data_write" } ],
+            "DATA_WRITE_VALUE": [ { "physical_name": "TRACE_data_write_value" } ],
+            "DCACHE_HIT": [ { "physical_name": "TRACE_dcache_hit" } ],
+            "DCACHE_RDY": [ { "physical_name": "TRACE_dcache_rdy" } ],
+            "DCACHE_READ": [ { "physical_name": "TRACE_dcache_read" } ],
+            "DCACHE_REQ": [ { "physical_name": "TRACE_dcache_req" } ],
+            "DELAY_SLOT": [ { "physical_name": "TRACE_delay_slot" } ],
+            "EX_PIPERUN": [ { "physical_name": "TRACE_ex_piperun" } ],
+            "EXCEPTION_KIND": [ { "physical_name": "TRACE_exception_kind" } ],
+            "EXCEPTION_TAKEN": [ { "physical_name": "TRACE_exception_taken" } ],
+            "ICACHE_HIT": [ { "physical_name": "TRACE_icache_hit" } ],
+            "ICACHE_RDY": [ { "physical_name": "TRACE_icache_rdy" } ],
+            "ICACHE_REQ": [ { "physical_name": "TRACE_icache_req" } ],
+            "INSTRUCTION": [ { "physical_name": "TRACE_instruction" } ],
+            "JUMP_HIT": [ { "physical_name": "TRACE_jump_hit" } ],
+            "JUMP_TAKEN": [ { "physical_name": "TRACE_jump_taken" } ],
+            "MB_HALTED": [ { "physical_name": "TRACE_mb_halted" } ],
+            "MEM_PIPERUN": [ { "physical_name": "TRACE_mem_piperun" } ],
+            "MSR_REG": [ { "physical_name": "TRACE_msr_reg" } ],
+            "NEW_REG_VALUE": [ { "physical_name": "TRACE_new_reg_value" } ],
+            "OF_PIPERUN": [ { "physical_name": "TRACE_of_piperun" } ],
+            "PC": [ { "physical_name": "TRACE_pc" } ],
+            "PID_REG": [ { "physical_name": "TRACE_pid_reg" } ],
+            "REG_ADDR": [ { "physical_name": "TRACE_reg_addr" } ],
+            "REG_WRITE": [ { "physical_name": "TRACE_reg_write" } ],
+            "VALID_INSTR": [ { "physical_name": "TRACE_valid_instr" } ]
+          }
+        }
+      }
+    }
+  }
+}

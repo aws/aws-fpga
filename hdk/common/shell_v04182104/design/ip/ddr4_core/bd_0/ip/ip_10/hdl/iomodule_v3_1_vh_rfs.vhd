@@ -2,24 +2,23 @@
 -- iomodule_vote_pkg.vhd - Package specification
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2015-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2015-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -28,11 +27,11 @@
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -41,7 +40,7 @@
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -256,24 +255,23 @@ end package IOModule_Vote_Pkg;
 -- iomodule_vote_pkg_body.vhd - Package body
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2015-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2015-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -282,11 +280,11 @@ end package IOModule_Vote_Pkg;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -295,7 +293,7 @@ end package IOModule_Vote_Pkg;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -449,24 +447,23 @@ end package body IOModule_Vote_Pkg;
 -- iomodule_funcs.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2001-2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2001-2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -475,11 +472,11 @@ end package body IOModule_Vote_Pkg;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -488,7 +485,7 @@ end package body IOModule_Vote_Pkg;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -614,24 +611,23 @@ end package body iomodule_funcs;
 -- xilinx_primitives.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -640,11 +636,11 @@ end package body iomodule_funcs;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -653,7 +649,7 @@ end package body iomodule_funcs;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -720,8 +716,8 @@ end architecture IMP;
 ----- entity XIL_SRL16E -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity XIL_SRL16E is
   generic(
@@ -804,8 +800,8 @@ end architecture IMP;
 ----- entity XIL_SRLC16E -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity XIL_SRLC16E is
   generic(
@@ -852,7 +848,8 @@ begin  -- architecture IMP
   end generate Use_unisim;
 
   Use_RTL : if (C_USE_SRL16 = "no" or C_TARGET = RTL) generate
-    signal shift_reg        : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
+    signal shift_reg         : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
+    constant shift_reg_const : std_logic_vector(15 downto 0) := to_stdLogicVector(INIT);
     attribute shreg_extract : string;
     attribute shreg_extract of SHIFT_REG : signal is C_USE_SRL16;
   begin
@@ -864,7 +861,7 @@ begin  -- architecture IMP
     begin
       if (rising_edge(CLK)) then
         if (Config_Reset = '1') then
-          shift_reg <= (others => '0');
+          shift_reg <= shift_reg_const;
         else
           if CE = '1' then
             shift_reg <= shift_reg(14 downto 0) & D;
@@ -880,8 +877,8 @@ end architecture IMP;
 ----- entity MUXCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXCY is
   generic (
@@ -922,8 +919,8 @@ end architecture IMP;
 ----- entity XORCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_XORCY is
   generic (
@@ -962,8 +959,8 @@ end architecture IMP;
 ----- entity MUXCY with XORCY -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXCY_XORCY is
   generic (
@@ -1012,8 +1009,8 @@ end architecture IMP;
 ----- entity FDR -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDR is
   generic (
@@ -1077,8 +1074,8 @@ end architecture IMP;
 ----- entity FDRE -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDRE is
   generic (
@@ -1144,8 +1141,8 @@ end architecture IMP;
 ----- entity FDSE -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_FDSE is
   generic (
@@ -1211,8 +1208,8 @@ end architecture IMP;
 ----- entity MULT_AND -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MULT_AND is
   generic (
@@ -1253,8 +1250,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_LUT3 is
   generic (
@@ -1310,8 +1307,8 @@ end architecture IMP;
 ----- entity MUXF5 -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXF5 is
   generic (
@@ -1352,8 +1349,8 @@ end architecture IMP;
 ----- entity MUXF6 -----
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity MB_MUXF6 is
   generic (
@@ -1398,24 +1395,23 @@ end architecture IMP;
 -- synchronizers.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2014,2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2014,2017,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -1424,11 +1420,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -1437,7 +1433,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -1502,8 +1498,8 @@ entity mb_sync_bit is
     Synced         : out std_logic);
 end mb_sync_bit;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.xil_scan_reset_control;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.xil_scan_reset_control;
 
 architecture IMP of mb_sync_bit is
 
@@ -1651,8 +1647,8 @@ begin
 end architecture IMP;  -- mb_sync_bit
 
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.mb_sync_bit;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.mb_sync_bit;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -1734,8 +1730,8 @@ entity mb_sync_reset is
     Synced         : out std_logic);
 end mb_sync_reset;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.xil_scan_reset_control;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.xil_scan_reset_control;
 
 architecture IMP of mb_sync_reset is
 
@@ -1818,9 +1814,9 @@ begin
 end architecture IMP;  -- mb_sync_reset
 
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.mb_sync_bit;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.mb_sync_bit;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -1829,8 +1825,7 @@ entity pulse_sync is
   generic(
     C_LEVELS          : natural := 2;
     C_TMR             : natural := 0;
-    C_LATE_ACK        : natural := 0;
-    C_USE_TMR_DISABLE : integer := 0);
+    C_LATE_ACK        : natural := 0);
   port(
     FromAVote       : in  std_logic_vector(PULSE_SYNC_Pos);
     FromBVote       : in  std_logic_vector(PULSE_SYNC_Pos);
@@ -1839,8 +1834,6 @@ entity pulse_sync is
     Clk_Dst         : in  std_logic;
     Rst_Src         : in  std_logic;
     Rst_Dst         : in  std_logic;
-    TMR_Disable_Src : in  std_logic;
-    TMR_Disable_Dst : in  std_logic;
     Pulse_Src       : in  std_logic;
     Pulse_Keep_Src  : out std_logic;
     Pulse_Ack_Src   : out std_logic;
@@ -1926,22 +1919,18 @@ begin
   end process Pulse_Keep_Logic;
 
   TMR_Yes : if (C_TMR /= 0) generate
-    signal tmr_disable_src_b : boolean;
-    signal tmr_disable_dst_b : boolean;
   begin
-    tmr_disable_src_b <= TMR_Disable_Src = '1' and C_USE_TMR_DISABLE = 1;
-    tmr_disable_dst_b <= TMR_Disable_Dst = '1' and C_USE_TMR_DISABLE = 1;
 
     ToVote(PULSE_SYNC_PULSE_Pos) <= pulseD_dst;
     ToVote(PULSE_SYNC_KEEP_Pos)  <= pulse_keepD_src;
 
     pulse_keepD_src_voted <= vote(pulse_keepD_src,
                                   FromAVote(PULSE_SYNC_KEEP_Pos),
-                                  FromBVote(PULSE_SYNC_KEEP_Pos), tmr_disable_src_b);
+                                  FromBVote(PULSE_SYNC_KEEP_Pos), false);
 
     pulseD_dst_voted <= vote(pulseD_dst,
                              FromAVote(PULSE_SYNC_PULSE_Pos),
-                             FromBVote(PULSE_SYNC_PULSE_Pos), tmr_disable_dst_b);
+                             FromBVote(PULSE_SYNC_PULSE_Pos), false);
 
   end generate TMR_Yes; 
 
@@ -2029,6 +2018,7 @@ begin
   end generate Late_Ack;
   
   -- Sync ack back to Clk_Src region to remove keep
+  -- Synced signal need to be voted for TMR
   Pulse_Ack_Sync_I: mb_sync_bit
   generic map(
     C_LEVELS            => C_LEVELS,
@@ -2056,24 +2046,23 @@ end architecture IMP;   -- irq_sync
 -- divide_part.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2082,11 +2071,11 @@ end architecture IMP;   -- irq_sync
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2095,7 +2084,7 @@ end architecture IMP;   -- irq_sync
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -2139,8 +2128,8 @@ end architecture IMP;   -- irq_sync
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity Divide_part is
   generic (
@@ -2414,24 +2403,23 @@ end architecture VHDL_RTL;
 -- fit_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2012,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2440,11 +2428,11 @@ end architecture VHDL_RTL;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2453,7 +2441,7 @@ end architecture VHDL_RTL;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -2499,8 +2487,8 @@ end architecture VHDL_RTL;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity FIT_Module is
   generic (
@@ -2526,9 +2514,9 @@ entity FIT_Module is
     Interrupt    : out std_logic);
 end entity FIT_Module;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.all;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture VHDL_RTL of FIT_Module is
 
@@ -2715,6 +2703,8 @@ begin  -- architecture VHDL_RTL
     signal Interrupt_i : std_logic := '0';
     signal rst_i       : std_logic;
     signal toggle_i    : std_logic;
+    signal toVote_0    : std_logic_vector(C_VOTE_SIZE-1 downto 0);
+    signal toVote_1    : std_logic_vector(C_VOTE_SIZE-1 downto 0);
 
   begin
 
@@ -2760,7 +2750,7 @@ begin  -- architecture VHDL_RTL
 
       Interrupt_i <= Clk_En_I(Divide_Factors.Nr_Of_Factors);
 
-      ToVote <= (others => '0');
+      toVote_0 <= (others => '0');
     end generate Using_SRL16s;
 
     -----------------------------------------------------------------------------
@@ -2822,8 +2812,8 @@ begin  -- architecture VHDL_RTL
           end if;
         end process Counter;
 
-        ToVote(FIT_COUNT_Pos)     <= (others => '0');
-        ToVote(FIT_INTERRUPT_Pos) <= '0';
+        toVote_1(FIT_COUNT_Pos)     <= (others => '0');
+        toVote_1(FIT_INTERRUPT_Pos) <= '0';
 
       end generate TMR_No;
 
@@ -2846,10 +2836,10 @@ begin  -- architecture VHDL_RTL
           end if;
         end process Counter_Logic;
 
-        ToVote(FIT_COUNT_Pos'low + Count_d'length - 1 downto FIT_COUNT_Pos'low) <= Count_d;
-        ToVote(FIT_COUNT_Pos'high downto FIT_COUNT_POs'low + Count_d'length )   <= (others => '0');
+        toVote_1(FIT_COUNT_Pos'low + Count_d'length - 1 downto FIT_COUNT_Pos'low) <= Count_d;
+        toVote_1(FIT_COUNT_Pos'high downto FIT_COUNT_POs'low + Count_d'length )   <= (others => '0');
 
-        ToVote(FIT_INTERRUPT_Pos) <= Interrupt_i_d;
+        toVote_1(FIT_INTERRUPT_Pos) <= Interrupt_i_d;
 
         Counter_DFF : process (Clk) is
         begin
@@ -2883,7 +2873,7 @@ begin  -- architecture VHDL_RTL
         end if;
       end process Toggle_Handler;
 
-      ToVote(FIT_TOGGLE_Pos) <= '0';
+      toVote_1(FIT_TOGGLE_Pos) <= '0';
 
     end generate TMR_No_Toggle;
 
@@ -2912,11 +2902,15 @@ begin  -- architecture VHDL_RTL
         end if;
       end process Toggle_DFF;
 
-      ToVote(FIT_TOGGLE_Pos) <= toggle_i_d;
+      toVote_1(FIT_TOGGLE_Pos) <= toggle_i_d;
 
     end generate TMR_Yes_Toggle;
 
     Toggle <= toggle_i;
+
+    ToVote <= toVote_0 when (Divide_Factors.Good_Divide) and
+                            (Divide_Factors.Nr_Of_SRL16s <= Nr_Of_Bits) and (C_TMR = 0) else
+              toVote_1;
 
   end generate Implement_FIT;
 
@@ -2934,24 +2928,23 @@ end architecture VHDL_RTL;
 -- gpi_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2013 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2013,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -2960,11 +2953,11 @@ end architecture VHDL_RTL;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -2973,7 +2966,7 @@ end architecture VHDL_RTL;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -3107,24 +3100,23 @@ end architecture IMP;
 -- gpo_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -3133,11 +3125,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -3146,7 +3138,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -3212,8 +3204,8 @@ entity GPO_Module is
     GPO         : out std_logic_vector(C_GPO_SIZE-1 downto 0));    
 end entity GPO_Module;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of GPO_Module is
 
@@ -3283,24 +3275,23 @@ end architecture IMP;
 -- intr_ctrl.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016,2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2012,2016,2018,2021,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -3309,11 +3300,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -3322,7 +3313,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -3368,8 +3359,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity intr_ctrl is
 
@@ -3413,9 +3404,9 @@ entity intr_ctrl is
     INTC_CIPR         : out std_logic_vector(31 downto 0));
 end entity intr_ctrl;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
-use iomodule_v3_1_6.mb_sync_bit;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
+use iomodule_v3_1_10.mb_sync_bit;
 
 architecture IMP of intr_ctrl is
 
@@ -3446,6 +3437,14 @@ architecture IMP of intr_ctrl is
     Synced         : out std_logic);
   end component mb_sync_bit;
 
+  subtype intr_pos_type is natural range 31 downto 0;
+  subtype intr_type     is std_logic_vector(intr_pos_type);
+
+  function value(vector : intr_type; index : intr_pos_type) return std_logic is
+  begin
+    return vector(index);
+  end function value;
+
   constant C_ENABLED_NONE : boolean := (C_INTC_ENABLED = (31 downto 0  => '0'));
   constant C_ENABLED_MSH  : boolean := (C_INTC_ENABLED(31 downto 16) /= X"0000");
   constant C_CIVAR_WIDTH  : integer := Boolean'Pos(C_ENABLED_MSH) + 4;
@@ -3457,6 +3456,9 @@ architecture IMP of intr_ctrl is
     C_BASE_VECTORS(C_ADDR_WIDTH - 1 downto 0);
 
   constant USE_LUTRAM : boolean := C_USE_LUTRAM = "yes";
+
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
 
   signal interrupt    : std_logic_vector(31 downto 0);
   signal intr_present : std_logic_vector(31 downto 0);
@@ -3473,23 +3475,27 @@ architecture IMP of intr_ctrl is
 
 begin
 
-  tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1 and C_TMR = 1;
+  tmr_disable_b <= TMR_Disable = '1' and C_USE_TMR_DISABLE = 1 and C_TMR_ONLY = 1;
 
   All_INTR_Bits : for I in 31 downto 0 generate
+    constant C_INTC_ENABLED_I    : std_logic := value(C_INTC_ENABLED, I);
+    constant C_INTC_ASYNC_INTR_I : std_logic := value(C_INTC_ASYNC_INTR, I);
+    constant C_RESET_VALUE       : std_logic := not value(C_INTC_POSITIVE, I);
+    constant C_INTC_LEVEL_EDGE_I : std_logic := value(C_INTC_LEVEL_EDGE, I);
+    constant C_INTC_POSITIVE_I   : std_logic := value(C_INTC_POSITIVE, I);
   begin
 
-    Using_Intr : if (C_INTC_ENABLED(I) = '1') generate
+    Using_Intr : if (C_INTC_ENABLED_I = '1') generate
     begin
 
       -- Clean the interrupt signals
       -- All internal sources are considered clean and only external needs to be registred once
       Ext_Intr : if (I > 15) generate
-        constant C_RESET_VALUE : std_logic :=  not C_INTC_POSITIVE(I);
         signal synced_intr : std_logic;
       begin
 
         -- Synchronize the interrupt signals
-        Async_Gen : if C_INTC_ASYNC_INTR(I) = '1' generate
+        Async_Gen : if C_INTC_ASYNC_INTR_I = '1' generate
           signal reset_std : std_logic;
         begin
 
@@ -3512,19 +3518,19 @@ begin
           
         end generate Async_Gen;
 
-        Sync_Gen: if C_INTC_ASYNC_INTR(I) = '0' generate
+        Sync_Gen: if C_INTC_ASYNC_INTR_I = '0' generate
         begin
           synced_intr <= INTR(i);
         end generate Sync_Gen;
 
-        Clean_TMR_No : if (C_TMR = 0) generate
+        Clean_TMR_No : if (C_TMR_or_LOCKSTEP = 0 or C_INTC_ASYNC_INTR_I = '0') generate
         begin
 
           Clean_Signal : process (Clk) is
           begin  -- process Clean_Signal
             if Clk'event and Clk = '1' then  -- rising clock edge
               if Reset then                  -- synchronous reset (active high)
-                interrupt(I) <= not C_INTC_POSITIVE(I);
+                interrupt(I) <= C_RESET_VALUE;
               else
                 interrupt(I) <= synced_intr;
               end if;
@@ -3535,14 +3541,14 @@ begin
 
         end generate Clean_TMR_No;
 
-        Clean_TMR_Yes : if (C_TMR /= 0) generate
+        Clean_TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0 and C_INTC_ASYNC_INTR_I = '1') generate
           signal interrupt_d : std_logic;
         begin
 
           Clean_Signal : process (Reset,synced_intr) is
           begin
             if Reset then
-              interrupt_d <= not C_INTC_POSITIVE(I);
+              interrupt_d <= C_RESET_VALUE;
             else
               interrupt_d <= synced_intr;
             end if;
@@ -3555,22 +3561,22 @@ begin
             if Clk'event and Clk = '1' then
               interrupt(I) <= vote(interrupt_d,
                                    FromAVote(IRQ_INTERRUPT_Pos'low+I),
-                                   FromBVote(IRQ_INTERRUPT_Pos'low+I), tmr_disable_b);
+                                   FromBVote(IRQ_INTERRUPT_Pos'low+I), false); -- always enabled do keep async interface aligned
             end if;
           end process Clean_Signal_DFF;
 
         end generate Clean_TMR_Yes;
 
         -- Detect External Interrupt
-        Level : if (C_INTC_LEVEL_EDGE(I) = '0') generate
+        Level : if (C_INTC_LEVEL_EDGE_I = '0') generate
         begin
-          intr_present(I) <= interrupt(I) xnor C_INTC_POSITIVE(I);
+          intr_present(I) <= interrupt(I) xnor C_INTC_POSITIVE_I;
         end generate Level;
 
-        Edge_TMR_No : if (C_TMR = 0) generate
+        Edge_TMR_No : if (C_TMR_ONLY = 0) generate
         begin
 
-          Edge : if (C_INTC_LEVEL_EDGE(I) = '1') generate
+          Edge : if (C_INTC_LEVEL_EDGE_I = '1') generate
           begin
             Reg_INTR : process (Clk) is
               variable s1 : std_logic;
@@ -3578,13 +3584,13 @@ begin
               if Clk'event and Clk = '1' then  -- rising clock edge
                 if Reset then                  -- synchronous reset (active high)
                   intr_present(I) <= '0';
-                  s1              := not C_INTC_POSITIVE(I);
+                  s1              := C_RESET_VALUE;
                 else
                   intr_present(I) <= '0';
-                  if (C_INTC_POSITIVE(I) = '0') and (s1 = '1') and (interrupt(I) = '0') then
+                  if (C_INTC_POSITIVE_I = '0') and (s1 = '1') and (interrupt(I) = '0') then
                     intr_present(I) <= '1';
                   end if;
-                  if (C_INTC_POSITIVE(I) = '1') and (s1 = '0') and (interrupt(I) = '1') then
+                  if (C_INTC_POSITIVE_I = '1') and (s1 = '0') and (interrupt(I) = '1') then
                     intr_present(I) <= '1';
                   end if;
                   s1 := interrupt(I);
@@ -3597,10 +3603,10 @@ begin
 
         end generate Edge_TMR_No;
 
-        Edge_TMR_Yes : if (C_TMR /= 0) generate
+        Edge_TMR_Yes : if (C_TMR_ONLY /= 0) generate
         begin
 
-          Edge : if (C_INTC_LEVEL_EDGE(I) = '1') generate
+          Edge : if (C_INTC_LEVEL_EDGE_I = '1') generate
             signal intr_present_d : std_logic;
             signal s1   : std_logic;
           begin
@@ -3610,8 +3616,8 @@ begin
               if Reset then
                 intr_present_d <= '0';
               else
-                if ((C_INTC_POSITIVE(I) = '0') and (s1 = '1') and (interrupt(I) = '0')) or
-                   ((C_INTC_POSITIVE(I) = '1') and (s1 = '0') and (interrupt(I) = '1')) then
+                if ((C_INTC_POSITIVE_I = '0') and (s1 = '1') and (interrupt(I) = '0')) or
+                   ((C_INTC_POSITIVE_I = '1') and (s1 = '0') and (interrupt(I) = '1')) then
                   intr_present_d <= '1';
                 else
                   intr_present_d <= '0';
@@ -3625,7 +3631,7 @@ begin
             begin  -- process Reg_INTR
               if Clk'event and Clk = '1' then  -- rising clock edge
                 if (Reset) then
-                  s1 <= not C_INTC_POSITIVE(I);
+                  s1 <= C_RESET_VALUE;
                 else
                   s1 <= interrupt(I);   -- no need to vote s1 as it follows interrupt which is voted
                 end if;
@@ -3637,7 +3643,7 @@ begin
 
           end generate Edge;
 
-          Level : if (C_INTC_LEVEL_EDGE(I) = '0') generate
+          Level : if (C_INTC_LEVEL_EDGE_I = '0') generate
           begin
             ToVote(IRQ_INTR_PRESENT_Pos'low + I) <= '0';
           end generate Level;
@@ -3655,7 +3661,7 @@ begin
         ToVote(IRQ_INTERRUPT_Pos'low + I)     <= '0'; -- no need to vote as it is not used
       end generate Internal_Intr;
 
-      CISR_CIER_TMR_No : if (C_TMR = 0) generate
+      CISR_CIER_TMR_No : if (C_TMR_ONLY = 0) generate
       begin
 
         CISR_Reg : process (Clk) is
@@ -3689,7 +3695,7 @@ begin
 
       end generate CISR_CIER_TMR_No;
 
-      CISR_CIER_TMR_Yes : if (C_TMR /= 0) generate
+      CISR_CIER_TMR_Yes : if (C_TMR_ONLY /= 0) generate
         signal cisr_d : std_logic;
         signal cier_d : std_logic;
       begin
@@ -3744,7 +3750,7 @@ begin
 
     end generate Using_Intr;
 
-    Not_Using_Intr : if (C_INTC_ENABLED(I) = '0') generate
+    Not_Using_Intr : if (C_INTC_ENABLED_I = '0') generate
     begin
       interrupt(I)                         <= '0';
       intr_present(I)                      <= '0';
@@ -3757,10 +3763,10 @@ begin
       ToVote(IRQ_CIER_Pos'low         + I) <= '0';
     end generate Not_Using_Intr;
 
-    Using_CIMR : if (C_INTC_ENABLED(I) = '1') and (C_INTC_HAS_FAST = 1) generate
+    Using_CIMR : if (C_INTC_ENABLED_I = '1') and (C_INTC_HAS_FAST = 1) generate
     begin
 
-      CIMR_TMR_No : if (C_TMR = 0) generate
+      CIMR_TMR_No : if (C_TMR_ONLY = 0) generate
       begin
 
         CIMR_Reg : process (Clk) is
@@ -3778,7 +3784,7 @@ begin
 
       end generate CIMR_TMR_No;
 
-      CIMR_TMR_Yes: if (C_TMR /= 0) generate
+      CIMR_TMR_Yes: if (C_TMR_ONLY /= 0) generate
         signal cimr_d : std_logic;
       begin
 
@@ -3806,7 +3812,7 @@ begin
 
     end generate Using_CIMR;
 
-    Not_Using_CIMR : if (C_INTC_ENABLED(I) = '0') or (C_INTC_HAS_FAST = 0) generate
+    Not_Using_CIMR : if (C_INTC_ENABLED_I = '0') or (C_INTC_HAS_FAST = 0) generate
     begin
       cimr(I) <= '0';
       ToVote(IRQ_CIMR_Pos'low + I) <= '0';
@@ -3876,7 +3882,7 @@ begin
                     std_logic_vector(to_unsigned(I,2)) & byte_res(I);
     end generate Mux_the_Results;
 
-    Fast_FSM_TMR_No : if (C_TMR = 0) generate
+    Fast_FSM_TMR_No : if (C_TMR_ONLY = 0) generate
     begin
 
       -- Handle interrupt occurrence and acknowledge
@@ -3932,7 +3938,7 @@ begin
 
     end generate Fast_FSM_TMR_No;
 
-    Fast_FSM_TMR_Yes : if (C_TMR /= 0) generate
+    Fast_FSM_TMR_Yes : if (C_TMR_ONLY /= 0) generate
       signal fast_state_d  : std_logic_vector(1 downto 0);
       signal INTC_IRQ_d    : std_logic;
       signal civr_d        : std_logic_vector(4 downto 0);
@@ -4157,7 +4163,7 @@ begin
 
   rst_cipr_rd_voted <= vote(rst_cipr_rd,
                             FromAVote(IRQ_RST_CIPR_RD_Pos),
-                            FromBVote(IRQ_RST_CIPR_RD_Pos), tmr_disable_b, C_TMR);
+                            FromBVote(IRQ_RST_CIPR_RD_Pos), tmr_disable_b, C_TMR_ONLY);
 
   cipr_rd_dff_all : for I in 0 to 31 generate
   begin
@@ -4178,24 +4184,23 @@ end architecture IMP;
 -- pit_module.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016-2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016-2017,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -4204,11 +4209,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -4217,7 +4222,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -4262,8 +4267,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity PIT_Module is
   generic (
@@ -4293,8 +4298,8 @@ entity PIT_Module is
     PIT_Interrupt     : out std_logic);
 end entity PIT_Module;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of PIT_Module is
 
@@ -4731,24 +4736,23 @@ end architecture IMP;
 -- uart_control_status.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -4757,11 +4761,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -4770,7 +4774,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -4816,8 +4820,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 entity Uart_Control_Status is
   generic (
@@ -5041,24 +5045,23 @@ end architecture IMP;
 -- uart_receive.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -5067,11 +5070,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -5080,7 +5083,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -5124,8 +5127,8 @@ end architecture IMP;
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity UART_Receive is
   generic (
@@ -5160,8 +5163,8 @@ entity UART_Receive is
 
 end entity UART_Receive;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of UART_Receive is
 
@@ -5988,24 +5991,23 @@ end architecture IMP;
 -- uart_transmit.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011, 2016, 2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -6014,11 +6016,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -6027,7 +6029,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -6071,8 +6073,8 @@ end architecture IMP;
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity UART_Transmit is
   generic (
@@ -6106,8 +6108,8 @@ end entity UART_Transmit;
 
 library ieee;
 use ieee.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of UART_Transmit is
 
@@ -6866,7 +6868,7 @@ begin  -- architecture IMP
     -----------------------------------------------------------------------------
     -- Parity handling
     -----------------------------------------------------------------------------
-    Using_Parity : if (C_USE_PARITY = 1) generate
+    Using_Parity : if (C_USE_PARITY /= 0) generate
       signal calc_Parity_voted    : std_logic;
       signal tx_Run1_d            : std_logic;
       signal serial_Data_d        : std_logic;
@@ -7039,24 +7041,23 @@ end architecture IMP;
 -- uart_core.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -7065,11 +7066,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -7078,7 +7079,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -7126,9 +7127,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 entity UART_Core is
   generic (
@@ -7587,24 +7588,23 @@ end architecture IMP;
 -- uart.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2016 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011,2016,2021,2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -7613,11 +7613,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -7626,7 +7626,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -7673,9 +7673,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 entity UART is
   generic (
@@ -7811,8 +7811,7 @@ architecture IMP of Uart is
   generic(
     C_LEVELS          : natural := 2;
     C_TMR             : natural := 0;
-    C_LATE_ACK        : natural := 0;
-    C_USE_TMR_DISABLE : integer := 0);
+    C_LATE_ACK        : natural := 0);
   port(
     FromAVote       : in  std_logic_vector(PULSE_SYNC_Pos);
     FromBVote       : in  std_logic_vector(PULSE_SYNC_Pos);
@@ -7822,17 +7821,18 @@ architecture IMP of Uart is
     Clk_Dst         : in  std_logic;
     Rst_Src         : in  std_logic;
     Rst_Dst         : in  std_logic;
-    TMR_Disable_Src : in  std_logic;
-    TMR_Disable_Dst : in  std_logic;
     Pulse_Src       : in  std_logic;
     Pulse_Keep_Src  : out std_logic;
     Pulse_Ack_Src   : out std_logic;
     Pulse_Dst       : out std_logic);
   end component pulse_sync;
 
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
+
   signal reset_b  : boolean;
   signal ToVote_i : std_logic_vector(C_VOTE_SIZE-1 downto 0);
-
+ 
 begin  -- architecture IMP
 
   reset_b <= Reset = '1';
@@ -7851,7 +7851,7 @@ begin  -- architecture IMP
       generic map (
         C_TARGET             => C_TARGET,
         C_FREQ               => C_FREQ,
-        C_TMR                => C_TMR,
+        C_TMR                => C_TMR_ONLY,
         C_USE_TMR_DISABLE    => C_USE_TMR_DISABLE,
         C_VOTE_SIZE          => UART_CORE_Pos'high-UART_CORE_Pos'low+1,
         C_USE_SRL16          => C_USE_SRL16,
@@ -7896,6 +7896,7 @@ begin  -- architecture IMP
     signal reset_std                         : std_logic;
     signal reset_uart_clk_b                  : boolean;
     signal tmr_disable_b                     : boolean;
+    signal tmr_disable_i                     : std_logic;
     signal tmr_disable_raw_uart_clk          : std_logic;
     signal tmr_disable_uart_clk              : std_logic;
     signal write_tx_data_uart_clk            : std_logic;
@@ -7936,7 +7937,7 @@ begin  -- architecture IMP
     signal uart_error_interrupt_clk          : std_logic;
   begin
 
-    TMR_Yes : if (C_TMR /= 0) generate
+    TMR_Yes : if (C_TMR_ONLY /= 0) generate
 
       Use_TMR_Disable: if C_USE_TMR_DISABLE = 1 generate
       begin
@@ -7968,7 +7969,7 @@ begin  -- architecture IMP
 
         ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= tmr_disable_raw_uart_clk;
         
-        tmr_disable_b          <= TMR_Disable = '1';
+        tmr_disable_i <= TMR_Disable;
         
       end generate Use_TMR_Disable;
 
@@ -7976,27 +7977,28 @@ begin  -- architecture IMP
       begin
         tmr_disable_raw_uart_clk           <= '0';
         tmr_disable_uart_clk               <= '0';
-        tmr_disable_b                      <= false;
+        tmr_disable_i                      <= '0';
         ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= '0';
       end generate No_Use_TMR_Disable;
 
     end generate TMR_Yes; 
 
-    TMR_No : if (C_TMR = 0) generate
+    TMR_No : if (C_TMR_ONLY = 0) generate
     begin
       tmr_disable_raw_uart_clk           <= '0';
       tmr_disable_uart_clk               <= '0';
-      tmr_disable_b                      <= false;
+      tmr_disable_i                      <= '0';
       ToVote_i(TMR_DISABLE_UART_Clk_Pos) <= '0';
     end generate TMR_No; 
 
+    tmr_disable_b    <= tmr_disable_i  = '1';
     reset_uart_clk_b <= Reset_UART_Clk = '1';
 
     UART_Core_I : UART_Core
       generic map (
         C_TARGET             => C_TARGET,
         C_FREQ               => C_UART_FREQ,
-        C_TMR                => C_TMR,
+        C_TMR                => C_TMR_ONLY,
         C_USE_TMR_DISABLE    => C_USE_TMR_DISABLE,
         C_VOTE_SIZE          => UART_CORE_Pos'high-UART_CORE_Pos'low+1,
         C_USE_SRL16          => C_USE_SRL16,
@@ -8038,9 +8040,8 @@ begin  -- architecture IMP
     Write_TX_Data_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
     port map(
       FromAVote       => FromAVote(WRITE_TX_DATA_POS),
       FromBVote       => FromBVote(WRITE_TX_DATA_POS),
@@ -8049,8 +8050,6 @@ begin  -- architecture IMP
       Clk_Dst         => UART_Clk,
       Rst_Src         => Reset,
       Rst_Dst         => Reset_UART_Clk,
-      TMR_Disable_Src => TMR_Disable,
-      TMR_Disable_Dst => tmr_disable_uart_clk,
       Pulse_Src       => Write_TX_Data,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8081,16 +8080,15 @@ begin  -- architecture IMP
         write_data_clk <= vote(write_data_clkD,
                                FromAVote(WRITE_DATA_Pos),
                                FromBVote(WRITE_DATA_Pos),
-                               tmr_disable_b, C_TMR);
+                               tmr_disable_b, C_TMR_ONLY);
       end if;
     end process Write_Data_DFF;
     
     Write_Baud_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
     port map(
       FromAVote       => FromAVote(WRITE_BAUD_Pos),
       FromBVote       => FromBVote(WRITE_BAUD_Pos),
@@ -8099,8 +8097,6 @@ begin  -- architecture IMP
       Clk_Dst         => UART_Clk,
       Rst_Src         => Reset,
       Rst_Dst         => Reset_UART_Clk,
-      TMR_Disable_Src => TMR_Disable,
-      TMR_Disable_Dst => tmr_disable_uart_clk,
       Pulse_Src       => Write_Baud,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8125,16 +8121,15 @@ begin  -- architecture IMP
         baud_data_clk <= vote(baud_data_clkD,
                               FromAVote(BAUD_DATA_Pos),
                               FromBVote(BAUD_DATA_Pos),
-                              tmr_disable_b, C_TMR);
+                              tmr_disable_b, C_TMR_ONLY);
       end if;
     end process TX_Baud_Data_DFF;
     
     RX_Data_Received_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
     port map(
       FromAVote       => FromAVote(RX_DATA_RECEIVED_Pos),
       FromBVote       => FromBVote(RX_DATA_RECEIVED_Pos),
@@ -8143,8 +8138,6 @@ begin  -- architecture IMP
       Clk_Dst         => Clk,
       Rst_Src         => Reset_UART_Clk,
       Rst_Dst         => Reset,
-      TMR_Disable_Src => tmr_disable_uart_clk,
-      TMR_Disable_Dst => TMR_Disable,
       Pulse_Src       => rx_data_received_uart_clk,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8153,9 +8146,8 @@ begin  -- architecture IMP
     Read_RX_Data_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 1,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 1)
     port map(
       FromAVote       => FromAVote(READ_RX_DATA_Pos),
       FromBVote       => FromBVote(READ_RX_DATA_Pos),
@@ -8164,11 +8156,9 @@ begin  -- architecture IMP
       Clk_Dst         => UART_Clk,
       Rst_Src         => Reset,
       Rst_Dst         => Reset_UART_Clk,
-      TMR_Disable_Src => TMR_Disable,
-      TMR_Disable_Dst => tmr_disable_uart_clk,
       Pulse_Src       => Read_RX_Data,
       Pulse_Keep_Src  => read_rx_keep,
-      Pulse_Ack_Src   => read_rx_ack_clk,
+      Pulse_Ack_Src   => read_rx_ack_clk,  -- synced voted before used below
       Pulse_Dst       => read_rx_uart_clk);
 
     -- Create Read RX Data pulse on returning acknowledged read
@@ -8199,7 +8189,7 @@ begin  -- architecture IMP
           read_rx_pulse_voted_clk <= vote(read_rx_pulse_tovote_clk,
                                           FromAVote(READ_RX_PULSE_Pos),
                                           FromBVote(READ_RX_PULSE_Pos),
-                                          tmr_disable_b, C_TMR);
+                                          false, C_TMR_or_LOCKSTEP);
         end if;
       end if;
     end process Read_RX_Pulse_DFF;
@@ -8241,7 +8231,7 @@ begin  -- architecture IMP
         rx_data_voted_uart_clk <= vote(rx_data_tovote_uart_clk,
                                        FromAVote(RX_DATA_Pos),
                                        FromBVote(RX_DATA_Pos),
-                                       tmr_disable_b, C_TMR);
+                                       tmr_disable_b, C_TMR_ONLY);
       end if;
     end process RX_Data_DFF;
 
@@ -8254,9 +8244,8 @@ begin  -- architecture IMP
     UART_Status_Read_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 1,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 1)
     port map(
       FromAVote       => FromAVote(UART_STATUS_READ_Pos),
       FromBVote       => FromBVote(UART_STATUS_READ_Pos),
@@ -8265,11 +8254,9 @@ begin  -- architecture IMP
       Clk_Dst         => UART_Clk,
       Rst_Src         => Reset,
       Rst_Dst         => Reset_UART_Clk,
-      TMR_Disable_Src => TMR_Disable,
-      TMR_Disable_Dst => tmr_disable_uart_clk,
       Pulse_Src       => UART_Status_Read,
       Pulse_Keep_Src  => uart_status_read_keep,
-      Pulse_Ack_Src   => uart_status_read_ack_clk,
+      Pulse_Ack_Src   => uart_status_read_ack_clk, -- synced voted before used below
       Pulse_Dst       => uart_status_read_uart_clk);
 
     -- Create Read UART Status pulse on returning acknowledged read
@@ -8300,7 +8287,7 @@ begin  -- architecture IMP
           uart_status_read_pulse_voted_clk <= vote(uart_status_read_pulse_tovote_clk,
                                                    FromAVote(UART_STATUS_READ_PULSE_Pos),
                                                    FromBVote(UART_STATUS_READ_PULSE_Pos),
-                                                   tmr_disable_b, C_TMR);
+                                                   false, C_TMR_or_LOCKSTEP);
         end if;
       end if;
     end process UART_Status_Read_Pulse_DFF;
@@ -8336,7 +8323,7 @@ begin  -- architecture IMP
         uart_status_voted_uart_clk <= vote(uart_status_tovote_uart_clk,
                                            FromAVote(UART_STATUS_Pos),
                                            FromBVote(UART_STATUS_Pos),
-                                           tmr_disable_b, C_TMR);
+                                           tmr_disable_b, C_TMR_ONLY);
       end if;
     end process UART_Status_DFF;
 
@@ -8349,9 +8336,8 @@ begin  -- architecture IMP
     UART_RX_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
     port map(
       FromAVote       => FromAVote(UART_RX_INTERRUPT_Pos),
       FromBVote       => FromBVote(UART_RX_INTERRUPT_Pos),
@@ -8360,8 +8346,6 @@ begin  -- architecture IMP
       Clk_Dst         => Clk,
       Rst_Src         => Reset_UART_Clk,
       Rst_Dst         => Reset,
-      TMR_Disable_Src => tmr_disable_uart_clk,
-      TMR_Disable_Dst => TMR_Disable,
       Pulse_Src       => uart_rx_interrupt_uart_clk,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8370,10 +8354,9 @@ begin  -- architecture IMP
     UART_TX_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
-    port map(
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
+   port map(
       FromAVote       => FromAVote(UART_TX_INTERRUPT_Pos),
       FromBVote       => FromBVote(UART_TX_INTERRUPT_Pos),
       ToVote          => ToVote_i(UART_TX_INTERRUPT_Pos),
@@ -8381,8 +8364,6 @@ begin  -- architecture IMP
       Clk_Dst         => Clk,
       Rst_Src         => Reset_UART_Clk,
       Rst_Dst         => Reset,
-      TMR_Disable_Src => tmr_disable_uart_clk,
-      TMR_Disable_Dst => TMR_Disable,
       Pulse_Src       => uart_tx_interrupt_uart_clk,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8391,9 +8372,8 @@ begin  -- architecture IMP
     Error_Sync: pulse_sync
     generic map(
       C_LEVELS          => C_UART_NUM_SYNC_FF,
-      C_TMR             => C_TMR,
-      C_LATE_ACK        => 0,
-      C_USE_TMR_DISABLE => C_USE_TMR_DISABLE)
+      C_TMR             => C_TMR_or_LOCKSTEP,
+      C_LATE_ACK        => 0)
     port map(
       FromAVote       => FromAVote(UART_ERROR_INTERRUPT_Pos),
       FromBVote       => FromBVote(UART_ERROR_INTERRUPT_Pos),
@@ -8402,8 +8382,6 @@ begin  -- architecture IMP
       Clk_Dst         => Clk,
       Rst_Src         => Reset_UART_Clk,
       Rst_Dst         => Reset,
-      TMR_Disable_Src => tmr_disable_uart_clk,
-      TMR_Disable_Dst => TMR_Disable,
       Pulse_Src       => uart_error_interrupt_uart_clk,
       Pulse_Keep_Src  => open,
       Pulse_Ack_Src   => open,
@@ -8418,11 +8396,11 @@ begin  -- architecture IMP
   end generate Async_UART;
 
   
-  TMR_Yes : if (C_TMR = 1) generate
+  TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0) generate
     ToVote <= ToVote_i;
   end generate TMR_Yes; 
 
-  TMR_No : if (C_TMR = 0) generate
+  TMR_No : if (C_TMR_or_LOCKSTEP = 0) generate
     ToVote <= (others => '0');
   end generate TMR_No; 
 
@@ -8433,24 +8411,23 @@ end architecture IMP;
 -- iomodule_core.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2012,2016,2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2012,2016,2018,2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -8459,11 +8436,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -8472,7 +8449,7 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -8519,8 +8496,8 @@ end architecture IMP;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 entity Iomodule_core is
 
@@ -8732,9 +8709,9 @@ entity Iomodule_core is
 
 end entity Iomodule_core;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.all;
-use iomodule_v3_1_6.iomodule_vote_pkg.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.all;
+use iomodule_v3_1_10.iomodule_vote_pkg.all;
 
 architecture IMP of iomodule_core is
 
@@ -8965,8 +8942,10 @@ architecture IMP of iomodule_core is
     end if;
   end function bool_to_string;
 
-  constant C_USE_SRL16  : string := bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 2)) and (C_TARGET /= RTL));
-  constant C_USE_LUTRAM : string := bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 1)) and (C_TARGET /= RTL));
+  constant C_USE_SRL16  : string :=
+    bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 2)) and (C_TARGET /= RTL) and (C_TMR /= 2));
+  constant C_USE_LUTRAM : string :=
+    bool_to_string(((C_AVOID_PRIMITIVES = 0) or (C_AVOID_PRIMITIVES = 1)) and (C_TARGET /= RTL));
 
   signal reset   : boolean;
   --------------------------------------------------------------------------------------------------
@@ -9027,13 +9006,16 @@ architecture IMP of iomodule_core is
   --------------------------------------------------------------------------------------------------
   -- TMR
   --------------------------------------------------------------------------------------------------
+  constant C_TMR_ONLY        : natural := Boolean'pos(C_TMR = 1);
+  constant C_TMR_or_LOCKSTEP : natural := Boolean'pos(C_TMR > 0);
+
   signal ToVote_i      : std_logic_vector(VOTE_SIZE-1 downto 0);
   signal FromAVote_i   : std_logic_vector(VOTE_SIZE-1 downto 0);
   signal FromBVote_i   : std_logic_vector(VOTE_SIZE-1 downto 0);
 
 begin  -- architecture IMP
 
-  TMR_Yes : if (C_TMR /= 0) generate
+  TMR_Yes : if (C_TMR_or_LOCKSTEP /= 0) generate
   begin
     ToVote(ToVote_i'range)                     <= ToVote_i;
     ToVote(ToVote'high downto ToVote_i'high+1) <= (others => '0');
@@ -9041,7 +9023,7 @@ begin  -- architecture IMP
     FromBVote_i                                <= FromBVote(FromBVote_i'range);
   end generate TMR_Yes;
 
-  TMR_No : if (C_TMR = 0) generate
+  TMR_No : if (C_TMR_or_LOCKSTEP = 0) generate
   begin
     ToVote      <= (others => '0');
     FromAVote_i <= (others => '0');
@@ -9050,7 +9032,9 @@ begin  -- architecture IMP
 
   Reset <= (Rst = '1');
 
-  config_reset_i <= Config_Reset when C_USE_CONFIG_RESET /= 0 else '0';
+  config_reset_i <= Rst          when C_TMR = 2               else
+                    Config_Reset when C_USE_CONFIG_RESET /= 0 else
+                    '0';
 
   --------------------------------------------------------------------------------------------------
   -- UART Section
@@ -9111,7 +9095,7 @@ begin  -- architecture IMP
   FIT_I1 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT1_Pos'high-FIT1_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -9134,7 +9118,7 @@ begin  -- architecture IMP
   FIT_I2 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT2_Pos'high-FIT2_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -9157,7 +9141,7 @@ begin  -- architecture IMP
   FIT_I3 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT3_Pos'high-FIT3_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -9180,7 +9164,7 @@ begin  -- architecture IMP
   FIT_I4 : FIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => FIT4_Pos'high-FIT4_Pos'low+1,
       C_USE_SRL16       => C_USE_SRL16,
@@ -9218,7 +9202,7 @@ begin  -- architecture IMP
   PIT_I1 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT1_Pos'high-PIT1_Pos'low+1,
       C_USE_PIT         => C_USE_PIT1,
@@ -9257,7 +9241,7 @@ begin  -- architecture IMP
   PIT_I2 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT2_Pos'high-PIT2_Pos'low+1,
       C_USE_PIT         => C_USE_PIT2,
@@ -9296,7 +9280,7 @@ begin  -- architecture IMP
   PIT_I3 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT3_Pos'high-PIT3_Pos'low+1,
       C_USE_PIT         => C_USE_PIT3,
@@ -9335,7 +9319,7 @@ begin  -- architecture IMP
   PIT_I4 : PIT_Module
     generic map (
       C_TARGET          => C_TARGET,
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => PIT4_Pos'high-PIT4_Pos'low+1,
       C_USE_PIT         => C_USE_PIT4,
@@ -9362,7 +9346,7 @@ begin  -- architecture IMP
 
   GPO_I1 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO1_Pos'high-GPO1_Pos'low+1,
       C_USE_GPO         => C_USE_GPO1,
@@ -9381,7 +9365,7 @@ begin  -- architecture IMP
 
   GPO_I2 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO2_Pos'high-GPO2_Pos'low+1,
       C_USE_GPO         => C_USE_GPO2,
@@ -9400,7 +9384,7 @@ begin  -- architecture IMP
 
   GPO_I3 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO3_Pos'high-GPO3_Pos'low+1,
       C_USE_GPO         => C_USE_GPO3,
@@ -9419,7 +9403,7 @@ begin  -- architecture IMP
 
   GPO_I4 : GPO_Module
     generic map (
-      C_TMR             => C_TMR,
+      C_TMR             => C_TMR_ONLY,
       C_USE_TMR_DISABLE => C_USE_TMR_DISABLE,
       C_VOTE_SIZE       => GPO4_Pos'high-GPO4_Pos'low+1,
       C_USE_GPO         => C_USE_GPO4,
@@ -9646,24 +9630,23 @@ end architecture IMP;
 -- pselect_mask.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011,2015 Xilinx, Inc. All rights reserved.
--- 
+-- (c) Copyright 2011,2015,2023 Advanced Micro Devices, Inc. All rights reserved.
+--
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
--- 
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
+--
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -9672,11 +9655,11 @@ end architecture IMP;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
--- 
+--
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -9685,12 +9668,12 @@ end architecture IMP;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
--- 
+--
 -- THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
--- PART OF THIS FILE AT ALL TIMES
+-- PART OF THIS FILE AT ALL TIMES.
 --
 ------------------------------------------------------------------------------
 -- Filename:        pselect_mask.vhd
@@ -9805,24 +9788,23 @@ end imp;
 -- iomodule.vhd - Entity and architecture
 -------------------------------------------------------------------------------
 --
--- (c) Copyright 2011-2015,2018 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 2011-2015,2018,2021-2023 Advanced Micro Devices, Inc. All rights reserved.
 --
 -- This file contains confidential and proprietary information
--- of Xilinx, Inc. and is protected under U.S. and 
--- international copyright and other intellectual property
--- laws.
+-- of AMD and is protected under U.S. and international copyright
+-- and other intellectual property laws.
 --
 -- DISCLAIMER
 -- This disclaimer is not a license and does not grant any
 -- rights to the materials distributed herewith. Except as
 -- otherwise provided in a valid license issued to you by
--- Xilinx, and to the maximum extent permitted by applicable
+-- AMD, and to the maximum extent permitted by applicable
 -- law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
--- WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+-- WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 -- AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 -- BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 -- INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
--- (2) Xilinx shall not be liable (whether in contract or tort,
+-- (2) AMD shall not be liable (whether in contract or tort,
 -- including negligence, or under any other theory of
 -- liability) for any loss or damage of any kind or nature
 -- related to, arising under or in connection with these
@@ -9831,11 +9813,11 @@ end imp;
 -- (including loss of data, profits, goodwill, or any type of
 -- loss or damage suffered as a result of any action brought
 -- by a third party) even if such damage or loss was
--- reasonably foreseeable or Xilinx had been advised of the
+-- reasonably foreseeable or AMD had been advised of the
 -- possibility of the same.
 --
 -- CRITICAL APPLICATIONS
--- Xilinx products are not designed or intended to be fail-
+-- AMD products are not designed or intended to be fail-
 -- safe, or for use in any application requiring fail-safe
 -- performance, such as life-support or safety devices or
 -- systems, Class III medical devices, nuclear facilities,
@@ -9844,7 +9826,7 @@ end imp;
 -- injury, or severe property or environmental damage
 -- (individually and collectively, "Critical
 -- Applications"). Customer assumes the sole risk and
--- liability of any use of Xilinx products in Critical
+-- liability of any use of AMD products in Critical
 -- Applications, subject only to applicable laws and
 -- regulations governing limitations on product liability.
 --
@@ -9867,6 +9849,7 @@ end imp;
 -- History:
 --   goran   2008-01-08    First Version
 --   stefana 2012-03-20    Added GPI interrupt
+--   rolandp 2021-12-02    Added optional UE and CE signals
 --
 -------------------------------------------------------------------------------
 -- Naming Conventions:
@@ -9891,9 +9874,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_core;
-use iomodule_v3_1_6.pselect_mask;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_core;
+use iomodule_v3_1_10.pselect_mask;
 
 entity iomodule is
   generic (
@@ -10029,11 +10012,13 @@ entity iomodule is
     IO_Byte_Enable  : out std_logic_vector((C_LMB_DWIDTH/8 - 1) downto 0);
     IO_Write_Data   : out std_logic_vector(C_LMB_DWIDTH-1 downto 0);
     IO_Read_Data    : in  std_logic_vector(C_LMB_DWIDTH-1 downto 0);
+    IO_UE           : in  std_logic := '0';
+    IO_CE           : in  std_logic := '0';
     IO_Ready        : in  std_logic;
 
     -- UART I/O
-    UART_Clk       : in std_logic;
-    UART_Rst       : in std_logic;
+    UART_Clk       : in  std_logic;
+    UART_Rst       : in  std_logic;
     UART_Rx        : in  std_logic;
     UART_Tx        : out std_logic;
     UART_Interrupt : out std_logic;
@@ -10101,8 +10086,8 @@ entity iomodule is
 
 end entity iomodule;
 
-library iomodule_v3_1_6;
-use iomodule_v3_1_6.iomodule_funcs.all;
+library iomodule_v3_1_10;
+use iomodule_v3_1_10.iomodule_funcs.all;
 
 architecture IMP of iomodule is
 
@@ -10381,6 +10366,8 @@ architecture IMP of iomodule is
   signal lmb_reg_write      : std_logic;
   signal io_ready_Q         : std_logic;
   signal io_bus_read_data   : std_logic_vector(C_LMB_DWIDTH-1 downto 0);
+  signal io_bus_ue          : std_logic;
+  signal io_bus_ce          : std_logic;
   
   -- Register access
   signal wen                : std_logic;
@@ -10445,7 +10432,9 @@ architecture IMP of iomodule is
 
 begin  -- architecture IMP
 
-  config_reset_i <= Config_Reset when C_USE_CONFIG_RESET /= 0 else '0';
+  config_reset_i <= Rst          when C_TMR = 2               else
+                    Config_Reset when C_USE_CONFIG_RESET /= 0 else
+                    '0';
 
   -----------------------------------------------------------------------------
   -- Do the LMB address decoding
@@ -10556,11 +10545,17 @@ begin  -- architecture IMP
       if (Clk'event and Clk = '1') then
         if config_reset_i = '1' then
           io_bus_read_data <= (others => '0');
+          io_bus_ue        <= '0';
+          io_bus_ce        <= '0';
         else
           if IO_Ready = '1' and io_read_keep = '1' then
             io_bus_read_data <= IO_Read_Data;
+            io_bus_ue        <= IO_UE;
+            io_bus_ce        <= IO_CE;
           else
             io_bus_read_data <= (others => '0');
+            io_bus_ue        <= '0';
+            io_bus_ce        <= '0';
           end if;
         end if;
       end if;
@@ -10571,6 +10566,8 @@ begin  -- architecture IMP
   Not_Using_IO_Bus : if (C_USE_IO_BUS = 0) generate
     io_ready_Q         <= '0';
     io_bus_read_data   <= (others => '0');
+    io_bus_ue          <= '0';
+    io_bus_ce          <= '0';
     lmb_io_select      <= '0';
     lmb_io_select_keep <= '0';
     IO_Addr_Strobe     <= '0';
@@ -10587,6 +10584,8 @@ begin  -- architecture IMP
   Sl_DBus_LMB_Protocol_0 : if (C_LMB_PROTOCOL = 0) generate
   begin
     Sl_DBus(0 to 31) <= io_reg_read_data(31 downto 0) or io_bus_read_data(31 downto 0);
+    Sl_UE            <= io_bus_ue;
+    Sl_CE            <= io_bus_ce;
   end generate Sl_DBus_LMB_Protocol_0;
 
   -- Timing optimized LMB protocol with RAM data read clocked in LMB controller
@@ -10599,8 +10598,12 @@ begin  -- architecture IMP
       if (Clk'event and Clk = '1') then
         if config_reset_i = '1' then
           Sl_DBus <= (others => '0');
+          Sl_UE            <= '0';
+          Sl_CE            <= '0';
         else        
           Sl_DBus(0 to 31) <= io_reg_read_data(31 downto 0) or io_bus_read_data(31 downto 0);
+          Sl_UE            <= io_bus_ue;
+          Sl_CE            <= io_bus_ce;
         end if;
       end if;
     end process Sl_DBus_DFF;
@@ -10610,9 +10613,6 @@ begin  -- architecture IMP
                       lmb_io_select_keep = '1' or
                       ((uart_status_wait = '1' or uart_rx_wait= '1') and C_UART_ASYNC = 1) else
              '0';
-
-  Sl_UE   <= '0'; -- No Uncorrectable Errors
-  Sl_CE   <= '0'; -- No Correctable Errors
 
   Sl_Ready <= '1' when lmb_reg_write  = '1' or
                        lmb_reg_read_Q = '1' or

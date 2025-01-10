@@ -103,7 +103,7 @@ ${XILINX_IP}/ddr4_core/rtl/cal/ddr4_v2_2_dp_AB9.sv
 ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core.sv
 ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core_ddr4.sv
 ${XILINX_IP}/ddr4_core/rtl/ip_top/ddr4_core_ddr4_mem_intfc.sv
-${XILINX_IP}/ddr4_core/tb/microblaze_mcs_0.sv
+${XILINX_IP}/ddr4_core/tb/ddr4_core_microblaze_mcs_0.sv
 
 +incdir+${HDK_COMMON_DIR}/verif/models/ddr4_model
 

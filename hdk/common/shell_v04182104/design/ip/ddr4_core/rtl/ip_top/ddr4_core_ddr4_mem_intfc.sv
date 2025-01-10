@@ -1,54 +1,53 @@
 
 /******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
-//
-// This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
-//
-// DISCLAIMER
-// This disclaimer is not a license and does not grant any
-// rights to the materials distributed herewith. Except as
-// otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
-// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
-// including negligence, or under any other theory of
-// liability) for any loss or damage of any kind or nature
-// related to, arising under or in connection with these
-// materials, including for any direct, or any indirect,
-// special, incidental, or consequential loss or damage
-// (including loss of data, profits, goodwill, or any type of
-// loss or damage suffered as a result of any action brought
-// by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
-// possibility of the same.
-//
-// CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
-// safe, or for use in any application requiring fail-safe
-// performance, such as life-support or safety devices or
-// systems, Class III medical devices, nuclear facilities,
-// applications related to the deployment of airbags, or any
-// other applications that could lead to death, personal
-// injury, or severe property or environmental damage
-// (individually and collectively, "Critical
-// Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
-// Applications, subject only to applicable laws and
-// regulations governing limitations on product liability.
-//
-// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// PART OF THIS FILE AT ALL TIMES.
+# (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
+#
+# This file contains confidential and proprietary information
+# of AMD and is protected under U.S. and international copyright
+# and other intellectual property laws.
+#
+# DISCLAIMER
+# This disclaimer is not a license and does not grant any
+# rights to the materials distributed herewith. Except as
+# otherwise provided in a valid license issued to you by
+# AMD, and to the maximum extent permitted by applicable
+# law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+# WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
+# AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+# BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+# INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+# (2) AMD shall not be liable (whether in contract or tort,
+# including negligence, or under any other theory of
+# liability) for any loss or damage of any kind or nature
+# related to, arising under or in connection with these
+# materials, including for any direct, or any indirect,
+# special, incidental, or consequential loss or damage
+# (including loss of data, profits, goodwill, or any type of
+# loss or damage suffered as a result of any action brought
+# by a third party) even if such damage or loss was
+# reasonably foreseeable or AMD had been advised of the
+# possibility of the same.
+#
+# CRITICAL APPLICATIONS
+# AMD products are not designed or intended to be fail-
+# safe, or for use in any application requiring fail-safe
+# performance, such as life-support or safety devices or
+# systems, Class III medical devices, nuclear facilities,
+# applications related to the deployment of airbags, or any
+# other applications that could lead to death, personal
+# injury, or severe property or environmental damage
+# (individually and collectively, "Critical
+# Applications"). Customer assumes the sole risk and
+# liability of any use of AMD products in Critical
+# Applications, subject only to applicable laws and
+# regulations governing limitations on product liability.
+#
+# THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+# PART OF THIS FILE AT ALL TIMES.
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.0
 //  \   \         Application        : MIG
 //  /   /         Filename           : ddr4_core_mem_intfc.sv
@@ -763,7 +762,7 @@ localparam tWTR_S_HOST = (LRDIMM_MODE=="ON") ? tWTR_S + LRDIMM_DELAY : tWTR_S;
 localparam tWTR_L_HOST = (LRDIMM_MODE=="ON") ? tWTR_L + LRDIMM_DELAY : tWTR_L;
 localparam tRTW_HOST   = (LRDIMM_MODE=="ON") ? tRTW + LRDIMM_DELAY : tRTW;
 
-ddr4_v2_2_10_mc # (
+ddr4_v2_2_23_mc # (
     .ABITS            (ADDR_WIDTH)
    ,.COLBITS          (COL_WIDTH)
    ,.BABITS           (BANK_WIDTH)
@@ -929,7 +928,7 @@ ddr4_v2_2_10_mc # (
   assign wrDataOffset = 1'b0;
   wire sr_req; // unused ui output port
 
-  ddr4_v2_2_10_ui #
+  ddr4_v2_2_23_ui #
     (
      .MEM                                (DRAM_TYPE),
      .TCQ                                (TCQ),
@@ -1062,7 +1061,7 @@ ddr4_v2_2_10_mc # (
 wire sample_gts;
 // Calibration Logic 
 
-ddr4_v2_2_10_cal_top # (
+ddr4_v2_2_23_cal_top # (
     .ABITS          (ADDR_WIDTH)
    ,.BABITS         (BANK_WIDTH)
    ,.BGBITS         (BANK_GROUP_WIDTH)
@@ -1422,34 +1421,34 @@ ddr4_core_ddr4_cal_riu #
   localparam STATIC_MAX_DELAY = 10000; // Max delay for static signals
   localparam SYNC_MTBF = 2; // Synchronizer Depth based on MTBF
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ)  u_en_vtc_sync       (riu_clk, en_vtc_in, en_vtc_riuclk);
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ)  u_fab_rst_sync      (riu_clk, rst_r1, fab_rst_sync);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ)  u_en_vtc_sync       (riu_clk, en_vtc_in, en_vtc_riuclk);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ)  u_fab_rst_sync      (riu_clk, rst_r1, fab_rst_sync);
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYf2r, TCQ) u_io_read_data_sync (riu_clk, io_read_data, io_read_data_riuclk); // MAN - can we remove this sync
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYf2r, TCQ) u_io_read_data_sync (riu_clk, io_read_data, io_read_data_riuclk); // MAN - can we remove this sync
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYf2r, TCQ)  u_io_ready_lvl_sync (riu_clk, io_ready_lvl, io_ready_lvl_riuclk);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYf2r, TCQ)  u_io_ready_lvl_sync (riu_clk, io_ready_lvl, io_ready_lvl_riuclk);
 
   localparam HANDSHAKE_MAX_DELAYr2f = 3000; // Fabric Clock Max frequency 333MHz
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_ready_sync     (div_clk, phy_ready_riuclk, phy_ready);
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_bisc_complete_sync  (div_clk, bisc_complete_riuclk, bisc_complete);
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_riu2clb_valid_sync     (div_clk, riu2clb_valid_r1_riuclk, riu2clb_valid);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_ready_sync     (div_clk, phy_ready_riuclk, phy_ready);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_bisc_complete_sync  (div_clk, bisc_complete_riuclk, bisc_complete);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_riu2clb_valid_sync     (div_clk, riu2clb_valid_r1_riuclk, riu2clb_valid);
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_fixdly_rdy_low (div_clk, phy2clb_fixdly_rdy_low_riuclk, phy2clb_fixdly_rdy_low); // DEBUG only
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_fixdly_rdy_upp (div_clk, phy2clb_fixdly_rdy_upp_riuclk, phy2clb_fixdly_rdy_upp); // DEBUG only
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_rdy_low    (div_clk, phy2clb_phy_rdy_low_riuclk, phy2clb_phy_rdy_low); // DEBUG only
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_rdy_upp    (div_clk, phy2clb_phy_rdy_upp_riuclk, phy2clb_phy_rdy_upp); // DEBUG only
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_fixdly_rdy_low (div_clk, phy2clb_fixdly_rdy_low_riuclk, phy2clb_fixdly_rdy_low); // DEBUG only
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_fixdly_rdy_upp (div_clk, phy2clb_fixdly_rdy_upp_riuclk, phy2clb_fixdly_rdy_upp); // DEBUG only
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_rdy_low    (div_clk, phy2clb_phy_rdy_low_riuclk, phy2clb_phy_rdy_low); // DEBUG only
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 20, INSERT_DELAY, STATIC_MAX_DELAY, TCQ) u_phy2clb_phy_rdy_upp    (div_clk, phy2clb_phy_rdy_upp_riuclk, phy2clb_phy_rdy_upp); // DEBUG only
 
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_addr_sync         (div_clk, io_address_riuclk, io_address); // MAN - can we remove this sync
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ)  u_io_write_strobe_sync (div_clk, io_write_strobe_riuclk, io_write_strobe);
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_write_data_sync   (div_clk, io_write_data_riuclk, io_write_data);
-  ddr4_v2_2_10_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_addr_strobe_lvl_sync (div_clk, io_addr_strobe_lvl_riuclk, io_addr_strobe_lvl);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_addr_sync         (div_clk, io_address_riuclk, io_address); // MAN - can we remove this sync
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ)  u_io_write_strobe_sync (div_clk, io_write_strobe_riuclk, io_write_strobe);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 32, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_write_data_sync   (div_clk, io_write_data_riuclk, io_write_data);
+  ddr4_v2_2_23_cal_sync #(SYNC_MTBF, 1, INSERT_DELAY, HANDSHAKE_MAX_DELAYr2f, TCQ) u_io_addr_strobe_lvl_sync (div_clk, io_addr_strobe_lvl_riuclk, io_addr_strobe_lvl);
 
 
 //synthesis translate_off
   generate
     if (MIG_PARAM_CHECKS  == "TRUE") begin
-       `include "ddr4_v2_2_10_ddr4_assert.vh"
+       `include "ddr4_v2_2_23_ddr4_assert.vh"
     end
   endgenerate   
 //synthesis translate_on

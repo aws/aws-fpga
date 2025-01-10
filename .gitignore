@@ -59,6 +59,7 @@ hdk/cl/examples/cl_uram_example/software/runtime/test_uram_example
 hdk/cl_uram_example/software/runtime/test_uram_example
 hdk/common/shell_*/build/debug_probes/
 hdk/common/verif/models/sh_bfm/cl_ports_sh_bfm.vh
+hdk/common/verif/scripts/ddr4_core_ip_report.txt
 
 # SDAccel generated files
 SDAccel/**/*.d

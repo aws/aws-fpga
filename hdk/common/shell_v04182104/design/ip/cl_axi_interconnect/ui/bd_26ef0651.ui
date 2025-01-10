@@ -1,25 +1,29 @@
 {
-   ExpandedHierarchyInLayout: "",
-   guistr: "# # String gsaved with Nlview 6.6.11  2017-06-12 bk=1.3860 VDI=40 GEI=35 GUI=JA:1.6
+   "ActiveEmotionalView":"Default View",
+   "Default View_ScaleFactor":"0.983092",
+   "Default View_TopLeft":"-379,-37",
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.7.1 2023-07-26 3bc4126617 VDI=43 GEI=38 GUI=JA:21.0 TLS
 #  -string -flagsOSRD
-preplace port S00_AXI -pg 1 -y 50 -defaultsOSRD
-preplace port ACLK -pg 1 -y 70 -defaultsOSRD
-preplace port S01_AXI -pg 1 -y 30 -defaultsOSRD
-preplace port M01_AXI -pg 1 -y 160 -defaultsOSRD
-preplace port ARESETN -pg 1 -y 90 -defaultsOSRD
-preplace port M03_AXI -pg 1 -y 200 -defaultsOSRD
-preplace port M02_AXI -pg 1 -y 180 -defaultsOSRD
-preplace port M00_AXI -pg 1 -y 140 -defaultsOSRD
-preplace inst axi_interconnect_0 -pg 1 -lvl 1 -y 170 -defaultsOSRD
-preplace netloc ACLK_1 1 0 1 20
-preplace netloc axi_interconnect_0_M02_AXI 1 1 1 NJ
-preplace netloc ARESETN_1 1 0 1 30
-preplace netloc S00_AXI_1 1 0 1 20J
-preplace netloc S01_AXI_1 1 0 1 30
-preplace netloc axi_interconnect_0_M00_AXI 1 1 1 NJ
-preplace netloc axi_interconnect_0_M01_AXI 1 1 1 NJ
-preplace netloc axi_interconnect_0_M03_AXI 1 1 1 NJ
-levelinfo -pg 1 0 180 350 -top -30 -bot 380
-",
+preplace port S00_AXI -pg 1 -lvl 0 -x -20 -y 50 -defaultsOSRD
+preplace port M00_AXI -pg 1 -lvl 2 -x 350 -y 140 -defaultsOSRD
+preplace port M01_AXI -pg 1 -lvl 2 -x 350 -y 160 -defaultsOSRD
+preplace port M02_AXI -pg 1 -lvl 2 -x 350 -y 180 -defaultsOSRD
+preplace port M03_AXI -pg 1 -lvl 2 -x 350 -y 200 -defaultsOSRD
+preplace port S01_AXI -pg 1 -lvl 0 -x -20 -y 30 -defaultsOSRD
+preplace port port-id_ACLK -pg 1 -lvl 0 -x -20 -y -10 -defaultsOSRD
+preplace port port-id_ARESETN -pg 1 -lvl 0 -x -20 -y 10 -defaultsOSRD
+preplace inst axi_interconnect_0 -pg 1 -lvl 1 -x 180 -y 170 -defaultsOSRD
+preplace netloc ACLK_1 1 0 1 30 -10n
+preplace netloc ARESETN_1 1 0 1 0 10n
+preplace netloc S00_AXI_1 1 0 1 20J 20n
+preplace netloc axi_interconnect_0_M00_AXI 1 1 1 NJ 140
+preplace netloc axi_interconnect_0_M01_AXI 1 1 1 NJ 160
+preplace netloc axi_interconnect_0_M02_AXI 1 1 1 NJ 180
+preplace netloc axi_interconnect_0_M03_AXI 1 1 1 NJ 200
+preplace netloc S01_AXI_1 1 0 1 10 30n
+levelinfo -pg 1 -20 180 350
+pagesize -pg 1 -db -bbox -sgen -140 -40 460 380
+"
 }
 0

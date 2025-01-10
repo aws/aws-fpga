@@ -55,27 +55,6 @@ ifeq ($(VCS), 1)
     export DEFAULT_DEFINES =
   endif
 else
-ifeq ($(IES), 1)
-  export SIMULATOR = ies
-  export COMPLIB_DIR = $(CL_ROOT)/verif/sim/ies/ies_complib
-  include Makefile.ies
-  ifeq ($(AXI_MEMORY_MODEL), 1)
-    ifeq ($(ECC_DIRECT), 1)
-      DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=1 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=0 +define+ECC_ADDR_HI=$(ECC_ADDR_HI) +define+ECC_ADDR_LO=$(ECC_ADDR_LO)
-    else
-      ifeq ($(ECC_RAND), 1)
-        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=1 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
-      else
-        DEFAULT_DEFINES = +define+FAST_SIM_MODE +define+NO_DDR +define+ECC_DIRECT_EN=0 +define+RND_ECC_EN=0 +define+RND_ECC_WEIGHT=$(RND_ECC_WEIGHT) +define+ECC_ADDR_HI=0 +define+ECC_ADDR_LO=0
-      endif
-    endif
-  else
-    ifeq ($(DDR_BKDR), 1)
-      PLUSARGS =+HDKDIR=$(HDK_DIR)
-    endif
-    export DEFAULT_DEFINES =
-  endif
-else
   export SIMULATOR = vivado
   include Makefile.vivado
   ifeq ($(AXI_MEMORY_MODEL), 1)
@@ -94,7 +73,6 @@ else
     endif
     export DEFAULT_DEFINES =
   endif
-endif
 endif
 endif
 

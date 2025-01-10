@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Amazon FPGA Hardware Development Kit
 #
@@ -18,7 +18,7 @@
 from __future__ import print_function
 import os
 import sys
-import platform
+import distro
 import glob
 import argparse
 import subprocess
@@ -58,8 +58,8 @@ def cmd_exec(cmd, check_return=True):
         sys.exit(1)
 
 def load_uio():
-    distro = platform.linux_distribution()
-    if (distro[0] == "Ubuntu"):
+    installed_distro = distro.name()
+    if (installed_distro == "Ubuntu"):
         cmd_exec("modprobe uio")
     else:
         cmd_exec("modprobe uio_pci_generic")
@@ -112,7 +112,7 @@ def setup_dpdk(install_path, eni_dbdf, eni_ethdev):
 
     # Bind the ENI device to to DPDK
     cmd_exec("ifdown %s" % (eni_ethdev))
-    cmd_exec("%s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
+    cmd_exec("python3 %s --bind=igb_uio %s" % (dpdk_devbind, eni_dbdf))
 
     # cd back to the original directory
     os.chdir("%s" % (cwd))

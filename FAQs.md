@@ -25,7 +25,7 @@ AWS designed its FPGA instances to provide a developer experience with ease of u
 
 - Developers don’t need to purchase / design / bringup or debug the physical hardware where the FPGA is hosted, nor the platform/server hardware: all the hardware is verified, monitored, and maintained by AWS.
 
-- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA Developer AMI developers have a choice to a wide range of instance (different CPU and Memory configuration) allowing developers to optimize their development flow.
+- AWS provides an [FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) that contains Xilinx Vivado development environment, with all the needed licenses. By using the FPGA Developer AMI developers have a choice to a wide range of instance (different CPU and Memory configuration) allowing developers to optimize their development flow.
 
 - AWS provides cloud based debug tools: [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) which is equivalent to debug using JTAG with on-premises development, and Virtual LED together with Virtual DIP Switch emulation the LED and DIP switches in typical development board.
 
@@ -158,7 +158,7 @@ Developers create an AFI by creating a Vivado Design Checkpoint (DCP) and submit
 
 Yes, on-premises tools can be used to develop the Design Checkpoint needed for creating an AFI. The developer needs to download AWS FPGA HDK from GitHub and run on any local machine.
 
-If a developer uses local tools and license, please check the [supported versions of Vivado](./supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ)
+If a developer uses local tools and license, please check the [supported versions of Vivado](./supported_vivado_versions.txt) for the exact Xilinx Vivado tool version supported by the HDK.  Developers have access to Xilinx Vivado running in the AWS by using the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 
 
 **Q: Is there a “best practice” system template?**
@@ -168,7 +168,7 @@ AWS prefers not to limit developers to a specific template in terms of how we ad
 
 **Q: Do I need to get a Xilinx license to generate an AFI?**
 
-If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ), Xilinx licenses for simulation, encryption and Design Checkpoint generation are included at no additional cost.
+If you decide to use the [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u), Xilinx licenses for simulation, encryption and Design Checkpoint generation are included at no additional cost.
 
 If you want to run using other methods or on a local machine, you will need to obtain any necessary licenses, specifically you will need to have setup the appropriate Xilinx Vivado license. For more details, please refer to [On-premises licensing help](docs/on_premise_licensing_help.md)
 
@@ -239,7 +239,7 @@ The [cl_dram_dma example](./hdk/cl/examples/cl_dram_dma) provides expanded featu
 
 **Q: How do I get access to AWS FPGA Developer AMI?**
 
-The [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) is avaliable on AWS Marketplace.
+The [FPGA Developer AMI on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) is avaliable on AWS Marketplace.
 
 **Q: Where do I go to for support?**
 

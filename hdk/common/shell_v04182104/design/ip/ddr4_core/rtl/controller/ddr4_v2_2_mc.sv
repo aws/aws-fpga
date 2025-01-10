@@ -1,22 +1,20 @@
-/******************************************************************************
-// (c) Copyright 2013 - 2014 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
+// of AMD and is protected under U.S. and international copyright
+// and other intellectual property laws.
 //
 // DISCLAIMER
 // This disclaimer is not a license and does not grant any
 // rights to the materials distributed herewith. Except as
 // otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
+// AMD, and to the maximum extent permitted by applicable
 // law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+// WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
 // AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 // BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
 // INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
+// (2) AMD shall not be liable (whether in contract or tort,
 // including negligence, or under any other theory of
 // liability) for any loss or damage of any kind or nature
 // related to, arising under or in connection with these
@@ -25,11 +23,11 @@
 // (including loss of data, profits, goodwill, or any type of
 // loss or damage suffered as a result of any action brought
 // by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
+// reasonably foreseeable or AMD had been advised of the
 // possibility of the same.
 //
 // CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
+// AMD products are not designed or intended to be fail-
 // safe, or for use in any application requiring fail-safe
 // performance, such as life-support or safety devices or
 // systems, Class III medical devices, nuclear facilities,
@@ -38,19 +36,22 @@
 // injury, or severe property or environmental damage
 // (individually and collectively, "Critical
 // Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
+// liability of any use of AMD products in Critical
 // Applications, subject only to applicable laws and
 // regulations governing limitations on product liability.
 //
 // THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 // PART OF THIS FILE AT ALL TIMES.
+////////////////////////////////////////////////////////////
+/******************************************************************************
+
 ******************************************************************************/
 //   ____  ____
 //  /   /\/   /
-// /___/  \  /    Vendor             : Xilinx
+// /___/  \  /    Vendor             : AMD
 // \   \   \/     Version            : 1.1
 //  \   \         Application        : MIG
-//  /   /         Filename           : ddr4_v2_2_10_mc.sv
+//  /   /         Filename           : ddr4_v2_2_23_mc.sv
 // /___/   /\     Date Last Modified : $Date: 2014/09/03 $
 // \   \  /  \    Date Created       : Tue May 13 2014
 //  \___\/\___\
@@ -58,14 +59,14 @@
 // Device           : UltraScale
 // Design Name      : DDR4 SDRAM & DDR3 SDRAM
 // Purpose          :
-//                   ddr4_v2_2_10_mc module
+//                   ddr4_v2_2_23_mc module
 // Reference        :
 // Revision History :
 //*****************************************************************************
 
 `timescale 1ns/100ps
 
-module ddr4_v2_2_10_mc # (parameter
+module ddr4_v2_2_23_mc # (parameter
     ABITS   = 18
    ,BABITS  = 2
    ,BGBITS  = 2
@@ -385,7 +386,7 @@ genvar bg;
 generate
    for (bg = 0; bg <= 3; bg = bg + 1) begin:bgr
       assign per_rd_req_vec[bg] = per_rd_req & (bg == 0); // Only inject periodic read into Group 0 FSM
-      ddr4_v2_2_10_mc_group #(
+      ddr4_v2_2_23_mc_group #(
           .ABITS   (ABITS)
          ,.COLBITS (COLBITS)
          ,.DBAW    (DBAW)
@@ -481,7 +482,7 @@ generate
    end
 endgenerate
 
-ddr4_v2_2_10_mc_act_timer #(
+ddr4_v2_2_23_mc_act_timer #(
     .tFAW   (tFAW)
    ,.tFAW_dlr(tFAW_dlr)
    ,.tRRD_L (tRRD_L)
@@ -510,7 +511,7 @@ ddr4_v2_2_10_mc_act_timer #(
    ,.act_rank_update (act_rank_update)
 );
 
-ddr4_v2_2_10_mc_arb_a # (
+ddr4_v2_2_23_mc_arb_a # (
     .TCQ (TCQ)
    ,.RKBITS    (RKBITS)
    ,.RANK_SLAB (RANK_SLAB)
@@ -527,7 +528,7 @@ ddr4_v2_2_10_mc_arb_a # (
    ,.req     (actReqT)
 );
 
-ddr4_v2_2_10_mc_rd_wr #(
+ddr4_v2_2_23_mc_rd_wr #(
     .RDSLOT (256)
    ,.WRSLOT (128)
    ,.tWTR_L (tWTR_L)
@@ -563,7 +564,7 @@ ddr4_v2_2_10_mc_rd_wr #(
    ,.tCWL     (tCWL)
 );
 
-ddr4_v2_2_10_mc_arb_c #(
+ddr4_v2_2_23_mc_arb_c #(
     .TCQ       (TCQ)
     ,.RKBITS    (RKBITS)
     ,.RANK_SLAB (RANK_SLAB)
@@ -600,7 +601,7 @@ ddr4_v2_2_10_mc_arb_c #(
    ,.preReqM  (4'b0)
 );
 
-ddr4_v2_2_10_mc_arb_mux_p #(
+ddr4_v2_2_23_mc_arb_mux_p #(
     .MEM   (MEM)
    ,.ABITS (ABITS)
    ,.ALIAS_P_CNT (ALIAS_P_CNT)
@@ -647,7 +648,7 @@ ddr4_v2_2_10_mc_arb_mux_p #(
    ,.preReqM   (preReqM)
 );
 
-ddr4_v2_2_10_mc_ctl #(
+ddr4_v2_2_23_mc_ctl #(
     .RANKS   (RANKS)
    ,.RANK_SLOT (RANK_SLOT)
    ,.RKBITS    (RKBITS)
@@ -734,7 +735,7 @@ ddr4_v2_2_10_mc_ctl #(
    ,.int_srxIss (int_srxIss)
 );
 
-ddr4_v2_2_10_mc_cmd_mux_ap #(
+ddr4_v2_2_23_mc_cmd_mux_ap #(
     .ABITS (ABITS)
    ,.RKBITS    (RKBITS)
    ,.RANK_SLAB (RANK_SLAB)
@@ -755,7 +756,7 @@ ddr4_v2_2_10_mc_cmd_mux_ap #(
    ,.sel      (winPortA)
 );
 
-ddr4_v2_2_10_mc_cmd_mux_c #(
+ddr4_v2_2_23_mc_cmd_mux_c #(
     .COLBITS (COLBITS)
    ,.RKBITS    (RKBITS)
    ,.RANK_SLAB (RANK_SLAB)
@@ -787,7 +788,7 @@ ddr4_v2_2_10_mc_cmd_mux_c #(
    ,.sel      (winPortC)
 );
 
-ddr4_v2_2_10_mc_ref #(
+ddr4_v2_2_23_mc_ref #(
     .NUMREF     (NUMREF)
    ,.RANKS      (RANKS)
    ,.RANK_SLOT  (RANK_SLOT)
@@ -871,7 +872,7 @@ always @ (posedge clk) begin
       stop_prd_reads <= #TCQ 1;
 end
 
-ddr4_v2_2_10_mc_periodic #(
+ddr4_v2_2_23_mc_periodic #(
     .TCQ    (TCQ)
 )u_ddr_mc_periodic(
     .clk    (clk)
@@ -890,7 +891,7 @@ ddr4_v2_2_10_mc_periodic #(
    ,.per_rd_accept            (per_rd_accept[0])
 );
 
-ddr4_v2_2_10_mc_ecc #(
+ddr4_v2_2_23_mc_ecc #(
     .PAYLOAD_WIDTH       (PAYLOAD_WIDTH)
    ,.PAYLOAD_DM_WIDTH    (PAYLOAD_DM_WIDTH)
    ,.ECC_WIDTH           (ECC_WIDTH)

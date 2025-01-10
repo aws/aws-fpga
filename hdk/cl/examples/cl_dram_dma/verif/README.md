@@ -8,20 +8,17 @@ The system verilog simulation tests can be run from the [verif/scripts](scripts)
     $ make TEST=test_ddr_peek_poke (Runs with XSIM by default)
     $ make TEST=test_ddr_peek_poke VCS=1
     $ make TEST=test_ddr_peek_poke QUESTA=1
-    $ make TEST=test_ddr_peek_poke IES=1
 
     //To Run Simulations in AXI_MEMORY_MODEL mode
 
     $ make TEST=test_ddr AXI_MEMORY_MODEL=1 (Runs with XSIM by default in AXI_MEMORY_MODEL mode)
     $ make TEST=test_ddr AXI_MEMORY_MODEL=1 VCS=1
     $ make TEST=test_ddr AXI_MEMORY_MODEL=1 QUESTA=1
-    $ make TEST=test_ddr AXI_MEMORY_MODEL=1 IES=1
 
     //To Run DDR backdoor loading tests
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 (Runs with XSIM by default)
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 VCS=1
     $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 QUESTA=1
-    $ make TEST=test_ddr_peek_bdr_walking_ones DDR_BKDR=1 IES=1
 
     //Backdoor loading test list. Description can be found in the sections below.
     test_ddr_peek_bdr_walking_ones
@@ -34,14 +31,12 @@ The HW/SW co-simulation tests can be run from the [verif/scripts](scripts) direc
     $ make C_TEST=test_dram_dma_hwsw_cosim (Runs with XSIM by default)
     $ make C_TEST=test_dram_dma_hwsw_cosim VCS=1
     $ make C_TEST=test_dram_dma_hwsw_cosim QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim IES=1
 
     //To Run in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR.
 
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 (Runs with XSIM by default)
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
     $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
-    $ make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 IES=1
 
 ```
 
