@@ -2,6 +2,7 @@
 
 ## Small Shell Release 1.6.1
 * Added support for Vivado/Vitis 2024.1
+* Discontinued support for CentOS and AL2 FPGA Developer AMIs. Please use [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 * Discontinued support for Cadence Incisive (IES) simulator
 
 ## Small Shell F1.S.1.0 Release 1.6.0
