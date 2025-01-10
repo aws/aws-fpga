@@ -19,7 +19,7 @@ Developers can write their tests in SystemVerilog and/or C languages. If a devel
 
 ### Have an EC2 instance or other server with Xilinx Vivado tools and an active license.
 
-One easy way is to have a pre-installed environment is to use the [AWS FPGA Developer AMI available on AWS Marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) which comes with pre-installed Vivado tools and license.
+One easy way is to have a pre-installed environment is to use the [AWS FPGA Developer AMI available on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) which comes with pre-installed Vivado tools and license.
 
 For developers who like to work on-premises or different AMI in the cloud, AWS recommends following the [required license for on-premise document](../../docs/on_premise_licensing_help.md).
 

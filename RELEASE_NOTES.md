@@ -4,6 +4,7 @@
 
 ## Release 1.4.25
 * Added support for Vivado/Vitis 2024.1
+* Discontinued support for CentOS and AL2 FPGA Developer AMIs. Please use [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 * Discontinued support for Cadence Incisive (IES) simulator
 
 ## Release 1.4.24
@@ -40,7 +41,7 @@ There should be no functional impact from this bug if your design has already me
 
 ## Release 1.4.16
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2020.1
-    * To upgrade, use [Developer AMI v1.9.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace.
+    * To upgrade, use Developer AMI v1.9.0 on the AWS Marketplace.
 * Updated Vitis examples to include usage of Vitis Libraries.
 * Added documentation and examples to show Xilinx Alveo design migration to F1.
 
@@ -61,7 +62,7 @@ There should be no functional impact from this bug if your design has already me
 
 ## Release 1.4.13
 * FPGA developer kit now supports Xilinx Vivado/Vitis 2019.2
-* To upgrade, use [Developer AMI v1.8.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace.
+* To upgrade, use Developer AMI v1.8.0 on the AWS Marketplace.
 
 ## Release 1.4.12
 * Added supported versions for BJS AMI's
@@ -72,7 +73,7 @@ There should be no functional impact from this bug if your design has already me
 ## Release 1.4.11
 * FPGA developer kit supports Xilinx SDx/Vivado 2019.1
     * We recommend developers upgrade to v1.4.11 to benefit from the new features, bug fixes, and optimizations.
-    * To upgrade, use [Developer AMI v1.7.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on the AWS Marketplace. The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2019.1 tools.
+    * To upgrade, use Developer AMI v1.7.0 on the AWS Marketplace. The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2019.1 tools.
 * New functionality:
     * Added a [developer resources section](./developer_resources/README.md) that provides guides on how to setup your own GUI Desktop and compute cluster environment.
     * Developers can now ask for AFI limit increases via the [AWS Support Center Console](https://console.aws.amazon.com/support/cases#/create).
@@ -143,7 +144,7 @@ There should be no functional impact from this bug if your design has already me
 
 ## Release 1.4.8
  * FPGA developer kit supports Xilinx SDx/Vivado 2018.3
-    * We recommend developers upgrade to v1.4.8 to benefit from the new features, bug fixes, and optimizations. To upgrade, use [Developer AMI v1.6.0](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) on AWS Marketplace.  The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2018.3 tools.
+    * We recommend developers upgrade to v1.4.8 to benefit from the new features, bug fixes, and optimizations. To upgrade, use Developer AMI v1.6.0 on AWS Marketplace.  The Developer Kit scripts (hdk_setup.sh or sdaccel_setup.sh) will detect the tool version and update the environment based on requirements needed for Xilinx 2018.3 tools.
  * Ease of Use features:
     * Support for importing results into SDx GUI - By importing results from a script-based flow into SDx IDE, developers can leverage the tools for debug/profiling while keeping flexibility of the script-based flow
     * Vivado HLS developers can now import designs into SDAccel environment to leverage emulation, debug and run-time software
@@ -232,7 +233,7 @@ There should be no functional impact from this bug if your design has already me
 ## Release 1.4.3
 * [DRAM Data Retention](hdk/docs/data_retention.md) - With DRAM data retention, developers can simply load a new AFI and continue using the data that is persistently kept in the DRAM attached to the FPGA, eliminating unnecessary data movements and greatly improving the overall application performance.
 * [Virtual Ethernet](./sdk/apps/virtual-ethernet/README.md) - Provides a low latency network interface for EC2 F1, that enables high performance hardware acceleration to ethernet based applications on AWS like firewalls, routers and advanced security virtual appliances. With Virtual Ethernet, developers are able to create F1 accelerators that process ethernet packets directly from user-space on the FPGA with high throughput and low-latency.
-* [Developer AMI v1.5](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ) with Vivado/SDx 2018.2 tools - New FPGA Developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
+* Developer AMI v1.5 with Vivado/SDx 2018.2 tools - New FPGA Developer AMI supporting Vivado 2018.2 for faster compile times, higher frequencies and improved timing closure
 
 ## Release 1.4.2
 * Fixed SDAccel XOCL driver compile fails that occur on linux kernels greater than 3.10.0-862.3.3.el7.x86_64
@@ -304,7 +305,7 @@ See example for more details [CL_HELLO_WORLD_VHDL](./hdk/cl/examples/cl_hello_wo
 ### 9.    Support for Vivado 2017.1 SDX Build
 
 * The FPGA Development AMI includes Vivado 2017.1 SDX
-    * Get the 1.3.0+ AMI by selecting the version from the [marketplace](https://aws.amazon.com/marketplace/pp/B06VVYBLZZ#).
+    * Get the 1.3.0+ AMI by selecting the version from the marketplace.
 * Older Vivado versions will not be supported
 
 ### 10.    SDK changes
