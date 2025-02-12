@@ -84,7 +84,10 @@ The Shell supplies two base clocks to the CL: a 250MHz `clk_main_a0` clock and a
 Run the command below to build a DCP with desired clock recipes:
 
 ```bash
-./aws_build_dcp_from_cl.sh -c cl_mem_perf --aws_clk_gen --clock_recipe_a A1 --clock_recipe_b B2 --clock_recipe_c C0 --clock_recipe_hbm H2
+cd hdk/cl/examples/cl_mem_perf
+export CL_DIR=$(pwd)
+cd build/scripts
+./aws_build_dcp_from_cl.py -c cl_mem_perf --aws_clk_gen --clock_recipe_a A1 --clock_recipe_b B2 --clock_recipe_c C0 --clock_recipe_hbm H2
 ```
 
 **NOTE**: The [cl_sde](./cl/examples/cl_sde/) example does not contain the AWS_CLK_GEN component. This command uses the [cl_mem_perf](./cl/examples/cl_mem_perf/) example to demonstrate the AWS_CLK_GEN usage.
