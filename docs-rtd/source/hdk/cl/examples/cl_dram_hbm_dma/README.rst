@@ -1,5 +1,5 @@
-CL_DRAM_HBM_DMA CustomLogic Example
-===================================
+CL_DRAM_HBM_DMA Custom Logic Example
+====================================
 
 ⚠️ **Features using XDMA engine are currently unsupported on F2
 instances**
@@ -12,7 +12,7 @@ Table of Content
 3. `Software <#software>`__
 
 Overview
-========
+--------
 
 The CL_DRAM_HBM_DMA example demonstrates the use and connectivity for
 many of the Shell/CL interfaces and functionality, including:
@@ -37,7 +37,7 @@ System diagram
 |cl_dram_hbm_dma|
 
 Functional Description
-======================
+----------------------
 
 Memory Interface
 ----------------
@@ -269,4 +269,13 @@ The test can be simulated with XSIM as follows.
   cd ${CL_DIR}/verif/scripts
   make C_TEST=test_dram_hbm_dma_hwsw_cosim
 
+Simulations
+-----------
+
+Please see more details on running simulations in this
+`README <./verif/README.html>`__
+
+
 .. |cl_dram_hbm_dma| image:: ../../../../_static/cl_dram_hbm_dma_images/cl_dram_hbm_dma.png
+
+`Back to HDK README <../../../README.html>`__

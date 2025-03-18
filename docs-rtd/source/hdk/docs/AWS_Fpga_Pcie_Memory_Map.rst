@@ -100,3 +100,5 @@ compatible with the F2 card (with multi-SLR, HBM FPGA) also only carry
 prefetchable BARs. Aligning the F2 BAR settings with these cards
 provides our customers flexibility to migrate between on-premise and
 cloud without having to change software/hardware.
+
+`Back to HDK README <../README.html>`__

@@ -55,15 +55,15 @@ def cmd_exec(cmd):
 def install_dpdk_dep():
     installed_distro = distro.name()
     if (installed_distro == "Ubuntu"):
-        cmd_exec("apt -y install libnuma-dev")
-        cmd_exec("apt -y install libpcap-dev")
-        cmd_exec("apt -y install meson")
-        cmd_exec("apt -y install python3-pyelftools")
+        cmd_exec("sudo apt -y install libnuma-dev")
+        cmd_exec("sudo apt -y install libpcap-dev")
+        cmd_exec("sudo apt -y install meson")
+        cmd_exec("sudo apt -y install python3-pyelftools")
     else:
-        cmd_exec("yum -y install numactl-devel.x86_64")
-        cmd_exec("yum -y install libpcap-devel")
-        cmd_exec("yum -y install meson")
-        cmd_exec("yum -y install python3-pyelftools")
+        cmd_exec("sudo yum -y install numactl-devel.x86_64")
+        cmd_exec("sudo yum -y install libpcap-devel")
+        cmd_exec("sudo yum -y install meson")
+        cmd_exec("sudo yum -y install python3-pyelftools")
 
 def install_dpdk(install_path):
     logger.debug("install_dpdk: install_path=%s" % (install_path))

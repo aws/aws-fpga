@@ -107,3 +107,5 @@ script <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/buil
 reads in all four XCI files but elaborates the desired DDR core at the
 time of synthesis based on macro defined in
 `cl_mem_perf.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design/cl_mem_perf.sv>`__
+
+`Back to HDK README <../README.html>`__

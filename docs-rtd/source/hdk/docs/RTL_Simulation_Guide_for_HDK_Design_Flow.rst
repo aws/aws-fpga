@@ -1416,3 +1416,5 @@ slot_id  Slot ID
 ======== ===========
 
 .. |alt tag| image:: ../../_static/hdk/docs/cl-sim-testbench.png
+
+`Back to HDK README <../README.html>`__

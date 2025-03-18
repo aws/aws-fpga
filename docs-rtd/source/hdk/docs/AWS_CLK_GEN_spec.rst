@@ -335,8 +335,8 @@ described in `Address Space <#ancAddressSpace>`__
     - RW
     - 0x0
     - Write 0xFFFF_FFFF to globally reset the AWS_CLK_GEN IP. Following blocks
-      are affected: 
-      Assert reset to all MMCMs. 
+      are affected:
+      Assert reset to all MMCMs.
       Assert reset to SYS_RST and its output to CL
       Write 0x0000_0000 to de-assert global resets
   * - 0x14
@@ -503,3 +503,5 @@ Usage of the AWS_CLK_GEN IP is fully demonstrated in the
 refer to that example for more details.
 
 .. |aws_clk_gen| image:: ./../../_static/aws_clk_gen.png
+
+`Back to HDK README <../README.html>`__

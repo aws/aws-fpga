@@ -15,3 +15,5 @@ Recommendations
   logic interfacing with this bus should reside in SLR1.
 
 .. |Small_shell_floorplan| image:: ./../../_static/small_shell_fp.png
+
+`Back to HDK README <../README.html>`__

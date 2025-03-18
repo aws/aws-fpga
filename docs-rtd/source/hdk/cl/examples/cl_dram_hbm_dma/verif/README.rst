@@ -345,3 +345,5 @@ can be found at ``software/runtime/``. For Information about how HW/SW
 co-simulation support can be added to a software test please refer to
 "Code changes to enable HW/SW co-simulation" section in `RTL simulation
 guide <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__.
+
+`Back to HDK README <../../../../README.html>`__

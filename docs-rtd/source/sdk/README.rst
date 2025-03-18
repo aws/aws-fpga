@@ -1,5 +1,5 @@
-AWS EC2 FPGA Software Development Kit
-=====================================
+AWS EC2 FPGA Software Development Kit (SDK)
+===========================================
 
 This directory includes the drivers and runtime environment required by
 any EC2 FPGA Instance.
@@ -16,7 +16,7 @@ AFIs, please refer to the `HDK <../hdk/README.html>`__.
 **NOTE:** This SDK is designed and tested for Linux environments only.
 
 Quick Start
-===========
+-----------
 
 Using an AFI on an EC2 FPGA Instance
 ------------------------------------
@@ -75,5 +75,6 @@ Additional SDK Documentation
    userspace/fpga_mgmt_examples/README
 
    userspace/fpga_mgmt_tools/README
+   docs/F2_Software_Performance_Optimization_Guide
 
 `Back to Home <../index.html>`__

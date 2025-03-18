@@ -81,7 +81,7 @@ Verification
 All examples use the same SystemVerilog `test
 bench <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/tb/sv/tb.sv>`__. The common verification
 files can be found under
-`AWS_FPGA_REPO_DIR/hdk/common/verif <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif>`__. 
+`AWS_FPGA_REPO_DIR/hdk/common/verif <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif>`__.
 This includes a `common Makefile flow <https://github.com/aws/aws-fpga/tree/f2/hdk/common/verif/tb/scripts>`__ that expects a
 `Makefile.tests <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/verif/scripts/Makefile.tests>`__ file that exposes Makefile targets for
 each test located under `$CL_DIR/verif/tests <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/verif/tests>`__.
@@ -422,3 +422,5 @@ and build scripts can be found in other examples such as
 After a successful build, you can follow the AFI creation, loading, and
 testing instructions in the `Hardware Development Kit (HDK) top level document
 <./../../../README.html#build-accelerator-afi-using-hdk-design-flow>`__.
+
+`Back to HDK README <../../../README.html>`__

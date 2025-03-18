@@ -295,3 +295,5 @@ the Vivado Lab Solutions and is available free of charge.
 .. |vjtag_4| image:: ./../../_static/VJTAG_images/vjtag_4.jpg
 .. |vjtag_5| image:: ./../../_static/VJTAG_images/vjtag_5.jpg
 .. |vjtag_6| image:: ./../../_static/VJTAG_images/vjtag_6.jpg
+
+`Back to HDK README <../README.html>`__

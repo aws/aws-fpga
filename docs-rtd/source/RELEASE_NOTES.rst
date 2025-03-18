@@ -78,3 +78,5 @@ v2.0.0
 ------
 
 Initial release. F2 general-availability companion.
+
+`Back to Home <./index.html>`__

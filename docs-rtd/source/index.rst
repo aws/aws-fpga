@@ -3,53 +3,52 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to AWS EC2 F2's documentation!
-======================================
+AWS EC2 F2 Developer Documentation
+==================================
 
-Contents:
+Welcome to the AWS EC2 F2 Developer documentation!
+
+The `AWS EC2 FPGA Development Kit User Guide <./User_Guide_AWS_EC2_FPGA_Development_Kit.html>`__ provides a high-level overview of the development kit, design flows, simulation flows, and recommendations for development environment usage.
+If you are new to AWS EC2 FPGA-accelerated instances, we recommend you read this guide before proceeding.
+
+.. list-table::
+   :header-rows: 1
+   :class: landing-page-table
+   :widths: 33 33 33
+
+   * - Development Kit Component
+     - Target Developer
+     - Development Flow Tool
+   * - `HDK <./hdk/README.html>`__
+     - Developers with advanced RTL experience
+     - Vivado/XSIM/VCS/Questa
+   * - `SDK <./sdk/README.html>`__
+     - Software developers on the F2 platform
+     - C/C++
+   * - `Vitis (Software-Defined) <./vitis/README.html>`__
+     - Intermediate to advanced RTL experience
+     - Vitis HLS/Hardware Emulation
+
+Table of Contents
+-----------------
 
 .. toctree::
-   :maxdepth: 1
+  :maxdepth: 1
 
-   User_Guide_AWS_EC2_FPGA_Development_Kit.rst
+  User_Guide_AWS_EC2_FPGA_Development_Kit
 
-   developer_resources/DCV
+  hdk/README
+  sdk/README
+  vitis/README
 
-   hdk/README
-   hdk/cl/CHECKLIST_BEFORE_BUILDING_CL
-   hdk/cl/examples/cl_sde/README
-   hdk/cl/examples/cl_sde/verif/README
-   hdk/cl/examples/cl_mem_perf/README
-   hdk/cl/examples/cl_mem_perf/verif/README
-   hdk/cl/examples/CL_TEMPLATE/README
-   hdk/cl/examples/cl_dram_hbm_dma/README
-   hdk/cl/examples/cl_dram_hbm_dma/verif/README
-   hdk/docs/Virtual_JTAG_XVC
-   hdk/docs/on_premise_licensing_help
-   hdk/docs/RTL_Simulation_Guide_for_HDK_Design_Flow
-   hdk/docs/AWS_CLK_GEN_spec
-   hdk/docs/Clock_Recipes_User_Guide
-   hdk/docs/AWS_Shell_Interface_Specification
-   hdk/docs/AWS_Shell_ERRATA
-   hdk/docs/AWS_Fpga_Pcie_Memory_Map
-   hdk/docs/shell_floorplan
-   hdk/docs/Supported_DDR_Modes
+  developer_resources/DCV.rst
 
-   sdk/README
-   sdk/apps/virtual-ethernet/README
-   sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide
-   sdk/apps/virtual-ethernet/doc/SDE_HW_Guide
-   sdk/userspace/fpga_mgmt_tools/README
+  ERRATA
+  RELEASE_NOTES
 
-   vitis/README
+  all_links
 
-   ERRATA
-   RELEASE_NOTES
+This development kit includes example programs and RTL that are easy to build and demonstrate the platform's capabilities. Several examples are listed below.
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Example Applications
+--------------------

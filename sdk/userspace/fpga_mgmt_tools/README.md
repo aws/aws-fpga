@@ -229,7 +229,7 @@ into the given `fpga-image-slot`.
    * Multiple concurrent process access to the tools using the same FPGA without proper synchronization between processes will cause response timeouts, and other indeterminate results.
 
 * **Q: What is an afi-power-violation?**
-   * The F2 system can only reliably provide a certain amount of power to the FPGA. If an AFI consumes more than this amount of power, the F2 system will disable the input clocks to the AFI. For more information on preventing, detecting, and recovering from this state, see [AFI power guide (COMING SOON)](../../../hdk/docs/afi_power.md)
+   * The F2 system can only reliably provide a certain amount of power to the FPGA. If an AFI consumes more than this amount of power, the F2 system will disable the input clocks to the AFI. For more information on preventing, detecting, and recovering from this state, see AFI power guide (COMING SOON)
 
 * **Q: How can I reset the AFI?**
    * The AFI may be reset (reloaded) via fpga-load-local-image, and/or reset back to a fully clean slate via `fpga-clear-local-image` and `fpga-load-local-image`.

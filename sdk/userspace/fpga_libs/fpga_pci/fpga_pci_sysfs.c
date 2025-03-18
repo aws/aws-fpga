@@ -925,9 +925,11 @@ fpga_pci_rescan_slot_app_pfs(int slot_id)
 	 * Note that if the driver takes a long time to complete the
 	 * PCI remove fuction (e.g. longer than the below wait time),
 	 * we may still fail to expose the changed PCI IDs in the rescan step.
+	 *
+	 * FPGA_REMOVE_APP_PF_LONG_DELAY_MSEC is being removed as it unnecessarily
+	 * increases AFI load times when the XDMA driver is loaded.
    	 */
-	uint32_t delay_msec = (attached) ?
-		FPGA_REMOVE_APP_PF_LONG_DELAY_MSEC : FPGA_REMOVE_APP_PF_SHORT_DELAY_MSEC;
+	uint32_t delay_msec = FPGA_REMOVE_APP_PF_SHORT_DELAY_MSEC;
 
 	log_info("Driver for " PCI_DEV_FMT " %s attached, waiting %u msec before rescan",
 		app_map->domain, app_map->bus, app_map->dev, app_map->func,

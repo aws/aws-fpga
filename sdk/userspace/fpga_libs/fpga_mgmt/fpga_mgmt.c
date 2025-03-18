@@ -27,8 +27,8 @@
 
 /** Synchronous API (load/clear) default timeout and delay msecs */
 #define FPGA_MGMT_SYNC_TIMEOUT		90000
-#define FPGA_MGMT_RL_RELOAD_DELAY       3000
-#define FPGA_MGMT_RL_RELOAD_RETRIES     10
+#define FPGA_MGMT_RL_RELOAD_DELAY       1000
+#define FPGA_MGMT_RL_RELOAD_RETRIES     30
 #define FPGA_MGMT_SYNC_DELAY_MSEC	2
 
 struct fgpa_mgmt_state_s fpga_mgmt_state = {

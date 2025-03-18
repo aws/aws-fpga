@@ -1,5 +1,5 @@
-`AWS EC2 FPGA Development Kit <https://github.com/aws/aws-fpga>`__
-==================================================================
+`AWS EC2 FPGA Development Kit User Guide <https://github.com/aws/aws-fpga>`__
+=============================================================================
 
 The development kit includes example designs to get you familiar with
 developing for AWS EC2 FPGA Instances.
@@ -331,3 +331,5 @@ FPGA Development Kit:
 .. |f2_instances| image:: ./_static/instance_sizes_20250110.png
 .. |image1| image:: ./_static/accel_card_specs_20250110.png
 .. |f2_f1_comp| image:: ./_static/f2_f1_comp_20250110.png
+
+`Back to Home <./index.html>`__

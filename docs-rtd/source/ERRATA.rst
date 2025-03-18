@@ -58,6 +58,8 @@ HDK
 SDK
 ---
 
+* N/A
+
 Software defined Accelerator Development (Vitis)
 ------------------------------------------------
 
@@ -66,3 +68,5 @@ Software defined Accelerator Development (Vitis)
 2. Support for Vitis 2024.1 accelerator binary creation and AFI creation is not supported, but will be released at a later time.
 
 3. Support for Vitis software emulation has been deprecated by AMD, therefore, no longer supported.
+
+`Back to Home <./index.html>`__

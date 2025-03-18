@@ -1,5 +1,5 @@
-Quick Start Guide to Accelerating your C/C++ application on AWS EC2 F2 (FPGA) Instances with Vitis
-==================================================================================================
+Accelerating your C/C++ application on AWS EC2 F2 (FPGA) Instances with Vitis
+=============================================================================
 
 This quick start guide will utilize a simple ``hello_world`` Vitis
 example to get you started.
@@ -262,3 +262,5 @@ can be found in the example directory.
 
 - `Vitis Documentation
   Hub <https://docs.amd.com/r/en-US/Vitis-Tutorials-Getting-Started>`__
+
+`Back to Home <../index.html>`__

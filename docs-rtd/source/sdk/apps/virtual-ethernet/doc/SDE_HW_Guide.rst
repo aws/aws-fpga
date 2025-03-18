@@ -2,7 +2,7 @@ SDE Hardware Guide
 ==================
 
 Table of Contents:
-==================
+------------------
 
 - `Overview <#Overview>`__
 
@@ -39,7 +39,7 @@ Table of Contents:
 - `FAQ <#FAQ>`__
 
 Overview
-========
+--------
 
 The Streaming Data Engine (SDE) provides high-performance packet
 streaming connectivity between the Custom Logic (CL) and the host
@@ -51,7 +51,7 @@ provides two AXI streaming compliant interfaces viz. one Card-to-Host
 (C2H) and one Host-to-Card (H2C) channel.
 
 Feature List
-============
+------------
 
 1.  High Performance PPS for C2H and H2C.
 2.  12GB/s Bandwidth per channel for C2H and H2C (4KB packet at 250MHz).
@@ -74,7 +74,7 @@ Feature List
 - One Streaming H2C Channel only (No C2H Channel)
 
 Architecture
-============
+------------
 
 .. image:: ./../../../../_static/sdk/apps/virtual-ethernet/SDE_Block_Diagram.jpg
 
@@ -102,7 +102,7 @@ architected to update these variables together by writing to the
 physical memory location using the PCIM interface.
 
 Designing with the SDE
-======================
+----------------------
 
 IOs
 ---
@@ -340,8 +340,8 @@ aligned. The following table describes address mapping within SDE.
 | Range**     | (Bytes)**   |             | Type**      | scription** |
 +=============+=============+=============+=============+=============+
 | 0x0000 –    | 4K          | C2H         | Write Only  | Software    |
-| 0x0FFC      |             | Descriptor  | (wri        | should use  |
-|             |             | RAM         | te-combine) | this        |
+| 0x0FFC      |             | Descriptor  | (write      | should use  |
+|             |             | RAM         | -combine)   | this        |
 |             |             |             |             | address     |
 |             |             |             |             | range when  |
 |             |             |             |             | writing the |
@@ -387,8 +387,8 @@ aligned. The following table describes address mapping within SDE.
 |             |             |             |             | range.      |
 +-------------+-------------+-------------+-------------+-------------+
 | 0x1000 –    | 4K          | H2C         | Write Only  | Software    |
-| 0x1FFC      |             | Descriptor  | (wri        | should use  |
-|             |             | RAM         | te-combine) | this        |
+| 0x1FFC      |             | Descriptor  | (write      | should use  |
+|             |             | RAM         | -combine)   | this        |
 |             |             |             |             | address     |
 |             |             |             |             | range when  |
 |             |             |             |             | writing the |
@@ -723,8 +723,8 @@ C2H Descriptor CSRs
 |             |             |          |             | register is |
 |             |             |          |             | written.    |
 |             |             |          |             | This will   |
-|             |             |          |             | aut         |
-|             |             |          |             | o-increment |
+|             |             |          |             | auto        |
+|             |             |          |             | -increment  |
 |             |             |          |             | when        |
 |             |             |          |             | DE          |
 |             |             |          |             | SC_RAM_DATA |
@@ -1423,23 +1423,22 @@ C2H AXI-Stream CSRs
 
    C2H CSR Offset – C2H_CSR_BASE_ADDR + 0x500
 
-+-------------+-------------+----------+-------------+-------------+
-| **Field     | **Bit       | **Type** | **Default   | **De        |
-| Name**      | Range**     |          | Value**     | scription** |
-+=============+=============+==========+=============+=============+
-| PKT_CNT     | 31:0        | RW0C     | 0x0         | Number of   |
-|             |             |          |             | packets     |
-|             |             |          |             | transmitted |
-|             |             |          |             | on the AXIS |
-|             |             |          |             | interface.  |
-|             |             |          |             | Increments  |
-|             |             |          |             | after       |
-|             |             |          |             | t           |
-|             |             |          |             | ransmitting |
-|             |             |          |             | an EOP.     |
-|             |             |          |             | Write 0 to  |
-|             |             |          |             | clear.      |
-+-------------+-------------+----------+-------------+-------------+
++-------------+-------------+----------+-------------+--------------+
+| **Field     | **Bit       | **Type** | **Default   | **De         |
+| Name**      | Range**     |          | Value**     | scription**  |
++=============+=============+==========+=============+==============+
+| PKT_CNT     | 31:0        | RW0C     | 0x0         | Number of    |
+|             |             |          |             | packets      |
+|             |             |          |             | transmitted  |
+|             |             |          |             | on the AXIS  |
+|             |             |          |             | interface.   |
+|             |             |          |             | Increments   |
+|             |             |          |             | after        |
+|             |             |          |             | transmitting |
+|             |             |          |             | an EOP.      |
+|             |             |          |             | Write 0 to   |
+|             |             |          |             | clear.       |
++-------------+-------------+----------+-------------+--------------+
 
 H2C CSRs
 --------
@@ -1609,8 +1608,8 @@ H2C Descriptor CSRs
 |             |             |          |             | register is |
 |             |             |          |             | written.    |
 |             |             |          |             | This will   |
-|             |             |          |             | aut         |
-|             |             |          |             | o-increment |
+|             |             |          |             | auto        |
+|             |             |          |             | -increment  |
 |             |             |          |             | when        |
 |             |             |          |             | DE          |
 |             |             |          |             | SC_RAM_DATA |
@@ -2220,8 +2219,7 @@ C2H Descriptor
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 32      | 31      | 0       | 32      | 31      | 0       |
 | Length  |         |         |         |         |         |         |
-| (B      |         |         |         |         |         |         |
-| ytes)   |         |         |         |         |         |         |
+| (Bytes) |         |         |         |         |         |         |
 | **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **P     | 64      | 95      | 32      | 48      | 79      | 32      |
@@ -2261,8 +2259,7 @@ C2H Write-Back Metadata
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 32      | 31      | 0       | 32      | 31      | 0       |
 | Length  |         |         |         |         |         |         |
-| (B      |         |         |         |         |         |         |
-| ytes)   |         |         |         |         |         |         |
+| (Bytes) |         |         |         |         |         |         |
 | **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 1       | 32      | 32      | 1       | 32      | 32      |
@@ -2309,8 +2306,7 @@ H2C Descriptor
 +---------+---------+---------+---------+---------+---------+---------+
 | **      | 32      | 31      | 0       | 32      | 31      | 0       |
 | Length  |         |         |         |         |         |         |
-| (B      |         |         |         |         |         |         |
-| ytes)   |         |         |         |         |         |         |
+| (Bytes) |         |         |         |         |         |         |
 | **      |         |         |         |         |         |         |
 +---------+---------+---------+---------+---------+---------+---------+
 | **P     | 64      | 95      | 32      | 48      | 79      | 32      |
@@ -2827,3 +2823,5 @@ single SLR. Additionally, AWS recommends adding pipelining on the PCIM
 and PCIS interfaces from the shell leading up to the SDE.
 
 .. |SDE_Block_Diagram| image:: ../../../../_static/sdk/apps/virtual-ethernet/SDE_Block_Diagram.jpg
+
+`Back to SDK README <../../../README.html>`__

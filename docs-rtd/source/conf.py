@@ -38,6 +38,7 @@ extensions = [
   'sphinx.ext.imgmath',
   'sphinx.ext.extlinks',
   'sphinxcontrib.spelling',
+  'sphinx_book_theme'
 ]
 
 # Makes the spelling filters visible.
@@ -109,51 +110,34 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 # Relative path definitions
-build_hdk_to_repo_root: str = "../../../.."
-build_hdk_to_hdk_root: str = f"{build_hdk_to_repo_root}/hdk"
-build_hdk_to_cl_examples_root: str = f"{build_hdk_to_hdk_root}/cl/examples"
-build_hdk_to_cl_template_build_scripts: str = f"{build_hdk_to_cl_examples_root}/CL_TEMPLATE/build/scripts"
-build_hdk_to_cl_template_build_constraints: str = f"{build_hdk_to_cl_examples_root}/CL_TEMPLATE/build/constraints"
-build_hdk_to_hdk_common_shell_stable_build_scripts: str = f"{build_hdk_to_hdk_root}/common/shell_stable/build/scripts"
-
-build_docs: str = "docs"
-build_cl_examples: str = "cl/examples"
-cl_dram_readme: str = "cl_dram_hbm_dma/README.html"
-build_hdk_to_cl_dram_hbm_dma_readme: str = f"./{build_cl_examples}/{cl_dram_readme}"
-build_hdk_to_cl_sde_readme: str = f"./{build_cl_examples}/cl_sde/README.html"
-
-build_docs_to_repo_root: str = f"../{build_hdk_to_repo_root}"
-build_hdk_docs_to_images: str = "../../../build/html/_images"
-
-build_vitis_to_repo_root = "../../../.."
-
-extlinks = {
-  "build-hdk-to-cl-example": (f"{build_hdk_to_cl_examples_root}/%s", "%s"),
-  "build-hdk-to-repo-root": (f"{build_hdk_to_repo_root}/%s", "%s"),
-  "build-hdk-to-cl-root": (f"{build_hdk_to_repo_root}/hdk/cl/examples/%s", "%s"),
-  "supported-ddr-modes": (f"./{build_docs}/%s.html", "%s"),
-  "cl-template-build-scripts": (f"{build_hdk_to_cl_template_build_scripts}/%s", "%s"),
-  "cl-template-build-constraints": (f"{build_hdk_to_cl_template_build_constraints}/%s", "%s"),
-  "common-shell-stable-build-scripts": (f"{build_hdk_to_hdk_common_shell_stable_build_scripts}/%s", "%s"),
-  "build-hdk-to-cl-readme": (f"{build_cl_examples}/%s/README.html", "%s"),
-  "run-rtl-sims": (f"{build_docs}/%s.html", "%s"),
-  "shell-interface-spec": (f"{build_docs}/%s.html", "%s"),
-  "pcie-memory-map": (f"{build_docs}/%s.html", "%s"),
-  "build-hdk-docs-to-repo-root": (f"{build_docs_to_repo_root}/%s", "%s"),
-  "docs-to-cl-mem-perf": (f"../{build_cl_examples}/%s", "%s"),
-  "build-vitis-to-repo-root": (f"{build_vitis_to_repo_root}/%s", "%s"),
-}
 
 
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'sphinx_book_theme'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #html_theme_options = {}
+
+html_context = {
+   # ...
+   "default_mode": "light"
+}
+
+html_theme_options = {
+    "repository_url": "https://github.com/aws/aws-fpga" ,
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button" : True,
+    "use_fullscreen_button" : True,
+    "use_edit_page_button": True,
+    "repository_branch" : "f2",
+    #"navbar_persistent": [],
+}
+
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []

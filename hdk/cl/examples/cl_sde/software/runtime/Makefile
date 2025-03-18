@@ -30,7 +30,7 @@ STATS_PERIOD = 0
 all: check_env install run
 
 install: check_env
-	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
+	$(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
 	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_setup.py $(DPDK_DIR) $(SLOT_NUM)
 
 run: check_env

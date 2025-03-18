@@ -37,7 +37,7 @@ Software installation and build phase
 
 ```
 cd $(SDK_DIR)/apps/virtual-ethernet/scripts
-sudo ./virtual_ethernet_install.py <install_dir>
+./virtual_ethernet_install.py <install_dir>
 ```
 
 System setup and device bind phase, e.g. on instance boot
@@ -100,7 +100,7 @@ Software installation and build phase
 
 ```
 cd $(SDK_DIR)/apps/virtual-ethernet/scripts
-sudo ./virtual_ethernet_install.py <install_dir>
+./virtual_ethernet_install.py <install_dir>
 ```
 
 System setup and device bind phase, e.g. on instance boot

@@ -28,6 +28,7 @@ import sys
 from termcolor import colored
 from time import sleep
 from typing import Dict, List, Match
+import argparse
 
 def get_repo_root_dir() -> str:
     repo_root_dir = subprocess.run("git rev-parse --show-toplevel".split(), capture_output=True, cwd=os.path.dirname(__file__), check=True).stdout.decode("utf-8").strip()
@@ -45,15 +46,19 @@ def get_link_to_self_html(rst_f: str) -> str:
 def construct_relative_link(rst_f: str, link_body: str) -> str:
     # Start by going to the location of the file that contains the relative link
     os.chdir(os.path.dirname(rst_f))
-    
+
     # Follow the relative link
     back_pos = link_body.find("../")
     while back_pos != -1:
         os.chdir("..")
         link_body = link_body[:back_pos] + link_body[back_pos + 3:]
         back_pos = link_body.find("../")
+
+    # Obtain the specified file path that current directory is relative to
     start = os.getcwd().replace(get_repo_root_dir(), "").replace("/docs-rtd/source/", "")
-    start = f"{start}/{link_body.replace('../', '').replace('./', '')}"# should grab 
+
+    # Reassemble the link relative to the repo root
+    start = f"{start}/{link_body.replace('../', '').replace('./', '')}"
     if start[-1] == "/":
         start = start[:-1]
     return start
@@ -63,39 +68,42 @@ def perform_request(link_body: str, rst_f: str, preamble: str) -> int:
     default_request = "http://localhost:3000"
     is_external_link = link_body.startswith("http")
     is_internal_section_link = link_body.startswith("#")
+    link_is_broken = False
+    session = requests.Session()
     try:
         if is_external_link:
-            response = requests.get(
+            response = session.head(
                 link_body,
-                timeout=2,
+                timeout=15,
                 headers={"User-Agent": "Mozilla/5.0"},
-                allow_redirects=True
+                allow_redirects=True,
+                verify=True
             )
         elif is_internal_section_link:
             link_to_self = get_link_to_self_html(rst_f)
             internal_link = f"{link_to_self}{link_body}"
-            response = requests.head(f"{default_request}/{internal_link}", timeout=1)
+            response = session.head(f"{default_request}/{internal_link}", timeout=1)
         elif "html" in link_body:
-            response = requests.head(f"{default_request}/{link_body}")
+            response = session.head(f"{default_request}/{link_body}")
             if response.status_code != 200:
                 relative_link = construct_relative_link(rst_f, link_body)
-                response = requests.head(f"{default_request}/{relative_link}")
-                if response.status_code != 200:
-                    requests.RequestException(response)
+                response = session.head(f"{default_request}/{relative_link}")
         else:
             file_or_directory_link = f"{default_request}/{link_body}"
-            response = requests.head(file_or_directory_link, timeout=1)
+            response = session.head(file_or_directory_link, timeout=1)
 
-        return_code = response.status_code
-        if return_code != 200:
-            raise requests.RequestException(response)
-        print(preamble + ": " + colored(f" OK, {return_code}", "green"))
-        return 0
-    except requests.RequestException as re:
-        return_code = 404
-        print(preamble + ": " + colored(f"ERROR, {return_code}", "red"))
-        return 1
-
+        link_is_broken = response.status_code != 200
+        status = "ERROR" if link_is_broken else "OK"
+        color = "red" if link_is_broken else "green"
+        print(preamble + ": " + colored(f"{status}, {response.status_code}", color))
+        return int(link_is_broken)
+    except Exception as e:
+        link_is_broken = True
+        print(preamble + ": " + colored("ERROR, Request exception thrown", "red"))
+        print(e)
+        return int(link_is_broken)
+    finally:
+        session.close()
 
 def navigate_to_rtd_build_html_dir() -> None:
     repo_root_dir = get_repo_root_dir()
@@ -180,15 +188,19 @@ def navigate_to_rtd_sources_dir() -> None:
     os.chdir(f"{repo_root_dir}/{rtd_sources_dir}")
 
 
-def gather_file_names() -> List[str]:
+def gather_file_names(files_to_check: List[str]) -> List[str]:
     navigate_to_rtd_sources_dir()
     rst_file_ext = ".rst"
     rst_files = glob.glob(os.getcwd() + f"/**/*{rst_file_ext}", recursive=True)
-    return rst_files
-
+    if not files_to_check:
+        return rst_files
+    return [rst_file for rst_file in rst_files for f in files_to_check if f in rst_file]
 
 def main():
-    rst_files = gather_file_names()
+    p = argparse.ArgumentParser()
+    p.add_argument('-f', nargs='+', required=False, default="")
+    args = vars(p.parse_args())['f']
+    rst_files = gather_file_names(args)
     files_links_dict = get_links_from_files(rst_files)
     check_links(files_links_dict)
 

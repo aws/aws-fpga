@@ -324,3 +324,5 @@ References
 
 `F1 Dynamic Clock
 Configuration <https://github.com/aws/aws-fpga/blob/master/hdk/docs/dynamic_clock_config.md>`__
+
+`Back to HDK README <../README.html>`__

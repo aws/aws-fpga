@@ -50,3 +50,5 @@ Dump Waves
 For information about how to dump waves with XSIM or VCS, please refer
 to
 `debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html#debugging-custom-logic-using-the-aws-hdk>`__
+
+`Back to HDK README <../../../../README.html>`__

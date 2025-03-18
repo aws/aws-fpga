@@ -152,4 +152,4 @@ The first three of these files can be found in the newly-generated directory pre
 <a name="read"></a>
 # 5. Additional Vitis Information
 
-* [Vitis Documentation Hub](https://docs.amd.com/r/en-US/Vitis-Tutorials-Getting-Started)
+* [Vitis Documentation Hub](https://docs.amd.com/v/u/en-US/ug1416-vitis-documentation)

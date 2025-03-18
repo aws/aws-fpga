@@ -23,7 +23,7 @@ Licensing Details
 
   - New users will need to obtain a Vivado ML Enterprise license. This
     can be purchased via the AMD website `Vivado License
-    Link <https://www.amd.com/en/products/software/adaptive-socs-and-fpgas/vivado/vivado-buy.html>`__
+    Link <https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.amd.com/en/products/software/adaptive-socs-and-fpgas/vivado/vivado-buy.html&ved=2ahUKEwjqwuv6nYeLAxWDFlkFHeDtPM8QFnoECCYQAQ&usg=AOvVaw0muZ2iQINIH3fkIRujhzro>`__
   - The correct ordering number for the Node-locked is
     EF-VIVADO-ENTER-NL and Floating is EF-VIVADO-ENTER-FL
   - Please send a request to xilinx_security_app@amd.com to have the
@@ -39,3 +39,5 @@ Licensing Details
     - SDK
     - Partial Reconfiguration
     - Simulation
+
+`Back to HDK README <../README.html>`__

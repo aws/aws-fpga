@@ -153,4 +153,13 @@ pre-generated AFI for this CL.
   * - Pre-generated AGFI ID
     - agfi-0925b211f5a81b071
 
+Simulations
+-----------
+
+Please see more details on running simulations in this
+`README <./verif/README.html>`__
+
+
 .. |CL_SDE_Block_Diagram| image:: ../../../../_static/cl_sde_images/CL_SDE_Block_Diagram.jpg
+
+`Back to HDK README <../../../README.html>`__

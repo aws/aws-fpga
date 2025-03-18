@@ -1,5 +1,13 @@
 # F2 Developer Kit Release Notes
 
+## v2.0.5
+
+* Releasing instructions for using the Vivado GUI.
+* Updating virtual_ethernet_install.py to no longer require sudo when run.
+* Updating f2_mgmt_example, load_multiple_fpga.c, to load AFIs in parallel.
+* Updated ReadTheDocs theme.
+* Added the "F2 Software Performance Optimization Guide" with techniques for f2.48xlarge instances
+
 ## v2.0.4
 
 * Release of new F2 instance size, **f2.6xlarge**:

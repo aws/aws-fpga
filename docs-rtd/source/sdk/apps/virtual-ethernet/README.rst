@@ -27,7 +27,7 @@ familiarize themselves with the following:
    Concepts <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_Network_and_Security.html>`__
 
 Virtual Ethernet Architecture
-=============================
+-----------------------------
 
 The Virtual Ethernet architecture is built upon DPDK (http://dpdk.org).
 DPDK is an open source set of libraries and drivers for fast packet
@@ -84,7 +84,7 @@ will be reserved for your SSH connections, and other control-plane
 traffic.
 
 Application Guide
-=================
+-----------------
 
 The above Virtual Ethernet architecture supports your development phases
 with sample applications that include loopback paths for bringup and
@@ -95,9 +95,11 @@ Please refer to the `Application
 Guide <./doc/Virtual_Ethernet_Application_Guide.html>`__ for details.
 
 Hardware Guide
-==============
+--------------
 
 More details about the Streaming Data Engine itself are covered in the
 `Hardware Guide <./doc/SDE_HW_Guide.html>`__.
 
 .. |alt tag| image:: ../../../_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Arch.jpg
+
+`Back to SDK README <../../README.html>`__

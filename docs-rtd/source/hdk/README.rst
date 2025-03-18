@@ -748,3 +748,21 @@ Next Steps
   <./docs/AWS_Shell_Interface_Specification.html>`__ and `PCIe Memory Map
   <./docs/AWS_Fpga_Pcie_Memory_Map.html>`__
 - Create your own CL designs or port F1 designs over to F2 systems
+
+Additional HDK Documentation
+----------------------------
+.. toctree::
+  :maxdepth: 1
+
+  docs/AWS_CLK_GEN_spec
+  docs/Clock_Recipes_User_Guide
+  docs/AWS_Shell_ERRATA
+  docs/AWS_Shell_Interface_Specification
+  docs/shell_floorplan
+  docs/AWS_Fpga_Pcie_Memory_Map
+  docs/RTL_Simulation_Guide_for_HDK_Design_Flow
+  docs/on_premise_licensing_help
+  docs/Supported_DDR_Modes
+  docs/Virtual_JTAG_XVC
+
+`Back to Home <../index.html>`__

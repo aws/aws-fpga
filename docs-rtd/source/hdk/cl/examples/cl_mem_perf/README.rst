@@ -54,7 +54,7 @@ Table of Content
     Test <#instructions-to-run-hbm-performance-test>`__
 
 Introduction
-============
+------------
 
 The CL_MEM_PERF is a customer reference design for F2 where the
 objective is to demonstrate fine tuned data paths to HBM and DDR to
@@ -93,7 +93,7 @@ accelerator designs to interface with various memories on the FPGA and
 to use as reference to fine tune their CL performance.
 
 Architecture Overview
-=====================
+---------------------
 
 Figure below shows an architectural overview of CL_MEM_PERF design:
 
@@ -325,7 +325,7 @@ ILAs. One ILA snoops the PCIS bus, whereas second ILA snoops DDR-AXI4
 bus.
 
 Address Space
-=============
+-------------
 
 OCL Address Space
 -----------------
@@ -633,13 +633,13 @@ SDA Memory Address Space
     - `AWS_CLK_GEN specifiction <./../../../docs/AWS_CLK_GEN_spec.html>`__
 
 Simulations
-===========
+-----------
 
 Please see more details on running simulations in this
 `README <./verif/README.html>`__
 
 Software
-========
+--------
 
 DMA accesses rely on the `XDMA
 driver <https://github.com/Xilinx/dma_ip_drivers>`__
@@ -730,7 +730,7 @@ The test can be simulated with XSIM as follows.
 .. _hbm-performance-tests-mem-1:
 
 HBM Performance Tests
-=====================
+---------------------
 
 A runtime test is provided to measure HBM performance aggregated across
 all 32 HBM Channels. The runtime test should be run on a real machine
@@ -801,3 +801,5 @@ Sample output:
 
 .. |cl_mem_perf| image:: ../../../../_static/cl_mem_perf_images/cl_mem_perf.png
 .. |cl_hbm_kernel| image:: ../../../../_static/cl_mem_perf_images/cl_hbm_kernel.png
+
+`Back to HDK README <../../../README.html>`__
