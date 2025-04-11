@@ -154,3 +154,6 @@ doctest:
 
 spelling:
 	$(SPHINXBUILD) -b spelling source/ build/
+
+links:
+	make clean && make html && python3 ../shared/bin/check_doc_links.py

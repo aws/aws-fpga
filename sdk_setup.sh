@@ -22,20 +22,6 @@ if [ $script == $0 ]; then
   exit 2
 fi
 
-export REPO_ROOT=$(pwd)
-
-# Install base packages on any AMI
-UBUNTU_DISTRO='"Ubuntu"'
-DISTRO=$(awk -F= '/^NAME/{print $2}' /etc/os-release)
-echo "Sourcing SDK setup on a '$DISTRO' machine. Next comparing if it is equal to '$UBUNTU_DISTRO'"
-if [[ "$DISTRO" == "$UBUNTU_DISTRO" ]]; then
-  sudo apt update -y
-  sudo apt install -y linux-headers-$(uname -r) bzip2 unzip libx11-6 perl build-essential gdb git screen tmux pciutils libstdc++6 libjpeg-turbo8-dev libtiff5 ocl-icd-opencl-dev opencl-headers tcl tcl-dev wget awscli environment-modules python3-pip
-else
-  sudo yum upgrade -y
-  sudo yum install -y kernel kernel-devel kernel-headers bzip2 unzip libX11 perl gcc gcc-c++ gdb git screen tmux pciutils libstdc++-static libjpeg-turbo-devel libtiff-devel ocl-icd ocl-icd-devel opencl-headers tcl tcl-devel wget awscli environment-modules python3-pip
-fi
-
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)

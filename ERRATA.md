@@ -34,12 +34,7 @@ Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 
 6. Simulation of the [HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface) is not supported in this release. The HBM IP always passes initialization and remains in an operating state for all tests. Simulation support for the HBM monitor will be added in a future release.
 
-7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2
-   instances at this time.
-
-8. The following ddr simulation backdoor test is not working with 64GB memory:
-
-   - test_ddr_peek_bdr_walking_ones
+7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2 instances at this time.
 
 ## SDK
 

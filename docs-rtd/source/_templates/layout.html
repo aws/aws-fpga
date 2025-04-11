@@ -1,0 +1,7 @@
+{% extends "!layout.html" %}
+{% block extrahead %}
+    {{ super() }}
+    {% if pagename == 'welcome' %}
+        <meta name="google-site-verification" content="8Towr1qSHYbKJeNUM4gRR3T13Rbh895fJjuafp8Hc10" />
+    {% endif %}
+{% endblock %}

@@ -42,7 +42,7 @@ Image (AFI) management while running on an FPGA-enabled EC2 instance
   - Starts a Virtual JTAG XVC server, to debug tools like Vivado Lab
     Edition Hardware Manager to access debug cores inside the AFI.
     Please refer to `Virtual JTAG
-    userguide <../../../hdk/docs/Virtual_JTAG_XVC.html>`__.
+    userguide <../../../hdk/docs/Virtual-JTAG-XVC.html>`__.
 
 - **``fpga-get-virtual-led``**
 

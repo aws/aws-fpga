@@ -14,8 +14,8 @@
  */
 
 /**
- * The fpga_dma_mem library contains a helper function for allocating and
- * deallocating memory.
+ * The fpga_dma_mem library contains a helper functions for mapping and
+ * unmapping memory.
  */
 
 #pragma once
@@ -29,16 +29,40 @@ extern "C" {
 
 //============================================================================================================
 //
-// fpga_dma_mem_alloc() : Allocate size_bytes memory using the provided file descriptor.
+// fpga_dma_mem_map() : Map size_bytes memory buffer using the provided file descriptor.
 // arguements:
 // -----------
-// int fd                      : The file descriptor to use for allocating the memory.
-// size_t size_bytes           : The number of bytes that will be allocated for the memory buffer.
-// uint64_t* virtual_address   : The virtual address that the application can use for accessing the allocated memory.
+// int fd                      : The file descriptor to use for mapping the memory.
+// size_t size_bytes           : The number of bytes that will be mapped for the memory buffer.
+// uint64_t* virtual_address   : The virtual address that the application can use for accessing the mapped memory.
 // uint64_t* physical_address  : The physical address that can be programmed into a custom dma engine on a card.
 //
 //=============================================================================================================
-int fpga_dma_mem_alloc(int fd, size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address);
+int fpga_dma_mem_map(int fd, size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address);
+
+//============================================================================================================
+//
+// fpga_dma_mem_map_anon() : Map size_bytes memory buffer anonymously.
+// arguements:
+// -----------
+// size_t size_bytes           : The number of bytes that will be mapped for the memory buffer.
+// uint64_t* virtual_address   : The virtual address that the application can use for accessing the mapped memory.
+// uint64_t* physical_address  : The physical address that can be programmed into a custom dma engine on a card.
+//
+//=============================================================================================================
+int fpga_dma_mem_map_anon(size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address);
+
+//============================================================================================================
+//
+// fpga_dma_mem_map_huge() : Map size_bytes memory buffer using a hugepage. Huge pages should be allocated prior
+// to making this call. Your system will default to 2MB or 1GB sized huge pages.
+// arguements:
+// -----------
+// uint64_t* virtual_address   : The virtual address that the application can use for accessing the mapped memory.
+// uint64_t* physical_address  : The physical address that can be programmed into a custom dma engine on a card.
+//
+//=============================================================================================================
+int fpga_dma_mem_map_huge(uint64_t* virtual_address, uint64_t* physical_address);
 
 //============================================================================================================
 //
@@ -49,7 +73,7 @@ int fpga_dma_mem_alloc(int fd, size_t size_bytes, uint64_t* virtual_address, uin
 // size_t size_bytes          : The number of bytes that were allocated for the memory buffer.
 //
 //=============================================================================================================
-int fpga_dma_mem_dealloc(uint64_t* virtual_address, size_t size_bytes);
+int fpga_dma_mem_unmap(uint64_t* virtual_address, size_t size_bytes);
 
 #ifdef __cplusplus
 }

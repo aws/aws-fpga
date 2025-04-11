@@ -4,7 +4,7 @@ F2 Developer Kit Errata
 Shell Errata
 ------------
 
-Shell errata is `documented here <./hdk/docs/AWS_Shell_ERRATA.html>`__
+Shell errata is `documented here <./hdk/docs/AWS-Shell-ERRATA.html>`__
 
 HDK
 ---
@@ -25,7 +25,7 @@ HDK
    CL builds using the XDMA Shell will result in a build failure.
 
 3. CL simulation might show the following "error" message if the `CL
-   clock generator <./hdk/docs/AWS_CLK_GEN_spec.html>`__ is contained in
+   clock generator <./hdk/docs/AWS-CLK-GEN-spec.html>`__ is contained in
    the design. By default, the generator blocks all output clocks
    (except for ``o_clk_main_a0``) and asserts all output resets. This
    behavior violates the built-in reset check in the `AXI SmartConnect
@@ -54,7 +54,7 @@ HDK
    is strongly recommended.
 
 6. Simulation of the `HBM monitor
-   interface <./hdk/docs/AWS_Shell_Interface_Specification.html#hbm-monitor-interface>`__
+   interface <./hdk/docs/AWS-Shell-Interface-Specification.html#hbm-monitor-interface>`__
    is not supported in this release. The HBM IP always passes
    initialization and remains in an operating state for all tests.
    Simulation support for the HBM monitor will be added in a future
@@ -62,10 +62,6 @@ HDK
 
 7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2
    instances at this time.
-
-8. The following ddr simulation backdoor test is not working with 64GB memory:
-
-   - test_ddr_peek_bdr_walking_ones
 
 SDK
 ---
@@ -81,4 +77,4 @@ Software defined Accelerator Development (Vitis)
 
 3. Support for Vitis software emulation has been deprecated by AMD, therefore, no longer supported.
 
-`Back to Home <./index.html>`__
+`Back to Home <./home.html>`__

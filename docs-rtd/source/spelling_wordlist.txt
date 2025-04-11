@@ -253,3 +253,15 @@ dn
 devkit
 colocated
 Colocated
+iops
+floorplans
+Hugepages
+hugepages
+hugepage
+writeback
+cli
+combinatorial
+Combinatorial
+wildcard
+wildcards
+prefetch

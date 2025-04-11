@@ -263,4 +263,4 @@ can be found in the example directory.
 - `Vitis Documentation
   Hub <https://docs.amd.com/r/en-US/Vitis-Tutorials-Getting-Started>`__
 
-`Back to Home <../index.html>`__
+`Back to Home <../home.html>`__

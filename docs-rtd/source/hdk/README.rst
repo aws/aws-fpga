@@ -136,9 +136,9 @@ examples <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples>`__.
 The Shell supplies two base clocks to the CL: a 250MHz ``clk_main_a0`` clock and
 a 100MHz ``clk_hbm_ref`` clock. However, the CL can run at higher frequencies
 using locally generated clocks. F2 Developer Kit offers an
-`AWS Clock Generation (AWS_CLK_GEN) IP <./docs/AWS_CLK_GEN_spec.html>`__
+`AWS Clock Generation (AWS_CLK_GEN) IP <./docs/AWS-CLK-GEN-spec.html>`__
 that you can leverage in your design to generate CL clocks with frequencies
-specified in the `Clock Recipes User Guide <./docs/Clock_Recipes_User_Guide.html>`__.
+specified in the `Clock Recipes User Guide <./docs/Clock-Recipes-User-Guide.html>`__.
 
 Run the command below to build a DCP with desired clock recipes:
 
@@ -149,8 +149,8 @@ Run the command below to build a DCP with desired clock recipes:
   cd build/scripts
   ./aws_build_dcp_from_cl.py -c cl_mem_perf --aws_clk_gen --clock_recipe_a A1 --clock_recipe_b B2 --clock_recipe_c C0 --clock_recipe_hbm H2
 
-**NOTE**: The `cl_sde <./cl/examples/cl_sde/README.html>`__ example does not contain
-the AWS_CLK_GEN component. This command uses the `cl_mem_perf <./cl/examples/cl_mem_perf/README.html>`__
+**NOTE**: The `cl_sde <./cl/examples/cl-sde/README.html>`__ example does not contain
+the AWS_CLK_GEN component. This command uses the `cl_mem_perf <./cl/examples/cl-mem-perf/README.html>`__
 example to demonstrate the AWS_CLK_GEN usage.
 
 A few more notes on
@@ -160,7 +160,7 @@ A few more notes on
   Shell.
 - Use ``--cl <CL name>`` option to build a different CL design. This is
   default to ``cl_dram_hbm_dma``.
-- Use ``--aws_clk_gen`` option to annotate the use of the `AWS_CLK_GEN IP <./docs/AWS_CLK_GEN_spec.html>`__ and the `Clock Recipes User Guide <./docs/Clock_Recipes_User_Guide.html>`__.
+- Use ``--aws_clk_gen`` option to annotate the use of the `AWS_CLK_GEN IP <./docs/AWS-CLK-GEN-spec.html>`__ and the `Clock Recipes User Guide <./docs/Clock-Recipes-User-Guide.html>`__.
 - The script also allows developers to pass different Vivado directives
   as shown below:
 
@@ -461,6 +461,49 @@ demonstrates runtime software execution using the ``CL_SDE`` example.
 
   Bye...
 
+AFI PCIe IDs
+------------
+
+Customers can customize the PCIe IDs for generated AFIs, including Vendor ID
+(VID), Device ID (DID), Subsystem Vendor ID (SVID) and Subsystem Device ID
+(SSID), to facilitate the proper driver binding. These PCIe IDs are required
+for the AFI generation process and must be defined in the `cl_id_defines.vh
+<https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/design/cl_id_defines.vh>`__
+file under each example. Here is an example in the `CL_SDE` example:
+
+.. code:: verilog
+
+    // CL_SH_ID0
+    // - PCIe Vendor/Device ID Values
+    //    31:16: PCIe Device ID
+    //    15: 0: PCIe Vendor ID
+    //    - A Vendor ID value of 0x8086 is not valid.
+    //    - If using a Vendor ID value of 0x1D0F (Amazon) then valid
+    //      values for Device ID's are in the range of 0xF000 - 0xF0FF.
+    //    - A Vendor/Device ID of 0 (zero) is not valid.
+    `define CL_SH_ID0       32'hF002_1D0F
+
+    // CL_SH_ID1
+    // - PCIe Subsystem/Subsystem Vendor ID Values
+    //    31:16: PCIe Subsystem ID
+    //    15: 0: PCIe Subsystem Vendor ID
+    // - A PCIe Subsystem/Subsystem Vendor ID of 0 (zero) is not valid
+    `define CL_SH_ID1       32'h1D51_FEDC
+
+When a DCP tarball file gets generated, the IDs are included in the manifest
+file within the tarball:
+
+.. code:: bash
+
+    pci_device_id=0xF002
+
+    pci_vendor_id=0x1D0F
+
+    pci_subsystem_id=0x1D51
+
+    pci_subsystem_vendor_id=0xFEDC
+
+
 CL Examples
 -----------
 
@@ -475,7 +518,7 @@ cl_sde
 
 The cl_sde example implements the Streaming Data Engine (SDE) IP block
 into FPGA custom logic to demonstrate the `Virtual Ethernet Application
-<../sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.html>`__.
+<../sdk/apps/virtual-ethernet/doc/Virtual-Ethernet-Application-Guide.html>`__.
 
 See `cl_sde <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde>`__
 for more information
@@ -586,7 +629,7 @@ Verification
     make TEST=${TEST_NAME} USE_AP_64GB_DDR_DIMM=1
 
   **NOTE**: Please refer to the `Supported DDR Modes
-  <./docs/Supported_DDR_Modes.html>`__ for details on supported DDR
+  <./docs/Supported-DDR-Modes.html>`__ for details on supported DDR
   configurations.
 
 - After adding new design IPs, make sure to add the new simulation libraries to
@@ -741,12 +784,12 @@ includes all sub-modules instantiated in CL examples.
 Next Steps
 ---------------
 
-- Familiarize the `cl_sde <./cl/examples/cl_sde/README.html>`__ example
-- `Run RTL simulations <./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.html>`__
+- Familiarize yourself with the `cl_sde <./cl/examples/cl-sde/README.html>`__ example
+- `Run RTL simulations <./docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html>`__
   on the example designs
 - Dive deep into the `Shell Interface Specification
-  <./docs/AWS_Shell_Interface_Specification.html>`__ and `PCIe Memory Map
-  <./docs/AWS_Fpga_Pcie_Memory_Map.html>`__
+  <./docs/AWS-Shell-Interface-Specification.html>`__ and `PCIe Memory Map
+  <./docs/AWS-Fpga-Pcie-Memory-Map.html>`__
 - Create your own CL designs or port F1 designs over to F2 systems
 
 Additional HDK Documentation
@@ -754,15 +797,16 @@ Additional HDK Documentation
 .. toctree::
   :maxdepth: 1
 
-  docs/AWS_CLK_GEN_spec
-  docs/Clock_Recipes_User_Guide
-  docs/AWS_Shell_ERRATA
-  docs/AWS_Shell_Interface_Specification
-  docs/shell_floorplan
-  docs/AWS_Fpga_Pcie_Memory_Map
-  docs/RTL_Simulation_Guide_for_HDK_Design_Flow
-  docs/on_premise_licensing_help
-  docs/Supported_DDR_Modes
-  docs/Virtual_JTAG_XVC
+  docs/AWS-CLI-FPGA-Commands
+  docs/AWS-CLK-GEN-spec
+  docs/Clock-Recipes-User-Guide
+  docs/AWS-Shell-ERRATA
+  docs/AWS-Shell-Interface-Specification
+  docs/shell-floorplan
+  docs/AWS-Fpga-Pcie-Memory-Map
+  docs/RTL-Simulation-Guide-for-HDK-Design-Flow
+  docs/on-premise-licensing-help
+  docs/Supported-DDR-Modes
+  docs/Virtual-JTAG-XVC
 
-`Back to Home <../index.html>`__
+`Back to Home <../home.html>`__

@@ -19,7 +19,7 @@
 
 TOP=`pwd`
 
-source $REPO_ROOT/shared/bin/set_common_functions.sh
+source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
 
 LOGLEVEL=$1
 if [ -z "$LOGLEVEL" ]; then

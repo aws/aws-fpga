@@ -86,7 +86,7 @@ In order to minimize latency and reduce the complexity of the software/driver, a
 ## Design Configuration parameters
 The SDE can be parameterized when the SDE is instanced in the CL. These configuration parameters are static parameters and are expected to be set when the SDE is instanced in the CL. Some important parameters are summarized below.
 * C2H_ONLY: Disable SDE H2C logic (Can be set to 1 if only the C2H channel is required).
-* H2C_ONLY: Disable SDE C2H logic (Can be set to 1 if only the C2H channel is required).
+* H2C_ONLY: Disable SDE C2H logic (Can be set to 1 if only the H2C channel is required).
 * C2H_DESC_TYPE & H2C_DESC_TYPE: Descriptor Type (0 - Regular, 1 - Compact) for C2H and H2C respectively.
 * C2H_DESC_RAM_DEPTH & H2C_DESC_RAM_DEPTH: Descriptor RAM depth. The maximum number of descriptors for C2H and H2C respectively.
 * C2H_BUF_DEPTH & H2C_BUF_DEPTH: Buffer RAM depth.
@@ -124,8 +124,8 @@ Full List of Parameters are listed in table below. **Supported values for each p
 | H2C_PCIM_DESC_ARID   | 1           | Default only | ARID for H2C Descriptor PCIM AXI4 Read Accesses                                                                                                                                                      |
 | H2C_PCIM_DM_ARID     | 2           | Default only | ARID for C2H Data Mover PCIM AXI4 Read Accesses                                                                                                                                                      |
 | PCIM_NUM_OT_RD       | 64          | Default only | PCIM Number of Outstanding Reads. This should be 64 when using the AWS shell in order to maximize H2C performance.                                                                                   |
-| H2C_PCIM_MAX_RD_SIZE | 0           | Default only | H2C Maximum AXI Read request size (0 – 512B, 1 – 1KB, 2 – 2KB, 3 – 4KB). This should be 0 when using the AWS shell in order to maximize H2C performance.                                             |
-| C2H_PCIM_MAX_WR_SIZE | 0           | Default only | C2H Maximum AXI Write request size (0 – 512B, 1 – 1KB, 2 – 2KB, 3 – 4KB). This should be 3 when using the AWS shell in order to maximize C2H performance.                                            |
+| H2C_PCIM_MAX_RD_SIZE | 3           | Default only | H2C Maximum AXI Read request size (0 – 512B, 1 – 1KB, 2 – 2KB, 3 – 4KB). This should be 0 when using the AWS shell in order to maximize H2C performance.                                             |
+| C2H_PCIM_MAX_WR_SIZE | 3           | Default only | C2H Maximum AXI Write request size (0 – 512B, 1 – 1KB, 2 – 2KB, 3 – 4KB). This should be 3 when using the AWS shell in order to maximize C2H performance.                                            |
 
 
 <a name="PF_AddressRange"></a>

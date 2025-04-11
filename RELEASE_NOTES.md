@@ -1,5 +1,11 @@
 # F2 Developer Kit Release Notes
 
+## v2.0.6
+
+* Releasing [CL_SDE software examples](./hdk/cl/examples/cl_sde/software/src/README.md) to demonstrate how to use the [Streaming Data Engine (SDE)](./sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) DMA on [small shell](./User_Guide_AWS_EC2_FPGA_Development_Kit.md#aws-shells).
+* Fixing the [virtual ethernet](./sdk/apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.md#packetgen-dual-instance-loopback) PacketGen Dual Instance Loopback example to forward packets back to the PacketGen instance.
+* Fixing DDR backdoor access in simulation.
+
 ## v2.0.5
 
 * Releasing instructions for using the Vivado GUI.

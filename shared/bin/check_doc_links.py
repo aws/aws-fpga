@@ -70,6 +70,13 @@ def perform_request(link_body: str, rst_f: str, preamble: str) -> int:
     is_internal_section_link = link_body.startswith("#")
     link_is_broken = False
     session = requests.Session()
+    if 'amd' in link_body or 'xilinx' in link_body:
+        link_is_broken = False
+        status = "AMD LINK! Please verify manually!"
+        color = "yellow"
+        print(preamble + ": " + colored(f"{status}", color))
+        return 1
+
     try:
         if is_external_link:
             response = session.head(

@@ -92,13 +92,13 @@ debug of the Virtual Ethernet application and custom CL, all the way to
 end-to-end application integration with live traffic.
 
 Please refer to the `Application
-Guide <./doc/Virtual_Ethernet_Application_Guide.html>`__ for details.
+Guide <./doc/Virtual-Ethernet-Application-Guide.html>`__ for details.
 
 Hardware Guide
 --------------
 
 More details about the Streaming Data Engine itself are covered in the
-`Hardware Guide <./doc/SDE_HW_Guide.html>`__.
+`Hardware Guide <./doc/SDE-HW-Guide.html>`__.
 
 .. |alt tag| image:: ../../../_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Arch.jpg
 

@@ -170,19 +170,19 @@
   endtask
 
   task write_bdr_ld_data_to_file(logic [63:0] axi_addr, logic [511:0] data);
-     logic [16:0]  row_a, row_b;
+     logic [17:0]  row_a, row_b;
      logic [1:0]   bank_a, bank_b;
      logic [9:0]   col_a, col_b;
      logic [1:0]   bank_group_a, bank_group_b;
      logic [63:0]  data_fp[17:0];
      logic [511:0] data_t;
 
-     row_a = axi_addr[33:17];
+     row_a = axi_addr[34:17];
      col_a = {axi_addr[16:11], axi_addr[8], axi_addr[5:3]};
      bank_a = {axi_addr[10:9]};
      bank_group_a = {axi_addr[7:6]};
 
-     row_b = {row_a[16:14], ~row_a[13], row_a[12], ~row_a[11], row_a[10], ~row_a[9:3], row_a[2:0]};
+     row_b = {row_a[17:14], ~row_a[13], row_a[12], ~row_a[11], row_a[10], ~row_a[9:3], row_a[2:0]};
      col_b = {~col_a[9:3], col_a[2:0]};
      bank_b = ~bank_a;
      bank_group_b = ~bank_group_a;

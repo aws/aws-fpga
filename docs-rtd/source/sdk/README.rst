@@ -69,12 +69,13 @@ Additional SDK Documentation
    :maxdepth: 1
 
    apps/virtual-ethernet/README
-   apps/virtual-ethernet/doc/SDE_HW_Guide
-   apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide
+   apps/virtual-ethernet/doc/SDE-HW-Guide
+   apps/virtual-ethernet/doc/Virtual-Ethernet-Application-Guide
 
    userspace/fpga_mgmt_examples/README
 
    userspace/fpga_mgmt_tools/README
-   docs/F2_Software_Performance_Optimization_Guide
+   docs/F2-Software-Performance-Optimization-Guide
+   docs/Load-Times
 
-`Back to Home <../index.html>`__
+`Back to Home <../home.html>`__

@@ -62,7 +62,7 @@ if [ $RET != 0 ]; then
     exit $RET
 fi
 
-source $REPO_ROOT/shared/bin/set_common_functions.sh
+source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
 
 # Add udev rules if asked for non root access
 allow_non_root

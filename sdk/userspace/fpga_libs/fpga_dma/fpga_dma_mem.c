@@ -58,10 +58,9 @@ err:
   return ret;
 }
 
-static int map_page(int fd, size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address) {
+static int map_page(int fd, size_t size_bytes, int flags, uint64_t* virtual_address, uint64_t* physical_address) {
   int ret = 0;
   int prot = PROT_READ | PROT_WRITE;
-  int flags = MAP_PRIVATE | MAP_ANONYMOUS;
 
   void *va = mmap(NULL, size_bytes, prot, flags, fd, 0);
   fail_on_with_code(va == MAP_FAILED, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "mmap failed");
@@ -82,22 +81,55 @@ cleanup:
   return ret;
 }
 
-int fpga_dma_mem_alloc(int fd, size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address) {
+int fpga_dma_mem_map(int fd, size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address) {
   int ret = 0;
   fail_on_with_code(virtual_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "virtual_address is NULL");
   fail_on_with_code(physical_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "physical_address is NULL");
   fail_on_with_code(size_bytes == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "size_bytes is 0");
 
-  ret = map_page(fd, size_bytes, virtual_address, physical_address);
+  int flags = MAP_SHARED;
+  ret = map_page(fd, size_bytes, flags, virtual_address, physical_address);
   fail_on_with_code(ret != FPGA_ERR_OK, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "map_page failed");
 
-  log_info("fpga_dma_mem_alloc: size_bytes = %zu, virtual_address = 0x%lx, physical_address = 0x%lx\n", size_bytes, *virtual_address, *physical_address);
+  log_info("size_bytes = %zu, virtual_address = 0x%lx, physical_address = 0x%lx", size_bytes, *virtual_address, *physical_address);
 
 err:
   return ret;
 }
 
-int fpga_dma_mem_dealloc(uint64_t* virtual_address, size_t size_bytes) {
+int fpga_dma_mem_map_anon(size_t size_bytes, uint64_t* virtual_address, uint64_t* physical_address) {
+  int ret = 0;
+  fail_on_with_code(virtual_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "virtual_address is NULL");
+  fail_on_with_code(physical_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "physical_address is NULL");
+  fail_on_with_code(size_bytes == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "size_bytes is 0");
+
+  int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+  ret = map_page(-1, size_bytes, flags, virtual_address, physical_address);
+  fail_on_with_code(ret != FPGA_ERR_OK, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "map_page failed");
+
+  log_info("size_bytes = %zu, virtual_address = 0x%lx, physical_address = 0x%lx", size_bytes, *virtual_address, *physical_address);
+
+err:
+  return ret;
+}
+
+int fpga_dma_mem_map_huge(uint64_t* virtual_address, uint64_t* physical_address) {
+  int ret = 0;
+  fail_on_with_code(virtual_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "virtual_address is NULL");
+  fail_on_with_code(physical_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "physical_address is NULL");
+
+  int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB;
+  size_t default_hugepage_bytes = 2 * 1024 * 1024;
+  ret = map_page(-1, default_hugepage_bytes, flags, virtual_address, physical_address);
+  fail_on_with_code(ret != FPGA_ERR_OK, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "map_page failed");
+
+  log_info("hugepage_size = %zu, virtual_address = 0x%lx, physical_address = 0x%lx", default_hugepage_bytes, *virtual_address, *physical_address);
+
+err:
+  return ret;
+}
+
+int fpga_dma_mem_unmap(uint64_t* virtual_address, size_t size_bytes) {
   int ret = FPGA_ERR_FAIL;
   fail_on_with_code(virtual_address == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "virtual_address is NULL");
   fail_on_with_code(size_bytes == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "size_bytes is 0");

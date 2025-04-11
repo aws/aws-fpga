@@ -21,7 +21,7 @@
 module sde #(parameter bit C2H_ONLY = 0,
              parameter bit H2C_ONLY = 0,
 
-             parameter H2C_PCIM_MAX_RD_SIZE = 0, // 0 - 512B, 1 - 1KB, 2 - 2KB, 3 - 4KB
+             parameter H2C_PCIM_MAX_RD_SIZE = 3, // 0 - 512B, 1 - 1KB, 2 - 2KB, 3 - 4KB
              parameter C2H_PCIM_MAX_WR_SIZE = 3, // 0 - 512B, 1 - 1KB, 2 - 2KB, 3 - 4KB
 
              parameter PCIM_DATA_WIDTH = 512,

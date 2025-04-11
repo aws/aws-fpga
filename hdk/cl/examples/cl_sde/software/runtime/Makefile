@@ -15,31 +15,61 @@
 # limitations under the License.
 # =============================================================================
 
-
 export TEST ?= test_sde_loopback
 
 SLOT_NUM = 0
 APP_SCRIPTS_DIR = $(SDK_DIR)/apps/virtual-ethernet/scripts
+SDK_USERSPACE_DIR = $(SDK_DIR)/userspace
+SDE_EXAMPLE_DIR = ../src
+SDE_LIB_DIR = $(SDE_EXAMPLE_DIR)/sde_lib
 APP_INSTALL_DIR = $(HDK_DIR)/cl/examples/cl_sde/software/runtime/veth_app
 DPDK_DIR = $(APP_INSTALL_DIR)/dpdk
 RMDIR = sudo rm -rf
 STATS_PERIOD = 0
 
+INCLUDES=-I$(SDE_LIB_DIR) -I$(SDK_USERSPACE_DIR)/include -I$(SDK_USERSPACE_DIR)/fpga_libs/fpga_mgmt
+LDFLAGS = -L$(SDK_USERSPACE_DIR)/lib/so
+LDLIBS = -lfpga_mgmt
+OPT=-DFPGA_ALLOW_NON_ROOT -DCONFIG_LOGLEVEL=1
+CFLAGS=$(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+SRC=$(SDE_LIB_DIR)/sde_hw_ctrl.c $(SDE_LIB_DIR)/sde_dma_buffer.c $(SDE_LIB_DIR)/sde_mgmt.c $(SDE_LIB_DIR)/sde_utility.c $(SDE_LIB_DIR)/sde_mem.c
+SDE_EXAMPLES = sde_c2h_perf_test sde_h2c_perf_test sde_c2h_simple sde_h2c_simple sde_loopback_simple
+
 .PHONY: all clean
 
-all: check_env install run
+all: check_env ve_install ve_run sde_examples
 
-install: check_env
+ve_install: check_env
 	$(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
 	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_setup.py $(DPDK_DIR) $(SLOT_NUM)
 
-run: check_env
+ve_run: check_env
 	sudo $(DPDK_DIR)/build/app/dpdk-testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=$(STATS_PERIOD) \
 
+sde_examples: $(SDE_EXAMPLES)
+
 clean:
-	$(RMDIR) $(APP_INSTALL_DIR)
+	$(RMDIR) $(APP_INSTALL_DIR) $(SDE_EXAMPLES)
 
 check_env:
 ifndef SDK_DIR
     $(error SDK_DIR is undefined. Try "source sdk_setup.sh" to set the software environment)
 endif
+ifndef HDK_DIR
+    $(error HDK_DIR is undefined. Try "source hdk_setup.sh" to set the software environment)
+endif
+
+sde_c2h_perf_test: $(SDE_EXAMPLE_DIR)/sde_c2h_perf_test.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+
+sde_h2c_perf_test: $(SDE_EXAMPLE_DIR)/sde_h2c_perf_test.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+
+sde_c2h_simple: $(SDE_EXAMPLE_DIR)/sde_c2h_simple.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+
+sde_h2c_simple: $(SDE_EXAMPLE_DIR)/sde_h2c_simple.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+
+sde_loopback_simple: $(SDE_EXAMPLE_DIR)/sde_loopback_simple.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)

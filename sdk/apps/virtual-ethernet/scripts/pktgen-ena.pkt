@@ -4,6 +4,6 @@ set 0 dst ip 172.31.58.142
 set 0 sport 54321
 set 0 dport 51234
 set 0 type ipv4
-set 0 proto udp
+set 0 proto tcp
 set 0 size 64
 start 0
