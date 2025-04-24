@@ -8,6 +8,7 @@
 * Added supplementary XDMA driver installation [guide](./hdk/docs/XDMA_Install.md)
 * Updated [ERRATA](./ERRATA.md#hdk) with fix for XSIM when simulating HBM.
 * Revised the [Vitis README](./vitis/README.md) with updated code snippets, more detail about the XRT setup, and a new guided example of the Hardware Emulation workflow.
+* Fixed HDK DCP Tarball path issue described in [#706](https://github.com/aws/aws-fpga/issues/706).
 
 ## v2.0.6
 
