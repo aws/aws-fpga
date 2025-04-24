@@ -642,7 +642,7 @@ Software
 --------
 
 DMA accesses rely on the `XDMA
-driver <https://github.com/Xilinx/dma_ip_drivers>`__
+driver <./../../../docs/XDMA-Install.html>`__
 
 The CL_MEM_PERF example includes runtime software to demonstrate working
 DMA accesses. The runtime example is located `in the runtime directory <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_hbm_dma.c>`__

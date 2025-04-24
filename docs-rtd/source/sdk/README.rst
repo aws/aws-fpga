@@ -78,4 +78,4 @@ Additional SDK Documentation
    docs/F2-Software-Performance-Optimization-Guide
    docs/Load-Times
 
-`Back to Home <../home.html>`__
+`Back to Home <../index.html>`__

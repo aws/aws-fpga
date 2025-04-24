@@ -120,4 +120,4 @@ Release Notes and Errata
   RELEASE-NOTES
   ERRATA
 
-`Back to Home <./home.html>`__
+`Back to Home <./index.html>`__

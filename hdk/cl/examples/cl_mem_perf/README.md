@@ -1,6 +1,6 @@
 # CL_MEM_PERF Custom Logic Example
 
-:warning:***Features using XDMA engine are currently unsupported on F2 instances***
+⚠️ **Features using XDMA engine are currently unsupported on F2 instances**
 
 ## Table of Content
 
@@ -222,7 +222,7 @@ The table below describes the registers available in CL_HBM_AXI4 block. This inc
 Please see more details on running simulations in this [README](verif/README.md)
 
 # Software
-DMA accesses rely on the [XDMA driver](https://github.com/Xilinx/dma_ip_drivers)
+DMA accesses rely on the [XDMA driver](../../../docs/XDMA_Install.md)
 
 The CL_MEM_PERF example includes runtime software to demonstrate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_hbm_dma.c)
 

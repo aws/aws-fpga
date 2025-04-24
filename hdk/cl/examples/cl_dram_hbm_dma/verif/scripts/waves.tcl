@@ -15,6 +15,8 @@
 # limitations under the License.
 # =============================================================================
 
+#uncomment to dump waves (xsim only)
+#log_wave -recursive *
 
 set curr_wave [current_wave_config]
 if { [string length $curr_wave] == 0 } {
@@ -26,5 +28,5 @@ if { [string length $curr_wave] == 0 } {
   }
 }
 
-run 200 us
+run -all
 quit

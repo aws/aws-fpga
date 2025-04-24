@@ -1,6 +1,6 @@
 # CL_DRAM_HBM_DMA CustomLogic Example
 
-:warning:***Features using XDMA engine are currently unsupported on F2 instances***
+⚠️ **Features using XDMA engine are currently unsupported on F2 instances**
 
 ## Table of Content
 
@@ -124,7 +124,7 @@ CL_DRAM_HBM_DMA uses the main `clk_main_a0`. It's frequency is set in [cl_clocks
 
 <a name="software"></a>
 ## Software
-DMA accesses rely on the [XDMA driver](https://github.com/Xilinx/dma_ip_drivers)
+DMA accesses rely on the [XDMA driver](../../../docs/XDMA_Install.md)
 
 The DRAM_HBM DMA example includes runtime software to demonstrate working DMA accesses. The runtime example is located [in the runtime directory](software/runtime/test_dram_dma.c)
 

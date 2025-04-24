@@ -15,6 +15,7 @@
       - [Step 6. Submit Generated DCP for AFI Creation](#step-6-submit-generated-dcp-for-afi-creation)
       - [Step 7. Load Accelerator AFI on F2 Instance](#step-7-load-accelerator-afi-on-f2-instance)
       - [Step 8. Validate your AFI using Example Runtime Software](#step-8-validate-your-afi-using-example-runtime-software)
+  - [AFI PCIe IDs](#afi-pcie-ids)
   - [CL Examples](#cl-examples)
     - [cl\_sde](#cl_sde)
     - [cl\_dram\_hbm\_dma](#cl_dram_hbm_dma)
@@ -147,7 +148,7 @@ Currently, `us-east-1` and `eu-west-2` are available as `REGION` options.
 export DCP_BUCKET_NAME='<DCP bucket name>'
 export DCP_FOLDER_NAME='<DCP folder name>'
 export REGION='us-east-1'
-export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/to_aws/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
+export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
 
 # Create an S3 bucket (choose a unique bucket name)
 aws s3 mb s3://${DCP_BUCKET_NAME} --region ${REGION}
@@ -321,6 +322,41 @@ Closing ports...
 Done
 
 Bye...
+```
+
+## AFI PCIe IDs
+
+Customers can customize the PCIe IDs for generated AFIs, including Vendor ID (VID), Device ID (DID), Subsystem Vendor ID (SVID) and Subsystem Device ID (SSID), to facilitate the proper driver binding. These PCIe IDs are required for the AFI generation process and must be defined in the [cl_id_defines.vh](./cl/examples/cl_sde/design/cl_id_defines.vh) file under each exmaple. Here is an exmaple in the `CL_SDE` example:
+
+```Verilog
+// CL_SH_ID0
+// - PCIe Vendor/Device ID Values
+//    31:16: PCIe Device ID
+//    15: 0: PCIe Vendor ID
+//    - A Vendor ID value of 0x8086 is not valid.
+//    - If using a Vendor ID value of 0x1D0F (Amazon) then valid
+//      values for Device ID's are in the range of 0xF000 - 0xF0FF.
+//    - A Vendor/Device ID of 0 (zero) is not valid.
+`define CL_SH_ID0       32'hF002_1D0F
+
+// CL_SH_ID1
+// - PCIe Subsystem/Subsystem Vendor ID Values
+//    31:16: PCIe Subsystem ID
+//    15: 0: PCIe Subsystem Vendor ID
+// - A PCIe Subsystem/Subsystem Vendor ID of 0 (zero) is not valid
+`define CL_SH_ID1       32'h1D51_FEDC
+```
+
+When a DCP tarball file gets generated, the IDs are included in the manifest file within the tarball:
+
+```bash
+pci_device_id=0xF002
+
+pci_vendor_id=0x1D0F
+
+pci_subsystem_id=0x1D51
+
+pci_subsystem_vendor_id=0xFEDC
 ```
 
 ## CL Examples

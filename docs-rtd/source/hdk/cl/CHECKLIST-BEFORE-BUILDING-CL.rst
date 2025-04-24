@@ -17,4 +17,4 @@ building a CL Design Check Point (DCP) file for AFI generation.
 4. Update the timing and placement constraints under
    ``$CL_DIR/build/constraints`` for your design specific changes.
 
-`Back to HDK README <../home.html>`__
+`Back to HDK README <../index.html>`__

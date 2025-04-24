@@ -1,6 +1,19 @@
 F2 Developer Kit Release Notes
 ==============================
 
+
+.. _v207:
+
+v2.0.7
+------
+
+- Documentation updates to improve `ReadTheDocs <https://awsdocs-fpga-f2.readthedocs-hosted.com/latest>`__ navigation and inline snippets.
+- XSIM template script update to extend the waveform dump time.
+- Added section with instructions for assigning custom PCIe IDs to HDK `README <./hdk/README.html>`__.
+- Added supplementary XDMA driver installation `guide <./hdk/docs/XDMA-Install.html>`__
+- Updated `ERRATA <./ERRATA.html#hdk-errata>`__ with fix for XSIM when simulating HBM.
+- Revised the `Vitis README <./vitis/README.html>`__ with updated code snippets, more detail about the XRT setup, and a new guided example of the Hardware Emulation workflow.
+
 .. _v206:
 
 v2.0.6
@@ -99,4 +112,4 @@ v2.0.0
 
 Initial release. F2 general-availability companion.
 
-`Back to Home <./home.html>`__
+`Back to Home <./index.html>`__

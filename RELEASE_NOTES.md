@@ -1,5 +1,14 @@
 # F2 Developer Kit Release Notes
 
+## v2.0.7
+
+* Documentation updates to improve [ReadTheDocs](https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/) navigation and inline snippets.
+* XSIM template script update to extend the waveform dump time.
+* Added section with instructions for assigning custom PCIe IDs to HDK [README](./hdk/README.md).
+* Added supplementary XDMA driver installation [guide](./hdk/docs/XDMA_Install.md)
+* Updated [ERRATA](./ERRATA.md#hdk) with fix for XSIM when simulating HBM.
+* Revised the [Vitis README](./vitis/README.md) with updated code snippets, more detail about the XRT setup, and a new guided example of the Hardware Emulation workflow.
+
 ## v2.0.6
 
 * Releasing [CL_SDE software examples](./hdk/cl/examples/cl_sde/software/src/README.md) to demonstrate how to use the [Streaming Data Engine (SDE)](./sdk/apps/virtual-ethernet/doc/SDE_HW_Guide.md) DMA on [small shell](./User_Guide_AWS_EC2_FPGA_Development_Kit.md#aws-shells).

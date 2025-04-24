@@ -21,4 +21,4 @@ DCV for their remote visualization requirements. Please refer to the
 `Official DCV
 documentation <https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html>`__
 
-`Back to Home <../home.html>`__
+`Back to Home <../index.html>`__

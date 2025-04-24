@@ -28,6 +28,7 @@ import sys
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
 extensions = [
+    'sphinx_sitemap',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -39,6 +40,7 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.extlinks',
     'sphinxcontrib.spelling',
+    'sphinx_copybutton',
     'sphinx_book_theme',
 ]
 
@@ -62,7 +64,7 @@ source_suffix = '.rst'
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'home'
+master_doc = 'index'
 
 # General information about the project.
 author = 'the AWS F2 Team'
@@ -128,6 +130,10 @@ html_theme = 'sphinx_book_theme'
 # documentation.
 # html_theme_options = {}
 
+html_baseurl = 'https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/'
+
+sitemap_filename = 'sitemap.xml'
+
 html_context = {
     # ...
     'default_mode': 'light',
@@ -154,7 +160,6 @@ html_theme_options = {
 # NOTE: This guy controls the little title header on the left side of the page with the search bar, etc.
 html_title = 'AWS F2 Documentation'
 
-html_link_suffix = ''
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
 
@@ -215,6 +220,17 @@ html_css_files = ['css/custom.css']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'F2doc'
+
+# Don't copy prompts in code blocks
+copybutton_prompt_text = "$ "
+copybutton_prompt_is_regexp = True
+
+# Custom CSS selector for elements that should have copy buttons
+copybutton_selector = "div:not(.no-copy-button) > div.highlight pre"
+
+# Add a message when copying is successful
+copybutton_copy_empty_lines = True
+copybutton_line_continuation_character = "\\"
 
 
 # -- Options for LaTeX output --------------------------------------------------

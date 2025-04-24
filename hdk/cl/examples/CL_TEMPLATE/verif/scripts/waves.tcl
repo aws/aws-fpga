@@ -26,5 +26,5 @@ if { [string length $curr_wave] == 0 } {
   }
 }
 
-run all
+run -all
 quit

@@ -17,13 +17,12 @@ developing for AWS EC2 FPGA Instances.
     Kit <#aws-ec2-f2-fpga-development-kit>`__
 
     - `Development Environments <#development-environments>`__
+    - `Example Links <#example-links>`__
     - `AWS Shells <#aws-shells>`__
     - `Hardware Development Kit (HDK) <#hardware-development-kit-hdk>`__
     - `Software-Defined Development
       Environment <#software-defined-development-environment>`__
 
-    - `Additional Vitis
-      Documentation <#additional-vitis-documentation>`__
     - `FPGA Developer AMI <#fpga-developer-ami>`__
 
   - `Getting Started <#getting-started>`__
@@ -100,7 +99,7 @@ supported in the development kit.
     - Hardware interface
     - Debug Options
     - Typical Developer
-  * - `Hardware accelerator development using Vivado <./hdk/README.html>`__
+  * - Hardware accelerator development using Vivado (HDK)
     - This environment supports the Hardware Development Kit (HDK) design flow,
       which empowers FPGA developers to create accelerator designs from scratch,
       using HDL source code and IPs. The AMD Vivado tool synthesizes, implements,
@@ -113,7 +112,7 @@ supported in the development kit.
     - User-implemented DMA engine or Streaming Data Engine (SDE)
     - Simulation
     - Hardware developers with advanced FPGA experience
-  * - `Hardware accelerator development using Vitis <./vitis/README.html>`__
+  * - Hardware accelerator development using Vitis
     - This environment supports the Vitis design flow,
       which enables software developers to write C++ code,
       which may then be compiled into RTL and used in
@@ -134,6 +133,85 @@ On-premise environment: Customers can set up a on-premise development
 environment using 2024.1 AMD tools with their own licenses. Refer to
 this guide `here <./hdk/docs/on-premise-licensing-help.html>`__ for
 licensing requirements.
+
+.. _example-links:
+
+Example Links
+~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 30 35
+
+   * - Development Environment
+     - Example
+     - Quick-Start Guide
+     - Resources
+   * - HDK
+     - `cl_mem_perf <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf>`__
+     - `Guided Example <./hdk/README.html#getting-started-hdk>`__
+     - `Design Spec <./hdk/cl/examples/cl-mem-perf/README.html>`__
+   * -
+     -
+     -
+     - `Design Source Code <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/design>`__
+   * -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/verif>`__
+   * -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software>`__
+   * -
+     - `cl_dram_hbm_dma <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma>`__
+     -
+     - `Design Spec <./hdk/cl/examples/cl-dram-hbm-dma/README.html>`__
+   * -
+     -
+     -
+     - `Design Source Code <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design>`__
+   * -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/verif>`__
+   * -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/software>`__
+   * -
+     - `cl_sde <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde>`__
+     -
+     - `Design Spec <./hdk/cl/examples/cl-sde/README.html>`__
+   * -
+     -
+     -
+     - `Design Source Code <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/design>`__
+   * -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/verif>`__
+   * -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde/software>`__
+   * - Vitis
+     - `hello_world <https://github.com/Xilinx/Vitis_Accel_Examples/tree/2024.1/hello_world>`__
+     - `Guided Example <./vitis/README.html>`__
+     - `Design Spec <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/README.rst>`__
+   * -
+     -
+     -
+     - `Design Source Code <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/vadd.cpp>`__
+   * -
+     -
+     -
+     - `Testbench <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp#L92>`__
+   * -
+     -
+     -
+     - `Runtime Software <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp>`__
+
 
 .. _aws-shells:
 
@@ -262,8 +340,8 @@ currently released to customers:
     - FPGA Developer AMI ID
     - Vivado/Vitis Version Supported
     - Operating System Version
-  * - 1.16.0
-    - `ami-0e6383ac30e23cf97 <https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u>`__
+  * - 1.16.1
+    - `ami-092fc5deb8f3c0f7d <https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u>`__
     - 2024.1
     - Ubuntu 20.04.6 (kernel 5.15)
 
@@ -332,4 +410,4 @@ FPGA Development Kit:
 .. |image1| image:: ./_static/accel_card_specs_20250110.png
 .. |f2_f1_comp| image:: ./_static/f2_f1_comp_20250110.png
 
-`Back to Home <./home.html>`__
+`Back to Home <./index.html>`__

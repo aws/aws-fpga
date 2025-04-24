@@ -7,6 +7,7 @@ Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 
 ## HDK
 
+
 1. Address Aliasing Bug in AMD HBM IP with Customer Address Mapping
 
    * An address aliasing bug has been identified in AMD HBM IP when the IP's "Customer Address Map" option is enabled for a 16GB HBM implementation. The bug allows a single memory entry to be accessed via two different addresses, which might lead to data corruption. More information about this bug will be published by AMD in the Ultrascale+ product errata.
@@ -35,6 +36,9 @@ Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 6. Simulation of the [HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface) is not supported in this release. The HBM IP always passes initialization and remains in an operating state for all tests. Simulation support for the HBM monitor will be added in a future release.
 
 7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2 instances at this time.
+
+8. HBM simulation using XSIM requires a fix described in this [AMD Answer Record](https://adaptivesupport.amd.com/s/article/000035639?language=en_US).
+
 
 ## SDK
 

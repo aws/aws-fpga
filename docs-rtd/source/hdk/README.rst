@@ -31,6 +31,8 @@ Table of Contents
       - `Step 8. Validate your AFI using Example Runtime
         Software <#step-8-validate-your-afi-using-example-runtime-software>`__
 
+  - `AFI PCIe IDs <#afi-pcie-ids>`__
+
   - `CL Examples <#cl-examples>`__
 
     - `cl_sde <#cl-sde>`__
@@ -62,6 +64,8 @@ designs for F2 instances using AMD Vivado. HDK designs must be
 integrated with Small Shell, which does not include a built-in Direct
 Memory Access (DMA) engine and offers full resources in the top Super
 Logic Region (SLR) of the FPGA to developers.
+
+.. _getting-started-hdk:
 
 Getting Started
 ---------------
@@ -251,7 +255,7 @@ Currently, ``us-east-1`` and ``eu-west-2`` are available as ``REGION`` options.
   export DCP_BUCKET_NAME='<DCP bucket name>'
   export DCP_FOLDER_NAME='<DCP folder name>'
   export REGION='us-east-1'
-  export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/to_aws/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
+  export DCP_TARBALL_TO_INGEST='<$CL_DIR/build/checkpoints/YYYY_MM_DD-HHMMSS.Developer_CL.tar>'
 
   # Create an S3 bucket (choose a unique bucket name)
   aws s3 mb s3://${DCP_BUCKET_NAME} --region ${REGION}
@@ -808,5 +812,6 @@ Additional HDK Documentation
   docs/on-premise-licensing-help
   docs/Supported-DDR-Modes
   docs/Virtual-JTAG-XVC
+  docs/XDMA-Install
 
-`Back to Home <../home.html>`__
+`Back to Home <../index.html>`__

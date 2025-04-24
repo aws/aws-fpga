@@ -813,8 +813,8 @@ check mechanism, following the next mapping
   - [15:0] – Subsystem Vendor ID
   - [31:16] – Subsystem ID
 
-In future revisions of the HDK, AWS scripts may override the
-cl_sh_id0/id1 to include an integrity hash function.
+See the `HDK development guide <../README.html#afi-pcie-ids>`__ for defining and
+adding these IDs to a CL design.
 
 General Control/Status
 ^^^^^^^^^^^^^^^^^^^^^^

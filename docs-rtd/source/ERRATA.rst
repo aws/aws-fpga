@@ -6,6 +6,8 @@ Shell Errata
 
 Shell errata is `documented here <./hdk/docs/AWS-Shell-ERRATA.html>`__
 
+.. _hdk-errata:
+
 HDK
 ---
 
@@ -63,6 +65,9 @@ HDK
 7. AFIs created based on HDK XDMA shell or Vitis are not supported on F2
    instances at this time.
 
+8. HBM simulation using XSIM requires a fix described in this
+   `AMD Answer Record <https://adaptivesupport.amd.com/s/article/000035639?language=en_US>`__.
+
 SDK
 ---
 
@@ -77,4 +82,4 @@ Software defined Accelerator Development (Vitis)
 
 3. Support for Vitis software emulation has been deprecated by AMD, therefore, no longer supported.
 
-`Back to Home <./home.html>`__
+`Back to Home <./index.html>`__

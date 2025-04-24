@@ -9,10 +9,10 @@ The development kit includes example designs to get you familiar with developing
     - [Comparison to F1](#comparison-to-f1)
   - [AWS EC2 F2 FPGA Development Kit](#aws-ec2-f2-fpga-development-kit)
     - [Development Environments](#development-environments)
+    - [Example Links](#example-links)
     - [AWS Shells](#aws-shells)
     - [Hardware Development Kit (HDK)](#hardware-development-kit-hdk)
     - [Software-Defined Development Environment](#software-defined-development-environment)
-    - [Additional Vitis Documentation](#additional-vitis-documentation)
     - [FPGA Developer AMI](#fpga-developer-ami)
   - [Getting Started](#getting-started)
     - [Getting Familiar with AWS](#getting-familiar-with-aws)
@@ -44,10 +44,81 @@ This table lists the F2 development flows currently enabled and supported in the
 
 | Development Environment | Description | Accelerator Language | Hardware Interface | Debug Options | Typical Developer |
 | ------------------------|-------------|----------------------|--------------------|---------------|-------------------|
-| [Hardware accelerator development using Vivado](hdk/README.md) | This environment supports the Hardware Development Kit (HDK) design flow, which empowers FPGA developers to create accelerator designs from scratch, using HDL source code and IPs. <br><br>The AMD Vivado tool synthesizes, implements, and generates the Design Check Point (DCP) file used in F2 AFI creation. AWS FPGA developers benefit from the suite of scripts supplied in the HDK that help to automate different design steps. This allows for flexibility in architecting, implementing, and optimizing accelerator designs while using the HDK.| Verilog/SystemVerilog/VHDL | User-implemented DMA engine or Streaming Data Engine (SDE) | Simulation | Hardware developers with advanced FPGA experience |
+| Hardware accelerator development using Vivado (HDK) | This environment supports the Hardware Development Kit (HDK) design flow, which empowers FPGA developers to create accelerator designs from scratch, using HDL source code and IPs. <br><br>The AMD Vivado tool synthesizes, implements, and generates the Design Check Point (DCP) file used in F2 AFI creation. AWS FPGA developers benefit from the suite of scripts supplied in the HDK that help to automate different design steps. This allows for flexibility in architecting, implementing, and optimizing accelerator designs while using the HDK.| Verilog/SystemVerilog/VHDL | User-implemented DMA engine or Streaming Data Engine (SDE) | Simulation | Hardware developers with advanced FPGA experience |
 | Hardware accelerator development using Vitis | This environment supports the Vitis design flow, which enables software developers to write C++ code, which may then be compiled into RTL and used in cycle-accurate hardware simulation. After it may then be built into an accelerator design. This step is not necessary, but is encouraged. Vitis may also be used to implement accelerator designs from scratch, using HDL and IPs directly, similar to Vivado. Vitis offers additional analysis tools to aid in the refinement of designs. | Verilog/System Verilog/VHDL | XDMA Engine (coming soon) | Hardware Emulation | Advanced software developers or hardware developers with intermediate to advanced FPGA experience |
 
 On-premise environment: Customers can set up a on-premise development environment using 2024.1 AMD tools with their own licenses. Refer to this guide [here](./hdk/docs/on_premise_licensing_help.md) for licensing requirements.
+
+### Example Links
+
+<!-- markdownlint-disable MD033 -->
+<table style="text-align: center">
+  <tr>
+    <th style="text-align: center">Development Environment</th>
+    <th style="text-align: center">Example</th>
+    <th style="text-align: center">Quick Start Guide</th>
+    <th style="text-align: center">Resources</th>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="12">HDK</td>
+    <td style="text-align: center" rowspan="4"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf">cl_mem_perf</a></td>
+    <td style="text-align: center" rowspan="4"><a href="./hdk/README.md#build-accelerator-afi-using-hdk-design-flow">Guided Example</a></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_mem_perf/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_mem_perf/design/">Design Source Code</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_mem_perf/verif/">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_mem_perf/software/">Runtime Software</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="4"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma">cl_dram_hbm_dma</a></td>
+    <td style="text-align: center" rowspan="4"></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_dram_hbm_dma/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_dram_hbm_dma/design/">Design Source</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_dram_hbm_dma/verif/">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_dram_hbm_dma/software/">Runtime Software</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="4"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_sde">cl_sde</a></td>
+    <td style="text-align: center" rowspan="4"></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_sde/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_sde/design/">Design Source</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_sde/verif/">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_sde/software/">Runtime Software</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="4">Vitis</td>
+    <td style="text-align: center" rowspan="4"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/tree/2024.1/hello_world">hello_world</a></td>
+    <td style="text-align: center" rowspan="4"><a href="./vitis/README.md">Guided Example</td>
+    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/README.rst">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/vadd.cpp">Design Source</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp#L92">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp">Runtime Software</a></td>
+  </tr>
+
+</table>
 
 ### AWS Shells
 
@@ -105,7 +176,7 @@ A free-to-use FPGA developer AMI is available for on-cloud F2 development with A
 
 | FPGA Developer AMI Version | FPGA Developer AMI ID | Vivado/Vitis Version Supported | Operating System Version    |
 |----------------------------|-----------------------|--------------------------------|-----------------------------|
-| 1.16.0                     | [ami-0e6383ac30e23cf97](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
+| 1.16.1                     | [ami-092fc5deb8f3c0f7d](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
 
 Given the large size of the FPGA used for F2, AMD tools work best with at least 4 vCPU’s and 32GiB Memory. We recommend [Compute Optimized and Memory Optimized instance types](https://aws.amazon.com/ec2/instance-types/) to successfully run the synthesis of acceleration code. Developers may start coding and run simulations on low-cost `General Purpose` [instances types](https://aws.amazon.com/ec2/instance-types/).
 
