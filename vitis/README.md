@@ -58,7 +58,7 @@ source vitis_setup.sh
   * Sets up the Vitis example directories
   * Installs the required libraries and package dependencies
   * Runs environment checks to verify supported tool/lib versions
-  * Gathers dependencies needed to install the [Xilinx Runtime](https://github.com/Xilinx/XRT/tree/2024.1) (XRT)
+  * Gathers dependencies needed to install the [Xilinx Runtime](https://github.com/Xilinx/XRT/tree/2024.2) (XRT)
   * Provides a command to install the XRT, necessary to perform builds, emulation, and run accelerated applications
 
 If the script has successfully set up all of the tools and the environment, you will see the following message:
@@ -135,15 +135,15 @@ The same command can be used for all Vitis examples after running `vitis_setup.s
 A successful hardware emulation run will produce log output similar to the following:
 
 ``` bash
-INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin.package_summary, at Fri Jan 17 16:06:50 2025
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin.package_summary, at Fri Jan 17 16:06:50 2025
 INFO: [v++ 60-1315] Creating rulecheck session with output '/home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/_x/reports/package/v++_package_vadd_guidance.html', at Fri Jan 17 16:06:50 2025
-INFO: [v++ 60-895]   Target platform: /opt/Xilinx/Vitis/2024.1/platforms/xilinx_aws-vu47p-f2_202410_1_2.xpfm
-INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.1/platforms/hw/hw.xsa'
-INFO: [v++ 74-78] Compiler Version string: 2024.1
+INFO: [v++ 60-895]   Target platform: /opt/Xilinx/Vitis/2024.2/platforms/xilinx_aws-vu47p-f2_202420_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.2/platforms/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2024.2
 INFO: [v++ 60-2256] Packaging for hardware emulation
-INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin
+INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin
 INFO: [v++ 60-2343] Use the Vitis Unified IDE to visualize and navigate the reports. Run the following command.
-    vitis -a/ --analyze /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin.package_summary
+    vitis -a/ --analyze /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin.package_summary
 INFO: [v++ 60-791] Total elapsed time: 0h 0m 5s
 INFO: [v++ 60-1653] Closing dispatch client
 ```
@@ -151,7 +151,7 @@ INFO: [v++ 60-1653] Closing dispatch client
 This line is the most significant:
 
 ``` bash
-INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin
+INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin
 ```
 
 The `.xclbin` file is what will be used to test your combined host/accelerator application.
@@ -164,21 +164,21 @@ Now, let's emulate our design by running `make run TARGET=hw_emu PLATFORM=$SHELL
 
 ``` bash
 ubuntu@ip-aaa-bb-cc-dd:~/aws-fpga/vitis/examples/vitis_examples/hello_world$ make run TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION
-emconfigutil --platform xilinx_aws-vu47p-f2_202410_1_2 --od ./_x.hw_emu.xilinx_aws-vu47p-f2_202410_1_2
-****** configutil v2024.1 (64-bit)
+emconfigutil --platform xilinx_aws-vu47p-f2_202420_1 --od ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_1
+****** configutil v2024.2 (64-bit)
   **** SW Build 5074859 on 2024-05-20-23:21:20
   **** Start of session at: Fri Jan 17 16:48:27 2025
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
-INFO: [ConfigUtil 60-895]   Target platform: /opt/Xilinx/Vitis/2024.1/platforms/xilinx_aws-vu47p-f2_202410_1_2.xpfm
-INFO: [ConfigUtil 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.1/platforms/hw/hw.xsa'
-INFO: [ConfigUtil 60-1032] Extracting hardware platform to ./_x.hw_emu.xilinx_aws-vu47p-f2_202410_1_2
-emulation configuration file `emconfig.json` is created in ./_x.hw_emu.xilinx_aws-vu47p-f2_202410_1_2 directory
-cp -rf ./_x.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/emconfig.json .
-XCL_EMULATION_MODE=hw_emu ./hello_world_xrt -x ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin
+INFO: [ConfigUtil 60-895]   Target platform: /opt/Xilinx/Vitis/2024.2/platforms/xilinx_aws-vu47p-f2_202420_1.xpfm
+INFO: [ConfigUtil 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.2/platforms/hw/hw.xsa'
+INFO: [ConfigUtil 60-1032] Extracting hardware platform to ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_1
+emulation configuration file `emconfig.json` is created in ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_1 directory
+cp -rf ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_1/emconfig.json .
+XCL_EMULATION_MODE=hw_emu ./hello_world_xrt -x ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin
 
 Open the device0
-Load the xclbin ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin
+Load the xclbin ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin
 INFO: [HW-EMU 05] Path of the simulation directory : /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/.run/1469002/hw_emu/device0/binary_0/behav_waveform/xsim
  server socket name is   /tmp/ubuntu/device0_0_1469002
 INFO: [HW-EMU 01] Hardware emulation runs simulation underneath. Using a large data set will result in long simulation times. It is recommended that a small dataset is used for faster execution. The flow uses approximate models for Global memories and interconnect and hence the performance data generated is approximate.
@@ -214,13 +214,13 @@ Again, we recommend running this build in the background to insure it's completi
 A successful hardware (HW) build will produce output similar to the following:
 
 ``` bash
-INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin.package_summary, at Fri Jan 17 17:39:31 2025
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin.package_summary, at Fri Jan 17 17:39:31 2025
 INFO: [v++ 60-1315] Creating rulecheck session with output '/home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/_x/reports/package/v++_package_vadd_guidance.html', at Fri Jan 17 17:39:31 2025
-INFO: [v++ 60-895]   Target platform: /opt/Xilinx/Vitis/2024.1/platforms/xilinx_aws-vu47p-f2_202410_1_2.xpfm
-INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.1/platforms/hw/hw.xsa'
-INFO: [v++ 74-78] Compiler Version string: 2024.1
+INFO: [v++ 60-895]   Target platform: /opt/Xilinx/Vitis/2024.2/platforms/xilinx_aws-vu47p-f2_202420_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/Vitis/2024.2/platforms/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2024.2
 INFO: [v++ 60-2256] Packaging for hardware
-INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw.xilinx_aws-vu47p-f2_202410_1_2/vadd.xclbin
+INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw.xilinx_aws-vu47p-f2_202420_1/vadd.xclbin
 INFO: [v++ 60-2343] Use the Vitis Unified IDE to visualize and navigate the reports. Run the following command.
 
 ```
@@ -236,9 +236,9 @@ Once the HW_EMU or HW run/build has completed, you will see a build directory wi
 ``` bash
 aws-fpga/vitis/examples/vitis_examples/
         hello_world/
-                build_dir.hw_emu.xilinx_aws-vu47p-f2_202410_1_2/
+                build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_1/
                                 or
-                build_dir.hw.xilinx_aws-vu47p-f2_202410_1_2/
+                build_dir.hw.xilinx_aws-vu47p-f2_202420_1/
 ```
 
 **These directories will contain the .xclbin file, as well as other artifacts, depending on the example run:**

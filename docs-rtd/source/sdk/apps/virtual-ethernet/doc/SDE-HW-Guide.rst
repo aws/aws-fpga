@@ -4,39 +4,41 @@ SDE Hardware Guide
 Table of Contents:
 ------------------
 
-- `Overview <#Overview>`__
+- `Overview <#overview-sde-hw>`__
 
-- `Feature List <#FeatureList>`__
+- `Feature List <#feature-list>`__
 
-- `Architecture <#Architecture>`__
+- `Architecture <#architecture>`__
 
-- `Designing with the SDE <#DesignCLwSDE>`__
+- `Designing with the SDE <#designing-with-the-sde>`__
 
-  - `IOs <#IOs>`__
+  - `IOs <#ios>`__
 
-  - `Design Configuration Parameters <#DesignParam>`__
+  - `Design Configuration Parameters <#design-configuration-parameters>`__
 
-  - `PF and Address Range <#PF_AddressRange>`__
+  - `PF and Address Mapping <#pf-and-address-mapping>`__
 
-  - `CSR Description and Address Mapping <#CSRRange>`__
+  - `CSR Description and Address Mapping <#csr-description-and-address-mapping>`__
 
-  - `Descriptors and Write-Back Metadata <#Descriptors>`__
+  - `Descriptors and Write-Back Metadata <#descriptors-and-write-back-metadata>`__
 
-  - `Credit Mechanism <#Credit>`__
+  - `Credit Mechanism <#credit-mechanism>`__
 
-  - `Write-Back Mechanism <#WBM>`__
+  - `Write-Back Mechanism <#write-back-mechanism>`__
 
-  - `Data Flow Model <#DataFlow>`__
+  - `Data Flow Model <#data-flow-model>`__
 
-  - `Error Conditions <#Error>`__
+  - `Error Conditions <#error-conditions>`__
 
-  - `Implementation - Maximum Clock Frequency <#MaxClockFreq>`__
+  - `Implementation - Maximum Clock Frequency <#implementation-maximum-clock-frequency>`__
 
-  - `Implementation - Resource Utilization <#ResourceUtil>`__
+  - `Implementation - Resource Utilization <#implementation-resource-utilization>`__
 
-- `Example Design <#ExampleDesign>`__
+- `Example Design <#example-design>`__
 
-- `FAQ <#FAQ>`__
+- `FAQ <#faq-sde-hw>`__
+
+.. _overview-sde-hw:
 
 Overview
 --------
@@ -49,6 +51,8 @@ host application. The SDE is a parameterizable, soft IP block that is
 intended to be instantiated within the CL. Each instance of the SDE
 provides two AXI streaming compliant interfaces viz. one Card-to-Host
 (C2H) and one Host-to-Card (H2C) channel.
+
+.. _feature-list:
 
 Feature List
 ------------
@@ -72,6 +76,8 @@ Feature List
 - One full-duplex streaming channel (one C2H and one H2C).
 - One Streaming C2H Channel only (No H2C Channel)
 - One Streaming H2C Channel only (No C2H Channel)
+
+.. _architecture:
 
 Architecture
 ------------
@@ -101,8 +107,12 @@ pointer, etc...) is stored in a contiguous host memory range. The SDE is
 architected to update these variables together by writing to the
 physical memory location using the PCIM interface.
 
+.. _designing-with-the-sde:
+
 Designing with the SDE
 ----------------------
+
+.. _ios:
 
 IOs
 ---
@@ -117,6 +127,8 @@ IOs
   packets from the CL.
 - Clocks and Reset: SDE uses a single clock and a single synchronous
   active-low reset.
+
+.. _design-configuration-parameters:
 
 Design Configuration parameters
 -------------------------------
@@ -268,6 +280,8 @@ for each parameter are listed in Supported Configurations column.**
      - Default only
      - C2H Maximum AXI Write request size (0 – 512B, 1 – 1KB, 2 – 2KB, 3 – 4KB). This should be 3 when using the AWS shell in order to maximize C2H performance.
 
+.. _pf-and-address-mapping:
+
 PF and Address Mapping
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -305,6 +319,8 @@ aligned. The following table describes address mapping within SDE.
      - CSRs
      - Read-Write (DW accesses)
      - Software should use this address range when accessing CSRs. Software should use only 4 byte aligned address of the registers to access CSRs implemented in this range. Only 1 DW read or 1 DW write accesses are allowed in this range.
+
+.. _csr-description-and-address-mapping:
 
 CSR Description and Address Mapping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2195,6 +2211,8 @@ H2C AXI-Stream CSRs
      - 0x0
      - Number of packets received on the AXIS interface. Increments after receiving an EOP. Write 0 to clear.
 
+.. _descriptors-and-write-back-metadata:
+
 Descriptors and Write-Back Metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2455,6 +2473,8 @@ Descriptions of Fields
    descriptor to 256 bits and unused in the SDE. SDE does not store
    these bits in the descriptor RAM.
 
+.. _credit-mechanism:
+
 Credit Mechanism
 ----------------
 
@@ -2486,6 +2506,8 @@ descriptor from the descriptor RAM.
 3) “available”: This is difference between the “consumed” and the
    “limit” counters. The software will compute this locally and will use
    this value to determine how many descriptors can be written.
+
+.. _write-back-mechanism:
 
 Write-Back Mechanism
 --------------------
@@ -2566,6 +2588,8 @@ of write pointer plus 1 is equal to the read pointer.
    write pointer by writing to host memory. The software can use the
    write pointer value to determine how many valid metadata entries are
    present in the circular buffer.
+
+.. _data_flow_model:
 
 Data Flow Model
 ---------------
@@ -2666,6 +2690,8 @@ H2C
     figure out that a packet has been transmitted on the AXI-Stream
     interface.
 
+.. _error-conditions:
+
 Error Conditions
 ----------------
 
@@ -2713,10 +2739,14 @@ H2C Error Conditions
 6. Write Back BRESP Error: Occurs when a non-zero BRESP is received on
    the PCIM interface for write-back writes.
 
+.. _implementation-maximum-clock-frequency:
+
 Implementation - Maximum Clock Frequency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The SDE can be implemented at a maximum frequency of 250MHz
+
+.. _implementation-resource-utilization:
 
 Implementation - Resource Utilization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2747,12 +2777,16 @@ descriptor RAM depth and 32KB buffers for C2H and H2C each.
      - 0
      -
 
+.. _example-design:
+
 Example Design
 --------------
 
 AWS provides an example CL called CL_SDE. CL_SDE instances the SDE and
 some utility and test blocks to demonstrate the functionality of the
 SDE. See `CL_SDE <../../../../hdk/cl/examples/cl-sde/README.html>`__ for details.
+
+.. _faq-sde-hw:
 
 FAQ
 ---

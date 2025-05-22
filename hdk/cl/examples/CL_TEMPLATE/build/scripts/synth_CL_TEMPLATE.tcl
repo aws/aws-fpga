@@ -73,18 +73,12 @@ print "Reading CL IP blocks"
 ## AXI Utility IP's
 # read_ip ${HDK_IP_SRC_DIR}/cl_axi_interconnect/cl_axi_interconnect.xci
 # read_ip ${HDK_IP_SRC_DIR}/cl_axi_interconnect_64G_ddr/cl_axi_interconnect_64G_ddr.xci
-# read_ip ${HDK_IP_SRC_DIR}/cl_c2c_xbar_128G/cl_c2c_xbar_128G.xci
-
-## C2C PCIe Bridge IP's
-# read_ip ${HDK_IP_SRC_DIR}/pcie_bridge_rc/pcie_bridge_rc.xci
-# read_ip ${HDK_IP_SRC_DIR}/pcie_bridge_ep/pcie_bridge_ep.xci
 
 ## Read IP for virtual jtag / ILA/VIO
 # read_ip ${HDK_IP_SRC_DIR}/cl_debug_bridge/cl_debug_bridge.xci
 # read_ip ${HDK_IP_SRC_DIR}/ila_1/ila_1.xci
 # read_ip ${HDK_IP_SRC_DIR}/ila_vio_counter/ila_vio_counter.xci
 # read_ip ${HDK_IP_SRC_DIR}/vio_0/vio_0.xci
-# read_ip ${HDK_IP_SRC_DIR}/ila_c2c/ila_c2c.xci
 
 #---- End of section uncommented by the User ----
 

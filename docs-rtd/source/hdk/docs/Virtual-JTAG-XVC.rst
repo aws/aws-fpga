@@ -57,12 +57,12 @@ guide <https://docs.amd.com/r/en-US/pg195-pcie-dma/Compiling-and-Loading-the-Dri
 1. Locate and unzip the XVC driver file from the Vivado tool installation
    directory:
 
-  ⚠️ Remember to update tool installation directory with the one if you own AMI.
+  ⚠️ Remember to update the tool installation directory to the correct directory for your AMI.
   The example below is for demonstration only.
 
   .. code:: bash
 
-    unzip /opt/Xilinx/Vivado/2024.1/data/xicom/drivers/pcie/xvc_pcie.zip
+    unzip /opt/Xilinx/Vivado/*/data/xicom/drivers/pcie/xvc_pcie.zip
     cd driver_v0.4
 
 2. To correctly bind the XVC driver to the FPGA, update the ``PCIE_VENDOR_ID``
@@ -134,11 +134,11 @@ in Vivado Hardware Manager.
 .. code:: bash
 
   sudo su
-  cd /opt/Xilinx/Vivado/2024.1/bin/
+  cd /opt/Xilinx/Vivado/*/bin/
   ./xvc_pcie
 
   Description:
-  Xilinx xvc_pcie v2024.1
+  Xilinx xvc_pcie v2024.2 -- Version will depend on your devAMI --
   Build date : May 22 2024-19:19:01
   Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 

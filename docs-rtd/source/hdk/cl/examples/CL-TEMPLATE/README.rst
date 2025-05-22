@@ -10,9 +10,9 @@ Table of Content
   - `Design <#design>`__
   - `Verification <#verification>`__
   - `Software <#software>`__
-  - `Build <#Build>`__
+  - `Build <#build-cl-template>`__
 
-- `CL Template Quick Start Guide <#cl_template-quick-start-guide>`__
+- `CL Template Quick Start Guide <#cl-template-quick-start-guide>`__
 
 Overview
 --------
@@ -135,6 +135,8 @@ CL_TEMPLATE does not yet support stand alone software tests. Please
 refer to other examples such as
 `CL_DRAM_HBM_DMA <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/software>`__
 
+.. _build-cl-template:
+
 Build
 ~~~~~
 
@@ -198,6 +200,8 @@ Required constraint files:
 For more information on how to populate the constraint files and build
 scripts, please refer to other examples such as
 `CL_DRAM_HBM_DMA <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/build>`__.
+
+.. _cl-template-quick-start-guide:
 
 CL_TEMPLATE Quick Start Guide
 -----------------------------

@@ -32,9 +32,6 @@ unset HDK_DIR
 unset HDK_COMMON_DIR
 unset HDK_SHELL_DIR
 unset HDK_SHELL_DESIGN_DIR
-unset HDK_IP_SRC_DIR
-unset HDK_BD_SRC_DIR
-unset HDK_BD_GEN_DIR
 
 export HDK_DIR=$AWS_FPGA_REPO_DIR/hdk
 
@@ -46,11 +43,6 @@ export HDK_SHELL_DIR=$(realpath -s $HDK_COMMON_DIR/shell_stable)
 
 # Set the common shell design dir
 export HDK_SHELL_DESIGN_DIR=$HDK_SHELL_DIR/design
-
-# Set CL IP directories
-export HDK_IP_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/ip)
-export HDK_BD_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/bd)
-export HDK_BD_GEN_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.gen/sources_1/bd)
 
 # SDK
 unset SDK_DIR

@@ -1,5 +1,11 @@
 # F2 Developer Kit Release Notes
 
+## v2.1.0
+
+* Support for Vivado and Vitis 2024.2 tools.
+* [Releasing New Developer AMI for 2024.2 tools.](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq)
+* Updating the asynchronous fpga_mgmt_examples to poll each FPGA once before moving to the next.
+
 ## v2.0.7
 
 * Documentation updates to improve [ReadTheDocs](https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/) navigation and inline snippets.

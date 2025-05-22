@@ -563,6 +563,6 @@ arrangement of this physical hardware. If it is not possible to launch
 an instance of the desired type in a placement group with an F2, try
 using another F2 instance as the packet generator instance. For more
 information, see the `documentation on placement
-groups <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html#placement-groups-cluster>`__.
+groups <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html>`__.
 
 .. |alt tag| image:: ../../../../_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Pktgen.jpg

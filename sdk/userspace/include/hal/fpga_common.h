@@ -61,9 +61,11 @@ enum {
 	FPGA_CMD_GET_HW_METRICS = 1 << 1,
 	/** return FPGA image hardware metrics (clear on read */
 	FPGA_CMD_CLEAR_HW_METRICS = 1 << 2,
+	/** F2 does not support forcing the Shell to Reload */
 	FPGA_CMD_FORCE_SHELL_RELOAD = 1 << 3,
-	/** request that ddr data retention is used during load */
+	/** F2 does not support DRAMN data retention */
 	FPGA_CMD_DRAM_DATA_RETENTION = 1 << 4,
+	/** F2 does not support extended metrics size */
 	FPGA_CMD_EXTENDED_METRICS_SIZE = 1 << 6,
 	FPGA_CMD_PREFETCH = 1 << 7,
 	FPGA_CMD_CLEAR_AFI_CACHE = 1 << 8,
@@ -75,6 +77,10 @@ enum {
 		FPGA_CMD_EXTENDED_METRICS_SIZE |
 		FPGA_CMD_PREFETCH |
 		FPGA_CMD_CLEAR_AFI_CACHE,
+
+	FPGA_CMD_UNSUPPORTED_FLAGS = FPGA_CMD_FORCE_SHELL_RELOAD |
+		FPGA_CMD_DRAM_DATA_RETENTION |
+		FPGA_CMD_EXTENDED_METRICS_SIZE,
 };
 
 

@@ -45,7 +45,6 @@ int main(int argc, char ** argv) {
 
   int slot_ids[] = {0, 1, 2, 3, 4, 5, 6, 7};
   size_t slot_id_count = sizeof(slot_ids)/sizeof(slot_ids[0]);
-  uint32_t num_retries = 120;
 
   int ret = FPGA_ERR_FAIL;
 
@@ -62,19 +61,19 @@ int main(int argc, char ** argv) {
   }
 
   /* 3. Poll: */
-  for (size_t i = 0; i < slot_id_count; ++i) {
-    int slot_id = slot_ids[i];
-    struct fpga_mgmt_image_info info;
-    printf("Polling for slot %d to no longer be busy\n", slot_id);
-    uint32_t retry = 0;
-    do {
-      usleep(2000);
+  uint8_t busy_state = 0;
+  do {
+    busy_state = 0;
+    printf("Polling for each slot to no longer be busy\n");
+    for (size_t i = 0; i < slot_id_count; ++i) {
+      struct fpga_mgmt_image_info info;
+      int slot_id = slot_ids[i];
       ret = fpga_mgmt_describe_local_image(slot_id, &info, 0);
-      fail_on(ret != 0, err, "fpga_mgmt_describe_local_image failed. An incorrect slot_id can cause this call to fail.");
 
-      ++retry;
-    } while (info.status_q == FPGA_ERR_AFI_CMD_BUSY && retry < num_retries);
-  }
+      uint8_t card_busy_state = (info.status == FPGA_STATUS_BUSY);
+      busy_state |= (card_busy_state << i);
+    }
+  } while (busy_state);
 
   for (size_t i = 0; i < slot_id_count; ++i) {
     int slot_id = slot_ids[i];

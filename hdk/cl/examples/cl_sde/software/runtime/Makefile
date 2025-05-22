@@ -37,13 +37,13 @@ SDE_EXAMPLES = sde_c2h_perf_test sde_h2c_perf_test sde_c2h_simple sde_h2c_simple
 
 .PHONY: all clean
 
-all: check_env ve_install ve_run sde_examples
+all: check_env ve_install sde_examples ve_run 
 
 ve_install: check_env
 	$(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
 	sudo $(APP_SCRIPTS_DIR)/virtual_ethernet_setup.py $(DPDK_DIR) $(SLOT_NUM)
 
-ve_run: check_env
+ve_run: check_env ve_install sde_examples
 	sudo $(DPDK_DIR)/build/app/dpdk-testpmd -l 0-1  -- --port-topology=loop --auto-start --tx-first --stats-period=$(STATS_PERIOD) \
 
 sde_examples: $(SDE_EXAMPLES)

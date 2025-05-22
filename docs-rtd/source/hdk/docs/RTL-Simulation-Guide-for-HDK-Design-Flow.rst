@@ -13,7 +13,7 @@ Table of Contents
   - `Try Out One of HDK Examples or Write Your
     Own <#try-out-one-of-hdk-examples-or-write-your-own>`__
   - `Xilinx's Library
-    Compilation <#xilinxs-library-compilation-complib_dir>`__
+    Compilation <#xilinxs-library-compilation-complib-dir>`__
 
 - `Create Your Own Tests for RTL
   Simulation <#create-your-own-tests-for-rtl-simulation>`__
@@ -112,6 +112,8 @@ The call of the ``make ${TEST_NAME}`` as above executes following steps.
 +-------+-------------+----------------------------------------------+
 | 5th   | ``run``     | Run the simulation                           |
 +-------+-------------+----------------------------------------------+
+
+.. _xilinxs-library-compilation-complib-dir:
 
 Xilinx's Library Compilation (``COMPLIB_DIR``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

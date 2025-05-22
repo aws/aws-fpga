@@ -9,7 +9,7 @@ Table of Contents
 
   - `Table of Contents <#table-of-contents>`__
   - `HDK Overview <#hdk-overview>`__
-  - `Getting Started <#getting-started>`__
+  - `Getting Started <#getting-started-hdk>`__
 
     - `Build Accelerator AFI using HDK Design
       Flow <#build-accelerator-afi-using-hdk-design-flow>`__

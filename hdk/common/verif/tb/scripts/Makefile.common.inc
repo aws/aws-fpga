@@ -136,34 +136,10 @@ else
    export SIM_DIR = $(SIM_ROOT)/$(C_TEST)$(SIM_DIR_EXTENSION)
 endif
 
-COMMON_LIBLISTS =\
-   unisims_ver\
-   unisim\
-   unifast_ver\
-   unifast\
-   unimacro_ver\
-   unimacro\
-   secureip\
-   xpm\
-   xil_defaultlib\
-   axi_dwidth_converter_v2_1_31\
-   axi_protocol_converter_v2_1_31\
-   axi_protocol_checker_v2_0_17\
-   hbm2e_pl_v1_0_1\
-   noc_hbm_v1_0_0\
-   hbm_v1_0_16\
-   axi_register_slice_v2_1_31\
-   axi_infrastructure_v1_1_0\
-   axi_crossbar_v2_1_32\
-   axi_clock_converter_v2_1_30\
-   fifo_generator_v13_2_10\
-   axi_data_fifo_v2_1_30\
-   generic_baseblocks_v2_1_2\
-   lut_buffer_v2_0_1\
-   xsdbm_v3_0_2\
-   xdma_v4_1_29\
-   xlconstant_v1_1_9\
-   smartconnect_v1_0
+#
+# COMMON_LIBLISTS FROM IP
+# 
+include $(HDK_COMMON_DIR)/ip/cl_ip/common_liblists.mk
 
 LIBLISTS_ARGS = $(shell echo " $(strip $(COMMON_LIBLISTS))" | sed 's|\ | -L |g')
 
@@ -219,6 +195,11 @@ recompile_cl_ips: check_cl_ip_in_progress
 	rm -f $(CL_IP_IN_PROGRESS)
 	$(MAKE) $(COMPILE_CL_IP_DIR)
 
+clean_libs:
+	rm -rf $(COMPLIB_DIR)
+	rm -rf $(COMPILE_CL_IP_DIR)
+	rm $(COMPLIB_IN_PROGRESS)
+	rm $(CL_IP_IN_PROGRESS)
 
 $(COMPLIB_DIR): check_complib_in_progress
 ifeq ("$(SIMULATOR)","xsim")
@@ -311,4 +292,5 @@ log_regression_results:
 print_regression_results:
 	echo "" ; \
 	echo "*** SEE RESULTS IN '$(REGRESSION_RESULTS_LOG)'" ; \
-	cat $(REGRESSION_RESULTS_LOG) ; \
+	cat $(REGRESSION_RESULTS_LOG) ; 
+   

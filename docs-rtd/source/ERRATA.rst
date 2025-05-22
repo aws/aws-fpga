@@ -71,14 +71,42 @@ HDK
 SDK
 ---
 
-* N/A
+.. role:: raw-html(raw)
+    :format: html
+
+1. The following fpga_mgmt flags are not supported for F2:
+
+   - ``FPGA_CMD_FORCE_SHELL_RELOAD``
+   - ``FPGA_CMD_DRAM_DATA_RETENTION``
+   - ``FPGA_CMD_EXTENDED_METRICS_SIZE``
+
+   These flags will cause a run-time error if passed to:
+
+   - ``fpga_mgmt_describe_local_image``
+   - ``fpga_mgmt_load_local_image_flags``
+   - ``fpga_mgmt_load_local_image_with_options``
+   - ``fpga_mgmt_load_local_image_sync_flags``
+   - ``fpga_mgmt_load_local_image_sync_with_options``
+
+   If your application passes these flags, you have two options:
+
+   1. Edit your application to no longer pass these flags
+
+   2. If your application links against ``libfpga_mgmt.so``, you can uncomment the following line from the ``Makefile`` in the ``<SDK>/userspace/fpga_libs/fpga_mgmt`` directory:
+
+      :raw-html:`<br />`
+      ``#IGNORE_DEPRECATION=-DUNSUPPORTED_OPTIONS_ACKNOWLEDGED``
+
+      After editing the Makefile, run ``source sdk_setup.sh`` in the root of this repository. Rebuild your application as normal and the options will be ignored. Alternatively, passing ``-DUNSUPPORTED_OPTIONS_ACKNOWLEDGED`` to the compiler when compiling the ``fpga_mgmt.c`` source file will also ignore the options.
+
+2. The ``-F`` flag is not supported when passed to the ``fpga-load-local-image`` CLI. The CLI will not error, but it will print a message indicating that the option is not supported and will be ignored.
 
 Software defined Accelerator Development (Vitis)
 ------------------------------------------------
 
-1. Only hardware emulation via Vitis 2024.1 is currently supported.
+1. Only hardware emulation via Vitis 2024.1 and 2024.2 is currently supported.
 
-2. Support for Vitis 2024.1 accelerator binary creation and AFI creation is not supported, but will be released at a later time.
+2. Support for Vitis 2024.1 and 2024.2 accelerator binary creation and AFI creation is not supported, but will be released at a later time.
 
 3. Support for Vitis software emulation has been deprecated by AMD, therefore, no longer supported.
 

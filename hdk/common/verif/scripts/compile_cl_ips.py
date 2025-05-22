@@ -145,9 +145,16 @@ class Compiler:
     def compile_ip(self, xilinx_ip_script_path: str, compile_log) -> None:
         ip_script_dir: str = os.path.dirname(xilinx_ip_script_path)
         symlink_dst: str = f'{ip_script_dir}/{self.init_files[self.simulator]}'
+
+        # check for abnormalities
+        print(f"Compiling this cl_ip {xilinx_ip_script_path}")
+        assert os.path.exists(self.sim_initfile), f"FATAL missing init file {self.sim_initfile}"
+        if self.simulator == QUESTA and not os.path.exists(f"{self.compile_cl_ip_dir}/_vmake") :
+            print(f"WARNING no lib, running vlib {self.compile_cl_ip_dir}")
+            subprocess.check_call(['vlib' ,  self.compile_cl_ip_dir], cwd=ip_script_dir, stdout=compile_log)
+
         if not os.path.exists(symlink_dst):
             os.symlink(self.sim_initfile, symlink_dst)
-
         self.prepare_ip_script_for_compilation(ip_script_dir, xilinx_ip_script_path)
         subprocess.check_call([xilinx_ip_script_path, '-lib_map_path', self.complib_dir], cwd=ip_script_dir, stdout=compile_log)
         self.cleanup_compilation_dir(ip_script_dir, symlink_dst)

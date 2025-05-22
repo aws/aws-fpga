@@ -14,7 +14,6 @@ The development kit includes example designs to get you familiar with developing
     - [Hardware Development Kit (HDK)](#hardware-development-kit-hdk)
     - [Software-Defined Development Environment](#software-defined-development-environment)
     - [FPGA Developer AMI](#fpga-developer-ami)
-  - [Getting Started](#getting-started)
     - [Getting Familiar with AWS](#getting-familiar-with-aws)
   - [Next Steps](#next-steps)
 
@@ -47,7 +46,7 @@ This table lists the F2 development flows currently enabled and supported in the
 | Hardware accelerator development using Vivado (HDK) | This environment supports the Hardware Development Kit (HDK) design flow, which empowers FPGA developers to create accelerator designs from scratch, using HDL source code and IPs. <br><br>The AMD Vivado tool synthesizes, implements, and generates the Design Check Point (DCP) file used in F2 AFI creation. AWS FPGA developers benefit from the suite of scripts supplied in the HDK that help to automate different design steps. This allows for flexibility in architecting, implementing, and optimizing accelerator designs while using the HDK.| Verilog/SystemVerilog/VHDL | User-implemented DMA engine or Streaming Data Engine (SDE) | Simulation | Hardware developers with advanced FPGA experience |
 | Hardware accelerator development using Vitis | This environment supports the Vitis design flow, which enables software developers to write C++ code, which may then be compiled into RTL and used in cycle-accurate hardware simulation. After it may then be built into an accelerator design. This step is not necessary, but is encouraged. Vitis may also be used to implement accelerator designs from scratch, using HDL and IPs directly, similar to Vivado. Vitis offers additional analysis tools to aid in the refinement of designs. | Verilog/System Verilog/VHDL | XDMA Engine (coming soon) | Hardware Emulation | Advanced software developers or hardware developers with intermediate to advanced FPGA experience |
 
-On-premise environment: Customers can set up a on-premise development environment using 2024.1 AMD tools with their own licenses. Refer to this guide [here](./hdk/docs/on_premise_licensing_help.md) for licensing requirements.
+On-premise environment: Customers can set up a on-premise development environment. See the [supported AMD tool versions here.](#hardware-development-kit-hdk) Refer to this guide [here](./hdk/docs/on_premise_licensing_help.md) for licensing requirements.
 
 ### Quick Start Links
 
@@ -154,11 +153,10 @@ The [HDK directory structure](./hdk/README.md) contains:
 
 The HDK currently supports the following tool versions:
 
-| Tool                                    | Version       |
-|:----------------------------------------|:--------------|
-|AMD Vivado Design Suite                  | 2024.1        |
-|Synopsys VCS  (Bring your own license)   | U-2023.03-SP2 |
-|Siemens Questa (Bring your own license)  | 2023.3        |
+| AMD Vivado Design Suite | Synopsys VCS  (Bring your own license) | Siemens Questa (Bring your own license) |
+|:------------------------|:---------------------------------------|:----------------------------------------|
+| 2024.2                  | V-2023.12-SP1                          | 2024.1_2                                |
+| 2024.1                  | U-2023.03-SP2                          | 2023.3                                  |
 
 Our scripts require a minimum Python version of 3.10, under `/usr/bin/env python3`:
 
@@ -181,13 +179,12 @@ A free-to-use FPGA developer AMI is available for on-cloud F2 development with A
 
 | FPGA Developer AMI Version | FPGA Developer AMI ID | Vivado/Vitis Version Supported | Operating System Version    |
 |----------------------------|-----------------------|--------------------------------|-----------------------------|
+| 1.17.0                     | [ami-01198b89d80ebfdd2](https://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq) | 2024.2 | Ubuntu 24.04 (kernel 6.8.0-1021-aws)|
 | 1.16.1                     | [ami-092fc5deb8f3c0f7d](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
 
 Given the large size of the FPGA used for F2, AMD tools work best with at least 4 vCPU’s and 32GiB Memory. We recommend [Compute Optimized and Memory Optimized instance types](https://aws.amazon.com/ec2/instance-types/) to successfully run the synthesis of acceleration code. Developers may start coding and run simulations on low-cost `General Purpose` [instances types](https://aws.amazon.com/ec2/instance-types/).
 
 Note that the tools used by the HDK are only supported on x86-based EC2 instances (Graviton-based instances are not compatible with the tools).
-
-## Getting Started
 
 ### Getting Familiar with AWS
 

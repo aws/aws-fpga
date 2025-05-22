@@ -4,46 +4,42 @@ CL_DRAM_HBM_DMA Example Simulation
 Table of Contents
 -----------------
 
-- `CL_DRAM_HBM_DMA Example
-  Simulation <#cl_dram_hbm_dma-example-simulation>`__
-
-  - `Table of Contents <#table-of-contents>`__
   - `Overview <#overview>`__
-  - `Dump Waves <#dump-waves>`__
-  - `SystemVerliog Tests <#systemverliog-tests>`__
+  - `Dump Waves <#dump-waves-dma>`__
+  - `SystemVerilog Tests <#system-verilog-tests>`__
 
-    - `test_clk_recipe.sv <#test_clk_recipesv>`__
-    - `test_ddr_peek_poke.sv <#test_ddr_peek_pokesv>`__
-    - `test_ddr.sv <#test_ddrsv>`__
-    - `test_hbm.sv <#test_hbmsv>`__
-    - `test_dram_dma.sv <#test_dram_dmasv>`__
-    - `test_dram_dma_rnd.sv <#test_dram_dma_rndsv>`__
-    - `test_dma_pcim_concurrent.sv <#test_dma_pcim_concurrentsv>`__
-    - `test_dma_pcis_concurrent.sv <#test_dma_pcis_concurrentsv>`__
-    - `test_dma_sda_concurrent.sv <#test_dma_sda_concurrentsv>`__
-    - `test_dram_dma_4k_crossing.sv <#test_dram_dma_4k_crossingsv>`__
-    - `test_dram_dma_allgn_addr_4k.sv <#test_dram_dma_allgn_addr_4ksv>`__
-    - `test_dram_dma_single_beat_4k.sv <#test_dram_dma_single_beat_4ksv>`__
-    - `test_dram_dma_axi_mstr.sv <#test_dram_dma_axi_mstrsv>`__
-    - `test_int.sv <#test_intsv>`__
-    - `test_peek_poke.sv <#test_peek_pokesv>`__
-    - `test_peek_poke_wc.sv <#test_peek_poke_wcsv>`__
-    - `test_peek_poke_len.sv <#test_peek_poke_lensv>`__
-    - `test_peek_poke_rnd_lengths.sv <#test_peek_poke_rnd_lengthssv>`__
-    - `test_peek_poke_pcis_axsize.sv <#test_peek_poke_pcis_axsizesv>`__
-    - `test_ddr_peek_bdr_walking_ones <#test_ddr_peek_bdr_walking_ones>`__
-    - `test_sda.sv <#test_sdasv>`__
-    - `test_null.sv <#test_nullsv>`__
+    - `test_clk_recipe.sv <#test-clk-recipesv>`__
+    - `test_ddr_peek_poke.sv <#test-ddr-peek-pokesv>`__
+    - `test_ddr.sv <#test-ddrsv>`__
+    - `test_hbm.sv <#test-hbmsv>`__
+    - `test_dram_dma.sv <#test-dram-dmasv>`__
+    - `test_dram_dma_rnd.sv <#test-dram-dma-rndsv>`__
+    - `test_dma_pcim_concurrent.sv <#test-dma-pcim-concurrentsv>`__
+    - `test_dma_pcis_concurrent.sv <#test-dma-pcis-concurrentsv>`__
+    - `test_dma_sda_concurrent.sv <#test-dma-sda-concurrentsv>`__
+    - `test_dram_dma_4k_crossing.sv <#test-dram-dma-4k-crossingsv>`__
+    - `test_dram_dma_allgn_addr-4k.sv <#test-dram-dma-allgn-addr-4ksv>`__
+    - `test_dram_dma_single_beat-4k.sv <#test-dram-dma-single-beat-4ksv>`__
+    - `test_dram_dma_axi_mstr.sv <#test-dram-dma-axi-mstrsv>`__
+    - `test_int.sv <#test-intsv>`__
+    - `test_peek_poke.sv <#test-peek-pokesv>`__
+    - `test_peek_poke_wc.sv <#test-peek-poke-wcsv>`__
+    - `test_peek_poke_len.sv <#test-peek-poke-lensv>`__
+    - `test_peek_poke_rnd_lengths.sv <#test-peek-poke-rnd-lengthssv>`__
+    - `test_peek_poke_pcis_axsize.sv <#test-peek-poke-pcis-axsizesv>`__
+    - `test_ddr_peek_bdr_walking_ones <#test-ddr-peek-bdr-walking-ones>`__
+    - `test_sda.sv <#test-sdasv>`__
+    - `test_null.sv <#test-nullsv>`__
 
-  - `AXI_MEMORY_MODEL Mode
-    Simulations <#axi_memory_model-mode-simulations>`__
+  - `AXI-MEMORY-MODEL Mode Simulations <#axi-memory-model-mode-simulations-dma>`__
 
-    - `test_dram_dma_mem_model_bdr_wr <#test_dram_dma_mem_model_bdr_wr>`__
-    - `test_dram_dma_mem_model_bdr_rd <#test_dram_dma_mem_model_bdr_rd>`__
+    - `test-dram-dma-mem-model-bdr-wr <#test-dram-dma-mem-model-bdr-wr-dma>`__
+    - `test-dram-dma-mem-model-bdr-rd <#test-dram-dma-mem-model-bdr-rd-dma>`__
 
-  - `DDR Backdoor Loading <#ddr-backdoor-loading>`__
+  - `DDR Backdoor Loading <#ddr-backdoor-loading-dma>`__
+  - `HW/SW Co-Simulation Test <#hw-sw-co-simulation-test>`__
 
-  - `HW/SW Co-Simulation Test <#hwsw-co-simulation-test>`__
+.. _overview:
 
 Overview
 --------
@@ -116,12 +112,16 @@ directory with all supported simulators:
 
 Note that the appropriate simulators must be installed.
 
+.. _dump-waves-dma:
+
 Dump Waves
 ----------
 
 For information about how to dump waves with XSIM or VCS, please refer
 to
 `debugging-custom-logic-using-the-aws-hdk <../../../../docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html>`__
+
+.. _system-verilog-tests:
 
 SystemVerliog Tests
 -------------------
@@ -131,7 +131,7 @@ include ``base_test_utils.svh`` which includes common signals and tasks
 used across tests. Please refer to this file for the DPI-C tasks used.
 Information about each test can be found below.
 
-.. _test_clk_recipesv:
+.. _test-clk-recipesv:
 
 test_clk_recipe.sv
 ~~~~~~~~~~~~~~~~~~
@@ -139,7 +139,7 @@ test_clk_recipe.sv
 This test programs valid clock recipes defined within and verifies the
 corresponding clock frequencies.
 
-.. _test_ddr_peek_pokesv:
+.. _test-ddr-peek-pokesv:
 
 test_ddr_peek_poke.sv
 ~~~~~~~~~~~~~~~~~~~~~
@@ -147,7 +147,7 @@ test_ddr_peek_poke.sv
 This does a walking ones test through the DDR address range. Also checks
 if any of the bits are stuck at '0'.
 
-.. _test_ddrsv:
+.. _test-ddrsv:
 
 test_ddr.sv
 ~~~~~~~~~~~
@@ -155,7 +155,7 @@ test_ddr.sv
 This test programs the CL_TST (ATG) to generate traffic to access all
 four DDR channels.
 
-.. _test_hbmsv:
+.. _test-hbmsv:
 
 test_hbm.sv
 ~~~~~~~~~~~
@@ -163,21 +163,21 @@ test_hbm.sv
 This test programs the CL_TST (ATG) to generate traffic to access both
 HBM stacks.
 
-.. _test_dram_dmasv:
+.. _test-dram-dmasv:
 
 test_dram_dma.sv
 ~~~~~~~~~~~~~~~~
 
 Basic H2C and C2H DMA test through all 4 DDR channels and 2 HBM stacks.
 
-.. _test_dram_dma_rndsv:
+.. _test-dram-dma-rndsv:
 
 test_dram_dma_rnd.sv
 ~~~~~~~~~~~~~~~~~~~~
 
 This test programs DMA transfers with random lengths.
 
-.. _test_dma_pcim_concurrentsv:
+.. _test-dma-pcim-concurrentsv:
 
 test_dma_pcim_concurrent.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,7 +185,7 @@ test_dma_pcim_concurrent.sv
 This test programs both the DMA and PCIM traffic to run concurrently and
 verifies that there are no errors on both DMA and PCIM interfaces.
 
-.. _test_dma_pcis_concurrentsv:
+.. _test-dma-pcis-concurrentsv:
 
 test_dma_pcis_concurrent.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,7 +193,7 @@ test_dma_pcis_concurrent.sv
 This test programs both the DMA and PCIS traffic to run concurrently and
 verifies that there are no errors on both DMA and PCIS interfaces.
 
-.. _test_dma_sda_concurrentsv:
+.. _test-dma-sda-concurrentsv:
 
 test_dma_sda_concurrent.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,7 +201,7 @@ test_dma_sda_concurrent.sv
 This test programs both the DMA and SDA traffic to run concurrently and
 verifies that there are no errors on both DMA and SDA interfaces.
 
-.. _test_dram_dma_4k_crossingsv:
+.. _test-dram-dma-4k-crossingsv:
 
 test_dram_dma_4k_crossing.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +209,7 @@ test_dram_dma_4k_crossing.sv
 This test programs DMA transfers that will cross a 4k boundary. All
 transfers are of same length with different destination addresses.
 
-.. _test_dram_dma_allgn_addr_4ksv:
+.. _test-dram-dma-allgn-addr-4ksv:
 
 test_dram_dma_allgn_addr_4k.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +217,7 @@ test_dram_dma_allgn_addr_4k.sv
 This test programs DMA transfers that will cross a 4k boundary. All
 transfers are of different length with different destination addresses.
 
-.. _test_dram_dma_single_beat_4ksv:
+.. _test-dram-dma-single-beat-4ksv:
 
 test_dram_dma_single_beat_4k.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,7 +225,7 @@ test_dram_dma_single_beat_4k.sv
 This test programs single beat DMA transfers that will cross a 4k
 boundary.
 
-.. _test_dram_dma_axi_mstrsv:
+.. _test-dram-dma-axi-mstrsv:
 
 test_dram_dma_axi_mstr.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,21 +233,21 @@ test_dram_dma_axi_mstr.sv
 This test configures the cl_dram_dma_axi_mstr.sv module to send and
 receive traffic from the DDR in the CL design.
 
-.. _test_intsv:
+.. _test-intsv:
 
 test_int.sv
 ~~~~~~~~~~~
 
 This test programs enables interrupts in CL and verifies them.
 
-.. _test_peek_pokesv:
+.. _test-peek-pokesv:
 
 test_peek_poke.sv
 ~~~~~~~~~~~~~~~~~
 
 This test programs ATG in CL to do 128 byte PCIM reads and writes.
 
-.. _test_peek_poke_wcsv:
+.. _test-peek-poke-wcsv:
 
 test_peek_poke_wc.sv
 ~~~~~~~~~~~~~~~~~~~~
@@ -255,7 +255,7 @@ test_peek_poke_wc.sv
 This test performs pcis write combine operations and reads back the
 data.
 
-.. _test_peek_poke_lensv:
+.. _test-peek-poke-lensv:
 
 test_peek_poke_len.sv
 ~~~~~~~~~~~~~~~~~~~~~
@@ -263,7 +263,7 @@ test_peek_poke_len.sv
 This test programs tester block to do PCIM reads and writes with
 incremental lengths.
 
-.. _test_peek_poke_rnd_lengthssv:
+.. _test-peek-poke-rnd-lengthssv:
 
 test_peek_poke_rnd_lengths.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -271,7 +271,7 @@ test_peek_poke_rnd_lengths.sv
 This test programs tester block to do PCIM reads and writes with random
 lengths within valid range.
 
-.. _test_peek_poke_pcis_axsizesv:
+.. _test-peek-poke-pcis-axsizesv:
 
 test_peek_poke_pcis_axsize.sv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,14 +288,14 @@ writes data(walking ones) for different addresses. The test backdoor
 loads DDR memory and reads through frontdoor and checks that the data
 matches.
 
-.. _test_sdasv:
+.. _test-sdasv:
 
 test_sda.sv
 ~~~~~~~~~~~
 
 This test does transfers to different addresses on SDA AXIL interface.
 
-.. _test_nullsv:
+.. _test-nullsv:
 
 test_null.sv
 ~~~~~~~~~~~~
@@ -303,7 +303,7 @@ test_null.sv
 test_null is not an actual test. This is a base SV file needed for HW/SW
 co-simulation
 
-
+.. _axi-memory-model-mode-simulations-dma:
 
 AXI_MEMORY_MODEL Mode Simulations
 ---------------------------------
@@ -317,11 +317,15 @@ Any test that accesses DDR memory can be run in AXI_MEMORY_MODEL mode.
 Below are some example tests for ECC and backdoor loading support
 features of AXI memory model.
 
+.. _test-dram-dma-mem-model-bdr-wr-dma:
+
 test_dram_dma_mem_model_bdr_wr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This test backdoor writes AXI memory model, reads through frontdoor and
 checks that the data matches.
+
+.. _test-dram-dma-mem-model-bdr-rd-dma:
 
 test_dram_dma_mem_model_bdr_rd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -329,12 +333,16 @@ test_dram_dma_mem_model_bdr_rd
 This test backdoor reads AXI memory model, writes through frontdoor and
 checks that the data matches.
 
+.. _ddr-backdoor-loading-dma:
+
 DDR Backdoor Loading
 --------------------
 
 The description of DDR backdoor loading can be found in DDR backdoor loading
 support section at `RTL simulation
 guide <../../../../docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html>`__.
+
+.. _hw-sw-co-simulation-test:
 
 HW/SW Co-Simulation Test
 ------------------------

@@ -29,9 +29,10 @@ script_dir=$(dirname $full_script)
 current_dir=$(pwd)
 
 debug=0
+skip_downloads=0
 
 function usage {
-  echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-h|-help]"
+  echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-s|-skip_downloads][-h|-help]"
 }
 
 function help {
@@ -42,6 +43,7 @@ function help {
   info_msg "hdk_setup.sh script will:"
   info_msg "  (1) Check if Xilinx Vivado is installed,"
   info_msg "  (2) Set up key environment variables HDK_*, and"
+  info_msg "  (3) Download shell and setup submodules (unless --skip_downloads is used)"
   echo " "
   usage
 }
@@ -65,6 +67,16 @@ function sha256_check {
     return 0
 }
 
+function check_git_lfs {
+    if ! command -v git-lfs &> /dev/null; then
+        echo "ERROR: git-lfs is not installed" >&2
+        echo "Please install git-lfs:" >&2
+        echo "  For RHEL/CentOS/Rocky: sudo yum install git-lfs" >&2
+        echo "  For Ubuntu/Debian: sudo apt-get install git-lfs" >&2
+        exit 1
+    fi
+}
+
 # Process command line args
 args=("$@")
 for ((i = 0; i < ${#args[@]}; i++)); do
@@ -76,6 +88,9 @@ for ((i = 0; i < ${#args[@]}; i++)); do
   -h | -help)
     help
     return 0
+    ;;
+  -s | -skip_downloads)
+    skip_downloads=1
     ;;
   *)
     err_msg "Invalid option: $arg\n"
@@ -119,8 +134,8 @@ else
   return 1
 fi
 
-VIVADO_TOOL_VERSION=$(vivado -version | grep -i Vivado | head -1 | sed 's/[Vv]ivado v//' | sed 's/^\(.\{7\}\).*$/\1/')
-export VIVADO_TOOL_VERSION=${VIVADO_TOOL_VERSION:0:7}
+VIVADO_TOOL_VERSION=$(vivado -version | grep -i Vivado | head -1 | sed 's/[Vv]ivado v//' | sed 's/^\(.\{6\}\).*$/\1/')
+export VIVADO_TOOL_VERSION
 info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
 debug_msg "Vivado check succeeded"
@@ -136,49 +151,87 @@ shell_ver_file=$HDK_SHELL_DIR/shell_version.txt
 # Shell files to be downloaded
 declare -a s3_hdk_files=("cl_bb_routed.small_shell.dcp")
 
-# Downloading the shell files
-for shell_file in "${s3_hdk_files[@]}"; do
-  sub_dir="checkpoints"
-  hdk_shell_dir=$HDK_SHELL_DIR/build/$sub_dir
-  hdk_shell_dir_from_aws=$hdk_shell_dir/from_aws
-  hdk_file=$hdk_shell_dir_from_aws/$shell_file
-  hdk_file_sha256=$hdk_shell_dir_from_aws/$shell_file.sha256
-  shell_file_sha256=$shell_file.sha256
+if [ $skip_downloads -eq 0 ]; then
+    # Downloading the shell files
+    for shell_file in "${s3_hdk_files[@]}"; do
+      sub_dir="checkpoints"
+      hdk_shell_dir=$HDK_SHELL_DIR/build/$sub_dir
+      hdk_shell_dir_from_aws=$hdk_shell_dir/from_aws
+      hdk_file=$hdk_shell_dir_from_aws/$shell_file
+      hdk_file_sha256=$hdk_shell_dir_from_aws/$shell_file.sha256
+      shell_file_sha256=$shell_file.sha256
 
-  if [ ! -d $hdk_shell_dir ]; then
-    if ! mkdir $hdk_shell_dir; then
-      err_msg "Failed to create $hdk_shell_dir"
-      return 2
-    fi
-  fi
+      if [ ! -d $hdk_shell_dir ]; then
+        if ! mkdir $hdk_shell_dir; then
+          err_msg "Failed to create $hdk_shell_dir"
+          return 2
+        fi
+      fi
 
-  if [ ! -d $hdk_shell_dir_from_aws ]; then
-    if ! mkdir $hdk_shell_dir_from_aws; then
-      err_msg "Failed to create $hdk_shell_dir_from_aws"
-      return 2
-    fi
-  fi
+      if [ ! -d $hdk_shell_dir_from_aws ]; then
+        if ! mkdir $hdk_shell_dir_from_aws; then
+          err_msg "Failed to create $hdk_shell_dir_from_aws"
+          return 2
+        fi
+      fi
 
-  shell_type=$(echo $shell_file | cut -d'.' -f2)
-  shell_ver=$(cat $shell_ver_file | grep "$shell_type" | cut -d '=' -f2)
+      shell_type=$(echo $shell_file | cut -d'.' -f2)
+      shell_ver=$(cat $shell_ver_file | grep "$shell_type" | cut -d '=' -f2)
 
-  s3_hdk_dir_url=https://aws-fpga-hdk-resources.s3.amazonaws.com/hdk
-  s3_shell_dir=${s3_hdk_dir_url}/shell_v${shell_ver:2}
+      s3_hdk_dir_url=https://aws-fpga-hdk-resources.s3.amazonaws.com/hdk
+      s3_shell_dir=${s3_hdk_dir_url}/shell_v${shell_ver:2}
 
-  if ! wget $s3_shell_dir/$shell_file -O $hdk_file -q; then
-    err_msg "Failed to download HDK shell $shell_file version $shell_ver"
-    return 2
-  fi
+      if ! wget $s3_shell_dir/$shell_file -O $hdk_file -q; then
+        err_msg "Failed to download HDK shell $shell_file version $shell_ver"
+        return 2
+      fi
 
-  if ! wget $s3_shell_dir/$shell_file_sha256 -O $hdk_file_sha256 -q; then
-    err_msg "Failed to download HDK shell $shell_file_sha256 version $shell_ver"
-    return 2
-  fi
-  sha256_check $hdk_file_sha256 $hdk_file
-  if [ $? -ne 0 ]; then
-    return 1
-  fi
-done
+      if ! wget $s3_shell_dir/$shell_file_sha256 -O $hdk_file_sha256 -q; then
+        err_msg "Failed to download HDK shell $shell_file_sha256 version $shell_ver"
+        return 2
+      fi
+      sha256_check $hdk_file_sha256 $hdk_file
+      if [ $? -ne 0 ]; then
+        return 1
+      fi
+    done
+else
+    info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
+fi
+
+info_msg "Settting up CL_IP for Vivado version $VIVADO_TOOL_VERSION"
+
+cl_ip_path="hdk/common/ip"
+cl_ip_branch="Vivado_$VIVADO_TOOL_VERSION-$cl_ip_path"
+
+if [ $skip_downloads -eq 0 ]; then
+    check_git_lfs 
+    git submodule update --init $cl_ip_path
+    git -C $cl_ip_path checkout $cl_ip_branch
+else
+    info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
+fi
+
+debug_msg "Checking for CL_IP Vivado version"
+
+cl_ip_ver=$(cat $AWS_FPGA_REPO_DIR/$cl_ip_path/VIVADO_VERSION | xargs)
+if [ "$VIVADO_TOOL_VERSION" == "$cl_ip_ver" ]; then
+  debug_msg "CL_IP was created using the expected Vivado version $VIVADO_TOOL_VERSION"
+else
+  err_msg "Detected CL_IP version mistch, expecting version $VIVADO_TOOL_VERSION "
+  err_msg "However, CL_IP was created in version $(cat $AWS_FPGA_REPO_DIR/$cl_ip_path/VIVADO_VERSION)"
+  return 1
+fi
+
+info_msg "Setting up IP environment variables"
+
+unset HDK_IP_SRC_DIR
+unset HDK_BD_SRC_DIR
+unset HDK_BD_GEN_DIR
+
+export HDK_IP_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/ip)
+export HDK_BD_SRC_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.srcs/sources_1/bd)
+export HDK_BD_GEN_DIR=$(realpath -s $HDK_COMMON_DIR/ip/cl_ip/cl_ip.gen/sources_1/bd)
 
 info_msg "HDK shell is up-to-date"
 

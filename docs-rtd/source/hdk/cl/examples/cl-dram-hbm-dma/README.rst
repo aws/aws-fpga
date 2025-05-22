@@ -83,7 +83,7 @@ DDR and HBM. So, if a particular memory is disabled, then the developer
 should take care to handle transactions to that address range since
 there will be no controller to respond to the request. The address
 ranges for each controller is described below in the `dma_pcis AXI4 bus
-section <#dma_pcis>`__.
+section <#dma-pcis>`__.
 
 Test Changes
 ------------
@@ -91,7 +91,7 @@ Test Changes
 If a particular controller is disabled, make sure that the test is not
 accessing address space for that controller.
 
-Please look at `dma_pcis AXI4 bus section <#dma_pcis>`__ for address
+Please look at `dma_pcis AXI4 bus section <#dma-pcis>`__ for address
 ranges.
 
 If DDR is enabled, make sure that the DDRs are initialized using the
@@ -105,6 +105,8 @@ eg: To initialize DDR
 
 Make sure that the Host to Card and Card to Host DMA transfers only
 access enabled DDR controller address space.
+
+.. _dma-pcis:
 
 dma_pcis AXI4 bus
 -----------------

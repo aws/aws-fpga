@@ -165,6 +165,7 @@ static const char *load_afi_usage[] = {
 	"      -F, --force-shell-reload",
 	"          Reload the FPGA shell on AFI load, even if the next AFI",
 	"          doesn't require it.",
+	"          THIS OPTION IS NOT SUPPORTED ON F2 AND IS IGNORED",
 	"      -P, --prefetch-image",
 	"          Prefetch the indicated AFI and store it in the cache for faster loading.",
 	"          Fastest load times can be achieved by using cached AFIs and enabling data retention (-D).",

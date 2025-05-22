@@ -95,8 +95,6 @@ err:
 static int fpga_mgmt_describe_cmd(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
-	bool issued_rl_reload = false;
-start: ;
 	int ret;
 	uint32_t len;
 	union afi_cmd cmd;
@@ -165,11 +163,7 @@ start: ;
 		ret = fpga_pci_poke(handle, FMB_REG_RL_RELOAD, 0x1);
 		fail_on(ret, out, "fpga_pci_poke failed");
 
-		/* Rerun the describe command afterwards to get RL reload status */
-		if (issued_rl_reload == false) {
-			issued_rl_reload = true;
-			goto start;
-		}
+		info->status = FPGA_STATUS_BUSY;
 	}
 out:
 	return ret;
@@ -183,6 +177,10 @@ int fpga_mgmt_describe_local_image(int slot_id,
 	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
 		FPGA_ERR_SOFTWARE_PROBLEM,
 		"fpga_mgmt_init must be called before the library can be used");
+
+	fail_on_unsupported_options(flags, FPGA_CMD_UNSUPPORTED_FLAGS, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"input flags (%d) contains unsupported options", flags);
 
 	ret = fpga_mgmt_describe_cmd(slot_id, info, flags);
 	fail_on(ret, out, "fpga_mgmt_describe_cmd");
@@ -489,6 +487,10 @@ int fpga_mgmt_load_local_image_with_options(union fpga_mgmt_load_local_image_opt
 		FPGA_ERR_SOFTWARE_PROBLEM,
 		"fpga_mgmt_init must be called before the library can be used");
 
+	fail_on_unsupported_options(opt->flags, FPGA_CMD_UNSUPPORTED_FLAGS, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"input flags (%d) contains unsupported options", opt->flags);
+
 	fail_slot_id(opt->slot_id, out, ret);
 
 	memset(&cmd, 0, sizeof(union afi_cmd));
@@ -547,6 +549,10 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 	fail_on_with_code(!fpga_mgmt_state.initialized, out, ret,
 		FPGA_ERR_SOFTWARE_PROBLEM,
 		"fpga_mgmt_init must be called before the library can be used");
+
+	fail_on_unsupported_options(opt->flags, FPGA_CMD_UNSUPPORTED_FLAGS, out, ret,
+		FPGA_ERR_SOFTWARE_PROBLEM,
+		"input flags (%d) contains unsupported options", opt->flags);
 
 	/** Allow timeout adjustments that are greater than the defaults */
 	uint32_t timeout_tmp = (timeout > FPGA_MGMT_SYNC_TIMEOUT) ?

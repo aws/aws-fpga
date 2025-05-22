@@ -1,10 +1,12 @@
+.. _aws-clk-gen-cl-clock-generator:
+
 AWS_CLK_GEN - CL Clock Generator
 ======================================
 
 Table of Contents
 -----------------
 
-- `AWS_CLK_GEN - CL Clock Generator <#aws_clk_gen---cl-clock-generator>`__
+- `AWS_CLK_GEN - CL Clock Generator <#aws-clk-gen-cl-clock-generator>`__
 
   - `Table of Contents <#table-of-contents>`__
   - `Introduction <#introduction>`__
@@ -238,7 +240,7 @@ Register Definitions
 
 Following registers are housed inside AWS_CLK_REGS component and are
 accessible from the AXIL interface from base address = ``BASE_REG`` as
-described in `Address Space <#ancAddressSpace>`__
+described in `Address Space <#address-space>`__
 
 .. list-table::
   :header-rows: 1

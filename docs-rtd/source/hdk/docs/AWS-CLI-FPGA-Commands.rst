@@ -11,7 +11,7 @@ The AWS CLI FPGA commands allow you to manage your Amazon FPGA Images.
 
 Use ``aws ec2 copy-fpga-image`` to copy AFIs between AWS regions. The
 copy operation will use the target `EC2
-endpoint <http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region>`__
+endpoint <https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints>`__
 as the destination region (this is the aws-cli default region or
 specified by the
 `region <http://docs.aws.amazon.com/cli/latest/userguide/cli-command-line.html>`__
@@ -289,7 +289,7 @@ An AFI will not be recoverable after deleting all copies in all regions.
 Use `IAM Policies for Amazon
 EC2 <http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-policies-for-amazon-ec2.html>`__
 to restrict access to the API unless explicitly required (See `IAM best
-practices <http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege>`__).
+practices <https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege>`__).
 For example, include the following statement in your IAM policy to deny
 access to ``DeleteFpgaImage``:
 

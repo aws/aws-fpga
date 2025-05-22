@@ -167,6 +167,20 @@ static inline __printf(1, 2) void log_dummy(const char *fmt, ...)
 		}                               \
 	} while (0)
 
+/** Usage: fail_on_unsupported_options(option, bits, label, message format string, [arg1, arg2, ...])*/
+#ifdef UNSUPPORTED_OPTIONS_ACKNOWLEDGED
+    #define fail_on_unsupported_options(VALUE, BITS, LABEL, RET, RET_VALUE, ...) do { } while (0)
+#else
+    #define fail_on_unsupported_options(VALUE, BITS, LABEL, RET, RET_VALUE, ...) \
+        do {                                                                     \
+            if ((VALUE) & (BITS)) {                                              \
+                log_error(__VA_ARGS__);                                          \
+								RET = RET_VALUE;                                                 \
+                goto LABEL;                                                      \
+            }                                                                    \
+        } while (0)
+#endif
+
 /** Usage:
  *  fail_on(condition, label, return code variable, return code value,
  *          message format string, [arg1, arg2, ...])

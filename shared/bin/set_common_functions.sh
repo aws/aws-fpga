@@ -291,4 +291,3 @@ function extract_vivado_version () {
 function allow_non_root {
        [ ! -z ${AWS_FPGA_ALLOW_NON_ROOT} ]
 }
-
