@@ -49,14 +49,14 @@ Table of Contents
 
       - `CL AXI Completer Error Reporting <#cl-axi-completer-error-reporting>`__
 
-    - `Accessing Aligned/Unaligned Addresses from PCIe (Shell is Requester, CL is Completer) <#accessing-alignedunaligned-addresses-from-pcie-shell-is-requester-cl-is-completer>`__
+    - `Accessing Aligned/Unaligned Addresses from PCIe (Shell is Requester, CL is Completer) <#accessing-aligned-unaligned-addresses-from-pcie>`__
     - `Interrupts <#interrupts>`__
     - `HBM Monitor Interface <#hbm-monitor-interface>`__
     - `Miscellaneous Signals <#miscellaneous-signals>`__
 
       - `Integrity Check <#integrity-check>`__
-      - `General Control/Status <#general-controlstatus>`__
-      - `Virtual LED/DIP <#virtual-leddip>`__
+      - `General Control/Status <#general-control-status>`__
+      - `Virtual LED/DIP <#virtual-led-dip>`__
       - `Global Counters <#global-counters>`__
 
   - `Implementation Tips <#implementation-tips>`__
@@ -323,7 +323,7 @@ Interfaces between Shell and CL
 -------------------------------
 
 CL/Shell AXI Interfaces
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 All AXI interfaces use the AXI-4 or AXI-Lite protocol. The AXI-L buses are
 for register access use cases, and can access lower speed control
@@ -409,7 +409,7 @@ clk_main_a0: rst_main_n. This is an active low reset signal, and
 combines the board reset and PCIe link-level reset conditions.
 
 PCIS Interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 This an 512-bit wide AXI-4 interface for Inbound PCIe Transactions (Shell is
 Requester, CL is Completer). It is used for:
@@ -473,7 +473,7 @@ be functional and the AFI/Shell must be re-loaded. This can be done by
 adding the "-F" option to ``fpga-load-local-image``.
 
 PCIM Interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 This is an 512-bit wide AXI-4 interface for Outbound PCIe Transactions (CL is
 Requester, Shell is Completer). It is used by the CL to initiate cycles to the PCIe bus, for example, to push
@@ -573,8 +573,10 @@ following cases:
 ⚠️ **If a timeout occurs, the PCIM bus will no longer be functional.
 This can be cleared by clearing/re-loading the AFI.**
 
+.. _ocl-sda-interfaces-for-register-access:
+
 OCL/SDA AXI-Lite Interfaces for Register Access
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are two AXI-L requester interfaces (Shell is Requester) that can
 be used for register access interfaces. Each interface is sourced from a
@@ -604,6 +606,8 @@ propagate the AXI-4 error responses to the PCIe bus. All PCIe cycles are
 terminated with non-error responses. The AXI-4 errors are reported
 through the Management PF and can be retrieved by the AFI Management
 Tools metric reporting APIs.
+
+.. _accessing-aligned-unaligned-addresses-from-pcie:
 
 Accessing Aligned/Unaligned Addresses from PCIe
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -816,6 +820,8 @@ check mechanism, following the next mapping
 See the `HDK development guide <../README.html#afi-pcie-ids>`__ for defining and
 adding these IDs to a CL design.
 
+.. _general-control-status:
+
 General Control/Status
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -834,6 +840,8 @@ The functionality of these signals is TBD.
   - 0x2 – Power level 2
   - 0x3 – Power is critical and FPGA may be shutting off clocks or
     powering down
+
+.. _virtual-led-dip:
 
 Virtual LED/DIP
 ^^^^^^^^^^^^^^^

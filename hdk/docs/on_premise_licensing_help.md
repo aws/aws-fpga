@@ -10,6 +10,14 @@ This document helps developers who choose to develop on-premises with specifying
 - URL: https://www.xilinx.com/member/forms/download/xef.html?filename=FPGAs_AdaptiveSoCs_Unified_2024.1_0522_2023.tar.gz
 - MD5 SUM Value: 372c0b184e32001137424e395823de3c
 
+## Requirements for AWS HDK (2024.2)
+
+- Xilinx Vivado ML Enterprise Edition v2024.2
+- Floating License: EF-VIVADO-ENTER-FL
+- Node locked License: EF-VIVADO-ENTER-NL
+- URL: https://www.xilinx.com/member/forms/download/xef.html?filename=FPGAs_AdaptiveSoCs_Unified_2024.2_1113_1001.tar
+- MD5 SUM Value: 0ca31a787bbdff82b55213522e604446
+
 ## Licensing Details
 
 - On-Premises customers may need a new or updated license

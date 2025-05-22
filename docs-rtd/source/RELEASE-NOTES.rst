@@ -1,6 +1,14 @@
 F2 Developer Kit Release Notes
 ==============================
 
+.. _v210:
+
+v2.1.0
+------
+
+- Support for Vivado and Vitis 2024.2 tools.
+- `Releasing New Developer AMI for 2024.2 tools. <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+- Updating the asynchronous fpga_mgmt_examples to poll each FPGA once before moving to the next.
 
 .. _v207:
 

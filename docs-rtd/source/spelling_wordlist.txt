@@ -265,3 +265,9 @@ Combinatorial
 wildcard
 wildcards
 prefetch
+KiB
+MiB
+GiB
+TiB
+uncomment
+github

@@ -207,25 +207,25 @@ module  cl_tst_scrb #(parameter DATA_WIDTH=512,
       end // block: gen_scrb_inst
       else begin : gen_noscrb
 
-         assign scrb_enable_q = '{default:'0};
+         assign scrb_enable_q = 0;
          assign scrb_awid     = '{default:'0};
          assign scrb_awaddr   = '{default:'0};
          assign scrb_awlen    = '{default:'0};
-         assign scrb_awvalid  = '{default:'0};
+         assign scrb_awvalid  = 0;
          assign scrb_awuser   = '{default:'0};
          assign scrb_wid      = '{default:'0};
          assign scrb_wdata    = '{default:'0};
          assign scrb_wstrb    = '{default:'0};
-         assign scrb_wlast    = '{default:'0};
-         assign scrb_wvalid   = '{default:'0};
-         assign scrb_bready   = '{default:'0};
+         assign scrb_wlast    = 0;
+         assign scrb_wvalid   = 0;
+         assign scrb_bready   = 0;
          assign scrb_arid     = '{default:'0};
          assign scrb_araddr   = '{default:'0};
          assign scrb_arlen    = '{default:'0};
-         assign scrb_arvalid  = '{default:'0};
+         assign scrb_arvalid  = 0;
          assign scrb_aruser   = '{default:'0};
-         assign scrb_arready  = '{default:'0};
-         assign scrb_rready   = '{default:'0};
+         assign scrb_arready  = 0;
+         assign scrb_rready   = 0;
 
       end // block: gen_noscrb
 

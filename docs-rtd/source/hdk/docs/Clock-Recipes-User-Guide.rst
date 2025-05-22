@@ -38,8 +38,10 @@ HBM IP to clock the APB interface.
 F2 Developer Kit provides a clocking IP
 `AWS_CLK_GEN <./AWS-CLK-GEN-spec.html>`__ for customers who desire to have
 same clocks and clock recipe support as F1.
-`Tables <./Clock-Recipes-User-Guide.html#f2-clock-recipe-table>`__
+`Tables <./Clock-Recipes-User-Guide.html#f2-clock-recipe-tables>`__
 below shows the clock recipes supported in F2.
+
+.. _f2-clock-recipe-tables:
 
 F2 Clock Recipe Tables
 ----------------------

@@ -199,7 +199,7 @@ set_property IOSTANDARD  DIFF_POD12_DCI [get_ports {M_DQS_DP[*]}]
 set_property IOSTANDARD  DIFF_POD12_DCI [get_ports {M_DQS_DN[*]}]
 
 ###############################################################################
-# C2C PCIe endpoint
+#
 ###############################################################################
 set_property PACKAGE_PIN AL40         [get_ports PCIE_EP_REF_CLK_P]
 set_property IOSTANDARD  LVDS         [get_ports PCIE_EP_REF_CLK_P]
@@ -217,7 +217,7 @@ set_property PACKAGE_PIN AT46         [get_ports {PCIE_EP_TXP[6]}]
 set_property PACKAGE_PIN AU48         [get_ports {PCIE_EP_TXP[7]}]
 
 ###############################################################################
-# C2C PCIe root port
+#
 ###############################################################################
 set_property PACKAGE_PIN AR15         [get_ports PCIE_RP_REF_CLK_P]
 set_property IOSTANDARD  LVDS         [get_ports PCIE_RP_REF_CLK_P]

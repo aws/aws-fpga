@@ -4,32 +4,28 @@
 The development kit includes example designs to get you familiar with
 developing for AWS EC2 FPGA Instances.
 
-- `AWS EC2 FPGA Development Kit <#aws-ec2-fpga-development-kit>`__
+- `AWS EC2 F2 Instance Overview <#aws-ec2-f2-instance-overview>`__
 
-  - `AWS EC2 F2 Instance Overview <#aws-ec2-f2-instance-overview>`__
+  - `Instance Types <#instance-types>`__
+  - `Second Generation On-Cloud FPGA Accelerator
+    Card <#second-generation-on-cloud-fpga-accelerator-card>`__
+  - `Comparison to F1 <#comparison-to-f1>`__
 
-    - `Instance Types <#instance-types>`__
-    - `2nd Generation On-Cloud FPGA Accelerator
-      Card <#second-generation-on-cloud-fpga-accelerator-card>`__
-    - `Comparison to F1 <#comparison-to-f1>`__
+- `AWS EC2 F2 FPGA Development
+  Kit <#aws-ec2-f2-fpga-development-kit>`__
 
-  - `AWS EC2 F2 FPGA Development
-    Kit <#aws-ec2-f2-fpga-development-kit>`__
+  - `Development Environments <#development-environments>`__
+  - `Quick Start Links <#quick-start-links>`__
+  - `AWS Shells <#aws-shells>`__
+  - `Hardware Development Kit (HDK) <#hardware-development-kit-hdk>`__
+  - `Software-Defined Development
+    Environment <#software-defined-development-environment>`__
 
-    - `Development Environments <#development-environments>`__
-    - `Quick Start Links <#quick-start-links>`__
-    - `AWS Shells <#aws-shells>`__
-    - `Hardware Development Kit (HDK) <#hardware-development-kit-hdk>`__
-    - `Software-Defined Development
-      Environment <#software-defined-development-environment>`__
+  - `FPGA Developer AMI <#fpga-developer-ami>`__
 
-    - `FPGA Developer AMI <#fpga-developer-ami>`__
+  - `Getting Familiar with AWS <#getting-familiar-with-aws>`__
 
-  - `Getting Started <#getting-started>`__
-
-    - `Getting Familiar with AWS <#getting-familiar-with-aws>`__
-
-  - `Next Steps <#next-steps>`__
+- `Next Steps <#next-steps>`__
 
 .. _aws-ec2-f2-instance-overview:
 
@@ -65,8 +61,8 @@ Instance Types
 
 .. _second-generation-on-cloud-fpga-accelerator-card:
 
-2nd Generation On-Cloud FPGA Accelerator Card
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Second-Generation On-Cloud FPGA Accelerator Card
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 |image1|
 
@@ -130,7 +126,7 @@ supported in the development kit.
       with intermediate to advanced FPGA experiences
 
 On-premise environment: Customers can set up a on-premise development
-environment using 2024.1 AMD tools with their own licenses. Refer to
+environment. See the `supported AMD tool versions here. <#hardware-development-kit-hdk>`__ Refer to
 this guide `here <./hdk/docs/on-premise-licensing-help.html>`__ for
 licensing requirements.
 
@@ -294,15 +290,16 @@ The HDK currently supports the following tool versions:
 .. list-table::
   :header-rows: 1
   :class: user-guide-simulators-table
-  :widths: 50 30
+  :widths: 30 30 30
 
-  * - Tool
-    - Version
   * - AMD Vivado Design Suite
-    - 2024.1
-  * - Synopsys VCS (Bring your own license)
+    - Synopsys VCS (Bring your own license)
+    - Siemens Questa (Bring your own license)
+  * - 2024.2
+    - V-2023.12-SP1
+    - 2024.1_2
+  * - 2024.1
     - U-2023.03-SP2
-  * - Siemens Questa (Bring your own license)
     - 2023.3
 
 Our scripts require a minimum Python version of 3.10, under
@@ -357,6 +354,10 @@ currently released to customers:
     - FPGA Developer AMI ID
     - Vivado/Vitis Version Supported
     - Operating System Version
+  * - 1.17.0
+    - `ami-01198b89d80ebfdd2 <https://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+    - 2024.2
+    - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
   * - 1.16.1
     - `ami-092fc5deb8f3c0f7d <https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u>`__
     - 2024.1
@@ -372,11 +373,6 @@ types <https://aws.amazon.com/ec2/instance-types/#General_Purpose>`__.
 
 Note that the tools used by the HDK are only supported on x86-based EC2
 instances (Graviton-based instances are not compatible with the tools).
-
-.. _getting-started:
-
-Getting Started
----------------
 
 .. _getting-familiar-with-aws:
 

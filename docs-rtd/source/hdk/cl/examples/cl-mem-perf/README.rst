@@ -3,13 +3,8 @@ CL_MEM_PERF Custom Logic Example
 
 ⚠️ **Features using XDMA engine are currently unsupported on F2 instances**
 
-Table of Content
-----------------
-
-- `CL_MEM_PERF Custom Logic
-  Example <#cl_mem_perf-custom-logic-example>`__
-
-  - `Table of Content <#table-of-content>`__
+Table of Contents
+-----------------
 
 - `Introduction <#introduction>`__
 - `Architecture Overview <#architecture-overview>`__
@@ -30,7 +25,7 @@ Table of Content
   - `PCIS Memory Address Space <#pcis-memory-address-space>`__
   - `HBM Memory Address Space <#hbm-memory-address-space>`__
   - `CL_HBM_AXI4 Register Address
-    Space <#cl_hbm_axi4-register-address-space>`__
+    Space <#cl-hbm-axi4-register-address-space>`__
   - `SDA Memory Address Space <#sda-memory-address-space>`__
 
 - `Simulations <#simulations>`__
@@ -411,6 +406,8 @@ user guide. For example:
 - Channel#0 \| Start Address = 0x0000_0000 \| End Address = 0x1FFF_FFFF
 - Channel#1 \| Start Address = 0x2000_0000 \| End Address = 0x3FFF_FFFF
   and so on...
+
+.. _cl-hbm-axi4-register-address-space:
 
 CL_HBM_AXI4 Register Address Space
 ----------------------------------

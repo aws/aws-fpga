@@ -1,4 +1,4 @@
-.. _supported-ddr-configurations-in-sh_ddrsv:
+.. _supported-ddr-configurations-in-sh-ddrsv:
 
 Supported DDR configurations in `sh_ddr.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/design/sh_ddr/sh_ddr.stub.sv>`__
 ============================================================================================================================================
@@ -7,7 +7,7 @@ Table of Contents
 -----------------
 
 - `Supported DDR configurations in
-  sh_ddr.sv <#supported-ddr-configurations-in-sh_ddrsv>`__
+  sh_ddr.sv <#supported-ddr-configurations-in-sh-ddrsv>`__
 
   - `Table of Contents <#table-of-contents>`__
   - `Overview <#overview>`__

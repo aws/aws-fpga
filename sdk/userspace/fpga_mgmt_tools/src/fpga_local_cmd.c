@@ -414,9 +414,11 @@ static int command_load(void)
 {
 	int ret;
 	union fpga_mgmt_load_local_image_options opt;
+	if (fpga.force_shell_reload) {
+		printf("THE -F (--force-shell-reload) IS NOT SUPPORTED ON F2 AND IS IGNORED\n");
+	}
 
 	uint32_t flags = 0;
-	flags |= (fpga.force_shell_reload ) ? FPGA_CMD_FORCE_SHELL_RELOAD  : 0;
 	flags |= (fpga.prefetch) ? FPGA_CMD_PREFETCH : 0;
 
  	fpga_mgmt_init_load_local_image_options(&opt);
