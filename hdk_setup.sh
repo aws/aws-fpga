@@ -73,8 +73,10 @@ function check_git_lfs {
         echo "Please install git-lfs:" >&2
         echo "  For RHEL/CentOS/Rocky: sudo yum install git-lfs" >&2
         echo "  For Ubuntu/Debian: sudo apt-get install git-lfs" >&2
-        exit 1
+        return 1
     fi
+    
+    return 0
 }
 
 # Process command line args
@@ -205,7 +207,10 @@ cl_ip_path="hdk/common/ip"
 cl_ip_branch="Vivado_$VIVADO_TOOL_VERSION-$cl_ip_path"
 
 if [ $skip_downloads -eq 0 ]; then
-    check_git_lfs 
+    check_git_lfs
+    if [ $? -ne 0 ]; then
+      return 1
+    fi
     git submodule update --init $cl_ip_path
     git -C $cl_ip_path checkout $cl_ip_branch
 else
