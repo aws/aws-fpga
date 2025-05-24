@@ -145,7 +145,7 @@ int sde_mem_close(struct sde_mem* mem) {
   }
 
   if (mem->h2c_buffers != NULL) {
-    for (size_t i = 0; i < mem->c2h_num_buffers; ++i) {
+    for (size_t i = 0; i < mem->h2c_num_buffers; ++i) {
       ret |= fpga_dma_mem_unmap(&mem->h2c_buffers[i].data_va, mem->h2c_buffers[i].alloc_length);
     }
   }
