@@ -49,7 +49,6 @@
 #include <sde_utility.h>
 #include <utils/log.h>
 #include <string.h>
-#include <sde_utility.h>
 #include <stdlib.h>
 
 #define H2C_DESC_COALESCE_CNT 32
