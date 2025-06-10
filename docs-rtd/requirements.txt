@@ -9,4 +9,4 @@ docutils>=0.18,<0.21
 sphinx-copybutton>=0.5.2
 
 termcolor==2.5.0
-requests==2.32.3
+requests==2.32.4
