@@ -2283,8 +2283,8 @@ C2H Descriptor
    * - **Total**
      - 128
      -
-     - 128
      -
+     - 128
      -
      -
 
@@ -2358,8 +2358,8 @@ C2H Write-Back Metadata
    * - **Total**
      - 128
      -
-     - 64
      -
+     - 64
      -
      -
 
@@ -2444,8 +2444,8 @@ H2C Descriptor
    * - **Total**
      - 256
      -
-     - 128
      -
+     - 128
      -
      -
 
