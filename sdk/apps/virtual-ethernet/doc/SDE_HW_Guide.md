@@ -1042,7 +1042,7 @@ back metadata will be the same as the descriptor type chosen.
 | **Length (Bytes)**   | 32              | 31                 | 0                 | 32            | 31                 | 0                 |
 | **Physical Address** | 64              | 95                 | 32                | 48            | 79                 | 32                |
 | **RSVD**             | 32              | 127                | 96                | 48            | 127                | 80                |
-| **Total**            | 128             |                    | 128               |               |                    |                   |
+| **Total**            | 128             |                    |                   | 128           |                    |                   |
 
 Description of Fields
 1) Physical Address: Destination physical address for the data. This is the host guest physical address
@@ -1061,7 +1061,7 @@ the SDE. SDE does not store these bits in the descriptor RAM.
 | **EOP**            | 1               | 33                 | 33                | 1             | 33                 | 33                |
 | **RSVD**           | 30              | 63                 | 34                | 30            | 63                 | 34                |
 | **User Bits**      | 64              | 127                | 64                | NA            | NA                 | NA                |
-| **Total**          | 128             |                    | 64                |               |                    |                   |
+| **Total**          | 128             |                    |                   | 64            |                    |                   |
 
 Description of Fields
 
@@ -1089,7 +1089,7 @@ Description of Fields
 | **SPB**              | 1               | NA                 | 97                | 1             | NA                 | 81                |
 | **RSVD**             | 94              | 191                | 98                | 46            | 127                | 82                |
 | **User Bits**        | 64              | 255                | 192               | NA            | NA                 | NA                |
-| **Total**            | 256             |                    | 128               |               |                    |                   |
+| **Total**            | 256             |                    |                   | 128           |                    |                   |
 
 Descriptions of Fields
 
