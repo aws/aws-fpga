@@ -184,14 +184,24 @@ task print_cl_hbm_perf_kernel_bandwidth_performance(logic [31:0] selected_channe
    tb.peek_ocl(.addr(`RD_TIMER_HI_REG), .data(rd_timer[63:32]));
    $display("RD_TIMER value = %016d", rd_timer);
 
-   wr_bw = (wr_timer == 0) ? 0 : ((wr_cyc_count * (axlen + 1) * $countones(selected_channels))/(wr_timer * 4.0));
-   rd_bw = (rd_timer == 0) ? 0 : ((rd_cyc_count * (axlen + 1) * $countones(selected_channels))/(rd_timer * 4.0));
+   // BW Calculation Notes
+   // wr_cyc_count increments by $countones(selecte_channels)
+   // bus width is 32B (256b),
+   // axlen is burst len - 1
+   // cycle cycle ~4ns
+   wr_bw = (wr_timer == 0) ? 0 : ((wr_cyc_count * (axlen + 1) * 32) / (wr_timer * 4.0));
+   rd_bw = (rd_timer == 0) ? 0 : ((rd_cyc_count * (axlen + 1) * 32) / (rd_timer * 4.0));
+
    $display("=======PERFORMANCE INFO=============");
    $display("Write BW = %-0.2f GB/s", wr_bw);
    $display("Read BW  = %-0.2f GB/s", rd_bw);
 
-   expected_wr_bandwidth = (400.0 * $pow( $countones(selected_channels), 3 ) / $pow( 32.0, 3 ));
-   expected_rd_bandwidth = (340.0 * $pow( $countones(selected_channels), 3 ) / $pow( 32.0, 3 ));
+   // Starting from theoretical max of bus x channels = 450GB/s
+   // Adjust by number of used channels
+   // Adjust by axlen , wraddr overhead cycles
+   // 0.90 toleraance
+   expected_wr_bandwidth = 0.90 * (450.0 * (axlen/ (axlen+1)) * ($countones(selected_channels) / 32.0));
+   expected_rd_bandwidth = 0.90 * (350.0 * ($countones(selected_channels) / 32.0));
 
    if (wr_bw < expected_wr_bandwidth) begin
       $error("Write Bandwidth of %3.1f is below %3.1f GB/s", wr_bw, expected_wr_bandwidth);

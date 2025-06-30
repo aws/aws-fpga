@@ -809,6 +809,7 @@ Additional HDK Documentation
   docs/shell-floorplan
   docs/AWS-Fpga-Pcie-Memory-Map
   docs/RTL-Simulation-Guide-for-HDK-Design-Flow
+  docs/List-AFI-on-Marketplace
   docs/on-premise-licensing-help
   docs/Supported-DDR-Modes
   docs/Virtual-JTAG-XVC

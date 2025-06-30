@@ -32,13 +32,15 @@ int sde_dma_buffer_init(struct sde_dma_buffer* dma_buffer, enum SDE_BUFFER_LAYOU
   dma_buffer->subsystem = subsystem;
   dma_buffer->pkt_size = pkt_size;
   dma_buffer->desc_element_size = subsystem == SDE_SUBSYSTEM_C2H ? sizeof(struct c2h_desc) : sizeof(struct h2c_desc);
-  dma_buffer->mem = mem;
   dma_buffer->ctrl = ctrl;
 
-  ret = sde_mem_get_desc(dma_buffer->mem, dma_buffer->subsystem, &dma_buffer->desc_va, &dma_buffer->desc_pa);
+  ret = sde_mem_get_desc(mem, dma_buffer->subsystem, &dma_buffer->desc_va, &dma_buffer->desc_pa);
   fail_on(ret, err, "Failed to get descriptor");
 
-  ret = sde_mem_get_buffers(dma_buffer->mem, dma_buffer->subsystem, &dma_buffer->buffers, &dma_buffer->num_buffers);
+  if (dma_buffer->layout != SDE_BUFFER_USER_MANAGED) {
+    dma_buffer->num_desc = SDE_NUM_DESC;
+    ret = sde_mem_get_buffers(mem, dma_buffer->subsystem, &dma_buffer->buffers, &dma_buffer->num_buffers);
+  }
 
 err:
   return ret;
@@ -70,14 +72,35 @@ static uint32_t get_next_start_dw(uint32_t curr_start_dw) {
   return(next_start_dw);
 }
 
+int sde_dma_buffer_set_dma_buffers(struct sde_dma_buffer* dma_buffer, struct sde_buffer* sde_buffers, size_t num_buffers) {
+  int ret = 0;
+
+  fail_on_with_code(dma_buffer == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "dma_buffer is NULL");
+  fail_on_with_code(sde_buffers == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "sde_buffer_descriptors is NULL");
+  fail_on_with_code(num_buffers == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "num_descriptors is 0");
+  fail_on_with_code(dma_buffer->layout != SDE_BUFFER_USER_MANAGED, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "dma_buffer->layout is not SDE_BUFFER_USER_MANAGED");
+
+  log_debug("dma_buffer->subsystem = %d", dma_buffer->subsystem);
+  log_debug("dma_buffer->num_buffers = %ld", dma_buffer->num_buffers);
+
+  dma_buffer->buffers = sde_buffers;
+  dma_buffer->num_buffers = num_buffers;
+  dma_buffer->num_desc = num_buffers;
+
+err:
+  return ret;
+}
+
 int sde_dma_init_desc_buffer(struct sde_dma_buffer* dma_buffer) {
   int ret = 0;
 
   fail_on_with_code(dma_buffer == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "dma_buffer is NULL");
+  fail_on_with_code(dma_buffer->num_buffers == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "dma_buffer->num_buffers is 0");
+  fail_on_with_code(dma_buffer->buffers == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "dma_buffer->buffers is NULL");
 
   if (dma_buffer->subsystem == SDE_SUBSYSTEM_C2H) {
     struct c2h_desc* desc = (struct c2h_desc*) dma_buffer->desc_va;
-    for (size_t i = 0; i < SDE_NUM_DESC; ++i) {
+    for (size_t i = 0; i < dma_buffer->num_desc; ++i) {
       size_t buffer_index = i % dma_buffer->num_buffers;
       desc[i].length = dma_buffer->buffers[buffer_index].length;
       desc[i].phys_addr = dma_buffer->buffers[buffer_index].data_pa;
@@ -88,7 +111,7 @@ int sde_dma_init_desc_buffer(struct sde_dma_buffer* dma_buffer) {
     uint32_t next_dw = get_next_start_dw(current_dw);
 
     struct h2c_desc* desc = (struct h2c_desc*) dma_buffer->desc_va;
-    for (size_t i = 0; i < SDE_NUM_DESC; ++i) {
+    for (size_t i = 0; i < dma_buffer->num_desc; ++i) {
       size_t buffer_index = i % dma_buffer->num_buffers;
       desc[i].length = dma_buffer->buffers[buffer_index].length;
       desc[i].phys_addr = dma_buffer->buffers[buffer_index].data_pa;
@@ -105,7 +128,6 @@ int sde_dma_init_desc_buffer(struct sde_dma_buffer* dma_buffer) {
     }
   }
 
-  dma_buffer->num_desc = SDE_NUM_DESC;
   dma_buffer->curr_desc_index_to_post = 0;
   dma_buffer->current_buffer_index = 0;
 

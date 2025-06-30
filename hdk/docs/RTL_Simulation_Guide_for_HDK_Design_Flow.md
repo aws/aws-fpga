@@ -52,7 +52,7 @@ export CL_DIR=$PWD/hdk/cl/examples/cl_sde
 cd ${CL_DIR}/verif/scripts
 
 # Run the default test using the VCS SIM
-export TEST_NAME=test_ddr
+export TEST_NAME=test_simple_c2h
 make ${TEST_NAME} VCS=1
 
 # To view the test log files (this is defined by SIM_DIR makefile variable)

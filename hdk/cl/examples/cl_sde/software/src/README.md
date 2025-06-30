@@ -11,6 +11,7 @@ This directory contains example applications demonstrating the usage of the Stre
   - `slot_id` (int): Specifies the FPGA image slot for subsequent SDE library operations.
   - `direction` (enum): Defines the data transfer direction (C2H: Card-to-Host, H2C: Host-to-Card, LOOPBACK). Determines which subsystem buffers are allocated.
   - `packet_size` (size_t): Defines the buffer size in bytes for data transfers with the CL_SDE.
+  - `layout` (enum): Defines the DMA Buffers used for DMA (SINGLE: each buffer descriptor represents the same buffer that is repeatedly used, MULTI: each buffer descriptor represents a unique buffer, USER_MANAGED: buffers are allocated and managed by the user and each descriptor points to a unique buffer)
   - **Returns**: 0 on success, non-zero value on error.
 
 * **`sde_mgmt_init_and_cfg`**
@@ -36,6 +37,14 @@ This directory contains example applications demonstrating the usage of the Stre
   - `subsystem` (enum): Specifies the subsystem to check (C2H: Card-to-Host, H2C: Host-to-Card).
   - **Returns**: 0 if no errors detected, non-zero value indicating specific error condition.
 
+* **`sde_mgmt_set_dma_buffers**
+  Sets the DMA buffers to buffers allocated by the user.
+  - `slot_id` (int): Identifies the FPGA image slot containing the CL_SDE.
+  - `subsystem` (enum): Specifies the subsystem to check (C2H: Card-to-Host, H2C: Host-to-Card).
+  - `sde_buffers` (struct sde_buffer*): Specifies the array of user buffers to be used by the CL_SDE.
+  - `num_buffers` (size_t): Specifies the number of user buffers passed in.
+  - **Returns**: 0 on success, non-zero value on error.
+
 * **`sde_mgmt_cfg`**
   Configures the CL_SDE using parameters established during initialization.
   - **Returns**: 0 on success, non-zero value on error.
@@ -59,6 +68,12 @@ This directory contains example applications demonstrating the usage of the Stre
   - `slot_id` (int): Identifies the FPGA image slot containing the CL_SDE.
   - `size` (size_t): Total number of bytes to be read from the card.
   - **Returns**: 0 on success, non-zero value on error.
+
+* **`sde_mgmt_read_md`**
+  Reads the write-back next valid writeback-metadata struct. This struct specifies if status of a Card-to-Host DMA transfer including the size of the transferred data.
+  - `slot_id` (int): Identifies the FPGA image slot containing the CL_SDE.
+  - `md` (struct sde_md*): Valid pointer that will be populated with the metadata for the Card-to-Host DMA transfer.
+  - **Returns**: 0 on success, non-zero value on error or timeout.
 
 * **`sde_mgmt_read_data`**
   Transfers data from internal DMA buffers to the user-provided buffer.
@@ -172,6 +187,16 @@ Build the sde_examples from the $(HDK)/cl/examples/cl_sde/software/runtime direc
 
 - `sudo ./sde_h2c_perf_test <num_millions_packets> <packet_size> <slot_id>`
 - `sudo ./sde_h2c_perf_test 1 131072 0`
+
+### 6. Card-to-Host Transfer with User Managed Buffers
+- File: `sde_c2h_user_buffers`
+- Demonstrates basic card-to-host data transfer with user managed buffers
+- Configures SDE for reading data into a user-managed DMA buffer
+
+#### Usage
+
+- `sudo ./sde_c2h_user_buffers <num_packets> <packet_size> <slot_id>`
+- `sudo ./sde_c2h_user_buffers 1 4096 0`
 
 ## Performance Metrics
 

@@ -53,12 +53,10 @@
 
 #define DESC_COALESCE_CNT 32
 
-void print_timing(double start_time, int pkt_size, size_t num_packets);
-
 int main(int argc, char **argv) {
 
   struct sde_parameters params;
-  double start_time;
+  double start_time, end_time;
   int ret = 0;
 
   ret = sde_parse_args(argc, argv, &params, "sde_loopback_simple");
@@ -119,7 +117,9 @@ int main(int argc, char **argv) {
     num_packets+=num_descriptors;
   }
 
-  print_timing(start_time, params.pkt_size, num_packets);
+  end_time = sde_get_curr_time();
+  // Each packet was sent and received, so multiply pkt_size and num_packets by 2 for BW calculations.
+  print_timing(start_time, end_time, params.pkt_size * 2, num_packets * 2, SDE_EXAMPLE_DIR_LOOPBACK);
 
   ret = memcmp(wr_data_ptr, rd_data_ptr, params.pkt_size * num_descriptors);
   fail_on_with_code(ret, cleanup, ret, FPGA_ERR_SOFTWARE_PROBLEM, "Error comparing data");
@@ -139,17 +139,4 @@ err:
   }
 
   return ret;
-}
-
-void print_timing(double start_time, int pkt_size, size_t num_packets) {
-  double curr_time = sde_get_curr_time();
-  double total_run_time = (curr_time - start_time);
-  double loopback_mpps = (((double)num_packets)/1e6) / total_run_time;
-  double loopback_bw = (((double) num_packets * (double) pkt_size * 2)/1e9)/total_run_time ;
-
-  printf ("Start Time = %.2f, Current Time = %.2f\n", start_time, curr_time);
-  printf ("Total Run time: %.2f secs\n", total_run_time);
-  printf ("Total Number of Packets: %ld\n", num_packets);
-  printf ("loopback_mpps: %.3f MPPS\n", loopback_mpps);
-  printf ("loopback BW: %.3f GB/s\n", loopback_bw);
 }

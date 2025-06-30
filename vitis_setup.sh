@@ -58,11 +58,8 @@ function check_xilinx_vitis {
         info_msg "    https://repost.aws/questions?view=all\&sort=recent\&tagIds=TAc7ofO5tbQRO57aX1lBYbjA"
         return 1
     fi
-    RELEASE_VER=$(basename $XILINX_VITIS)
-    RELEASE_VER=${RELEASE_VER:0:6}
-    export RELEASE_VER="${RELEASE_VER}"
-    export VIVADO_TOOL_VER=$(echo "${RELEASE_VER}" | tr -d '[:space:]')
-    info_msg "RELEASE_VER = ${RELEASE_VER}"
+    export VITIS_TOOL_VER=$(vivado -version | grep -o "v[0-9]\+\.[0-9]" | sed 's/v//')
+    info_msg "VITIS_TOOL_VER = ${VITIS_TOOL_VER}"
     return 0
 }
 
@@ -73,11 +70,10 @@ valid_tool_versions["2024.2"]="true"
 
 declare -A valid_os
 valid_os["Ubuntu"]="true"
-valid_os["AlmaLinux"]="true"
 
 function check_os_and_tool_ver {
-    if [[ "${valid_tool_versions[${VIVADO_TOOL_VER}]}" != "true" ]]; then
-        err_msg "Unsupported Vivado tool version detected: ${VIVADO_TOOL_VER}!!!"
+    if [[ "${valid_tool_versions[${VITIS_TOOL_VER}]}" != "true" ]]; then
+        err_msg "Unsupported Vivado tool version detected: ${VITIS_TOOL_VER}!!!"
         info_msg "Supported versions are: 2024.1 and 2024.2"
         return 1
     fi
@@ -85,7 +81,7 @@ function check_os_and_tool_ver {
     echo "Distro: ${distro}"
     if [[ "${valid_os[${distro}]}" != "true" ]]; then
         err_msg "Unsupported OS detected!!!"
-        info_msg "Supported OS are: Ubuntu 24.04, Ubuntu 20.04, and AlmaLinux 9.4"
+        info_msg "Supported OS are: Ubuntu 24.04 and Ubuntu 20.04"
         return 1
     fi
     return 0
@@ -134,17 +130,10 @@ function set_up_vitis_examples {
         mkdir -p $VITIS_DIR/examples/
         cd $VITIS_DIR/examples/
 
-        if ! git clone "${vitis_exs_repo_url}" --recurse-submodules; then
+        if ! git clone "${vitis_exs_repo_url}" -b "${VITIS_TOOL_VER}" --recurse-submodules; then
             err_msg "Couldn't clone in ${vitis_exs_repo_name} repo!"
             return 1
         fi
-
-        cd $vitis_exs_repo_name
-        if ! git checkout "${VIVADO_TOOL_VER}"; then
-            err_msg "Couldn't check out ${VIVADO_TOOL_VER} branch of ${vitis_exs_repo_name}"
-            return 1
-        fi
-        cd ..
     fi
 
     if [[ -d "${VITIS_DIR}/examples/vitis_examples" && ! -L "${VITIS_DIR}/examples/vitis_examples" ]]; then
@@ -184,20 +173,16 @@ function sha256_check {
 
 function get_sha_file {
     missing_sha="${missing_xsa}.sha256"
-    if [ ! -e "${vitis_xpfm_dir}/${missing_sha}" ]; then
-        if ! sudo wget "${vitis_xsa_s3_url}/${missing_sha}" -O "${vitis_xpfm_dir}/${missing_sha}" -q; then
+    sha_path="${destination_dir}/${missing_sha}"
+    if [ ! -e "${sha_path}" ]; then
+        if ! sudo wget "${vitis_xsa_s3_url}/${missing_sha}" -O "${sha_path}" -q; then
             err_msg "Download of Vitis XSA SHA256 file ${missing_sha} failed!"
             return 1
         fi
     fi
 
-    sha_path=""
-    if [[ "${missing_xsa}" != "${vitis_xpfm}" ]]; then
-        sha_path="${vitis_xpfm_dir}/${missing_xsa%.*}/${missing_xsa}"
-    else
-        sha_path="${vitis_xpfm_dir}/${missing_xsa}"
-    fi
-    if ! sha256_check "${vitis_xpfm_dir}/${missing_xsa}.sha256" "${sha_path}"; then
+    xsa_path="${destination_dir}/${missing_xsa}"
+    if ! sha256_check "${sha_path}" "${xsa_path}"; then
         sha_mismatches=1
     fi
     return 0
@@ -205,25 +190,31 @@ function get_sha_file {
 
 
 function get_xsa_file {
-    if [ ! -e "${vitis_xpfm_dir}/${missing_xsa}" ]; then
-        if ! sudo wget "${vitis_xsa_s3_url}/${missing_xsa}" -O "${vitis_xpfm_dir}/${missing_xsa}" -q; then
-            err_msg "Download of Vitis XSA file ${missing_xsa} failed!"
-            return 1
-        fi
-        if [[ "${missing_xsa}" != "${vitis_xpfm}" ]]; then
-            # Gets the stem of the XSA file
-            destination_dir=$(echo "${missing_xsa%.*}")
-            sudo mv "${vitis_xpfm_dir}/${missing_xsa}" "${vitis_xpfm_dir}/${destination_dir}"
-        fi
-    else
-        info_msg "Vitis XSA file $missing_xsa already downloaded!"
+    # Set up the directory where the XSA file will live
+    destination_dir="${vitis_xpfm_dir}"
+    category_dir=""
+    if [[ "${missing_xsa}" != "${vitis_xpfm}" ]]; then
+        # Gets the stem of the XSA file: hw, hw_emu, sw
+        category_dir=$(echo "${missing_xsa%.*}")
+        destination_dir="${destination_dir}/${category_dir}"
     fi
+
+    # Remove the old XSA
+    missing_xsa_file_extension="${missing_xsa##*.}"
+    sudo rm -f "${destination_dir}/*.${missing_xsa_file_extension}"
+
+    # Grab the new XSA
+    if ! sudo wget "${vitis_xsa_s3_url}/${missing_xsa}" -O "${destination_dir}/${missing_xsa}"  -q; then
+        err_msg "Download of Vitis XSA file ${missing_xsa} failed!"
+        return 1
+    fi
+
     return 0
 }
 
 
 function create_xsa_dirs {
-    vitis_xpfm_dir=/opt/Xilinx/Vitis/${VIVADO_TOOL_VER}/platforms
+    vitis_xpfm_dir=$XILINX_VITIS/platforms
     vitis_hw_dir=$vitis_xpfm_dir/hw
     vitis_hw_emu_dir=$vitis_xpfm_dir/hw_emu
     vitis_sw_dir=$vitis_xpfm_dir/sw
@@ -235,11 +226,12 @@ function create_xsa_dirs {
     )
 
     for dir in "${xsa_dirs[@]}"; do
-        if [ ! -d $dir ]; then
-            if ! sudo mkdir -p $dir; then
-                err_msg "Couldn't create directory $dir!"
-                return 1
-            fi
+        if [ -d $dir ]; then
+            sudo rm -rf $dir
+        fi
+        if ! sudo mkdir -p $dir; then
+            err_msg "Couldn't create directory $dir!"
+            return 1
         fi
     done
     return 0
@@ -258,16 +250,15 @@ xsa_map["2024.2"]="202420_1"
 function setup_xsa {
 
     info_msg "Installing supporting libraries"
-    export DEBIAN_FRONTEND=noninteractive
-    sudo DEBIAN_FRONTEND=noninteractive $XILINX_VITIS/scripts/installLibs.sh >>/dev/null
+    sudo $XILINX_VITIS/scripts/installLibs.sh >>/dev/null
     rm installLibs.sh_*
 
     # Get XSA for right tool version
-    xsa_for_tool_ver="${xsa_map[${VIVADO_TOOL_VER}]}"
+    xsa_for_tool_ver="${xsa_map[${VITIS_TOOL_VER}]}"
     XSA="xilinx_aws-vu47p-f2_${xsa_for_tool_ver}"
     export SHELL_EMU_VERSION="${XSA}"
 
-    XSA_S3_BASE_DIR="xsa_f2_${xsa_dir_map[${VIVADO_TOOL_VER}]}"
+    XSA_S3_BASE_DIR="xsa_f2_${xsa_dir_map[${VITIS_TOOL_VER}]}"
 
     if ! create_xsa_dirs; then
         return 1
@@ -329,12 +320,6 @@ xrt_install_map["Ubuntu_install_cmd"]="sudo dpkg -i"
 xrt_install_map["Ubuntu_xrt_pkg_prefix"]="amd64-xrt"
 xrt_install_map["Ubuntu_aws_pkg_prefix"]="amd64-aws"
 
-xrt_install_map["AlmaLinux_pkg_ext"]="rpm"
-xrt_install_map["AlmaLinux_install_cmd"]="sudo dnf install -y"
-xrt_install_map["AlmaLinux_xrt_pkg_prefix"]="x86_64-xrt"
-xrt_install_map["AlmaLinux_aws_pkg_prefix"]="x86_64-aws"
-
-
 function build_and_install_xrt {
     if ! sudo -E ./$xrt_deps_script_path; then
         err_msg "Couldn't install XRT dependencies!"
@@ -384,7 +369,7 @@ function set_up_xrt_repo {
     if [[ ! -d $xrt_repo_name ]]; then
         info_msg "Cloning XRT repo into home directory: ${HOME}"
         info_msg "This directory may be moved to any destination, once the XRT install is complete!"
-        if ! git clone $xrt_repo_url --recurse-submodules; then
+        if ! git clone "${xrt_repo_url}" -b "${xrt_branch}" --recurse-submodules; then
             err_msg "Couldn't clone XRT repository!"
             cd $AWS_FPGA_REPO_DIR && return 1
         fi
@@ -393,16 +378,6 @@ function set_up_xrt_repo {
     fi
 
     cd $xrt_repo_name
-    if ! git fetch; then
-        err_msg "Couldn't fetch updated references for XRT repo!"
-        cd $AWS_FPGA_REPO_DIR && return 1
-    fi
-
-    if ! git checkout $xrt_branch; then
-        err_msg "Couldn't checkout branch: ${xrt_branch}!"
-        cd $AWS_FPGA_REPO_DIR && return 1
-    fi
-
     if ! git checkout $xrt_working_commit_hash; then
         err_msg "Couldn't checkout compatible commit: ${xrt_working_commit_hash}!"
         cd $AWS_FPGA_REPO_DIR && return 1
@@ -412,8 +387,8 @@ function set_up_xrt_repo {
 
 
 declare -A commit_hash_map
-commit_hash_map["2024.1"]="7c27d759993a184bb7782fa9af0b3b7a92de5d32"
-commit_hash_map["2024.2"]="a3f9984cdcf687d1cd960b3b6270a097516de3b5"
+commit_hash_map["2024.1"]="a0729c69dba1ec05856d3008fbf9994a665f276c"
+commit_hash_map["2024.2"]="d8cf77af92e92324b038d787773b78fb7a44f812"
 
 
 function set_up_xrt_vars {
@@ -431,8 +406,8 @@ function set_up_xrt_vars {
     xrt_build_script_run="build/build.sh -noert"
     xrt_build_release_dir="build/Release"
     xrt_setup_script_path="${xrt_path}/setup.sh"
-    xrt_branch="${VIVADO_TOOL_VER}"
-    xrt_working_commit_hash="${commit_hash_map[${VIVADO_TOOL_VER}]}"
+    xrt_branch="${VITIS_TOOL_VER}"
+    xrt_working_commit_hash="${commit_hash_map[${VITIS_TOOL_VER}]}"
 
     return 0
 }
@@ -503,7 +478,6 @@ function pre_flight_checks {
         esac
     done
 
-    export NEEDRESTART_MODE=a
     export DEBIAN_FRONTEND="noninteractive"
 
     if ! source $script_dir/shared/bin/set_common_functions.sh; then

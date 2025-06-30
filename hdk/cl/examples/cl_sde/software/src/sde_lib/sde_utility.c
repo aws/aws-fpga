@@ -17,7 +17,6 @@
 #include <hal/fpga_common.h>
 #include <fpga_mgmt.h>
 #include <utils/log.h>
-#include <sde_enums.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <stdlib.h>
@@ -111,4 +110,29 @@ double sde_get_curr_time() {
   struct timeval curr_time;
   gettimeofday(&curr_time, NULL);
   return((double) curr_time.tv_sec + ((double) curr_time.tv_usec / 1e6));
+}
+
+void print_timing(double start_time, double end_time, int pkt_size, size_t num_packets, enum SDE_EXAMPLE_DIR test_direction) {
+  double total_run_time = (end_time - start_time);
+  double mpps = (((double)num_packets)/1e6) / total_run_time;
+  double bw = (((double) num_packets * (double) pkt_size)/1e9)/total_run_time ;
+
+  char* str_direction;
+  switch (test_direction) {
+    case SDE_EXAMPLE_DIR_C2H:
+      str_direction = "c2h";
+      break;
+    case SDE_EXAMPLE_DIR_H2C:
+      str_direction = "h2c";
+      break;
+    case SDE_EXAMPLE_DIR_LOOPBACK:
+      str_direction = "loopback";
+      break;
+  }
+
+  printf ("Start Time = %.2f, Current Time = %.2f\n", start_time, end_time);
+  printf ("Total Run time: %.2f secs\n", total_run_time);
+  printf ("Total Number of Packets: %ld\n", num_packets);
+  printf ("%s_mpps: %.3f MPPS\n", str_direction, mpps);
+  printf ("%s BW: %.3f GB/s\n", str_direction, bw);
 }

@@ -42,7 +42,7 @@ Table of Contents
   sdk/README
   vitis/README
 
-  developer-resources/DCV.rst
+  developer-resources/Amazon-DCV-Setup-Guide.rst
 
   ERRATA
   RELEASE-NOTES

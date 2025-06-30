@@ -1,6 +1,17 @@
 F2 Developer Kit Release Notes
 ==============================
 
+.. _v211:
+
+v2.1.1
+------
+
+- Added global register offset for the SDE IP. See `CL_SDE software examples <./hdk/cl/examples/cl-sde/software/src/README.html>`__.
+- Added `CL_SDE software exmaple <https://github.com/aws/aws-fpga/blob/f2/hdk/cl/examples/cl_sde/software/src/sde_c2h_user_buffers.c>`__ for a user allocated DMA buffer.
+- `Documentation <./hdk/docs/List-AFI-on-Marketplace.html>`__` to assist F2 customers with releasing AFIs and AMIs on the AWS Marketplace.
+- `Documentation <./developer-resources/Amazon-DCV-Setup-Guide.html>`__ to assist in creating a virtual desktop based on the FPGA Developer AMI running graphics-intensive applications remotely on Amazon EC2 instances.
+- Fixed the BW calculation and tolerance calculation in the test_hbm_perf_random in the `cl_mem_perf <./hdk/cl/examples/cl-mem-perf/verif/README.html#test-hbm-perf-randomsv-mem>`__.
+
 .. _v210:
 
 v2.1.0

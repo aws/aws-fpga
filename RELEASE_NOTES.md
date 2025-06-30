@@ -1,5 +1,13 @@
 # F2 Developer Kit Release Notes
 
+## v2.1.1
+
+* Added global register offset for the SDE IP. See [CL_SDE software examples](./hdk/cl/examples/cl_sde/software/src/README.md).
+* Added [CL_SDE software exmaple](./hdk/cl/examples/cl_sde/software/src/sde_c2h_user_buffers.c) for a user allocated DMA buffer.
+* [Documentation](./hdk/docs/List_AFI_on_Marketplace.md) to assist F2 customers with releasing AFIs and AMIs on the AWS Marketplace.
+* [Documentation](./developer_resources/Amazon_DCV_Setup_Guide.md) to assist in creating a virtual desktop based on the FPGA Developer AMI running graphics-intensive applications remotely on Amazon EC2 instances.
+* Fixed the BW calculation and tolerance calculation in the test_hbm_perf_random in the [cl_mem_perf](./hdk/cl/examples/cl_mem_perf/verif/README.md#test_hbm_perf_randomsv).
+
 ## v2.1.0
 
 * Support for Vivado and Vitis 2024.2 tools.

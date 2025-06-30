@@ -271,3 +271,5 @@ GiB
 TiB
 uncomment
 github
+Startup
+popups

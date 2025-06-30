@@ -114,9 +114,6 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     # Remove then load igb_uio.ko
     cmd_exec("rmmod ./build/kernel/linux/igb_uio/igb_uio.ko >/dev/null 2>&1", False)
 
-    # set to permissive (Alma is default enabled, Ubuntu is default disable)
-    if distro.id() == "almalinux" :
-        cmd_exec("setenforce 0")
     cmd_exec("insmod ./build/kernel/linux/igb_uio/igb_uio.ko")
 
     # Bind the FPGA to to DPDK

@@ -112,7 +112,7 @@ int sde_mem_init(struct sde_mem* mem, enum SDE_BUFFER_LAYOUT c2h_layout, enum SD
   mem->c2h_layout = c2h_layout;
   mem->c2h_num_buffers = 0;
 
-  if (direction != SDE_EXAMPLE_DIR_H2C) {
+  if (direction != SDE_EXAMPLE_DIR_H2C && c2h_layout != SDE_BUFFER_USER_MANAGED) {
     ret = dma_buffer_init(c2h_layout, pkt_size, &mem->c2h_buffers, &mem->c2h_num_buffers);
     fail_on(ret, err, "dma_buffer_init c2h failed");
   }
@@ -120,7 +120,7 @@ int sde_mem_init(struct sde_mem* mem, enum SDE_BUFFER_LAYOUT c2h_layout, enum SD
   mem->h2c_layout = h2c_layout;
   mem->h2c_num_buffers = 0;
 
-  if (direction != SDE_EXAMPLE_DIR_C2H) {
+  if (direction != SDE_EXAMPLE_DIR_C2H && h2c_layout != SDE_BUFFER_USER_MANAGED) {
     ret = dma_buffer_init(h2c_layout, pkt_size, &mem->h2c_buffers, &mem->h2c_num_buffers);
     fail_on(ret, err, "dma_buffer_init h2c failed");
   }

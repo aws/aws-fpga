@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <sde_enums.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -106,3 +107,15 @@ int sde_parse_args(int argc, char **argv, struct sde_parameters* params, const c
 //
 //=============================================================================================================
 double sde_get_curr_time(void);
+
+//============================================================================================================
+//
+// print_timing() : Prints the elapsed time and bandwidth in MPPS and GB/s.
+// double start_time : The beginning of the test after configuration is complete.
+// double end_time : The end of the test after transfers are complete.
+// int pkt_size : The number of bytes transferred with each packet.
+// size_t num_packets : The number of packets transferred.
+// enum SDE_EXAMPLE_DIR direction : The direction of the example (c2h, h2c, loopback).
+//
+//=============================================================================================================
+void print_timing(double start_time, double end_time, int pkt_size, size_t num_packets, enum SDE_EXAMPLE_DIR direction);

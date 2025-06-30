@@ -51,7 +51,7 @@ struct sde_mgmt {
 #define SDE_SLOT_MAX 8
 static struct sde_mgmt priv_sde_mgmt[SDE_SLOT_MAX];
 
-int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_size) {
+int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_size, enum SDE_BUFFER_LAYOUT layout) {
   int ret = 0;
 
   fail_on_with_code(slot_id >= SDE_SLOT_MAX, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "slot_id %d is out of range", slot_id);
@@ -61,7 +61,7 @@ int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_siz
 
   sde_mgmt->direction = direction;
 
-  ret = sde_mem_init(&sde_mgmt->mem, SDE_BUFFER_LAYOUT_MULTI /*c2h_layout*/, SDE_BUFFER_LAYOUT_MULTI /*h2c_layout*/, sde_mgmt->direction, packet_size);
+  ret = sde_mem_init(&sde_mgmt->mem, layout, layout, sde_mgmt->direction, packet_size);
   fail_on(ret, err, "failed to init mem");
 
   ret = sde_hw_init(&sde_mgmt->hw_ctrl, slot_id);
@@ -74,7 +74,7 @@ int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_siz
 
   sde_mgmt->c2h_status = (struct c2h_status*)c2h_status_va;
 
-  ret = sde_dma_buffer_init(&sde_mgmt->c2h_buffer, SDE_BUFFER_LAYOUT_SINGLE, SDE_SUBSYSTEM_C2H, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
+  ret = sde_dma_buffer_init(&sde_mgmt->c2h_buffer, layout, SDE_SUBSYSTEM_C2H, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
   fail_on(ret, err, "failed to init c2h_buffer");
 
   uint64_t h2c_status_va;
@@ -84,7 +84,7 @@ int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_siz
 
   sde_mgmt->h2c_status = (struct h2c_status*) h2c_status_va;
 
-  ret = sde_dma_buffer_init(&sde_mgmt->h2c_buffer, SDE_BUFFER_LAYOUT_SINGLE, SDE_SUBSYSTEM_H2C, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
+  ret = sde_dma_buffer_init(&sde_mgmt->h2c_buffer, layout, SDE_SUBSYSTEM_H2C, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
   fail_on(ret, err, "failed to init h2c_buffer");
 
   uint64_t md_ring_va;
@@ -103,7 +103,7 @@ err:
 int sde_mgmt_init_and_cfg(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_size) {
   int ret = 0;
 
-  ret = sde_mgmt_init(slot_id, direction, packet_size);
+  ret = sde_mgmt_init(slot_id, direction, packet_size, SDE_BUFFER_LAYOUT_MULTI);
   fail_on(ret, err, "failed to init sde_mgmt");
 
   ret = sde_mgmt_reset(slot_id);
@@ -182,6 +182,28 @@ int sde_mgmt_check_status(int slot_id, enum SDE_SUBSYSTEM subsystem) {
   fail_on_with_code(desc_error, err, ret, SDE_STATUS_COUNTER_ERROR, "desc_error");
   fail_on_with_code(datamover_error, err, ret, SDE_STATUS_COUNTER_ERROR, "dm_error");
   fail_on_with_code(writeback_error, err, ret, SDE_STATUS_COUNTER_ERROR, "wb_error");
+
+err:
+  return ret;
+}
+
+int sde_mgmt_set_dma_buffers(int slot_id, enum SDE_SUBSYSTEM subsystem, struct sde_buffer* sde_buffers, size_t num_buffers) {
+  int ret = 0;
+
+  fail_on_with_code(slot_id >= SDE_SLOT_MAX, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "slot_id %d is out of range", slot_id);
+  fail_on_with_code(num_buffers > SDE_NUM_DESC, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "num_buffers %ld is out of range", num_buffers);
+  fail_on_with_code(num_buffers == 0, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "num_buffers is 0");
+  fail_on_with_code(sde_buffers == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "sde_buffers is NULL");
+
+  struct sde_mgmt *sde_mgmt = &priv_sde_mgmt[slot_id];
+
+  if (subsystem == SDE_SUBSYSTEM_C2H) {
+    ret = sde_dma_buffer_set_dma_buffers(&sde_mgmt->c2h_buffer, sde_buffers, num_buffers);
+    fail_on(ret, err, "failed to set c2h descriptors");
+  } else if (subsystem == SDE_SUBSYSTEM_H2C) {
+    ret = sde_dma_buffer_set_dma_buffers(&sde_mgmt->h2c_buffer, sde_buffers, num_buffers);
+    fail_on(ret, err, "failed to set h2c descriptors");
+  }
 
 err:
   return ret;
@@ -356,8 +378,12 @@ err:
   return ret;
 }
 
-static int sde_mgmt_read_md(struct sde_mgmt* sde_mgmt, struct sde_md* md) {
+int sde_mgmt_read_md(int slot_id, struct sde_md* md) {
   int ret = 0;
+  fail_on_with_code(slot_id >= SDE_SLOT_MAX, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "slot_id %d is out of range", slot_id);
+  fail_on_with_code(md == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "md is NULL");
+
+  struct sde_mgmt *sde_mgmt = &priv_sde_mgmt[slot_id];
 
   bool done = 0;
   size_t iters = 0;
@@ -401,7 +427,7 @@ int sde_mgmt_read_data(int slot_id, void *data, size_t size) {
   size_t iter = 0;
   size_t data_to_read = 0;
   while (data_read < size) {
-    ret = sde_mgmt_read_md(sde_mgmt, &md);
+    ret = sde_mgmt_read_md(slot_id, &md);
     fail_on(ret, err, "failed to read md");
 
     data_to_read = md.length < (size - data_read) ? md.length : (size - data_read);

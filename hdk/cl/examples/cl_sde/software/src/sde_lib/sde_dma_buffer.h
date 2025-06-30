@@ -30,7 +30,6 @@
 struct sde_dma_buffer {
   enum SDE_BUFFER_LAYOUT layout;
   enum SDE_SUBSYSTEM subsystem;
-  struct sde_mem* mem;
   struct sde_hw_ctrl* ctrl;
 
   uint64_t desc_va;
@@ -51,6 +50,7 @@ struct sde_dma_buffer {
 int sde_dma_buffer_init(struct sde_dma_buffer* dma_buffer, enum SDE_BUFFER_LAYOUT layout, enum SDE_SUBSYSTEM subsystem, size_t pkt_size, struct sde_mem* mem, struct sde_hw_ctrl* ctrl);
 int sde_dma_buffer_close(struct sde_dma_buffer* dma_buffer);
 
+int sde_dma_buffer_set_dma_buffers(struct sde_dma_buffer* dma_buffer, struct sde_buffer* sde_buffers, size_t num_buffers);
 int sde_dma_init_desc_buffer(struct sde_dma_buffer* dma_buffer);
 int sde_dma_post_desc(struct sde_dma_buffer* dma_buffer, size_t* num_desc);
 int sde_dma_read_data(struct sde_dma_buffer* dma_buffer, void* data, size_t size);

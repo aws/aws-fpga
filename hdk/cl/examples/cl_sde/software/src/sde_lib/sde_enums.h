@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 enum SDE_EXAMPLE_DIR {
   SDE_EXAMPLE_DIR_C2H,
   SDE_EXAMPLE_DIR_H2C,
@@ -23,7 +25,8 @@ enum SDE_EXAMPLE_DIR {
 
 enum SDE_BUFFER_LAYOUT {
     SDE_BUFFER_LAYOUT_SINGLE,
-    SDE_BUFFER_LAYOUT_MULTI
+    SDE_BUFFER_LAYOUT_MULTI,
+    SDE_BUFFER_USER_MANAGED,
 };
 
 enum SDE_SUBSYSTEM {
@@ -37,6 +40,13 @@ enum SDE_ERROR {
   SDE_STATUS_COUNTER_ERROR = 0x1002,
   SDE_DESC_LIMIT_TIMEOUT = 0x1003,
   SDE_METADATA_VALID_TIMEOUT = 0x1004,
+};
+
+struct sde_buffer {
+  uint64_t data_va;
+  uint64_t data_pa;
+  uint32_t length;
+  uint32_t alloc_length;
 };
 
 #define SDE_ERR2STR(error) \

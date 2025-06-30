@@ -70,6 +70,7 @@ General Documentation
   hdk/docs/AWS-Shell-ERRATA
   hdk/docs/AWS-Shell-Interface-Specification
   hdk/docs/Clock-Recipes-User-Guide
+  hdk/docs/List-AFI-on-Marketplace
   hdk/docs/on-premise-licensing-help
   hdk/docs/RTL-Simulation-Guide-for-HDK-Design-Flow
   hdk/docs/shell-floorplan

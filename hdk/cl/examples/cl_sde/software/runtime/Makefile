@@ -30,14 +30,17 @@ STATS_PERIOD = 0
 INCLUDES=-I$(SDE_LIB_DIR) -I$(SDK_USERSPACE_DIR)/include -I$(SDK_USERSPACE_DIR)/fpga_libs/fpga_mgmt
 LDFLAGS = -L$(SDK_USERSPACE_DIR)/lib/so
 LDLIBS = -lfpga_mgmt
-OPT=-DFPGA_ALLOW_NON_ROOT -DCONFIG_LOGLEVEL=1
+# Global offsets are available if your design has an offset register set compared to the original CL_SDE example.
+GLOBAL_SDE_OFFSET=-DGLOBAL_SDE_OFFSET=0x0
+GLOBAL_ATG_OFFSET=-DGLOBAL_ATG_OFFSET=0x0
+OPT=-DFPGA_ALLOW_NON_ROOT -DCONFIG_LOGLEVEL=1 $(GLOBAL_SDE_OFFSET) $(GLOBAL_ATG_OFFSET)
 CFLAGS=$(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 SRC=$(SDE_LIB_DIR)/sde_hw_ctrl.c $(SDE_LIB_DIR)/sde_dma_buffer.c $(SDE_LIB_DIR)/sde_mgmt.c $(SDE_LIB_DIR)/sde_utility.c $(SDE_LIB_DIR)/sde_mem.c
-SDE_EXAMPLES = sde_c2h_perf_test sde_h2c_perf_test sde_c2h_simple sde_h2c_simple sde_loopback_simple
+SDE_EXAMPLES = sde_c2h_perf_test sde_h2c_perf_test sde_c2h_simple sde_h2c_simple sde_loopback_simple sde_c2h_user_buffers
 
 .PHONY: all clean
 
-all: check_env ve_install sde_examples ve_run 
+all: check_env ve_install sde_examples ve_run
 
 ve_install: check_env
 	$(APP_SCRIPTS_DIR)/virtual_ethernet_install.py $(APP_INSTALL_DIR)
@@ -72,4 +75,7 @@ sde_h2c_simple: $(SDE_EXAMPLE_DIR)/sde_h2c_simple.c $(SRC) check_env
 	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
 
 sde_loopback_simple: $(SDE_EXAMPLE_DIR)/sde_loopback_simple.c $(SRC) check_env
+	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+
+sde_c2h_user_buffers: $(SDE_EXAMPLE_DIR)/sde_c2h_user_buffers.c $(SRC) check_env
 	gcc $< $(SRC) -o $@ -mavx2 $(LDFLAGS) $(LDLIBS) $(CFLAGS)

@@ -22,14 +22,6 @@
 #include <stdint.h>
 #include <sde_enums.h>
 #include <stddef.h>
-#include <sde_enums.h>
-
-struct sde_buffer {
-  uint64_t data_va;
-  uint64_t data_pa;
-  uint32_t length;
-  uint32_t alloc_length;
-};
 
 struct sde_writeback_mem {
   uint64_t memory_va;
