@@ -74,6 +74,8 @@ Additional SDK Documentation
 
    userspace/fpga_mgmt_examples/README
 
+   userspace/cython-bindings/README
+
    userspace/fpga_mgmt_tools/README
    docs/F2-Software-Performance-Optimization-Guide
    docs/Load-Times

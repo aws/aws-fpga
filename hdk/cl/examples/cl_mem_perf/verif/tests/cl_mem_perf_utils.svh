@@ -164,10 +164,13 @@ task print_cl_hbm_perf_kernel_bandwidth_performance(logic [31:0] selected_channe
    logic [63:0] wr_cyc_count, wr_timer;
    logic [63:0] rd_cyc_count, rd_timer;
 
+   $display("Reading selected channels %d", $countones(selected_channels));
+   $display("Reading axlen %x", axlen);
+
    $display("Reading WR_CYC_CNT");
    tb.peek_ocl(.addr(`WR_CYC_CNT_LO_REG), .data(wr_cyc_count[31:0]));
    tb.peek_ocl(.addr(`WR_CYC_CNT_HI_REG), .data(wr_cyc_count[63:32]));
-   $display("WR_CYC_CNT value = 0x%x", wr_cyc_count);
+   $display("WR_CYC_CNT value = %d", wr_cyc_count);
 
    $display("Reading WR_TIMER");
    tb.peek_ocl(.addr(`WR_TIMER_LO_REG), .data(wr_timer[31:0]));
@@ -177,7 +180,7 @@ task print_cl_hbm_perf_kernel_bandwidth_performance(logic [31:0] selected_channe
    $display("Reading RD_CYC_CNT");
    tb.peek_ocl(.addr(`RD_CYC_CNT_LO_REG), .data(rd_cyc_count[31:0]));
    tb.peek_ocl(.addr(`RD_CYC_CNT_HI_REG), .data(rd_cyc_count[63:32]));
-   $display("RD_CYC_CNT value = 0x%x", rd_cyc_count);
+   $display("RD_CYC_CNT value = %d", rd_cyc_count);
 
    $display("Reading RD_TIMER");
    tb.peek_ocl(.addr(`RD_TIMER_LO_REG), .data(rd_timer[31:0]));
@@ -200,8 +203,11 @@ task print_cl_hbm_perf_kernel_bandwidth_performance(logic [31:0] selected_channe
    // Adjust by number of used channels
    // Adjust by axlen , wraddr overhead cycles
    // 0.90 toleraance
-   expected_wr_bandwidth = 0.90 * (450.0 * (axlen/ (axlen+1)) * ($countones(selected_channels) / 32.0));
-   expected_rd_bandwidth = 0.90 * (350.0 * ($countones(selected_channels) / 32.0));
+   expected_wr_bandwidth = 0.95 * (450.0 * (axlen+1)/(axlen+2)) * ($countones(selected_channels) / 32.0);
+   expected_rd_bandwidth = 0.95 * (350.0 * (axlen+1)/(axlen+2)) * ($countones(selected_channels) / 32.0);
+
+   $display("Exp Write BW = %-0.2f GB/s", expected_wr_bandwidth);
+   $display("Exp Read BW  = %-0.2f GB/s", expected_rd_bandwidth);
 
    if (wr_bw < expected_wr_bandwidth) begin
       $error("Write Bandwidth of %3.1f is below %3.1f GB/s", wr_bw, expected_wr_bandwidth);

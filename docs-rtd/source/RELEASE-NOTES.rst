@@ -1,6 +1,18 @@
 F2 Developer Kit Release Notes
 ==============================
 
+.. _v212:
+
+v2.1.2
+------
+
+- Introduced Python Bindings to the SDK
+- Added `documentation <./sdk/userspace/cython-bindings/README.html>` for Python binding usage and setup
+- `Examples <https://github.com/aws/aws-fpga/blob/f2/sdk/userspace/cython_bindings>` demonstrating Python-based FPGA control
+- Added link to instructions for DCV licensing setup. Credit to @morgnza for this update!
+- Added verbiage to DCV setup guide to show where to set virtual display resolution
+- Fix to Bandwidth Calculation
+
 .. _v211:
 
 v2.1.1

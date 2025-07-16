@@ -174,11 +174,13 @@ function sha256_check {
 function get_sha_file {
     missing_sha="${missing_xsa}.sha256"
     sha_path="${destination_dir}/${missing_sha}"
-    if [ ! -e "${sha_path}" ]; then
-        if ! sudo wget "${vitis_xsa_s3_url}/${missing_sha}" -O "${sha_path}" -q; then
-            err_msg "Download of Vitis XSA SHA256 file ${missing_sha} failed!"
-            return 1
-        fi
+    if [ -e "${sha_path}" ]; then
+        rm $sha_path
+    fi
+
+    if ! sudo wget "${vitis_xsa_s3_url}/${missing_sha}" -O "${sha_path}" -q; then
+        err_msg "Download of Vitis XSA SHA256 file ${missing_sha} failed!"
+        return 1
     fi
 
     xsa_path="${destination_dir}/${missing_xsa}"
@@ -201,7 +203,8 @@ function get_xsa_file {
 
     # Remove the old XSA
     missing_xsa_file_extension="${missing_xsa##*.}"
-    sudo rm -f "${destination_dir}/*.${missing_xsa_file_extension}"
+    sudo rm -f ${destination_dir}/*${missing_xsa_file_extension}
+    sudo rm -f ${destination_dir}/*${missing_xsa_file_extension}.sha256
 
     # Grab the new XSA
     if ! sudo wget "${vitis_xsa_s3_url}/${missing_xsa}" -O "${destination_dir}/${missing_xsa}"  -q; then
@@ -250,8 +253,10 @@ xsa_map["2024.2"]="202420_1"
 function setup_xsa {
 
     info_msg "Installing supporting libraries"
-    sudo $XILINX_VITIS/scripts/installLibs.sh >>/dev/null
-    rm installLibs.sh_*
+    if [[ -z $(lsmod | grep xocl) ]]; then
+        sudo $XILINX_VITIS/scripts/installLibs.sh >>/dev/null
+        rm installLibs.sh_*
+    fi
 
     # Get XSA for right tool version
     xsa_for_tool_ver="${xsa_map[${VITIS_TOOL_VER}]}"

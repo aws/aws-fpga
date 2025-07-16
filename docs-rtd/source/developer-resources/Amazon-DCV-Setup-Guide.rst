@@ -49,16 +49,17 @@ Installing the Amazon DCV Server on an Amazon EC2 Instance
 Prerequisites
 ~~~~~~~~~~~~~
 
-1. `Depenency
+1. `Instance and IAM Configuration for DCV Licensing <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#dcv-lic-req>`__
+2. `Depenency
    Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui>`__
 
    - ⚠️ DO NOT PERFORM STEP 3! Upgrading may impact the stability of
      development kit software!
 
-2. `Protocol
+3. `Protocol
    Setup <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-wayland>`__
-3. `Driver
-   Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu>`__
+4. `Driver
+   Installation and Setting Virtual Display Resolution <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu>`__
 
 Amazon DCV Server Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,9 +151,6 @@ Checks <#post-installation-checks>`__ in the ``Password`` box and click
 
 At this point, you should see your session begin and a virtual desktop
 displayed after a brief delay.
-
-Any popups about not having a license may be safely ignored. This is a
-known issue with DCV.
 
 Now, open a terminal and run the following command:
 ``source /etc/profile.d/default_module.sh``. You're now ready to use

@@ -32,3 +32,22 @@ Early release of the AFI management tools may return uninformative errors or une
 The `fpga-describe-local-image` API is currently asynchronous which will require polling with `fpga-describe-local-image` until the expected image appears. If the describe call does not provide the expected response, attempt the `fpga-load-local-image` one more time. Attempting to load images that are not compatible with the currently loaded shell will fail and may not return an informative error message. Please verify the design was built with the shell that is loaded on the instance.
 
 Please reach out to the AWS FPGA team with any instability issues so we can help as soon as possible.
+
+## Additional SDK Documentation
+
+* [Virtual Ethernet](./apps/virtual-ethernet/README.md)
+
+* [Virtual Ethernet SDE HW Guide](./apps/virtual-ethernet/doc/SDE_HW_Guide.md)
+
+* [Virtual Ethernet Application Guide](./apps/virtual-ethernet/doc/Virtual_Ethernet_Application_Guide.md)
+
+* [FPGA Management Examples](./userspace/fpga_mgmt_examples/README.md)
+
+* [Python Bindings](./userspace/cython_bindings/README.md)
+
+* [FPGA Management Tools](./userspace/fpga_mgmt_tools/README.md)
+
+* [F2 Software Performance Optimization Guide](./docs/F2_Software_Performance_Optimization_Guide.md)
+
+* [Load-Times](./docs/Load_Times.md)
+

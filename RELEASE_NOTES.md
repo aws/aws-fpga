@@ -1,5 +1,14 @@
 # F2 Developer Kit Release Notes
 
+## v2.1.2
+
+* Introduced Python Bindings to the SDK
+* Added [documentation](./sdk/userspace/cython_bindings/README.md) for Python binding usage and setup
+* [Examples](./sdk/userspace/cython_bindings/) demonstrating Python-based FPGA control
+* Added link to instructions for DCV licensing setup. Credit to @morgnza for this update!
+* Added verbiage to DCV setup guide to show where to set virtual display resolution
+* Fix to Bandwidth Calculation
+
 ## v2.1.1
 
 * Added global register offset for the SDE IP. See [CL_SDE software examples](./hdk/cl/examples/cl_sde/software/src/README.md).

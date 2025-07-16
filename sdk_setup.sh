@@ -55,6 +55,15 @@ if ! bash $SDK_DIR/sdk_install.sh; then
     return 1
 fi
 
+cd sdk/userspace/cython_bindings
+sudo apt install -y python3-venv python3-pip
+python3 -m venv venv
+source venv/bin/activate
+pip install setuptools Cython
+python3 setup.py build_ext --inplace
+deactivate
+echo "Cython bindings setup complete!"
+
 cd $current_dir
 info_msg "$script_name PASSED"
 

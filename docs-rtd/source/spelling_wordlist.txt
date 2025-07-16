@@ -270,6 +270,9 @@ MiB
 GiB
 TiB
 uncomment
+Cython
+PCI
 github
 Startup
 popups
+morgnza

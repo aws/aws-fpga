@@ -31,10 +31,11 @@ graphical user interface (GUI) to visualize FPGA development in the cloud.
 
 ### Prerequisites
 
-1. [Depenency Installation](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui)
-    * :warning: DO NOT PERFORM STEP 3! Upgrading may impact the stability of development kit software!
-2. [Protocol Setup](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-wayland)
-3. [Driver Installation](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu)
+1. [Instance and IAM Configuration for DCV Licensing](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#dcv-lic-req)
+2. [Depenency Installation](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui)
+    - :warning: DO NOT PERFORM STEP 3! Upgrading may impact the stability of development kit software!
+3. [Protocol Setup](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-wayland)
+4. [Driver Installation and Setting Virtual Display Resolution](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu)
 
 ### Amazon DCV Server Installation
 

@@ -24,7 +24,9 @@ waves.shm
 *.order
 *.symvers
 .vscode/
-
+venv
+*_wrapper.c
+fpga_utils.c
 *~
 .\#*
 \#*
