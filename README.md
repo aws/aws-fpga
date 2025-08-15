@@ -1,5 +1,10 @@
 ⚠️ <b>NOTE:</b> The AWS FPGA Developer AMI based on CentOS or Amazon Linux 2 (AL2) is no longer supported. Please use the AWS-provided [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 
+⚠️ <b>NOTE:</b> AWS will no longer accept new AFI creation requests for Vivado versions older than **2024.1** after **2025/09/19**.
+Please use **Vivado 2024.1** to create designs for F1. 
+To provide customers with additional time to migrate to 2024.1,
+we will extend support for Vivado 2020.2 & 2021.2 until **2025/10/31**.
+
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
@@ -28,6 +33,7 @@ AWS EC2 FPGA Development Kit is a set of development and runtime tools to develo
 It is distributed between this github repository and FPGA Developer AMI - [(Ubuntu)](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) provided by AWS with no cost of development tools.
 
 ⚠️ <b>NOTE:</b> FPGA Developer Kit AMI with CentOS or Amazon Linux 2 (AL2) is no longer supported
+
 ⚠️ <b>NOTE:</b> The developer kit is supported for Linux operating systems only.
 
 ## Developer Support
@@ -78,7 +84,7 @@ AWS marketplace offers multiple versions of the FPGA Developer AMI. The followin
 ⚠️ Developer kit release v1.4.16 will remove support for Xilinx 2017.4, 2018.2, 2018.3 toolsets. While developer kit release v1.4.16 onwards will not support older Xilinx tools, you can still use them using HDK releases v1.4.15b or earlier.
 Please check out [the latest v1.4.15b release tag from Github](https://github.com/aws/aws-fpga/releases/tag/v1.4.15b) to use Xilinx 2017.4, 2018.2, 2018.3 toolsets.
 
-For deprecation notices, please check the [End of life announces](./README.md#end-of-life-announcements)
+For deprecation notices, please check the [End of life Announcements](./README.md#end-of-life-announcements)
 
 For software-defined development please look at the runtime compatibility table based on the Xilinx toolset in use:
 [SDAccel](SDAccel/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table) or [Vitis](Vitis/docs/Create_Runtime_AMI.md#runtime-ami-compatibility-table)
@@ -90,6 +96,7 @@ For software-defined development please look at the runtime compatibility table 
 | 2017.1 | 🚫 Deprecated on 09/01/2018 | Developer kit versions prior to v1.3.7 and Developer AMI prior to v1.4 (2017.1) [reached end-of-life](https://forums.aws.amazon.com/ann.jspa?annID=6068).                 |
 | 2017.4 | 🚫 Deprecated on 12/31/2021 | [Support for Xilinx 2017.4 toolsets was deprecated on 12/31/2021](https://forums.aws.amazon.com/ann.jspa?annID=8949). |
 | 2020.1 and below | Discontinued on 02/2022 | Removed the ability for customers to newly subscribe to 2020.1 and below AMI versions to remove exposure to [CVE-2021-44228](https://www.cve.org/CVERecord?id=CVE-2021-44228) as these versions of tools do not have patches from xilinx |
+| 2023.x and below | Discontinued 2025/09/19 | End-of-life for Vivado versions older than 2024.1. Support shall be extended for Vivado 2020.2 & 2021.2, until **2025/10/31** |
 
 ## Hardware Development Kit (HDK)
 
