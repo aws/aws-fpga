@@ -1,5 +1,10 @@
 ⚠️ <b>NOTE:</b> The AWS FPGA Developer AMI based on CentOS or Amazon Linux 2 (AL2) is no longer supported. Please use the AWS-provided [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 
+⚠️ <b>NOTE:</b> AWS will no longer accept new AFI creation requests for Vivado versions older than **2024.1** after **2025/10/17**.
+Please use **Vivado 2024.1** to create designs for F1. 
+To provide customers with additional time to migrate to 2024.1,
+we will extend support for Vivado 2020.2 & 2021.2 until **2025/11/30**.
+
 # Small Shell
 This branch provides a Small Shell which is 30% smaller in size than the F1.X.1.4 Shell. Small Shell F1.S.1.0 occupies only 14 Clock Regions worth of real estate in the FPGA: 10 Clock Regions in Middle SLR, and 4 Clock Regions in Bottom SLR. Smaller physical footprint of the Shell F1.S.1.0 increases the available resources to the CL. This feature is available in Shell [F1.S.1.0](./hdk/common/shell_v04182104) provided in this developer kit.
 
