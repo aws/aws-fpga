@@ -1,6 +1,6 @@
 ⚠️ <b>NOTE:</b> The AWS FPGA Developer AMI based on CentOS or Amazon Linux 2 (AL2) is no longer supported. Please use the AWS-provided [Ubuntu FPGA Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u)
 
-⚠️ <b>NOTE:</b> AWS will no longer accept new AFI creation requests for Vivado versions older than **2024.1** after **2025/10/178**.
+⚠️ <b>NOTE:</b> AWS will no longer accept new AFI creation requests for Vivado versions older than **2024.1** after **2025/10/17**.
 Please use **Vivado 2024.1** to create designs for F1. 
 To provide customers with additional time to migrate to 2024.1,
 we will extend support for Vivado 2020.2 & 2021.2 until **2025/11/30**.
