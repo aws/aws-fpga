@@ -1,1 +1,0 @@
-../../../../../common/shell_stable/hlx/build/scripts/aws_build_dcp_from_cl_hlx_rtl.sh
