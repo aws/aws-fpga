@@ -20,13 +20,9 @@ Table of Content
 Introduction
 ------------
 
-F2 Shell offers two clocks - ``clk_main_a0`` and ``clk_hbm_ref`` to the
-CL. This is different from F1 Shell, which offers total of 8 clocks from
-Shell to the CL as described in `F1 Shell Interface
-Spec <./AWS-Shell-Interface-Specification.html#clocks>`__.
-Offering fewer clocks from the Shell to CL is beneficial because it does
-not lock up the routing resources for customers who do not require all
-the clocks from the Shell.
+F2 Shell offers two clocks - ``clk_main_a0`` and ``clk_hbm_ref`` - to the CL
+compared to the 8 clocks offered in F1 Shell. Fewer clocks to the CL helps
+avoid routing congestion and free up more resources for customer usage.
 
 The ``clk_main_a0`` defaults to 250MHz. Dynamic reconfiguration of the
 frequency for ``clk_main_a0`` is currently NOT supported. However, this
@@ -320,11 +316,5 @@ Clock Consideration When Porting CL Designs from F1 into F2
 
 3. F2 supports same clock recipe build switches as F1 to simplify
    porting of F1 designs into F2.
-
-References
-----------
-
-`F1 Dynamic Clock
-Configuration <https://github.com/aws/aws-fpga/blob/master/hdk/docs/dynamic_clock_config.md>`__
 
 `Back to HDK README <../README.html>`__

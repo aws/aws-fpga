@@ -21,24 +21,13 @@ Table of Contents
 Introduction
 ------------
 
-F1 Shell provides eight clocks to the CL and supports multiple `clock
-recipes <https://github.com/aws/aws-fpga/blob/master/hdk/docs/clock_recipes.csv>`__
-to choose from at the time of CL builds. It also allows to scale clock
-frequencies during runtime (or after AFI/bitstream is loaded into FPGA)
-using
-`dynamic_clock_config <https://github.com/aws/aws-fpga/blob/master/hdk/docs/dynamic_clock_config.md>`__.
-While this architecture provides multiple clock choices for customer
-designs, it locks up the global clock routing resources in the CL
-region. This can pose limitations for customers who do not require all
-the clocks provided from Shell to the CL.
-
-Therefore, F2 Shell provides only two clocks - ``clk_main_a0`` and
-``clk_hbm_ref`` - to the CL resulting in efficient use of global routing
-resources. The ``clk_main_a0`` is currently a fixed frequency 250MHz
-clock (❗ dynamic scaling of frequency as F1 using the SW APIs will be added
-in a future release). The ``clk_hbm_ref`` is a fixed frequency 100MHz clock
-which can be used by customer as a reference clock for their MMCMs. This scheme
-provides flexibility for customers to devise their own clocking mechanisms with
+F2 Shell provides two clocks - ``clk_main_a0`` and ``clk_hbm_ref`` - to the CL,
+enabling more efficient use of global routing resources compared to F1. The
+``clk_main_a0 is`` currently a fixed frequency 250MHz clock (❗️ dynamic
+frequency scaling as in F1 using the SW APIs will be added in a future release).
+The ``clk_hbm_ref`` is a fixed frequency 100MHz clock which can be used by
+customers as a reference clock for their MMCMs. This scheme provides
+flexibility for customers to devise their own clocking mechanisms with the
 desired number of clocks.
 
 In order to provide F1’s clock recipes in F2, as well as support Vitis
