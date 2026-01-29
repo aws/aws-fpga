@@ -1,1 +1,0 @@
-../../../../../common/shell_stable/build/scripts/build_all.tcl

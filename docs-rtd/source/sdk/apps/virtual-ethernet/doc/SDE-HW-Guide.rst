@@ -2589,12 +2589,10 @@ of write pointer plus 1 is equal to the read pointer.
    write pointer value to determine how many valid metadata entries are
    present in the circular buffer.
 
-.. _data-flow-model:
+.. _data_flow_model:
 
 Data Flow Model
 ---------------
-
-.. _c2h-sde:
 
 C2H
 ~~~
@@ -2645,8 +2643,6 @@ C2H
     available before posting the descriptor, metadata pointers can be
     disabled and the software is not required to update SDE’s copy of
     the read pointer.
-
-.. _h2c-sde:
 
 H2C
 ~~~
