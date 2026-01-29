@@ -22,7 +22,9 @@ The following examples are not currently supported by AMD:
 
 The following examples are currently under development by AMD:
 
-* `performance/axi_burst_performance`
+* `rtl_kernels/rtl_streaming_free_running_k2k`
+* `rtl_kernels/rtl_streaming_k2k_mm`
+* `rtl_kernels/rtl_vadd_hw_debug`
 
 ## Hardware Emulation
 

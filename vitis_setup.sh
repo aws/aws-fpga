@@ -73,8 +73,6 @@ valid_tool_versions["2025.1"]="true"
 
 declare -A valid_os
 valid_os["Ubuntu"]="true"
-valid_os["RockyLinux"]="true"
-
 
 function check_os_and_tool_ver {
     if [[ "${valid_tool_versions[${VITIS_TOOL_VER}]}" != "true" ]]; then
@@ -214,7 +212,7 @@ function get_xsa_file {
     sudo rm -f ${destination_dir}/*${missing_xsa_file_extension}.sha256
 
     # Grab the new XSA
-    if ! sudo wget "${vitis_xsa_s3_url}/${missing_xsa}" -O "${destination_dir}/${missing_xsa}" -q; then
+    if ! sudo wget "${vitis_xsa_s3_url}/${missing_xsa}" -O "${destination_dir}/${missing_xsa}"  -q; then
         err_msg "Download of Vitis XSA file ${missing_xsa} failed!"
         return 1
     fi
@@ -303,7 +301,6 @@ function setup_xsa {
 
 }
 
-
 function xrt_install_check {
 
     xrt_path=/opt/xilinx/xrt
@@ -325,15 +322,9 @@ function xrt_install_check {
 
 declare -A xrt_install_map
 xrt_install_map["Ubuntu_pkg_ext"]="deb"
-xrt_install_map["Ubuntu_install_cmd"]="sudo apt install -y"
+xrt_install_map["Ubuntu_install_cmd"]="sudo dpkg -i"
 xrt_install_map["Ubuntu_xrt_pkg_prefix"]="amd64-xrt"
 xrt_install_map["Ubuntu_aws_pkg_prefix"]="amd64-aws"
-
-xrt_install_map["RockyLinux_pkg_ext"]="rpm"
-xrt_install_map["RockyLinux_install_cmd"]="sudo dnf install -y"
-xrt_install_map["RockyLinux_xrt_pkg_prefix"]="x86_64-xrt"
-xrt_install_map["RockyLinux_aws_pkg_prefix"]="x86_64-aws"
-
 
 function build_and_install_xrt {
     if ! sudo -E "./${xrt_deps_script_path}"; then
@@ -342,7 +333,7 @@ function build_and_install_xrt {
     fi
 
     if ! ./$xrt_build_script_run; then
-        err_msg "Couldn't build XRT packages!"
+        err_msg "Couldn't build XRT dpkgs!"
         cd $AWS_FPGA_REPO_DIR && return 1
     fi
 
@@ -356,13 +347,13 @@ function build_and_install_xrt {
     # Base XRT install first
     for file in $(ls *${xrt_pkg_prefix}.${install_pkg_ext}); do
         info_msg "Installing $file"
-        $install_cmd ./$file
+        $install_cmd $file
     done
 
     # AWS extension install
     for file in $(ls *${aws_pkg_prefix}.${install_pkg_ext}); do
         info_msg "Installing $file"
-        $install_cmd ./$file
+        $install_cmd $file
     done
 
     if ! source $xrt_setup_script_path; then
@@ -404,7 +395,7 @@ function set_up_xrt_repo {
 declare -A commit_hash_map
 commit_hash_map["2024.1"]="a0729c69dba1ec05856d3008fbf9994a665f276c"
 commit_hash_map["2024.2"]="d8cf77af92e92324b038d787773b78fb7a44f812"
-commit_hash_map["2025.1"]="db8c37afa751589e72f0c47436bf3daca444d45d"
+commit_hash_map["2025.1"]="fe6f99daac071f3973b20ce6d0d5457df76ada34"
 
 
 function set_up_xrt_vars {
@@ -414,7 +405,7 @@ function set_up_xrt_vars {
     fi
 
     xrt_path="/opt/xilinx/xrt"
-    xrt_pkg_install_path="${xrt_path}/XRT/build/Release"
+    xrt_dpkg_install_path="${xrt_path}/XRT/build/Release"
 
     xrt_repo_name="XRT"
     xrt_repo_url="https://github.com/Xilinx/XRT.git"
