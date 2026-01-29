@@ -224,6 +224,15 @@ if { [info exists ::env(VIVADO_TOOL_VERSION)] } {
     exit
 }
 
+# FireSim: Read desired host frequency from environment (set by aws_build_dcp_from_cl.py)
+if { [info exists ::env(DESIRED_HOST_FREQUENCY)] } {
+    set desired_host_frequency $::env(DESIRED_HOST_FREQUENCY)
+    print "Using DESIRED_HOST_FREQUENCY from environment: $desired_host_frequency MHz"
+} else {
+    set desired_host_frequency 75
+    print "WARNING: DESIRED_HOST_FREQUENCY not set, using default 75 MHz"
+}
+
 
 ###############################################################################
 # Implementation Flow

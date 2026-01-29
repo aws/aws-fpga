@@ -115,4 +115,10 @@ Software defined Accelerator Development (Vitis)
 
 3. Support for Vitis software emulation has been deprecated by AMD, therefore, no longer supported.
 
+Amazon DCV
+----------
+
+1. Amazon DCV does not support Rocky Linux 8.10 at this time.
+
+
 `Back to Home <./index.html>`__

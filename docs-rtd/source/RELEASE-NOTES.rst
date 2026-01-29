@@ -1,6 +1,17 @@
 F2 Developer Kit Release Notes
 ==============================
 
+v2.2.1
+------
+
+- `Release of FPGA Developer AMI 1.18.0 (Rocky Linux 8.10) <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__ with Vivado/Vitis 2025.1 tools pre-installed
+- `Release of Vivado HLx flow <./User-Guide-AWS-EC2-FPGA-Development-Kit.html#development-environments>`__
+- Fixed TCL glob expression to properly read both .sv and .v files. Credit to @pyz-creeper and @dsw for this update!
+- Updated error codes in create-fpga-image for unsupported design logic
+- Updated the Virtual Ethernet Application to write the DMA buffer descriptors using the byte alignment required by the CL_SDE example, preventing data alignment errors on Rocky
+- `Added Amazon FPGA Image (AFI) creation Python script <./hdk/README.html#step-6-submit-generated-dcp-for-afi-creation>`__
+- Updated XRT version which includes stability fixes for Vitis
+
 .. _v220:
 
 v2.2.0

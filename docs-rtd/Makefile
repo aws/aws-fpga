@@ -154,7 +154,16 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 spelling:
-	$(SPHINXBUILD) -b spelling source/ build/
+	$(SPHINXBUILD) -b spelling source/ build/ && \
+	echo "Spelling check complete" >&2 && \
+	if [ -n "$$(find build -name "*.spelling" 2>/dev/null)" ]; then \
+		find build -name "*.spelling" -exec cat {} \; | \
+			sed 's/^\(.*\.rst\):\([0-9]*\): (\([^)]*\)).*/- \3 (in \1, line \2)/' | \
+			sort | uniq >&2 && \
+			echo "Spelling errors found. Total misspelled words: $$(find build -name "*.spelling" -exec cat {} \; | wc -l)" >&2; \
+	else \
+		echo "No spelling errors found." >&2; \
+	fi
 
 links:
 	make clean && make html && python3 ../shared/bin/check_doc_links.py

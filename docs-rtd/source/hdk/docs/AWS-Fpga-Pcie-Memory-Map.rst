@@ -78,9 +78,8 @@ this flexibility to F2 customers by advertising all the BARs in the
 shell as prefetchable. Customer applications must access BARs in a way
 supported by the customer logic (CL). For example, enabling
 write-combining on a prefetchable BAR requires a custom kernel driver or
-application to map and mark the target memory space as `write-combining
-(WC)
-memory <https://docs.kernel.org/driver-api/device-io.html#device-memory-mapping-modes>`__.
+application to map and mark the target memory space as
+`write-combining (WC) memory <https://docs.kernel.org/driver-api/device-io.html#device-memory-mapping-modes>`__.
 Additionally, applications enabling prefetching should avoid caching
 data from a memory space that contains any clear-on-read registers or
 FIFOs.

@@ -61,7 +61,7 @@ To begin debugging a CL design, the developer must first install the XVC driver 
   :warning: Developers may encounter a compilation error in some operating systems due to driver incompatibility, like this:
 
 ```bash
-/home/ubuntu/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
+/home/<ubuntu_or_rocky>/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
   306 |         xvc_dev_class = class_create(THIS_MODULE, "xil_xvc_class");
 ```
 

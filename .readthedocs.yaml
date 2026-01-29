@@ -1,9 +1,13 @@
 version: 2
 
 build:
-  os: ubuntu-20.04
+  os: ubuntu-24.04
   tools:
-    python: "3.10"
+    python: "3.12"
+    nodejs: "22"
+    rust: "1.82"
+    golang: "1.23"
+
 
 python:
   install:
@@ -11,3 +15,26 @@ python:
 
 sphinx:
   configuration: docs-rtd/source/conf.py
+  builder: html
+  fail_on_warning: true
+
+search:
+  ranking:
+    index.html: 10
+    all-links.html: 7
+    User-Guide-AWS-EC2-FPGA-Development-Kit.html: 9
+    hdk/README.html: 9
+    hdk/cl/CHECKLIST-BEFORE-BUILDING-CL.html: 8
+    hdk/cl/examples/cl-dram-hbm-dma/README.html: 8
+    hdk/cl/examples/cl-mem-perf/README.html: 8
+    hdk/cl/examples/cl-sde/README.html: 8
+    hdk/cl/examples/CL-TEMPLATE/README.html: 8
+    hdk/docs/AWS-CLI-FPGA-Commands.html: 8
+    hdk/docs/AWS-Shell-Interface-Specification.html: 8
+    hdk/docs/List-AFI-on-Marketplace.html: 8
+    sdk/README.html: 9
+    sdk/apps/msix-interrupts/README.html: 8
+    sdk/apps/virtual-ethernet/README.html: 8
+    sdk/docs/F2-Software-Performance-Optimization-Guide.html: 8
+    vitis/README.html: 9
+    developer-resources/Amazon-DCV-Setup-Guide.html: 8

@@ -27,13 +27,12 @@ print "Reading encrypted user source codes"
 
 #---- User would replace this section -----
 
-# Reading the .sv and .v files, as proper designs would not require reading
-# .vh, nor .inc files
+# # Reading the .sv and .v files, and any .vh files that require handling
 read_verilog -sv [glob ${src_post_enc_dir}/cl_sde_defines.vh]
 set_property file_type {Verilog Header} [get_files ${src_post_enc_dir}/cl_sde_defines.vh]
 set_property is_global_include true     [get_files ${src_post_enc_dir}/cl_sde_defines.vh]
 
-read_verilog -sv [glob ${src_post_enc_dir}/*.?v]
+read_verilog -sv [glob ${src_post_enc_dir}/*.{s,}v]
 
 #---- End of section replaced by User ----
 

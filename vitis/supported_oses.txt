@@ -1,2 +1,3 @@
 Ubuntu 20.04
 Ubuntu 24.04
+Rocky Linux 8.10

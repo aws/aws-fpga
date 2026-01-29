@@ -635,6 +635,8 @@ Simulations
 Please see more details on running simulations in this
 `README <./verif/README.html>`__
 
+.. _cl-mem-perf-software:
+
 Software
 --------
 

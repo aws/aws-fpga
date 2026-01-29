@@ -50,8 +50,7 @@ Prerequisites
 ~~~~~~~~~~~~~
 
 1. `Instance and IAM Configuration for DCV Licensing <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#dcv-lic-req>`__
-2. `Depenency
-   Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui>`__
+2. `Dependency Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui>`__
 
    - ⚠️ DO NOT PERFORM STEP 3! Upgrading may impact the stability of
      development kit software!

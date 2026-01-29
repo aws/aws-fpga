@@ -1,5 +1,5 @@
 
-![f2_headline_graphic](./shared/assets/f2_headline_graphic.png)
+![f2_headline_graphic](./docs-rtd/source/_static/f2_headline_graphic.png)
 
 # AWS F2
 

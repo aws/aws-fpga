@@ -39,6 +39,7 @@ fpga_utils.c
 *.a
 *.ko
 fio
+.coverage
 
 !SDAccel/aws_platform/xilinx_aws-vu9p-f1_1ddr-xpr-2pr_4_0/sw/lib/x86_64/libxilinxopencl.so
 !SDAccel/aws_platform/xilinx_aws-vu9p-f1_4ddr-xpr-2pr_4_0/sw/lib/x86_64/libxilinxopencl.so
@@ -139,3 +140,8 @@ slurm*.out
 
 # RTD Builds
 docs-rtd/build/*
+
+# HLx files
+*.tmp
+**/example_projects/
+*.pb

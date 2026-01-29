@@ -1,10 +1,10 @@
-From 179266b3f16e1cdc32bb1507dc0230ee847abae9 Mon Sep 17 00:00:00 2001
-From: <aws-fpga-support@amazon.com>
-Date: Sat, 16 Nov 2024 02:44:00 +0000
+From c373650011a291ec6dc9e45fdce1a1825e4b62ac Mon Sep 17 00:00:00 2001
+From: aws-fpga-support@amazon.com <aws-fpga-support@amazon.com>
+Date: Thu, 18 Sep 2025 19:35:38 +0000
 Subject: [PATCH] The AWS FPGA SPP (Streaming Packet Port) PMD uses the AWS SDE
-  (Streaming Data Engine) to provide packet streaming connectivity between the
-  AWS FPGA DPDK application and the AWS FPGA CL (Custom Logic). The SDE and
- the  CL communicate using the AXI-Stream interface.
+ (Streaming Data Engine) to provide packet streaming connectivity between the
+ AWS FPGA DPDK application and the AWS FPGA CL (Custom Logic). The SDE and the
+ CL communicate using the AXI-Stream interface.
 
 ---
  drivers/net/meson.build           |    4 +
@@ -15,11 +15,11 @@ Subject: [PATCH] The AWS FPGA SPP (Streaming Packet Port) PMD uses the AWS SDE
  drivers/net/spp/spp_hal.c         | 1553 +++++++++++++++++++++++++++++
  drivers/net/spp/spp_hal.h         |  183 ++++
  drivers/net/spp/spp_hal_dbg.c     |  455 +++++++++
- drivers/net/spp/spp_hal_private.h |  258 +++++
+ drivers/net/spp/spp_hal_private.h |  296 ++++++
  drivers/net/spp/spp_hal_regs.h    |  520 ++++++++++
  drivers/net/spp/spp_logs.h        |   48 +
  usertools/dpdk-devbind.py         |    5 +-
- 12 files changed, 3653 insertions(+), 1 deletion(-)
+ 12 files changed, 3691 insertions(+), 1 deletion(-)
  create mode 100644 drivers/net/spp/meson.build
  create mode 100644 drivers/net/spp/spp.h
  create mode 100644 drivers/net/spp/spp_defs.h
@@ -2913,10 +2913,10 @@ index 0000000000..0f9f4e5c12
 +#endif  /* SPP_DBG_SW_LOOPBACK */
 diff --git a/drivers/net/spp/spp_hal_private.h b/drivers/net/spp/spp_hal_private.h
 new file mode 100644
-index 0000000000..c361019ca8
+index 0000000000..93700ee348
 --- /dev/null
 +++ b/drivers/net/spp/spp_hal_private.h
-@@ -0,0 +1,258 @@
+@@ -0,0 +1,296 @@
 +/*
 + * Copyright 2015-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 + *
@@ -2941,8 +2941,36 @@ index 0000000000..c361019ca8
 +extern "C" {
 +#endif
 +
++static inline void
++spp_unaligned_memcpy(void *dst, const void *src, size_t len)
++{
++	size_t num_32bit_writes = len / 4; /* 4 bytes per write */
++	for (size_t i = 0; i < num_32bit_writes; i++) {
++		uint32_t source = *((const uint32_t *)src + i);
++		rte_write32_relaxed(source, dst);
++	}
++}
++
 +#if !defined(SPP_DBG_SW_LOOPBACK)
 +#if defined(SPP_USE_AVX2)
++
++static inline void
++spp_16byte_aligned_memcpy(void *dst, const void *src)
++{
++	__m128i xmm0;
++
++	xmm0 = _mm_loadu_si128((const __m128i *)src);
++	_mm_storeu_si128((__m128i *)dst, xmm0);
++}
++
++static inline void
++spp_32byte_aligned_memcpy(void *dst, const void *src)
++{
++		__m256i ymm0;
++
++		ymm0 = _mm256_load_si256((const __m256i *)src);
++		_mm256_store_si256((__m256i *)dst, ymm0);
++}
 +
 +#if defined(SPP_USE_COMPACT_DESCS)
 +/* Non-debug FastPath */
@@ -2959,10 +2987,12 @@ index 0000000000..c361019ca8
 +static inline void
 +spp_rx_desc_memcpy(void *dst, const void *src)
 +{
-+	__m128i xmm0;
-+
-+	xmm0 = _mm_loadu_si128((const __m128i *)src);
-+	_mm_storeu_si128((__m128i *)dst, xmm0);
++	bool pointers_aligned = (((uint64_t)dst & 0xF) == 0) && (((uint64_t)src & 0xF) == 0);
++	if (pointers_aligned) {
++		spp_16byte_aligned_memcpy(dst, src);
++	} else {
++		spp_unaligned_memcpy(dst, src, 16 /* len */);
++	}
 +}
 +
 +/**
@@ -2972,10 +3002,12 @@ index 0000000000..c361019ca8
 +static inline void
 +spp_tx_desc_memcpy(void *dst, const void *src)
 +{
-+	__m128i xmm0;
-+
-+	xmm0 = _mm_loadu_si128((const __m128i *)src);
-+	_mm_storeu_si128((__m128i *)dst, xmm0);
++	bool pointers_aligned = (((uint64_t)dst & 0xF) == 0) && (((uint64_t)src & 0xF) == 0);
++	if (pointers_aligned) {
++		spp_16byte_aligned_memcpy(dst, src);
++	} else {
++		spp_unaligned_memcpy(dst, src, 16 /* len */);
++	}
 +}
 +#else
 +/* Non-debug FastPath */
@@ -2995,10 +3027,12 @@ index 0000000000..c361019ca8
 +static inline void
 +spp_rx_desc_memcpy(void *dst, const void *src)
 +{
-+	__m128i xmm0;
-+
-+	xmm0 = _mm_loadu_si128((const __m128i *)src);
-+	_mm_storeu_si128((__m128i *)dst, xmm0);
++	bool pointers_aligned = (((uint64_t)dst & 0xF) == 0) && (((uint64_t)src & 0xF) == 0);
++	if (pointers_aligned) {
++		spp_16byte_aligned_memcpy(dst, src);
++	} else {
++		spp_unaligned_memcpy(dst, src, 16 /* len */);
++	}
 +}
 +
 +/**
@@ -3008,11 +3042,14 @@ index 0000000000..c361019ca8
 +static inline void
 +spp_tx_desc_memcpy(void *dst, const void *src)
 +{
-+	__m256i ymm0;
-+
-+	ymm0 = _mm256_loadu_si256((const __m256i *)src);
-+	_mm256_storeu_si256((__m256i *)dst, ymm0);
++	bool pointers_aligned = (((uint64_t)dst & 0x1F) == 0) && (((uint64_t)src & 0x1F) == 0);
++	if (pointers_aligned) {
++		spp_32byte_aligned_memcpy(dst, src);
++	} else {
++		spp_unaligned_memcpy(dst, src, 32 /* len */);
++	}
 +}
++
 +#endif
 +
 +#else /* !SPP_USE_AVX2 */
@@ -3175,6 +3212,7 @@ index 0000000000..c361019ca8
 +#endif
 +
 +#endif
++
 diff --git a/drivers/net/spp/spp_hal_regs.h b/drivers/net/spp/spp_hal_regs.h
 new file mode 100644
 index 0000000000..efe8e240b4
@@ -3779,5 +3817,4 @@ index a278f5e7f3..1e757d5990 100755
  crypto_devices = [encryption_class, intel_processor_class]
  dma_devices = [cnxk_dma, hisilicon_dma,
 --
-2.40.1
-
+2.43.7

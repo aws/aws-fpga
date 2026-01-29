@@ -6,4 +6,7 @@
     path = hdk/common/ip
     url = https://github.com/aws/aws-fpga-resources.git
     ignore = dirty
-	branch = Vivado_2025.1-hdk/common/ip
+[submodule "hdk/common/shell_stable/hlx"]
+    path = hdk/common/shell_stable/hlx
+    url = https://github.com/aws/aws-fpga-resources.git
+    ignore = dirty

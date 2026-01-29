@@ -38,7 +38,7 @@ GLOBAL_SDE_OFFSET := -DGLOBAL_SDE_OFFSET=0x0
 GLOBAL_ATG_OFFSET := -DGLOBAL_ATG_OFFSET=0x0
 
 OPT := -DFPGA_ALLOW_NON_ROOT -DCONFIG_LOGLEVEL=1 $(GLOBAL_SDE_OFFSET) $(GLOBAL_ATG_OFFSET)
-LIB_CFLAGS := $(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES) -fvisibility=hidden -mavx2 -MMD -MP
+LIB_CFLAGS := $(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES) -fvisibility=hidden -mavx2 -MMD -MP -fPIC
 EXAMPLE_CFLAGS := $(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
 SRCS := $(wildcard $(SDE_SRC_DIR)/*.c)
 SDE_EXAMPLES := sde_c2h_perf_test sde_h2c_perf_test sde_c2h_simple sde_h2c_simple sde_loopback_simple sde_c2h_user_buffers sde_loopback_perf_test
@@ -86,7 +86,7 @@ install_sde_lib: $(SDELIB_SO)
 
 $(SDELIB_SO): $(OBJS)
 	mkdir -p $(SDE_LIB_SO_DIR)
-	$(CC) -o $(SDELIB_SO) $(LIBCFLAGS) -shared $(OBJS) -Wl,-soname,libsde.so.1
+	$(CC) -o $(SDELIB_SO) $(LIB_CFLAGS) -shared $(OBJS) -Wl,-soname,libsde.so.1
 
 $(SDE_SRC_DIR)/%.o: $(SDE_SRC_DIR)/%.c
 	$(CC) $(LIB_CFLAGS) -c $< -o $@

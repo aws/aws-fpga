@@ -1,0 +1,7 @@
+build/constraints/cl_clocks_aws.xdc
+build/reports/
+build/scripts/.Xil/
+build/scripts/*.vivado.log
+build/scripts/hd_visual/
+build/scripts/last_log
+verif/sim/

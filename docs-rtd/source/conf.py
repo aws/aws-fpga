@@ -28,48 +28,54 @@ import sys
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
 extensions = [
-    'sphinx_sitemap',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.imgmath',
-    'sphinx.ext.extlinks',
-    'sphinxcontrib.spelling',
-    'sphinx_copybutton',
-    'sphinx_book_theme',
+    "sphinx_sitemap",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.imgmath",
+    "sphinx.ext.extlinks",
+    "sphinxcontrib.spelling",
+    "sphinx_copybutton",
+    "sphinx_book_theme",
 ]
 
 # Makes the spelling filters visible.
-sys.path.insert(0, os.path.abspath('./spelling_filters'))
+sys.path.insert(0, os.path.abspath("./spelling_filters"))
 from hex_filter import HexFilter
 from ordinal_filter import OrdinalFilter
 from rtl_hex_filter import RTLHexFilter
+from username_filter import UsernameFilter
 
 spelling_ignore_acronyms = True
-spelling_filters = ['hex_filter.HexFilter', 'rtl_hex_filter.RTLHexFilter', 'ordinal_filter.OrdinalFilter']
+spelling_filters = [
+    "hex_filter.HexFilter",
+    "rtl_hex_filter.RTLHexFilter",
+    "ordinal_filter.OrdinalFilter",
+    "username_filter.UsernameFilter",
+]
 
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-author = 'the AWS F2 Team'
-project = 'AWS F2'
-copyright = '2024-2025, Amazon, Inc'
+author = "the AWS F2 Team"
+project = "AWS F2"
+copyright = "2024-2025, Amazon, Inc"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -112,7 +118,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -124,30 +130,30 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 # html_theme_options = {}
 
-html_baseurl = 'https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/'
+html_baseurl = "https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/"
 
-sitemap_filename = 'sitemap.xml'
+sitemap_filename = "sitemap.xml"
 
 html_context = {
     # ...
-    'default_mode': 'light',
-    'author': 'the AWS F2 Team',
+    "default_mode": "light",
+    "author": "the AWS F2 Team",
 }
 
 html_theme_options = {
-    'repository_url': 'https://github.com/aws/aws-fpga',
-    'use_issues_button': True,
-    'use_repository_button': True,
-    'use_download_button': True,
-    'use_fullscreen_button': True,
-    'use_edit_page_button': True,
-    'repository_branch': 'f2',
+    "repository_url": "https://github.com/aws/aws-fpga",
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button": True,
+    "use_fullscreen_button": True,
+    "use_edit_page_button": True,
+    "repository_branch": "f2",
     # "navbar_persistent": [],
 }
 
@@ -158,7 +164,7 @@ html_theme_options = {
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 # NOTE: This guy controls the little title header on the left side of the page with the search bar, etc.
-html_title = 'AWS F2 Documentation'
+html_title = "AWS F2 Documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
@@ -175,8 +181,8 @@ html_title = 'AWS F2 Documentation'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
-html_css_files = ['css/custom.css']
+html_static_path = ["_static"]
+html_css_files = ["css/custom.css"]
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
@@ -219,7 +225,7 @@ html_css_files = ['css/custom.css']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'F2doc'
+htmlhelp_basename = "F2doc"
 
 # Don't copy prompts in code blocks
 copybutton_prompt_text = "$ "

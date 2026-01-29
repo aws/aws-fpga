@@ -25,15 +25,15 @@ This documentation is relevant to F2 only. Therefore, it applies to all branches
 
 ### Instance Types
 
-![f2_instances](./shared/assets/instance_sizes_20250110.png)
+![f2_instances](./docs-rtd/source/_static/instance_sizes.png)
 
 ### 2nd Generation On-Cloud FPGA Accelerator Card
 
-![f2_instances](./shared/assets/accel_card_specs_20250110.png)
+![accel_card_specs](./docs-rtd/source/_static/accel_card_specs.png)
 
 ### Comparison to F1
 
-![f2_f1_comp](./shared/assets/f2_f1_comp_20250110.png)
+![f2_f1_comp](./docs-rtd/source/_static/f2_f1_comp.png)
 
 ## AWS EC2 F2 FPGA Development Kit
 
@@ -43,10 +43,11 @@ This table lists the F2 development flows currently enabled and supported in the
 
 | Development Environment | Description | Accelerator Language | Hardware Interface | Debug Options | Typical Developer |
 | ------------------------|-------------|----------------------|--------------------|---------------|-------------------|
-| Hardware accelerator development using Vivado (HDK) | This environment supports the Hardware Development Kit (HDK) design flow, which empowers FPGA developers to create accelerator designs from scratch, using HDL source code and IPs. <br><br>The AMD Vivado tool synthesizes, implements, and generates the Design Check Point (DCP) file used in F2 AFI creation. AWS FPGA developers benefit from the suite of scripts supplied in the HDK that help to automate different design steps. This allows for flexibility in architecting, implementing, and optimizing accelerator designs while using the HDK.| Verilog/SystemVerilog/VHDL | User-implemented DMA engine or Streaming Data Engine (SDE) | Simulation | Hardware developers with advanced FPGA experience |
+| Hardware accelerator development using Vivado (HDK) | This environment supports the Hardware Development Kit (HDK) design flow, which empowers FPGA developers to create accelerator designs from scratch, using HDL source code and IPs. <br><br>The AMD Vivado tool synthesizes, implements, and generates the Design Check Point (DCP) file used in F2 AFI creation. AWS FPGA developers benefit from the suite of scripts supplied in the HDK that help to automate different design steps. This allows for flexibility in architecting, implementing, and optimizing accelerator designs while using the HDK.| Verilog/SystemVerilog/VHDL | User-implemented DMA engine or Streaming Data Engine (SDE) | Simulation, Virtual JTAG | Hardware developers with advanced FPGA experience |
 | Hardware accelerator development using Vitis | This environment supports the Vitis design flow, which enables software developers to write C++ code, which may then be compiled into RTL and used in cycle-accurate hardware simulation. After it may then be built into an accelerator design. This step is not necessary, but is encouraged. Vitis may also be used to implement accelerator designs from scratch, using HDL and IPs directly, similar to Vivado. Vitis offers additional analysis tools to aid in the refinement of designs. | Verilog/System Verilog/VHDL | XDMA Engine (coming soon) | Hardware Emulation | Advanced software developers or hardware developers with intermediate to advanced FPGA experience |
+| Hardware accelerator development using Vivado IP Integrator (IPI) and High Level Design (HLx) | This environment supports the Vivado high-level design flow using IP integrator in the GUI. | Block Design in IP Integrator | AWS IP for HLx | Simulation, Virtual JTAG | Hardware developers with intermediate FPGA experience |
 
-On-premise environment: Customers can set up a on-premise development environment. See the [supported AMD tool versions here.](#hardware-development-kit-hdk) Refer to this guide [here](./hdk/docs/on_premise_licensing_help.md) for licensing requirements.
+On-premise environment: Customers can set up a [on-premise development (with licensing requirements listed)](./hdk/docs/on_premise_licensing_help.md) environment for [supported AMD tool versions.](#hardware-development-kit-hdk).
 
 ### Quick Start Links
 
@@ -116,12 +117,48 @@ On-premise environment: Customers can set up a on-premise development environmen
     <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/vadd.cpp">Design Source</a></td>
   </tr>
   <tr>
-    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp#L92">Testbench</a></td>
+    <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp">Testbench</a></td>
   </tr>
   <tr>
     <td style="text-align: center"><a href="https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp">Runtime Software</a></td>
   </tr>
-
+  <tr>
+    <td style="text-align: center" rowspan="9">HLx</td>
+    <td style="text-align: center" rowspan="3"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/hello_world_hlx">hello_world_hlx</a></td>
+    <td style="text-align: center" rowspan="3">Demonstrates simple register peek and poke using GPIO and VLED</td>
+    <td style="text-align: center" rowspan="3"><a href="./hdk/docs/IPI-GUI-Vivado-Setup.md">Vivado IPI Setup Guide</a></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/hello_world_hlx/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world/verif">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world/software">Runtime Software</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="3"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/hello_world_mb_hlx">hello_world_mb_hlx</a></td>
+    <td style="text-align: center" rowspan="3">Demonstrates integrating MicroBlaze soft processor in HLx design</td>
+    <td style="text-align: center" rowspan="3"></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/hello_world_mb_hlx/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world_mb/verif">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world_mb/software">Runtime Software</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center" rowspan="3"><a href="https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_ipi_cdma_test_hlx">cl_ipi_cdma_test_hlx</a></td>
+    <td style="text-align: center" rowspan="3">Demonstrates direct memory access to the DDR and HBM in AWS IP</td>
+    <td style="text-align: center" rowspan="3"></td>
+    <td style="text-align: center"><a href="./hdk/cl/examples/cl_ipi_cdma_test_hlx/README.md">Design Spec</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/cl_ipi_cdma_test/verif">Testbench</a></td>
+  </tr>
+  <tr>
+    <td style="text-align: center"><a href="https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/cl_ipi_cdma_test/software">Runtime Software</a></td>
+  </tr>
 </table>
 
 ### AWS Shells
@@ -178,8 +215,9 @@ To get started, please see the [README for a hello world accelerator example](./
 
 A free-to-use FPGA developer AMI is available for on-cloud F2 development with AMD tools pre-installed on a variety of AWS EC2 instance types. Customers can use this AMI to design, simulate, and build their designs. The table below lists the FPGA Developer AMI(s) currently released to customers:
 
-| FPGA Developer AMI Version | FPGA Developer AMI ID | Vivado/Vitis Version Supported | Operating System Version    |
-|----------------------------|-----------------------|--------------------------------|-----------------------------|
+| FPGA Developer AMI Version | FPGA Developer AMI ID (us-east-1) | Vivado/Vitis Version Supported | Operating System Version    |
+|----------------------------|-----------------------------------|--------------------------------|-----------------------------|
+| 1.18.0                     | [ami-04b57de2833b499b1](http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu) | 2025.1 | Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)|
 | 1.18.0                     | [ami-098b2ed4c92602975](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq) | 2025.1 | Ubuntu 24.04 (kernel 6.8.0-1021-aws)|
 | 1.16.1                     | [ami-092fc5deb8f3c0f7d](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
 
@@ -193,13 +231,15 @@ If you have never used AWS before, we recommend you start with [AWS getting star
 
 ## Next Steps
 
-Before you create your own AWS FPGA design, we recommend that you go through the [step-by-step quickstart guide for customer hardware development](./hdk/README.md).
+Once developers are familiar with the F2 development kit and the HDK development environment, we recommend exploring all the design features and examples offered in the AWS EC2 FPGA Development Kit:
 
-Once developers are familiar with the F2 development kit and the HDK development environment, we recommend exploring the following contents to master all the design features and examples offered in the AWS EC2 FPGA Development Kit:
+1. **Get Started**: Follow the [step-by-step quickstart guide for customer hardware development](./hdk/README.md) before creating your own AWS FPGA design
+2. **Learn by Example**: Explore [CL examples](./hdk/README.md#cl-examples) to understand shell-to-CL connectivity, memory interfaces (DDR & HBM), and the [CL clock generation block](./hdk/docs/AWS_CLK_GEN_spec.md)
 
-- [Run RTL simulations](./hdk/docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) provided in CL examples to learn the design verification setup in the HDK development environment.
-- Familiarize with the [AWS F2 Shell-CL interfaces](./hdk/docs/AWS_Shell_Interface_Specification.md), e.g. [the HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md/#hbm-monitor-interface)
-- Familiarize with the [shell floorplan](./hdk/docs/shell_floorplan.md) and locations of major shell interfaces.
-- Deep dive into [CL examples](./hdk/README.md#cl-examples) to explore shell-to-CL connectivity, CL resources e.g. DDR and HBM, and features e.g. [CL clock generation block](./hdk/docs/AWS_CLK_GEN_spec.md).
-- Create a custom CL design using the [CL_TEMPLATE](./hdk/cl/examples/CL_TEMPLATE/README.md) example.
-- Connect to a custom CL design in FPGA through [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) to run hardware debug.
+    - [Run RTL simulations](./hdk/docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) for design verification of existing CL examples.
+    - Review the [AWS F2 Shell-CL interfaces](./hdk/docs/AWS_Shell_Interface_Specification.md), e.g. [the HBM monitor interface](./hdk/docs/AWS_Shell_Interface_Specification.md#hbm-monitor-interface)
+
+3. **Create Your Design**: Use the [CL_TEMPLATE](./hdk/cl/examples/CL_TEMPLATE/README.md) example as a starting point
+
+    - Review the [shell floorplan](./hdk/docs/shell_floorplan.md) and locations of major shell interfaces.
+    - Connect to debug cores within a custom FPGA CL design through the [Virtual JTAG](./hdk/docs/Virtual_JTAG_XVC.md) interface to debug hardware issues.

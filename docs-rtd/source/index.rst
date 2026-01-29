@@ -29,6 +29,9 @@ If you are new to AWS EC2 FPGA-accelerated instances, we recommend you read this
    * - `Vitis (Software-Defined) <./vitis/README.html>`__
      - Software developers with C/C++ or RTL experience
      - Vitis HLS/RTL/Hardware Emulation
+   * - `HLx <./hdk/docs/IPI-GUI-Vivado-Setup.html>`__
+     - Developers with Block Design experience
+     - Vivado IP Integrator
 
 Table of Contents
 -----------------
@@ -43,6 +46,7 @@ Table of Contents
   vitis/README
 
   developer-resources/Amazon-DCV-Setup-Guide.rst
+  hdk/docs/IPI-GUI-Vivado-Setup
 
   ERRATA
 

@@ -64,7 +64,7 @@ Instance Types
 Second-Generation On-Cloud FPGA Accelerator Card
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|image1|
+|accel_card_specs|
 
 .. _comparison-to-f1:
 
@@ -76,7 +76,7 @@ Comparison to F1
 AWS EC2 F2 FPGA Development Kit
 -------------------------------
 
-.. _development-environments-user-guide:
+.. _development-environments:
 
 Development Environments
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -106,7 +106,7 @@ supported in the development kit.
       using the HDK.
     - Verilog/System Verilog/VHDL
     - User-implemented DMA engine or Streaming Data Engine (SDE)
-    - Simulation
+    - Simulation and Virtual JTAG
     - Hardware developers with advanced FPGA experience
   * - Hardware accelerator development using Vitis
     - This environment supports the Vitis design flow,
@@ -124,6 +124,14 @@ supported in the development kit.
     - Hardware Emulation
     - Advanced software developers or hardware developers
       with intermediate to advanced FPGA experiences
+  * - Hardware accelerator development using Vivado IP Integrator (IPI) and
+      High Level Design (HLx)
+    - This environment supports the Vivado high-level design flow using IP
+      integrator in the GUI.
+    - Block Design in IP Integrator
+    - AWS IP for HLx
+    - Simulation and Virtual JTAG
+    - Hardware developers with intermediate FPGA experience
 
 On-premise environment: Customers can set up a on-premise development
 environment. See the `supported AMD tool versions here. <#hardware-development-kit-hdk>`__ Refer to
@@ -218,13 +226,57 @@ Quick Start Links
      -
      -
      -
-     - `Testbench <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp#L92>`__
+     - `Testbench <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp>`__
    * -
      -
      -
      -
      - `Runtime Software <https://github.com/Xilinx/Vitis_Accel_Examples/blob/main/hello_world/src/host.cpp>`__
-
+   * - HLx
+     - `hello_world_hlx <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_ipi_cdma_test_hlx>`__
+     - Demonstrates simple register peek and poke using GPIO and VLED
+     - `Vivado IPI Setup Guide <./hdk/docs/IPI-GUI-Vivado-Setup.html>`__
+     - `Design Spec <./hdk/cl/examples/hello-world-hlx/README.html>`__
+   * -
+     -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world/verif>`__
+   * -
+     -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world/software>`__
+   * -
+     - `hello_world_mb_hlx <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/hello_world_mb_hlx>`__
+     - Demonstrates integrating MicroBlaze soft processor in HLx design
+     -
+     - `Design Spec <./hdk/cl/examples/hello-world-mb-hlx/README.html>`__
+   * -
+     -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world_mb/verif>`__
+   * -
+     -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/hello_world_mb/software>`__
+   * -
+     - `cl_ipi_cdma_test_hlx <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_ipi_cdma_test_hlx>`__
+     - Demonstrates direct memory access to the DDR and HBM in AWS IP
+     -
+     - `Design Spec <./hdk/cl/examples/cl-ipi-cdma-test-hlx/README.html>`__
+   * -
+     -
+     -
+     -
+     - `Testbench <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/cl_ipi_cdma_test/verif>`__
+   * -
+     -
+     -
+     -
+     - `Runtime Software <https://github.com/aws/aws-fpga-resources/tree/Hlx_1.0-hdk/common/shell_stable/hlx/hlx_examples/build/IPI/cl_ipi_cdma_test/software>`__
 
 .. _aws-shells:
 
@@ -358,6 +410,10 @@ currently released to customers:
     - Vivado/Vitis Version Supported
     - Operating System Version
   * - 1.18.0
+    - `ami-04b57de2833b499b1 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
+    - 2025.1
+    - Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)
+  * - 1.18.0
     - `ami-098b2ed4c92602975 <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
     - 2025.1
     - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
@@ -369,10 +425,10 @@ currently released to customers:
 Given the large size of the FPGA used for F2, AMD tools work best with
 at least 4 vCPU’s and 32GiB Memory. We recommend `Compute Optimized and
 Memory Optimized instance
-types <https://aws.amazon.com/ec2/instance-types/#Compute_Optimized>`__ to successfully
+types <https://aws.amazon.com/ec2/instance-types/compute-optimized/>`__ to successfully
 run the synthesis of acceleration code. Developers may start coding and
 run simulations on low-cost `General Purpose instances
-types <https://aws.amazon.com/ec2/instance-types/#General_Purpose>`__.
+types <https://aws.amazon.com/ec2/instance-types/general-purpose/>`__.
 
 Note that the tools used by the HDK are only supported on x86-based EC2
 instances (Graviton-based instances are not compatible with the tools).
@@ -422,8 +478,8 @@ FPGA Development Kit:
 - Connect to a custom CL design in FPGA through `Virtual
   JTAG <./hdk/docs/Virtual-JTAG-XVC.html>`__ to run hardware debug.
 
-.. |f2_instances| image:: ./_static/instance_sizes_20250110.png
-.. |image1| image:: ./_static/accel_card_specs_20250110.png
-.. |f2_f1_comp| image:: ./_static/f2_f1_comp_20250110.png
+.. |f2_instances| image:: ./_static/instance_sizes.png
+.. |accel_card_specs| image:: ./_static/accel_card_specs.png
+.. |f2_f1_comp| image:: ./_static/f2_f1_comp.png
 
 `Back to Home <./index.html>`__

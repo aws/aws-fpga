@@ -94,6 +94,8 @@ This section will walk you through the emulation process. The goal of hardware e
 
 To perform hardware emulation for the `hello_world` example, run the following commands:
 
+`NOTE: All paths shown below are identical for customers using Rocky Linux, substituting 'rocky' for 'ubuntu'`
+
 ``` bash
 cd $AWS_FPGA_REPO_DIR/vitis/examples/vitis_examples/hello_world
 ll

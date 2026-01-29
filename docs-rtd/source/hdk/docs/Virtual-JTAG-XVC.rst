@@ -95,7 +95,7 @@ guide <https://docs.amd.com/r/en-US/pg195-pcie-dma/Compiling-and-Loading-the-Dri
 
   .. code:: bash
 
-    /home/ubuntu/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
+    /home/<ubuntu_or_rocky>/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
       306 |         xvc_dev_class = class_create(THIS_MODULE, "xil_xvc_class");
 
 3. To resolve the error, update the ``xvc_pcie_driver_base.c`` file as follows:

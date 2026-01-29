@@ -72,6 +72,7 @@ function check_git_lfs {
         echo "ERROR: git-lfs is not installed" >&2
         echo "Please install git-lfs:" >&2
         echo "  For Ubuntu/Debian: sudo apt-get install git-lfs" >&2
+        echo "  For Rocky Linux/RHEL: sudo dnf install git-lfs" >&2
         return 1
     fi
 
@@ -211,7 +212,9 @@ if [ $skip_downloads -eq 0 ]; then
       return 1
     fi
     git submodule sync --recursive
-    git submodule update --init $cl_ip_path
+    # To ensure that users don't have to manually input git credentials
+    GIT_LFS_SKIP_SMUDGE=1 git submodule update --init $cl_ip_path
+    GIT_LFS_USERNAME="" GIT_LFS_PASSWORD="" git -C $cl_ip_path lfs pull
     git -C $cl_ip_path checkout $cl_ip_branch
     git -C $cl_ip_path pull origin $cl_ip_branch
 else
@@ -249,6 +252,26 @@ else
     err_msg "CL_DIR doesn't exist. Set CL_DIR to a valid directory."
     unset CL_DIR
   fi
+fi
+
+info_msg "Setting up HLx environment"
+
+hlx_path="hdk/common/shell_stable/hlx"
+hlx_branch="Hlx_1.0-$hlx_path"
+
+if [ $skip_downloads -eq 0 ]; then
+    check_git_lfs
+    if [ $? -ne 0 ]; then
+      return 1
+    fi
+    git submodule sync --recursive
+    # To ensure that users don't have to manually input git credentials
+    GIT_LFS_SKIP_SMUDGE=1 git submodule update --init $hlx_path
+    GIT_LFS_USERNAME="" GIT_LFS_PASSWORD="" git -C $hlx_path lfs pull
+    git -C $hlx_path checkout $hlx_branch
+    git -C $hlx_path pull origin $hlx_branch
+else
+    info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
 fi
 
 cd $current_dir

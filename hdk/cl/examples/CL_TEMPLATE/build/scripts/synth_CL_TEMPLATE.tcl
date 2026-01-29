@@ -28,7 +28,7 @@ print "Reading encrypted user source codes"
 
 # Reading the .sv and .v files, as proper designs would not require reading
 # .vh, nor .inc files
-read_verilog -sv [glob ${src_post_enc_dir}/*.?v]
+read_verilog -sv [glob ${src_post_enc_dir}/*.{s,}v]
 
 #---- End of section replaced by User ----
 

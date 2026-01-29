@@ -32,6 +32,11 @@ if allow_non_root ; then
        OPT="$OPT -DFPGA_ALLOW_NON_ROOT=1"
 fi
 
+# rh: chipyard headers buggin
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
+unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH
+
 #
 # gcc optimizations
 #OPT="-O3 -fno-strict-aliasing"

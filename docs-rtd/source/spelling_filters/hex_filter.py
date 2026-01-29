@@ -1,7 +1,8 @@
 from enchant.tokenize import Filter
 
+
 class HexFilter(Filter):
-    def _skip(self, word):
+    def _skip(self, word) -> bool:
         if word.startswith(("0x", "0X")):
             try:
                 int(word[2:], 16)

@@ -2,201 +2,233 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/ERRATA.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/RELEASE-NOTES.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/User-Guide-AWS-EC2-FPGA-Development-Kit.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/all-links.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/developer-resources/Amazon-DCV-Setup-Guide.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/CHECKLIST-BEFORE-BUILDING-CL.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/CL-TEMPLATE/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-dram-hbm-dma/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-dram-hbm-dma/verif/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-ipi-cdma-test-hlx/README.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-mem-perf/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-mem-perf/verif/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-sde/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-sde/software/src/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/cl-sde/verif/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/hello-world-hlx/README.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/cl/examples/hello-world-mb-hlx/README.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/AWS-CLI-FPGA-Commands.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/AWS-CLK-GEN-spec.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/AWS-Fpga-Pcie-Memory-Map.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/AWS-Shell-ERRATA.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/AWS-Shell-Interface-Specification.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/Clock-Recipes-User-Guide.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/IPI-GUI-AWS-IP.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/IPI-GUI-Examples.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/IPI-GUI-Flows.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/IPI-GUI-Vivado-Setup.html</loc>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/List-AFI-on-Marketplace.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/Supported-DDR-Modes.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/Virtual-JTAG-XVC.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/XDMA-Install.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/on-premise-licensing-help.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/hdk/docs/shell-floorplan.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/index.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/apps/msix-interrupts/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/apps/virtual-ethernet/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/apps/virtual-ethernet/doc/SDE-HW-Guide.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/apps/virtual-ethernet/doc/Virtual-Ethernet-Application-Guide.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/docs/F2-Software-Performance-Optimization-Guide.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/docs/Load-Times.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/userspace/cython-bindings/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/userspace/fpga_mgmt_examples/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>
             https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/sdk/userspace/fpga_mgmt_tools/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/vitis/ERRATA.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/vitis/README.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/genindex.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
     <url>
         <loc>https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/search.html</loc>
-        <lastmod>2025-08-18T00:00:01+00:00</lastmod>
+        <lastmod>2025-09-25T00:00:01+00:00</lastmod>
     </url>
 </urlset>

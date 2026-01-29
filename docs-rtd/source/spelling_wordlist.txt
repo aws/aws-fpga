@@ -277,3 +277,14 @@ Startup
 popups
 morgnza
 libsde
+afi
+el
+HLx
+hlx
+ipi
+mb
+cdma
+xdc
+impl
+pnr
+floorplanning

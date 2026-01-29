@@ -237,19 +237,32 @@ Error Codes
   See AWS FPGA HDK documentation for valid input format. We recommend
   using the scripts provided with AWS FPGA HDK*
 
-- ``UNKNOWN_BITSTREAM_GENERATE_ERROR`` *An error occurred generating the
-  FPGA image bitstream. If an S3 LogsStorageLocation was provided in the
-  CreateFpgaImage request, review the captured bitstream generation logs
-  saved to S3 under the FpgaImageId for this AFI.*
+- ``UNSUPPORTED_DESIGN_LOGIC`` *The FPGA image bitstream generation
+  failed during design rule validation. If an S3 LogsStorageLocation was
+  provided in the CreateFpgaImage request, review the captured bitstream
+  generation logs saved to S3 under the FpgaImageId for this AFI.
+  Examples of failures include:*
 
-  - **Note:** This is a catch-all error and could be caused due to a
-    variety of issues, for eg:
+  *1. The design validation detected unsupported primitives in the
+  customer logic. Certain FPGA primitives are restricted to maintain
+  platform stability and ensure reliable operation of customer workloads.
+  The following primitives are not supported: DNA_PORT, FRAME_ECC, MCAP,
+  ICAP_TOP, ICAP_BOT, MASTER_JTAG, DCIRESET, EFUSE_USR, USR_ACCESS,
+  STARTUP, BSCAN1, BSCAN2, BSCAN3, BSCAN4, SYSMON.* *NOTE: This
+  implementation follows the*
+  `design advisory issued by AMD <https://docs.amd.com/r/en-US/000038693>`__.
+  *Refer to it for detailed information.*
 
-    - We found a combinatorial loop in the CL design. Bitstream
-      generation logs might show errors like \`ERROR: [DRC LUTLP-1]
-      Combinatorial Loop Alert: 2 LUT cells form a combinatorial loop.
-      Combinatorial loops are not allowed in CL designs and AFI's are
-      not generated in such a case.
+  *2. We found a combinatorial loop in the CL design. Bitstream
+  generation logs might show errors like ERROR: [DRC LUTLP-1]
+  Combinatorial Loop Alert: 2 LUT cells form a combinatorial loop.
+  Combinatorial loops are not allowed in CL designs and AFIs are not
+  generated in such cases.*
+
+- ``UNKNOWN_BITSTREAM_GENERATE_ERROR`` *An unclassified error occurred
+  generating the FPGA image bitstream. If an S3 LogsStorageLocation was
+  provided in the CreateFpgaImage request, review the captured bitstream
+  generation logs saved to S3 under the FpgaImageId for this AFI.*
 
 ``delete-fpga-image``
 ---------------------

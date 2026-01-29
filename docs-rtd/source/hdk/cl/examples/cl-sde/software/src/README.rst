@@ -358,14 +358,12 @@ Data Flow Models
 Card-to-Host (C2H) Data Flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Follow the recommended `Card-to-Host data flow
-model <../../../../../../sdk/apps/virtual-ethernet/doc/SDE-HW-Guide.html#c2h>`__
+Follow the recommended `Card-to-Host data flow model <../../../../../../sdk/apps/virtual-ethernet/doc/SDE-HW-Guide.html#c2h-sde>`__
 
 Host-to-Card (H2C) Data Flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Follow the recommended `Host-to-Card data flow
-model <../../../../../../sdk/apps/virtual-ethernet/doc/SDE-HW-Guide.html#h2c>`__
+Follow the recommended `Host-to-Card data flow model <../../../../../../sdk/apps/virtual-ethernet/doc/SDE-HW-Guide.html#h2c-sde>`__
 
 Support
 -------

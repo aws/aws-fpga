@@ -161,6 +161,8 @@ command to insure that all files required for simulation are present. If
 all required files are present, you will see
 ``All required simulation files are present!``.
 
+``NOTE: All paths shown below are identical for customers using Rocky Linux, substituting 'rocky' for 'ubuntu'``
+
 .. code:: bash
 
    ubuntu@ip-aaa-bb-cc-dd:~/aws-fpga/vitis/examples/vitis_examples/hello_world$ hw_file_check
