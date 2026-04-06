@@ -41,7 +41,7 @@ pyenchant==3.2.2
     # via
     #   -r requirements.in
     #   sphinxcontrib-spelling
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   accessible-pygments
     #   pydata-sphinx-theme
