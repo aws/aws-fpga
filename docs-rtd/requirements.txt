@@ -46,7 +46,7 @@ pygments==2.19.2
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-requests==2.32.5
+requests==2.33.0
     # via
     #   sphinx
     #   sphinxcontrib-spelling
