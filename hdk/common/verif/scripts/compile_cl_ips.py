@@ -48,19 +48,11 @@ if __name__ == "__main__":
         )
 
 
-def run_cmd(cmd: list[str], working_directory: str = os.getcwd(), do_print: bool = False) -> str:
-    if working_directory is None:
-        working_directory = os.getcwd()
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, cwd=working_directory)
-    stdout = result.stdout.decode("utf-8").strip()
-    if do_print:
-        print(stdout)
-    return stdout
-
-
-def get_git_root() -> str:
-    git_root_cmd: list[str] = ["git", "rev-parse", "--show-toplevel"]
-    return run_cmd(git_root_cmd)
+def get_hdk_common_dir() -> str:
+    hdk_common_dir = os.getenv('HDK_COMMON_DIR')
+    if hdk_common_dir is None:
+        raise Exception("Environment variable HDK_COMMON_DIR not set. Please source hdk_setup.sh\n")
+    return os.path.realpath(hdk_common_dir)
 
 
 XSIM = "xsim"
@@ -72,7 +64,7 @@ class Compiler:
     orig_file_ext: str = ".orig"
     cl_dir: str = os.getenv("CL_DIR")
     default_xilinx_library_name: str = "xil_defaultlib"
-    cl_ip_sim_scripts_dir: str = f"{get_git_root()}/hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
+    cl_ip_sim_scripts_dir: str = f"{get_hdk_common_dir()}/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
     init_files: dict[str, str] = {XSIM: "xsim.ini", VCS: "synopsys_sim.setup", QUESTA: "modelsim.ini"}
 
     def __init__(self, args):
