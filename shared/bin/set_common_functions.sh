@@ -41,7 +41,7 @@ function get_tools_dst_dir {
   fi
 }
 
-export -f get_tools_dst_dir
+[[ -n "${BASH_VERSION:-}" ]] && export -f get_tools_dst_dir
 function get_tools_lib_dir {
   if [ -d "/usr/local/lib64" ]; then
     echo "/usr/local/lib64"
@@ -56,7 +56,7 @@ function get_tools_lib_dir {
     exit 1
   fi
 }
-export -f get_tools_lib_dir
+[[ -n "${BASH_VERSION:-}" ]] && export -f get_tools_lib_dir
 
 function is_myvivado_set {
     if env | grep -q ^MYVIVADO=
@@ -225,15 +225,32 @@ function extract_vivado_version() {
     local version="$1"
     [[ -z "$version" ]] && return 1
 
-    local parts=($version)
-    [[ ${#parts[@]} -lt 3 ]] && return 1
+    local remainder vivado_token tail osbits patches patches_no_underscores
 
-    local version_parts=(${parts[1]//_/ })
+    remainder="${version#* }"
+    [[ "$remainder" == "$version" ]] && return 1
 
-    EXTRACTED_VIVADO_BASEVER="${version_parts[0]}"
-    EXTRACTED_VIVADO_PATCHES="${version_parts[*]:1}"
-    EXTRACTED_VIVADO_PATCHES_NUM=$((${#version_parts[@]} - 1))
-    EXTRACTED_VIVADO_OSBITS="${parts[-1]//[()]/}"
+    vivado_token="${remainder%% *}"
+    tail="${remainder#* }"
+    [[ "$tail" == "$remainder" ]] && return 1
+
+    osbits="${tail##* }"
+
+    [[ -z "$vivado_token" || -z "$osbits" ]] && return 1
+
+    EXTRACTED_VIVADO_BASEVER="${vivado_token%%_*}"
+    patches="${vivado_token#*_}"
+
+    if [[ "$patches" == "$vivado_token" ]]; then
+        EXTRACTED_VIVADO_PATCHES=""
+        EXTRACTED_VIVADO_PATCHES_NUM=0
+    else
+        EXTRACTED_VIVADO_PATCHES="${patches//_/ }"
+        patches_no_underscores="${patches//_/}"
+        EXTRACTED_VIVADO_PATCHES_NUM=$(( ${#patches} - ${#patches_no_underscores} + 1 ))
+    fi
+
+    EXTRACTED_VIVADO_OSBITS="${osbits//[()]/}"
 
     return 0
 }
