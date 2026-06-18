@@ -1,6 +1,17 @@
 F2 Developer Kit Release Notes
 ==============================
 
+v2.3.3
+------
+
+- Migrated FPGA Developer AMI (Ubuntu) - 1.16.2 to Ubuntu 22.04 due to
+  20.04 EoL
+- Added AWS Clock Gen IP toggle/deassert reset SDK API entries, Cython
+  bindings, and updated documentation
+- Updated devkit to support Vivado/Vitis tool versions back to 2024.1
+- Updated AWS EC2 F2 RAB to use 32GiB of storage for the root volume to
+  simplify building experience
+
 v2.3.2
 ------
 

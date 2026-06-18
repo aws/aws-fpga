@@ -329,7 +329,7 @@ int aws_clkgen_get_dynamic(int slot_id, struct fpga_clkgen_info* info) {
 
     // Attach to PCIe PF/BAR
     rc = fpga_pci_attach(slot_id, AWS_CLKGEN_PF, AWS_CLKGEN_BAR, fpga_attach_flags, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", fpga_attach_flags);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
     rc = aws_clkgen_mmcm_init(pci_bar_handle);
     fail_on(rc, out, "ERROR: Failed to aws_clkgen_mmcm_init\n");
@@ -372,7 +372,7 @@ int aws_clkgen_set_recipe(int slot_id, uint32_t recipe_a, uint32_t recipe_b, uin
     }
 
     rc = fpga_pci_attach(slot_id, AWS_CLKGEN_PF, AWS_CLKGEN_BAR, fpga_attach_flags, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", fpga_attach_flags);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
     rc = aws_clkgen_mmcm_init(pci_bar_handle);
     fail_on(rc, out, "ERROR: Failed to aws_clkgen_mmcm_init\n");
@@ -421,7 +421,7 @@ int aws_clkgen_set_dynamic(int slot_id, uint32_t clk_a_freq, uint32_t clk_b_freq
 
     // Attach to PCIe PF/BAR
     rc = fpga_pci_attach(slot_id, AWS_CLKGEN_PF, AWS_CLKGEN_BAR, fpga_attach_flags, &pci_bar_handle);
-    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", fpga_attach_flags);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
     rc = aws_clkgen_mmcm_init(pci_bar_handle);
     fail_on(rc, out, "ERROR: Failed to aws_clkgen_mmcm_init\n");
@@ -445,6 +445,62 @@ int aws_clkgen_set_dynamic(int slot_id, uint32_t clk_a_freq, uint32_t clk_b_freq
     fail_on(rc, out, "aws_clkgen_set_freq(clkgen_group_hbm, ...) failed.");
 
     // De-assert all resets
+    rc = aws_clkgen_reset(pci_bar_handle, 0);
+    fail_on(rc, out, "aws_clkgen_reset(0) failed.");
+
+out:
+    if (pci_bar_handle != PCI_BAR_HANDLE_INIT) {
+      fpga_pci_detach(pci_bar_handle);
+    }
+    return rc;
+}
+
+int aws_clkgen_deassert_resets(int slot_id) {
+    int rc = 0;
+    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
+    int fpga_attach_flags = 0;
+
+    // Attach to PCIe PF/BAR
+    rc = fpga_pci_attach(slot_id, AWS_CLKGEN_PF, AWS_CLKGEN_BAR, fpga_attach_flags, &pci_bar_handle);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
+
+    rc = aws_clkgen_mmcm_init(pci_bar_handle);
+    fail_on(rc, out, "ERROR: Failed to aws_clkgen_mmcm_init\n");
+
+    rc = aws_clkgen_check_id(pci_bar_handle);
+    fail_on_with_code(rc, out, rc, FPGA_ERR_CLKGEN_NOT_FOUND, "aws_clkgen_check_id() check failed.");
+
+    // De-assert all resets (waits for MMCM lock internally)
+    rc = aws_clkgen_reset(pci_bar_handle, 0);
+    fail_on(rc, out, "aws_clkgen_reset(0) failed.");
+
+out:
+    if (pci_bar_handle != PCI_BAR_HANDLE_INIT) {
+      fpga_pci_detach(pci_bar_handle);
+    }
+    return rc;
+}
+
+int aws_clkgen_reset_toggle(int slot_id) {
+    int rc = 0;
+    pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
+    int fpga_attach_flags = 0;
+
+    // Attach to PCIe PF/BAR
+    rc = fpga_pci_attach(slot_id, AWS_CLKGEN_PF, AWS_CLKGEN_BAR, fpga_attach_flags, &pci_bar_handle);
+    fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
+
+    rc = aws_clkgen_mmcm_init(pci_bar_handle);
+    fail_on(rc, out, "ERROR: Failed to aws_clkgen_mmcm_init\n");
+
+    rc = aws_clkgen_check_id(pci_bar_handle);
+    fail_on_with_code(rc, out, rc, FPGA_ERR_CLKGEN_NOT_FOUND, "aws_clkgen_check_id() check failed.");
+
+    // Assert all resets
+    rc = aws_clkgen_reset(pci_bar_handle, 1);
+    fail_on(rc, out, "aws_clkgen_reset(1) failed.");
+
+    // De-assert all resets (waits for MMCM lock internally)
     rc = aws_clkgen_reset(pci_bar_handle, 0);
     fail_on(rc, out, "aws_clkgen_reset(0) failed.");
 

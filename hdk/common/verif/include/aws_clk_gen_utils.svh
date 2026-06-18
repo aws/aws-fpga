@@ -29,15 +29,24 @@
 
 //
 // AWS_CLK_GEN Specific Regs
-//
-`define AWS_CLKGEN_ID_REG      (`AWS_CLKGEN_BASE_REG + 64'h0)
-`define AWS_CLKGEN_VER_REG     (`AWS_CLKGEN_BASE_REG + 64'h4)
-`define AWS_CLKGEN_BLD_REG     (`AWS_CLKGEN_BASE_REG + 64'h8)
-`define AWS_CLKGEN_GRST_REG    (`AWS_CLKGEN_BASE_REG + 64'h10)
-`define AWS_CLKGEN_SYSRST_REG  (`AWS_CLKGEN_BASE_REG + 64'h14)
-`define AWS_CLKGEN_LOCK_REG    (`AWS_CLKGEN_BASE_REG + 64'h20)
+//                           
+`define AWS_CLKGEN_ID_REG           (`AWS_CLKGEN_BASE_REG + 64'h0)
+`define AWS_CLKGEN_VER_REG          (`AWS_CLKGEN_BASE_REG + 64'h4)
+`define AWS_CLKGEN_BLD_REG          (`AWS_CLKGEN_BASE_REG + 64'h8)
+`define AWS_CLKGEN_CLKS_AVAIL_REG   (`AWS_CLKGEN_BASE_REG + 64'hC)
+`define AWS_CLKGEN_GRST_REG         (`AWS_CLKGEN_BASE_REG + 64'h10)
+`define AWS_CLKGEN_SYSRST_REG       (`AWS_CLKGEN_BASE_REG + 64'h14)
+`define AWS_CLKGEN_DISRST_MAIN_REG  (`AWS_CLKGEN_BASE_REG + 64'h18)
+`define AWS_CLKGEN_LOCK_REG         (`AWS_CLKGEN_BASE_REG + 64'h20)
 
 `define AWS_CLKGEN_LOCK   32'h151
+
+//
+// Polling parameters for MMCM lock checks
+//
+`define LOCKED                  1
+`define MAX_CLKGEN_LOOP_RETRIES 1000
+`define LOOP_WAIT_100_NS            100
 
 `define MMCM_STATUS     64'h04
 `define MMCM_MAIN_CFG   64'h200 // Main clock multiplier/dividers
@@ -111,33 +120,58 @@ typedef struct {
    logic [63:0] addr;
 } clk;
 
+// ---------------------------------------------------------------------------
+// aws_clkgen_get_expected_lock
+//   Derives the expected MMCM lock mask from the CLKS_AVAIL register.
+//   Masking with AWS_CLKGEN_LOCK extracts only the MMCM lock positions.
+// ---------------------------------------------------------------------------
+function automatic logic [31:0] aws_clkgen_get_expected_lock(logic [31:0] clks_avail);
+   return clks_avail & `AWS_CLKGEN_LOCK;
+endfunction
+
 task aws_clkgen_asrt_rst();
    // Task to assert all resets from AWS_CLK_GEN IP
    logic [31:0] read_data;
 
    $display("__INFO__: Writing SDA interface at Base addr = 0x%0x\n", `AWS_CLKGEN_BASE_REG);
    tb.poke_sda(.addr(`AWS_CLKGEN_SYSRST_REG ), .data(32'hFFFF_FFFF)); // SYS_RST_REG
-   tb.poke_sda(.addr(`AWS_CLKGEN_BASE_REG + 64'h18 ), .data(32'd1)); // DIS_RST_MAIN_REG
+   tb.poke_sda(.addr(`AWS_CLKGEN_DISRST_MAIN_REG), .data(32'd1)); // DIS_RST_MAIN_REG
 
 endtask // aws_clkgen_asrt_rst
 
 task aws_clkgen_dsrt_rst();
-   //
-   // Task to de-assert all resets from AWS_CLK_GEN IP
-   //
+   // Task to de-assert all resets from AWS_CLK_GEN IP.
+   // Dynamically reads CLKS_AVAIL_REG to determine which MMCMs are enabled
+   // and only waits for those to lock.
+   automatic int loop_count = 0;
    logic [31:0] read_data;
+   logic [31:0] clks_avail;
+   logic [31:0] expected_lock;
+
+   // Read which clock groups are enabled from the IP
+   tb.peek_sda(.addr(`AWS_CLKGEN_CLKS_AVAIL_REG), .data(clks_avail));
+   expected_lock = aws_clkgen_get_expected_lock(clks_avail);
+   $display("__INFO__: CLKS_AVAIL = 0x%0x | Expected MMCM lock mask = 0x%0x\n", clks_avail, expected_lock);
 
    $display("__INFO__: Writing SDA interface at Base addr = 0x%0x\n", `AWS_CLKGEN_BASE_REG);
-   tb.poke_sda(.addr(`AWS_CLKGEN_GRST_REG), .data(32'd0)); // G_RST_REG
-   tb.poke_sda(.addr(`AWS_CLKGEN_SYSRST_REG ), .data(32'd0)); // SYS_RST_REG
-   tb.poke_sda(.addr(`AWS_CLKGEN_BASE_REG + 64'h18 ), .data(32'd0)); // DIS_RST_MAIN_REG
+   tb.poke_sda(.addr(`AWS_CLKGEN_GRST_REG),          .data(32'd0)); // G_RST_REG
+   tb.poke_sda(.addr(`AWS_CLKGEN_DISRST_MAIN_REG),   .data(32'd0)); // DIS_RST_MAIN_REG
 
-   // wait for MMCMs to lock
+   // Wait for enabled MMCMs to lock before releasing resets
    do begin
-      tb.wait_clock(100);
+      tb.nsec_delay(`LOOP_WAIT_100_NS);
       tb.peek_sda(.addr(`AWS_CLKGEN_LOCK_REG), .data(read_data));
       $display("__INFO__: Reading SDA interface at addr = 0x%0x | read_data = 0x%0x\n", (`AWS_CLKGEN_LOCK_REG), read_data);
-   end while (read_data != `AWS_CLKGEN_LOCK);
+      loop_count++;
+   end while ((read_data != expected_lock) && (loop_count < `MAX_CLKGEN_LOOP_RETRIES));
+
+   if (loop_count >= `MAX_CLKGEN_LOOP_RETRIES) begin
+      error_count++;
+      $error("__ERROR__: Timeout: MMCMs failed to lock after %0d iterations. @addr = 0x%0x | lock_status = 0x%0x | lock_expected = 0x%0x",
+                  loop_count, `AWS_CLKGEN_LOCK_REG, read_data, expected_lock);
+   end
+
+   tb.poke_sda(.addr(`AWS_CLKGEN_SYSRST_REG),        .data(32'd0)); // SYS_RST_REG
 
 endtask // aws_clkgen_dsrt_rst
 
@@ -283,16 +317,13 @@ task aws_clkgen_set_mmcm(logic [63:0] mmcm_base, int mult, int mult_frac, int di
    check_clkgen_status_locked(.mmcm_base(mmcm_base));
 endtask // aws_clkgen_set_mmcm
 
-`define LOCKED 1
-`define MAX_CLKGEN_LOOP_RETRIES 1000
-`define LOOP_WAIT_NS 100
 // Wait until mmcm_base + `MMCM_STATUS bit[0] is 1 for locked, 0 for unlocked
 task check_clkgen_status_locked(logic [63:0] mmcm_base);
    // Check Status Register is currently locked.
    automatic int loop_count = 0;
    logic [63:0] read_data;
    do begin
-      tb.nsec_delay(`LOOP_WAIT_NS);
+      tb.nsec_delay(`LOOP_WAIT_100_NS);
       tb.peek_sda(.addr(mmcm_base + `MMCM_STATUS), .data(read_data));
       loop_count++;
    end while ((read_data[0] != `LOCKED) && (loop_count < `MAX_CLKGEN_LOOP_RETRIES));
@@ -300,28 +331,35 @@ task check_clkgen_status_locked(logic [63:0] mmcm_base);
    if (loop_count >= `MAX_CLKGEN_LOOP_RETRIES) begin
       error_count++;
       $display("__ERROR__: Timeout: MMCM is not locked after %d ns. MMCM address = 0x%08x\n",
-                              loop_count * `LOOP_WAIT_NS, mmcm_base + `MMCM_STATUS);
+                              loop_count * `LOOP_WAIT_100_NS, mmcm_base + `MMCM_STATUS);
    end
 endtask // check_clkgen_status_reaches_state
 
 task aws_clkgen_reset(bit reset);
    automatic int loop_count = 0;
    logic [31:0] read_data;
+   logic [31:0] clks_avail;
+   logic [31:0] expected_lock;
+
    // Clear global reset reg
    tb.poke_sda(.addr(`AWS_CLKGEN_GRST_REG), .data(32'd0));
 
    // Wait for MMCM lock if de-asserting resets
    if (!reset) begin
+      // Dynamically determine which MMCMs should lock
+      tb.peek_sda(.addr(`AWS_CLKGEN_CLKS_AVAIL_REG), .data(clks_avail));
+      expected_lock = aws_clkgen_get_expected_lock(clks_avail);
+
       do begin
-         tb.nsec_delay(`LOOP_WAIT_NS);
+         tb.nsec_delay(`LOOP_WAIT_100_NS);
          tb.peek_sda(.addr(`AWS_CLKGEN_LOCK_REG), .data(read_data));
          loop_count++;
-      end while ((read_data != `AWS_CLKGEN_LOCK) && (loop_count < `MAX_CLKGEN_LOOP_RETRIES));
+      end while ((read_data != expected_lock) && (loop_count < `MAX_CLKGEN_LOOP_RETRIES));
 
       if (loop_count >= `MAX_CLKGEN_LOOP_RETRIES) begin
          error_count++;
          $display("__ERROR__: Timeout: Failed to achieve MMCM lock after %d iterations. @addr = 0x%08x | lock_status = 0x%08x | lock_expected = 0x%08x ",
-                     loop_count * `LOOP_WAIT_NS, `AWS_CLKGEN_LOCK_REG, read_data, `AWS_CLKGEN_LOCK);
+                     loop_count * `LOOP_WAIT_100_NS, `AWS_CLKGEN_LOCK_REG, read_data, expected_lock);
       end
    end
 

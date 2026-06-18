@@ -52,33 +52,33 @@ def print_fpga_info(info: dict) -> None:
     # Core status
     print(f"  Slot:       {info.get('slot_id', '?')}")
     print(f"  Status:     {info.get('status', '?')}")
-    status_q = info.get('status_q', 0)
+    status_q = info.get("status_q", 0)
     if status_q:
         print(f"  Status Q:   {status_q}")
 
     # AFI ID
-    ids = info.get('afi_id', {})
-    afi_id = ids.get('afi_id', b'').rstrip(b'\x00').decode('utf-8', errors='replace') if isinstance(ids, dict) else str(ids)
+    ids = info.get("afi_id", {})
+    afi_id = ids.get("afi_id", b"").rstrip(b"\x00").decode("utf-8", errors="replace") if isinstance(ids, dict) else str(ids)
     if afi_id:
         print(f"  AFI ID:     {afi_id}")
 
     # Shell version
-    sh_ver = info.get('sh_version', 0)
+    sh_ver = info.get("sh_version", 0)
     if sh_ver:
         print(f"  Shell Ver:  0x{sh_ver:08X}")
 
     # Metrics — only non-zero error counters
-    metrics = info.get('metrics', {})
+    metrics = info.get("metrics", {})
     if not isinstance(metrics, dict):
         return
 
     error_fields = [
-        ('pcim_range_error_count',           'PCIM Range Errors'),
-        ('pcim_axi_protocol_error_count',    'PCIM AXI Protocol Errors'),
-        ('dma_pcis_timeout_count',           'DMA PCIS Timeouts'),
-        ('ocl_slave_timeout_count',          'OCL Slave Timeouts'),
-        ('sda_slave_timeout_count',          'SDA Slave Timeouts'),
-        ('virtual_jtag_slave_timeout_count', 'VJTAG Slave Timeouts'),
+        ("pcim_range_error_count", "PCIM Range Errors"),
+        ("pcim_axi_protocol_error_count", "PCIM AXI Protocol Errors"),
+        ("dma_pcis_timeout_count", "DMA PCIS Timeouts"),
+        ("ocl_slave_timeout_count", "OCL Slave Timeouts"),
+        ("sda_slave_timeout_count", "SDA Slave Timeouts"),
+        ("virtual_jtag_slave_timeout_count", "VJTAG Slave Timeouts"),
     ]
 
     errors_found = False
@@ -94,7 +94,7 @@ def print_fpga_info(info: dict) -> None:
         print("  Errors:     None")
 
     # Cached AGFIs (if any non-zero)
-    cached = metrics.get('cached_agfis', [])
-    non_zero = [a for a in cached if a != '0' and a != 0]
+    cached = metrics.get("cached_agfis", [])
+    non_zero = [a for a in cached if a != "0" and a != 0]
     if non_zero:
         print(f"  Cached AFIs: {', '.join(str(a) for a in non_zero)}")

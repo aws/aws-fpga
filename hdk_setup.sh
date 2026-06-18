@@ -74,11 +74,22 @@ function sha256_check {
 
 function check_git_lfs {
     if ! command -v git-lfs &> /dev/null; then
-        echo "ERROR: git-lfs is not installed" >&2
-        echo "Please install git-lfs:" >&2
-        echo "  For Ubuntu/Debian: sudo apt-get install git-lfs" >&2
-        echo "  For Rocky Linux/RHEL: sudo dnf install git-lfs" >&2
-        return 1
+        info_msg "git-lfs not found, attempting to install..."
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get install -y git-lfs
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y git-lfs
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y git-lfs
+        else
+            echo "ERROR: Could not install git-lfs: no supported package manager found" >&2
+            return 1
+        fi
+        if ! command -v git-lfs &> /dev/null; then
+            echo "ERROR: git-lfs installation failed" >&2
+            return 1
+        fi
+        info_msg "git-lfs installed successfully"
     fi
 
     return 0
@@ -142,6 +153,11 @@ export VIVADO_TOOL_VERSION
 info_msg "VIVADO_TOOL_VERSION is $VIVADO_TOOL_VERSION"
 
 debug_msg "Vivado check succeeded"
+
+check_git_lfs
+if [ $? -ne 0 ]; then
+  return 1
+fi
 
 # The CL_DIR is where the actual Custom Logic design resides. The developer is expected to override this.
 # export CL_DIR=$HDK_DIR/cl/developer_designs

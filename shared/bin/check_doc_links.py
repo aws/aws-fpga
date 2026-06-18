@@ -49,8 +49,8 @@ SUCCESS = 200
 NOT_FOUND = 404
 LOCAL_HOST = "http://localhost:3000"
 REQUEST_TIMEOUT = 10  # Increased timeout but with better handling
-MAX_RETRIES = 1
-BACKOFF_FACTOR = 1
+MAX_RETRIES = 5  # GitHub occasionally returns transient 502s; retry enough to ride them out
+BACKOFF_FACTOR = 2
 ERROR = "ERROR"
 EXCEPTION = "EXCEPTION"
 # Restart the local HTTP server every BATCH_SIZE links

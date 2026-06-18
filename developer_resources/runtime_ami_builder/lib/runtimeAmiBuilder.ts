@@ -177,11 +177,8 @@ if (!Object.values(VivadoLabEditionVersion).includes(vivadoLabEditionVersion)) {
   throw new Error(`Invalid Vivado Lab Edition Version: '${vivadoLabEditionVersion}'`);
 }
 
-if (baseImage === "UBUNTU_24_04" && rootVolumeSize < 14) {
-  throw new Error(`Ubuntu 24.04 requires >= 14GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
-}
-if (baseImage === "ROCKY_8_10" && rootVolumeSize < 12) {
-  throw new Error(`Rocky Linux 8.10 requires >= 12GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
+if (rootVolumeSize < 32) {
+  throw new Error(`Runtime AMI requires >= 32GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
 }
 if (!(Object.values(EbsDeviceVolumeType).includes(rootVolumeType))) {
   throw new Error(`Invalid root volume type: '${rootVolumeType}'`);

@@ -53,6 +53,9 @@ if ! bash $SDK_DIR/sdk_install.sh; then
 fi
 
 cd sdk/userspace/cython_bindings
+if ! command -v python3 &>/dev/null && command -v apt-get &>/dev/null; then
+    sudo apt-get install -y python3 python3-venv
+fi
 if python3 -m venv venv && \
    source venv/bin/activate && \
    pip install setuptools Cython && \

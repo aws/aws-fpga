@@ -20,3 +20,11 @@ class FpgaClkgen:
     def set_dynamic(self, slot_id: int, clk_a_freq: uint32_t, clk_b_freq: uint32_t, clk_c_freq: uint32_t, clk_hbm_freq: uint32_t, reset: uint32_t) -> None:
         ret = aws_clkgen_set_dynamic(slot_id, clk_a_freq, clk_b_freq, clk_c_freq, clk_hbm_freq, reset)
         check_return_code(ret, "set dynamic", slot_id)
+
+    def deassert_resets(self, slot_id: int) -> None:
+        ret = aws_clkgen_deassert_resets(slot_id)
+        check_return_code(ret, "deassert resets", slot_id)
+
+    def reset_toggle(self, slot_id: int) -> None:
+        ret = aws_clkgen_reset_toggle(slot_id)
+        check_return_code(ret, "reset toggle", slot_id)
