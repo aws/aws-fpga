@@ -343,7 +343,7 @@ class TestDCPDiscovery(unittest.TestCase):
         mock_hdk_setup.is_file.return_value = True
         mock_hdk_dir.is_dir.return_value = True
         mock_hdk_dir.__str__.return_value = "/test/repo/hdk"
-        mock_parent.__truediv__ = MagicMock(side_effect=lambda p: (mock_hdk_setup if p == "hdk_setup.sh" else mock_hdk_dir))
+        mock_parent.__truediv__ = MagicMock(side_effect=lambda p: mock_hdk_setup if p == "hdk_setup.sh" else mock_hdk_dir)
         self.assertEqual(
             DCPDiscovery.search_for_repo_root_from_current_script_dir(),
             "/test/repo/hdk",

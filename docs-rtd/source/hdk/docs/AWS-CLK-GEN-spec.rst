@@ -10,6 +10,7 @@ Table of Contents
 - `Ports Description <#ports-description>`__
 - `Address Space <#address-space>`__
 - `Register Definitions <#register-definitions>`__
+- `Boot and Reset Sequencing <#boot-and-reset-sequencing>`__
 - `Clock Recipes User Guide <#clock-recipes-user-guide>`__
 - `Implementation Example <#implementation-example>`__
 
@@ -38,6 +39,10 @@ and located in the CL top module.
 ⚠️ The AWS_CLK_GEN is optional for CL designs that do not require same
 clocking scheme as F1. This block is not required if the CL designs use
 only ``clk_main_a0`` and/or ``clk_hbm_ref``.
+
+⚠️ If AWS_CLK_GEN is instantiated, the runtime SW must call
+`aws_clkgen_deassert_resets(slot_id) <https://github.com/aws/aws-fpga/tree/f2/sdk/userspace/include/fpga_clkgen.h>`__
+after AFI load to release the CL from reset.
 
 Architecture Overview
 ---------------------
@@ -210,7 +215,7 @@ The AXI-Lite address space is decoded as shown in the table below:
    setting the output clock frequencies of AWS_CLK_GEN IP.
 
 2. Write access to undefined address space is ignored. Reading from
-   undefined address space returns 0xDEAD_DEC0. Reading from undefined
+   undefined address space returns 0xBAAD_DEC0. Reading from undefined
    address space within MMCM results in MMCM’s default behavior.
    AWS_CLK_GEN IP does not have any protection against illegal use of
    MMCMs. User discretion is recommended regarding such accesses.
@@ -327,7 +332,7 @@ described in `Address Space <#address-space>`__
      - 31:0
      - RW
      - 0x0
-     - Write 0xFFFF_FFFF to globally reset AWS_CLK_GEN IP. Following blocks are affected: - Assert reset to all MMCMs - Assert reset to SYS_RST and its output to CL  Write 0x0000_0000 to de-assert global resets
+     - Write 0xFFFF_FFFF to assert all CL-facing reset outputs (`cl_rst_*_n`). This does not reset the MMCMs — clocks continue running. Write 0x0000_0000 to release. G_RST_REG takes priority over all other reset controls.
    * - 
      - 
      - 
@@ -338,8 +343,8 @@ described in `Address Space <#address-space>`__
      - SYS_RST_REG
      - 31:10
      - RW
-     - 0xFF
-     - Reserved
+     - 0x3FFFFF
+     - Reserved. Default value keeps all reserved bits set.
    * - 
      - 
      - 9
@@ -423,7 +428,7 @@ described in `Address Space <#address-space>`__
      - 0
      - RW
      - 0x0
-     - 1 = Disable rst_main_n from asserting resets in SYS_RST block. i.e rst_main_n no longer affects the reset outputs from SYS_RST block.
+     - 1 = Disable rst_main_n from asserting resets in SYS_RST block. i.e rst_main_n no longer affects the reset outputs from SYS_RST block. Useful during clock reprogramming to prevent rst_main_n transitions from interfering with the reset outputs. The combined reset output equation is: `rst_out_n[i] = ~G_RST & ~SYS_RST[i] & (DIS_RST_MAIN[0] | rst_main_n)`
    * - 
      - 
      - 
@@ -491,8 +496,44 @@ described in `Address Space <#address-space>`__
      - 0x0
      - 1 = MMCM_BASE_A locked
 
-**NOTE**: Write access to undefined address space is ignored. Reading
-from undefined address space returns ``0xDEAD_DEC0``.
+**NOTE**: The ``MMCM_LOCK_REG`` lock bits are at positions [0], [4],
+[6], [8] — aligning with the ``SYS_RST_REG`` bit position of the first
+clock in each MMCM group (A=0, B=4, C=6, HBM=8). When all four MMCMs are
+locked, the register reads ``0x0000_0151``. This value can be used as a
+lock mask to poll for all MMCMs to achieve lock before de-asserting
+resets.
+
+Boot and Reset Sequencing
+-------------------------
+
+Initial Boot State
+~~~~~~~~~~~~~~~~~~
+
+At AFI load, the AWS_CLK_GEN IP starts in the following state:
+
+- ``SYS_RST_REG = 0xFFFF_FFFE``: All CL resets are asserted except
+  ``cl_rst_main_n`` (bit 0), which is de-asserted by default to allow
+  the bootstrap clock domain to operate.
+- ``G_RST_REG = 0x0``: Global reset is not asserted.
+- ``DIS_RST_MAIN_REG = 0x0``: Shell reset (``rst_main_n``) influences
+  the reset outputs.
+- MMCM clock outputs are static low until the respective MMCM PLL
+  achieves lock. Once locked, the clock outputs begin oscillating at the
+  configured frequency.
+
+MMCM Clock Behavior
+~~~~~~~~~~~~~~~~~~~
+
+MMCM clock outputs (``clk_extra_a1``, ``clk_hbm_axi``, etc.) are held
+static low by the MMCM until the PLL locks. Software must poll
+``MMCM_LOCK_REG`` to confirm clocks are stable before releasing resets
+via ``SYS_RST_REG``. Releasing resets while clocks are static low will
+result in downstream IPs not seeing proper clocked reset assertion,
+which can cause initialization failures.
+
+⚠️ ``SYS_RST_REG`` must only be cleared after ``MMCM_LOCK_REG`` confirms
+all enabled MMCMs are locked. Refer to the SDK ``fpga_clkgen`` library
+for the recommended reset and clock programming sequences.
 
 Clock Recipes User Guide
 ------------------------

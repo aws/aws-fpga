@@ -17,3 +17,5 @@ cdef extern from "fpga_clkgen.h":
     int aws_clkgen_get_dynamic(int slot_id, fpga_clkgen_info* info)
     int aws_clkgen_set_recipe(int slot_id, uint32_t clk_a_recipe, uint32_t clk_b_recipe, uint32_t clk_c_recipe, uint32_t clk_hbm_recipe, uint32_t reset);
     int aws_clkgen_set_dynamic(int slot_id, uint32_t clk_a_freq, uint32_t clk_b_freq, uint32_t clk_c_freq, uint32_t clk_hbm_freq, uint32_t reset);
+    int aws_clkgen_deassert_resets(int slot_id)
+    int aws_clkgen_reset_toggle(int slot_id)

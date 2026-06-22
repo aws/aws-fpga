@@ -22,7 +22,7 @@ mypy-boto3-sns>=1.34.0
 moto[all]
 pydantic==2.5.3
 pydantic-core==2.14.6
-coverage>=7.13.2
+coverage>=7.6.0
 moto>=5.1.20
 EOF
 

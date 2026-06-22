@@ -79,6 +79,12 @@ def main() -> None:
     info = json.dumps(fpga_clkgen_wrapper.get_dynamic(slot), indent=2)
     print(f"Clock Information after setting recipe\n {info}\n")
 
+    print("De-asserting resets\n")
+    fpga_clkgen_wrapper.deassert_resets(slot)
+
+    print("Toggling resets\n")
+    fpga_clkgen_wrapper.reset_toggle(slot)
+
 
 if __name__ == "__main__":
     main()

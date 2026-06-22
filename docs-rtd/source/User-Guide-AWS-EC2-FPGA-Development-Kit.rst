@@ -350,18 +350,30 @@ currently released to customers:
      - FPGA Developer AMI ID (us-east-1)
      - Vivado/Vitis Version Supported
      - Operating System Version
-   * - 1.19.1
-     - `ami-07c259dae738189ec <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
-     - 2025.2
-     - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
-   * - 1.19.1
-     - `ami-039f2d1d9952ef402 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
+   * - 1.19.3
+     - `ami-0ade775ce1137d8d3 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
      - 2025.2
      - Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)
-   * - 1.16.1
-     - `ami-092fc5deb8f3c0f7d <https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u>`__
+   * - 1.19.2
+     - `ami-017bd23ff95264395 <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+     - 2025.2
+     - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
+   * - 1.18.2
+     - `ami-0850e21ed2dded9d6 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
+     - 2025.1
+     - Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)
+   * - 1.18.1
+     - `ami-0bba7ad55f85d021d <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+     - 2025.1
+     - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
+   * - 1.17.1
+     - `ami-059eadfeb949bc072 <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+     - 2024.2
+     - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
+   * - 1.16.2
+     - `ami-0b655f161063b404a <https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u>`__
      - 2024.1
-     - Ubuntu 20.04.6 (kernel 5.15)
+     - Ubuntu 22.04.5 (kernel 6.8.0-1018-aws)
 
 Given the large size of the FPGA used for F2, AMD tools work best with
 at least 4 vCPU’s and 32GiB Memory. We recommend `Compute Optimized and

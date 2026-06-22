@@ -116,6 +116,29 @@ int aws_clkgen_set_recipe(int slot_id, uint32_t clk_a_recipe, uint32_t clk_b_rec
 //=============================================================================================================
 int aws_clkgen_set_dynamic(int slot_id, uint32_t clk_a_freq, uint32_t clk_b_freq, uint32_t clk_c_freq, uint32_t clk_hbm_freq, uint32_t reset);
 
+//============================================================================================================
+//
+// aws_clkgen_deassert_resets() : De-assert all CL resets from AWS_CLK_GEN after waiting for MMCM lock.
+//                                Intended for the initial boot path where resets are asserted by default
+//                                (SYS_RST_REG = 0xFFFFFFFE) and clocks need to stabilize before releasing.
+// arguments:
+// -----------
+// int slot_id            : PCIe slot id value for FPGA card
+//
+//=============================================================================================================
+int aws_clkgen_deassert_resets(int slot_id);
+
+//============================================================================================================
+//
+// aws_clkgen_reset_toggle() : Assert and de-assert all CL resets from AWS_CLK_GEN without changing
+//                             clock frequencies. Waits for MMCM lock before releasing resets.
+// arguments:
+// -----------
+// int slot_id            : PCIe slot id value for FPGA card
+//
+//=============================================================================================================
+int aws_clkgen_reset_toggle(int slot_id);
+
 #ifdef __cplusplus
 }
 #endif
