@@ -33,6 +33,15 @@ cl_axil_reg_access
   hdk/cl/examples/cl-demo/cl-axil-reg-access/README
   hdk/cl/examples/cl-demo/cl-axil-reg-access/verif/README
 
+cl_clk_gen
+""""""""""""
+
+.. toctree::
+  :maxdepth: 1
+
+  hdk/cl/examples/cl-demo/cl-clk-gen/README
+  hdk/cl/examples/cl-demo/cl-clk-gen/verif/README
+
 cl_dram_hbm_dma
 """""""""""""""
 
