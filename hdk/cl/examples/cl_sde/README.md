@@ -22,7 +22,7 @@ The CL_SDE example implements the FPGA custom logic used to generate the AFI to 
 
 ### System Diagram
 
-![Diagram](./../../../../../docs-rtd/source/_static/cl_sde_images/CL_SDE_Block_Diagram.jpg)
+![Diagram](./../../../../docs-rtd/source/_static/cl_sde_images/CL_SDE_Block_Diagram.jpg)
 
 ## Functional Description
 
