@@ -1,6 +1,23 @@
 F2 Developer Kit Release Notes
 ==============================
 
+v2.3.4
+------
+
+- Released the `AWS FPGA
+  Workshop <https://catalog.us-east-1.prod.workshops.aws/workshops/9391f9b2-8011-460c-ab4c-ac8ff1adcf03/en-US>`__
+  for getting started with FPGA development on AWS
+- Added an `Operating System Support
+  Matrix <./developer-resources/OS-Support-Matrix.html>`__ documenting AMD
+  Vivado/Vitis operating system support alongside the FPGA Developer AMI
+  combinations built and tested by AWS
+- Runtime AMI Builder (RAB) and Python dependency security updates
+- Removed the ``sdk_setup.sh`` step that wrote the ``allow_non_root``
+  function to ``/tmp/sdk_root_env.exp``; the SDK tools now source it
+  directly from ``shared/bin/set_common_functions.sh``
+- Updated the Vitis `ERRATA <./vitis/ERRATA.html>`__ to reflect examples
+  that do not currently support Hardware Emulation
+
 v2.3.3
 ------
 

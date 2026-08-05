@@ -20,6 +20,7 @@ developing for AWS EC2 FPGA Instances.
   - `Software-Defined Development
     Environment <#software-defined-development-environment>`__
   - `FPGA Developer AMI <#fpga-developer-ami>`__
+  - `F2 FPGA Interactive Workshop <#f2-fpga-interactive-workshop>`__
   - `Getting Familiar with AWS <#getting-familiar-with-aws>`__
 
 - `Next Steps <#next-steps>`__
@@ -340,7 +341,10 @@ A free-to-use FPGA developer AMI is available for on-cloud F2
 development with AMD tools pre-installed on a variety of AWS EC2
 instance types. Customers can use this AMI to design, simulate, and
 build their designs. The table below lists the FPGA Developer AMI(s)
-currently released to customers:
+currently released to customers. For AMD operating system support across
+Vivado/Vitis 2024.1 through 2026.1 and current and historical
+AMI/tool/OS combinations built and tested by AWS, see the `Operating
+System Support Matrix <./developer-resources/OS-Support-Matrix.html>`__.
 
 .. list-table::
    :header-rows: 1
@@ -393,6 +397,17 @@ The RAB is a customizable and extensible tool based on `the AWS
 CDK <https://docs.aws.amazon.com/cdk/v2/guide/home.html>`__ that easily
 automates building production-ready AMIs tailored to each accelerator
 application’s needs.
+
+F2 FPGA Interactive Workshop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Working with FPGAs in the cloud can be challenging and FPGA & cloud
+development necessitates distinct domain knowledge. `The AWS F2 FPGA
+Workshop <https://catalog.us-east-1.prod.workshops.aws/workshops/9391f9b2-8011-460c-ab4c-ac8ff1adcf03/en-US>`__
+provides an interactive quick-start experience intended to familiarize
+engineers of all backgrounds with the AWS EC2 F2 platform. It also
+provides an overview of F2’s architecture, and guides the participant
+through loading a design and using it.
 
 Getting Familiar with AWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~
