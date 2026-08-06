@@ -50,6 +50,7 @@ Table of Contents
   developer-resources/runtime-ami-builder/README
 
   developer-resources/Amazon-DCV-Setup-Guide
+  developer-resources/OS-Support-Matrix
 
   ERRATA
 

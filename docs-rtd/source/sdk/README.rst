@@ -10,6 +10,16 @@ Linux environments.
 registering them. For AFI development, see the
 `HDK <../hdk/README.html>`__.
 
+New to F2? Try the Interactive Workshop
+---------------------------------------
+
+If you are getting started with F2, `The AWS F2 FPGA
+Workshop <https://catalog.us-east-1.prod.workshops.aws/workshops/9391f9b2-8011-460c-ab4c-ac8ff1adcf03/en-US>`__
+provides a guided, hands-on companion to the CLI-driven Quick Start
+below. It walks engineers of all backgrounds through F2’s architecture
+and the end-to-end flow of loading a design onto an FPGA and interacting
+with it - the same runtime tools this SDK documents.
+
 Quick Start
 -----------
 

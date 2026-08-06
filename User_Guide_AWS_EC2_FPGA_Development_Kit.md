@@ -13,6 +13,7 @@ The development kit includes example designs to get you familiar with developing
   - [Hardware Development Kit (HDK)](#hardware-development-kit-hdk)
   - [Software-Defined Development Environment](#software-defined-development-environment)
   - [FPGA Developer AMI](#fpga-developer-ami)
+  - [F2 FPGA Interactive Workshop](#f2-fpga-interactive-workshop)
   - [Getting Familiar with AWS](#getting-familiar-with-aws)
 - [Next Steps](#next-steps)
 
@@ -210,7 +211,7 @@ To get started, please see the [README for a hello world accelerator example](./
 
 ### FPGA Developer AMI
 
-A free-to-use FPGA developer AMI is available for on-cloud F2 development with AMD tools pre-installed on a variety of AWS EC2 instance types. Customers can use this AMI to design, simulate, and build their designs. The table below lists the FPGA Developer AMI(s) currently released to customers:
+A free-to-use FPGA developer AMI is available for on-cloud F2 development with AMD tools pre-installed on a variety of AWS EC2 instance types. Customers can use this AMI to design, simulate, and build their designs. The table below lists the FPGA Developer AMI(s) currently released to customers. For AMD operating system support across Vivado/Vitis 2024.1 through 2026.1 and current and historical AMI/tool/OS combinations built and tested by AWS, see the [Operating System Support Matrix](./developer_resources/OS_Support_Matrix.md).
 
 | FPGA Developer AMI Version | FPGA Developer AMI ID (us-east-1) | Vivado/Vitis Version Supported | Operating System Version    |
 |----------------------------|-----------------------------------|--------------------------------|-----------------------------|
@@ -227,6 +228,13 @@ Note that the tools used by the HDK are only supported on x86-based EC2 instance
 
 For long-term cost savings when evaluating or debugging an accelerator in hardware, we recommend [creating a runtime AMI using the Runtime AMI Builder (RAB)](./developer_resources/runtime_ami_builder/README.md).
 The RAB is a customizable and extensible tool based on [the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html) that easily automates building production-ready AMIs tailored to each accelerator application's needs.
+
+### F2 FPGA Interactive Workshop
+
+Working with FPGAs in the cloud can be challenging and FPGA & cloud development necessitates distinct domain knowledge.
+[The AWS F2 FPGA Workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/9391f9b2-8011-460c-ab4c-ac8ff1adcf03/en-US)
+provides an interactive quick-start experience intended to familiarize engineers of all backgrounds with the AWS EC2 F2 platform.
+It also provides an overview of F2's architecture, and guides the participant through loading a design and using it.
 
 ### Getting Familiar with AWS
 

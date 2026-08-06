@@ -131,6 +131,15 @@ Runtime AMI Builder
 
   developer-resources/runtime-ami-builder/README
 
+Developer Resources
+-------------------
+
+.. toctree::
+  :maxdepth: 1
+
+  developer-resources/Amazon-DCV-Setup-Guide
+  developer-resources/OS-Support-Matrix
+
 Release Notes and Errata
 ------------------------
 

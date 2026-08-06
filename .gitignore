@@ -9,6 +9,7 @@ vc_hdrs.h
 INCA_libs
 irun.log
 irun.key
+.meta/
 
 fpga-local-cmd*
 static-fpga-local-cmd

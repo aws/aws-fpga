@@ -28,11 +28,11 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.232.1",
+    "aws-cdk-lib": "^2.246.0",
     "constructs": "^10.0.0",
     "eslint-config-prettier": "^9.0.0",
     "jsonc-parser": "^3.3.1",
     "source-map-support": "^0.5.21",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.3"
   }
 }

@@ -23,7 +23,6 @@ The following examples are not currently supported by AMD:
 The following examples are currently under development by AMD:
 
 * `host_py/hello_world_py`
-* `host_xrt/mailbox_auto_restart_xrt`
 * `rtl_kernels/rtl_vadd_mixed_c`
 
 ## Hardware Emulation
@@ -33,6 +32,9 @@ The following examples do not support Hardware Emulation.
 * `rtl_kernels/rtl_vadd_hw_debug`
 * `host_xrt/kernel_chain`
 * `sys_opt/multiple_processes`
+* `host_xrt/mailbox_auto_restart_xrt`
+* `host_xrt/mult_compute_units_xrt`
+* `rtl_kernels/rtl_vadd_mixed_c_vadd`
 
 ## Vitis 2025.2
 
