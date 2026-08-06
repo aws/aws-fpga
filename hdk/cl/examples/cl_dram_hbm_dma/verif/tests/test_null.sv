@@ -17,11 +17,17 @@
 
 
 module test_null();
+ import tb_type_defines_pkg::*;
+
+   `include "base_test_utils.svh";
+
 
    initial begin
       int exit_code;
 
       tb.power_up();
+       initialize_ddr();
+       deselect_cl_tst_hw();
 
       tb.test_main(exit_code);
 
