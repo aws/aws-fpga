@@ -17,10 +17,13 @@
 # When being sourced $0 will be the interactive shell and $BASH_SOURCE_ will contain the script being sourced
 # When being run $0 and $_ will be the same.
 
-script=${BASH_SOURCE[0]}
-if [ "$script" == "$0" ]; then
-  echo "ERROR: You must source this script"
-  exit 2
+script=$0
+if [[ -n "${BASH_VERSION:-}" ]]; then
+  script=${BASH_SOURCE[0]}
+  if [[ "$script" == "$0" ]]; then
+    echo "ERROR: You must source this script"
+    exit 2
+  fi
 fi
 
 full_script=$(readlink -f $script)
@@ -96,9 +99,7 @@ function check_git_lfs {
 }
 
 # Process command line args
-args=("$@")
-for ((i = 0; i < ${#args[@]}; i++)); do
-  arg=${args[$i]}
+for arg in "$@"; do
   case $arg in
   -d | -debug)
     debug=1
@@ -240,7 +241,7 @@ fi
 debug_msg "Checking for CL_IP Vivado version"
 
 cl_ip_ver=$(cat $AWS_FPGA_REPO_DIR/$cl_ip_path/VIVADO_VERSION | xargs)
-if [ "$VIVADO_TOOL_VERSION" == "$cl_ip_ver" ]; then
+if [[ "$VIVADO_TOOL_VERSION" == "$cl_ip_ver" ]]; then
   debug_msg "CL_IP was created using the expected Vivado version $VIVADO_TOOL_VERSION"
 else
   err_msg "Detected CL_IP version mistch, expecting version $VIVADO_TOOL_VERSION "
