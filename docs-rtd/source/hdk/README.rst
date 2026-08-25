@@ -186,6 +186,10 @@ A few more notes on
   source code and DCPs. Encryption, enabled by default, may impede
   debugging as errors from encrypted envelope do not provide meaningful
   information.
+- Use ``--package-only -t <YYYY_MM_DD-HHMMSS>`` to skip Vivado and
+  package an existing post-route DCP. The tag must match the checkpoint
+  filename (``<cl>.<tag>.post_route.dcp`` in
+  ``$CL_DIR/build/checkpoints``).
 - The script also allows developers to pass different Vivado directives
   as shown below:
 

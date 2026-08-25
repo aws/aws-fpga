@@ -256,6 +256,14 @@ def main():
         default=True,
     )
 
+    parser.add_option(
+        "--package-only",
+        dest="package_only",
+        action="store_true",
+        default=False,
+        help="Skip Vivado and package an existing post-route DCP. Requires --tag matching the checkpoint timestamp.",
+    )
+
     (options, args) = parser.parse_args()
 
     print("==================================================")
@@ -323,18 +331,21 @@ def main():
 
             Custom `clock_recipe` arguments were detected, please add `--aws_clk_gen` to continue.""")
 
-    # Run the Vivado job
-    cmd = (
-        f"vivado -mode batch -source build_all.tcl -log {build_tag}.vivado.log "
-        + f"-tclargs {options.place_direct} {options.phy_opt_direct} {options.route_direct} "
-        + f"{options.clock_recipe_a} {options.clock_recipe_b} {options.clock_recipe_c} {options.clock_recipe_hbm} "
-    )
-
     start_time = datetime.datetime.now()
     print(f"\nAWS FPGA: {start_time.strftime(TIMESTAMP_LOG_FORMAT)} - Build starts\n")
-
     sys.stdout.flush()
-    os.system(cmd)
+
+    if options.package_only:
+        if not options.build_tag:
+            print_error("--package-only requires --tag matching an existing post-route DCP (for example -t YYYY_MM_DD-HHMMSS)")
+        print(f"AWS FPGA: --package-only set, skipping Vivado and packaging tag {build_tag}\n")
+    else:
+        cmd = (
+            f"vivado -mode batch -source build_all.tcl -log {build_tag}.vivado.log "
+            + f"-tclargs {options.place_direct} {options.phy_opt_direct} {options.route_direct} "
+            + f"{options.clock_recipe_a} {options.clock_recipe_b} {options.clock_recipe_c} {options.clock_recipe_hbm} "
+        )
+        os.system(cmd)
 
     if options.flow == "BuildAll":
         generate_dcp_tarball(
