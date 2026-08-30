@@ -28,6 +28,20 @@ from optparse import OptionParser
 TIMESTAMP_LOG_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIMESTAMP_FILE_FORMAT = "%Y_%m_%d-%H%M%S"
 
+CLOCK_RECIPE_OPTS = (
+    "--clock_recipe_a",
+    "--clock_recipe_b",
+    "--clock_recipe_c",
+    "--clock_recipe_hbm",
+)
+
+
+def option_on_argv(option_name):
+    for arg in sys.argv[1:]:
+        if arg == option_name or arg.startswith(option_name + "="):
+            return True
+    return False
+
 
 #############################################################
 # Print error message and exit
@@ -261,7 +275,7 @@ def main():
         dest="package_only",
         action="store_true",
         default=False,
-        help="Skip Vivado and package an existing post-route DCP. Requires --tag matching the checkpoint timestamp.",
+        help="Skip Vivado and package an existing post-route DCP. Requires --tag matching the checkpoint timestamp and at least one of --clock_recipe_a/b/c/hbm. Omitted recipes use documented defaults in the tarball manifest.",
     )
 
     (options, args) = parser.parse_args()
@@ -325,8 +339,9 @@ def main():
         build_tag = now.strftime(TIMESTAMP_FILE_FORMAT)
     os.environ["BUILD_TAG"] = build_tag
 
-    # Last check before build in case the user sets clock recipes without the aws_clk_gen IP
-    if not options.aws_clk_gen and "clock_recipe" in str(sys.argv):
+    # Last check before build in case the user sets clock recipes without the aws_clk_gen IP.
+    # --package-only only records recipes in the tarball manifest, so --aws_clk_gen is not required.
+    if not options.package_only and not options.aws_clk_gen and "clock_recipe" in str(sys.argv):
         print_error("""The aws_clk_gen IP is required for setting custom clock recipes.
 
             Custom `clock_recipe` arguments were detected, please add `--aws_clk_gen` to continue.""")
@@ -337,7 +352,14 @@ def main():
 
     if options.package_only:
         if not options.build_tag:
-            print_error("--package-only requires --tag matching an existing post-route DCP (for example -t YYYY_MM_DD-HHMMSS)")
+            print_error(
+                "--package-only requires --tag matching an existing post-route DCP (for example -t YYYY_MM_DD-HHMMSS)"
+            )
+        if not any(option_on_argv(opt) for opt in CLOCK_RECIPE_OPTS):
+            print_error(
+                "--package-only requires at least one clock recipe "
+                "(--clock_recipe_a, --clock_recipe_b, --clock_recipe_c, or --clock_recipe_hbm)"
+            )
         print(f"AWS FPGA: --package-only set, skipping Vivado and packaging tag {build_tag}\n")
     else:
         cmd = (

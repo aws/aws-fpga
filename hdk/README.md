@@ -109,7 +109,7 @@ A few more notes on [aws_build_dcp_from_cl.py](https://github.com/aws/aws-fpga/b
 - Use `--cl <CL name>` option to build a different CL design. This is default to `cl_dram_hbm_dma`.
 - Use `--aws_clk_gen` option to annotate the use of [AWS clock generation block](./docs/AWS_CLK_GEN_spec.md) and [customer clock recipes](./docs/Clock_Recipes_User_Guide.md).
 - Use `--no-encrypt` option to disable encryption of the design's source code and DCPs. Encryption, enabled by default, may impede debugging as errors from encrypted envelope do not provide meaningful information.
-- Use `--package-only -t <YYYY_MM_DD-HHMMSS>` to skip Vivado and package an existing post-route DCP. The tag must match the checkpoint filename (`<cl>.<tag>.post_route.dcp` in `$CL_DIR/build/checkpoints`).
+- Use `--package-only -t <YYYY_MM_DD-HHMMSS>` with at least one of `--clock_recipe_a`, `--clock_recipe_b`, `--clock_recipe_c`, or `--clock_recipe_hbm` to skip Vivado and package an existing post-route DCP. The tag must match the checkpoint filename (`<cl>.<tag>.post_route.dcp` in `$CL_DIR/build/checkpoints`). Omitted recipes use documented defaults in the Developer CL tarball manifest.
 - The script also allows developers to pass different Vivado directives as shown below:
   - `--place <directive>`: Default to `SSI_SpreadLogic_high` placement strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Available-Directives) for supported directives.
   - `--phy_opt <directive>` : Default to `AggressiveExplore` physical optimization strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=9xJiGeSV35ApxUsX7pAVDg) for supported directives
