@@ -275,7 +275,7 @@ def main():
         dest="package_only",
         action="store_true",
         default=False,
-        help="Skip Vivado and package an existing post-route DCP. Requires --tag matching the checkpoint timestamp and at least one of --clock_recipe_a/b/c/hbm. Omitted recipes use documented defaults in the tarball manifest.",
+        help="Skip Vivado and package an existing post-route DCP. Requires --tag matching the checkpoint timestamp and all four of --clock_recipe_a/b/c/hbm passed explicitly (recipes are not defaulted or derived from the DCP).",
     )
 
     (options, args) = parser.parse_args()
@@ -355,10 +355,11 @@ def main():
             print_error(
                 "--package-only requires --tag matching an existing post-route DCP (for example -t YYYY_MM_DD-HHMMSS)"
             )
-        if not any(option_on_argv(opt) for opt in CLOCK_RECIPE_OPTS):
+        _missing_recipes = [opt for opt in CLOCK_RECIPE_OPTS if not option_on_argv(opt)]
+        if _missing_recipes:
             print_error(
-                "--package-only requires at least one clock recipe "
-                "(--clock_recipe_a, --clock_recipe_b, --clock_recipe_c, or --clock_recipe_hbm)"
+                "--package-only requires all four clock recipes to be passed explicitly "
+                "(--clock_recipe_a, --clock_recipe_b, --clock_recipe_c, and --clock_recipe_hbm)"
             )
         print(f"AWS FPGA: --package-only set, skipping Vivado and packaging tag {build_tag}\n")
     else:
