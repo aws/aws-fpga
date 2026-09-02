@@ -37,11 +37,6 @@ if ! source $script_dir/shared/bin/set_common_env_vars.sh; then
   return 1
 fi
 
-sudo rm -f /tmp/sdk_root_env.exp
-typeset -f allow_non_root > /tmp/sdk_root_env.exp
-sudo chown root:root /tmp/sdk_root_env.exp
-sudo chmod 700 /tmp/sdk_root_env.exp
-
 #
 # Execute sdk_install.sh inside a subshell so the user's current
 # shell does not exit on errors from the install.
