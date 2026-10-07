@@ -58,11 +58,6 @@ def run_cmd(cmd: list[str], working_directory: str = os.getcwd(), do_print: bool
     return stdout
 
 
-def get_git_root() -> str:
-    git_root_cmd: list[str] = ["git", "rev-parse", "--show-toplevel"]
-    return run_cmd(git_root_cmd)
-
-
 XSIM = "xsim"
 VCS = "vcs"
 QUESTA = "questa"
@@ -71,8 +66,9 @@ QUESTA = "questa"
 class Compiler:
     orig_file_ext: str = ".orig"
     cl_dir: str = os.getenv("CL_DIR")
+    hdk_common_dir: str = os.getenv("HDK_COMMON_DIR")
     default_xilinx_library_name: str = "xil_defaultlib"
-    cl_ip_sim_scripts_dir: str = f"{get_git_root()}/hdk/common/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
+    cl_ip_sim_scripts_dir: str = f"{hdk_common_dir}/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
     init_files: dict[str, str] = {XSIM: "xsim.ini", VCS: "synopsys_sim.setup", QUESTA: "modelsim.ini"}
 
     def __init__(self, args):
