@@ -18,11 +18,16 @@
 # =============================================================================
 
 
+from __future__ import annotations
+
 import os
+import re
+import shlex
 import shutil
 import subprocess
 import sys
 from argparse import ArgumentParser
+from collections import deque
 from collections.abc import Callable
 from glob import glob
 
@@ -31,44 +36,45 @@ parser.add_argument("--simulator", dest="simulator", required=True)
 parser.add_argument("--complib_dir", dest="complib_dir", required=True)
 parser.add_argument("--compile_cl_ip_dir", dest="compile_cl_ip_dir", required=True)
 parser.add_argument("--in_progress_file", dest="in_progress_file", required=True)
+parser.add_argument("--common_library", dest="common_libraries", action="append", default=[])
+
+
+class CompileError(RuntimeError):
+    pass
+
+
+def check_python_version(in_progress_file: str) -> None:
+    print(f"Using Python {sys.version} from '/usr/bin/env python3'")
+    if sys.version_info < (3, 10):  # noqa: UP036
+        if os.path.exists(in_progress_file):
+            os.remove(in_progress_file)
+        raise Exception(
+            f"Python {sys.version} from this system's '/usr/bin/env python3' is not usable. "
+            "Please review and make sure Python 3.10+ is installed\n"
+        )
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
-
-    print(f"Using Python {sys.version} from '/usr/bin/env python3'")
-    is_python3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
-    is_greater_than_3_8 = sys.version_info >= (3, 8)
-    if not (is_python3 and is_greater_than_3_8):
-        if os.path.exists(args.in_progress_file):
-            os.remove(args.in_progress_file)
-        raise Exception(
-            f"Python {sys.version} from this system's '/usr/bin/env python3' is not usable. "
-            "Please review and make sure Python 3.8+ is installed\n"
-        )
-
-
-def run_cmd(cmd: list[str], working_directory: str = os.getcwd(), do_print: bool = False) -> str:
-    if working_directory is None:
-        working_directory = os.getcwd()
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, cwd=working_directory)
-    stdout = result.stdout.decode("utf-8").strip()
-    if do_print:
-        print(stdout)
-    return stdout
+    check_python_version(args.in_progress_file)
 
 
 XSIM = "xsim"
 VCS = "vcs"
 QUESTA = "questa"
 
+LIBRARY_MAPPING_PATH = re.compile(r"^\s*[A-Za-z][A-Za-z0-9_]*\s*[:=]\s*(\S+)")
+
+
+def maps_into(line: str, directory: str) -> bool:
+    match = LIBRARY_MAPPING_PATH.match(line)
+    return bool(match) and os.path.dirname(match.group(1)) == directory
+
 
 class Compiler:
     orig_file_ext: str = ".orig"
     cl_dir: str = os.getenv("CL_DIR")
-    hdk_common_dir: str = os.getenv("HDK_COMMON_DIR")
     default_xilinx_library_name: str = "xil_defaultlib"
-    cl_ip_sim_scripts_dir: str = f"{hdk_common_dir}/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
     init_files: dict[str, str] = {XSIM: "xsim.ini", VCS: "synopsys_sim.setup", QUESTA: "modelsim.ini"}
 
     def __init__(self, args):
@@ -78,50 +84,138 @@ class Compiler:
         if self.simulator not in self.init_files:
             self.clean_failure(f"Unknown simulator: {self.simulator}")
 
+        self.hdk_common_dir: str = os.getenv("HDK_COMMON_DIR")
+        if not self.hdk_common_dir:
+            self.clean_failure("HDK_COMMON_DIR is not set. Please source hdk_setup.sh before compiling CL IPs.")
+
         self.complib_dir: str = args.complib_dir
         self.compile_cl_ip_dir: str = args.compile_cl_ip_dir
+        self.common_libraries: list[str] = args.common_libraries
 
-        self.results_file: str = f"{os.getcwd()}/{self.simulator}_cl_ip_compilation.log"
+        self.cl_ip_sim_scripts_dir: str = f"{self.hdk_common_dir}/ip/cl_ip/cl_ip.ip_user_files/sim_scripts"
+        self.results_file: str = f"{self.compile_cl_ip_dir}/cl_ip_compilation.log"
         self.sim_initfile: str = f"{self.complib_dir}/{self.init_files[self.simulator]}"
 
     def compile_cl_ips(self) -> None:
-        self.add_xil_defaultlib_path_to_initfile()
         xilinx_ip_compile_scripts: list[str] = self.get_all_cl_ip_compilation_script_paths()
+        self.add_library_paths_to_initfile(xilinx_ip_compile_scripts)
+        ip_logs: dict[str, str] = {}
         with open(self.results_file, "w") as f:
-            f.write(str(xilinx_ip_compile_scripts))
+            f.write("CL IP compilation logs:\n")
             for xilinx_ip_path in xilinx_ip_compile_scripts:
-                self.compile_ip(xilinx_ip_path, f)
+                ip_name, ip_log = self.compile_ip(xilinx_ip_path)
+                ip_logs[ip_name] = ip_log
+                f.write(f"{ip_name}: {ip_log}\n")
 
-        self.check_for_errors()
+        self.check_for_errors(ip_logs)
         print(f"__PYTHON_INFO__: Moving {self.results_file} to {self.compile_cl_ip_dir}/done")
         shutil.move(self.results_file, f"{self.compile_cl_ip_dir}/done")
 
-    def check_for_errors(self) -> None:
-        with open(self.results_file) as output:
-            for line in output:
-                if "Error" in line and "Errors: 0" not in line:
-                    self.clean_failure(f"FOUND COMPILATION ERRORS! See {self.results_file}")
+    def check_for_errors(self, ip_logs: dict[str, str]) -> None:
+        errors = []
+        for ip_name, ip_log in ip_logs.items():
+            with open(ip_log, errors="replace") as output:
+                for line in output:
+                    if re.search(r"\berrors?\b", line, re.IGNORECASE) and not re.search(r"\berrors:\s*0\b", line, re.IGNORECASE):
+                        errors.append((ip_name, ip_log, line.strip()))
+                        break
+        if errors:
+            summary = "\n\n".join(
+                f"IP: {ip_name}\nreported error: {line}\nfull log: {ip_log}\nlast 80 log lines:\n{self.get_log_tail(ip_log)}"
+                for ip_name, ip_log, line in errors
+            )
+            self.clean_failure(f"=== CL IP COMPILATION REPORTED ERRORS ===\n{summary}")
 
-    def add_xil_defaultlib_path_to_initfile(self) -> None:
-        lib_path_seperator: str = ":" if self.simulator == VCS else "="
-        xilinx_defaultlib_mapping: str = f"{self.default_xilinx_library_name} {lib_path_seperator} {self.compile_cl_ip_dir}\n"
+    def add_library_paths_to_initfile(self, xilinx_ip_compile_scripts: list[str]) -> None:
+        library_paths = {self.default_xilinx_library_name: f"{self.compile_cl_ip_dir}/{self.default_xilinx_library_name}"}
+        if self.simulator != XSIM:
+            required_libraries = set(self.common_libraries)
+            required_libraries.update(self.get_generated_script_libraries(xilinx_ip_compile_scripts))
+            library_paths.update(
+                {
+                    library: f"{self.compile_cl_ip_dir}/{library}"
+                    for library in required_libraries
+                    if library != self.default_xilinx_library_name
+                }
+            )
+
+        self.remove_library_mapping(self.default_xilinx_library_name)
+        # This run deletes and recreates every library under compile_cl_ip_dir, so their old mappings are stale.
+        self.remove_library_mappings_into(self.compile_cl_ip_dir)
+        mapped_libraries = self.get_mapped_libraries()
+        missing_library_paths = {library: path for library, path in library_paths.items() if library not in mapped_libraries}
+        for path in missing_library_paths.values():
+            if self.simulator == QUESTA:
+                command = ["vlib", path]
+                try:
+                    subprocess.check_call(command)
+                except subprocess.CalledProcessError as error:
+                    self.clean_failure(
+                        "Unable to create Questa simulation library.\n"
+                        f"command: {shlex.join(command)}\n"
+                        f"library path: {path}\n"
+                        f"exit code: {error.returncode}"
+                    )
+            else:
+                os.makedirs(path, exist_ok=True)
+
+        lib_path_separator: str = ":" if self.simulator == VCS else "="
+        library_mappings = "".join(f"{library} {lib_path_separator} {path}\n" for library, path in sorted(missing_library_paths.items()))
+        if not library_mappings:
+            return
+
         line_insertion_map: dict[str, dict[str, Callable | list[str]]] = {
             XSIM: {
                 "func": self.append_line_to_file,
-                "args": [self.sim_initfile, xilinx_defaultlib_mapping, self.default_xilinx_library_name],
+                "args": [self.sim_initfile, library_mappings, None],
             },
             VCS: {
                 "func": self.append_line_to_file,
-                "args": [self.sim_initfile, xilinx_defaultlib_mapping, self.default_xilinx_library_name],
+                "args": [self.sim_initfile, library_mappings, None],
             },
             QUESTA: {
                 "func": self.insert_line_at_end_of_section,
-                "args": [self.sim_initfile, "[Library]", xilinx_defaultlib_mapping],
+                "args": [self.sim_initfile, "[Library]", library_mappings],
             },
         }
         insertion_func: Callable = line_insertion_map[self.simulator]["func"]
         insertion_args: list[str] = line_insertion_map[self.simulator]["args"]
         insertion_func(*insertion_args)
+
+    def get_generated_script_libraries(self, xilinx_ip_compile_scripts: list[str]) -> set[str]:
+        work_option = re.compile(r"^\s*(?:vlogan|vhdlan|vlog|vcom)\b.*?\s-work\s+([A-Za-z0-9_]+)")
+        libraries = set()
+        for script_path in xilinx_ip_compile_scripts:
+            compile_path = script_path if self.simulator == VCS else f"{os.path.dirname(script_path)}/compile.do"
+            with open(compile_path) as compile_file:
+                for line in compile_file:
+                    match = work_option.match(line)
+                    if match:
+                        libraries.add(match.group(1))
+        return libraries
+
+    def get_mapped_libraries(self) -> set[str]:
+        library_mapping = re.compile(r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*[:=]")
+        mapped_libraries = set()
+        with open(self.sim_initfile) as init_file:
+            for line in init_file:
+                match = library_mapping.match(line)
+                if match:
+                    mapped_libraries.add(match.group(1))
+        return mapped_libraries
+
+    def remove_library_mapping(self, library: str) -> None:
+        library_mapping = re.compile(rf"^\s*{re.escape(library)}\s*[:=]")
+        with open(self.sim_initfile) as init_file:
+            lines = [line for line in init_file if not library_mapping.match(line)]
+        with open(self.sim_initfile, "w") as init_file:
+            init_file.writelines(lines)
+
+    def remove_library_mappings_into(self, directory: str) -> None:
+        with open(self.sim_initfile) as init_file:
+            lines = [line for line in init_file if not maps_into(line, directory)]
+        with open(self.sim_initfile, "w") as init_file:
+            init_file.writelines(lines)
 
     def append_line_to_file(self, file_path: str, xilinx_defaultlib_mapping: str, exception: str) -> None:
         with open(file_path, "r+") as f:
@@ -132,15 +226,14 @@ class Compiler:
                 f.write(xilinx_defaultlib_mapping)
 
     def insert_line_at_end_of_section(self, file_path: str, section_header: str, xilinx_defaultlib_mapping: str) -> None:
-        exists, in_section, last_was_lib_entry = False, False, False
+        in_section, last_was_lib_entry = False, False
         lines = []
         with open(file_path) as f:
             for line in f:
-                exists |= self.default_xilinx_library_name in line
                 in_section |= line.strip().startswith(section_header)
 
                 is_lib_entry = in_section and "=" in line and not line.strip().startswith(";")
-                should_insert = not exists and in_section and last_was_lib_entry and not is_lib_entry
+                should_insert = in_section and last_was_lib_entry and not is_lib_entry
                 if should_insert:
                     lines.append(xilinx_defaultlib_mapping)
                     in_section = False
@@ -157,28 +250,94 @@ class Compiler:
             ip_sim_dir: str = f"{self.cl_ip_sim_scripts_dir}/{ip_name}/{self.simulator}"
             shell_scripts: list[str] = glob(f"{ip_sim_dir}/*.sh")
             if len(shell_scripts) != 1:
-                self.clean_failure(f"Found {shell_scripts} at {ip_sim_dir}")
+                self.clean_failure(
+                    "Expected exactly one CL IP compilation script.\n"
+                    f"IP: {ip_name}\n"
+                    f"simulator: {self.simulator}\n"
+                    f"expected pattern: {ip_sim_dir}/*.sh\n"
+                    f"found: {shell_scripts}"
+                )
             ip_compile_scripts.append(shell_scripts[0])
         return ip_compile_scripts
 
-    def compile_ip(self, xilinx_ip_script_path: str, compile_log) -> None:
+    @staticmethod
+    def get_log_tail(log_path: str, line_count: int = 80) -> str:
+        try:
+            with open(log_path, errors="replace") as log_file:
+                return "".join(deque(log_file, maxlen=line_count)).strip()
+        except OSError as error:
+            return f"Could not read log: {error}"
+
+    def compilation_failure_message(
+        self,
+        ip_name: str,
+        command: list[str],
+        working_directory: str,
+        log_path: str,
+        returncode: int | None = None,
+        cause: Exception | None = None,
+    ) -> str:
+        lines = [
+            "=== CL IP COMPILATION FAILED ===",
+            f"simulator: {self.simulator}",
+            f"IP: {ip_name}",
+            f"command: {shlex.join(command)}",
+            f"working directory: {working_directory}",
+        ]
+        if returncode is not None:
+            lines.append(f"exit code: {returncode}")
+        if cause is not None:
+            lines.append(f"cause: {cause}")
+        lines.extend([f"full log: {log_path}", f"last 80 log lines:\n{self.get_log_tail(log_path)}"])
+        return "\n".join(lines)
+
+    def compile_ip(self, xilinx_ip_script_path: str) -> tuple[str, str]:
         ip_script_dir: str = os.path.dirname(xilinx_ip_script_path)
         symlink_dst: str = f"{ip_script_dir}/{self.init_files[self.simulator]}"
+        ip_name = os.path.basename(os.path.dirname(ip_script_dir))
+        log_dir = f"{self.compile_cl_ip_dir}/logs"
+        os.makedirs(log_dir, exist_ok=True)
+        ip_log = f"{log_dir}/{ip_name}.log"
+        command = [xilinx_ip_script_path, "-lib_map_path", self.complib_dir]
+        created_symlink = False
 
-        # check for abnormalities
-        print(f"Compiling this cl_ip {xilinx_ip_script_path}")
-        assert os.path.exists(self.sim_initfile), f"FATAL missing init file {self.sim_initfile}"
-        artifacts_dirs_exist = os.path.exists(f"{self.compile_cl_ip_dir}/_info") or os.path.exists(f"{self.compile_cl_ip_dir}/_vmake")
-        if self.simulator == QUESTA and not artifacts_dirs_exist:
-            print(f"WARNING no lib, running vlib {self.compile_cl_ip_dir}")
-            subprocess.check_call(["vlib", self.compile_cl_ip_dir], cwd=ip_script_dir, stdout=compile_log)
+        try:
+            print(f"Compiling CL IP '{ip_name}'; log: {ip_log}")
+            if not os.path.exists(self.sim_initfile):
+                self.clean_failure(f"Missing simulator initialization file.\nsimulator: {self.simulator}\ninit file: {self.sim_initfile}")
 
-        if not os.path.exists(symlink_dst):
-            os.symlink(self.sim_initfile, symlink_dst)
-        self.prepare_ip_script_for_compilation(ip_script_dir, xilinx_ip_script_path)
-        print(f"Doing {xilinx_ip_script_path} -lib_map_path {self.complib_dir}")
-        subprocess.check_call([xilinx_ip_script_path, "-lib_map_path", self.complib_dir], cwd=ip_script_dir, stdout=compile_log)
-        self.cleanup_compilation_dir(ip_script_dir, symlink_dst)
+            if not os.path.exists(symlink_dst):
+                os.symlink(self.sim_initfile, symlink_dst)
+                created_symlink = True
+            self.prepare_ip_script_for_compilation(ip_script_dir, xilinx_ip_script_path)
+            with open(ip_log, "w") as compile_log:
+                compile_log.write(f"IP: {ip_name}\n")
+                compile_log.write(f"command: {shlex.join(command)}\n")
+                compile_log.write(f"working directory: {ip_script_dir}\n\n")
+                result = subprocess.run(
+                    command,
+                    cwd=ip_script_dir,
+                    stdout=compile_log,
+                    stderr=subprocess.STDOUT,
+                    check=False,
+                )
+            if result.returncode:
+                self.clean_failure(
+                    self.compilation_failure_message(
+                        ip_name,
+                        command,
+                        ip_script_dir,
+                        ip_log,
+                        returncode=result.returncode,
+                    )
+                )
+            return ip_name, ip_log
+        except CompileError:
+            raise
+        except Exception as error:
+            self.clean_failure(self.compilation_failure_message(ip_name, command, ip_script_dir, ip_log, cause=error))
+        finally:
+            self.cleanup_compilation_dir(ip_script_dir, symlink_dst, created_symlink)
 
     def prepare_ip_script_for_compilation(self, dir_path: str, file_path: str) -> None:
         self.backup_file(file_path)
@@ -211,8 +370,9 @@ class Compiler:
         with open(file_path, "w") as f:
             f.writelines(lines)
 
-    def cleanup_compilation_dir(self, ip_script_dir: str, symlink_dst: str) -> None:
-        os.remove(symlink_dst)
+    def cleanup_compilation_dir(self, ip_script_dir: str, symlink_dst: str, created_symlink: bool) -> None:
+        if created_symlink and os.path.lexists(symlink_dst):
+            os.remove(symlink_dst)
         self.remove_compile_artifacts(ip_script_dir)
         self.move_backup_files_back()
 
@@ -236,6 +396,7 @@ class Compiler:
             original_file_path: str = f"{modified_file_path}{self.orig_file_ext}"
             if os.path.exists(original_file_path):
                 shutil.move(original_file_path, modified_file_path)
+        self.backed_up_files = []
 
     def backup_file(self, file_path: str) -> None:
         if file_path not in self.backed_up_files:
@@ -245,7 +406,7 @@ class Compiler:
     def clean_failure(self, message: str) -> None:
         if os.path.exists(self.in_progress_file):
             os.remove(self.in_progress_file)
-        raise Exception(message)
+        raise CompileError(message)
 
 
 if __name__ == "__main__":
@@ -256,7 +417,13 @@ if __name__ == "__main__":
 
         os.makedirs(compiler.compile_cl_ip_dir)
         compiler.compile_cl_ips()
-    except Exception as e:
+    except CompileError as error:
         if os.path.exists(args.in_progress_file):
             os.remove(args.in_progress_file)
-        raise Exception("The Python script experienced a failure. Please review and make sure Python 3.8+ is installed\n") from e
+        print(error, file=sys.stderr)
+        raise SystemExit(1) from None
+    except Exception:
+        if os.path.exists(args.in_progress_file):
+            os.remove(args.in_progress_file)
+        print("=== CL IP COMPILATION FAILED ===\nUnexpected error before compilation completed.", file=sys.stderr)
+        raise

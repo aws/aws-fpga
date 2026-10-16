@@ -1,6 +1,21 @@
 F2 Developer Kit Release Notes
 ==============================
 
+v2.3.5
+------
+
+- Fixes for ``check_host_memory()`` in the `cl_dram_hbm_dma testbench utilities <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/verif/tests/cl_dram_hbm_dma_utils.svh>`__
+  to compare all addresses of each host buffer in DDR and HBM DMA tests
+  for ``cl_dram_hbm_dma`` and ``cl_mem_perf``
+- HDK runtime software example fixes
+- Improved error logging for CL IP compilation
+- Runtime AMI Builder package version updates for security fixes
+- Added more Vitis examples not supported for Hardware Emulation to the
+  `Vitis errata <./vitis/ERRATA.html>`__
+- Added retry attempts to downloading the F2 shells in
+  `hdk_setup.sh <https://github.com/aws/aws-fpga/tree/f2/hdk_setup.sh#L203>`__
+- Security improvements for the AWS FPGA SDK
+
 v2.3.4
 ------
 

@@ -14,21 +14,24 @@
 #
 
 TOP = ..
-INCLUDES = -I. -I../include -I/usr/include
-LIB_PATH = $(TOP)/lib
+include $(TOP)/common.mk
 
-#OPT=-O2
-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+INCLUDES = -I. -I$(TOPINC_PATH)
+CFLAGS += -fPIC
 
 UTILLIB = $(LIB_PATH)/libutils.a
 
-#SRC = $(wildcard *.c)
+# sh_dpi_tasks.c is deliberately excluded from libutils.a.
 SRC = io.c log.c logger-kmsg.c
 OBJ = $(SRC:.c=.o)
 
+all: $(UTILLIB)
+
 $(UTILLIB): $(OBJ)
 	mkdir -p $(LIB_PATH)
-	ar rcs $(UTILLIB) $(OBJ)
+	$(AR) rcs $(UTILLIB) $(OBJ)
 
 clean:
-	rm -f *.o *.a $(UTILLIB)
+	rm -f *.o *.d $(UTILLIB)
+
+-include $(DEPS)

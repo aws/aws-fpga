@@ -29,6 +29,7 @@ module test_dram_dma_rnd();
 
       logic [63:0] host_memory_buffer_address;
       logic [63:0] cl_addr_0, cl_addr_1, cl_addr_2, cl_addr_3;
+      logic [63:0] hbm_addr_0, hbm_addr_1;
 
       tb.power_up(.clk_recipe_a(ClockRecipe::A1));
       `ifdef AWS_CLKGEN_BASE_REG
@@ -60,6 +61,11 @@ module test_dram_dma_rnd();
       cl_addr_1 = `DDR_BASE_ADDR + `DDR_LEVEL_1 + $urandom_range(64'h1000,  64'h1064);
       cl_addr_1[5:0] = 6'b0;
       $display("[%t] : cl_addr_1 is %x", $realtime, cl_addr_1);
+
+      hbm_addr_0 = `HBM_BASE_ADDR + (cl_addr_0 - `DDR_BASE_ADDR);
+      hbm_addr_1 = `HBM_BASE_ADDR + `_8_GB + (cl_addr_1 - `DDR_BASE_ADDR - `DDR_LEVEL_1);
+      $display("[%t] : hbm_addr_0 is %x", $realtime, hbm_addr_0);
+      $display("[%t] : hbm_addr_1 is %x", $realtime, hbm_addr_1);
 
       cl_addr_2 = `DDR_BASE_ADDR + `DDR_LEVEL_2 + $urandom_range(64'h0010,  64'h0080);
       cl_addr_2[5:0] = 6'b0;
@@ -112,8 +118,8 @@ module test_dram_dma_rnd();
       check_host_memory(.addr(`DDR_HOST_MEM_BUFFER_ADDR_3), .expected_data_pattern(8'hDD), .num_bytes(len3));
 
       $display("[%t] : Initializing HBM buffers", $realtime);
-	  load_host_memory(.chan(`HBM_CHANNEL), .host_addr(64'h0004_000), .cl_addr(`HBM_BASE_ADDR + cl_addr_0), .data_pattern(8'hAB), .num_bytes(len2));
-	  load_host_memory(.chan(`HBM_CHANNEL), .host_addr(64'h0005_000), .cl_addr(`HBM_BASE_ADDR + `_8_GB + cl_addr_1), .data_pattern(8'hCD), .num_bytes(len3));
+	  load_host_memory(.chan(`HBM_CHANNEL), .host_addr(64'h0004_0000), .cl_addr(hbm_addr_0), .data_pattern(8'hAB), .num_bytes(len2));
+	  load_host_memory(.chan(`HBM_CHANNEL), .host_addr(64'h0005_0000), .cl_addr(hbm_addr_1), .data_pattern(8'hCD), .num_bytes(len3));
 
       $display("[%t] : Starting HBM H2C DMA channels ", $realtime);
       tb.start_que_to_cl(.chan(`HBM_CHANNEL));
@@ -126,8 +132,8 @@ module test_dram_dma_rnd();
       $display("[%t] : Transferring HBM data to host buffer", $realtime);
       `define HBM_HOST_MEM_BUFFER_ADDR_0 64'h0_000E_0000
       `define HBM_HOST_MEM_BUFFER_ADDR_1 64'h0_000F_0000
-      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_0), .cl_addr(`HBM_BASE_ADDR + cl_addr_0), .len(len2) );
-      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_1), .cl_addr(`HBM_BASE_ADDR + `_8_GB + cl_addr_1), .len(len3) );
+      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_0), .cl_addr(hbm_addr_0), .len(len2) );
+      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_1), .cl_addr(hbm_addr_1), .len(len3) );
       tb.start_que_to_buffer(.chan(`HBM_CHANNEL));
 
       wait_for_dma_transfer_from_cl_to_buffer(`HBM_CHANNEL);

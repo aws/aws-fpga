@@ -13,34 +13,27 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
-#g
+#
 
-# Build script for the Amazon FPGA Image Management Tools and associated libraries.
+# Clean script for the Amazon FPGA Image Management Tools and associated libraries.
 
-TOP=`pwd`
+set -euo pipefail
 
-LOGLEVEL=$1
-if [ -z "$LOGLEVEL" ]; then
-	CONFIG_LOGLEVEL=3
-else
-	CONFIG_LOGLEVEL=$LOGLEVEL
-fi
+TOP=$(pwd)
 
 function build_exec {
-	cd $TOP/$BUILD_DIR
-	echo "Entering $TOP/$BUILD_DIR"
-	RET=$?
-	if [ $RET -ne 0 ]; then
+	if ! cd "$TOP/$BUILD_DIR"; then
 		echo "could not cd to $TOP/$BUILD_DIR"
 		exit 1
 	fi
-	make clean
-	RET=$?
-	if [ $RET -ne 0 ]; then
+	echo "Entering $TOP/$BUILD_DIR"
+
+	if ! make clean; then
 		echo "make clean failed"
 		exit 1
 	fi
-	cd $TOP
+
+	cd "$TOP"
 }
 
 
@@ -56,11 +49,16 @@ build_exec
 BUILD_DIR="fpga_libs/fpga_clkgen"
 build_exec
 
-BUILD_DIR="fpga_libs/fpga_mgmt"
-build_exec
-
 BUILD_DIR="fpga_mgmt_tools/src"
 build_exec
 
 BUILD_DIR="fpga_mgmt_examples/src"
 build_exec
+
+# fpga_mgmt last: its clean removes the shared-library symlinks from lib/so.
+BUILD_DIR="fpga_libs/fpga_mgmt"
+build_exec
+
+# The library output directory is created by the per-directory builds; remove it
+# once everything else has been cleaned.
+rm -rf "$TOP/lib"

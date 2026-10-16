@@ -14,37 +14,31 @@
 #
 
 TOP = ../..
-TOPINC_PATH = $(TOP)/include
-FPGAHALINC_PATH = $(TOPINC_PATH)/hal
-LIB_PATH = $(TOP)/lib
+include $(TOP)/common.mk
 
 INCLUDES = -I$(FPGAHALINC_PATH) -I$(TOPINC_PATH) -I../. -I.
 
-OPT=-DFPGA_ALLOW_NON_ROOT -DCONFIG_LOGLEVEL=1
-CFLAGS=$(OPT) -g -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
-
-LDFLAGS = -L$(LIB_PATH)/so
+LDFLAGS_SHARED = $(LDFLAGS) -L$(LIB_SO_PATH)
 LDLIBS = -lfpga_mgmt
 
 # flags for compiling a statically linked version
-LDFLAGS_STATIC = -L$(LIB_PATH)
+LDFLAGS_STATIC = $(LDFLAGS) -L$(LIB_PATH)
 LDLIBS_STATIC = -lfpga_mgmt -lrt -lpthread
 
-UTILLCDLIB = $(LIB_PATH)/libutils.a
-LIBS=$(UTILLCDLIB)
-
-OBJ = $(SRC:.c=.o)
-
 BINS = clear_single_fpga clear_multiple_fpga load_single_fpga load_multiple_fpga prefetch_multiple_afi
-STATIC_BINS = clear_single_fpga clear_multiple_fpga load_single_fpga load_multiple_fpga prefetch_multiple_afi
+STATIC_BINS = $(addprefix static_,$(BINS))
+# Direct compile-and-link rules write target-named dependency files.
+DEPS = $(addsuffix .d,$(BINS) $(STATIC_BINS))
 
-all: $(BINS) $(addprefix static_,$(STATIC_BINS))
+all: $(BINS) $(STATIC_BINS)
 
-%:: %.c
-	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(CFLAGS)
+$(BINS): %: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS_SHARED) $(LDLIBS)
 
-static_%:: %.c
-	$(CC) -o $@ $^ $(LDFLAGS_STATIC) $(LDLIBS_STATIC) $(CFLAGS)
+$(STATIC_BINS): static_%: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS_STATIC) $(LDLIBS_STATIC)
 
 clean:
-	rm -f *.o *.a $(BINS) $(addprefix static_,$(STATIC_BINS))
+	rm -f *.o *.d *.a $(BINS) $(STATIC_BINS)
+
+-include $(DEPS)

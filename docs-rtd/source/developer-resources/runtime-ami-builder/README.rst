@@ -170,17 +170,16 @@ The AWS CDK depends on ``Node.js`` to function. More information about
 `supported versions is available
 here <https://docs.aws.amazon.com/cdk/v2/guide/node-versions.html>`__.
 
-To install Node.js, `visit the download
-page <https://nodejs.org/en/download>`__ and choose a version. This
-guide uses ``Linux`` as the platform, ``nvm`` as the Node.js version
-manager, and ``npm`` as the package manager.
+Install Node.js 20.19+, 22.13+, or 24+ from the `Node.js download
+page <https://nodejs.org/en/download>`__. This guide uses ``Linux`` as
+the platform, ``nvm`` as the Node.js version manager, and ``npm`` as the
+package manager.
 
 Installing AWS CDK Dependencies
 -------------------------------
 
-After installing Node.js, source the setup script to install the CDK and
-its dependencies and perform any necessary security updates for those
-npm packages:
+After installing Node.js, source the setup script to install the pinned
+CDK and project dependencies:
 
 .. code-block:: bash
 

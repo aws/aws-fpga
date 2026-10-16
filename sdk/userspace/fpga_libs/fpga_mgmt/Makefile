@@ -14,18 +14,15 @@
 #
 
 TOP = ../..
-TOPINC_PATH = $(TOP)/include
-UTILLIB_PATH = $(TOP)/util
-LIB_PATH = $(TOP)/lib
-LIB_SO_PATH = $(LIB_PATH)/so
+include $(TOP)/common.mk
 
-INCLUDES = -I. -I$(TOPINC_PATH) -I/usr/include
+INCLUDES = -I. -I$(TOPINC_PATH)
+CFLAGS += -fPIC
 
 # The FPGA_CMD_UNSUPPORTED_FLAGS are unsupported flags that are ignored in F2.
 # Uncomment the following line to acknowledge that your application does not depend on the flags.
 #IGNORE_DEPRECATION=-DUNSUPPORTED_OPTIONS_ACKNOWLEDGED
-#OPT=-O2
-CFLAGS=$(IGNORE_DEPRECATION) $(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+CPPFLAGS += $(IGNORE_DEPRECATION)
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
@@ -39,17 +36,33 @@ FPGAAUXLIBS += $(LIB_PATH)/libutils.a
 FPGAAUXLIBS += $(LIB_PATH)/libfpga_dma.a
 FPGAAUXLIBS += $(LIB_PATH)/libfpga_clkgen.a
 
+# Scratch directory for objects extracted from the auxiliary archives.
+AUXOBJ_DIR = .auxobj
+
 all: $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)
 
-$(FPGAMGMTLIB): $(OBJ)
+# The auxiliary archives are folded into this output, so a change to any of them must rebuild it.
+$(FPGAMGMTLIB): $(OBJ) $(FPGAAUXLIBS)
 	mkdir -p $(LIB_PATH)
-	for library in $(FPGAAUXLIBS); do ar -x $$library; done
-	ar rcs $(FPGAMGMTLIB) *.o
+	rm -rf $(AUXOBJ_DIR)
+	mkdir -p $(AUXOBJ_DIR)
+	set -e; for library in $(FPGAAUXLIBS); do \
+		( cd $(AUXOBJ_DIR) && $(AR) -x ../$$library ); \
+	done
+	rm -f $(FPGAMGMTLIB)
+	$(AR) rcs $(FPGAMGMTLIB) $(OBJ) $(AUXOBJ_DIR)/*.o
+	rm -rf $(AUXOBJ_DIR)
 
-$(FPGAMGMTLIB_SO): $(OBJ)
+$(FPGAMGMTLIB_SO): $(OBJ) $(FPGAAUXLIBS)
 	mkdir -p $(LIB_SO_PATH)
-	$(CC) -o $(FPGAMGMTLIB_SO) -shared $(OBJ) -Wl,-soname,libfpga_mgmt.so.1 -Wl,--whole-archive $(FPGAAUXLIBS) -Wl,--no-whole-archive $(LDLIBS)
-	ln -sf libfpga_mgmt.so.1.0.0 $(LIB_SO_PATH)/libfpga_mgmt.so
+	$(CC) -o $(FPGAMGMTLIB_SO) -shared $(OBJ) -Wl,-soname,libfpga_mgmt.so.1 -Wl,--whole-archive $(FPGAAUXLIBS) -Wl,--no-whole-archive $(LDFLAGS) $(LDLIBS)
+	ln -sf libfpga_mgmt.so.1.0.0 $(LIB_SO_PATH)/libfpga_mgmt.so.1
+	ln -sf libfpga_mgmt.so.1 $(LIB_SO_PATH)/libfpga_mgmt.so
 
 clean:
-	rm -f *.o $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)
+	rm -rf $(AUXOBJ_DIR)
+	rm -f *.o *.d
+	rm -f $(FPGAMGMTLIB) $(FPGAMGMTLIB_SO)
+	rm -f $(LIB_SO_PATH)/libfpga_mgmt.so $(LIB_SO_PATH)/libfpga_mgmt.so.1
+
+-include $(DEPS)

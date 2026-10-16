@@ -76,13 +76,24 @@ SDAccel/tools/*.o
 SDAccel/tools/xbsak
 
 # SDK generated files
-sdk/linux_kernel_drivers/edma/.*.o.cmd
-sdk/linux_kernel_drivers/edma/.*.ko.cmd
-sdk/linux_kernel_drivers/edma/.tmp_versions
-sdk/linux_kernel_drivers/xdma/.*.o.cmd
-sdk/linux_kernel_drivers/xdma/.*.ko.cmd
-sdk/linux_kernel_drivers/xdma/.tmp_versions
 sdk/userspace/lib/
+sdk/userspace/**/*.d
+sdk/userspace/fpga_libs/fpga_mgmt/.auxobj/
+
+# SDK fpga_mgmt_examples binaries
+sdk/userspace/fpga_mgmt_examples/src/clear_single_fpga
+sdk/userspace/fpga_mgmt_examples/src/clear_multiple_fpga
+sdk/userspace/fpga_mgmt_examples/src/load_single_fpga
+sdk/userspace/fpga_mgmt_examples/src/load_multiple_fpga
+sdk/userspace/fpga_mgmt_examples/src/prefetch_multiple_afi
+sdk/userspace/fpga_mgmt_examples/src/static_*
+
+# SDK apps: msix-interrupts kbuild artifacts
+sdk/apps/msix-interrupts/.*.cmd
+sdk/apps/msix-interrupts/*.mod
+sdk/apps/msix-interrupts/.tmp_versions
+sdk/apps/msix-interrupts/Module.symvers
+sdk/apps/msix-interrupts/modules.order
 
 # Vitis adjacent files
  vitis/aws_platform/

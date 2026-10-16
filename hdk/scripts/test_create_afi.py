@@ -358,7 +358,8 @@ class TestDCPDiscovery(unittest.TestCase):
             self.assertEqual(self.dcp_discovery.find_dcp_files_in_hdk_workspace(), [])
 
             mock_find_hdk.return_value = "/test/hdk"
-            mock_glob.return_value = ["/test/path/test.tar"]
+            # One glob for cl/examples/* and one for cl/examples/cl_demo/*.
+            mock_glob.side_effect = [["/test/path/test.tar"], []]
             results = self.dcp_discovery.find_dcp_files_in_hdk_workspace()
             self.assertEqual(len(results), 1)
 
