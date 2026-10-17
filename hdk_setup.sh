@@ -200,12 +200,12 @@ if [ $skip_downloads -eq 0 ]; then
       s3_hdk_dir_url=https://aws-fpga-hdk-resources.s3.amazonaws.com/hdk
       s3_shell_dir=${s3_hdk_dir_url}/shell_v${shell_ver:2}
 
-      if ! wget $s3_shell_dir/$shell_file -O $hdk_file -q; then
+      if ! retry_with_backoff 4 5 wget $s3_shell_dir/$shell_file -O $hdk_file -q; then
         err_msg "Failed to download HDK shell $shell_file version $shell_ver"
         return 2
       fi
 
-      if ! wget $s3_shell_dir/$shell_file_sha256 -O $hdk_file_sha256 -q; then
+      if ! retry_with_backoff 4 5 wget $s3_shell_dir/$shell_file_sha256 -O $hdk_file_sha256 -q; then
         err_msg "Failed to download HDK shell $shell_file_sha256 version $shell_ver"
         return 2
       fi

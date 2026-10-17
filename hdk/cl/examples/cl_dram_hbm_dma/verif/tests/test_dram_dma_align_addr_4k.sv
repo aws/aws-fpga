@@ -102,8 +102,8 @@ module test_dram_dma_align_addr_4k();
       $display("[%t] : Transferring HBM data to host buffer", $realtime);
       `define HBM_HOST_MEM_BUFFER_ADDR_0 64'h0_0005_4800
       `define HBM_HOST_MEM_BUFFER_ADDR_1 64'h0_0006_5800
-      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_0), .cl_addr(`HBM_BASE_ADDR + 64'h0FC0), .len(len0));
-      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_1), .cl_addr(`HBM_BASE_ADDR + `_8_GB + 64'h1F80), .len(len1));
+      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_0), .cl_addr(`HBM_BASE_ADDR + 64'h0FC0), .len(len2));
+      tb.que_cl_to_buffer(.chan(`HBM_CHANNEL), .dst_addr(`HBM_HOST_MEM_BUFFER_ADDR_1), .cl_addr(`HBM_BASE_ADDR + `_8_GB + 64'h1F80), .len(len3));
       tb.start_que_to_buffer(.chan(`HBM_CHANNEL));
 
       wait_for_dma_transfer_from_cl_to_buffer(`HBM_CHANNEL);

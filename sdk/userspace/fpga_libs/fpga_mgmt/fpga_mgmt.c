@@ -91,7 +91,7 @@ int fpga_mgmt_get_sh_version(int slot_id, uint32_t *sh_version)
 
 	handle = fpga_mgmt_state.slots[slot_id].handle;
 
-	struct fpga_hal_mbox_versions ver;
+	struct fpga_hal_mbox_versions ver = {0};
 	ret = fpga_hal_mbox_get_versions(handle, &ver);
 	fail_on(ret, err, "fpga_hal_mbox_get_versions failed");
 
@@ -152,7 +152,7 @@ static int fpga_mgmt_describe_cmd(int slot_id,
 	info->sh_version = sh_version;
 
 	/* copy the metrics into the out param */
-	struct fpga_pci_resource_map mbox_map;
+	struct fpga_pci_resource_map mbox_map = {0};
 	ret = fpga_pci_get_resource_map(slot_id, FPGA_MGMT_PF, &mbox_map);
 	fail_on(ret != 0, out, "fpga_pci_get_resource_map failed");
 	if (IS_F1((&mbox_map))) {
@@ -363,7 +363,7 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 		struct fpga_mgmt_image_info *info)
 {
 	struct fpga_mgmt_image_info tmp_info;
-	struct fpga_pci_resource_map app_map;
+	struct fpga_pci_resource_map app_map = {0};
 	uint32_t prev_sh_version = 0;
 	uint32_t sh_version = 0;
 	uint32_t retries = 0;
@@ -546,7 +546,7 @@ int fpga_mgmt_load_local_image_sync_with_options(union fpga_mgmt_load_local_imag
 		struct fpga_mgmt_image_info *info)
 {
 	struct fpga_mgmt_image_info tmp_info;
-	struct fpga_pci_resource_map app_map;
+	struct fpga_pci_resource_map app_map = {0};
 	uint32_t prev_sh_version = 0;
 	uint32_t sh_version = 0;
 	uint32_t retries = 0;

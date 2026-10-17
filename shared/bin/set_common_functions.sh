@@ -239,7 +239,7 @@ function extract_vivado_version() {
 }
 
 function allow_non_root {
-       [ ! -z ${AWS_FPGA_ALLOW_NON_ROOT} ]
+       [ -n "${AWS_FPGA_ALLOW_NON_ROOT:-}" ]
 }
 
 function get_pkg_manager {
@@ -268,6 +268,23 @@ function is_rocky_linux {
 
 function is_ubuntu {
     [[ $(cat /etc/os-release) == *"Ubuntu"* ]]
+}
+
+function retry_with_backoff {
+    local max_attempts="${1:?retry_with_backoff requires max_attempts}"
+    local delay="${2:?retry_with_backoff requires delay}"
+    local retry_command=("${3:?retry_with_backoff requires a command}" "${@:4}")
+    local attempt=1
+
+    until "${retry_command[@]}"; do
+        if (( attempt >= max_attempts )); then
+            return 1
+        fi
+        warn_msg "Command failed (attempt ${attempt}/${max_attempts}): ${retry_command[*]}. Retrying in ${delay}s..."
+        sleep "$delay"
+        delay=$(( delay * 2 ))
+        (( attempt++ ))
+    done
 }
 
 function check_for_empty_var {

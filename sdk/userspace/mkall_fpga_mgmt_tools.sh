@@ -16,60 +16,81 @@
 #
 
 # Build script for the Amazon FPGA Image Management Tools and libraries.
+#
+# Usage: ./mkall_fpga_mgmt_tools.sh [loglevel] [max_bars]
+#
+# Environment:
+#   SDK_BUILD_INCREMENTAL=1  skip the `make clean` before each build
+#   SDK_BUILD_JOBS=<n>       pass -j<n> to make
+#   OPT=<flags>              override the optimization level
 
-TOP=`pwd`
+set -euo pipefail
 
-source $AWS_FPGA_REPO_DIR/shared/bin/set_common_functions.sh
+TOP=$(pwd)
 
-LOGLEVEL=$1
+source "${AWS_FPGA_REPO_DIR:-$TOP/../..}/shared/bin/set_common_functions.sh"
+
+LOGLEVEL=${1:-}
 if [ -z "$LOGLEVEL" ]; then
 	CONFIG_LOGLEVEL=0
 else
 	CONFIG_LOGLEVEL=$LOGLEVEL
 fi
 
+# Preprocessor defines stay separate from OPT so callers can select an
+# optimization level without dropping required SDK definitions.
+EXTRA_CPPFLAGS=""
+
 if allow_non_root ; then
-       OPT="$OPT -DFPGA_ALLOW_NON_ROOT=1"
+	EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -DFPGA_ALLOW_NON_ROOT=1"
 fi
 
 #
-# gcc optimizations
-#OPT="-O3 -fno-strict-aliasing"
+# gcc optimizations. Overridable from the environment.
+#
+OPT=${OPT:-}
 
 #
 # The max number of FPGA BARs that may be attached,
 # e.g. (FPGA_SLOT_MAX * FPGA_PF_MAX * FPGA_BAR_PER_PF_MAX) is the upper bound.
 #
 FPGA_PCI_BARS_DFLT=64
-FPGA_PCI_BARS_MAX=$2
+FPGA_PCI_BARS_MAX=${2:-}
 if [ -z "$FPGA_PCI_BARS_MAX" ]; then
 	FPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_DFLT
 fi
 
 # get the HDK/SDK version number
-source $TOP/../../release_version.txt
+source "$TOP/../../release_version.txt"
+
+EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -DFPGA_PCI_BARS_MAX=$FPGA_PCI_BARS_MAX"
+EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -DCLI_VERSION=\\\"$RELEASE_VERSION\\\""
+
+MAKE_ARGS=()
+if [ -n "${SDK_BUILD_JOBS:-}" ]; then
+	MAKE_ARGS+=("-j${SDK_BUILD_JOBS}")
+fi
 
 function build_exec {
-	cd $TOP/$BUILD_DIR
-	echo "Entering $TOP/$BUILD_DIR"
-	RET=$?
-	if [ $RET -ne 0 ]; then
+	if ! cd "$TOP/$BUILD_DIR"; then
 		echo "could not cd to $TOP/$BUILD_DIR"
 		exit 1
 	fi
-	make clean
-	RET=$?
-	if [ $RET -ne 0 ]; then
-		echo "make clean failed"
-		exit 1
+	echo "Entering $TOP/$BUILD_DIR"
+
+	if [ -z "${SDK_BUILD_INCREMENTAL:-}" ]; then
+		if ! make clean; then
+			echo "make clean failed"
+			exit 1
+		fi
 	fi
-	make OPT="$OPT -DCONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" -DFPGA_PCI_BARS_MAX="$FPGA_PCI_BARS_MAX" -DCLI_VERSION='\"$RELEASE_VERSION\"'"
-	RET=$?
-	if [ $RET -ne 0 ]; then
+
+	if ! make "${MAKE_ARGS[@]}" OPT="$OPT" CONFIG_LOGLEVEL="$CONFIG_LOGLEVEL" EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS"; then
 		echo "make failed"
 		exit 1
 	fi
-	cd $TOP
+
+	cd "$TOP"
 }
 
 

@@ -24,14 +24,11 @@ install_cdk_deps() {
     fi
 
     npm_cmds=(
-        "install -g aws-cdk"
-        "install"
-        "install yaml"
-        "install jsonc-parser"
-        "audit fix --force"
+        "install -g aws-cdk@2.1138.0"
+        "ci"
     )
 
-    info_msg "Installing CDK dependencies and applying package security updates!"
+    info_msg "Installing pinned CDK dependencies!"
     for cmd in "${npm_cmds[@]}"; do
         if ! npm $cmd; then
             err_msg "Failed to run: npm $cmd"

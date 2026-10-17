@@ -175,7 +175,7 @@ endif
 
 
 export CL_IP_IN_PROGRESS = $(IP_SIM_DIR)/$(strip $(SIMULATOR))_compile_cl_ips_dir_in_progress
-check_cl_ip_in_progress:
+check_cl_ip_in_progress: $(COMPLIB_DIR)
 ifneq ("$(wildcard $(CL_IP_IN_PROGRESS))","")
 	$(error "$n ERROR: CL IP compilation is in progress $n")
 else
@@ -207,20 +207,20 @@ ifeq ("$(SIMULATOR)","xsim")
 else
 ifeq ("$(wildcard $(COMPLIB_DIR))","")
 	mkdir -p $(SIM_ROOT)
-	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family all" > create_libs.tcl
-	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family virtexuplus" > create_libs.tcl
+	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl || { status=$$?; rm -rf $(COMPLIB_DIR); rm -f $(COMPLIB_IN_PROGRESS) $(SIM_ROOT)/create_libs.tcl; exit $$status; }
 	cd $(SIM_ROOT) && rm -rf create_libs.tcl
 endif
 endif
 	rm -f $(COMPLIB_IN_PROGRESS)
 
 
-$(COMPILE_CL_IP_DIR): check_cl_ip_in_progress $(COMPLIB_DIR)
+$(COMPILE_CL_IP_DIR): check_cl_ip_in_progress
 ifeq ("$(SIMULATOR)","xsim")
 	$(MAKE) copy_xsim_ini
 endif
 ifeq ("$(wildcard $(COMPILE_CL_IP_DIR)/done)","")
-	$(HDK_COMMON_DIR)/verif/scripts/compile_cl_ips.py --simulator $(SIMULATOR) --complib_dir $(COMPLIB_DIR) --compile_cl_ip_dir $(COMPILE_CL_IP_DIR) --in_progress_file $(CL_IP_IN_PROGRESS);
+	$(HDK_COMMON_DIR)/verif/scripts/compile_cl_ips.py --simulator $(SIMULATOR) --complib_dir $(COMPLIB_DIR) --compile_cl_ip_dir $(COMPILE_CL_IP_DIR) --in_progress_file $(CL_IP_IN_PROGRESS) $(foreach library,$(COMMON_LIBLISTS),--common_library $(library));
 endif
 	rm -f $(CL_IP_IN_PROGRESS)
 

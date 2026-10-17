@@ -66,38 +66,43 @@ int sde_mgmt_init(int slot_id, enum SDE_EXAMPLE_DIR direction, size_t packet_siz
   fail_on(ret, err, "failed to init mem");
 
   ret = sde_hw_init(&sde_mgmt->hw_ctrl, slot_id);
-  fail_on(ret, err, "failed to init hw_ctrl");
+  fail_on(ret, err_hw, "failed to init hw_ctrl");
 
   uint64_t c2h_status_va;
   uint64_t c2h_status_pa;
   ret = sde_mem_get_status(&sde_mgmt->mem, SDE_SUBSYSTEM_C2H, &c2h_status_va, &c2h_status_pa);
-  fail_on(ret, err, "failed to get c2h_status_va");
+  fail_on(ret, err_hw, "failed to get c2h_status_va");
 
   sde_mgmt->c2h_status = (struct c2h_status*)c2h_status_va;
 
   ret = sde_dma_buffer_init(&sde_mgmt->c2h_buffer, layout, SDE_SUBSYSTEM_C2H, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
-  fail_on(ret, err, "failed to init c2h_buffer");
+  fail_on(ret, err_hw, "failed to init c2h_buffer");
 
   uint64_t h2c_status_va;
   uint64_t h2c_status_pa;
   ret = sde_mem_get_status(&sde_mgmt->mem, SDE_SUBSYSTEM_H2C, &h2c_status_va, &h2c_status_pa);
-  fail_on(ret, err, "failed to get h2c_status_va");
+  fail_on(ret, err_hw, "failed to get h2c_status_va");
 
   sde_mgmt->h2c_status = (struct h2c_status*) h2c_status_va;
 
   ret = sde_dma_buffer_init(&sde_mgmt->h2c_buffer, layout, SDE_SUBSYSTEM_H2C, packet_size, &sde_mgmt->mem, &sde_mgmt->hw_ctrl);
-  fail_on(ret, err, "failed to init h2c_buffer");
+  fail_on(ret, err_hw, "failed to init h2c_buffer");
 
   uint64_t md_ring_va;
   uint64_t md_ring_pa;
   ret = sde_mem_get_metadata(&sde_mgmt->mem, SDE_SUBSYSTEM_C2H, &md_ring_va, &md_ring_pa);
-  fail_on(ret, err, "failed to get md_ring_va");
+  fail_on(ret, err_hw, "failed to get md_ring_va");
 
   sde_mgmt->metadata = (struct c2h_wb_metadata*)(md_ring_va);
 
   sde_mgmt->data_pattern = START_DOUBLE_WORD;
 
   sde_mgmt->initialized = true;
+  return ret;
+
+err_hw:
+  sde_hw_close(&sde_mgmt->hw_ctrl);
+  sde_mem_close(&sde_mgmt->mem);
 err:
   return ret;
 }

@@ -44,34 +44,30 @@ module test_dram_dma_mem_model_bdr_wr();
 
 	  #10000ns;
 
-      $display("[%t] Back door load memory to DDR Base Address \n", $realtime);
       ddr_addr_0 = `DDR_BASE_ADDR;
+      $display("[%t] Back door load memory: start addr %h, length %0d, data pattern 8'hAA", $realtime, ddr_addr_0, len0);
       for (int i = 0 ; i < len0 ; i++) begin
-         $display("[%t]:[%d] back door load memory model to DDR Base Address mapped address: addr %h data 8'hAA. \n", $realtime, i,ddr_addr_0);
 	 tb.card.fpga.CL.SH_DDR.u_mem_model.axi_mem_bdr_write(.addr(ddr_addr_0), .d(8'hAA));
          ddr_addr_0++;
       end
 
-      $display("[%t] Back door load memory to DDR Offset 8 GB \n", $realtime);
       ddr_addr_1 = `DDR_BASE_ADDR + `DDR_LEVEL_1;
-      for (int i = 0 ; i < len0 ; i++) begin
-         $display("[%t]:[%d] back door load memory model to DDR Offset 8 GB mapped address: addr %h data 8'hBB. \n", $realtime, i,ddr_addr_1);
+      $display("[%t] Back door load memory: start addr %h, length %0d, data pattern 8'hBB", $realtime, ddr_addr_1, len1);
+      for (int i = 0 ; i < len1 ; i++) begin
 	 tb.card.fpga.CL.SH_DDR.u_mem_model.axi_mem_bdr_write(.addr(ddr_addr_1), .d(8'hBB));
          ddr_addr_1++;
       end
 
-      $display("[%t] Back door load memory to DDR Offset 16 GB \n", $realtime);
       ddr_addr_2 = `DDR_BASE_ADDR + `DDR_LEVEL_2;
-      for (int i = 0 ; i < len0 ; i++) begin
-         $display("[%t]:[%d] back door load memory model to DDR Offset 16 GB mapped address: addr %h data 8'hCC. \n", $realtime, i,ddr_addr_2);
+      $display("[%t] Back door load memory: start addr %h, length %0d, data pattern 8'hCC", $realtime, ddr_addr_2, len2);
+      for (int i = 0 ; i < len2 ; i++) begin
 	 tb.card.fpga.CL.SH_DDR.u_mem_model.axi_mem_bdr_write(.addr(ddr_addr_2), .d(8'hCC));
          ddr_addr_2++;
       end
 
-      $display("[%t] Back door load memory to DDR Offset 24 GB \n", $realtime);
       ddr_addr_3 = `DDR_BASE_ADDR + `DDR_LEVEL_3;
-      for (int i = 0 ; i < len0 ; i++) begin
-         $display("[%t]:[%d] back door load memory model to DDR Offset 24 GB mapped address: addr %h data 8'hDD. \n", $realtime, i,ddr_addr_3);
+      $display("[%t] Back door load memory: start addr %h, length %0d, data pattern 8'hDD", $realtime, ddr_addr_3, len3);
+      for (int i = 0 ; i < len3 ; i++) begin
          tb.card.fpga.CL.SH_DDR.u_mem_model.axi_mem_bdr_write(.addr(ddr_addr_3), .d(8'hDD));
          ddr_addr_3++;
       end

@@ -26,6 +26,8 @@ int sde_hw_init(struct sde_hw_ctrl* ctrl, int slot_id) {
   ctrl->initialized = false;
 
   ctrl->bar0_handle = PCI_BAR_HANDLE_INIT;
+  ctrl->bar4_handle = PCI_BAR_HANDLE_INIT;
+  ctrl->bar4_wc_handle = PCI_BAR_HANDLE_INIT;
   ret = fpga_pci_attach(ctrl->slot_id, FPGA_APP_PF, APP_PF_BAR0, 0, &ctrl->bar0_handle);
 
   ret |= fpga_pci_attach(ctrl->slot_id, FPGA_APP_PF, APP_PF_BAR4, 0, &ctrl->bar4_handle);
@@ -40,17 +42,25 @@ err:
   return ret;
 }
 
+static int detach_if_attached(pci_bar_handle_t* handle) {
+  if (*handle == PCI_BAR_HANDLE_INIT) {
+    return FPGA_ERR_OK;
+  }
+
+  int ret = fpga_pci_detach(*handle);
+  *handle = PCI_BAR_HANDLE_INIT;
+  return ret;
+}
+
 int sde_hw_close(struct sde_hw_ctrl* ctrl) {
   int ret = 0;
 
   fail_on_with_code(ctrl == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "ctrl is NULL");
 
-  if (ctrl->initialized) {
-    ret = fpga_pci_detach(ctrl->bar0_handle);
-    ret |= fpga_pci_detach(ctrl->bar4_handle);
-    ret |= fpga_pci_detach(ctrl->bar4_wc_handle);
-    ctrl->initialized = false;
-  }
+  ret = detach_if_attached(&ctrl->bar0_handle);
+  ret |= detach_if_attached(&ctrl->bar4_handle);
+  ret |= detach_if_attached(&ctrl->bar4_wc_handle);
+  ctrl->initialized = false;
 
   if (ret != FPGA_ERR_OK) {
     log_error("Error during fpga_sde_close");

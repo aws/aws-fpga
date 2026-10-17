@@ -115,17 +115,28 @@ task load_host_memory(int chan, logic [63:0] host_addr, logic [63:0] cl_addr, lo
    end
 endtask
 
+// shared/.tests/check_host_memory_regression.py extracts this task by its header line
+// and compiles it standalone against a mock tb: keep `task ... check_host_memory(` on one
+// line at column 0, and keep every constant the task uses declared inside it.
 task check_host_memory(logic [63:0] addr, logic [7:0] expected_data_pattern, int num_bytes);
+   localparam int MAX_MISMATCH_REPORTS = 16;
    logic [7:0] current_byte;
+   automatic int mismatch_count;
 
+   mismatch_count = 0;
    for (int i = 0 ; i< num_bytes ; i++) begin
-      current_byte = tb.hm_get_byte(.addr(addr));
+      current_byte = tb.hm_get_byte(.addr(addr + i));
       if (current_byte !== expected_data_pattern) begin
-         $error("[%t] : *** ERROR *** Data mismatch, addr:%0x Expected: %0x Actual: %0x",
-                  $realtime, (addr + i), expected_data_pattern, current_byte);
+         mismatch_count++;
+         if (mismatch_count <= MAX_MISMATCH_REPORTS)
+            $error("[%t] : *** ERROR *** Data mismatch, addr:%0x Expected: %0x Actual: %0x",
+                     $realtime, (addr + i), expected_data_pattern, current_byte);
          error_count++;
       end
    end
+   if (mismatch_count > MAX_MISMATCH_REPORTS)
+      $error("[%t] : *** ERROR *** Suppressed %0d additional data mismatches (%0d total)",
+               $realtime, mismatch_count - MAX_MISMATCH_REPORTS, mismatch_count);
 endtask
 
 task wait_for_dma_transfer_from_buffer_to_cl(int chan);

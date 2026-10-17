@@ -34,12 +34,16 @@ Hardware Emulation
 
 The following examples do not support Hardware Emulation.
 
-- ``rtl_kernels/rtl_vadd_hw_debug``
 - ``host_xrt/kernel_chain``
-- ``sys_opt/multiple_processes``
 - ``host_xrt/mailbox_auto_restart_xrt``
 - ``host_xrt/mult_compute_units_xrt``
+- ``performance/axi_burst_performance``
+- ``performance/hbm_bandwidth_pseudo_random``
+- ``rtl_kernels/rtl_streaming_k2k_mm``
+- ``rtl_kernels/rtl_vadd_hw_debug``
 - ``rtl_kernels/rtl_vadd_mixed_c_vadd``
+- ``sys_opt/kernel_swap``
+- ``sys_opt/multiple_process``
 
 Vitis 2025.2
 ------------

@@ -14,22 +14,22 @@
 #
 
 TOP = ../..
-TOPINC_PATH = $(TOP)/include
-UTILLIB_PATH = $(TOP)/util
-LIB_PATH = $(TOP)/lib
+include $(TOP)/common.mk
 
-INCLUDES = -I. -I$(TOPINC_PATH) -I/usr/include
-
-#OPT=-O2
-CFLAGS=$(OPT) -g -std=gnu99 -fPIC -Wall -Werror -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes $(INCLUDES)
+INCLUDES = -I. -I$(TOPINC_PATH)
+CFLAGS += -fPIC
 
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
 FPGAPCILIB = $(LIB_PATH)/libfpga_pci.a
 
+all: $(FPGAPCILIB)
+
 $(FPGAPCILIB): $(OBJ)
 	mkdir -p $(LIB_PATH)
-	ar rcs $(FPGAPCILIB) $(OBJ)
+	$(AR) rcs $(FPGAPCILIB) $(OBJ)
 
 clean:
-	rm -f *.o $(FPGAPCILIB)
+	rm -f *.o *.d $(FPGAPCILIB)
+
+-include $(DEPS)
