@@ -44,7 +44,9 @@ Manifest file specification: Version 2
 
 - **shell_version=**\ …..
 
-  - *Taken from*
+  - *The hex ID of the shell the design was built for, for example
+    ``0x10212415`` for the Small Shell or ``0x10052623`` for the XDMA
+    Shell. The released shell IDs are listed in*
     `aws-fpga/hdk/common/shell_stable/shell_version.txt <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/shell_version.txt>`__
 
 - **dcp_file_name=**\ …..

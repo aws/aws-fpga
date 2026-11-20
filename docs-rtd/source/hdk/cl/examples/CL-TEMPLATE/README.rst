@@ -13,6 +13,7 @@ Table of Content
   - `Build <#build>`__
 
 - `CL Template Quick Start Guide <#cl-template-quick-start-guide>`__
+- `Metadata <#metadata>`__
 
 Overview
 --------
@@ -428,5 +429,28 @@ the ``checkpoints`` directory. Details can be found under the
 After a successful build, you can follow the AFI creation, loading, and
 testing instructions in the `HDK design
 flow <./../../../README.html#build-accelerator-afi-using-hdk-design-flow>`__.
+
+Metadata
+--------
+
+Use the following values to register this CL as an AFI.
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Key
+     - Value
+   * - PCI Device ID
+     - 0xF010
+   * - PCI Vendor ID
+     - 0x1D0F (Amazon)
+   * - PCI Subsystem ID
+     - 0x1D51
+   * - PCI Subsystem Vendor ID
+     - 0xFEDC
+
+This example is a starting point for your own design, so no pre-built
+AFI is provided. Build it with the steps above.
 
 `Back to Home <../../../../index.html>`__

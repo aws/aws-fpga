@@ -88,6 +88,16 @@ low-level C interfaces.
 - ``load_local_image_flags(self, slot_id: int, afi_id: str, flags: uint32_t) -> dict``
 - ``load_local_image_sync_flags(self, slot_id: int, afi_id: str, flags: uint32_t, timeout: uint32_t, delay_msec: uint32_t) -> dict``
 
+..
+
+   ``load_local_image`` and ``load_local_image_flags`` send the load
+   command and return without waiting for the load to finish.
+   Immediately after calling either one, call ``describe_local_image``
+   once a second until the AFI is loaded and the status is no longer
+   busy. The load is completed by these describe calls, so if you don’t
+   poll, the AFI might not load. To have the library wait instead, use
+   ``load_local_image_sync_flags``.
+
 FPGA Clock Generation Library Functions
 ---------------------------------------
 

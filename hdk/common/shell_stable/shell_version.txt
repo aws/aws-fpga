@@ -1,1 +1,2 @@
+xdma_shell=0x10052623
 small_shell=0x10212415

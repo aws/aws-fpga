@@ -10,6 +10,7 @@ Table of Contents
 4. `Functional Code Blocks <#functional-code-blocks>`__
 5. `RTL Simulation <#rtl-simulation>`__
 6. `Software Runtime <#software-runtime>`__
+7. `Metadata <#metadata>`__
 
 Overview
 --------
@@ -302,5 +303,44 @@ Reading from OCL registers:
    📓 For an interactive, step-by-step walkthrough of the software
    runtime example, refer to the `cl_axil_reg_access Jupyter
    notebook <../../../../../sdk/notebooks/README.html>`__.
+
+Metadata
+--------
+
+Use the following values to register this CL as an AFI. To skip the
+build, load the pre-built public AFI below instead.
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Key
+     - Value
+   * - PCI Device ID
+     - 0xF006
+   * - PCI Vendor ID
+     - 0x1D0F (Amazon)
+   * - PCI Subsystem ID
+     - 0x1D51
+   * - PCI Subsystem Vendor ID
+     - 0xFEDC
+
+Pre-built AFI
+~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Shell
+     - Shell Version
+     - AGFI ID
+   * - Small Shell
+     - 0x10212415
+     - agfi-06447dea0ca9b0a39
+
+This AFI is public in us-east-1 only. Launch your F2 instance in
+us-east-1 and load it with
+``sudo fpga-load-local-image -S 0 -I agfi-06447dea0ca9b0a39``.
 
 `Back to Home <../../../../../index.html>`__

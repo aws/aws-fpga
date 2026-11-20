@@ -31,7 +31,7 @@ RET=$?
 if [ $RET != 0 ]; then
     echo "Error: gcc is not installed."
     echo "    You can install gcc and other useful development tools by using: sudo yum groupinstall \"Development tools\""
-    exit $RET 
+    exit $RET
 fi
 
 sudo -V &> /dev/null
@@ -39,7 +39,7 @@ RET=$?
 if [ $RET != 0 ]; then
     echo "Error: sudo is not in path or not installed. Driver installations will fail "
     echo "    To install drivers please add sudo to your path or install sudo by running \"yum install sudo\" as root "
-    #exit $RET 
+    #exit $RET
 fi
 
 

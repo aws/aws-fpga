@@ -88,7 +88,8 @@ sdk/userspace/fpga_mgmt_examples/src/load_multiple_fpga
 sdk/userspace/fpga_mgmt_examples/src/prefetch_multiple_afi
 sdk/userspace/fpga_mgmt_examples/src/static_*
 
-# SDK apps: msix-interrupts kbuild artifacts
+# SDK apps: msix-interrupts kbuild artifacts and test binary
+sdk/apps/msix-interrupts/f2_test
 sdk/apps/msix-interrupts/.*.cmd
 sdk/apps/msix-interrupts/*.mod
 sdk/apps/msix-interrupts/.tmp_versions
@@ -153,6 +154,7 @@ slurm*.out
 
 # RTD Builds
 docs-rtd/build/*
+docs-rtd/.DS_Store
 
 # HLx files
 *.tmp

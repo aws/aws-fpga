@@ -8,7 +8,6 @@
 - [System Verilog Tests](#system-verilog-tests)
 - [AXI Memory Model Mode Simulations](#axi-memory-model-mode-simulations)
 - [DDR Backdoor Loading](#ddr-backdoor-loading)
-- [HW and SW Co-Simulation Test](#hw-and-sw-co-simulation-test)
 
 ## Overview
 
@@ -51,19 +50,6 @@ test_ddr_peek_bdr_walking_ones
 ```
 
 **NOTE**: Please refer to [Supported_DDR_Modes.md](./../../../../docs/Supported_DDR_Modes.md) for details on supported DDR configurations.
-
-The HW/SW co-simulation tests can be run from the `verif/scripts/` directory with all supported simulators:
-
-```bash
-make C_TEST=test_dram_dma_hwsw_cosim # Runs with XSIM by default
-make C_TEST=test_dram_dma_hwsw_cosim VCS=1
-make C_TEST=test_dram_dma_hwsw_cosim QUESTA=1
-
-# To Run in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR.
-make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 (Runs with XSIM by default)
-make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
-make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
-```
 
 Note that the appropriate simulators must be installed.
 
@@ -194,7 +180,3 @@ This test backdoor reads AXI memory model, writes through frontdoor and checks t
 ##  DDR Backdoor Loading
 
 The description of DDR backdoor loading can be found in DDR backdoor loading support section at [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md)
-
-## HW and SW Co-Simulation Test
-
-The software test with HW/SW co-simulation support [test_dram_dma_hwsw_cosim.c](../software/runtime/test_dram_dma_hwsw_cosim.c) can be found at `software/runtime/`. For Information about how HW/SW co-simulation support can be added to a software test please refer to "Code changes to enable HW/SW co-simulation" section in [RTL simulation guide](../../../../docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md)

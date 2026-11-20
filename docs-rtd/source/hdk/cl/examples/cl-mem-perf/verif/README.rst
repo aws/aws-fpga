@@ -10,7 +10,6 @@ Table of Contents
 - `AXI Memory Model Mode
   Simulations <#axi-memory-model-mode-simulations>`__
 - `DDR Backdoor Loading <#ddr-backdoor-loading>`__
-- `HW and SW Co-Simulation Test <#hw-and-sw-co-simulation-test>`__
 
 Overview
 --------
@@ -65,20 +64,6 @@ followed by the environment variables required to run that test.
 **NOTE**: Please refer to
 `Supported_DDR_Modes.md <./../../../../docs/Supported-DDR-Modes.html>`__
 for details on supported DDR configurations.
-
-The HW/SW co-simulation tests can be run from the ``verif/scripts/``
-directory with all supported simulators:
-
-.. code-block:: bash
-
-   make C_TEST=test_dram_dma_hwsw_cosim # Runs with XSIM by default
-   make C_TEST=test_dram_dma_hwsw_cosim VCS=1
-   make C_TEST=test_dram_dma_hwsw_cosim QUESTA=1
-
-   # To Run in AXI_MEMORY_MODEL mode with AXI memory models instead of DDR.
-   make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 (Runs with XSIM by default)
-   make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 VCS=1
-   make C_TEST=test_dram_dma_hwsw_cosim AXI_MEMORY_MODEL=1 QUESTA=1
 
 Note that the appropriate simulators must be installed.
 
@@ -282,16 +267,6 @@ DDR Backdoor Loading
 
 The description of DDR backdoor loading can be found in DDR backdoor
 loading support section at `RTL simulation
-guide <../../../../docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html>`__
-
-HW and SW Co-Simulation Test
-----------------------------
-
-The software test with HW/SW co-simulation support
-`test_dram_dma_hwsw_cosim.c <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_mem_perf/software/runtime/test_dram_dma_hwsw_cosim.c>`__
-can be found at ``software/runtime/``. For Information about how HW/SW
-co-simulation support can be added to a software test please refer to
-“Code changes to enable HW/SW co-simulation” section in `RTL simulation
 guide <../../../../docs/RTL-Simulation-Guide-for-HDK-Design-Flow.html>`__
 
 `Back to Home <../../../../../index.html>`__

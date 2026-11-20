@@ -168,7 +168,7 @@ debug_msg "Done setting environment variables."
 shell_ver_file=$HDK_SHELL_DIR/shell_version.txt
 
 # Shell files to be downloaded
-declare -a s3_hdk_files=("cl_bb_routed.small_shell.dcp")
+declare -a s3_hdk_files=("cl_bb_routed.small_shell.dcp" "cl_bb_routed.xdma_shell.dcp")
 
 if [ $skip_downloads -eq 0 ]; then
     # Downloading the shell files
@@ -243,7 +243,7 @@ cl_ip_ver=$(cat $AWS_FPGA_REPO_DIR/$cl_ip_path/VIVADO_VERSION | xargs)
 if [ "$VIVADO_TOOL_VERSION" == "$cl_ip_ver" ]; then
   debug_msg "CL_IP was created using the expected Vivado version $VIVADO_TOOL_VERSION"
 else
-  err_msg "Detected CL_IP version mistch, expecting version $VIVADO_TOOL_VERSION "
+  err_msg "Detected CL_IP version mismatch, expecting version $VIVADO_TOOL_VERSION "
   err_msg "However, CL_IP was created in version $(cat $AWS_FPGA_REPO_DIR/$cl_ip_path/VIVADO_VERSION)"
   return 1
 fi

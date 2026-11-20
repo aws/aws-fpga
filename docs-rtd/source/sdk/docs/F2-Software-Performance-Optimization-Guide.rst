@@ -129,7 +129,7 @@ order. On an f2.48xlarge instance, the lowest BDF hex value will be slot
 
    $ sudo fpga-describe-local-image -S 0 -H
    Type  FpgaImageSlot  FpgaImageId             StatusName    StatusCode   ErrorName    ErrorCode   ShVersion
-   AFI          0       No AFI                  cleared           1        ok               0       0x10162423
+   AFI          0       No AFI                  cleared           1        ok               0       0x10052623
    Type  FpgaImageSlot  VendorId    DeviceId    DBDF
    AFIDEVICE    0       0x1d0f      0x9048      0000:9f:00.0```
 

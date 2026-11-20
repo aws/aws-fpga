@@ -1,36 +1,44 @@
-Quick Start Guide to Accelerating your C/C++ application on AWS EC2 F2 (FPGA) Instances with Vitis
-==================================================================================================
+Quick Start Guide to Accelerating a C/C++ application on AWS EC2 F2 (FPGA) Instances with Vitis
+===============================================================================================
 
-This quick start guide will utilize a simple ``hello_world`` Vitis
-example to get you started.
+This quick start guide introduces the Vitis development workflow using a
+simple ``hello_world`` example.
 
 Table of Contents
 -----------------
 
-1. `Overview <#overview>`__
-2. `Prerequisites <#prerequisites>`__
+- `Overview <#overview>`__
+- `Prerequisites <#prerequisites>`__
 
-   1. `AWS Fundamentals <#aws-fundamentals>`__
-   2. `Familiarize Yourself With
-      Vitis <#familiarize-yourself-with-vitis>`__
-   3. `GitHub and Environment Setup <#github-and-environment-setup>`__
+  - `AWS Fundamentals <#aws-fundamentals>`__
+  - `Vitis Introductory Examples <#vitis-introductory-examples>`__
+  - `GitHub and Environment Setup <#github-and-environment-setup>`__
 
-3. `Hardware Emulation <#hardware-emulation>`__
+- `Hardware Emulation <#hardware-emulation>`__
 
-   1. `Hardware Emulation Setup <#hardware-emulation-setup>`__
-   2. `Hardware Emulation Run <#hardware-emulation-run>`__
-   3. `Emulating the host Application and Accelerator
-      Design <#emulating-the-host-application-and-accelerator-design>`__
+  - `Hardware Emulation Setup <#hardware-emulation-setup>`__
+  - `Hardware Emulation Run <#hardware-emulation-run>`__
+  - `Emulating the host Application and Accelerator
+    Design <#emulating-the-host-application-and-accelerator-design>`__
 
-4. `Hardware Binary Build <#hardware-binary-build>`__
-5. `Results and Artifacts <#results-and-artifacts>`__
+- `Hardware Binary Build <#hardware-binary-build>`__
+- `Results and Artifacts <#results-and-artifacts>`__
 
-   1. `Hardware Emulation Artifacts <#hardware-emulation-artifacts>`__
-   2. `Hardware Binary Build
-      Artifacts <#hardware-binary-build-artifacts>`__
+  - `Hardware Emulation Artifacts <#hardware-emulation-artifacts>`__
+  - `Hardware Binary Build
+    Artifacts <#hardware-binary-build-artifacts>`__
 
-6. `Examining Run Data <#examining-run-and-build-data>`__
-7. `Additional Vitis Information <#additional-vitis-information>`__
+- `AFI Creation <#afi-creation>`__
+
+  - `Examining Build Data <#examining-build-data>`__
+
+- `Running the Example AFIs <#running-the-example-afis>`__
+
+  - `Running the Host Application Binary With an
+    AFI <#running-the-host-application-binary-with-an-afi>`__
+  - `Examining Run Results <#examining-run-results>`__
+
+- `Additional Vitis Information <#additional-vitis-information>`__
 
 Overview
 --------
@@ -53,15 +61,15 @@ AWS Fundamentals are critical to the development workflow on F2 and are
 here <../User-Guide-AWS-EC2-FPGA-Development-Kit.html#getting-familiar-with-aws>`__
 in more detail.
 
-For information about the development environment and AMI, `please
-reference the User
+Information about the development environment and AMI is available in
+`the User
 Guide <../User-Guide-AWS-EC2-FPGA-Development-Kit.html#software-defined-development-environment>`__.
 
-Familiarize Yourself With Vitis
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Vitis Introductory Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are new to using Vitis, it is essential to understand the
-following examples before proceeding with your own accelerator design:
+The following examples provide essential background for developing an
+accelerator design with Vitis:
 
 - `Vitis HLS (High-Level Synthesis) Introductory
   Examples <https://github.com/Xilinx/Vitis-HLS-Introductory-Examples>`__
@@ -70,7 +78,32 @@ following examples before proceeding with your own accelerator design:
 GitHub and Environment Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Clone the GitHub repository and source the ``vitis_setup.sh`` script:
+Vitis 2024.1 is not supported by the AWS F2 Developer Kit. Vivado 2024.1
+remains supported for the HDK flow; see
+`supported_vivado_versions.txt <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__.
+
+Platform ``202420_3`` with XDMA shell ``0x10052623`` is the only
+supported pairing. ``vitis_setup.sh`` downloads this platform for the
+Vitis versions below:
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Vitis version
+     - Platform version
+     - XDMA shell
+     - Workflow and validation
+   * - 2024.2, 2025.1, 2025.2
+     - ``202420_3``
+     - ``0x10052623``
+     - Hardware Emulation and AFI creation
+
+Cloning the Developer Kit and Sourcing the Setup Script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run these commands in a Bash shell on an FPGA Developer AMI with a
+supported Vitis version.
 
 .. code-block:: bash
 
@@ -85,7 +118,7 @@ GitHub and Environment Setup
 
     - AWS EC2 F2 Vitis platform package that enables Vitis kernels to
       run on AWS F2 instances
-    - Valid platforms for the current stable shell version
+    - A platform matching the installed Vitis version
 
   - Sets up the Vitis example directories
   - Installs the required libraries and package dependencies
@@ -96,21 +129,23 @@ GitHub and Environment Setup
   - Provides a command to install the XRT, which is necessary to perform
     builds, emulation, and run accelerated applications
 
-If the script has successfully set up all of the tools and the
-environment, you will see the following message:
+The script displays the following message after successfully setting up
+all of the tools and the environment:
 
 .. code-block:: bash
 
    INFO: #-------------------------------------------------------------------------------#
-   INFO: How to run hardware emulation on an example
+   INFO: How to run Hardware Emulation or a Hardware Build for an example
    INFO: cd vitis/examples/vitis_examples/hello_world
    INFO: hw_file_check
-   INFO: #----------------------------- Emulation ---------------------------------------#
-   INFO: make build TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION
+   INFO: #---------------------------- Emulation ----------------------------------------#
+   INFO: make run TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION
+   INFO: #---------------------------- Hardware -----------------------------------------#
+   INFO: make build TARGET=hw PLATFORM=$SHELL_EMU_VERSION
    INFO: #-------------------------------------------------------------------------------#
    INFO: Vitis Setup PASSED.
 
-You will also see this prompt if no XRT install is present on your
+The script also displays this prompt if no XRT install is present on the
 system:
 
 .. code-block:: bash
@@ -120,26 +155,31 @@ system:
    INFO: "#     To install the XRT for Vitis runtime support, run 'install_xrt'     #"
    INFO: "###########################################################################"
 
+If the “No XRT install detected!” prompt appears, run ``install_xrt``.
+XRT conflicts with the standalone XDMA driver. If
+``lsmod | grep '^xdma '`` shows that driver is loaded, stop applications
+using it and run ``sudo modprobe -r xdma`` before installing XRT.
+
 Hardware Emulation
 ------------------
 
 The Vitis hardware emulation (HW_EMU) flow enables developers to iterate
 on their designs more rapidly than performing a hardware build. It is a
-cycle-accurate emulation of your accelerator design. The emulation flow
+cycle-accurate emulation of the accelerator design. The emulation flow
 invokes Vitis’ hardware simulator to test both the host application and
 accelerator code.
 
-This section will walk you through the emulation process. The goal of
-hardware emulation is to verify functional correctness of the logic
-generated by the tools and partition the application between the host
-CPU and the FPGA. Hardware emulation does not use actual FPGAs and can
-be run on any compute instance. Using non-F2 EC2 compute instances
-during initial development reduces cost.
+This section describes the emulation process. The goal of hardware
+emulation is to verify functional correctness of the logic generated by
+the tools and partition the application between the host CPU and the
+FPGA. Hardware emulation does not use actual FPGAs and can be run on any
+compute instance. Using non-F2 EC2 compute instances during initial
+development reduces cost.
 
 Hardware Emulation Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To perform hardware emulation for the ``hello_world`` example, run the
+Hardware emulation setup for the ``hello_world`` example uses the
 following commands:
 
 ``NOTE: All paths shown below are identical for customers using Rocky Linux, substituting 'rocky' for 'ubuntu'``
@@ -149,9 +189,9 @@ following commands:
    cd $AWS_FPGA_REPO_DIR/vitis/examples/vitis_examples/hello_world
    ll
 
-Prior to starting a hardware emulation run, run the ``hw_file_check``
-command to insure that all files required for simulation are present. If
-all required files are present, you will see
+Before a hardware emulation run, the ``hw_file_check`` command verifies
+that all files required for simulation are present. If all required
+files are present, the command displays
 ``All required simulation files are present!``.
 
 .. code-block:: bash
@@ -159,59 +199,46 @@ all required files are present, you will see
    ubuntu@ip-aaa-bb-cc-dd:~/aws-fpga/vitis/examples/vitis_examples/hello_world$ hw_file_check
    INFO: All required simulation files are present!
 
-Otherwise, the missing files’ names will be displayed. These files can
-always be reobtained from the ``aws-fpga`` repository if they are
-deleted or renamed at any point.
+Otherwise, the missing files’ names will be displayed. The example
+directory is part of the ``Vitis_Accel_Examples`` clone under
+``$AWS_FPGA_REPO_DIR/vitis/examples/``, so restore a deleted file with
+``git checkout -- <file>`` from the example directory.
 
 .. code-block:: bash
 
    ubuntu@ip-aaa-bb-cc-dd:~/aws-fpga/vitis/examples/vitis_examples/hello_world$ hw_file_check
    ERROR: !!! Required file: makefile_us_alveo.mk not found in current example directory !!!
 
-The most critical file in each example directory is the ``Makefile``.
-Some examples will have sub-examples, whose ``Makefiles`` are located in
-the associated subdirectory.
-
-Note the presence of the ``Makefile`` in this subdirectory. Some
-examples will have sub-examples, whose ``Makefiles`` are located in the
-associated subdirectory.
-
-   [!WARNING] A Makefile is required in order to run hardware emulation
-   for all designs/examples
+Run ``make`` from the directory containing the example’s ``Makefile``.
+For an example with sub-examples, use the sub-example directory.
 
 Hardware Emulation Run
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We recommend running hardware emulation in the background to allow
-concurrent design iteration and to prevent disruption due to the time
-needed for completion. Prefixing commands with ``nohup`` and ending them
-with an ``&`` will insure more reliable execution.
-
-Once you’ve verified that all required files are present in the current
-example directory, start the hardware emulation run with the following
-command:
+To build the accelerator for hardware emulation in the background, run:
 
 .. code-block:: bash
 
    nohup make build TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION &
 
-The same command can be used for all Vitis examples after running
-``vitis_setup.sh``.
+Use this command for examples that support hardware emulation after
+sourcing ``vitis_setup.sh``. See `Vitis ERRATA <./ERRATA.html>`__ for
+example and tool-version restrictions.
 
-A successful hardware emulation run will produce log output similar to
-the following:
+A successful hardware emulation build produces output similar to the
+following:
 
 .. code-block:: bash
 
-   INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin.package_summary, at Fri Jan 17 16:06:50 2025
+   INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin.package_summary, at Fri Jan 17 16:06:50 2025
    INFO: [v++ 60-1315] Creating rulecheck session with output '/home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/_x/reports/package/v++_package_vadd_guidance.html', at Fri Jan 17 16:06:50 2025
-   INFO: [v++ 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_2.xpfm
+   INFO: [v++ 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_3.xpfm
    INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/2025.2/Vitis/platforms/hw/hw.xsa'
    INFO: [v++ 74-78] Compiler Version string: 2025.2
    INFO: [v++ 60-2256] Packaging for hardware emulation
-   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin
+   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin
    INFO: [v++ 60-2343] Use the Vitis Unified IDE to visualize and navigate the reports. Run the following command.
-       vitis -a/ --analyze /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin.package_summary
+       vitis -a/ --analyze /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin.package_summary
    INFO: [v++ 60-791] Total elapsed time: 0h 0m 5s
    INFO: [v++ 60-1653] Closing dispatch client
 
@@ -219,39 +246,38 @@ This line is the most significant:
 
 .. code-block:: bash
 
-   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin
+   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin
 
-The ``.xclbin`` file is what will be used to test your combined
-host/accelerator application.
-
-After running hardware emulation, a number of artifacts will be
-produced. These artifacts will be discussed in a section below,
-alongside those produced by hardware builds.
+The ``.xclbin`` file is used to test the combined host/accelerator
+application.
 
 Emulating the Host Application and Accelerator Design
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now, let’s emulate our design by running
-``make run TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION``
+The command ``make run TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION``
+builds the host application and accelerator design, then runs hardware
+emulation in a single invocation. The separate ``make build`` step above
+is optional; it allows the long build to run in the background before
+starting emulation.
 
 .. code-block:: bash
 
    ubuntu@ip-aaa-bb-cc-dd:~/aws-fpga/vitis/examples/vitis_examples/hello_world$ make run TARGET=hw_emu PLATFORM=$SHELL_EMU_VERSION
-   emconfigutil --platform xilinx_aws-vu47p-f2_202420_2 --od ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_2
+   emconfigutil --platform xilinx_aws-vu47p-f2_202420_3 --od ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_3
    ****** configutil v2025.2 (64-bit)
      **** SW Build 5074859 on 2024-05-20-23:21:20
      **** Start of session at: Fri Jan 17 16:48:27 2025
        ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
        ** Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
-   INFO: [ConfigUtil 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_2.xpfm
+   INFO: [ConfigUtil 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_3.xpfm
    INFO: [ConfigUtil 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/2025.2/Vitis/platforms/hw/hw.xsa'
-   INFO: [ConfigUtil 60-1032] Extracting hardware platform to ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_2
-   emulation configuration file `emconfig.json` is created in ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_2 directory
-   cp -rf ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_2/emconfig.json .
-   XCL_EMULATION_MODE=hw_emu ./hello_world_xrt -x ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin
+   INFO: [ConfigUtil 60-1032] Extracting hardware platform to ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_3
+   emulation configuration file `emconfig.json` is created in ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_3 directory
+   cp -rf ./_x.hw_emu.xilinx_aws-vu47p-f2_202420_3/emconfig.json .
+   XCL_EMULATION_MODE=hw_emu ./hello_world_xrt -x ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin
 
    Open the device0
-   Load the xclbin ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin
+   Load the xclbin ./build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin
    INFO: [HW-EMU 05] Path of the simulation directory : /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/.run/1469002/hw_emu/device0/binary_0/behav_waveform/xsim
     server socket name is   /tmp/ubuntu/device0_0_1469002
    INFO: [HW-EMU 01] Hardware emulation runs simulation underneath. Using a large data set will result in long simulation times. It is recommended that a small dataset is used for faster execution. The flow uses approximate models for Global memories and interconnect and hence the performance data generated is approximate.
@@ -272,15 +298,18 @@ as written. It is important to note that although the emulation output
 states things like ``Open the device``, it is not interacting with an
 actual FPGA, but is being simulated.
 
-Once you have iterated on your design using hardware emulation,
-performing a hardware build is the next step.
+After design iteration using hardware emulation, the next step is a
+hardware build.
 
 Hardware Binary Build
 ---------------------
 
-With the functional correctness of your design verified, it’s time to
-build the accelerator design into a binary that can be loaded onto an
-FPGA.
+After verification of functional correctness, the accelerator design can
+be built into a binary that can be loaded onto an FPGA.
+
+   [!WARNING] Only hardware builds made with Vitis 2024.2 or later can
+   be turned into an AFI. Details are provided in `AFI
+   Creation <#afi-creation>`__.
 
 The process is nearly identical to that of HW_EMU and is run with the
 following command:
@@ -297,35 +326,35 @@ following:
 
 .. code-block:: bash
 
-   INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin.package_summary, at Fri Jan 17 17:39:31 2025
+   INFO: [v++ 60-1548] Creating build summary session with primary output /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/build_dir.hw.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin.package_summary, at Fri Jan 17 17:39:31 2025
    INFO: [v++ 60-1315] Creating rulecheck session with output '/home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/_x/reports/package/v++_package_vadd_guidance.html', at Fri Jan 17 17:39:31 2025
-   INFO: [v++ 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_2.xpfm
+   INFO: [v++ 60-895]   Target platform: /opt/Xilinx/2025.2/Vitis/platforms/xilinx_aws-vu47p-f2_202420_3.xpfm
    INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/Xilinx/2025.2/Vitis/platforms/hw/hw.xsa'
    INFO: [v++ 74-78] Compiler Version string: 2025.2
    INFO: [v++ 60-2256] Packaging for hardware
-   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw.xilinx_aws-vu47p-f2_202420_2/vadd.xclbin
+   INFO: [v++ 60-2460] Successfully copied a temporary xclbin to the output xclbin: /home/ubuntu/aws-fpga/vitis/examples/Vitis_Accel_Examples/hello_world/./build_dir.hw.xilinx_aws-vu47p-f2_202420_3/vadd.xclbin
    INFO: [v++ 60-2343] Use the Vitis Unified IDE to visualize and navigate the reports. Run the following command.
 
 Once again, the message stating that a ``.xclbin`` file has been
 successfully copied is our assurance that the build was successful.
 
 When a build completes, it produces several artifacts that contain
-information about our design. Let’s now see where we can find these
-artifacts and examine them.
+information about the design. The following section describes their
+locations and contents.
 
 Results and Artifacts
 ---------------------
 
-Once the HW_EMU or HW run/build has completed, you will see a build
-directory with the pertinent name.
+Once the HW_EMU or HW run/build has completed, the artifacts are
+available in a build directory with the pertinent name.
 
 .. code-block:: bash
 
    aws-fpga/vitis/examples/vitis_examples/
            hello_world/
-                   build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_2/
+                   build_dir.hw_emu.xilinx_aws-vu47p-f2_202420_3/
                                    or
-                   build_dir.hw.xilinx_aws-vu47p-f2_202420_2/
+                   build_dir.hw.xilinx_aws-vu47p-f2_202420_3/
 
 **These directories will contain the .xclbin file, as well as other
 artifacts, depending on the example run:**
@@ -357,37 +386,269 @@ Hardware Binary Build Artifacts
    -rw-rw-r--  1 ubuntu ubuntu 47823836 Jan 16 19:30 vadd.xclbin
    -rw-rw-r--  1 ubuntu ubuntu     4111 Jan 16 19:30 vadd.xclbin.package_summary
 
-With our ``.xclbin`` file in hand from our hardware build, it’s time to
-create an Amazon FPGA Image (AFI)
+The ``.xclbin`` file from the hardware build is used to create an Amazon
+FPGA Image (AFI).
 
-⚠️ **Vitis AFI generation is not currently supported on F2 instances**
+AFI Creation
+------------
 
-Examining Run and Build Data
-----------------------------
+Deployment of an accelerator design on an FPGA connected to an F2
+instance requires creation of an AFI.
 
-After a HW_EMU or HW run/build, there are four files that contain very
-important information:
+An AFI combines the accelerator design, referred to as Custom Logic
+(CL), with the FPGA’s shell, which forms the interface between the host
+system and the design.
 
-- ``vadd.xclbin.info``
+AFI creation requires an IAM role with the appropriate permissions
+attached to the EC2 instance. The `IAM role setup
+guide <../developer-resources/Setting-up-IAM-roles-for-devkit-use.html>`__
+covers the required permissions and `attaching the role to an
+instance <../developer-resources/Setting-up-IAM-roles-for-devkit-use.html#attaching-an-iam-role-to-an-ec2-instance>`__.
+
+The ``$AWS_FPGA_REPO_DIR/vitis/tools/create_vitis_afi.sh`` command
+builds the AFI from within a build directory, as shown in `Results and
+Artifacts <#results-and-artifacts>`__.
+
+.. code-block:: bash
+
+   cd "$AWS_FPGA_REPO_DIR/vitis/examples/vitis_examples/hello_world/build_dir.hw.$SHELL_EMU_VERSION"
+
+   S3_BUCKET="my-fpga-bucket"
+   S3_DCP_KEY="vitis/dcp"
+   S3_LOGS_KEY="vitis/logs"
+   XCLBIN="vadd.xclbin"
+   AWSXCLBIN="vadd"
+   AWS_REGION="us-east-1"
+
+   bash $AWS_FPGA_REPO_DIR/vitis/tools/create_vitis_afi.sh \
+       -s3_bucket="$S3_BUCKET" \
+       -s3_dcp_key="$S3_DCP_KEY" \
+       -s3_logs_key="$S3_LOGS_KEY" \
+       -xclbin="$XCLBIN" \
+       -o="$AWSXCLBIN" \
+       -region="$AWS_REGION"
+
+All options are required except ``-aws_profile_name``.
+
+- ``-s3_bucket`` - the S3 bucket that receives the AFI creation files
+- ``-s3_dcp_key`` - the key prefix in that bucket for the AFI creation
+  archive
+- ``-s3_logs_key`` - the key prefix in that bucket for AFI creation logs
+- ``-xclbin`` - the input ``.xclbin`` file, for example ``vadd.xclbin``
+- ``-o`` - the output ``.awsxclbin`` basename, for example ``vadd``
+- ``-region`` - the AWS Region in which to create the AFI
+- ``-aws_profile_name`` - optional named AWS profile; specified by
+  setting ``AWS_PROFILE_NAME`` and appending
+  ``-aws_profile_name="$AWS_PROFILE_NAME"`` to the command
+
+Command help is available with
+``bash $AWS_FPGA_REPO_DIR/vitis/tools/create_vitis_afi.sh -h`` or
+``bash $AWS_FPGA_REPO_DIR/vitis/tools/create_vitis_afi.sh --help``.
+
+The results will look similar to below:
+
+.. code-block:: text
+
+   drwxrwxr-x 3 ubuntu ubuntu     4096 Jan 16 17:17 ./
+   drwxrwxr-x 9 ubuntu ubuntu     4096 Jan 16 17:48 ../
+   -rw-rw-r-- 1 ubuntu ubuntu 47708160 Jan 16 17:17 2025_01_16-171710_Developer_Vitis_Kernel.tar
+   -rw-rw-r-- 1 ubuntu ubuntu 47698217 Jan 16 17:17 2025_01_16-171710_SH_CL_routed.dcp
+   -rw-rw-r-- 1 ubuntu ubuntu       98 Jan 16 17:17 2025_01_16-171710_afi_id.txt
+   -rw-rw-r-- 1 ubuntu ubuntu       22 Jan 16 17:17 2025_01_16-171710_agfi_id.txt
+   -rw-rw-r-- 1 ubuntu ubuntu     5838 Jan 16 17:17 2025_01_16-171710_build.json
+   -rw-rw-r-- 1 ubuntu ubuntu      670 Jan 16 17:17 2025_01_16-171710_clocks.json
+   -rw-rw-r-- 1 ubuntu ubuntu      389 Jan 16 17:17 2025_01_16-171710_manifest.txt
+   -rw-rw-r-- 1 ubuntu ubuntu    51964 Jan 16 17:17 vadd.awsxclbin
+   drwxrwxr-x 2 ubuntu ubuntu     4096 Jan 16 17:17 to_aws/
+   -rw-rw-r-- 1 ubuntu ubuntu      579 Jan 16 03:23 vadd.link.ltx
+   -rw-rw-r-- 1 ubuntu ubuntu 47751100 Jan 16 03:23 vadd.link.xclbin
+   -rw-rw-r-- 1 ubuntu ubuntu    10683 Jan 16 03:23 vadd.link.xclbin.info
+   -rw-rw-r-- 1 ubuntu ubuntu    45974 Jan 16 03:23 vadd.link.xclbin.link_summary
+   -rw-rw-r-- 1 ubuntu ubuntu 47751140 Jan 16 03:23 vadd.xclbin
+   -rw-rw-r-- 1 ubuntu ubuntu     4111 Jan 16 03:23 vadd.xclbin.package_summary
+
+The AFI creation status can be checked using the AFI ID from the
+generated ``*_afi_id.txt`` file, such as
+``2025_01_16-171710_afi_id.txt``.
+
+.. code-block:: text
+
+   {
+       "FpgaImageId": "afi-abcdef0123456789a",
+       "FpgaImageGlobalId": "agfi-abcdef0123456789a"
+   }
+
+The following command checks the status using the ``afi`` string:
+
+``aws ec2 describe-fpga-images --fpga-image-ids afi-abcdef0123456789a --region <aws-region>``
+
+Which will yield the output below once successfully processed and
+available:
+
+.. code-block:: text
+
+   {
+       "FpgaImages": [
+           {
+               "FpgaImageId": "afi-abcdef0123456789a",
+               "FpgaImageGlobalId": "agfi-abcdef0123456789a",
+               "Name": "vadd",
+               "Description": "vadd_Vitis",
+               "ShellVersion": "0x10052623",
+               "PciId": {
+                   "DeviceId": "0xf010",
+                   "VendorId": "0x1d0f",
+                   "SubsystemId": "0x1d51",
+                   "SubsystemVendorId": "0xfedd"
+               },
+               "State": {
+                   "Code": "available"
+               },
+               "CreateTime": "2025-01-16T17:17:14.000Z",
+               "UpdateTime": "2025-01-16T17:33:54.000Z",
+               "OwnerId": "012345678901",
+               "Tags": [],
+               "Public": false,
+               "DataRetentionSupport": false
+           }
+       ]
+   }
+
+While the AFI is being processed, the ``"State"`` field reports
+``"pending"``. Periodic status checks indicate when processing has
+finished.
+
+If AFI processing fails, the provided error message identifies the error
+that requires correction.
+
+Once the state is ``"available"``, the AFI is ready to use.
+
+Examining Build Data
+~~~~~~~~~~~~~~~~~~~~
+
+The ``hello_world`` HW_EMU or HW build produces the following reports.
+XRT can also produce a runtime report when profiling or tracing is
+enabled in ``xrt.ini``:
+
+- ``vadd.link.xclbin.info``
 
   - A text report of the generated device binary
 
-- ``vadd.xclbin.link_summary``
-
-  - A summary report of the linking process which generated the device
-    binary
-
 - ``vadd.link.xclbin.link_summary``
 
-  - Contains an estimate of system performance
+  - A summary report of the linking process, including an estimate of
+    system performance
+
+- ``vadd.xclbin.package_summary``
+
+  - A summary report of the packaging process
 
 - ``xrt.run_summary``
 
   - A summarized report of events captured during application runtime
 
-The first three of these files can be found in the newly-generated
-directory prefixed with ``build_dir.<hw/hw_emu>.``. The
-``xrt.run_summary`` file can be found in the example directory itself.
+The first three files are in the ``build_dir.hw.<platform>`` or
+``build_dir.hw_emu.<platform>`` directory. When generated,
+``xrt.run_summary`` is in the example directory itself.
+
+Running Vitis AFIs is discussed in the next section.
+
+Running the Example AFIs
+------------------------
+
+Running the Host Application Binary With an AFI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once the AFI is available, the accelerated application can run on an F2
+instance. The runtime instance needs XRT and its AWS extension for the
+Vitis version used to build the example. On an FPGA Developer AMI,
+source ``vitis_setup.sh`` and run ``install_xrt`` if XRT is missing, as
+described above. The standalone XDMA driver must be unloaded before
+installing XRT.
+
+Source the XRT environment on the runtime instance and clear any
+emulation setting before running on hardware:
+
+.. code-block:: bash
+
+   source /opt/xilinx/xrt/setup.sh
+   unset XCL_EMULATION_MODE
+
+If you built the example on a different instance, copy both artifacts to
+the runtime instance:
+
+- The host application executable, built with ``make host``
+- The ``.awsxclbin`` file produced by ``create_vitis_afi.sh``
+
+If you built ``hello_world`` on this F2 instance, build and run the host
+application from the example directory:
+
+.. code-block:: bash
+
+   cd "$AWS_FPGA_REPO_DIR/vitis/examples/vitis_examples/hello_world"
+   make host
+   ./hello_world_xrt -x "build_dir.hw.$SHELL_EMU_VERSION/vadd.awsxclbin"
+
+On a separate F2 runtime instance, run
+``./hello_world_xrt -x vadd.awsxclbin`` from the directory containing
+the two copied files.
+
+Examples that use two ``.awsxclbin`` files, such as ``kernel_swap``, are
+called with two flags:
+
+.. code-block:: bash
+
+   ./<host_executable> -x1 <first.awsxclbin> -x2 <second.awsxclbin>
+
+The Python-based example ``hello_world_py`` is currently under
+development; see `Vitis ERRATA <./ERRATA.html#examples>`__. Its host
+argument syntax uses ``-k`` in place of ``-x``:
+
+.. code-block:: bash
+
+   python3 host.py -k vadd.awsxclbin
+
+Some examples take the ``.awsxclbin`` as a positional argument with no
+flag:
+
+.. code-block:: bash
+
+   ./<host_executable> vadd.awsxclbin
+
+Each example’s ``README`` provides specific instructions.
+
+Examining Run Results
+~~~~~~~~~~~~~~~~~~~~~
+
+When working with the Vitis examples, some emit a passing message and
+others don’t. Example output from the ``hello_world`` example is shown
+below:
+
+.. code-block:: bash
+
+   Open the device0
+   Load the xclbin build_dir.hw.xilinx_aws-vu47p-f2_202420_3/vadd.awsxclbin
+   Allocate Buffer in Global Memory
+   synchronize input buffer data to device global memory
+   Execution of the kernel
+   Get the output data from the device
+   TEST PASSED
+
+Some examples emit performance figures, while others don’t:
+
+.. code-block:: bash
+
+   Found Platform
+   Platform Name: Xilinx
+   INFO: Reading krnl_vaddmul.awsxclbin
+   Loading: 'krnl_vaddmul.awsxclbin'
+   Trying to program device[0]: xilinx_aws-vu47p-f2_xdma-shell-v10052623_202420_3
+   Device[0]: program successful!
+   Creating a kernel [krnl_vaddmul:{krnl_vaddmul_1}] for CU(1)
+   Creating a kernel [krnl_vaddmul:{krnl_vaddmul_2}] for CU(2)
+   Creating a kernel [krnl_vaddmul:{krnl_vaddmul_3}] for CU(3)
+   THROUGHPUT = 154.183 GB/s
+   TEST PASSED
 
 Additional Vitis Information
 ----------------------------

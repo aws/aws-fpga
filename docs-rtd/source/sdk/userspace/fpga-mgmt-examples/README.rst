@@ -80,6 +80,14 @@ Important Notes
 ---------------
 
 - These examples must be run on an F2 instance
+- ``fpga_mgmt_load_local_image``, ``fpga_mgmt_load_local_image_flags``,
+  and ``fpga_mgmt_load_local_image_with_options`` send the load command
+  and return without waiting for the load to finish. Immediately after
+  calling one of them, call ``fpga_mgmt_describe_local_image`` once a
+  second until the AFI is loaded and the status is no longer busy. The
+  load is completed by these describe calls, so if you don’t poll, the
+  AFI might not load. ``load_multiple_fpga.c`` shows this pattern. The
+  ``_sync`` variants, used by ``load_single_fpga.c``, poll for you.
 - Ensure you have the correct AFI ID when loading images
 - Always check error messages for troubleshooting
 

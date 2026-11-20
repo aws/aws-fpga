@@ -88,7 +88,7 @@ upon the ``$HDK_SHELL_DIR`` path to the end of the file.
 
 **NOTE**: A ``shell`` variable must be specified for the flow to pair
 the customer design with the correct shell variant. Valid values are
-``xdma_shell`` (coming soon) or ``small_shell``.
+``xdma_shell`` or ``small_shell``.
 
 Switching between HDK and HLx flows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

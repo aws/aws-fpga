@@ -63,7 +63,7 @@ if [ ! -d "$AFI_MGMT_TOOLS_DST_DIR" ]; then
 	mkdir -p $AFI_MGMT_TOOLS_DST_DIR
 fi
 
-# /usr/bin requires sudo permissions 
+# /usr/bin requires sudo permissions
 echo "AWS FPGA: Copying Amazon FPGA Image (AFI) Management Tools to $AFI_MGMT_TOOLS_DST_DIR"
 cp -f $AFI_MGMT_TOOLS_SRC_DIR/fpga-* $AFI_MGMT_TOOLS_DST_DIR
 cp -f $AFI_MGMT_TOOLS_LIB_DIR/libfpga_mgmt.so.1.0.0 $AFI_MGMT_LIBS_DST_DIR

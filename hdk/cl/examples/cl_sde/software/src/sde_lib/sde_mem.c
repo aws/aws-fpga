@@ -26,6 +26,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SDE_HUGEPAGE_SIZE (2 * 1024 * 1024)
+
 static int writeback_init(struct sde_writeback_mem* writeback_mem, enum SDE_SUBSYSTEM subsystem) {
   int ret = 0;
 
@@ -45,14 +47,26 @@ static int writeback_init(struct sde_writeback_mem* writeback_mem, enum SDE_SUBS
   size_t desc_ring_size = sde_aligned_size(desc_size * SDE_NUM_DESC, SDE_ALIGN);
   writeback_mem->desc_offset = metadata_ring_size;
 
-  size_t status_size = sde_aligned_size(sizeof(struct c2h_status), SDE_ALIGN);
   writeback_mem->status_offset = metadata_ring_size + desc_ring_size;
 
-  writeback_mem->memory_size = desc_ring_size + metadata_ring_size + status_size;
-  ret = fpga_dma_mem_map_anon(writeback_mem->memory_size, &writeback_mem->memory_va, &writeback_mem->memory_pa);
-  fail_on(ret, err, "fpga_dma_mem_map_anon failed");
+  // The hardware writes these rings while the host polls them, so they must stay at the physical
+  // address programmed into the SDE. The kernel can migrate an mlocked anonymous page (NUMA
+  // balancing, compaction, khugepaged); it never migrates a hugetlb page.
+  ret = fpga_dma_mem_map_huge(&writeback_mem->memory_va, &writeback_mem->memory_pa);
+  fail_on(ret, err, "fpga_dma_mem_map_huge failed: the SDE library needs one free 2 MiB hugepage per write-back ring (sysctl vm.nr_hugepages)");
+  writeback_mem->memory_size = SDE_HUGEPAGE_SIZE;
 
 err:
+  return ret;
+}
+
+// memory_size is only set once the ring is mapped, so 0 means there is nothing to release.
+static int writeback_close(struct sde_writeback_mem* writeback_mem) {
+  if (writeback_mem->memory_size == 0) {
+    return 0;
+  }
+  int ret = fpga_dma_mem_unmap(&writeback_mem->memory_va, writeback_mem->memory_size);
+  writeback_mem->memory_size = 0;
   return ret;
 }
 
@@ -62,33 +76,40 @@ static int dma_buffer_init(enum SDE_BUFFER_LAYOUT layout, size_t pkt_size, struc
   fail_on_with_code(buffers == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "buffer ptr is NULL");
   fail_on_with_code(num_buffers == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "num_buffers ptr is NULL");
 
+  size_t buffer_count = 0;
   if (layout == SDE_BUFFER_LAYOUT_SINGLE) {
-    *num_buffers = 1;
+    buffer_count = 1;
   } else if (layout == SDE_BUFFER_LAYOUT_MULTI) {
-    *num_buffers = SDE_NUM_DESC;
+    buffer_count = SDE_NUM_DESC;
   }
+  *num_buffers = 0;
 
-  // Allocate enough space for *num_buffers sde_buffers.
-  *buffers = malloc(*num_buffers * sizeof(struct sde_buffer));
-  fail_on_with_code(*buffers == NULL, err, ret, SDE_ALLOCATION_FAILURE, "malloc failed");
+  // Allocate enough space for buffer_count sde_buffers.
+  *buffers = calloc(buffer_count, sizeof(struct sde_buffer));
+  fail_on_with_code(*buffers == NULL, err, ret, SDE_ALLOCATION_FAILURE, "calloc failed");
 
   struct sde_buffer* current_buffer = NULL;
-  for (size_t i = 0; i < *num_buffers; ++i) {
+  for (size_t i = 0; i < buffer_count; ++i) {
     // Map memory for each buffer.
     current_buffer = (*buffers + i);
     if (pkt_size > 0x1000 /*4k*/) {
       // If the pkt_size is larger than 4k, it cannot fit on a single memory page.
       // Use a hugepage for the mapping.
       current_buffer->length = pkt_size;
-      current_buffer->alloc_length = 2 * 1024 * 1024;
+      current_buffer->alloc_length = SDE_HUGEPAGE_SIZE;
       ret = fpga_dma_mem_map_huge(&current_buffer->data_va, &current_buffer->data_pa);
-      fail_on(ret, err, "fpga_dma_mem_alloc_huge failed");
+      fail_on(ret, err, "fpga_dma_mem_map_huge failed");
     } else {
+      // Memory compaction can still move this mlocked page while a transfer is in flight. No failure
+      // has shown that yet; only the write-back rings have been observed to move. Moving packet
+      // buffers to hugetlb pages is a separate change.
       current_buffer->length = pkt_size;
       current_buffer->alloc_length = pkt_size;
       ret = fpga_dma_mem_map_anon(current_buffer->length, &current_buffer->data_va, &current_buffer->data_pa);
       fail_on(ret, err, "fpga_dma_mem_map_anon failed");
     }
+    // Count a buffer only once it is mapped, so sde_mem_close() never unmaps a failed slot.
+    *num_buffers = i + 1;
   }
 
 err:
@@ -104,17 +125,17 @@ int sde_mem_init(struct sde_mem* mem, enum SDE_BUFFER_LAYOUT c2h_layout, enum SD
   memset(mem, 0, sizeof(struct sde_mem));
 
   ret = writeback_init(&mem->c2h_writeback, SDE_SUBSYSTEM_C2H);
-  fail_on(ret, err, "writeback_init c2h failed");
+  fail_on(ret, err_mem, "writeback_init c2h failed");
 
   ret = writeback_init(&mem->h2c_writeback, SDE_SUBSYSTEM_H2C);
-  fail_on(ret, err, "writeback_init h2c failed");
+  fail_on(ret, err_mem, "writeback_init h2c failed");
 
   mem->c2h_layout = c2h_layout;
   mem->c2h_num_buffers = 0;
 
   if (direction != SDE_EXAMPLE_DIR_H2C && c2h_layout != SDE_BUFFER_USER_MANAGED) {
     ret = dma_buffer_init(c2h_layout, pkt_size, &mem->c2h_buffers, &mem->c2h_num_buffers);
-    fail_on(ret, err, "dma_buffer_init c2h failed");
+    fail_on(ret, err_mem, "dma_buffer_init c2h failed");
   }
 
   mem->h2c_layout = h2c_layout;
@@ -122,9 +143,14 @@ int sde_mem_init(struct sde_mem* mem, enum SDE_BUFFER_LAYOUT c2h_layout, enum SD
 
   if (direction != SDE_EXAMPLE_DIR_C2H && h2c_layout != SDE_BUFFER_USER_MANAGED) {
     ret = dma_buffer_init(h2c_layout, pkt_size, &mem->h2c_buffers, &mem->h2c_num_buffers);
-    fail_on(ret, err, "dma_buffer_init h2c failed");
+    fail_on(ret, err_mem, "dma_buffer_init h2c failed");
   }
 
+  return ret;
+
+err_mem:
+  // sde_mgmt_init() does not call sde_mem_close() when this function fails
+  sde_mem_close(mem);
 err:
   return ret;
 }
@@ -134,8 +160,8 @@ int sde_mem_close(struct sde_mem* mem) {
 
   fail_on_with_code(mem == NULL, err, ret, FPGA_ERR_SOFTWARE_PROBLEM, "mem ptr is NULL");
 
-  ret |= fpga_dma_mem_unmap(&mem->c2h_writeback.memory_va, mem->c2h_writeback.memory_size);
-  ret |= fpga_dma_mem_unmap(&mem->h2c_writeback.memory_va, mem->h2c_writeback.memory_size);
+  ret |= writeback_close(&mem->c2h_writeback);
+  ret |= writeback_close(&mem->h2c_writeback);
 
 
   if (mem->c2h_buffers != NULL) {
@@ -151,7 +177,12 @@ int sde_mem_close(struct sde_mem* mem) {
   }
 
   free(mem->c2h_buffers);
+  mem->c2h_buffers = NULL;
+  mem->c2h_num_buffers = 0;
+
   free(mem->h2c_buffers);
+  mem->h2c_buffers = NULL;
+  mem->h2c_num_buffers = 0;
 
   fail_on(ret, err, "fpga_dma_mem_unmap failed");
 

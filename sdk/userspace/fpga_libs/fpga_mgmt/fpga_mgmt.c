@@ -100,6 +100,20 @@ err:
 	return ret;
 }
 
+static int fpga_mgmt_signal_rl_reload_ready(int slot_id)
+{
+	/** Send RL reload ready signal */
+	int ret = fpga_mgmt_mbox_attach(slot_id);
+	fail_on(ret, out, "fpga_mgmt_mbox_attach failed");
+
+	pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
+	ret = fpga_pci_poke(handle, FMB_REG_RL_RELOAD, 0x1);
+	fail_on(ret, out, "fpga_pci_poke failed");
+
+out:
+	return ret;
+}
+
 static int fpga_mgmt_describe_cmd(int slot_id,
 	struct fpga_mgmt_image_info *info, uint32_t flags)
 {
@@ -163,13 +177,8 @@ static int fpga_mgmt_describe_cmd(int slot_id,
 
 	/* Send the RL reload command as the last step so the shell version can be fetched */
 	if (metrics->status == FPGA_STATUS_LOADING_RL) {
-		/** Send RL reload ready signal */
-		int ret = fpga_mgmt_mbox_attach(slot_id);
-		fail_on(ret, out, "fpga_mgmt_mbox_attach failed");
-
-		pci_bar_handle_t handle = fpga_mgmt_state.slots[slot_id].handle;
-		ret = fpga_pci_poke(handle, FMB_REG_RL_RELOAD, 0x1);
-		fail_on(ret, out, "fpga_pci_poke failed");
+		ret = fpga_mgmt_signal_rl_reload_ready(slot_id);
+		fail_on(ret, out, "fpga_mgmt_signal_rl_reload_ready failed");
 
 		info->status = FPGA_STATUS_BUSY;
 	}

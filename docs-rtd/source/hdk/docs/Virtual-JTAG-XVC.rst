@@ -15,8 +15,6 @@ Table of Contents
     Instances <#start-local-debug-server-on-f2-instances>`__
   - `Connect to target FPGA via Virtual
     JTAG <#connect-to-target-fpga-via-virtual-jtag>`__
-  - `Start Remote Debug Server on F2 Instances (Coming
-    Soon) <#start-remote-debug-server-on-f2-instances-coming-soon>`__
   - `Embedded Debug Bridge in CL <#embedded-debug-bridge-in-cl>`__
   - `Frequently Asked Questions <#frequently-asked-questions>`__
 
@@ -54,15 +52,57 @@ AWS FPGA developer AMI. For detailed compilation and installation
 information, refer to the `AMD product
 guide <https://docs.amd.com/r/en-US/pg195-pcie-dma/Compiling-and-Loading-the-Driver>`__.
 
-- Locate and unzip the XVC driver file from the Vivado tool installation
-  directory:
-
-  - ⚠️ Remember to update the tool installation directory to the correct
-    directory for your AMI. The example below is for demonstration only.
+`install_xilinx_virtual_cable.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_xilinx_virtual_cable.sh>`__
+from the `Runtime AMI
+Builder <./../../developer-resources/runtime-ami-builder/README.html>`__
+performs all of the steps in this section. It then runs the XVC loopback
+test on every FPGA in the instance and prints
+``XVC loopback test passed on <N> FPGA(s)!`` when the driver works:
 
 .. code-block:: bash
 
-       unzip /opt/Xilinx/Vivado/*/data/xicom/drivers/pcie/xvc_pcie.zip
+   # FPGA Developer AMI, or any AMI where Vivado's environment is set up (uses $XILINX_VIVADO)
+   $AWS_FPGA_REPO_DIR/developer_resources/runtime_ami_builder/scripts/install_xilinx_virtual_cable.sh
+   # Runtime AMI with Vivado Lab Edition 2025.1 or 2025.2 installed by the Runtime AMI Builder
+   $AWS_FPGA_REPO_DIR/developer_resources/runtime_ami_builder/scripts/install_xilinx_virtual_cable.sh -v 2025.2
+   # Any other Vivado or Vivado Lab Edition install
+   $AWS_FPGA_REPO_DIR/developer_resources/runtime_ami_builder/scripts/install_xilinx_virtual_cable.sh -p /opt/Xilinx/2025.2/Vivado
+
+To install the driver manually instead, follow the steps below.
+
+- Building the driver requires ``gcc``, ``make``, and the kernel headers
+  for the running kernel. Install them if they are not already present:
+
+.. code-block:: bash
+
+       # Ubuntu
+       sudo apt-get install -y gcc make build-essential linux-headers-$(uname -r)
+       # Rocky Linux
+       sudo dnf install -y gcc make kernel-devel-$(uname -r)
+
+- Locate and unzip the XVC driver file from the Vivado tool installation
+  directory. Set ``VIVADO_DIR`` to the Vivado installation on your AMI.
+  On the FPGA Developer AMI, Vivado’s environment is already set up, so
+  use ``$XILINX_VIVADO``. ``$XILINX_VIVADO`` is not set on a runtime AMI
+  with only Vivado Lab Edition, so set the path directly. The
+  installation directory depends on the Vivado version and edition, for
+  example:
+
+  - Vivado 2025.1 and 2025.2: ``/opt/Xilinx/<version>/Vivado``, for
+    example ``/opt/Xilinx/2025.2/Vivado``
+  - Vivado 2024.1 and 2024.2: ``/opt/Xilinx/Vivado/<version>``, for
+    example ``/opt/Xilinx/Vivado/2024.2``
+  - Vivado Lab Edition installed by the Runtime AMI Builder:
+    ``/opt/Xilinx/<version>/Vivado_Lab``, for example
+    ``/opt/Xilinx/2025.2/Vivado_Lab``
+
+.. code-block:: bash
+
+       # FPGA Developer AMI (Vivado environment already set up)
+       export VIVADO_DIR=$XILINX_VIVADO
+       # Runtime AMI with Vivado Lab Edition, for example:
+       # export VIVADO_DIR=/opt/Xilinx/2025.2/Vivado_Lab
+       unzip $VIVADO_DIR/data/xicom/drivers/pcie/xvc_pcie.zip
        cd driver_v0.4
 
 - To correctly bind the XVC driver to the FPGA, update the
@@ -91,16 +131,18 @@ guide <https://docs.amd.com/r/en-US/pg195-pcie-dma/Compiling-and-Loading-the-Dri
            },
        },
 
-⚠️ Developers may encounter a compilation error in some operating
-systems due to driver incompatibility, like this:
+⚠️ On Ubuntu 24.04, and other systems with Linux kernel 6.4 or later,
+the driver fails to compile with this error:
 
 .. code-block:: bash
 
-   /home/<ubuntu_or_rocky>/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
+   /home/ubuntu/driver_v0.4/xvc_pcie_driver_base.c:306:25: error: too many arguments to function ‘class_create’
      306 |         xvc_dev_class = class_create(THIS_MODULE, "xil_xvc_class");
 
-- To resolve the error, update the ``xvc_pcie_driver_base.c`` file as
-  follows:
+- To resolve the error, remove the ``THIS_MODULE`` argument from
+  ``class_create`` in the ``xvc_pcie_driver_base.c`` file. Only make
+  this change on kernel 6.4 or later, such as Ubuntu 24.04. Rocky Linux
+  8.10 uses an older kernel and needs the original code.
 
 .. code-block:: c
 
@@ -108,22 +150,28 @@ systems due to driver incompatibility, like this:
        306    xvc_dev_class = class_create("xil_xvc_class"); // Remove THIS_MODULE here
        307    if (IS_ERR(xvc_dev_class)) {
        308            xil_xvc_cleanup();
-       308            xil_xvc_cleanup();
        309            return PTR_ERR(xvc_dev_class);
        310    }
+
+The same change can be made with this command:
+
+.. code-block:: bash
+
+       sed -i '/class_create/ s/class_create(THIS_MODULE,/class_create(/' xvc_pcie_driver_base.c
 
 - Next, compile and install the XVC driver:
 
 .. code-block:: bash
 
-       sudo su
-       cd driver_v0.4
-       make install
-       depmod -a
-       modprobe xilinx_xvc_pci_driver
+       sudo make install
+       sudo depmod -a
+       sudo modprobe xilinx_xvc_pci_driver
        lsmod | grep xilinx
        ...
        xilinx_xvc_pci_driver    20480  0 ---> This means XVC driver is successfully installed
+
+When reinstalling the driver, unload the running driver with
+``sudo modprobe -r xilinx_xvc_pci_driver`` before loading the new one.
 
 Start Local Debug Server on F2 Instances
 ----------------------------------------
@@ -131,13 +179,15 @@ Start Local Debug Server on F2 Instances
 - To start the XVC server on a instance, run the ``xvc_pcie`` executable
   in Vivado installation directory. The application should spit out the
   host server name and port number. These information will later be used
-  to create a virtual JTAG cable in Vivado Hardware Manager.
+  to create a virtual JTAG cable in Vivado Hardware Manager. The
+  commands below use ``VIVADO_DIR`` from the `install
+  section <#install-xvc-driver-on-f2-instances>`__. In a new shell, set
+  it again first.
 
 .. code-block:: bash
 
-       sudo su
-       cd /opt/Xilinx/Vivado/*/bin/
-       ./xvc_pcie
+       cd $VIVADO_DIR/bin
+       sudo ./xvc_pcie
 
        Description:
        Xilinx xvc_pcie v2024.2  -- Version will depend on your devAMI --
@@ -153,6 +203,19 @@ Start Local Debug Server on F2 Instances
        INFO: Use Ctrl-C to exit xvc_pcie application
 
        INFO: To connect to this xvc_pcie instance use url: tcp:ip-172-31-8-59:10200 ---> This shows the host server name and the port number
+
+- ``XVC PCIE Driver Loopback test successful.`` confirms the XVC driver
+  is installed and working for that FPGA. ``xvc_pcie`` keeps running
+  until it’s stopped with Ctrl-C.
+- By default, ``xvc_pcie`` connects to the first FPGA
+  (``/dev/xil_xvc/cfg_ioc0``) on port 10200. Instances with more than
+  one FPGA have one driver character file per FPGA, ``cfg_ioc0`` through
+  ``cfg_ioc7`` on an f2.48xlarge. To debug another FPGA, select its file
+  with ``-d`` and give each ``xvc_pcie`` its own port with ``-s``:
+
+.. code-block:: bash
+
+       sudo ./xvc_pcie -d /dev/xil_xvc/cfg_ioc1 -s TCP::10201
 
 Connect to target FPGA via Virtual JTAG
 ---------------------------------------
@@ -223,12 +286,6 @@ target FPGA is ready to be built in Vivado.
    :alt: vjtag_6
 
    vjtag_6
-
-Start Remote Debug Server on F2 Instances (Coming Soon)
--------------------------------------------------------
-
-Guide for debugging designs through Vivado running on a remote machine
-is coming soon.
 
 Embedded Debug Bridge in CL
 ---------------------------
@@ -303,9 +360,13 @@ A: No. If you are utilizing the AWS FPGA developer AMI, you can leverage
 the built-in Vivado. If you using a different runtime AMI, you can
 download the standalone Vivado Lab Solutions from `AMD
 website <https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools.html>`__
-and use that for free.
+and use that for free. Choose a version listed in
+`supported_vivado_versions.txt <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__.
+The `Runtime AMI
+Builder <./../../developer-resources/runtime-ami-builder/README.html>`__
+can install Vivado Lab Edition and the XVC driver on a runtime AMI.
 
-**Q: Do I need a Vivado license to use Virtual JTAG and Xilinx VIO/LIA
+**Q: Do I need a Vivado license to use Virtual JTAG and Xilinx VIO/ILA
 debug capabilities?**
 
 A: No. All you require is the Vivado Hardware Manager, which is included

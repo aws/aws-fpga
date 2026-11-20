@@ -24,8 +24,8 @@
  *    - The APP_PF of the FPGA card must have bus mastering enabled (check with `lspci -d 1d0f:f002 -vv`,
  *      should show `BusMaster+`)
  *    - To enable bus mastering if needed: `sudo setpci -s <Device:Bus:Device.Function> 4.w=6`
- *    - Hugepages must be allocated as this example uses them for DMA buffer management
- *    - To allocate hugepages: `sudo sysctl -w vm.nr_hugepages=<number_of_pages>`
+ *    - This example needs three free 2 MiB hugepages: one it maps itself for the DMA buffers, plus the two
+ *      the SDE library maps for its write-back rings. Reserve them with `sudo sysctl -w vm.nr_hugepages=<number_of_pages>`.
  *
  * 1. Compile the example:
  *    `make sde_c2h_user_buffers`

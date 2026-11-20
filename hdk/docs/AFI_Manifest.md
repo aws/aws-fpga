@@ -24,7 +24,7 @@ This document is a purely informative specification for the `manifest.txt` file 
   * *Includes the sha256sum value of the submitted Design Checkpoint (DCP)*
 
 * **shell_version=**.....
-  * *Taken from [aws-fpga/hdk/common/shell_stable/shell_version.txt](./../common/shell_stable/shell_version.txt)*
+  * *The hex ID of the shell the design was built for, for example `0x10212415` for the Small Shell or `0x10052623` for the XDMA Shell. The released shell IDs are listed in [aws-fpga/hdk/common/shell_stable/shell_version.txt](./../common/shell_stable/shell_version.txt)*
 
 * **dcp_file_name=**.....
   * *The .dcp file name including the file type suffix*

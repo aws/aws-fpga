@@ -37,7 +37,7 @@ Table of Contents
   - `cl_sde <#cl-sde>`__
   - `cl_dram_hbm_dma <#cl-dram-hbm-dma>`__
   - `cl_mem_perf <#cl-mem-perf>`__
-  - `CL_TEMPLATE - Create your own
+  - `CL_TEMPLATE to Create your own
     design <#cl-template-to-create-your-own-design>`__
 
 - `CL Example Hierarchy <#cl-example-hierarchy>`__
@@ -59,11 +59,11 @@ Table of Contents
 HDK Overview
 ------------
 
-The HDK design flow enables developers to create RTL-based accelerator
-designs for F2 instances using AMD Vivado. HDK designs must be
-integrated with Small Shell, which does not include a built-in Direct
-Memory Access (DMA) engine and offers full resources in the top Super
-Logic Region (SLR) of the FPGA to developers.
+The HDK design flow enables RTL-based accelerator development for F2
+instances using AMD Vivado. Developers can choose between the XDMA Shell
+with a built-in Direct Memory Access (DMA) engine or the Small Shell
+which maximizes available resources in the top Super Logic Region (SLR)
+by omitting the DMA engine.
 
 Getting Started
 ---------------
@@ -135,6 +135,10 @@ After the setup is done successfully, you should see
 - Generates IP simulation models for CL examples
 - Downloads all required shell files from a shared S3 bucket
 
+Vitis AFI creation requires Vitis 2024.2 or later; see the `Vitis
+tool/platform
+pairings <../vitis/README.html#github-and-environment-setup>`__.
+
 Step 4. Build CL Design Check Point (DCP)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -175,8 +179,11 @@ AWS_CLK_GEN usage.
 A few more notes on
 `aws_build_dcp_from_cl.py <https://github.com/aws/aws-fpga/blob/-/hdk/common/shell_stable/build/scripts/aws_build_dcp_from_cl.py>`__:
 
-- Use ``--mode small_shell`` option to build CL designs with Small
-  Shell.
+- Use ``--mode <supported shell type>`` option to build CL designs with
+  either Small Shell or XDMA Shell. This is default to ``small_shell``.
+  Designs built with the XDMA Shell need the `XDMA
+  driver <./docs/XDMA-Install.html>`__ on the F2 instance to use the DMA
+  engine.
 - Use ``--cl <CL name>`` option to build a different CL design. This is
   default to ``cl_dram_hbm_dma``.
 - Use ``--aws_clk_gen`` option to annotate the use of `AWS clock
@@ -621,6 +628,9 @@ Build
   - `small_shell_cl_pnr_user.xdc <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/constraints/small_shell_cl_pnr_user.xdc>`__
     - place and route constraints specific to that example’s small shell
     build
+  - `xdma_shell_cl_pnr_user.xdc <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/constraints/xdma_shell_cl_pnr_user.xdc>`__
+    - place and route constraints specific to that example’s xdma shell
+    build
 
 For more information on
 `synth_CL_NAME.tcl <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/CL_TEMPLATE/build/scripts/synth_CL_TEMPLATE.tcl>`__
@@ -732,6 +742,9 @@ Next Steps
 - Dive deep into `Shell interface
   specifications <./docs/AWS-Shell-Interface-Specification.html>`__ and
   `PCIe Memory map <./docs/AWS-Fpga-Pcie-Memory-Map.html>`__
+- Understand the `programmer’s view of the
+  CL <./docs/Programmer-View.html>`__: the management and runtime
+  interfaces available from Linux userspace
 - Create your own designs/Port F1 designs to F2 systems
 - Try the `Virtual JTAG XVC debug flow <./docs/Virtual-JTAG-XVC.html>`__
   and understand the `shell timeout
@@ -753,6 +766,7 @@ Additional HDK Documentation
   docs/AWS-CLK-GEN-spec
   docs/Clock-Recipes-User-Guide
   docs/AWS-CLI-FPGA-Commands
+  docs/Programmer-View
 
   docs/AWS-Fpga-Pcie-Memory-Map
   docs/Supported-DDR-Modes

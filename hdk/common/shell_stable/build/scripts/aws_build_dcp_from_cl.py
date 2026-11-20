@@ -27,6 +27,7 @@ from optparse import OptionParser
 
 TIMESTAMP_LOG_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIMESTAMP_FILE_FORMAT = "%Y_%m_%d-%H%M%S"
+SUPPORTED_SHELLS = ["small_shell", "xdma_shell"]
 
 CLOCK_RECIPE_OPTS = (
     "--clock_recipe_a",
@@ -177,7 +178,7 @@ def main():
         "-m",
         "--mode",
         dest="mode",
-        help="Mode of shell. Supported value is: small_shell. Default to <small_shell>",
+        help=f"Mode of shell. Supported values: {SUPPORTED_SHELLS}. Default to <small_shell>",
         default="small_shell",
     )
 
@@ -293,9 +294,7 @@ def main():
         print_error(f"Unsupported build flow value: {options.flow}. Build terminated")
 
     # Check selected shell mode
-    if options.mode not in ["small_shell"]:
-        if options.mode == "xdma_shell":
-            print_warning("XDMA shell is not supported at this time. See ERRATA for details.")
+    if options.mode not in SUPPORTED_SHELLS:
         print_error(f"Unsupported mode value: {options.mode}. Build terminated")
 
     # Check selected clock_recipe_a
@@ -369,7 +368,10 @@ def main():
             + f"-tclargs {options.place_direct} {options.phy_opt_direct} {options.route_direct} "
             + f"{options.clock_recipe_a} {options.clock_recipe_b} {options.clock_recipe_c} {options.clock_recipe_hbm} "
         )
-        os.system(cmd)
+        try:
+            subprocess.run(cmd, shell=True, check=True)
+        except subprocess.CalledProcessError as error:
+            print_error(f"Vivado exited with status {error.returncode}. Build terminated")
 
     if options.flow == "BuildAll":
         generate_dcp_tarball(

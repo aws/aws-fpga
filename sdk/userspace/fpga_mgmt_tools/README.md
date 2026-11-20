@@ -133,12 +133,15 @@ AFIDEVICE    0       0x6789      0x1d50      0000:34:00.0
 
 ### Asynchronous Operations
 
-Use `-A` flag for non-blocking operations:
+Use `-A` flag for non-blocking operations.
+
+> `fpga-load-local-image -A` sends the load command and returns immediately. Immediately after it returns, poll the status with `fpga-describe-local-image` once a second until the AFI is loaded and the status is no longer `busy`. The load is completed by these describe calls, so if you don't poll, the AFI might not load.
 
 ```bash
 sudo fpga-load-local-image -S 0 -I agfi-0123456789abcdef0 -A
-# Returns immediately, check status separately
-sudo fpga-describe-local-image -S 0 -R  # -R rescans PCIe bus
+# Returns immediately. Poll once a second until the load finishes.
+while sudo fpga-describe-local-image -S 0 | grep -q busy; do sleep 1; done
+sudo fpga-describe-local-image -S 0 -R -H  # -R rescans the PCIe bus for the loaded AFI
 ```
 
 ### Multi-FPGA Operations

@@ -26,11 +26,17 @@ fi
 full_script=$(readlink -f $script)
 script_name=$(basename $full_script)
 script_dir=$(dirname $full_script)
+
+if ! source "$script_dir/shared/bin/set_common_functions.sh"; then
+    echo "ERROR: Setup of common functions FAILED" >&2
+    return 1
+fi
+
 distro=$(sed -n 's/^NAME="\([^"]*\)"/\1/p' /etc/os-release)
 distro=${distro// /}
 
 function vitis_usage {
-    echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR]/$script_name [-h|-help]"
+    echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR]/$script_name [-h|-help|--help]"
     return 0
 }
 
@@ -69,11 +75,11 @@ function check_xilinx_vitis {
 }
 
 
-declare -A valid_tool_versions
-valid_tool_versions["2024.1"]="true"
-valid_tool_versions["2024.2"]="true"
-valid_tool_versions["2025.1"]="true"
-valid_tool_versions["2025.2"]="true"
+declare -A valid_tool_versions=(
+    ["2024.2"]="true"
+    ["2025.1"]="true"
+    ["2025.2"]="true"
+)
 
 declare -A valid_os
 valid_os["Ubuntu"]="true"
@@ -250,27 +256,12 @@ function create_xsa_dirs {
 }
 
 
-declare -A xsa_dir_map
-xsa_dir_map["2024.1"]="2024_1_2"
-xsa_dir_map["2024.2"]="2024_2"
-xsa_dir_map["2025.1"]="2024_2"
-xsa_dir_map["2025.2"]="2024_2"
-
-declare -A xsa_map
-xsa_map["2024.1"]="202410_1_2"
-xsa_map["2024.2"]="202420_1"
-xsa_map["2025.1"]="202420_2"
-xsa_map["2025.2"]="202420_2"
-
-
 function setup_xsa {
 
-    # Get XSA for right tool version
-    xsa_for_tool_ver="${xsa_map[${VITIS_TOOL_VER}]}"
-    XSA="xilinx_aws-vu47p-f2_${xsa_for_tool_ver}"
+    # 202420_3 is built for XDMA shell 0x10052623 and supports every version in valid_tool_versions.
+    XSA_VERSION="202420_3"
+    XSA="xilinx_aws-vu47p-f2_${XSA_VERSION}"
     export SHELL_EMU_VERSION="${XSA}"
-
-    XSA_S3_BASE_DIR="xsa_f2_${xsa_dir_map[${VITIS_TOOL_VER}]}"
 
     if ! create_xsa_dirs; then
         return 1
@@ -278,8 +269,7 @@ function setup_xsa {
 
     # set a variable to point to the platform for build and emulation runs
     vitis_xpfm="${XSA}.xpfm"
-    PLATFORM_ENV_VAR_NAME="AWS_PLATFORM_${xsa_for_tool_ver}"
-    export "${PLATFORM_ENV_VAR_NAME}"="${vitis_xpfm_dir}/${vitis_xpfm}"
+    export "AWS_PLATFORM_${XSA_VERSION}"="${vitis_xpfm_dir}/${vitis_xpfm}"
     export PLATFORM_REPO_PATHS="${XILINX_VITIS}/platforms"
 
     # Grab all XSAs, check their SHAs, and move to necessary Vitis dir
@@ -290,7 +280,7 @@ function setup_xsa {
         "${vitis_xpfm}"
     )
     sha_mismatches=0
-    vitis_xsa_s3_url="https://aws-fpga-hdk-resources.s3.amazonaws.com/Vitis/${XSA_S3_BASE_DIR}/${XSA}"
+    vitis_xsa_s3_url="https://aws-fpga-hdk-resources.s3.amazonaws.com/Vitis/${XSA}"
     for missing_xsa in "${xsas[@]}"; do
         if ! get_xsa_file; then
             return 1
@@ -304,12 +294,10 @@ function setup_xsa {
     if [ $sha_mismatches -ne 0 ]; then
         return 1
     fi
-
 }
 
 
 function xrt_install_check {
-
     xrt_path=/opt/xilinx/xrt
     if [[ -n $(lsmod | grep "xocl") ]]; then
         info_msg "###############################################################################"
@@ -405,11 +393,11 @@ function set_up_xrt_repo {
 }
 
 
-declare -A commit_hash_map
-commit_hash_map["2024.1"]="a0729c69dba1ec05856d3008fbf9994a665f276c"
-commit_hash_map["2024.2"]="d8cf77af92e92324b038d787773b78fb7a44f812"
-commit_hash_map["2025.1"]="db8c37afa751589e72f0c47436bf3daca444d45d"
-commit_hash_map["2025.2"]="a4d60af463ae44509a92bb608e3fe3b48ea14be0"
+declare -A commit_hash_map=(
+    ["2024.2"]="d8cf77af92e92324b038d787773b78fb7a44f812"
+    ["2025.1"]="db8c37afa751589e72f0c47436bf3daca444d45d"
+    ["2025.2"]="a4d60af463ae44509a92bb608e3fe3b48ea14be0"
+)
 
 
 function set_up_xrt_vars {
@@ -468,7 +456,7 @@ function install_xrt {
 function hw_file_check {
     required_files=("Makefile" "README.rst" "description.json" "details.rst" "makefile_us_alveo.mk" "qor.json" "utils.mk" "xrt.ini")
     missing_a_file=0
-    for file in ${required_files[@]}; do
+    for file in "${required_files[@]}"; do
         if [[ ! -e $file ]]; then
             err_msg "!!! Required file: $file not found in current example directory !!!"
             missing_a_file=1
@@ -483,29 +471,7 @@ function hw_file_check {
 
 function pre_flight_checks {
 
-    # Process command line args
-    args=("$@")
-    for ((i = 0; i < ${#args[@]}; i++)); do
-        arg=${args[$i]}
-        case $arg in
-        -h | -help)
-            vitis_help
-            return 0
-            ;;
-        *)
-            err_msg "Invalid option: $arg\n"
-            usage
-            return 1
-            ;;
-        esac
-    done
-
     export DEBIAN_FRONTEND="noninteractive"
-
-    if ! source $script_dir/shared/bin/set_common_functions.sh; then
-        err_msg "Setup of common functions FAILED"
-        return 1
-    fi
 
     if ! source $script_dir/shared/bin/set_common_env_vars.sh; then # Sets VITIS_DIR for the line below
         err_msg "Setup of common environment variables FAILED"
@@ -557,6 +523,21 @@ function pre_flight_checks {
 
 function main {
 
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            -h|-help|--help)
+                vitis_help
+                return 0
+                ;;
+            -*)
+                err_msg "Invalid option: $arg"
+                vitis_usage
+                return 1
+                ;;
+        esac
+    done
+
     if ! pre_flight_checks; then
         return 1
     fi
@@ -576,21 +557,21 @@ function main {
     xrt_install_check
     cd $AWS_FPGA_REPO_DIR
 
-    export AWS_PLATFORM="AWS_PLATFORM_${xsa_for_tool_ver}"
+    export AWS_PLATFORM="AWS_PLATFORM_${XSA_VERSION}"
     info_msg "The default AWS Platform has been set to: \"AWS_PLATFORM=${AWS_PLATFORM}\" "
 
     echo ""
     info_msg "#-------------------------------------------------------------------------------#"
-    info_msg "How to run Hardware Emulation on an example"
+    info_msg "How to run Hardware Emulation or a Hardware Build for an example"
     info_msg "cd vitis/examples/vitis_examples/hello_world"
     info_msg "hw_file_check"
-    info_msg "#----------------------------- Emulation: Build --------------------------------#"
-    info_msg "make build TARGET=hw_emu PLATFORM=\$SHELL_EMU_VERSION"
-    info_msg "#--------------------------- Emulation: Simulation -----------------------------#"
+    info_msg "#---------------------------- Emulation ----------------------------------------#"
     info_msg "make run TARGET=hw_emu PLATFORM=\$SHELL_EMU_VERSION"
+    info_msg "#---------------------------- Hardware -----------------------------------------#"
+    info_msg "make build TARGET=hw PLATFORM=\$SHELL_EMU_VERSION"
     info_msg "#-------------------------------------------------------------------------------#"
 
     info_msg "Vitis Setup PASSED"
 }
 
-main
+main "$@"

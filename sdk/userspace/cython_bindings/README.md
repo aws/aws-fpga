@@ -5,14 +5,14 @@ allowing developers to control and interact with FPGAs using Python instead of C
 
 ## Cython Overview
 
-A typical Cython binding setup creates a bridge between Python and C code through a specific file structure: 
-the `.pxd` file declares the external C functions and types (similar to a C header file), 
-while the `.pyx` file implements the actual Python-facing wrappers around these C functions, 
-handling type conversions and memory management. 
+A typical Cython binding setup creates a bridge between Python and C code through a specific file structure:
+the `.pxd` file declares the external C functions and types (similar to a C header file),
+while the `.pyx` file implements the actual Python-facing wrappers around these C functions,
+handling type conversions and memory management.
 
 When compiled, Cython transforms the `.pyx` file into C code, which is then built into a shared object (`.so`) file that Python can import directly as a module, allowing Python code to seamlessly call C functions while maintaining Python's ease of use but with C's performance benefits.
 
-## Setup 
+## Setup
 
 ### How to Build Bindings
 
@@ -63,6 +63,8 @@ These are the core functions that provide direct interaction with AWS F2 FPGA in
 - `clear_local_image_sync(self, slot_id: int, timeout: uint32_t, delay_msec: uint32_t) -> dict`
 - `load_local_image_flags(self, slot_id: int, afi_id: str, flags: uint32_t) -> dict`
 - `load_local_image_sync_flags(self, slot_id: int, afi_id: str, flags: uint32_t, timeout: uint32_t, delay_msec: uint32_t) -> dict`
+
+> `load_local_image` and `load_local_image_flags` send the load command and return without waiting for the load to finish. Immediately after calling either one, call `describe_local_image` once a second until the AFI is loaded and the status is no longer busy. The load is completed by these describe calls, so if you don't poll, the AFI might not load. To have the library wait instead, use `load_local_image_sync_flags`.
 
 ## FPGA Clock Generation Library Functions
 

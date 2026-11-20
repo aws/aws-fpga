@@ -51,7 +51,7 @@ int main(int argc, char ** argv) {
   uint32_t retry_delay = 2;
   char* afi_images[] = {
     "agfi-0925b211f5a81b071",
-    "agfi-01d87c1ef9313165b" };
+    "agfi-09d63a981b83fa3ea" };
   size_t afi_image_count = sizeof(afi_images)/sizeof(afi_images[0]);
 
   int ret = FPGA_ERR_FAIL;

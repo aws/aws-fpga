@@ -8,6 +8,7 @@
 4. [Functional Code Blocks](#functional-code-blocks)
 5. [RTL Simulation](#rtl-simulation)
 6. [Software Runtime](#software-runtime)
+7. [Metadata](#metadata)
 
 ## Overview
 
@@ -203,3 +204,22 @@ fpga_pci_peek(pci_bar_handle, 0x0008, &result);
 ```
 
 > 📓 For an interactive, step-by-step walkthrough of the software runtime example, refer to the [cl_axil_reg_access Jupyter notebook](../../../../../sdk/notebooks/README.md).
+
+## Metadata
+
+Use the following values to register this CL as an AFI. To skip the build, load the pre-built public AFI below instead.
+
+| Key | Value |
+|-----|-------|
+| PCI Device ID | 0xF006 |
+| PCI Vendor ID | 0x1D0F (Amazon) |
+| PCI Subsystem ID | 0x1D51 |
+| PCI Subsystem Vendor ID | 0xFEDC |
+
+### Pre-built AFI
+
+| Shell | Shell Version | AGFI ID |
+|-------|---------------|---------|
+| Small Shell | 0x10212415 | agfi-06447dea0ca9b0a39 |
+
+This AFI is public in us-east-1 only. Launch your F2 instance in us-east-1 and load it with `sudo fpga-load-local-image -S 0 -I agfi-06447dea0ca9b0a39`.

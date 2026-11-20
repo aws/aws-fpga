@@ -33,24 +33,33 @@ The following examples do not support Hardware Emulation.
 * `host_xrt/mailbox_auto_restart_xrt`
 * `host_xrt/mult_compute_units_xrt`
 * `performance/axi_burst_performance`
+* `performance/hbm_bandwidth`
 * `performance/hbm_bandwidth_pseudo_random`
+* `rtl_kernels/rtl_streaming_free_running_k2k`
 * `rtl_kernels/rtl_streaming_k2k_mm`
 * `rtl_kernels/rtl_vadd_hw_debug`
 * `rtl_kernels/rtl_vadd_mixed_c_vadd`
 * `sys_opt/kernel_swap`
 * `sys_opt/multiple_process`
 
-## Vitis 2025.2
+## Hardware
 
-Vitis currently only supports Hardware Emulation. Hardware builds and AFI creation are not supported at this time.
+The following examples do not support Hardware.
 
-## Vitis 2024.1
+* `host_xrt/asynchronous_xrt`
+* `host_xrt/data_transfer_xrt`
+* `rtl_kernels/rtl_adder_streams`
 
-For this tool version, the following designs do not meet timing and have reduced HBM clock speeds:
+## Vitis 2024.2
 
-* `host_xrt/copy_buffer_xrt`
-  * Actual:   425MHz
-  * Expected: 450MHz
-* `performance/iops_test_xrt`
-  * Actual:   437MHz
-  * Expected: 450MHz
+The following examples do not support Hardware with this tool version.
+
+* `sys_opt/multiple_process`
+
+## Vitis 2025.1
+
+The following examples do not support Hardware with this tool version.
+
+* `performance/axi_burst_performance`
+* `rtl_kernels/rtl_vadd_2clks`
+* `sys_opt/multiple_process`

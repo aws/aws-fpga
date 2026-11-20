@@ -482,7 +482,7 @@ parser.add_argument(
     "--poll-interval",
     type=int,
     default=DEFAULT_POLL_INTERVAL,
-    help=f"Polling interval in seconds (default: {DEFAULT_POLL_INTERVAL})",
+    help=f"Polling interval in seconds (default: {DEFAULT_POLL_INTERVAL}, 0 to skip polling)",
 )
 parser.add_argument("--email", help="Email address for notification (Sends email when AFI gen completes)")
 parser.add_argument("--sns-topic", default="CREATE_AFI", help="SNS topic name (default: CREATE_AFI)")

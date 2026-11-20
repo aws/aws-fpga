@@ -72,6 +72,7 @@ sudo mkdir -p "${install_path}"
 lsblk
 df -h
 
+info_msg "Fetching Vivado Lab Edition v${vivado_lab_tool_version}!"
 if ! wget "${materials_loc}/${vivado_lab_installer_tarball}" -O "/dev/shm/${vivado_lab_installer_tarball}" -q; then
     err_msg "Couldn't download the installer tarball!"
     err_msg "Exiting!"
