@@ -30,6 +30,10 @@ clean:
 	@ -rm -rf $(SIM_DIR)/*.dat
 	@ -rm -rf $(SIM_DIR)/*.wdb
 
+XSIM_LINK_OPTIONS ?=
+ifneq ($(USE_LD_PATH),)
+	XSIM_LINK_OPTIONS += -gcc_link_options "-B$(USE_LD_PATH)"
+endif
 
 XSIM_PLUSARGS_DIRTY = $(subst +define+,--define ,$(PLUSARGS))
 XSIM_PLUSARGS = $(subst +, --define ,$(XSIM_PLUSARGS_DIRTY))
@@ -47,7 +51,7 @@ endif
 
 compile: copy_xsim_ini $(COMPILE_CL_IP_DIR) generate_sim_file_list
 	cd ${SIM_DIR} && ln -s -f $(COMPLIB_DIR)/xsim.ini
-	cd $(SIM_DIR) && xsc $(C_FILES) $(XSIM_C_INCLUDE_ARGS) --gcc_compile_options "-DVIVADO_SIM" --gcc_compile_options "-DSV_TEST" --gcc_compile_options "-DDMA_TEST"
+	cd $(SIM_DIR) && xsc $(C_FILES) $(XSIM_C_INCLUDE_ARGS) --gcc_compile_options "-DVIVADO_SIM" --gcc_compile_options "-DSV_TEST" --gcc_compile_options "-DDMA_TEST" $(XSIM_LINK_OPTIONS)
 	cd $(SIM_DIR) && xvlog --sv -m64 --define DMA_TEST $(XSIM_PLUSARGS) $(XSIM_DEFINES) --work xil_defaultlib --incr --relax -f $(SCRIPTS_DIR)/top.$(SIMULATOR).f
 	cd $(SIM_DIR) && xelab -m64 $(XSIM_PLUSARGS) $(XSIM_DEFINES) --timescale 1ps/1ps --debug typical --relax --mt 8 $(LIBLISTS_ARGS) -sv_lib dpi --snapshot tb xil_defaultlib.tb xil_defaultlib.glbl xil_defaultlib.$(TEST)
 
