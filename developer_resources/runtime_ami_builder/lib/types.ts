@@ -34,4 +34,5 @@ export const BASE_AMI_CONFIGS = sourceAmisData as {
 
 export enum VivadoLabEditionVersion {
   V2025_1 = '2025.1',
+  V2025_2 = '2025.2',
 }

@@ -56,7 +56,7 @@ set shell small_shell
 source $::env(HDK_SHELL_DIR)/hlx/hlx_setup.tcl
 ```
 
-**NOTE**: A `shell` variable must be specified for the flow to pair the customer design with the correct shell variant. Valid values are `xdma_shell` (coming soon) or `small_shell`.
+**NOTE**: A `shell` variable must be specified for the flow to pair the customer design with the correct shell variant. Valid values are `xdma_shell` or `small_shell`.
 
 ### Switching between HDK and HLx flows
 

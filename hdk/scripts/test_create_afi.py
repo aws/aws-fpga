@@ -358,10 +358,11 @@ class TestDCPDiscovery(unittest.TestCase):
             self.assertEqual(self.dcp_discovery.find_dcp_files_in_hdk_workspace(), [])
 
             mock_find_hdk.return_value = "/test/hdk"
-            # One glob for cl/examples/* and one for cl/examples/cl_demo/*.
-            mock_glob.side_effect = [["/test/path/test.tar"], []]
+            example_dcp = "/test/hdk/cl/examples/cl_mem_perf/build/checkpoints/test.tar"
+            demo_dcp = "/test/hdk/cl/examples/cl_demo/cl_axil_reg_access/build/checkpoints/test.tar"
+            mock_glob.side_effect = [[example_dcp], [demo_dcp]]
             results = self.dcp_discovery.find_dcp_files_in_hdk_workspace()
-            self.assertEqual(len(results), 1)
+            self.assertEqual([path for path, _ in results], sorted([example_dcp, demo_dcp]))
 
         self.assertEqual(
             self.dcp_discovery._create_display_name("/test/file_2024_13_99-999999.tar"),

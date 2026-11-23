@@ -1,6 +1,6 @@
 # MSI-X Interrupts Implementation Guide
 
-This guide describes how to implement PCIe Message Signaled Interrupts Extended (MSI-X) with F2. It demonstrates the implementation of a custom interrupt service routine (ISR) and provides working examples of both kernel and user space code. 
+This guide describes how to implement PCIe Message Signaled Interrupts Extended (MSI-X) with F2. It demonstrates the implementation of a custom interrupt service routine (ISR) and provides working examples of both kernel and user space code.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ This guide describes how to implement PCIe Message Signaled Interrupts Extended 
 
 MSI-X functionality is enabled using the ```pci_enable_msix_exact``` function which requires the following:
 
-* Pointer to the device's PCI data structure 
+* Pointer to the device's PCI data structure
 * Table to map kernel vector numbers to device interrupts
 * Number of interrupts that are being allocated in the kernel
 
@@ -63,8 +63,8 @@ The snippet of code shown below runs from user space and programs the PCIe block
 Each MSI-X entry needs its interrupt vector number programmed in the IRQ block. By default, all vectors point to index 0. For this example, each user interrupt is programmed to point to a different interrupt vector to illustrate using all 16 entries. The vector numbers are aligned on byte boundaries, and four 32-bit addresses (0x80-0x8f) are used to assign interrupt vectors.
 
 ```c
-rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x080), 0x03020100);    
-rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x084), 0x07060504);    
+rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x080), 0x03020100);
+rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x084), 0x07060504);
 rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x088), 0x0b0a0908);
 rc |= fpga_pci_poke(dma_bar_handle, dma_reg_addr(IRQ_TGT, 0, 0x08c), 0x0f0e0d0c);
 ```
@@ -91,11 +91,12 @@ Note:
 
 * Replace `<slot_number>` with the appropriate FPGA slot number you're using
 * To find the `<bus:device.function>` of your FPGA slot, use `sudo fpga-describe-local-image -S <slot_number>`
+* The [XDMA driver](./../../../hdk/docs/XDMA_Install.md) must not be bound to the FPGA. It binds to device ID `0xf001` and claims the BARs and MSI-X vectors this guide's driver needs, so `make install` fails. If it is installed, run `sudo modprobe -r xdma` before `make install`.
 
 Use the `fpga-load-local-image` command to load the FPGA with the pre-generated CL_DRAM_HBM_DMA AFI
 
 ```bash
-sudo fpga-load-local-image -S <slot_number> -I agfi-01d87c1ef9313165b
+sudo fpga-load-local-image -S <slot_number> -I agfi-09d63a981b83fa3ea
 ```
 
 Run the following command with the verbose flag to see if interrupts are enabled
@@ -159,7 +160,7 @@ sudo ./f2_test <slot_number>
 Running the example on a 12xlarge instance will show the following on the terminal:
 
 ```
-Starting MSI-X Interrupt test 
+Starting MSI-X Interrupt test
 Initial DDR value: 0
 IRQ Block Identifier read_data: 1fc20006
 IRQ Block User Interrupt Enable Mask read_data: 0, Addr: 2004
@@ -179,7 +180,7 @@ CL read_data: 00000000
 ```
 
 Run `sudo dmesg` to see the kernel log which shows each interrupt that is triggered and its corresponding DDR counter value.
- 
+
 ### Other Useful MakeFile Targets
 
 ` make remove `
@@ -187,7 +188,7 @@ Run `sudo dmesg` to see the kernel log which shows each interrupt that is trigge
 * Removes the F2 kernel module from the system using `rmmod`
 * Use this command when you want to unload the driver
 
-` make clean ` 
+` make clean `
 
 * Removes all compiled files and build artifacts
 * Cleans the kernel module build directory

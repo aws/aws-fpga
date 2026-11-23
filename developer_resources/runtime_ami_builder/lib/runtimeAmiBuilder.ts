@@ -43,12 +43,25 @@ export class RuntimeAmiBuilderStack extends Stack {
       ...(user === BASE_AMI_CONFIGS.ROCKY_8_10.user ? [COMPONENTS.updateRockyPython(user)] : []),
       COMPONENTS.installAwsCli(user),
       COMPONENTS.displayStorage([rootVolume]),
+    ];
+
+    const clDeviceNumber = Stack.of(this).node.tryGetContext('ami-builder:cl-device-number');
+    if (clDeviceNumber === '0x0000') {
+      console.log('\n⚠️  XDMA Driver Installation Notice:');
+      console.log('   Device ID is set to 0x0000. The XDMA driver source will be prepared,');
+      console.log('   but manual completion of the installation is required after the AMI is built.');
+      console.log('   See the README for detailed instructions.\n');
+    }
+
+    componentConfigs.push(
       COMPONENTS.installF2RuntimeUtils(user),
       COMPONENTS.installAwsFpgaSdk(user),
       COMPONENTS.installVivadoLabEdition(user, vivadoToolVersion),
       COMPONENTS.installXilinxVirtualCable(user, vivadoToolVersion),
+      COMPONENTS.installXdmaDriver(user, clDeviceNumber),
       COMPONENTS.cleanupStage(user)
-    ];
+    );
+
     componentConfigs.forEach((componentDefn) => {
       const component = createComponent(this, componentDefn);
       components.push({
@@ -112,13 +125,14 @@ export class RuntimeAmiBuilderStack extends Stack {
     const sharingAccountIds = Stack.of(this).node.tryGetContext('ami-builder:sharing-accounts');
     const distributions = Stack.of(this).node.tryGetContext('ami-builder:distribution-regions').map((region: string) => ({
       region,
+      // This nested object is raw CloudFormation JSON; CDK does not convert its keys.
       amiDistributionConfiguration: {
-        name: `${Stack.of(this).node.tryGetContext('ami-builder:name-prefix')}-{{imagebuilder:buildDate}}`,
-        description: Stack.of(this).node.tryGetContext('ami-builder:description'),
-        amiTags: Stack.of(this).node.tryGetContext('ami-builder:tags'),
+        Name: `${Stack.of(this).node.tryGetContext('ami-builder:name-prefix')}-{{imagebuilder:buildDate}}`,
+        Description: Stack.of(this).node.tryGetContext('ami-builder:description'),
+        AmiTags: Stack.of(this).node.tryGetContext('ami-builder:tags'),
         ...(sharingAccountIds?.length > 0 && {
-          launchPermissionConfiguration: {
-            userIds: sharingAccountIds,
+          LaunchPermissionConfiguration: {
+            UserIds: sharingAccountIds,
           }
         }),
       }
@@ -158,6 +172,7 @@ const encrypted = app.node.tryGetContext('ami-builder:root-volume-encrypted');
 const distributionRegions = app.node.tryGetContext('ami-builder:distribution-regions');
 const sharingAccountIds = app.node.tryGetContext('ami-builder:sharing-accounts');
 const uniqueIdentifier = app.node.tryGetContext('ami-builder:unique-identifier');
+const clDeviceNumber = app.node.tryGetContext('ami-builder:cl-device-number');
 
 if (!/^\d+\.\d+\.\d+$/.test(app.node.tryGetContext('ami-builder:image-recipe-version'))) {
   throw new Error('No image recipe version specified!');
@@ -179,6 +194,10 @@ if (!Object.values(VivadoLabEditionVersion).includes(vivadoLabEditionVersion)) {
 
 if (rootVolumeSize < 32) {
   throw new Error(`Runtime AMI requires >= 32GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
+}
+// Matches install_xdma_driver.sh, so a bad value fails here instead of during the AMI build
+if (typeof clDeviceNumber !== 'string' || !/^0x[0-9A-Fa-f]{4}$/.test(clDeviceNumber)) {
+  throw new Error(`CL device number must be a 4-digit hex value such as "0xf001" or "0x0000": '${clDeviceNumber}'`);
 }
 if (!(Object.values(EbsDeviceVolumeType).includes(rootVolumeType))) {
   throw new Error(`Invalid root volume type: '${rootVolumeType}'`);

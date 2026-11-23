@@ -23,20 +23,17 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -std=gnu11 -g -Wall -Werror $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt
 
-SRC = test_dram_dma_common.c test_dram_hbm_dma.c test_dram_dma_hwsw_cosim.c
+SRC = test_dram_dma_common.c test_dram_hbm_dma.c
 OBJ = $(SRC:.c=.o)
 
 
-all: test_dram_hbm_dma check_env cosim $(BIN)
+all: test_dram_hbm_dma check_env $(BIN)
 
 test_dram_hbm_dma: $(OBJ)
 	$(CC) $(CFLAGS) -o test_dram_hbm_dma test_dram_hbm_dma.o test_dram_dma_common.o  $(LDFLAGS) $(LDLIBS)
 
-cosim: $(OBJ)
-	$(CC) $(CFLAGS) -o test_dram_dma_hwsw_cosim test_dram_dma_hwsw_cosim.o test_dram_dma_common.o $(LDFLAGS) $(LDLIBS)
-
 clean:
-	rm -f *.o test_dram_hbm_dma test_dram_dma_hwsw_cosim
+	rm -f *.o test_dram_hbm_dma
 
 check_env:
 ifndef SDK_DIR

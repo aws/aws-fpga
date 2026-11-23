@@ -1,5 +1,20 @@
 # F2 Developer Kit Release Notes
 
+## v2.4.0
+
+* Released the [XDMA Shell](./User_Guide_AWS_EC2_FPGA_Development_Kit.md#aws-shells) (`0x10052623`), which adds a built-in DMA engine. Build a CL for it with `aws_build_dcp_from_cl.py --mode xdma_shell`; the [Small Shell](./User_Guide_AWS_EC2_FPGA_Development_Kit.md#aws-shells) (`0x10212415`) remains the default
+  * The `cl_dram_hbm_dma`, `cl_mem_perf`, `cl_axil_reg_access`, and `CL_TEMPLATE` examples can be built with either shell
+  * Install the [XDMA driver](./hdk/docs/XDMA_Install.md) to use the DMA engine from the host. The [Runtime AMI Builder](./developer_resources/runtime_ami_builder/README.md#xdma-driver-installation) can install it in custom AMIs
+  * The `cl_dram_hbm_dma`, `cl_mem_perf`, `cl_axil_reg_access`, and `cl_sde` example READMEs now list a pre-built public AFI
+* Removed the HW/SW co-simulation runtime example (`test_dram_hbm_dma_hwsw_cosim`) from `cl_dram_hbm_dma` and `cl_mem_perf`
+* The CL build script now stops with an error when Vivado exits unsuccessfully, rather than continuing to package a checkpoint.
+* Removed Vitis 2024.1 support; the Vivado 2024.1 HDK flow is unchanged. See the [supported Vitis versions](./vitis/supported_versions.txt)
+* Vitis AFI loading is now officially supported. See the Vitis README for detailed [AFI build instructions](./vitis/README.md#hardware-binary-build) and [details on running AFIs with their host applications](./vitis/README.md#running-the-example-afis).
+* Updated the [Vitis errata](./vitis/ERRATA.md) with the examples that do not support Hardware Emulation or Hardware builds
+* The [cl_sde](./hdk/cl/examples/cl_sde/README.md) software library now maps its write-back rings from 2 MiB hugepages, so each initialized slot needs two free hugepages. See the [SDE software README](./hdk/cl/examples/cl_sde/software/src/README.md)
+* Added Function Level Reset (FLR) to the [shell errata](./hdk/docs/AWS_Shell_ERRATA.md): FLR is currently unavailable on F2 instances and a fix is in progress. See [aws-fpga issue #811](https://github.com/aws/aws-fpga/issues/811)
+* The Runtime AMI Builder now applies the AMI name, description, tags, and launch permissions set in `lib/cdk.jsonc`. Before deploying, replace the placeholder `ami-builder:sharing-accounts`, or set it to `[]`, so the AMI isn't shared with the placeholder account
+
 ## v2.3.5
 
 * Fixes for `check_host_memory()` in the [cl_dram_hbm_dma testbench utilities](./hdk/cl/examples/cl_dram_hbm_dma/verif/tests/cl_dram_hbm_dma_utils.svh) to compare all addresses of each host buffer in DDR and HBM DMA tests for `cl_dram_hbm_dma` and `cl_mem_perf`

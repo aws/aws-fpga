@@ -1,15 +1,13 @@
 CL_DRAM_HBM_DMA CustomLogic Example
 ===================================
 
-⚠️ **Features using XDMA engine are currently unsupported on F2
-instances**
-
 Table of Content
 ----------------
 
 1. `Overview <#overview>`__
 2. `Functional Description <#functional-description>`__
 3. `Software <#software>`__
+4. `Metadata <#metadata>`__
 
 Overview
 --------
@@ -191,11 +189,10 @@ generating the IRQ requests and checks if ACK has been received.
 Virtual JTAG
 ~~~~~~~~~~~~
 
-3 ILA cores are integrated, one to monitoring the sh_c_dma_pcis bus, one
-to monitor the AXI4 signals on DDR and the third to monitor the AXI4
-signals on HBM. An example usage is provided in
-`cl_ila.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_ila.sv>`__. An example usage for Xilinx VIO is
-provided in `cl_vio.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_vio.sv>`__
+This design contains three integrated ILA cores. One to monitor the
+sh_c_dma_pcis bus, one to monitor the AXI4 signals on DDR, both in
+`cl_ila.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_ila.sv>`__, and one to monitor the VIO counter
+signals in `cl_vio.sv <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/design/cl_vio.sv>`__.
 
 Clocks
 ~~~~~~
@@ -211,23 +208,35 @@ DMA accesses rely on the `XDMA driver <../../../docs/XDMA-Install.html>`__
 The DRAM_HBM DMA example includes runtime software to demonstrate
 working DMA accesses. The runtime example is located `in the runtime directory <https://github.com/aws/aws-fpga/tree/f2/hdk/cl/examples/cl_dram_hbm_dma/software/runtime/test_dram_hbm_dma.c>`__
 
-There are three example tests in cl_dram_hbm_dma example.
-
-test_dram_dma.c
-^^^^^^^^^^^^^^^
-
-This test runs a software test with data transfer with DDR enabled.
-
-test_hbm_dma.c
-^^^^^^^^^^^^^^
-
-This test runs a software test with data transfer with HBM enabled.
-
 test_dram_hbm_dma.c
 ^^^^^^^^^^^^^^^^^^^
 
-This test runs a software test with data transfer with both DDR and HBM
-enabled
+This test has four legs and prints ``TEST PASSED`` or ``TEST FAILED`` at
+the end.
+
+1. DMA and bandwidth. The test uses one XDMA channel and runs DMA
+   operations sequentially on a single thread. It writes DDR then HBM,
+   and reads DDR then HBM, each as one contiguous range. Transfers use
+   256 MiB chunks, chosen for their high throughput; achieved rates
+   depend on the host, driver, and memory path. For each transfer the
+   XDMA driver allocates a 512 KiB contiguous page list, so on a host
+   with fragmented memory a transfer can fail with ENOMEM. The error
+   message then suggests lowering ``CHUNK_SIZE`` in
+   ``test_dram_hbm_dma.c`` or compacting host memory. DDR write, HBM
+   write, DDR read, and HBM read each report GiB transferred, elapsed
+   time, and GiB/s. Initial buffer preparation and the verification in
+   leg 2 are excluded from timing. These host-observed rates include
+   driver overhead and per-chunk address stamping on writes. Bandwidth
+   numbers do not decide pass or fail; a DMA error does.
+2. Verification. Right after each chunk is read, it is compared against
+   the random pattern and its address stamp. Verification is untimed.
+   The first differing byte fails the test; the log names the chunk
+   address and the first differing byte.
+3. AXI master. One register-driven write and read to DDR and to HBM.
+4. Interrupts. All 16 user interrupts are triggered and observed.
+
+The test covers all 80 GiB of device memory: 64 GiB of DDR followed by
+16 GiB of HBM, which form one contiguous address range.
 
 Compile and run instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -238,28 +247,45 @@ Compile and run instructions
    make all
    sudo ./test_dram_hbm_dma
 
-test_dram_hbm_dma_hwsw_cosim.c
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Metadata
+--------
 
-This test runs a software test with HW/SW co-simulation enabled with
-both DDR and HBM enabled.
+Use the following values to register this CL as an AFI. To skip the
+build, load the pre-built public AFI below instead.
 
-.. _compile-and-run-instructions-1:
+.. list-table::
+   :header-rows: 1
+   :widths: auto
 
-Compile and run instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * - Key
+     - Value
+   * - PCI Device ID
+     - 0xF001
+   * - PCI Vendor ID
+     - 0x1D0F (Amazon)
+   * - PCI Subsystem ID
+     - 0x1D51
+   * - PCI Subsystem Vendor ID
+     - 0xFEDC
 
-.. code-block:: bash
+Pre-built AFI
+~~~~~~~~~~~~~
 
-   cd ${CL_DIR}/software/runtime
-   make TEST=test_dram_hbm_dma_hwsw_cosim
-   sudo ./test_dram_hbm_dma_hwsw_cosim
+.. list-table::
+   :header-rows: 1
+   :widths: auto
 
-The test can be simulated with XSIM as follows.
+   * - Shell
+     - Shell Version
+     - AGFI ID
+   * - XDMA Shell
+     - 0x10052623
+     - agfi-09d63a981b83fa3ea
 
-.. code-block:: bash
-
-   cd ${CL_DIR}/verif/scripts
-   make C_TEST=test_dram_hbm_dma_hwsw_cosim
+This AFI is public in us-east-1 only. Launch your F2 instance in
+us-east-1 and load it with
+``sudo fpga-load-local-image -S 0 -I agfi-09d63a981b83fa3ea``. This AFI
+uses the XDMA Shell, so install the `XDMA
+driver <../../../docs/XDMA-Install.html>`__ to use its DMA engine.
 
 `Back to Home <../../../../index.html>`__

@@ -102,8 +102,8 @@ FPGA Management
 .. toctree::
   :maxdepth: 1
 
-  sdk/userspace/fpga_mgmt_examples/README
-  sdk/userspace/fpga_mgmt_tools/README
+  sdk/userspace/fpga-mgmt-examples/README
+  sdk/userspace/fpga-mgmt-tools/README
 
 Virtual Ethernet
 ^^^^^^^^^^^^^^^^

@@ -18,15 +18,18 @@
     // The version of the components and runtime AMI for this deployment
     "ami-builder:image-recipe-version": "1.0.0",
 
-    // Controls which AMI definition from lib/types.ts we use
+    // Controls which AMI definition from lib/source_amis.json we use
     "ami-builder:base-image": "UBUNTU_24_04",
-    // Which Vivado Lab Edition version to install. If Vivado Lab Edition isn't needed,
-    // leave this value as is and remove the InstallVivadoLabEdition component from the list in in lib/runtimeAmiBuilder.ts
+    // Which Vivado Lab Edition version to install. If Vivado Lab Edition isn't needed, leave this value as is and
+    // remove the installVivadoLabEdition and installXilinxVirtualCable components from the list in lib/runtimeAmiBuilder.ts
     // Supported versions are in supported_vivado_versions.txt at this repo's root
     "ami-builder:vivado-version": "2025.2",
 
     // Volume size in GiB. Applies to all supported base images (Ubuntu 24.04, Rocky Linux 8.10); minimum 32GiB.
     "ami-builder:root-volume-size": 32,
+    // Device number specified in cl_id_defines.vh during CL build. Leave as "0x0000" to allow device ID update before install
+    "ami-builder:cl-device-number": "0x0000",
+
     // Volume type. See here for more info: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ec2.BlockDevice.html
     "ami-builder:root-volume-type": "gp3",
     // Optional drive encryption. Requires a KMS key: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_kms.Key.html

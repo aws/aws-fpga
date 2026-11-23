@@ -13,10 +13,11 @@ The matrix covers AMD tool versions **2024.1, 2024.2, 2025.1, 2025.2,
 and 2026.1**. AMD support and AWS testing are independent: listing a
 tool version in the AMD column does not indicate AWS testing, and an
 AWS-built/tested tool version does not imply that AMD listed that
-OS/tool combination in UG973. Tool versions supported by the AWS F2
+OS/tool combination in UG973. Vivado versions supported by the AWS F2
 Developer Kit are listed in
 `supported_vivado_versions.txt <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__;
-listing AMD’s 2026.1 OS support here does not declare F2 Developer Kit
+for Vitis support, see the `Vitis README <../vitis/README.html>`__.
+Listing AMD’s 2026.1 OS support here does not declare F2 Developer Kit
 support for Vivado / Vitis 2026.1.
 
 The OS and tool-version mappings are taken from AMD’s official `UG973 —

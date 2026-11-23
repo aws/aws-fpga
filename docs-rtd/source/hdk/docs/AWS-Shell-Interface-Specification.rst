@@ -29,7 +29,7 @@ Table of Contents
     - `Clocks and Reset <#clocks-and-reset>`__
 
       - `Clocks <#clocks>`__
-      - `Reset <#cl-reset>`__
+      - `CL Reset <#cl-reset>`__
 
     - `PCIS Interface <#pcis-interface>`__
 
@@ -56,14 +56,15 @@ Table of Contents
 
       - `Integrity Check <#integrity-check>`__
       - `General Control and Status <#general-control-and-status>`__
-      - `Virtual LED/DIP <#virtual-leds-and-dip-switches>`__
+      - `Virtual LEDs and DIP
+        Switches <#virtual-leds-and-dip-switches>`__
       - `Global Counters <#global-counters>`__
 
   - `Implementation Tips <#implementation-tips>`__
 
     - `Multi-SLR FPGA <#multi-slr-fpga>`__
     - `Logic Levels <#logic-levels>`__
-    - `Reset <#logic-reset>`__
+    - `Logic Reset <#logic-reset>`__
     - `Pipeline Registers <#pipeline-registers>`__
     - `Vivado Analysis <#vivado-analysis>`__
 
@@ -280,11 +281,10 @@ interfaces should be left unconnected.
 DMA
 ~~~
 
-There is an integrated DMA controller inside the XDMA Shell (Xilinx DMA,
-not supported at this time), which writes/reads data to/from the CL via
-the sh_cl_pcis_dma bus. Because of the shared DMA/PCIS interface, this
-maps to the same address space exposed by the AppPF BAR4 address. XDMA
-driver is available on Xilinx
+There is an integrated DMA controller inside the XDMA Shell, which
+writes/reads data to/from the CL via the sh_cl_pcis_dma bus. Because of
+the shared DMA/PCIS interface, this maps to the same address space
+exposed by the AppPF BAR4 address. XDMA driver is available on Xilinx
 `github <https://github.com/Xilinx/dma_ip_drivers>`__.
 
 Interfaces between Shell and CL
@@ -891,7 +891,8 @@ first flop/register slice should be placed in the same SLR:
   - HBM MON APB
 
 Please see the `Shell Floorplan <./shell-floorplan.html>`__ for additional
-details on Shell-CL interface placements in SMALL_SHELL.
+details on Shell-CL interface placements in the XDMA Shell and Small
+Shell.
 
 For the interfaces that are in both the MID/BOTTOM the recommendation is
 to use flops for pipelining, but don’t constrain to an SLR. Constrain

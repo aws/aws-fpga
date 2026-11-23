@@ -22,6 +22,7 @@
 ## Known Bugs/Issues
 
 - HBM ECC Scrubbing is not supported in Small Shell `0x10212415`:
-  - DO NOT enable the "Enable ECC Scrubbing" or the "Initialize Memory Using ECC" option in the HBM IP. Enabling either option will cause an HBM monitor interface timeout during AFI loading, making the HBM inaccessible. Refer to [AWS Shell Interface Specification](./AWS_Shell_Interface_Specification.md#hbm-monitor-interface) for details.
+  - DO NOT enable the "Enable ECC Scrubbing" or the "Initialize Memory Using ECC" option in the HBM IP. ECC scrubbing takes too long to finish, so enabling either option causes an HBM monitor interface timeout during AFI loading, making the HBM inaccessible. Refer to [AWS Shell Interface Specification](./AWS_Shell_Interface_Specification.md#hbm-monitor-interface) for details.
   - ECC protection remains available. Developers can enable only the "Enable ECC Correction" option in the IP configuration to use it. **Note: Reading from uninitialized memory locations will result in ECC errors**.
-  - Support for the "Enable ECC Scrubbing" and "Initialize Memory Using ECC" options will be added in a future shell release.
+- Function Level Reset (FLR) is currently unavailable on F2 instances. AWS has confirmed an issue with FLR on F2 instances and a fix is in progress. See [aws-fpga issue #811](https://github.com/aws/aws-fpga/issues/811) for status.
+- The descriptions of `sh_cl_flr_assert` and `cl_sh_flr_done` in `cl_ports.vh` and in the HDK simulation BFM do not match the Shell's behavior. `sh_cl_flr_assert` is a single `clk_main_a0` cycle pulse, not a level, and the Shell does not wait for `cl_sh_flr_done`, which is optional.

@@ -1,9 +1,6 @@
 CL_MEM_PERF Custom Logic Example
 ================================
 
-⚠️ **Features using XDMA engine are currently unsupported on F2
-instances**
-
 Table of Contents
 -----------------
 
@@ -34,13 +31,13 @@ Table of Contents
 
   - `Software Tests <#software-tests>`__
   - `Compile and run instructions <#compile-and-run-instructions>`__
-  - `Cosim Compile and run
-    instructions <#cosim-compile-and-run-instructions>`__
 
 - `HBM Performance Tests <#hbm-performance-tests>`__
 
   - `Instructions to run HBM Performance
     Test <#instructions-to-run-hbm-performance-test>`__
+
+- `Metadata <#metadata>`__
 
 Introduction
 ------------
@@ -617,8 +614,10 @@ Software Tests
 test_dram_hbm_dma.c
 ^^^^^^^^^^^^^^^^^^^
 
-This test runs a software test with data transfer with both DDR and HBM
-enabled
+This is the same binary as in
+`cl_dram_hbm_dma <../cl-dram-hbm-dma/README.html>`__. See the
+``test_dram_hbm_dma.c`` section of that page for what it covers and
+reports.
 
 test_hbm_perf32.c
 ^^^^^^^^^^^^^^^^^
@@ -647,28 +646,6 @@ Compile and run instructions
    cd $CL_DIR/software/runtime
    make all
    sudo ./test_dram_hbm_dma
-
-test_dram_hbm_dma_hwsw_cosim.c
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This test runs a software test with HW/SW co-simulation enabled with
-both DDR and HBM enabled.
-
-Cosim Compile and run instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   cd $CL_DIR/software/runtime
-   make TEST=test_dram_hbm_dma_hwsw_cosim
-   sudo ./test_dram_hbm_dma_hwsw_cosim
-
-The test can be simulated with XSIM as follows.
-
-.. code-block:: bash
-
-   cd $CL_DIR/verif/scripts
-   make C_TEST=test_dram_hbm_dma_hwsw_cosim
 
 HBM Performance Tests
 ---------------------
@@ -739,6 +716,47 @@ Sample output:
    __INFO__: RD RespError    = 0x00000000
    __INFO__: RD Bandwidth    = 426.28 GBytes/s
    2023-01-24T18:13:21.555468Z, test_dram_hbm_dma, INFO, test_hbm_perf32.c +152: main(): TEST PASSED
+
+Metadata
+--------
+
+Use the following values to register this CL as an AFI. To skip the
+build, load the pre-built public AFI below instead.
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Key
+     - Value
+   * - PCI Device ID
+     - 0xF004
+   * - PCI Vendor ID
+     - 0x1D0F (Amazon)
+   * - PCI Subsystem ID
+     - 0x1D51
+   * - PCI Subsystem Vendor ID
+     - 0xFEDC
+
+Pre-built AFI
+~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Shell
+     - Shell Version
+     - AGFI ID
+   * - XDMA Shell
+     - 0x10052623
+     - agfi-064211c86af3e2d62
+
+This AFI is public in us-east-1 only. Launch your F2 instance in
+us-east-1 and load it with
+``sudo fpga-load-local-image -S 0 -I agfi-064211c86af3e2d62``. This AFI
+uses the XDMA Shell, so install the `XDMA
+driver <../../../docs/XDMA-Install.html>`__ to use its DMA engine.
 
 .. |Diagram| image:: ../../../../_static/cl_mem_perf_images/cl_mem_perf.png
 .. |image1| image:: ../../../../_static/cl_mem_perf_images/cl_hbm_kernel.png

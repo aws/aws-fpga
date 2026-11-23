@@ -18,7 +18,7 @@
     - [CL and Shell AXI Interfaces](#cl-and-shell-axi-interfaces)
     - [Clocks and Reset](#clocks-and-reset)
       - [Clocks](#clocks)
-      - [Reset](#cl-reset)
+      - [CL Reset](#cl-reset)
     - [PCIS Interface](#pcis-interface)
       - [PCIS Interface Timeout Details](#pcis-interface-timeout-details)
     - [PCIM interface](#pcim-interface)
@@ -33,12 +33,12 @@
     - [Miscellaneous Signals](#miscellaneous-signals)
       - [Integrity Check](#integrity-check)
       - [General Control and Status](#general-control-and-status)
-      - [Virtual LED/DIP](#virtual-leds-and-dip-switches)
+      - [Virtual LEDs and DIP Switches](#virtual-leds-and-dip-switches)
       - [Global Counters](#global-counters)
   - [Implementation Tips](#implementation-tips)
     - [Multi-SLR FPGA](#multi-slr-fpga)
     - [Logic Levels](#logic-levels)
-    - [Reset](#logic-reset)
+    - [Logic Reset](#logic-reset)
     - [Pipeline Registers](#pipeline-registers)
     - [Vivado Analysis](#vivado-analysis)
 
@@ -164,7 +164,7 @@ If the DDR controllers are not used by the CL, then the interfaces should be lef
 
 ### DMA
 
-There is an integrated DMA controller inside the XDMA Shell (Xilinx DMA, not supported at this time), which writes/reads data to/from the CL via the sh_cl_pcis_dma bus. Because of the shared DMA/PCIS interface, this maps to the same address space exposed by the AppPF BAR4 address.  XDMA driver is available on Xilinx [github](https://github.com/Xilinx/dma_ip_drivers).
+There is an integrated DMA controller inside the XDMA Shell, which writes/reads data to/from the CL via the sh_cl_pcis_dma bus. Because of the shared DMA/PCIS interface, this maps to the same address space exposed by the AppPF BAR4 address.  XDMA driver is available on Xilinx [github](https://github.com/Xilinx/dma_ip_drivers).
 
 ## Interfaces between Shell and CL
 
@@ -535,7 +535,7 @@ It is ideal to place logic that interfaces to the shell in the same SLR as the S
 - MID/BOTTOM
   - HBM MON APB
 
-Please see the [Shell Floorplan](./shell_floorplan.md) for additional details on Shell-CL interface placements in SMALL_SHELL.
+Please see the [Shell Floorplan](./shell_floorplan.md) for additional details on Shell-CL interface placements in the XDMA Shell and Small Shell.
 
 For the interfaces that are in both the MID/BOTTOM the recommendation is to use flops for pipelining, but don’t constrain to an SLR.
 Constrain logic to a particular SLR by creating PBLOCKs (one per SLR), and assigning logic to the PBLOCKs (refer to cl_dram_hbm_dma example [small_shell_cl_pnr_user.xdc](../cl/examples/cl_dram_hbm_dma/build/constraints/small_shell_cl_pnr_user.xdc)).

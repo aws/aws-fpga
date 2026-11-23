@@ -32,6 +32,7 @@ while getopts ":h" opt; do
   esac
 done
 
+curr_dir=$(pwd)
 install_command=""
 os_info=$(cat /etc/os-release)
 if [[ "${os_info}" == *"Ubuntu"* ]]; then
@@ -50,5 +51,6 @@ unzip -q awscliv2.zip
 sudo ./aws/install
 rm awscliv2.zip
 rm -rf aws
+cd $curr_dir
 
 echo "AWS CLI installed successfully!"

@@ -154,6 +154,11 @@ int fpga_mgmt_clear_local_image_sync(int slot_id,
 
 /**
  * Wrapper for fpga_mgmt_load_local_image_flags, with flags set to 0 as a default
+ * Note: Calling fpga_mgmt_load_local_image will send the command to load the AFI
+ * and return immediately. Poll the status with fpga_mgmt_describe_local_image once
+ * a second immediately after calling fpga_mgmt_load_local_image until the
+ * AFI is loaded and the status is no longer busy. Failure to poll with
+ * fpga_mgmt_describe_local_image could result in the AFI not loading.
  */
 int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
 
@@ -161,7 +166,12 @@ int fpga_mgmt_load_local_image(int slot_id, char *afi_id);
  * Wrapper for fpga_mgmt_load_local_image_with_options, passing the slot_id, afi_id,
  * and flags in the opt structure, with other options set to defaults via
  * fpga_mgmt_init_load_local_image_options
-*/
+ * Note: Calling fpga_mgmt_load_local_image_flags will send the command to load the AFI
+ * and return immediately. Poll the status with fpga_mgmt_describe_local_image once
+ * a second immediately after calling fpga_mgmt_load_local_image_flags until the
+ * AFI is loaded and the status is no longer busy. Failure to poll with
+ * fpga_mgmt_describe_local_image could result in the AFI not loading.
+ */
 int fpga_mgmt_load_local_image_flags(int slot_id, char *afi_id, uint32_t flags);
 
 /*
@@ -187,6 +197,11 @@ int fpga_mgmt_init_load_local_image_options(union fpga_mgmt_load_local_image_opt
 
 /**
  * Asynchronously loads the specified FPGA image to the specified slot number.
+ * Note: Calling fpga_mgmt_load_local_image_with_options will send the command to load the AFI
+ * and return immediately. Poll the status with fpga_mgmt_describe_local_image once
+ * a second immediately after calling fpga_mgmt_load_local_image_with_options until the
+ * AFI is loaded and the status is no longer busy. Failure to poll with
+ * fpga_mgmt_describe_local_image could result in the AFI not loading.
  *
  * @param[in]  opt	See fpga_mgmt_load_local_image_options
  * @returns 0 on success, non-zero on error

@@ -22,8 +22,8 @@
  *    CL_SDE is loaded on the FPGA. The `BusMaster+` on the line starting with `Control:` indicates that bus mastering is
  *    enabled, whereas `BusMaster-` indicates that bus mastering is disabled. To enable bus mastering run
  *    `sudo setpci -s <Device:Bus:Device.Function> 4.w=6`. Note that Device:Bus:Device.Function is the DBDF for your FPGA.
- *    If using pkt_size greater than 4096, hugepages will need to be allocated and free for this example to use. To
- *    allocate a hugepage, run `sudo sysctl -w vm.nr_hugepages=<number_of_pages>`.
+ *    The SDE library maps its write-back rings from 2 MiB hugepages: two per initialized slot, plus one per packet
+ *    buffer when pkt_size is greater than 4096. Reserve them with `sudo sysctl -w vm.nr_hugepages=<number_of_pages>`.
  * 1. Compile the example:
  *    `make sde_h2c_perf_test`
  * 2. Run the example:

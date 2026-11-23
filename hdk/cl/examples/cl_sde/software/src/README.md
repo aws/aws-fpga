@@ -134,9 +134,13 @@ This directory contains example applications demonstrating the usage of the Stre
 
 Note: Device:Bus:Device.Function is for the PF0 function of the FPGA.
 
-3. Configure Hugepages so that 128 are available (for packet sizes > 4096):
+3. Configure Hugepages:
 
 `sudo sysctl -w vm.nr_hugepages=<number_of_pages>`
+
+The SDE library maps its two write-back rings from 2 MiB hugepages, so every initialized slot needs two free
+hugepages. Packet sizes above 4096 bytes need one more hugepage per packet buffer (64 per direction for the
+simple and perf examples), so a loopback example with large packets needs 130.
 
 4. Pinning Examples to a NUMA Node
 
@@ -242,7 +246,7 @@ Each example provides performance metrics:
 
 - Ensure CL_SDE is loaded on the correct FPGA slot
 - Verify bus mastering is enabled
-- Check hugepages allocation for large packet sizes
+- Check that free hugepages are available (`grep HugePages_Free /proc/meminfo`)
 
 ## Software Interactions with the SDE
 

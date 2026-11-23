@@ -36,6 +36,7 @@ Developer AMI to build a runtime AMI with the following tools installed:
 - Runtime utilities for performance optimization
 - Vivado Lab Edition (VLE)
 - The Xilinx Virtual Cable driver (XVC)
+- The XDMA driver, for designs built with the XDMA Shell
 
 Table of Contents
 -----------------
@@ -67,6 +68,7 @@ Table of Contents
   - `Customizing AMI Info <#customizing-ami-info>`__
   - `Selecting Components to Use in the Runtime
     AMI <#selecting-components-to-use-in-the-runtime-ami>`__
+  - `XDMA Driver Installation <#xdma-driver-installation>`__
 
 - `Bootstrapping, Deploying, and Running the Image Builder
   Pipeline <#bootstrapping-deploying-and-running-the-image-builder-pipeline>`__
@@ -104,9 +106,11 @@ this tool, but a basic understanding of these concepts will help:
 - **Deploying** creates the actual Image Builder pipeline and related
   resources
 
-To use the RAB, only three core files need to be edited to create a
-runtime AMI build configuration. After that, only two commands are
-needed to deploy the EC2 Image Builder pipeline.
+To create a runtime AMI build configuration, edit the settings in
+`lib/cdk.jsonc <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/cdk.jsonc>`__ and, if needed, the component list
+in `lib/runtimeAmiBuilder.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/runtimeAmiBuilder.ts>`__. After
+that, only two commands are needed to deploy the EC2 Image Builder
+pipeline.
 
 What Does Using the Runtime AMI Builder Cost?
 ---------------------------------------------
@@ -129,10 +133,12 @@ Running Individual Installation Scripts Locally
 Before cloning the FPGA Developer Kit onto either base AMI, install
 ``git``. After the FPGA Developer Kit is cloned onto the base AMI, the
 installation scripts used by the RAB may be executed individually on the
-base AMI. This is greatly reduces iteration time before setting up an
-EC2 Image Builder pipeline. If all components are being installed via
-local execution of the installer scripts, they must be run in this order
-to satisfy tool and package dependencies:
+base AMI. This greatly reduces iteration time before setting up an EC2
+Image Builder pipeline. Run the scripts from inside the cloned FPGA
+Developer Kit, because they use the repository to locate shared helper
+scripts. If all components are being installed via local execution of
+the installer scripts, they must be run in this order to satisfy tool
+and package dependencies:
 
 1. `install_script_execution_essentials.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_script_execution_essentials.sh>`__
 2. `update_rocky_python.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/update_rocky_python.sh>`__
@@ -140,13 +146,17 @@ to satisfy tool and package dependencies:
 4. `install_f2_runtime_utils.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_f2_runtime_utils.sh>`__
 5. `install_vivado_lab_edition.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_vivado_lab_edition.sh>`__
 6. `install_xilinx_virtual_cable.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_xilinx_virtual_cable.sh>`__
-7. `sdk_setup.sh <https://github.com/aws/aws-fpga/tree/f2/sdk_setup.sh>`__ (must be sourced)
+7. `install_xdma_driver.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_xdma_driver.sh>`__
+   (optional, see `XDMA Driver
+   Installation <#xdma-driver-installation>`__)
+8. `sdk_setup.sh <https://github.com/aws/aws-fpga/tree/f2/sdk_setup.sh>`__ (must be sourced)
 
 Refer to each script to see any necessary flags and arguments.
 
-   install_xilinx_virtual_cable.sh emits an error if ran on a compute
-   instance. If “XVC PCIe driver installation complete!” is emitted when
-   ran, this error can be ignored.
+   install_xilinx_virtual_cable.sh tests the driver on every FPGA in the
+   instance. On an instance without FPGAs, such as the build instance
+   the Runtime AMI Builder uses, it installs the driver and skips the
+   test.
 
 AWS Account IAM Role Setup
 --------------------------
@@ -198,9 +208,24 @@ Configuration and Resource Deployment
 The RAB can be configured via the ``context`` section of
 `lib/cdk.jsonc <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/cdk.jsonc>`__. In this section are all of the
 values that can be adjusted to create a runtime AMI, along with
-descriptions of what they do. These context values also allow
-configuration of the region where the CloudFormation and EC2 Image
-Builder pipeline the CDK creates are deployed.
+descriptions of what they do. These context values also set the AWS
+account and region the CDK deploys the CloudFormation stack and EC2
+Image Builder pipeline to:
+
+- ``ami-builder:deployment-account`` - the AWS account that will own the
+  deployed resources
+- ``ami-builder:deployment-region`` - the region the resources are
+  deployed in
+
+..
+
+   ⚠️ The account IDs shipped in `lib/cdk.jsonc <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/cdk.jsonc>`__
+   (``109876543210`` for ``ami-builder:deployment-account`` and
+   ``012345678901`` for ``ami-builder:sharing-accounts``) are
+   placeholders. Replace them with real account IDs, or set
+   ``ami-builder:sharing-accounts`` to ``[]``, before deploying.
+   Otherwise the runtime AMI will be shared with the placeholder
+   account.
 
    Unless mentioned otherwise, all configuration discussed will take
    place in `lib/cdk.jsonc <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/cdk.jsonc>`__.
@@ -208,14 +233,17 @@ Builder pipeline the CDK creates are deployed.
 Choosing a Base AMI
 ~~~~~~~~~~~~~~~~~~~
 
-Two default base AMIs are available: ``Rocky Linux 8.10`` and
-``Ubuntu 24.04``. The AMI configurations are defined in
-`lib/types.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/types.ts>`__ using their AMI IDs for ``us-east-1``.
-To add and use a different base AMI, modify ``BASE_AMI_CONFIGS`` in
-`lib/types.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/types.ts>`__ to include the new AMI’s ID and
-configuration details. We recommend choosing an AMI without a product
-code attached to it. To find an AMI that without a product code, use the
-following command:
+Two default base AMIs are available: ``ROCKY_8_10`` (Rocky Linux 8.10)
+and ``UBUNTU_24_04`` (Ubuntu 24.04). Select one with
+``ami-builder:base-image``. The AMI configurations are defined in
+`lib/source_amis.json <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/source_amis.json>`__ using their AMI IDs
+for ``us-east-1``. To add and use a different base AMI, add an entry to
+`lib/source_amis.json <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/source_amis.json>`__ with the new AMI’s ID,
+its default login user, and a description, then set
+``ami-builder:base-image`` to the new entry’s name. The new AMI must be
+based on Rocky Linux or Ubuntu. We recommend choosing an AMI without a
+product code attached to it. To find an AMI without a product code, use
+the following command:
 
 .. code-block:: bash
 
@@ -231,50 +259,60 @@ Versioning the Image Recipe
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Image recipe versioning, as the name suggests, provides version control
-over image builder pipelines and components. The image recipe version
-must be incremented between changes to any of the files used by the RAB.
+over image builder pipelines and components. The image recipe version,
+``ami-builder:image-recipe-version``, must be incremented between
+changes to any of the files used by the RAB.
 
 Choosing a Vivado Lab Edition Tool Version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The two default base AMIs are supported by `Vivado Lab Edition
+Set the Vivado Lab Edition version with ``ami-builder:vivado-version``.
+The RAB supports the 2025.1 and later versions listed in
+`supported_vivado_versions.txt <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__
+at the root of the FPGA Developer Kit, currently 2025.1 and 2025.2. The
+two default base AMIs are supported by `Vivado Lab Edition
 2025.2 <https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license/Supported-Operating-Systems>`__.
-Other supported versions will be listed in
-`supported_vivado_lab_edition_versions.txt <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/supported_vivado_lab_edition_versions.txt>`__
-when they are added to the RAB.
 
-If Vivado Lab Edition is not required, remove the
-``installVivadoLabEdition`` component from ``componentConfigs`` in
-`lib/runtimeAmiBuilder.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/runtimeAmiBuilder.ts>`__.
+If Vivado Lab Edition is not required, remove both the
+``installVivadoLabEdition`` and ``installXilinxVirtualCable`` components
+from ``componentConfigs`` in
+`lib/runtimeAmiBuilder.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/runtimeAmiBuilder.ts>`__. The Xilinx
+Virtual Cable driver is installed from Vivado Lab Edition, so its
+component fails without it. Leave ``ami-builder:vivado-version`` set to
+a supported version.
 
 Sizing AMI Storage
 ~~~~~~~~~~~~~~~~~~
 
-Fine-tuning the storage capacity of the runtime AMI is done here. Root
-volume storage sizing provides precise `storage cost
-control <https://aws.amazon.com/s3/pricing/?p=pm&c=s3&z=4>`__.
+Set the runtime AMI’s root volume size in GiB with
+``ami-builder:root-volume-size``. The minimum is 32 GiB. The volume type
+and encryption are set with ``ami-builder:root-volume-type`` and
+``ami-builder:root-volume-encrypted``. Root volume sizing provides
+precise `storage cost control <https://aws.amazon.com/ebs/pricing/>`__.
 
 Auto-Sharing with Other AWS Accounts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Add any AWS accounts to be granted launch permissions for the runtime
-AMI. This does **not** grant the target accounts ownership of it. If no
-other accounts need to be granted launch permissions, set this value to
-``[]``.
+AMI to ``ami-builder:sharing-accounts``. This does **not** grant the
+target accounts ownership of it. If no other accounts need to be granted
+launch permissions, set this value to ``[]``.
 
 Auto-Sharing in Specific Regions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Distribution of the runtime AMI to the regions specified is handled
-automatically as part of the EC2 Image Builder pipeline. This makes the
-runtime AMI available in the specified regions for only the deploying
-account and the accounts granted launch permissions above. If the
-runtime AMI is not needed in regions other than the deployment one, set
-the value to ``[]``.
+Distribution of the runtime AMI to the regions in
+``ami-builder:distribution-regions`` is handled automatically as part of
+the EC2 Image Builder pipeline. Only regions where F2 instances are
+available are accepted. This makes the runtime AMI available in the
+specified regions for only the deploying account and the accounts
+granted launch permissions above. If the runtime AMI is not needed in
+regions other than the deployment one, set the value to ``[]``.
 
 Selecting a Build Instance Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Set the build instance types with ``ami-builder:build-instance-types``.
 The instance type and size chosen will affect the speed of the runtime
 AMI build. `Instance type pricing can be seen
 here <#what-does-using-the-runtime-ami-builder-cost>`__.
@@ -282,8 +320,9 @@ here <#what-does-using-the-runtime-ami-builder-cost>`__.
 Customizing AMI Info
 ~~~~~~~~~~~~~~~~~~~~
 
-The AMI’s name, unique identifier, description, and tags may all be
-configured as well.
+The AMI’s name prefix, unique identifier, description, and tags are set
+with ``ami-builder:name-prefix``, ``ami-builder:unique-identifier``,
+``ami-builder:description``, and ``ami-builder:tags``.
 
    Spaces aren’t allowed in the unique identifier field.
 
@@ -292,7 +331,56 @@ Selecting Components to Use in the Runtime AMI
 
 Edit the ``componentConfigs`` list in
 `lib/runtimeAmiBuilder.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/runtimeAmiBuilder.ts>`__ to choose
-which components will be installed on the runtime AMI.
+which components will be installed on the runtime AMI. By default, every
+component in this guide is included. With the default
+``ami-builder:cl-device-number``, the XDMA component only prepares the
+driver source. See `XDMA Driver
+Installation <#xdma-driver-installation>`__. If the runtime AMI is for a
+design built with the Small Shell, which has no DMA engine, remove the
+``installXdmaDriver`` component.
+
+XDMA Driver Installation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Designs built with the XDMA Shell need the XDMA driver to use the
+shell’s DMA engine. The ``installXdmaDriver`` component runs
+`install_xdma_driver.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_xdma_driver.sh>`__ with the
+device ID set in ``ami-builder:cl-device-number``. The value must be a
+4-digit hex value with the ``0x`` prefix, such as ``"0xf001"``. The
+``cdk synth`` and ``cdk deploy`` commands stop with an error otherwise.
+When running the script directly, pass the device ID with the required
+``-d`` option. See `XDMA Driver Installation
+Instructions <./../../hdk/docs/XDMA-Install.html>`__ for how to find the
+device ID of a CL.
+
+- **Device ID set** (for example ``"0xf001"``): the driver is built,
+  installed, and loaded during the AMI build, and binds to FPGAs running
+  an AFI with that device ID.
+- **Default device ID** (``"0x0000"``): the driver source is prepared in
+  ``~/dma_ip_drivers/XDMA/linux-kernel/xdma/`` on the runtime AMI, but
+  not built. ``cdk synth`` and ``cdk deploy`` print a notice about this.
+  To finish the install on an instance launched from the runtime AMI,
+  run these steps from that directory:
+
+  1. In ``xdma_mod.c``, change the entry
+     ``{ PCI_DEVICE(0x1d0f, 0x0000), },`` to use the CL’s device ID, for
+     example ``{ PCI_DEVICE(0x1d0f, 0xf001), },``
+  2. Run ``sudo make clean``
+  3. Run ``sudo make install``
+  4. Run ``sudo modprobe xdma``
+
+The driver is built for the kernel of the build instance. If an instance
+launched from the runtime AMI runs a different kernel, for example after
+a kernel update, rebuild the driver as described in the `XDMA Driver
+Installation Instructions <./../../hdk/docs/XDMA-Install.html>`__. On
+Rocky Linux, the build updates the installed packages before it builds
+the driver, which can install a newer kernel than the one the driver is
+built for. If ``modinfo -n xdma`` reports ``Module xdma not found`` on
+an instance launched from the AMI, rebuild the driver on that instance.
+
+   The XDMA and XRT ``xocl`` drivers cannot be installed on the same
+   instance. Don’t add components that install XRT to a runtime AMI that
+   uses the XDMA driver.
 
 Bootstrapping, Deploying, and Running the Image Builder Pipeline
 ----------------------------------------------------------------
@@ -351,32 +439,33 @@ granted as expected:
 
 .. code-block:: yaml
 
-     MyRuntimeAmiDistributionConfig:
+     F2RuntimeAMIDistributionConfig:
        Type: AWS::ImageBuilder::DistributionConfiguration
        Properties:
          Distributions:
            - AmiDistributionConfiguration:
-               name: f2-runtime-ami-{{imagebuilder:buildDate}}
-               description: F2 FPGA Runtime AMI - {{imagebuilder:buildDate}}
-               amiTags:
+               Name: f2-runtime-ami-{{imagebuilder:buildDate}}
+               Description: F2 FPGA Runtime AMI - {{imagebuilder:buildDate}}
+               AmiTags:
                  Project: AWS-FPGA-F2
                  Environment: Production
                  ManagedBy: ImageBuilder
-               launchPermissionConfiguration:
-                 userIds:
+               LaunchPermissionConfiguration:
+                 UserIds:
                    - "012345678901"
              Region: us-east-1
            - AmiDistributionConfiguration:
-               name: f2-runtime-ami-{{imagebuilder:buildDate}}
-               description: F2 FPGA Runtime AMI - {{imagebuilder:buildDate}}
-               amiTags:
+               Name: f2-runtime-ami-{{imagebuilder:buildDate}}
+               Description: F2 FPGA Runtime AMI - {{imagebuilder:buildDate}}
+               AmiTags:
                  Project: AWS-FPGA-F2
                  Environment: Production
                  ManagedBy: ImageBuilder
-               launchPermissionConfiguration:
-                 userIds:
+               LaunchPermissionConfiguration:
+                 UserIds:
                    - "012345678901"
              Region: us-west-2
+         Name: F2RuntimeAMIDistributionConfig
 
 Here, the AMI is being shared with the AWS account ``012345678901`` and
 is also being distributed to regions ``us-east-1`` and ``us-west-2``.

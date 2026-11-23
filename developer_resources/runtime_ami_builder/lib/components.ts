@@ -9,7 +9,11 @@ const getHomeDir = (user: string): string => {
 };
 
 const returnToScriptsDirCmd = (user: string): string => {
-  return `cd ${getHomeDir(user)}/aws-fpga/developer_resources/runtime_ami_builder/scripts`;
+  return `cd ${locateAwsFpgaRepo(user)}/developer_resources/runtime_ami_builder/scripts`;
+};
+
+const locateAwsFpgaRepo = (user: string) => {
+  return `"$(find ${getHomeDir(user)} -type d -not -path "*.git*" -name "aws-fpga*" -print -quit)"`;
 };
 
 const getPkgManager = (user: string): string => {
@@ -38,7 +42,7 @@ export const COMPONENTS = {
       `cd $HOME`,
       `git config --system --add safe.directory $HOME`,
       `git clone https://github.com/aws/aws-fpga`,
-      `git config --system --add safe.directory $HOME/aws-fpga`,
+      `git config --system --add safe.directory ${locateAwsFpgaRepo(user)}`,
       `echo "Basic utilities installed and FPGA Developer Kit cloned!"`,
       `echo "Proceeding to build the AMI!"`
     ]
@@ -83,7 +87,7 @@ export const COMPONENTS = {
     name: "InstallAwsFpgaSdk",
     header: "Installing AWS FPGA SDK",
     cmds: [
-      `cd ${getHomeDir(user)}/aws-fpga`,
+      `cd ${locateAwsFpgaRepo(user)}`,
       `. sdk_setup.sh`
     ]
   }),
@@ -113,6 +117,16 @@ export const COMPONENTS = {
       returnToScriptsDirCmd(user),
       `export HOME=${getHomeDir(user)}`,
       `. install_xilinx_virtual_cable.sh -v ${toolVersion}`
+    ]
+  }),
+
+  installXdmaDriver: (user: string, deviceNumber: string): ComponentDefn => ({
+    name: "InstallXdmaDriver",
+    header: "Installing XDMA Driver",
+    cmds: [
+      `export HOME=${getHomeDir(user)}`,
+      returnToScriptsDirCmd(user),
+      `. install_xdma_driver.sh -d ${deviceNumber}`
     ]
   }),
 

@@ -73,13 +73,19 @@ The software is provided as part of the [Virtual Ethernet Application](../../../
 
 ## Metadata
 
-The following table displays information about the CL that is required to register it as an AFI with AWS. Alternatively, you can directly use a pre-generated AFI for this CL.
+Use the following values to register this CL as an AFI. To skip the build, load the pre-built public AFI below instead.
 
-| Key   | Value     |
-|-----------|------|
-| Shell Version | 0x10212415 |
+| Key | Value |
+|-----|-------|
 | PCI Device ID | 0xF002 |
 | PCI Vendor ID | 0x1D0F (Amazon) |
 | PCI Subsystem ID | 0x1D51 |
 | PCI Subsystem Vendor ID | 0xFEDC |
-| Pre-generated AGFI ID | agfi-0925b211f5a81b071 |
+
+### Pre-built AFI
+
+| Shell | Shell Version | AGFI ID |
+|-------|---------------|---------|
+| Small Shell | 0x10212415 | agfi-0925b211f5a81b071 |
+
+This AFI is public in us-east-1 only. Launch your F2 instance in us-east-1 and load it with `sudo fpga-load-local-image -S 0 -I agfi-0925b211f5a81b071`.

@@ -9,6 +9,7 @@
   - [Software](#software)
   - [Build](#build)
 - [CL Template Quick Start Guide](#cl_template-quick-start-guide)
+- [Metadata](#metadata)
 
 ## Overview
 
@@ -268,3 +269,16 @@ The build will create 4 new subdirectories under [./build/](./build/):
 Builds with timing violations will have a suffix of `_VIOLATED` under the `checkpoints` directory. Details can be found under the `reports` directory.
 
 After a successful build, you can follow the AFI creation, loading, and testing instructions in the [HDK design flow](./../../../README.md#build-accelerator-afi-using-hdk-design-flow).
+
+## Metadata
+
+Use the following values to register this CL as an AFI.
+
+| Key | Value |
+|-----|-------|
+| PCI Device ID | 0xF010 |
+| PCI Vendor ID | 0x1D0F (Amazon) |
+| PCI Subsystem ID | 0x1D51 |
+| PCI Subsystem Vendor ID | 0xFEDC |
+
+This example is a starting point for your own design, so no pre-built AFI is provided. Build it with the steps above.
